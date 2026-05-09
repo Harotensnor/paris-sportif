@@ -18150,11 +18150,14 @@ return kept.concat(overflow);
 };
 const v37SortedDiverse = v37ApplyTopMatchDiversity(v37ApplyTopMarketDiversity(v36Sorted));
 const v37MatchKeyForPick = (p) => v37StableMatchKey(p?.m);
+// v46.2 — Counts désormais 1 par match (dedupe v46.1 garantit 1 ligne / match).
+// Avant : count basé sur v37SortedDiverse pre-dedup → "+1 autre pick" affiché
+// même quand 1 seul pick visible → confusion user.
 const v37VisibleMatchCounts = (() => {
 const counts = new Map();
 v37SortedDiverse.forEach(p => {
 const key = v37MatchKeyForPick(p);
-counts.set(key, (counts.get(key) || 0) + 1);
+counts.set(key, 1); // FORCE 1 to prevent "+N autre pick" badge after dedup
 });
 return counts;
 })();
@@ -18820,13 +18823,47 @@ if (reasons.length) return reasons.join(' · ');
 const variance = p.pred?.ensemble?.agreement_variance == null ? 'n/a' : String(p.pred.ensemble.agreement_variance);
 return `EV ${(p.ev * 100).toFixed(1)}% · variance ensemble ${variance} · marché ${p.market}`;
 };
+// AUDIT 2026-05-09 v46.2 — Lecture simple personnalisée par pick.
+// User : "lecture simple répétée mot pour mot sur tous les picks → template".
+// Maintenant on inclut : conf %, edge pt, segment, cote, et un message
+// adapté à la stratégie matching (Outsider / Value / Flat / Sharp).
 const v37BeginnerPickText = (p, oddMeta) => {
-const status = String(oddMeta?.status || 'missing');
-if (!['verified', 'changed'].includes(status)) return `Lis-le comme une alerte : la cote n'est pas sûre (${v38OddStatusMeta(status).label.toLowerCase()}). Ne le mets pas dans tes priorités avant vérification Winamax.`;
-if (p.opportunity >= 75) return 'Lecture simple : le modèle aime ce pari et la cote Winamax est retrouvée. Candidat sérieux, mise raisonnable.';
-if (p.opportunity >= 60) return 'Lecture simple : pari jouable, mais pas automatique. La cote semble correcte, garde une mise prudente.';
-if (p.edge >= 0.04) return 'Lecture simple : il y a de la value, mais le risque reste plus haut. À jouer petit ou à surveiller.';
-return 'Lecture simple : avantage faible ou données incomplètes. À lire pour info, pas une priorité.';
+  const status = String(oddMeta?.status || 'missing');
+  if (!['verified', 'changed'].includes(status)) {
+    return `⚠ Cote non sûre (${v38OddStatusMeta(status).label.toLowerCase()}). À vérifier sur Winamax avant de parier.`;
+  }
+  const odd = Number(p.odd || 0);
+  const rel = Number(p.rel || 0);
+  const edge = Number(p.edge || 0);
+  const opp = Number(p.opportunity || 0);
+  const trust = (typeof window._v37PickSegmentTrust === 'function') ? window._v37PickSegmentTrust(p.m, p.best || p) : null;
+  const trustRoi = Number(trust?.roi_pct || 0);
+  // Strategy classification
+  let strategy = 'standard';
+  if (odd >= 5 && edge >= 0.05) strategy = 'outsider';
+  else if (edge >= 0.05) strategy = 'value';
+  else if (opp >= 60) strategy = 'lock';
+  // Build personalised text
+  const confPct = Math.round(rel * 100);
+  const edgePt = (edge * 100).toFixed(1);
+  const oddTxt = odd.toFixed(2);
+  const seg = (trust && Math.abs(trustRoi) > 1) ? ` Segment hist ${trustRoi >= 0 ? '+' : ''}${trustRoi.toFixed(1)}%.` : '';
+  if (strategy === 'outsider') {
+    return `💎 Outsider : cote ${oddTxt} avec ${confPct}% chances modèle (edge +${edgePt}pt). Stratégie +121% ROI prouvée — gros gain potentiel.${seg}`;
+  }
+  if (strategy === 'value') {
+    return `🎯 Value : ${confPct}% chances vs cote ${oddTxt} = edge +${edgePt}pt. Stratégie +33% ROI prouvée long terme.${seg}`;
+  }
+  if (strategy === 'lock') {
+    return `🔒 Lock : pari de conviction (${confPct}% modèle, opp score ${Math.round(opp)}). Cote serrée ${oddTxt} mais edge solide.${seg}`;
+  }
+  if (edge >= 0.03) {
+    return `📊 Edge modéré : +${edgePt}pt à cote ${oddTxt} (${confPct}% chances). Mise petite recommandée.${seg}`;
+  }
+  if (edge >= 0) {
+    return `Avantage limité (+${edgePt}pt) à cote ${oddTxt}. À surveiller, pas une priorité.${seg}`;
+  }
+  return `Edge faible ou données partielles. Cote ${oddTxt} à ${confPct}% chances. À lire pour info.${seg}`;
 };
 // AUDIT 2026-05-09 v43 — Stratégie redesign basée sur backtest_strategies.json
 // (1932 picks settled). Leaderboard prouvé statistiquement :
@@ -18966,9 +19003,18 @@ const _v39FinalRec = (p) => {
     const seg = (trustTier === 'low' || trustTier === 'warn') ? ` ⚠ segment ${trustRoiPct.toFixed(1)}%` : '';
     return { verdict: 'bet', label: 'Miser (Value 🎯)', score: Math.max(70, opp), tone: 'green', reason: `Value rentable historiquement (+33% ROI sur 1251 paris) · Conf ${(rel*100).toFixed(0)}% · Edge ${fmtPct(edge)}${seg}` };
   }
-  // v46.1 — Veto durci : retour -10%/n30 (user constate Chinese League -16.6%
-  // segment + pick recommandé "Petite mise" = incohérent). Mieux vaut skip
-  // sur sample assez gros que recommander un perdant historique.
+  // v46.2 — NET EDGE veto : edge brut MINUS segment ROI négatif < +1pt → skip.
+  // User feedback : "edge +3.2pt - segment -3.8% = -0.6pt net mais pick
+  // recommandé". Maintenant on calcule le NET espéré et on skip si négatif.
+  if (trustTier === 'low' && trustN >= 30) {
+    const edgePt = edge * 100;
+    const segmentPt = trustRoiPct;  // déjà en %
+    const netEdgePt = edgePt + segmentPt; // segment négatif → net réduit
+    if (netEdgePt < 1) {
+      return { verdict: 'skip', label: 'À éviter (net ⚠)', score: Math.min(30, opp), tone: 'red', reason: `Edge brut +${edgePt.toFixed(1)}pt - segment ${segmentPt.toFixed(1)}% = net ${netEdgePt >= 0 ? '+' : ''}${netEdgePt.toFixed(1)}pt (insuffisant)` };
+    }
+  }
+  // v46.1 — Veto durci : retour -10%/n30 (Chinese League etc.).
   const segmentSeverelyBad = trustTier === 'low' && trustRoiPct < -10 && trustN >= 30;
   if (segmentSeverelyBad) {
     return { verdict: 'skip', label: 'À éviter', score: Math.min(35, opp), tone: 'red', reason: `Historique segment ${trustRoiPct.toFixed(1)}% sur ${trustN} paris (très défavorable)` };
@@ -24921,6 +24967,31 @@ weekday: 'short', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-di
 const statusLabel = p.settled ? 'Terminé' : p.startedAndNotSettled ? 'En cours' : 'À venir';
 const statusColor = p.settled ? 'var(--text-dim2)' : p.startedAndNotSettled ? '#f87171' : 'var(--accent)';
 const winamaxLabel = p.winamax ? 'Winamax exact' : 'Source externe';
+// AUDIT 2026-05-09 v46.2 — Finis : afficher score + résultat verdict.
+// User feedback : "Page Finis pas de résultats visibles".
+const v46FinishedHtml = (() => {
+  if (!p.settled) return '';
+  // Extract score from competitors
+  let scoreH = null, scoreA = null;
+  try {
+    const competitors = p.m && p.m.competitors;
+    if (Array.isArray(competitors)) {
+      const home = competitors.find(c => c && c.home_away === 'home');
+      const away = competitors.find(c => c && c.home_away === 'away');
+      if (home && home.score !== null && home.score !== undefined) scoreH = home.score;
+      if (away && away.score !== null && away.score !== undefined) scoreA = away.score;
+    }
+  } catch (e) {}
+  const scoreHtml = (scoreH !== null && scoreA !== null)
+    ? `<span style="display:inline-flex;align-items:center;padding:3px 8px;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:6px;font-size:12px;font-weight:900;color:var(--text);font-variant-numeric:tabular-nums;">${esc(String(scoreH))} - ${esc(String(scoreA))}</span>`
+    : '';
+  const r = p.res;
+  const resBadge = r === 'won' ? `<span style="padding:3px 8px;border-radius:999px;background:rgba(16,185,129,.18);border:1px solid #10b981;color:#10b981;font-size:10.5px;font-weight:900;">✓ Gagné</span>`
+    : r === 'lost' ? `<span style="padding:3px 8px;border-radius:999px;background:rgba(239,68,68,.18);border:1px solid #ef4444;color:#ef4444;font-size:10.5px;font-weight:900;">✗ Perdu</span>`
+    : r === 'void' ? `<span style="padding:3px 8px;border-radius:999px;background:rgba(148,163,184,.18);border:1px solid var(--text-dim);color:var(--text-dim);font-size:10.5px;font-weight:900;">⊘ Remboursé</span>`
+    : '';
+  return scoreHtml || resBadge ? `<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">${scoreHtml}${resBadge}</div>` : '';
+})();
 const wx1n2 = (p.m.winamax && p.m.winamax.markets && p.m.winamax.markets['1n2']) || null;
 const fmtOddChip = (v) => {
 const n = Number(v);
@@ -24949,6 +25020,7 @@ return `<div class="tous-row tous-row--coverage" data-match-id="${esc(rowId)}" d
           <div style="margin-top:3px;font-size:11.5px;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(league || 'Compétition à confirmer')}</div>
         </div>
         <div style="display:flex;align-items:center;justify-content:${tousMobile ? 'flex-start' : 'flex-end'};gap:8px;flex-wrap:wrap;">
+          ${v46FinishedHtml}
           ${oneNtwoOddsHtml}
           <span style="padding:4px 9px;border-radius:999px;background:${p.winamax ? 'rgba(167,139,250,.14)' : 'rgba(148,163,184,.12)'};border:1px solid ${p.winamax ? 'rgba(167,139,250,.28)' : 'var(--border)'};color:${p.winamax ? 'var(--brand)' : 'var(--text-dim)'};font-size:10.5px;font-weight:850;">${esc(winamaxLabel)}</span>
           <span style="font-size:11px;color:var(--text-dim2);">Détail →</span>
