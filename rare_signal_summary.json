@@ -1,26 +1,26 @@
 {
-  "generated_at": "2026-05-09T15:08:14Z",
+  "generated_at": "2026-05-09T15:15:46Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 81,
+    "active_events": 80,
     "actionable": 38,
     "watch": 1,
-    "risk": 42,
+    "risk": 41,
     "expired_sample": 0,
     "by_type": {
-      "weather_extreme": 1,
       "injury_imbalance": 29,
       "travel_extreme": 12,
       "back_to_back_travel": 31,
-      "market_uncertain": 39,
+      "market_uncertain": 38,
+      "market_move": 1,
       "signal_conflict": 8
     },
     "by_quality": {
       "actionable": 38,
       "watch": 1,
-      "risk": 42
+      "risk": 41
     }
   },
   "active_actionable": [
@@ -349,6 +349,24 @@
       "context": "Absences severes 6-12"
     },
     {
+      "event_id": "401867714",
+      "date": "2026-05-12T18:45Z",
+      "sport": "football",
+      "league_code": "scottishpremiership",
+      "league_name": "Scottish Premiership",
+      "home": "Dundee United",
+      "away": "Livingston",
+      "match": "Dundee United - Livingston",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "away",
+      "strength": 1.0,
+      "context": "Cote away: 7.00 -> 13.00 (-85.7%)"
+    },
+    {
       "event_id": "401815273",
       "date": "2026-05-09T20:10Z",
       "sport": "baseball",
@@ -491,24 +509,6 @@
       "side": "away",
       "strength": 0.827,
       "context": "1 match dans les 48h + 1487 km de voyage"
-    },
-    {
-      "event_id": "401864044",
-      "date": "2026-05-09T15:00Z",
-      "sport": "football",
-      "league_code": "bundesligaautriche",
-      "league_name": "Bundesliga Autriche",
-      "home": "Grazer AK",
-      "away": "SC Rheindorf Altach",
-      "match": "Grazer AK - SC Rheindorf Altach",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "weather_extreme",
-      "direction": "under_goals",
-      "team": null,
-      "side": null,
-      "strength": 0.825,
-      "context": "Meteo dure: vent 16 km/h, pluie 16.5 mm"
     },
     {
       "event_id": "401815287",
@@ -782,7 +782,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.0%"
+      "context": "marge bookmaker anormale 19.0%"
     },
     {
       "event_id": "401842707",
@@ -890,7 +890,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.0%"
+      "context": "marge bookmaker anormale 19.0%"
     },
     {
       "event_id": "401866576",
@@ -909,24 +909,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.0%"
-    },
-    {
-      "event_id": "746665",
-      "date": "2026-05-13T17:00Z",
-      "sport": "football",
-      "league_code": "fra.1",
-      "league_name": "Ligue 1",
-      "home": "Brest",
-      "away": "Strasbourg",
-      "match": "Brest - Strasbourg",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.3%"
     },
     {
       "event_id": "401867716",
@@ -998,7 +980,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.0%"
+      "context": "marge bookmaker anormale 19.0%"
     },
     {
       "event_id": "401871157",
@@ -1070,7 +1052,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.0%"
+      "context": "marge bookmaker anormale 19.0%"
     },
     {
       "event_id": "401867719",
@@ -1196,7 +1178,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.7%"
+      "context": "marge bookmaker anormale 19.0%"
     },
     {
       "event_id": "747020",
@@ -1214,7 +1196,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 19.2%"
+      "context": "marge bookmaker anormale 18.8%"
     },
     {
       "event_id": "747018",
@@ -1232,7 +1214,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.6%"
+      "context": "marge bookmaker anormale 18.7%"
     },
     {
       "event_id": "747023",
