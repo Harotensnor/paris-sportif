@@ -19424,7 +19424,11 @@ keys.add(v37PickRowKey(candidate));
 }
 return out;
 };
-const v37RenderPool = v37SortedDiverse.length ? v37SortedDiverse.concat(v37DataOnlyPool) : v37DataOnlyPool;
+// v54.8 — L'accueil ne doit afficher que des pronos réellement jouables.
+// Les lignes data-only / non confirmées restent utiles pour l'audit et la
+// page Tous, mais elles ne doivent plus remplir le dashboard comme si c'était
+// une reco. C'est ce qui créait "0 prono détecté" + 30 lignes à vérifier.
+const v37RenderPool = v37SortedDiverse.length ? v37SortedDiverse : [];
 // AUDIT 2026-05-08 v40.11 — Mode strict : seuls les picks misables.
 // User : "je veux voir que des prono sur lesquels je peux misé".
 // On garde uniquement verdict 'bet' (Miser) ou 'bet-light' (Petite mise).
@@ -19501,9 +19505,10 @@ const _v45GeniusFilter = (p) => {
   // étaient bloqués alors qu'ils ont edge +17pt. Mathématiquement EV+
   // reste solide tant que edge ≥ 5pt).
   if (odd < 1.30 || odd > 8.0) return false;
-  // v53.1 — cote eligible uniquement si verified/changed (drift OK).
-  const oddMeta = p.oddValidation;
-  if (oddMeta && oddMeta.status === 'suspicious') return false;
+  // Cote eligible uniquement si verified/changed exploitable. Jamais de
+  // "Genius" sur cote indicative, missing, stale ou suspicious.
+  const oddMeta = p.oddValidation || (typeof validatePickOdd === 'function' ? validatePickOdd(p.m, p.best || p, p.pred) : null);
+  if (oddMeta && typeof v38OddTopEligible === 'function' && !v38OddTopEligible(oddMeta)) return false;
   // Match dans 24h prochaines (pas de matchs trop loin)
   const ko = p.ts || (p.m && p.m.date ? new Date(p.m.date).getTime() : 0);
   const now = Date.now();
@@ -19547,25 +19552,7 @@ const v45GeniusBannerHtml = (() => {
   try {
     const _bk = parseFloat(localStorage.getItem('userBankroll')) || 100;
     const _u = (typeof window._v45FlatStake === 'function') ? window._v45FlatStake(_bk) : Math.max(1, Math.round(_bk * 0.01));
-    if (!v45GeniusPicks.length) {
-      return `<section class="v37-empty-pool-help" style="background:linear-gradient(135deg,rgba(168,85,247,.08),transparent);border:1px solid rgba(168,85,247,.4);">
-        <strong style="display:flex;align-items:center;gap:8px;font-size:14px;">
-          <span style="font-size:18px;">🧠</span>
-          Genius Mode · TOP 3 picks du jour
-          <span style="display:inline-flex;align-items:center;padding:2px 8px;background:rgba(168,85,247,.2);border:1px solid rgba(168,85,247,.5);border-radius:999px;font-size:11px;font-weight:800;color:#a855f7;">strict criteria</span>
-        </strong>
-        <div style="font-size:13px;line-height:1.6;color:var(--text-dim);margin-top:10px;">
-          <b style="color:var(--text);">Aucun pick "Genius" qualifié aujourd'hui.</b> Le modèle est conservateur — c'est OK,
-          un jour sans pari fiable est mieux qu'un pari forcé. Critères stricts :
-          edge ≥ 12pt OU net edge ≥ 5pt (segment-aware) + conf ≥ 55% + cote 1.30-8.0 + match &lt; 30h.
-        </div>
-        <div style="margin-top:10px;padding:8px 10px;background:rgba(15,15,20,.4);border-radius:6px;font-size:11px;color:var(--text-dim2);line-height:1.5;">
-          ⚠ <b>Honnêteté</b> : aucun pari n'est "garanti gagnant". L'objectif est <b>+EV long terme</b>
-          (chaque pari a une espérance positive). Sur 100 paris à edge +7pt, ROI espéré ≈ +5 à +10%.
-          Variance court terme = inévitable.
-        </div>
-      </section>`;
-    }
+    if (!v45GeniusPicks.length) return '';
     const cards = v45GeniusPicks.map((p, idx) => {
       const odd = Number(p.odd || 0);
       const rel = Number(p.rel || 0);
@@ -19651,7 +19638,8 @@ const v37DisplayTotal = v36TableRows.length;
 const v37QualifiedMatchCount = new Set(v36PickPool.map(p => v37MatchKeyForPick(p))).size;
 const v37ScopeMatchDenominator = v37InitialScanPoolLength || v37ScanPool.length || terminalScanPool.length;
 const v37QualificationRate = v37ScopeMatchDenominator ? Math.round((v37QualifiedMatchCount / v37ScopeMatchDenominator) * 100) : 0;
-const v36CoverageLine = `${v37DisplayTotal} lignes visibles · ${v37QualifiedMatchCount}/${v37ScopeMatchDenominator} matchs du scope avec pick (${v37QualificationRate}%) · ${v36PickPool.length} picks qualifies · ${v37DataOnlyPool.length} lignes data · ${v36UpcomingAll.length} a venir · ${v37LiveAll.length} live · ${v37FinishedAll.length} termines · data ${_dataAgeMin} min`;
+const v37WatchOnlyCount = Math.max(0, v37DataOnlyPool.length);
+const v36CoverageLine = `${v37DisplayTotal} lignes visibles · ${v37QualifiedMatchCount}/${v37ScopeMatchDenominator} matchs du scope avec pick (${v37QualificationRate}%) · ${v36PickPool.length} picks qualifiés · ${v37WatchOnlyCount} en veille non actionnable · ${v36UpcomingAll.length} à venir · ${v37LiveAll.length} live · ${v37FinishedAll.length} terminés · data ${_dataAgeMin} min`;
 const v37CountBy = (rows, keyFn, limit) => Object.entries((rows || []).reduce((acc, row) => {
 const key = keyFn(row) || 'inconnu';
 acc[key] = (acc[key] || 0) + 1;
@@ -19800,14 +19788,14 @@ const v37DebugPanelHtml = v37DebugOn ? `<section class="v37-debug-panel" data-v3
 // Affiche uniquement quand 0 misables (vrai cas dégénéré). Si ≥1 misable,
 // la bannière 💎 v40.8 et le compteur "X misables" suffisent.
 const _v42HasMisables = (typeof v40BettableCount === 'number' && v40BettableCount > 0);
-const v37EmptyPoolHelpHtml = (!v36PickPool.length && terminalScanPool.length > 10 && !_v42HasMisables) ? `<section class="v37-empty-pool-help">
-        <strong>Mode secours actif : le tableau ne reste jamais vide.</strong>
-        <span>${terminalScanPool.length} matchs sont disponibles. ${v37DataOnlyPool.length ? `${v37DataOnlyPool.length} matchs data-only sont affiches avec cote a verifier.` : 'La liste complete reste accessible dans Tous.'}</span>
-        <button type="button" class="page-btn" data-page="tous">Voir tous les matchs</button>
+const v37EmptyPoolHelpHtml = (!v36PickPool.length && terminalScanPool.length > 10 && !_v42HasMisables) ? `<section class="v37-empty-pool-help is-info">
+        <strong>Aucun pari jouable sur ce filtre.</strong>
+        <span>${terminalScanPool.length} matchs restent en veille, mais les cotes ne sont pas assez confirmées pour l'accueil. Les lignes non actionnables sont déplacées dans Tous.</span>
+        <button type="button" class="page-btn" data-page="tous">Ouvrir la veille complète</button>
       </section>` : '';
 const v37DenseFallbackHtml = (v36PickPool.length > 0 && v37DataOnlyPool.length > 0) ? `<section class="v37-empty-pool-help is-info">
-        <strong>Tableau complété en lecture prudente</strong>
-        <span>${v36PickPool.length} picks qualifiés seulement sur ce scope ; ${v37DataOnlyPool.length} matchs data fiables ont été ajoutés pour atteindre une lecture exploitable. Les lignes "data fiable" restent à vérifier chez Winamax.</span>
+        <strong>Veille non actionnable masquée</strong>
+        <span>${v36PickPool.length} picks qualifiés seulement sur ce scope ; ${v37DataOnlyPool.length} lignes à cote non confirmée sont gardées hors accueil. Vérifie-les dans Tous si tu veux auditer la couverture.</span>
       </section>` : '';
 // v47.3 — v40MultiDayOutsiders scanner + v40OutsiderListHtml retirés (étaient
 // utilisés exclusivement par v43StrategyBannerHtml retiré v47.2).
@@ -20456,7 +20444,7 @@ const v36TableHtml = `<section class="v36-table-panel" aria-label="Tableau dense
         <header class="v36-table-toolbar">
           <div>
             <strong>${v36TableRows.length} lignes · ${esc(v37ScopeLabel)}</strong>
-            <span>${v36PickPool.length} pick${v36PickPool.length > 1 ? 's' : ''}${v37DataOnlyPool.length ? ` + ${v37DataOnlyPool.length} data fiable` : ''} · ${v40BettableCount} <b style="color:#34d399;">misable${v40BettableCount > 1 ? 's' : ''}</b>${v40HiddenCount > 0 ? ` · <button type="button" data-v40-toggle-strict style="background:none;border:1px solid var(--text-dim);color:var(--text-dim);padding:2px 8px;border-radius:6px;font-size:11px;cursor:pointer;">${v40StrictApplied ? `+${v40HiddenCount} cachés` : `cacher ${v40HiddenCount}`}</button>` : ''}</span>
+            <span>${v36PickPool.length} pick${v36PickPool.length > 1 ? 's' : ''}${v37WatchOnlyCount ? ` · ${v37WatchOnlyCount} en veille` : ''} · ${v40BettableCount} <b style="color:#34d399;">misable${v40BettableCount > 1 ? 's' : ''}</b>${v40HiddenCount > 0 ? ` · <button type="button" data-v40-toggle-strict style="background:none;border:1px solid var(--text-dim);color:var(--text-dim);padding:2px 8px;border-radius:6px;font-size:11px;cursor:pointer;">${v40StrictApplied ? `+${v40HiddenCount} cachés` : `cacher ${v40HiddenCount}`}</button>` : ''}</span>
           </div>
           <label class="v36-table-search"><span>Search</span><input type="search" data-v36-search value="${esc(v36Search)}" placeholder="Équipe, ligue, marché"></label>
           ${/* v46.0 — v37BlindToggle + v37TrackFirstButton retirés (redondants
