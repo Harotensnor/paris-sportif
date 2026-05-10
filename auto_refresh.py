@@ -179,6 +179,7 @@ PATCH_STAGES = [
     ('audit_mcp_shadow_copy.py',     1,   15),
     ('test_mcp_smoke.py',            1,   30),
     ('build_picks_history.py',      1,   30),
+    ('build_history_compact.py',    1,   30),
     ('build_team_priors.py',        1,   30),
     ('build_bayesian_priors_v5.py', 1,   30),
     ('build_stacking_meta_v5.py',   1,   30),
@@ -252,6 +253,7 @@ PATCH_STAGES = [
     ('finalize_inline.py',          1,   15),
     ('check_pipeline_health.py',    1,   15),
     ('check_pipeline_freshness.py', 1,   15),
+    ('check_winamax_markets_attached.py', 1, 15),
     ('audit_bundle_size.py',        1,   15),
     # v35.92 — No-op sans DISCORD_WEBHOOK_URL ; garde le drift CI/local aligné.
     ('notify_discord.py',           1,   20),

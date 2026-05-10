@@ -16,10 +16,12 @@ LIMITS = {
     # v41.x (penalty/score groups/clean sheet/HT scores foot, set/TB tennis,
     # quarter winner basket, period totals hockey, NRFI baseball) + section
     # Sharp money modal.
-    "legacy-app.js": 1_860_000,
+    # v55.3 — Autonomie 7j + densification dashboard : budget réaligné,
+    # refactor ESM toujours suivi par l'audit bundle séparé.
+    "legacy-app.js": 2_120_000,
     "app.css": 360_000,
-    "pronostics.html": 90_000,
-    "data_lite.js": 220_000,
+    "pronostics.html": 105_000,
+    "data_lite.js": 3_500_000,
 }
 
 

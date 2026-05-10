@@ -60,6 +60,9 @@ jobs:
     name: qa ${{ matrix.os }} py${{ matrix.python-version }} node${{ matrix.node-version }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 10
+    defaults:
+      run:
+        shell: bash
     strategy:
       fail-fast: false
       matrix:

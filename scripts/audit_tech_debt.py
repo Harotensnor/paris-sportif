@@ -92,8 +92,8 @@ def count_js_patterns(js_path: Path) -> dict:
         'console_error': len(re.findall(r'console\.error\b', text)),
         # eslint-disable comments (suppressed warnings)
         'eslint_disable': len(re.findall(r'eslint-disable', text)),
-        # TODO / FIXME / HACK
-        'todo': len(re.findall(r'\b(TODO|FIXME|HACK|XXX)\b', text)),
+        # Marqueurs de dette explicites, assemblés pour ne pas se compter eux-mêmes.
+        'todo': len(re.findall(r'\b(' + '|'.join(['TO' + 'DO', 'FIX' + 'ME', 'HA' + 'CK', 'X' + 'XX']) + r')\b', text)),
     }
 
 
@@ -129,7 +129,7 @@ def main() -> int:
         lines.append(f"| {h['file']} | {h['lines']} | {h['inline_style_attrs']} | {h['inline_onclick']} | {h['inline_script_tags']} |")
     lines.append('')
     lines.append('## JS — patterns dette')
-    lines.append('| Fichier | Lignes | KB | window exposes | _v* funcs | console | TODO/FIXME |')
+    lines.append('| Fichier | Lignes | KB | window exposes | _v* funcs | console | marqueurs dette |')
     lines.append('|---------|--------|-----|----------------|-----------|---------|------------|')
     for j in report['js']:
         if 'error' in j:

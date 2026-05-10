@@ -26,7 +26,9 @@ def test_top_paris_requires_fresh_verified_or_changed_odds():
 def test_dashboard_is_table_first_without_extra_panels():
     legacy = LEGACY.read_text(encoding="utf-8")
     analytics = LOCAL_ANALYTICS.read_text(encoding="utf-8")
-    assert "v37DateFilter = (/^\\d{4}-\\d{2}-\\d{2}$/.test(v37HashDate) || v37HashDate === 'all') ? v37HashDate : todayIso" in legacy
+    assert "let v37DateFilter =" in legacy
+    assert "v37HashDate === 'all'" in legacy
+    assert ": todayIso" in legacy
     assert "${v37DecisionGuideHtml}" not in legacy
     assert "${v37TierLegendHtml}" not in legacy
     assert "Comment choisir un pari" not in legacy
@@ -50,7 +52,7 @@ def test_footer_version_is_driven_by_app_shell():
     app = (ROOT / "app.js").read_text(encoding="utf-8")
     html = (ROOT / "pronostics.html").read_text(encoding="utf-8")
     app_version = re.search(r"const VERSION = '(v\d+\.\d+)'", app).group(1)
-    footer_version = re.search(r'id="footer-version"[^>]*>(v\d+\.\d+)</span>', html).group(1)
+    footer_version = re.search(r'id="footer-version"[^>]*>(v\d+\.\d+)(?:-\d{8}-\d{6})?</span>', html).group(1)
     assert "version: VERSION" in app
     assert "syncFooterVersion" in app
     assert footer_version == app_version

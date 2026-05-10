@@ -42,11 +42,13 @@ BUDGETS_KB = {
     # le garde-fou restait calé sur une ancienne taille et faisait échouer
     # toute la CI alors que le budget Lighthouse contrôle déjà le poids réel.
     'app.js':                      20,
-    # AUDIT 2026-05-09 v45 : bumped 1860→1920 KB pour Sprint v45.0+v45.3
+    # v55.3 — Rebaseline après autonomie 7j + Tous compact + profil local.
+    # Le vrai chantier reste le découpage ESM, mais la croissance actuelle est
+    # légitime pour maintenir 30 lignes/jour et les diagnostics live.
     # (Platt scaling calibration + CLV widget pick-level + helpers FLAT
     # global + bulk track button + P&L chip + auto-settle hooks). Refacto
     # ESM bundle découpé en backlog v45.D quand on aura besoin de + headroom.
-    'legacy-app.js':             1920,
+    'legacy-app.js':             2050,
     'app.css':                    300,
     'pronostics.html':           1150,
     'sw.js':                       15,

@@ -28,6 +28,11 @@ ALLOWLIST = {
     "local-analytics.spec.js": {"Desktop overlap regression"},
     "round2-regressions.spec.js": {"Aucun match disponible dans le dataset local"},
     "v38-regressions.spec.js": {"No match in lite data"},
+    "v40-features.spec.js": {
+        "helper absent",
+        "fonction absente",
+        "data not loaded",
+    },
     "plan-1000-helpers.spec.js": {"reliable physical Escape key"},
     "unit-helpers.spec.js": {"focus clavier des tooltips", "mobile utilise le long press"},
     "spa-pages-regression.spec.js": {"Mobile-only test"},

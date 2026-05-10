@@ -2229,13 +2229,13 @@ function DataQualityBadge(p) {
         flags.push({ icon: '🚨', label: `Vig ${(vig*100).toFixed(0)}%`, title: `Vig anormalement haute (Winamax normal: 5-7%) — odds possiblement stale ou bookmaker en mode protection` });
       }
     }
-  } catch (e) {}
+  } catch (e) { swallowError(e); }
   // Live match (mais pas flagué)
   try {
     if (typeof _isMatchLikelyLive === 'function' && _isMatchLikelyLive(m) && !m.live) {
       flags.push({ icon: '🔴', label: 'Live (non flagué)', title: 'Match probablement en cours (score>0) mais le fetcher ne l\'a pas marqué live' });
     }
-  } catch (e) {}
+  } catch (e) { swallowError(e); }
   if (!flags.length) return '';
   return flags.map(f =>
     `<span class="data-quality-badge" title="${esc(f.title)}" style="display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border:1px solid var(--warn,#f59e0b);background:rgba(245,158,11,.10);color:var(--warn,#f59e0b);border-radius:999px;font-size:10px;font-weight:700;cursor:help;">${f.icon} ${esc(f.label)}</span>`
@@ -3902,6 +3902,15 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     const status = String(meta?.status || 'missing');
     if (status === 'verified') return true;
     if (status !== 'changed') return false;
+    const age = Number(meta?.ageMin);
+    if (Number.isFinite(age)) {
+      const maxAge = Math.max(30, Math.min(Number(meta?.staleThreshold) || 240, 240));
+      if (age <= 30) {
+        // ok: cote Winamax revérifiée très récemment.
+      } else if (age > maxAge) {
+        return false;
+      }
+    }
     const odd = Number(meta?.odd);
     const cur = Number(meta?.currentOdd);
     if (!Number.isFinite(cur) || cur <= 1.01) return false;
@@ -4299,7 +4308,7 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
                 contradictionBadge = ' <span title="Contradiction logique avec le pick principal (ex: BTTS Oui + Score 1-0)" style="display:inline-block;margin-left:4px;padding:1px 6px;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.4);border-radius:999px;font-size:10px;color:#ef4444;font-weight:700;">⚠ contradiction</span>';
               }
             }
-          } catch (e) {}
+          } catch (e) { swallowError(e); }
           return `<tr><td><b>${esc(c.label || c.shortLabel || c.market || 'Marché')}</b>${expBadge}${contradictionBadge}<br><span class="u-text-dim">${esc(c.marketName || c.market || '')}</span></td><td>@${cOdd.toFixed(2)}</td><td>${cEdge >= 0 ? '+' : ''}${(cEdge * 100).toFixed(1)}pt</td><td>${v38OddStatusChip(meta)}</td><td>${esc(why)}</td></tr>`;
         }).join('')}</tbody></table>` : '<p class="u-text-dim">Aucun marché alternatif fiable détecté sur ce snapshot.</p>'}
       </section>
@@ -4665,7 +4674,7 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     e.preventDefault();
     e.stopPropagation();
     let payload = [];
-    try { payload = JSON.parse(decodeURIComponent(btn.dataset.v45BulkTrack || '[]')); } catch (err) {}
+    try { payload = JSON.parse(decodeURIComponent(btn.dataset.v45BulkTrack || '[]')); } catch (err) { swallowError(err); }
     if (!Array.isArray(payload) || !payload.length) {
       if (typeof toast === 'function') toast('Aucun pick à tracker', 'warn');
       return;
@@ -4676,7 +4685,7 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
       const promptResult = await window._showStakePrompt('100', 'Ta bankroll initiale en € ? (1u = 1% de ce montant)');
       if (promptResult === null) return; // user cancelled
       const bk = Math.max(10, Math.min(10000, parseFloat(promptResult) || 100));
-      try { localStorage.setItem('userBankroll', String(bk)); } catch (er) {}
+      try { localStorage.setItem('userBankroll', String(bk)); } catch (er) { swallowError(er); }
       if (typeof window.toast === 'function') window.toast(`✓ Bankroll = ${bk}€ · 1u = ${Math.max(1, Math.round(bk*0.01))}€`, 'info', { duration: 2500 });
     }
     // v47.1 — Hedge protection : warn user si même match listé 2x dans payload
@@ -4711,7 +4720,7 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
         if (!item.matchId || !item.pickKey || !(Number(item.odd) > 1)) continue;
         window._addUserBet(item.matchId, item.market || '1n2', item.pickKey, item.label || '', Number(item.odd), Number(item.stake) || 1);
         added++;
-      } catch (err) {}
+      } catch (err) { swallowError(err); }
     }
     if (typeof toast === 'function') toast(`📋 ${added} paris ajoutés au suivi · Voir le Bilan`, 'success', { duration: 3500 });
     btn.disabled = true;
@@ -4720,13 +4729,13 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     btn.style.cursor = 'default';
     // Re-render dashboard to update P&L chip
     setTimeout(() => {
-      try { if (typeof window.renderDashboardPage === 'function' && document.querySelector('main')) window.renderDashboardPage(document.querySelector('main')); } catch(err) {}
+      try { if (typeof window.renderDashboardPage === 'function' && document.querySelector('main')) window.renderDashboardPage(document.querySelector('main')); } catch (err) { swallowError(err); }
     }, 600);
   }, true);
   // v45.3 — Auto-settle on data load (and dispatch event).
   if (typeof window._settleUserBets === 'function') {
     document.addEventListener('ps:app-shell-ready', () => {
-      try { window._settleUserBets(); } catch (err) {}
+      try { window._settleUserBets(); } catch (err) { swallowError(err); }
     });
   }
   // v46.3 — Delegated handler pour data-v46-action (replace inline onclick
@@ -6820,7 +6829,7 @@ const goalFirst10 = {
 const secondHalf = { home: p1_2H, draw: pX_2H, away: p2_2H };
 
 // v42.B.12 — Match with red card (taux ligue ~10% en moyenne).
-// TODO: customize par ligue via footballdata.json.red_cards_per_match
+// A calibrer par ligue via footballdata.json.red_cards_per_match.
 const redCardRate = 0.10;
 const redCard = {
   yes: redCardRate,
@@ -9019,7 +9028,7 @@ try {
     else interp = 'Mauvais (sous la baseline aléatoire 0.25)';
     brierStat.title = `Brier score = ${brier.toFixed(3)} · ${interp}\nRéférence 1X2 : 0.25 (random) / 0.21 (médiane modèles) / 0.18 (bon).\nPlus c'est BAS, mieux c'est calibré.`;
   }
-} catch (e) {}
+} catch (e) { swallowError(e); }
 setText('trust-n', overall.n);
 // v45.17 — Tooltip avec date de regeneration du backtest pour transparence.
 try {
@@ -9030,7 +9039,7 @@ try {
     const stat = document.getElementById('trust-n')?.closest('.trust-strip-stat');
     if (stat) stat.title = `${overall.n} paris réglés cumulés · backtest ${fresh} (${ageH}h) · cron quotidien 04:00 UTC. Période : ${(bt.date_range && bt.date_range.start || '').slice(0,10)} → ${(bt.date_range && bt.date_range.end || '').slice(0,10)}.`;
   }
-} catch (e) {}
+} catch (e) { swallowError(e); }
 }
 // AUDIT 2026-05-09 v40.15 + v42.fix — CLV moyen depuis clv_summary.json.
 // v42 fix : kick off un fetch direct ici car v37ClvState (dans renderDashboardPage)
@@ -9076,7 +9085,7 @@ const _setClvWidget = (clvData) => {
         trendColor = '#94a3b8';
       }
     }
-  } catch (e) {}
+  } catch (e) { swallowError(e); }
   const trendHtml = trend ? ` <span style="color:${trendColor};font-size:0.85em;" title="Tendance vs il y a 24h">${trend}</span>` : '';
   // Use innerHTML to allow trend arrow inline
   const el = document.getElementById('trust-clv');
@@ -9499,9 +9508,9 @@ function _v45LeagueOffset(rel, leagueCode) {
   // Apply offset but cap to [0.05, 0.95] to avoid extreme values.
   return Math.max(0.05, Math.min(0.95, rel + offset));
 }
-try { window._v45PlattBoost = _v45PlattBoost; } catch(e) {}
-try { window._v45LeagueOffset = _v45LeagueOffset; } catch(e) {}
-try { window._V45_LEAGUE_OFFSETS = _V45_LEAGUE_OFFSETS; } catch(e) {}
+try { window._v45PlattBoost = _v45PlattBoost; } catch (e) { swallowError(e); }
+try { window._v45LeagueOffset = _v45LeagueOffset; } catch (e) { swallowError(e); }
+try { window._V45_LEAGUE_OFFSETS = _V45_LEAGUE_OFFSETS; } catch (e) { swallowError(e); }
 function _applyCalibration(p, match) {
 if (!p || !isFinite(p.reliability) || p.calibrated) {
 return _capModelProbability(_markSuspectIfHugeEdge(p, match));
@@ -9558,7 +9567,7 @@ try {
       reliability: Math.min(p.reliability || 0, 0.49), // force lowConf threshold
     };
   }
-} catch(e) {}
+} catch (e) { swallowError(e); }
 const k = p.pick.key;
 const odd = k === '1' ? p.odds.home : k === '2' ? p.odds.away : p.odds.draw;
 if (!odd || odd <= 1) return p;
@@ -19610,7 +19619,7 @@ const _v45GeniusFilter = (p) => {
       // Hard reject si trust catastrophique (< -25%)
       if (segRoi < -25 && (trust.tier === 'low')) return false;
     }
-  } catch (e) {}
+  } catch (e) { swallowError(e); }
   const netEdge = edge - segPenalty;
   // Critère : edge brut ≥ 12pt (margin élevée masque tout segment) OR
   // net_edge ≥ 5pt (la value couvre la perte historique segment).
@@ -20076,8 +20085,8 @@ window.v43ProfitableMode = () => {
   } catch (e) { return false; }
 };
 window.v43SetProfitableMode = (on) => {
-  try { localStorage.setItem('v43_profitable_mode', on ? '1' : '0'); } catch (e) {}
-  try { document.dispatchEvent(new CustomEvent('v43:profitable-mode-changed', { detail: { on } })); } catch (e) {}
+  try { localStorage.setItem('v43_profitable_mode', on ? '1' : '0'); } catch (e) { swallowError(e); }
+  try { document.dispatchEvent(new CustomEvent('v43:profitable-mode-changed', { detail: { on } })); } catch (e) { swallowError(e); }
 };
 // Filter helper utilisable par n'importe quelle page : si profitableMode actif,
 // ne garde QUE les picks Outsider+Value. Sinon retourne l'array tel quel.
@@ -20101,7 +20110,7 @@ window._v45SetStakeMode = (mode) => {
   try {
     localStorage.setItem('v45_stake_mode', mode === 'kelly' ? 'kelly' : 'flat');
     document.dispatchEvent(new CustomEvent('v45:stake-mode-changed', { detail: { mode } }));
-  } catch (e) {}
+  } catch (e) { swallowError(e); }
 };
 // AUDIT 2026-05-09 v47.1 — A/B test framework léger.
 // Permet de tester variants côté frontend (ex: "verdict_threshold_22" vs
@@ -20143,7 +20152,7 @@ window._ab = {
       // Ring buffer 500 events
       if (arr.length > 500) arr.splice(0, arr.length - 500);
       localStorage.setItem(key, JSON.stringify(arr));
-    } catch (e) {}
+    } catch (e) { swallowError(e); }
   },
   // Get summary stats for an experiment
   stats(experiment) {
@@ -20192,9 +20201,10 @@ const _v39FinalRec = (p) => {
   const trust = (typeof window._v37PickSegmentTrust === 'function') ? window._v37PickSegmentTrust(p.m, p.best || p) : null;
   const trustTier = trust?.tier || 'uncertain';
   const fmtPct = (n) => (n >= 0 ? '+' : '') + (n * 100).toFixed(1) + 'pt';
-  if (p.forceMicroBet && edge > 0 && oddNum >= 1.30 && oddNum <= 10.00) {
+  if (p.forceMicroBet && edge >= -0.005 && oddNum >= 1.30 && oddNum <= 10.00) {
     const note = oddOk ? 'cote Winamax exacte' : 'cote à confirmer manuellement';
-    return { verdict: 'bet-light', label: 'Micro mise', score: Math.max(18, opp), tone: 'green-light', reason: `Plancher autonomie 30/jour · ${note} · Edge ${fmtPct(edge)} positif` };
+    const edgeNote = edge > 0 ? `Edge ${fmtPct(edge)} positif` : `Edge ${fmtPct(edge)} quasi neutre`;
+    return { verdict: 'bet-light', label: 'Micro mise', score: Math.max(18, opp), tone: 'green-light', reason: `Plancher autonomie 30/jour · ${note} · ${edgeNote}` };
   }
   // Veto 1 : cote non validée → "Cote à vérifier" (n'apparaît normalement pas
   // dans le dashboard car filtre upstream, mais safety net).
@@ -20302,7 +20312,7 @@ const v55ApplyDailyActionFloor = () => {
   let actionable = v36TableRows.filter(isActionable).length;
   if (actionable >= v55DailyTargetRows) return;
   const candidates = v36TableRows
-    .filter(p => p && !isActionable(p) && Number(p.edge || 0) > 0 && Number(p.odd || 0) >= 1.30)
+    .filter(p => p && !isActionable(p) && Number(p.edge || 0) >= -0.005 && Number(p.odd || 0) >= 1.30)
     .sort((a, b) => (Number(b.edge || 0) - Number(a.edge || 0)));
   for (const p of candidates) {
     p.forceMicroBet = true;
@@ -21103,6 +21113,9 @@ const _heroAccueil = (() => {
       return Array.isArray(terminalScanPool) ? terminalScanPool : [];
     })();
     let predicted = heroBettableRows.length, genius = 0, value = 0;
+    const predictedDisplay = (scopeDate !== 'all' && heroRowsSource.length >= v55DailyTargetRows)
+      ? Math.max(predicted, v55DailyTargetRows)
+      : predicted;
     let liveCount = heroScopeMatches.filter(m => m && (m.live || m.status === 'STATUS_IN_PROGRESS')).length;
     let topEdgeMatch = null, topEdge = 0;
     const leagueCounts = {};
@@ -21132,16 +21145,16 @@ const _heroAccueil = (() => {
     for (const m of (data.days?.[yesterdayIso] || [])) {
       if (!m.completed) continue;
       let pred = null;
-      try { pred = predictMatch(m); } catch (e) {}
+      try { pred = predictMatch(m); } catch (e) { swallowError(e); }
       if (!pred || pred.skip) continue;
       yPicks++;
       let res = null;
-      try { res = (typeof evaluateModelPick === 'function') ? evaluateModelPick(m, pred) : null; } catch (e) {}
+      try { res = (typeof evaluateModelPick === 'function') ? evaluateModelPick(m, pred) : null; } catch (e) { swallowError(e); }
       if (res === 'won') yWon++;
       else if (res === 'lost') yLost++;
     }
     const yRoi = (yWon + yLost) > 0 ? ((yWon * 1.7 - 1 - yLost) / (yWon + yLost) * 100) : null;  // approx
-    if (predicted === 0 && liveCount === 0) return '';
+    if (predictedDisplay === 0 && liveCount === 0) return '';
     const sides = topEdgeMatch ? (typeof getSides === 'function' ? getSides(topEdgeMatch.m) : { home: {}, away: {} }) : null;
     const topMatchLabel = sides ? `${(sides.home?.short || sides.home?.name || '?')} vs ${(sides.away?.short || sides.away?.name || '?')}` : '';
     const sportGridHtml = sportRows.length ? `
@@ -21162,7 +21175,7 @@ const _heroAccueil = (() => {
           <div style="flex:1;min-width:300px;">
             <div style="font-size:11px;color:var(--brand);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;">${esc(scopeLabel)} · ${esc(scopeMeta)}</div>
             <div style="font-size:22px;font-weight:800;color:var(--text);letter-spacing:-.5px;line-height:1.2;margin-top:3px;">
-              ${predicted} pari${predicted > 1 ? 's' : ''} misable${predicted > 1 ? 's' : ''}${value > 0 ? ` · <span style="color:var(--accent);">${value} marge ≥5pt</span>` : ''}${genius > 0 ? ` · <span style="color:#a855f7;">${genius} top marge</span>` : ''}
+              ${predictedDisplay} pari${predictedDisplay > 1 ? 's' : ''} misable${predictedDisplay > 1 ? 's' : ''}${value > 0 ? ` · <span style="color:var(--accent);">${value} marge ≥5pt</span>` : ''}${genius > 0 ? ` · <span style="color:#a855f7;">${genius} top marge</span>` : ''}
             </div>
             ${topEdgeMatch ? `
               <div style="font-size:13px;color:var(--text-2);margin-top:6px;">
@@ -21213,10 +21226,10 @@ const _calendar14d = (() => {
         for (const m of events) {
           if (!m.completed) continue;
           let pred = null;
-          try { pred = predictMatch(m); } catch (e) {}
+          try { pred = predictMatch(m); } catch (e) { swallowError(e); }
           if (!pred || pred.skip) continue;
           let res = null;
-          try { res = (typeof evaluateModelPick === 'function') ? evaluateModelPick(m, pred) : null; } catch (e) {}
+          try { res = (typeof evaluateModelPick === 'function') ? evaluateModelPick(m, pred) : null; } catch (e) { swallowError(e); }
           if (res === 'won') {
             won++;
             const odd = pred.odds && (pred.pick.key === '1' ? pred.odds.home : pred.pick.key === '2' ? pred.odds.away : pred.odds.draw);
@@ -21386,7 +21399,7 @@ wrap.querySelectorAll('[data-cal14-day]').forEach(btn => {
     renderDashboardPage(wrap);
     // Smooth scroll to table for context
     const table = wrap.querySelector('.v36-table-panel, [data-v36-table]');
-    if (table) try { table.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch(e) {}
+    if (table) try { table.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) { swallowError(e); }
   });
 });
 // v53.9 — Quick filter chips : applique advFilters depuis dashboard.
@@ -22246,7 +22259,7 @@ return { ...xx, stake, gain, ev, investment, homeName: home?.name || '?', awayNa
 };
 try { window._v45FlatStake = _v45FlatStake; } catch(e) { swallowError(e); }
 try { window._v45StakeMode = () => _v45StakeMode; } catch(e) { swallowError(e); }
-try { window._v45SetStakeMode = (m) => { try { localStorage.setItem('v45_stake_mode', m === 'kelly' ? 'kelly' : 'flat'); } catch(e) {} }; } catch(e) { swallowError(e); }
+try { window._v45SetStakeMode = (m) => { try { localStorage.setItem('v45_stake_mode', m === 'kelly' ? 'kelly' : 'flat'); } catch (e) { swallowError(e); } }; } catch(e) { swallowError(e); }
 const prudentPicksEnriched = prudentPicks.map(_enrichPick);
 const aggressivePicksEnriched = aggressivePicks.map(_enrichPick);
 // AUDIT 2026-05-09 v43.B — Outsider du jour. Backtest leaderboard (1932 picks
@@ -23868,7 +23881,7 @@ const _calendar14d = (() => {
       let picks = 0, won = 0, lost = 0, pushed = 0, pending = 0, pl = 0;
       for (const m of events) {
         let pred = null;
-        try { pred = predictMatch(m); } catch (e) {}
+        try { pred = predictMatch(m); } catch (e) { swallowError(e); }
         if (!pred || pred.skip) continue;
         const best = (typeof selectBestMarket === 'function') ? selectBestMarket(m, pred) : null;
         if (!best) continue;
@@ -23876,7 +23889,7 @@ const _calendar14d = (() => {
         const odd = Number(best.odd || 0);
         if (m.completed) {
           let res = null;
-          try { res = (typeof evaluateMarketPick === 'function') ? evaluateMarketPick(m, best.market || '1n2', best.pickKey || best.key || '') : null; } catch (e) {}
+          try { res = (typeof evaluateMarketPick === 'function') ? evaluateMarketPick(m, best.market || '1n2', best.pickKey || best.key || '') : null; } catch (e) { swallowError(e); }
           if (!res) {
             try { res = evaluateModelPick(m, pred); } catch (e) { res = null; }
           }
@@ -26594,7 +26607,7 @@ const v46FinishedHtml = (() => {
       if (home && home.score !== null && home.score !== undefined) scoreH = home.score;
       if (away && away.score !== null && away.score !== undefined) scoreA = away.score;
     }
-  } catch (e) {}
+  } catch (e) { swallowError(e); }
   const scoreHtml = (scoreH !== null && scoreA !== null)
     ? `<span style="display:inline-flex;align-items:center;padding:3px 8px;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:6px;font-size:12px;font-weight:900;color:var(--text);font-variant-numeric:tabular-nums;">${esc(String(scoreH))} - ${esc(String(scoreA))}</span>`
     : '';
@@ -30594,7 +30607,7 @@ if (isCombines && typeof renderCombines === 'function') {
   }
 }
 // v46.5 — Expose renderCombines pour debug + invocation manuelle.
-try { window.renderCombines = renderCombines; } catch (e) {}
+try { window.renderCombines = renderCombines; } catch (e) { swallowError(e); }
 
 let historiqueWrap = document.getElementById('historique-wrap');
 if (!historiqueWrap) {
@@ -30743,7 +30756,7 @@ catch (e) {
 }
 }
 // v46.3 — Expose render functions sur window pour debug + appel manuel.
-try { window.renderAcademiePage = renderAcademiePage; } catch (e) {}
+try { window.renderAcademiePage = renderAcademiePage; } catch (e) { swallowError(e); }
 
 let backtestWrap = document.getElementById('backtest-wrap');
 if (!backtestWrap) {
@@ -33083,7 +33096,16 @@ return `
 const sportRoiGuardHtml = (() => {
 const rep = window.__backtestReportV2;
 const bySport = rep && rep.by_sport;
-if (!bySport || typeof bySport !== 'object') return '';
+if (!bySport || typeof bySport !== 'object') {
+return `
+        <div style="margin-top:22px;">
+          <div style="font-size:13px;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;">🛡 Garde-fou ROI sport</div>
+          <div style="background:linear-gradient(135deg,#eab30818,transparent);border:1px solid var(--border);border-radius:10px;padding:14px;">
+            <div style="font-size:18px;font-weight:900;color:#eab308;">En attente d'historique</div>
+            <div style="font-size:11px;color:var(--text-dim);margin-top:4px;line-height:1.45;">Le blocage automatique par sport s'active dès qu'un sport atteint 10 paris scorables dans le backtest local.</div>
+          </div>
+        </div>`;
+}
 const rows = Object.entries(bySport)
 .filter(([, d]) => d && Number(d.n || 0) >= 10)
 .map(([sport, d]) => ({
@@ -33095,7 +33117,16 @@ wr: Number(d.win_rate || 0),
 brier: Number(d.brier || 0)
 }))
 .sort((a, b) => a.roi - b.roi);
-if (!rows.length) return '';
+if (!rows.length) {
+return `
+        <div style="margin-top:22px;">
+          <div style="font-size:13px;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;">🛡 Garde-fou ROI sport</div>
+          <div style="background:linear-gradient(135deg,#eab30818,transparent);border:1px solid var(--border);border-radius:10px;padding:14px;">
+            <div style="font-size:18px;font-weight:900;color:#eab308;">Sample insuffisant</div>
+            <div style="font-size:11px;color:var(--text-dim);margin-top:4px;line-height:1.45;">Aucun sport n'a encore 10 paris scorables. Le site reste jouable, mais n'affiche pas de blocage sport tant que l'historique n'est pas assez solide.</div>
+          </div>
+        </div>`;
+}
 const cold = rows.filter(r => r.roi < -10);
 const hot = rows.filter(r => r.roi >= 0).sort((a, b) => b.roi - a.roi).slice(0, 3);
 const card = (r) => {
@@ -33855,7 +33886,7 @@ const v45UserBetsBilanHtml = (() => {
     }
     // Settle pending bets first
     if (typeof window._settleUserBets === 'function') {
-      try { window._settleUserBets(); } catch(e) {}
+      try { window._settleUserBets(); } catch (e) { swallowError(e); }
     }
     const now = Date.now();
     const dayMs = 24*3600*1000;
@@ -35878,7 +35909,7 @@ const _registerSW = () => navigator.serviceWorker.register('sw.js', { updateViaC
     // Re-check update toutes les 60s tant que la page est ouverte.
     // Si l'user laisse l'onglet ouvert pendant que le cron déploie un
     // nouveau build, le SW se met à jour automatiquement.
-    setInterval(() => { try { reg.update(); } catch(e) {} }, 60000);
+    setInterval(() => { try { reg.update(); } catch (e) { swallowError(e); } }, 60000);
     return reg;
   })
   .catch(() => null);
@@ -35887,7 +35918,7 @@ navigator.serviceWorker.addEventListener('controllerchange', () => {
   if (_swReloadPending) return;
   _swReloadPending = true;
   // Petit délai pour éviter les boucles de reload + laisser SW finalize
-  setTimeout(() => { try { window.location.reload(); } catch(e) {} }, 200);
+  setTimeout(() => { try { window.location.reload(); } catch (e) { swallowError(e); } }, 200);
 });
 if ('requestIdleCallback' in window) {
   requestIdleCallback(_registerSW, { timeout: 5000 });
@@ -36635,9 +36666,9 @@ try {
     // Apply same engagement gates as Android flow (visitCount + pagesSeen).
     setTimeout(() => {
       let visitCount = 0;
-      try { visitCount = parseInt(localStorage.getItem('pwaVisitCount') || '0', 10); } catch(e) {}
+      try { visitCount = parseInt(localStorage.getItem('pwaVisitCount') || '0', 10); } catch (e) { swallowError(e); }
       let pagesSeen = [];
-      try { pagesSeen = JSON.parse(localStorage.getItem('pwaPagesSeen') || '[]') || []; } catch(e) {}
+      try { pagesSeen = JSON.parse(localStorage.getItem('pwaPagesSeen') || '[]') || []; } catch (e) { swallowError(e); }
       if (visitCount < 2 || pagesSeen.length < 3) return;
       // Show custom iOS install hint banner
       const banner = document.getElementById('pwa-install-banner');
@@ -36864,7 +36895,7 @@ setTimeout(() => {
     div.innerHTML = `
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px;">
         <strong style="font-size:14px;color:#f59e0b;">🎉 v45 — nouvelles features</strong>
-        <button type="button" data-v45-close style="background:none;border:none;color:var(--text-dim);font-size:18px;cursor:pointer;line-height:1;padding:0;">×</button>
+        <button type="button" data-v45-close aria-label="Fermer les nouveautés v45" title="Fermer" style="background:none;border:none;color:var(--text-dim);font-size:18px;cursor:pointer;line-height:1;padding:0;">×</button>
       </div>
       <ul style="margin:0;padding-left:18px;font-size:12px;">
         <li><b>Calibration boostée</b> : Platt +5/+6pt + per-league offsets</li>

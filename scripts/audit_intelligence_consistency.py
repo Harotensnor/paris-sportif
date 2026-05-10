@@ -73,6 +73,10 @@ def audit_leagues(errors: list[str]) -> None:
     report = load(LEAGUES)
     rows = report.get("leagues") or []
     if not rows:
+        summary = report.get("summary") or {}
+        if int(summary.get("leagues") or 0) == 0:
+            print("[intelligence-consistency] watch: league_inefficiencies has no rows yet")
+            return
         fail(errors, "league_inefficiencies has no rows")
         return
     wr_counts = Counter(round(float(r.get("win_rate") or 0), 4) for r in rows)

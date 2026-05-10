@@ -149,7 +149,16 @@ function startServer() {
     }
     const body = document.body?.innerText || '';
     const title = document.querySelector('h1')?.innerText || '';
-    const coverageMatch = body.match(/(\d+)\s+lignes visibles\s+·\s+(\d+)\/(\d+)\s+matchs du scope avec pick/i);
+    const heroBettableMatch = body.match(/(\d+)\s+paris misables\s+·\s+(\d+)\s+marge ≥5pt/i);
+    if (heroBettableMatch) {
+      return {
+        kind: 'hero-bettable',
+        rows: Number(heroBettableMatch[1]),
+        exact: Number(heroBettableMatch[2]),
+        label: heroBettableMatch[0],
+      };
+    }
+    const coverageMatch = body.match(/(\d+)\s+lignes visibles\s+·\s+(\d+)\/(\d+)\s+matchs (?:du scope avec pick|analysés avec pari)/i);
     if (coverageMatch) {
       return {
         kind: 'table-only',
@@ -170,7 +179,7 @@ function startServer() {
     }
     const titleMatch = (title.match(/(\d+)\s+lignes (?:affichées|visibles)/i)
       || body.match(/(\d+)\s+lignes (?:affichées|visibles)/i));
-    const scopeMatch = body.match(/(\d+)\/(\d+)\s+matchs du scope avec pick/i);
+    const scopeMatch = body.match(/(\d+)\/(\d+)\s+matchs (?:du scope avec pick|analysés avec pari)/i);
     if (titleMatch || scopeMatch) {
       return {
         kind: 'dense-table',

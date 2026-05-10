@@ -57,7 +57,7 @@ test.describe('v40 — Helpers exposés sur window', () => {
       const missing = window.v38OddTopEligible({ status: 'missing' });
       return { verified, changedSmallDrift, changedHugeDrift, missing };
     });
-    if (result === null) test.skip();
+    if (result === null) test.skip(true, 'helper absent: v38OddTopEligible');
     expect(result.verified).toBe(true);
     expect(result.changedSmallDrift).toBe(true);
     expect(result.changedHugeDrift).toBe(false);
@@ -83,7 +83,7 @@ test.describe('v40 — Helpers exposés sur window', () => {
       const r = window._v39FinalRec(pick);
       return r;
     });
-    if (verdict === null) test.skip();
+    if (verdict === null) test.skip(true, 'helper absent: _v39FinalRec');
     expect(verdict.verdict).toBe('bet');
     expect(verdict.label).toContain('Outsider');
   });
@@ -102,7 +102,7 @@ test.describe('v40 — Helpers exposés sur window', () => {
       const variants = window.buildComboVariants(picks);
       return Object.keys(variants);
     });
-    if (result === null) test.skip();
+    if (result === null) test.skip(true, 'helper absent: buildComboVariants');
     expect(result).toContain('outsider');
   });
 });
