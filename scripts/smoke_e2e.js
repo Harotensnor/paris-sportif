@@ -98,17 +98,29 @@ function startServer() {
   await page.waitForTimeout(300);
 
   async function activatePage(pageName) {
-    return page.evaluate(name => {
-      const btn = document.querySelector(`.page-btn[data-page="${name}"]`);
-      if (btn) {
-        btn.click();
-        return 'button';
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      try {
+        return await page.evaluate(name => {
+          const btn = document.querySelector(`.page-btn[data-page="${name}"]`);
+          if (btn) {
+            btn.click();
+            return 'button';
+          }
+          const nextHash = `#${name}`;
+          if (window.location.hash !== nextHash) window.location.hash = nextHash;
+          else window.dispatchEvent(new HashChangeEvent('hashchange', { oldURL: location.href, newURL: location.href }));
+          return 'hash';
+        }, pageName);
+      } catch (err) {
+        const message = String(err && err.message || err);
+        if (attempt === 0 && /Execution context was destroyed|Cannot find context/i.test(message)) {
+          await page.waitForLoadState('domcontentloaded', { timeout: 5000 }).catch(() => {});
+          continue;
+        }
+        throw err;
       }
-      const nextHash = `#${name}`;
-      if (window.location.hash !== nextHash) window.location.hash = nextHash;
-      else window.dispatchEvent(new HashChangeEvent('hashchange', { oldURL: location.href, newURL: location.href }));
-      return 'hash';
-    }, pageName);
+    }
+    return 'retry';
   }
 
   // Open every supported route. Some routes are intentionally hash-only

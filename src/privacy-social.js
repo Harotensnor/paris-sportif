@@ -908,10 +908,11 @@
     handleComboHash();
     if (new URLSearchParams(location.search || '').has('docsNoTour')) localStorage.setItem(STORAGE.ack, '1');
     if (!window.__psBootSequence) showPrivacyModal(false);
-    const root = $('#app') || document.body;
+    const root = document.body;
     const observer = new MutationObserver(renderSoon);
     observer.observe(root, { childList: true, subtree: true });
-    [250, 900, 1800, 3600].forEach(delay => setTimeout(renderSoon, delay));
+    window.__psPrivacySocialObserver = observer;
+    [250, 900, 1800, 3600, 7000, 12000, 18000, 30000].forEach(delay => setTimeout(renderSoon, delay));
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
