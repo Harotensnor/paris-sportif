@@ -17940,10 +17940,21 @@ if (k <= 0) { return; } // pas d'edge → pas de mise
       const start = now.getTime() - 7 * 24 * 3600000;
       const end = now.getTime() + 8 * 24 * 3600000;
       const arr = [];
+      // v54.5 — User feedback persistant : "Hero dit 3 pronos détectés mais
+      // table 0 lignes". Root cause : terminalScanPool exigeait exactBookable
+      // strict (= match_id + markets['1n2'] avec home/away > 1). Or beaucoup
+      // de matchs MLB / NBA / NHL sont sur Winamax avec match_id valide mais
+      // markets vides (fetch_winamax_match_details limit 300/run, donc tous
+      // les matchs ne sont pas encore enrichis). Conséquence : Red Sox vs
+      // Rays @2.09 sur Rays gagnent visible dans hero (fallback chain) mais
+      // exclu du table v36. Maintenant on accepte winamax.available=true
+      // (au moins une cote indicative existe). Les filtres downstream
+      // (v36TierForCandidate + validatePickOdd v54.4) gardent la qualité.
+      const wxAvailable = m => !!(m && m.winamax && m.winamax.available === true);
       Object.values(data.days || {}).forEach(dayArr => (dayArr || []).forEach(m => {
         const ts = new Date(m?.date || 0).getTime();
         if (!Number.isFinite(ts) || ts < start || ts > end) return;
-        if (!exactBookable(m)) return;
+        if (!exactBookable(m) && !wxAvailable(m)) return;
         arr.push(m);
       }));
       arr.sort((a, b) => new Date(a.date || 0) - new Date(b.date || 0));
