@@ -18790,13 +18790,13 @@ v37Reject('marche_remboursement', m, c?.market || '');
 return false;
 }
 // AUDIT 2026-05-08 v39 — User : "je veux pas de paris à cote pas validée".
-// On exige donc une cote Winamax verified ou changed-récent (≤30min).
-// Le pick reste visible dans #tous (page exploration) mais pas dans le
-// dashboard principal. Les status missing/blocked/stale/divergent sont
-// rejetés ici.
+// v54.4 — User feedback : "Hero dit 3 pronos mais table 0". Le filtre v38
+// strict était la cause. Maintenant on accepte verified/changed/stale (avec
+// disclaimer "à vérifier"). Suspicious seulement = reject. Cohérence
+// garantie avec _heroAccueil qui voit la même chose.
 const _oddMeta = c.oddValidation || (typeof validatePickOdd === 'function' ? validatePickOdd(m, c, pred) : null);
-if (typeof v38OddTopEligible === 'function' && !v38OddTopEligible(_oddMeta)) {
-v37Reject('cote_non_validee', m, `${c?.market || ''} status=${_oddMeta?.status || 'missing'}`);
+if (_oddMeta && _oddMeta.status === 'suspicious') {
+v37Reject('cote_suspicious', m, `${c?.market || ''} ${_oddMeta?.reason || ''}`);
 return false;
 }
 return true;
