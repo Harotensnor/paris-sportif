@@ -18725,7 +18725,14 @@ const v37ReadableMetricHtml = (metric, tone) => `<span class="v37-readable-metri
 let v37ScanPool = v37BuildScanPool(v37DateFilter);
 const v37InitialDateFilter = v37DateFilter;
 const v37InitialScanPoolLength = v37ScanPool.length;
-const v37DashboardScanLimit = v37DateFilter === 'all' ? 96 : 64;
+// v54.5b — Cap relevé 64 → 140 (single-day) et 96 → 220 (all). Avant : avec
+// 99 matchs ingérés un jour MLB, le tri "proximity-to-now" coupait les 35
+// matchs du soir → tous les MLB éjectés (kickoff 17h+ UTC = aprem/soirée
+// Paris, plus loin que les matchs euro du midi). Conséquence : Red Sox vs
+// Rays (top edge hero +4.3pt) invisible dans la table. Maintenant on couvre
+// la journée entière. Coût perf : ~140 appels predictMatch au lieu de 64
+// (cache __predCache amorti, OK).
+const v37DashboardScanLimit = v37DateFilter === 'all' ? 220 : 140;
 const v37ScanPoolCappedFrom = v37ScanPool.length > v37DashboardScanLimit ? v37ScanPool.length : 0;
 v37ScanPool = v37PrioritizeDashboardScanPool(v37ScanPool, v37DashboardScanLimit);
 const v37MinDenseDailyScanPool = 60;
