@@ -8973,7 +8973,7 @@ const hasBigBets = (bigBets.n || 0) > 0;
 const headlineTier = hasBigBets ? bigBets : locks;
 const setText = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
 const firstLabel = document.querySelector('#trust-locks-wr + .trust-strip-lbl');
-if (firstLabel) firstLabel.textContent = hasBigBets ? 'Big Bets' : 'locks WR';
+if (firstLabel) firstLabel.textContent = hasBigBets ? 'Gros paris' : 'Réussite locks';
 if (headlineTier.n > 0) {
 setText('trust-locks-wr', Math.round((headlineTier.win_rate || 0) * 100) + '%');
 } else {
@@ -8995,11 +8995,11 @@ const baselineNote = (Number.isFinite(baselineFav) && baselineFav !== 0) ?
 if (lowSample || trivialRoi) {
   setText('trust-roi', '—');
   const stat = document.getElementById('trust-roi')?.closest('.trust-strip-stat');
-  if (stat) stat.title = (lowSample ? `Échantillon trop petit (${overall.n} picks) — ROI fiable à partir de 30+` : `ROI ≈ 0 (variance normale sur ${overall.n} picks)`) + baselineNote;
+  if (stat) stat.title = (lowSample ? `Échantillon trop petit (${overall.n} paris) — ROI fiable à partir de 30+` : `ROI ≈ 0 (variance normale sur ${overall.n} paris)`) + baselineNote;
 } else {
   setText('trust-roi', (roiPct >= 0 ? '+' : '') + roiPct.toFixed(1) + '%');
   const stat = document.getElementById('trust-roi')?.closest('.trust-strip-stat');
-  if (stat) stat.title = `ROI Flat = ${roiPct >= 0 ? '+' : ''}${roiPct.toFixed(2)}% sur ${overall.n} picks${baselineNote}`;
+  if (stat) stat.title = `ROI fixe = ${roiPct >= 0 ? '+' : ''}${roiPct.toFixed(2)}% sur ${overall.n} paris${baselineNote}`;
 }
 setText('trust-brier', (overall.brier || 0).toFixed(3));
 // v48 fix — Audit point #16 : Brier 0.231 paraît proche de 0.25 (random)
@@ -9027,7 +9027,7 @@ try {
     const ageH = Math.round((Date.now() - new Date(genAt).getTime()) / 3600000);
     const fresh = ageH < 26 ? 'frais' : ageH < 50 ? 'récent' : ageH < 200 ? `il y a ${Math.round(ageH/24)}j` : 'à régénérer';
     const stat = document.getElementById('trust-n')?.closest('.trust-strip-stat');
-    if (stat) stat.title = `${overall.n} picks réglés cumulés · backtest ${fresh} (${ageH}h) · cron quotidien 04:00 UTC. Range : ${(bt.date_range && bt.date_range.start || '').slice(0,10)} → ${(bt.date_range && bt.date_range.end || '').slice(0,10)}.`;
+    if (stat) stat.title = `${overall.n} paris réglés cumulés · backtest ${fresh} (${ageH}h) · cron quotidien 04:00 UTC. Période : ${(bt.date_range && bt.date_range.start || '').slice(0,10)} → ${(bt.date_range && bt.date_range.end || '').slice(0,10)}.`;
   }
 } catch (e) {}
 }
@@ -19367,8 +19367,8 @@ market: '1n2',
 line: '',
 pickKey: pk,
 opportunity,
-opportunityBadges: oddState === 'blocked' ? ['data fiable', v38OddStatusMeta(candidate.oddValidation.status).label] : ['data fiable'],
-opportunityTooltip: `Ligne data-only : aucun pick haut-conviction ne passe les seuils. Cote ${source === 'winamax_exact' ? 'Winamax' : 'indicative'} à vérifier avant action.${oddState === 'blocked' ? ` ${v38OddStatusMeta(candidate.oddValidation.status).detail}` : ''}`,
+  opportunityBadges: oddState === 'blocked' ? ['en veille', v38OddStatusMeta(candidate.oddValidation.status).label] : ['en veille'],
+  opportunityTooltip: `Ligne de veille : aucun pari assez fiable ne passe les seuils. Cote ${source === 'winamax_exact' ? 'Winamax' : 'indicative'} à vérifier avant action.${oddState === 'blocked' ? ` ${v38OddStatusMeta(candidate.oddValidation.status).detail}` : ''}`,
 ts: new Date(m.date || 0).getTime(),
 score: Math.max(10, Math.min(70, (rel * 80) + Math.max(-10, edge * 100) - (oddState === 'blocked' ? 28 : oddState === 'watch' ? 6 : 0))),
 dataOnly: true
@@ -19574,9 +19574,9 @@ const v45GeniusBannerHtml = (() => {
         <div style="font-size:15px;font-weight:800;color:var(--text);margin-top:4px;padding-right:34px;">${esc(hN)} vs ${esc(aN)}</div>
         <div style="font-size:13px;font-weight:700;color:${rankColor};margin-top:6px;">${esc(pickLbl)} <b style="color:var(--text);">@ ${odd.toFixed(2)}</b></div>
         <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:8px;font-size:11px;color:var(--text-dim);">
-          <span>Conf <b style="color:${rankColor};">${(rel*100).toFixed(0)}%</b></span>
-          <span>Edge <b style="color:${rankColor};">+${(edge*100).toFixed(1)}pt</b></span>
-          <span>EV <b style="color:${rankColor};">${ev>=0?'+':''}${ev.toFixed(0)}%</b></span>
+          <span>Fiab. <b style="color:${rankColor};">${(rel*100).toFixed(0)}%</b></span>
+          <span>Marge <b style="color:${rankColor};">+${(edge*100).toFixed(1)}pt</b></span>
+          <span>Avantage <b style="color:${rankColor};">${ev>=0?'+':''}${ev.toFixed(0)}%</b></span>
         </div>
         <div style="margin-top:8px;padding-top:8px;border-top:1px dashed var(--border);font-size:11px;color:var(--text-dim);">
           <span title="1u (1 unité) = 1% de ta bankroll. Avec bankroll ${(_u*100).toFixed(0)}€, 1u = ${_u}€." style="border-bottom:1px dotted var(--text-dim2);cursor:help;">Mise FLAT 1u = <b style="color:var(--text);">${_u}€</b></span> · gain potentiel <b style="color:#10b981;">+${gain.toFixed(0)}€</b> · perte max <b style="color:#ef4444;">-${_u}€</b>
@@ -19586,11 +19586,11 @@ const v45GeniusBannerHtml = (() => {
     return `<section class="v37-empty-pool-help" style="background:linear-gradient(135deg,rgba(168,85,247,.10),rgba(59,130,246,.08));border:1px solid rgba(168,85,247,.5);">
       <strong style="display:flex;align-items:center;gap:8px;font-size:14px;flex-wrap:wrap;">
         <span style="font-size:20px;">🧠</span>
-        Genius Mode · TOP ${v45GeniusPicks.length} pick${v45GeniusPicks.length > 1 ? 's' : ''} du jour
-        <span style="padding:2px 8px;background:rgba(168,85,247,.2);border:1px solid rgba(168,85,247,.5);border-radius:999px;font-size:11px;font-weight:800;color:#a855f7;">edge ≥12pt ou net ≥5pt · conf ≥55%</span>
+        Mode Genius · ${v45GeniusPicks.length} pari${v45GeniusPicks.length > 1 ? 's' : ''} strict${v45GeniusPicks.length > 1 ? 's' : ''} du jour
+        <span style="padding:2px 8px;background:rgba(168,85,247,.2);border:1px solid rgba(168,85,247,.5);border-radius:999px;font-size:11px;font-weight:800;color:#a855f7;">marge ≥12pt ou nette ≥5pt · fiabilité ≥55%</span>
       </strong>
       <div style="font-size:12px;color:var(--text-dim);margin:8px 0 12px;line-height:1.5;">
-        Filtrage ULTRA strict : seuls les picks avec marge mathématique élevée + données fiables.
+        Filtrage très strict : seuls les paris avec marge mathématique élevée + données fiables.
         Mise <b style="color:#10b981;" title="1u = 1 unité = 1% de ta bankroll. Bankroll ${(_u*100).toFixed(0)}€ → 1u = ${_u}€.">FLAT 1u (${_u}€)</b> sur chaque, indépendamment de la cote.
         <br><span style="font-size:10px;color:var(--text-dim2);">💡 1u (1 unité) = 1% bankroll. Avec ${(_u*100).toFixed(0)}€ de bankroll, 1u = ${_u}€.</span>
       </div>
@@ -19598,7 +19598,7 @@ const v45GeniusBannerHtml = (() => {
         ${cards}
       </div>
       <div style="margin-top:12px;padding:8px 12px;background:rgba(15,15,20,.4);border-radius:6px;font-size:10.5px;color:var(--text-dim2);line-height:1.5;">
-        ⚠ <b style="color:var(--text-dim);">Aucun gain assuré</b> — chaque pick à 60% de chances perd 40% du temps. L'objectif est <b>+EV long terme</b>, pas victoire individuelle. Sur 100 picks à edge +7pt : ROI espéré +5-10%, variance ±20% en route. Discipline FLAT 1u = pas de wipeout.
+        ⚠ <b style="color:var(--text-dim);">Aucun gain assuré</b> — un pari à 60% de chances perd encore 40% du temps. L'objectif est une <b>espérance positive sur la durée</b>, pas une victoire isolée. Sur 100 paris à marge +7pt : ROI espéré +5-10%, variance possible ±20%. Discipline FLAT 1u = pas de mise excessive.
       </div>
     </section>`;
   } catch (e) { return ''; }
@@ -19639,7 +19639,7 @@ const v37QualifiedMatchCount = new Set(v36PickPool.map(p => v37MatchKeyForPick(p
 const v37ScopeMatchDenominator = v37InitialScanPoolLength || v37ScanPool.length || terminalScanPool.length;
 const v37QualificationRate = v37ScopeMatchDenominator ? Math.round((v37QualifiedMatchCount / v37ScopeMatchDenominator) * 100) : 0;
 const v37WatchOnlyCount = Math.max(0, v37DataOnlyPool.length);
-const v36CoverageLine = `${v37DisplayTotal} lignes visibles · ${v37QualifiedMatchCount}/${v37ScopeMatchDenominator} matchs du scope avec pick (${v37QualificationRate}%) · ${v36PickPool.length} picks qualifiés · ${v37WatchOnlyCount} en veille non actionnable · ${v36UpcomingAll.length} à venir · ${v37LiveAll.length} live · ${v37FinishedAll.length} terminés · data ${_dataAgeMin} min`;
+const v36CoverageLine = `${v37DisplayTotal} lignes visibles · ${v37QualifiedMatchCount}/${v37ScopeMatchDenominator} matchs analysés avec pari (${v37QualificationRate}%) · ${v36PickPool.length} paris qualifiés · ${v37WatchOnlyCount} en veille non actionnable · ${v36UpcomingAll.length} à venir · ${v37LiveAll.length} live · ${v37FinishedAll.length} terminés · données ${_dataAgeMin} min`;
 const v37CountBy = (rows, keyFn, limit) => Object.entries((rows || []).reduce((acc, row) => {
 const key = keyFn(row) || 'inconnu';
 acc[key] = (acc[key] || 0) + 1;
@@ -19795,7 +19795,7 @@ const v37EmptyPoolHelpHtml = (!v36PickPool.length && terminalScanPool.length > 1
       </section>` : '';
 const v37DenseFallbackHtml = (v36PickPool.length > 0 && v37DataOnlyPool.length > 0) ? `<section class="v37-empty-pool-help is-info">
         <strong>Veille non actionnable masquée</strong>
-        <span>${v36PickPool.length} picks qualifiés seulement sur ce scope ; ${v37DataOnlyPool.length} lignes à cote non confirmée sont gardées hors accueil. Vérifie-les dans Tous si tu veux auditer la couverture.</span>
+        <span>${v36PickPool.length} pari${v36PickPool.length > 1 ? 's' : ''} qualifié${v36PickPool.length > 1 ? 's' : ''} seulement sur ce filtre ; ${v37DataOnlyPool.length} lignes à cote non confirmée sont gardées hors accueil. Vérifie-les dans Tous si tu veux auditer la couverture.</span>
       </section>` : '';
 // v47.3 — v40MultiDayOutsiders scanner + v40OutsiderListHtml retirés (étaient
 // utilisés exclusivement par v43StrategyBannerHtml retiré v47.2).
@@ -20293,13 +20293,13 @@ const active = v37DateFilter === value;
 return `<button type="button" class="v37-day-chip ${active ? 'is-active' : ''}" data-v37-day="${esc(value)}"><b>${esc(label)}</b>${deltaLabel ? `<span>${esc(deltaLabel)}</span>` : ''}</button>`;
 };
 const v37DayNavHtml = `<section class="v37-day-nav" aria-label="Navigation jour par jour">
-        ${v37DayChip('7 jours', 'all', '300+ rows')}
+        ${v37DayChip('7 jours', 'all', 'vue complète')}
         ${v37DayChip('J-2', v37AddDays(todayIso, -2), v37DateLabel(v37AddDays(todayIso, -2)))}
         ${v37DayChip('Hier', v37AddDays(todayIso, -1), v37DateLabel(v37AddDays(todayIso, -1)))}
         ${v37DayChip("Aujourd'hui", todayIso, v37DateLabel(todayIso))}
         ${v37DayChip('Demain', v37AddDays(todayIso, 1), v37DateLabel(v37AddDays(todayIso, 1)))}
         <label class="v37-date-picker"><span>Date</span><input type="date" data-v37-date-input value="${esc(v37DateFilter === 'all' ? todayIso : v37DateFilter)}"></label>
-        <label class="v37-live-toggle"><input type="checkbox" data-v37-live-toggle ${v37IncludeLive ? 'checked' : ''}><span>Inclure LIVE</span></label>
+        <label class="v37-live-toggle"><input type="checkbox" data-v37-live-toggle ${v37IncludeLive ? 'checked' : ''}><span>Inclure live</span></label>
       </section>`;
 const v37HistoryStats = (() => {
 if (!v37ShowResultColumn) return '';
@@ -20315,7 +20315,7 @@ else acc.pending++;
 const staked = acc.won + acc.lost;
 const roi = staked ? (acc.pl / staked) * 100 : 0;
 return `<footer class="v37-history-footer">
-          <strong>${esc(v37DateLabel(v37DateFilter))} : ${v36TableRows.length} picks</strong>
+          <strong>${esc(v37DateLabel(v37DateFilter))} : ${v36TableRows.length} pari${v36TableRows.length > 1 ? 's' : ''}</strong>
           <span>${acc.won} gagnés · ${acc.lost} perdus · ${acc.void} remboursés · ${acc.live} live · ${acc.pending} à venir · ROI ${roi >= 0 ? '+' : ''}${roi.toFixed(1)}%</span>
           <button type="button" class="page-btn" data-page="performance">Voir tout l'historique</button>
         </footer>`;
@@ -20380,7 +20380,7 @@ const v45BulkTrackBtn = (() => {
     })).filter(x => x.matchId && x.pickKey && x.odd > 1);
     if (!bulkPayload.length) return '';
     const payloadStr = encodeURIComponent(JSON.stringify(bulkPayload));
-    return `<button type="button" data-v45-bulk-track="${payloadStr}" data-tooltip="Enregistre uniquement les ${bulkPayload.length} picks Genius (TOP strict criteria) avec FLAT 1u (${stake}€) chacun. Discipline FLAT = sélection rigoureuse." style="min-height:40px;border:1px solid #a855f7;background:linear-gradient(135deg,rgba(168,85,247,.18),rgba(168,85,247,.06));color:#a855f7;border-radius:999px;padding:0 14px;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;cursor:pointer;white-space:nowrap;">🧠 Tracker Genius (${bulkPayload.length}×${stake}€)</button>`;
+    return `<button type="button" data-v45-bulk-track="${payloadStr}" data-tooltip="Enregistre uniquement les ${bulkPayload.length} paris Genius stricts avec FLAT 1u (${stake}€) chacun. Discipline FLAT = sélection rigoureuse." style="min-height:40px;border:1px solid #a855f7;background:linear-gradient(135deg,rgba(168,85,247,.18),rgba(168,85,247,.06));color:#a855f7;border-radius:999px;padding:0 14px;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;cursor:pointer;white-space:nowrap;">🧠 Suivre Genius (${bulkPayload.length}×${stake}€)</button>`;
   } catch (e) { return ''; }
 })();
 const v45PnlChip = (() => {
@@ -20444,9 +20444,9 @@ const v36TableHtml = `<section class="v36-table-panel" aria-label="Tableau dense
         <header class="v36-table-toolbar">
           <div>
             <strong>${v36TableRows.length} lignes · ${esc(v37ScopeLabel)}</strong>
-            <span>${v36PickPool.length} pick${v36PickPool.length > 1 ? 's' : ''}${v37WatchOnlyCount ? ` · ${v37WatchOnlyCount} en veille` : ''} · ${v40BettableCount} <b style="color:#34d399;">misable${v40BettableCount > 1 ? 's' : ''}</b>${v40HiddenCount > 0 ? ` · <button type="button" data-v40-toggle-strict style="background:none;border:1px solid var(--text-dim);color:var(--text-dim);padding:2px 8px;border-radius:6px;font-size:11px;cursor:pointer;">${v40StrictApplied ? `+${v40HiddenCount} cachés` : `cacher ${v40HiddenCount}`}</button>` : ''}</span>
+            <span>${v36PickPool.length} pari${v36PickPool.length > 1 ? 's' : ''}${v37WatchOnlyCount ? ` · ${v37WatchOnlyCount} en veille` : ''} · ${v40BettableCount} <b style="color:#34d399;">jouable${v40BettableCount > 1 ? 's' : ''}</b>${v40HiddenCount > 0 ? ` · <button type="button" data-v40-toggle-strict style="background:none;border:1px solid var(--text-dim);color:var(--text-dim);padding:2px 8px;border-radius:6px;font-size:11px;cursor:pointer;">${v40StrictApplied ? `+${v40HiddenCount} masqués` : `masquer ${v40HiddenCount}`}</button>` : ''}</span>
           </div>
-          <label class="v36-table-search"><span>Search</span><input type="search" data-v36-search value="${esc(v36Search)}" placeholder="Équipe, ligue, marché"></label>
+          <label class="v36-table-search"><span>Recherche</span><input type="search" data-v36-search value="${esc(v36Search)}" placeholder="Équipe, ligue, marché"></label>
           ${/* v46.0 — v37BlindToggle + v37TrackFirstButton retirés (redondants
                 avec bulk track). Sort buttons réduits 7 → 4. */ ''}
           ${v45BulkTrackBtn}
@@ -20467,10 +20467,10 @@ const v36TableHtml = `<section class="v36-table-panel" aria-label="Tableau dense
               <th class="v39-th-rec" data-tooltip="Recommandation : verdict combiné Priorité : note globale 0-100, Edge, Confiance, Tier, Segment historique, Cote validée. Vert = miser. Bleu = petite mise. Orange = surveiller. Rouge = passer.">${v36SortButton('score', 'Recommandation')}</th>
               ${v37ShowResultColumn ? '<th class="v38-th-tier">Résultat</th>' : ''}
             </tr></thead>
-            <tbody>${v36TableRows.length ? v36TableRows.map(v36TableRow).join('') : `<tr><td colspan="${v37ShowResultColumn ? '5' : '4'}"><div class="v36-tier-empty">Aucun pick pour ce filtre. Retire un sport, une heure ou une recherche.</div></td></tr>`}</tbody>
+            <tbody>${v36TableRows.length ? v36TableRows.map(v36TableRow).join('') : `<tr><td colspan="${v37ShowResultColumn ? '5' : '4'}"><div class="v36-tier-empty">Aucun pari pour ce filtre. Retire un sport, une heure ou une recherche.</div></td></tr>`}</tbody>
           </table>
         </div>
-        <div class="v36-table-cards">${v36TableRows.length ? v36TableRows.map(v36MobileCard).join('') : `<div class="v36-tier-empty">Aucun pick pour ce filtre.</div>`}</div>
+        <div class="v36-table-cards">${v36TableRows.length ? v36TableRows.map(v36MobileCard).join('') : `<div class="v36-tier-empty">Aucun pari pour ce filtre.</div>`}</div>
         ${v37HistoryStats}
       </section>`;
 const v36NextHtml = v36Next.length ? v36Next.map(m => {
@@ -20987,11 +20987,11 @@ const _heroAccueil = (() => {
           <div style="flex:1;min-width:300px;">
             <div style="font-size:11px;color:var(--brand);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;">Aujourd'hui · ${todayIsoLocal}</div>
             <div style="font-size:22px;font-weight:800;color:var(--text);letter-spacing:-.5px;line-height:1.2;margin-top:3px;">
-              ${predicted} prono${predicted > 1 ? 's' : ''} détecté${predicted > 1 ? 's' : ''}${value > 0 ? ` · <span style="color:var(--accent);">${value} value (edge ≥5pt)</span>` : ''}${genius > 0 ? ` · <span style="color:#a855f7;">${genius} 🧠 Genius</span>` : ''}
+              ${predicted} pari${predicted > 1 ? 's' : ''} jouable${predicted > 1 ? 's' : ''}${value > 0 ? ` · <span style="color:var(--accent);">${value} marge ≥5pt</span>` : ''}${genius > 0 ? ` · <span style="color:#a855f7;">${genius} 🧠 Genius</span>` : ''}
             </div>
             ${topEdgeMatch ? `
               <div style="font-size:13px;color:var(--text-2);margin-top:6px;">
-                💎 Top edge : <b>${esc(topMatchLabel)}</b> — <b style="color:var(--accent);">+${(topEdge * 100).toFixed(1)}pt</b> sur ${esc(topEdgeMatch.best.label || '?')} @${topEdgeMatch.odd.toFixed(2)}
+                💎 Meilleure marge : <b>${esc(topMatchLabel)}</b> — <b style="color:var(--accent);">+${(topEdge * 100).toFixed(1)}pt</b> sur ${esc(topEdgeMatch.best.label || '?')} @${topEdgeMatch.odd.toFixed(2)}
                 <button type="button" data-cal14-day="${esc(todayIsoLocal)}" data-big-detail="${esc(String(topEdgeMatch.m.id))}" style="margin-left:8px;background:var(--brand);color:#fff;border:none;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:700;cursor:pointer;">→ Voir</button>
               </div>
             ` : ''}
@@ -21059,12 +21059,12 @@ const _calendar14d = (() => {
         ? (d.completedCount > 0
             ? (d.roi != null
                 ? `<div style="font-size:11px;font-weight:800;color:${d.roi > 0 ? 'var(--accent)' : '#fca5a5'};">${d.won}V·${d.lost}D</div><div style="font-size:9.5px;color:${d.roi > 0 ? 'var(--accent)' : '#fca5a5'};">${d.roi >= 0 ? '+' : ''}${d.roi.toFixed(0)}%</div>`
-                : `<div style="font-size:10px;color:var(--text-dim);">${d.completedCount} settled</div>`)
+                : `<div style="font-size:10px;color:var(--text-dim);">${d.completedCount} réglé${d.completedCount > 1 ? 's' : ''}</div>`)
             : '<div style="font-size:10px;color:var(--text-dim2);">—</div>')
         : (d.evCount > 0
             ? `<div style="font-size:11px;font-weight:800;color:var(--brand);">${d.evCount}</div><div style="font-size:9.5px;color:var(--text-dim);">match${d.evCount > 1 ? 's' : ''}</div>`
             : '<div style="font-size:10px;color:var(--text-dim2);">—</div>');
-      return `<button type="button" data-cal14-day="${esc(d.iso)}" title="${esc(d.iso)} — ${d.evCount} match(s)${d.isPast && d.completedCount ? `, ${d.completedCount} settled${d.roi != null ? `, ROI ${d.roi.toFixed(1)}%` : ''}` : ''}" style="padding:6px 4px;background:${tone};border:${border};border-radius:6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;min-height:64px;justify-content:center;transition:all .15s;">
+      return `<button type="button" data-cal14-day="${esc(d.iso)}" title="${esc(d.iso)} — ${d.evCount} match(s)${d.isPast && d.completedCount ? `, ${d.completedCount} réglé${d.completedCount > 1 ? 's' : ''}${d.roi != null ? `, ROI ${d.roi.toFixed(1)}%` : ''}` : ''}" style="padding:6px 4px;background:${tone};border:${border};border-radius:6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;min-height:64px;justify-content:center;transition:all .15s;">
         <div style="font-size:9.5px;color:${d.isPast ? 'var(--text-dim)' : 'var(--text)'};text-transform:uppercase;letter-spacing:.5px;font-weight:700;">${d.dow} ${d.date}/${d.month}</div>
         ${stats}
       </button>`;
@@ -21089,8 +21089,8 @@ const _calendar14d = (() => {
       <section style="padding:16px 0 12px;margin-bottom:14px;border-bottom:1px solid var(--border);">
         <div style="margin-bottom:10px;">
           <div style="font-size:11px;color:var(--brand);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;">Vue 14 jours</div>
-          <div style="font-size:18px;font-weight:800;color:var(--text);letter-spacing:-.4px;line-height:1.2;">📅 Historique 7j + Pronos 7j à venir</div>
-          <div style="font-size:11.5px;color:var(--text-dim);margin-top:3px;">Clique un jour pour filtrer le tableau · ROI calculé sur résultats settled</div>
+          <div style="font-size:18px;font-weight:800;color:var(--text);letter-spacing:-.4px;line-height:1.2;">📅 Historique 7j + Paris 7j à venir</div>
+          <div style="font-size:11.5px;color:var(--text-dim);margin-top:3px;">Clique un jour pour filtrer le tableau · ROI calculé sur résultats réglés</div>
         </div>
         <div style="display:grid;grid-template-columns:repeat(15,minmax(0,1fr));gap:4px;">
           ${cellsHtml}
@@ -21128,9 +21128,9 @@ const _quickFilters = (() => {
   <div style="display:flex;gap:8px;flex-wrap:wrap;padding:10px 0 12px;align-items:center;">
     <span style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;font-weight:700;">Filtre rapide :</span>
     <button type="button" data-quick-filter="all" aria-pressed="${all.pressed}" style="padding:6px 12px;background:var(--panel);border:1px solid var(--border);color:var(--text);border-radius:999px;font-size:12px;font-weight:600;cursor:pointer;${all.ring}">📋 Tous</button>
-    <button type="button" data-quick-filter="genius" aria-pressed="${gen.pressed}" style="padding:6px 12px;background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.4);color:#a855f7;border-radius:999px;font-size:12px;font-weight:700;cursor:pointer;${gen.ring}">🧠 Genius (edge ≥7pt)</button>
-    <button type="button" data-quick-filter="value" aria-pressed="${val.pressed}" style="padding:6px 12px;background:rgba(52,211,153,.15);border:1px solid rgba(52,211,153,.4);color:var(--accent);border-radius:999px;font-size:12px;font-weight:700;cursor:pointer;${val.ring}">💎 Value (edge ≥5pt)</button>
-    <button type="button" data-quick-filter="locks" aria-pressed="${loc.pressed}" style="padding:6px 12px;background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.4);color:var(--warn);border-radius:999px;font-size:12px;font-weight:700;cursor:pointer;${loc.ring}">🔒 Locks (conf ≥75%)</button>
+    <button type="button" data-quick-filter="genius" aria-pressed="${gen.pressed}" style="padding:6px 12px;background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.4);color:#a855f7;border-radius:999px;font-size:12px;font-weight:700;cursor:pointer;${gen.ring}">🧠 Genius (marge ≥7pt)</button>
+    <button type="button" data-quick-filter="value" aria-pressed="${val.pressed}" style="padding:6px 12px;background:rgba(52,211,153,.15);border:1px solid rgba(52,211,153,.4);color:var(--accent);border-radius:999px;font-size:12px;font-weight:700;cursor:pointer;${val.ring}">💎 Value (marge ≥5pt)</button>
+    <button type="button" data-quick-filter="locks" aria-pressed="${loc.pressed}" style="padding:6px 12px;background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.4);color:var(--warn);border-radius:999px;font-size:12px;font-weight:700;cursor:pointer;${loc.ring}">🔒 Locks (fiab. ≥75%)</button>
     <button type="button" data-quick-filter="outsiders" aria-pressed="${out.pressed}" style="padding:6px 12px;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.4);color:#f59e0b;border-radius:999px;font-size:12px;font-weight:700;cursor:pointer;${out.ring}">💎 Outsiders (cote ≥5)</button>
   </div>`;
 })();
