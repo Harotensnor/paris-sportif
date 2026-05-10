@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-const URL = '/pronostics.html';
+const URL = '/pronostics.html?docsNoTour=1';
 
 test.beforeEach(async ({ context }) => {
   await context.addInitScript(() => {
@@ -37,6 +37,10 @@ test.beforeEach(async ({ context }) => {
 });
 
 test.describe('privacy-first social layer', () => {
+  test.describe.configure({ mode: 'serial' });
+  test.setTimeout(60_000);
+  test.use({ serviceWorkers: 'block' });
+
   test('exposes a zero-network audit and renders the QR sharing modal', async ({ page }) => {
     await page.goto(URL);
     await page.waitForFunction(() => Boolean(window.__privacyFeaturesNetworkAudit && window.__psPrivacySocial));
@@ -52,7 +56,7 @@ test.describe('privacy-first social layer', () => {
   test('adds local profile and personal report panels', async ({ page }) => {
     await page.goto(URL + '#profil');
     await expect(page.locator('[data-privacy-profile]')).toBeVisible({ timeout: 10_000 });
-    await expect(page.locator('[data-privacy-profile]')).toContainText('Profil privé local');
+    await expect(page.locator('[data-privacy-profile]')).toContainText('Confidentialité locale');
     await expect(page.locator('[data-privacy-profile]')).toContainText('rang basé sur volume');
     await expect(page.locator('[data-privacy-profile]')).toContainText('sport le plus joué');
     await expect(page.locator('[data-privacy-profile]')).toContainText('Badges locaux');

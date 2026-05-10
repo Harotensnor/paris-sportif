@@ -141,7 +141,7 @@ async function dispatchFetch(ctx, url) {
 }
 
 (async () => {
-  check('CACHE_VERSION is stamped', /^paris-sportif-\d{8}-\d{6}$/.test(version || ''), String(version));
+  check('CACHE_VERSION is stamped', /^paris-sportif-(?:v\d+\.\d+-)?\d{8}-\d{6}$/.test(version || ''), String(version));
   const ctx = makeRuntime();
   vm.runInNewContext(swSource, ctx, { filename: 'sw.js' });
   check('worker registers install/activate/fetch handlers', ['install', 'activate', 'fetch'].every(k => typeof ctx.__listeners[k] === 'function'));

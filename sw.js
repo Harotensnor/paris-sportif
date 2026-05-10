@@ -11,7 +11,7 @@
 // The "Stamp sw.js" step replaces this entire line with the current UTC timestamp,
 // so every deploy invalidates all caches → users see the new pronostics.html
 // without needing Ctrl+Shift+R. Manual edits stay valid for local dev.
-const CACHE_VERSION = 'paris-sportif-v54.6-20260510-124041';
+const CACHE_VERSION = 'paris-sportif-v55.3-20260510-151759';
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
@@ -176,14 +176,16 @@ function pathEndsWith(url, name) {
 }
 
 // Network-first wrapper standard (rafraîchit cache à chaque hit).
-function networkFirst(req, cacheName) {
-  return fetch(req)
+function networkFirst(req, cacheName, options = {}) {
+  const fetchReq = options.noStore ? new Request(req, { cache: 'no-store' }) : req;
+  const cacheKey = options.cacheKey || req;
+  return fetch(fetchReq)
     .then(resp => {
       const respClone = resp.clone();
-      caches.open(cacheName).then(c => c.put(req, respClone));
+      caches.open(cacheName).then(c => c.put(cacheKey, respClone));
       return resp;
     })
-    .catch(() => caches.match(req));
+    .catch(() => caches.match(cacheKey));
 }
 
 // Gros fichiers de données : servir le dernier cache immédiatement puis
@@ -240,10 +242,14 @@ self.addEventListener('fetch', (event) => {
   const isHtml = pathEndsWith(url, 'pronostics.html') || path === '/' || path.endsWith('/');
   if (isHtml) {
     event.respondWith(
-      fetch(req)
+      fetch(new Request(req, { cache: 'no-store' }))
         .then(resp => {
           const respClone = resp.clone();
-          caches.open(RUNTIME_CACHE).then(c => c.put(req, respClone));
+          const canonicalClone = resp.clone();
+          caches.open(RUNTIME_CACHE).then(c => {
+            c.put(req, respClone);
+            if (pathEndsWith(url, 'pronostics.html')) c.put('pronostics.html', canonicalClone);
+          });
           return resp;
         })
         .catch(() => caches.match(req).then(hit => hit || caches.match('pronostics.html')))
@@ -284,20 +290,11 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // app.css + app.js : STALE-WHILE-REVALIDATE. Servir le cache
-  // immédiatement (instant render) ET refetch en background pour la prochaine
-  // visite. Couplé au stamp CACHE_VERSION bumpé à chaque vrai changement.
+  // CSS/JS d'application : NETWORK-FIRST no-store. Les captures utilisateur
+  // montraient une vieille v54 servie malgré les query stamps v55 ; on préfère
+  // un hit réseau frais et seulement utiliser le cache en secours offline.
   if (pathEndsWith(url, 'app.css') || pathEndsWith(url, 'app-design-v3.css') || pathEndsWith(url, 'app.js') || pathEndsWith(url, 'legacy-app.js')) {
-    event.respondWith(
-      caches.match(req).then(hit => {
-        const fetchPromise = fetch(req).then(resp => {
-          const respClone = resp.clone();
-          caches.open(SHELL_CACHE).then(c => c.put(req, respClone));
-          return resp;
-        }).catch(() => hit);  // network fail → fallback to cache
-        return hit || fetchPromise;  // immediate cache, refresh background
-      })
-    );
+    event.respondWith(networkFirst(req, SHELL_CACHE, { noStore: true }));
     return;
   }
 

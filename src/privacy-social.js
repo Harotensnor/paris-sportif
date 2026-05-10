@@ -156,6 +156,12 @@
     style.id = 'privacy-social-style';
     style.textContent = `
       .privacy-card{border:1px solid var(--border,rgba(148,163,184,.25));background:linear-gradient(135deg,rgba(16,185,129,.08),rgba(99,102,241,.08));border-radius:16px;padding:18px;color:var(--text,#e5e7eb);box-shadow:0 16px 40px rgba(0,0,0,.08)}
+      .privacy-card--profile{margin-top:18px;background:var(--panel,#101620);box-shadow:none}
+      .privacy-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap}
+      .privacy-card-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:14px}
+      .privacy-details{margin-top:14px;border:1px solid var(--border,rgba(148,163,184,.22));border-radius:12px;background:rgba(255,255,255,.025);overflow:hidden}
+      .privacy-details summary{min-height:44px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 12px;cursor:pointer;color:var(--text,#e5e7eb);font-weight:850}
+      .privacy-details-body{padding:0 12px 12px}
       .privacy-card h2,.privacy-card h3{margin:0 0 8px;font-size:18px;letter-spacing:0}
       .privacy-card p{margin:0;color:var(--text-dim,#9ca3af);line-height:1.55}
       .privacy-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:14px}
@@ -183,7 +189,7 @@
       .privacy-qr{display:flex;justify-content:center;background:#fff;border-radius:16px;padding:18px;margin:12px 0}
       .privacy-qr svg{max-width:280px;width:100%;height:auto}
       .privacy-table{width:100%;border-collapse:collapse;margin-top:10px}.privacy-table th,.privacy-table td{border-bottom:1px solid var(--border,rgba(148,163,184,.2));padding:9px;text-align:left}.privacy-table th{color:var(--text-dim,#9ca3af);font-size:12px;text-transform:uppercase}
-      @media (max-width:720px){.privacy-modal{align-items:flex-end;padding:0}.privacy-dialog{border-radius:18px 18px 0 0;max-height:92vh}.privacy-heatmap{grid-template-columns:repeat(26,1fr)}}
+      @media (max-width:720px){.privacy-modal{align-items:flex-end;padding:0}.privacy-dialog{border-radius:18px 18px 0 0;max-height:92vh}.privacy-heatmap{grid-template-columns:repeat(26,1fr)}.privacy-card-kpis{grid-template-columns:1fr 1fr}.privacy-grid{grid-template-columns:1fr}}
     `;
     document.head.appendChild(style);
   }
@@ -713,45 +719,55 @@
     const prev = months.length > 1 ? snapshots[months[months.length - 2]] : null;
     const goalProgress = Math.max(0, Math.min(100, stats.goalTarget ? stats.monthRoi / stats.goalTarget * 100 : 0));
     const panel = document.createElement('section');
-    panel.className = 'privacy-card';
+    panel.className = 'privacy-card privacy-card--profile';
     panel.setAttribute('data-privacy-profile', '1');
     panel.innerHTML = `
-      <h2>Profil privé local</h2>
-      <p>Badges, rang, objectifs et comparaisons restent dans ce navigateur. Partage seulement si tu exportes un fichier ou scannes un QR.</p>
-      <div class="privacy-grid">
+      <div class="privacy-card-head">
+        <div>
+          <h2>Confidentialité locale</h2>
+          <p>Exports, badges et comparaisons restent dans ce navigateur. Rien n'est envoyé sans action volontaire.</p>
+        </div>
+        <div class="privacy-actions" style="margin-top:0">
+          <button type="button" class="privacy-btn secondary" data-privacy-export-user>Exporter</button>
+          <button type="button" class="privacy-btn secondary" data-privacy-import-user>Importer</button>
+          <button type="button" class="privacy-btn secondary" data-privacy-privacy>Politique locale</button>
+        </div>
+      </div>
+      <div class="privacy-card-kpis">
         <div class="privacy-mini"><span class="privacy-rank">${esc(rank.label)} · ${rank.score}/100</span><p>rang basé sur volume, ROI et diversité</p></div>
         <div class="privacy-mini"><strong>${pct(stats.monthRoi)}</strong><p>objectif mensuel ${pct(stats.goalTarget)}</p><div style="height:8px;background:rgba(148,163,184,.18);border-radius:999px;overflow:hidden"><i style="display:block;height:100%;width:${goalProgress}%;background:var(--accent,#10b981)"></i></div></div>
         <div class="privacy-mini"><strong>${esc(topEntry(stats.bySport, 'aucun'))}</strong><p>sport le plus joué</p></div>
         <div class="privacy-mini"><strong>${esc(topEntry(stats.tiers, 'aucun'))}</strong><p>tier favori</p></div>
       </div>
-      <div class="privacy-grid">
+      <div class="privacy-card-kpis">
         <div class="privacy-mini"><strong>${esc(prev ? money(stats.pnl - prev.pnl) : 'Premier mois')}</strong><p>évolution vs snapshot précédent</p></div>
         <div class="privacy-mini"><strong>${money(stats.avgStake).replace('+', '')}</strong><p>mise moyenne</p></div>
         <div class="privacy-mini"><strong>${esc(topEntry(stats.byLeague, 'aucune'))}</strong><p>ligue favorite</p></div>
         <div class="privacy-mini"><strong>${stats.hours.morning}/${stats.hours.afternoon}/${stats.hours.night}</strong><p>matin / après-midi / soir</p></div>
       </div>
-      <h3 style="margin-top:18px">Badges locaux (${getUnlocked(stats).length}/${BADGES.length})</h3>
-      <div class="privacy-badge-grid">${renderBadges(stats)}</div>
-      <h3 style="margin-top:18px">Comparer avec des amis (saisie manuelle)</h3>
-      <div class="privacy-grid">
-        <input class="privacy-input" data-privacy-friend-name placeholder="Nom">
-        <input class="privacy-input" data-privacy-friend-bets type="number" min="0" placeholder="Paris">
-        <input class="privacy-input" data-privacy-friend-wins type="number" min="0" placeholder="Gagnés">
-        <input class="privacy-input" data-privacy-friend-stake type="number" min="0" step="0.01" placeholder="Mise totale">
-        <input class="privacy-input" data-privacy-friend-pnl type="number" step="0.01" placeholder="P&L">
-      </div>
-      <div class="privacy-actions"><button type="button" class="privacy-btn" data-privacy-add-friend>Ajouter au leaderboard local</button></div>
-      ${renderFriends(stats)}
-      <h3 style="margin-top:18px">Données et confidentialité</h3>
+      <details class="privacy-details">
+        <summary><span>Badges locaux et comparaison</span><span>${getUnlocked(stats).length}/${BADGES.length}</span></summary>
+        <div class="privacy-details-body">
+          <h3 style="margin-top:8px">Badges locaux (${getUnlocked(stats).length}/${BADGES.length})</h3>
+          <div class="privacy-badge-grid">${renderBadges(stats)}</div>
+          <h3 style="margin-top:18px">Comparer avec des amis (saisie manuelle)</h3>
+          <div class="privacy-grid">
+            <input class="privacy-input" data-privacy-friend-name placeholder="Nom">
+            <input class="privacy-input" data-privacy-friend-bets type="number" min="0" placeholder="Paris">
+            <input class="privacy-input" data-privacy-friend-wins type="number" min="0" placeholder="Gagnés">
+            <input class="privacy-input" data-privacy-friend-stake type="number" min="0" step="0.01" placeholder="Mise totale">
+            <input class="privacy-input" data-privacy-friend-pnl type="number" step="0.01" placeholder="P&L">
+          </div>
+          <div class="privacy-actions"><button type="button" class="privacy-btn" data-privacy-add-friend>Ajouter au leaderboard local</button></div>
+          ${renderFriends(stats)}
+        </div>
+      </details>
       <div class="privacy-actions">
-        <button type="button" class="privacy-btn secondary" data-privacy-export-user>Exporter mes données</button>
-        <button type="button" class="privacy-btn secondary" data-privacy-import-user>Importer mes données</button>
-        <button type="button" class="privacy-btn secondary" data-privacy-privacy>Voir la politique locale</button>
         <button type="button" class="privacy-btn danger" data-privacy-forget>Effacer toutes mes données</button>
       </div>
       <input type="file" accept="application/json,.json" data-privacy-import-file hidden>
     `;
-    wrap.prepend(panel);
+    wrap.appendChild(panel);
   }
 
   function showYearSummary() {
@@ -861,6 +877,7 @@
     window.addEventListener('hashchange', () => {
       handleComboHash();
       renderSoon();
+      [300, 1000, 2400].forEach(delay => setTimeout(renderSoon, delay));
     });
   }
   function initNetworkAudit() {
@@ -894,6 +911,7 @@
     const root = $('#app') || document.body;
     const observer = new MutationObserver(renderSoon);
     observer.observe(root, { childList: true, subtree: true });
+    [250, 900, 1800, 3600].forEach(delay => setTimeout(renderSoon, delay));
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });

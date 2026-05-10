@@ -19280,7 +19280,12 @@ counts.set(key, 1); // FORCE 1 to prevent "+N autre pick" badge after dedup
 return counts;
 })();
 const v37DenseRowLimit = 360;
-const v37DenseMinimumRows = Math.min(30, Math.max(0, v37ScanPool.length));
+// v55.3 — L'objectif produit est 30 paris/jour. Quand une date n'a que
+// quelques matchs, on complète avec les lignes 1N2 Winamax exactes des matchs
+// non encore représentés au lieu d'arrêter le tableau à 7 ou 12 lignes.
+const v37DenseMinimumRows = v37DateFilter === 'all'
+? Math.min(30, Math.max(0, v37ScanPool.length))
+: (v37ScanPool.length ? v55DailyTargetRows : 0);
 const v37PickRowKey = (p) => p?.pickUid || `${v37MatchKeyForPick(p)}|${p?.tier || ''}|${p?.market || ''}|${p?.pickKey || ''}|${p?.line ?? ''}|${Number(p?.odd || 0).toFixed(2)}`;
 const v37DataOnlyScanPool = v37ScanPool;
 const v37DataOnlyPool = (() => {
@@ -19884,7 +19889,7 @@ const v37EmptyPoolHelpHtml = (!v36PickPool.length && terminalScanPool.length > 1
         <span>${terminalScanPool.length} matchs restent en veille, mais les cotes ne sont pas assez confirmées pour l'accueil. Les lignes non actionnables sont déplacées dans Tous.</span>
         <button type="button" class="page-btn" data-page="tous">Ouvrir la veille complète</button>
       </section>` : '';
-const v37DenseFallbackHtml = (v36PickPool.length > 0 && v37DataOnlyPool.length > 0) ? `<section class="v37-empty-pool-help is-info">
+const v37DenseFallbackHtml = (v37DebugOn && v36PickPool.length > 0 && v37DataOnlyPool.length > 0) ? `<section class="v37-empty-pool-help is-info">
         <strong>Veille non actionnable masquée</strong>
         <span>${v36PickPool.length} pari${v36PickPool.length > 1 ? 's' : ''} qualifié${v36PickPool.length > 1 ? 's' : ''} seulement sur ce filtre ; ${v37DataOnlyPool.length} lignes à cote non confirmée sont gardées hors accueil. Vérifie-les dans Tous si tu veux auditer la couverture.</span>
       </section>` : '';
@@ -20470,9 +20475,10 @@ else acc.pending++;
 });
 const staked = acc.won + acc.lost;
 const roi = staked ? (acc.pl / staked) * 100 : 0;
+const _pl = (n, one, many) => `${n} ${n > 1 ? many : one}`;
 return `<footer class="v37-history-footer">
           <strong>${esc(v37DateLabel(v37DateFilter))} : ${v36TableRows.length} pari${v36TableRows.length > 1 ? 's' : ''}</strong>
-          <span>${acc.won} gagnés · ${acc.lost} perdus · ${acc.void} remboursés · ${acc.live} live · ${acc.pending} à venir · ROI ${roi >= 0 ? '+' : ''}${roi.toFixed(1)}%</span>
+          <span>${_pl(acc.won, 'gagné', 'gagnés')} · ${_pl(acc.lost, 'perdu', 'perdus')} · ${_pl(acc.void, 'remboursé', 'remboursés')} · ${acc.live} live · ${acc.pending} à venir · ROI ${roi >= 0 ? '+' : ''}${roi.toFixed(1)}%</span>
           <button type="button" class="page-btn" data-page="performance">Voir tout l'historique</button>
         </footer>`;
 })();
@@ -21072,33 +21078,45 @@ const _heroAccueil = (() => {
     const todayIsoLocal = new Date().toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
     const yesterdayDate = new Date(); yesterdayDate.setDate(yesterdayDate.getDate() - 1);
     const yesterdayIso = yesterdayDate.toLocaleDateString('fr-CA', { timeZone: 'Europe/Paris' });
-    const todayEvents = (data.days?.[todayIsoLocal] || []).filter(m => m && m.id && !/TBD|Winner/i.test((m.competitors || []).map(c => c.name).join(' ')));
-    let predicted = 0, genius = 0, value = 0, liveCount = 0;
+    const scopeDate = v37DateFilter || 'all';
+    const scopeMeta = scopeDate === 'all'
+      ? `${todayIsoLocal} -> ${v37AddDays(todayIsoLocal, 6)}`
+      : scopeDate;
+    const scopeLabel = scopeDate === 'all'
+      ? '7 jours glissants'
+      : (scopeDate === todayIsoLocal ? "Aujourd'hui" : v37DateLabel(scopeDate));
+    const heroRowsSource = (Array.isArray(v36TableRows) && v36TableRows.length)
+      ? v36TableRows
+      : (Array.isArray(v36PickPoolRaw) ? v36PickPoolRaw : []);
+    const isHeroBettable = (p) => {
+      if (!p || !p.m) return false;
+      try {
+        if (typeof v40IsBettable === 'function') return v40IsBettable(p);
+      } catch(e) { swallowError(e); }
+      return Number(p.odd || 0) >= 1.30 && Number(p.edge || 0) > 0 && Number(p.rel || 0) > 0;
+    };
+    const heroBettableRows = heroRowsSource.filter(isHeroBettable);
+    const heroScopeMatches = (() => {
+      try {
+        if (typeof v37BuildScanPool === 'function') return v37BuildScanPool(scopeDate);
+      } catch(e) { swallowError(e); }
+      return Array.isArray(terminalScanPool) ? terminalScanPool : [];
+    })();
+    let predicted = heroBettableRows.length, genius = 0, value = 0;
+    let liveCount = heroScopeMatches.filter(m => m && (m.live || m.status === 'STATUS_IN_PROGRESS')).length;
     let topEdgeMatch = null, topEdge = 0;
     const leagueCounts = {};
     const sportCounts = {};
-    const now = Date.now();
-    for (const m of todayEvents) {
-      if (m.live || m.status === 'STATUS_IN_PROGRESS') liveCount++;
-      const ko = m.date ? new Date(m.date).getTime() : 0;
-      if (m.completed || ko < now - 60 * 1000) continue;
-      let pred = null;
-      try { pred = predictMatch(m); } catch (e) {}
-      if (!pred || pred.skip) continue;
-      // v54.7 — Le hero compte uniquement les paris réellement jouables :
-      // marché Winamax exact, cote éligible, edge/EV positifs, kickoff futur.
-      let best = null;
-      try { best = (typeof selectBestMarket === 'function') ? selectBestMarket(m, pred) : null; } catch(e) {}
-      if (!best || !best.odd) continue;
-      predicted++;
-      const edge = Number(best.edge || 0);
-      const rel = Number(best.rel || 0);
-      const odd = Number(best.odd || 0);
+    for (const p of heroBettableRows) {
+      const m = p.m;
+      const edge = Number(p.edge || 0);
+      const rel = Number(p.rel || 0);
+      const odd = Number(p.odd || 0);
       if (edge >= 0.05) value++;
       if ((edge >= 0.12 || (edge >= 0.07 && rel >= 0.55)) && odd >= 1.30 && odd <= 8.0) genius++;
       if (edge > topEdge) {
         topEdge = edge;
-        topEdgeMatch = { m, best, edge, rel, odd };
+        topEdgeMatch = { ...p, m, best: p.best || p, edge, rel, odd };
       }
       const lg = m.league_name || m.league_code || '?';
       leagueCounts[lg] = (leagueCounts[lg] || 0) + 1;
@@ -21142,14 +21160,14 @@ const _heroAccueil = (() => {
       <section style="padding:18px 20px;margin-bottom:14px;background:linear-gradient(135deg,rgba(167,139,250,.10),rgba(52,211,153,.04));border:1px solid rgba(167,139,250,.25);border-radius:12px;">
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
           <div style="flex:1;min-width:300px;">
-            <div style="font-size:11px;color:var(--brand);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;">Aujourd'hui · ${todayIsoLocal}</div>
+            <div style="font-size:11px;color:var(--brand);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;">${esc(scopeLabel)} · ${esc(scopeMeta)}</div>
             <div style="font-size:22px;font-weight:800;color:var(--text);letter-spacing:-.5px;line-height:1.2;margin-top:3px;">
-              ${predicted} pari${predicted > 1 ? 's' : ''} jouable${predicted > 1 ? 's' : ''}${value > 0 ? ` · <span style="color:var(--accent);">${value} marge ≥5pt</span>` : ''}${genius > 0 ? ` · <span style="color:#a855f7;">${genius} 🧠 top marge</span>` : ''}
+              ${predicted} pari${predicted > 1 ? 's' : ''} misable${predicted > 1 ? 's' : ''}${value > 0 ? ` · <span style="color:var(--accent);">${value} marge ≥5pt</span>` : ''}${genius > 0 ? ` · <span style="color:#a855f7;">${genius} top marge</span>` : ''}
             </div>
             ${topEdgeMatch ? `
               <div style="font-size:13px;color:var(--text-2);margin-top:6px;">
-                💎 Meilleure marge : <b>${esc(topMatchLabel)}</b> — <b style="color:var(--accent);">+${(topEdge * 100).toFixed(1)}pt</b> sur ${esc(topEdgeMatch.best.label || '?')} @${topEdgeMatch.odd.toFixed(2)}
-                <button type="button" data-cal14-day="${esc(todayIsoLocal)}" data-big-detail="${esc(String(topEdgeMatch.m.id))}" style="margin-left:8px;background:var(--brand);color:#fff;border:none;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:700;cursor:pointer;">→ Voir</button>
+                💎 Meilleure marge : <b>${esc(topMatchLabel)}</b> — <b style="color:var(--accent);">+${(topEdge * 100).toFixed(1)}pt</b> sur ${esc(topEdgeMatch.labelFull || topEdgeMatch.label || topEdgeMatch.best?.label || '?')} @${topEdgeMatch.odd.toFixed(2)}
+                <button type="button" data-cal14-day="${esc(parisDateISO(topEdgeMatch.m.date) || todayIsoLocal)}" data-big-detail="${esc(String(topEdgeMatch.m.id))}" style="margin-left:8px;background:var(--brand);color:#fff;border:none;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:700;cursor:pointer;">→ Voir</button>
               </div>
             ` : ''}
             ${topLeagues.length ? `
@@ -26297,12 +26315,13 @@ if (counts.finished > 0) return 'finished';
 return validKeys.includes(saved) ? saved : 'pending'; // tout vide → afficher empty state
 })();
 const tousMobile = typeof matchMedia === 'function' && matchMedia('(max-width:720px)').matches;
-const defaultCoverageLimit = isCoveragePreset ? (tousMobile ? 220 : 260) : Number.POSITIVE_INFINITY;
+const defaultCoverageLimit = isCoveragePreset ? (tousMobile ? 60 : 90) : Number.POSITIVE_INFINITY;
+const maxCoverageLimit = isCoveragePreset ? (tousMobile ? 120 : 180) : Number.POSITIVE_INFINITY;
 const visibleLimit = (() => {
 if (!isCoveragePreset) return Number.POSITIVE_INFINITY;
 try {
 const saved = parseInt(localStorage.getItem('tousVisibleLimit') || '', 10);
-if (Number.isFinite(saved) && saved >= defaultCoverageLimit) return saved;
+if (Number.isFinite(saved) && saved >= defaultCoverageLimit) return Math.min(saved, maxCoverageLimit);
 } catch(e) { swallowError(e); }
 return defaultCoverageLimit;
 })();
@@ -26313,7 +26332,7 @@ const renderedFinished = renderSlice(displayFinished);
 const activeTotalRows = activeTab === 'pending' ? displayPending.length : activeTab === 'inprogress' ? displayInProgress.length : displayFinished.length;
 const activeRenderedRows = activeTab === 'pending' ? renderedPending.length : activeTab === 'inprogress' ? renderedInProgress.length : renderedFinished.length;
 const hasMoreRows = isCoveragePreset && activeRenderedRows < activeTotalRows;
-const nextLoadCount = hasMoreRows ? Math.min(80, activeTotalRows - activeRenderedRows) : 0;
+const nextLoadCount = hasMoreRows ? Math.min(60, Math.max(0, Math.min(activeTotalRows, maxCoverageLimit) - activeRenderedRows)) : 0;
 const tousRailStyle = tousMobile
 ? 'flex-wrap:nowrap;overflow-x:auto;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;mask-image:linear-gradient(90deg,#000 calc(100% - 32px),transparent);padding-bottom:4px;'
 : 'flex-wrap:wrap;';
@@ -26682,12 +26701,15 @@ const finishedEmptyMsg = _completedNoOdds > 0
 const finishedHtml = displayFinished.length
 ? renderedFinished.map(p => isCoveragePreset ? renderCoverageRow(p) : renderRow(p, true)).join('')
 : _emptyState(finishedEmptyMsg, false);
-const loadMoreHtml = hasMoreRows ? `
+const loadMoreHtml = hasMoreRows && nextLoadCount > 0 ? `
       <div style="display:flex;justify-content:center;margin:12px 0 4px;">
         <button type="button" data-tous-load-more style="min-height:44px;padding:10px 18px;border-radius:999px;border:1px solid var(--brand-border);background:rgba(167,139,250,.12);color:var(--brand);font-size:12px;font-weight:900;cursor:pointer;">
           Afficher ${nextLoadCount} match${nextLoadCount>1?'s':''} de plus · ${activeRenderedRows}/${activeTotalRows}
         </button>
-      </div>` : '';
+      </div>` : (hasMoreRows ? `
+      <div style="margin:14px 0 4px;text-align:center;color:var(--text-dim2);font-size:11.5px;">
+        Vue compacte limitée à ${activeRenderedRows} lignes pour garder la page lisible. Utilise la recherche, les filtres ou l'export CSV pour auditer les ${activeTotalRows} matchs.
+      </div>` : '');
 
 const _sourcesStats = (() => {
 try {
@@ -26947,7 +26969,7 @@ renderTousPage(wrap);
 });
 const loadMoreBtn = wrap.querySelector('[data-tous-load-more]');
 if (loadMoreBtn) loadMoreBtn.addEventListener('click', () => {
-try { localStorage.setItem('tousVisibleLimit', String(Math.min(activeTotalRows, activeRenderedRows + 80))); } catch(e) { swallowError(e); }
+try { localStorage.setItem('tousVisibleLimit', String(Math.min(activeTotalRows, maxCoverageLimit, activeRenderedRows + 60))); } catch(e) { swallowError(e); }
 renderTousPage(wrap);
 });
 const tousSearch = wrap.querySelector('[data-tous-search]');
@@ -28765,6 +28787,9 @@ const esc2 = (typeof esc === 'function') ? esc : (s) => String(s).replace(/[&<>"
     const diversification = Math.max(1, Math.min(5, Number(strategyPrefs.diversification || 3)));
     const minConfidence = Math.max(50, Math.min(90, Number(strategyPrefs.minConfidence || 55)));
     const excludedLeagues = Array.isArray(strategyPrefs.excludedLeagues) ? strategyPrefs.excludedLeagues : [];
+    const profileName = String(prefs.displayName || localStorage.getItem('profileDisplayName') || '').trim();
+    const profileTitle = profileName || 'Mon profil';
+    const profileInitial = (profileName || 'P').slice(0, 1).toUpperCase();
 
     const availableSports = ['football', 'tennis', 'basketball', 'hockey', 'baseball', 'rugby', 'mma'];
     const availableLeagues = (() => {
@@ -28952,10 +28977,10 @@ const esc2 = (typeof esc === 'function') ? esc : (s) => String(s).replace(/[&<>"
       <div class="page-wrap">
         <div style="margin-bottom:24px;padding:32px 0 20px;border-bottom:1px solid var(--border);position:relative;display:flex;align-items:center;gap:18px;flex-wrap:wrap;">
           <div style="position:absolute;top:0;left:0;width:40px;height:3px;background:var(--brand);border-radius:0 0 2px 2px;"></div>
-          <div style="width:56px;height:56px;border-radius:50%;background:var(--panel-2);border:1px solid var(--border-2);display:grid;place-items:center;font-size:22px;color:var(--text);font-weight:800;flex-shrink:0;">T</div>
+          <div style="width:56px;height:56px;border-radius:50%;background:var(--panel-2);border:1px solid var(--border-2);display:grid;place-items:center;font-size:22px;color:var(--text);font-weight:800;flex-shrink:0;">${esc(profileInitial)}</div>
           <div style="min-width:0;flex:1;">
             <div style="font-size:11px;color:var(--brand);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:4px;">Profil &amp; bankroll</div>
-            <h1 style="margin:0 0 4px;font-size:36px;font-weight:800;letter-spacing:-1.2px;color:var(--text);line-height:1;">👤 Théo</h1>
+            <h1 style="margin:0 0 4px;font-size:36px;font-weight:800;letter-spacing:-1.2px;color:var(--text);line-height:1;">${esc(profileTitle)}</h1>
             <div style="font-size:13px;color:var(--text-dim);">Préférences personnelles · bankroll, seuil lock, cagnotte initiale.</div>
           </div>
         </div>
