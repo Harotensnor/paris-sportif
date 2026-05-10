@@ -13,7 +13,7 @@
   "@context": "https://schema.org",
   "@type": "Dataset",
   "name": "Performance Paris-Sportif (audit)",
-  "description": "Backtest 1932 picks settled, paper trading forward log, calibration Brier, CLV pick-level. Toutes les stats sont reproductibles via les fichiers JSON publics.",
+  "description": "Backtest 1932 paris réglés, paper trading forward log, calibration Brier, CLV par pari. Toutes les stats sont reproductibles via les fichiers JSON publics.",
   "url": "https://harotensnor.github.io/paris-sportif/stats.html",
   "creator": {"@type": "Organization", "name": "Paris-Sportif"},
   "license": "https://creativecommons.org/publicdomain/zero/1.0/",
@@ -43,7 +43,7 @@
       <div class="hero-sub">ROI sur <b>356 paris</b> · max DD <b>3.0%</b></div>
     </div>
     <div class="hero-card hero-blue">
-      <div class="hero-label">Value-only</div>
+      <div class="hero-label">Marge seule</div>
       <div class="hero-value" id="stat-value-roi">+33.1%</div>
       <div class="hero-sub">ROI sur <b>1251 paris</b> · max DD <b>3.6%</b></div>
     </div>
@@ -58,22 +58,22 @@
       <div class="hero-sub">À éviter · max DD <b>99.99%</b> (wipeout)</div>
     </div>
   </div>
-  <div class="hero-disclaimer">Backtest 1932 picks settled (sample audité 2026-04-27 → 2026-05-09). Reproductible via <a href="backtest_strategies.json"><code>backtest_strategies.json</code></a>.</div>
+  <div class="hero-disclaimer">Backtest 1932 paris réglés (sample audité 2026-04-27 → 2026-05-09). Reproductible via <a href="backtest_strategies.json"><code>backtest_strategies.json</code></a>.</div>
 </section>
 
 <section class="content-section">
   <h2>📈 Forward proof (paper trading)</h2>
-  <p>Le backtest historique peut être recalibré rétrospectivement. Le <b>paper trading</b> snapshot tous les picks futurs et résout au fil du temps — impossible à manipuler.</p>
+  <p>Le backtest historique peut être recalibré rétrospectivement. Le <b>paper trading</b> fige tous les paris futurs et les résout au fil du temps — impossible à manipuler.</p>
   <div class="paper-stats" id="paper-stats">
     <div class="paper-card">
       <div class="paper-label">Snapshots</div>
       <div class="paper-value" id="paper-snapshot-count">—</div>
-      <div class="paper-sub">picks tracked</div>
+      <div class="paper-sub">paris suivis</div>
     </div>
     <div class="paper-card">
       <div class="paper-label">Settled</div>
       <div class="paper-value" id="paper-settled-count">—</div>
-      <div class="paper-sub">matches resolved</div>
+      <div class="paper-sub">matchs réglés</div>
     </div>
     <div class="paper-card">
       <div class="paper-label">Win rate</div>
@@ -99,7 +99,7 @@
       <span class="quality-status" id="stat-brier-status">⚠ proche</span>
     </div>
     <div class="quality-row">
-      <span class="quality-label">CLV pick-level (target &gt; +1%)</span>
+      <span class="quality-label">CLV par pari (objectif &gt; +1%)</span>
       <span class="quality-value" id="stat-clv">-0.77%</span>
       <span class="quality-status">⚠ légèrement en-dessous</span>
     </div>
@@ -109,7 +109,7 @@
       <span class="quality-status">✓ &gt; 50%</span>
     </div>
     <div class="quality-row">
-      <span class="quality-label">Picks réglés (cumulé)</span>
+      <span class="quality-label">Paris réglés (cumulé)</span>
       <span class="quality-value" id="stat-n-total">647</span>
       <span class="quality-status">✓ sample représentatif</span>
     </div>
@@ -134,10 +134,10 @@
 <section class="content-section">
   <h2>🔍 Méthodologie</h2>
   <ul class="meth-list">
-    <li><b>Source des cotes</b> : Winamax exact (catalog official) — 100% des picks dans le sample.</li>
+    <li><b>Source des cotes</b> : Winamax exact (catalog officiel) — 100% des paris dans le sample.</li>
     <li><b>Modèle</b> : Bivariate Poisson + Dixon-Coles τ correction + Elo per-team + LightGBM stacking + ensemble adaptive weights v5.</li>
     <li><b>Backtest</b> : <a href="scripts/backtest_v2.py">scripts/backtest_v2.py</a> rejoue <code>predictMatch</code> sur events historiques via mini-racer (V8 embedded). Une seule source de vérité avec la prod.</li>
-    <li><b>Paper log</b> : <a href="scripts/paper_trade_log.py">scripts/paper_trade_log.py</a> snapshot des picks futurs + settle quand match completed. Forward proof immutable.</li>
+    <li><b>Paper log</b> : <a href="scripts/paper_trade_log.py">scripts/paper_trade_log.py</a> fige les paris futurs + règlement quand le match est terminé. Forward proof immutable.</li>
     <li><b>CLV</b> : compute_clv.py compare cote au snapshot vs cote finale Winamax. Mesure si on bat le marché.</li>
     <li><b>Stratégie default</b> : FLAT 1u (1% bankroll). Kelly disponible mais documenté -30% ROI historique.</li>
   </ul>

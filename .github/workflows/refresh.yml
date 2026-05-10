@@ -301,7 +301,8 @@ jobs:
           # v33.32 — Compute Closing Line Value depuis odds_history.jsonl
           # Mesure si on bat le marché (cote bouge en notre faveur après
           # qu'on ait pris la cote). Cheap (~1s sur 450 matches).
-          python3 build_picks_history.py || true
+          python3 build_picks_history.py --backfill-git-days 14 || true
+          python3 build_history_compact.py || true
           python3 build_team_priors.py || true
           python3 build_bayesian_priors_v5.py || true
           python3 build_stacking_meta_v5.py || true
@@ -380,6 +381,10 @@ jobs:
           # écrit data_today.json + data_manifest.json + ré-inline LITE blob
           # dans pronostics.html. Réduit le 1er paint de ~1.4 MB à ~0.4 MB.
           python3 finalize_inline.py || true
+          # v55.2 — Ne jamais publier un tableau vide par perte des marchés
+          # Winamax. Si data.js contient des matchs Winamax mais que les cotes
+          # n'ont pas été attachées, le run échoue avant le commit.
+          python3 check_winamax_markets_attached.py
           python3 check_pipeline_health.py --max-age-min 30
           python3 check_pipeline_freshness.py --max-age-min 30
           # AUDIT 2026-05-08 v40 — Push winamax_markets.json (~90 MB) sur
@@ -471,7 +476,7 @@ jobs:
             lightgbm_weights.json lightgbm_weights.js \
             rugby_markets.json niche_markets.json mlb_player_props.json nhl_playoff_markets.json tennis_challenger_watchlist.json football_expansion_watchlist.json sports_expansion_audit.json \
             boosted_odds.json \
-            results_archive.jsonl tennis_ratings.json.gz footballdata.json.gz \
+            results_archive.jsonl picks_history.jsonl picks_history_summary.json history_compact.json tennis_ratings.json.gz footballdata.json.gz \
             bayesian_priors.json.gz team_priors.json.gz team_form.json.gz \
             mlb_pitchers.json baseball_savant.json nhl_stats.json backtest.html feed.xml \
             credibilite.html stadiums.json dixon_coles_rho.json index.html \

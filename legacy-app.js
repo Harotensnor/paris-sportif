@@ -1011,7 +1011,7 @@ overlay.innerHTML = `
             ['Maj+T', 'Cycle thème (sombre/clair/auto)'],
             ['g+h/t/m/e/p', 'Accueil / Tous / Mes paris / Méthode / Profil'],
             ['j / k', 'Carte suivante / précédente'],
-            ['B', 'Mode Big Bets seulement'],
+            ['B', 'Mode gros paris seulement'],
             ['← / →', 'Jour précédent / suivant'],
           ].map(([k, desc]) => `
 <div style="display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center;padding:6px 0;">
@@ -1557,7 +1557,7 @@ picks: [
 { page: 'top', label: '⭐ Top du jour' },
 { page: 'valeur', label: '💎 Mismatches' },
 { page: 'plan-mise', label: '💼 Mises du jour' },
-{ page: 'locks', label: '🔒 Locks' },
+{ page: 'locks', label: '🔒 Paris sûrs' },
 { page: 'combines', label: '🔗 Combinés' },
 { page: 'montante-jour', label: '📈 Montante jour' },
 { page: 'montante-weekend', label: '🗓️ Weekend' },
@@ -4034,6 +4034,7 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     const exact = sameMarket.find(row => matchSide(row) && matchLine(row));
     if (exact) return { row: exact, rows: sameMarket.length, reason: '' };
     const sameMarketSameOdd = sameMarket.find(row => Math.abs(Number(row.odd) - Number(c.odd)) <= 0.006);
+    if (sameMarketSameOdd) return { row: sameMarketSameOdd, rows: sameMarket.length, reason: 'prix exact retrouvé dans le même marché' };
     return { row: null, rows: sameMarket.length, sameMarketSameOdd, reason: sameMarket.length ? 'sélection ou ligne introuvable dans Winamax' : 'marché introuvable dans Winamax' };
   }
 
@@ -8973,7 +8974,7 @@ const hasBigBets = (bigBets.n || 0) > 0;
 const headlineTier = hasBigBets ? bigBets : locks;
 const setText = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
 const firstLabel = document.querySelector('#trust-locks-wr + .trust-strip-lbl');
-if (firstLabel) firstLabel.textContent = hasBigBets ? 'Gros paris' : 'Réussite locks';
+if (firstLabel) firstLabel.textContent = hasBigBets ? 'Gros paris' : 'Réussite forts';
 if (headlineTier.n > 0) {
 setText('trust-locks-wr', Math.round((headlineTier.win_rate || 0) * 100) + '%');
 } else {
@@ -9226,6 +9227,8 @@ const keys = [
 'smartSuggestionDismissedTs',
 'howToReadDismissedTs',
 'autoRefreshDoneAt',
+'paris_sportif_onboarded_v1',
+'paris_sportif_onboarded_v2',
 ];
 let n = 0;
 keys.forEach(k => {
@@ -9241,10 +9244,16 @@ const prefs = JSON.parse(localStorage.getItem('userPrefs') || '{}');
 delete prefs.onboardingDone;
 delete prefs.howToShownTimes;
 localStorage.setItem('userPrefs', JSON.stringify(prefs));
+localStorage.setItem('paris_sportif_onboarding_requested', '1');
 n++;
 } catch(e) { swallowError(e); }
+try {
+if (typeof showOnboardingModal === 'function') {
+showOnboardingModal({ force: true, explicit: true });
+}
+} catch(e) { swallowError(e); }
 if (typeof window.toast === 'function') {
-window.toast(`✓ ${n} tutoriels/banners réinitialisés. Recharge la page pour les revoir.`, 'success');
+window.toast(`✓ ${n} tutoriels/banners réinitialisés.`, 'success');
 }
 return n;
 };
@@ -13344,8 +13353,27 @@ const whyNoBetReason = whyDone ? 'Match terminé'
 : !whyBest ? 'Aucun marché exploitable'
 : !whyOddOk ? 'Cote à revérifier'
 : pred?.skip ? 'Pick filtré par le modèle'
-: !whyPositiveValue ? 'Aucune value exploitable'
+: !whyPositiveValue ? 'Aucune marge exploitable'
 : 'Non actionnable';
+try {
+const _wxBtn = document.getElementById('detail-winamax-cta');
+if (_wxBtn) {
+const labelEl = _wxBtn.querySelector('[data-winamax-cta-label]') || _wxBtn.querySelector('span:nth-of-type(2)');
+if (whyActionable) {
+if (labelEl) labelEl.textContent = 'Placer sur Winamax';
+_wxBtn.setAttribute('aria-label', 'Placer ce pari sur Winamax (nouvel onglet)');
+_wxBtn.title = 'Pari recommandé : ouvrir Winamax';
+_wxBtn.style.background = 'linear-gradient(135deg,#fbbf24 0%,#f59e0b 100%)';
+_wxBtn.style.color = '#0c0a0a';
+} else {
+if (labelEl) labelEl.textContent = 'Voir les cotes Winamax';
+_wxBtn.setAttribute('aria-label', `Voir les cotes Winamax, sans recommandation de mise : ${whyNoBetReason}`);
+_wxBtn.title = `Aucun pari recommandé : ${whyNoBetReason}`;
+_wxBtn.style.background = 'rgba(255,255,255,.045)';
+_wxBtn.style.color = 'var(--text)';
+}
+}
+} catch(e) { swallowError(e); }
 const whyStakeDisplay = whyActionable ? `${whyStake}€` : '0€';
 const whyStakeHint = whyActionable
 ? (whyStakeMode === 'kelly' ? 'Kelly ⚠ -30% hist' : 'FLAT 1u (recommandé)')
@@ -15884,7 +15912,7 @@ ${match.surface ? `<div class="kv"><div class="k">Surface</div><div class="v">${
         }
       };
       toggle.addEventListener('click', () => setExpanded(shell.hidden));
-      setExpanded(true);
+      setExpanded(false);
     })();
 
     // scroll vertical (qui faisait jusqu'à 5400px sur foot top-5). Sur ≤720px,
@@ -16423,14 +16451,14 @@ teams.forEach(t => items.push({ kind: 'team', label: t.name, sub: t.sport, logo:
 leagues.forEach(l => items.push({ kind: 'league', label: l.name, sub: l.sport }));
 venues.forEach(v => items.push({ kind: 'venue', label: v.name, sub: v.sport }));
 [
-['page', 'Accueil Big Bets', 'dashboard', 'Voir les gros coups du jour'],
+['page', 'Accueil gros paris', 'dashboard', 'Voir les gros coups du jour'],
 ['page', 'Tous les paris', 'tous', 'Filtrer tous les matchs'],
 ['page', 'Mes paris et performance', 'performance', 'Bilan, historique, track record'],
 ['page', 'Méthode', 'academie', 'Glossaire et stratégie'],
 ['page', 'Profil', 'profil', 'Préférences, diagnostic et bankroll'],
 ['page', 'Diagnostic data', 'profil', 'Pipeline et erreurs dans Profil'],
 ['page', 'Stratégies montantes', 'performance', 'Jour, weekend, semaine dans Performance'],
-['action', 'Mode Big Bets seulement', 'focus', 'Masquer le bruit'],
+['action', 'Mode gros paris seulement', 'focus', 'Masquer le bruit'],
 ['action', 'Cotes 2.50+', 'sport:all:2.5', 'Filtrer les grosses cotes'],
 ['action', 'Football du jour', 'sport:football', 'Filtrer football'],
 ['action', 'Tennis du jour', 'sport:tennis', 'Filtrer tennis'],
@@ -18084,7 +18112,7 @@ const v36TierDefs = [
 { id: 'safe', icon: 'S', abbr: 'S', label: 'Sur', range: '1.30-1.50', desc: 'Conf. 65%+ · avantage proche neutre accepte', tone: 'safe' },
 { id: 'solid', icon: 'SO', abbr: 'SO', label: 'Solide', range: '1.50-2.00', desc: 'Conf. 50%+ · bon equilibre risque/gain', tone: 'solid' },
 { id: 'value', icon: 'V', abbr: 'V', label: 'Valeur', range: '2.00-3.00', desc: 'Conf. 35%+ · avantage 1%+', tone: 'value' },
-{ id: 'big', icon: 'B', abbr: 'B', label: 'Big odds', range: '3.00-5.00', desc: 'Conf. 18%+ · avantage 3%+', tone: 'big' },
+{ id: 'big', icon: 'B', abbr: 'B', label: 'Grosse cote', range: '3.00-5.00', desc: 'Conf. 18%+ · avantage 3%+', tone: 'big' },
 { id: 'out', icon: 'O', abbr: 'O', label: 'Outsider', range: '5.00+', desc: 'Conf. 6%+ · avantage 5%+', tone: 'out' }
 ];
 const v36TierById = Object.fromEntries(v36TierDefs.map(t => [t.id, t]));
@@ -18618,9 +18646,12 @@ let v37FilterResetNotice = '';
 let v37AutoHorizonReason = '';
 const v37HashDate = v37HashParams.get('date') || '';
 let v37DateSource = v37HashDate ? 'url' : 'default';
-let v37DateFilter = (/^\d{4}-\d{2}-\d{2}$/.test(v37HashDate) || v37HashDate === 'all') ? v37HashDate : todayIso;
-if (!v37HashDate && v36Filter.date !== todayIso) {
-v36Filter.date = todayIso;
+const v37StoredDate = (/^\d{4}-\d{2}-\d{2}$/.test(String(v36Filter.date || '')) || v36Filter.date === 'all') ? v36Filter.date : '';
+let v37DateFilter = (/^\d{4}-\d{2}-\d{2}$/.test(v37HashDate) || v37HashDate === 'all')
+? v37HashDate
+: (v37StoredDate && v37StoredDate !== todayIso ? v37StoredDate : 'all');
+if (!v37HashDate && v36Filter.date !== v37DateFilter) {
+v36Filter.date = v37DateFilter;
 try { localStorage.setItem(v36FilterKey, JSON.stringify(v36Filter)); } catch(e) { swallowError(e); }
 }
 const v37IncludeLive = v36Filter.includeLive === true || v36Filter.includeLive === '1';
@@ -18791,6 +18822,21 @@ v37Reject('date_auto_horizon_low_pool', null, v37AutoHorizonReason);
 }
 }
 const v37ShowResultColumn = v37HistoryMode || v37DateFilter === todayIso;
+const v55DailyTargetRows = 30;
+// On affiche un tampon au-dessus de l'objectif utilisateur : quelques lignes
+// peuvent rester en mode prudent, mais il doit rester au moins 30 boutons Miser.
+const v55DailyRenderBufferRows = 8;
+const v55DailyRenderTargetRows = v37DateFilter === 'all'
+? v55DailyTargetRows
+: v55DailyTargetRows + v55DailyRenderBufferRows;
+const v55PerMatchCap = (() => {
+if (v37DateFilter === 'all') return 2;
+const n = Math.max(1, v37ScanPool.length || 0);
+if (n >= v55DailyTargetRows) return 2;
+if (n < 20) return 8;
+if (n < v55DailyTargetRows) return 5;
+return Math.max(2, Math.min(8, Math.ceil(v55DailyTargetRows / n)));
+})();
 const v37DashboardMarketLimit = (market) => {
 const m = String(market || '');
 if (m === 'exactScore' || m === 'resultBtts' || m === 'ht_1n2') return 1;
@@ -19010,9 +19056,9 @@ v37Reject('doublon_exact_filtre', p.m, p.labelFull || p.label || '');
 continue;
 }
 const matchCount = matchCounts.get(matchKey) || 0;
-if (matchCount >= 2) {
+if (matchCount >= v55PerMatchCap) {
 v37QualityCounters.matchCapRemoved++;
-v37Reject('cap_match_2', p.m, p.labelFull || p.label || '');
+v37Reject('cap_match_dynamic', p.m, p.labelFull || p.label || '');
 continue;
 }
 const family = v37MarketFamilyKey(p);
@@ -19078,7 +19124,7 @@ const pickKey = `${matchKey}|${p.tier || ''}|${p.market || ''}|${p.pickKey || ''
 const displayKey = `${matchKey}|${p.tier || ''}|${p.market || ''}|${v37NormDisplayKey(p.labelFull || p.label || '')}|${Number(p.odd || 0).toFixed(2)}`;
 if (seenPick.has(pickKey) || seenDisplay.has(displayKey)) continue;
 const currentMatchCount = matchCounts.get(matchKey) || 0;
-if (currentMatchCount >= 2) {
+if (currentMatchCount >= v55PerMatchCap) {
 const replaceIdx = out.findIndex(x => v37StableMatchKey(x.m) === matchKey && x.tier !== tierDef.id);
 if (replaceIdx < 0) continue;
 const replaced = out.splice(replaceIdx, 1)[0];
@@ -19428,7 +19474,36 @@ return out;
 // Les lignes data-only / non confirmées restent utiles pour l'audit et la
 // page Tous, mais elles ne doivent plus remplir le dashboard comme si c'était
 // une reco. C'est ce qui créait "0 prono détecté" + 30 lignes à vérifier.
-const v37RenderPool = v37SortedDiverse.length ? v37SortedDiverse : [];
+const v37RenderPool = (() => {
+const base = v37SortedDiverse.length ? v37SortedDiverse.slice() : [];
+const target = v37DateFilter === 'all'
+? Math.min(v55DailyTargetRows, Math.max(0, v37ScanPool.length))
+: v55DailyRenderTargetRows;
+if (!target || base.length >= target) return base;
+const keys = new Set(base.map(v37PickRowKey));
+for (const p of v36PickPoolCanonical.slice().sort((a, b) => (Number(b.score || 0) - Number(a.score || 0)))) {
+if (base.length >= target) break;
+if (!p || v37OddPriorityState(p.oddValidation) === 'blocked') continue;
+if (!(Number(p.edge || 0) > 0 && Number(p.ev || 0) > 0)) continue;
+const key = v37PickRowKey(p);
+if (keys.has(key)) continue;
+base.push(p);
+keys.add(key);
+}
+for (const p of v37DataOnlyPool) {
+if (!p) continue;
+const oddState = v37OddPriorityState(p.oddValidation);
+const hasExactWinamaxLine = p?.best?.source === 'winamax_exact' || p?.best?.exact === true || !!p?.m?.winamax?.markets?.['1n2'];
+if (!hasExactWinamaxLine) continue;
+if (oddState === 'blocked' && !(Number(p.odd || 0) >= 1.30)) continue;
+const key = v37PickRowKey(p);
+if (keys.has(key)) continue;
+base.push(p);
+keys.add(key);
+if (base.length >= target) break;
+}
+return base;
+})();
 // AUDIT 2026-05-08 v40.11 — Mode strict : seuls les picks misables.
 // User : "je veux voir que des prono sur lesquels je peux misé".
 // On garde uniquement verdict 'bet' (Miser) ou 'bet-light' (Petite mise).
@@ -19463,6 +19538,7 @@ const v40PickVerdict = (p) => {
   if (opp >= 50) return 'bet';
   if (opp >= 22) return 'bet-light';
   if (edge >= 0.025 && relN >= 0.45 && oddN >= 1.30) return 'bet-light';
+  if (edge > 0 && oddN >= 1.30 && oddN <= 10.00) return 'bet-light';
   if (opp >= 14) return 'watch';
   return 'skip';
 };
@@ -19586,7 +19662,7 @@ const v45GeniusBannerHtml = (() => {
     return `<section class="v37-empty-pool-help" style="background:linear-gradient(135deg,rgba(168,85,247,.10),rgba(59,130,246,.08));border:1px solid rgba(168,85,247,.5);">
       <strong style="display:flex;align-items:center;gap:8px;font-size:14px;flex-wrap:wrap;">
         <span style="font-size:20px;">🧠</span>
-        Mode Genius · ${v45GeniusPicks.length} pari${v45GeniusPicks.length > 1 ? 's' : ''} strict${v45GeniusPicks.length > 1 ? 's' : ''} du jour
+        Top marge · ${v45GeniusPicks.length} pari${v45GeniusPicks.length > 1 ? 's' : ''} strict${v45GeniusPicks.length > 1 ? 's' : ''} du jour
         <span style="padding:2px 8px;background:rgba(168,85,247,.2);border:1px solid rgba(168,85,247,.5);border-radius:999px;font-size:11px;font-weight:800;color:#a855f7;">marge ≥12pt ou nette ≥5pt · fiabilité ≥55%</span>
       </strong>
       <div style="font-size:12px;color:var(--text-dim);margin:8px 0 12px;line-height:1.5;">
@@ -19611,6 +19687,7 @@ const v40RenderPoolFiltered = v40StrictApplied ? v37RenderPool.filter(v40IsBetta
 // User : "Bastia-Le Mans listé 3 fois" → confusion + sur-allocation potentielle.
 const _v46DedupeByMatch = (rows) => {
   if (!Array.isArray(rows) || rows.length === 0) return rows;
+  if (v37DateFilter !== 'all') return rows;
   const byMatch = new Map();
   for (const p of rows) {
     if (!p || !p.m || !p.m.id) continue;
@@ -19721,6 +19798,8 @@ v37ScanPoolCappedFrom,
 v37DashboardScanLimit,
 v37MinDenseDailyScanPool,
 v37DenseMinimumRows,
+v55DailyTargetRows,
+v55PerMatchCap,
 v37HashDate,
 v37CanAutoHorizonLowPool,
 v37AutoHorizonReason,
@@ -19778,6 +19857,18 @@ qualitySamples: v37QualitySamples,
 rejectReasons: v37RejectReasons,
 rejectSamples: v37RejectSamples
 };
+try {
+window.__v37DebugState = v37DebugState;
+window.__v36TableRowsDebug = v36TableRows.map(p => ({
+date: parisDateISO(p?.m?.date),
+matchId: v37StableMatchKey(p?.m),
+label: p?.labelFull || p?.label || '',
+market: p?.market || '',
+odd: Number(p?.odd || 0),
+edge: Number(p?.edge || 0),
+verdict: v40PickVerdict(p)
+}));
+} catch(e) { swallowError(e); }
 if (v37DebugOn) {
 try { prodLog('[v37 debug]', { ...v37DebugState, sampleMatches: v37DebugMatches() }); } catch(e) { swallowError(e); }
 }
@@ -19797,6 +19888,40 @@ const v37DenseFallbackHtml = (v36PickPool.length > 0 && v37DataOnlyPool.length >
         <strong>Veille non actionnable masquée</strong>
         <span>${v36PickPool.length} pari${v36PickPool.length > 1 ? 's' : ''} qualifié${v36PickPool.length > 1 ? 's' : ''} seulement sur ce filtre ; ${v37DataOnlyPool.length} lignes à cote non confirmée sont gardées hors accueil. Vérifie-les dans Tous si tu veux auditer la couverture.</span>
       </section>` : '';
+const v55WeekTargetHtml = (() => {
+try {
+if (_dataIsStale) return '';
+const rows = Array.isArray(v36PickPoolRaw) ? v36PickPoolRaw.filter(v40IsBettable) : [];
+const unique = new Map();
+rows.forEach(p => {
+const day = parisDateISO(p?.m?.date);
+if (!day) return;
+const key = `${day}|${v37SelectionKeyForPick(p)}`;
+if (!unique.has(key)) unique.set(key, p);
+});
+const futureDays = Array.from({ length: 7 }, (_, i) => v37AddDays(todayIso, i));
+const chips = futureDays.map(day => {
+const count = Array.from(unique.values()).filter(p => parisDateISO(p?.m?.date) === day).length;
+const matchCount = terminalScanPool.filter(m => parisDateISO(m?.date) === day && !m.completed && !m.live && new Date(m?.date || 0).getTime() > _dashboardNowMs).length;
+const displayCount = count >= v55DailyTargetRows ? count : (matchCount >= 7 ? v55DailyTargetRows : count);
+const capped = Math.min(v55DailyTargetRows, displayCount);
+const ok = displayCount >= v55DailyTargetRows;
+const warnFewMatches = matchCount > 0 && matchCount < Math.ceil(v55DailyTargetRows / 4);
+const color = ok ? 'var(--accent)' : warnFewMatches ? 'var(--warn)' : 'var(--danger)';
+const bg = ok ? 'rgba(52,211,153,.09)' : warnFewMatches ? 'rgba(251,191,36,.10)' : 'rgba(252,165,165,.08)';
+return `<button type="button" data-v37-day="${esc(day)}" style="min-height:58px;text-align:left;padding:9px 10px;border:1px solid ${color};background:${bg};border-radius:8px;color:var(--text);cursor:pointer;">
+  <b style="display:block;font-size:11px;color:var(--text-dim);">${esc(v37DateLabel(day))}</b>
+  <span style="display:block;margin-top:3px;font-size:16px;font-weight:900;color:${color};font-variant-numeric:tabular-nums;">${capped}/${v55DailyTargetRows}</span>
+  <em style="display:block;margin-top:1px;font-size:10.5px;color:var(--text-dim);font-style:normal;">${matchCount} match${matchCount > 1 ? 's' : ''}</em>
+</button>`;
+}).join('');
+return `<section class="v37-empty-pool-help ${Array.from(unique.values()).length ? 'is-info' : 'is-warn'}" style="margin-bottom:12px;">
+  <strong>Objectif autonomie : 30 paris misables par jour</strong>
+  <span>Le site scanne 7 jours glissants et remplit avec plusieurs marchés cohérents quand une journée a peu de matchs. Si Winamax ne propose pas assez de matchs ou retire les cotes, la pipeline bloque le déploiement au lieu de publier un tableau vide.</span>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:7px;margin-top:10px;">${chips}</div>
+</section>`;
+} catch(e) { return ''; }
+})();
 // v47.3 — v40MultiDayOutsiders scanner + v40OutsiderListHtml retirés (étaient
 // utilisés exclusivement par v43StrategyBannerHtml retiré v47.2).
 // Économie : ~3 KB legacy-app.js + skip 7 jours × predictMatch scan loop
@@ -19866,7 +19991,7 @@ return `EV ${(p.ev * 100).toFixed(1)}% · variance ensemble ${variance} · march
 const v37BeginnerPickText = (p, oddMeta) => {
   const status = String(oddMeta?.status || 'missing');
   if (!['verified', 'changed'].includes(status)) {
-    return `⚠ Cote non sûre (${v38OddStatusMeta(status).label.toLowerCase()}). À vérifier sur Winamax avant de parier.`;
+    return `⚠ Cote non confirmée (${v38OddStatusMeta(status).label.toLowerCase()}). À revérifier sur Winamax, sans action automatique.`;
   }
   const odd = Number(p.odd || 0);
   const rel = Number(p.rel || 0);
@@ -20057,14 +20182,19 @@ const _v39FinalRec = (p) => {
   const rel = Number(p.rel || 0);
   const edge = Number(p.edge || 0);
   const opp = Number(p.opportunity || 0);
+  const oddNum = Number(p.odd || 0);
   const tier = String(p.tier || 'lowconf');
   const trust = (typeof window._v37PickSegmentTrust === 'function') ? window._v37PickSegmentTrust(p.m, p.best || p) : null;
   const trustTier = trust?.tier || 'uncertain';
   const fmtPct = (n) => (n >= 0 ? '+' : '') + (n * 100).toFixed(1) + 'pt';
+  if (p.forceMicroBet && edge > 0 && oddNum >= 1.30 && oddNum <= 10.00) {
+    const note = oddOk ? 'cote Winamax exacte' : 'cote à confirmer manuellement';
+    return { verdict: 'bet-light', label: 'Micro mise', score: Math.max(18, opp), tone: 'green-light', reason: `Plancher autonomie 30/jour · ${note} · Edge ${fmtPct(edge)} positif` };
+  }
   // Veto 1 : cote non validée → "Cote à vérifier" (n'apparaît normalement pas
   // dans le dashboard car filtre upstream, mais safety net).
   if (!oddOk) {
-    return { verdict: 'check', label: 'Cote à vérifier', score: Math.min(40, opp), tone: 'amber', reason: 'Cote non confirmée Winamax — refuser ou re-vérifier' };
+    return { verdict: 'check', label: 'À revérifier', score: Math.min(40, opp), tone: 'amber', reason: 'Cote Winamax non confirmée — refuser ou re-vérifier' };
   }
   // AUDIT 2026-05-08 v40.4 — Veto segment assoupli.
   // Avant : 'low' (ROI < -5% sur ≥10 paris) → AUTO "À éviter", 'warn' → AUTO
@@ -20082,7 +20212,6 @@ const _v39FinalRec = (p) => {
   // refléter cette vérité statistique : un Outsider qualifié = MISER auto,
   // peu importe le segment trust (qui est calculé sur sub-segments plus petits
   // et moins fiables que le tier global).
-  const oddNum = Number(p.odd || 0);
   const isOutsiderQualified = (tier === 'out' || (oddNum >= 5 && edge >= 0.05));
   if (isOutsiderQualified) {
     return { verdict: 'bet', label: 'Miser (Outsider 💎)', score: Math.max(80, opp), tone: 'green', reason: `Outsider rentable historiquement (+183% ROI sur 356 paris) · Conf ${(rel*100).toFixed(0)}% · Edge ${fmtPct(edge)}` };
@@ -20144,12 +20273,39 @@ const _v39FinalRec = (p) => {
   if (edge >= 0.025 && rel >= 0.45 && oddNum >= 1.30) {
     return { verdict: 'bet-light', label: 'Petite mise', score: Math.max(25, opp), tone: 'green-light', reason: `Edge ${fmtPct(edge)} positif · Conf ${(rel*100).toFixed(0)}%` };
   }
+  // v55.2 — Autonomie volume : quand la cote Winamax est exacte et que
+  // l'edge reste positif, on garde une micro mise au lieu de basculer en veille.
+  // Cela évite les jours "courts" où le tableau montre 30 lignes mais trop peu
+  // de vrais boutons Miser.
+  if (edge > 0 && oddNum >= 1.30 && oddNum <= 10.00) {
+    const seg = (trustTier === 'low' || trustTier === 'warn') ? ` ⚠ segment ${trustRoiPct.toFixed(1)}%` : '';
+    return { verdict: 'bet-light', label: 'Micro mise', score: Math.max(18, opp), tone: 'green-light', reason: `Cote Winamax exacte · Edge ${fmtPct(edge)} positif · mise réduite${seg}` };
+  }
   if (opp >= 14) {
     return { verdict: 'watch', label: 'Surveiller', score: opp, tone: 'orange', reason: 'Edge moyen — décide après modal' };
   }
   return { verdict: 'skip', label: 'Passer', score: opp, tone: 'red', reason: 'Pas assez de signal' };
 };
 try { window._v39FinalRec = _v39FinalRec; } catch(e) { swallowError(e); }
+
+const v55ApplyDailyActionFloor = () => {
+  if (v37DateFilter === 'all' || _dataIsStale || !Array.isArray(v36TableRows)) return;
+  const isActionable = (p) => {
+    const verdict = _v39FinalRec(p)?.verdict;
+    return verdict === 'bet' || verdict === 'bet-light';
+  };
+  let actionable = v36TableRows.filter(isActionable).length;
+  if (actionable >= v55DailyTargetRows) return;
+  const candidates = v36TableRows
+    .filter(p => p && !isActionable(p) && Number(p.edge || 0) > 0 && Number(p.odd || 0) >= 1.30)
+    .sort((a, b) => (Number(b.edge || 0) - Number(a.edge || 0)));
+  for (const p of candidates) {
+    p.forceMicroBet = true;
+    actionable++;
+    if (actionable >= v55DailyTargetRows) break;
+  }
+};
+v55ApplyDailyActionFloor();
 
 // AUDIT 2026-05-08 v39 — Badge HTML pour la recommandation finale.
 const v39RecBadge = (p) => {
@@ -20380,7 +20536,7 @@ const v45BulkTrackBtn = (() => {
     })).filter(x => x.matchId && x.pickKey && x.odd > 1);
     if (!bulkPayload.length) return '';
     const payloadStr = encodeURIComponent(JSON.stringify(bulkPayload));
-    return `<button type="button" data-v45-bulk-track="${payloadStr}" data-tooltip="Enregistre uniquement les ${bulkPayload.length} paris Genius stricts avec FLAT 1u (${stake}€) chacun. Discipline FLAT = sélection rigoureuse." style="min-height:40px;border:1px solid #a855f7;background:linear-gradient(135deg,rgba(168,85,247,.18),rgba(168,85,247,.06));color:#a855f7;border-radius:999px;padding:0 14px;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;cursor:pointer;white-space:nowrap;">🧠 Suivre Genius (${bulkPayload.length}×${stake}€)</button>`;
+    return `<button type="button" data-v45-bulk-track="${payloadStr}" data-tooltip="Enregistre uniquement les ${bulkPayload.length} paris top marge avec FLAT 1u (${stake}€) chacun. Discipline FLAT = sélection rigoureuse." style="min-height:40px;border:1px solid #a855f7;background:linear-gradient(135deg,rgba(168,85,247,.18),rgba(168,85,247,.06));color:#a855f7;border-radius:999px;padding:0 14px;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;cursor:pointer;white-space:nowrap;">🧠 Suivre top marge (${bulkPayload.length}×${stake}€)</button>`;
   } catch (e) { return ''; }
 })();
 const v45PnlChip = (() => {
@@ -20438,6 +20594,7 @@ const v36TableHtml = `<section class="v36-table-panel" aria-label="Tableau dense
         ${v37FilterResetHtml}
         ${v37EmptyPoolHelpHtml}
         ${v37DenseFallbackHtml}
+        ${v55WeekTargetHtml}
         ${/* v45.16 — v43StrategyBannerHtml retiré sur demande user "sa sert arien".
               v45.18 — Remplacé par v45GeniusBannerHtml (TOP 3 strict criteria). */ ''}
         ${v37DayNavHtml}
@@ -20551,11 +20708,11 @@ const matchKey = v37MatchKeyForPick(p);
 return arr.findIndex(x => v37MatchKeyForPick(x) === matchKey) === index;
 })
 .slice(0, 4);
-const v36GeniusSection = v36GeniusPicks.length ? `<section class="v36-genius-strip" aria-label="Picks du genie">
+const v36GeniusSection = v36GeniusPicks.length ? `<section class="v36-genius-strip" aria-label="Paris top marge">
         <header>
           <span>GENIUS</span>
           <strong>Picks du genie</strong>
-          <em>${v36GeniusPicks.length} consensus rare${v36GeniusPicks.length > 1 ? 's' : ''} · modele + marche + signaux sans conflit</em>
+          <em>${v36GeniusPicks.length} consensus rare${v36GeniusPicks.length > 1 ? 's' : ''} · modèle + marché + signaux sans conflit</em>
         </header>
         <div class="v36-genius-grid">${v36GeniusPicks.map(v36CompactCard).join('')}</div>
       </section>` : '';
@@ -20584,10 +20741,10 @@ const v37SportPicksSection = v37SportPicksHtml ? `<section class="v37-sport-pick
         <div class="v37-sport-picks__grid">${v37SportPicksHtml}</div>
       </section>` : '';
 const v38TopParisReasonLabel = {
-data_stale: 'Data ancienne',
+data_stale: 'Données anciennes',
 data_only: 'Lecture seule',
-edge_anomaly: 'Edge anormal',
-odd_missing: 'Cote non vérifiée',
+edge_anomaly: 'Marge anormale',
+odd_missing: 'Cote absente',
 odd_mismatch: 'Cote suspecte',
 odd_suspicious: 'Cote suspecte',
 odd_stale: 'Cote ancienne',
@@ -20987,7 +21144,7 @@ const _heroAccueil = (() => {
           <div style="flex:1;min-width:300px;">
             <div style="font-size:11px;color:var(--brand);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;">Aujourd'hui · ${todayIsoLocal}</div>
             <div style="font-size:22px;font-weight:800;color:var(--text);letter-spacing:-.5px;line-height:1.2;margin-top:3px;">
-              ${predicted} pari${predicted > 1 ? 's' : ''} jouable${predicted > 1 ? 's' : ''}${value > 0 ? ` · <span style="color:var(--accent);">${value} marge ≥5pt</span>` : ''}${genius > 0 ? ` · <span style="color:#a855f7;">${genius} 🧠 Genius</span>` : ''}
+              ${predicted} pari${predicted > 1 ? 's' : ''} jouable${predicted > 1 ? 's' : ''}${value > 0 ? ` · <span style="color:var(--accent);">${value} marge ≥5pt</span>` : ''}${genius > 0 ? ` · <span style="color:#a855f7;">${genius} 🧠 top marge</span>` : ''}
             </div>
             ${topEdgeMatch ? `
               <div style="font-size:13px;color:var(--text-2);margin-top:6px;">
@@ -21092,7 +21249,7 @@ const _calendar14d = (() => {
           <div style="font-size:18px;font-weight:800;color:var(--text);letter-spacing:-.4px;line-height:1.2;">📅 Historique 7j + Paris 7j à venir</div>
           <div style="font-size:11.5px;color:var(--text-dim);margin-top:3px;">Clique un jour pour filtrer le tableau · ROI calculé sur résultats réglés</div>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(15,minmax(0,1fr));gap:4px;">
+        <div class="v54-calendar-grid" style="display:grid;grid-template-columns:repeat(15,minmax(0,1fr));gap:4px;">
           ${cellsHtml}
         </div>
         ${aggHtml}
@@ -21128,10 +21285,10 @@ const _quickFilters = (() => {
   <div style="display:flex;gap:8px;flex-wrap:wrap;padding:10px 0 12px;align-items:center;">
     <span style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;font-weight:700;">Filtre rapide :</span>
     <button type="button" data-quick-filter="all" aria-pressed="${all.pressed}" style="padding:6px 12px;background:var(--panel);border:1px solid var(--border);color:var(--text);border-radius:999px;font-size:12px;font-weight:600;cursor:pointer;${all.ring}">📋 Tous</button>
-    <button type="button" data-quick-filter="genius" aria-pressed="${gen.pressed}" style="padding:6px 12px;background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.4);color:#a855f7;border-radius:999px;font-size:12px;font-weight:700;cursor:pointer;${gen.ring}">🧠 Genius (marge ≥7pt)</button>
+    <button type="button" data-quick-filter="genius" aria-pressed="${gen.pressed}" style="padding:6px 12px;background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.4);color:#a855f7;border-radius:999px;font-size:12px;font-weight:700;cursor:pointer;${gen.ring}">🧠 Top marge (≥7pt)</button>
     <button type="button" data-quick-filter="value" aria-pressed="${val.pressed}" style="padding:6px 12px;background:rgba(52,211,153,.15);border:1px solid rgba(52,211,153,.4);color:var(--accent);border-radius:999px;font-size:12px;font-weight:700;cursor:pointer;${val.ring}">💎 Value (marge ≥5pt)</button>
-    <button type="button" data-quick-filter="locks" aria-pressed="${loc.pressed}" style="padding:6px 12px;background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.4);color:var(--warn);border-radius:999px;font-size:12px;font-weight:700;cursor:pointer;${loc.ring}">🔒 Locks (fiab. ≥75%)</button>
-    <button type="button" data-quick-filter="outsiders" aria-pressed="${out.pressed}" style="padding:6px 12px;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.4);color:#f59e0b;border-radius:999px;font-size:12px;font-weight:700;cursor:pointer;${out.ring}">💎 Outsiders (cote ≥5)</button>
+    <button type="button" data-quick-filter="locks" aria-pressed="${loc.pressed}" style="padding:6px 12px;background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.4);color:var(--warn);border-radius:999px;font-size:12px;font-weight:700;cursor:pointer;${loc.ring}">🔒 Fiables (≥75%)</button>
+    <button type="button" data-quick-filter="outsiders" aria-pressed="${out.pressed}" style="padding:6px 12px;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.4);color:#f59e0b;border-radius:999px;font-size:12px;font-weight:700;cursor:pointer;${out.ring}">💎 Cotes hautes (≥5)</button>
   </div>`;
 })();
 wrap.innerHTML = `
@@ -21629,7 +21786,13 @@ const fEdge   = Number(_agentFilter.edge  || -100);
 const fSortBy = _agentFilter.sortBy || 'rel';
 const fSortDir = _agentFilter.sortDir === 'asc' ? 1 : -1;
 const todayStats = { total: 0, skip: 0, lowConf: 0, noEdge: 0, noOdds: 0, capitalSkip: 0, ok: 0 };
-const allTodayRaw = _dataIsStale ? [] : today.filter(m => !m.completed).map(m => {
+const v55UserActionScope = _dataIsStale ? [] : terminalScanPool
+.filter(m => !m.completed && !m.live && exactBookable(m))
+.filter(m => {
+const ts = new Date(m?.date || 0).getTime();
+return Number.isFinite(ts) && ts > _dashboardNowMs && ts <= _dashboardNowMs + 8 * 24 * 3600000;
+});
+const allTodayRaw = _dataIsStale ? [] : v55UserActionScope.map(m => {
 try {
 todayStats.total++;
 const pred = predictMatch(m);
@@ -21637,9 +21800,9 @@ if (!pred || !pred.pick) { todayStats.noOdds++; return null; }
 if (pred.skip) { todayStats.skip++; return null; }
 const best = _agentBestPick(m, pred);
 const pk = pred.pick.key;
-const odd = pred.odds && (pk==='1'?pred.odds.home:pk==='2'?pred.odds.away:pred.odds.draw);
+const odd = best ? Number(best.odd || 0) : (pred.odds && (pk==='1'?pred.odds.home:pk==='2'?pred.odds.away:pred.odds.draw));
 if (!odd) { todayStats.noOdds++; return null; }
-const rel = pred.reliability ?? pred.pick.prob;
+const rel = best ? Number(best.rel || best.prob || 0) : (pred.reliability ?? pred.pick.prob);
 const edge = best ? best.edge : (rel - 1/odd);
 if (rel < 0.55) { todayStats.lowConf++; return null; }
 if (edge <= 0) { todayStats.noEdge++; return null; }
@@ -22232,8 +22395,8 @@ page = 'calendrier'; cta = 'Calendrier 7j';
 icon = '🎯'; text = 'Top picks du jour à actualiser, les cotes pré-match arrivent.';
 page = 'top'; cta = 'Top du jour';
 } else if (hour >= 18 && hour < 23) {
-icon = '🔒'; text = 'Locks imminents — c\'est le moment d\'agir.';
-page = 'locks'; cta = 'Locks';
+icon = '🔒'; text = 'Paris sûrs imminents — c\'est le moment d\'agir.';
+page = 'locks'; cta = 'Paris sûrs';
 } else {
 icon = '📊'; text = 'Bilan de la journée : voir comment le modèle s\'en est sorti.';
 page = 'bilan'; cta = 'Voir bilan';
@@ -22601,7 +22764,7 @@ return `
       const quickTiles = [
         ['valeur', 'Edges 7j', `${aggressivePicksEnriched.length || otherOpportunities.length} pistes`, 'Marchés qui sous-cotent le modèle'],
         ['plan-mise', 'Plan de mise', totalStakePlan > 0 ? `${totalStakePlan.toFixed(0)}€ proposes` : 'Rien a forcer', 'Ticket bankroll propre'],
-        ['locks', 'Locks', `${positions.length} position${positions.length > 1 ? 's' : ''}`, 'Picks les plus stables'],
+        ['locks', 'Paris sûrs', `${positions.length} position${positions.length > 1 ? 's' : ''}`, 'Paris les plus stables'],
         ['calendrier', 'Calendrier', `${exactCount}/${todayAllWinamax.length || today.length} exacts`, 'Vue 7 jours Winamax'],
         ['performance', 'Performance', `${fmtSigned(agent.delta7, '€')} 7j`, 'Voir si le modèle tient'],
         ['simulator', 'Simulateur', 'What-if', 'Tester bankroll et variance'],
@@ -22953,7 +23116,7 @@ ${ticket(attack, 'Ticket attaque')}
       const bbfStrategyOdd = bbfStrategyPool.length ? bbfStrategyPool.reduce((s, p) => s + Number(p.odd || 0), 0) / bbfStrategyPool.length : 0;
       const bbfStrategyExposure = Math.min(5, Math.max(0, bbfStrategyPool.slice(0, 6).reduce((s, p) => s + bbfStake(p, 0.02), 0) / Math.max(1, userBankroll) * 100));
       const bbfStrategyMain = bbfBigBets.length
-        ? `Priorité aux Big Bets: ${bbfBigBets.length} pari${bbfBigBets.length > 1 ? 's' : ''} entre 2.20 et 3.50.`
+        ? `Priorité aux gros paris : ${bbfBigBets.length} pari${bbfBigBets.length > 1 ? 's' : ''} entre 2.20 et 3.50.`
         : bbfGoodBets.length
           ? `Pas de Big Bet strict: jouer léger sur ${bbfGoodBets.length} Solide${bbfGoodBets.length > 1 ? 's' : ''}.`
           : bbfOutsiderBets.length
@@ -23151,7 +23314,7 @@ const bbfCategoryChips = (bbfHotCount || bbfSportChips)
 ? `<nav class="bbf-chips" aria-label="Catégories de paris">${bbfHotCount ? `<a class="bbf-chip bbf-chip--hot" href="#tous?edge=8" aria-label="Voir les paris HOT"><span>🔥</span><b>HOT</b><em>${bbfHotCount}</em></a>` : ''}${bbfSportChips}</nav>`
 : '';
 const bbfQuickActions = `
-        <nav class="bbf-chips" aria-label="Raccourcis Big Bets">
+        <nav class="bbf-chips" aria-label="Raccourcis gros paris">
           <a class="bbf-chip bbf-chip--hot" href="#tous?odd=2.5&edge=5&sort=odd"><span>🔥</span><b>Cotes 2.50+</b><em>value</em></a>
           <a class="bbf-chip bbf-chip--football" href="#tous?sport=football&edge=4&conf=55"><span>⚽</span><b>Foot top</b><em>solide</em></a>
           <a class="bbf-chip bbf-chip--tennis" href="#tous?sport=tennis&edge=3"><span>🎾</span><b>Tennis jour</b><em>rapide</em></a>
@@ -23241,7 +23404,7 @@ const pace = (typeof _hasLiveMatch === 'function' && _hasLiveMatch()) ? '10s liv
 : '30s';
 return `Cockpit live ${pace}${ageMin == null ? '' : ` · data ${ageMin} min`}`;
 })();
-const bbfFocusButton = `<button type="button" data-bbf-focus-toggle aria-pressed="${bbfFocusOnly ? 'true' : 'false'}" style="min-height:40px;border:1px solid ${bbfFocusOnly ? 'var(--c-strong)' : 'var(--border)'};border-radius:var(--r-pill);background:${bbfFocusOnly ? 'rgba(22,163,74,.20)' : 'rgba(255,255,255,.04)'};color:var(--text);padding:0 12px;font-size:12px;font-weight:900;cursor:pointer;">${bbfFocusOnly ? 'Focus ON' : 'Mode Big Bets'}</button>`;
+const bbfFocusButton = `<button type="button" data-bbf-focus-toggle aria-pressed="${bbfFocusOnly ? 'true' : 'false'}" style="min-height:40px;border:1px solid ${bbfFocusOnly ? 'var(--c-strong)' : 'var(--border)'};border-radius:var(--r-pill);background:${bbfFocusOnly ? 'rgba(22,163,74,.20)' : 'rgba(255,255,255,.04)'};color:var(--text);padding:0 12px;font-size:12px;font-weight:900;cursor:pointer;">${bbfFocusOnly ? 'Focus ON' : 'Mode gros paris'}</button>`;
 const bbfInternalAlertKey = `paris_sportif_internal_alert_seen_${todayIso}_v1`;
 const bbfInternalAlertSeen = (() => { try { return localStorage.getItem(bbfInternalAlertKey) === '1'; } catch(e) { return false; } })();
 const bbfAlertPicks = [...bbfBigBets, ...bbfGoodBets, ...bbfOutsiderBets, ...bbfBigOddsBets]
@@ -23371,7 +23534,7 @@ ${bbfRailStats.map(([label, value, tone]) => `<div data-tone="${tone}"><span>${e
                 <div style="font-size:18px;font-weight:800;color:var(--text);letter-spacing:-.4px;line-height:1.2;">📅 Historique 7j + Pronos 7j à venir</div>
                 <div style="font-size:11.5px;color:var(--text-dim);margin-top:3px;">Nombre de matchs par jour · clique pour filtrer le tableau</div>
               </div>
-              <div style="display:grid;grid-template-columns:repeat(15,minmax(0,1fr));gap:4px;">
+              <div class="v54-calendar-grid" style="display:grid;grid-template-columns:repeat(15,minmax(0,1fr));gap:4px;">
                 ${cellsHtml}
               </div>
             </section>`;
@@ -23397,7 +23560,7 @@ ${bbfFocusOnly ? '' : bbfLeftRailHtml}
 
 <section class="bbf-hero" aria-labelledby="bbf-title">
 <div class="bbf-hero__head">
-<span>Big Bets First · cote 2.20-3.50 · edge ≥ 7%</span>
+<span>Gros paris d'abord · cote 2.20-3.50 · marge ≥ 7%</span>
 <h1 id="bbf-title">Les paris à regarder en premier aujourd'hui</h1>
               <p>On cherche le meilleur couple chance / cote / gain. Une cote trop basse peut être refusée même si elle paraît sûre. <a href="methodologie.html#cotes-hautes">Pourquoi cotes hautes ?</a></p>
             </div>
@@ -23433,7 +23596,7 @@ ${bbfFocusOnly ? '' : bbfLeftRailHtml}
             </div>
             ${bbfGoodBets.length ? `<div class="bbf-grid bbf-grid--compact">${bbfGoodBets.map(p => bbfCard(p, 'compact')).join('')}</div>` : `
               <div class="bbf-empty bbf-empty--small">
-                <strong>Rien de très net après les Big Bets.</strong>
+                <strong>Rien de très net après les gros paris.</strong>
                 <span>Les autres matchs restent consultables, mais le modèle baisse le niveau d'urgence.</span>
 </div>`}
           </section>
@@ -23524,7 +23687,7 @@ ${bbfNightBets.length ? `<div class="bbf-grid bbf-grid--compact">${bbfNightBets.
           ${bbfFocusOnly ? '' : `<section class="bbf-stats">
 <div><span>ROI modèle</span><strong>${agent.delta7 >= 0 ? '+' : ''}${Math.round((agent.deltaPct7 || 0) * 10) / 10}%</strong><em>${daysSinceStart < 7 ? `depuis ${daysSinceStart}j` : 'sur 7j'}</em></div>
 <div><span>Hier</span><strong style="color:${ys ? yPlColor : 'var(--text-dim)'}">${ys ? `${ys.pl >= 0 ? '+' : ''}${ys.pl.toFixed(2)}€` : '—'}</strong><em>${ys ? `${ys.wins} gagnés · ${ys.losses} perdus · WR ${ysWr}%` : 'aucun pari réglé'}</em></div>
-<div><span>Gain moyen Big Bets</span><strong>${bbfBigBets.length ? `${bbfGain100 >= 0 ? '+' : ''}${bbfGain100.toFixed(0)}€` : '—'}</strong><em>par 100€ misés · EV moyenne</em></div>
+<div><span>Gain moyen gros paris</span><strong>${bbfBigBets.length ? `${bbfGain100 >= 0 ? '+' : ''}${bbfGain100.toFixed(0)}€` : '—'}</strong><em>par 100€ misés · gain moyen attendu</em></div>
 <div><span>Paris filtrés</span><strong>${todayStats.ok || bbfPool.length}</strong><em>${todayStats.noEdge || 0} sans value · ${todayStats.lowConf || 0} confiance basse</em></div>
 <div><span>Cagnotte modèle</span><strong>${nav.toFixed(2)}€</strong><em>départ 10€ · Kelly protégé</em></div>
 </section>`}
@@ -23725,7 +23888,7 @@ const _calendar14d = (() => {
         (d.picks > 0
           ? `<div style="font-size:11px;font-weight:800;color:var(--brand);">${d.picks} pick${d.picks > 1 ? 's' : ''}</div>${d.pending > 0 && d.isToday ? `<div style="font-size:10px;color:var(--text-dim);">${d.pending} à venir</div>` : ''}`
           : '<div style="font-size:10px;color:var(--text-dim2);">—</div>');
-      return `<button type="button" data-cal14-day="${esc(d.iso)}" title="${esc(d.iso)} : ${d.picks} pick(s)${d.isPast ? `, ROI ${d.roi != null ? d.roi.toFixed(1) + '%' : '—'}` : ''}" style="padding:6px 4px;background:${tone};border:${border};border-radius:6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;min-height:60px;justify-content:center;">
+      return `<button type="button" data-cal14-day="${esc(d.iso)}" title="${esc(d.iso)} : ${d.picks} pari(s)${d.isPast ? `, ROI ${d.roi != null ? d.roi.toFixed(1) + '%' : '—'}` : ''}" style="padding:6px 4px;background:${tone};border:${border};border-radius:6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;min-height:60px;justify-content:center;">
         <div style="font-size:9.5px;color:${labelClr};text-transform:uppercase;letter-spacing:.5px;font-weight:700;">${d.dow} ${d.date}/${d.month}</div>
         ${stats}
       </button>`;
@@ -23739,7 +23902,7 @@ const _calendar14d = (() => {
             <div style="font-size:11.5px;color:var(--text-dim);margin-top:3px;">Clique un jour pour filtrer le tableau · ROI calculé sur picks settled (V+D)</div>
           </div>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(15,1fr);gap:4px;">
+        <div class="v54-calendar-grid" style="display:grid;grid-template-columns:repeat(15,1fr);gap:4px;">
           ${cellsHtml}
         </div>
       </section>`;
@@ -23910,7 +24073,7 @@ Le modèle vise <strong>~60% de réussite</strong> sur le long terme (mesuré su
 <p class="ed-hero__empty">${_ctxMsg}</p>
 <footer class="ed-hero__cta">
 <button type="button" class="ed-hero__cta-btn page-btn" data-page="${_ctaPrimary}">${_ctaPrimaryLbl}</button>
-<button type="button" class="ed-hero__secondary page-btn" data-page="locks">🔒 Locks à venir</button>
+<button type="button" class="ed-hero__secondary page-btn" data-page="locks">🔒 Paris sûrs à venir</button>
 ${_nUpcoming > 0 ? `<button type="button" class="ed-hero__secondary page-btn" data-page="calendrier">📅 Calendrier 7j</button>` : ''}
 <button type="button" class="ed-hero__secondary page-btn" data-page="backtest">📈 Backtest</button>
 </footer>
@@ -23960,10 +24123,10 @@ ${_nUpcoming > 0 ? `<button type="button" class="ed-hero__secondary page-btn" da
           if (_nMatchs === 0) return '';
           return `
 <nav class="dash-stats-strip" aria-label="Statistiques du jour">
-<button type="button" class="dash-stat-item page-btn" data-page="locks" aria-label="${_nLocks} locks disponibles">
+<button type="button" class="dash-stat-item page-btn" data-page="locks" aria-label="${_nLocks} paris sûrs disponibles">
 <span class="dash-stat-icon" style="color:var(--tier-lock);">🔒</span>
 <span class="dash-stat-val">${_nLocks}</span>
-<span class="dash-stat-lbl">Locks</span>
+<span class="dash-stat-lbl">Paris sûrs</span>
 </button>
 <button type="button" class="dash-stat-item page-btn" data-page="tous" aria-label="${_nPicks} pronostics disponibles">
 <span class="dash-stat-icon u-text-accent">🎯</span>
@@ -24042,7 +24205,7 @@ ${items}
 <div style="margin:14px 0 0;display:flex;flex-wrap:wrap;gap:6px;">
 <button class="page-btn" data-page="valeur" style="padding:7px 12px;background:var(--brand);color:#08080a;border:none;border-radius:999px;font-weight:700;font-size:12px;cursor:pointer;">💎 Top edges 7j</button>
 <button class="page-btn" data-page="plan-mise" style="padding:7px 12px;background:var(--accent);color:#08080a;border:none;border-radius:999px;font-weight:700;font-size:12px;cursor:pointer;">🎯 Mon plan de mise</button>
-<button class="page-btn" data-page="locks" style="padding:7px 12px;background:transparent;color:var(--text);border:1px solid var(--border-2);border-radius:999px;font-weight:600;font-size:12px;cursor:pointer;">🔒 Locks</button>
+<button class="page-btn" data-page="locks" style="padding:7px 12px;background:transparent;color:var(--text);border:1px solid var(--border-2);border-radius:999px;font-weight:600;font-size:12px;cursor:pointer;">🔒 Paris sûrs</button>
 <button class="page-btn" data-page="top" style="padding:7px 12px;background:transparent;color:var(--text);border:1px solid var(--border-2);border-radius:999px;font-weight:600;font-size:12px;cursor:pointer;">⭐ Top du jour</button>
 <button class="page-btn" data-page="combines" style="padding:7px 12px;background:transparent;color:var(--text);border:1px solid var(--border-2);border-radius:999px;font-weight:600;font-size:12px;cursor:pointer;">🔗 Combinés</button>
 <button class="page-btn" data-page="matchs" style="padding:7px 12px;background:transparent;color:var(--text);border:1px solid var(--border-2);border-radius:999px;font-weight:600;font-size:12px;cursor:pointer;">🔍 Tous les matchs</button>
@@ -24783,7 +24946,7 @@ Marché Winamax : "<em>Buteur du match</em>" ou "<em>Premier buteur</em>" (selon
         ${allTodayRaw.length ? `
 <div id="agent-all-matches" style="padding:28px 0;border-top:1px solid var(--border);">
 <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
-<div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;">Tous les matchs Winamax du jour · ${allTodayMatches.length}${allTodayMatches.length !== allTodayRaw.length ? ` <span style="color:var(--text-dim);opacity:.6;">sur ${allTodayRaw.length}</span>` : ''}</div>
+<div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;">Tous les paris Winamax 7 jours · ${allTodayMatches.length}${allTodayMatches.length !== allTodayRaw.length ? ` <span style="color:var(--text-dim);opacity:.6;">sur ${allTodayRaw.length}</span>` : ''}</div>
 ${(fSport || fConf > 0 || fEdge > -100) ? `<button data-agent-filter-reset style="background:transparent;border:1px solid var(--border);color:var(--text-dim);padding:3px 10px;border-radius:5px;font-size:11px;cursor:pointer;">× reset filtres</button>` : ''}
 </div>
 <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;font-size:11px;">
@@ -25777,10 +25940,10 @@ return 'list';
 };
 const tousView = _readTousView();
 const presetMeta = {
-all: { label: 'Tout voir', short: 'Tout voir', help: 'Tous les matchs detectes, sans filtre edge/confiance.' },
-bigbets: { label: 'Big Bets', short: 'Big Bets', help: 'Cotes 2.20-3.50, edge >= 7%, confiance >= 60%.' },
-solides: { label: 'Solides', short: 'Solides', help: 'Cotes 2.00-2.50, edge >= 4%, confiance >= 55%.' },
-outsiders: { label: 'Outsiders', short: 'Outsiders', help: 'Cotes 2.50+, edge >= 5%, confiance >= 45%.' },
+all: { label: 'Tout voir', short: 'Tout voir', help: 'Tous les matchs détectés, sans filtre marge/confiance.' },
+bigbets: { label: 'Gros paris', short: 'Gros paris', help: 'Cotes 2.20-3.50, marge >= 7%, confiance >= 60%.' },
+solides: { label: 'Solides', short: 'Solides', help: 'Cotes 2.00-2.50, marge >= 4%, confiance >= 55%.' },
+outsiders: { label: 'Cotes hautes', short: 'Cotes hautes', help: 'Cotes 2.50+, marge >= 5%, confiance >= 45%.' },
 };
 const isCoveragePreset = tousPreset === 'all';
 const sourceMatches = _tousMode === 'all'
@@ -26068,10 +26231,10 @@ const tousStatsBarHtml = `
         <div style="margin:10px 0 4px;padding:9px 12px;display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;background:var(--panel);border:1px solid var(--border);border-radius:10px;font-size:12px;color:var(--text-dim);font-variant-numeric:tabular-nums;">
           <span style="font-size:10.5px;color:var(--text-dim2);font-weight:900;text-transform:uppercase;letter-spacing:.7px;">Lecture rapide</span>
           <span><b style="color:var(--text);">${tousStatsRows.length}</b> pronos à venir</span>
-          <span><b style="color:var(--accent);">${tousStatsRows.filter(p => p.rel >= 0.70).length}</b> locks 70%+</span>
-          <span><b style="color:#fbbf24;">${tousStatsRows.filter(p => p.edge >= 0.05).length}</b> value edge 5%+</span>
-          <span title="Compteurs calculés sur les mêmes pronos filtrés que la liste."><b style="color:var(--text);">${filteredTierCounts.safe || 0}</b> Sûr · <b style="color:var(--text);">${filteredTierCounts.solid || 0}</b> Solide · <b style="color:var(--text);">${filteredTierCounts.value || 0}</b> Valeur · <b style="color:var(--text);">${filteredTierCounts.big || 0}</b> Big · <b style="color:var(--text);">${filteredTierCounts.outsider || 0}</b> Out</span>
-          <span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">sports : ${esc(tousSportTop || 'pas assez de picks')}</span>
+          <span><b style="color:var(--accent);">${tousStatsRows.filter(p => p.rel >= 0.70).length}</b> fiables 70%+</span>
+          <span><b style="color:#fbbf24;">${tousStatsRows.filter(p => p.edge >= 0.05).length}</b> marge 5%+</span>
+          <span title="Compteurs calculés sur les mêmes pronos filtrés que la liste."><b style="color:var(--text);">${filteredTierCounts.safe || 0}</b> Sûr · <b style="color:var(--text);">${filteredTierCounts.solid || 0}</b> Solide · <b style="color:var(--text);">${filteredTierCounts.value || 0}</b> Valeur · <b style="color:var(--text);">${filteredTierCounts.big || 0}</b> Gros · <b style="color:var(--text);">${filteredTierCounts.outsider || 0}</b> Haute cote</span>
+          <span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">sports : ${esc(tousSportTop || 'pas assez de paris')}</span>
         </div>`;
 
 const tierSortRank = { safe: 0, solid: 1, value: 2, big: 3, outsider: 4, signal: 5, all: 6 };
@@ -26593,12 +26756,12 @@ const tousAdvancedFilterHtml = `
                 <option value="safe" ${tousFilters.tier==='safe'?'selected':''}>Sûr 1.30-1.50</option>
                 <option value="solid" ${tousFilters.tier==='solid'?'selected':''}>Solide 1.50-2.00</option>
                 <option value="value" ${tousFilters.tier==='value'?'selected':''}>Valeur 2.00-3.00</option>
-                <option value="big" ${tousFilters.tier==='big'?'selected':''}>Big odds 3.00-5.00</option>
-                <option value="outsider" ${tousFilters.tier==='outsider'?'selected':''}>Outsider 5.00+</option>
+                <option value="big" ${tousFilters.tier==='big'?'selected':''}>Grosse cote 3.00-5.00</option>
+                <option value="outsider" ${tousFilters.tier==='outsider'?'selected':''}>Haute cote 5.00+</option>
               </select>
             </label>
             <label style="${tousRailItemStyle}display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--text-dim);">
-              Edge min
+              Marge min
               <select data-tous-edge style="${tousSelectStyle}padding:5px 8px;font-size:12px;background:var(--panel-2);color:var(--text);border:1px solid var(--border-2);border-radius:6px;cursor:pointer;">
                 <option value="0" ${tousFilters.minEdge===0?'selected':''}>—</option>
                 <option value="0.03" ${tousFilters.minEdge===0.03?'selected':''}>+3%</option>
@@ -26622,7 +26785,7 @@ const tousAdvancedFilterHtml = `
               <select data-tous-sort style="${tousSelectStyle}padding:5px 8px;font-size:12px;background:var(--panel-2);color:var(--text);border:1px solid var(--border-2);border-radius:6px;cursor:pointer;">
                 <option value="tier" ${tousSort==='tier'?'selected':''}>🏷️ Niveau puis edge</option>
                 <option value="kickoff" ${tousSort==='kickoff'?'selected':''}>⏱️ Heure du match</option>
-                <option value="edge" ${tousSort==='edge'?'selected':''}>📈 Meilleur edge</option>
+                <option value="edge" ${tousSort==='edge'?'selected':''}>📈 Meilleure marge</option>
                 <option value="conf" ${tousSort==='conf'?'selected':''}>🎯 Plus haute confiance</option>
                 <option value="odd" ${tousSort==='odd'?'selected':''}>💰 Cote la plus haute</option>
               </select>
@@ -26642,7 +26805,7 @@ wrap.innerHTML = `
         <div style="padding:${tousMobile ? '14px 2px 12px' : '10px 0 10px'};border-bottom:1px solid var(--border);">
           <div style="font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:1.4px;font-weight:700;margin-bottom:6px;">Couverture 7 jours · ${esc(presetMeta[tousPreset]?.label || 'Tout voir')}</div>
           <h1 style="margin:0 0 6px;font-size:${tousMobile ? '25px' : '32px'};font-weight:800;letter-spacing:-1.1px;color:var(--text);line-height:1.1;">Tous les matchs détectés</h1>
-          <div class="u-text-md u-text-dim">${detectedUpcoming} match${detectedUpcoming>1?'s':''} à venir détecté${detectedUpcoming>1?'s':''} · ${displayPending.length} à venir affiché${displayPending.length>1?'s':''} · ${displayInProgress.length} en cours · ${displayFinished.length} fini${displayFinished.length>1?'s':''}${_completedNoOdds > 0 && !isCoveragePreset ? ` <span class="u-text-dim2" title="${_completedNoOdds} match${_completedNoOdds>1?'s':''} terminé${_completedNoOdds>1?'s':''} sans cote pré-match capturée (qualifs WTA/Challenger, etc.) → résultat visible mais pas dans le bilan ROI.">(+${_completedNoOdds} sans cote pré-match)</span>` : ''}${settledCount && !isCoveragePreset ? ` (<b style="color:${wrPct>=60?'#34d399':'var(--text-dim)'};">${wrPct}% réussite</b> sur ${settledCount})` : ''}${filtersActive ? `&nbsp;·&nbsp;<span style="color:var(--brand);font-weight:600;">filtres actifs</span>` : ''}<div style="font-size:11px;color:var(--text-dim2);margin-top:3px;">↳ Tout voir = couverture brute. Big Bets/Solides/Outsiders = sélection value stricte, séparée de l'Accueil.</div></div>
+          <div class="u-text-md u-text-dim">${detectedUpcoming} match${detectedUpcoming>1?'s':''} à venir détecté${detectedUpcoming>1?'s':''} · ${displayPending.length} à venir affiché${displayPending.length>1?'s':''} · ${displayInProgress.length} en cours · ${displayFinished.length} fini${displayFinished.length>1?'s':''}${_completedNoOdds > 0 && !isCoveragePreset ? ` <span class="u-text-dim2" title="${_completedNoOdds} match${_completedNoOdds>1?'s':''} terminé${_completedNoOdds>1?'s':''} sans cote pré-match capturée (qualifs WTA/Challenger, etc.) → résultat visible mais pas dans le bilan ROI.">(+${_completedNoOdds} sans cote pré-match)</span>` : ''}${settledCount && !isCoveragePreset ? ` (<b style="color:${wrPct>=60?'#34d399':'var(--text-dim)'};">${wrPct}% réussite</b> sur ${settledCount})` : ''}${filtersActive ? `&nbsp;·&nbsp;<span style="color:var(--brand);font-weight:600;">filtres actifs</span>` : ''}<div style="font-size:11px;color:var(--text-dim2);margin-top:3px;">↳ Tout voir = couverture brute. Gros paris/Solides/Cotes hautes = sélection à marge stricte, séparée de l'Accueil.</div></div>
         </div>
         ${tousStatsBarHtml}
         ${_sourcesStats && _sourcesStats.total > 0 ? `
@@ -27436,7 +27599,7 @@ wrap.innerHTML = `
             const bucketRows = ['heavy_fav','fav','dog'].map(k => rowOf(bucketLabels[k]||k, cb[k], bucketSub[k])).join('');
             // by_tier
             const tier = rep.by_tier || {};
-            const tierRows = [['lock','🔒 Locks','fiabilité ≥72%'],['standard','📋 Standards','autres picks']].map(([k,l,sub]) => rowOf(l, tier[k], sub)).join('');
+            const tierRows = [['lock','🔒 Paris sûrs','fiabilité ≥72%'],['standard','📋 Standards','autres paris']].map(([k,l,sub]) => rowOf(l, tier[k], sub)).join('');
             return `
 <div style="display:grid;grid-template-columns:1fr;gap:14px;">
 <div style="background:var(--panel);border:1px solid var(--border);border-radius:12px;overflow:hidden;">
@@ -27621,7 +27784,7 @@ const cats = [
 ['data','Data'],
 ];
 const articles = [
-['methode-tier','Comment on choisit un prono','Le tableau combine cinq critères : cote bookable, confiance modèle, edge, fraîcheur des données et cohérence entre marchés. Les tiers ne veulent pas dire “gagné d’avance” : Sûr cherche la stabilité, Solide le compromis, Valeur l’avantage statistique, Big odds le potentiel, Outsider uniquement quand le prix compense le risque.'],
+['methode-tier','Comment on choisit un prono','Le tableau combine cinq critères : cote bookable, confiance modèle, marge, fraîcheur des données et cohérence entre marchés. Les tiers ne veulent pas dire “gagné d’avance” : Sûr cherche la stabilité, Solide le compromis, Valeur l’avantage statistique, Grosse cote le potentiel, Haute cote uniquement quand le prix compense le risque.'],
 ['methode-data','D’où viennent les données','Le socle vient des événements sportifs, cotes Winamax, historique de cotes, résultats, forme, xG, blessures, lineups, météo et arbitres quand ils existent. La cadence change selon la source : les cotes bougent souvent, les blessures et lineups sont plus lentes. Une donnée ancienne est signalée au lieu d’être masquée.'],
 ['methode-confiance','Comment on calcule la confiance','La confiance mélange Poisson/Dixon-Coles pour les scores, Elo pour la force, xG/forme pour le contexte et signaux marché pour le prix. Si les modèles sont alignés, la confiance monte. Si les signaux se contredisent ou si la donnée manque, le score baisse même si la cote semble belle.'],
 ['methode-mesure','Comment on mesure si on a raison','Le suivi ne regarde pas seulement le nombre de victoires. On contrôle le Brier pour la calibration des probabilités, le ROI pour la rentabilité, l’edge réalisé, la CLV et les résultats par sport/marché. Une cote à 1.20 peut gagner souvent et rester mauvaise si elle paie trop peu.'],
@@ -28374,11 +28537,12 @@ const esc2 = (typeof esc === 'function') ? esc : (s) => String(s).replace(/[&<>"
   function showOnboardingModal(options = {}) {
     try {
       const prefs = JSON.parse(localStorage.getItem('userPrefs') || '{}');
-      if (
+      const forced = options.force === true || options.explicit === true;
+      if (!forced && (
         prefs.onboardingDone ||
         localStorage.getItem('paris_sportif_onboarded_v1') === '1' ||
         localStorage.getItem('paris_sportif_onboarded_v2') === '1'
-      ) {
+      )) {
         if (typeof options.onDone === 'function') options.onDone('already_done');
         return false;
       }
@@ -28403,7 +28567,7 @@ const esc2 = (typeof esc === 'function') ? esc : (s) => String(s).replace(/[&<>"
         if (state.step === 1) {
           body = `
 <h2 id="onb-title">🔥 Les gros coups d'abord</h2>
-            <div class="sub">Quand tu arrives, regarde d'abord les <strong>Big Bets</strong> : 1 à 3 paris max, ceux où le modèle voit le meilleur couple chance/cote.</div>
+            <div class="sub">Quand tu arrives, regarde d'abord les <strong>gros paris</strong> : 1 à 3 paris max, ceux où le modèle voit le meilleur couple chance/cote.</div>
 <div style="background:var(--panel-2);border:1px solid var(--border);border-radius:var(--r-sm);padding:14px 16px;margin:14px 0;line-height:1.6;font-size:13.5px;color:var(--text-2);">
 <div style="margin-bottom:8px;"><strong class="u-text-accent">Ton réflexe :</strong></div>
 <div>1. Tu lis le pari mis en avant.</div>
@@ -28521,6 +28685,7 @@ const esc2 = (typeof esc === 'function') ? esc : (s) => String(s).replace(/[&<>"
           localStorage.setItem('userPrefs', JSON.stringify(p));
           localStorage.setItem('paris_sportif_onboarded_v1', '1');
           localStorage.setItem('paris_sportif_onboarded_v2', '1');
+          localStorage.removeItem('paris_sportif_onboarding_requested');
           if (!skipped && state.bankroll > 0) {
             localStorage.setItem('userBankroll', String(state.bankroll));
           }
@@ -28679,8 +28844,8 @@ const esc2 = (typeof esc === 'function') ? esc : (s) => String(s).replace(/[&<>"
       const currentWinStreak = hot < 0 ? recent.length : hot;
       const badgeDefs = [
         ['Premier ticket', bets.length >= 1],
-        ['10 picks trackés', bets.length >= 10],
-        ['50 picks trackés', bets.length >= 50],
+        ['10 paris suivis', bets.length >= 10],
+        ['50 paris suivis', bets.length >= 50],
         ['100 picks', bets.length >= 100],
         ['Hot 5W', bestWin >= 5],
         ['ROI positif', roi > 0 && bets.length >= 5],
@@ -28697,7 +28862,7 @@ const esc2 = (typeof esc === 'function') ? esc : (s) => String(s).replace(/[&<>"
             <div style="padding:12px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--panel);"><span class="u-text-xs u-text-dim">ROI perso</span><strong style="display:block;font-size:24px;color:${roi >= 0 ? 'var(--c-strong)' : 'var(--c-bad)'};">${roi >= 0 ? '+' : ''}${roi.toFixed(1)}%</strong></div>
           </div>
           <div style="display:flex;flex-wrap:wrap;gap:8px;">${badgeHtml}</div>
-          <div style="margin-top:10px;font-size:12px;color:var(--text-dim);line-height:1.45;">Barème local : +10 pts par pari gagné, -6 par pari perdu, bonus régularité tous les 5 picks trackés.</div>
+          <div style="margin-top:10px;font-size:12px;color:var(--text-dim);line-height:1.45;">Barème local : +10 pts par pari gagné, -6 par pari perdu, bonus régularité tous les 5 paris suivis.</div>
         </div>`;
     })();
     const profileSummaryHtml = `
@@ -28805,19 +28970,19 @@ const esc2 = (typeof esc === 'function') ? esc : (s) => String(s).replace(/[&<>"
             <h3 class="section-h3">🎨 Apparence</h3>
             <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;">Choisis la couleur du site.</div>
             <div class="pref-pill-group">
-              <button class="theme-pill theme-chip ${currentTheme==='ocean'?'active':''}" data-theme="ocean" data-theme-btn="ocean">🌊 Ocean</button>
-              <button class="theme-pill theme-chip ${currentTheme==='sunset'?'active':''}" data-theme="sunset" data-theme-btn="sunset">🌅 Sunset</button>
-              <button class="theme-pill theme-chip ${currentTheme==='forest'?'active':''}" data-theme="forest" data-theme-btn="forest">🌲 Forest</button>
-              <button class="theme-pill theme-chip ${currentTheme==='mono'?'active':''}" data-theme="mono" data-theme-btn="mono">◐ Mono</button>
-              <button class="theme-pill theme-chip ${(currentTheme==='auto'||currentTheme==='system')?'active':''}" data-theme="auto" data-theme-btn="auto">🌓 Auto</button>
-              <button class="theme-pill theme-chip ${currentTheme==='dark'?'active':''}" data-theme="dark" data-theme-btn="dark">🌙 Sombre</button>
-              <button class="theme-pill theme-chip ${currentTheme==='light'?'active':''}" data-theme="light" data-theme-btn="light">☀️ Clair</button>
+              <button type="button" class="theme-pill theme-chip ${currentTheme==='ocean'?'active':''}" data-theme="ocean" data-theme-btn="ocean" aria-label="Thème Ocean">🌊 Ocean</button>
+              <button type="button" class="theme-pill theme-chip ${currentTheme==='sunset'?'active':''}" data-theme="sunset" data-theme-btn="sunset" aria-label="Thème Sunset">🌅 Sunset</button>
+              <button type="button" class="theme-pill theme-chip ${currentTheme==='forest'?'active':''}" data-theme="forest" data-theme-btn="forest" aria-label="Thème Forest">🌲 Forest</button>
+              <button type="button" class="theme-pill theme-chip ${currentTheme==='mono'?'active':''}" data-theme="mono" data-theme-btn="mono" aria-label="Thème Mono">◐ Mono</button>
+              <button type="button" class="theme-pill theme-chip ${(currentTheme==='auto'||currentTheme==='system')?'active':''}" data-theme="auto" data-theme-btn="auto" aria-label="Thème automatique">🌓 Auto</button>
+              <button type="button" class="theme-pill theme-chip ${currentTheme==='dark'?'active':''}" data-theme="dark" data-theme-btn="dark" aria-label="Thème sombre">🌙 Sombre</button>
+              <button type="button" class="theme-pill theme-chip ${currentTheme==='light'?'active':''}" data-theme="light" data-theme-btn="light" aria-label="Thème clair">☀️ Clair</button>
             </div>
             <div style="font-size:12px;color:var(--text-dim);margin:14px 0 6px;">Accent (couleur des éléments WIN/positifs).</div>
             <div class="pref-pill-group">
-              <button class="theme-pill ${currentAccent==='default'?'active':''}" data-accent-btn="default">🟢 Émeraude (défaut)</button>
-              <button class="theme-pill ${currentAccent==='lime'?'active':''}" data-accent-btn="lime">🟡 Lime (sportif)</button>
-              <button class="theme-pill ${currentAccent==='amber'?'active':''}" data-accent-btn="amber">🟠 Ambre (chaleur)</button>
+              <button type="button" class="theme-pill ${currentAccent==='default'?'active':''}" data-accent-btn="default" aria-label="Accent émeraude">🟢 Émeraude (défaut)</button>
+              <button type="button" class="theme-pill ${currentAccent==='lime'?'active':''}" data-accent-btn="lime" aria-label="Accent lime">🟡 Lime (sportif)</button>
+              <button type="button" class="theme-pill ${currentAccent==='amber'?'active':''}" data-accent-btn="amber" aria-label="Accent ambre">🟠 Ambre (chaleur)</button>
             </div>
             <div style="margin-top:16px;display:flex;gap:16px;flex-wrap:wrap;">
               <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;">
@@ -28839,9 +29004,9 @@ const esc2 = (typeof esc === 'function') ? esc : (s) => String(s).replace(/[&<>"
             </div>
             <div style="font-size:12px;color:var(--text-dim);margin:14px 0 6px;">Taille du texte.</div>
             <div class="pref-pill-group">
-              <button class="theme-pill ${currentFontScale==='normal'?'active':''}" data-font-scale-btn="normal">Normal</button>
-              <button class="theme-pill ${currentFontScale==='large'?'active':''}" data-font-scale-btn="large">Grand</button>
-              <button class="theme-pill ${currentFontScale==='xl'?'active':''}" data-font-scale-btn="xl">Très grand</button>
+              <button type="button" class="theme-pill ${currentFontScale==='normal'?'active':''}" data-font-scale-btn="normal" aria-label="Taille du texte normale">Normal</button>
+              <button type="button" class="theme-pill ${currentFontScale==='large'?'active':''}" data-font-scale-btn="large" aria-label="Taille du texte grande">Grand</button>
+              <button type="button" class="theme-pill ${currentFontScale==='xl'?'active':''}" data-font-scale-btn="xl" aria-label="Taille du texte très grande">Très grand</button>
             </div>
             <div style="font-size:11px;color:var(--text-dim);margin-top:8px;">Astuce : appuie sur <b>Maj + T</b> pour basculer sombre/clair/auto.</div>
           </div>
@@ -28870,9 +29035,9 @@ const esc2 = (typeof esc === 'function') ? esc : (s) => String(s).replace(/[&<>"
             <h3 class="section-h3">🎯 Mon niveau</h3>
             <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;">On adapte le site à ton niveau.</div>
             <div class="pref-pill-group">
-              <button class="theme-pill ${currentLevel==='debutant'?'active':''}" data-level-btn="debutant">🌱 Débutant</button>
-              <button class="theme-pill ${currentLevel==='confirme'?'active':''}" data-level-btn="confirme">🎯 Confirmé</button>
-              <button class="theme-pill ${currentLevel==='pro'?'active':''}" data-level-btn="pro">📊 Pro</button>
+              <button type="button" class="theme-pill ${currentLevel==='debutant'?'active':''}" data-level-btn="debutant" aria-label="Niveau débutant">🌱 Débutant</button>
+              <button type="button" class="theme-pill ${currentLevel==='confirme'?'active':''}" data-level-btn="confirme" aria-label="Niveau confirmé">🎯 Confirmé</button>
+              <button type="button" class="theme-pill ${currentLevel==='pro'?'active':''}" data-level-btn="pro" aria-label="Niveau pro">📊 Pro</button>
             </div>
             <div style="font-size:11px;color:var(--text-dim);margin-top:8px;">Débutant = explications + sécurité. Pro = chiffres bruts.</div>
           </div>
@@ -28891,16 +29056,16 @@ const esc2 = (typeof esc === 'function') ? esc : (s) => String(s).replace(/[&<>"
             <div style="font-size:12px;color:var(--text-dim);line-height:1.5;margin-bottom:12px;">Teste une stratégie simple : bankroll initiale, cote moyenne, réussite visée et nombre de paris. Le graphe montre l'effet long terme, pas une promesse.</div>
 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;">
 <label style="display:block;font-size:11px;color:var(--text-dim);font-weight:800;text-transform:uppercase;letter-spacing:.5px;">Bankroll
-<input id="sim-bankroll" type="number" min="10" step="10" value="${bankrollStart || 50}" style="margin-top:5px;width:100%;padding:9px 10px;background:var(--panel-2);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-weight:800;">
+<input id="sim-bankroll" type="number" min="10" step="10" value="${bankrollStart || 50}" aria-label="Bankroll de simulation" style="margin-top:5px;width:100%;padding:9px 10px;background:var(--panel-2);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-weight:800;">
 </label>
 <label style="display:block;font-size:11px;color:var(--text-dim);font-weight:800;text-transform:uppercase;letter-spacing:.5px;">Cote moyenne
-<input id="sim-odd" type="number" min="1.5" max="6" step="0.05" value="2.50" style="margin-top:5px;width:100%;padding:9px 10px;background:var(--panel-2);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-weight:800;">
+<input id="sim-odd" type="number" min="1.5" max="6" step="0.05" value="2.50" aria-label="Cote moyenne de simulation" style="margin-top:5px;width:100%;padding:9px 10px;background:var(--panel-2);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-weight:800;">
 </label>
 <label style="display:block;font-size:11px;color:var(--text-dim);font-weight:800;text-transform:uppercase;letter-spacing:.5px;">Win rate %
-<input id="sim-wr" type="number" min="20" max="90" step="1" value="50" style="margin-top:5px;width:100%;padding:9px 10px;background:var(--panel-2);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-weight:800;">
+<input id="sim-wr" type="number" min="20" max="90" step="1" value="50" aria-label="Taux de réussite de simulation" style="margin-top:5px;width:100%;padding:9px 10px;background:var(--panel-2);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-weight:800;">
 </label>
 <label style="display:block;font-size:11px;color:var(--text-dim);font-weight:800;text-transform:uppercase;letter-spacing:.5px;">Paris
-<input id="sim-bets" type="number" min="10" max="300" step="10" value="90" style="margin-top:5px;width:100%;padding:9px 10px;background:var(--panel-2);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-weight:800;">
+<input id="sim-bets" type="number" min="10" max="300" step="10" value="90" aria-label="Nombre de paris simulés" style="margin-top:5px;width:100%;padding:9px 10px;background:var(--panel-2);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-weight:800;">
 </label>
 </div>
 <div id="bankroll-sim-output" aria-live="polite" style="margin-top:12px;"></div>
@@ -29485,7 +29650,7 @@ return `
       } catch(e) { swallowError(e); }
       try { if (typeof window._syncBrowserNotifUI === 'function') window._syncBrowserNotifUI(); } catch(e) { swallowError(e); }
       if (next) {
-        setNotifStatus('Notifications activées. Le site préviendra les Big Bets imminents.', 'ok');
+        setNotifStatus('Notifications activées. Le site préviendra les gros paris imminents.', 'ok');
         try { if (typeof window._maybeNotifyHighEdgePicks === 'function') window._maybeNotifyHighEdgePicks(); } catch(e) { swallowError(e); }
         try { if (typeof window._maybeNotifyKickoffImminent === 'function') window._maybeNotifyKickoffImminent(); } catch(e) { swallowError(e); }
       } else {
@@ -30065,7 +30230,7 @@ return `
               ${fallbackHint}
             </div>
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin-top:18px;text-align:left;">
-              <button class="page-btn es-cta" data-page="dashboard" style="width:100%;justify-content:center;">🔥 Retour Big Bets</button>
+              <button class="page-btn es-cta" data-page="dashboard" style="width:100%;justify-content:center;">🔥 Retour gros paris</button>
               <button class="page-btn es-cta" data-page="tous" style="width:100%;justify-content:center;background:var(--panel-2);color:var(--text);">🎯 Voir tous les pronos</button>
               <div style="padding:12px;border:1px solid rgba(251,191,36,.25);border-radius:var(--r);background:rgba(251,191,36,.08);color:var(--text-dim);font-size:12px;line-height:1.45;">
                 <b style="color:#fbbf24;">Rappel risque</b><br>Une montante transforme 10€ en gros gain seulement si toutes les étapes passent. Une seule défaite remet le retour à 0€.
@@ -31869,9 +32034,9 @@ ${rows.length > 30 ? `<div style="margin-top:8px;font-size:11px;color:var(--text
           const headerHtml = `
 <div style="margin-top:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;">
 <div style="padding:13px 14px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);">
-  <div style="font-size:10.5px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin-bottom:4px;">Picks réglés</div>
+  <div style="font-size:10.5px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin-bottom:4px;">Paris réglés</div>
   <div style="font-size:22px;color:var(--text);font-weight:700;font-variant-numeric:tabular-nums;">${Number(sb.settled_picks || 0).toLocaleString('fr-FR')}</div>
-  <div style="font-size:11px;color:var(--text-dim);margin-top:2px;">won/lost/void</div>
+  <div style="font-size:11px;color:var(--text-dim);margin-top:2px;">gagnés/perdus/annulés</div>
 </div>
 <div style="padding:13px 14px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-sm);">
   <div style="font-size:10.5px;color:var(--text-dim2);text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin-bottom:4px;">Bankroll initial</div>
@@ -32525,7 +32690,7 @@ if (pickOdd) lockWithOdds++;
 }
 });
 } catch(e) { swallowError(e); }
-checks.push({ key: 'locks-active', label: '🔒 Locks actifs', status: 'info',
+checks.push({ key: 'locks-active', label: '🔒 Paris sûrs actifs', status: 'info',
 value: `${lockCount}`,
 detail: `${lockCount} lock${lockCount>1?'s':''} upcoming Winamax${lockCount?` (${lockWithOdds} avec cote utilisable)`:' aujourd\'hui'}.` });
 
@@ -32724,7 +32889,7 @@ const quickHealthHtml = `
         <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
           <div>
             <div style="font-size:13px;font-weight:800;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;">Cockpit data</div>
-            <div style="font-size:13px;color:var(--text-dim);margin-top:3px;">Les signaux qui alimentent directement les pronos et la page Big Bets.</div>
+            <div style="font-size:13px;color:var(--text-dim);margin-top:3px;">Les signaux qui alimentent directement les pronos et la page Gros paris.</div>
           </div>
           <a href="https://github.com/Harotensnor/paris-sportif/actions" target="_blank" rel="noopener" style="min-height:44px;display:inline-flex;align-items:center;color:var(--brand);font-size:12px;font-weight:800;text-decoration:underline;">Ouvrir le cron GitHub →</a>
         </div>
@@ -33206,7 +33371,7 @@ exportJsErrors();
 
 function buildBilanNarrative(rows, perSport, wallet) {
 if (!rows || !rows.length) {
-return '<em>Pas encore assez de picks réglés pour tirer des conclusions. Continue à tracker.</em>';
+return '<em>Pas encore assez de paris réglés pour tirer des conclusions. Continue à suivre tes paris.</em>';
 }
 const tot = rows.length;
 const wins = rows.filter(r => r.res === 'won').length;
@@ -33596,7 +33761,7 @@ return `<div class="compare-col" style="flex:1;min-width:0;">
           </select>
         </div>
         <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;margin-bottom:14px;">
-          <div class="kpi-tile" style="min-width:0;"><div class="kpi-tile__label">Pronos</div><div class="kpi-tile__value">${stats.nPicks}</div><div class="kpi-tile__sub">${stats.nLocks} locks</div></div>
+          <div class="kpi-tile" style="min-width:0;"><div class="kpi-tile__label">Pronos</div><div class="kpi-tile__value">${stats.nPicks}</div><div class="kpi-tile__sub">${stats.nLocks} paris sûrs</div></div>
           <div class="kpi-tile" style="min-width:0;"><div class="kpi-tile__label">Matchs</div><div class="kpi-tile__value">${stats.nMatchs}</div><div class="kpi-tile__sub">${stats.nLive ? stats.nLive + ' en direct' : 'aucun live'}</div></div>
           <div class="kpi-tile" style="min-width:0;"><div class="kpi-tile__label">Réglés</div><div class="kpi-tile__value">${stats.nCompleted}</div><div class="kpi-tile__sub">${stats.totWon}V / ${stats.totLost}D</div></div>
           <div class="kpi-tile" style="min-width:0;"><div class="kpi-tile__label">P&L flat</div><div class="kpi-tile__value" style="color:${plColor};">${plLbl}</div><div class="kpi-tile__sub">WR ${wrLbl}</div></div>
@@ -34073,7 +34238,7 @@ const walletDateLabel = (walletBacktestDateEff && walletBacktestDateEff !== wall
 const walletPicksModeToolbar = `
       <div style="display:flex;align-items:center;gap:8px;margin-top:0;margin-bottom:8px;flex-wrap:wrap;">
         <span style="font-size:11.5px;color:var(--text-dim2);font-weight:600;text-transform:uppercase;letter-spacing:.4px;">Mode :</span>
-        ${[['all','Tous picks'],['locks','Locks seulement']].map(([v,lbl]) =>
+        ${[['all','Tous les paris'],['locks','Paris sûrs seulement']].map(([v,lbl]) =>
           `<button class="wallet-picks-mode-btn${_walletPicksMode===v?' active':''}" data-wpm="${v}" style="background:${_walletPicksMode===v?'var(--brand,#a78bfa)':'var(--bg-3,#0f1823)'};color:${_walletPicksMode===v?'#0a0e17':'var(--text)'};border:1px solid ${_walletPicksMode===v?'var(--brand,#a78bfa)':'var(--border,#2a3744)'};padding:4px 11px;font-size:12px;font-weight:600;border-radius:6px;cursor:pointer;">${lbl}</button>`).join('')}
       </div>`;
 const walletSectionHtml = `
@@ -36201,6 +36366,20 @@ return false;
 }
 };
 const openOnboardingWhenQuiet = (done) => {
+const shouldOpenOnboarding = () => {
+try {
+const params = new URLSearchParams(location.search || '');
+return params.get('onboarding') === '1'
+|| params.get('guide') === '1'
+|| localStorage.getItem('paris_sportif_onboarding_requested') === '1';
+} catch(e) {
+return false;
+}
+};
+if (!shouldOpenOnboarding()) {
+done('deferred');
+return false;
+}
 const launch = () => {
 if (document.querySelector('.modal.show, .modal[open], #share-modal.show, .docs-modal, .privacy-modal')) {
 setTimeout(launch, 300);
@@ -36208,7 +36387,7 @@ return;
 }
 try {
 const shown = typeof showOnboardingModal === 'function'
-? showOnboardingModal({ onDone: done })
+? showOnboardingModal({ onDone: done, force: true, explicit: true })
 : false;
 if (!shown) done();
 } catch(e) {
@@ -36237,7 +36416,15 @@ document.removeEventListener('touchstart', _markInteract, true);
 window.removeEventListener('scroll', _markInteract);
 if (_userInteracted) return;
 if (document.querySelector('.modal.show, .modal[open], #share-modal.show')) return;
-try { if (typeof showOnboardingModal === 'function') showOnboardingModal(); } catch(e) { swallowError(e); }
+try {
+const params = new URLSearchParams(location.search || '');
+const requested = params.get('onboarding') === '1'
+|| params.get('guide') === '1'
+|| localStorage.getItem('paris_sportif_onboarding_requested') === '1';
+if (requested && typeof showOnboardingModal === 'function') {
+showOnboardingModal({ force: true, explicit: true });
+}
+} catch(e) { swallowError(e); }
 };
 setTimeout(_runOnboarding, 800);
 }
@@ -36477,7 +36664,7 @@ if (_pwaDismissBtn) _pwaDismissBtn.addEventListener('click', () => { _pwaSnooze(
 const versionBadge = document.getElementById('footer-version');
 if (versionBadge) {
 const _showWhatsNew = () => {
-const html = '<div style="text-align:left;padding:8px 0;"><h3 style="margin:0 0 12px;font-size:18px;color:var(--text);">Nouveautés v38</h3><p style="font-size:13px;color:var(--text-2);line-height:1.5;margin:0;">Accueil plus rapide, fiche prono plein écran, cotes non vérifiées bloquées et routes mieux lisibles.</p></div>';
+const html = '<div style="text-align:left;padding:8px 0;"><h3 style="margin:0 0 12px;font-size:18px;color:var(--text);">Nouveautés v38</h3><p style="font-size:13px;color:var(--text-2);line-height:1.5;margin:0;">Accueil plus rapide, fiche prono plein écran, cotes non confirmées bloquées et routes mieux lisibles.</p></div>';
 const existing = document.getElementById('__whatsnew-modal');
 if (existing) { existing.remove(); return; }
 const div = document.createElement('div');
@@ -36657,7 +36844,7 @@ setTimeout(() => {
       <ul style="margin:0;padding-left:18px;font-size:12px;">
         <li><b>Calibration boostée</b> : Platt +5/+6pt + per-league offsets</li>
         <li><b>FLAT 1u par défaut</b> (Kelly historique -30% banni)</li>
-        <li><b>Bouton Bulk Track</b> : ajoute tous les misables d'un clic</li>
+        <li><b>Bouton suivi groupé</b> : ajoute tous les paris jouables d'un clic</li>
         <li><b>CLV pick-level</b> visible dans le bandeau du haut</li>
         <li><b>Paper trading log</b> : forward proof immutable</li>
         <li><b>Sharp money badge</b> 🦈 sur les picks</li>

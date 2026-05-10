@@ -226,7 +226,7 @@
       <li><strong>Cote 2.50</strong> : gain net 150€. Avec une vraie probabilité proche de 45-50%, le rendement devient intéressant.</li>
       <li><strong>Cote 4.00+</strong> : gain très fort, mais variance élevée. Le site exige donc un edge plus haut et une mise plus petite.</li>
     </ul>
-    <p>La règle Phase 7 est donc volontaire : <strong>minimum @2.00 par défaut</strong>, sweet spot Big Bets autour de <strong>@2.20 à @3.50</strong>, et handicaps masqués sauf anomalie énorme. Moins de tickets, plus de discipline.</p>
+    <p>La règle Phase 7 est donc volontaire : <strong>minimum @2.00 par défaut</strong>, zone gros paris autour de <strong>@2.20 à @3.50</strong>, et handicaps masqués sauf anomalie énorme. Moins de tickets, plus de discipline.</p>
   </section>
 
   <h2 id="sources">📚 Sources de données</h2>
@@ -270,7 +270,7 @@
     <dl>
       <div>
         <dt>WR (taux de réussite)</dt>
-        <dd>Nombre de picks gagnés ÷ nombre total de picks réglés. Pure base, ignore la cote. Un WR 60% sans cote moyenne ne dit rien sur la rentabilité.</dd>
+        <dd>Nombre de paris gagnés ÷ nombre total de paris réglés. Pure base, ignore la cote. Un WR 60% sans cote moyenne ne dit rien sur la rentabilité.</dd>
       </div>
       <div>
         <dt>ROI flat (mise plate)</dt>
@@ -286,7 +286,7 @@
       </div>
       <div>
         <dt>Brier score</dt>
-        <dd><code>Σ (p_modèle − résultat)² ÷ N</code>. Mesure l'erreur de prédiction probabiliste. <strong>0 = parfait, 0.25 = pile/face.</strong> Un Brier &lt; 0.22 sur ≥150 picks indique un signal réel.</dd>
+        <dd><code>Σ (p_modèle − résultat)² ÷ N</code>. Mesure l'erreur de prédiction probabiliste. <strong>0 = parfait, 0.25 = pile/face.</strong> Un Brier &lt; 0.22 sur ≥150 paris indique un signal réel.</dd>
       </div>
       <div>
         <dt>Calibration</dt>
@@ -316,12 +316,12 @@
       <li><strong>Univers</strong> : tous les matchs réglés dans <code>data.js</code> (fenêtre rolling 13 jours) + <code>results_archive.jsonl</code> (append-only depuis le déploiement de l'archive).</li>
       <li><strong>Capture cote</strong> : la cote prise en compte est celle figée par <code>snapshot_odds.py</code> dans <code>odds_history.jsonl</code> au plus proche du coup d'envoi (typiquement 5-15 min avant). Pas de cote post-match, pas de cote "early".</li>
       <li><strong>Modèle évalué</strong> : la vraie fonction <code>predictMatch()</code> embarquée dans <code>pronostics.html</code>, exécutée en Python via <code>scripts/model_loader.py</code> (V8 embarqué) — pas une réimplémentation simplifiée.</li>
-      <li><strong>Filtrage</strong> : on évalue tous les picks que le modèle aurait surfacés (lock + standard + lowconf), pas une sélection rétroactive. Les "skip" sont aussi tracés mais hors-ROI (ils représentent ce que le modèle <em>refuse</em> de jouer).</li>
+      <li><strong>Filtrage</strong> : on évalue tous les paris que le modèle aurait surfacés (lock + standard + lowconf), pas une sélection rétroactive. Les "skip" sont aussi tracés mais hors-ROI (ils représentent ce que le modèle <em>refuse</em> de jouer).</li>
       <li><strong>Paris annulés</strong> : exclus du calcul de WR et de ROI. Comptés séparément dans les métadonnées.</li>
-      <li><strong>Staking évalué</strong> : Kelly 0.25× cap 10% bankroll, démarrage 100 unités. ROI flat 1u/pick reporté en parallèle pour comparaison.</li>
+      <li><strong>Staking évalué</strong> : Kelly 0.25× cap 10% bankroll, démarrage 100 unités. ROI flat 1u/pari reporté en parallèle pour comparaison.</li>
       <li><strong>Cron</strong> : <code>backtest.yml</code> rejoue tout chaque dimanche, écrit <code>backtest_report_v2.{json,md}</code> à la racine.</li>
       <li><strong>Reproductibilité</strong> : tout est public. Tu peux <code>git clone</code> et relancer <code>python scripts/backtest_v2.py</code> sur ta machine. Les sorties <code>.json</code> + <code>.md</code> sont dans le repo, comparables historiquement.</li>
-      <li><strong>Transparence symétrique</strong> (v31.7.27) : on publie aussi les <a href="backtest.html#best">10 plus beaux gains</a> et les <a href="backtest.html#worst">10 pires picks</a> en symétrie pour ne pas biaiser le framing négatif. Les <a href="backtest.html#streaks">séries publiques</a> (longest win/lose + streak courante) sont aussi visibles, pour montrer que les "froids" font partie du jeu.</li>
+      <li><strong>Transparence symétrique</strong> (v31.7.27) : on publie aussi les <a href="backtest.html#best">10 plus beaux gains</a> et les <a href="backtest.html#worst">10 pires paris</a> en symétrie pour ne pas biaiser le framing négatif. Les <a href="backtest.html#streaks">séries publiques</a> (longest win/lose + streak courante) sont aussi visibles, pour montrer que les "froids" font partie du jeu.</li>
     </ul>
   </section>
 
@@ -360,7 +360,7 @@
     <ul>
       <li><strong>Faible n par segment</strong> : les ROI par sport / par ligue sur quelques semaines peuvent être pure variance. Il faut typiquement <strong>≥150 paris</strong> dans une catégorie pour qu'un ROI ait du sens. Avant ça, c'est du bruit.</li>
       <li><strong>Look-ahead bias possible</strong> : le modèle utilise des features (forme L5, classements, blessures) qui sont scrapées à un moment donné. Si une ligne d'historique scrape les blessures de "maintenant" pour évaluer un match passé, on a un look-ahead. Mitigation : les snapshots sont datés, mais 100% de l'historique pré-snapshot est imparfait.</li>
-      <li><strong>Survivorship bias léger</strong> : seuls les events que ESPN+Sofascore couvrent sont inclus. Les ligues sous-couvertes (Asie, Amérique du Sud) ont moins de signaux disponibles donc des picks plus volatiles. Ne pas extrapoler la perf moyenne aux sous-segments mal couverts.</li>
+      <li><strong>Survivorship bias léger</strong> : seuls les events que ESPN+Sofascore couvrent sont inclus. Les ligues sous-couvertes (Asie, Amérique du Sud) ont moins de signaux disponibles donc des paris plus volatils. Ne pas extrapoler la perf moyenne aux sous-segments mal couverts.</li>
       <li><strong>Variance court terme</strong> : un WR cible 60% sur le long terme reste compatible avec des séries de 4-5 défaites consécutives. <strong>3-5 pertes d'affilée sont normales</strong>, ne pas casser son Kelly après une bad run. Le hasard reste irréductible.</li>
       <li><strong>Modèle calibré sur le passé</strong> : les paramètres (poids des composants, seuils des tiers) ont été tunés sur l'historique. Une rupture structurelle (changement de règle, nouveau format) peut dégrader la perf jusqu'à recalibrage. Le journal des changements modèle est dans le commit log.</li>
       <li><strong>Pas de garantie</strong> : "Les performances passées ne garantissent pas les performances futures." Phrase légale mais aussi vraie. Ce site est un outil d'aide à la décision, pas une promesse de gains.</li>

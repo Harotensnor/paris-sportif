@@ -4,19 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Backtest — Performance vérifiable du modèle Paris-Sportif</title>
-<meta name="description" content="Performance réelle du modèle Paris-Sportif sur 1 picks réglés : WR 100.0%, ROI flat +120.0%, Brier 0.3363, Kelly +0.0u. Backtest hebdo via vrai predictMatch(). Tableaux par tier, sport, ligue, cote, calibration.">
+<meta name="description" content="Performance réelle du modèle Paris-Sportif sur 1 pari réglé : WR 100.0%, ROI flat +120.0%, Brier 0.3363, Kelly +0.0u. Backtest hebdo via vrai predictMatch(). Tableaux par tier, sport, ligue, cote, calibration.">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://harotensnor.github.io/paris-sportif/backtest.html">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Backtest — Performance vérifiable du modèle Paris-Sportif">
-<meta property="og:description" content="WR 100.0% · ROI flat +120.0% · Brier 0.3363 · 1 picks · backtest hebdo">
+<meta property="og:description" content="WR 100.0% · ROI flat +120.0% · Brier 0.3363 · 1 pari · backtest hebdo">
 <meta property="og:url" content="https://harotensnor.github.io/paris-sportif/backtest.html">
 <meta property="og:image" content="https://harotensnor.github.io/paris-sportif/og-backtest.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Backtest — Paris-Sportif">
-<meta name="twitter:description" content="Performance vérifiable du modèle : ROI, Win Rate, Brier, calibration sur 600+ picks réglés. Indexable et reproductible.">
+<meta name="twitter:description" content="Performance vérifiable du modèle : ROI, Win Rate, Brier, calibration sur 600+ paris réglés. Indexable et reproductible.">
 <meta name="twitter:image" content="https://harotensnor.github.io/paris-sportif/og-backtest.png">
 <meta name="theme-color" content="#08080a">
 
@@ -35,7 +35,7 @@
     {
       "@type": "Dataset",
       "name": "Paris-Sportif backtest model performance",
-      "description": "Performance vérifiée du modèle predictMatch sur 1 picks réglés (2026-05-09T14:00Z → 2026-05-09T14:00Z). WR 100.0%, ROI flat +120.0%, Brier 0.3363.",
+      "description": "Performance vérifiée du modèle predictMatch sur 1 pari réglé (2026-05-09T14:00Z → 2026-05-09T14:00Z). WR 100.0%, ROI flat +120.0%, Brier 0.3363.",
       "url": "https://harotensnor.github.io/paris-sportif/backtest.html",
       "creator": { "@id": "https://harotensnor.github.io/paris-sportif/#org" },
       "datePublished": "2026-05-10T06:27:34Z",
@@ -193,7 +193,7 @@
   <div class="breadcrumb"><a href="./">Accueil</a> › Backtest</div>
   <span class="uppercase-pill">Backtest vérifiable</span>
   <h1>Backtest du modèle</h1>
-  <p class="lead">Historique des picks réglés, par fiabilité, sport, bucket de cote et calibration. Les chiffres sont utiles pour diagnostiquer le modèle, pas pour promettre un résultat futur.</p>
+  <p class="lead">Historique des paris réglés, par fiabilité, sport, bucket de cote et calibration. Les chiffres sont utiles pour diagnostiquer le modèle, pas pour promettre un résultat futur.</p>
 
   <div class="meta-box">
     📅 Fenêtre : <b>2026-05-09T14:00Z</b> → <b>2026-05-09T14:00Z</b><br>
@@ -205,7 +205,7 @@
   
     <div class="kpi-strip">
       <div class="kpi-card">
-        <div class="kpi-label">Picks réglés</div>
+        <div class="kpi-label">Paris réglés</div>
         <div class="kpi-value">1</div>
         <div class="kpi-sub">1 gagnés · 0 perdus</div>
       </div>
@@ -217,7 +217,7 @@
       <div class="kpi-card">
         <div class="kpi-label">ROI flat</div>
         <div class="kpi-value pos">+120.0%</div>
-        <div class="kpi-sub">P&amp;L +1.20u · mise plate 1u/pick</div>
+        <div class="kpi-sub">P&amp;L +1.20u · mise plate 1u/pari</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-label">Kelly 0.25× (cap 10%)</div>
@@ -237,7 +237,7 @@
     </div>
 
   <h2 id="tier">🏷️ Par tier de fiabilité <span class="subtle">— ce que vaut la jauge</span></h2>
-  <table><thead><tr><th>Tier</th><th>N</th><th>WR</th><th>ROI flat</th><th>P&amp;L flat</th><th>P&amp;L Kelly</th><th>Brier</th><th>CLV moy.</th></tr></thead><tbody><tr><td><b>🔒 Lock</b></td><td>0</td><td><span class="neg">0%</span></td><td><span class="neu">+0.0%</span></td><td>—</td><td>+0.00u</td><td>0.000</td><td>—</td></tr><tr><td><b>✅ Standard</b></td><td>0</td><td><span class="neg">0%</span></td><td><span class="neu">+0.0%</span></td><td>—</td><td>+0.00u</td><td>0.000</td><td>—</td></tr><tr><td><b>⚠️ Low conf</b></td><td>0</td><td><span class="neg">0%</span></td><td><span class="neu">+0.0%</span></td><td>—</td><td>+0.00u</td><td>0.000</td><td>—</td></tr><tr><td><b>🚫 Skip</b></td><td>1</td><td><span class="pos">100%</span></td><td><span class="pos">+120.0%</span></td><td>+1.20u</td><td>+0.00u</td><td>0.336</td><td>—</td></tr></tbody></table>
+  <table><thead><tr><th>Tier</th><th>N</th><th>WR</th><th>ROI flat</th><th>P&amp;L flat</th><th>P&amp;L Kelly</th><th>Brier</th><th>CLV moy.</th></tr></thead><tbody><tr><td><b>🔒 Sûr</b></td><td>0</td><td><span class="neg">0%</span></td><td><span class="neu">+0.0%</span></td><td>—</td><td>+0.00u</td><td>0.000</td><td>—</td></tr><tr><td><b>✅ Standard</b></td><td>0</td><td><span class="neg">0%</span></td><td><span class="neu">+0.0%</span></td><td>—</td><td>+0.00u</td><td>0.000</td><td>—</td></tr><tr><td><b>⚠️ Confiance basse</b></td><td>0</td><td><span class="neg">0%</span></td><td><span class="neu">+0.0%</span></td><td>—</td><td>+0.00u</td><td>0.000</td><td>—</td></tr><tr><td><b>🚫 Refusé</b></td><td>1</td><td><span class="pos">100%</span></td><td><span class="pos">+120.0%</span></td><td>+1.20u</td><td>+0.00u</td><td>0.336</td><td>—</td></tr></tbody></table>
 
   <h2 id="sport">🏆 Par sport <span class="subtle">— où le modèle gagne, où il perd</span></h2>
   <table><thead><tr><th>Sport</th><th>N</th><th>WR</th><th>ROI flat</th><th>P&amp;L flat</th><th>P&amp;L Kelly</th><th>Brier</th></tr></thead><tbody><tr><td><b>⚽ Foot</b></td><td>1</td><td><span class="pos">100%</span></td><td><span class="pos">+120.0%</span></td><td>+1.20u</td><td>+0.00u</td><td>0.336</td></tr></tbody></table>
@@ -257,7 +257,7 @@
         </tr>
       </thead>
       <tbody><tr style="background:rgba(167,139,250,.08);">
-      <td><b>🤖 Modèle predictMatch</b><br><span style="font-size:11px;color:#a3a3aa;">1 picks réglés</span></td>
+      <td><b>🤖 Modèle predictMatch</b><br><span style="font-size:11px;color:#a3a3aa;">1 pari réglé</span></td>
       <td style="text-align:right;">1</td>
       <td style="text-align:right;">100.0%</td>
       <td style="text-align:right;color:#34d399;font-weight:700;">+120.0%</td>
@@ -334,7 +334,7 @@
     
     <div style="margin:0 0 14px;padding:8px 12px;background:rgba(255,255,255,.02);border:1px solid var(--border, rgba(255,255,255,.08));border-radius:8px;display:flex;align-items:center;gap:12px;">
       <span style="font-size:10.5px;color:#a3a3aa;text-transform:uppercase;letter-spacing:.5px;font-weight:700;">Cumul</span>
-      <svg viewBox="0 0 480 60" style="flex:1;height:60px;display:block;" xmlns="http://www.w3.org/2000/svg" aria-label="Cumul P&amp;L flat sur les 1 picks">
+      <svg viewBox="0 0 480 60" style="flex:1;height:60px;display:block;" xmlns="http://www.w3.org/2000/svg" aria-label="Cumul P&amp;L flat sur 1 pari">
         <path d="M 4 56 L 4.0,30.0 L 476 56 Z" fill="#34d39922" stroke="none"/>
         <polyline points="4.0,30.0" fill="none" stroke="#34d399" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
       </svg>
@@ -359,15 +359,15 @@
       <td style="text-align:right;color:#a3a3aa;">42%</td>
       <td style="text-align:right;font-variant-numeric:tabular-nums;">@2.20</td>
       <td style="text-align:right;font-weight:600;color:#34d399;">+1.20u</td>
-      <td style="text-align:right;font-size:11px;color:#a3a3aa;">🤔 Skip</td>
+      <td style="text-align:right;font-size:11px;color:#a3a3aa;">🤔 Refusé</td>
     </tr></tbody>
     </table>
     <p style="font-size:12px;color:#a3a3aa;margin-top:8px;">
       Source : <code>backtest_report_v2.json#best_picks</code> (cron hebdo).
     </p>
 
-  <h2 id="worst">😬 Pires picks <span class="subtle">— transparence sur les erreurs du modèle</span></h2>
-  <p style="color:#a3a3aa;font-size:13px;">Pas de pires picks à afficher (aucune perte avec confiance ≥65%).</p>
+  <h2 id="worst">😬 Pires paris <span class="subtle">— transparence sur les erreurs du modèle</span></h2>
+  <p style="color:#a3a3aa;font-size:13px;">Pas de pires paris à afficher (aucune perte avec confiance ≥65%).</p>
 
   <h2 id="calibration">📊 Calibration probabiliste <span class="subtle">— quand on dit 70%, on gagne 70% ?</span></h2>
   <p style="font-size:13px;color:#a3a3aa;margin:0 0 12px;">Plus le <b>gap</b> est proche de 0, mieux le modèle est calibré.
@@ -378,7 +378,7 @@
   <table><thead><tr><th>Ligue</th><th>N</th><th>WR</th><th>ROI flat</th><th>Brier</th></tr></thead><tbody><tr><td><code>bel.1</code></td><td>1</td><td><span class="pos">100%</span></td><td><span class="pos">+120.0%</span></td><td>0.336</td></tr></tbody></table>
 
   <div class="danger-banner">
-    <strong>⚠️ Petite n.</strong> 1 picks restent insuffisants pour conclure définitivement
+    <strong>⚠️ Petite n.</strong> 1 pari reste insuffisant pour conclure définitivement
     sur les sous-segments (sport, ligue, bucket de cote). Il faut typiquement <b>≥150 paris</b> par
     catégorie pour qu'un ROI ait du sens. Avant ça, c'est de la variance. Voir <a href="methodologie.html#biais">méthodologie · biais &amp; limites</a>.
   </div>

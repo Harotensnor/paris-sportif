@@ -44,7 +44,7 @@
         { "@type": "HowToStep", "name": "Identifier le pick", "text": "Regarde la ligne 'Pick' : c'est l'issue que le modèle recommande (1 = domicile, N = nul, 2 = extérieur)." },
         { "@type": "HowToStep", "name": "Lire la cote", "text": "La cote (ex: 1.85) indique combien tu récupères pour 1€ misé. Plus la cote est haute, plus l'issue est jugée improbable." },
         { "@type": "HowToStep", "name": "Vérifier la fiabilité", "text": "Le pourcentage de fiabilité (ex: 72%) est la probabilité estimée par le modèle. Compare-la à la cote pour évaluer la valeur." },
-        { "@type": "HowToStep", "name": "Évaluer l'edge", "text": "L'edge (ex: +12pt) est l'écart entre la fiabilité du modèle et la probabilité implicite de la cote. Positif = bonne valeur potentielle." },
+        { "@type": "HowToStep", "name": "Évaluer la marge", "text": "La marge (ex: +12pt) est l'écart entre la fiabilité du modèle et la probabilité implicite de la cote. Positive = bonne valeur potentielle." },
         { "@type": "HowToStep", "name": "Lire les raisons", "text": "Le bloc 'Pourquoi ce pronostic' liste les composants qui ont produit le pick : marché, Elo, forme, blessures, météo." }
       ],
       "publisher": { "@id": "https://harotensnor.github.io/paris-sportif/#org" },
@@ -278,11 +278,11 @@
     </div>
     <div class="annot-card">
       <span class="num">4</span><h3>Edge (+14pt)</h3>
-      <p style="margin-top:6px;">L'écart entre ta fiabilité (72%) et la probabilité implicite de la cote (1/1.85 = 54%). +14pt = le marché sous-estime, c'est la "value". Un edge négatif = le marché a raison, on skip.</p>
+    <p style="margin-top:6px;">L'écart entre ta fiabilité (72%) et la probabilité implicite de la cote (1/1.85 = 54%). +14pt = le marché sous-estime, c'est la marge exploitable. Une marge négative = le marché a raison, on passe.</p>
     </div>
     <div class="annot-card">
       <span class="num">5</span><h3>Mise FLAT 1u</h3>
-      <p style="margin-top:6px;"><strong>Pivot v45 (mai 2026)</strong> : Kelly a été retiré. Le backtest sur 1932 picks réglés a montré que <strong>Kelly perdait -30%</strong> (max drawdown 100%) tandis que <strong>FLAT 1u faisait +19% ROI</strong> avec drawdown 5%. Le FLAT 1u est désormais la mise recommandée. <code>1u = 1 unité = 1% bankroll</code>. Si ta cagnotte est 100€, 1u = 1€. Si bankroll 1000€, 1u = 10€. Discipline : même mise sur chaque pick, indépendamment de la cote.</p>
+      <p style="margin-top:6px;"><strong>Pivot v45 (mai 2026)</strong> : Kelly a été retiré. Le backtest sur 1932 paris réglés a montré que <strong>Kelly perdait -30%</strong> (max drawdown 100%) tandis que <strong>FLAT 1u faisait +19% ROI</strong> avec drawdown 5%. Le FLAT 1u est désormais la mise recommandée. <code>1u = 1 unité = 1% bankroll</code>. Si ta cagnotte est 100€, 1u = 1€. Si bankroll 1000€, 1u = 10€. Discipline : même mise sur chaque pari, indépendamment de la cote.</p>
     </div>
     <div class="annot-card">
       <span class="num">6</span><h3>Le panneau "raisons"</h3>
@@ -303,7 +303,7 @@
   <h2>🚦 Comprendre les tiers de fiabilité</h2>
   <section class="card">
     <ul>
-      <li><strong>🔒 lock</strong> : prob ≥ 72% + ≥3 composants non-marché concordants. Top picks, plus volume.</li>
+      <li><strong>🔒 lock</strong> : prob ≥ 72% + ≥3 composants non-marché concordants. Sélection prioritaire, plus de volume.</li>
       <li><strong>✅ standard</strong> : prob ≥ 55% avec couverture data minimale. Solide, à miser plus modestement.</li>
       <li><strong>⚠️ lowconf</strong> : prob ≥ 50% mais data thin. Considérer comme un signal, pas un ordre.</li>
       <li><strong>🚫 skip</strong> : prob &lt; 50% ou inversion modèle/marché. <em>Ne pas miser.</em></li>
@@ -313,10 +313,10 @@
   <h2>❌ Erreurs classiques à éviter</h2>
   <section class="card warn">
     <ul>
-      <li><strong>Miser sur tous les picks</strong>. Le modèle filtre déjà — un "skip" est une décision intentionnelle. Forcer un skip = casser le filtrage.</li>
+      <li><strong>Miser sur tous les paris proposés</strong>. Le modèle filtre déjà — un "skip" est une décision intentionnelle. Forcer un skip = casser le filtrage.</li>
       <li><strong>Doubler la mise après une défaite</strong>. La variance court-terme est normale. 3-5 défaites consécutives = attendu, ne pas paniquer.</li>
       <li><strong>Ignorer FLAT 1u et miser plus</strong>. La discipline FLAT préserve la bankroll même quand le modèle se trompe. Misant 5u sur un pick "convaincant", tu accélères la ruine si tu te trompes — pas la croissance si tu as raison. Le backtest a éliminé Kelly justement pour cette raison.</li>
-      <li><strong>Comparer sur 10 picks</strong>. Il faut typiquement 100-200 paris pour qu'un ROI commence à signifier quelque chose. Avant ça, c'est du bruit.</li>
+      <li><strong>Comparer sur 10 paris</strong>. Il faut typiquement 100-200 paris pour qu'un ROI commence à signifier quelque chose. Avant ça, c'est du bruit.</li>
       <li><strong>Suivre un seul sport</strong>. Un sport en perte (-50% ROI) sur 8 paris peut juste être de la malchance. Diversifier amortit la variance.</li>
     </ul>
   </section>
@@ -333,7 +333,7 @@
   </section>
 
   <p class="contrib-prompt">
-    💡 La meilleure manière d'apprendre : regarde 5-10 picks différents sur le <a href="pronostics.html">dashboard live</a>, lis les raisons à chaque fois. Tu vas vite repérer les patterns.
+    💡 La meilleure manière d'apprendre : regarde 5-10 paris différents sur le <a href="pronostics.html">dashboard live</a>, lis les raisons à chaque fois. Tu vas vite repérer les patterns.
   </p>
 </main>
 

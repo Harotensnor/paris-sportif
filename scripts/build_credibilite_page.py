@@ -231,7 +231,7 @@ PAGE_TEMPLATE = '''<!DOCTYPE html>
 
   <div class="kpi-strip">
     <div class="kpi-card">
-      <div class="kpi-label">Picks réglés</div>
+      <div class="kpi-label">Paris réglés</div>
       <div class="kpi-value">{n}</div>
       <div class="kpi-sub">{date_start} → {date_end}</div>
     </div>
@@ -254,7 +254,7 @@ PAGE_TEMPLATE = '''<!DOCTYPE html>
 
   <h2>📈 Calibration : ce qu'on annonce vs ce qu'on observe</h2>
   <section class="card">
-    <p>Chaque cercle est un bin de prédictions, positionné par sa probabilité moyenne (axe X) et son win rate observé (axe Y). La taille du cercle reflète le nombre de picks dans le bin. <strong>La diagonale violette est la calibration parfaite</strong> : modèle qui dit X%, gagne X%.</p>
+    <p>Chaque cercle est un bin de prédictions, positionné par sa probabilité moyenne (axe X) et son win rate observé (axe Y). La taille du cercle reflète le nombre de paris dans le bin. <strong>La diagonale violette est la calibration parfaite</strong> : modèle qui dit X%, gagne X%.</p>
     {svg_diagram}
     <div class="legend">
       <span><span class="swatch" style="background:#34d399;"></span>Gap &lt; 5pp (bien calibré)</span>
@@ -268,14 +268,14 @@ PAGE_TEMPLATE = '''<!DOCTYPE html>
 
   <h2>🧠 Comment lire ces chiffres</h2>
   <section class="card">
-    <p><strong>Brier score</strong> : <code>Σ(p_modèle − résultat)² / N</code>. C'est l'erreur moyenne au carré entre la probabilité prédite et l'issue réelle (0 ou 1). Un Brier de 0.25 correspond à du pile/face. <strong>0.22 = signal honnête</strong> sur ≥150 picks. Plus bas = meilleure calibration ET meilleure résolution.</p>
-    <p><strong>Log-loss</strong> : pénalise les prédictions confiantes mais fausses (un "95%" qui perd compte beaucoup). Si le modèle est plus précis sur les picks confiants, le log-loss baisse rapidement.</p>
+    <p><strong>Brier score</strong> : <code>Σ(p_modèle − résultat)² / N</code>. C'est l'erreur moyenne au carré entre la probabilité prédite et l'issue réelle (0 ou 1). Un Brier de 0.25 correspond à du pile/face. <strong>0.22 = signal honnête</strong> sur ≥150 paris. Plus bas = meilleure calibration ET meilleure résolution.</p>
+    <p><strong>Log-loss</strong> : pénalise les prédictions confiantes mais fausses (un "95%" qui perd compte beaucoup). Si le modèle est plus précis sur les paris confiants, le log-loss baisse rapidement.</p>
     <p><strong>Gap par bin</strong> : différence WR observé − prob moyenne dans chaque tranche. Un gap positif = le modèle <em>sous-estime</em> ses chances (les "70% prédits" gagnent en fait 75%). Un gap négatif = il <em>sur-estime</em>. Petit n par bin = pas conclure.</p>
   </section>
 
   <h2>🎯 Pourquoi c'est plus important que le ROI</h2>
   <section class="card">
-    <p>Un modèle peut avoir un ROI positif par <em>chance</em> sur petite série. Mais un modèle <strong>bien calibré</strong> sur ≥200 picks signifie que ses probabilités reflètent la réalité — c'est un signal beaucoup plus difficile à fabriquer. La calibration est ce qui distingue un "lucky streak" d'un vrai edge.</p>
+    <p>Un modèle peut avoir un ROI positif par <em>chance</em> sur petite série. Mais un modèle <strong>bien calibré</strong> sur ≥200 paris signifie que ses probabilités reflètent la réalité — c'est un signal beaucoup plus difficile à fabriquer. La calibration est ce qui distingue un "lucky streak" d'un vrai edge.</p>
     <p>Concrètement, si tu mises selon Kelly fractionnaire, ton espérance de croissance long-terme dépend directement de la précision de tes probabilités. Un modèle mal calibré qui produit 60% sur des matchs où la vraie prob est 50% va te faire perdre de l'argent même avec un staking parfait.</p>
   </section>
 

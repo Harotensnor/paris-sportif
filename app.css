@@ -59,6 +59,27 @@
   }
 }
 
+.refresh-indicator.topbar-refresh .rfr-txt {
+  min-width: 0;
+  max-width: calc(100vw - 96px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+  .refresh-indicator.topbar-refresh {
+    left: 8px;
+    right: 8px;
+    max-width: calc(100vw - 16px);
+  }
+
+  .refresh-indicator.topbar-refresh .rfr-txt {
+    display: block;
+    max-width: calc(100vw - 70px);
+  }
+}
+
 /* BUG-001: keep body out of the scroll/overflow chain so sticky headers use the viewport. */
 body {
   overflow-x: visible !important;

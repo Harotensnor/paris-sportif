@@ -1,6 +1,6 @@
 # Audit dette technique
 
-Généré : 2026-05-09T15:00:14.429983Z
+Généré : 2026-05-09T23:37:37.469552Z
 
 ## CSS — !important par fichier
 | Fichier | Lignes | !important total | dans @media | hors @media |
@@ -15,22 +15,22 @@ Généré : 2026-05-09T15:00:14.429983Z
 |---------|--------|----------|---------|------------------|
 | pronostics.html | 1549 | 52 | 0 | 53 |
 | index.html | 543 | 5 | 0 | 1 |
-| methodologie.html | 383 | 11 | 0 | 1 |
-| academie.html | 456 | 6 | 0 | 1 |
-| comment-lire-un-prono.html | 348 | 9 | 0 | 1 |
-| legal.html | 348 | 12 | 0 | 1 |
+| methodologie.html | 386 | 11 | 0 | 1 |
+| academie.html | 459 | 6 | 0 | 1 |
+| comment-lire-un-prono.html | 351 | 9 | 0 | 1 |
+| legal.html | 351 | 12 | 0 | 1 |
 
 ## JS — patterns dette
 | Fichier | Lignes | KB | window exposes | _v* funcs | console | TODO/FIXME |
 |---------|--------|-----|----------------|-----------|---------|------------|
-| app.js | 273 | 10 | 0 | 0 | 0 | 0 |
-| legacy-app.js | 35544 | 1882 | 146 | 30 | 0 | 1 |
+| app.js | 281 | 10 | 0 | 0 | 0 | 0 |
+| legacy-app.js | 36585 | 1945 | 148 | 30 | 0 | 1 |
 
 ## Sprint naming distribution (legacy-app.js)
 | Sprint | Occurrences |
 |--------|-------------|
 | v37 | 680 |
-| v40 | 44 |
+| v40 | 43 |
 | v43 | 35 |
 | v45 | 36 |
 | v46 | 3 |
