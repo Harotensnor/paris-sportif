@@ -636,18 +636,24 @@ html[data-theme="light"]{--surface-0:#f5f5f7;--surface-1:#ffffff;--surface-2:#fb
 
 /* v54.7 — garde-fous mobile : topbar compacte, filtres scrollables, pas de texte qui déborde. */
 @media (max-width:720px){
+  html,
+  body{
+    max-width:100%!important;
+    overflow-x:hidden!important;
+  }
   .topbar-inner{
     display:flex!important;
     align-items:center!important;
-    gap:8px!important;
+    gap:6px!important;
     min-width:0!important;
     width:100%!important;
   }
   .topbar-brand{
     flex:1 1 auto!important;
     min-width:0!important;
-    max-width:42vw!important;
+    max-width:none!important;
     overflow:hidden!important;
+    padding-right:0!important;
   }
   .topbar-brand .brand-title,
   .topbar-brand span,
@@ -657,10 +663,30 @@ html[data-theme="light"]{--surface-0:#f5f5f7;--surface-1:#ffffff;--surface-2:#fb
     text-overflow:ellipsis!important;
     white-space:nowrap!important;
   }
+  .v36-search-wrap{
+    display:none!important;
+  }
   .topbar-utils{
     flex:0 0 auto!important;
     min-width:0!important;
-    gap:6px!important;
+    max-width:calc(100vw - 112px)!important;
+    margin-left:auto!important;
+    justify-content:flex-end!important;
+    gap:5px!important;
+    overflow:visible!important;
+  }
+  .v36-icon-btn,
+  .v36-profile-btn{
+    width:36px!important;
+    min-width:36px!important;
+    max-width:36px!important;
+    height:36px!important;
+    min-height:36px!important;
+    padding:0!important;
+    gap:0!important;
+  }
+  .v36-profile-btn span:last-child{
+    display:none!important;
   }
   .date-nav,
   .v37-day-nav,
@@ -674,6 +700,8 @@ html[data-theme="light"]{--surface-0:#f5f5f7;--surface-1:#ffffff;--surface-2:#fb
     flex-wrap:nowrap!important;
     scrollbar-width:none!important;
     -webkit-overflow-scrolling:touch;
+    min-width:0!important;
+    width:100%!important;
   }
   .date-nav::-webkit-scrollbar,
   .v37-day-nav::-webkit-scrollbar,
@@ -694,6 +722,15 @@ html[data-theme="light"]{--surface-0:#f5f5f7;--surface-1:#ffffff;--surface-2:#fb
     white-space:nowrap!important;
     overflow:hidden!important;
     text-overflow:ellipsis!important;
+  }
+  .v37-date-picker{
+    flex:0 0 132px!important;
+    max-width:132px!important;
+    min-width:132px!important;
+  }
+  .v37-date-picker input{
+    min-width:0!important;
+    width:100%!important;
   }
   .coachmark,
   .tour-step,
