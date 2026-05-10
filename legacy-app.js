@@ -35614,13 +35614,51 @@ return;
 }
 gcSeenLocks();
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+// v54.3 — Auto-update : quand le cron déploie un nouveau build, le SW
+// détecte le nouveau sw.js (CACHE_VERSION bumpé), s'installe en arrière-plan
+// puis reload silencieusement la page → user voit toujours le dernier build
+// sans Ctrl+Shift+R. Avant : SW en mode "waiting" qui ne s'activait jamais
+// → user pouvait voir des données d'il y a 9h alors que prod refresh OK.
+let _swReloadPending = false;
+const _swAutoActivate = (reg) => {
+  if (!reg) return;
+  // Si déjà un SW en attente, prend le contrôle immédiatement
+  if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+  // Quand un update est trouvé, surveille son état
+  reg.addEventListener('updatefound', () => {
+    const newSW = reg.installing;
+    if (!newSW) return;
+    newSW.addEventListener('statechange', () => {
+      if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+        // Nouveau SW prêt + un SW existe déjà = update disponible.
+        newSW.postMessage({ type: 'SKIP_WAITING' });
+      }
+    });
+  });
+};
 const _registerSW = () => navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' })
-.then(reg => { try { reg.update(); } catch(e) { swallowError(e); } return reg; })
-.catch(() => {});
+  .then(reg => {
+    if (!reg) return null;
+    try { reg.update(); } catch(e) { swallowError(e); }
+    _swAutoActivate(reg);
+    // Re-check update toutes les 60s tant que la page est ouverte.
+    // Si l'user laisse l'onglet ouvert pendant que le cron déploie un
+    // nouveau build, le SW se met à jour automatiquement.
+    setInterval(() => { try { reg.update(); } catch(e) {} }, 60000);
+    return reg;
+  })
+  .catch(() => null);
+// Quand le SW prend le contrôle pour la 1ère fois OU change, recharge la page.
+navigator.serviceWorker.addEventListener('controllerchange', () => {
+  if (_swReloadPending) return;
+  _swReloadPending = true;
+  // Petit délai pour éviter les boucles de reload + laisser SW finalize
+  setTimeout(() => { try { window.location.reload(); } catch(e) {} }, 200);
+});
 if ('requestIdleCallback' in window) {
-requestIdleCallback(_registerSW, { timeout: 5000 });
+  requestIdleCallback(_registerSW, { timeout: 5000 });
 } else {
-setTimeout(_registerSW, 2000);
+  setTimeout(_registerSW, 2000);
 }
 }
 currentDate = todayISO();

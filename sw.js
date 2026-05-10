@@ -11,7 +11,7 @@
 // The "Stamp sw.js" step replaces this entire line with the current UTC timestamp,
 // so every deploy invalidates all caches → users see the new pronostics.html
 // without needing Ctrl+Shift+R. Manual edits stay valid for local dev.
-const CACHE_VERSION = 'paris-sportif-v54.2-20260510-081004';
+const CACHE_VERSION = 'paris-sportif-v54.3-20260510-081444';
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
@@ -120,6 +120,15 @@ self.addEventListener('activate', (event) => {
       ))
       .then(() => self.clients.claim())
   );
+});
+
+// v54.3 — Auto-update : le client envoie SKIP_WAITING quand il détecte un
+// nouveau SW. Le SW arrête le mode "waiting" et prend le contrôle direct.
+// Combiné avec controllerchange + reload côté client = update silencieux.
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
 
 self.addEventListener('notificationclick', (event) => {
