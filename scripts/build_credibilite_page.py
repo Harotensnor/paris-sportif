@@ -45,7 +45,7 @@ def render_calibration_svg(cal: list[dict]) -> str:
     plot_h = H - 2 * pad
     max_n = max((b.get('n') or 1) for b in valid)
 
-    svg = [f'<svg viewBox="0 0 {W} {H}" width="100%" height="auto" role="img" aria-label="Diagramme de calibration">']
+    svg = [f'<svg viewBox="0 0 {W} {H}" width="100%" style="height:auto;display:block;" role="img" aria-label="Diagramme de calibration">']
     # Grid + axes
     for frac in (0, 0.25, 0.5, 0.75, 1):
         y = pad + (1 - frac) * plot_h
@@ -127,7 +127,7 @@ PAGE_TEMPLATE = '''<!DOCTYPE html>
 <meta name="twitter:description" content="Le modèle est-il honnête sur ses probabilités ? Diagramme de calibration, Brier, log-loss. Test ultime de l'honnêteté.">
 <meta name="twitter:image" content="https://harotensnor.github.io/paris-sportif/og-credibilite.png">
 <meta name="theme-color" content="#08080a">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; font-src 'self' data:; connect-src 'none'; manifest-src 'self'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'; object-src 'none'; media-src 'none'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; font-src 'self' data:; connect-src 'none'; manifest-src 'self'; base-uri 'self'; form-action 'none'; object-src 'none'; media-src 'none'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 
 <script type="application/ld+json">
@@ -199,7 +199,40 @@ PAGE_TEMPLATE = '''<!DOCTYPE html>
   footer.site-footer {{ border-top: 1px solid rgba(255,255,255,.06); margin-top: 40px; padding: 24px 20px; text-align: center; font-size: 12.5px; color: #c5c5cc; }}
   footer.site-footer nav a {{ margin: 0 10px; color: #d4d4dc; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 2px; }}
   .contrib-prompt a, main p a, p a, li a {{ text-decoration: underline !important; }}
-</div>
+  @media (max-width: 720px) {{
+    header.topbar {{ align-items: flex-start; gap: 10px; flex-direction: column; }}
+    .topbar nav {{ display: flex; gap: 8px; overflow-x: auto; width: 100%; padding-bottom: 2px; }}
+    .topbar nav a {{ margin-left: 0; white-space: nowrap; }}
+    main {{ padding-inline: 14px; }}
+    h1 {{ font-size: 30px; }}
+    table {{ display: block; overflow-x: auto; white-space: nowrap; }}
+  }}
+</style>
+</head>
+<body>
+<header class="topbar" role="banner">
+  <a href="./" class="brand" aria-label="Retour à l'accueil Paris-Sportif">
+    <span class="brand-logo">📊</span>
+    <span class="brand-text">Paris-Sportif</span>
+  </a>
+  <nav aria-label="Navigation principale">
+    <a href="./">Accueil</a>
+    <a href="stats.html">Stats</a>
+    <a href="backtest.html">Backtest</a>
+    <a href="methodologie.html">Méthodologie</a>
+  </nav>
+</header>
+
+<main>
+  <div class="breadcrumb"><a href="./">Accueil</a> › Crédibilité</div>
+  <span class="uppercase-pill">Calibration probabiliste</span>
+  <h1>Crédibilité du modèle</h1>
+  <p class="lead">On vérifie si les probabilités annoncées collent au réel : quand le modèle dit 70%, gagne-t-on environ 70% ?</p>
+
+  <div class="kpi-strip">
+    <div class="kpi-card">
+      <div class="kpi-label">Picks réglés</div>
+      <div class="kpi-value">{n}</div>
       <div class="kpi-sub">{date_start} → {date_end}</div>
     </div>
     <div class="kpi-card">

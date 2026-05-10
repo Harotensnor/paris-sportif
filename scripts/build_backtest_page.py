@@ -463,6 +463,7 @@ def render_streaks(streaks: dict) -> str:
             n = r["len"]
             items.append(f'<li><b>{n}</b> {_word_fr(n, "lose")} ({ds} → {de})</li>')
         top_lose_html = f'<div><h4 style="margin:12px 0 6px;font-size:13px;color:#f87171;">❄️ Top 3 séries perdantes</h4><ol style="font-size:13px;padding-left:18px;color:#d4d4d8;">{"".join(items)}</ol></div>'
+    runs_html = '\n      '.join(x for x in (top_win_html, top_lose_html) if x)
 
     return f'''<p style="font-size:13px;color:#a3a3aa;margin:0 0 12px;">
       Les paris sportifs sont <b>variance-driven</b> : un modèle profitable a quand même des "froids"
@@ -484,8 +485,7 @@ def render_streaks(streaks: dict) -> str:
       </div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
-      {top_win_html}
-      {top_lose_html}
+      {runs_html}
     </div>
     <p style="font-size:12px;color:#a3a3aa;margin-top:12px;">
       Source : <code>backtest_report_v2.json#streaks</code> (cron hebdo).
@@ -717,7 +717,64 @@ PAGE_TEMPLATE = '''<!DOCTYPE html>
     border-bottom: 1px solid rgba(255,255,255,.08);
     z-index: 1;
   }}
-</b> → <b>{date_end}</b><br>
+  tbody td {{ padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,.04); color: #c5c5cc; }}
+  tbody tr:last-child td {{ border-bottom: none; }}
+  tbody td:nth-child(n+2) {{ text-align: right; }}
+  .meta-box {{
+    margin: 0 0 26px;
+    padding: 14px 16px;
+    background: rgba(255,255,255,.035);
+    border: 1px solid rgba(255,255,255,.08);
+    border-left: 4px solid #34d399;
+    border-radius: 10px;
+    color: #c5c5cc;
+    font-size: 13px;
+  }}
+  .danger-banner {{
+    margin: 28px 0 18px;
+    padding: 14px 16px;
+    background: rgba(251,191,36,.08);
+    border: 1px solid rgba(251,191,36,.18);
+    border-left: 4px solid #fbbf24;
+    border-radius: 10px;
+    color: #e6ebf2;
+    font-size: 13px;
+  }}
+  .contrib-prompt {{ color: #a3a3aa; font-size: 13px; margin-top: 22px; }}
+  footer.site-footer {{ border-top: 1px solid rgba(255,255,255,.06); margin-top: 40px; padding: 24px 20px; text-align: center; font-size: 12.5px; color: #c5c5cc; }}
+  footer.site-footer nav a {{ margin: 0 10px; color: #d4d4dc; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 2px; }}
+  @media (max-width: 720px) {{
+    header.topbar {{ align-items: flex-start; gap: 10px; flex-direction: column; }}
+    .topbar nav {{ display: flex; gap: 8px; overflow-x: auto; width: 100%; padding-bottom: 2px; }}
+    .topbar nav a {{ margin-left: 0; white-space: nowrap; }}
+    main {{ padding-inline: 14px; }}
+    h1 {{ font-size: 30px; }}
+    table {{ display: block; overflow-x: auto; white-space: nowrap; }}
+  }}
+</style>
+</head>
+<body>
+<header class="topbar" role="banner">
+  <a href="./" class="brand" aria-label="Retour à l'accueil Paris-Sportif">
+    <span class="brand-logo">📈</span>
+    <span class="brand-text">Paris-Sportif</span>
+  </a>
+  <nav aria-label="Navigation principale">
+    <a href="./">Accueil</a>
+    <a href="stats.html">Stats</a>
+    <a href="credibilite.html">Crédibilité</a>
+    <a href="methodologie.html">Méthodologie</a>
+  </nav>
+</header>
+
+<main>
+  <div class="breadcrumb"><a href="./">Accueil</a> › Backtest</div>
+  <span class="uppercase-pill">Backtest vérifiable</span>
+  <h1>Backtest du modèle</h1>
+  <p class="lead">Historique des picks réglés, par fiabilité, sport, bucket de cote et calibration. Les chiffres sont utiles pour diagnostiquer le modèle, pas pour promettre un résultat futur.</p>
+
+  <div class="meta-box">
+    📅 Fenêtre : <b>{date_start}</b> → <b>{date_end}</b><br>
     🔄 Régénéré : <b>{generated_human}</b><br>
     📦 Sources brutes : <a href="backtest_report_v2.json">backtest_report_v2.json</a> · <a href="backtest_report_v2.md">.md</a> · <a href="results_archive.jsonl">results_archive.jsonl</a>
   </div>

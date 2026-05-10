@@ -28,7 +28,7 @@
 </head>
 <body>
 <header class="static-page-header">
-  <a href="/" class="back-link">← Retour</a>
+  <a href="./" class="back-link">← Retour</a>
   <h1>📊 Stats publiques · audit complet</h1>
   <p class="subtitle">Toutes les performances du modèle Paris-Sportif, vérifiables et reproductibles. Aucun bullshit, juste les chiffres.</p>
 </header>
@@ -136,7 +136,7 @@
   <ul class="meth-list">
     <li><b>Source des cotes</b> : Winamax exact (catalog official) — 100% des picks dans le sample.</li>
     <li><b>Modèle</b> : Bivariate Poisson + Dixon-Coles τ correction + Elo per-team + LightGBM stacking + ensemble adaptive weights v5.</li>
-    <li><b>Backtest</b> : <a href="backtest_v2.py">scripts/backtest_v2.py</a> rejoue <code>predictMatch</code> sur events historiques via mini-racer (V8 embedded). Une seule source de vérité avec la prod.</li>
+    <li><b>Backtest</b> : <a href="scripts/backtest_v2.py">scripts/backtest_v2.py</a> rejoue <code>predictMatch</code> sur events historiques via mini-racer (V8 embedded). Une seule source de vérité avec la prod.</li>
     <li><b>Paper log</b> : <a href="scripts/paper_trade_log.py">scripts/paper_trade_log.py</a> snapshot des picks futurs + settle quand match completed. Forward proof immutable.</li>
     <li><b>CLV</b> : compute_clv.py compare cote au snapshot vs cote finale Winamax. Mesure si on bat le marché.</li>
     <li><b>Stratégie default</b> : FLAT 1u (1% bankroll). Kelly disponible mais documenté -30% ROI historique.</li>
@@ -188,7 +188,7 @@
 </main>
 
 <footer class="static-page-footer">
-  <div>Paris-Sportif · stats publiques · <a href="/">retour app</a> · <a href="methodologie.html">méthodologie</a> · <a href="legal.html">mentions légales</a></div>
+  <div>Paris-Sportif · stats publiques · <a href="./">retour app</a> · <a href="methodologie.html">méthodologie</a> · <a href="legal.html">mentions légales</a></div>
   <div class="footer-version">Page régénérée chaque cron tick · données live</div>
 </footer>
 

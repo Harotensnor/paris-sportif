@@ -437,7 +437,7 @@ const SPORTS_COVERAGE_PAGES = [
 'sports-tous', 'rugby', 'handball', 'volley', 'esport', 'combat',
 'cyclisme', 'ski', 'athle', 'tennis-challenger', 'foot-feminin', 'nfl'
 ];
-const VALID_PAGES = ['dashboard','tous','performance','academie','profil','buteurs','combines','sante','alertes','credibilite','bilan','historique','backtest','montantes','compare', ...SPORTS_COVERAGE_PAGES];
+const VALID_PAGES = ['dashboard','tous','performance','academie','profil','buteurs','combines','sante','alertes','credibilite','bilan','historique','backtest','montantes','compare','legal','methodologie', ...SPORTS_COVERAGE_PAGES];
 const PAGE_ALIASES = {
 'top': 'dashboard',
 'locks': 'dashboard',
@@ -449,7 +449,7 @@ const PAGE_ALIASES = {
 'resultats': 'performance',
 'mes-paris': 'performance',
 'methode': 'academie',
-'methodologie': 'academie',
+'methodologie': 'methodologie',
 'comment-lire': 'academie',
 'comment-lire-un-prono': 'academie',
 'buteur': 'buteurs',
@@ -461,8 +461,8 @@ const PAGE_ALIASES = {
 'simulator': 'profil',
 'health': 'profil',
 'diagnostic': 'profil',
-'legal': 'profil',
-'mentions-legales': 'profil',
+'legal': 'legal',
+'mentions-legales': 'legal',
 'montante-jour': 'montantes',
 'montante-weekend': 'montantes',
 'montante-semaine': 'montantes',
@@ -515,6 +515,8 @@ historique: { title: 'Historique' },
 backtest: { title: 'Backtest' },
 montantes: { title: 'Montantes séquentielles' },
 compare: { title: 'Comparer 2 jours' },
+legal: { title: 'Mentions légales' },
+methodologie: { title: 'Méthodologie' },
 'sports-tous': { title: 'Sports étendus' },
 rugby: { title: 'Rugby' },
 handball: { title: 'Handball' },
@@ -602,7 +604,7 @@ const LEGACY_HASHES = {
 top: { page: 'tous', hash: '#tous?legacy=top', label: 'Tous · top picks' },
 locks: { page: 'tous', hash: '#tous?legacy=locks', label: 'Tous · locks' },
 matchs: { page: 'dashboard', hash: '#dashboard?legacy=matchs', label: 'Accueil · matchs détectés' },
-methodologie: { page: 'academie', hash: '#academie?legacy=methodologie', label: 'Académie · méthodologie' },
+methodologie: { page: 'methodologie', hash: '#methodologie?legacy=methodologie', label: 'Méthodologie' },
 favoris: { page: 'profil', hash: '#profil?legacy=favoris', label: 'Profil · favoris' },
 simulator: { page: 'profil', hash: '#profil?legacy=simulator', label: 'Profil · simulateur bankroll', scrollTo: 'profile-bankroll-simulator' },
 calendrier: { page: 'tous', hash: '#tous?view=calendar&legacy=calendrier', label: 'Tous · calendrier' },
@@ -2753,7 +2755,7 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
       : rawConf;
     const edge = Number.isFinite(Number(c?.edge)) ? Number(c.edge) : (conf && odd ? conf - 1 / odd : 0);
     const ev = Number.isFinite(Number(c?.ev)) ? Number(c.ev) : (conf && odd ? conf * odd - 1 : -1);
-    if (!(odd >= 1.30) || !(conf > 0) || !(edge >= -0.005) || !(ev >= -0.005)) return null;
+    if (!(odd >= 1.30) || !(conf > 0) || !(edge > 0) || !(ev > 0)) return null;
     if (odd < 1.50 && conf >= 0.65) return 'safe';
     if (odd < 2.00 && conf >= 0.50) return 'solid';
     if (odd < 3.00 && conf >= 0.35 && edge >= 0.01) return 'value';
@@ -2822,7 +2824,9 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
       ? opts.matches
       : Object.values(days).flatMap(arr => Array.isArray(arr) ? arr : []);
     const includeSettled = opts.includeSettled !== false;
-    const includeStarted = opts.includeStarted !== false;
+    // Actionable lists must not silently keep matches whose kickoff is already past.
+    // Pages that audit coverage/history opt back in explicitly with includeStarted:true.
+    const includeStarted = opts.includeStarted === true;
     const onlyWinamax = opts.onlyWinamax !== false;
     const byKey = new Map();
     for (const m of matches) {
@@ -4370,6 +4374,8 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
       if (m === '1n2' || m === 'matchwinner') return 0.85;  // -15% pénalité
       return 1.00;
     };
+    const allowNonValue = opts.allowNonValue === true || opts.analysisOnly === true;
+    if (!pool.length && !allowNonValue) return null;
     const sorted = (pool.length ? pool : allowed).slice();
     sorted.sort((a, b) => {
       const aMul = _CLV_MARKET_MULTIPLIER(a.market);
@@ -13289,7 +13295,11 @@ const leadersHtml = ((home?.leaders?.length || 0) + (away?.leaders?.length || 0)
 const body = document.getElementById('detail-body');
 const whyBest = (() => {
 if (detailSelectedPick) return detailSelectedPick;
-try { return (typeof _agentBestPick === 'function') ? _agentBestPick(match, pred) : null; }
+try {
+  const actionable = (typeof selectBestMarket === 'function') ? selectBestMarket(match, pred) : null;
+  if (actionable) return actionable;
+  return (typeof _agentBestPick === 'function') ? _agentBestPick(match, pred) : null;
+}
 catch(e) { return null; }
 })();
 const whyOdd = Number(whyBest?.odd || (pred?.odds && pred?.pick ? (pred.pick.key === '1' ? pred.odds.home : pred.pick.key === '2' ? pred.odds.away : pred.odds.draw) : 0) || 0);
@@ -13311,6 +13321,35 @@ try {
 } catch(e) { return 1; }
 })();
 const whyStakeMode = (typeof window._v45StakeMode === 'function') ? window._v45StakeMode() : 'flat';
+const whyOddMeta = whyBest && typeof validatePickOdd === 'function'
+? validatePickOdd(match, whyBest, pred)
+: { status: whyBest?.exact ? 'verified' : 'missing' };
+const whyOddOk = whyBest
+? (typeof v38OddTopEligible === 'function' ? v38OddTopEligible(whyOddMeta) : whyOddMeta.status === 'verified')
+: false;
+const whyKickoffTs = match?.date ? new Date(match.date).getTime() : NaN;
+const whyDone = Boolean(match?.completed || (typeof _isMatchEffectivelyDone === 'function' && _isMatchEffectivelyDone(match)));
+const whyStarted = Boolean(
+match?.live
+|| match?.status === 'STATUS_IN_PROGRESS'
+|| whyDone
+|| (typeof _hasMatchKickedOff === 'function' && _hasMatchKickedOff(match))
+|| (Number.isFinite(whyKickoffTs) && whyKickoffTs < Date.now() - 60000)
+);
+const whyPositiveValue = whyOdd > 1 && whyRel > 0 && whyEdge > 0 && whyEv > 0 && !pred?.skip;
+const whyActionable = Boolean(match?.winamax?.match_id && whyBest && whyOddOk && whyPositiveValue && !whyStarted);
+const whyNoBetReason = whyDone ? 'Match terminé'
+: whyStarted ? 'Match commencé'
+: !match?.winamax?.match_id ? 'Cote non liée Winamax'
+: !whyBest ? 'Aucun marché exploitable'
+: !whyOddOk ? 'Cote à revérifier'
+: pred?.skip ? 'Pick filtré par le modèle'
+: !whyPositiveValue ? 'Aucune value exploitable'
+: 'Non actionnable';
+const whyStakeDisplay = whyActionable ? `${whyStake}€` : '0€';
+const whyStakeHint = whyActionable
+? (whyStakeMode === 'kelly' ? 'Kelly ⚠ -30% hist' : 'FLAT 1u (recommandé)')
+: whyNoBetReason;
 const whySignalState = { for: [], against: [], resolution: null };
 const whyReasons = (() => {
 const arr = [];
@@ -13475,9 +13514,9 @@ return `<div class="why-bet__signals" aria-label="Signaux pour et contre ce pari
         </div>`;
 })();
 const whyWinamaxHref = buildWinamaxLink(match);
-const whyWinamaxCta = match?.winamax?.match_id
+const whyWinamaxCta = whyActionable
 ? `<a class="why-bet__winamax" href="${esc(whyWinamaxHref)}" target="_blank" rel="noopener" data-modal-winamax-click>Placer chez Winamax →</a>`
-: '<span class="why-bet__disabled">Cote non liée Winamax</span>';
+: `<span class="why-bet__disabled">${esc(whyNoBetReason)}</span>`;
 const whyHtml = `
       <section class="why-bet" aria-labelledby="why-bet-title">
         <div class="why-bet__eyebrow">Pourquoi ce pari ?</div>
@@ -13488,9 +13527,9 @@ const whyHtml = `
             <p>${whyEdge > 0 ? `+${(whyEdge * 100).toFixed(1)}% mieux que le marché` : 'Pas assez de value claire'} · ${whyEv >= 0 ? '+' : ''}${Math.round(whyEv * 100)}% attendu par euro misé.</p>
           </div>
           <div class="why-bet__stake">
-            <span>Mise suggérée</span>
-            <strong>${whyStake}€</strong>
-            <em>${whyStakeMode === 'kelly' ? 'Kelly ⚠ -30% hist' : 'FLAT 1u (recommandé)'}</em>
+            <span>${whyActionable ? 'Mise suggérée' : 'Mise bloquée'}</span>
+            <strong>${whyStakeDisplay}</strong>
+            <em>${esc(whyStakeHint)}</em>
           </div>
         </div>
         <ol>${whyDecisionReasons.map(r => `<li><b>${esc(r.label)}</b><span>${esc(r.text)}</span></li>`).join('')}</ol>
@@ -18016,14 +18055,13 @@ const _dashboardNowMs = Number.isFinite(_dashboardGeneratedMs) && Number.isFinit
 const _dataAgeMin = (typeof getDataAge === 'function')
 ? getDataAge(data, { nowMs: _dashboardNowMs }).minutes
 : (data.generated_at ? Math.floor((_dashboardNowMs - _dashboardGeneratedMs)/60000) : 9999);
-// v37.182 — Bumpe le seuil "stale" de 4h → 24h. Avant, dès que le cron data
-// avait > 4h de retard, _dataIsStale=true vidait Top Paris, perSport7d,
-// allTodayRaw, butsDuMatch et coupait l'affichage des picks. Conséquence :
-// site inutilisable lors d'un blip pipeline. Maintenant on tolère 24h ; le
-// refresh-indicator + l'affichage per-pick (validatePickOdd) signalent déjà
-// la fraîcheur sans bloquer l'expérience. Au-delà de 24h, le mode "data
-// figée" reste pertinent (informations pré-match probablement obsolètes).
-const _dataIsStale = _dataAgeMin > 1440; // 24h
+// v37.182 — Ajustement du seuil "stale" en 4h. Avant, dès que le cron data
+// avait > 4h de retard, _dataIsStale=true pouvait vider Top Paris, perSport7d,
+// allTodayRaw, butsDuMatch et coupait l'affichage des picks.
+// Pour limiter les régressions, on refuse les actions de pari au-delà de 4h de
+// fraîcheur ; en pratique la bannière d'alerte et le mode "data figée" restent
+// la source d'information tant que l'actualisation auto est en cours.
+const _dataIsStale = _dataAgeMin > 240; // 4h
 
 {
 const v36FilterKey = 'paris_sportif_v36_home_filter';
@@ -18599,8 +18637,8 @@ const v37DateMatches = (m) => v37DateMatchesFor(m, v37DateFilter);
 const v37PickIsVisibleByClockFor = (m, dateFilter, historyMode) => {
 const ts = new Date(m?.date || 0).getTime();
 if (!Number.isFinite(ts)) return false;
-if (historyMode || dateFilter === todayIso) return true;
-const isLive = !!(m?.live || m?.status === 'STATUS_IN_PROGRESS');
+if (historyMode) return true;
+const isLive = !!(m?.live || m?.status === 'STATUS_IN_PROGRESS' || (typeof _isMatchLikelyLive === 'function' && _isMatchLikelyLive(m)));
 if (m?.completed || _isMatchEffectivelyDone(m)) return false;
 if (isLive) return v37IncludeLive;
 return ts > _dashboardNowMs;
@@ -18633,7 +18671,7 @@ const sides = getSides(m);
 return String(m?.id || `${parisDateISO(m?.date) || ''}|${v36TeamName(sides.home)}|${v36TeamName(sides.away)}`);
 };
 const v37PickUid = (m, candidate) => `${v37StableMatchKey(m)}|${marketCandidateSignature(candidate)}`;
-const v37SoftEdgeFloor = -0.005;
+const v37SoftEdgeFloor = 0.0001;
 const v37EdgeDisplayCap = 0.25;
 const v37EdgeAnomalyThreshold = 0.30;
 const v37CapEdge = (value) => {
@@ -18808,13 +18846,12 @@ v37Reject('marche_remboursement', m, c?.market || '');
 return false;
 }
 // AUDIT 2026-05-08 v39 — User : "je veux pas de paris à cote pas validée".
-// v54.4 — User feedback : "Hero dit 3 pronos mais table 0". Le filtre v38
-// strict était la cause. Maintenant on accepte verified/changed/stale (avec
-// disclaimer "à vérifier"). Suspicious seulement = reject. Cohérence
-// garantie avec _heroAccueil qui voit la même chose.
+// v54.7 — Pas de pari actionnable sans cote Winamax exploitable. Les cotes
+// missing/stale/suspicious restent visibles seulement dans les vues d'audit,
+// jamais dans le flux "à jouer".
 const _oddMeta = c.oddValidation || (typeof validatePickOdd === 'function' ? validatePickOdd(m, c, pred) : null);
-if (_oddMeta && _oddMeta.status === 'suspicious') {
-v37Reject('cote_suspicious', m, `${c?.market || ''} ${_oddMeta?.reason || ''}`);
+if (_oddMeta && typeof v38OddTopEligible === 'function' && !v38OddTopEligible(_oddMeta)) {
+v37Reject(`cote_${_oddMeta.status || 'non_verifiee'}`, m, `${c?.market || ''} ${_oddMeta?.reason || ''}`);
 return false;
 }
 return true;
@@ -20899,31 +20936,14 @@ const _heroAccueil = (() => {
     for (const m of todayEvents) {
       if (m.live || m.status === 'STATUS_IN_PROGRESS') liveCount++;
       const ko = m.date ? new Date(m.date).getTime() : 0;
-      if (m.completed || ko < now - 6 * 3600 * 1000) continue;
+      if (m.completed || ko < now - 60 * 1000) continue;
       let pred = null;
       try { pred = predictMatch(m); } catch (e) {}
       if (!pred || pred.skip) continue;
-      // v54.2 — Hero accueil : si selectBestMarket null (cote stale rejette
-      // tout), fallback sur buildMarketCandidates relâché. Sinon hero=vide
-      // dès que data > 4h. User screenshot prod : hero invisible malgré
-      // 99 events présents.
+      // v54.7 — Le hero compte uniquement les paris réellement jouables :
+      // marché Winamax exact, cote éligible, edge/EV positifs, kickoff futur.
       let best = null;
       try { best = (typeof selectBestMarket === 'function') ? selectBestMarket(m, pred) : null; } catch(e) {}
-      if (!best) {
-        try {
-          const cands = (typeof buildMarketCandidates === 'function') ? buildMarketCandidates(m, pred, { requireExact: false }) : [];
-          best = cands.find(c => c.edge > 0 && c.rel > 0.45) || cands[0] || null;
-        } catch(e) {}
-      }
-      if (!best) {
-        // Last fallback : raw 1n2 from pred.pick
-        const pk = pred.pick?.key;
-        const odd = pred.odds && pk ? (pk === '1' ? pred.odds.home : pk === '2' ? pred.odds.away : pred.odds.draw) : null;
-        const rel = pred.reliability ?? pred.pick?.prob;
-        if (odd > 1 && rel > 0) {
-          best = { odd, rel, edge: rel - 1/odd, label: pred.pick?.label || 'Pick', market: '1n2' };
-        }
-      }
       if (!best || !best.odd) continue;
       predicted++;
       const edge = Number(best.edge || 0);
@@ -21893,7 +21913,7 @@ const bbfFavSportsPrefs = Array.isArray(bbfUserPrefs.favSports) ? bbfUserPrefs.f
 const bbfExcludedLeagues = new Set(Array.isArray(bbfStrategyPrefs.excludedLeagues) ? bbfStrategyPrefs.excludedLeagues.map(String) : []);
 const bbfMinRelPref = bbfStrategyHasPrefs ? Math.max(0.50, Math.min(0.90, Number(bbfStrategyPrefs.minConfidence || 55) / 100)) : 0;
 const bbfRiskEdgePref = bbfStrategyHasPrefs ? ({ 1: 0.08, 2: 0.06, 3: 0.04, 4: 0.03, 5: 0.02 }[Math.max(1, Math.min(5, Number(bbfStrategyPrefs.riskTolerance || 3)))] || 0.04) : 0;
-if (_dataAgeMin > 120 && !data._lite) {
+if (_dataAgeMin > 360 && !data._lite) {
 const lastTry = parseInt(sessionStorage.getItem('autoRefreshDoneAt') || '0', 10);
 const ageMin = (Date.now() - lastTry) / 60000;
 if (!isFinite(ageMin) || ageMin > 30) {
@@ -22685,7 +22705,8 @@ return `
       }
       const rows = [];
       let exactMatches = 0, detailedMatches = 0, candidateCount = 0;
-      terminalScanPool.slice(0, 260).forEach(m => {
+      const terminalActionPool = v37ScanPool.length ? v37ScanPool : terminalScanPool.filter(m => v37PickIsVisibleByClock(m));
+      terminalActionPool.slice(0, 260).forEach(m => {
         try {
           const pred = predictMatch(m);
           if (!pred || !pred.pick || pred.skip) return;
@@ -22698,7 +22719,11 @@ return `
         } catch(e) { swallowError(e); }
       });
       const valueRows = rows
-        .filter(x => x.c && x.c.source === 'winamax_exact' && x.c.ev > 0 && x.c.edge > 0 && x.c.investment?.action !== 'skip')
+        .filter(x => {
+          if (!(x.c && x.c.source === 'winamax_exact' && x.c.ev > 0 && x.c.edge > 0 && x.c.investment?.action !== 'skip')) return false;
+          const meta = x.c.oddValidation || (typeof validatePickOdd === 'function' ? validatePickOdd(x.m, x.c, x.pred) : null);
+          return typeof v38OddTopEligible === 'function' ? v38OddTopEligible(meta) : true;
+        })
         .sort((a,b) => (b.c.investment?.score || 0) - (a.c.investment?.score || 0) || (b.c.ev || 0) - (a.c.ev || 0));
       const main = valueRows.find(x => x.c.odd >= 1.45 && x.c.odd <= 3.50 && (x.c.investment?.score || 0) >= 60) || valueRows[0];
       const attackScore = (x) => {
@@ -32655,12 +32680,25 @@ const sourceMetric = (key, field, fallback = '—') => {
 const v = healthSources[key] && healthSources[key][field];
 return (v === 0 || v) ? v : fallback;
 };
+const liveAgeInfo = (typeof getDataAge === 'function') ? getDataAge(window.PRONOSTICS_DATA) : null;
+const healthAgeMin = Number(healthData.data_age_min);
+const displayAgeMin = liveAgeInfo && Number.isFinite(liveAgeInfo.minutes)
+? liveAgeInfo.minutes
+: (Number.isFinite(healthAgeMin) ? healthAgeMin : 9999);
+const displayAgeValue = displayAgeMin >= 9999
+? '—'
+: displayAgeMin < 60 ? `${displayAgeMin} min`
+: `${Math.round(displayAgeMin / 60)} h`;
+const displayGeneratedAt = liveAgeInfo?.generatedAt || healthData.generated_at || '';
+const displayGeneratedTime = displayGeneratedAt
+? new Date(displayGeneratedAt).toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' })
+: '—';
 const quickHealthCards = [
 {
 label: 'Fraîcheur data',
-value: `${Number(healthData.data_age_min || 0)} min`,
-detail: `généré ${healthData.generated_at ? new Date(healthData.generated_at).toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' }) : '—'}`,
-color: Number(healthData.data_age_min || 0) > 30 ? '#eab308' : '#34d399'
+value: displayAgeValue,
+detail: `data.js généré ${displayGeneratedTime}`,
+color: displayAgeMin > 240 ? '#f87171' : displayAgeMin > 30 ? '#eab308' : '#34d399'
 },
 {
 label: 'Marchés détaillés',
@@ -36516,7 +36554,7 @@ el.textContent = `📅 Données ${lbl}`;
 el.style.color = '';
 }
 el.title = `Dernière actualisation : ${new Date(data.generated_at).toLocaleString('fr-FR')}`;
-if (ageMin > 120 && !(data && data._lite)) {
+if (ageMin > 360 && !(data && data._lite)) {
 try {
 const lastTry = parseInt(sessionStorage.getItem('autoRefreshDoneAt') || '0', 10);
 const sinceLast = (Date.now() - lastTry) / 60000;

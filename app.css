@@ -633,3 +633,73 @@ html[data-theme="light"]{--surface-0:#f5f5f7;--surface-1:#ffffff;--surface-2:#fb
   margin-bottom:14px !important;
   box-shadow:0 4px 16px rgba(168,85,247,.12);
 }
+
+/* v54.7 — garde-fous mobile : topbar compacte, filtres scrollables, pas de texte qui déborde. */
+@media (max-width:720px){
+  .topbar-inner{
+    display:flex!important;
+    align-items:center!important;
+    gap:8px!important;
+    min-width:0!important;
+    width:100%!important;
+  }
+  .topbar-brand{
+    flex:1 1 auto!important;
+    min-width:0!important;
+    max-width:42vw!important;
+    overflow:hidden!important;
+  }
+  .topbar-brand .brand-title,
+  .topbar-brand span,
+  .brand-text{
+    min-width:0!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    white-space:nowrap!important;
+  }
+  .topbar-utils{
+    flex:0 0 auto!important;
+    min-width:0!important;
+    gap:6px!important;
+  }
+  .date-nav,
+  .v37-day-nav,
+  .v36-sort-strip,
+  .page-tabs,
+  .tous-filter-bar,
+  .v36-mobile-quick{
+    max-width:100%!important;
+    overflow-x:auto!important;
+    overflow-y:hidden!important;
+    flex-wrap:nowrap!important;
+    scrollbar-width:none!important;
+    -webkit-overflow-scrolling:touch;
+  }
+  .date-nav::-webkit-scrollbar,
+  .v37-day-nav::-webkit-scrollbar,
+  .v36-sort-strip::-webkit-scrollbar,
+  .page-tabs::-webkit-scrollbar,
+  .tous-filter-bar::-webkit-scrollbar,
+  .v36-mobile-quick::-webkit-scrollbar{display:none}
+  .date-nav button,
+  .v37-day-chip,
+  .v36-filter-chip,
+  .v36-sort-btn,
+  [data-tous-preset],
+  [data-tous-sport],
+  [data-tous-tab]{
+    flex:0 0 auto!important;
+    min-width:44px!important;
+    max-width:148px!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+  .coachmark,
+  .tour-step,
+  [data-coachmark]{
+    max-width:calc(100vw - 24px)!important;
+    inset-inline:12px!important;
+    z-index:140!important;
+  }
+}
