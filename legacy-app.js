@@ -20885,8 +20885,28 @@ const _heroAccueil = (() => {
       let pred = null;
       try { pred = predictMatch(m); } catch (e) {}
       if (!pred || pred.skip) continue;
-      const best = (typeof selectBestMarket === 'function') ? selectBestMarket(m, pred) : null;
-      if (!best) continue;
+      // v54.2 — Hero accueil : si selectBestMarket null (cote stale rejette
+      // tout), fallback sur buildMarketCandidates relâché. Sinon hero=vide
+      // dès que data > 4h. User screenshot prod : hero invisible malgré
+      // 99 events présents.
+      let best = null;
+      try { best = (typeof selectBestMarket === 'function') ? selectBestMarket(m, pred) : null; } catch(e) {}
+      if (!best) {
+        try {
+          const cands = (typeof buildMarketCandidates === 'function') ? buildMarketCandidates(m, pred, { requireExact: false }) : [];
+          best = cands.find(c => c.edge > 0 && c.rel > 0.45) || cands[0] || null;
+        } catch(e) {}
+      }
+      if (!best) {
+        // Last fallback : raw 1n2 from pred.pick
+        const pk = pred.pick?.key;
+        const odd = pred.odds && pk ? (pk === '1' ? pred.odds.home : pk === '2' ? pred.odds.away : pred.odds.draw) : null;
+        const rel = pred.reliability ?? pred.pick?.prob;
+        if (odd > 1 && rel > 0) {
+          best = { odd, rel, edge: rel - 1/odd, label: pred.pick?.label || 'Pick', market: '1n2' };
+        }
+      }
+      if (!best || !best.odd) continue;
       predicted++;
       const edge = Number(best.edge || 0);
       const rel = Number(best.rel || 0);
@@ -20927,14 +20947,12 @@ const _heroAccueil = (() => {
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;">
         ${sportRows.map(([sp, n]) => `<span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:999px;font-size:12px;color:var(--text-2);font-weight:600;">${SPORT_ICONS[sp] || '🎯'} ${esc(sp.slice(0, 12))} <b style="color:var(--brand);">${n}</b></span>`).join('')}
       </div>` : '';
+    // v54.2 — Compare hier : juste le bilan résultat, pas une compare picks
+    // bancale (yPicks = settled hier, predicted = futurs aujourd'hui — incomparable).
     const compareHierHtml = yPicks > 0 ? (() => {
-      const dPicks = predicted - yPicks;
-      const arrow = dPicks > 0 ? '↗' : dPicks < 0 ? '↘' : '→';
-      const dPicksColor = dPicks >= 0 ? 'var(--accent)' : '#fca5a5';
       const yRoiTone = yRoi != null ? (yRoi > 0 ? 'var(--accent)' : '#fca5a5') : 'var(--text-dim)';
       return `<div style="font-size:12px;color:var(--text-dim);margin-top:8px;">
-        Hier : <b style="color:var(--text-2);">${yWon}V·${yLost}D</b> · ROI <b style="color:${yRoiTone};">${yRoi != null ? `${yRoi >= 0 ? '+' : ''}${yRoi.toFixed(0)}%` : '—'}</b>
-        · vs aujourd'hui <b style="color:${dPicksColor};">${arrow} ${dPicks >= 0 ? '+' : ''}${dPicks} pick${Math.abs(dPicks) > 1 ? 's' : ''}</b>
+        🕒 Hier : <b style="color:var(--text-2);">${yWon}V·${yLost}D</b> · ROI <b style="color:${yRoiTone};">${yRoi != null ? `${yRoi >= 0 ? '+' : ''}${yRoi.toFixed(0)}%` : '—'}</b>
       </div>`;
     })() : '';
     return `
@@ -21055,17 +21073,41 @@ const _calendar14d = (() => {
       </section>`;
   } catch (e) { return ''; }
 })();
-// v53.9 — Quick filter chips au-dessus du tableau (toggle Genius / Value /
-// Tout — affiche le subset pertinent dans la table principale).
-const _quickFilters = `
+// v53.9/v54.2 — Quick filter chips au-dessus du tableau avec aria-pressed
+// active state (audit P2 fix). Lit advFilters localStorage pour décider
+// quel chip est actif.
+const _quickActiveFilter = (() => {
+  try {
+    const cur = JSON.parse(localStorage.getItem('advFilters') || '{}') || {};
+    if (cur.minOdd >= 5.0) return 'outsiders';
+    if (cur.minRel >= 0.75) return 'locks';
+    if (cur.valueOnly && cur.evMin >= 0.07) return 'genius';
+    if (cur.valueOnly && cur.evMin >= 0.05) return 'value';
+    return 'all';
+  } catch (e) { return 'all'; }
+})();
+const _chipStyle = (kind, baseColor) => {
+  const isActive = _quickActiveFilter === kind;
+  const ring = isActive ? `box-shadow:0 0 0 2px ${baseColor};` : '';
+  const pressed = isActive ? 'true' : 'false';
+  return { ring, pressed };
+};
+const _quickFilters = (() => {
+  const all = _chipStyle('all', 'var(--text)');
+  const gen = _chipStyle('genius', '#a855f7');
+  const val = _chipStyle('value', 'var(--accent)');
+  const loc = _chipStyle('locks', 'var(--warn)');
+  const out = _chipStyle('outsiders', '#f59e0b');
+  return `
   <div style="display:flex;gap:8px;flex-wrap:wrap;padding:10px 0 12px;align-items:center;">
     <span style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;font-weight:700;">Filtre rapide :</span>
-    <button type="button" data-quick-filter="all" style="padding:6px 12px;background:var(--panel);border:1px solid var(--border);color:var(--text);border-radius:999px;font-size:12px;font-weight:600;cursor:pointer;">📋 Tous</button>
-    <button type="button" data-quick-filter="genius" style="padding:6px 12px;background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.4);color:#a855f7;border-radius:999px;font-size:12px;font-weight:700;cursor:pointer;">🧠 Genius (edge ≥7pt)</button>
-    <button type="button" data-quick-filter="value" style="padding:6px 12px;background:rgba(52,211,153,.15);border:1px solid rgba(52,211,153,.4);color:var(--accent);border-radius:999px;font-size:12px;font-weight:700;cursor:pointer;">💎 Value (edge ≥5pt)</button>
-    <button type="button" data-quick-filter="locks" style="padding:6px 12px;background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.4);color:var(--warn);border-radius:999px;font-size:12px;font-weight:700;cursor:pointer;">🔒 Locks (conf ≥75%)</button>
-    <button type="button" data-quick-filter="outsiders" style="padding:6px 12px;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.4);color:#f59e0b;border-radius:999px;font-size:12px;font-weight:700;cursor:pointer;">💎 Outsiders (cote ≥5)</button>
+    <button type="button" data-quick-filter="all" aria-pressed="${all.pressed}" style="padding:6px 12px;background:var(--panel);border:1px solid var(--border);color:var(--text);border-radius:999px;font-size:12px;font-weight:600;cursor:pointer;${all.ring}">📋 Tous</button>
+    <button type="button" data-quick-filter="genius" aria-pressed="${gen.pressed}" style="padding:6px 12px;background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.4);color:#a855f7;border-radius:999px;font-size:12px;font-weight:700;cursor:pointer;${gen.ring}">🧠 Genius (edge ≥7pt)</button>
+    <button type="button" data-quick-filter="value" aria-pressed="${val.pressed}" style="padding:6px 12px;background:rgba(52,211,153,.15);border:1px solid rgba(52,211,153,.4);color:var(--accent);border-radius:999px;font-size:12px;font-weight:700;cursor:pointer;${val.ring}">💎 Value (edge ≥5pt)</button>
+    <button type="button" data-quick-filter="locks" aria-pressed="${loc.pressed}" style="padding:6px 12px;background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.4);color:var(--warn);border-radius:999px;font-size:12px;font-weight:700;cursor:pointer;${loc.ring}">🔒 Locks (conf ≥75%)</button>
+    <button type="button" data-quick-filter="outsiders" aria-pressed="${out.pressed}" style="padding:6px 12px;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.4);color:#f59e0b;border-radius:999px;font-size:12px;font-weight:700;cursor:pointer;${out.ring}">💎 Outsiders (cote ≥5)</button>
   </div>`;
+})();
 wrap.innerHTML = `
         <div class="v36-home-shell" data-home-table-only>
           ${_heroAccueil}
