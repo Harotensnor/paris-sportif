@@ -1,0 +1,95 @@
+name: refresh-data-v2
+
+# v54.3 — Workflow de secours (le précédent refresh-data a été auto-disabled
+# par GitHub Actions). En tant que NOUVEAU workflow, celui-ci sera enabled
+# par défaut au premier push.
+#
+# Identique fonctionnellement à refresh.yml mais sans héritage du status
+# disabled. Si refresh.yml est ré-activé manuellement, on peut supprimer
+# ce fichier.
+
+on:
+  schedule:
+    - cron: '*/5 10-23 * * *'
+    - cron: '*/10 0-9 * * *'
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/refresh-data-v2.yml'
+
+# Concurrency : 1 run à la fois (évite race git push)
+concurrency:
+  group: paris-sportif-refresh-data-v2
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install deps
+        run: pip install --quiet curl-cffi requests
+
+      - name: Pull latest
+        run: git pull --rebase --strategy-option=theirs origin main || true
+
+      - name: Fetch live + patches (minimal pipeline)
+        run: |
+          set +e
+          python3 scripts/fetch_live.py || true
+          python3 scripts/fetch_winamax_catalog.py || true
+          WINAMAX_DETAILS_CAP=300 WINAMAX_DETAILS_SLEEP=0.10 python3 scripts/fetch_winamax_match_details.py --limit 300 --ttl-hours 0.5 --horizon-days 14 || true
+          python3 scripts/patch_winamax.py || true
+          python3 scripts/patch_winamax_markets.py || true
+          python3 scripts/finalize_inline.py || true
+
+      - name: Stamp asset versions
+        run: |
+          APP_VERSION=$(python3 - <<'PY'
+          import re
+          from pathlib import Path
+          m = re.search(r"VERSION\s*=\s*['\"](v\d+(?:\.\d+)?)['\"]", Path('app.js').read_text(encoding='utf-8', errors='ignore'))
+          print(m.group(1) if m else 'v0')
+          PY
+          )
+          BUILD_ID="${APP_VERSION}-$(date -u +'%Y%m%d-%H%M%S')"
+          echo "ASSET_BUILD_ID=${BUILD_ID}" >> "$GITHUB_ENV"
+          python3 scripts/stamp_asset_hashes.py --build-id "$BUILD_ID" || true
+
+      - name: Stamp sw.js
+        run: |
+          BUILD_ID="${ASSET_BUILD_ID:-v0-$(date -u +'%Y%m%d-%H%M%S')}"
+          sed -i "s|^const CACHE_VERSION = .*|const CACHE_VERSION = 'paris-sportif-${BUILD_ID}';|" sw.js
+
+      - name: Commit + push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          for path in data.js data_lite.js pronostics.html app.js app.css sw.js \
+            data_today.json data_manifest.json odds_history.jsonl; do
+            [ -e "$path" ] && git add "$path"
+          done
+          if git diff --cached --quiet; then
+            echo "No data delta — noop"
+            exit 0
+          fi
+          git commit -m "data: refresh-v2 $(date -u '+%Y-%m-%d %H:%M UTC')"
+          for attempt in 1 2 3; do
+            if git push; then exit 0; fi
+            echo "Push rejected attempt $attempt — pulling rebase"
+            git pull --rebase --strategy-option=theirs origin main || true
+          done
+          echo "Push failed after 3 retries"
+          exit 1
