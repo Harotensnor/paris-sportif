@@ -1,26 +1,26 @@
 {
-  "generated_at": "2026-05-11T22:26:40Z",
+  "generated_at": "2026-05-11T22:33:27Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 86,
+    "active_events": 88,
     "actionable": 19,
     "watch": 9,
-    "risk": 58,
+    "risk": 60,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 10,
-      "market_uncertain": 55,
+      "injury_imbalance": 9,
+      "market_uncertain": 57,
       "market_move": 39,
       "back_to_back_travel": 7,
-      "signal_conflict": 8,
+      "signal_conflict": 7,
       "travel_extreme": 1
     },
     "by_quality": {
       "actionable": 19,
       "watch": 9,
-      "risk": 58
+      "risk": 60
     }
   },
   "active_actionable": [
@@ -205,6 +205,24 @@
       "context": "Cote draw: 4.70 -> 5.50 (-17.0%)"
     },
     {
+      "event_id": "401815303",
+      "date": "2026-05-12T02:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Los Angeles Dodgers",
+      "away": "San Francisco Giants",
+      "match": "Los Angeles Dodgers - San Francisco Giants",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "away",
+      "strength": 0.93,
+      "context": "Cote away: 2.57 -> 3.00 (-16.7%)"
+    },
+    {
       "event_id": "401871330",
       "date": "2026-05-13T04:00Z",
       "sport": "basketball",
@@ -239,24 +257,6 @@
       "side": "away",
       "strength": 0.888,
       "context": "1 match dans les 48h + 1789 km de voyage"
-    },
-    {
-      "event_id": "401815303",
-      "date": "2026-05-12T02:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Los Angeles Dodgers",
-      "away": "San Francisco Giants",
-      "match": "Los Angeles Dodgers - San Francisco Giants",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "away",
-      "strength": 0.879,
-      "context": "Cote away: 2.59 -> 3.00 (-15.8%)"
     },
     {
       "event_id": "401843345",
@@ -1539,6 +1539,42 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.9%"
+    },
+    {
+      "event_id": "750218",
+      "date": "2026-05-17T17:00Z",
+      "sport": "football",
+      "league_code": "superlig",
+      "league_name": "Süper Lig",
+      "home": "Fenerbahce",
+      "away": "Eyupspor",
+      "match": "Fenerbahce - Eyupspor",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 19.1%"
+    },
+    {
+      "event_id": "750220",
+      "date": "2026-05-17T17:00Z",
+      "sport": "football",
+      "league_code": "superlig",
+      "league_name": "Süper Lig",
+      "home": "Kasimpasa",
+      "away": "Galatasaray",
+      "match": "Kasimpasa - Galatasaray",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.7%"
     },
     {
       "event_id": "401871338",
