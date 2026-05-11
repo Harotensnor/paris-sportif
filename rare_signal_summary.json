@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-05-11T16:58:26Z",
+  "generated_at": "2026-05-11T17:08:09Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 89,
-    "actionable": 21,
-    "watch": 8,
+    "actionable": 19,
+    "watch": 10,
     "risk": 60,
     "expired_sample": 0,
     "by_type": {
@@ -18,8 +18,8 @@
       "signal_conflict": 5
     },
     "by_quality": {
-      "actionable": 21,
-      "watch": 8,
+      "actionable": 19,
+      "watch": 10,
       "risk": 60
     }
   },
@@ -36,11 +36,11 @@
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
       "type": "market_move",
-      "direction": "steam",
+      "direction": "drift",
       "team": null,
       "side": "away",
       "strength": 1.0,
-      "context": "Cote away: 10.00 -> 8.00 (+20.0%)"
+      "context": "Cote away: 8.00 -> 11.00 (-37.5%)"
     },
     {
       "event_id": "401815298",
@@ -187,6 +187,24 @@
       "context": "2 match dans les 48h + 1789 km de voyage"
     },
     {
+      "event_id": "750222",
+      "date": "2026-05-17T17:00Z",
+      "sport": "football",
+      "league_code": "superlig",
+      "league_name": "Süper Lig",
+      "home": "Trabzonspor",
+      "away": "Genclerbirligi",
+      "match": "Trabzonspor - Genclerbirligi",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.952,
+      "context": "Cote away: 3.50 -> 2.90 (+17.1%)"
+    },
+    {
       "event_id": "401843344",
       "date": "2026-05-16T14:00Z",
       "sport": "football",
@@ -239,24 +257,6 @@
       "side": "away",
       "strength": 0.888,
       "context": "1 match dans les 48h + 1789 km de voyage"
-    },
-    {
-      "event_id": "750222",
-      "date": "2026-05-17T17:00Z",
-      "sport": "football",
-      "league_code": "superlig",
-      "league_name": "Süper Lig",
-      "home": "Trabzonspor",
-      "away": "Genclerbirligi",
-      "match": "Trabzonspor - Genclerbirligi",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.873,
-      "context": "Cote away: 3.50 -> 2.95 (+15.7%)"
     },
     {
       "event_id": "737151",
@@ -347,42 +347,6 @@
       "side": "away",
       "strength": 0.757,
       "context": "1 match dans les 48h + 1135 km de voyage"
-    },
-    {
-      "event_id": "401871355",
-      "date": "2026-05-11T19:00Z",
-      "sport": "football",
-      "league_code": "championship",
-      "league_name": "Championship",
-      "home": "Millwall",
-      "away": "Hull City",
-      "match": "Millwall - Hull City",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.709,
-      "context": "Cote away: 4.70 -> 4.10 (+12.8%)"
-    },
-    {
-      "event_id": "748507",
-      "date": "2026-05-17T17:00Z",
-      "sport": "football",
-      "league_code": "esp.1",
-      "league_name": "La Liga",
-      "home": "Elche",
-      "away": "Getafe",
-      "match": "Elche - Getafe",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "home",
-      "strength": 0.694,
-      "context": "Cote home: 2.00 -> 2.25 (-12.5%)"
     },
     {
       "event_id": "747016",
@@ -477,6 +441,60 @@
       "context": "Cote away: 4.80 -> 5.30 (-10.4%)"
     },
     {
+      "event_id": "401856903",
+      "date": "2026-05-13T02:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Portland Fire",
+      "away": "New York Liberty",
+      "match": "Portland Fire - New York Liberty",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 0.575,
+      "context": "Cote home: 5.80 -> 5.20 (+10.3%)"
+    },
+    {
+      "event_id": "401856909",
+      "date": "2026-05-15T02:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Portland Fire",
+      "away": "New York Liberty",
+      "match": "Portland Fire - New York Liberty",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 0.575,
+      "context": "Cote home: 5.80 -> 5.20 (+10.3%)"
+    },
+    {
+      "event_id": "748507",
+      "date": "2026-05-17T17:00Z",
+      "sport": "football",
+      "league_code": "esp.1",
+      "league_name": "La Liga",
+      "home": "Elche",
+      "away": "Getafe",
+      "match": "Elche - Getafe",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 0.556,
+      "context": "Cote home: 2.00 -> 2.20 (-10.0%)"
+    },
+    {
       "event_id": "401843346",
       "date": "2026-05-16T14:00Z",
       "sport": "football",
@@ -493,24 +511,6 @@
       "side": "away",
       "strength": 0.545,
       "context": "Cote away: 5.10 -> 5.60 (-9.8%)"
-    },
-    {
-      "event_id": "748944",
-      "date": "2026-05-11T18:30Z",
-      "sport": "football",
-      "league_code": "laliga2",
-      "league_name": "La Liga 2",
-      "home": "Huesca",
-      "away": "Real Sociedad II",
-      "match": "Huesca - Real Sociedad II",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.529,
-      "context": "Cote away: 3.15 -> 2.85 (+9.5%)"
     },
     {
       "event_id": "748510",
@@ -854,7 +854,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.5%"
+      "context": "marge bookmaker anormale 18.1%"
     },
     {
       "event_id": "401864049",
@@ -1160,7 +1160,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 19.5%"
+      "context": "marge bookmaker anormale 18.9%"
     },
     {
       "event_id": "741277",
@@ -1592,7 +1592,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.9%"
+      "context": "marge bookmaker anormale 18.7%"
     },
     {
       "event_id": "401871338",
