@@ -1,23 +1,23 @@
 {
-  "generated_at": "2026-05-11T03:37:09Z",
+  "generated_at": "2026-05-11T03:45:09Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 91,
+    "active_events": 90,
     "actionable": 14,
     "watch": 0,
-    "risk": 77,
+    "risk": 76,
     "expired_sample": 0,
     "by_type": {
-      "market_move": 16,
-      "market_uncertain": 76,
+      "market_move": 13,
+      "market_uncertain": 75,
       "back_to_back_travel": 8,
       "signal_conflict": 2
     },
     "by_quality": {
       "actionable": 14,
-      "risk": 77
+      "risk": 76
     }
   },
   "active_actionable": [
@@ -69,11 +69,11 @@
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
       "type": "market_move",
-      "direction": "steam",
+      "direction": "drift",
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 4.10 -> 2.70 (+34.1%)"
+      "context": "Cote home: 4.10 -> 5.90 (-43.9%)"
     },
     {
       "event_id": "401871428",
@@ -87,11 +87,11 @@
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
       "type": "market_move",
-      "direction": "drift",
+      "direction": "steam",
       "team": null,
-      "side": "home",
+      "side": "draw",
       "strength": 1.0,
-      "context": "Cote home: 1.54 -> 2.40 (-55.8%)"
+      "context": "Cote draw: 3.60 -> 2.85 (+20.8%)"
     },
     {
       "event_id": "401871429",
@@ -105,11 +105,11 @@
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
       "type": "market_move",
-      "direction": "steam",
+      "direction": "drift",
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 4.10 -> 2.70 (+34.1%)"
+      "context": "Cote home: 4.10 -> 5.90 (-43.9%)"
     },
     {
       "event_id": "401815325",
@@ -419,24 +419,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 19.0%"
-    },
-    {
-      "event_id": "401843342",
-      "date": "2026-05-16T12:00Z",
-      "sport": "football",
-      "league_code": "eliteserien",
-      "league_name": "Eliteserien",
-      "home": "SK Brann",
-      "away": "KFUM Oslo",
-      "match": "SK Brann - KFUM Oslo",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.1%"
     },
     {
       "event_id": "401842714",
@@ -1174,7 +1156,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 19.3%"
+      "context": "marge bookmaker anormale 18.8%"
     },
     {
       "event_id": "747322",
