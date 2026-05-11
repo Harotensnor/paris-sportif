@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-11T23:22:15Z",
+  "generated_at": "2026-05-11T23:27:22Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -499,13 +499,13 @@
         "1 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.823,
-        "away_score": -1.034,
-        "home_fade": 1.35,
+        "status": "net",
+        "net_side": "away",
+        "home_score": -1.357,
+        "away_score": -0.847,
+        "home_fade": 1.884,
         "away_fade": 1.507,
-        "reason": "Signaux opposes: Minnesota Wild fade 1.35, Colorado Avalanche fade 1.51 -> prudence",
+        "reason": "Direction nette: Colorado Avalanche (-0.85)",
         "detail": [
           {
             "side": "home",
@@ -536,6 +536,12 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.6
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 0.534
           },
           {
             "side": "away",
@@ -807,11 +813,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.085,
-        "away_score": -1.747,
+        "home_score": 0.272,
+        "away_score": -2.281,
         "home_fade": 0.6,
-        "away_fade": 1.957,
-        "reason": "Direction nette: Colorado Avalanche (+0.08)",
+        "away_fade": 2.491,
+        "reason": "Direction nette: Colorado Avalanche (+0.27)",
         "detail": [
           {
             "side": "home",
@@ -830,6 +836,12 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.6
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 0.534
           },
           {
             "side": "away",
@@ -1029,11 +1041,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.377,
-        "away_score": -1.454,
+        "home_score": 0.564,
+        "away_score": -1.989,
         "home_fade": 0.15,
-        "away_fade": 1.507,
-        "reason": "Direction nette: Colorado Avalanche (+0.38)",
+        "away_fade": 2.041,
+        "reason": "Direction nette: Colorado Avalanche (+0.56)",
         "detail": [
           {
             "side": "home",
@@ -1052,6 +1064,12 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.6
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 0.534
           },
           {
             "side": "away",

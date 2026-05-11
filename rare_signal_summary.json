@@ -1,26 +1,26 @@
 {
-  "generated_at": "2026-05-11T23:22:15Z",
+  "generated_at": "2026-05-11T23:27:22Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 84,
-    "actionable": 19,
-    "watch": 9,
-    "risk": 56,
+    "active_events": 82,
+    "actionable": 20,
+    "watch": 7,
+    "risk": 55,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 7,
       "market_uncertain": 53,
-      "market_move": 44,
+      "market_move": 45,
       "back_to_back_travel": 7,
-      "signal_conflict": 8,
+      "signal_conflict": 7,
       "travel_extreme": 1
     },
     "by_quality": {
-      "actionable": 19,
-      "watch": 9,
-      "risk": 56
+      "actionable": 20,
+      "watch": 7,
+      "risk": 55
     }
   },
   "active_actionable": [
@@ -40,7 +40,7 @@
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 2.24 -> 2.80 (-25.0%)"
+      "context": "Cote home: 2.24 -> 2.85 (-27.2%)"
     },
     {
       "event_id": "401815302",
@@ -76,7 +76,7 @@
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 1.66 -> 2.15 (-29.5%)"
+      "context": "Cote home: 1.66 -> 3.65 (-119.9%)"
     },
     {
       "event_id": "401866574",
@@ -94,7 +94,7 @@
       "team": null,
       "side": "away",
       "strength": 1.0,
-      "context": "Cote away: 3.40 -> 4.10 (-20.6%)"
+      "context": "Cote away: 3.40 -> 4.20 (-23.5%)"
     },
     {
       "event_id": "401815325",
@@ -112,7 +112,7 @@
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 1.66 -> 2.15 (-29.5%)"
+      "context": "Cote home: 1.66 -> 3.65 (-119.9%)"
     },
     {
       "event_id": "748961",
@@ -313,6 +313,24 @@
       "context": "1 match dans les 48h + 1135 km de voyage"
     },
     {
+      "event_id": "401871421",
+      "date": "2026-05-16T00:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Minnesota Wild",
+      "away": "Colorado Avalanche",
+      "match": "Minnesota Wild - Colorado Avalanche",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Colorado Avalanche",
+      "side": "away",
+      "strength": 0.757,
+      "context": "1 match dans les 48h + 1135 km de voyage"
+    },
+    {
       "event_id": "401871422",
       "date": "2026-05-17T04:00Z",
       "sport": "hockey",
@@ -441,24 +459,6 @@
       "context": "Cote home: 5.80 -> 5.20 (+10.3%)"
     },
     {
-      "event_id": "748507",
-      "date": "2026-05-17T17:00Z",
-      "sport": "football",
-      "league_code": "esp.1",
-      "league_name": "La Liga",
-      "home": "Elche",
-      "away": "Getafe",
-      "match": "Elche - Getafe",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "home",
-      "strength": 0.556,
-      "context": "Cote home: 2.00 -> 2.20 (-10.0%)"
-    },
-    {
       "event_id": "401843346",
       "date": "2026-05-16T14:00Z",
       "sport": "football",
@@ -495,24 +495,6 @@
       "context": "Cote home: 2.10 -> 2.30 (-9.5%)"
     },
     {
-      "event_id": "748510",
-      "date": "2026-05-17T17:00Z",
-      "sport": "football",
-      "league_code": "esp.1",
-      "league_name": "La Liga",
-      "home": "Levante",
-      "away": "Mallorca",
-      "match": "Levante - Mallorca",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "away",
-      "strength": 0.496,
-      "context": "Cote away: 2.80 -> 3.05 (-8.9%)"
-    },
-    {
       "event_id": "401843349",
       "date": "2026-05-16T18:00Z",
       "sport": "football",
@@ -532,24 +514,6 @@
     }
   ],
   "active_risk": [
-    {
-      "event_id": "401871421",
-      "date": "2026-05-16T00:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Minnesota Wild",
-      "away": "Colorado Avalanche",
-      "match": "Minnesota Wild - Colorado Avalanche",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "signal_conflict",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 1.0,
-      "context": "Signaux opposes: Minnesota Wild fade 1.35, Colorado Avalanche fade 1.51 -> prudence"
-    },
     {
       "event_id": "401871331",
       "date": "2026-05-16T04:00Z",
