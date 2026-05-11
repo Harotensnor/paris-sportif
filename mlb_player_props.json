@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-11T19:13:52Z",
+  "generated_at": "2026-05-11T19:17:06Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -46,6 +46,42 @@
             "whip": 1.37
           },
           "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Los Angeles Angels",
+          "pitcher": "Brent Suter",
+          "label": "Brent Suter plus de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "over",
+          "probability": 0.5009,
+          "fair_odds": 2.0,
+          "expected_strikeouts": 6.5,
+          "projected_ip": 6.6,
+          "inputs": {
+            "k9": 8.87,
+            "era": 4.03,
+            "whip": 1.34,
+            "hand": "L"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Los Angeles Angels",
+          "pitcher": "Brent Suter",
+          "label": "Brent Suter concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5882,
+          "fair_odds": 1.7,
+          "expected_hr_allowed": 0.887,
+          "projected_ip": 6.6,
+          "inputs": {
+            "hr9": 1.21,
+            "era": 4.03,
+            "whip": 1.34
+          },
+          "side": "away"
         }
       ]
     },
@@ -624,7 +660,7 @@
       ]
     }
   ],
-  "props": 30,
+  "props": 32,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
