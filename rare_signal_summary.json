@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-05-11T19:21:49Z",
+  "generated_at": "2026-05-11T19:24:51Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 90,
+    "active_events": 88,
     "actionable": 19,
-    "watch": 13,
+    "watch": 11,
     "risk": 58,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 7,
       "travel_extreme": 2,
-      "back_to_back_travel": 7,
-      "signal_conflict": 5,
+      "market_uncertain": 57,
       "market_move": 42,
-      "market_uncertain": 57
+      "back_to_back_travel": 7,
+      "signal_conflict": 5
     },
     "by_quality": {
       "actionable": 19,
-      "watch": 13,
+      "watch": 11,
       "risk": 58
     }
   },
@@ -59,6 +59,24 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 11-5"
+    },
+    {
+      "event_id": "401871419",
+      "date": "2026-05-12T00:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Minnesota Wild",
+      "away": "Colorado Avalanche",
+      "match": "Minnesota Wild - Colorado Avalanche",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 2.21 -> 2.75 (-24.4%)"
     },
     {
       "event_id": "401815302",
@@ -131,6 +149,24 @@
       "side": "home",
       "strength": 0.988,
       "context": "Cote home: 2.25 -> 2.65 (-17.8%)"
+    },
+    {
+      "event_id": "401815303",
+      "date": "2026-05-12T02:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Los Angeles Dodgers",
+      "away": "San Francisco Giants",
+      "match": "Los Angeles Dodgers - San Francisco Giants",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "away",
+      "strength": 0.987,
+      "context": "Cote away: 2.59 -> 3.05 (-17.8%)"
     },
     {
       "event_id": "401815325",
@@ -223,24 +259,6 @@
       "context": "1 match dans les 48h + 1789 km de voyage"
     },
     {
-      "event_id": "746709",
-      "date": "2026-05-17T19:00Z",
-      "sport": "football",
-      "league_code": "fra.1",
-      "league_name": "Ligue 1",
-      "home": "Brest",
-      "away": "Angers",
-      "match": "Brest - Angers",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "draw",
-      "strength": 0.868,
-      "context": "Cote draw: 3.20 -> 3.70 (-15.6%)"
-    },
-    {
       "event_id": "737151",
       "date": "2026-05-17T18:00Z",
       "sport": "football",
@@ -293,24 +311,6 @@
       "side": "home",
       "strength": 0.813,
       "context": "Cote home: 1.64 -> 1.88 (-14.6%)"
-    },
-    {
-      "event_id": "401871419",
-      "date": "2026-05-12T00:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Minnesota Wild",
-      "away": "Colorado Avalanche",
-      "match": "Minnesota Wild - Colorado Avalanche",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Colorado Avalanche",
-      "side": "away",
-      "strength": 0.757,
-      "context": "1 match dans les 48h + 1135 km de voyage"
     },
     {
       "event_id": "401871420",
@@ -565,42 +565,6 @@
       "side": "away",
       "strength": 0.471,
       "context": "Cote away: 2.95 -> 3.20 (-8.5%)"
-    },
-    {
-      "event_id": "737146",
-      "date": "2026-05-17T18:00Z",
-      "sport": "football",
-      "league_code": "ita.1",
-      "league_name": "Serie A",
-      "home": "Udinese",
-      "away": "Cremonese",
-      "match": "Udinese - Cremonese",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "away",
-      "strength": 0.471,
-      "context": "Cote away: 2.95 -> 3.20 (-8.5%)"
-    },
-    {
-      "event_id": "746710",
-      "date": "2026-05-17T19:00Z",
-      "sport": "football",
-      "league_code": "fra.1",
-      "league_name": "Ligue 1",
-      "home": "Lille",
-      "away": "AJ Auxerre",
-      "match": "Lille - AJ Auxerre",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "home",
-      "strength": 0.47,
-      "context": "Cote home: 1.30 -> 1.41 (-8.5%)"
     }
   ],
   "active_risk": [
