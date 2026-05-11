@@ -1,26 +1,26 @@
 {
-  "generated_at": "2026-05-11T23:41:40Z",
+  "generated_at": "2026-05-11T23:46:51Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 85,
-    "actionable": 18,
+    "active_events": 84,
+    "actionable": 19,
     "watch": 9,
-    "risk": 58,
+    "risk": 56,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 7,
-      "market_uncertain": 55,
-      "market_move": 42,
+      "market_uncertain": 53,
+      "market_move": 44,
       "back_to_back_travel": 7,
       "signal_conflict": 8,
       "travel_extreme": 1
     },
     "by_quality": {
-      "actionable": 18,
+      "actionable": 19,
       "watch": 9,
-      "risk": 58
+      "risk": 56
     }
   },
   "active_actionable": [
@@ -76,7 +76,7 @@
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 1.66 -> 7.25 (-336.7%)"
+      "context": "Cote home: 1.66 -> 7.00 (-321.7%)"
     },
     {
       "event_id": "401866574",
@@ -112,7 +112,7 @@
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 1.66 -> 7.25 (-336.7%)"
+      "context": "Cote home: 1.66 -> 7.00 (-321.7%)"
     },
     {
       "event_id": "748961",
@@ -203,6 +203,24 @@
       "side": "draw",
       "strength": 0.946,
       "context": "Cote draw: 4.70 -> 5.50 (-17.0%)"
+    },
+    {
+      "event_id": "401815303",
+      "date": "2026-05-12T02:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Los Angeles Dodgers",
+      "away": "San Francisco Giants",
+      "match": "Los Angeles Dodgers - San Francisco Giants",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "away",
+      "strength": 0.93,
+      "context": "Cote away: 2.57 -> 3.00 (-16.7%)"
     },
     {
       "event_id": "401871330",
@@ -531,24 +549,6 @@
       "side": null,
       "strength": 1.0,
       "context": "Signaux opposes: Minnesota Wild fade 1.35, Colorado Avalanche fade 1.51 -> prudence"
-    },
-    {
-      "event_id": "401871331",
-      "date": "2026-05-16T04:00Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "Los Angeles Lakers",
-      "away": "Oklahoma City Thunder",
-      "match": "Los Angeles Lakers - Oklahoma City Thunder",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "signal_conflict",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 1.0,
-      "context": "Signaux opposes: Los Angeles Lakers fade 1.44, Oklahoma City Thunder fade 1.19 -> prudence"
     },
     {
       "event_id": "175977",
@@ -1487,40 +1487,22 @@
       "context": "marge bookmaker anormale 18.3%"
     },
     {
-      "event_id": "750215",
-      "date": "2026-05-17T17:00Z",
-      "sport": "football",
-      "league_code": "superlig",
-      "league_name": "Süper Lig",
-      "home": "Antalyaspor",
-      "away": "Kocaelispor",
-      "match": "Antalyaspor - Kocaelispor",
+      "event_id": "401871331",
+      "date": "2026-05-16T04:00Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "Los Angeles Lakers",
+      "away": "Oklahoma City Thunder",
+      "match": "Los Angeles Lakers - Oklahoma City Thunder",
       "quality": "risk",
       "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
+      "type": "signal_conflict",
       "direction": "abstain",
       "team": null,
       "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.9%"
-    },
-    {
-      "event_id": "750218",
-      "date": "2026-05-17T17:00Z",
-      "sport": "football",
-      "league_code": "superlig",
-      "league_name": "Süper Lig",
-      "home": "Fenerbahce",
-      "away": "Eyupspor",
-      "match": "Fenerbahce - Eyupspor",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 19.1%"
+      "strength": 0.796,
+      "context": "Signaux opposes: Los Angeles Lakers fade 1.21, Oklahoma City Thunder fade 1.19 -> prudence"
     },
     {
       "event_id": "401871338",
