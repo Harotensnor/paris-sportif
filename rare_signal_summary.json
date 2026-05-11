@@ -1,47 +1,28 @@
 {
-  "generated_at": "2026-05-11T06:37:25Z",
+  "generated_at": "2026-05-11T06:39:37Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 94,
-    "actionable": 14,
-    "watch": 2,
-    "risk": 78,
+    "active_events": 89,
+    "actionable": 11,
+    "watch": 1,
+    "risk": 77,
     "expired_sample": 0,
     "by_type": {
-      "market_move": 7,
       "injury_imbalance": 4,
       "travel_extreme": 2,
-      "market_uncertain": 77,
       "back_to_back_travel": 8,
-      "signal_conflict": 3
+      "signal_conflict": 3,
+      "market_uncertain": 75
     },
     "by_quality": {
-      "actionable": 14,
-      "watch": 2,
-      "risk": 78
+      "actionable": 11,
+      "watch": 1,
+      "risk": 77
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401842707",
-      "date": "2026-05-11T17:00Z",
-      "sport": "football",
-      "league_code": "allsvenskan",
-      "league_name": "Allsvenskan",
-      "home": "IK Sirius",
-      "away": "Örgryte IS",
-      "match": "IK Sirius - Örgryte IS",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 1.0,
-      "context": "Cote away: 9.50 -> 7.50 (+21.1%)"
-    },
     {
       "event_id": "401815298",
       "date": "2026-05-11T22:10Z",
@@ -77,24 +58,6 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 10-5"
-    },
-    {
-      "event_id": "401871419",
-      "date": "2026-05-12T00:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Minnesota Wild",
-      "away": "Colorado Avalanche",
-      "match": "Minnesota Wild - Colorado Avalanche",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 2.10 -> 2.60 (-23.8%)"
     },
     {
       "event_id": "401815302",
@@ -187,6 +150,24 @@
       "context": "1 match dans les 48h + 1789 km de voyage"
     },
     {
+      "event_id": "401871419",
+      "date": "2026-05-12T00:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Minnesota Wild",
+      "away": "Colorado Avalanche",
+      "match": "Minnesota Wild - Colorado Avalanche",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Colorado Avalanche",
+      "side": "away",
+      "strength": 0.757,
+      "context": "1 match dans les 48h + 1135 km de voyage"
+    },
+    {
       "event_id": "401871420",
       "date": "2026-05-14T00:00Z",
       "sport": "hockey",
@@ -239,42 +220,6 @@
       "side": "away",
       "strength": 0.757,
       "context": "1 match dans les 48h + 1135 km de voyage"
-    },
-    {
-      "event_id": "748944",
-      "date": "2026-05-11T18:30Z",
-      "sport": "football",
-      "league_code": "laliga2",
-      "league_name": "La Liga 2",
-      "home": "Huesca",
-      "away": "Real Sociedad II",
-      "match": "Huesca - Real Sociedad II",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.714,
-      "context": "Cote away: 3.50 -> 3.05 (+12.9%)"
-    },
-    {
-      "event_id": "401871355",
-      "date": "2026-05-11T19:00Z",
-      "sport": "football",
-      "league_code": "championship",
-      "league_name": "Championship",
-      "home": "Millwall",
-      "away": "Hull City",
-      "match": "Millwall - Hull City",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.679,
-      "context": "Cote away: 4.50 -> 3.95 (+12.2%)"
     }
   ],
   "active_watch": [
@@ -295,45 +240,9 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 5-2"
-    },
-    {
-      "event_id": "740954",
-      "date": "2026-05-11T19:00Z",
-      "sport": "football",
-      "league_code": "eng.1",
-      "league_name": "Premier League",
-      "home": "Tottenham Hotspur",
-      "away": "Leeds United",
-      "match": "Tottenham Hotspur - Leeds United",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.529,
-      "context": "Cote away: 4.20 -> 3.80 (+9.5%)"
     }
   ],
   "active_risk": [
-    {
-      "event_id": "401859356",
-      "date": "2026-05-13T10:00Z",
-      "sport": "football",
-      "league_code": "jleague",
-      "league_name": "J-League",
-      "home": "Machida Zelvia",
-      "away": "Tokyo Verdy 1969",
-      "match": "Machida Zelvia - Tokyo Verdy 1969",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.0%"
-    },
     {
       "event_id": "401870492",
       "date": "2026-05-15T09:35Z",
@@ -353,14 +262,14 @@
       "context": "marge bookmaker anormale 18.4%"
     },
     {
-      "event_id": "401861382",
-      "date": "2026-05-15T11:35Z",
+      "event_id": "401861383",
+      "date": "2026-05-15T12:00Z",
       "sport": "football",
       "league_code": "chn.1",
       "league_name": "Chinese Super League",
-      "home": "Henan Songshan Longmen",
-      "away": "Shenzhen Xinpengcheng",
-      "match": "Henan Songshan Longmen - Shenzhen Xinpengcheng",
+      "home": "Beijing Guoan",
+      "away": "Qingdao Hainiu",
+      "match": "Beijing Guoan - Qingdao Hainiu",
       "quality": "risk",
       "quality_reason": "Signal de prudence, pas une opportunite directe",
       "type": "market_uncertain",
@@ -368,7 +277,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.0%"
+      "context": "marge bookmaker anormale 18.1%"
     },
     {
       "event_id": "401861384",
@@ -533,14 +442,14 @@
       "context": "marge bookmaker anormale 18.2%"
     },
     {
-      "event_id": "747021",
+      "event_id": "747018",
       "date": "2026-05-16T13:30Z",
       "sport": "football",
       "league_code": "ger.1",
       "league_name": "Bundesliga",
-      "home": "St. Pauli",
-      "away": "VfL Wolfsburg",
-      "match": "St. Pauli - VfL Wolfsburg",
+      "home": "Borussia Mönchengladbach",
+      "away": "TSG Hoffenheim",
+      "match": "Borussia Mönchengladbach - TSG Hoffenheim",
       "quality": "risk",
       "quality_reason": "Signal de prudence, pas une opportunite directe",
       "type": "market_uncertain",
@@ -548,7 +457,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.7%"
+      "context": "marge bookmaker anormale 18.1%"
     },
     {
       "event_id": "750217",
@@ -908,7 +817,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.5%"
+      "context": "marge bookmaker anormale 19.1%"
     },
     {
       "event_id": "401842716",
@@ -1610,7 +1519,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 19.2%"
+      "context": "marge bookmaker anormale 18.3%"
     },
     {
       "event_id": "746711",
@@ -1646,7 +1555,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.3%"
+      "context": "marge bookmaker anormale 19.3%"
     },
     {
       "event_id": "746715",
@@ -1682,7 +1591,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 19.9%"
+      "context": "marge bookmaker anormale 18.7%"
     },
     {
       "event_id": "401871338",
