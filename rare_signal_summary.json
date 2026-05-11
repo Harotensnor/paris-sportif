@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-05-11T23:46:51Z",
+  "generated_at": "2026-05-11T23:49:30Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 84,
-    "actionable": 19,
-    "watch": 9,
+    "active_events": 82,
+    "actionable": 21,
+    "watch": 5,
     "risk": 56,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 7,
+      "injury_imbalance": 9,
       "market_uncertain": 53,
-      "market_move": 44,
+      "market_move": 42,
       "back_to_back_travel": 7,
       "signal_conflict": 8,
       "travel_extreme": 1
     },
     "by_quality": {
-      "actionable": 19,
-      "watch": 9,
+      "actionable": 21,
+      "watch": 5,
       "risk": 56
     }
   },
@@ -40,7 +40,7 @@
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 2.24 -> 2.80 (-25.0%)"
+      "context": "Cote home: 2.30 -> 2.80 (-21.7%)"
     },
     {
       "event_id": "401815302",
@@ -79,6 +79,24 @@
       "context": "Cote home: 1.66 -> 7.00 (-321.7%)"
     },
     {
+      "event_id": "401856903",
+      "date": "2026-05-13T02:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Portland Fire",
+      "away": "New York Liberty",
+      "match": "Portland Fire - New York Liberty",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "New York Liberty",
+      "side": null,
+      "strength": 1.0,
+      "context": "Absences severes 1-6"
+    },
+    {
       "event_id": "401866574",
       "date": "2026-05-13T16:30Z",
       "sport": "football",
@@ -113,6 +131,24 @@
       "side": "home",
       "strength": 1.0,
       "context": "Cote home: 1.66 -> 7.00 (-321.7%)"
+    },
+    {
+      "event_id": "401856909",
+      "date": "2026-05-15T02:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Portland Fire",
+      "away": "New York Liberty",
+      "match": "Portland Fire - New York Liberty",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "New York Liberty",
+      "side": null,
+      "strength": 1.0,
+      "context": "Absences severes 1-6"
     },
     {
       "event_id": "748961",
@@ -405,60 +441,6 @@
       "context": "Cote away: 4.40 -> 4.90 (-11.4%)"
     },
     {
-      "event_id": "401856903",
-      "date": "2026-05-13T02:00Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Portland Fire",
-      "away": "New York Liberty",
-      "match": "Portland Fire - New York Liberty",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "home",
-      "strength": 0.575,
-      "context": "Cote home: 5.80 -> 5.20 (+10.3%)"
-    },
-    {
-      "event_id": "401856909",
-      "date": "2026-05-15T02:00Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Portland Fire",
-      "away": "New York Liberty",
-      "match": "Portland Fire - New York Liberty",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "home",
-      "strength": 0.575,
-      "context": "Cote home: 5.80 -> 5.20 (+10.3%)"
-    },
-    {
-      "event_id": "748507",
-      "date": "2026-05-17T17:00Z",
-      "sport": "football",
-      "league_code": "esp.1",
-      "league_name": "La Liga",
-      "home": "Elche",
-      "away": "Getafe",
-      "match": "Elche - Getafe",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "home",
-      "strength": 0.556,
-      "context": "Cote home: 2.00 -> 2.20 (-10.0%)"
-    },
-    {
       "event_id": "401843346",
       "date": "2026-05-16T14:00Z",
       "sport": "football",
@@ -493,24 +475,6 @@
       "side": "home",
       "strength": 0.529,
       "context": "Cote home: 2.10 -> 2.30 (-9.5%)"
-    },
-    {
-      "event_id": "748510",
-      "date": "2026-05-17T17:00Z",
-      "sport": "football",
-      "league_code": "esp.1",
-      "league_name": "La Liga",
-      "home": "Levante",
-      "away": "Mallorca",
-      "match": "Levante - Mallorca",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "away",
-      "strength": 0.496,
-      "context": "Cote away: 2.80 -> 3.05 (-8.9%)"
     },
     {
       "event_id": "401843349",
