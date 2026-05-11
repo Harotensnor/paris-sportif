@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-11T22:42:51Z",
+  "generated_at": "2026-05-11T22:48:08Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815299",
-      "kickoff": "2026-05-11T22:35Z",
-      "league": "MLB",
-      "match": "New York Yankees at Baltimore Orioles",
-      "home": "Baltimore Orioles",
-      "away": "New York Yankees",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Baltimore Orioles",
-          "pitcher": "Brandon Young",
-          "label": "Brandon Young moins de 3,5 strikeouts",
-          "line": 3.5,
-          "pick": "under",
-          "probability": 0.5213,
-          "fair_odds": 1.92,
-          "expected_strikeouts": 3.42,
-          "projected_ip": 5.05,
-          "inputs": {
-            "k9": 6.1,
-            "era": 4.35,
-            "whip": 1.45,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Baltimore Orioles",
-          "pitcher": "Brandon Young",
-          "label": "Brandon Young concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5205,
-          "fair_odds": 1.92,
-          "expected_hr_allowed": 0.735,
-          "projected_ip": 5.05,
-          "inputs": {
-            "hr9": 1.31,
-            "era": 4.35,
-            "whip": 1.45
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "New York Yankees",
-          "pitcher": "Ryan Weathers",
-          "label": "Ryan Weathers moins de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "under",
-          "probability": 0.5307,
-          "fair_odds": 1.88,
-          "expected_strikeouts": 6.35,
-          "projected_ip": 5.46,
-          "inputs": {
-            "k9": 10.47,
-            "era": 3.03,
-            "whip": 1.19,
-            "hand": "L"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "New York Yankees",
-          "pitcher": "Ryan Weathers",
-          "label": "Ryan Weathers concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5721,
-          "fair_odds": 1.75,
-          "expected_hr_allowed": 0.849,
-          "projected_ip": 5.46,
-          "inputs": {
-            "hr9": 1.4,
-            "era": 3.03,
-            "whip": 1.19
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815300",
       "kickoff": "2026-05-11T23:07Z",
@@ -578,7 +496,7 @@
       ]
     }
   ],
-  "props": 28,
+  "props": 24,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
