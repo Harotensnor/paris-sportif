@@ -1,26 +1,26 @@
 {
-  "generated_at": "2026-05-11T22:53:46Z",
+  "generated_at": "2026-05-11T22:56:10Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 88,
     "actionable": 19,
-    "watch": 9,
-    "risk": 60,
+    "watch": 10,
+    "risk": 59,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 8,
-      "market_uncertain": 57,
-      "market_move": 40,
+      "market_uncertain": 56,
+      "market_move": 41,
       "back_to_back_travel": 7,
       "signal_conflict": 7,
       "travel_extreme": 1
     },
     "by_quality": {
-      "watch": 9,
+      "watch": 10,
       "actionable": 19,
-      "risk": 60
+      "risk": 59
     }
   },
   "active_actionable": [
@@ -59,24 +59,6 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 15-9"
-    },
-    {
-      "event_id": "175280",
-      "date": "2026-05-12T13:00Z",
-      "sport": "tennis",
-      "league_code": "internazionalibnldit",
-      "league_name": "Internazionali BNL d'Italia",
-      "home": "",
-      "away": "",
-      "match": "? - ?",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 20.27 -> 25.00 (-23.3%)"
     },
     {
       "event_id": "401866574",
@@ -185,6 +167,24 @@
       "side": "away",
       "strength": 0.968,
       "context": "2 match dans les 48h + 1789 km de voyage"
+    },
+    {
+      "event_id": "175280",
+      "date": "2026-05-12T13:00Z",
+      "sport": "tennis",
+      "league_code": "internazionalibnldit",
+      "league_name": "Internazionali BNL d'Italia",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 0.965,
+      "context": "Cote home: 21.30 -> 25.00 (-17.4%)"
     },
     {
       "event_id": "401843344",
@@ -493,6 +493,24 @@
       "side": "away",
       "strength": 0.545,
       "context": "Cote away: 5.10 -> 5.60 (-9.8%)"
+    },
+    {
+      "event_id": "401871356",
+      "date": "2026-05-12T19:00Z",
+      "sport": "football",
+      "league_code": "championship",
+      "league_name": "Championship",
+      "home": "Southampton",
+      "away": "Middlesbrough",
+      "match": "Southampton - Middlesbrough",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 0.529,
+      "context": "Cote home: 2.10 -> 2.30 (-9.5%)"
     },
     {
       "event_id": "748510",
@@ -1557,24 +1575,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 19.1%"
-    },
-    {
-      "event_id": "750220",
-      "date": "2026-05-17T17:00Z",
-      "sport": "football",
-      "league_code": "superlig",
-      "league_name": "Süper Lig",
-      "home": "Kasimpasa",
-      "away": "Galatasaray",
-      "match": "Kasimpasa - Galatasaray",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.7%"
     },
     {
       "event_id": "401871338",
