@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-05-11T04:07:00Z",
+  "generated_at": "2026-05-11T04:11:47Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 23,
+    "active_events": 22,
     "expired_sample": 0,
     "by_type": {
       "lookahead": 32,
       "back_to_back_travel": 8,
       "travel_extreme": 4,
-      "schedule_congestion": 14
+      "schedule_congestion": 12
     },
     "by_decision": {
-      "abstain": 9,
+      "abstain": 8,
       "lean_home": 11,
       "lean_away": 3
     },
     "lean_home": 11,
     "lean_away": 3,
-    "abstain": 9,
+    "abstain": 8,
     "monitor": 0
   },
   "active": [
@@ -144,70 +144,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.4
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401871429",
-      "source_event_ids": [
-        "401871429"
-      ],
-      "kickoff": "2026-05-16T04:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Vegas Golden Knights",
-      "away": "Anaheim Ducks",
-      "match": "Vegas Golden Knights - Anaheim Ducks",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Vegas Golden Knights 0.60, Anaheim Ducks 0.60",
-      "pressure_score": 1.2,
-      "home_fade": 0.6,
-      "away_fade": 0.6,
-      "travel_score": 0,
-      "lookahead_score": 0,
-      "congestion_score": 1.2,
-      "types": {
-        "schedule_congestion": 2
-      },
-      "contexts": [
-        "3 matchs sur les 7 derniers jours",
-        "3 matchs sur les 7 derniers jours"
-      ],
-      "global_resolution": {
-        "status": "mixed",
-        "net_side": null,
-        "home_score": -1.39,
-        "away_score": 0.96,
-        "home_fade": 1.6,
-        "away_fade": 0.6,
-        "reason": "Signaux mitigés: avantage net trop faible (Vegas Golden Knights -1.39, Anaheim Ducks +0.96)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 1.0
           }
         ]
       }
@@ -991,11 +927,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.167,
-        "away_score": -0.854,
-        "home_fade": 0.15,
-        "away_fade": 0.907,
-        "reason": "Direction nette: Minnesota Wild (+0.17)",
+        "home_score": -0.483,
+        "away_score": -1.504,
+        "home_fade": 1.15,
+        "away_fade": 1.907,
+        "reason": "Direction nette: Minnesota Wild (-0.48)",
         "detail": [
           {
             "side": "home",
@@ -1008,6 +944,18 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           },
           {
             "side": "away",
