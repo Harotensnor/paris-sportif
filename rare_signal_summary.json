@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-05-11T07:07:24Z",
+  "generated_at": "2026-05-11T07:11:53Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 90,
-    "actionable": 14,
+    "active_events": 89,
+    "actionable": 13,
     "watch": 2,
     "risk": 74,
     "expired_sample": 0,
@@ -13,34 +13,34 @@
       "market_move": 13,
       "injury_imbalance": 4,
       "travel_extreme": 2,
-      "market_uncertain": 73,
       "back_to_back_travel": 8,
-      "signal_conflict": 3
+      "signal_conflict": 3,
+      "market_uncertain": 72
     },
     "by_quality": {
-      "actionable": 14,
+      "actionable": 13,
       "watch": 2,
       "risk": 74
     }
   },
   "active_actionable": [
     {
-      "event_id": "401842707",
-      "date": "2026-05-11T17:00Z",
-      "sport": "football",
-      "league_code": "allsvenskan",
-      "league_name": "Allsvenskan",
-      "home": "IK Sirius",
-      "away": "Örgryte IS",
-      "match": "IK Sirius - Örgryte IS",
+      "event_id": "175284",
+      "date": "2026-05-11T13:00Z",
+      "sport": "tennis",
+      "league_code": "internazionalibnldit",
+      "league_name": "Internazionali BNL d'Italia",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
       "type": "market_move",
-      "direction": "steam",
+      "direction": "drift",
       "team": null,
-      "side": "away",
+      "side": "home",
       "strength": 1.0,
-      "context": "Cote away: 9.50 -> 7.50 (+21.1%)"
+      "context": "Cote home: 15.00 -> 19.00 (-26.7%)"
     },
     {
       "event_id": "401815298",
@@ -79,24 +79,6 @@
       "context": "Absences severes 10-5"
     },
     {
-      "event_id": "401871419",
-      "date": "2026-05-12T00:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Minnesota Wild",
-      "away": "Colorado Avalanche",
-      "match": "Minnesota Wild - Colorado Avalanche",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 2.10 -> 2.65 (-26.2%)"
-    },
-    {
       "event_id": "401815302",
       "date": "2026-05-12T00:10Z",
       "sport": "baseball",
@@ -131,6 +113,24 @@
       "side": "away",
       "strength": 0.968,
       "context": "2 match dans les 48h + 1789 km de voyage"
+    },
+    {
+      "event_id": "175952",
+      "date": "2026-05-11T18:30Z",
+      "sport": "tennis",
+      "league_code": "internazionalibnldit",
+      "league_name": "Internazionali BNL d'Italia",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "away",
+      "strength": 0.91,
+      "context": "Cote away: 5.80 -> 6.75 (-16.4%)"
     },
     {
       "event_id": "401871330",
@@ -187,6 +187,24 @@
       "context": "1 match dans les 48h + 1789 km de voyage"
     },
     {
+      "event_id": "401871419",
+      "date": "2026-05-12T00:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Minnesota Wild",
+      "away": "Colorado Avalanche",
+      "match": "Minnesota Wild - Colorado Avalanche",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Colorado Avalanche",
+      "side": "away",
+      "strength": 0.757,
+      "context": "1 match dans les 48h + 1135 km de voyage"
+    },
+    {
       "event_id": "401871420",
       "date": "2026-05-14T00:00Z",
       "sport": "hockey",
@@ -239,42 +257,6 @@
       "side": "away",
       "strength": 0.757,
       "context": "1 match dans les 48h + 1135 km de voyage"
-    },
-    {
-      "event_id": "748944",
-      "date": "2026-05-11T18:30Z",
-      "sport": "football",
-      "league_code": "laliga2",
-      "league_name": "La Liga 2",
-      "home": "Huesca",
-      "away": "Real Sociedad II",
-      "match": "Huesca - Real Sociedad II",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.714,
-      "context": "Cote away: 3.50 -> 3.05 (+12.9%)"
-    },
-    {
-      "event_id": "401871355",
-      "date": "2026-05-11T19:00Z",
-      "sport": "football",
-      "league_code": "championship",
-      "league_name": "Championship",
-      "home": "Millwall",
-      "away": "Hull City",
-      "match": "Millwall - Hull City",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.679,
-      "context": "Cote away: 4.50 -> 3.95 (+12.2%)"
     }
   ],
   "active_watch": [
@@ -297,22 +279,22 @@
       "context": "Absences severes 5-2"
     },
     {
-      "event_id": "740954",
-      "date": "2026-05-11T19:00Z",
+      "event_id": "401866574",
+      "date": "2026-05-13T16:30Z",
       "sport": "football",
-      "league_code": "eng.1",
-      "league_name": "Premier League",
-      "home": "Tottenham Hotspur",
-      "away": "Leeds United",
-      "match": "Tottenham Hotspur - Leeds United",
+      "league_code": "superleaguegrece",
+      "league_name": "Super League Grèce",
+      "home": "PAOK Salonika",
+      "away": "AEK Athens",
+      "match": "PAOK Salonika - AEK Athens",
       "quality": "watch",
       "quality_reason": "Signal rare present mais intensite moyenne",
       "type": "market_move",
-      "direction": "steam",
+      "direction": "drift",
       "team": null,
       "side": "away",
-      "strength": 0.463,
-      "context": "Cote away: 4.20 -> 3.85 (+8.3%)"
+      "strength": 0.572,
+      "context": "Cote away: 3.40 -> 3.75 (-10.3%)"
     }
   ],
   "active_risk": [
@@ -487,6 +469,24 @@
       "home": "Borussia Mönchengladbach",
       "away": "TSG Hoffenheim",
       "match": "Borussia Mönchengladbach - TSG Hoffenheim",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.1%"
+    },
+    {
+      "event_id": "747022",
+      "date": "2026-05-16T13:30Z",
+      "sport": "football",
+      "league_code": "ger.1",
+      "league_name": "Bundesliga",
+      "home": "Werder Bremen",
+      "away": "Borussia Dortmund",
+      "match": "Werder Bremen - Borussia Dortmund",
       "quality": "risk",
       "quality_reason": "Signal de prudence, pas une opportunite directe",
       "type": "market_uncertain",
@@ -711,24 +711,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.9%"
-    },
-    {
-      "event_id": "750219",
-      "date": "2026-05-16T17:00Z",
-      "sport": "football",
-      "league_code": "superlig",
-      "league_name": "Süper Lig",
-      "home": "Samsunspor",
-      "away": "Goztepe",
-      "match": "Samsunspor - Goztepe",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.2%"
     },
     {
       "event_id": "401843349",
@@ -1376,7 +1358,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 19.6%"
+      "context": "marge bookmaker anormale 18.9%"
     },
     {
       "event_id": "748510",
@@ -1394,7 +1376,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 19.0%"
+      "context": "marge bookmaker anormale 18.9%"
     },
     {
       "event_id": "748511",
@@ -1412,7 +1394,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.7%"
+      "context": "marge bookmaker anormale 18.6%"
     },
     {
       "event_id": "748512",
@@ -1430,7 +1412,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.9%"
+      "context": "marge bookmaker anormale 19.6%"
     },
     {
       "event_id": "750215",
@@ -1520,7 +1502,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.6%"
+      "context": "marge bookmaker anormale 18.7%"
     },
     {
       "event_id": "746710",
@@ -1556,7 +1538,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.7%"
+      "context": "marge bookmaker anormale 19.6%"
     },
     {
       "event_id": "746714",
@@ -1610,7 +1592,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 19.0%"
+      "context": "marge bookmaker anormale 19.8%"
     },
     {
       "event_id": "401871338",
