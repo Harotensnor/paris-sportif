@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-11T04:03:18Z",
+  "generated_at": "2026-05-11T04:07:00Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -177,13 +177,13 @@
         "3 matchs sur les 7 derniers jours"
       ],
       "global_resolution": {
-        "status": "abstain",
+        "status": "mixed",
         "net_side": null,
-        "home_score": -0.39,
-        "away_score": -0.39,
-        "home_fade": 0.6,
+        "home_score": -1.39,
+        "away_score": 0.96,
+        "home_fade": 1.6,
         "away_fade": 0.6,
-        "reason": "Signaux opposes: Vegas Golden Knights fade 0.60, Anaheim Ducks fade 0.60 -> prudence",
+        "reason": "Signaux mitigés: avantage net trop faible (Vegas Golden Knights -1.39, Anaheim Ducks +0.96)",
         "detail": [
           {
             "side": "home",
@@ -196,6 +196,18 @@
             "type": "schedule_congestion",
             "direction": "fade",
             "strength": 0.6
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
           }
         ]
       }
@@ -335,11 +347,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
-        "home_fade": 0.15,
+        "home_score": -1.097,
+        "away_score": 1.252,
+        "home_fade": 1.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Anaheim Ducks (-0.10)",
+        "reason": "Direction nette: Anaheim Ducks (+1.25)",
         "detail": [
           {
             "side": "home",
@@ -352,6 +364,18 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
           }
         ]
       }
@@ -490,12 +514,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
+        "net_side": "home",
+        "home_score": 1.252,
+        "away_score": -1.097,
         "home_fade": 0.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Vegas Golden Knights (-0.10)",
+        "away_fade": 1.15,
+        "reason": "Direction nette: Anaheim Ducks (+1.25)",
         "detail": [
           {
             "side": "home",
@@ -508,6 +532,18 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           }
         ]
       }

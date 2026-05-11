@@ -1,25 +1,80 @@
 {
-  "generated_at": "2026-05-11T04:03:18Z",
+  "generated_at": "2026-05-11T04:07:00Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 85,
-    "actionable": 8,
+    "active_events": 87,
+    "actionable": 11,
     "watch": 0,
-    "risk": 77,
+    "risk": 76,
     "expired_sample": 0,
     "by_type": {
       "back_to_back_travel": 8,
+      "market_move": 9,
       "market_uncertain": 74,
       "signal_conflict": 3
     },
     "by_quality": {
-      "actionable": 8,
-      "risk": 77
+      "actionable": 11,
+      "risk": 76
     }
   },
   "active_actionable": [
+    {
+      "event_id": "401871427",
+      "date": "2026-05-13T01:30Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Vegas Golden Knights",
+      "away": "Anaheim Ducks",
+      "match": "Vegas Golden Knights - Anaheim Ducks",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 5.70 -> 65.00 (-1040.4%)"
+    },
+    {
+      "event_id": "401871428",
+      "date": "2026-05-14T04:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Anaheim Ducks",
+      "away": "Vegas Golden Knights",
+      "match": "Anaheim Ducks - Vegas Golden Knights",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 1.56 -> 1.03 (+34.0%)"
+    },
+    {
+      "event_id": "401871429",
+      "date": "2026-05-16T04:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Vegas Golden Knights",
+      "away": "Anaheim Ducks",
+      "match": "Vegas Golden Knights - Anaheim Ducks",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 5.70 -> 65.00 (-1040.4%)"
+    },
     {
       "event_id": "401815325",
       "date": "2026-05-13T23:07Z",
@@ -1101,7 +1156,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 19.2%"
+      "context": "marge bookmaker anormale 18.3%"
     },
     {
       "event_id": "747324",
@@ -1353,7 +1408,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.9%"
+      "context": "marge bookmaker anormale 19.4%"
     },
     {
       "event_id": "750215",
@@ -1516,24 +1571,6 @@
       "side": null,
       "strength": 0.488,
       "context": "Signaux opposes: Cleveland Cavaliers fade 0.75, Detroit Pistons fade 0.75 -> prudence"
-    },
-    {
-      "event_id": "401871429",
-      "date": "2026-05-16T04:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Vegas Golden Knights",
-      "away": "Anaheim Ducks",
-      "match": "Vegas Golden Knights - Anaheim Ducks",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "signal_conflict",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.45,
-      "context": "Signaux opposes: Vegas Golden Knights fade 0.60, Anaheim Ducks fade 0.60 -> prudence"
     },
     {
       "event_id": "401871339",
