@@ -1,26 +1,26 @@
 {
-  "generated_at": "2026-05-11T23:38:16Z",
+  "generated_at": "2026-05-11T23:41:40Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 82,
-    "actionable": 20,
-    "watch": 7,
-    "risk": 55,
+    "active_events": 85,
+    "actionable": 18,
+    "watch": 9,
+    "risk": 58,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 7,
-      "market_uncertain": 53,
-      "market_move": 45,
+      "market_uncertain": 55,
+      "market_move": 42,
       "back_to_back_travel": 7,
-      "signal_conflict": 7,
+      "signal_conflict": 8,
       "travel_extreme": 1
     },
     "by_quality": {
-      "actionable": 20,
-      "watch": 7,
-      "risk": 55
+      "actionable": 18,
+      "watch": 9,
+      "risk": 58
     }
   },
   "active_actionable": [
@@ -40,7 +40,7 @@
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 2.24 -> 2.85 (-27.2%)"
+      "context": "Cote home: 2.24 -> 2.80 (-25.0%)"
     },
     {
       "event_id": "401815302",
@@ -76,7 +76,7 @@
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 1.66 -> 5.70 (-243.4%)"
+      "context": "Cote home: 1.66 -> 7.25 (-336.7%)"
     },
     {
       "event_id": "401866574",
@@ -112,7 +112,7 @@
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 1.66 -> 5.70 (-243.4%)"
+      "context": "Cote home: 1.66 -> 7.25 (-336.7%)"
     },
     {
       "event_id": "748961",
@@ -205,24 +205,6 @@
       "context": "Cote draw: 4.70 -> 5.50 (-17.0%)"
     },
     {
-      "event_id": "401815303",
-      "date": "2026-05-12T02:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Los Angeles Dodgers",
-      "away": "San Francisco Giants",
-      "match": "Los Angeles Dodgers - San Francisco Giants",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "away",
-      "strength": 0.93,
-      "context": "Cote away: 2.57 -> 3.00 (-16.7%)"
-    },
-    {
       "event_id": "401871330",
       "date": "2026-05-13T04:00Z",
       "sport": "basketball",
@@ -308,24 +290,6 @@
       "type": "back_to_back_travel",
       "direction": "fade",
       "team": "Minnesota Wild",
-      "side": "away",
-      "strength": 0.757,
-      "context": "1 match dans les 48h + 1135 km de voyage"
-    },
-    {
-      "event_id": "401871421",
-      "date": "2026-05-16T00:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Minnesota Wild",
-      "away": "Colorado Avalanche",
-      "match": "Minnesota Wild - Colorado Avalanche",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Colorado Avalanche",
       "side": "away",
       "strength": 0.757,
       "context": "1 match dans les 48h + 1135 km de voyage"
@@ -459,6 +423,24 @@
       "context": "Cote home: 5.80 -> 5.20 (+10.3%)"
     },
     {
+      "event_id": "748507",
+      "date": "2026-05-17T17:00Z",
+      "sport": "football",
+      "league_code": "esp.1",
+      "league_name": "La Liga",
+      "home": "Elche",
+      "away": "Getafe",
+      "match": "Elche - Getafe",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 0.556,
+      "context": "Cote home: 2.00 -> 2.20 (-10.0%)"
+    },
+    {
       "event_id": "401843346",
       "date": "2026-05-16T14:00Z",
       "sport": "football",
@@ -495,6 +477,24 @@
       "context": "Cote home: 2.10 -> 2.30 (-9.5%)"
     },
     {
+      "event_id": "748510",
+      "date": "2026-05-17T17:00Z",
+      "sport": "football",
+      "league_code": "esp.1",
+      "league_name": "La Liga",
+      "home": "Levante",
+      "away": "Mallorca",
+      "match": "Levante - Mallorca",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "away",
+      "strength": 0.496,
+      "context": "Cote away: 2.80 -> 3.05 (-8.9%)"
+    },
+    {
       "event_id": "401843349",
       "date": "2026-05-16T18:00Z",
       "sport": "football",
@@ -514,6 +514,24 @@
     }
   ],
   "active_risk": [
+    {
+      "event_id": "401871421",
+      "date": "2026-05-16T00:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Minnesota Wild",
+      "away": "Colorado Avalanche",
+      "match": "Minnesota Wild - Colorado Avalanche",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "signal_conflict",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 1.0,
+      "context": "Signaux opposes: Minnesota Wild fade 1.35, Colorado Avalanche fade 1.51 -> prudence"
+    },
     {
       "event_id": "401871331",
       "date": "2026-05-16T04:00Z",
@@ -1467,6 +1485,42 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.3%"
+    },
+    {
+      "event_id": "750215",
+      "date": "2026-05-17T17:00Z",
+      "sport": "football",
+      "league_code": "superlig",
+      "league_name": "Süper Lig",
+      "home": "Antalyaspor",
+      "away": "Kocaelispor",
+      "match": "Antalyaspor - Kocaelispor",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.9%"
+    },
+    {
+      "event_id": "750218",
+      "date": "2026-05-17T17:00Z",
+      "sport": "football",
+      "league_code": "superlig",
+      "league_name": "Süper Lig",
+      "home": "Fenerbahce",
+      "away": "Eyupspor",
+      "match": "Fenerbahce - Eyupspor",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 19.1%"
     },
     {
       "event_id": "401871338",
