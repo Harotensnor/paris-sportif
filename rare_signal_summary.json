@@ -1,29 +1,47 @@
 {
-  "generated_at": "2026-05-11T08:59:41Z",
+  "generated_at": "2026-05-11T09:11:01Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 92,
-    "actionable": 19,
-    "watch": 2,
-    "risk": 71,
+    "active_events": 95,
+    "actionable": 20,
+    "watch": 8,
+    "risk": 67,
     "expired_sample": 0,
     "by_type": {
+      "market_move": 37,
       "injury_imbalance": 4,
       "travel_extreme": 2,
-      "market_uncertain": 71,
-      "market_move": 27,
-      "back_to_back_travel": 8,
+      "market_uncertain": 67,
+      "back_to_back_travel": 7,
       "signal_conflict": 3
     },
     "by_quality": {
-      "actionable": 19,
-      "watch": 2,
-      "risk": 71
+      "actionable": 20,
+      "watch": 8,
+      "risk": 67
     }
   },
   "active_actionable": [
+    {
+      "event_id": "401842707",
+      "date": "2026-05-11T17:00Z",
+      "sport": "football",
+      "league_code": "allsvenskan",
+      "league_name": "Allsvenskan",
+      "home": "IK Sirius",
+      "away": "Örgryte IS",
+      "match": "IK Sirius - Örgryte IS",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 1.0,
+      "context": "Cote away: 9.50 -> 7.50 (+21.1%)"
+    },
     {
       "event_id": "401815298",
       "date": "2026-05-11T22:10Z",
@@ -187,24 +205,6 @@
       "context": "1 match dans les 48h + 1899 km de voyage"
     },
     {
-      "event_id": "401871332",
-      "date": "2026-05-18T04:00Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "Oklahoma City Thunder",
-      "away": "Los Angeles Lakers",
-      "match": "Oklahoma City Thunder - Los Angeles Lakers",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Los Angeles Lakers",
-      "side": "away",
-      "strength": 0.91,
-      "context": "1 match dans les 48h + 1899 km de voyage"
-    },
-    {
       "event_id": "401815310",
       "date": "2026-05-12T23:07Z",
       "sport": "baseball",
@@ -241,22 +241,22 @@
       "context": "Cote home: 2.25 -> 2.60 (-15.6%)"
     },
     {
-      "event_id": "748507",
-      "date": "2026-05-17T17:00Z",
+      "event_id": "737151",
+      "date": "2026-05-17T18:00Z",
       "sport": "football",
-      "league_code": "esp.1",
-      "league_name": "La Liga",
-      "home": "Elche",
-      "away": "Getafe",
-      "match": "Elche - Getafe",
+      "league_code": "ita.1",
+      "league_name": "Serie A",
+      "home": "Internazionale",
+      "away": "Hellas Verona",
+      "match": "Internazionale - Hellas Verona",
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
       "type": "market_move",
       "direction": "drift",
       "team": null,
-      "side": "home",
-      "strength": 0.833,
-      "context": "Cote home: 2.00 -> 2.30 (-15.0%)"
+      "side": "draw",
+      "strength": 0.855,
+      "context": "Cote draw: 6.50 -> 7.50 (-15.4%)"
     },
     {
       "event_id": "401866574",
@@ -349,6 +349,24 @@
       "context": "Cote home: 1.64 -> 1.86 (-13.4%)"
     },
     {
+      "event_id": "748507",
+      "date": "2026-05-17T17:00Z",
+      "sport": "football",
+      "league_code": "esp.1",
+      "league_name": "La Liga",
+      "home": "Elche",
+      "away": "Getafe",
+      "match": "Elche - Getafe",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 0.694,
+      "context": "Cote home: 2.00 -> 2.25 (-12.5%)"
+    },
+    {
       "event_id": "748503",
       "date": "2026-05-14T19:30Z",
       "sport": "football",
@@ -369,6 +387,42 @@
   ],
   "active_watch": [
     {
+      "event_id": "740902",
+      "date": "2026-05-13T19:00Z",
+      "sport": "football",
+      "league_code": "eng.1",
+      "league_name": "Premier League",
+      "home": "Manchester City",
+      "away": "Crystal Palace",
+      "match": "Manchester City - Crystal Palace",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "draw",
+      "strength": 0.641,
+      "context": "Cote draw: 6.50 -> 7.25 (-11.5%)"
+    },
+    {
+      "event_id": "401871355",
+      "date": "2026-05-11T19:00Z",
+      "sport": "football",
+      "league_code": "championship",
+      "league_name": "Championship",
+      "home": "Millwall",
+      "away": "Hull City",
+      "match": "Millwall - Hull City",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.617,
+      "context": "Cote away: 4.50 -> 4.00 (+11.1%)"
+    },
+    {
       "event_id": "401856902",
       "date": "2026-05-13T02:00Z",
       "sport": "basketball",
@@ -387,6 +441,60 @@
       "context": "Absences severes 5-2"
     },
     {
+      "event_id": "748944",
+      "date": "2026-05-11T18:30Z",
+      "sport": "football",
+      "league_code": "laliga2",
+      "league_name": "La Liga 2",
+      "home": "Huesca",
+      "away": "Real Sociedad II",
+      "match": "Huesca - Real Sociedad II",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.556,
+      "context": "Cote away: 3.50 -> 3.15 (+10.0%)"
+    },
+    {
+      "event_id": "740954",
+      "date": "2026-05-11T19:00Z",
+      "sport": "football",
+      "league_code": "eng.1",
+      "league_name": "Premier League",
+      "home": "Tottenham Hotspur",
+      "away": "Leeds United",
+      "match": "Tottenham Hotspur - Leeds United",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.505,
+      "context": "Cote away: 4.40 -> 4.00 (+9.1%)"
+    },
+    {
+      "event_id": "737148",
+      "date": "2026-05-17T18:00Z",
+      "sport": "football",
+      "league_code": "ita.1",
+      "league_name": "Serie A",
+      "home": "AS Roma",
+      "away": "Lazio",
+      "match": "AS Roma - Lazio",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "draw",
+      "strength": 0.505,
+      "context": "Cote draw: 3.85 -> 4.20 (-9.1%)"
+    },
+    {
       "event_id": "748510",
       "date": "2026-05-17T17:00Z",
       "sport": "football",
@@ -403,27 +511,27 @@
       "side": "away",
       "strength": 0.496,
       "context": "Cote away: 2.80 -> 3.05 (-8.9%)"
+    },
+    {
+      "event_id": "737146",
+      "date": "2026-05-17T18:00Z",
+      "sport": "football",
+      "league_code": "ita.1",
+      "league_name": "Serie A",
+      "home": "Udinese",
+      "away": "Cremonese",
+      "match": "Udinese - Cremonese",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "away",
+      "strength": 0.471,
+      "context": "Cote away: 2.95 -> 3.20 (-8.5%)"
     }
   ],
   "active_risk": [
-    {
-      "event_id": "401870492",
-      "date": "2026-05-15T09:35Z",
-      "sport": "football",
-      "league_code": "aleague",
-      "league_name": "A-League",
-      "home": "Adelaide United",
-      "away": "Auckland FC",
-      "match": "Adelaide United - Auckland FC",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.4%"
-    },
     {
       "event_id": "750216",
       "date": "2026-05-15T17:00Z",
@@ -837,24 +945,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.7%"
-    },
-    {
-      "event_id": "750223",
-      "date": "2026-05-16T17:00Z",
-      "sport": "football",
-      "league_code": "superlig",
-      "league_name": "Süper Lig",
-      "home": "Gaziantep FK",
-      "away": "Istanbul Basaksehir",
-      "match": "Gaziantep FK - Istanbul Basaksehir",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.9%"
     },
     {
       "event_id": "401843349",
@@ -1322,7 +1412,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.9%"
+      "context": "marge bookmaker anormale 19.0%"
     },
     {
       "event_id": "747327",
@@ -1469,24 +1559,6 @@
       "context": "marge bookmaker anormale 18.3%"
     },
     {
-      "event_id": "748511",
-      "date": "2026-05-17T17:00Z",
-      "sport": "football",
-      "league_code": "esp.1",
-      "league_name": "La Liga",
-      "home": "Osasuna",
-      "away": "Espanyol",
-      "match": "Osasuna - Espanyol",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.6%"
-    },
-    {
       "event_id": "750215",
       "date": "2026-05-17T17:00Z",
       "sport": "football",
@@ -1556,7 +1628,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.9%"
+      "context": "marge bookmaker anormale 18.7%"
     },
     {
       "event_id": "746709",
@@ -1592,7 +1664,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.7%"
+      "context": "marge bookmaker anormale 18.4%"
     },
     {
       "event_id": "746714",
@@ -1629,24 +1701,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.6%"
-    },
-    {
-      "event_id": "746716",
-      "date": "2026-05-17T19:00Z",
-      "sport": "football",
-      "league_code": "fra.1",
-      "league_name": "Ligue 1",
-      "home": "Strasbourg",
-      "away": "AS Monaco",
-      "match": "Strasbourg - AS Monaco",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 19.4%"
     },
     {
       "event_id": "401871338",
