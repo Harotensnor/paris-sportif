@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-11T21:23:06Z",
+  "generated_at": "2026-05-11T21:28:56Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -991,11 +991,11 @@
       "global_resolution": {
         "status": "abstain",
         "net_side": null,
-        "home_score": -0.433,
-        "away_score": -0.644,
-        "home_fade": 0.75,
-        "away_fade": 0.907,
-        "reason": "Signaux opposes: Minnesota Wild fade 0.75, Colorado Avalanche fade 0.91 -> prudence",
+        "home_score": -1.083,
+        "away_score": -1.294,
+        "home_fade": 1.75,
+        "away_fade": 1.907,
+        "reason": "Signaux opposes: Minnesota Wild fade 1.75, Colorado Avalanche fade 1.91 -> prudence",
         "detail": [
           {
             "side": "home",
@@ -1014,6 +1014,18 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.6
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           },
           {
             "side": "away",
@@ -1333,11 +1345,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.157,
-        "away_score": -0.825,
+        "home_score": 0.055,
+        "away_score": -0.532,
         "home_fade": 0.15,
-        "away_fade": 0.877,
-        "reason": "Direction nette: Manchester City (+0.16)",
+        "away_fade": 0.585,
+        "reason": "Direction nette: Manchester City (+0.05)",
         "detail": [
           {
             "side": "home",
@@ -1349,7 +1361,7 @@
             "side": "away",
             "type": "market_move",
             "direction": "drift",
-            "strength": 0.877
+            "strength": 0.585
           }
         ]
       }
