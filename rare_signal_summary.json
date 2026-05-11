@@ -1,26 +1,26 @@
 {
-  "generated_at": "2026-05-11T23:07:43Z",
+  "generated_at": "2026-05-11T23:14:00Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 88,
-    "actionable": 18,
+    "actionable": 19,
     "watch": 10,
-    "risk": 60,
+    "risk": 59,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 8,
-      "market_uncertain": 57,
-      "market_move": 40,
+      "market_uncertain": 56,
+      "market_move": 41,
       "back_to_back_travel": 7,
       "signal_conflict": 7,
       "travel_extreme": 1
     },
     "by_quality": {
       "watch": 10,
-      "actionable": 18,
-      "risk": 60
+      "actionable": 19,
+      "risk": 59
     }
   },
   "active_actionable": [
@@ -59,6 +59,24 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 15-9"
+    },
+    {
+      "event_id": "175280",
+      "date": "2026-05-12T13:00Z",
+      "sport": "tennis",
+      "league_code": "internazionalibnldit",
+      "league_name": "Internazionali BNL d'Italia",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 20.88 -> 25.00 (-19.7%)"
     },
     {
       "event_id": "401866574",
@@ -1557,24 +1575,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 19.1%"
-    },
-    {
-      "event_id": "750220",
-      "date": "2026-05-17T17:00Z",
-      "sport": "football",
-      "league_code": "superlig",
-      "league_name": "Süper Lig",
-      "home": "Kasimpasa",
-      "away": "Galatasaray",
-      "match": "Kasimpasa - Galatasaray",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.7%"
     },
     {
       "event_id": "401871338",
