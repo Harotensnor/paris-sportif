@@ -1,25 +1,80 @@
 {
-  "generated_at": "2026-05-11T02:04:57Z",
+  "generated_at": "2026-05-11T02:08:18Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 91,
-    "actionable": 8,
+    "active_events": 93,
+    "actionable": 14,
     "watch": 0,
-    "risk": 83,
+    "risk": 79,
     "expired_sample": 0,
     "by_type": {
       "back_to_back_travel": 8,
-      "market_uncertain": 78,
-      "signal_conflict": 6
+      "market_uncertain": 80,
+      "market_move": 12,
+      "signal_conflict": 4
     },
     "by_quality": {
-      "actionable": 8,
-      "risk": 83
+      "actionable": 14,
+      "risk": 79
     }
   },
   "active_actionable": [
+    {
+      "event_id": "401871156",
+      "date": "2026-05-13T00:00Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "San Antonio Spurs",
+      "away": "Minnesota Timberwolves",
+      "match": "San Antonio Spurs - Minnesota Timberwolves",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 1.58 -> 2.20 (-39.2%)"
+    },
+    {
+      "event_id": "401871157",
+      "date": "2026-05-15T04:00Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "Minnesota Timberwolves",
+      "away": "San Antonio Spurs",
+      "match": "Minnesota Timberwolves - San Antonio Spurs",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 1.92 -> 1.42 (+26.0%)"
+    },
+    {
+      "event_id": "401871158",
+      "date": "2026-05-17T04:00Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "San Antonio Spurs",
+      "away": "Minnesota Timberwolves",
+      "match": "San Antonio Spurs - Minnesota Timberwolves",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 1.58 -> 2.20 (-39.2%)"
+    },
     {
       "event_id": "401815325",
       "date": "2026-05-13T23:07Z",
@@ -163,28 +218,64 @@
       "side": "away",
       "strength": 0.757,
       "context": "1 match dans les 48h + 1135 km de voyage"
+    },
+    {
+      "event_id": "401871427",
+      "date": "2026-05-13T01:30Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Vegas Golden Knights",
+      "away": "Anaheim Ducks",
+      "match": "Vegas Golden Knights - Anaheim Ducks",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "draw",
+      "strength": 0.745,
+      "context": "Cote draw: 4.10 -> 3.55 (+13.4%)"
+    },
+    {
+      "event_id": "401871428",
+      "date": "2026-05-14T04:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Anaheim Ducks",
+      "away": "Vegas Golden Knights",
+      "match": "Anaheim Ducks - Vegas Golden Knights",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "draw",
+      "strength": 0.745,
+      "context": "Cote draw: 4.10 -> 3.55 (+13.4%)"
+    },
+    {
+      "event_id": "401871429",
+      "date": "2026-05-16T04:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Vegas Golden Knights",
+      "away": "Anaheim Ducks",
+      "match": "Vegas Golden Knights - Anaheim Ducks",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "draw",
+      "strength": 0.745,
+      "context": "Cote draw: 4.10 -> 3.55 (+13.4%)"
     }
   ],
   "active_watch": [],
   "active_risk": [
-    {
-      "event_id": "401871156",
-      "date": "2026-05-13T00:00Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "San Antonio Spurs",
-      "away": "Minnesota Timberwolves",
-      "match": "San Antonio Spurs - Minnesota Timberwolves",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 15.4%"
-    },
     {
       "event_id": "401859356",
       "date": "2026-05-13T10:00Z",
@@ -202,24 +293,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.0%"
-    },
-    {
-      "event_id": "401871157",
-      "date": "2026-05-15T04:00Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "Minnesota Timberwolves",
-      "away": "San Antonio Spurs",
-      "match": "Minnesota Timberwolves - San Antonio Spurs",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 15.4%"
     },
     {
       "event_id": "401870492",
@@ -399,7 +472,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.8%"
+      "context": "marge bookmaker anormale 18.3%"
     },
     {
       "event_id": "747020",
@@ -420,6 +493,42 @@
       "context": "marge bookmaker anormale 18.3%"
     },
     {
+      "event_id": "747018",
+      "date": "2026-05-16T13:30Z",
+      "sport": "football",
+      "league_code": "ger.1",
+      "league_name": "Bundesliga",
+      "home": "Borussia Mönchengladbach",
+      "away": "TSG Hoffenheim",
+      "match": "Borussia Mönchengladbach - TSG Hoffenheim",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.1%"
+    },
+    {
+      "event_id": "747023",
+      "date": "2026-05-16T13:30Z",
+      "sport": "football",
+      "league_code": "ger.1",
+      "league_name": "Bundesliga",
+      "home": "Eintracht Frankfurt",
+      "away": "VfB Stuttgart",
+      "match": "Eintracht Frankfurt - VfB Stuttgart",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.2%"
+    },
+    {
       "event_id": "747021",
       "date": "2026-05-16T13:30Z",
       "sport": "football",
@@ -436,6 +545,24 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.2%"
+    },
+    {
+      "event_id": "747022",
+      "date": "2026-05-16T13:30Z",
+      "sport": "football",
+      "league_code": "ger.1",
+      "league_name": "Bundesliga",
+      "home": "Werder Bremen",
+      "away": "Borussia Dortmund",
+      "match": "Werder Bremen - Borussia Dortmund",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.1%"
     },
     {
       "event_id": "401866316",
@@ -618,24 +745,6 @@
       "context": "marge bookmaker anormale 18.8%"
     },
     {
-      "event_id": "401864050",
-      "date": "2026-05-16T15:00Z",
-      "sport": "football",
-      "league_code": "bundesligaautriche",
-      "league_name": "Bundesliga Autriche",
-      "home": "Wolfsberger",
-      "away": "WSG Swarovski Tirol",
-      "match": "Wolfsberger - WSG Swarovski Tirol",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 19.4%"
-    },
-    {
       "event_id": "401866579",
       "date": "2026-05-16T16:00Z",
       "sport": "football",
@@ -724,24 +833,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.5%"
-    },
-    {
-      "event_id": "401871158",
-      "date": "2026-05-17T04:00Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "San Antonio Spurs",
-      "away": "Minnesota Timberwolves",
-      "match": "San Antonio Spurs - Minnesota Timberwolves",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 15.4%"
     },
     {
       "event_id": "401859395",
@@ -849,7 +940,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 19.1%"
+      "context": "marge bookmaker anormale 18.9%"
     },
     {
       "event_id": "741275",
@@ -867,7 +958,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.8%"
+      "context": "marge bookmaker anormale 19.0%"
     },
     {
       "event_id": "741274",
@@ -975,7 +1066,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.3%"
+      "context": "marge bookmaker anormale 19.1%"
     },
     {
       "event_id": "741280",
@@ -1479,7 +1570,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.3%"
+      "context": "marge bookmaker anormale 18.7%"
     },
     {
       "event_id": "750222",
@@ -1590,22 +1681,22 @@
       "context": "Signaux opposes: Cleveland Cavaliers fade 0.75, Detroit Pistons fade 0.75 -> prudence"
     },
     {
-      "event_id": "401871409",
-      "date": "2026-05-16T04:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Montreal Canadiens",
-      "away": "Buffalo Sabres",
-      "match": "Montreal Canadiens - Buffalo Sabres",
+      "event_id": "401871339",
+      "date": "2026-05-17T04:00Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "Detroit Pistons",
+      "away": "Cleveland Cavaliers",
+      "match": "Detroit Pistons - Cleveland Cavaliers",
       "quality": "risk",
       "quality_reason": "Signal de prudence, pas une opportunite directe",
       "type": "signal_conflict",
       "direction": "abstain",
       "team": null,
       "side": null,
-      "strength": 0.488,
-      "context": "Signaux opposes: Montreal Canadiens fade 0.75, Buffalo Sabres fade 0.75 -> prudence"
+      "strength": 0.45,
+      "context": "Signaux opposes: Detroit Pistons fade 0.60, Cleveland Cavaliers fade 0.60 -> prudence"
     }
   ],
   "expired_sample": []
