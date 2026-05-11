@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-05-11T17:08:09Z",
+  "generated_at": "2026-05-11T17:12:08Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 89,
-    "actionable": 19,
-    "watch": 10,
+    "actionable": 17,
+    "watch": 12,
     "risk": 60,
     "expired_sample": 0,
     "by_type": {
@@ -18,30 +18,12 @@
       "signal_conflict": 5
     },
     "by_quality": {
-      "actionable": 19,
-      "watch": 10,
+      "watch": 12,
+      "actionable": 17,
       "risk": 60
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401842707",
-      "date": "2026-05-11T17:00Z",
-      "sport": "football",
-      "league_code": "allsvenskan",
-      "league_name": "Allsvenskan",
-      "home": "IK Sirius",
-      "away": "Örgryte IS",
-      "match": "IK Sirius - Örgryte IS",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "away",
-      "strength": 1.0,
-      "context": "Cote away: 8.00 -> 11.00 (-37.5%)"
-    },
     {
       "event_id": "401815298",
       "date": "2026-05-11T22:10Z",
@@ -259,24 +241,6 @@
       "context": "1 match dans les 48h + 1789 km de voyage"
     },
     {
-      "event_id": "737151",
-      "date": "2026-05-17T18:00Z",
-      "sport": "football",
-      "league_code": "ita.1",
-      "league_name": "Serie A",
-      "home": "Internazionale",
-      "away": "Hellas Verona",
-      "match": "Internazionale - Hellas Verona",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "draw",
-      "strength": 0.855,
-      "context": "Cote draw: 6.50 -> 7.50 (-15.4%)"
-    },
-    {
       "event_id": "401843345",
       "date": "2026-05-16T14:00Z",
       "sport": "football",
@@ -405,6 +369,24 @@
       "context": "Cote away: 4.40 -> 4.90 (-11.4%)"
     },
     {
+      "event_id": "748944",
+      "date": "2026-05-11T18:30Z",
+      "sport": "football",
+      "league_code": "laliga2",
+      "league_name": "La Liga 2",
+      "home": "Huesca",
+      "away": "Real Sociedad II",
+      "match": "Huesca - Real Sociedad II",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.617,
+      "context": "Cote away: 3.15 -> 2.80 (+11.1%)"
+    },
+    {
       "event_id": "747023",
       "date": "2026-05-16T13:30Z",
       "sport": "football",
@@ -529,6 +511,24 @@
       "side": "away",
       "strength": 0.496,
       "context": "Cote away: 2.80 -> 3.05 (-8.9%)"
+    },
+    {
+      "event_id": "401871355",
+      "date": "2026-05-11T19:00Z",
+      "sport": "football",
+      "league_code": "championship",
+      "league_name": "Championship",
+      "home": "Millwall",
+      "away": "Hull City",
+      "match": "Millwall - Hull City",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.473,
+      "context": "Cote away: 4.70 -> 4.30 (+8.5%)"
     },
     {
       "event_id": "401843349",
