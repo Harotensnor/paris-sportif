@@ -1,26 +1,26 @@
 {
-  "generated_at": "2026-05-11T20:58:18Z",
+  "generated_at": "2026-05-11T21:03:05Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 86,
-    "actionable": 20,
+    "actionable": 19,
     "watch": 9,
-    "risk": 57,
+    "risk": 58,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 10,
       "travel_extreme": 2,
-      "market_uncertain": 57,
+      "market_uncertain": 56,
       "market_move": 38,
       "back_to_back_travel": 7,
-      "signal_conflict": 6
+      "signal_conflict": 7
     },
     "by_quality": {
-      "actionable": 20,
+      "actionable": 19,
       "watch": 9,
-      "risk": 57
+      "risk": 58
     }
   },
   "active_actionable": [
@@ -151,6 +151,24 @@
       "context": "Cote draw: 6.25 -> 9.00 (-44.0%)"
     },
     {
+      "event_id": "748508",
+      "date": "2026-05-17T17:00Z",
+      "sport": "football",
+      "league_code": "esp.1",
+      "league_name": "La Liga",
+      "home": "Barcelona",
+      "away": "Real Betis",
+      "match": "Barcelona - Real Betis",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 1.0,
+      "context": "Cote away: 8.63 -> 5.50 (+36.3%)"
+    },
+    {
       "event_id": "747021",
       "date": "2026-05-16T13:30Z",
       "sport": "football",
@@ -185,24 +203,6 @@
       "side": "away",
       "strength": 0.968,
       "context": "2 match dans les 48h + 1789 km de voyage"
-    },
-    {
-      "event_id": "750222",
-      "date": "2026-05-17T17:00Z",
-      "sport": "football",
-      "league_code": "superlig",
-      "league_name": "Süper Lig",
-      "home": "Trabzonspor",
-      "away": "Genclerbirligi",
-      "match": "Trabzonspor - Genclerbirligi",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.952,
-      "context": "Cote away: 3.50 -> 2.90 (+17.1%)"
     },
     {
       "event_id": "401843344",
@@ -257,24 +257,6 @@
       "side": "away",
       "strength": 0.888,
       "context": "1 match dans les 48h + 1789 km de voyage"
-    },
-    {
-      "event_id": "401815303",
-      "date": "2026-05-12T02:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Los Angeles Dodgers",
-      "away": "San Francisco Giants",
-      "match": "Los Angeles Dodgers - San Francisco Giants",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "away",
-      "strength": 0.879,
-      "context": "Cote away: 2.59 -> 3.00 (-15.8%)"
     },
     {
       "event_id": "740902",
@@ -567,6 +549,24 @@
       "side": null,
       "strength": 1.0,
       "context": "Signaux opposes: Minnesota Wild fade 1.35, Colorado Avalanche fade 1.51 -> prudence"
+    },
+    {
+      "event_id": "401871331",
+      "date": "2026-05-16T04:00Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "Los Angeles Lakers",
+      "away": "Oklahoma City Thunder",
+      "match": "Los Angeles Lakers - Oklahoma City Thunder",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "signal_conflict",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 1.0,
+      "context": "Signaux opposes: Los Angeles Lakers fade 1.44, Oklahoma City Thunder fade 1.19 -> prudence"
     },
     {
       "event_id": "401861382",
