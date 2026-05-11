@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-11T23:13:52Z",
+  "generated_at": "2026-05-11T23:17:36Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815300",
-      "kickoff": "2026-05-11T23:07Z",
-      "league": "MLB",
-      "match": "Tampa Bay Rays at Toronto Blue Jays",
-      "home": "Toronto Blue Jays",
-      "away": "Tampa Bay Rays",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Toronto Blue Jays",
-          "pitcher": "Kevin Gausman",
-          "label": "Kevin Gausman moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.54,
-          "fair_odds": 1.85,
-          "expected_strikeouts": 5.32,
-          "projected_ip": 5.78,
-          "inputs": {
-            "k9": 8.29,
-            "era": 3.09,
-            "whip": 0.99,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Toronto Blue Jays",
-          "pitcher": "Kevin Gausman",
-          "label": "Kevin Gausman ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5401,
-          "fair_odds": 1.85,
-          "expected_hr_allowed": 0.616,
-          "projected_ip": 5.78,
-          "inputs": {
-            "hr9": 0.96,
-            "era": 3.09,
-            "whip": 0.99
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Tampa Bay Rays",
-          "pitcher": "Drew Rasmussen",
-          "label": "Drew Rasmussen moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.563,
-          "fair_odds": 1.78,
-          "expected_strikeouts": 5.22,
-          "projected_ip": 5.17,
-          "inputs": {
-            "k9": 9.08,
-            "era": 2.95,
-            "whip": 0.93,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Tampa Bay Rays",
-          "pitcher": "Drew Rasmussen",
-          "label": "Drew Rasmussen concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5703,
-          "fair_odds": 1.75,
-          "expected_hr_allowed": 0.845,
-          "projected_ip": 5.17,
-          "inputs": {
-            "hr9": 1.47,
-            "era": 2.95,
-            "whip": 0.93
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815301",
       "kickoff": "2026-05-12T00:05Z",
@@ -496,7 +414,7 @@
       ]
     }
   ],
-  "props": 24,
+  "props": 20,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
