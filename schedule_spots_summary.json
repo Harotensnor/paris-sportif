@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-05-11T02:21:43Z",
+  "generated_at": "2026-05-11T02:26:54Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 24,
+    "active_events": 22,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 36,
+      "lookahead": 32,
       "back_to_back_travel": 8,
       "travel_extreme": 4,
       "schedule_congestion": 12
     },
     "by_decision": {
-      "abstain": 10,
+      "abstain": 8,
       "lean_home": 11,
       "lean_away": 3
     },
     "lean_home": 11,
     "lean_away": 3,
-    "abstain": 10,
+    "abstain": 8,
     "monitor": 0
   },
   "active": [
@@ -253,70 +253,6 @@
       }
     },
     {
-      "event_id": "401871156",
-      "source_event_ids": [
-        "401871156"
-      ],
-      "kickoff": "2026-05-13T00:00Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "San Antonio Spurs",
-      "away": "Minnesota Timberwolves",
-      "match": "San Antonio Spurs - Minnesota Timberwolves",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: San Antonio Spurs 0.15, Minnesota Timberwolves 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -1.097,
-        "away_score": 1.252,
-        "home_fade": 1.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Minnesota Timberwolves (+1.25)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401871427",
       "source_event_ids": [
         "401871427"
@@ -520,70 +456,6 @@
         "home_fade": 0.15,
         "away_fade": 1.15,
         "reason": "Direction nette: Anaheim Ducks (+1.25)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401871157",
-      "source_event_ids": [
-        "401871157"
-      ],
-      "kickoff": "2026-05-15T04:00Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "Minnesota Timberwolves",
-      "away": "San Antonio Spurs",
-      "match": "Minnesota Timberwolves - San Antonio Spurs",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Minnesota Timberwolves 0.15, San Antonio Spurs 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 1.252,
-        "away_score": -1.097,
-        "home_fade": 0.15,
-        "away_fade": 1.15,
-        "reason": "Direction nette: Minnesota Timberwolves (+1.25)",
         "detail": [
           {
             "side": "home",
