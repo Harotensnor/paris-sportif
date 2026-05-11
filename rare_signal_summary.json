@@ -1,47 +1,29 @@
 {
-  "generated_at": "2026-05-11T07:38:16Z",
+  "generated_at": "2026-05-11T07:41:43Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 89,
-    "actionable": 15,
+    "active_events": 85,
+    "actionable": 11,
     "watch": 2,
     "risk": 72,
     "expired_sample": 0,
     "by_type": {
-      "market_move": 16,
       "injury_imbalance": 4,
       "travel_extreme": 2,
-      "market_uncertain": 71,
       "back_to_back_travel": 8,
-      "signal_conflict": 3
+      "signal_conflict": 3,
+      "market_move": 9,
+      "market_uncertain": 70
     },
     "by_quality": {
-      "actionable": 15,
+      "actionable": 11,
       "watch": 2,
       "risk": 72
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401842707",
-      "date": "2026-05-11T17:00Z",
-      "sport": "football",
-      "league_code": "allsvenskan",
-      "league_name": "Allsvenskan",
-      "home": "IK Sirius",
-      "away": "Örgryte IS",
-      "match": "IK Sirius - Örgryte IS",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 1.0,
-      "context": "Cote away: 9.50 -> 7.50 (+21.1%)"
-    },
     {
       "event_id": "401815298",
       "date": "2026-05-11T22:10Z",
@@ -77,24 +59,6 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 10-5"
-    },
-    {
-      "event_id": "401871419",
-      "date": "2026-05-12T00:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Minnesota Wild",
-      "away": "Colorado Avalanche",
-      "match": "Minnesota Wild - Colorado Avalanche",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 2.10 -> 2.65 (-26.2%)"
     },
     {
       "event_id": "401815302",
@@ -187,6 +151,24 @@
       "context": "1 match dans les 48h + 1789 km de voyage"
     },
     {
+      "event_id": "401871419",
+      "date": "2026-05-12T00:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Minnesota Wild",
+      "away": "Colorado Avalanche",
+      "match": "Minnesota Wild - Colorado Avalanche",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Colorado Avalanche",
+      "side": "away",
+      "strength": 0.757,
+      "context": "1 match dans les 48h + 1135 km de voyage"
+    },
+    {
       "event_id": "401871420",
       "date": "2026-05-14T00:00Z",
       "sport": "hockey",
@@ -239,60 +221,6 @@
       "side": "away",
       "strength": 0.757,
       "context": "1 match dans les 48h + 1135 km de voyage"
-    },
-    {
-      "event_id": "748944",
-      "date": "2026-05-11T18:30Z",
-      "sport": "football",
-      "league_code": "laliga2",
-      "league_name": "La Liga 2",
-      "home": "Huesca",
-      "away": "Real Sociedad II",
-      "match": "Huesca - Real Sociedad II",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.714,
-      "context": "Cote away: 3.50 -> 3.05 (+12.9%)"
-    },
-    {
-      "event_id": "740954",
-      "date": "2026-05-11T19:00Z",
-      "sport": "football",
-      "league_code": "eng.1",
-      "league_name": "Premier League",
-      "home": "Tottenham Hotspur",
-      "away": "Leeds United",
-      "match": "Tottenham Hotspur - Leeds United",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.694,
-      "context": "Cote away: 4.40 -> 3.85 (+12.5%)"
-    },
-    {
-      "event_id": "401871355",
-      "date": "2026-05-11T19:00Z",
-      "sport": "football",
-      "league_code": "championship",
-      "league_name": "Championship",
-      "home": "Millwall",
-      "away": "Hull City",
-      "match": "Millwall - Hull City",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.679,
-      "context": "Cote away: 4.50 -> 3.95 (+12.2%)"
     }
   ],
   "active_watch": [
