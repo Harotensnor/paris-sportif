@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-05-12T22:52:02Z",
-  "calculated_at": "2026-05-12T22:52:02Z",
+  "generated_at": "2026-05-12T22:56:53Z",
+  "calculated_at": "2026-05-12T22:56:53Z",
   "source_of_truth": "data.js",
   "data_age_min": 1,
   "data_file_age_min": 0,
@@ -11,7 +11,7 @@
       "matches": 759
     },
     "winamax_markets": {
-      "age_min": 0,
+      "age_min": 1,
       "matches_with_odds": 723,
       "matches_detailed": 723,
       "details_ratio_pct": 100.0,
@@ -74,22 +74,13 @@
     },
     "h2h_extended": {
       "age_min": 1,
-      "events": 149,
-      "events_with_meetings": 62,
-      "meetings": 296,
-      "coverage_pct": 41.6,
-      "empty_events": 87,
+      "events": 146,
+      "events_with_meetings": 61,
+      "meetings": 294,
+      "coverage_pct": 41.8,
+      "empty_events": 85,
       "sports": 4,
       "by_sport": {
-        "baseball": {
-          "events": 14,
-          "events_with_meetings": 8,
-          "meetings": 36,
-          "sources": {
-            "espn_summary_empty": 6,
-            "seasonseries": 8
-          }
-        },
         "hockey": {
           "events": 2,
           "events_with_meetings": 2,
@@ -98,13 +89,22 @@
             "seasonseries": 2
           }
         },
+        "baseball": {
+          "events": 11,
+          "events_with_meetings": 7,
+          "meetings": 34,
+          "sources": {
+            "seasonseries": 7,
+            "espn_summary_empty": 4
+          }
+        },
         "basketball": {
           "events": 7,
           "events_with_meetings": 3,
           "meetings": 18,
           "sources": {
-            "seasonseries": 3,
-            "espn_summary_empty": 4
+            "espn_summary_empty": 4,
+            "seasonseries": 3
           }
         },
         "football": {
@@ -321,19 +321,19 @@
       "age_min": 1,
       "insights": 7,
       "events_today": 40,
-      "events_next_36h": 38,
+      "events_next_36h": 39,
       "sources_loaded": 8
     },
     "detected_angles": {
       "age_min": 0,
-      "events": 94,
-      "angles": 149,
+      "events": 91,
+      "angles": 136,
       "by_type": {
-        "injury_imbalance": 12,
-        "market_uncertain": 44,
-        "market_move": 71,
-        "lookahead": 14,
+        "market_uncertain": 43,
+        "market_move": 61,
         "signal_conflict": 4,
+        "lookahead": 14,
+        "injury_imbalance": 10,
         "travel_extreme": 3,
         "back_to_back_travel": 1
       }
@@ -348,37 +348,37 @@
     },
     "rare_signals": {
       "age_min": 0,
-      "signals": 130,
+      "signals": 117,
       "by_type": {
-        "injury_imbalance": 8,
-        "market_uncertain": 44,
-        "market_move": 70,
+        "market_uncertain": 43,
+        "market_move": 60,
         "signal_conflict": 4,
+        "injury_imbalance": 6,
         "travel_extreme": 3,
         "back_to_back_travel": 1
       }
     },
     "rare_signal_summary": {
       "age_min": 0,
-      "active": 82,
-      "actionable": 27,
-      "watch": 14,
+      "active": 83,
+      "actionable": 29,
+      "watch": 13,
       "risk": 41,
       "status": "ok"
     },
     "timing_edges": {
       "age_min": 0,
-      "events": 151,
-      "bet_now": 107,
-      "wait": 36,
-      "price_shortening": 8
+      "events": 154,
+      "bet_now": 117,
+      "wait": 35,
+      "price_shortening": 2
     },
     "injuries_multisport": {
       "age_min": 1,
-      "teams": 132,
+      "teams": 129,
       "sports": 4,
-      "injuries": 681,
-      "severe": 521
+      "injuries": 645,
+      "severe": 485
     },
     "thesportsdb_meta": {
       "age_min": 1,
@@ -429,8 +429,8 @@
     },
     "mlb_player_props": {
       "age_min": 0,
-      "events": 12,
-      "props": 46,
+      "events": 11,
+      "props": 42,
       "markets": 2,
       "status": "ok"
     },
@@ -496,7 +496,7 @@
     "winamax_markets": {
       "script": "scripts/fetch_winamax_match_details.py",
       "output": "winamax_markets.json",
-      "age_min": 0,
+      "age_min": 1,
       "threshold_min": 15,
       "fast_red_min": 30,
       "status": "ok"
@@ -1054,7 +1054,7 @@
   ],
   "overall": "warning",
   "quality_checks": {
-    "data_generated_at": "2026-05-12T22:51:02.633666Z",
+    "data_generated_at": "2026-05-12T22:55:45.620008Z",
     "truth_scope": "all_events",
     "all_winamax_available": 173,
     "all_winamax_exact": 170,
@@ -1071,7 +1071,7 @@
     "winamax_detail_gap_to_target": 0,
     "winamax_detail_fetch_cap_reco": 90,
     "winamax_detail_status": "ok",
-    "actionable_external_odds": 18,
+    "actionable_external_odds": 0,
     "football_invalid_form": 0,
     "events_with_xg": 64,
     "winamax_coverage": {
@@ -1133,7 +1133,7 @@
   "data_truth": {
     "source_of_truth": "data.js",
     "scope": "all_events",
-    "data_generated_at": "2026-05-12T22:51:02.633666Z",
+    "data_generated_at": "2026-05-12T22:55:45.620008Z",
     "winamax_available": 173,
     "winamax_exact": 170,
     "winamax_exact_ratio": 0.9827,
@@ -1153,7 +1153,7 @@
     "anomalies_emitted": 3
   },
   "source_health": {
-    "generated_at": "2026-05-12T22:52:02Z",
+    "generated_at": "2026-05-12T22:56:53Z",
     "sources_total": 11,
     "sources_ok": 8,
     "sources_warning": 3,
@@ -1253,7 +1253,7 @@
   },
   "observability": {
     "pipeline_traces": {
-      "generated_at": "2026-05-12T22:52:02Z",
+      "generated_at": "2026-05-12T22:56:53Z",
       "runs_observed": 99,
       "by_status": {
         "warning": 65,
@@ -1265,13 +1265,13 @@
           "runs": 99,
           "errors": 1,
           "last_status": "ok",
-          "max_duration_ms": 977
+          "max_duration_ms": 1299
         }
       }
     }
   },
   "data_lineage": {
-    "generated_at": "2026-05-12T22:52:02Z",
+    "generated_at": "2026-05-12T22:56:53Z",
     "status": "ok",
     "events": 173,
     "events_missing_inline_lineage": 0,
@@ -1279,8 +1279,8 @@
     "source_counts": {
       "espn": 173,
       "winamax": 173,
+      "h2h": 146,
       "weather": 132,
-      "h2h": 130,
       "clubelo": 82,
       "xg": 72,
       "sofascore_referees": 49,
