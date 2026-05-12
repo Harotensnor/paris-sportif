@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-05-12T23:47:23Z",
+  "generated_at": "2026-05-12T23:52:27Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 82,
+    "active_events": 80,
     "actionable": 28,
-    "watch": 13,
+    "watch": 11,
     "risk": 41,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 6,
-      "travel_extreme": 3,
-      "signal_conflict": 3,
-      "market_move": 58,
-      "market_uncertain": 42,
+      "injury_imbalance": 4,
+      "market_move": 65,
+      "travel_extreme": 1,
+      "signal_conflict": 2,
+      "market_uncertain": 43,
       "back_to_back_travel": 1
     },
     "by_quality": {
       "actionable": 28,
-      "watch": 13,
+      "watch": 11,
       "risk": 41
     }
   },
@@ -41,6 +41,24 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 14-9"
+    },
+    {
+      "event_id": "401871427",
+      "date": "2026-05-13T01:30Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Vegas Golden Knights",
+      "away": "Anaheim Ducks",
+      "match": "Vegas Golden Knights - Anaheim Ducks",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 1.62 -> 1.98 (-22.4%)"
     },
     {
       "event_id": "401856903",
@@ -457,24 +475,6 @@
       "context": "Cote draw: 4.00 -> 4.60 (-15.0%)"
     },
     {
-      "event_id": "401815313",
-      "date": "2026-05-12T23:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Chicago White Sox",
-      "away": "Kansas City Royals",
-      "match": "Chicago White Sox - Kansas City Royals",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Chicago White Sox",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 10-6"
-    },
-    {
       "event_id": "750215",
       "date": "2026-05-17T17:00Z",
       "sport": "football",
@@ -530,24 +530,6 @@
     }
   ],
   "active_watch": [
-    {
-      "event_id": "401815315",
-      "date": "2026-05-12T23:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Milwaukee Brewers",
-      "away": "San Diego Padres",
-      "match": "Milwaukee Brewers - San Diego Padres",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "travel_extreme",
-      "direction": "fade",
-      "team": "San Diego Padres",
-      "side": "away",
-      "strength": 0.649,
-      "context": "Deplacement estime 2789 km, decalage ~1.9h"
-    },
     {
       "event_id": "401859356",
       "date": "2026-05-13T10:00Z",
@@ -639,40 +621,22 @@
       "context": "Cote away: 4.50 -> 5.00 (-11.1%)"
     },
     {
-      "event_id": "401871427",
-      "date": "2026-05-13T01:30Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Vegas Golden Knights",
-      "away": "Anaheim Ducks",
-      "match": "Vegas Golden Knights - Anaheim Ducks",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Anaheim Ducks",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 0-3"
-    },
-    {
-      "event_id": "401815314",
-      "date": "2026-05-12T23:40Z",
+      "event_id": "401815318",
+      "date": "2026-05-13T01:40Z",
       "sport": "baseball",
       "league_code": "mlb",
       "league_name": "MLB",
-      "home": "Minnesota Twins",
-      "away": "Miami Marlins",
-      "match": "Minnesota Twins - Miami Marlins",
+      "home": "Athletics",
+      "away": "St. Louis Cardinals",
+      "match": "Athletics - St. Louis Cardinals",
       "quality": "watch",
       "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "travel_extreme",
-      "direction": "fade",
-      "team": "Miami Marlins",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
       "side": "away",
-      "strength": 0.566,
-      "context": "Deplacement estime 2434 km, decalage ~0.9h"
+      "strength": 0.582,
+      "context": "Cote away: 2.29 -> 2.05 (+10.5%)"
     },
     {
       "event_id": "737149",

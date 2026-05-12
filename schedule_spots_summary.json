@@ -1,22 +1,22 @@
 {
-  "generated_at": "2026-05-12T23:47:23Z",
+  "generated_at": "2026-05-12T23:52:27Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 12,
+    "active_events": 10,
     "expired_sample": 0,
     "by_type": {
-      "travel_extreme": 3,
       "lookahead": 12,
+      "travel_extreme": 1,
       "back_to_back_travel": 1
     },
     "by_decision": {
       "abstain": 4,
-      "lean_home": 5,
+      "lean_home": 3,
       "lean_away": 3
     },
-    "lean_home": 5,
+    "lean_home": 3,
     "lean_away": 3,
     "abstain": 4,
     "monitor": 0
@@ -105,11 +105,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.252,
+        "home_score": 0.87,
         "away_score": -1.097,
         "home_fade": 0.15,
         "away_fade": 1.15,
-        "reason": "Direction nette: Portland Fire (+0.25)",
+        "reason": "Direction nette: Portland Fire (+0.87)",
         "detail": [
           {
             "side": "home",
@@ -128,6 +128,12 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 1.0
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.617
           }
         ]
       }
@@ -323,11 +329,11 @@
       "global_resolution": {
         "status": "abstain",
         "net_side": null,
-        "home_score": -0.752,
-        "away_score": -0.357,
+        "home_score": 0.452,
+        "away_score": -0.943,
         "home_fade": 1.0,
-        "away_fade": 0.707,
-        "reason": "Signaux opposes: Houston Astros fade 1.00, Seattle Mariners fade 0.71 -> prudence",
+        "away_fade": 1.293,
+        "reason": "Signaux opposes: Houston Astros fade 1.00, Seattle Mariners fade 1.29 -> prudence",
         "detail": [
           {
             "side": "home",
@@ -336,106 +342,22 @@
             "strength": 1.0
           },
           {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.707
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815315",
-      "source_event_ids": [
-        "401815315"
-      ],
-      "kickoff": "2026-05-12T23:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Milwaukee Brewers",
-      "away": "San Diego Padres",
-      "match": "Milwaukee Brewers - San Diego Padres",
-      "decision": "lean_home",
-      "net_team": "Milwaukee Brewers",
-      "reason": "San Diego Padres plus penalise par calendrier/voyage (0.65 vs 0.00)",
-      "pressure_score": 0.649,
-      "home_fade": 0.0,
-      "away_fade": 0.649,
-      "travel_score": 0.649,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "travel_extreme": 1
-      },
-      "contexts": [
-        "Deplacement estime 2789 km, decalage ~1.9h"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.227,
-        "away_score": -0.649,
-        "home_fade": 0.0,
-        "away_fade": 0.649,
-        "reason": "Direction nette: Milwaukee Brewers (+0.23)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.649
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815314",
-      "source_event_ids": [
-        "401815314"
-      ],
-      "kickoff": "2026-05-12T23:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Minnesota Twins",
-      "away": "Miami Marlins",
-      "match": "Minnesota Twins - Miami Marlins",
-      "decision": "lean_home",
-      "net_team": "Minnesota Twins",
-      "reason": "Miami Marlins plus penalise par calendrier/voyage (0.57 vs 0.00)",
-      "pressure_score": 0.566,
-      "home_fade": 0.0,
-      "away_fade": 0.566,
-      "travel_score": 0.566,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "travel_extreme": 1
-      },
-      "contexts": [
-        "Deplacement estime 2434 km, decalage ~0.9h"
-      ],
-      "global_resolution": {
-        "status": "mixed",
-        "net_side": null,
-        "home_score": -0.202,
-        "away_score": -0.426,
-        "home_fade": 0.4,
-        "away_fade": 0.566,
-        "reason": "Signaux mitigés: avantage net trop faible (Minnesota Twins -0.20, Miami Marlins -0.43)",
-        "detail": [
-          {
             "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 0.586
           },
           {
             "side": "away",
             "type": "travel_extreme",
             "direction": "fade",
-            "strength": 0.566
+            "strength": 0.707
           }
         ]
       }
