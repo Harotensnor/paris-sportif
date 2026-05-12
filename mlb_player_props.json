@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-12T03:27:19Z",
+  "generated_at": "2026-05-12T03:35:56Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -80,6 +80,52 @@
             "hr9": 0.4,
             "era": 3.22,
             "whip": 1.57
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815308",
+      "kickoff": "2026-05-12T22:35Z",
+      "league": "MLB",
+      "match": "New York Yankees at Baltimore Orioles",
+      "home": "Baltimore Orioles",
+      "away": "New York Yankees",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "New York Yankees",
+          "pitcher": "Will Warren",
+          "label": "Will Warren plus de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "over",
+          "probability": 0.5104,
+          "fair_odds": 1.96,
+          "expected_strikeouts": 6.55,
+          "projected_ip": 5.15,
+          "inputs": {
+            "k9": 11.45,
+            "era": 3.46,
+            "whip": 1.2,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "New York Yankees",
+          "pitcher": "Will Warren",
+          "label": "Will Warren concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5247,
+          "fair_odds": 1.91,
+          "expected_hr_allowed": 0.744,
+          "projected_ip": 5.15,
+          "inputs": {
+            "hr9": 1.3,
+            "era": 3.46,
+            "whip": 1.2
           },
           "side": "away"
         }
@@ -1162,7 +1208,7 @@
       ]
     }
   ],
-  "props": 56,
+  "props": 58,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
