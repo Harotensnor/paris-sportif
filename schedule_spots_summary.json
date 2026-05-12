@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-12T22:56:49Z",
+  "generated_at": "2026-05-12T23:09:28Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -51,13 +51,13 @@
         "1 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.698,
-        "away_score": 0.112,
+        "status": "mixed",
+        "net_side": null,
+        "home_score": 0.639,
+        "away_score": -0.848,
         "home_fade": 0.75,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Tampa Bay Rays (+0.11)",
+        "away_fade": 1.111,
+        "reason": "Signaux mitigés: avantage net trop faible (Toronto Blue Jays +0.64, Tampa Bay Rays -0.85)",
         "detail": [
           {
             "side": "home",
@@ -76,6 +76,18 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.6
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 0.961
           }
         ]
       }
@@ -163,11 +175,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.252,
+        "home_score": 0.87,
         "away_score": -1.097,
         "home_fade": 0.15,
         "away_fade": 1.15,
-        "reason": "Direction nette: Portland Fire (+0.25)",
+        "reason": "Direction nette: Portland Fire (+0.87)",
         "detail": [
           {
             "side": "home",
@@ -186,6 +198,12 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 1.0
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.617
           }
         ]
       }
@@ -381,17 +399,29 @@
       "global_resolution": {
         "status": "abstain",
         "net_side": null,
-        "home_score": -0.752,
-        "away_score": -0.357,
+        "home_score": 0.452,
+        "away_score": -0.943,
         "home_fade": 1.0,
-        "away_fade": 0.707,
-        "reason": "Signaux opposes: Houston Astros fade 1.00, Seattle Mariners fade 0.71 -> prudence",
+        "away_fade": 1.293,
+        "reason": "Signaux opposes: Houston Astros fade 1.00, Seattle Mariners fade 1.29 -> prudence",
         "detail": [
           {
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 1.0
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 0.586
           },
           {
             "side": "away",
