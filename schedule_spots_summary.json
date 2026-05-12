@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-12T01:36:30Z",
+  "generated_at": "2026-05-12T01:42:00Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -51,13 +51,13 @@
         "1 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -1.698,
-        "away_score": 1.462,
-        "home_fade": 1.75,
+        "status": "mixed",
+        "net_side": null,
+        "home_score": 0.302,
+        "away_score": 0.112,
+        "home_fade": 0.75,
         "away_fade": 0.15,
-        "reason": "Direction nette: Tampa Bay Rays (+1.46)",
+        "reason": "Signaux mitigés: avantage net trop faible (Toronto Blue Jays +0.30, Tampa Bay Rays +0.11)",
         "detail": [
           {
             "side": "home",
@@ -79,12 +79,6 @@
           },
           {
             "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
             "type": "market_move",
             "direction": "steam",
             "strength": 1.0
@@ -175,11 +169,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 1.252,
+        "home_score": 0.252,
         "away_score": -1.097,
         "home_fade": 0.15,
         "away_fade": 1.15,
-        "reason": "Direction nette: Portland Fire (+1.25)",
+        "reason": "Direction nette: Portland Fire (+0.25)",
         "detail": [
           {
             "side": "home",
@@ -197,12 +191,6 @@
             "side": "away",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
             "strength": 1.0
           }
         ]
@@ -238,12 +226,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "home",
-        "home_score": 1.17,
-        "away_score": -0.861,
-        "home_fade": 0.15,
-        "away_fade": 0.914,
-        "reason": "Direction nette: Detroit Pistons (+1.17)",
+        "net_side": "away",
+        "home_score": -1.097,
+        "away_score": 1.252,
+        "home_fade": 1.15,
+        "away_fade": 0.15,
+        "reason": "Direction nette: Cleveland Cavaliers (+1.25)",
         "detail": [
           {
             "side": "home",
@@ -260,14 +248,14 @@
           {
             "side": "home",
             "type": "market_move",
-            "direction": "steam",
+            "direction": "drift",
             "strength": 1.0
           },
           {
             "side": "away",
             "type": "market_move",
-            "direction": "drift",
-            "strength": 0.764
+            "direction": "steam",
+            "strength": 1.0
           }
         ]
       }
@@ -360,12 +348,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "home",
-        "home_score": 0.164,
-        "away_score": -0.845,
-        "home_fade": 0.15,
-        "away_fade": 0.898,
-        "reason": "Direction nette: Colorado Avalanche (+0.16)",
+        "net_side": "away",
+        "home_score": -0.603,
+        "away_score": 0.079,
+        "home_fade": 0.655,
+        "away_fade": 0.15,
+        "reason": "Direction nette: Minnesota Wild (+0.08)",
         "detail": [
           {
             "side": "home",
@@ -380,10 +368,10 @@
             "strength": 0.15
           },
           {
-            "side": "away",
+            "side": "home",
             "type": "market_move",
             "direction": "drift",
-            "strength": 0.748
+            "strength": 0.505
           }
         ]
       }
@@ -470,12 +458,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "away",
-        "home_score": -0.861,
-        "away_score": 1.17,
-        "home_fade": 0.914,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Detroit Pistons (+1.17)",
+        "net_side": "home",
+        "home_score": 1.252,
+        "away_score": -1.097,
+        "home_fade": 0.15,
+        "away_fade": 1.15,
+        "reason": "Direction nette: Cleveland Cavaliers (+1.25)",
         "detail": [
           {
             "side": "home",
@@ -492,13 +480,13 @@
           {
             "side": "home",
             "type": "market_move",
-            "direction": "drift",
-            "strength": 0.764
+            "direction": "steam",
+            "strength": 1.0
           },
           {
             "side": "away",
             "type": "market_move",
-            "direction": "steam",
+            "direction": "drift",
             "strength": 1.0
           }
         ]
@@ -535,13 +523,13 @@
         "1 match dans les 48h + 1135 km de voyage"
       ],
       "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.58,
-        "away_score": -0.593,
-        "home_fade": 0.898,
-        "away_fade": 0.907,
-        "reason": "Signaux opposes: Minnesota Wild fade 0.90, Colorado Avalanche fade 0.91 -> prudence",
+        "status": "net",
+        "net_side": "home",
+        "home_score": 0.344,
+        "away_score": -1.359,
+        "home_fade": 0.15,
+        "away_fade": 1.412,
+        "reason": "Direction nette: Minnesota Wild (+0.34)",
         "detail": [
           {
             "side": "home",
@@ -556,10 +544,10 @@
             "strength": 0.15
           },
           {
-            "side": "home",
+            "side": "away",
             "type": "market_move",
             "direction": "drift",
-            "strength": 0.748
+            "strength": 0.505
           },
           {
             "side": "away",
@@ -903,19 +891,19 @@
         "1 match dans les 48h + 1135 km de voyage"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.527,
-        "away_score": -1.505,
-        "home_fade": 0.0,
-        "away_fade": 1.505,
-        "reason": "Direction nette: Colorado Avalanche (+0.53)",
+        "status": "abstain",
+        "net_side": null,
+        "home_score": -0.24,
+        "away_score": -0.58,
+        "home_fade": 0.505,
+        "away_fade": 0.757,
+        "reason": "Signaux opposes: Colorado Avalanche fade 0.51, Minnesota Wild fade 0.76 -> prudence",
         "detail": [
           {
-            "side": "away",
+            "side": "home",
             "type": "market_move",
             "direction": "drift",
-            "strength": 0.748
+            "strength": 0.505
           },
           {
             "side": "away",
@@ -956,11 +944,11 @@
       "global_resolution": {
         "status": "mixed",
         "net_side": null,
-        "home_score": -1.752,
-        "away_score": 0.993,
-        "home_fade": 2.0,
-        "away_fade": 0.707,
-        "reason": "Signaux mitigés: avantage net trop faible (Houston Astros -1.75, Seattle Mariners +0.99)",
+        "home_score": 0.598,
+        "away_score": -1.357,
+        "home_fade": 1.0,
+        "away_fade": 1.707,
+        "reason": "Signaux mitigés: avantage net trop faible (Houston Astros +0.60, Seattle Mariners -1.36)",
         "detail": [
           {
             "side": "home",
@@ -971,13 +959,13 @@
           {
             "side": "home",
             "type": "market_move",
-            "direction": "drift",
+            "direction": "steam",
             "strength": 1.0
           },
           {
             "side": "away",
             "type": "market_move",
-            "direction": "steam",
+            "direction": "drift",
             "strength": 1.0
           },
           {
