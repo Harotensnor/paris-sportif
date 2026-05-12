@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-12T16:41:41Z",
+  "generated_at": "2026-05-12T16:49:25Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -93,6 +93,42 @@
       "home": "Baltimore Orioles",
       "away": "New York Yankees",
       "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Baltimore Orioles",
+          "pitcher": "Trevor Rogers",
+          "label": "Trevor Rogers moins de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "under",
+          "probability": 0.5085,
+          "fair_odds": 1.97,
+          "expected_strikeouts": 4.46,
+          "projected_ip": 5.02,
+          "inputs": {
+            "k9": 8.01,
+            "era": 4.75,
+            "whip": 1.45,
+            "hand": "L"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Baltimore Orioles",
+          "pitcher": "Trevor Rogers",
+          "label": "Trevor Rogers ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6089,
+          "fair_odds": 1.64,
+          "expected_hr_allowed": 0.496,
+          "projected_ip": 5.02,
+          "inputs": {
+            "hr9": 0.89,
+            "era": 4.75,
+            "whip": 1.45
+          },
+          "side": "home"
+        },
         {
           "market": "pitcher_strikeouts",
           "team": "New York Yankees",
@@ -1208,7 +1244,7 @@
       ]
     }
   ],
-  "props": 58,
+  "props": 60,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
