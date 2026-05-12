@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-12T13:28:37Z",
+  "generated_at": "2026-05-12T13:31:53Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -163,11 +163,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.252,
+        "home_score": 1.252,
         "away_score": -1.097,
         "home_fade": 0.15,
         "away_fade": 1.15,
-        "reason": "Direction nette: Portland Fire (+0.25)",
+        "reason": "Direction nette: Portland Fire (+1.25)",
         "detail": [
           {
             "side": "home",
@@ -185,6 +185,12 @@
             "side": "away",
             "type": "injury_imbalance",
             "direction": "fade",
+            "strength": 1.0
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
             "strength": 1.0
           }
         ]
