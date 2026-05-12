@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-12T17:57:59Z",
+  "generated_at": "2026-05-12T18:07:48Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -175,11 +175,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.252,
+        "home_score": 1.019,
         "away_score": -1.097,
         "home_fade": 0.15,
         "away_fade": 1.15,
-        "reason": "Direction nette: Portland Fire (+0.25)",
+        "reason": "Direction nette: Portland Fire (+1.02)",
         "detail": [
           {
             "side": "home",
@@ -198,6 +198,12 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 1.0
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.766
           }
         ]
       }
@@ -456,11 +462,11 @@
       "global_resolution": {
         "status": "abstain",
         "net_side": null,
-        "home_score": 0.472,
-        "away_score": -0.998,
+        "home_score": 0.457,
+        "away_score": -0.955,
         "home_fade": 1.0,
-        "away_fade": 1.348,
-        "reason": "Signaux opposes: Houston Astros fade 1.00, Seattle Mariners fade 1.35 -> prudence",
+        "away_fade": 1.305,
+        "reason": "Signaux opposes: Houston Astros fade 1.00, Seattle Mariners fade 1.30 -> prudence",
         "detail": [
           {
             "side": "home",
@@ -478,7 +484,7 @@
             "side": "away",
             "type": "market_move",
             "direction": "drift",
-            "strength": 0.641
+            "strength": 0.598
           },
           {
             "side": "away",
