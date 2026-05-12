@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-12T04:32:56Z",
+  "generated_at": "2026-05-12T04:37:01Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -163,11 +163,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 1.252,
+        "home_score": 0.252,
         "away_score": -1.097,
         "home_fade": 0.15,
         "away_fade": 1.15,
-        "reason": "Direction nette: Portland Fire (+1.25)",
+        "reason": "Direction nette: Portland Fire (+0.25)",
         "detail": [
           {
             "side": "home",
@@ -185,12 +185,6 @@
             "side": "away",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
             "strength": 1.0
           }
         ]
@@ -336,25 +330,25 @@
         "1 match dans les 48h + 1899 km de voyage"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 1.106,
-        "away_score": -1.814,
-        "home_fade": 0.0,
-        "away_fade": 1.814,
-        "reason": "Direction nette: Oklahoma City Thunder (+1.11)",
+        "status": "mixed",
+        "net_side": null,
+        "home_score": 0.002,
+        "away_score": -0.187,
+        "home_fade": 0.471,
+        "away_fade": 1.351,
+        "reason": "Signaux mitigés: avantage net trop faible (Oklahoma City Thunder +0.00, Los Angeles Lakers -0.19)",
         "detail": [
           {
             "side": "home",
             "type": "market_move",
-            "direction": "steam",
+            "direction": "drift",
             "strength": 0.471
           },
           {
             "side": "away",
             "type": "market_move",
-            "direction": "drift",
-            "strength": 0.463
+            "direction": "steam",
+            "strength": 1.0
           },
           {
             "side": "away",
@@ -402,13 +396,13 @@
         "Deplacement estime 1899 km, decalage ~1.4h"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.69,
-        "away_score": -1.002,
-        "home_fade": 0.15,
-        "away_fade": 1.055,
-        "reason": "Direction nette: Oklahoma City Thunder (+0.69)",
+        "status": "abstain",
+        "net_side": null,
+        "home_score": -0.414,
+        "away_score": 0.626,
+        "home_fade": 0.621,
+        "away_fade": 0.592,
+        "reason": "Signaux opposes: Oklahoma City Thunder fade 0.62, Los Angeles Lakers fade 0.59 -> prudence",
         "detail": [
           {
             "side": "home",
@@ -425,14 +419,14 @@
           {
             "side": "home",
             "type": "market_move",
-            "direction": "steam",
+            "direction": "drift",
             "strength": 0.471
           },
           {
             "side": "away",
             "type": "market_move",
-            "direction": "drift",
-            "strength": 0.463
+            "direction": "steam",
+            "strength": 1.0
           },
           {
             "side": "away",
@@ -474,13 +468,13 @@
         "Deplacement estime 1899 km, decalage ~1.4h"
       ],
       "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.406,
-        "away_score": 0.094,
-        "home_fade": 0.613,
-        "away_fade": 0.592,
-        "reason": "Signaux opposes: Los Angeles Lakers fade 0.61, Oklahoma City Thunder fade 0.59 -> prudence",
+        "status": "net",
+        "net_side": "home",
+        "home_score": 1.222,
+        "away_score": -1.01,
+        "home_fade": 0.15,
+        "away_fade": 1.062,
+        "reason": "Direction nette: Los Angeles Lakers (+1.22)",
         "detail": [
           {
             "side": "home",
@@ -497,13 +491,13 @@
           {
             "side": "home",
             "type": "market_move",
-            "direction": "drift",
-            "strength": 0.463
+            "direction": "steam",
+            "strength": 1.0
           },
           {
             "side": "away",
             "type": "market_move",
-            "direction": "steam",
+            "direction": "drift",
             "strength": 0.471
           },
           {
