@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-05-12T02:52:21Z",
+  "generated_at": "2026-05-12T02:55:13Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 23,
+    "active_events": 21,
     "expired_sample": 0,
     "by_type": {
       "travel_extreme": 8,
-      "lookahead": 26,
+      "lookahead": 22,
       "back_to_back_travel": 4
     },
     "by_decision": {
-      "abstain": 8,
+      "abstain": 6,
       "lean_home": 12,
       "lean_away": 3
     },
     "lean_home": 12,
     "lean_away": 3,
-    "abstain": 8,
+    "abstain": 6,
     "monitor": 0
   },
   "active": [
@@ -163,11 +163,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 1.252,
+        "home_score": 0.252,
         "away_score": -1.097,
         "home_fade": 0.15,
         "away_fade": 1.15,
-        "reason": "Direction nette: Portland Fire (+1.25)",
+        "reason": "Direction nette: Portland Fire (+0.25)",
         "detail": [
           {
             "side": "home",
@@ -186,64 +186,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 1.0
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401871337",
-      "source_event_ids": [
-        "401871337"
-      ],
-      "kickoff": "2026-05-13T04:00Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "Detroit Pistons",
-      "away": "Cleveland Cavaliers",
-      "match": "Detroit Pistons - Cleveland Cavaliers",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Detroit Pistons 0.15, Cleveland Cavaliers 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
-        "home_fade": 0.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Cleveland Cavaliers (-0.10)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
           }
         ]
       }
@@ -336,12 +278,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "home",
-        "home_score": 1.252,
-        "away_score": -1.097,
+        "net_side": "away",
+        "home_score": -0.098,
+        "away_score": -0.098,
         "home_fade": 0.15,
-        "away_fade": 1.15,
-        "reason": "Direction nette: Colorado Avalanche (+1.25)",
+        "away_fade": 0.15,
+        "reason": "Direction nette: Minnesota Wild (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -354,18 +296,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
           }
         ]
       }
@@ -423,58 +353,6 @@
       }
     },
     {
-      "event_id": "401871338",
-      "source_event_ids": [
-        "401871338"
-      ],
-      "kickoff": "2026-05-15T04:00Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "Cleveland Cavaliers",
-      "away": "Detroit Pistons",
-      "match": "Cleveland Cavaliers - Detroit Pistons",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Cleveland Cavaliers 0.15, Detroit Pistons 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
-        "home_fade": 0.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Detroit Pistons (-0.10)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401871421",
       "source_event_ids": [
         "401871421"
@@ -505,13 +383,13 @@
         "1 match dans les 48h + 1135 km de voyage"
       ],
       "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.833,
-        "away_score": 0.496,
-        "home_fade": 1.15,
+        "status": "net",
+        "net_side": "home",
+        "home_score": 0.167,
+        "away_score": -0.854,
+        "home_fade": 0.15,
         "away_fade": 0.907,
-        "reason": "Signaux opposes: Minnesota Wild fade 1.15, Colorado Avalanche fade 0.91 -> prudence",
+        "reason": "Direction nette: Minnesota Wild (+0.17)",
         "detail": [
           {
             "side": "home",
@@ -524,18 +402,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 1.0
           },
           {
             "side": "away",
@@ -578,18 +444,12 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.635,
-        "away_score": -1.814,
+        "home_score": 0.473,
+        "away_score": -1.351,
         "home_fade": 0.0,
-        "away_fade": 1.814,
-        "reason": "Direction nette: Oklahoma City Thunder (+0.64)",
+        "away_fade": 1.351,
+        "reason": "Direction nette: Oklahoma City Thunder (+0.47)",
         "detail": [
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 0.463
-          },
           {
             "side": "away",
             "type": "travel_extreme",
@@ -638,11 +498,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.219,
-        "away_score": -1.002,
+        "home_score": 0.057,
+        "away_score": -0.539,
         "home_fade": 0.15,
-        "away_fade": 1.055,
-        "reason": "Direction nette: Oklahoma City Thunder (+0.22)",
+        "away_fade": 0.592,
+        "reason": "Direction nette: Oklahoma City Thunder (+0.06)",
         "detail": [
           {
             "side": "home",
@@ -655,12 +515,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 0.463
           },
           {
             "side": "away",
@@ -702,13 +556,13 @@
         "Deplacement estime 1899 km, decalage ~1.4h"
       ],
       "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.406,
-        "away_score": -0.377,
-        "home_fade": 0.613,
+        "status": "net",
+        "net_side": "home",
+        "home_score": 0.057,
+        "away_score": -0.539,
+        "home_fade": 0.15,
         "away_fade": 0.592,
-        "reason": "Signaux opposes: Los Angeles Lakers fade 0.61, Oklahoma City Thunder fade 0.59 -> prudence",
+        "reason": "Direction nette: Los Angeles Lakers (+0.06)",
         "detail": [
           {
             "side": "home",
@@ -721,12 +575,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 0.463
           },
           {
             "side": "away",
@@ -881,24 +729,12 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 1.615,
-        "away_score": -1.757,
+        "home_score": 0.265,
+        "away_score": -0.757,
         "home_fade": 0.0,
-        "away_fade": 1.757,
-        "reason": "Direction nette: Colorado Avalanche (+1.61)",
+        "away_fade": 0.757,
+        "reason": "Direction nette: Colorado Avalanche (+0.26)",
         "detail": [
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
           {
             "side": "away",
             "type": "back_to_back_travel",
@@ -938,11 +774,11 @@
       "global_resolution": {
         "status": "mixed",
         "net_side": null,
-        "home_score": -1.752,
-        "away_score": 0.993,
-        "home_fade": 2.0,
-        "away_fade": 0.707,
-        "reason": "Signaux mitigés: avantage net trop faible (Houston Astros -1.75, Seattle Mariners +0.99)",
+        "home_score": 0.598,
+        "away_score": -1.357,
+        "home_fade": 1.0,
+        "away_fade": 1.707,
+        "reason": "Signaux mitigés: avantage net trop faible (Houston Astros +0.60, Seattle Mariners -1.36)",
         "detail": [
           {
             "side": "home",
@@ -953,13 +789,13 @@
           {
             "side": "home",
             "type": "market_move",
-            "direction": "drift",
+            "direction": "steam",
             "strength": 1.0
           },
           {
             "side": "away",
             "type": "market_move",
-            "direction": "steam",
+            "direction": "drift",
             "strength": 1.0
           },
           {
