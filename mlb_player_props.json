@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-12T23:21:36Z",
+  "generated_at": "2026-05-12T23:26:37Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815305",
-      "kickoff": "2026-05-12T23:15Z",
-      "league": "MLB",
-      "match": "Chicago Cubs at Atlanta Braves",
-      "home": "Atlanta Braves",
-      "away": "Chicago Cubs",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Atlanta Braves",
-          "pitcher": "Grant Holmes",
-          "label": "Grant Holmes moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.5958,
-          "fair_odds": 1.68,
-          "expected_strikeouts": 4.12,
-          "projected_ip": 5.3,
-          "inputs": {
-            "k9": 6.99,
-            "era": 4.34,
-            "whip": 1.31,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Atlanta Braves",
-          "pitcher": "Grant Holmes",
-          "label": "Grant Holmes concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5742,
-          "fair_odds": 1.74,
-          "expected_hr_allowed": 0.854,
-          "projected_ip": 5.3,
-          "inputs": {
-            "hr9": 1.45,
-            "era": 4.34,
-            "whip": 1.31
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Chicago Cubs",
-          "pitcher": "Colin Rea",
-          "label": "Colin Rea moins de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "under",
-          "probability": 0.5866,
-          "fair_odds": 1.7,
-          "expected_strikeouts": 6.08,
-          "projected_ip": 6.6,
-          "inputs": {
-            "k9": 8.29,
-            "era": 4.03,
-            "whip": 1.37,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Chicago Cubs",
-          "pitcher": "Colin Rea",
-          "label": "Colin Rea concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5018,
-          "fair_odds": 1.99,
-          "expected_hr_allowed": 0.697,
-          "projected_ip": 6.6,
-          "inputs": {
-            "hr9": 0.95,
-            "era": 4.03,
-            "whip": 1.37
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815313",
       "kickoff": "2026-05-12T23:40Z",
@@ -706,7 +624,7 @@
       ]
     }
   ],
-  "props": 34,
+  "props": 30,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
