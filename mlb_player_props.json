@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-12T23:11:55Z",
+  "generated_at": "2026-05-12T23:17:52Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815310",
-      "kickoff": "2026-05-12T23:07Z",
-      "league": "MLB",
-      "match": "Tampa Bay Rays at Toronto Blue Jays",
-      "home": "Toronto Blue Jays",
-      "away": "Tampa Bay Rays",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Toronto Blue Jays",
-          "pitcher": "Patrick Corbin",
-          "label": "Patrick Corbin plus de 3,5 strikeouts",
-          "line": 3.5,
-          "pick": "over",
-          "probability": 0.5,
-          "fair_odds": 2.0,
-          "expected_strikeouts": 3.5,
-          "projected_ip": 5.0,
-          "inputs": {
-            "k9": 6.3,
-            "era": 3.6,
-            "whip": 1.27,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Toronto Blue Jays",
-          "pitcher": "Patrick Corbin",
-          "label": "Patrick Corbin ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6065,
-          "fair_odds": 1.65,
-          "expected_hr_allowed": 0.5,
-          "projected_ip": 5.0,
-          "inputs": {
-            "hr9": 0.9,
-            "era": 3.6,
-            "whip": 1.27
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Tampa Bay Rays",
-          "pitcher": "Shane McClanahan",
-          "label": "Shane McClanahan plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.5682,
-          "fair_odds": 1.76,
-          "expected_strikeouts": 4.79,
-          "projected_ip": 4.89,
-          "inputs": {
-            "k9": 8.83,
-            "era": 2.6,
-            "whip": 1.07,
-            "hand": "L"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Tampa Bay Rays",
-          "pitcher": "Shane McClanahan",
-          "label": "Shane McClanahan ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.8684,
-          "fair_odds": 1.15,
-          "expected_hr_allowed": 0.141,
-          "projected_ip": 4.89,
-          "inputs": {
-            "hr9": 0.26,
-            "era": 2.6,
-            "whip": 1.07
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815307",
       "kickoff": "2026-05-12T23:10Z",
@@ -97,17 +15,17 @@
           "market": "pitcher_strikeouts",
           "team": "New York Mets",
           "pitcher": "Freddy Peralta",
-          "label": "Freddy Peralta moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.5341,
-          "fair_odds": 1.87,
-          "expected_strikeouts": 5.35,
-          "projected_ip": 5.39,
+          "label": "Freddy Peralta plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.5779,
+          "fair_odds": 1.73,
+          "expected_strikeouts": 4.84,
+          "projected_ip": 4.8,
           "inputs": {
-            "k9": 8.93,
-            "era": 3.12,
-            "whip": 1.2,
+            "k9": 9.07,
+            "era": 3.09,
+            "whip": 1.21,
             "hand": "R"
           },
           "side": "home"
@@ -118,14 +36,14 @@
           "pitcher": "Freddy Peralta",
           "label": "Freddy Peralta ne concède pas de home run",
           "pick": "no",
-          "probability": 0.6084,
-          "fair_odds": 1.64,
-          "expected_hr_allowed": 0.497,
-          "projected_ip": 5.39,
+          "probability": 0.6458,
+          "fair_odds": 1.55,
+          "expected_hr_allowed": 0.437,
+          "projected_ip": 4.8,
           "inputs": {
-            "hr9": 0.83,
-            "era": 3.12,
-            "whip": 1.2
+            "hr9": 0.82,
+            "era": 3.09,
+            "whip": 1.21
           },
           "side": "home"
         },
@@ -870,7 +788,7 @@
       ]
     }
   ],
-  "props": 42,
+  "props": 38,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"

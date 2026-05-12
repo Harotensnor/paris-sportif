@@ -1,85 +1,27 @@
 {
-  "generated_at": "2026-05-12T23:12:03Z",
+  "generated_at": "2026-05-12T23:18:00Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 13,
+    "active_events": 12,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 14,
       "travel_extreme": 3,
+      "lookahead": 12,
       "back_to_back_travel": 1
     },
     "by_decision": {
-      "abstain": 5,
+      "abstain": 4,
       "lean_home": 5,
       "lean_away": 3
     },
     "lean_home": 5,
     "lean_away": 3,
-    "abstain": 5,
+    "abstain": 4,
     "monitor": 0
   },
   "active": [
-    {
-      "event_id": "401815310",
-      "source_event_ids": [
-        "401815310"
-      ],
-      "kickoff": "2026-05-12T23:07Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Toronto Blue Jays",
-      "away": "Tampa Bay Rays",
-      "match": "Toronto Blue Jays - Tampa Bay Rays",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Toronto Blue Jays 0.15, Tampa Bay Rays 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.698,
-        "away_score": 0.112,
-        "home_fade": 0.75,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Tampa Bay Rays (+0.11)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.6
-          }
-        ]
-      }
-    },
     {
       "event_id": "401871156",
       "source_event_ids": [
@@ -163,11 +105,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.252,
+        "home_score": 0.87,
         "away_score": -1.097,
         "home_fade": 0.15,
         "away_fade": 1.15,
-        "reason": "Direction nette: Portland Fire (+0.25)",
+        "reason": "Direction nette: Portland Fire (+0.87)",
         "detail": [
           {
             "side": "home",
@@ -186,6 +128,12 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 1.0
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.617
           }
         ]
       }
@@ -381,17 +329,29 @@
       "global_resolution": {
         "status": "abstain",
         "net_side": null,
-        "home_score": -0.752,
-        "away_score": -0.357,
+        "home_score": 0.452,
+        "away_score": -0.943,
         "home_fade": 1.0,
-        "away_fade": 0.707,
-        "reason": "Signaux opposes: Houston Astros fade 1.00, Seattle Mariners fade 0.71 -> prudence",
+        "away_fade": 1.293,
+        "reason": "Signaux opposes: Houston Astros fade 1.00, Seattle Mariners fade 1.29 -> prudence",
         "detail": [
           {
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 1.0
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 0.586
           },
           {
             "side": "away",
