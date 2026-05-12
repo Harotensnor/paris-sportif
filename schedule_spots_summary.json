@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-12T13:43:29Z",
+  "generated_at": "2026-05-12T13:50:53Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -163,11 +163,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.252,
+        "home_score": 1.21,
         "away_score": -1.097,
         "home_fade": 0.15,
         "away_fade": 1.15,
-        "reason": "Direction nette: Portland Fire (+0.25)",
+        "reason": "Direction nette: Portland Fire (+1.21)",
         "detail": [
           {
             "side": "home",
@@ -186,6 +186,12 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 1.0
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.958
           }
         ]
       }
@@ -331,10 +337,10 @@
         "status": "mixed",
         "net_side": null,
         "home_score": -1.289,
-        "away_score": 0.458,
+        "away_score": 0.404,
         "home_fade": 1.6,
         "away_fade": 0.888,
-        "reason": "Signaux mitigés: avantage net trop faible (Toronto Blue Jays -1.29, Tampa Bay Rays +0.46)",
+        "reason": "Signaux mitigés: avantage net trop faible (Toronto Blue Jays -1.29, Tampa Bay Rays +0.40)",
         "detail": [
           {
             "side": "home",
@@ -352,7 +358,7 @@
             "side": "away",
             "type": "market_move",
             "direction": "steam",
-            "strength": 0.786
+            "strength": 0.732
           },
           {
             "side": "away",
