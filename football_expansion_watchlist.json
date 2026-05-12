@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-12T21:22:09Z",
+  "generated_at": "2026-05-12T21:26:39Z",
   "source": "data.js bookable feed + sofascore_events source feed",
   "status": "ok",
   "categories": {
@@ -77,17 +77,9 @@
     },
     "J5_football_tier2": {
       "label": "Ligues tier 2",
-      "bookable": 1,
+      "bookable": 0,
       "source": 20,
       "samples": [
-        {
-          "event_id": "401872117",
-          "source": "winamax_exact",
-          "kickoff": "2026-05-12T19:00Z",
-          "match": "US Avellino at Catanzaro",
-          "league": "Serie B",
-          "code": "ita.2"
-        },
         {
           "event_id": "sofa_15345973",
           "source": "sofascore_watch",
@@ -143,9 +135,17 @@
           "match": "Hokkaido Consadole Sapporo vs AC Nagano Parceiro",
           "league": "J2/J3 League, East B",
           "code": "jpn.2"
+        },
+        {
+          "event_id": "sofa_15346051",
+          "source": "sofascore_watch",
+          "kickoff": "2026-05-06T05:00Z",
+          "match": "RB Omiya Ardija vs Iwaki FC",
+          "league": "J2/J3 League, East B",
+          "code": "jpn.2"
         }
       ],
-      "status": "ok"
+      "status": "watch"
     },
     "J6_coupes": {
       "label": "Coupes",
@@ -293,8 +293,8 @@
     }
   },
   "summary": {
-    "bookable_total": 11,
+    "bookable_total": 10,
     "source_total": 141,
-    "ok_categories": 3
+    "ok_categories": 2
   }
 }
