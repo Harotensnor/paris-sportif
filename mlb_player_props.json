@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-12T22:16:44Z",
+  "generated_at": "2026-05-12T22:21:49Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815304",
-      "kickoff": "2026-05-12T22:10Z",
-      "league": "MLB",
-      "match": "Los Angeles Angels at Cleveland Guardians",
-      "home": "Cleveland Guardians",
-      "away": "Los Angeles Angels",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Cleveland Guardians",
-          "pitcher": "Slade Cecconi",
-          "label": "Slade Cecconi plus de 3,5 strikeouts",
-          "line": 3.5,
-          "pick": "over",
-          "probability": 0.5958,
-          "fair_odds": 1.68,
-          "expected_strikeouts": 3.87,
-          "projected_ip": 5.12,
-          "inputs": {
-            "k9": 6.8,
-            "era": 6.15,
-            "whip": 1.59,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Cleveland Guardians",
-          "pitcher": "Slade Cecconi",
-          "label": "Slade Cecconi concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6329,
-          "fair_odds": 1.58,
-          "expected_hr_allowed": 1.002,
-          "projected_ip": 5.12,
-          "inputs": {
-            "hr9": 1.76,
-            "era": 6.15,
-            "whip": 1.59
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Los Angeles Angels",
-          "pitcher": "Walbert Ureña",
-          "label": "Walbert Ureña moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.512,
-          "fair_odds": 1.95,
-          "expected_strikeouts": 5.45,
-          "projected_ip": 5.53,
-          "inputs": {
-            "k9": 8.87,
-            "era": 3.22,
-            "whip": 1.57,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Los Angeles Angels",
-          "pitcher": "Walbert Ureña",
-          "label": "Walbert Ureña ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.7823,
-          "fair_odds": 1.28,
-          "expected_hr_allowed": 0.246,
-          "projected_ip": 5.53,
-          "inputs": {
-            "hr9": 0.4,
-            "era": 3.22,
-            "whip": 1.57
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815308",
       "kickoff": "2026-05-12T22:35Z",
@@ -1280,7 +1198,7 @@
       ]
     }
   ],
-  "props": 62,
+  "props": 58,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
