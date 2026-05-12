@@ -1,26 +1,26 @@
 {
-  "generated_at": "2026-05-12T19:52:45Z",
+  "generated_at": "2026-05-12T19:57:42Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 81,
-    "actionable": 23,
+    "active_events": 82,
+    "actionable": 25,
     "watch": 12,
-    "risk": 46,
+    "risk": 45,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 11,
       "travel_extreme": 5,
-      "market_uncertain": 47,
-      "market_move": 51,
+      "market_uncertain": 46,
+      "market_move": 52,
       "signal_conflict": 5,
       "back_to_back_travel": 1
     },
     "by_quality": {
-      "actionable": 23,
+      "actionable": 25,
       "watch": 12,
-      "risk": 46
+      "risk": 45
     }
   },
   "active_actionable": [
@@ -130,7 +130,7 @@
       "team": "Houston Astros",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 15-9"
+      "context": "Absences severes 14-9"
     },
     {
       "event_id": "401871427",
@@ -238,7 +238,7 @@
       "team": null,
       "side": "draw",
       "strength": 1.0,
-      "context": "Cote draw: 6.25 -> 9.50 (-52.0%)"
+      "context": "Cote draw: 6.25 -> 9.00 (-44.0%)"
     },
     {
       "event_id": "747023",
@@ -419,6 +419,42 @@
       "side": "away",
       "strength": 0.775,
       "context": "Cote away: 4.30 -> 4.90 (-14.0%)"
+    },
+    {
+      "event_id": "737148",
+      "date": "2026-05-17T18:00Z",
+      "sport": "football",
+      "league_code": "ita.1",
+      "league_name": "Serie A",
+      "home": "AS Roma",
+      "away": "Lazio",
+      "match": "AS Roma - Lazio",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "away",
+      "strength": 0.694,
+      "context": "Cote away: 4.80 -> 5.40 (-12.5%)"
+    },
+    {
+      "event_id": "748507",
+      "date": "2026-05-17T17:00Z",
+      "sport": "football",
+      "league_code": "esp.1",
+      "league_name": "La Liga",
+      "home": "Elche",
+      "away": "Getafe",
+      "match": "Elche - Getafe",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "away",
+      "strength": 0.67,
+      "context": "Cote away: 2.90 -> 3.25 (-12.1%)"
     },
     {
       "event_id": "401867717",
@@ -1449,24 +1485,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.3%"
-    },
-    {
-      "event_id": "748507",
-      "date": "2026-05-17T17:00Z",
-      "sport": "football",
-      "league_code": "esp.1",
-      "league_name": "La Liga",
-      "home": "Elche",
-      "away": "Getafe",
-      "match": "Elche - Getafe",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "home et away montent ensemble (+10.0% / +6.9%)"
     },
     {
       "event_id": "750218",
