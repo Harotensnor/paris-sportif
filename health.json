@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-05-12T23:19:52Z",
-  "calculated_at": "2026-05-12T23:19:52Z",
+  "generated_at": "2026-05-12T23:21:48Z",
+  "calculated_at": "2026-05-12T23:21:48Z",
   "source_of_truth": "data.js",
   "data_age_min": 1,
   "data_file_age_min": 0,
@@ -16,7 +16,7 @@
       "matches_detailed": 723,
       "details_ratio_pct": 100.0,
       "last_run_delta": 0,
-      "last_run_limit": 1000
+      "last_run_limit": 400
     },
     "injuries_soccer": {
       "age_min": 1,
@@ -327,14 +327,14 @@
     "detected_angles": {
       "age_min": 0,
       "events": 90,
-      "angles": 130,
+      "angles": 137,
       "by_type": {
-        "injury_imbalance": 10,
+        "injury_imbalance": 9,
         "travel_extreme": 3,
         "signal_conflict": 3,
         "lookahead": 12,
-        "market_move": 59,
-        "market_uncertain": 42,
+        "market_move": 66,
+        "market_uncertain": 43,
         "back_to_back_travel": 1
       }
     },
@@ -348,30 +348,30 @@
     },
     "rare_signals": {
       "age_min": 0,
-      "signals": 113,
+      "signals": 121,
       "by_type": {
         "injury_imbalance": 6,
         "travel_extreme": 3,
         "signal_conflict": 3,
-        "market_move": 58,
-        "market_uncertain": 42,
+        "market_move": 65,
+        "market_uncertain": 43,
         "back_to_back_travel": 1
       }
     },
     "rare_signal_summary": {
       "age_min": 0,
-      "active": 82,
+      "active": 83,
       "actionable": 28,
-      "watch": 13,
+      "watch": 14,
       "risk": 41,
       "status": "ok"
     },
     "timing_edges": {
       "age_min": 0,
-      "events": 150,
-      "bet_now": 114,
-      "wait": 34,
-      "price_shortening": 2
+      "events": 147,
+      "bet_now": 106,
+      "wait": 35,
+      "price_shortening": 6
     },
     "injuries_multisport": {
       "age_min": 1,
@@ -429,8 +429,8 @@
     },
     "mlb_player_props": {
       "age_min": 0,
-      "events": 10,
-      "props": 38,
+      "events": 9,
+      "props": 34,
       "markets": 2,
       "status": "ok"
     },
@@ -1054,7 +1054,7 @@
   ],
   "overall": "warning",
   "quality_checks": {
-    "data_generated_at": "2026-05-12T23:18:51.789210Z",
+    "data_generated_at": "2026-05-12T23:20:45.957927Z",
     "truth_scope": "all_events",
     "all_winamax_available": 173,
     "all_winamax_exact": 170,
@@ -1071,7 +1071,7 @@
     "winamax_detail_gap_to_target": 0,
     "winamax_detail_fetch_cap_reco": 90,
     "winamax_detail_status": "ok",
-    "actionable_external_odds": 0,
+    "actionable_external_odds": 16,
     "football_invalid_form": 0,
     "events_with_xg": 64,
     "winamax_coverage": {
@@ -1133,7 +1133,7 @@
   "data_truth": {
     "source_of_truth": "data.js",
     "scope": "all_events",
-    "data_generated_at": "2026-05-12T23:18:51.789210Z",
+    "data_generated_at": "2026-05-12T23:20:45.957927Z",
     "winamax_available": 173,
     "winamax_exact": 170,
     "winamax_exact_ratio": 0.9827,
@@ -1153,7 +1153,7 @@
     "anomalies_emitted": 3
   },
   "source_health": {
-    "generated_at": "2026-05-12T23:19:52Z",
+    "generated_at": "2026-05-12T23:21:48Z",
     "sources_total": 11,
     "sources_ok": 8,
     "sources_warning": 3,
@@ -1253,7 +1253,7 @@
   },
   "observability": {
     "pipeline_traces": {
-      "generated_at": "2026-05-12T23:19:52Z",
+      "generated_at": "2026-05-12T23:21:48Z",
       "runs_observed": 99,
       "by_status": {
         "warning": 65,
@@ -1265,13 +1265,13 @@
           "runs": 99,
           "errors": 1,
           "last_status": "ok",
-          "max_duration_ms": 1304
+          "max_duration_ms": 1265
         }
       }
     }
   },
   "data_lineage": {
-    "generated_at": "2026-05-12T23:19:52Z",
+    "generated_at": "2026-05-12T23:21:48Z",
     "status": "ok",
     "events": 173,
     "events_missing_inline_lineage": 0,
@@ -1279,8 +1279,8 @@
     "source_counts": {
       "espn": 173,
       "winamax": 173,
-      "h2h": 142,
       "weather": 132,
+      "h2h": 130,
       "clubelo": 82,
       "xg": 72,
       "sofascore_referees": 49,

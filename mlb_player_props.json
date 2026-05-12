@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-12T23:19:40Z",
+  "generated_at": "2026-05-12T23:21:36Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815307",
-      "kickoff": "2026-05-12T23:10Z",
-      "league": "MLB",
-      "match": "Detroit Tigers at New York Mets",
-      "home": "New York Mets",
-      "away": "Detroit Tigers",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "New York Mets",
-          "pitcher": "Freddy Peralta",
-          "label": "Freddy Peralta plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.5779,
-          "fair_odds": 1.73,
-          "expected_strikeouts": 4.84,
-          "projected_ip": 4.8,
-          "inputs": {
-            "k9": 9.07,
-            "era": 3.09,
-            "whip": 1.21,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "New York Mets",
-          "pitcher": "Freddy Peralta",
-          "label": "Freddy Peralta ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6458,
-          "fair_odds": 1.55,
-          "expected_hr_allowed": 0.437,
-          "projected_ip": 4.8,
-          "inputs": {
-            "hr9": 0.82,
-            "era": 3.09,
-            "whip": 1.21
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Detroit Tigers",
-          "pitcher": "Jack Flaherty",
-          "label": "Jack Flaherty moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.5554,
-          "fair_odds": 1.8,
-          "expected_strikeouts": 5.25,
-          "projected_ip": 4.25,
-          "inputs": {
-            "k9": 11.12,
-            "era": 5.56,
-            "whip": 1.65,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Detroit Tigers",
-          "pitcher": "Jack Flaherty",
-          "label": "Jack Flaherty ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5362,
-          "fair_odds": 1.87,
-          "expected_hr_allowed": 0.623,
-          "projected_ip": 4.25,
-          "inputs": {
-            "hr9": 1.32,
-            "era": 5.56,
-            "whip": 1.65
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815305",
       "kickoff": "2026-05-12T23:15Z",
@@ -788,7 +706,7 @@
       ]
     }
   ],
-  "props": 38,
+  "props": 34,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
