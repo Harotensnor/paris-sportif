@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-12T19:42:10Z",
+  "generated_at": "2026-05-12T19:47:12Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -339,6 +339,42 @@
       "home": "Boston Red Sox",
       "away": "Philadelphia Phillies",
       "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Boston Red Sox",
+          "pitcher": "Jovani Morán",
+          "label": "Jovani Morán moins de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "under",
+          "probability": 0.5835,
+          "fair_odds": 1.71,
+          "expected_strikeouts": 6.09,
+          "projected_ip": 6.6,
+          "inputs": {
+            "k9": 8.31,
+            "era": 2.91,
+            "whip": 1.25,
+            "hand": "L"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Boston Red Sox",
+          "pitcher": "Jovani Morán",
+          "label": "Jovani Morán concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.6002,
+          "fair_odds": 1.67,
+          "expected_hr_allowed": 0.917,
+          "projected_ip": 6.6,
+          "inputs": {
+            "hr9": 1.25,
+            "era": 2.91,
+            "whip": 1.25
+          },
+          "side": "home"
+        },
         {
           "market": "pitcher_strikeouts",
           "team": "Philadelphia Phillies",
@@ -1244,7 +1280,7 @@
       ]
     }
   ],
-  "props": 60,
+  "props": 62,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
