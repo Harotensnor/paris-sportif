@@ -1,22 +1,22 @@
 {
-  "generated_at": "2026-05-12T05:27:12Z",
+  "generated_at": "2026-05-12T05:33:01Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 18,
+    "active_events": 15,
     "expired_sample": 0,
     "by_type": {
-      "travel_extreme": 8,
-      "lookahead": 18,
-      "back_to_back_travel": 2
+      "travel_extreme": 5,
+      "lookahead": 14,
+      "back_to_back_travel": 1
     },
     "by_decision": {
       "abstain": 5,
-      "lean_home": 10,
+      "lean_home": 7,
       "lean_away": 3
     },
-    "lean_home": 10,
+    "lean_home": 7,
     "lean_away": 3,
     "abstain": 5,
     "monitor": 0
@@ -163,11 +163,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.252,
+        "home_score": 1.107,
         "away_score": -1.097,
         "home_fade": 0.15,
         "away_fade": 1.15,
-        "reason": "Direction nette: Portland Fire (+0.25)",
+        "reason": "Direction nette: Portland Fire (+1.11)",
         "detail": [
           {
             "side": "home",
@@ -186,6 +186,12 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 1.0
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.855
           }
         ]
       }
@@ -296,215 +302,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401871332",
-      "source_event_ids": [
-        "401871332"
-      ],
-      "kickoff": "2026-05-18T04:00Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "Oklahoma City Thunder",
-      "away": "Los Angeles Lakers",
-      "match": "Oklahoma City Thunder - Los Angeles Lakers",
-      "decision": "lean_home",
-      "net_team": "Oklahoma City Thunder",
-      "reason": "Los Angeles Lakers plus penalise par calendrier/voyage (1.35 vs 0.00)",
-      "pressure_score": 1.351,
-      "home_fade": 0.0,
-      "away_fade": 1.351,
-      "travel_score": 1.351,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "travel_extreme": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "Deplacement estime 1899 km, decalage ~1.4h",
-        "1 match dans les 48h + 1899 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 1.529,
-        "away_score": -2.351,
-        "home_fade": 0.0,
-        "away_fade": 2.351,
-        "reason": "Direction nette: Oklahoma City Thunder (+1.53)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.706
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.442
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.91
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401871330",
-      "source_event_ids": [
-        "401871330"
-      ],
-      "kickoff": "2026-05-13T04:00Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "Oklahoma City Thunder",
-      "away": "Los Angeles Lakers",
-      "match": "Oklahoma City Thunder - Los Angeles Lakers",
-      "decision": "lean_home",
-      "net_team": "Oklahoma City Thunder",
-      "reason": "Los Angeles Lakers plus penalise par calendrier/voyage (0.59 vs 0.15)",
-      "pressure_score": 1.108,
-      "home_fade": 0.15,
-      "away_fade": 0.592,
-      "travel_score": 0.442,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2,
-        "travel_extreme": 1
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours",
-        "Deplacement estime 1899 km, decalage ~1.4h"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 1.113,
-        "away_score": -1.539,
-        "home_fade": 0.15,
-        "away_fade": 1.592,
-        "reason": "Direction nette: Oklahoma City Thunder (+1.11)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.706
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.442
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401871331",
-      "source_event_ids": [
-        "401871331"
-      ],
-      "kickoff": "2026-05-16T04:00Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "Los Angeles Lakers",
-      "away": "Oklahoma City Thunder",
-      "match": "Los Angeles Lakers - Oklahoma City Thunder",
-      "decision": "lean_home",
-      "net_team": "Los Angeles Lakers",
-      "reason": "Oklahoma City Thunder plus penalise par calendrier/voyage (0.59 vs 0.15)",
-      "pressure_score": 1.108,
-      "home_fade": 0.15,
-      "away_fade": 0.592,
-      "travel_score": 0.442,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2,
-        "travel_extreme": 1
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours",
-        "Deplacement estime 1899 km, decalage ~1.4h"
-      ],
-      "global_resolution": {
-        "status": "mixed",
-        "net_side": null,
-        "home_score": -0.943,
-        "away_score": 0.517,
-        "home_fade": 1.15,
-        "away_fade": 0.592,
-        "reason": "Signaux mitigés: avantage net trop faible (Los Angeles Lakers -0.94, Oklahoma City Thunder +0.52)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.706
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.442
           }
         ]
       }
