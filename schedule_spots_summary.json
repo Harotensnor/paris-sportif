@@ -1,78 +1,23 @@
 {
-  "generated_at": "2026-05-13T19:09:27Z",
+  "generated_at": "2026-05-13T19:12:57Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 8,
+    "active_events": 4,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 5,
       "travel_extreme": 4
     },
     "by_decision": {
-      "abstain": 1,
-      "lean_home": 5,
-      "lean_away": 2
+      "lean_home": 4
     },
-    "lean_home": 5,
-    "lean_away": 2,
-    "abstain": 1,
+    "lean_home": 4,
+    "lean_away": 0,
+    "abstain": 0,
     "monitor": 0
   },
   "active": [
-    {
-      "event_id": "401867717",
-      "source_event_ids": [
-        "401867717"
-      ],
-      "kickoff": "2026-05-13T19:00Z",
-      "sport": "football",
-      "league_code": "scottishpremiership",
-      "league_name": "Scottish Premiership",
-      "home": "Motherwell",
-      "away": "Celtic",
-      "match": "Motherwell - Celtic",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Motherwell 0.15, Celtic 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
-        "home_fade": 0.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Celtic (-0.10)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          }
-        ]
-      }
-    },
     {
       "event_id": "401815331",
       "source_event_ids": [
@@ -152,20 +97,14 @@
         "Deplacement estime 2789 km, decalage ~1.9h"
       ],
       "global_resolution": {
-        "status": "mixed",
-        "net_side": null,
+        "status": "net",
+        "net_side": "home",
         "home_score": 0.227,
-        "away_score": -0.066,
+        "away_score": -0.649,
         "home_fade": 0.0,
         "away_fade": 0.649,
-        "reason": "Signaux mitigés: avantage net trop faible (Milwaukee Brewers +0.23, San Diego Padres -0.07)",
+        "reason": "Direction nette: Milwaukee Brewers (+0.23)",
         "detail": [
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.582
-          },
           {
             "side": "away",
             "type": "travel_extreme",
@@ -254,13 +193,13 @@
         "Deplacement estime 2120 km, decalage ~1.7h"
       ],
       "global_resolution": {
-        "status": "mixed",
-        "net_side": null,
+        "status": "net",
+        "net_side": "home",
         "home_score": 0.313,
-        "away_score": -0.278,
+        "away_score": -0.893,
         "home_fade": 0.0,
         "away_fade": 0.893,
-        "reason": "Signaux mitigés: avantage net trop faible (Pittsburgh Pirates +0.31, Colorado Rockies -0.28)",
+        "reason": "Direction nette: Pittsburgh Pirates (+0.31)",
         "detail": [
           {
             "side": "away",
@@ -270,150 +209,9 @@
           },
           {
             "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.615
-          },
-          {
-            "side": "away",
             "type": "travel_extreme",
             "direction": "fade",
             "strength": 0.493
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "740902",
-      "source_event_ids": [
-        "740902"
-      ],
-      "kickoff": "2026-05-13T19:00Z",
-      "sport": "football",
-      "league_code": "eng.1",
-      "league_name": "Premier League",
-      "home": "Manchester City",
-      "away": "Crystal Palace",
-      "match": "Manchester City - Crystal Palace",
-      "decision": "lean_away",
-      "net_team": "Crystal Palace",
-      "reason": "Manchester City plus penalise par calendrier/voyage (0.15 vs 0.00)",
-      "pressure_score": 0.333,
-      "home_fade": 0.15,
-      "away_fade": 0.0,
-      "travel_score": 0,
-      "lookahead_score": 0.333,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 1
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.15,
-        "away_score": 0.052,
-        "home_fade": 0.15,
-        "away_fade": 0.0,
-        "reason": "Direction nette: Crystal Palace (+0.05)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401867716",
-      "source_event_ids": [
-        "401867716"
-      ],
-      "kickoff": "2026-05-13T19:00Z",
-      "sport": "football",
-      "league_code": "scottishpremiership",
-      "league_name": "Scottish Premiership",
-      "home": "Heart of Midlothian",
-      "away": "Falkirk",
-      "match": "Heart of Midlothian - Falkirk",
-      "decision": "lean_away",
-      "net_team": "Falkirk",
-      "reason": "Heart of Midlothian plus penalise par calendrier/voyage (0.15 vs 0.00)",
-      "pressure_score": 0.333,
-      "home_fade": 0.15,
-      "away_fade": 0.0,
-      "travel_score": 0,
-      "lookahead_score": 0.333,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 1
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.15,
-        "away_score": 0.052,
-        "home_fade": 0.15,
-        "away_fade": 0.0,
-        "reason": "Direction nette: Falkirk (+0.05)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401867718",
-      "source_event_ids": [
-        "401867718"
-      ],
-      "kickoff": "2026-05-13T19:00Z",
-      "sport": "football",
-      "league_code": "scottishpremiership",
-      "league_name": "Scottish Premiership",
-      "home": "Rangers",
-      "away": "Hibernian",
-      "match": "Rangers - Hibernian",
-      "decision": "lean_home",
-      "net_team": "Rangers",
-      "reason": "Hibernian plus penalise par calendrier/voyage (0.15 vs 0.00)",
-      "pressure_score": 0.333,
-      "home_fade": 0.0,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.333,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 1
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.052,
-        "away_score": -0.15,
-        "home_fade": 0.0,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Rangers (+0.05)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
           }
         ]
       }
