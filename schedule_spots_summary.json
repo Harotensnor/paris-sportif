@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-13T00:15:32Z",
+  "generated_at": "2026-05-13T00:18:55Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -51,12 +51,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
+        "net_side": "home",
+        "home_score": 0.748,
         "away_score": -0.098,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Celtic (-0.10)",
+        "reason": "Direction nette: Motherwell (+0.75)",
         "detail": [
           {
             "side": "home",
@@ -69,6 +69,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.845
           }
         ]
       }
@@ -105,10 +111,10 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.098,
-        "away_score": -0.098,
+        "away_score": 0.399,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: San Antonio Spurs (-0.10)",
+        "reason": "Direction nette: San Antonio Spurs (+0.40)",
         "detail": [
           {
             "side": "home",
@@ -121,6 +127,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.497
           }
         ]
       }
@@ -257,12 +269,18 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.227,
+        "home_score": 0.91,
         "away_score": -0.649,
         "home_fade": 0.0,
         "away_fade": 0.649,
-        "reason": "Direction nette: Milwaukee Brewers (+0.23)",
+        "reason": "Direction nette: Milwaukee Brewers (+0.91)",
         "detail": [
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.683
+          },
           {
             "side": "away",
             "type": "travel_extreme",
@@ -300,13 +318,13 @@
         "Deplacement estime 2434 km, decalage ~0.9h"
       ],
       "global_resolution": {
-        "status": "mixed",
-        "net_side": null,
-        "home_score": -0.719,
-        "away_score": 0.276,
-        "home_fade": 0.917,
+        "status": "net",
+        "net_side": "home",
+        "home_score": 0.67,
+        "away_score": -0.426,
+        "home_fade": 0.4,
         "away_fade": 0.566,
-        "reason": "Signaux mitigés: avantage net trop faible (Minnesota Twins -0.72, Miami Marlins +0.28)",
+        "reason": "Direction nette: Minnesota Twins (+0.67)",
         "detail": [
           {
             "side": "home",
@@ -317,14 +335,8 @@
           {
             "side": "home",
             "type": "market_move",
-            "direction": "drift",
-            "strength": 0.517
-          },
-          {
-            "side": "away",
-            "type": "market_move",
             "direction": "steam",
-            "strength": 0.521
+            "strength": 0.871
           },
           {
             "side": "away",
@@ -365,11 +377,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.626,
-        "away_score": -1.789,
+        "home_score": 1.663,
+        "away_score": -1.893,
         "home_fade": 0.0,
-        "away_fade": 1.789,
-        "reason": "Direction nette: Pittsburgh Pirates (+0.63)",
+        "away_fade": 1.893,
+        "reason": "Direction nette: Pittsburgh Pirates (+1.66)",
         "detail": [
           {
             "side": "away",
@@ -378,10 +390,16 @@
             "strength": 0.4
           },
           {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
+          },
+          {
             "side": "away",
             "type": "market_move",
             "direction": "drift",
-            "strength": 0.896
+            "strength": 1.0
           },
           {
             "side": "away",
@@ -423,16 +441,22 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.15,
-        "away_score": 0.052,
+        "away_score": 0.747,
         "home_fade": 0.15,
         "away_fade": 0.0,
-        "reason": "Direction nette: Crystal Palace (+0.05)",
+        "reason": "Direction nette: Crystal Palace (+0.75)",
         "detail": [
           {
             "side": "home",
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.694
           }
         ]
       }
@@ -468,16 +492,22 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.15,
-        "away_score": 0.052,
+        "away_score": 1.052,
         "home_fade": 0.15,
         "away_fade": 0.0,
-        "reason": "Direction nette: Falkirk (+0.05)",
+        "reason": "Direction nette: Falkirk (+1.05)",
         "detail": [
           {
             "side": "home",
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
           }
         ]
       }
@@ -511,18 +541,24 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "home",
+        "net_side": "away",
         "home_score": 0.052,
-        "away_score": -0.15,
+        "away_score": 0.432,
         "home_fade": 0.0,
         "away_fade": 0.15,
-        "reason": "Direction nette: Rangers (+0.05)",
+        "reason": "Direction nette: Hibernian (+0.43)",
         "detail": [
           {
             "side": "away",
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.582
           }
         ]
       }
