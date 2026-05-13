@@ -1,6 +1,6 @@
 # Backtest ROI — VRAI modèle (v2)
 
-Généré : 2026-05-12T06:30:43Z
+Généré : 2026-05-13T06:41:12Z
 
 Statut : skipped
 
