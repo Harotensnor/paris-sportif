@@ -1,26 +1,26 @@
 {
-  "generated_at": "2026-05-13T21:55:33Z",
+  "generated_at": "2026-05-13T21:57:44Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 77,
-    "actionable": 26,
-    "watch": 4,
-    "risk": 47,
+    "active_events": 75,
+    "actionable": 22,
+    "watch": 7,
+    "risk": 46,
     "expired_sample": 0,
     "by_type": {
       "travel_extreme": 11,
-      "market_move": 13,
       "injury_imbalance": 16,
       "back_to_back_travel": 13,
-      "signal_conflict": 5,
-      "market_uncertain": 46
+      "signal_conflict": 3,
+      "market_uncertain": 45,
+      "market_move": 2
     },
     "by_quality": {
-      "watch": 4,
-      "actionable": 26,
-      "risk": 47
+      "watch": 7,
+      "actionable": 22,
+      "risk": 46
     }
   },
   "active_actionable": [
@@ -41,42 +41,6 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 10-3"
-    },
-    {
-      "event_id": "401815320",
-      "date": "2026-05-13T23:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Atlanta Braves",
-      "away": "Chicago Cubs",
-      "match": "Atlanta Braves - Chicago Cubs",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 2.08 -> 1.56 (+25.0%)"
-    },
-    {
-      "event_id": "401871420",
-      "date": "2026-05-14T00:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Colorado Avalanche",
-      "away": "Minnesota Wild",
-      "match": "Colorado Avalanche - Minnesota Wild",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 1.44 -> 1.72 (-19.9%)"
     },
     {
       "event_id": "401815331",
@@ -187,24 +151,6 @@
       "context": "2 match dans les 48h + 1998 km de voyage"
     },
     {
-      "event_id": "401815322",
-      "date": "2026-05-13T23:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "New York Mets",
-      "away": "Detroit Tigers",
-      "match": "New York Mets - Detroit Tigers",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "home",
-      "strength": 0.997,
-      "context": "Cote home: 1.88 -> 1.54 (+18.0%)"
-    },
-    {
       "event_id": "401815335",
       "date": "2026-05-14T16:35Z",
       "sport": "baseball",
@@ -257,24 +203,6 @@
       "side": "away",
       "strength": 0.888,
       "context": "1 match dans les 48h + 1789 km de voyage"
-    },
-    {
-      "event_id": "401856905",
-      "date": "2026-05-14T00:00Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Connecticut Sun",
-      "away": "Las Vegas Aces",
-      "match": "Connecticut Sun - Las Vegas Aces",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "home",
-      "strength": 0.868,
-      "context": "Cote home: 8.00 -> 6.75 (+15.6%)"
     },
     {
       "event_id": "401815327",
@@ -421,6 +349,24 @@
       "context": "Absences severes 8-12"
     },
     {
+      "event_id": "401871420",
+      "date": "2026-05-14T00:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Colorado Avalanche",
+      "away": "Minnesota Wild",
+      "match": "Colorado Avalanche - Minnesota Wild",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Minnesota Wild",
+      "side": "away",
+      "strength": 0.757,
+      "context": "1 match dans les 48h + 1135 km de voyage"
+    },
+    {
       "event_id": "401871421",
       "date": "2026-05-16T00:00Z",
       "sport": "hockey",
@@ -473,7 +419,9 @@
       "side": "away",
       "strength": 0.718,
       "context": "1 match dans les 48h + 938 km de voyage"
-    },
+    }
+  ],
+  "active_watch": [
     {
       "event_id": "401815330",
       "date": "2026-05-13T23:40Z",
@@ -483,17 +431,33 @@
       "home": "Milwaukee Brewers",
       "away": "San Diego Padres",
       "match": "Milwaukee Brewers - San Diego Padres",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "travel_extreme",
+      "direction": "fade",
+      "team": "San Diego Padres",
       "side": "away",
-      "strength": 0.689,
-      "context": "Cote away: 2.34 -> 2.05 (+12.4%)"
-    }
-  ],
-  "active_watch": [
+      "strength": 0.649,
+      "context": "Deplacement estime 2789 km, decalage ~1.9h"
+    },
+    {
+      "event_id": "401856905",
+      "date": "2026-05-14T00:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Connecticut Sun",
+      "away": "Las Vegas Aces",
+      "match": "Connecticut Sun - Las Vegas Aces",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Connecticut Sun",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 5-2"
+    },
     {
       "event_id": "401856910",
       "date": "2026-05-15T23:30Z",
@@ -513,40 +477,58 @@
       "context": "Absences severes 5-2"
     },
     {
-      "event_id": "401872570",
-      "date": "2026-05-14T02:00Z",
-      "sport": "football",
-      "league_code": "ligamx",
-      "league_name": "Liga MX",
-      "home": "Cruz Azul",
-      "away": "Guadalajara",
-      "match": "Cruz Azul - Guadalajara",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.589,
-      "context": "Cote away: 3.30 -> 2.95 (+10.6%)"
-    },
-    {
-      "event_id": "401815326",
-      "date": "2026-05-13T22:40Z",
+      "event_id": "401815329",
+      "date": "2026-05-13T23:40Z",
       "sport": "baseball",
       "league_code": "mlb",
       "league_name": "MLB",
-      "home": "Cincinnati Reds",
-      "away": "Washington Nationals",
-      "match": "Cincinnati Reds - Washington Nationals",
+      "home": "Minnesota Twins",
+      "away": "Miami Marlins",
+      "match": "Minnesota Twins - Miami Marlins",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "travel_extreme",
+      "direction": "fade",
+      "team": "Miami Marlins",
+      "side": "away",
+      "strength": 0.566,
+      "context": "Deplacement estime 2434 km, decalage ~0.9h"
+    },
+    {
+      "event_id": "401867719",
+      "date": "2026-05-16T11:30Z",
+      "sport": "football",
+      "league_code": "scottishpremiership",
+      "league_name": "Scottish Premiership",
+      "home": "Celtic",
+      "away": "Heart of Midlothian",
+      "match": "Celtic - Heart of Midlothian",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "away",
+      "strength": 0.556,
+      "context": "Cote away: 4.00 -> 4.40 (-10.0%)"
+    },
+    {
+      "event_id": "401867720",
+      "date": "2026-05-16T11:30Z",
+      "sport": "football",
+      "league_code": "scottishpremiership",
+      "league_name": "Scottish Premiership",
+      "home": "Falkirk",
+      "away": "Rangers",
+      "match": "Falkirk - Rangers",
       "quality": "watch",
       "quality_reason": "Signal rare present mais intensite moyenne",
       "type": "market_move",
       "direction": "steam",
       "team": null,
-      "side": "away",
-      "strength": 0.515,
-      "context": "Cote away: 2.48 -> 2.25 (+9.3%)"
+      "side": "home",
+      "strength": 0.499,
+      "context": "Cote home: 3.90 -> 3.55 (+9.0%)"
     },
     {
       "event_id": "401815321",
@@ -568,24 +550,6 @@
     }
   ],
   "active_risk": [
-    {
-      "event_id": "401815329",
-      "date": "2026-05-13T23:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Minnesota Twins",
-      "away": "Miami Marlins",
-      "match": "Minnesota Twins - Miami Marlins",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "signal_conflict",
-      "direction": "mixed",
-      "team": null,
-      "side": null,
-      "strength": 1.0,
-      "context": "Signaux mitigés: avantage net trop faible (Minnesota Twins +0.89, Miami Marlins -1.19)"
-    },
     {
       "event_id": "401859392",
       "date": "2026-05-16T07:00Z",
