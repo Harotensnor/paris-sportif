@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-05-13T23:02:52Z",
+  "generated_at": "2026-05-13T23:47:30Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 37,
+    "active_events": 34,
     "expired_sample": 0,
     "by_type": {
-      "back_to_back_travel": 16,
-      "lookahead": 48,
+      "lookahead": 44,
       "travel_extreme": 10,
+      "back_to_back_travel": 14,
       "schedule_congestion": 22
     },
     "by_decision": {
-      "abstain": 17,
-      "lean_home": 20
+      "abstain": 16,
+      "lean_home": 18
     },
-    "lean_home": 20,
+    "lean_home": 18,
     "lean_away": 0,
-    "abstain": 17,
+    "abstain": 16,
     "monitor": 0
   },
   "active": [
@@ -186,58 +186,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.4
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815322",
-      "source_event_ids": [
-        "401815322"
-      ],
-      "kickoff": "2026-05-13T23:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "New York Mets",
-      "away": "Detroit Tigers",
-      "match": "New York Mets - Detroit Tigers",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: New York Mets 0.15, Detroit Tigers 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
-        "home_fade": 0.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Detroit Tigers (-0.10)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
           }
         ]
       }
@@ -2042,117 +1990,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.8
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815320",
-      "source_event_ids": [
-        "401815320"
-      ],
-      "kickoff": "2026-05-13T23:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Atlanta Braves",
-      "away": "Chicago Cubs",
-      "match": "Atlanta Braves - Chicago Cubs",
-      "decision": "lean_home",
-      "net_team": "Atlanta Braves",
-      "reason": "Chicago Cubs plus penalise par calendrier/voyage (0.87 vs 0.15)",
-      "pressure_score": 1.384,
-      "home_fade": 0.15,
-      "away_fade": 0.868,
-      "travel_score": 0.718,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours",
-        "1 match dans les 48h + 938 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.154,
-        "away_score": -0.815,
-        "home_fade": 0.15,
-        "away_fade": 0.868,
-        "reason": "Direction nette: Atlanta Braves (+0.15)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.718
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815325",
-      "source_event_ids": [
-        "401815325"
-      ],
-      "kickoff": "2026-05-13T23:07Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Toronto Blue Jays",
-      "away": "Tampa Bay Rays",
-      "match": "Toronto Blue Jays - Tampa Bay Rays",
-      "decision": "lean_home",
-      "net_team": "Toronto Blue Jays",
-      "reason": "Tampa Bay Rays plus penalise par calendrier/voyage (0.97 vs 0.00)",
-      "pressure_score": 0.968,
-      "home_fade": 0.0,
-      "away_fade": 0.968,
-      "travel_score": 0.968,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "2 match dans les 48h + 1789 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.261,
-        "away_score": -0.758,
-        "home_fade": 0.6,
-        "away_fade": 0.968,
-        "reason": "Direction nette: Toronto Blue Jays (-0.26)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.968
           }
         ]
       }
