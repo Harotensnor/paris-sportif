@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-13T16:13:03Z",
+  "generated_at": "2026-05-13T16:15:13Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -103,17 +103,17 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.546,
-        "away_score": -1.561,
+        "home_score": 0.616,
+        "away_score": -1.761,
         "home_fade": 0.0,
-        "away_fade": 1.561,
-        "reason": "Direction nette: Cleveland Guardians (+0.55)",
+        "away_fade": 1.761,
+        "reason": "Direction nette: Cleveland Guardians (+0.62)",
         "detail": [
           {
             "side": "away",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.8
+            "strength": 1.0
           },
           {
             "side": "away",
@@ -353,16 +353,22 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.15,
-        "away_score": 0.052,
+        "away_score": 0.978,
         "home_fade": 0.15,
         "away_fade": 0.0,
-        "reason": "Direction nette: Crystal Palace (+0.05)",
+        "reason": "Direction nette: Crystal Palace (+0.98)",
         "detail": [
           {
             "side": "home",
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.926
           }
         ]
       }
