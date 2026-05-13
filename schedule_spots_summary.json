@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-13T07:33:40Z",
+  "generated_at": "2026-05-13T07:36:48Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -51,12 +51,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "home",
-        "home_score": 0.627,
+        "net_side": "away",
+        "home_score": -0.098,
         "away_score": -0.098,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Motherwell (+0.63)",
+        "reason": "Direction nette: Celtic (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -69,12 +69,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.725
           }
         ]
       }
@@ -359,22 +353,16 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.15,
-        "away_score": 0.747,
+        "away_score": 0.052,
         "home_fade": 0.15,
         "away_fade": 0.0,
-        "reason": "Direction nette: Crystal Palace (+0.75)",
+        "reason": "Direction nette: Crystal Palace (+0.05)",
         "detail": [
           {
             "side": "home",
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.694
           }
         ]
       }
@@ -410,22 +398,16 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.15,
-        "away_score": 0.926,
+        "away_score": 0.052,
         "home_fade": 0.15,
         "away_fade": 0.0,
-        "reason": "Direction nette: Falkirk (+0.93)",
+        "reason": "Direction nette: Falkirk (+0.05)",
         "detail": [
           {
             "side": "home",
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.873
           }
         ]
       }
@@ -459,24 +441,18 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "away",
+        "net_side": "home",
         "home_score": 0.052,
-        "away_score": 0.294,
+        "away_score": -0.15,
         "home_fade": 0.0,
         "away_fade": 0.15,
-        "reason": "Direction nette: Hibernian (+0.29)",
+        "reason": "Direction nette: Rangers (+0.05)",
         "detail": [
           {
             "side": "away",
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.444
           }
         ]
       }
