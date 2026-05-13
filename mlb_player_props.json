@@ -1,54 +1,8 @@
 {
-  "generated_at": "2026-05-13T01:27:30Z",
+  "generated_at": "2026-05-13T01:33:32Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815323",
-      "kickoff": "2026-05-13T17:05Z",
-      "league": "MLB",
-      "match": "New York Yankees at Baltimore Orioles",
-      "home": "Baltimore Orioles",
-      "away": "New York Yankees",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "New York Yankees",
-          "pitcher": "Max Fried",
-          "label": "Max Fried moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.547,
-          "fair_odds": 1.83,
-          "expected_strikeouts": 5.29,
-          "projected_ip": 6.47,
-          "inputs": {
-            "k9": 7.36,
-            "era": 2.91,
-            "whip": 0.95,
-            "hand": "L"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "New York Yankees",
-          "pitcher": "Max Fried",
-          "label": "Max Fried ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.8978,
-          "fair_odds": 1.11,
-          "expected_hr_allowed": 0.108,
-          "projected_ip": 6.47,
-          "inputs": {
-            "hr9": 0.15,
-            "era": 2.91,
-            "whip": 0.95
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815319",
       "kickoff": "2026-05-13T17:10Z",
@@ -1116,7 +1070,7 @@
       ]
     }
   ],
-  "props": 54,
+  "props": 52,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
