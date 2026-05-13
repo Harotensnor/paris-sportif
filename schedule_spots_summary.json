@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-13T20:23:13Z",
+  "generated_at": "2026-05-13T20:27:25Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -97,14 +97,20 @@
         "Deplacement estime 2789 km, decalage ~1.9h"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "home",
+        "status": "mixed",
+        "net_side": null,
         "home_score": 0.227,
-        "away_score": -0.649,
+        "away_score": -0.066,
         "home_fade": 0.0,
         "away_fade": 0.649,
-        "reason": "Direction nette: Milwaukee Brewers (+0.23)",
+        "reason": "Signaux mitigés: avantage net trop faible (Milwaukee Brewers +0.23, San Diego Padres -0.07)",
         "detail": [
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.582
+          },
           {
             "side": "away",
             "type": "travel_extreme",
@@ -142,19 +148,31 @@
         "Deplacement estime 2434 km, decalage ~0.9h"
       ],
       "global_resolution": {
-        "status": "mixed",
-        "net_side": null,
-        "home_score": -0.202,
-        "away_score": -0.426,
+        "status": "net",
+        "net_side": "home",
+        "home_score": 0.924,
+        "away_score": -1.047,
         "home_fade": 0.4,
-        "away_fade": 0.566,
-        "reason": "Signaux mitigés: avantage net trop faible (Minnesota Twins -0.20, Miami Marlins -0.43)",
+        "away_fade": 1.187,
+        "reason": "Direction nette: Minnesota Twins (+0.92)",
         "detail": [
           {
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.4
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.908
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 0.621
           },
           {
             "side": "away",
@@ -193,19 +211,25 @@
         "Deplacement estime 2120 km, decalage ~1.7h"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "home",
+        "status": "mixed",
+        "net_side": null,
         "home_score": 0.313,
-        "away_score": -0.893,
+        "away_score": -0.278,
         "home_fade": 0.0,
         "away_fade": 0.893,
-        "reason": "Direction nette: Pittsburgh Pirates (+0.31)",
+        "reason": "Signaux mitigés: avantage net trop faible (Pittsburgh Pirates +0.31, Colorado Rockies -0.28)",
         "detail": [
           {
             "side": "away",
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.4
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.615
           },
           {
             "side": "away",
