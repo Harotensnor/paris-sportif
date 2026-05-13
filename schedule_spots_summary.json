@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-13T21:03:12Z",
+  "generated_at": "2026-05-13T21:39:15Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -7,19 +7,18 @@
     "active_events": 40,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 53,
+      "lookahead": 54,
       "travel_extreme": 11,
       "back_to_back_travel": 17,
       "schedule_congestion": 22
     },
     "by_decision": {
-      "abstain": 18,
-      "lean_home": 21,
-      "lean_away": 1
+      "abstain": 19,
+      "lean_home": 21
     },
     "lean_home": 21,
-    "lean_away": 1,
-    "abstain": 18,
+    "lean_away": 0,
+    "abstain": 19,
     "monitor": 0
   },
   "active": [
@@ -679,6 +678,58 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.4
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "748503",
+      "source_event_ids": [
+        "748503"
+      ],
+      "kickoff": "2026-05-14T19:30Z",
+      "sport": "football",
+      "league_code": "esp.1",
+      "league_name": "La Liga",
+      "home": "Real Madrid",
+      "away": "Real Oviedo",
+      "match": "Real Madrid - Real Oviedo",
+      "decision": "abstain",
+      "net_team": null,
+      "reason": "Fatigue/agenda des deux cotes: Real Madrid 0.15, Real Oviedo 0.15",
+      "pressure_score": 0.667,
+      "home_fade": 0.15,
+      "away_fade": 0.15,
+      "travel_score": 0,
+      "lookahead_score": 0.667,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 2
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours",
+        "1 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "away",
+        "home_score": -0.098,
+        "away_score": -0.098,
+        "home_fade": 0.15,
+        "away_fade": 0.15,
+        "reason": "Direction nette: Real Oviedo (-0.10)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
           }
         ]
       }
@@ -2370,51 +2421,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.798
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "748503",
-      "source_event_ids": [
-        "748503"
-      ],
-      "kickoff": "2026-05-14T19:30Z",
-      "sport": "football",
-      "league_code": "esp.1",
-      "league_name": "La Liga",
-      "home": "Real Madrid",
-      "away": "Real Oviedo",
-      "match": "Real Madrid - Real Oviedo",
-      "decision": "lean_away",
-      "net_team": "Real Oviedo",
-      "reason": "Real Madrid plus penalise par calendrier/voyage (0.15 vs 0.00)",
-      "pressure_score": 0.333,
-      "home_fade": 0.15,
-      "away_fade": 0.0,
-      "travel_score": 0,
-      "lookahead_score": 0.333,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 1
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.15,
-        "away_score": 0.052,
-        "home_fade": 0.15,
-        "away_fade": 0.0,
-        "reason": "Direction nette: Real Oviedo (+0.05)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
           }
         ]
       }
