@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-13T17:13:00Z",
+  "generated_at": "2026-05-13T17:17:47Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815323",
-      "kickoff": "2026-05-13T17:05Z",
-      "league": "MLB",
-      "match": "New York Yankees at Baltimore Orioles",
-      "home": "Baltimore Orioles",
-      "away": "New York Yankees",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Baltimore Orioles",
-          "pitcher": "Kyle Bradish",
-          "label": "Kyle Bradish plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.5272,
-          "fair_odds": 1.9,
-          "expected_strikeouts": 5.63,
-          "projected_ip": 5.12,
-          "inputs": {
-            "k9": 9.88,
-            "era": 4.83,
-            "whip": 1.66,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Baltimore Orioles",
-          "pitcher": "Kyle Bradish",
-          "label": "Kyle Bradish ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5345,
-          "fair_odds": 1.87,
-          "expected_hr_allowed": 0.626,
-          "projected_ip": 5.12,
-          "inputs": {
-            "hr9": 1.1,
-            "era": 4.83,
-            "whip": 1.66
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "New York Yankees",
-          "pitcher": "Max Fried",
-          "label": "Max Fried moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.547,
-          "fair_odds": 1.83,
-          "expected_strikeouts": 5.29,
-          "projected_ip": 6.47,
-          "inputs": {
-            "k9": 7.36,
-            "era": 2.91,
-            "whip": 0.95,
-            "hand": "L"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "New York Yankees",
-          "pitcher": "Max Fried",
-          "label": "Max Fried ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.8978,
-          "fair_odds": 1.11,
-          "expected_hr_allowed": 0.108,
-          "projected_ip": 6.47,
-          "inputs": {
-            "hr9": 0.15,
-            "era": 2.91,
-            "whip": 0.95
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815319",
       "kickoff": "2026-05-13T17:10Z",
@@ -97,16 +15,16 @@
           "market": "pitcher_strikeouts",
           "team": "Cleveland Guardians",
           "pitcher": "Parker Messick",
-          "label": "Parker Messick moins de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "under",
-          "probability": 0.5248,
-          "fair_odds": 1.91,
-          "expected_strikeouts": 6.38,
-          "projected_ip": 5.88,
+          "label": "Parker Messick plus de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "over",
+          "probability": 0.5589,
+          "fair_odds": 1.79,
+          "expected_strikeouts": 5.78,
+          "projected_ip": 5.33,
           "inputs": {
-            "k9": 9.77,
-            "era": 2.3,
+            "k9": 9.75,
+            "era": 2.25,
             "whip": 0.98,
             "hand": "L"
           },
@@ -118,13 +36,13 @@
           "pitcher": "Parker Messick",
           "label": "Parker Messick ne concède pas de home run",
           "pick": "no",
-          "probability": 0.6049,
-          "fair_odds": 1.65,
-          "expected_hr_allowed": 0.503,
-          "projected_ip": 5.88,
+          "probability": 0.6412,
+          "fair_odds": 1.56,
+          "expected_hr_allowed": 0.444,
+          "projected_ip": 5.33,
           "inputs": {
-            "hr9": 0.77,
-            "era": 2.3,
+            "hr9": 0.75,
+            "era": 2.25,
             "whip": 0.98
           },
           "side": "home"
@@ -1152,7 +1070,7 @@
       ]
     }
   ],
-  "props": 56,
+  "props": 52,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
