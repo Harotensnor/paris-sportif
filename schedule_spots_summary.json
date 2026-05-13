@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-05-13T22:54:03Z",
+  "generated_at": "2026-05-13T22:56:42Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 36,
+    "active_events": 35,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 50,
       "back_to_back_travel": 13,
+      "lookahead": 48,
       "travel_extreme": 10,
       "schedule_congestion": 13
     },
     "by_decision": {
-      "abstain": 18,
+      "abstain": 17,
       "lean_home": 18
     },
     "lean_home": 18,
     "lean_away": 0,
-    "abstain": 18,
+    "abstain": 17,
     "monitor": 0
   },
   "active": [
@@ -143,64 +143,6 @@
             "type": "schedule_congestion",
             "direction": "fade",
             "strength": 0.6
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815324",
-      "source_event_ids": [
-        "401815324"
-      ],
-      "kickoff": "2026-05-13T22:45Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Boston Red Sox",
-      "away": "Philadelphia Phillies",
-      "match": "Boston Red Sox - Philadelphia Phillies",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Boston Red Sox 0.15, Philadelphia Phillies 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -1.097,
-        "away_score": 0.252,
-        "home_fade": 1.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Philadelphia Phillies (+0.25)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
           }
         ]
       }
@@ -713,10 +655,10 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.098,
-        "away_score": 0.902,
+        "away_score": -0.098,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Real Oviedo (+0.90)",
+        "reason": "Direction nette: Real Oviedo (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -729,12 +671,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 1.0
           }
         ]
       }
@@ -770,11 +706,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -1.147,
-        "away_score": -0.607,
-        "home_fade": 1.55,
-        "away_fade": 1.15,
-        "reason": "Direction nette: Montreal Canadiens (-0.61)",
+        "home_score": -0.498,
+        "away_score": 0.043,
+        "home_fade": 0.55,
+        "away_fade": 0.15,
+        "reason": "Direction nette: Montreal Canadiens (+0.04)",
         "detail": [
           {
             "side": "home",
@@ -793,18 +729,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.4
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
           }
         ]
       }
@@ -841,10 +765,10 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.098,
-        "away_score": 0.685,
+        "away_score": -0.098,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Pumas UNAM (+0.68)",
+        "reason": "Direction nette: Pumas UNAM (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -857,12 +781,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.782
           }
         ]
       }
@@ -898,11 +816,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -1.147,
-        "away_score": -0.607,
-        "home_fade": 1.55,
-        "away_fade": 1.15,
-        "reason": "Direction nette: Vegas Golden Knights (-0.61)",
+        "home_score": -0.498,
+        "away_score": 0.043,
+        "home_fade": 0.55,
+        "away_fade": 0.15,
+        "reason": "Direction nette: Vegas Golden Knights (+0.04)",
         "detail": [
           {
             "side": "home",
@@ -921,18 +839,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.4
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
           }
         ]
       }
@@ -1980,10 +1886,10 @@
         "status": "mixed",
         "net_side": null,
         "home_score": 0.129,
-        "away_score": -0.058,
+        "away_score": -0.176,
         "home_fade": 0.15,
         "away_fade": 0.799,
-        "reason": "Signaux mitigés: avantage net trop faible (Milwaukee Brewers +0.13, San Diego Padres -0.06)",
+        "reason": "Signaux mitigés: avantage net trop faible (Milwaukee Brewers +0.13, San Diego Padres -0.18)",
         "detail": [
           {
             "side": "home",
@@ -2001,7 +1907,7 @@
             "side": "away",
             "type": "market_move",
             "direction": "steam",
-            "strength": 0.689
+            "strength": 0.57
           },
           {
             "side": "away",

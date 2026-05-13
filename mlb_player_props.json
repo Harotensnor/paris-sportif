@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-13T22:53:57Z",
+  "generated_at": "2026-05-13T22:56:34Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815324",
-      "kickoff": "2026-05-13T22:45Z",
-      "league": "MLB",
-      "match": "Philadelphia Phillies at Boston Red Sox",
-      "home": "Boston Red Sox",
-      "away": "Philadelphia Phillies",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Boston Red Sox",
-          "pitcher": "Sonny Gray",
-          "label": "Sonny Gray moins de 2,5 strikeouts",
-          "line": 2.5,
-          "pick": "under",
-          "probability": 0.5002,
-          "fair_odds": 2.0,
-          "expected_strikeouts": 2.5,
-          "projected_ip": 4.67,
-          "inputs": {
-            "k9": 4.82,
-            "era": 3.54,
-            "whip": 1.29,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Boston Red Sox",
-          "pitcher": "Sonny Gray",
-          "label": "Sonny Gray ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6079,
-          "fair_odds": 1.65,
-          "expected_hr_allowed": 0.498,
-          "projected_ip": 4.67,
-          "inputs": {
-            "hr9": 0.96,
-            "era": 3.54,
-            "whip": 1.29
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Philadelphia Phillies",
-          "pitcher": "Andrew Painter",
-          "label": "Andrew Painter plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.5983,
-          "fair_odds": 1.67,
-          "expected_strikeouts": 4.93,
-          "projected_ip": 5.37,
-          "inputs": {
-            "k9": 8.27,
-            "era": 6.89,
-            "whip": 1.71,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Philadelphia Phillies",
-          "pitcher": "Andrew Painter",
-          "label": "Andrew Painter concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6261,
-          "fair_odds": 1.6,
-          "expected_hr_allowed": 0.984,
-          "projected_ip": 5.37,
-          "inputs": {
-            "hr9": 1.65,
-            "era": 6.89,
-            "whip": 1.71
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815325",
       "kickoff": "2026-05-13T23:07Z",
@@ -1526,7 +1444,7 @@
       ]
     }
   ],
-  "props": 74,
+  "props": 70,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
