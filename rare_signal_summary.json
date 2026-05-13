@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-05-13T04:33:29Z",
+  "generated_at": "2026-05-13T04:38:42Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 86,
-    "actionable": 33,
-    "watch": 20,
+    "active_events": 74,
+    "actionable": 26,
+    "watch": 15,
     "risk": 33,
     "expired_sample": 0,
     "by_type": {
-      "market_move": 68,
-      "signal_conflict": 4,
       "injury_imbalance": 8,
       "travel_extreme": 5,
-      "market_uncertain": 35
+      "signal_conflict": 2,
+      "market_move": 51,
+      "market_uncertain": 34
     },
     "by_quality": {
-      "watch": 20,
-      "actionable": 33,
+      "actionable": 26,
+      "watch": 15,
       "risk": 33
     }
   },
@@ -60,24 +60,6 @@
       "context": "Absences severes 3-8"
     },
     {
-      "event_id": "401867716",
-      "date": "2026-05-13T19:00Z",
-      "sport": "football",
-      "league_code": "scottishpremiership",
-      "league_name": "Scottish Premiership",
-      "home": "Heart of Midlothian",
-      "away": "Falkirk",
-      "match": "Heart of Midlothian - Falkirk",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 1.0,
-      "context": "Cote away: 7.00 -> 5.50 (+21.4%)"
-    },
-    {
       "event_id": "401815324",
       "date": "2026-05-13T22:45Z",
       "sport": "baseball",
@@ -96,42 +78,6 @@
       "context": "Absences severes 10-3"
     },
     {
-      "event_id": "401856905",
-      "date": "2026-05-14T00:00Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Connecticut Sun",
-      "away": "Las Vegas Aces",
-      "match": "Connecticut Sun - Las Vegas Aces",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 8.00 -> 6.50 (+18.8%)"
-    },
-    {
-      "event_id": "401871420",
-      "date": "2026-05-14T00:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Colorado Avalanche",
-      "away": "Minnesota Wild",
-      "match": "Colorado Avalanche - Minnesota Wild",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 1.49 -> 1.80 (-21.0%)"
-    },
-    {
       "event_id": "401815331",
       "date": "2026-05-14T00:10Z",
       "sport": "baseball",
@@ -148,24 +94,6 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 14-9"
-    },
-    {
-      "event_id": "401815332",
-      "date": "2026-05-14T02:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Los Angeles Dodgers",
-      "away": "San Francisco Giants",
-      "match": "Los Angeles Dodgers - San Francisco Giants",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 1.41 -> 10.50 (-646.3%)"
     },
     {
       "event_id": "748961",
@@ -366,6 +294,24 @@
       "context": "Cote home: 2.20 -> 2.75 (-25.0%)"
     },
     {
+      "event_id": "740956",
+      "date": "2026-05-18T19:00Z",
+      "sport": "football",
+      "league_code": "eng.1",
+      "league_name": "Premier League",
+      "home": "Arsenal",
+      "away": "Burnley",
+      "match": "Arsenal - Burnley",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "away",
+      "strength": 1.0,
+      "context": "Cote away: 15.00 -> 18.00 (-20.0%)"
+    },
+    {
       "event_id": "746709",
       "date": "2026-05-17T19:00Z",
       "sport": "football",
@@ -438,24 +384,6 @@
       "context": "Cote draw: 6.50 -> 7.50 (-15.4%)"
     },
     {
-      "event_id": "401867717",
-      "date": "2026-05-13T19:00Z",
-      "sport": "football",
-      "league_code": "scottishpremiership",
-      "league_name": "Scottish Premiership",
-      "home": "Motherwell",
-      "away": "Celtic",
-      "match": "Motherwell - Celtic",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "home",
-      "strength": 0.845,
-      "context": "Cote home: 4.60 -> 3.90 (+15.2%)"
-    },
-    {
       "event_id": "401843345",
       "date": "2026-05-16T14:00Z",
       "sport": "football",
@@ -492,24 +420,6 @@
       "context": "Cote draw: 4.00 -> 4.60 (-15.0%)"
     },
     {
-      "event_id": "401859359",
-      "date": "2026-05-13T10:00Z",
-      "sport": "football",
-      "league_code": "jleague",
-      "league_name": "J-League",
-      "home": "Vissel Kobe",
-      "away": "Kyoto Sanga",
-      "match": "Vissel Kobe - Kyoto Sanga",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.81,
-      "context": "Cote away: 4.80 -> 4.10 (+14.6%)"
-    },
-    {
       "event_id": "401815328",
       "date": "2026-05-13T23:40Z",
       "sport": "baseball",
@@ -528,24 +438,6 @@
       "context": "Absences severes 10-6"
     },
     {
-      "event_id": "401866574",
-      "date": "2026-05-13T16:30Z",
-      "sport": "football",
-      "league_code": "superleaguegrece",
-      "league_name": "Super League Grèce",
-      "home": "PAOK Salonika",
-      "away": "AEK Athens",
-      "match": "PAOK Salonika - AEK Athens",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.778,
-      "context": "Cote away: 5.00 -> 4.30 (+14.0%)"
-    },
-    {
       "event_id": "750215",
       "date": "2026-05-17T17:00Z",
       "sport": "football",
@@ -562,24 +454,6 @@
       "side": "away",
       "strength": 0.775,
       "context": "Cote away: 4.30 -> 4.90 (-14.0%)"
-    },
-    {
-      "event_id": "740902",
-      "date": "2026-05-13T19:00Z",
-      "sport": "football",
-      "league_code": "eng.1",
-      "league_name": "Premier League",
-      "home": "Manchester City",
-      "away": "Crystal Palace",
-      "match": "Manchester City - Crystal Palace",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.694,
-      "context": "Cote away: 12.00 -> 10.50 (+12.5%)"
     },
     {
       "event_id": "748956",
@@ -619,24 +493,6 @@
     }
   ],
   "active_watch": [
-    {
-      "event_id": "401866572",
-      "date": "2026-05-13T14:00Z",
-      "sport": "football",
-      "league_code": "superleaguegrece",
-      "league_name": "Super League Grèce",
-      "home": "Volos NFC",
-      "away": "Aris",
-      "match": "Volos NFC - Aris",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "home",
-      "strength": 0.649,
-      "context": "Cote home: 3.85 -> 3.40 (+11.7%)"
-    },
     {
       "event_id": "401815330",
       "date": "2026-05-13T23:40Z",
@@ -728,40 +584,22 @@
       "context": "Absences severes 11-8"
     },
     {
-      "event_id": "401867718",
-      "date": "2026-05-13T19:00Z",
-      "sport": "football",
-      "league_code": "scottishpremiership",
-      "league_name": "Scottish Premiership",
-      "home": "Rangers",
-      "away": "Hibernian",
-      "match": "Rangers - Hibernian",
+      "event_id": "401871420",
+      "date": "2026-05-14T00:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Colorado Avalanche",
+      "away": "Minnesota Wild",
+      "match": "Colorado Avalanche - Minnesota Wild",
       "quality": "watch",
       "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.582,
-      "context": "Cote away: 5.25 -> 4.70 (+10.5%)"
-    },
-    {
-      "event_id": "401859356",
-      "date": "2026-05-13T10:00Z",
-      "sport": "football",
-      "league_code": "jleague",
-      "league_name": "J-League",
-      "home": "Machida Zelvia",
-      "away": "Tokyo Verdy 1969",
-      "match": "Machida Zelvia - Tokyo Verdy 1969",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.579,
-      "context": "Cote away: 4.80 -> 4.30 (+10.4%)"
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Minnesota Wild",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 0-3"
     },
     {
       "event_id": "401815329",
@@ -798,24 +636,6 @@
       "side": "home",
       "strength": 0.565,
       "context": "Cote home: 5.90 -> 6.50 (-10.2%)"
-    },
-    {
-      "event_id": "401872570",
-      "date": "2026-05-14T02:00Z",
-      "sport": "football",
-      "league_code": "ligamx",
-      "league_name": "Liga MX",
-      "home": "Cruz Azul",
-      "away": "Guadalajara",
-      "match": "Cruz Azul - Guadalajara",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.556,
-      "context": "Cote away: 3.50 -> 3.15 (+10.0%)"
     },
     {
       "event_id": "737150",
@@ -908,24 +728,6 @@
       "context": "Cote away: 2.80 -> 3.05 (-8.9%)"
     },
     {
-      "event_id": "401866576",
-      "date": "2026-05-13T14:00Z",
-      "sport": "football",
-      "league_code": "superleaguegrece",
-      "league_name": "Super League Grèce",
-      "home": "Levadiakos",
-      "away": "OFI Crete",
-      "match": "Levadiakos - OFI Crete",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.494,
-      "context": "Cote away: 4.50 -> 4.10 (+8.9%)"
-    },
-    {
       "event_id": "401815321",
       "date": "2026-05-13T22:40Z",
       "sport": "baseball",
@@ -960,24 +762,6 @@
       "side": "home",
       "strength": 0.473,
       "context": "Cote home: 2.35 -> 2.55 (-8.5%)"
-    },
-    {
-      "event_id": "401856906",
-      "date": "2026-05-14T02:00Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Golden State Valkyries",
-      "away": "Chicago Sky",
-      "match": "Golden State Valkyries - Chicago Sky",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.471,
-      "context": "Cote away: 2.95 -> 2.70 (+8.5%)"
     }
   ],
   "active_risk": [
