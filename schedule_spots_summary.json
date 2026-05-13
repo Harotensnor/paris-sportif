@@ -1,22 +1,22 @@
 {
-  "generated_at": "2026-05-13T16:52:52Z",
+  "generated_at": "2026-05-13T16:58:27Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 10,
+    "active_events": 9,
     "expired_sample": 0,
     "by_type": {
       "travel_extreme": 5,
-      "lookahead": 6
+      "lookahead": 5
     },
     "by_decision": {
       "abstain": 1,
       "lean_home": 6,
-      "lean_away": 3
+      "lean_away": 2
     },
     "lean_home": 6,
-    "lean_away": 3,
+    "lean_away": 2,
     "abstain": 1,
     "monitor": 0
   },
@@ -51,12 +51,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "home",
-        "home_score": 0.347,
+        "net_side": "away",
+        "home_score": -0.098,
         "away_score": -0.098,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Motherwell (+0.35)",
+        "reason": "Direction nette: Celtic (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -69,12 +69,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.444
           }
         ]
       }
@@ -359,22 +353,16 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.15,
-        "away_score": 1.052,
+        "away_score": 0.052,
         "home_fade": 0.15,
         "away_fade": 0.0,
-        "reason": "Direction nette: Crystal Palace (+1.05)",
+        "reason": "Direction nette: Crystal Palace (+0.05)",
         "detail": [
           {
             "side": "home",
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 1.0
           }
         ]
       }
@@ -462,51 +450,6 @@
         "detail": [
           {
             "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "748503",
-      "source_event_ids": [
-        "748503"
-      ],
-      "kickoff": "2026-05-14T19:30Z",
-      "sport": "football",
-      "league_code": "esp.1",
-      "league_name": "La Liga",
-      "home": "Real Madrid",
-      "away": "Real Oviedo",
-      "match": "Real Madrid - Real Oviedo",
-      "decision": "lean_away",
-      "net_team": "Real Oviedo",
-      "reason": "Real Madrid plus penalise par calendrier/voyage (0.15 vs 0.00)",
-      "pressure_score": 0.333,
-      "home_fade": 0.15,
-      "away_fade": 0.0,
-      "travel_score": 0,
-      "lookahead_score": 0.333,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 1
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.15,
-        "away_score": 0.052,
-        "home_fade": 0.15,
-        "away_fade": 0.0,
-        "reason": "Direction nette: Real Oviedo (+0.05)",
-        "detail": [
-          {
-            "side": "home",
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
