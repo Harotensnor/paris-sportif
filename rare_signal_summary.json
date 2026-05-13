@@ -1,28 +1,64 @@
 {
-  "generated_at": "2026-05-13T22:58:41Z",
+  "generated_at": "2026-05-13T23:02:52Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 71,
-    "actionable": 21,
-    "watch": 4,
+    "active_events": 72,
+    "actionable": 24,
+    "watch": 2,
     "risk": 46,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 15,
-      "back_to_back_travel": 13,
-      "signal_conflict": 3,
+      "back_to_back_travel": 16,
       "travel_extreme": 10,
-      "market_uncertain": 45
+      "market_uncertain": 45,
+      "signal_conflict": 1
     },
     "by_quality": {
-      "actionable": 21,
-      "watch": 4,
+      "actionable": 24,
+      "watch": 2,
       "risk": 46
     }
   },
   "active_actionable": [
+    {
+      "event_id": "401815329",
+      "date": "2026-05-13T23:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Minnesota Twins",
+      "away": "Miami Marlins",
+      "match": "Minnesota Twins - Miami Marlins",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Miami Marlins",
+      "side": "away",
+      "strength": 1.0,
+      "context": "1 match dans les 48h + 2434 km de voyage"
+    },
+    {
+      "event_id": "401815330",
+      "date": "2026-05-13T23:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Milwaukee Brewers",
+      "away": "San Diego Padres",
+      "match": "Milwaukee Brewers - San Diego Padres",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "San Diego Padres",
+      "side": "away",
+      "strength": 1.0,
+      "context": "1 match dans les 48h + 2789 km de voyage"
+    },
     {
       "event_id": "401815331",
       "date": "2026-05-14T00:10Z",
@@ -42,6 +78,24 @@
       "context": "Absences severes 14-8"
     },
     {
+      "event_id": "401815335",
+      "date": "2026-05-14T16:35Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Pittsburgh Pirates",
+      "away": "Colorado Rockies",
+      "match": "Pittsburgh Pirates - Colorado Rockies",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Colorado Rockies",
+      "side": "away",
+      "strength": 1.0,
+      "context": "2 match dans les 48h + 2120 km de voyage"
+    },
+    {
       "event_id": "401815340",
       "date": "2026-05-14T17:40Z",
       "sport": "baseball",
@@ -57,7 +111,7 @@
       "team": "Miami Marlins",
       "side": "away",
       "strength": 1.0,
-      "context": "1 match dans les 48h + 2434 km de voyage"
+      "context": "2 match dans les 48h + 2434 km de voyage"
     },
     {
       "event_id": "401815341",
@@ -75,7 +129,7 @@
       "team": "San Diego Padres",
       "side": "away",
       "strength": 1.0,
-      "context": "1 match dans les 48h + 2789 km de voyage"
+      "context": "2 match dans les 48h + 2789 km de voyage"
     },
     {
       "event_id": "401815342",
@@ -132,22 +186,22 @@
       "context": "2 match dans les 48h + 1998 km de voyage"
     },
     {
-      "event_id": "401815335",
-      "date": "2026-05-14T16:35Z",
+      "event_id": "401815325",
+      "date": "2026-05-13T23:07Z",
       "sport": "baseball",
       "league_code": "mlb",
       "league_name": "MLB",
-      "home": "Pittsburgh Pirates",
-      "away": "Colorado Rockies",
-      "match": "Pittsburgh Pirates - Colorado Rockies",
+      "home": "Toronto Blue Jays",
+      "away": "Tampa Bay Rays",
+      "match": "Toronto Blue Jays - Tampa Bay Rays",
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
       "type": "back_to_back_travel",
       "direction": "fade",
-      "team": "Colorado Rockies",
+      "team": "Tampa Bay Rays",
       "side": "away",
-      "strength": 0.954,
-      "context": "1 match dans les 48h + 2120 km de voyage"
+      "strength": 0.968,
+      "context": "2 match dans les 48h + 1789 km de voyage"
     },
     {
       "event_id": "401815410",
@@ -168,24 +222,6 @@
       "context": "1 match dans les 48h + 1998 km de voyage"
     },
     {
-      "event_id": "401815325",
-      "date": "2026-05-13T23:07Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Toronto Blue Jays",
-      "away": "Tampa Bay Rays",
-      "match": "Toronto Blue Jays - Tampa Bay Rays",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Tampa Bay Rays",
-      "side": "away",
-      "strength": 0.888,
-      "context": "1 match dans les 48h + 1789 km de voyage"
-    },
-    {
       "event_id": "401815327",
       "date": "2026-05-14T00:05Z",
       "sport": "baseball",
@@ -200,8 +236,8 @@
       "direction": "fade",
       "team": "Arizona Diamondbacks",
       "side": "away",
-      "strength": 0.809,
-      "context": "1 match dans les 48h + 1397 km de voyage"
+      "strength": 0.889,
+      "context": "2 match dans les 48h + 1397 km de voyage"
     },
     {
       "event_id": "401815328",
@@ -330,6 +366,24 @@
       "context": "Absences severes 8-12"
     },
     {
+      "event_id": "401815334",
+      "date": "2026-05-14T23:15Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Atlanta Braves",
+      "away": "Chicago Cubs",
+      "match": "Atlanta Braves - Chicago Cubs",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Chicago Cubs",
+      "side": "away",
+      "strength": 0.798,
+      "context": "2 match dans les 48h + 938 km de voyage"
+    },
+    {
       "event_id": "401871420",
       "date": "2026-05-14T00:00Z",
       "sport": "hockey",
@@ -384,8 +438,8 @@
       "context": "1 match dans les 48h + 1135 km de voyage"
     },
     {
-      "event_id": "401815334",
-      "date": "2026-05-14T23:15Z",
+      "event_id": "401815320",
+      "date": "2026-05-13T23:15Z",
       "sport": "baseball",
       "league_code": "mlb",
       "league_name": "MLB",
@@ -403,24 +457,6 @@
     }
   ],
   "active_watch": [
-    {
-      "event_id": "401815330",
-      "date": "2026-05-13T23:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Milwaukee Brewers",
-      "away": "San Diego Padres",
-      "match": "Milwaukee Brewers - San Diego Padres",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "travel_extreme",
-      "direction": "fade",
-      "team": "San Diego Padres",
-      "side": "away",
-      "strength": 0.649,
-      "context": "Deplacement estime 2789 km, decalage ~1.9h"
-    },
     {
       "event_id": "401856905",
       "date": "2026-05-14T00:00Z",
@@ -456,24 +492,6 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 5-2"
-    },
-    {
-      "event_id": "401815329",
-      "date": "2026-05-13T23:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Minnesota Twins",
-      "away": "Miami Marlins",
-      "match": "Minnesota Twins - Miami Marlins",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "travel_extreme",
-      "direction": "fade",
-      "team": "Miami Marlins",
-      "side": "away",
-      "strength": 0.566,
-      "context": "Deplacement estime 2434 km, decalage ~0.9h"
     }
   ],
   "active_risk": [
@@ -1018,24 +1036,6 @@
       "context": "marge bookmaker anormale 18.3%"
     },
     {
-      "event_id": "401842774",
-      "date": "2026-05-20T17:00Z",
-      "sport": "football",
-      "league_code": "allsvenskan",
-      "league_name": "Allsvenskan",
-      "home": "GAIS",
-      "away": "Hammarby IF",
-      "match": "GAIS - Hammarby IF",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.9%"
-    },
-    {
       "event_id": "401843286",
       "date": "2026-05-20T17:00Z",
       "sport": "football",
@@ -1052,6 +1052,24 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.8%"
+    },
+    {
+      "event_id": "401842774",
+      "date": "2026-05-20T17:00Z",
+      "sport": "football",
+      "league_code": "allsvenskan",
+      "league_name": "Allsvenskan",
+      "home": "GAIS",
+      "away": "Hammarby IF",
+      "match": "GAIS - Hammarby IF",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.9%"
     },
     {
       "event_id": "401843341",
