@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-13T17:17:47Z",
+  "generated_at": "2026-05-13T17:23:29Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815319",
-      "kickoff": "2026-05-13T17:10Z",
-      "league": "MLB",
-      "match": "Los Angeles Angels at Cleveland Guardians",
-      "home": "Cleveland Guardians",
-      "away": "Los Angeles Angels",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Cleveland Guardians",
-          "pitcher": "Parker Messick",
-          "label": "Parker Messick plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.5589,
-          "fair_odds": 1.79,
-          "expected_strikeouts": 5.78,
-          "projected_ip": 5.33,
-          "inputs": {
-            "k9": 9.75,
-            "era": 2.25,
-            "whip": 0.98,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Cleveland Guardians",
-          "pitcher": "Parker Messick",
-          "label": "Parker Messick ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6412,
-          "fair_odds": 1.56,
-          "expected_hr_allowed": 0.444,
-          "projected_ip": 5.33,
-          "inputs": {
-            "hr9": 0.75,
-            "era": 2.25,
-            "whip": 0.98
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Los Angeles Angels",
-          "pitcher": "Reid Detmers",
-          "label": "Reid Detmers plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.5663,
-          "fair_odds": 1.77,
-          "expected_strikeouts": 5.81,
-          "projected_ip": 5.4,
-          "inputs": {
-            "k9": 9.69,
-            "era": 4.33,
-            "whip": 1.24,
-            "hand": "L"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Los Angeles Angels",
-          "pitcher": "Reid Detmers",
-          "label": "Reid Detmers ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6894,
-          "fair_odds": 1.45,
-          "expected_hr_allowed": 0.372,
-          "projected_ip": 5.4,
-          "inputs": {
-            "hr9": 0.62,
-            "era": 4.33,
-            "whip": 1.24
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815321",
       "kickoff": "2026-05-13T22:40Z",
@@ -1070,7 +988,7 @@
       ]
     }
   ],
-  "props": 52,
+  "props": 48,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
