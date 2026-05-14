@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-05-14T22:36:34Z",
+  "generated_at": "2026-05-14T22:41:56Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 78,
-    "actionable": 25,
+    "active_events": 80,
+    "actionable": 27,
     "watch": 8,
     "risk": 45,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 30,
+      "market_uncertain": 45,
+      "market_move": 8,
       "back_to_back_travel": 7,
-      "market_uncertain": 43,
       "signal_conflict": 3,
-      "travel_extreme": 3,
-      "market_move": 2
+      "travel_extreme": 3
     },
     "by_quality": {
-      "actionable": 25,
+      "actionable": 27,
       "watch": 8,
       "risk": 45
     }
@@ -41,6 +41,42 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 10-3"
+    },
+    {
+      "event_id": "401871408",
+      "date": "2026-05-14T23:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Buffalo Sabres",
+      "away": "Montreal Canadiens",
+      "match": "Buffalo Sabres - Montreal Canadiens",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 1.85 -> 2.35 (-27.2%)"
+    },
+    {
+      "event_id": "401871428",
+      "date": "2026-05-15T01:30Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Anaheim Ducks",
+      "away": "Vegas Golden Knights",
+      "match": "Anaheim Ducks - Vegas Golden Knights",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 1.93 -> 2.40 (-24.6%)"
     },
     {
       "event_id": "401856909",
@@ -477,24 +513,6 @@
   ],
   "active_watch": [
     {
-      "event_id": "401871428",
-      "date": "2026-05-15T01:30Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Anaheim Ducks",
-      "away": "Vegas Golden Knights",
-      "match": "Anaheim Ducks - Vegas Golden Knights",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Anaheim Ducks",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 4-1"
-    },
-    {
       "event_id": "401815348",
       "date": "2026-05-15T23:10Z",
       "sport": "baseball",
@@ -619,6 +637,24 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 14-11"
+    },
+    {
+      "event_id": "401872572",
+      "date": "2026-05-15T01:00Z",
+      "sport": "football",
+      "league_code": "ligamx",
+      "league_name": "Liga MX",
+      "home": "Pachuca",
+      "away": "Pumas UNAM",
+      "match": "Pachuca - Pumas UNAM",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.469,
+      "context": "Cote away: 3.55 -> 3.25 (+8.5%)"
     }
   ],
   "active_risk": [
