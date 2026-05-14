@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-14T23:00:08Z",
+  "generated_at": "2026-05-14T23:02:35Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -824,6 +824,88 @@
       ]
     },
     {
+      "event_id": "401815353",
+      "kickoff": "2026-05-16T00:15Z",
+      "league": "MLB",
+      "match": "Kansas City Royals at St. Louis Cardinals",
+      "home": "St. Louis Cardinals",
+      "away": "Kansas City Royals",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "St. Louis Cardinals",
+          "pitcher": "Kyle Leahy",
+          "label": "Kyle Leahy plus de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "over",
+          "probability": 0.6148,
+          "fair_odds": 1.63,
+          "expected_strikeouts": 3.95,
+          "projected_ip": 4.9,
+          "inputs": {
+            "k9": 7.26,
+            "era": 4.31,
+            "whip": 1.59,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "St. Louis Cardinals",
+          "pitcher": "Kyle Leahy",
+          "label": "Kyle Leahy concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5231,
+          "fair_odds": 1.91,
+          "expected_hr_allowed": 0.74,
+          "projected_ip": 4.9,
+          "inputs": {
+            "hr9": 1.36,
+            "era": 4.31,
+            "whip": 1.59
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Kansas City Royals",
+          "pitcher": "Noah Cameron",
+          "label": "Noah Cameron plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.5022,
+          "fair_odds": 1.99,
+          "expected_strikeouts": 4.51,
+          "projected_ip": 5.03,
+          "inputs": {
+            "k9": 8.07,
+            "era": 5.55,
+            "whip": 1.63,
+            "hand": "L"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Kansas City Royals",
+          "pitcher": "Noah Cameron",
+          "label": "Noah Cameron concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5054,
+          "fair_odds": 1.98,
+          "expected_hr_allowed": 0.704,
+          "projected_ip": 5.03,
+          "inputs": {
+            "hr9": 1.26,
+            "era": 5.55,
+            "whip": 1.63
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
       "event_id": "401815356",
       "kickoff": "2026-05-16T00:40Z",
       "league": "MLB",
@@ -948,6 +1030,88 @@
             "whip": 1.16
           },
           "side": "home"
+        }
+      ]
+    },
+    {
+      "event_id": "401815368",
+      "kickoff": "2026-05-16T18:15Z",
+      "league": "MLB",
+      "match": "Kansas City Royals at St. Louis Cardinals",
+      "home": "St. Louis Cardinals",
+      "away": "Kansas City Royals",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "St. Louis Cardinals",
+          "pitcher": "Kyle Leahy",
+          "label": "Kyle Leahy plus de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "over",
+          "probability": 0.6148,
+          "fair_odds": 1.63,
+          "expected_strikeouts": 3.95,
+          "projected_ip": 4.9,
+          "inputs": {
+            "k9": 7.26,
+            "era": 4.31,
+            "whip": 1.59,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "St. Louis Cardinals",
+          "pitcher": "Kyle Leahy",
+          "label": "Kyle Leahy concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5231,
+          "fair_odds": 1.91,
+          "expected_hr_allowed": 0.74,
+          "projected_ip": 4.9,
+          "inputs": {
+            "hr9": 1.36,
+            "era": 4.31,
+            "whip": 1.59
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Kansas City Royals",
+          "pitcher": "Noah Cameron",
+          "label": "Noah Cameron plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.5022,
+          "fair_odds": 1.99,
+          "expected_strikeouts": 4.51,
+          "projected_ip": 5.03,
+          "inputs": {
+            "k9": 8.07,
+            "era": 5.55,
+            "whip": 1.63,
+            "hand": "L"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Kansas City Royals",
+          "pitcher": "Noah Cameron",
+          "label": "Noah Cameron concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5054,
+          "fair_odds": 1.98,
+          "expected_hr_allowed": 0.704,
+          "projected_ip": 5.03,
+          "inputs": {
+            "hr9": 1.26,
+            "era": 5.55,
+            "whip": 1.63
+          },
+          "side": "away"
         }
       ]
     },
@@ -1618,7 +1782,7 @@
       ]
     }
   ],
-  "props": 78,
+  "props": 86,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
