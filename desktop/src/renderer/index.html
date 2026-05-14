@@ -986,6 +986,17 @@
             <button class="ghost-btn" id="reset-demo-btn" type="button">Reset démo</button>
           </article>
           <article class="preference-card">
+            <h4>Apparence</h4>
+            <label>Thème
+              <select id="pref-theme">
+                <option value="dark">Sombre</option>
+                <option value="light">Clair</option>
+                <option value="auto">Auto</option>
+              </select>
+            </label>
+            <p class="match-sub">Le thème s'applique instantanément à toute l'application.</p>
+          </article>
+          <article class="preference-card">
             <h4>Sports suivis</h4>
             <div class="check-grid" id="pref-sports"></div>
           </article>
@@ -1013,6 +1024,7 @@
             <label>Brief du soir heure<input id="pref-evening-hour" type="number" min="18" max="23" step="1"></label>
             <label class="check-line"><input id="pref-prematch-alerts" type="checkbox"> Alertes pré-match 30 min</label>
             <label class="check-line"><input id="pref-top-pick-alerts" type="checkbox"> Alerte si le #1 change</label>
+            <label class="check-line"><input id="pref-bug-report-prompt" type="checkbox"> Proposer un rapport si l'app plante</label>
             <label>Webhook mobile
               <select id="pref-webhook-type">
                 <option value="generic">Générique JSON</option>
@@ -1103,8 +1115,18 @@
             <button class="ghost-btn" id="force-weekly-report-btn" type="button">Voir rapport hebdo</button>
             <button class="ghost-btn" id="force-evening-brief-btn" type="button">Voir brief du soir</button>
             <button class="ghost-btn" id="start-demo-tour-btn" type="button">Faire le tour démo</button>
+            <button class="ghost-btn" id="manual-bug-report-btn" type="button">Signaler un bug</button>
             <p class="match-sub" id="app-version-label">Paris Sportif Desktop</p>
             <p class="match-sub" id="update-status">Aucune vérification de mise à jour lancée.</p>
+            <div class="profile-preview" id="bug-report-list">Aucun rapport de bug local.</div>
+          </article>
+          <article class="preference-card expert-only hidden">
+            <h4>Raccourcis clavier</h4>
+            <div class="shortcut-grid" id="shortcut-settings-grid"></div>
+            <div class="section-actions">
+              <button class="ghost-btn" id="reset-shortcuts-btn" type="button">Réinitialiser</button>
+            </div>
+            <p class="match-sub" id="shortcut-capture-status">Clique sur modifier puis tape une combinaison.</p>
           </article>
           <article class="preference-card">
             <h4>Profil local</h4>
@@ -1211,6 +1233,7 @@
     <p><strong>Confiance</strong> : solidité du pick après garde-fous.</p>
     <p><strong>Mode expert</strong> : affiche audits, logs et diagnostics avancés.</p>
     <button class="ghost-btn" id="help-demo-tour-btn" type="button">Faire le tour rapide</button>
+    <button class="ghost-btn" id="help-bug-report-btn" type="button">Signaler un bug</button>
   </aside>
 
   <div class="log-drawer hidden" id="log-drawer" aria-label="Logs debug">
@@ -1304,6 +1327,47 @@
       <div class="section-actions">
         <button class="ghost-btn" id="weekly-report-detail" type="button">Voir détail</button>
         <button class="ghost-btn" id="weekly-report-export" type="button">Exporter PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop hidden" id="update-modal" role="dialog" aria-modal="true" aria-labelledby="update-modal-title">
+    <div class="feedback-modal">
+      <header class="modal-head">
+        <div>
+          <div class="eyebrow">Mise à jour</div>
+          <h3 id="update-modal-title">Nouvelle version disponible</h3>
+          <p id="update-modal-subtitle">Tu peux l'installer au prochain redémarrage.</p>
+        </div>
+        <button class="icon-btn" id="update-modal-close" type="button" aria-label="Fermer">×</button>
+      </header>
+      <div class="profile-preview" id="update-modal-notes">Chargement des nouveautés...</div>
+      <div class="section-actions">
+        <button class="ghost-btn" id="update-modal-notes-btn" type="button">Voir les nouveautés</button>
+        <button class="primary-btn" id="update-modal-install-btn" type="button">Installer au redémarrage</button>
+        <button class="ghost-btn" id="update-modal-later-btn" type="button">Plus tard</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop hidden" id="bug-report-modal" role="dialog" aria-modal="true" aria-labelledby="bug-report-title">
+    <div class="feedback-modal">
+      <header class="modal-head">
+        <div>
+          <div class="eyebrow">Rapport local</div>
+          <h3 id="bug-report-title">Signaler un bug</h3>
+          <p id="bug-report-subtitle">Le rapport est anonymisé et sauvegardé localement si aucun webhook n'est configuré.</p>
+        </div>
+        <button class="icon-btn" id="bug-report-close" type="button" aria-label="Fermer">×</button>
+      </header>
+      <label>Description courte
+        <textarea id="bug-report-description" rows="4" placeholder="Ce que tu as vu, en une phrase."></textarea>
+      </label>
+      <p class="match-sub" id="bug-report-status">Aucune donnée personnelle ni clé API n'est incluse.</p>
+      <div class="section-actions">
+        <button class="primary-btn" id="bug-report-send" type="button">Envoyer</button>
+        <button class="ghost-btn" id="bug-report-later" type="button">Plus tard</button>
+        <button class="ghost-btn" id="bug-report-never" type="button">Ne plus demander</button>
       </div>
     </div>
   </div>

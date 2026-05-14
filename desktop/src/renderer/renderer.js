@@ -90,7 +90,10 @@
     focusRow: null,
     feedbackBetId: null,
     updateStatus: null,
-    appInfo: null
+    appInfo: null,
+    bugReportDraft: null,
+    actionTrail: [],
+    shortcutCaptureAction: null
   };
 
   const ACTION_HISTORY_KEY = 'parisSportifActionHistory';
@@ -123,6 +126,29 @@
   const EVENING_BRIEF_KEY = 'parisSportifEveningBriefs';
   const EVENING_BRIEF_SEEN_KEY = 'parisSportifEveningBriefSeen';
   const DEMO_TOUR_KEY = 'parisSportifDemoTourDone';
+  const BUG_REPORTS_KEY = 'parisSportifBugReportsLocal';
+  const BUG_REPORT_PROMPT_KEY = 'parisSportifBugReportPrompt';
+  const SHORTCUTS_KEY = 'parisSportifKeyboardShortcuts';
+  const DEFAULT_SHORTCUTS = {
+    dashboard: 'Ctrl+1',
+    history: 'Ctrl+2',
+    preferences: 'Ctrl+3',
+    expert: 'Ctrl+E',
+    refresh: 'Ctrl+R',
+    topPick: 'Ctrl+M',
+    help: 'Ctrl+/',
+    logs: 'Ctrl+Shift+L'
+  };
+  const SHORTCUT_ACTIONS = {
+    dashboard: { label: 'Vue Picks' },
+    history: { label: 'Vue Bilan' },
+    preferences: { label: 'Vue Réglages' },
+    expert: { label: 'Mode expert' },
+    refresh: { label: 'Refresh manuel' },
+    topPick: { label: 'Mise rapide top pick' },
+    help: { label: 'Aide' },
+    logs: { label: 'Logs debug' }
+  };
   const SPORTS_PREFS = ['football', 'tennis', 'basketball', 'hockey', 'baseball', 'rugby', 'football américain', 'mma', 'boxe', 'handball', 'volleyball'];
   const SIMPLE_MARKET_PREFS = [
     { key: 'winner', label: 'Vainqueur du match', keys: ['1n2', 'matchwinner', 'vainqueur'] },
@@ -184,6 +210,8 @@
     antiTiltStrict: true,
     autoUpdateEnabled: true,
     updateChannel: 'stable',
+    bugReportPrompt: true,
+    theme: 'dark',
     strict: false
   };
   const REFRESH_DEFAULT_INTERVAL_MS = 30 * 60 * 1000;
@@ -590,6 +618,16 @@
     renderDebugLogs();
   }
 
+  function recordUserAction(action, detail = '') {
+    const entry = {
+      at: new Date().toISOString(),
+      action: String(action || 'action').slice(0, 80),
+      detail: String(detail || '').slice(0, 180)
+    };
+    state.actionTrail.push(entry);
+    state.actionTrail = state.actionTrail.slice(-60);
+  }
+
   function installDebugLogHooks() {
     ['warn', 'error'].forEach((level) => {
       const original = console[level];
@@ -605,6 +643,119 @@
         }
         original.apply(console, args);
       };
+    });
+  }
+
+  function appStateForBugReport() {
+    const prefs = loadPreferences();
+    return {
+      tab: $('.tab-panel.active')?.dataset.panel || 'unknown',
+      picksVisible: Number($('#metric-picks')?.textContent || 0) || state.picks.length,
+      trackedBets: loadUserBets().length,
+      bankrollPresent: Boolean(prefs.bankroll),
+      demoMode: Boolean(prefs.demoMode),
+      expertMode: Boolean(prefs.expertMode),
+      theme: prefs.theme || 'dark',
+      autoUpdateEnabled: prefs.autoUpdateEnabled !== false,
+      webhookConfigured: Boolean(prefs.webhookUrl),
+      aiConfigured: Boolean(prefs.aiApiKey),
+      dataStatus: state.status?.status || null,
+      refreshRunning: Boolean(state.status?.refresh?.running)
+    };
+  }
+
+  function bugReportPayload(type, description, error) {
+    const prefs = loadPreferences();
+    return {
+      type,
+      description,
+      error: error ? {
+        message: error.message || String(error),
+        stack: error.stack || '',
+        name: error.name || ''
+      } : null,
+      actions: state.actionTrail,
+      appState: appStateForBugReport(),
+      config: prefs.webhookUrl ? { type: prefs.webhookType || 'generic', url: prefs.webhookUrl } : {}
+    };
+  }
+
+  async function sendBugReport({ type = 'manual', description = '', error = null } = {}) {
+    const payload = bugReportPayload(type, description, error);
+    const response = await fetchJson('/api/bug-report/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    writeStorageJson(BUG_REPORTS_KEY, response.reports || []);
+    pushLog(response.report?.sent ? 'info' : 'warn', response.report?.sent ? 'Rapport bug envoyé' : 'Rapport bug sauvegardé localement', response.report);
+    return response;
+  }
+
+  function showBugReportModal({ type = 'manual', description = '', error = null } = {}) {
+    state.bugReportDraft = { type, description, error };
+    const modal = $('#bug-report-modal');
+    const textarea = $('#bug-report-description');
+    const status = $('#bug-report-status');
+    if (textarea) textarea.value = description || (error ? String(error.message || error).slice(0, 500) : '');
+    if (status) status.textContent = 'Le rapport est anonymisé : pas de clé API, pas de montant, pas de détail de pari.';
+    modal?.classList.remove('hidden');
+  }
+
+  function closeBugReportModal() {
+    $('#bug-report-modal')?.classList.add('hidden');
+    state.bugReportDraft = null;
+  }
+
+  function renderBugReportList() {
+    const node = $('#bug-report-list');
+    if (!node) return;
+    const reports = readStorageJson(BUG_REPORTS_KEY, []);
+    if (!Array.isArray(reports) || !reports.length) {
+      node.textContent = 'Aucun rapport de bug local.';
+      return;
+    }
+    node.innerHTML = reports.slice(0, 4).map((report) => `
+      <div class="bug-report-row">
+        <div>
+          <strong>${escapeHtml(report.type || 'rapport')}</strong>
+          <small>${escapeHtml(report.description || report.id || 'Sans description')}</small>
+        </div>
+        <span class="shortcut-key">${escapeHtml(report.sent ? 'envoyé' : 'local')}</span>
+      </div>
+    `).join('');
+  }
+
+  async function loadBugReports() {
+    try {
+      const response = await fetchJson('/api/bug-report/list');
+      writeStorageJson(BUG_REPORTS_KEY, response.reports || []);
+      renderBugReportList();
+    } catch (error) {
+      pushLog('warn', `Rapports bug indisponibles: ${error.message}`);
+    }
+  }
+
+  function installGlobalErrorReporting() {
+    window.addEventListener('error', (event) => {
+      const prefs = loadPreferences();
+      const error = event.error || new Error(event.message || 'Erreur inconnue');
+      pushLog('error', `Erreur app: ${error.message || event.message}`);
+      if (prefs.bugReportPrompt !== false && localStorage.getItem(BUG_REPORT_PROMPT_KEY) !== 'never') {
+        showBugReportModal({ type: 'auto-error', description: 'Erreur détectée automatiquement.', error });
+      } else {
+        sendBugReport({ type: 'auto-error', description: 'Erreur détectée automatiquement.', error }).catch(() => {});
+      }
+    });
+    window.addEventListener('unhandledrejection', (event) => {
+      const prefs = loadPreferences();
+      const reason = event.reason instanceof Error ? event.reason : new Error(String(event.reason || 'Promise rejetée'));
+      pushLog('error', `Erreur async: ${reason.message}`);
+      if (prefs.bugReportPrompt !== false && localStorage.getItem(BUG_REPORT_PROMPT_KEY) !== 'never') {
+        showBugReportModal({ type: 'auto-rejection', description: 'Erreur asynchrone détectée.', error: reason });
+      } else {
+        sendBugReport({ type: 'auto-rejection', description: 'Erreur asynchrone détectée.', error: reason }).catch(() => {});
+      }
     });
   }
 
@@ -1470,6 +1621,7 @@
 
   function trackUserBet(row) {
     if (!row || !canDisplayStake(row)) return;
+    recordUserAction('track-bet', row.title || row.label || '');
     const discipline = bankrollDisciplineStatus();
     if (discipline.blocked) {
       setSideStatus(discipline.label, discipline.tone === 'danger' ? 'danger' : 'warn');
@@ -4142,6 +4294,24 @@
     const max = Number(memory.maxRssMb || memory.rssMb || 0);
     const liveCount = liveRows().length;
     const tone = memory.warning ? 'warn' : 'ok';
+    const stress = status?.stressReport || null;
+    const update = state.updateStatus || readStorageJson(UPDATE_STATUS_KEY, null);
+    const stressHtml = stress ? `
+      <article class="refresh-card refresh-${escapeHtml(stress.ok === false ? 'warn' : 'ok')}">
+        <span>Stress test</span>
+        <strong>${escapeHtml(stress.label || `${stress.durationMinutes || stress.requestedMinutes || '-'} min mesurées`)}</strong>
+        <p>Max ${escapeHtml(String(stress.memoryMaxMb || stress.maxMemoryMb || '-'))} MB · p95 ${escapeHtml(String(stress.memoryP95Mb || '-'))} MB · erreurs ${formatCount((stress.errors || []).length)}</p>
+        <small>${escapeHtml(stress.finishedAt ? `Dernier rapport ${formatDateTime(stress.finishedAt)}` : 'Rapport local disponible.')}</small>
+      </article>
+    ` : '';
+    const updateHtml = update ? `
+      <article class="refresh-card refresh-${escapeHtml(update.error ? 'warn' : update.available ? 'ok' : 'idle')}">
+        <span>Auto-update</span>
+        <strong>${escapeHtml(update.available ? `v${update.latestVersion || ''}` : 'À jour')}</strong>
+        <p>${escapeHtml(update.installOnQuit ? 'Installation au prochain redémarrage' : update.assetName || update.channel || 'stable')}</p>
+        <small>${escapeHtml(update.error || (update.checkedAt ? `Vérifié ${formatDateTime(update.checkedAt)}` : 'Pas encore vérifié'))}</small>
+      </article>
+    ` : '';
     node.innerHTML = `
       <article class="refresh-card refresh-${escapeHtml(tone)}">
         <span>Stabilité</span>
@@ -4149,6 +4319,8 @@
         <p>Moy. ${avg ? `${avg.toFixed(1)} MB` : '-'} · max ${max ? `${max.toFixed(1)} MB` : '-'} · live suivis ${formatCount(liveCount)}</p>
         <small>${escapeHtml(memory.warning || 'Objectif 7 jours : monitoring actif, UI non bloquante.')}</small>
       </article>
+      ${updateHtml}
+      ${stressHtml}
     `;
   }
 
@@ -6136,6 +6308,130 @@
     return `<label class="check-line"><input type="checkbox" name="${escapeHtml(name)}" value="${escapeHtml(value)}"${checked ? ' checked' : ''}> ${escapeHtml(label)}</label>`;
   }
 
+  function applyTheme(prefs = loadPreferences()) {
+    const theme = ['dark', 'light', 'auto'].includes(prefs.theme) ? prefs.theme : 'dark';
+    document.body.classList.remove('theme-dark', 'theme-light', 'theme-auto');
+    document.body.classList.add(`theme-${theme}`);
+  }
+
+  function loadShortcuts() {
+    const stored = readStorageJson(SHORTCUTS_KEY, {});
+    return { ...DEFAULT_SHORTCUTS, ...(stored && typeof stored === 'object' ? stored : {}) };
+  }
+
+  function saveShortcuts(shortcuts) {
+    const clean = { ...DEFAULT_SHORTCUTS, ...(shortcuts || {}) };
+    writeStorageJson(SHORTCUTS_KEY, clean);
+    return clean;
+  }
+
+  function normalizeShortcutText(text) {
+    const raw = String(text || '').trim();
+    if (!raw) return '';
+    const parts = raw.split('+').map((part) => part.trim()).filter(Boolean);
+    const key = parts.pop() || '';
+    const mods = new Set(parts.map((part) => part.toLowerCase()));
+    const ordered = [];
+    if (mods.has('ctrl') || mods.has('control')) ordered.push('Ctrl');
+    if (mods.has('shift')) ordered.push('Shift');
+    if (mods.has('alt')) ordered.push('Alt');
+    if (mods.has('meta') || mods.has('cmd')) ordered.push('Meta');
+    const canonicalKey = key.length === 1 ? key.toUpperCase() : key.replace(/^arrow/i, 'Arrow');
+    return [...ordered, canonicalKey].join('+');
+  }
+
+  function shortcutFromEvent(event) {
+    const key = event.key === ' ' ? 'Space' : event.key;
+    if (!key || ['Control', 'Shift', 'Alt', 'Meta'].includes(key)) return '';
+    const parts = [];
+    if (event.ctrlKey) parts.push('Ctrl');
+    if (event.shiftKey) parts.push('Shift');
+    if (event.altKey) parts.push('Alt');
+    if (event.metaKey) parts.push('Meta');
+    const displayKey = key.length === 1 ? key.toUpperCase() : key;
+    return [...parts, displayKey].join('+');
+  }
+
+  function renderShortcutSettings() {
+    const grid = $('#shortcut-settings-grid');
+    if (!grid) return;
+    const shortcuts = loadShortcuts();
+    grid.innerHTML = Object.entries(SHORTCUT_ACTIONS).map(([action, item]) => {
+      const capturing = state.shortcutCaptureAction === action;
+      return `
+        <div class="shortcut-row${capturing ? ' capturing' : ''}" data-shortcut-row="${escapeHtml(action)}">
+          <div>
+            <strong>${escapeHtml(item.label)}</strong>
+            <small>${escapeHtml(capturing ? 'Tape la nouvelle combinaison...' : 'Raccourci configurable')}</small>
+          </div>
+          <span class="shortcut-key">${escapeHtml(shortcuts[action] || DEFAULT_SHORTCUTS[action] || '-')}</span>
+          <button class="ghost-btn" type="button" data-shortcut-edit="${escapeHtml(action)}">${capturing ? 'Annuler' : 'Modifier'}</button>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function setShortcut(action, combo) {
+    if (!SHORTCUT_ACTIONS[action] || !combo) return false;
+    const normalized = normalizeShortcutText(combo);
+    const shortcuts = loadShortcuts();
+    const duplicate = Object.entries(shortcuts).find(([otherAction, value]) => otherAction !== action && normalizeShortcutText(value) === normalized);
+    const status = $('#shortcut-capture-status');
+    if (duplicate) {
+      if (status) status.textContent = `Conflit avec ${SHORTCUT_ACTIONS[duplicate[0]]?.label || duplicate[0]}.`;
+      return false;
+    }
+    saveShortcuts({ ...shortcuts, [action]: normalized });
+    state.shortcutCaptureAction = null;
+    if (status) status.textContent = `${SHORTCUT_ACTIONS[action].label} : ${normalized}`;
+    renderShortcutSettings();
+    return true;
+  }
+
+  function toggleHelpPanel() {
+    $('#help-panel')?.classList.toggle('hidden');
+  }
+
+  function executeShortcut(action, event) {
+    const target = event?.target;
+    if (target && ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName)) return false;
+    if (action === 'dashboard') switchTab('dashboard');
+    else if (action === 'history') switchTab('history');
+    else if (action === 'preferences') switchTab('preferences');
+    else if (action === 'expert') {
+      const prefs = { ...loadPreferences(), expertMode: !loadPreferences().expertMode };
+      savePreferences(prefs);
+      renderPreferences();
+      applyExpertMode();
+      setSideStatus(prefs.expertMode ? 'Mode expert actif' : 'Mode expert masqué', 'ok');
+    } else if (action === 'refresh') {
+      startRefresh().catch((error) => setSideStatus(`Refresh impossible : ${error.message}`, 'danger'));
+    } else if (action === 'topPick') {
+      const row = (dashboardPickRows(readPickFilters()) || [])[0] || state.picks[0] || state.allPicks[0];
+      if (row) trackUserBet(row);
+      else setSideStatus('Aucun top pick à miser', 'warn');
+    } else if (action === 'help') toggleHelpPanel();
+    else if (action === 'logs') openLogDrawer();
+    else return false;
+    recordUserAction('shortcut', action);
+    return true;
+  }
+
+  function applyShortcutEvent(event) {
+    if (state.shortcutCaptureAction) {
+      event.preventDefault();
+      const combo = shortcutFromEvent(event);
+      if (combo) setShortcut(state.shortcutCaptureAction, combo);
+      return true;
+    }
+    const combo = normalizeShortcutText(shortcutFromEvent(event));
+    if (!combo) return false;
+    const action = Object.entries(loadShortcuts()).find(([, value]) => normalizeShortcutText(value) === combo)?.[0];
+    if (!action) return false;
+    event.preventDefault();
+    return executeShortcut(action, event);
+  }
+
   function applyExpertMode() {
     const expert = Boolean(loadPreferences().expertMode);
     document.body.classList.toggle('expert-mode', expert);
@@ -6157,6 +6453,8 @@
     if (strict) strict.checked = Boolean(prefs.strict);
     const demo = $('#pref-demo-mode');
     if (demo) demo.checked = Boolean(prefs.demoMode);
+    const theme = $('#pref-theme');
+    if (theme) theme.value = prefs.theme || 'dark';
     const coachEnabled = $('#pref-coach-enabled');
     if (coachEnabled) coachEnabled.checked = prefs.coachEnabled !== false;
     const antiTiltStrict = $('#pref-anti-tilt-strict');
@@ -6165,6 +6463,8 @@
     if (prematchAlerts) prematchAlerts.checked = prefs.prematchAlertsEnabled !== false;
     const topPickAlerts = $('#pref-top-pick-alerts');
     if (topPickAlerts) topPickAlerts.checked = prefs.topPickAlertsEnabled !== false;
+    const bugReportPrompt = $('#pref-bug-report-prompt');
+    if (bugReportPrompt) bugReportPrompt.checked = prefs.bugReportPrompt !== false;
     const expertMode = $('#pref-expert-mode');
     if (expertMode) expertMode.checked = Boolean(prefs.expertMode);
     const aiEnabled = $('#pref-ai-enabled');
@@ -6232,7 +6532,10 @@
     if (webhookUrl) webhookUrl.value = prefs.webhookUrl || '';
     const versionLabel = $('#app-version-label');
     if (versionLabel) versionLabel.textContent = `Paris Sportif Desktop v${state.appInfo?.version || '1.0.0'}`;
+    applyTheme(prefs);
     renderUpdateStatus();
+    renderShortcutSettings();
+    renderBugReportList();
     renderProfileImportPreview();
     renderOnboarding();
     renderLearningAudit();
@@ -6254,9 +6557,47 @@
       node.textContent = `Update : ${status.error}`;
       return;
     }
+    if (status.installOnQuit) {
+      node.textContent = `Version ${status.latestVersion || ''} préparée · installation au prochain redémarrage.`;
+      return;
+    }
     node.textContent = status.available
-      ? `Update disponible ${status.latestVersion || ''} · installation au prochain redémarrage si demandée.`
+      ? `Version ${status.latestVersion || ''} disponible${status.assetName ? ` · ${status.assetName}` : ''}.`
       : `À jour (${status.currentVersion || 'version locale'}) · vérifié ${status.checkedAt ? formatDateTime(status.checkedAt) : '-'}.`;
+  }
+
+  function closeUpdateModal() {
+    $('#update-modal')?.classList.add('hidden');
+  }
+
+  function showUpdateModal(status = state.updateStatus) {
+    const modal = $('#update-modal');
+    if (!modal || !status?.available) return;
+    const title = $('#update-modal-title');
+    const subtitle = $('#update-modal-subtitle');
+    const notes = $('#update-modal-notes');
+    if (title) title.textContent = `Mise à jour v${status.latestVersion || ''} disponible`;
+    if (subtitle) subtitle.textContent = status.releaseName || 'Tu peux l’installer au prochain redémarrage.';
+    if (notes) {
+      notes.classList.add('update-note-box');
+      notes.textContent = status.releaseNotes || 'Aucune note de version fournie.';
+    }
+    modal.classList.remove('hidden');
+  }
+
+  async function prepareUpdateInstall() {
+    try {
+      const response = await fetchJson('/api/update/install-next-restart', { method: 'POST' });
+      state.updateStatus = response.status || state.updateStatus;
+      writeStorageJson(UPDATE_STATUS_KEY, state.updateStatus);
+      renderUpdateStatus();
+      closeUpdateModal();
+      setSideStatus(state.updateStatus?.installOnQuit ? 'Update préparée au redémarrage' : 'Aucune update disponible', state.updateStatus?.installOnQuit ? 'ok' : 'warn');
+      return state.updateStatus;
+    } catch (error) {
+      setSideStatus(`Préparation update impossible : ${error.message}`, 'warn');
+      return null;
+    }
   }
 
   async function checkForUpdates({ manual = false } = {}) {
@@ -6273,6 +6614,7 @@
       renderUpdateStatus();
       if (state.updateStatus.available) {
         notifyUser('Mise à jour disponible', `Version ${state.updateStatus.latestVersion || ''} prête sur GitHub Releases.`);
+        showUpdateModal(state.updateStatus);
       }
       if (manual) setSideStatus(state.updateStatus.available ? 'Mise à jour disponible' : 'Application à jour', state.updateStatus.available ? 'warn' : 'ok');
       return state.updateStatus;
@@ -6293,6 +6635,7 @@
     return {
       bankroll: Math.max(10, Number($('#pref-bankroll')?.value || 50) || 50),
       level: $('#pref-level')?.value || 'intermediate',
+      theme: $('#pref-theme')?.value || DEFAULT_PREFERENCES.theme,
       sports: selectedSports.length ? selectedSports : SPORTS_PREFS,
       markets: [...(simpleSelected.length ? simpleSelected : DEFAULT_PREFERENCES.markets), ...expertSelected],
       edgeMin: Math.max(0, Number($('#pref-edge-min')?.value || 0) || 0),
@@ -6315,6 +6658,7 @@
       antiTiltStrict: $('#pref-anti-tilt-strict')?.checked !== false,
       prematchAlertsEnabled: $('#pref-prematch-alerts')?.checked !== false,
       topPickAlertsEnabled: $('#pref-top-pick-alerts')?.checked !== false,
+      bugReportPrompt: $('#pref-bug-report-prompt')?.checked !== false,
       dailyBetLimit: Math.max(1, Number($('#pref-daily-bet-limit')?.value || DEFAULT_PREFERENCES.dailyBetLimit) || DEFAULT_PREFERENCES.dailyBetLimit),
       dailyStakeCapPct: Math.max(1, Number($('#pref-daily-stake-cap')?.value || DEFAULT_PREFERENCES.dailyStakeCapPct) || DEFAULT_PREFERENCES.dailyStakeCapPct),
       coachLossStreakConfirm: Math.max(2, Number($('#pref-loss-streak-confirm')?.value || DEFAULT_PREFERENCES.coachLossStreakConfirm) || DEFAULT_PREFERENCES.coachLossStreakConfirm),
@@ -6338,6 +6682,7 @@
     const bankrollInput = $('#bankroll-input');
     if (bankrollInput) bankrollInput.value = String(prefs.bankroll || 50);
     localStorage.setItem('userBankroll', String(prefs.bankroll || 50));
+    applyTheme(prefs);
     renderPreferences();
     applyExpertMode();
     renderPicks();
@@ -10137,6 +10482,7 @@
 
   async function startRefresh(mode = 'quick', requestedSource = null) {
     const source = mode === 'signals' ? (requestedSource || $('#refresh-signal-source')?.value || 'all') : 'all';
+    recordUserAction('refresh', `${mode}:${source}`);
     const actionId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
     const actionRecord = {
       id: actionId,
@@ -10306,6 +10652,7 @@
 
   function switchTab(tab) {
     if (tab === 'data' && !loadPreferences().expertMode) tab = 'preferences';
+    recordUserAction('view', tab);
     $$('.nav-btn').forEach((btn) => btn.classList.toggle('active', btn.dataset.tab === tab));
     $$('.tab-panel').forEach((panel) => panel.classList.toggle('active', panel.dataset.panel === tab));
     const titles = {
@@ -11196,11 +11543,18 @@
       });
     });
     $('#reload-engine-btn').addEventListener('click', () => reloadEngine());
-    $('#help-panel-btn')?.addEventListener('click', () => $('#help-panel')?.classList.remove('hidden'));
+    $('#help-panel-btn')?.addEventListener('click', () => {
+      recordUserAction('help', 'panel');
+      $('#help-panel')?.classList.remove('hidden');
+    });
     $('#help-panel-close')?.addEventListener('click', () => $('#help-panel')?.classList.add('hidden'));
     $('#help-demo-tour-btn')?.addEventListener('click', () => {
       $('#help-panel')?.classList.add('hidden');
       startDemoTour({ force: true });
+    });
+    $('#help-bug-report-btn')?.addEventListener('click', () => {
+      $('#help-panel')?.classList.add('hidden');
+      showBugReportModal({ type: 'manual', description: '' });
     });
     $('#daily-suggestion-dismiss')?.addEventListener('click', () => {
       localStorage.setItem(DAILY_SUGGESTION_DISMISS_KEY, parisDayKey());
@@ -11387,16 +11741,58 @@
       });
     });
     $('#check-update-btn')?.addEventListener('click', () => checkForUpdates({ manual: true }));
-    $('#install-update-btn')?.addEventListener('click', async () => {
+    $('#install-update-btn')?.addEventListener('click', prepareUpdateInstall);
+    $('#update-modal-close')?.addEventListener('click', closeUpdateModal);
+    $('#update-modal-later-btn')?.addEventListener('click', closeUpdateModal);
+    $('#update-modal-install-btn')?.addEventListener('click', prepareUpdateInstall);
+    $('#update-modal-notes-btn')?.addEventListener('click', () => {
+      const url = state.updateStatus?.releaseUrl;
+      if (url) window.open(url, '_blank', 'noopener,noreferrer');
+      else setSideStatus('Aucune page release disponible', 'warn');
+    });
+    $('#update-modal')?.addEventListener('click', (event) => {
+      if (event.target.id === 'update-modal') closeUpdateModal();
+    });
+    $('#manual-bug-report-btn')?.addEventListener('click', () => showBugReportModal({ type: 'manual', description: '' }));
+    $('#bug-report-close')?.addEventListener('click', closeBugReportModal);
+    $('#bug-report-later')?.addEventListener('click', closeBugReportModal);
+    $('#bug-report-never')?.addEventListener('click', () => {
+      localStorage.setItem(BUG_REPORT_PROMPT_KEY, 'never');
+      const prefs = { ...loadPreferences(), bugReportPrompt: false };
+      savePreferences(prefs);
+      renderPreferences();
+      closeBugReportModal();
+    });
+    $('#bug-report-send')?.addEventListener('click', async () => {
+      const status = $('#bug-report-status');
+      const draft = state.bugReportDraft || { type: 'manual' };
       try {
-        const response = await fetchJson('/api/update/install-next-restart', { method: 'POST' });
-        state.updateStatus = response.status || state.updateStatus;
-        writeStorageJson(UPDATE_STATUS_KEY, state.updateStatus);
-        renderUpdateStatus();
-        setSideStatus(state.updateStatus?.installOnQuit ? 'Update préparée au redémarrage' : 'Aucune update disponible', state.updateStatus?.installOnQuit ? 'ok' : 'warn');
+        const description = ($('#bug-report-description')?.value || draft.description || '').trim();
+        const response = await sendBugReport({ ...draft, description });
+        if (status) status.textContent = response.report?.sent ? 'Rapport envoyé.' : 'Rapport sauvegardé localement.';
+        renderBugReportList();
+        setTimeout(closeBugReportModal, 650);
       } catch (error) {
-        setSideStatus(`Préparation update impossible : ${error.message}`, 'warn');
+        if (status) status.textContent = `Rapport impossible : ${error.message}`;
       }
+    });
+    $('#bug-report-modal')?.addEventListener('click', (event) => {
+      if (event.target.id === 'bug-report-modal') closeBugReportModal();
+    });
+    $('#shortcut-settings-grid')?.addEventListener('click', (event) => {
+      const button = event.target.closest('[data-shortcut-edit]');
+      if (!button) return;
+      const action = button.dataset.shortcutEdit;
+      state.shortcutCaptureAction = state.shortcutCaptureAction === action ? null : action;
+      renderShortcutSettings();
+      const status = $('#shortcut-capture-status');
+      if (status) status.textContent = state.shortcutCaptureAction ? 'Tape la nouvelle combinaison.' : 'Capture annulée.';
+    });
+    $('#reset-shortcuts-btn')?.addEventListener('click', () => {
+      saveShortcuts(DEFAULT_SHORTCUTS);
+      state.shortcutCaptureAction = null;
+      renderShortcutSettings();
+      setSideStatus('Raccourcis réinitialisés', 'ok');
     });
     $('#export-profile-btn')?.addEventListener('click', exportProfile);
     $('#import-profile-btn')?.addEventListener('click', () => $('#profile-import-input')?.click());
@@ -11437,6 +11833,11 @@
     $('#force-weekly-report-btn')?.addEventListener('click', () => maybeShowWeeklyReport({ force: true }));
     $('#force-evening-brief-btn')?.addEventListener('click', () => maybeShowEveningBrief({ force: true }));
     $('#start-demo-tour-btn')?.addEventListener('click', () => startDemoTour({ force: true }));
+    $('#pref-theme')?.addEventListener('change', () => {
+      const prefs = { ...loadPreferences(), theme: $('#pref-theme')?.value || 'dark' };
+      savePreferences(prefs);
+      applyTheme(prefs);
+    });
     $('#weekly-report-close')?.addEventListener('click', closeWeeklyReportModal);
     $('#weekly-report-detail')?.addEventListener('click', () => {
       closeWeeklyReportModal();
@@ -11655,31 +12056,18 @@
     });
     document.addEventListener('keydown', (event) => {
       if (event.key === 'Escape') {
+        if (state.shortcutCaptureAction) {
+          state.shortcutCaptureAction = null;
+          renderShortcutSettings();
+        }
         closeFocusMode();
         closeLossFeedbackPrompt();
         closeWeeklyReportModal();
+        closeUpdateModal();
+        closeBugReportModal();
         closeMatchDetail();
       }
-      if (event.ctrlKey && event.shiftKey && !event.altKey && !event.metaKey && event.key.toLowerCase() === 'l') {
-        event.preventDefault();
-        openLogDrawer();
-        return;
-      }
-      if (event.ctrlKey && !event.altKey && !event.metaKey) {
-        const target = event.target;
-        if (target && ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName)) return;
-        const shortcuts = {
-          '1': 'dashboard',
-          '2': 'history',
-          '3': 'preferences',
-          '4': 'data'
-        };
-        const tab = shortcuts[event.key];
-        if (tab) {
-          event.preventDefault();
-          switchTab(tab);
-        }
-      }
+      applyShortcutEvent(event);
     });
     $('#bankroll-input').addEventListener('change', () => {
       localStorage.setItem('userBankroll', String(getBankroll()));
@@ -11750,6 +12138,8 @@
   async function boot() {
     state.bootStartedAt = typeof performance !== 'undefined' ? performance.now() : Date.now();
     installDebugLogHooks();
+    installGlobalErrorReporting();
+    applyTheme(loadPreferences());
     pushLog('info', 'Démarrage du cockpit desktop');
     markAppSessionStart();
     bindEvents();
@@ -11757,6 +12147,7 @@
     state.aiAssist = readStorageJson(AI_ENGINE_KEY, null);
     state.webEnrichments = readStorageJson(WEB_ENRICHMENT_KEY, null);
     state.updateStatus = readStorageJson(UPDATE_STATUS_KEY, null);
+    loadBugReports().catch(() => {});
     renderActionHistory();
     updateWebEnrichmentSummary();
     const storedBankroll = Number(localStorage.getItem('userBankroll') || loadPreferences().bankroll || 50);

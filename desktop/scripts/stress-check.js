@@ -10,6 +10,19 @@ function argMinutes() {
   return Number.isFinite(value) && value > 0 ? value : 5;
 }
 
+function percentile(values, pct) {
+  if (!values.length) return 0;
+  const sorted = values.slice().sort((a, b) => a - b);
+  const index = Math.min(sorted.length - 1, Math.max(0, Math.ceil((pct / 100) * sorted.length) - 1));
+  return sorted[index];
+}
+
+function writeStressReport(root, report) {
+  const stateDir = path.join(root, 'desktop', 'state');
+  fs.mkdirSync(stateDir, { recursive: true });
+  fs.writeFileSync(path.join(stateDir, 'stress-report.json'), JSON.stringify(report, null, 2));
+}
+
 async function firstWindow(app) {
   return app.windows()[0] || app.waitForEvent('window', { timeout: 60_000 });
 }
@@ -26,9 +39,12 @@ async function main() {
   const deadline = Date.now() + minutes * 60_000;
   const messages = [];
   const memory = [];
+  const startedAt = new Date().toISOString();
+  const testPort = 23000 + Math.floor(Math.random() * 2000);
   const app = await electron.launch({
     executablePath: electronExe,
     cwd: path.join(root, 'desktop'),
+    env: { ...process.env, PARIS_DESKTOP_PORT: String(testPort) },
     args: [`--user-data-dir=${userDataDir}`, '.']
   });
   try {
@@ -64,9 +80,25 @@ async function main() {
     const severe = messages.filter((message) => (
       message.startsWith('error:') || message.startsWith('pageerror:')
     ) && !isIgnorableConsoleMessage(message));
-    if (severe.length) throw new Error(`Erreurs console pendant stress: ${severe.join(' | ')}`);
     const maxMemory = memory.length ? Math.max(...memory) : 0;
     const avgMemory = memory.length ? memory.reduce((sum, value) => sum + value, 0) / memory.length : 0;
+    const p95Memory = percentile(memory, 95);
+    const report = {
+      ok: !severe.length && maxMemory <= 600,
+      label: minutes >= 5760 ? 'Stress 96h' : `Stress court ${minutes} min`,
+      requestedMinutes: minutes,
+      startedAt,
+      finishedAt: new Date().toISOString(),
+      durationMinutes: minutes,
+      memoryAvgMb: Number(avgMemory.toFixed(1)) || 0,
+      memoryMaxMb: Number(maxMemory.toFixed(1)) || 0,
+      memoryP95Mb: Number(p95Memory.toFixed(1)) || 0,
+      sampleCount: memory.length,
+      errors: severe.slice(0, 20),
+      note: minutes < 5760 ? 'Validation locale courte. Le profil 96h utilise le même garde-fou avec --minutes=5760.' : 'Validation 96h complète.'
+    };
+    writeStressReport(root, report);
+    if (severe.length) throw new Error(`Erreurs console pendant stress: ${severe.join(' | ')}`);
     if (maxMemory > 600) throw new Error(`Mémoire trop haute: ${maxMemory} MB RSS`);
     console.log(`Stress desktop OK: ${minutes} min, mémoire max ${maxMemory || 'n/a'} MB, moyenne ${avgMemory ? avgMemory.toFixed(1) : 'n/a'} MB, ${memory.length} samples.`);
   } finally {

@@ -29,17 +29,25 @@ async function main() {
   for (const marker of ['contextIsolation: true', 'sandbox: true', 'setWindowOpenHandler', "permission === 'notifications'", 'process.memoryUsage()', 'requestSingleInstanceLock', 'cleanupChromiumEphemeralStorage', 'fallback démarrage']) {
     if (!mainText.includes(marker)) throw new Error(`Durcissement Electron absent: ${marker}`);
   }
+  for (const marker of ['DEFAULT_LOCAL_PORT = 17654', '/api/bug-report/save']) {
+    if (!mainText.includes(marker)) throw new Error(`Sprint 20 main absent: ${marker}`);
+  }
   if (mainText.includes('clearStorageData')) throw new Error('Nettoyage CacheStorage agressif réintroduit au démarrage');
   for (const marker of ['todayFunnel', 'renderSimpleTimeline', 'antiTiltStatus', 'applyExpertMode', 'renderWinamaxPromos', 'renderBankrollAccounting', 'winamaxMarketAudit', 'coverage24h', 'safeBadgeHtml', 'renderTemporalCockpit', 'priorityBadgeHtml', 'dailyBudgetPlan', 'renderPaperSimulation', 'renderModelVsUser', 'buildDailySuggestion', 'specialPatternBadgeHtml', 'maybeShowEveningBrief', 'startDemoTour', 'SIMPLE_MARKET_PREFS', 'actionPickHtml', 'userBetLabel']) {
     if (!rendererText.includes(marker)) throw new Error(`Sprint 14 renderer absent: ${marker}`);
   }
+  for (const marker of ['applyTheme', 'installGlobalErrorReporting', 'renderShortcutSettings', 'prepareUpdateInstall']) {
+    if (!rendererText.includes(marker)) throw new Error(`Sprint 20 renderer absent: ${marker}`);
+  }
 
   const messages = [];
   const userDataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'paris-sportif-smoke-'));
+  const testPort = 21000 + Math.floor(Math.random() * 2000);
   const app = await electron.launch({
     executablePath: electronExe,
     cwd: path.join(root, 'desktop'),
     acceptDownloads: true,
+    env: { ...process.env, PARIS_DESKTOP_PORT: String(testPort) },
     args: [`--user-data-dir=${userDataDir}`, '.']
   });
 
@@ -98,6 +106,8 @@ async function main() {
     const prefs = await win.evaluate(() => ({
       expert: Boolean(document.querySelector('#pref-expert-mode')),
       antiTilt: Boolean(document.querySelector('#pref-anti-tilt-strict')),
+      theme: Boolean(document.querySelector('#pref-theme')),
+      bugReport: Boolean(document.querySelector('#pref-bug-report-prompt') && document.querySelector('#manual-bug-report-btn')),
       allocation: Boolean(document.querySelector('#pref-allocation-strategy') && document.querySelector('#pref-daily-budget')),
       prematchAlerts: Boolean(document.querySelector('#pref-prematch-alerts') && document.querySelector('#pref-top-pick-alerts')),
       expandedSports: (document.querySelector('#pref-sports')?.textContent || '').includes('rugby') && (document.querySelector('#pref-sports')?.textContent || '').includes('mma'),
@@ -107,7 +117,14 @@ async function main() {
       accounting: Boolean(document.querySelector('#add-bankroll-transaction-btn')),
       multiBook: Boolean(document.querySelector('#pref-multibook-enabled') || document.querySelector('#pref-odds-api-key'))
     }));
-    if (!prefs.expert || !prefs.antiTilt || !prefs.allocation || !prefs.prematchAlerts || !prefs.expandedSports || !prefs.simpleMarkets || prefs.simpleHasAdvanced || !prefs.advancedMarkets || !prefs.accounting || prefs.multiBook) throw new Error(`Réglages Sprint 15 invalides: ${JSON.stringify(prefs)}`);
+    if (!prefs.expert || !prefs.antiTilt || !prefs.theme || !prefs.bugReport || !prefs.allocation || !prefs.prematchAlerts || !prefs.expandedSports || !prefs.simpleMarkets || prefs.simpleHasAdvanced || !prefs.advancedMarkets || !prefs.accounting || prefs.multiBook) throw new Error(`Réglages Sprint 20 invalides: ${JSON.stringify(prefs)}`);
+    await win.selectOption('#pref-theme', 'light');
+    await win.waitForFunction(() => document.body.classList.contains('theme-light'), null, { timeout: 5000 });
+    await win.selectOption('#pref-theme', 'dark');
+    await win.waitForFunction(() => document.body.classList.contains('theme-dark'), null, { timeout: 5000 });
+    await win.click('#manual-bug-report-btn');
+    await win.waitForSelector('#bug-report-modal:not(.hidden)', { timeout: 5000 });
+    await win.click('#bug-report-close');
     await win.fill('#bankroll-tx-amount', '25');
     await win.click('#add-bankroll-transaction-btn');
     await win.waitForFunction(() => /Dépôt/.test(document.querySelector('#bankroll-transaction-list')?.textContent || ''), null, { timeout: 5000 });
@@ -115,6 +132,7 @@ async function main() {
     await win.check('#pref-expert-mode');
     await win.click('#save-preferences-btn');
     await win.waitForSelector('[data-tab="data"]:not(.hidden)', { timeout: 5000 });
+    await win.waitForFunction(() => /Vue Picks/.test(document.querySelector('#shortcut-settings-grid')?.textContent || ''), null, { timeout: 5000 });
     await win.click('[data-tab="data"]');
     await win.waitForSelector('#quality-report-grid .quality-report-card, #quality-report-grid .empty', { timeout: 30000 });
     await win.waitForSelector('#winamax-market-audit-grid .quality-report-card, #winamax-market-audit-grid .empty', { timeout: 30000 });

@@ -5,6 +5,18 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 20 — Auto-update, thèmes, robustesse
+
+- Audit post-hotfix : le démarrage Electron conserve maintenant le même origin local (`127.0.0.1:17654`), ce qui protège bankroll, préférences et paris suivis entre deux redémarrages.
+- Auto-update rendu visible : vérification GitHub Releases au boot, canal stable/beta, notes de version, préparation d'installation au redémarrage et état dans `Réglages > Avancé` / Pipeline.
+- Ajout du reporting de bug utilisateur : erreurs non interceptées capturées, rapport anonymisé, envoi webhook si configuré ou sauvegarde locale dans `desktop/state/bug-reports/`, plus bouton manuel `Signaler un bug`.
+- Ajout des thèmes `Sombre`, `Clair` et `Auto`, appliqués instantanément via les variables CSS sans multiplier les écrans.
+- Raccourcis clavier configurables en Mode expert : navigation, refresh, mode expert, mise rapide top pick, aide et logs avec détection de conflits.
+- Le test de stress écrit désormais `desktop/state/stress-report.json`, affiché dans Pipeline avec mémoire max/p95 et erreurs, pour suivre les sessions longues.
+- Documentation enrichie : FAQ 25 questions, aperçu `desktop/docs/preview.gif` et guide `desktop/docs/first-month.md`.
+- QA renforcée : smoke/Playwright vérifient les garde-fous de démarrage, l'absence de `clearStorageData`, le port fixe, les thèmes, le reporting bug et les raccourcis.
+- Version desktop incrémentée en `v1.0.1` pour préparer le build Sprint 20.
+
 ### Version 1.0 — 2026-05-14
 
 - Paris Sportif Desktop passe en `v1.0.0` : cockpit Winamax-only, marchés simples par défaut, hiérarchie `TOP PICK` puis #2-#5, bankroll, settlement sécurisé, alertes, mode démo et profil local.

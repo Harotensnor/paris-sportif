@@ -3,6 +3,7 @@ const childProcess = require('child_process');
 const fs = require('fs');
 const http = require('http');
 const https = require('https');
+const os = require('os');
 const path = require('path');
 const { URL } = require('url');
 const { createLegacyEngineService } = require('./engine/legacy-engine');
@@ -12,6 +13,8 @@ const desktopPackage = require('../package.json');
 const DESKTOP_ROOT = path.resolve(__dirname, '..');
 const PROJECT_ROOT = path.resolve(DESKTOP_ROOT, '..');
 const HOST = '127.0.0.1';
+const DEFAULT_LOCAL_PORT = 17654;
+const LOCAL_PORT = Number(process.env.PARIS_DESKTOP_PORT || DEFAULT_LOCAL_PORT);
 const STATE_ROOT = path.join(DESKTOP_ROOT, 'state');
 const REFRESH_HISTORY_PATH = path.join(STATE_ROOT, 'refresh-history.json');
 const PROFILE_BACKUP_ROOT = path.join(STATE_ROOT, 'backups');
@@ -21,6 +24,8 @@ const AI_WEB_ENRICHMENT_PATH = path.join(STATE_ROOT, 'ai-web-enrichment.json');
 const WINAMAX_PROMOS_PATH = path.join(STATE_ROOT, 'winamax-promos.json');
 const WEBHOOK_LOG_PATH = path.join(STATE_ROOT, 'webhook-log.jsonl');
 const UPDATE_STATUS_PATH = path.join(STATE_ROOT, 'update-status.json');
+const BUG_REPORT_ROOT = path.join(STATE_ROOT, 'bug-reports');
+const STRESS_REPORT_PATH = path.join(STATE_ROOT, 'stress-report.json');
 const SIGNAL_SOURCES = new Set(['all', 'weather', 'referees', 'injuries', 'lineups', 'team_form', 'team_stats', 'h2h', 'context']);
 const REFRESH_MODES = new Set([
   'quick',
@@ -709,10 +714,16 @@ async function checkForUpdates(config = {}) {
   const status = {
     checkedAt: new Date().toISOString(),
     channel,
-    currentVersion: '0.1.0',
+    currentVersion: String(desktopPackage.version || '1.0.0'),
     available: false,
     latestVersion: null,
+    releaseName: null,
+    releaseNotes: null,
     releaseUrl: null,
+    assetName: null,
+    assetUrl: null,
+    downloadProgress: null,
+    readyToInstall: false,
     error: null
   };
   try {
@@ -737,14 +748,32 @@ async function checkForUpdates(config = {}) {
     ));
     if (release) {
       status.latestVersion = String(release.tag_name || release.name || '').replace(/^v/i, '');
+      status.releaseName = release.name || release.tag_name || null;
+      status.releaseNotes = String(release.body || '').slice(0, 2000);
       status.releaseUrl = release.html_url || null;
-      status.available = Boolean(status.latestVersion && status.latestVersion !== status.currentVersion);
+      const assets = Array.isArray(release.assets) ? release.assets : [];
+      const installer = assets.find((asset) => /\.exe$/i.test(asset.name || '')) || assets[0] || null;
+      status.assetName = installer?.name || null;
+      status.assetUrl = installer?.browser_download_url || null;
+      status.downloadProgress = status.assetName ? 0 : null;
+      status.available = Boolean(status.latestVersion && compareVersions(status.latestVersion, status.currentVersion) > 0);
     }
   } catch (error) {
     status.error = error.name === 'AbortError' ? 'timeout GitHub Releases' : error.message;
   }
   atomicWriteJson(UPDATE_STATUS_PATH, status);
   return status;
+}
+
+function compareVersions(a, b) {
+  const left = String(a || '').split(/[.-]/).map((part) => Number.parseInt(part, 10)).map((value) => Number.isFinite(value) ? value : 0);
+  const right = String(b || '').split(/[.-]/).map((part) => Number.parseInt(part, 10)).map((value) => Number.isFinite(value) ? value : 0);
+  const len = Math.max(left.length, right.length, 3);
+  for (let index = 0; index < len; index += 1) {
+    const diff = (left[index] || 0) - (right[index] || 0);
+    if (diff) return diff > 0 ? 1 : -1;
+  }
+  return 0;
 }
 
 function webhookPayload(config, alert) {
@@ -880,6 +909,99 @@ function webhookRecentLog() {
   } catch {
     return [];
   }
+}
+
+function redactBugValue(value) {
+  if (value == null) return value;
+  if (Array.isArray(value)) return value.slice(0, 40).map(redactBugValue);
+  if (typeof value === 'object') {
+    const output = {};
+    for (const [key, raw] of Object.entries(value)) {
+      if (/api.?key|token|secret|password|webhook|url/i.test(key)) {
+        output[key] = raw ? '[redacted]' : raw;
+      } else if (/bankroll|stake|pnl|amount|montant/i.test(key)) {
+        output[key] = raw == null || raw === '' ? raw : '[present]';
+      } else {
+        output[key] = redactBugValue(raw);
+      }
+    }
+    return output;
+  }
+  if (typeof value === 'string') {
+    return value
+      .replace(/sk-[A-Za-z0-9_-]{12,}/g, '[api-key]')
+      .replace(/https?:\/\/[^\s)]+/g, '[url]')
+      .slice(0, 5000);
+  }
+  return value;
+}
+
+function bugReportFileName(id) {
+  return `${String(id || Date.now()).replace(/[^a-zA-Z0-9_.-]/g, '-')}.json`;
+}
+
+function localBugReports(limit = 30) {
+  try {
+    if (!fs.existsSync(BUG_REPORT_ROOT)) return [];
+    return fs.readdirSync(BUG_REPORT_ROOT)
+      .filter((name) => name.endsWith('.json'))
+      .map((name) => {
+        const filePath = path.join(BUG_REPORT_ROOT, name);
+        const parsed = readJsonFileDefault(filePath, {});
+        return {
+          id: parsed.id || name.replace(/\.json$/i, ''),
+          createdAt: parsed.createdAt || fs.statSync(filePath).mtime.toISOString(),
+          type: parsed.type || 'manual',
+          description: parsed.description || parsed.error?.message || '-',
+          sent: Boolean(parsed.sent),
+          file: name
+        };
+      })
+      .sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)))
+      .slice(0, limit);
+  } catch {
+    return [];
+  }
+}
+
+async function saveBugReport(payload = {}) {
+  const now = new Date().toISOString();
+  const report = {
+    id: `bug-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    createdAt: now,
+    app: 'Paris-Sportif Desktop',
+    version: String(desktopPackage.version || '1.0.0'),
+    platform: {
+      os: os.platform(),
+      release: os.release(),
+      arch: os.arch()
+    },
+    type: String(payload.type || 'manual').slice(0, 60),
+    description: String(payload.description || '').slice(0, 2000),
+    error: redactBugValue(payload.error || {}),
+    actions: redactBugValue(Array.isArray(payload.actions) ? payload.actions.slice(-25) : []),
+    appState: redactBugValue(payload.appState || {}),
+    sent: false,
+    delivery: null
+  };
+  fs.mkdirSync(BUG_REPORT_ROOT, { recursive: true });
+  const config = payload.config && typeof payload.config === 'object' ? payload.config : {};
+  if (config.url) {
+    try {
+      const sent = await postWebhook(config, {
+        title: 'Rapport bug Paris-Sportif',
+        message: `${report.type} · ${report.description || report.error?.message || 'Sans description'}\nVersion ${report.version} · ${report.platform.os} ${report.platform.release}`
+      });
+      report.sent = Boolean(sent.ok);
+      report.delivery = redactBugValue(sent);
+    } catch (error) {
+      report.delivery = { ok: false, error: error.message };
+    }
+  }
+  const file = bugReportFileName(report.id);
+  atomicWriteJson(path.join(BUG_REPORT_ROOT, file), report);
+  appendRefreshLine(`[bug-report] ${report.type}: ${report.description || report.error?.message || 'rapport local'}`);
+  return { ok: true, report: { id: report.id, createdAt: report.createdAt, sent: report.sent, delivery: report.delivery }, reports: localBugReports() };
 }
 
 function isSelfWebhookTarget(value, hostHeader) {
@@ -1155,6 +1277,7 @@ function getDataStatus() {
       sources: health.sources || null
     } : null,
     memory: sampleMemoryUsage(),
+    stressReport: readJsonFileDefault(STRESS_REPORT_PATH, null),
     files: [
       fileMeta('data.js'),
       fileMeta('data_today.json'),
@@ -1395,6 +1518,7 @@ async function handleApi(req, res, url) {
     jsonResponse(res, 200, {
       app: 'Paris-Sportif Desktop',
       version: String(desktopPackage.version || '1.0.0'),
+      os: `${os.platform()} ${os.release()} ${os.arch()}`,
       projectRoot: PROJECT_ROOT,
       desktopRoot: DESKTOP_ROOT,
       calculationMode: 'desktop-jsdom',
@@ -1521,7 +1645,7 @@ async function handleApi(req, res, url) {
     return;
   }
   if (url.pathname === '/api/update/status') {
-    jsonResponse(res, 200, readJsonFileDefault(UPDATE_STATUS_PATH, { checkedAt: null, available: false, currentVersion: '0.1.0' }));
+    jsonResponse(res, 200, readJsonFileDefault(UPDATE_STATUS_PATH, { checkedAt: null, available: false, currentVersion: String(desktopPackage.version || '1.0.0') }));
     return;
   }
   if (url.pathname === '/api/update/check') {
@@ -1547,6 +1671,20 @@ async function handleApi(req, res, url) {
     };
     atomicWriteJson(UPDATE_STATUS_PATH, status);
     jsonResponse(res, 200, { ok: true, status });
+    return;
+  }
+  if (url.pathname === '/api/bug-report/list') {
+    jsonResponse(res, 200, { ok: true, reports: localBugReports() });
+    return;
+  }
+  if (url.pathname === '/api/bug-report/save') {
+    if (req.method !== 'POST') {
+      jsonResponse(res, 405, { ok: false, error: 'POST required' });
+      return;
+    }
+    const payload = await readJsonBody(req, 256 * 1024);
+    const result = await saveBugReport(payload);
+    jsonResponse(res, 200, result);
     return;
   }
   if (url.pathname === '/api/refresh/cancel') {
@@ -1611,7 +1749,7 @@ function startLocalServer() {
       routeStatic(url.pathname, res);
     });
     server.on('error', reject);
-    server.listen(0, HOST, () => {
+    server.listen(LOCAL_PORT, HOST, () => {
       const address = server.address();
       localServer = server;
       resolve({ server, port: address.port });
@@ -1718,6 +1856,10 @@ if (!gotSingleInstanceLock) {
   });
 
   app.on('before-quit', () => {
+    const updateStatus = readJsonFileDefault(UPDATE_STATUS_PATH, null);
+    if (updateStatus?.installOnQuit && updateStatus.releaseUrl) {
+      shell.openExternal(updateStatus.releaseUrl).catch(() => {});
+    }
     engineService.close();
     if (localServer) localServer.close();
   });

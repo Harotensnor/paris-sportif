@@ -1,5 +1,7 @@
 # Paris Sportif Desktop
 
+![Aperçu du logiciel](docs/preview.gif)
+
 Paris Sportif Desktop est le logiciel PC local pour préparer tes paris Winamax. Il lit les données locales, calcule les picks, affiche les paris simples les plus clairs et garde ton suivi bankroll sur ta machine.
 
 ## Installation
@@ -95,6 +97,8 @@ En Mode expert, la vue `Avancé` montre la pipeline, les logs et les diagnostics
 - Winamax ne s'ouvre pas : certains événements peuvent manquer de lien direct, ouvre le match manuellement sur Winamax.
 - Profil corrompu : importe un export récent ou restaure depuis `desktop/state/backups/`.
 - Notifications absentes : vérifie les permissions Windows et le webhook dans `Réglages`.
+- L'app ne démarre pas : relance une seule instance, puis regarde `Réglages > Avancé > Logs`.
+- Un bug revient : `Réglages > Avancé > Signaler un bug` sauvegarde un rapport anonymisé.
 
 ## Build Windows
 
@@ -105,3 +109,31 @@ npm --prefix desktop run dist
 ```
 
 La sortie est écrite dans `desktop/dist/`. Le build embarque l'application Electron, les scripts locaux et les derniers fichiers de données disponibles. Python doit être disponible sur la machine si tu veux relancer la pipeline locale complète.
+
+## FAQ
+
+1. **Est-ce que l'app mise automatiquement ?** Non. Elle prépare le ticket, tu confirmes sur Winamax.
+2. **Pourquoi seulement Winamax ?** Pour garder les cotes, liens, boosts et tickets cohérents avec ton usage réel.
+3. **Pourquoi je ne vois pas les handicaps ?** Les marchés complexes sont cachés par défaut. Active le Mode expert si tu veux les revoir.
+4. **Que signifie `PARI` ?** C'est exactement ce que tu dois sélectionner chez Winamax.
+5. **Que signifie `COTE` ?** C'est la cote Winamax utilisée par le modèle au moment du calcul.
+6. **Que signifie `MISE` ?** C'est une suggestion prudente selon ta bankroll et tes limites.
+7. **Puis-je changer ma bankroll ?** Oui, dans `Réglages > Profil`.
+8. **Comment suivre un pari ?** Clique `Je mise`, puis place le pari chez Winamax.
+9. **Comment régler un pari terminé ?** L'app tente le settlement automatique ; le manuel reste disponible en secours.
+10. **Pourquoi un pari reste pending ?** Il manque souvent un résultat final confirmé ou la marge de sécurité post-match.
+11. **Pourquoi les données peuvent être anciennes ?** La pipeline locale ou GitHub peut avoir échoué ; l'app garde le dernier snapshot valide.
+12. **Que faire si les données sont anciennes ?** Lance un refresh depuis la vue standard ou `Avancé` si le Mode expert est actif.
+13. **L'IA est-elle obligatoire ?** Non. Sans clé, l'app utilise ses règles locales.
+14. **Où est stockée ma clé IA ?** Localement, dans ton profil Electron.
+15. **Qu'est-ce que le Mode expert ?** Les diagnostics, logs, pipeline, marchés avancés et raccourcis.
+16. **Comment activer le thème clair ?** `Réglages > Apparence > Thème`.
+17. **Comment recevoir les versions beta ?** `Réglages > Avancé > Canal > Beta`.
+18. **Comment envoyer un bug ?** `Réglages > Avancé > Signaler un bug`.
+19. **Que contient un rapport de bug ?** Version, OS, erreurs et état anonymisé. Pas de clé API ni montant détaillé.
+20. **Comment sauvegarder mon profil ?** `Réglages > Profil local > Exporter mon profil`.
+21. **Comment restaurer mon profil ?** `Importer un profil`, puis fusionner ou remplacer.
+22. **Comment tester sans risque ?** Active `Mode démo`, puis lance le tour rapide.
+23. **Pourquoi je reçois une alerte anti-tilt ?** Tu dépasses tes limites de rythme, perte ou mise.
+24. **Pourquoi un pick disparaît après refresh ?** La cote, la donnée ou le garde-fou a changé.
+25. **Quelle routine suivre le premier mois ?** Lis le guide `docs/first-month.md`.

@@ -5,6 +5,7 @@ const { test, expect, _electron: electron } = require('@playwright/test');
 
 const root = path.resolve(__dirname, '..', '..');
 const electronExe = path.join(root, 'desktop', 'node_modules', 'electron', 'dist', process.platform === 'win32' ? 'electron.exe' : 'electron');
+const testPort = 19000 + Math.floor(Math.random() * 2000);
 
 async function firstWindow(app) {
   return app.windows()[0] || app.waitForEvent('window', { timeout: 60_000 });
@@ -30,6 +31,8 @@ test('Sprint 15 desktop shows only clear simple Winamax bets by default', async 
   expect(mainText).toContain('requestSingleInstanceLock');
   expect(mainText).toContain('cleanupChromiumEphemeralStorage');
   expect(mainText).toContain('fallback démarrage');
+  expect(mainText).toContain('DEFAULT_LOCAL_PORT = 17654');
+  expect(mainText).toContain('/api/bug-report/save');
   expect(mainText).not.toContain('clearStorageData');
   expect(rendererText).toContain('todayFunnel');
   expect(rendererText).toContain('renderSimpleTimeline');
@@ -52,12 +55,17 @@ test('Sprint 15 desktop shows only clear simple Winamax bets by default', async 
   expect(rendererText).toContain('SIMPLE_MARKET_PREFS');
   expect(rendererText).toContain('actionPickHtml');
   expect(rendererText).toContain('userBetLabel');
+  expect(rendererText).toContain('applyTheme');
+  expect(rendererText).toContain('installGlobalErrorReporting');
+  expect(rendererText).toContain('renderShortcutSettings');
+  expect(rendererText).toContain('prepareUpdateInstall');
 
   const userDataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'paris-sportif-pw-'));
   const messages = [];
   const app = await electron.launch({
     executablePath: electronExe,
     cwd: path.join(root, 'desktop'),
+    env: { ...process.env, PARIS_DESKTOP_PORT: String(testPort) },
     args: [`--user-data-dir=${userDataDir}`, '.']
   });
 
@@ -137,7 +145,16 @@ test('Sprint 15 desktop shows only clear simple Winamax bets by default', async 
     await expect(win.locator('#pref-prematch-alerts')).toBeVisible();
     await expect(win.locator('#pref-evening-hour')).toBeVisible();
     await expect(win.locator('#pref-expert-mode')).toBeVisible();
-    await expect(win.locator('#app-version-label')).toContainText('v1.0.0');
+    await expect(win.locator('#pref-theme')).toBeVisible();
+    await expect(win.locator('#pref-bug-report-prompt')).toBeVisible();
+    await expect(win.locator('#app-version-label')).toContainText('v1.0.1');
+    await win.selectOption('#pref-theme', 'light');
+    await expect(win.locator('body')).toHaveClass(/theme-light/);
+    await win.selectOption('#pref-theme', 'dark');
+    await expect(win.locator('body')).toHaveClass(/theme-dark/);
+    await win.click('#manual-bug-report-btn');
+    await expect(win.locator('#bug-report-modal:not(.hidden)')).toContainText('Signaler un bug');
+    await win.click('#bug-report-close');
     await expect(win.locator('#pref-sports')).toContainText('rugby');
     await expect(win.locator('#pref-sports')).toContainText('mma');
     await expect(win.locator('#pref-markets')).toContainText('Vainqueur du match');
@@ -166,6 +183,8 @@ test('Sprint 15 desktop shows only clear simple Winamax bets by default', async 
     await win.check('#pref-expert-mode');
     await win.click('#save-preferences-btn');
     await expect(win.locator('[data-tab="data"]:not(.hidden)')).toBeVisible();
+    await expect(win.locator('#shortcut-settings-grid')).toContainText('Vue Picks');
+    await expect(win.locator('#shortcut-settings-grid')).toContainText('Ctrl+1');
     await win.click('[data-tab="data"]');
     await expect(win.locator('#quality-report-grid')).toBeVisible();
     await expect(win.locator('#winamax-market-audit-grid')).toContainText('Familles disponibles');

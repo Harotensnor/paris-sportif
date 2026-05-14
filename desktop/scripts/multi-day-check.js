@@ -17,9 +17,11 @@ async function main() {
   const electronExe = path.join(root, 'desktop', 'node_modules', 'electron', 'dist', process.platform === 'win32' ? 'electron.exe' : 'electron');
   const userDataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'paris-sportif-multiday-'));
   const messages = [];
+  const testPort = 25000 + Math.floor(Math.random() * 2000);
   const app = await electron.launch({
     executablePath: electronExe,
     cwd: path.join(root, 'desktop'),
+    env: { ...process.env, PARIS_DESKTOP_PORT: String(testPort) },
     args: [`--user-data-dir=${userDataDir}`, '.']
   });
   try {

@@ -3213,6 +3213,70 @@ td.empty::before,
   line-height: 1.35;
 }
 
+.shortcut-grid {
+  display: grid;
+  gap: 8px;
+}
+
+.shortcut-row,
+.bug-report-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 8px;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-2);
+  padding: 9px 10px;
+}
+
+.shortcut-row strong,
+.bug-report-row strong {
+  display: block;
+  color: var(--text);
+}
+
+.shortcut-key {
+  min-width: 92px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--accent);
+  padding: 6px 8px;
+  text-align: center;
+  font-weight: 850;
+  font-variant-numeric: tabular-nums;
+}
+
+.shortcut-row.capturing {
+  border-color: rgba(16, 185, 129, .52);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, .12);
+}
+
+.update-note-box {
+  max-height: 220px;
+  overflow: auto;
+  white-space: pre-wrap;
+}
+
+.theme-light .help-panel,
+.theme-auto .help-panel {
+  background: color-mix(in srgb, var(--surface) 96%, transparent);
+}
+
+.theme-light .focus-ticket,
+.theme-auto .focus-ticket,
+.theme-light .action-pick,
+.theme-auto .action-pick {
+  background: var(--surface-2);
+}
+
+#bug-report-description {
+  width: calc(100% - 36px);
+  margin: 0 18px 8px;
+  resize: vertical;
+}
+
 .ultimate-bet-card {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 220px;
