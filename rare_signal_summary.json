@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-05-14T16:56:45Z",
+  "generated_at": "2026-05-14T17:08:34Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 65,
+    "active_events": 66,
     "actionable": 15,
-    "watch": 2,
+    "watch": 3,
     "risk": 48,
     "expired_sample": 0,
     "by_type": {
@@ -14,12 +14,12 @@
       "back_to_back_travel": 6,
       "injury_imbalance": 10,
       "market_uncertain": 50,
-      "market_move": 9
+      "market_move": 10
     },
     "by_quality": {
       "actionable": 15,
       "risk": 48,
-      "watch": 2
+      "watch": 3
     }
   },
   "active_actionable": [
@@ -330,6 +330,24 @@
       "side": "away",
       "strength": 0.463,
       "context": "Cote away: 2.40 -> 2.60 (-8.3%)"
+    },
+    {
+      "event_id": "401866578",
+      "date": "2026-05-17T16:30Z",
+      "sport": "football",
+      "league_code": "superleaguegrece",
+      "league_name": "Super League Grèce",
+      "home": "Panathinaikos",
+      "away": "PAOK Salonika",
+      "match": "Panathinaikos - PAOK Salonika",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 0.455,
+      "context": "Cote home: 3.05 -> 3.30 (-8.2%)"
     }
   ],
   "active_risk": [
