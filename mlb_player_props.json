@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-14T18:16:43Z",
+  "generated_at": "2026-05-14T18:21:38Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815342",
-      "kickoff": "2026-05-14T18:10Z",
-      "league": "MLB",
-      "match": "Seattle Mariners at Houston Astros",
-      "home": "Houston Astros",
-      "away": "Seattle Mariners",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Houston Astros",
-          "pitcher": "Mike Burrows",
-          "label": "Mike Burrows moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.5684,
-          "fair_odds": 1.76,
-          "expected_strikeouts": 5.19,
-          "projected_ip": 5.53,
-          "inputs": {
-            "k9": 8.46,
-            "era": 5.04,
-            "whip": 1.48,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Houston Astros",
-          "pitcher": "Mike Burrows",
-          "label": "Mike Burrows concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6278,
-          "fair_odds": 1.59,
-          "expected_hr_allowed": 0.988,
-          "projected_ip": 5.53,
-          "inputs": {
-            "hr9": 1.61,
-            "era": 5.04,
-            "whip": 1.48
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Seattle Mariners",
-          "pitcher": "Luis Castillo",
-          "label": "Luis Castillo plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.5235,
-          "fair_odds": 1.91,
-          "expected_strikeouts": 4.6,
-          "projected_ip": 4.76,
-          "inputs": {
-            "k9": 8.69,
-            "era": 6.57,
-            "whip": 1.62,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Seattle Mariners",
-          "pitcher": "Luis Castillo",
-          "label": "Luis Castillo concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5258,
-          "fair_odds": 1.9,
-          "expected_hr_allowed": 0.746,
-          "projected_ip": 4.76,
-          "inputs": {
-            "hr9": 1.41,
-            "era": 6.57,
-            "whip": 1.62
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815344",
       "kickoff": "2026-05-14T19:05Z",
@@ -414,7 +332,7 @@
       ]
     }
   ],
-  "props": 20,
+  "props": 16,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
