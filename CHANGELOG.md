@@ -23,6 +23,14 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 - Préparation release : `desktop/package.json` est en `1.0.0`, l'écran avancé affiche la version locale et la configuration `electron-builder` produit un build Windows non signé.
 - Validation Sprint 17 : `qa:engine`, tests unitaires/refresh/smoke, Playwright Electron, capture visuelle, multi-jours accéléré J+3, stress court, audit npm et build Windows `Paris Sportif Desktop Setup 1.0.0.exe` passent. Le smoke test du binaire packagé confirme que l'application démarre.
 
+### Hotfix Sprint 17 — Démarrage Electron
+
+- Correction du démarrage desktop après le retour utilisateur “le logiciel ne se lance plus” : la fenêtre n'attend plus indéfiniment `ready-to-show` et s'affiche via un fallback si Chromium rate l'événement.
+- Suppression du nettoyage `clearStorageData` au boot, qui pouvait réveiller une base CacheStorage/Service Worker corrompue dans le profil Electron et produire `Failed to delete the database`.
+- Ajout d'un nettoyage ciblé des caches Chromium jetables (`Service Worker`, cache, GPU/code cache) sans toucher au localStorage utilisateur, donc sans perdre bankroll, préférences ou paris suivis.
+- Ajout d'un verrou instance unique : un second lancement recentre la fenêtre existante au lieu de multiplier des processus Electron invisibles qui verrouillent le profil.
+- QA hotfix : lancement sur profil normal validé avec 18 picks visibles, `qa:engine`, `npm test`, Playwright Electron, capture visuelle et audit npm passent. Les tests protègent maintenant le fallback fenêtre et interdisent la réintroduction de `clearStorageData`.
+
 ### Sprint 16 — Consolidation
 
 - Audit complet post-Sprint 15 : les contrôles automatisés couvrent désormais le cockpit simplifié, les marchés simples, le format `PARI / COTE / MISE / Pourquoi`, les gates Winamax-only, les décisions centrales, le settlement sécurisé, les vues expert et la cohérence des mises.

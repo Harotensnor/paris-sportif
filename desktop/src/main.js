@@ -80,6 +80,7 @@ const refreshState = {
 let localServer = null;
 let mainWindow = null;
 let refreshChild = null;
+const gotSingleInstanceLock = app.requestSingleInstanceLock();
 const engineService = createLegacyEngineService({ projectRoot: PROJECT_ROOT });
 const memoryState = {
   rssMb: null,
@@ -175,6 +176,28 @@ function readJsonFileDefault(filePath, fallback) {
     return parsed && typeof parsed === 'object' ? parsed : fallback;
   } catch {
     return fallback;
+  }
+}
+
+function cleanupChromiumEphemeralStorage() {
+  const userDataRoot = app.getPath('userData');
+  const disposableDirs = [
+    'Service Worker',
+    'Cache',
+    'Code Cache',
+    'GPUCache',
+    'DawnCache',
+    'GrShaderCache',
+    'ShaderCache'
+  ];
+  for (const dirName of disposableDirs) {
+    const target = path.join(userDataRoot, dirName);
+    if (!isWithin(userDataRoot, target) || !fs.existsSync(target)) continue;
+    try {
+      fs.rmSync(target, { recursive: true, force: true });
+    } catch (error) {
+      appendRefreshLine(`[desktop] cache Chromium conservé (${dirName}): ${error.message}`);
+    }
   }
 }
 
@@ -1612,7 +1635,33 @@ function createWindow(port) {
     }
   });
 
-  mainWindow.once('ready-to-show', () => mainWindow.show());
+  const showMainWindow = (reason) => {
+    if (!mainWindow || mainWindow.isDestroyed() || mainWindow.isVisible()) return;
+    appendRefreshLine(`[desktop] fenêtre affichée (${reason})`);
+    mainWindow.show();
+    mainWindow.focus();
+  };
+  const showFallback = setTimeout(() => showMainWindow('fallback démarrage'), 2500);
+  mainWindow.once('ready-to-show', () => {
+    clearTimeout(showFallback);
+    showMainWindow('ready-to-show');
+  });
+  mainWindow.webContents.once('did-finish-load', () => {
+    setTimeout(() => showMainWindow('page chargée'), 250);
+  });
+  mainWindow.webContents.on('did-fail-load', (_event, errorCode, errorDescription, validatedURL, isMainFrame) => {
+    appendRefreshLine(`[desktop] chargement refusé ${errorCode}: ${errorDescription} ${validatedURL || ''}`);
+    if (isMainFrame) showMainWindow('erreur chargement visible');
+  });
+  mainWindow.webContents.on('render-process-gone', (_event, details) => {
+    appendRefreshLine(`[desktop] renderer arrêté: ${details.reason || 'inconnu'} ${details.exitCode ?? ''}`);
+    showMainWindow('renderer arrêté');
+  });
+  mainWindow.on('unresponsive', () => appendRefreshLine('[desktop] fenêtre non réactive'));
+  mainWindow.on('closed', () => {
+    clearTimeout(showFallback);
+    mainWindow = null;
+  });
   mainWindow.webContents.on('will-navigate', (event, url) => {
     if (!url.startsWith(`http://${HOST}:`)) {
       event.preventDefault();
@@ -1623,7 +1672,10 @@ function createWindow(port) {
     if (/^https?:\/\//i.test(url)) shell.openExternal(url);
     return { action: 'deny' };
   });
-  mainWindow.loadURL(`http://${HOST}:${port}/desktop/`);
+  mainWindow.loadURL(`http://${HOST}:${port}/desktop/`).catch((error) => {
+    appendRefreshLine(`[desktop] ouverture écran impossible: ${error.message}`);
+    showMainWindow('erreur ouverture visible');
+  });
 }
 
 function warmEngineAnalysis() {
@@ -1634,29 +1686,39 @@ function warmEngineAnalysis() {
   });
 }
 
-app.whenReady().then(async () => {
-  const warmup = warmEngineAnalysis();
-  const { port } = await startLocalServer();
-  await warmup;
-  await session.defaultSession.clearCache().catch(() => {});
-  await session.defaultSession.clearStorageData({ storages: ['serviceworkers', 'cachestorage'] }).catch(() => {});
-  session.defaultSession.setPermissionRequestHandler((_webContents, permission, callback) => {
-    callback(permission === 'notifications');
+if (!gotSingleInstanceLock) {
+  app.exit(0);
+} else {
+  app.on('second-instance', () => {
+    if (!mainWindow || mainWindow.isDestroyed()) return;
+    if (mainWindow.isMinimized()) mainWindow.restore();
+    mainWindow.show();
+    mainWindow.focus();
   });
-  createWindow(port);
-});
 
-app.on('activate', () => {
-  if (BrowserWindow.getAllWindows().length === 0 && localServer && localServer.address()) {
-    createWindow(localServer.address().port);
-  }
-});
+  app.whenReady().then(async () => {
+    cleanupChromiumEphemeralStorage();
+    const warmup = warmEngineAnalysis();
+    const { port } = await startLocalServer();
+    await warmup;
+    session.defaultSession.setPermissionRequestHandler((_webContents, permission, callback) => {
+      callback(permission === 'notifications');
+    });
+    createWindow(port);
+  });
 
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit();
-});
+  app.on('activate', () => {
+    if (BrowserWindow.getAllWindows().length === 0 && localServer && localServer.address()) {
+      createWindow(localServer.address().port);
+    }
+  });
 
-app.on('before-quit', () => {
-  engineService.close();
-  if (localServer) localServer.close();
-});
+  app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') app.quit();
+  });
+
+  app.on('before-quit', () => {
+    engineService.close();
+    if (localServer) localServer.close();
+  });
+}

@@ -26,9 +26,10 @@ async function main() {
   if (retiredOddsPattern.test(`${rendererText}\n${mainText}\n${htmlText}`)) {
     throw new Error('Reste multi-bookmaker détecté alors que Sprint 11 est Winamax-only');
   }
-  for (const marker of ['contextIsolation: true', 'sandbox: true', 'setWindowOpenHandler', "permission === 'notifications'", 'process.memoryUsage()']) {
+  for (const marker of ['contextIsolation: true', 'sandbox: true', 'setWindowOpenHandler', "permission === 'notifications'", 'process.memoryUsage()', 'requestSingleInstanceLock', 'cleanupChromiumEphemeralStorage', 'fallback démarrage']) {
     if (!mainText.includes(marker)) throw new Error(`Durcissement Electron absent: ${marker}`);
   }
+  if (mainText.includes('clearStorageData')) throw new Error('Nettoyage CacheStorage agressif réintroduit au démarrage');
   for (const marker of ['todayFunnel', 'renderSimpleTimeline', 'antiTiltStatus', 'applyExpertMode', 'renderWinamaxPromos', 'renderBankrollAccounting', 'winamaxMarketAudit', 'coverage24h', 'safeBadgeHtml', 'renderTemporalCockpit', 'priorityBadgeHtml', 'dailyBudgetPlan', 'renderPaperSimulation', 'renderModelVsUser', 'buildDailySuggestion', 'specialPatternBadgeHtml', 'maybeShowEveningBrief', 'startDemoTour', 'SIMPLE_MARKET_PREFS', 'actionPickHtml', 'userBetLabel']) {
     if (!rendererText.includes(marker)) throw new Error(`Sprint 14 renderer absent: ${marker}`);
   }

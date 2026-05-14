@@ -27,6 +27,10 @@ test('Sprint 15 desktop shows only clear simple Winamax bets by default', async 
   expect(mainText).toContain('sandbox: true');
   expect(mainText).toContain('setWindowOpenHandler');
   expect(mainText).toContain("permission === 'notifications'");
+  expect(mainText).toContain('requestSingleInstanceLock');
+  expect(mainText).toContain('cleanupChromiumEphemeralStorage');
+  expect(mainText).toContain('fallback démarrage');
+  expect(mainText).not.toContain('clearStorageData');
   expect(rendererText).toContain('todayFunnel');
   expect(rendererText).toContain('renderSimpleTimeline');
   expect(rendererText).toContain('antiTiltStatus');
