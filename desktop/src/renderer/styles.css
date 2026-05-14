@@ -2993,6 +2993,10 @@ body.modal-open {
   background: rgba(120, 53, 15, .28);
 }
 
+.today-funnel-alert.hidden {
+  display: none;
+}
+
 .today-funnel-alert.danger {
   border-color: rgba(248, 113, 113, .55);
   background: rgba(127, 29, 29, .28);
@@ -3339,6 +3343,39 @@ td.empty::before,
 .adjusted-confidence {
   margin-top: 4px;
   font-size: 11px;
+}
+
+.safe-pick-badge {
+  display: inline-flex;
+  align-items: center;
+  width: max-content;
+  max-width: 100%;
+  margin: 2px 4px 2px 0;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.safe-pick-badge.safe {
+  color: var(--accent);
+  border-color: rgba(16, 185, 129, .38);
+  background: rgba(16, 185, 129, .11);
+}
+
+.safe-pick-badge.watch {
+  color: var(--warn);
+  border-color: rgba(245, 158, 11, .36);
+  background: rgba(245, 158, 11, .10);
+}
+
+.safe-pick-badge.danger {
+  color: var(--danger);
+  border-color: rgba(248, 113, 113, .34);
+  background: rgba(248, 113, 113, .10);
 }
 
 .validation-warm,

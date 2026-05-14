@@ -61,6 +61,7 @@
     clvSummary: null,
     dashboardMeta: null,
     todayFunnel: null,
+    coverage24h: null,
     winamaxMarketAudit: null,
     winamaxPromos: null,
     weeklyReport: null,
@@ -547,6 +548,29 @@
     }).format(date);
   }
 
+  function parisDateParts(value = new Date()) {
+    const date = value instanceof Date ? value : new Date(value);
+    if (!date || Number.isNaN(date.getTime())) return null;
+    const out = {};
+    for (const part of new Intl.DateTimeFormat('fr-FR', {
+      timeZone: 'Europe/Paris',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    }).formatToParts(date)) {
+      if (part.type !== 'literal') out[part.type] = part.value;
+    }
+    const hour = Number(String(out.hour || '0').replace('24', '0'));
+    return {
+      day: `${out.year}-${out.month}-${out.day}`,
+      hour: Number.isFinite(hour) ? hour : 0,
+      minute: Number(out.minute || 0) || 0
+    };
+  }
+
   function pickDayKey(row) {
     const date = row?.start ? new Date(row.start) : null;
     if (!date || Number.isNaN(date.getTime())) return null;
@@ -958,7 +982,7 @@
     const strip = $('#imminent-strip');
     if (!grid) return;
     const rows = (state.picks || []).filter((row) => pickHasCoreData(row) && canDisplayStake(row));
-    const bigRows = rows.filter((row) => Number(row.edge || 0) >= 0.10);
+    const bigRows = rows.filter((row) => displayEdgeValue(row) >= 0.10);
     const ultimate = ultimateBetCandidate(rows);
     const nextPick = rows
       .filter((row) => Number.isFinite(Date.parse(row.start || '')))
@@ -1256,7 +1280,7 @@
       }
     }
     const warnings = [];
-    if (Number(row.edge || 0) < 0.05) warnings.push('edge_modere');
+    if (displayEdgeValue(row) < 0.05) warnings.push('edge_modere');
     return { allow: true, label: 'Coach OK', detail: 'Garde-fous personnels respectés.', warnings };
   }
 
@@ -1310,7 +1334,7 @@
       closingOdd: null,
       clvPct: null,
       probability: Number(row.probability || 0),
-      edge: Number(row.edge || 0),
+      edge: displayEdgeValue(row),
       edgeBucket: edgeBucketFor(row.edge),
       tier: row.calibration?.level || row.contextQuality?.tier || row.status || 'standard',
       marketKey: marketKeyFromRow(row),
@@ -1432,8 +1456,37 @@
     return `<div class="match-sub validation-note validation-${escapeHtml(cls)}">${escapeHtml(label)}</div>`;
   }
 
+  function displayEdgeValue(row) {
+    const value = Number(row?.safeEdge ?? row?.edge ?? 0);
+    return Number.isFinite(value) ? value : 0;
+  }
+
+  function safeConfidenceValue(row) {
+    const value = Number(row?.safeConfidence);
+    if (Number.isFinite(value) && value > 0) return value;
+    return realConfidenceValue(row);
+  }
+
+  function safeBadgeHtml(row) {
+    const assessment = row?.safeAssessment || null;
+    if (!assessment) return '';
+    const status = assessment.status || 'watch';
+    const cls = status === 'reliable' ? 'safe' : status === 'watch' ? 'watch' : 'danger';
+    const label = status === 'reliable' ? '✓ Fiable' : status === 'watch' ? 'À surveiller' : 'Écarté';
+    const reason = (assessment.reasons || assessment.warnings || []).slice(0, 2).join(' · ') || 'Filtre fiable et safe';
+    return `<span class="safe-pick-badge ${escapeHtml(cls)}" title="${escapeHtml(reason)}">${escapeHtml(label)}</span>`;
+  }
+
+  function edgeDisplayHtml(row) {
+    const edge = displayEdgeValue(row);
+    const raw = Number(row?.edge || 0);
+    const capped = Boolean(row?.safeAssessment?.edgeCapped) && raw > edge + 0.001;
+    const title = capped ? `Edge brut ${formatPct(raw, 1)} plafonné par prudence` : 'Edge prudent utilisé pour décider';
+    return `<span title="${escapeHtml(title)}">${escapeHtml(formatPct(edge, 1))}</span>${capped ? '<div class="match-sub">edge prudent</div>' : ''}`;
+  }
+
   function adjustedConfidenceHtml(row) {
-    const value = realConfidenceValue(row);
+    const value = safeConfidenceValue(row);
     const validation = row?.segmentValidation || {};
     const label = validation.status === 'insufficient_sample' ? 'sample court' : 'historique réel';
     return `<div class="match-sub adjusted-confidence">Ajustée ${escapeHtml(formatPct(value, 0))} · ${escapeHtml(label)}</div>`;
@@ -1804,7 +1857,7 @@
   function pickReason(row) {
     const reasons = [];
     if (row?.decisionCenter?.mainReason && !row.decisionCenter.canBet) reasons.push(row.decisionCenter.mainReason);
-    if (Number(row?.edge) > 0) reasons.push(`edge ${formatPct(row.edge, 1)}`);
+    if (displayEdgeValue(row) > 0) reasons.push(`edge ${formatPct(displayEdgeValue(row), 1)}`);
     if (Number(row?.probability) > 0) reasons.push(`proba ${formatPct(row.probability, 1)}`);
     if (Number(row?.stake) > 0) reasons.push(`Kelly ${formatMoney(row.stake)}`);
     if (row?.contextQuality?.score != null) reasons.push(`contexte ${Math.round(Number(row.contextQuality.score))}/100`);
@@ -1959,7 +2012,7 @@
   function pickNarrative(row, signalPreview, fallback) {
     const parts = [];
     const context = row?.contextQuality?.score ?? row?.match?.context?.quality?.score;
-    parts.push(`${row.market || 'Marché'} : ${row.label || 'pick'} ${formatOdd(row.odd)} avec ${formatPct(row.edge || 0, 1)} d'edge modèle.`);
+    parts.push(`${row.market || 'Marché'} : ${row.label || 'pick'} ${formatOdd(row.odd)} avec ${formatPct(displayEdgeValue(row), 1)} d'edge prudent.`);
     if (Number.isFinite(Number(context))) {
       parts.push(`Le contexte est noté ${Math.round(Number(context))}/100, donc la mise reste proportionnée à la qualité réelle des signaux.`);
     }
@@ -2203,6 +2256,8 @@
       state.clvSummary = null;
       state.dashboardMeta = null;
       state.todayFunnel = null;
+      state.coverage24h = null;
+      state.winamaxMarketAudit = null;
       state.prematchPlan = null;
       renderPicks('Données trop anciennes : le logiciel bloque les recommandations actionnables.');
       renderStakeScenarios('Scénarios bloqués : données trop anciennes.');
@@ -2311,6 +2366,7 @@
     state.clvSummary = analysis.clvSummary || null;
     state.dashboardMeta = analysis.dashboardMeta || null;
     state.todayFunnel = analysis.todayFunnel || null;
+    state.coverage24h = analysis.coverage24h || null;
     state.winamaxMarketAudit = analysis.winamaxMarketAudit || null;
     state.prematchPlan = analysis.prematchPlan || null;
     refreshTrackedBetMarketData();
@@ -2463,7 +2519,7 @@
       hasWinamax &&
       Number(row.odd || 0) > 1 &&
       Number(row.probability || 0) > 0 &&
-      Number(row.edge || 0) > 0
+      displayEdgeValue(row) >= 0.01
     );
   }
 
@@ -2482,7 +2538,7 @@
       if (!canDisplayStake(row)) return false;
       if (allowedSports.size && !allowedSports.has(String(row.sport || '').toLowerCase())) return false;
       if (allowedMarkets.size && !allowedMarkets.has(marketKeyFromRow(row))) return false;
-      if (prefEdgeMin && Number(row.edge || 0) < prefEdgeMin) return false;
+      if (prefEdgeMin && displayEdgeValue(row) < prefEdgeMin) return false;
       if (prefOddMin > 1 && Number(row.odd || 0) < prefOddMin) return false;
       if (prefOddMax > 1 && Number(row.odd || 0) > prefOddMax) return false;
       if ((prefs.strict || prefConfidenceMin > 0) && Number(row.probability || 0) < prefConfidenceMin) return false;
@@ -2490,14 +2546,14 @@
       if (adjustment?.direction === 'harden') {
         const adjustedEdge = Math.max(prefEdgeMin, 0) + Math.max(0, Number(adjustment.edgeDelta || 0));
         const adjustedConfidence = Math.max(prefConfidenceMin, 0) + Math.max(0, Number(adjustment.confidenceDelta || 0));
-        if (Number(row.edge || 0) < adjustedEdge) return false;
+        if (displayEdgeValue(row) < adjustedEdge) return false;
         if (Number(row.probability || 0) < adjustedConfidence) return false;
       }
       if (filters.query && !pickSearchText(row).includes(filters.query)) return false;
       if (filters.sport !== 'all' && row.sport !== filters.sport) return false;
       if (filters.league !== 'all' && leagueKeyFromRow(row) !== filters.league) return false;
       if (filters.market !== 'all' && marketKeyFromRow(row) !== filters.market) return false;
-      if (filters.edgeMin && Number(row.edge || 0) < filters.edgeMin) return false;
+      if (filters.edgeMin && displayEdgeValue(row) < filters.edgeMin) return false;
       if (filters.oddMin && Number(row.odd || 0) < filters.oddMin) return false;
       if (state.calendarDayFilter && pickDayKey(row) !== state.calendarDayFilter) return false;
       return true;
@@ -2505,9 +2561,9 @@
     rows.sort((a, b) => {
       if (filters.sort === 'kickoff') return new Date(a.start || 0) - new Date(b.start || 0);
       if (filters.sort === 'confidence') return Number(b.confidenceTrust?.score || b.probability || 0) - Number(a.confidenceTrust?.score || a.probability || 0);
-      if (filters.sort === 'real_confidence') return realConfidenceValue(b) - realConfidenceValue(a) || Number(b.edge || 0) - Number(a.edge || 0);
+      if (filters.sort === 'real_confidence') return safeConfidenceValue(b) - safeConfidenceValue(a) || displayEdgeValue(b) - displayEdgeValue(a);
       if (filters.sort === 'odd') return Number(b.odd || 0) - Number(a.odd || 0);
-      return Number(b.edge || 0) - Number(a.edge || 0);
+      return displayEdgeValue(b) - displayEdgeValue(a);
     });
     return active ? rows.slice(0, 40) : rows;
   }
@@ -2528,7 +2584,7 @@
         bestOdd: 0
       };
       bucket.count += 1;
-      bucket.edge += Number(row.edge || 0);
+      bucket.edge += displayEdgeValue(row);
       bucket.bestOdd = Math.max(bucket.bestOdd, Number(row.odd || 0));
       byMarket.set(key, bucket);
     });
@@ -2731,7 +2787,7 @@
       const ts = Date.parse(row.start || '');
       const key = userBetKey(row);
       return !notified.has(key)
-        && Number(row.edge || 0) >= 0.10
+        && displayEdgeValue(row) >= 0.10
         && Number(row.odd || 0) >= 2
         && Number.isFinite(ts)
         && ts > now
@@ -2742,7 +2798,7 @@
     writeNotifiedPickKeys(notified);
     notifyUser(
       'Gros pick proche',
-      `${bigPick.title} · ${bigPick.label} ${formatOdd(bigPick.odd)} · edge ${formatPct(bigPick.edge, 1)}`,
+      `${bigPick.title} · ${bigPick.label} ${formatOdd(bigPick.odd)} · edge ${formatPct(displayEdgeValue(bigPick), 1)}`,
       bigPick
     );
   }
@@ -2763,7 +2819,7 @@
     if (['warm', 'tracked'].includes(level)) return true;
     if (row?.calibration?.edgeBucket?.level === 'warm') return true;
     if (tier.includes('lock') || tier.includes('premium') || tier.includes('value')) return true;
-    return Number(row?.edge || 0) >= 0.10 && Number(row?.calibration?.sample || 0) === 0;
+    return displayEdgeValue(row) >= 0.10 && Number(row?.calibration?.sample || 0) === 0;
   }
 
   function ultimateBetCandidate(rows) {
@@ -2775,12 +2831,12 @@
         const ts = Date.parse(row.start || '');
         return Number.isFinite(ts) && ts >= now - 30 * 60 * 1000 && ts <= horizon;
       })
-      .filter((row) => Number(row.edge || 0) >= 0.07)
-      .filter((row) => pickConfidenceValue(row) >= 0.65)
+      .filter((row) => displayEdgeValue(row) >= 0.07)
+      .filter((row) => safeConfidenceValue(row) >= 0.65)
       .filter(hasPositiveHistoricalSegment)
       .sort((a, b) => (
-        Number(b.edge || 0) - Number(a.edge || 0)
-        || pickConfidenceValue(b) - pickConfidenceValue(a)
+        displayEdgeValue(b) - displayEdgeValue(a)
+        || safeConfidenceValue(b) - safeConfidenceValue(a)
         || Date.parse(a.start || '') - Date.parse(b.start || '')
       ))[0] || null;
   }
@@ -2819,8 +2875,8 @@
   function ultimateBetReason(row) {
     if (!row) return 'Aucun pick ne réunit edge ≥ 7pt, confiance ≥ 65%, segment positif et départ dans les 24h.';
     const bits = [
-      `${formatPct(row.edge || 0, 1)} d’edge`,
-      `${formatPct(pickConfidenceValue(row), 0)} confiance`,
+      `${formatPct(displayEdgeValue(row), 1)} d’edge`,
+      `${formatPct(safeConfidenceValue(row), 0)} confiance`,
       `${formatOdd(row.odd)} Winamax`,
       countdownLabel(row.start)
     ];
@@ -2854,6 +2910,7 @@
           <span>${escapeHtml(row.label)}</span>
           <span>${escapeHtml(formatOdd(row.odd))}</span>
           <span>mise ${escapeHtml(visibleStakeText(row))}</span>
+          ${safeBadgeHtml(row)}
           ${betTypeBadgeHtml(row)}
           ${boostBadgeHtml(row)}
           ${enrichmentBadgeHtml(row)}
@@ -2875,13 +2932,17 @@
     if (!Number.isFinite(ts)) return 'later';
     const diff = ts - now;
     if (diff < -30 * 60 * 1000) return 'later';
-    if (diff < 2 * 60 * 60 * 1000) return 'now';
-    if (diff < 6 * 60 * 60 * 1000) return 'soon';
+    if (diff < 60 * 60 * 1000) return 'hour';
+    if (diff < 3 * 60 * 60 * 1000) return 'three';
     const today = parisDayKey(new Date());
     const tomorrow = parisDayKey(new Date(now + 24 * 60 * 60 * 1000));
-    const day = parisDayKey(new Date(ts));
+    const parts = parisDateParts(ts);
+    const day = parts?.day || parisDayKey(new Date(ts));
+    const hour = parts?.hour ?? 12;
     if (day === today) return 'today';
-    if (day === tomorrow) return 'tomorrow';
+  if (diff <= 24 * 60 * 60 * 1000 && hour < 6) return 'tonight';
+    if (day === tomorrow && hour < 14) return 'tomorrow_am';
+    if (day === tomorrow) return 'tomorrow_pm';
     return 'later';
   }
 
@@ -2896,9 +2957,10 @@
           <span>${escapeHtml(row.market)}</span>
           <span>${escapeHtml(row.label)}</span>
           <span>${escapeHtml(formatOdd(row.odd))}</span>
-          <span>edge ${escapeHtml(formatPct(row.edge || 0, 1))}</span>
-          <span>conf. aj. ${escapeHtml(formatPct(realConfidenceValue(row), 0))}</span>
+          <span>edge ${escapeHtml(formatPct(displayEdgeValue(row), 1))}</span>
+          <span>conf. ${escapeHtml(formatPct(safeConfidenceValue(row), 0))}</span>
           <span>${escapeHtml(countdownLabel(row.start))}</span>
+          ${safeBadgeHtml(row)}
           ${betTypeBadgeHtml(row)}
           ${boostBadgeHtml(row)}
           ${enrichmentBadgeHtml(row)}
@@ -2917,24 +2979,26 @@
     const wrap = $('#time-cockpit');
     if (!wrap) return;
     const buckets = [
-      { key: 'now', title: 'À jouer maintenant', detail: '< 2h', open: true },
-      { key: 'soon', title: 'Bientôt', detail: '2h - 6h', open: false },
-      { key: 'today', title: 'Plus tard aujourd’hui', detail: '6h - fin de journée', open: false },
-      { key: 'tomorrow', title: 'Demain', detail: 'J+1', open: false },
+      { key: 'hour', title: 'Dans l’heure', detail: '< 60 min', open: true },
+      { key: 'three', title: 'Dans les 3 heures', detail: '1h - 3h', open: true },
+      { key: 'today', title: 'Aujourd’hui', detail: 'après 3h', open: false },
+      { key: 'tonight', title: 'Cette nuit', detail: '00h - 06h Paris', open: false },
+      { key: 'tomorrow_am', title: 'Demain matin-midi', detail: '06h - 14h', open: false },
+      { key: 'tomorrow_pm', title: 'Demain après-midi/soir', detail: '14h - 00h', open: false },
       { key: 'later', title: 'Prochains jours', detail: 'J+2 à J+7', open: false }
     ];
     const grouped = new Map(buckets.map((bucket) => [bucket.key, []]));
     (Array.isArray(rows) ? rows : [])
       .filter((row) => pickHasCoreData(row) && canDisplayStake(row))
       .forEach((row) => grouped.get(temporalBucketForPick(row))?.push(row));
-    grouped.forEach((bucketRows) => bucketRows.sort((a, b) => realConfidenceValue(b) - realConfidenceValue(a) || Number(b.edge || 0) - Number(a.edge || 0) || Date.parse(a.start || '') - Date.parse(b.start || '')));
+    grouped.forEach((bucketRows) => bucketRows.sort((a, b) => Date.parse(a.start || '') - Date.parse(b.start || '') || safeConfidenceValue(b) - safeConfidenceValue(a) || displayEdgeValue(b) - displayEdgeValue(a)));
     wrap.innerHTML = buckets.map((bucket) => {
       const bucketRows = grouped.get(bucket.key) || [];
       const rowsHtml = bucketRows.length
         ? bucketRows.slice(0, bucket.key === 'later' ? 12 : 8).map(timePickCard).join('')
         : '<div class="empty compact-empty">Aucun pick dans cette fenêtre.</div>';
       return `
-        <details class="time-section ${bucket.key === 'now' && bucketRows.length ? 'hot' : ''}" data-time-bucket="${escapeHtml(bucket.key)}"${bucket.open ? ' open' : ''}>
+        <details class="time-section ${bucket.key === 'hour' && bucketRows.length ? 'hot' : ''}" data-time-bucket="${escapeHtml(bucket.key)}"${bucket.open ? ' open' : ''}>
           <summary>
             <span>${escapeHtml(bucket.title)}</span>
             <strong>${formatCount(bucketRows.length)}</strong>
@@ -2944,7 +3008,7 @@
         </details>
       `;
     }).join('');
-    const nowSection = wrap.querySelector('[data-time-bucket="now"].hot');
+    const nowSection = wrap.querySelector('[data-time-bucket="hour"].hot');
     if (nowSection && !state.didScrollToNow) {
       state.didScrollToNow = true;
       setTimeout(() => nowSection.scrollIntoView({ block: 'nearest', behavior: 'smooth' }), 200);
@@ -3091,7 +3155,7 @@
     if (prefs.webEnrichmentEnabled === false) return;
     const top = [
       aiSelectedUltimate(rows) || ultimateBetCandidate(rows),
-      ...(Array.isArray(rows) ? rows.filter((row) => temporalBucketForPick(row) === 'now').slice(0, 2) : [])
+      ...(Array.isArray(rows) ? rows.filter((row) => temporalBucketForPick(row) === 'hour').slice(0, 2) : [])
     ].filter(Boolean);
     const unique = Array.from(new Map(top.map((row) => [userBetKey(row), row])).values()).slice(0, 3);
     unique.forEach((row, index) => {
@@ -3244,7 +3308,7 @@
     const topRows = (Array.isArray(rows) ? rows : [])
       .filter((row) => pickHasCoreData(row) && canDisplayStake(row))
       .slice()
-      .sort((a, b) => Number(b.edge || 0) - Number(a.edge || 0))
+      .sort((a, b) => displayEdgeValue(b) - displayEdgeValue(a))
       .slice(0, 10);
     if (!topRows.length) return;
     try {
@@ -3288,6 +3352,25 @@
   function renderTodayFunnelAlert() {
     const node = $('#today-funnel-alert');
     if (!node) return;
+    const coverage = state.coverage24h?.summary || state.status?.analysis?.coverage24h?.summary || null;
+    if (coverage) {
+      const displayed24h = Number(coverage.displayed || 0);
+      const ready24h = Number(coverage.ready || 0);
+      const nightDisplayed = Number(coverage.nightDisplayed || 0);
+      const healthy24h = displayed24h >= 15 && ready24h >= 10 && nightDisplayed >= 3;
+      if (healthy24h) {
+        node.classList.add('hidden');
+        return;
+      }
+      const status = displayed24h >= 8 ? 'warn' : 'danger';
+      node.className = `today-funnel-alert ${status}`;
+      node.innerHTML = `
+        <strong>${displayed24h ? `${formatCount(displayed24h)} pick(s) sur 24h glissantes` : 'Aucun pick sur 24h glissantes'}</strong>
+        <span>Funnel 24h : ${formatCount(coverage.events || 0)} matchs → ${formatCount(coverage.bookable || 0)} Winamax → ${formatCount(coverage.positive || 0)} positifs → ${formatCount(ready24h)} prêts · ${formatCount(nightDisplayed)} cette nuit.</span>
+        <button class="ghost-btn" type="button" data-tab-target="data">Diagnostic auto</button>
+      `;
+      return;
+    }
     const funnel = state.status?.analysis?.todayFunnel || state.todayFunnel || null;
     if (!funnel) {
       node.classList.add('hidden');
@@ -3312,7 +3395,7 @@
     const upcoming = (Array.isArray(rows) ? rows : [])
       .filter((row) => pickHasCoreData(row))
       .slice()
-      .sort((a, b) => Date.parse(a.start || '') - Date.parse(b.start || '') || Number(b.edge || 0) - Number(a.edge || 0))
+      .sort((a, b) => Date.parse(a.start || '') - Date.parse(b.start || '') || displayEdgeValue(b) - displayEdgeValue(a))
       .slice(0, 14);
     if (!upcoming.length) {
       node.innerHTML = '<div class="empty compact-empty">Aucun pick à afficher dans la timeline.</div>';
@@ -3323,7 +3406,7 @@
         <span>${escapeHtml(countdownLabel(row.start))}</span>
         <strong>${escapeHtml(row.title)}</strong>
         <em>${escapeHtml(`${row.market} · ${row.label}`)}</em>
-        <small>${escapeHtml(formatOdd(row.odd))} · edge ${escapeHtml(formatPct(row.edge || 0, 1))} · ${escapeHtml(row.winamaxBetType?.label || 'Single')}</small>
+        <small>${escapeHtml(formatOdd(row.odd))} · edge ${escapeHtml(formatPct(displayEdgeValue(row), 1))} · ${escapeHtml(row.safeAssessment?.label || row.winamaxBetType?.label || 'Single')}</small>
       </article>
     `).join('');
   }
@@ -3395,6 +3478,9 @@
     if (!grid) return;
     const report = state.winamaxMarketAudit || {};
     const summary = report.summary || {};
+    const coverage = state.coverage24h || {};
+    const coverageSummary = coverage.summary || {};
+    const coverageBuckets = Array.isArray(coverage.buckets) ? coverage.buckets : [];
     const families = Array.isArray(report.families) ? report.families : [];
     const sports = Array.isArray(report.sports) ? report.sports : [];
     if (!families.length && !sports.length) {
@@ -3404,15 +3490,22 @@
     const cards = [
       ['Familles disponibles', formatCount(summary.availableFamilies || families.length), `${formatCount(summary.exploitedFamilies || 0)} exploitées dans les picks`],
       ['Picks positifs', formatCount(summary.positiveRows || 0), `Cible produit ${formatCount(summary.targetDailyPicks || 15)} / jour, sans forcer la qualité`],
+      ['24h glissantes', `${formatCount(coverageSummary.displayed || 0)} affichés`, `${formatCount(coverageSummary.ready || 0)} prêts · ${formatCount(coverageSummary.nightDisplayed || 0)} cette nuit`],
+      ['Funnel 24h', `${formatCount(coverageSummary.events || 0)} events`, `${formatCount(coverageSummary.bookable || 0)} Winamax · ${formatCount(coverageSummary.positive || 0)} positifs`],
       ['Boosts détectés', formatCount(summary.boostsDetected || 0), summary.boostsDetected ? 'Boosts associés aux données locales.' : 'Aucun boost structuré dans les fichiers actuels.'],
       ['Sports Winamax', formatCount(summary.sportsDetected || sports.length), sports.slice(0, 5).map((row) => row.sport).join(' · ') || 'Catalogue en attente']
     ];
+    const bucketCards = coverageBuckets.map((row) => [
+      row.label || row.key,
+      `${formatCount(row.displayed || 0)} affichés`,
+      `${formatCount(row.bookable || 0)} Winamax · ${formatCount(row.ready || 0)} prêts · ${formatCount(row.reliable || 0)} fiables`
+    ]);
     const familyCards = families.slice(0, 8).map((row) => [
       row.label || row.family,
       `${formatCount(row.exploited || 0)}/${formatCount(row.count || 0)}`,
       row.exploited ? 'Déjà exploité dans le cockpit.' : 'Disponible mais encore prudent / non retenu.'
     ]);
-    grid.innerHTML = [...cards, ...familyCards].map(([label, value, detail]) => `
+    grid.innerHTML = [...cards, ...bucketCards, ...familyCards].map(([label, value, detail]) => `
       <article class="quality-report-card quality-ok">
         <span>${escapeHtml(label)}</span>
         <strong>${escapeHtml(value)}</strong>
@@ -3453,7 +3546,7 @@
     const caption = pickFiltersActive(filters)
       ? `${formatCount(displayRows.length)} pick(s) filtré(s) sur ${formatCount(total)} lignes prêtes.`
       : ready > 0
-        ? `${formatCount(ready)} pick(s) prêt(s) : seules ces lignes affichent une mise.`
+        ? `${formatCount(ready)} pick(s) prêt(s), ${formatCount(meta.rolling24Displayed || displayRows.length)} sur 24h glissantes.`
         : meta.mode === 'bestAvailable'
           ? 'Aucun pari prêt dans la fenêtre courte : affichage des meilleurs candidats à surveiller.'
           : 'Aucun pari à jouer maintenant : candidats surveillés sans mise.';
@@ -3464,7 +3557,7 @@
       ? `${state.picks.length} affichés · ${total} picks positifs au total`
       : globalBlocked
         ? '0 mise tant qu’un gate est rouge'
-        : `${formatCount(ready)} prêt(s)`;
+        : `${formatCount(meta.rolling24Displayed || ready)} sur 24h · ${formatCount(state.coverage24h?.summary?.nightDisplayed || 0)} nuit`;
     if (!displayRows.length) {
       body.innerHTML = `<tr><td colspan="8" class="empty">${escapeHtml(emptyMessage || 'Aucun pick jouable avec les règles actuelles.')}</td></tr>`;
       markFirstPickVisible(0);
@@ -3474,7 +3567,8 @@
     const discipline = bankrollDisciplineStatus();
     body.innerHTML = displayRows.map((pick) => {
       const startLabel = `${formatDateLabel(pick.start)} · ${countdownLabel(pick.start)}`;
-      const edgeClass = pick.edge >= 0.08 ? 'edge-pos' : 'edge-warn';
+      const displayEdge = displayEdgeValue(pick);
+      const edgeClass = displayEdge >= 0.08 ? 'edge-pos' : 'edge-warn';
       const decision = pick.decisionCenter || {};
       const statusText = decision.canBet ? 'Prêt' : decision.status === 'repair' ? 'À réparer' : decision.status === 'skip' ? 'À éviter' : 'À surveiller';
       const trackKey = userBetKey(pick);
@@ -3491,10 +3585,10 @@
             <div class="match-title">${escapeHtml(pick.title)}</div>
             <div class="match-sub">${escapeHtml(pick.sport)} · ${escapeHtml(pick.league)}</div>
           </td>
-          <td data-label="Marché"><span class="pill">${escapeHtml(statusText)}</span> <span class="pill">${escapeHtml(pick.market)}</span>${betTypeBadgeHtml(pick)}${boostBadgeHtml(pick)}<div class="match-sub">${escapeHtml(pick.label)}</div><div class="match-sub selection-reason">${escapeHtml(pickReason(pick))}</div>${calibrationNote(pick)}${segmentValidationHtml(pick)}</td>
+          <td data-label="Marché"><span class="pill">${escapeHtml(statusText)}</span> <span class="pill">${escapeHtml(pick.market)}</span>${safeBadgeHtml(pick)}${betTypeBadgeHtml(pick)}${boostBadgeHtml(pick)}<div class="match-sub">${escapeHtml(pick.label)}</div><div class="match-sub selection-reason">${escapeHtml(pickReason(pick))}</div>${calibrationNote(pick)}${segmentValidationHtml(pick)}</td>
           <td data-label="Cote">@${pick.odd.toFixed(2)}</td>
           <td data-label="Proba">${formatPct(pick.probability, 1)}${adjustedConfidenceHtml(pick)}</td>
-          <td data-label="Edge" class="${edgeClass}">${formatPct(pick.edge, 1)}</td>
+          <td data-label="Edge" class="${edgeClass}">${edgeDisplayHtml(pick)}</td>
           <td data-label="Mise">${visibleStakeText(pick)}</td>
           <td data-label="Départ">${escapeHtml(startLabel)}</td>
           <td data-label="Action">${winamaxAction}${action}</td>
@@ -3509,11 +3603,11 @@
     const allRows = (state.allPicks || []).filter(pickHasCoreData);
     const profitable = rows.filter((row) => {
       const cal = row.calibration || {};
-      return cal.level === 'warm' || Number(row.edge || 0) >= 0.10 || String(row.tier || '').includes('value');
+      return cal.level === 'warm' || displayEdgeValue(row) >= 0.10 || String(row.tier || '').includes('value');
     });
     const risky = rows.filter((row) => row.calibration?.level === 'cold' || row.contextQuality?.tier === 'insuffisant');
-    const avgEdge = rows.length ? rows.reduce((sum, row) => sum + Number(row.edge || 0), 0) / rows.length : 0;
-    const avgAllEdge = allRows.length ? allRows.reduce((sum, row) => sum + Number(row.edge || 0), 0) / allRows.length : avgEdge;
+    const avgEdge = rows.length ? rows.reduce((sum, row) => sum + displayEdgeValue(row), 0) / rows.length : 0;
+    const avgAllEdge = allRows.length ? allRows.reduce((sum, row) => sum + displayEdgeValue(row), 0) / allRows.length : avgEdge;
     const level = rows.length >= 20 && profitable.length >= risky.length ? 'Bonne' : rows.length >= 10 ? 'Moyenne' : 'Faible';
     return { rows, profitable, risky, avgEdge, avgAllEdge, level };
   }
@@ -3546,7 +3640,7 @@
       const key = pickDayKey(row);
       const bucket = byDay.get(key) || { key, rows: [], edge: 0 };
       bucket.rows.push(row);
-      bucket.edge += Number(row.edge || 0);
+      bucket.edge += displayEdgeValue(row);
       byDay.set(key, bucket);
     });
     const today = new Date();
@@ -3560,7 +3654,7 @@
         date,
         rows,
         count: rows.length,
-        big: rows.filter((row) => Number(row.edge || 0) >= 0.10).length,
+        big: rows.filter((row) => displayEdgeValue(row) >= 0.10).length,
         avgEdge: rows.length ? bucket.edge / rows.length : 0
       };
     });
@@ -3592,7 +3686,7 @@
       <button class="timeline-row" type="button" data-match-id="${escapeHtml(row.id)}">
         <span>${escapeHtml(new Date(row.start).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }))}</span>
         <strong>${escapeHtml(row.title)}</strong>
-        <em>${escapeHtml(row.market)} · ${escapeHtml(row.label)} · ${escapeHtml(formatOdd(row.odd))} · edge ${escapeHtml(formatPct(row.edge, 1))}</em>
+        <em>${escapeHtml(row.market)} · ${escapeHtml(row.label)} · ${escapeHtml(formatOdd(row.odd))} · edge ${escapeHtml(formatPct(displayEdgeValue(row), 1))}</em>
       </button>
     `).join('') : '<div class="empty">Aucun pick prêt sur cette journée.</div>';
   }
@@ -4171,7 +4265,7 @@
     });
     body.innerHTML = picks.slice(0, 12).map((pick) => {
       const stakes = stakeByPick.get(pick.id) || {};
-      const edgeClass = pick.edge >= 0.08 ? 'edge-pos' : 'edge-warn';
+      const edgeClass = displayEdgeValue(pick) >= 0.08 ? 'edge-pos' : 'edge-warn';
       return `
         <tr class="clickable-row scenario-detail-row" data-match-id="${escapeHtml(pick.id)}" tabindex="0" role="button" aria-label="Ouvrir ${escapeHtml(pick.title)}">
           <td data-label="Match">
@@ -4182,7 +4276,7 @@
           <td data-label="Prudent" class="stake-value">${formatMoney(stakes.prudent || 0)}</td>
           <td data-label="Normal" class="stake-value">${formatMoney(stakes.normal || 0)}</td>
           <td data-label="Agressif" class="stake-value">${formatMoney(stakes.agressif || 0)}</td>
-          <td data-label="Edge" class="${edgeClass}">${formatPct(pick.edge, 1)}</td>
+          <td data-label="Edge" class="${edgeClass}">${edgeDisplayHtml(pick)}</td>
         </tr>
       `;
     }).join('');
@@ -4191,7 +4285,7 @@
   function renderStakeScenarios(emptyMessage) {
     const wrap = $('#stake-scenario-grid');
     if (!wrap) return;
-    const picks = state.picks.filter((pick) => canDisplayStake(pick) && Number(pick.edge || 0) > 0);
+    const picks = state.picks.filter((pick) => canDisplayStake(pick) && displayEdgeValue(pick) > 0);
     const bankroll = getBankroll();
     if (!picks.length || !(bankroll > 0)) {
       wrap.innerHTML = `<div class="empty">${escapeHtml(emptyMessage || 'Aucun scénario actif : pas de pick user jouable.')}</div>`;
@@ -4228,7 +4322,8 @@
       return;
     }
     body.innerHTML = visibleRows.map((row) => {
-      const edgeClass = row.edge >= 0.08 ? 'edge-pos' : row.edge > 0 ? 'edge-warn' : 'status-skip';
+      const rowEdge = displayEdgeValue(row);
+      const edgeClass = rowEdge >= 0.08 ? 'edge-pos' : rowEdge > 0 ? 'edge-warn' : 'status-skip';
       const dcStatus = row.decisionCenter?.status || row.status;
       const statusClass = dcStatus === 'ready' ? 'status-bet' : dcStatus === 'watch' || dcStatus === 'repair' ? 'status-watch' : 'status-skip';
       const statusLabel = dcStatus === 'ready'
@@ -4244,10 +4339,10 @@
             <div class="match-title">${escapeHtml(row.title)}</div>
             <div class="match-sub">${escapeHtml(row.sport)} · ${escapeHtml(row.league)}</div>
           </td>
-          <td data-label="Marché"><span class="pill">${escapeHtml(row.market)}</span><div class="match-sub">${escapeHtml(row.label)}</div>${calibrationNote(row)}</td>
+          <td data-label="Marché"><span class="pill">${escapeHtml(row.market)}</span>${safeBadgeHtml(row)}<div class="match-sub">${escapeHtml(row.label)}</div>${calibrationNote(row)}</td>
           <td data-label="Cote">${row.odd > 1 ? `@${row.odd.toFixed(2)}` : '-'}</td>
           <td data-label="Proba">${row.probability > 0 ? formatPct(row.probability, 1) : '-'}</td>
-          <td data-label="Edge" class="${edgeClass}">${row.edge > 0 ? formatPct(row.edge, 1) : '-'}</td>
+          <td data-label="Edge" class="${edgeClass}">${rowEdge > 0 ? edgeDisplayHtml(row) : '-'}</td>
           <td data-label="Statut" class="${statusClass}">${escapeHtml(statusLabel)}</td>
           <td data-label="Départ">${escapeHtml(formatDateLabel(row.start))}</td>
         </tr>`;
@@ -6312,7 +6407,8 @@
     if (ticket) ticket.innerHTML = `
       <span>${escapeHtml(pick.market || '-')}</span>
       <strong>${escapeHtml(pick.label || '-')} ${escapeHtml(formatOdd(pick.odd))}</strong>
-      <em>mise ${escapeHtml(visibleStakeText(pick))} · edge ${escapeHtml(formatPct(pick.edge || 0, 1))}</em>
+      <em>mise ${escapeHtml(visibleStakeText(pick))} · edge ${escapeHtml(formatPct(displayEdgeValue(pick), 1))}</em>
+      ${safeBadgeHtml(pick)}
       ${enrichmentBadgeHtml(pick)}
     `;
     if (reason) reason.textContent = pickReason(pick).replace(/^Pourquoi\s*:\s*/i, '');
@@ -6665,7 +6761,7 @@
             <div class="kv">
               <span>Statut</span><strong>${escapeHtml(row.statusLabel || row.status || '-')}</strong>
               <span>Agent</span><strong>${escapeHtml(row.contextGate?.agentEligible === false || row.prebetGate?.blocked ? 'Bloqué' : 'Éligible si Kelly positif')}</strong>
-              <span>Edge</span><strong>${escapeHtml(formatPct(row.edge || 0, 1))}</strong>
+              <span>Edge</span><strong>${escapeHtml(formatPct(displayEdgeValue(row), 1))}</strong>
               <span>Mise autorisée</span><strong>${escapeHtml(visibleStakeText(row, decisions))}</strong>
               <span>Raison mise</span><strong>${escapeHtml(stakePolicyText(row, decisions))}</strong>
               <span>Préparation</span><strong>${escapeHtml(action.label || refreshModeLabel(action.mode))}</strong>
@@ -6815,9 +6911,9 @@
       ['Boost Winamax', row.winamaxBoost ? (row.winamaxBoost.to ? `${row.winamaxBoost.from ? `${Number(row.winamaxBoost.from).toFixed(2)} → ` : ''}${Number(row.winamaxBoost.to).toFixed(2)}` : 'détecté') : 'Aucun boost détecté'],
       ['Cote', row.odd > 1 ? `@${row.odd.toFixed(2)}` : '-'],
       ['Proba modèle', row.probability > 0 ? formatPct(row.probability, 1) : '-'],
-      ['Confiance ajustée', formatPct(realConfidenceValue(row), 1)],
+      ['Confiance ajustée', formatPct(safeConfidenceValue(row), 1)],
       ['Validation historique', segmentValidation.label || 'Sample insuffisant pour validation rétrospective'],
-      ['Edge', row.edge > 0 ? formatPct(row.edge, 1) : '-'],
+      ['Edge', displayEdgeValue(row) > 0 ? formatPct(displayEdgeValue(row), 1) : '-'],
       ['Mise autorisée', visibleStakeText(row, decisionBundle)],
       ['Kelly théorique', Number(row.modelStake || row.stake || 0) > 0 && !stakeAllowed ? `${formatMoney(row.modelStake || row.stake)} · bloquée` : row.stake > 0 ? formatMoney(row.stake) : '0 €'],
       ['Prudence mise', stakePolicyText(row, decisionBundle)],
@@ -6880,7 +6976,7 @@
             <p>${escapeHtml(readableReason)}</p>
             <div class="decision-hero-grid">
               <div><span>Cote</span><strong>${escapeHtml(row.odd > 1 ? `@${row.odd.toFixed(2)}` : '-')}</strong></div>
-              <div><span>Edge</span><strong>${escapeHtml(row.edge > 0 ? formatPct(row.edge, 1) : '-')}</strong></div>
+              <div><span>Edge</span><strong>${escapeHtml(displayEdgeValue(row) > 0 ? formatPct(displayEdgeValue(row), 1) : '-')}</strong></div>
               <div><span>Mise</span><strong>${escapeHtml(visibleStakeText(row, decisionBundle))}</strong></div>
               <div><span>Contexte</span><strong>${escapeHtml(contextScoreLabel(contextQuality))}</strong></div>
             </div>
@@ -8073,7 +8169,7 @@
         </td>
         <td data-label="Raison"><span class="pill">${escapeHtml(row.reason || row.reasonKey || '-')}</span><div class="match-sub">${escapeHtml(row.market || '-')} · ${escapeHtml(row.label || '-')}</div></td>
         <td data-label="Cote">${formatOdd(row.odd)}</td>
-        <td data-label="Edge" class="${Number(row.edge || 0) >= 0.08 ? 'edge-pos' : 'edge-warn'}">${formatPct(row.edge || 0, 1)}</td>
+        <td data-label="Edge" class="${displayEdgeValue(row) >= 0.08 ? 'edge-pos' : 'edge-warn'}">${formatPct(displayEdgeValue(row), 1)}</td>
         <td data-label="Confiance">${Number.isFinite(Number(row.trustScore)) ? `${Math.round(Number(row.trustScore))}/100` : '-'}</td>
         <td data-label="Départ">${escapeHtml(formatDateLabel(row.start))}</td>
       </tr>
@@ -9543,7 +9639,7 @@
   }
 
   function exportStakeScenariosCsv() {
-    const picks = state.picks.filter((pick) => canDisplayStake(pick) && Number(pick.edge || 0) > 0);
+    const picks = state.picks.filter((pick) => canDisplayStake(pick) && displayEdgeValue(pick) > 0);
     if (!picks.length) return;
     const bankroll = getBankroll();
     const plans = stakeScenarioProfiles().map((profile) => stakeScenarioPlan(bankroll, picks, profile));
@@ -9565,7 +9661,7 @@
         pick.label,
         Number(pick.odd || 0).toFixed(2),
         Number(pick.probability || 0).toFixed(4),
-        Number(pick.edge || 0).toFixed(4),
+        displayEdgeValue(pick).toFixed(4),
         Number(stakes.prudent || 0).toFixed(2),
         Number(stakes.normal || 0).toFixed(2),
         Number(stakes.agressif || 0).toFixed(2),
@@ -9641,7 +9737,7 @@
           pick: row.label || '',
           odd: Number(row.odd || 0),
           probability: Number(row.probability || 0),
-          edge: Number(row.edge || 0),
+          edge: displayEdgeValue(row),
           stake: displayStakeAmount(row),
           modelStake: Number(row.stake || 0),
           status: row.status || '',
@@ -9877,7 +9973,7 @@
       row.label || '',
       Number(row.odd || 0).toFixed(2),
       Number(row.probability || 0).toFixed(4),
-      Number(row.edge || 0).toFixed(4),
+      displayEdgeValue(row).toFixed(4),
       row.status || '',
       Number.isFinite(Number(row.contextScore)) ? Number(row.contextScore).toFixed(0) : '',
       row.contextTier || '',

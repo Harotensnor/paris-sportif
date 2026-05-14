@@ -5,6 +5,19 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 13 — Couverture 24h, volume fiable et filtre safe Winamax
+
+- Refonte de la sélection moteur autour d'une fenêtre 24h glissantes : le dashboard privilégie désormais les picks Winamax à venir jour/nuit avant les edges plus lointains.
+- Ajout d'un rapport `coverage24h` exposé en Mode expert : funnel événements 24h → Winamax bookables → prédictibles → positifs → affichés → fiables → prêts, avec ventilation `Cette nuit`, matin, après-midi et soir.
+- Correction de la perte de picks nocturnes : les meilleurs edges globaux ne masquent plus les opportunités plus proches NBA/MLB/NHL/football Amériques quand elles passent les garde-fous.
+- Ajout d'un filtre `fiable et safe` par pick : edge prudent entre +3pt et +20pt, cote Winamax exploitable, confiance minimale, segment non négatif si échantillon suffisant, absence de red flag et contexte cohérent.
+- Les edges aberrants restent pris en compte mais sont affichés comme `edge prudent` plafonné, pour éviter de présenter des valeurs artificiellement énormes comme des certitudes.
+- La confiance affichée devient plus intelligente : si un segment manque encore de sample, le moteur conserve la confiance brute et le score de confiance modèle au lieu de pénaliser trop fort les sports/marchés nocturnes.
+- Le cockpit affiche maintenant les sections 24h demandées : `Dans l'heure`, `Dans les 3 heures`, `Aujourd'hui`, `Cette nuit`, `Demain matin-midi`, `Demain après-midi/soir` et `Prochains jours`.
+- Ajout des badges `✓ Fiable`, `À surveiller`, `Écarté` dans les cartes, tableaux, timeline, bet ultime et fiche match, avec la raison courte en tooltip.
+- Les métriques, exports et fiches utilisent l'edge prudent/safe pour rester cohérents avec ce que l'utilisateur voit et peut vraiment miser.
+- QA Sprint 13 : refresh réel rapide, contrat moteur, unit/refresh, smoke Electron, Playwright, capture visuelle et audit npm valident 180 picks candidats, 25 affichés, 20 prêts dans le cockpit, 20 picks sur 24h glissantes, 15 prêts sur 24h, 6 picks nocturnes affichés, 0 vulnérabilité et UI Winamax-only.
+
 ### Sprint 12 — Exploitation Winamax, comptabilité et cockpit 80/20
 
 - Ajout d’un audit moteur `winamaxMarketAudit` : familles de marchés disponibles/exploitées, sports présents dans le catalogue Winamax, boosts détectés et marchés encore dormants. Sur les données fraîches : 194 événements bookables, 16 familles disponibles et 11 familles déjà exploitées.

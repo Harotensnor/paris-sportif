@@ -14,7 +14,7 @@ function isIgnorableConsoleMessage(message) {
   return /Failed to load resource:\s*net::ERR_(EMPTY_RESPONSE|ABORTED)/i.test(String(message || ''));
 }
 
-test('Sprint 12 desktop keeps the simple Winamax cockpit and accounting', async () => {
+test('Sprint 13 desktop keeps the safe 24h Winamax cockpit and accounting', async () => {
   const rendererText = fs.readFileSync(path.join(root, 'desktop', 'src', 'renderer', 'renderer.js'), 'utf8');
   const htmlText = fs.readFileSync(path.join(root, 'desktop', 'src', 'renderer', 'index.html'), 'utf8');
   const mainText = fs.readFileSync(path.join(root, 'desktop', 'src', 'main.js'), 'utf8');
@@ -34,6 +34,9 @@ test('Sprint 12 desktop keeps the simple Winamax cockpit and accounting', async 
   expect(rendererText).toContain('renderWinamaxPromos');
   expect(rendererText).toContain('renderBankrollAccounting');
   expect(rendererText).toContain('winamaxMarketAudit');
+  expect(rendererText).toContain('coverage24h');
+  expect(rendererText).toContain('safeBadgeHtml');
+  expect(rendererText).toContain('renderTemporalCockpit');
 
   const userDataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'paris-sportif-pw-'));
   const messages = [];
@@ -60,6 +63,8 @@ test('Sprint 12 desktop keeps the simple Winamax cockpit and accounting', async 
       rows: document.querySelectorAll('#picks-body tr.clickable-row').length,
       timeline: document.querySelectorAll('#simple-pick-timeline .simple-timeline-card').length,
       trackButtons: document.querySelectorAll('[data-track-bet-key]').length,
+      safeBadges: document.querySelectorAll('.safe-pick-badge.safe').length,
+      hasRollingSections: ['Dans l’heure', 'Dans les 3 heures', 'Cette nuit'].every((label) => document.body.textContent.includes(label)),
       bankroll: document.querySelector('#simple-bankroll')?.textContent || '',
       pnl: document.querySelector('#simple-pnl')?.textContent || '',
       combines: Boolean(document.querySelector('#simple-combines-section')),
@@ -70,10 +75,12 @@ test('Sprint 12 desktop keeps the simple Winamax cockpit and accounting', async 
     }));
     expect(cockpit.title).toBe('Picks');
     expect(cockpit.nav).toEqual(['Picks', 'Bilan', 'Réglages']);
-    expect(cockpit.metric).toBeGreaterThanOrEqual(5);
-    expect(cockpit.rows).toBeGreaterThanOrEqual(5);
-    expect(cockpit.timeline).toBeGreaterThanOrEqual(5);
-    expect(cockpit.trackButtons).toBeGreaterThanOrEqual(5);
+    expect(cockpit.metric).toBeGreaterThanOrEqual(15);
+    expect(cockpit.rows).toBeGreaterThanOrEqual(15);
+    expect(cockpit.timeline).toBeGreaterThanOrEqual(10);
+    expect(cockpit.trackButtons).toBeGreaterThanOrEqual(15);
+    expect(cockpit.safeBadges).toBeGreaterThanOrEqual(10);
+    expect(cockpit.hasRollingSections).toBe(true);
     expect(cockpit.bankroll).toContain('€');
     expect(cockpit.pnl).toContain('€');
     expect(cockpit.combines).toBe(true);
@@ -112,6 +119,8 @@ test('Sprint 12 desktop keeps the simple Winamax cockpit and accounting', async 
     await win.click('[data-tab="data"]');
     await expect(win.locator('#quality-report-grid')).toBeVisible();
     await expect(win.locator('#winamax-market-audit-grid')).toContainText('Familles disponibles');
+    await expect(win.locator('#winamax-market-audit-grid')).toContainText('24h glissantes');
+    await expect(win.locator('#winamax-market-audit-grid')).toContainText('Cette nuit');
 
     await win.click('[data-tab="dashboard"]');
     await win.click('#help-panel-btn');

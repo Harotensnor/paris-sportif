@@ -47,8 +47,10 @@ function testAnalysis() {
   assert(analysis.modelRealityAudit && analysis.modelRealityAudit.schema === 'paris-sportif.model_reality_audit.v1', 'Audit réalité modèle absent', analysis.modelRealityAudit);
   assert(Number(analysis.modelRealityAudit.sampleSize || 0) > 0, 'Audit réalité sans sample', analysis.modelRealityAudit);
   assert(analysis.todayFunnel && analysis.todayFunnel.schema === 'paris-sportif.today_funnel.v1', 'Funnel aujourd’hui absent', analysis.todayFunnel);
-  assert(Number(analysis.todayFunnel.today?.displayed || 0) >= 5, 'Moins de 5 picks aujourd’hui affichés', analysis.todayFunnel.today);
-  assert(Number(analysis.todayFunnel.today?.ready || 0) >= 5, 'Moins de 5 picks aujourd’hui prêts', analysis.todayFunnel.today);
+  assert(analysis.coverage24h && analysis.coverage24h.schema === 'paris-sportif.coverage_24h.v1', 'Couverture 24h absente', analysis.coverage24h);
+  assert(Number(analysis.coverage24h.summary?.displayed || 0) >= 15, 'Moins de 15 picks affichés sur 24h glissantes', analysis.coverage24h.summary);
+  assert(Number(analysis.coverage24h.summary?.nightDisplayed || 0) >= 3 || Number(analysis.coverage24h.buckets?.find((bucket) => bucket.key === '00-06')?.bookable || 0) < 8, 'Couverture nuit insuffisante', analysis.coverage24h);
+  assert(Number(analysis.coverage24h.summary?.ready || 0) >= 10, 'Moins de 10 picks prêts sur 24h glissantes', analysis.coverage24h.summary);
   assert(analysis.winamaxMarketAudit && analysis.winamaxMarketAudit.schema === 'paris-sportif.winamax_market_audit.v1', 'Audit marchés Winamax absent', analysis.winamaxMarketAudit);
   assert(Number(analysis.winamaxMarketAudit.summary?.availableFamilies || 0) >= 8, 'Pas assez de familles de marchés Winamax détectées', analysis.winamaxMarketAudit.summary);
   assert(Number(analysis.winamaxMarketAudit.summary?.exploitedFamilies || 0) >= 8, 'Pas assez de familles de marchés exploitées', analysis.winamaxMarketAudit.summary);
@@ -63,6 +65,8 @@ function testAnalysis() {
     assert(pick.segmentValidation && Number(pick.segmentValidation.realConfidence || 0) > 0, 'Pick sans validation historique réelle', pick);
     assert(Number(pick.adjustedConfidence || 0) > 0, 'Pick sans confiance ajustée', pick);
     assert(pick.winamaxBetType && pick.winamaxBetType.label, 'Pick sans type de pari Winamax conseillé', pick);
+    assert(pick.safeAssessment && pick.safeAssessment.status, 'Pick sans filtre fiable et safe', pick);
+    assert(Number(pick.safeEdge || pick.edge || 0) >= 0.01, 'Pick sans edge prudent positif', pick);
     if (pick.decisionCenter.canBet) {
       assert(Number(pick.stake) > 0, 'Pick prêt sans mise positive', pick);
     } else {
@@ -118,8 +122,8 @@ function testAnalysis() {
     perMatch.set(pick.id, (perMatch.get(pick.id) || 0) + 1);
   }
   assert(Array.from(perMatch.values()).every((count) => count <= 2), 'Dashboard expose plus de 2 picks sur un même match', Array.from(perMatch.entries()).filter(([, count]) => count > 2));
-  assert(Number(analysis.decisionCenter?.summary?.ready || 0) >= 10, 'Moins de 10 paris utilisateurs prêts', analysis.decisionCenter?.summary);
-  assert(readyUserPicks.length >= 10, 'Moins de 10 paris prêts visibles dans la sélection', readyUserPicks);
+  assert(Number(analysis.decisionCenter?.summary?.ready || 0) >= 15, 'Moins de 15 paris utilisateurs prêts', analysis.decisionCenter?.summary);
+  assert(readyUserPicks.length >= 15, 'Moins de 15 paris prêts visibles dans la sélection', readyUserPicks);
 
   assert(analysis.agent && analysis.agent.guard, 'Snapshot agent absent', analysis.agent);
   assert(!Object.keys(analysis.agent).some((key) => /^v(?:[5-9]|1[0-6])/.test(key)), 'Anciennes gates versionnées ne doivent plus bloquer l’agent', analysis.agent);

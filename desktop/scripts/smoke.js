@@ -29,8 +29,8 @@ async function main() {
   for (const marker of ['contextIsolation: true', 'sandbox: true', 'setWindowOpenHandler', "permission === 'notifications'", 'process.memoryUsage()']) {
     if (!mainText.includes(marker)) throw new Error(`Durcissement Electron absent: ${marker}`);
   }
-  for (const marker of ['todayFunnel', 'renderSimpleTimeline', 'antiTiltStatus', 'applyExpertMode', 'renderWinamaxPromos', 'renderBankrollAccounting', 'winamaxMarketAudit']) {
-    if (!rendererText.includes(marker)) throw new Error(`Sprint 12 renderer absent: ${marker}`);
+  for (const marker of ['todayFunnel', 'renderSimpleTimeline', 'antiTiltStatus', 'applyExpertMode', 'renderWinamaxPromos', 'renderBankrollAccounting', 'winamaxMarketAudit', 'coverage24h', 'safeBadgeHtml', 'renderTemporalCockpit']) {
+    if (!rendererText.includes(marker)) throw new Error(`Sprint 13 renderer absent: ${marker}`);
   }
 
   const messages = [];
@@ -58,6 +58,8 @@ async function main() {
       rows: document.querySelectorAll('#picks-body tr.clickable-row').length,
       todayRows: Array.from(document.querySelectorAll('#picks-body tr.clickable-row')).filter((row) => /Aujourd'hui|Aujourd’hui|dans|h|min/i.test(row.textContent || '')).length,
       timeline: document.querySelectorAll('#simple-pick-timeline .simple-timeline-card').length,
+      safeBadges: document.querySelectorAll('.safe-pick-badge.safe').length,
+      hasRollingSections: ['Dans l’heure', 'Dans les 3 heures', 'Cette nuit'].every((label) => document.body.textContent.includes(label)),
       combines: Boolean(document.querySelector('#simple-combines-section')),
       scorers: Boolean(document.querySelector('#simple-scorers-section')),
       promos: Boolean(document.querySelector('#simple-promos-section')),
@@ -69,9 +71,9 @@ async function main() {
     }));
     if (dashboard.title !== 'Picks') throw new Error(`Titre dashboard invalide: ${dashboard.title}`);
     if (dashboard.nav.join('|') !== 'Picks|Bilan|Réglages') throw new Error(`Navigation non simplifiée: ${dashboard.nav.join(', ')}`);
-    if (dashboard.metric < 5 || dashboard.rows < 5 || dashboard.timeline < 5 || dashboard.trackButtons < 5) throw new Error(`Picks insuffisants: ${JSON.stringify(dashboard)}`);
+    if (dashboard.metric < 15 || dashboard.rows < 15 || dashboard.timeline < 10 || dashboard.trackButtons < 15 || dashboard.safeBadges < 10 || !dashboard.hasRollingSections) throw new Error(`Picks Sprint 13 insuffisants: ${JSON.stringify(dashboard)}`);
     if (!dashboard.combines || !dashboard.scorers || !dashboard.promos || !dashboard.bankroll.includes('€') || !dashboard.pnl.includes('€') || !dashboard.expertHidden || dashboard.multibookText) {
-      throw new Error(`Cockpit Sprint 12 incohérent: ${JSON.stringify(dashboard)}`);
+      throw new Error(`Cockpit Sprint 13 incohérent: ${JSON.stringify(dashboard)}`);
     }
 
     await win.click('[data-track-bet-key]');
@@ -89,7 +91,7 @@ async function main() {
       accounting: Boolean(document.querySelector('#add-bankroll-transaction-btn')),
       multiBook: Boolean(document.querySelector('#pref-multibook-enabled') || document.querySelector('#pref-odds-api-key'))
     }));
-    if (!prefs.expert || !prefs.antiTilt || !prefs.expandedSports || !prefs.winamaxMarkets || !prefs.accounting || prefs.multiBook) throw new Error(`Réglages Sprint 12 invalides: ${JSON.stringify(prefs)}`);
+    if (!prefs.expert || !prefs.antiTilt || !prefs.expandedSports || !prefs.winamaxMarkets || !prefs.accounting || prefs.multiBook) throw new Error(`Réglages Sprint 13 invalides: ${JSON.stringify(prefs)}`);
     await win.fill('#bankroll-tx-amount', '25');
     await win.click('#add-bankroll-transaction-btn');
     await win.waitForFunction(() => /Dépôt/.test(document.querySelector('#bankroll-transaction-list')?.textContent || ''), null, { timeout: 5000 });
@@ -100,6 +102,10 @@ async function main() {
     await win.click('[data-tab="data"]');
     await win.waitForSelector('#quality-report-grid .quality-report-card, #quality-report-grid .empty', { timeout: 30000 });
     await win.waitForSelector('#winamax-market-audit-grid .quality-report-card, #winamax-market-audit-grid .empty', { timeout: 30000 });
+    const auditText = await win.textContent('#winamax-market-audit-grid');
+    if (!/24h glissantes/i.test(auditText || '') || !/Cette nuit/i.test(auditText || '')) {
+      throw new Error(`Audit 24h absent du Mode expert: ${auditText}`);
+    }
 
     await win.click('[data-tab="dashboard"]');
     await win.click('#picks-body tr.clickable-row td[data-label="Match"]');
@@ -120,7 +126,7 @@ async function main() {
       message.startsWith('error:') || message.startsWith('pageerror:')
     ) && !isIgnorableConsoleMessage(message));
     if (severe.length) throw new Error(`Erreurs console: ${severe.join(' | ')}`);
-    console.log(`Desktop smoke OK: ${dashboard.metric} picks visibles, ${dashboard.timeline} en timeline, Winamax-only Sprint 12.`);
+    console.log(`Desktop smoke OK: ${dashboard.metric} picks visibles, ${dashboard.timeline} en timeline, ${dashboard.safeBadges} fiables, Winamax-only Sprint 13.`);
   } finally {
     await app.close();
     fs.rmSync(userDataDir, { recursive: true, force: true });
