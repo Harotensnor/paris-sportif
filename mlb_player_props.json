@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-14T02:04:13Z",
+  "generated_at": "2026-05-14T02:35:38Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815332",
-      "kickoff": "2026-05-14T02:10Z",
-      "league": "MLB",
-      "match": "San Francisco Giants at Los Angeles Dodgers",
-      "home": "Los Angeles Dodgers",
-      "away": "San Francisco Giants",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Los Angeles Dodgers",
-          "pitcher": "Emmet Sheehan",
-          "label": "Emmet Sheehan moins de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "under",
-          "probability": 0.5902,
-          "fair_odds": 1.69,
-          "expected_strikeouts": 6.06,
-          "projected_ip": 5.03,
-          "inputs": {
-            "k9": 10.85,
-            "era": 4.79,
-            "whip": 1.35,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Los Angeles Dodgers",
-          "pitcher": "Emmet Sheehan",
-          "label": "Emmet Sheehan concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5699,
-          "fair_odds": 1.75,
-          "expected_hr_allowed": 0.844,
-          "projected_ip": 5.03,
-          "inputs": {
-            "hr9": 1.51,
-            "era": 4.79,
-            "whip": 1.35
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "San Francisco Giants",
-          "pitcher": "Landen Roupp",
-          "label": "Landen Roupp moins de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "under",
-          "probability": 0.5394,
-          "fair_odds": 1.85,
-          "expected_strikeouts": 6.31,
-          "projected_ip": 5.4,
-          "inputs": {
-            "k9": 10.51,
-            "era": 3.09,
-            "whip": 1.1,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "San Francisco Giants",
-          "pitcher": "Landen Roupp",
-          "label": "Landen Roupp ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.8816,
-          "fair_odds": 1.13,
-          "expected_hr_allowed": 0.126,
-          "projected_ip": 5.4,
-          "inputs": {
-            "hr9": 0.21,
-            "era": 3.09,
-            "whip": 1.1
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815335",
       "kickoff": "2026-05-14T16:35Z",
@@ -824,7 +742,7 @@
       ]
     }
   ],
-  "props": 40,
+  "props": 36,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
