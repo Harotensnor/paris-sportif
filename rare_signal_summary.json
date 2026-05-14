@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-05-14T20:04:20Z",
+  "generated_at": "2026-05-14T20:42:50Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 81,
+    "active_events": 82,
     "actionable": 26,
-    "watch": 5,
-    "risk": 50,
+    "watch": 7,
+    "risk": 49,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 28,
+      "injury_imbalance": 30,
       "back_to_back_travel": 8,
-      "signal_conflict": 6,
+      "signal_conflict": 5,
       "market_uncertain": 45,
       "travel_extreme": 3
     },
     "by_quality": {
       "actionable": 26,
-      "watch": 5,
-      "risk": 50
+      "watch": 7,
+      "risk": 49
     }
   },
   "active_actionable": [
@@ -494,6 +494,24 @@
   ],
   "active_watch": [
     {
+      "event_id": "401871428",
+      "date": "2026-05-15T01:30Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Anaheim Ducks",
+      "away": "Vegas Golden Knights",
+      "match": "Anaheim Ducks - Vegas Golden Knights",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Anaheim Ducks",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 4-1"
+    },
+    {
       "event_id": "401815348",
       "date": "2026-05-15T23:10Z",
       "sport": "baseball",
@@ -528,6 +546,24 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 14-11"
+    },
+    {
+      "event_id": "401871429",
+      "date": "2026-05-16T21:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Vegas Golden Knights",
+      "away": "Anaheim Ducks",
+      "match": "Vegas Golden Knights - Anaheim Ducks",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Anaheim Ducks",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 1-4"
     },
     {
       "event_id": "401815370",
@@ -982,24 +1018,6 @@
       "context": "marge bookmaker anormale 19.2%"
     },
     {
-      "event_id": "401865545",
-      "date": "2026-05-20T22:00Z",
-      "sport": "football",
-      "league_code": "conmebol.libertadores",
-      "league_name": "Copa Libertadores",
-      "home": "Nacional",
-      "away": "Universitario",
-      "match": "Nacional - Universitario",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.7%"
-    },
-    {
       "event_id": "401865436",
       "date": "2026-05-20T22:00Z",
       "sport": "football",
@@ -1054,6 +1072,24 @@
       "context": "marge bookmaker anormale 19.0%"
     },
     {
+      "event_id": "401865545",
+      "date": "2026-05-20T22:00Z",
+      "sport": "football",
+      "league_code": "conmebol.libertadores",
+      "league_name": "Copa Libertadores",
+      "home": "Nacional",
+      "away": "Universitario",
+      "match": "Nacional - Universitario",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.7%"
+    },
+    {
       "event_id": "401865442",
       "date": "2026-05-21T00:00Z",
       "sport": "football",
@@ -1088,6 +1124,24 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.7%"
+    },
+    {
+      "event_id": "401865445",
+      "date": "2026-05-21T00:30Z",
+      "sport": "football",
+      "league_code": "conmebol.sudamericana",
+      "league_name": "Copa Sudamericana",
+      "home": "River Plate",
+      "away": "Red Bull Bragantino",
+      "match": "River Plate - Red Bull Bragantino",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.6%"
     },
     {
       "event_id": "401865534",
@@ -1142,24 +1196,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.7%"
-    },
-    {
-      "event_id": "401865445",
-      "date": "2026-05-21T00:30Z",
-      "sport": "football",
-      "league_code": "conmebol.sudamericana",
-      "league_name": "Copa Sudamericana",
-      "home": "River Plate",
-      "away": "Red Bull Bragantino",
-      "match": "River Plate - Red Bull Bragantino",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.6%"
     },
     {
       "event_id": "401865547",
@@ -1466,24 +1502,6 @@
       "side": null,
       "strength": 0.585,
       "context": "Signaux opposes: Chicago White Sox fade 0.90, Chicago Cubs fade 0.90 -> prudence"
-    },
-    {
-      "event_id": "401871410",
-      "date": "2026-05-18T04:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Buffalo Sabres",
-      "away": "Montreal Canadiens",
-      "match": "Buffalo Sabres - Montreal Canadiens",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "signal_conflict",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.45,
-      "context": "Signaux opposes: Buffalo Sabres fade 0.60, Montreal Canadiens fade 0.60 -> prudence"
     }
   ],
   "expired_sample": []
