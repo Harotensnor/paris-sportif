@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-14T23:27:20Z",
+  "generated_at": "2026-05-14T23:36:06Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -968,10 +968,10 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.098,
-        "away_score": -0.098,
+        "away_score": 0.372,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Pumas UNAM (-0.10)",
+        "reason": "Direction nette: Pumas UNAM (+0.37)",
         "detail": [
           {
             "side": "home",
@@ -984,6 +984,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.469
           }
         ]
       }
@@ -1019,11 +1025,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.698,
-        "away_score": 0.112,
-        "home_fade": 0.75,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Vegas Golden Knights (+0.11)",
+        "home_score": -1.348,
+        "away_score": -0.537,
+        "home_fade": 1.75,
+        "away_fade": 1.15,
+        "reason": "Direction nette: Vegas Golden Knights (-0.54)",
         "detail": [
           {
             "side": "home",
@@ -1042,6 +1048,18 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.6
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           }
         ]
       }
