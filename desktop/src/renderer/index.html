@@ -26,6 +26,9 @@
         <button class="nav-btn" data-tab="history">Historique</button>
         <button class="nav-btn" data-tab="agent">Agent</button>
         <button class="nav-btn" data-tab="data">Données</button>
+        <button class="nav-btn" data-tab="calendar">Calendrier</button>
+        <button class="nav-btn" data-tab="pipeline">Pipeline</button>
+        <button class="nav-btn" data-tab="help">Aide</button>
         <button class="nav-btn" data-tab="preferences">Préférences</button>
       </nav>
       <div class="side-status" id="side-status">
@@ -135,6 +138,18 @@
             <small id="metric-refresh-next">Prochain refresh : calcul...</small>
           </article>
         </div>
+
+        <section class="today-model-card" aria-label="Modèle aujourd'hui">
+          <div class="section-head compact">
+            <div>
+              <h3>Modèle aujourd'hui</h3>
+              <p>Lecture rapide de la qualité des signaux du jour.</p>
+            </div>
+          </div>
+          <div class="morning-grid" id="today-model-pulse">
+            <article class="morning-card"><span>Picks affichés</span><strong>-</strong><p>Calcul en cours</p></article>
+          </div>
+        </section>
 
         <section class="onboarding-card hidden" id="onboarding-card" aria-label="Première configuration">
           <div>
@@ -395,6 +410,9 @@
               <option value="30">30 jours</option>
               <option value="90">90 jours</option>
             </select>
+            <select id="user-bets-tag-filter" aria-label="Tag des paris suivis">
+              <option value="all">Tous tags</option>
+            </select>
           </div>
         </div>
         <div class="tracked-bets-chart" id="tracked-bets-chart"></div>
@@ -409,12 +427,13 @@
                 <th>Mise</th>
                 <th>Statut</th>
                 <th>CLV</th>
+                <th>Tags / notes</th>
                 <th>P&L</th>
                 <th>Action</th>
               </tr>
             </thead>
             <tbody id="user-bets-body">
-              <tr><td colspan="9" class="empty">Aucun pari suivi.</td></tr>
+              <tr><td colspan="10" class="empty">Aucun pari suivi.</td></tr>
             </tbody>
           </table>
         </div>
@@ -795,7 +814,18 @@
             <h4>Alertes</h4>
             <label>Edge notif %<input id="pref-alert-edge" type="number" min="0" max="50" step="1"></label>
             <label>Kickoff notif heures<input id="pref-alert-window" type="number" min="1" max="24" step="1"></label>
-            <p class="match-sub">Les notifications restent locales et déclenchées par les picks visibles.</p>
+            <label>Webhook mobile
+              <select id="pref-webhook-type">
+                <option value="generic">Générique JSON</option>
+                <option value="discord">Discord</option>
+                <option value="ntfy">ntfy.sh</option>
+                <option value="telegram">Telegram</option>
+                <option value="pushover">Pushover</option>
+              </select>
+            </label>
+            <label>URL webhook<input id="pref-webhook-url" type="url" placeholder="https://..."></label>
+            <button class="ghost-btn" id="test-webhook-btn" type="button">Envoyer test</button>
+            <p class="match-sub" id="webhook-status">Les alertes PC restent locales ; le webhook envoie seulement les alertes importantes configurées.</p>
           </article>
           <article class="preference-card">
             <h4>Discipline bankroll</h4>
@@ -821,10 +851,95 @@
           <div class="empty">Aucun warning personnel.</div>
         </div>
       </section>
+
+      <section class="tab-panel" data-panel="calendar">
+        <div class="section-head">
+          <div>
+            <h3>Calendrier</h3>
+            <p>Vue 7 jours des picks : densité, horaires et actions rapides.</p>
+          </div>
+          <div class="section-actions">
+            <button class="ghost-btn" id="clear-calendar-filter-btn" type="button">Voir tous les jours</button>
+          </div>
+        </div>
+        <div class="calendar-grid" id="calendar-grid">
+          <div class="empty">Chargement calendrier...</div>
+        </div>
+        <div class="section-head compact">
+          <div>
+            <h3 id="calendar-day-title">Timeline du jour</h3>
+            <p id="calendar-day-caption">Clique sur une journée pour filtrer le cockpit.</p>
+          </div>
+        </div>
+        <div class="timeline-list" id="calendar-timeline">
+          <div class="empty">Aucune journée sélectionnée.</div>
+        </div>
+      </section>
+
+      <section class="tab-panel" data-panel="pipeline">
+        <div class="section-head">
+          <div>
+            <h3>Pipeline</h3>
+            <p>Refresh local, durée des étapes, mémoire et logs utiles.</p>
+          </div>
+          <div class="section-actions">
+            <button class="primary-btn" id="pipeline-refresh-btn" type="button">Refresh maintenant</button>
+            <button class="ghost-btn" id="cancel-refresh-btn" type="button">Annuler refresh</button>
+          </div>
+        </div>
+        <div class="pipeline-progress" id="pipeline-progress">
+          <div class="empty compact-empty">Aucun refresh en cours.</div>
+        </div>
+        <div class="refresh-stage-grid" id="pipeline-stage-grid">
+          <div class="empty">Historique refresh en attente.</div>
+        </div>
+        <div class="section-head compact">
+          <div>
+            <h3>Log live</h3>
+            <p>Les dernières lignes du processus local, filtrées pour diagnostiquer vite.</p>
+          </div>
+        </div>
+        <pre class="logbox pipeline-log" id="pipeline-live-log">Aucun log pour le moment.</pre>
+      </section>
+
+      <section class="tab-panel" data-panel="help">
+        <div class="section-head">
+          <div>
+            <h3>Aide</h3>
+            <p>Glossaire court des termes qui guident les décisions.</p>
+          </div>
+        </div>
+        <div class="glossary-grid" id="glossary-grid">
+          <div class="empty">Chargement aide...</div>
+        </div>
+      </section>
     </main>
   </div>
 
-  <div class="export-toast hidden" id="export-toast" role="status" aria-live="polite"></div>
+  <div class="export-toast hidden" id="export-toast" role="status" aria-live="polite" tabindex="0"></div>
+
+  <div class="log-drawer hidden" id="log-drawer" aria-label="Logs debug">
+    <div class="log-drawer-panel">
+      <header class="log-drawer-head">
+        <div>
+          <span class="eyebrow">Debug local</span>
+          <h3>Logs de l'application</h3>
+        </div>
+        <button class="icon-btn" id="log-drawer-close" type="button" aria-label="Fermer">×</button>
+      </header>
+      <div class="log-drawer-controls">
+        <select id="log-level-filter" aria-label="Niveau de log">
+          <option value="all">Tous niveaux</option>
+          <option value="info">Info</option>
+          <option value="warn">Warn</option>
+          <option value="error">Error</option>
+        </select>
+        <button class="ghost-btn" id="copy-logs-btn" type="button">Copier</button>
+        <button class="ghost-btn" id="clear-logs-btn" type="button">Vider</button>
+      </div>
+      <pre class="logbox" id="debug-log-output">Aucun log capturé.</pre>
+    </div>
+  </div>
 
   <div class="modal-backdrop hidden" id="match-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
     <div class="modal">

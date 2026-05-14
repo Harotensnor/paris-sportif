@@ -29,6 +29,12 @@ test('desktop cockpit is actionable and stable', async () => {
   expect(rendererText).toContain('visibilitychange');
   expect(rendererText).toContain('Notification');
   expect(rendererText).toContain('scheduleBackgroundRefresh();');
+  expect(rendererText).toContain('renderHelp');
+  expect(rendererText).toContain('renderCalendar');
+  expect(rendererText).toContain('sendExternalAlert');
+  expect(rendererText).toContain("'/api/webhook/send'");
+  expect(mainText).toContain('/api/webhook/send');
+  expect(mainText).toContain('/api/refresh/cancel');
 
   const userDataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'paris-sportif-pw-'));
   const messages = [];
@@ -97,13 +103,42 @@ test('desktop cockpit is actionable and stable', async () => {
     await win.click('[data-tab="preferences"]');
     await expect(win.locator('#pref-bankroll')).toBeVisible();
     await expect(win.locator('#pref-stake-mode')).toBeVisible();
+    await expect(win.locator('#pref-webhook-url')).toBeVisible();
     await expect(win.locator('#preference-warning-grid')).toBeVisible();
+    await win.evaluate(() => {
+      document.querySelector('#pref-webhook-url').value = `${window.location.origin}/api/webhook/test`;
+    });
+    await win.click('#test-webhook-btn');
+    await expect(win.locator('#webhook-status')).toContainText(/Webhook test|Webhook en erreur|URL webhook/i);
+    await win.click('[data-tab="help"]');
+    await expect(win.locator('#glossary-grid')).toContainText('CLV');
+    await expect(win.locator('#glossary-grid')).toContainText('Kelly');
+    await win.click('[data-tab="calendar"]');
+    await expect(win.locator('#calendar-grid .calendar-day').first()).toBeVisible();
+    await win.click('#calendar-grid .calendar-day');
+    await expect(win.locator('#page-title')).toHaveText('Accueil');
+    await win.click('[data-tab="pipeline"]');
+    await expect(win.locator('#pipeline-progress')).toBeVisible();
+    await expect(win.locator('#pipeline-live-log')).toBeVisible();
+    await win.keyboard.press('Control+Shift+L');
+    await expect(win.locator('#log-drawer:not(.hidden)')).toBeVisible();
+    await win.click('#log-drawer-close');
     await win.keyboard.press('Control+1');
     await expect(win.locator('#page-title')).toHaveText('Accueil');
 
     await win.click('[data-track-bet-key]');
     await win.waitForFunction(() => /1 en cours/.test(document.querySelector('#user-pnl-sub')?.textContent || ''), null, { timeout: 5_000 });
     await expect(win.locator('[data-track-bet-key]').first()).toContainText('Suivi');
+    await win.click('[data-tab="history"]');
+    await win.fill('[data-bet-tags-id]', 'favori, test');
+    await win.fill('[data-bet-note-id]', 'Pari suivi pendant le test complet.');
+    await win.locator('[data-bet-note-id]').blur();
+    await expect(win.locator('#user-bets-tag-filter')).toContainText('favori');
+    await win.selectOption('#user-bets-tag-filter', 'favori');
+    await expect(win.locator('#user-bets-body')).toContainText('Pari suivi pendant le test complet.');
+    await win.click('[data-settle-status="won"]');
+    await expect(win.locator('#user-bets-body')).toContainText('Gagné');
+    await win.click('[data-tab="dashboard"]');
 
     await win.click('#picks-body tr.clickable-row td[data-label="Match"]');
     await win.waitForSelector('#match-modal:not(.hidden)', { timeout: 10_000 });

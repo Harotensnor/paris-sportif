@@ -2,6 +2,7 @@ const { app, BrowserWindow, shell, session } = require('electron');
 const childProcess = require('child_process');
 const fs = require('fs');
 const http = require('http');
+const https = require('https');
 const path = require('path');
 const { URL } = require('url');
 const { createLegacyEngineService } = require('./engine/legacy-engine');
@@ -70,6 +71,7 @@ const refreshState = {
 
 let localServer = null;
 let mainWindow = null;
+let refreshChild = null;
 const engineService = createLegacyEngineService({ projectRoot: PROJECT_ROOT });
 const memoryState = {
   rssMb: null,
@@ -103,6 +105,133 @@ function jsonResponse(res, statusCode, payload) {
   const body = JSON.stringify(payload, null, 2);
   res.writeHead(statusCode, baseHeaders('application/json; charset=utf-8'));
   res.end(body);
+}
+
+function readRequestBody(req, maxBytes = 64 * 1024) {
+  return new Promise((resolve, reject) => {
+    let body = '';
+    req.on('data', (chunk) => {
+      body += chunk;
+      if (Buffer.byteLength(body) > maxBytes) {
+        reject(new Error('Payload too large'));
+        req.destroy();
+      }
+    });
+    req.on('end', () => resolve(body));
+    req.on('error', reject);
+  });
+}
+
+async function readJsonBody(req) {
+  const body = await readRequestBody(req);
+  if (!body) return {};
+  try {
+    return JSON.parse(body);
+  } catch (error) {
+    throw new Error(`JSON invalide: ${error.message}`);
+  }
+}
+
+function webhookPayload(config, alert) {
+  const title = String(alert.title || 'Paris-Sportif').slice(0, 160);
+  const message = String(alert.message || alert.body || '').slice(0, 4000);
+  const type = String(config.type || 'generic').toLowerCase();
+  const text = `${title}\n${message}`.trim();
+  if (type === 'discord') {
+    return {
+      contentType: 'application/json',
+      body: JSON.stringify({ content: `**${title}**\n${message}`.trim() })
+    };
+  }
+  if (type === 'ntfy') {
+    return {
+      contentType: 'text/plain; charset=utf-8',
+      headers: { Title: title },
+      body: message || title
+    };
+  }
+  if (type === 'telegram') {
+    return {
+      contentType: 'application/json',
+      body: JSON.stringify({ text, parse_mode: 'HTML' })
+    };
+  }
+  if (type === 'pushover') {
+    const targetUrl = new URL(config.url);
+    const params = new URLSearchParams();
+    for (const [key, value] of targetUrl.searchParams.entries()) {
+      if (['token', 'user', 'device', 'priority', 'sound'].includes(key)) params.set(key, value);
+    }
+    params.set('title', title);
+    params.set('message', message || title);
+    return {
+      contentType: 'application/x-www-form-urlencoded; charset=utf-8',
+      body: params.toString()
+    };
+  }
+  return {
+    contentType: 'application/json',
+    body: JSON.stringify({
+      app: 'Paris-Sportif Desktop',
+      title,
+      message,
+      match: alert.match || null,
+      sentAt: new Date().toISOString()
+    })
+  };
+}
+
+function postWebhook(config, alert) {
+  return new Promise((resolve, reject) => {
+    const target = new URL(config.url);
+    if (!['https:', 'http:'].includes(target.protocol)) {
+      reject(new Error('URL webhook invalide'));
+      return;
+    }
+    const payload = webhookPayload(config, alert);
+    const client = target.protocol === 'https:' ? https : http;
+    const options = {
+      method: 'POST',
+      hostname: target.hostname,
+      port: target.port || undefined,
+      path: `${target.pathname}${target.search}`,
+      timeout: 15000,
+      headers: {
+        'Content-Type': payload.contentType,
+        'Content-Length': Buffer.byteLength(payload.body),
+        ...(payload.headers || {})
+      }
+    };
+    const request = client.request(options, (response) => {
+      let responseBody = '';
+      response.on('data', (chunk) => { responseBody += chunk; });
+      response.on('end', () => {
+        if (response.statusCode >= 200 && response.statusCode < 300) {
+          resolve({ ok: true, statusCode: response.statusCode, body: responseBody.slice(0, 500) });
+        } else {
+          reject(new Error(`Webhook HTTP ${response.statusCode}: ${responseBody.slice(0, 200)}`));
+        }
+      });
+    });
+    request.on('timeout', () => {
+      request.destroy(new Error('Webhook timeout'));
+    });
+    request.on('error', reject);
+    request.write(payload.body);
+    request.end();
+  });
+}
+
+function isSelfWebhookTarget(value, hostHeader) {
+  try {
+    const target = new URL(value);
+    const host = String(hostHeader || '').toLowerCase();
+    const targetHost = `${target.hostname}${target.port ? `:${target.port}` : ''}`.toLowerCase();
+    const isLocal = ['127.0.0.1', 'localhost', '[::1]', '::1'].includes(target.hostname.toLowerCase());
+    return isLocal && host === targetHost && target.pathname.startsWith('/api/webhook/');
+  } catch {
+    return false;
+  }
 }
 
 function textResponse(res, statusCode, body, contentType = 'text/plain; charset=utf-8') {
@@ -302,7 +431,9 @@ function appendRefreshLine(line) {
 }
 
 function finishRefresh(exitCode, errorMessage = null) {
+  if (!refreshState.running && !refreshChild && refreshState.finishedAt) return;
   refreshState.running = false;
+  refreshChild = null;
   refreshState.finishedAt = new Date().toISOString();
   refreshState.exitCode = exitCode;
   refreshState.error = errorMessage;
@@ -376,6 +507,7 @@ function spawnPythonRefresh(mode, source = 'all') {
         PYTHONUTF8: '1'
       }
     });
+    refreshChild = child;
 
     let failedBeforeStart = true;
     child.stdout.on('data', (chunk) => {
@@ -415,6 +547,23 @@ function startRefresh(mode = 'quick', source = 'all') {
   refreshState.exitCode = null;
   refreshState.error = null;
   spawnPythonRefresh(refreshState.mode, refreshState.source || 'all');
+  return true;
+}
+
+function cancelRefresh() {
+  if (!refreshState.running || !refreshChild) return false;
+  appendRefreshLine('[desktop] annulation demandée depuis le cockpit');
+  try {
+    if (process.platform === 'win32') {
+      childProcess.spawn('taskkill', ['/pid', String(refreshChild.pid), '/T', '/F'], { windowsHide: true });
+    } else {
+      refreshChild.kill('SIGTERM');
+    }
+  } catch (error) {
+    appendRefreshLine(`[desktop] annulation impossible: ${error.message}`);
+    return false;
+  }
+  finishRefresh(null, 'Refresh annulé par l’utilisateur');
   return true;
 }
 
@@ -540,6 +689,35 @@ async function handleApi(req, res, url) {
     const source = SIGNAL_SOURCES.has(requestedSource) ? requestedSource : 'all';
     const started = startRefresh(mode, source);
     jsonResponse(res, started ? 202 : 200, { ok: true, started, refresh: refreshState });
+    return;
+  }
+  if (url.pathname === '/api/refresh/cancel') {
+    if (req.method !== 'POST') {
+      jsonResponse(res, 405, { ok: false, error: 'POST required' });
+      return;
+    }
+    const cancelled = cancelRefresh();
+    jsonResponse(res, cancelled ? 202 : 200, { ok: true, cancelled, refresh: refreshState });
+    return;
+  }
+  if (url.pathname === '/api/webhook/send' || url.pathname === '/api/webhook/test') {
+    if (req.method !== 'POST') {
+      jsonResponse(res, 405, { ok: false, error: 'POST required' });
+      return;
+    }
+    const payload = await readJsonBody(req);
+    const config = payload.config || {};
+    const alert = payload.alert || {};
+    if (!config.url) {
+      jsonResponse(res, 400, { ok: false, error: 'URL webhook manquante' });
+      return;
+    }
+    if (payload.dryRun || url.pathname === '/api/webhook/test' || isSelfWebhookTarget(config.url, req.headers.host)) {
+      jsonResponse(res, 200, { ok: true, dryRun: true, preview: webhookPayload(config, alert) });
+      return;
+    }
+    const result = await postWebhook(config, alert);
+    jsonResponse(res, 200, result);
     return;
   }
   jsonResponse(res, 404, { ok: false, error: 'Unknown API route' });

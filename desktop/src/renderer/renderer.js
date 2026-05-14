@@ -69,7 +69,10 @@
     backgroundRefreshTimer: null,
     backgroundRefreshNextAt: null,
     exportTimer: null,
-    actionHistory: []
+    actionHistory: [],
+    calendarDayFilter: null,
+    selectedCalendarDay: null,
+    debugLogs: []
   };
 
   const ACTION_HISTORY_KEY = 'parisSportifActionHistory';
@@ -118,6 +121,8 @@
     maxStakePct: 5,
     stopLossPct: 5,
     takeProfitPct: 8,
+    webhookType: 'generic',
+    webhookUrl: '',
     strict: false
   };
   const REFRESH_DEFAULT_INTERVAL_MS = 30 * 60 * 1000;
@@ -250,6 +255,40 @@
     }
   }
 
+  function pushLog(level, message, meta) {
+    const entry = {
+      at: new Date().toISOString(),
+      level: ['info', 'warn', 'error'].includes(level) ? level : 'info',
+      message: String(message || ''),
+      meta: meta || null
+    };
+    state.debugLogs.push(entry);
+    state.debugLogs = state.debugLogs.slice(-250);
+    renderDebugLogs();
+  }
+
+  function installDebugLogHooks() {
+    ['warn', 'error'].forEach((level) => {
+      const original = console[level];
+      console[level] = (...args) => {
+        try {
+          pushLog(level, args.map((arg) => {
+            if (arg instanceof Error) return arg.stack || arg.message;
+            if (typeof arg === 'object') return JSON.stringify(arg);
+            return String(arg);
+          }).join(' '));
+        } catch {
+          // Le journal debug ne doit jamais casser l'app.
+        }
+        original.apply(console, args);
+      };
+    });
+  }
+
+  function termTip(label, detail) {
+    return `<span class="term-tip" tabindex="0" title="${escapeHtml(detail)}">${escapeHtml(label)}<span aria-hidden="true">?</span></span>`;
+  }
+
   function parisDayKey(date = new Date()) {
     return new Intl.DateTimeFormat('fr-CA', {
       timeZone: 'Europe/Paris',
@@ -257,6 +296,12 @@
       month: '2-digit',
       day: '2-digit'
     }).format(date);
+  }
+
+  function pickDayKey(row) {
+    const date = row?.start ? new Date(row.start) : null;
+    if (!date || Number.isNaN(date.getTime())) return null;
+    return parisDayKey(date);
   }
 
   function userBetKey(row) {
@@ -598,6 +643,8 @@
       stake,
       status: 'pending',
       pnl: 0,
+      tags: [],
+      note: '',
       day: parisDayKey(now),
       createdAt: now.toISOString()
     });
@@ -605,6 +652,7 @@
     renderUserPnl();
     renderPicks();
     renderStakeScenarios();
+    renderHistory();
     setSideStatus('Pari ajouté au suivi', 'ok');
   }
 
@@ -658,6 +706,8 @@
       stake,
       status: 'pending',
       pnl: 0,
+      tags: [],
+      note: '',
       legs: combo.legs,
       day: parisDayKey(now),
       createdAt: now.toISOString()
@@ -1468,6 +1518,9 @@
       renderActionHistory();
       renderPrebetChecklistBacktest();
       renderFinalDecisionPanel();
+      renderCalendar();
+      renderHelp();
+      if (state.status) renderPipelinePanel(state.status);
       return;
     }
     const bankroll = getBankroll();
@@ -1558,6 +1611,8 @@
     renderFinalDecisionPanel();
     renderSmartPreparePlan();
     renderAgentSimulation();
+    renderCalendar();
+    renderHelp();
     if (state.status) {
       renderQualityReport(state.status);
       renderSourceHealth(state.status);
@@ -1579,6 +1634,7 @@
       renderSignalGapCenter();
       renderQualityAlerts(state.status);
       renderWarnings(state.status);
+      renderPipelinePanel(state.status);
     }
     maybeAutoCriticalRefresh();
     maybeAutoPrematchRefresh();
@@ -1701,6 +1757,7 @@
       if (filters.market !== 'all' && marketKeyFromRow(row) !== filters.market) return false;
       if (filters.edgeMin && Number(row.edge || 0) < filters.edgeMin) return false;
       if (filters.oddMin && Number(row.odd || 0) < filters.oddMin) return false;
+      if (state.calendarDayFilter && pickDayKey(row) !== state.calendarDayFilter) return false;
       return true;
     });
     rows.sort((a, b) => {
@@ -1766,6 +1823,9 @@
   }
 
   function notifyUser(title, body, row) {
+    sendExternalAlert(title, body, row).catch((error) => {
+      pushLog('warn', `Webhook mobile non envoyé: ${error.message}`);
+    });
     if (!('Notification' in window)) return;
     const show = () => {
       try {
@@ -1788,6 +1848,41 @@
     } catch {
       // Permission API non disponible dans certains profils Electron.
     }
+  }
+
+  function externalAlertPayload(title, body, row) {
+    const prefs = loadPreferences();
+    if (!prefs.webhookUrl) return null;
+    return {
+      config: {
+        type: prefs.webhookType || 'generic',
+        url: prefs.webhookUrl
+      },
+      alert: {
+        title,
+        message: body,
+        match: row ? {
+          id: row.id || null,
+          title: row.title || row.match || null,
+          market: row.market || null,
+          pick: row.label || row.pick || null,
+          odd: row.odd || null,
+          start: row.start || null
+        } : null
+      }
+    };
+  }
+
+  async function sendExternalAlert(title, body, row, options = {}) {
+    const payload = externalAlertPayload(title, body, row);
+    if (!payload) return { ok: false, skipped: true };
+    const result = await fetchJson(options.test ? '/api/webhook/test' : '/api/webhook/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...payload, dryRun: Boolean(options.dryRun) })
+    });
+    pushLog('info', `Webhook mobile ${options.test ? 'testé' : 'envoyé'}: ${title}`);
+    return result;
   }
 
   function alertOnce(key, title, body, row) {
@@ -1889,6 +1984,7 @@
     const metricLabel = $('#metric-picks-label');
     renderUserPnl();
     renderMorningDashboard();
+    renderTodayModelPulse();
     updatePickFilters();
     const filters = readPickFilters();
     const displayRows = dashboardPickRows(filters);
@@ -1950,6 +2046,205 @@
     }).join('');
     markFirstPickVisible(displayRows.length);
     renderRefreshPolicy();
+  }
+
+  function todayModelPulse() {
+    const rows = (state.picks || []).filter((row) => pickHasCoreData(row) && canDisplayStake(row));
+    const allRows = (state.allPicks || []).filter(pickHasCoreData);
+    const profitable = rows.filter((row) => {
+      const cal = row.calibration || {};
+      return cal.level === 'warm' || Number(row.edge || 0) >= 0.10 || String(row.tier || '').includes('value');
+    });
+    const risky = rows.filter((row) => row.calibration?.level === 'cold' || row.contextQuality?.tier === 'insuffisant');
+    const avgEdge = rows.length ? rows.reduce((sum, row) => sum + Number(row.edge || 0), 0) / rows.length : 0;
+    const avgAllEdge = allRows.length ? allRows.reduce((sum, row) => sum + Number(row.edge || 0), 0) / allRows.length : avgEdge;
+    const level = rows.length >= 20 && profitable.length >= risky.length ? 'Bonne' : rows.length >= 10 ? 'Moyenne' : 'Faible';
+    return { rows, profitable, risky, avgEdge, avgAllEdge, level };
+  }
+
+  function renderTodayModelPulse() {
+    const pulse = todayModelPulse();
+    const target = $('#today-model-pulse');
+    if (!target) return;
+    target.innerHTML = [
+      ['Picks affichés', formatCount(pulse.rows.length), 'Sélection visible après préférences.'],
+      ['Segments verts', formatCount(pulse.profitable.length), 'Historique ou edge robuste.'],
+      ['Segments rouges', formatCount(pulse.risky.length), 'À surveiller ou à éviter.'],
+      ['Edge moyen jour', formatPct(pulse.avgEdge, 1), `Moyenne globale ${formatPct(pulse.avgAllEdge, 1)}.`],
+      ['Qualité du jour', pulse.level, 'Lecture rapide de la journée de signaux.']
+    ].map(([label, value, detail]) => `
+      <article class="morning-card">
+        <span>${escapeHtml(label)}</span>
+        <strong>${escapeHtml(value)}</strong>
+        <p>${escapeHtml(detail)}</p>
+      </article>
+    `).join('');
+  }
+
+  function calendarRows() {
+    const source = (state.allPicks.length ? state.allPicks : state.picks)
+      .filter((row) => pickHasCoreData(row) && canDisplayStake(row))
+      .filter((row) => pickDayKey(row));
+    const byDay = new Map();
+    source.forEach((row) => {
+      const key = pickDayKey(row);
+      const bucket = byDay.get(key) || { key, rows: [], edge: 0 };
+      bucket.rows.push(row);
+      bucket.edge += Number(row.edge || 0);
+      byDay.set(key, bucket);
+    });
+    const today = new Date();
+    return Array.from({ length: 7 }, (_, index) => {
+      const date = new Date(today.getTime() + index * 24 * 60 * 60 * 1000);
+      const key = parisDayKey(date);
+      const bucket = byDay.get(key) || { key, rows: [], edge: 0 };
+      const rows = bucket.rows.slice().sort((a, b) => Date.parse(a.start || '') - Date.parse(b.start || ''));
+      return {
+        key,
+        date,
+        rows,
+        count: rows.length,
+        big: rows.filter((row) => Number(row.edge || 0) >= 0.10).length,
+        avgEdge: rows.length ? bucket.edge / rows.length : 0
+      };
+    });
+  }
+
+  function renderCalendar() {
+    const grid = $('#calendar-grid');
+    const timeline = $('#calendar-timeline');
+    if (!grid || !timeline) return;
+    const days = calendarRows();
+    const selected = state.selectedCalendarDay || state.calendarDayFilter || days.find((day) => day.count)?.key || days[0]?.key;
+    state.selectedCalendarDay = selected;
+    grid.innerHTML = days.map((day) => {
+      const density = day.count >= 16 ? 'high' : day.count >= 8 ? 'medium' : day.count > 0 ? 'low' : 'empty';
+      return `
+        <button class="calendar-day ${density} ${selected === day.key ? 'active' : ''}" type="button" data-calendar-day="${escapeHtml(day.key)}">
+          <span>${escapeHtml(formatDayKey(day.date.toISOString()))}</span>
+          <strong>${formatCount(day.count)}</strong>
+          <small>${formatCount(day.big)} gros · edge moy. ${escapeHtml(formatPct(day.avgEdge, 1))}</small>
+        </button>
+      `;
+    }).join('');
+    const day = days.find((item) => item.key === selected) || days[0];
+    const title = $('#calendar-day-title');
+    const caption = $('#calendar-day-caption');
+    if (title) title.textContent = day ? `Timeline ${formatDayKey(day.date.toISOString())}` : 'Timeline';
+    if (caption) caption.textContent = day?.count ? `${formatCount(day.count)} pick(s), triés par coup d'envoi.` : 'Aucun pick prêt ce jour-là.';
+    timeline.innerHTML = day?.rows.length ? day.rows.slice(0, 40).map((row) => `
+      <button class="timeline-row" type="button" data-match-id="${escapeHtml(row.id)}">
+        <span>${escapeHtml(new Date(row.start).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }))}</span>
+        <strong>${escapeHtml(row.title)}</strong>
+        <em>${escapeHtml(row.market)} · ${escapeHtml(row.label)} · ${escapeHtml(formatOdd(row.odd))} · edge ${escapeHtml(formatPct(row.edge, 1))}</em>
+      </button>
+    `).join('') : '<div class="empty">Aucun pick prêt sur cette journée.</div>';
+  }
+
+  function glossaryRows() {
+    return [
+      ['Edge', 'Différence entre la probabilité estimée par le modèle et celle implicite dans la cote. Edge positif = value théorique.'],
+      ['EV', 'Espérance de valeur. C’est le gain moyen attendu si le même pari était répété dans des conditions comparables.'],
+      ['Kelly', 'Méthode de mise proportionnelle à l’avantage estimé. Ici elle est plafonnée pour éviter les mises trop agressives.'],
+      ['CLV', 'Closing Line Value : compare la cote prise à la cote proche du coup d’envoi. Battre la clôture est un signal de qualité.'],
+      ['Brier', 'Score de calibration des probabilités. Plus il est bas, plus les probabilités historiques étaient bien calibrées.'],
+      ['Tier', 'Niveau de lecture du pick : lock, premium, value ou standard selon les signaux et l’historique.'],
+      ['Bucket d’edge', 'Tranche de value utilisée pour comparer les performances historiques des petits et gros edges.'],
+      ['Segment', 'Groupe de paris comparable : sport, ligue, marché ou tranche d’edge.'],
+      ['Sharp money', 'Mouvement de marché supposé informatif, souvent lié à des parieurs ou volumes plus spécialisés.'],
+      ['Outsider', 'Pick sur une cote élevée. Peut être rentable en value, mais variance plus forte.'],
+      ['BTTS', 'Both Teams To Score : les deux équipes marquent.'],
+      ['OU', 'Over/Under : total au-dessus ou en dessous d’une ligne, par exemple plus de 2,5 buts.'],
+      ['DC', 'Double chance : deux issues couvertes sur trois en football.'],
+      ['AH', 'Asian Handicap : handicap qui peut réduire ou annuler une partie du risque selon la ligne.'],
+      ['DNB', 'Draw No Bet : nul remboursé, pari gagné seulement si l’équipe choisie gagne.']
+    ];
+  }
+
+  function renderHelp() {
+    const grid = $('#glossary-grid');
+    if (!grid) return;
+    grid.innerHTML = glossaryRows().map(([term, detail]) => `
+      <article class="glossary-card">
+        <strong>${escapeHtml(term)}</strong>
+        <p>${escapeHtml(detail)}</p>
+      </article>
+    `).join('');
+  }
+
+  function refreshStageRows(refresh) {
+    const history = Array.isArray(refresh?.history) ? refresh.history : [];
+    const running = refresh?.running ? [refresh] : [];
+    return [...running, ...history].slice(0, 12);
+  }
+
+  function renderPipelinePanel(status = state.status) {
+    const progress = $('#pipeline-progress');
+    const stages = $('#pipeline-stage-grid');
+    const log = $('#pipeline-live-log');
+    if (!progress || !stages || !log) return;
+    const refresh = status?.refresh || {};
+    const eta = refresh.running ? refreshEtaInfo(refresh) : null;
+    const memory = status?.memory || {};
+    if (refresh.running) {
+      progress.innerHTML = `
+        <div class="pipeline-head">
+          <div>
+            <span class="eyebrow">Refresh actif</span>
+            <strong>${escapeHtml(refreshModeLabel(refresh.mode || 'quick'))}</strong>
+            <p>${eta?.overdue ? 'Plus long que prévu' : `Temps restant estimé ${formatDurationSeconds(eta?.remainingSec || 0)}`} · écoulé ${formatDurationSeconds(eta?.elapsedSec || 0)}</p>
+          </div>
+          <div class="pipeline-meter"><span style="width:${Math.round(eta?.progressPct || 0)}%"></span></div>
+        </div>
+      `;
+    } else {
+      progress.innerHTML = `
+        <div class="pipeline-head">
+          <div>
+            <span class="eyebrow">Pipeline prêt</span>
+            <strong>Dernier état local</strong>
+            <p>Mémoire ${memory.rssMb || '-'} MB RSS · prochain refresh ${nextRefreshPlan().label || 'selon contexte'}.</p>
+          </div>
+        </div>
+      `;
+    }
+    const rows = refreshStageRows(refresh);
+    stages.innerHTML = rows.length ? rows.map((row) => {
+      const running = row.running;
+      const ok = row.exitCode === 0 && !row.error;
+      const tone = running ? 'warn' : ok ? 'ok' : row.error ? 'danger' : 'idle';
+      const started = row.startedAt ? new Date(row.startedAt) : null;
+      const finished = row.finishedAt ? new Date(row.finishedAt) : null;
+      const duration = started && finished ? Math.max(0, Math.round((finished - started) / 1000)) : null;
+      return `
+        <article class="refresh-card refresh-${tone}">
+          <span>${escapeHtml(refreshModeLabel(row.mode || 'quick'))}</span>
+          <strong>${running ? 'En cours' : ok ? 'OK' : row.error ? 'Erreur' : 'Historique'}</strong>
+          <p>${duration == null ? 'Durée en cours' : `Durée ${formatDurationSeconds(duration)}`}</p>
+          <small>${escapeHtml(row.error || row.source || row.startedAt || '')}</small>
+        </article>
+      `;
+    }).join('') : '<div class="empty">Aucun refresh enregistré.</div>';
+    log.textContent = (refresh.lines && refresh.lines.length ? refresh.lines.slice(-80).join('\n') : 'Aucun log live pour le moment.');
+  }
+
+  function renderDebugLogs() {
+    const out = $('#debug-log-output');
+    if (!out) return;
+    const filter = $('#log-level-filter')?.value || 'all';
+    const rows = state.debugLogs.filter((row) => filter === 'all' || row.level === filter);
+    out.textContent = rows.length
+      ? rows.slice(-200).map((row) => `${new Date(row.at).toLocaleTimeString('fr-FR')} [${row.level}] ${row.message}`).join('\n')
+      : 'Aucun log capturé.';
+  }
+
+  function openLogDrawer() {
+    $('#log-drawer')?.classList.remove('hidden');
+    renderDebugLogs();
+  }
+
+  function closeLogDrawer() {
+    $('#log-drawer')?.classList.add('hidden');
   }
 
   function autoPrematchEnabled() {
@@ -2920,15 +3215,15 @@
         : marketClv.n ? `${formatCount(marketClv.n)} observations marché · sample ${marketClv.sample_status || 'learning'}` : 'Se remplit avec les paris suivis.';
       const cards = [
         ['Picks réglés', formatCount(summary.settled_rows || state.history?.settled || 0), 'Sample utilisé pour juger la stratégie.'],
-        ['ROI cumulé', formatPct(summary.roi || 0, 1), `${formatSignedUnits(summary.pnl_units || 0)} en flat historique.`],
+        [termTip('ROI cumulé', 'Retour sur investissement : P&L divisé par les mises.'), formatPct(summary.roi || 0, 1), `${formatSignedUnits(summary.pnl_units || 0)} en flat historique.`, true],
         ['Win rate', formatPct(summary.hit_rate || state.history?.winRate || 0, 1), 'Taux brut, moins important que la calibration.'],
-        ['Brier', Number.isFinite(Number(summary.brier)) ? Number(summary.brier).toFixed(3) : '-', 'Plus bas = probabilités mieux calibrées.'],
-        ['CLV moyen', clvLabel, clvDetail],
+        [termTip('Brier', 'Score de qualité des probabilités : plus il est bas, mieux c’est.'), Number.isFinite(Number(summary.brier)) ? Number(summary.brier).toFixed(3) : '-', 'Plus bas = probabilités mieux calibrées.', true],
+        [termTip('CLV moyen', 'Compare la cote prise à la cote proche du coup d’envoi.'), clvLabel, clvDetail, true],
         ['Drawdown', Number.isFinite(Number(summary.max_drawdown_units)) ? `${Number(summary.max_drawdown_units).toFixed(1)}u` : '-', 'Perte max historique simulée.']
       ];
-      grid.innerHTML = cards.map(([label, value, detail]) => `
+      grid.innerHTML = cards.map(([label, value, detail, htmlLabel]) => `
         <article class="performance-card">
-          <span>${escapeHtml(label)}</span>
+          <span>${htmlLabel ? label : escapeHtml(label)}</span>
           <strong>${escapeHtml(value)}</strong>
           <p>${escapeHtml(detail)}</p>
         </article>
@@ -2969,16 +3264,38 @@
   function filteredUserBets() {
     const status = $('#user-bets-status-filter')?.value || 'all';
     const period = $('#user-bets-period-filter')?.value || 'all';
+    const tag = $('#user-bets-tag-filter')?.value || 'all';
     const maxAgeMs = period === 'all' ? null : Number(period) * 24 * 60 * 60 * 1000;
     const now = Date.now();
     return loadUserBets()
       .filter((bet) => status === 'all' || bet.status === status)
+      .filter((bet) => {
+        if (tag === 'all') return true;
+        return Array.isArray(bet.tags) && bet.tags.map(normalizeUiKey).includes(tag);
+      })
       .filter((bet) => {
         if (!maxAgeMs) return true;
         const ts = Date.parse(bet.createdAt || bet.day || '');
         return Number.isFinite(ts) && now - ts <= maxAgeMs;
       })
       .sort((a, b) => Date.parse(b.createdAt || b.day || 0) - Date.parse(a.createdAt || a.day || 0));
+  }
+
+  function updateUserBetTagFilter() {
+    const select = $('#user-bets-tag-filter');
+    if (!select) return;
+    const current = select.value || 'all';
+    const tags = Array.from(new Map(loadUserBets()
+      .flatMap((bet) => Array.isArray(bet.tags) ? bet.tags : [])
+      .map((tag) => [normalizeUiKey(tag), tag])
+      .filter(([key]) => Boolean(key))).entries())
+      .sort((a, b) => String(a[1]).localeCompare(String(b[1])));
+    const html = ['<option value="all">Tous tags</option>', ...tags.map(([key, label]) => `<option value="${escapeHtml(key)}">${escapeHtml(label)}</option>`)].join('');
+    if (select.dataset.optionsHtml !== html) {
+      select.innerHTML = html;
+      select.dataset.optionsHtml = html;
+      select.value = tags.some(([key]) => key === current) ? current : 'all';
+    }
   }
 
   function cumulativePnlSvg(bets) {
@@ -3053,10 +3370,11 @@
     const body = $('#user-bets-body');
     const chart = $('#tracked-bets-chart');
     if (!body) return;
+    updateUserBetTagFilter();
     const rows = filteredUserBets();
     if (chart) chart.innerHTML = cumulativePnlSvg(loadUserBets());
     if (!rows.length) {
-      body.innerHTML = '<tr><td colspan="9" class="empty">Aucun pari suivi avec ces filtres.</td></tr>';
+      body.innerHTML = '<tr><td colspan="10" class="empty">Aucun pari suivi avec ces filtres. Mise sur ton premier pick depuis l’accueil.</td></tr>';
       return;
     }
     body.innerHTML = rows.slice(0, 80).map((bet) => {
@@ -3074,11 +3392,25 @@
           <td data-label="Mise">${escapeHtml(formatMoney(bet.stake || 0))}</td>
           <td data-label="Statut" class="${resultClass(bet.status)}">${escapeHtml(resultLabel(bet.status))}</td>
           <td data-label="CLV">${bet.clvPct != null ? escapeHtml(formatPct(bet.clvPct, 2)) : '<span class="match-sub">en attente</span>'}</td>
+          <td data-label="Tags / notes">
+            <input class="bet-tags-input" data-bet-tags-id="${escapeHtml(bet.id)}" value="${escapeHtml((bet.tags || []).join(', '))}" placeholder="favori, test">
+            <textarea class="bet-note-input" data-bet-note-id="${escapeHtml(bet.id)}" rows="2" placeholder="Note privée">${escapeHtml(bet.note || '')}</textarea>
+          </td>
           <td data-label="P&L">${escapeHtml(formatMoney(bet.pnl || 0))}</td>
           <td data-label="Action">${action}</td>
         </tr>
       `;
     }).join('');
+  }
+
+  function updateTrackedBetText(id, patch) {
+    const bets = loadUserBets();
+    const index = bets.findIndex((bet) => bet.id === id);
+    if (index < 0) return;
+    bets[index] = { ...bets[index], ...patch, updatedAt: new Date().toISOString() };
+    saveUserBets(bets);
+    updateUserBetTagFilter();
+    renderLearningAudit();
   }
 
   function trackedLearningAudit() {
@@ -3204,6 +3536,10 @@
       const node = $(`#${id}`);
       if (node) node.value = String(value ?? '');
     });
+    const webhookType = $('#pref-webhook-type');
+    if (webhookType) webhookType.value = prefs.webhookType || 'generic';
+    const webhookUrl = $('#pref-webhook-url');
+    if (webhookUrl) webhookUrl.value = prefs.webhookUrl || '';
     renderOnboarding();
     renderLearningAudit();
   }
@@ -3227,6 +3563,8 @@
       maxStakePct: Math.max(0.1, Number($('#pref-max-stake')?.value || DEFAULT_PREFERENCES.maxStakePct) || DEFAULT_PREFERENCES.maxStakePct),
       stopLossPct: Math.max(0, Number($('#pref-stop-loss')?.value || DEFAULT_PREFERENCES.stopLossPct) || DEFAULT_PREFERENCES.stopLossPct),
       takeProfitPct: Math.max(0, Number($('#pref-take-profit')?.value || DEFAULT_PREFERENCES.takeProfitPct) || DEFAULT_PREFERENCES.takeProfitPct),
+      webhookType: $('#pref-webhook-type')?.value || DEFAULT_PREFERENCES.webhookType,
+      webhookUrl: ($('#pref-webhook-url')?.value || '').trim(),
       strict: Boolean($('#pref-strict')?.checked)
     };
   }
@@ -5603,6 +5941,7 @@
   function renderStatus(status) {
     state.status = status;
     renderRefreshEta(status.refresh || null);
+    renderPipelinePanel(status);
     $('#metric-age').textContent = formatAge(status.ageMinutes);
     $('#metric-generated').textContent = status.generatedAt ? new Date(status.generatedAt).toLocaleString('fr-FR') : '-';
     if (!state.matches.length) {
@@ -6405,6 +6744,7 @@
     if (state.status) {
       state.status.refresh = status;
       renderRefreshSummary(state.status);
+      renderPipelinePanel(state.status);
     }
     return status;
   }
@@ -6589,9 +6929,15 @@
       history: 'Historique',
       agent: 'Agent',
       data: 'Données',
+      calendar: 'Calendrier',
+      pipeline: 'Pipeline',
+      help: 'Aide',
       preferences: 'Préférences'
     };
     $('#page-title').textContent = titles[tab] || 'Paris-Sportif';
+    if (tab === 'calendar') renderCalendar();
+    if (tab === 'pipeline') renderPipelinePanel(state.status);
+    if (tab === 'help') renderHelp();
   }
 
   function exportCsv() {
@@ -6620,7 +6966,7 @@
 
   function exportUserBetsCsv() {
     const bets = loadUserBets();
-    const headers = ['created_at', 'match', 'sport', 'league', 'market', 'pick', 'odd', 'last_seen_odd', 'closing_odd', 'clv_pct', 'probability', 'edge', 'edge_bucket', 'stake_mode', 'stake', 'status', 'pnl'];
+    const headers = ['created_at', 'match', 'sport', 'league', 'market', 'pick', 'odd', 'last_seen_odd', 'closing_odd', 'clv_pct', 'probability', 'edge', 'edge_bucket', 'stake_mode', 'stake', 'status', 'tags', 'note', 'pnl'];
     const rows = bets.map((bet) => [
       bet.createdAt || '',
       bet.title || '',
@@ -6638,9 +6984,11 @@
       bet.stakeMode || '',
       Number(bet.stake || 0).toFixed(2),
       bet.status || '',
+      Array.isArray(bet.tags) ? bet.tags.join('|') : '',
+      bet.note || '',
       Number(bet.pnl || 0).toFixed(2)
     ]);
-    if (!rows.length) rows.push(['', 'Aucun pari suivi', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']);
+    if (!rows.length) rows.push(['', 'Aucun pari suivi', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']);
     downloadText(`paris-sportif-paris-suivis-${new Date().toISOString().slice(0, 10)}.csv`, toCsv(headers, rows), 'text/csv;charset=utf-8');
   }
 
@@ -7532,7 +7880,7 @@
       const button = event.target.closest('[data-match-id]');
       if (button) openMatchDetail(button.dataset.matchId || '');
     });
-    ['user-bets-status-filter', 'user-bets-period-filter'].forEach((id) => {
+    ['user-bets-status-filter', 'user-bets-period-filter', 'user-bets-tag-filter'].forEach((id) => {
       const el = $(`#${id}`);
       if (el) el.addEventListener('change', renderTrackedBets);
     });
@@ -7540,6 +7888,73 @@
       const button = event.target.closest('[data-settle-bet-id]');
       if (!button) return;
       settleUserBet(button.dataset.settleBetId || '', button.dataset.settleStatus || 'void');
+    });
+    $('#user-bets-body')?.addEventListener('change', (event) => {
+      const tagInput = event.target.closest('[data-bet-tags-id]');
+      const noteInput = event.target.closest('[data-bet-note-id]');
+      if (tagInput) {
+        const tags = String(tagInput.value || '').split(',').map((item) => item.trim()).filter(Boolean).slice(0, 8);
+        updateTrackedBetText(tagInput.dataset.betTagsId || '', { tags });
+      }
+      if (noteInput) {
+        updateTrackedBetText(noteInput.dataset.betNoteId || '', { note: String(noteInput.value || '').slice(0, 800) });
+      }
+    });
+    $('#calendar-grid')?.addEventListener('click', (event) => {
+      const button = event.target.closest('[data-calendar-day]');
+      if (!button) return;
+      state.selectedCalendarDay = button.dataset.calendarDay || null;
+      state.calendarDayFilter = state.selectedCalendarDay;
+      renderCalendar();
+      renderPicks();
+      switchTab('dashboard');
+    });
+    $('#calendar-timeline')?.addEventListener('click', openMatchFromEvent);
+    $('#clear-calendar-filter-btn')?.addEventListener('click', () => {
+      state.calendarDayFilter = null;
+      state.selectedCalendarDay = null;
+      renderCalendar();
+      renderPicks();
+    });
+    $('#pipeline-refresh-btn')?.addEventListener('click', () => startRefresh().catch((error) => {
+      setSideStatus('Refresh impossible', 'danger');
+      $('#refresh-log').textContent = error.stack || error.message;
+    }));
+    $('#cancel-refresh-btn')?.addEventListener('click', async () => {
+      try {
+        const response = await fetchJson('/api/refresh/cancel', { method: 'POST' });
+        setSideStatus(response.cancelled ? 'Refresh annulé' : 'Aucun refresh actif', response.cancelled ? 'warn' : 'ok');
+        await refreshLog();
+      } catch (error) {
+        setSideStatus('Annulation impossible', 'danger');
+        pushLog('error', error.message);
+      }
+    });
+    $('#test-webhook-btn')?.addEventListener('click', async () => {
+      const status = $('#webhook-status');
+      const prefs = collectPreferencesFromForm();
+      savePreferences(prefs);
+      if (!prefs.webhookUrl) {
+        if (status) status.textContent = 'Ajoute une URL webhook avant le test.';
+        return;
+      }
+      try {
+        await sendExternalAlert('Test Paris-Sportif', 'Ton cockpit PC peut maintenant envoyer une alerte mobile.', null, { test: true, dryRun: true });
+        if (status) status.textContent = 'Webhook test validé localement. Les alertes importantes utiliseront cette URL.';
+      } catch (error) {
+        if (status) status.textContent = `Webhook en erreur : ${error.message}`;
+      }
+    });
+    $('#export-toast')?.addEventListener('click', () => $('#export-toast')?.classList.add('hidden'));
+    $('#log-drawer-close')?.addEventListener('click', closeLogDrawer);
+    $('#log-level-filter')?.addEventListener('change', renderDebugLogs);
+    $('#clear-logs-btn')?.addEventListener('click', () => {
+      state.debugLogs = [];
+      renderDebugLogs();
+    });
+    $('#copy-logs-btn')?.addEventListener('click', () => {
+      const text = $('#debug-log-output')?.textContent || '';
+      navigator.clipboard?.writeText(text).then(() => setSideStatus('Logs copiés', 'ok')).catch(() => setSideStatus('Copie logs impossible', 'warn'));
     });
     $('#quality-alert-filter')?.addEventListener('change', () => {
       if (state.status) renderQualityAlerts(state.status);
@@ -7691,6 +8106,11 @@
     });
     document.addEventListener('keydown', (event) => {
       if (event.key === 'Escape') closeMatchDetail();
+      if (event.ctrlKey && event.shiftKey && !event.altKey && !event.metaKey && event.key.toLowerCase() === 'l') {
+        event.preventDefault();
+        openLogDrawer();
+        return;
+      }
       if (event.ctrlKey && !event.altKey && !event.metaKey) {
         const target = event.target;
         if (target && ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName)) return;
@@ -7701,7 +8121,10 @@
           '4': 'data',
           '5': 'history',
           '6': 'combines',
-          '7': 'scorers'
+          '7': 'scorers',
+          '8': 'calendar',
+          '9': 'pipeline',
+          '0': 'help'
         };
         const tab = shortcuts[event.key];
         if (tab) {
@@ -7771,6 +8194,8 @@
 
   async function boot() {
     state.bootStartedAt = typeof performance !== 'undefined' ? performance.now() : Date.now();
+    installDebugLogHooks();
+    pushLog('info', 'Démarrage du cockpit desktop');
     bindEvents();
     state.actionHistory = readActionHistory();
     renderActionHistory();

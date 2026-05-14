@@ -93,7 +93,23 @@ async function main() {
     await win.waitForSelector('#pref-bankroll', { timeout: 10000 });
     const preferenceInputs = await win.locator('#pref-bankroll, input[name="pref-sport"], input[name="pref-market"]').count();
     const disciplineInputs = await win.locator('#pref-stake-mode, #pref-stop-loss, #pref-take-profit').count();
+    const webhookControls = await win.locator('#pref-webhook-type, #pref-webhook-url, #test-webhook-btn').count();
     await safeScreenshot(win, path.join(captureDir, 'desktop-preferences-audit.png'), { fullPage: true });
+
+    await win.click('[data-tab="calendar"]');
+    await win.waitForSelector('#calendar-grid .calendar-day, #calendar-grid .empty', { timeout: 30000 });
+    const calendarDays = await win.locator('#calendar-grid .calendar-day').count();
+    await safeScreenshot(win, path.join(captureDir, 'desktop-calendar-audit.png'), { fullPage: true });
+
+    await win.click('[data-tab="pipeline"]');
+    await win.waitForSelector('#pipeline-progress', { timeout: 10000 });
+    const pipelineCards = await win.locator('#pipeline-stage-grid .refresh-card, #pipeline-stage-grid .empty').count();
+    await safeScreenshot(win, path.join(captureDir, 'desktop-pipeline-audit.png'), { fullPage: true });
+
+    await win.click('[data-tab="help"]');
+    await win.waitForSelector('#glossary-grid .glossary-card', { timeout: 10000 });
+    const glossaryCards = await win.locator('#glossary-grid .glossary-card').count();
+    await safeScreenshot(win, path.join(captureDir, 'desktop-help-audit.png'), { fullPage: true });
 
     await win.click('[data-tab="matches"]');
     await win.waitForSelector('#matches-body tr.clickable-row', { timeout: 30000 });
@@ -134,8 +150,8 @@ async function main() {
     if (decisionConsistency.picksMetric < 20 || decisionConsistency.morningCards < 4 || !decisionConsistency.imminentStrip || decisionConsistency.trackButtons < 20 || !decisionConsistency.pnlVisible || !decisionConsistency.pnlSparkline || !decisionConsistency.filtersVisible) {
       throw new Error(`Cockpit actionnable incomplet: ${JSON.stringify(decisionConsistency)}`);
     }
-    if (combines <= 0 || scorers <= 0 || performanceCards < 6 || segmentCards <= 0 || learningCards <= 0 || agentCards <= 0 || preferenceInputs < 8 || disciplineInputs < 3) {
-      throw new Error(`Captures écrans incomplètes: ${JSON.stringify({ combines, scorers, performanceCards, segmentCards, learningCards, agentCards, preferenceInputs, disciplineInputs })}`);
+    if (combines <= 0 || scorers <= 0 || performanceCards < 6 || segmentCards <= 0 || learningCards <= 0 || agentCards <= 0 || preferenceInputs < 8 || disciplineInputs < 3 || webhookControls < 3 || calendarDays < 7 || pipelineCards <= 0 || glossaryCards < 12) {
+      throw new Error(`Captures écrans incomplètes: ${JSON.stringify({ combines, scorers, performanceCards, segmentCards, learningCards, agentCards, preferenceInputs, disciplineInputs, webhookControls, calendarDays, pipelineCards, glossaryCards })}`);
     }
     if (!/s|\.\.\./.test(decisionConsistency.performanceMetric) || !/Auto-refresh|Mode économie/.test(decisionConsistency.refreshPolicy)) {
       throw new Error(`Indicateurs cockpit manquants: ${JSON.stringify(decisionConsistency)}`);
@@ -149,7 +165,7 @@ async function main() {
     if (!mobile.before.includes('Match') || mobile.hasOverflow || mobile.rows <= 0) {
       throw new Error(`Rendu mobile invalide: ${JSON.stringify(mobile)}`);
     }
-    console.log(`Visual capture OK: décision ${finalCards} cartes, ${combines} combinés, ${scorers} buteurs, ${sources} sources, ${refreshCards} refresh cards, ${mobile.rows} cartes mobiles.`);
+    console.log(`Visual capture OK: décision ${finalCards} cartes, ${combines} combinés, ${scorers} buteurs, ${sources} sources, ${refreshCards} refresh cards, ${calendarDays} jours, ${glossaryCards} aides, ${mobile.rows} cartes mobiles.`);
   } finally {
     await app.close();
     fs.rmSync(userDataDir, { recursive: true, force: true });

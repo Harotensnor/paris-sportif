@@ -538,6 +538,8 @@ a:hover {
   padding: 12px 14px;
   font-size: 13px;
   line-height: 1.35;
+  cursor: pointer;
+  animation: toast-in 220ms ease-out both;
 }
 
 .export-toast strong {
@@ -556,16 +558,41 @@ a:hover {
   display: none;
 }
 
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .hidden {
   display: none;
 }
 
 .tab-panel {
   display: none;
+  opacity: 0;
+  transform: translateY(6px);
 }
 
 .tab-panel.active {
   display: block;
+  animation: panel-in 220ms ease-out both;
+}
+
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .metrics-grid {
@@ -2856,6 +2883,304 @@ body.modal-open {
   padding: 16px;
 }
 
+.metric,
+.morning-card,
+.quality-report-card,
+.performance-card,
+.segment-card,
+.combo-card,
+.scorer-card,
+.preference-card,
+.calendar-day,
+.timeline-row,
+.glossary-card,
+.refresh-card {
+  transition: transform 200ms ease-out, border-color 200ms ease-out, background-color 200ms ease-out, box-shadow 200ms ease-out;
+}
+
+.metric:hover,
+.morning-card:hover,
+.quality-report-card:hover,
+.performance-card:hover,
+.segment-card:hover,
+.combo-card:hover,
+.scorer-card:hover,
+.preference-card:hover,
+.calendar-day:hover,
+.timeline-row:hover,
+.glossary-card:hover,
+.refresh-card:hover {
+  transform: translateY(-1px);
+  border-color: rgba(148, 163, 184, .34);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, .18);
+}
+
+.primary-btn,
+.ghost-btn,
+.track-bet-btn,
+.mini-export-btn,
+.icon-btn {
+  transition: transform 120ms ease-out, border-color 160ms ease-out, background-color 160ms ease-out;
+}
+
+.primary-btn:active,
+.ghost-btn:active,
+.track-bet-btn:active,
+.mini-export-btn:active,
+.icon-btn:active {
+  transform: translateY(1px) scale(.99);
+}
+
+.empty {
+  position: relative;
+}
+
+.empty::before {
+  content: "";
+  display: block;
+  width: 26px;
+  height: 26px;
+  margin: 0 auto 10px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background:
+    linear-gradient(135deg, rgba(16, 185, 129, .18), transparent),
+    var(--surface-2);
+}
+
+td.empty::before,
+.compact-empty::before {
+  display: none;
+}
+
+.today-model-card {
+  margin-bottom: 20px;
+}
+
+.term-tip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.term-tip span {
+  width: 17px;
+  height: 17px;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  color: var(--blue);
+  font-size: 10px;
+}
+
+.bet-tags-input,
+.bet-note-input {
+  width: 100%;
+  min-width: 160px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-2);
+  color: var(--text);
+  padding: 7px 9px;
+  margin-bottom: 6px;
+  resize: vertical;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.calendar-day {
+  min-height: 130px;
+  display: grid;
+  align-content: space-between;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  padding: 14px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.calendar-day strong {
+  font-size: 28px;
+}
+
+.calendar-day small,
+.timeline-row em,
+.glossary-card p,
+.refresh-card small {
+  color: var(--muted);
+  font-style: normal;
+}
+
+.calendar-day.low {
+  border-left: 4px solid rgba(56, 189, 248, .7);
+}
+
+.calendar-day.medium {
+  border-left: 4px solid rgba(245, 158, 11, .8);
+}
+
+.calendar-day.high,
+.calendar-day.active {
+  border-left: 4px solid var(--accent);
+  background: linear-gradient(135deg, rgba(16, 185, 129, .13), transparent 42%), var(--surface);
+}
+
+.timeline-list {
+  display: grid;
+  gap: 8px;
+}
+
+.timeline-row {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  padding: 12px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.timeline-row span {
+  color: var(--blue);
+  font-weight: 900;
+}
+
+.timeline-row em {
+  grid-column: 2;
+}
+
+.glossary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.glossary-card {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  padding: 14px;
+}
+
+.glossary-card strong {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 16px;
+}
+
+.pipeline-progress {
+  margin-bottom: 16px;
+}
+
+.pipeline-head {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  padding: 14px;
+}
+
+.pipeline-head strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 22px;
+}
+
+.pipeline-head p {
+  margin: 6px 0 0;
+  color: var(--muted);
+}
+
+.pipeline-meter {
+  height: 8px;
+  margin-top: 12px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+
+.pipeline-meter span {
+  display: block;
+  height: 100%;
+  min-width: 3%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--accent), var(--blue));
+}
+
+.refresh-stage-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.pipeline-log {
+  max-height: 360px;
+  overflow: auto;
+}
+
+.log-drawer {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: stretch end;
+  background: rgba(5, 8, 22, .58);
+}
+
+.log-drawer.hidden {
+  display: none;
+}
+
+.log-drawer-panel {
+  width: min(720px, calc(100vw - 24px));
+  height: 100vh;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  border-left: 1px solid var(--line);
+  background: var(--graphite);
+  box-shadow: var(--shadow-pop);
+}
+
+.log-drawer-head,
+.log-drawer-controls {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.log-drawer-head h3 {
+  margin: 4px 0 0;
+}
+
+.log-drawer-controls select {
+  min-height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  padding: 8px 10px;
+}
+
+.log-drawer .logbox {
+  margin: 16px;
+  overflow: auto;
+}
+
 .v8-sheet-hero {
   border-color: rgba(96, 165, 250, .28);
   background:
@@ -3147,5 +3472,17 @@ body.modal-open {
 
   .table-wrap td.empty {
     display: block;
+  }
+
+  .calendar-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .timeline-row {
+    grid-template-columns: 1fr;
+  }
+
+  .timeline-row em {
+    grid-column: auto;
   }
 }

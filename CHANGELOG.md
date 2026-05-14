@@ -5,6 +5,19 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 6 — Polish ultime, aide intégrée, calendrier et stabilité longue durée
+
+- Polish visuel du cockpit desktop : transitions douces entre vues, micro-interactions sur cartes/boutons, toasts unifiés, états vides plus lisibles et respect renforcé des tokens visuels.
+- Ajout d'une vue `Aide` avec glossaire intégré pour les termes de décision : edge, EV, Kelly, CLV, Brier, tier, bucket d'edge, segment, sharp money, Outsider, BTTS, OU, DC, AH et DNB.
+- Ajout de tooltips contextuels sur les notions techniques clés du cockpit pour éviter que les chiffres importants restent opaques.
+- `Mes paris` accepte maintenant des notes privées et des tags personnels persistés localement, avec filtre par tag et export CSV enrichi.
+- Nouvelle vue `Calendrier` sur 7 jours : densité de picks par jour, heatmap compacte et timeline horaire cliquable pour revenir au cockpit filtré.
+- Préférences enrichies avec webhook mobile externe générique/Discord/ntfy/Telegram/Pushover, test sécurisé localement et envoi des alertes importantes depuis le process Electron, jamais depuis le renderer.
+- Nouvelle vue `Pipeline` : état refresh, historique des durées, mémoire RSS, log live et annulation de refresh bloqué.
+- Ajout d'un panneau logs debug accessible par `Ctrl+Shift+L`, avec filtres info/warn/error, copie et vidage local.
+- Brief d'ouverture complété par `Modèle aujourd'hui` : picks affichés, segments verts/rouges, edge moyen du jour et qualité de journée de signaux.
+- QA Sprint 6 : Playwright couvre le cycle complet `Je mise` → tags/notes → settlement → P&L, les écrans Aide/Calendrier/Pipeline/Logs et l'absence d'erreurs console ; stress Electron 30 minutes validé avec mémoire max 382 MB.
+
 ### Sprint 5 — Cockpit intelligent, CLV, discipline bankroll et alertes
 
 - Ajout d'un `Brief du matin` en haut de l'accueil : nombre de picks affichés, gros edges, prochain match avec compte à rebours, performance d'hier, bankroll, CLV et accès rapides aux picks, combinés et paris suivis.
