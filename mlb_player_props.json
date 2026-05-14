@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-14T01:45:16Z",
+  "generated_at": "2026-05-14T01:47:36Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -210,6 +210,42 @@
             "whip": 0.9
           },
           "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Detroit Tigers",
+          "pitcher": "Keider Montero",
+          "label": "Keider Montero moins de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "under",
+          "probability": 0.6015,
+          "fair_odds": 1.66,
+          "expected_strikeouts": 4.09,
+          "projected_ip": 5.6,
+          "inputs": {
+            "k9": 6.58,
+            "era": 3.18,
+            "whip": 0.96,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Detroit Tigers",
+          "pitcher": "Keider Montero",
+          "label": "Keider Montero ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.655,
+          "fair_odds": 1.53,
+          "expected_hr_allowed": 0.423,
+          "projected_ip": 5.6,
+          "inputs": {
+            "hr9": 0.68,
+            "era": 3.18,
+            "whip": 0.96
+          },
+          "side": "away"
         }
       ]
     },
@@ -706,7 +742,7 @@
       ]
     }
   ],
-  "props": 34,
+  "props": 36,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
