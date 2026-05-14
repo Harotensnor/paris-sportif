@@ -1,0 +1,17 @@
+{
+  "name": "paris-sportif-desktop",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Application PC locale pour Paris-Sportif.",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "refresh": "python bin/refresh_once.py"
+  },
+  "devDependencies": {
+    "electron": "^42.0.1"
+  },
+  "dependencies": {
+    "jsdom": "^29.1.1"
+  }
+}

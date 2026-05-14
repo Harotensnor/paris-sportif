@@ -1,0 +1,551 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https://img.sofascore.com; connect-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none'; worker-src 'none'">
+  <title>Paris-Sportif Desktop</title>
+  <link rel="stylesheet" href="/desktop/styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">PS</div>
+        <div>
+          <h1>Paris-Sportif</h1>
+          <p>Logiciel local</p>
+        </div>
+      </div>
+      <nav class="nav">
+        <button class="nav-btn active" data-tab="dashboard">Accueil</button>
+        <button class="nav-btn" data-tab="combines">Combinés</button>
+        <button class="nav-btn" data-tab="scorers">Buteurs</button>
+        <button class="nav-btn" data-tab="matches">Tous les matchs</button>
+        <button class="nav-btn" data-tab="history">Historique</button>
+        <button class="nav-btn" data-tab="agent">Agent</button>
+        <button class="nav-btn" data-tab="data">Données</button>
+      </nav>
+      <div class="side-status" id="side-status">
+        <span class="dot dot-idle"></span>
+        <span>Initialisation</span>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow">Analyse locale Winamax-only</div>
+          <h2 id="page-title">Accueil</h2>
+        </div>
+        <div class="actions decision-actions">
+          <button class="primary-btn" id="refresh-btn">Rafraîchir</button>
+          <button class="ghost-btn" id="refresh-full-btn">Refresh complet</button>
+          <select id="refresh-signal-source" class="signal-source-select" aria-label="Source des signaux">
+            <option value="all">Tous signaux</option>
+            <option value="weather">Météo</option>
+            <option value="referees">Arbitres</option>
+            <option value="injuries">Blessures</option>
+            <option value="lineups">Lineups</option>
+            <option value="team_form">Forme équipes</option>
+            <option value="team_stats">Stats équipes</option>
+            <option value="h2h">H2H</option>
+          </select>
+          <button class="ghost-btn" id="refresh-signals-btn">Signaux lents</button>
+          <button class="ghost-btn" id="refresh-prematch-btn">Pré-match</button>
+          <button class="ghost-btn" id="reload-engine-btn">Recalculer</button>
+        </div>
+      </header>
+
+      <div class="refresh-eta hidden" id="refresh-eta" role="status" aria-live="polite">
+        <div class="refresh-eta-main">
+          <span id="refresh-eta-title">Refresh en cours</span>
+          <strong id="refresh-eta-remaining">Temps restant estimé : -</strong>
+          <em id="refresh-eta-detail">Calcul de l'estimation...</em>
+        </div>
+        <div class="refresh-eta-track" aria-hidden="true">
+          <div class="refresh-eta-bar" id="refresh-eta-bar"></div>
+        </div>
+      </div>
+
+      <section class="banner hidden" id="stale-banner"></section>
+
+      <section class="tab-panel active" data-panel="dashboard">
+        <div class="metrics-grid">
+          <article class="metric">
+            <span>Fraîcheur</span>
+            <strong id="metric-age">-</strong>
+            <small id="metric-generated">-</small>
+          </article>
+          <article class="metric">
+            <span>Matchs analysés</span>
+            <strong id="metric-upcoming">-</strong>
+            <small id="metric-bookable">-</small>
+          </article>
+          <article class="metric">
+            <span id="metric-picks-label">Candidats détectés</span>
+            <strong id="metric-picks">-</strong>
+            <small id="metric-picks-sub">La V8 bloque les mises non prêtes</small>
+          </article>
+          <article class="metric">
+            <span>Bankroll user</span>
+            <div class="bankroll-line">
+              <input id="bankroll-input" type="number" min="1" step="1" value="50">
+              <strong>€</strong>
+            </div>
+            <small>sert au calcul des mises</small>
+          </article>
+        </div>
+
+        <div class="v8-cockpit v12-cockpit v14-cockpit" id="v16-cockpit">
+          <div class="v8-cockpit-head">
+            <div>
+              <div class="eyebrow">V16 Décision finale</div>
+              <h3 id="v16-main-message">Chargement V16...</h3>
+              <p id="v16-main-caption">Ticket final : prêt, T-10, prix, source, hostile ou écarté.</p>
+            </div>
+            <div class="v8-cockpit-actions">
+              <button class="primary-btn" id="v16-finalize-run-btn">Finaliser V16</button>
+              <button class="ghost-btn" id="v16-t10-run-btn">T-10 V16</button>
+              <button class="ghost-btn" id="v16-source-run-btn">Sources V16</button>
+              <button class="ghost-btn" id="v16-ticket-export-btn">Exporter ticket V16</button>
+            </div>
+          </div>
+          <div class="v8-control-room" id="v16-cockpit-grid">
+            <div class="empty">Chargement du cockpit V16...</div>
+          </div>
+        </div>
+
+      </section>
+
+      <section class="tab-panel" data-panel="combines">
+        <div class="section-head">
+          <div>
+            <h3>Combinés</h3>
+            <p>Tickets construits avec les marchés Winamax exacts et anti-corrélation.</p>
+          </div>
+        </div>
+        <div class="combo-grid" id="combines-list">
+          <div class="empty">Chargement des combinés...</div>
+        </div>
+      </section>
+
+      <section class="tab-panel" data-panel="scorers">
+        <div class="section-head">
+          <div>
+            <h3>Buteurs probables</h3>
+            <p>Lecture secondaire issue du modèle joueurs, à vérifier dans le marché buteur Winamax.</p>
+          </div>
+          <div class="section-actions">
+            <button class="ghost-btn" id="export-scorers-csv-btn">Exporter buteurs</button>
+          </div>
+        </div>
+        <div class="scorer-grid" id="scorers-list">
+          <div class="empty">Chargement des buteurs...</div>
+        </div>
+        <div class="section-head compact scorer-quality-head">
+          <div>
+            <h3>Qualité buteurs</h3>
+            <p>Readiness actuelle : marché joueur, compos, blessures et profils stars.</p>
+          </div>
+        </div>
+        <div class="quality-report-grid scorer-report-grid" id="scorer-report-grid">
+          <div class="empty">Chargement qualité buteurs...</div>
+        </div>
+        <div class="section-head compact scorer-quality-head">
+          <div>
+            <h3>Audit pending buteurs</h3>
+            <p>Suivi des candidats joueurs non réglés, sans les compter perdants par défaut.</p>
+          </div>
+        </div>
+        <div class="quality-report-grid scorer-report-grid" id="scorer-pending-grid">
+          <div class="empty">Chargement audit pending...</div>
+        </div>
+      </section>
+
+      <section class="tab-panel" data-panel="matches">
+        <div class="section-head">
+          <div>
+            <h3>Tous les matchs</h3>
+            <p>Liste native du logiciel, limitée aux matchs Winamax exacts.</p>
+          </div>
+          <div class="filters">
+            <input id="match-search" type="search" placeholder="Rechercher une équipe">
+            <select id="sport-filter" aria-label="Filtrer par sport">
+              <option value="all">Tous sports</option>
+            </select>
+            <select id="calibration-filter" aria-label="Filtrer par calibration">
+              <option value="all">Tous risques</option>
+              <option value="cold">Froids</option>
+              <option value="warm">Chauds</option>
+              <option value="blocked">Freinés</option>
+              <option value="unknown">Sans historique</option>
+            </select>
+            <select id="edge-filter" aria-label="Filtrer par edge">
+              <option value="all">Tous edges</option>
+              <option value="edge_00_05">Edge 0-5%</option>
+              <option value="edge_05_10">Edge 5-10%</option>
+              <option value="edge_10_20">Edge 10-20%</option>
+              <option value="edge_20_plus">Edge 20%+</option>
+            </select>
+            <select id="league-filter" aria-label="Filtrer par ligue">
+              <option value="all">Toutes ligues</option>
+            </select>
+            <button class="ghost-btn" id="export-filter-backtest-csv-btn">Exporter backtest</button>
+          </div>
+        </div>
+        <div class="match-backtest-grid" id="matches-backtest-grid">
+          <div class="empty">Chargement du backtest filtre...</div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Match</th>
+                <th>Pick modèle</th>
+                <th>Cote</th>
+                <th>Proba</th>
+                <th>Edge</th>
+                <th>Statut</th>
+                <th>Départ</th>
+              </tr>
+            </thead>
+            <tbody id="matches-body">
+              <tr><td colspan="7" class="empty">Chargement des matchs...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="tab-panel" data-panel="history">
+        <div class="metrics-grid history-grid">
+          <article class="metric">
+            <span>Total picks</span>
+            <strong id="hist-total">-</strong>
+            <small id="hist-generated">-</small>
+          </article>
+          <article class="metric">
+            <span>Settled</span>
+            <strong id="hist-settled">-</strong>
+            <small id="hist-wl">-</small>
+          </article>
+          <article class="metric">
+            <span>Win rate</span>
+            <strong id="hist-winrate">-</strong>
+            <small>hors void</small>
+          </article>
+          <article class="metric">
+            <span>ROI flat</span>
+            <strong id="hist-roi">-</strong>
+            <small id="hist-pnl">-</small>
+          </article>
+        </div>
+        <div class="section-head compact">
+          <div>
+            <h3>Calibration marchés</h3>
+            <p id="calibration-summary">Historique réglé par marché, ligue et tranche d'edge.</p>
+          </div>
+          <div class="section-actions">
+            <button class="ghost-btn" id="export-calibration-json-btn">Exporter JSON</button>
+            <button class="ghost-btn" id="export-calibration-csv-btn">Exporter CSV</button>
+          </div>
+        </div>
+        <div class="calibration-grid" id="calibration-market-grid">
+          <div class="empty">Chargement calibration...</div>
+        </div>
+        <div class="section-head compact calibration-subhead">
+          <div>
+            <h3>Marché + contexte</h3>
+            <p>Lecture plus stricte des couples marché/niveau de contexte.</p>
+          </div>
+        </div>
+        <div class="calibration-grid" id="calibration-market-context-grid">
+          <div class="empty">Chargement couples contexte...</div>
+        </div>
+        <div class="section-head compact calibration-subhead">
+          <div>
+            <h3>Backtest contexte</h3>
+            <p>ROI, Brier et sample par niveau de contexte. Les anciennes lignes utilisent un proxy qualité.</p>
+          </div>
+          <div class="section-actions">
+            <button class="ghost-btn" id="export-context-backtest-csv-btn">Exporter contexte backtest</button>
+          </div>
+        </div>
+        <div class="match-backtest-grid context-backtest-grid" id="context-backtest-grid">
+          <div class="empty">Chargement backtest contexte...</div>
+        </div>
+        <div class="section-head compact calibration-subhead">
+          <div>
+            <h3>Backtest décision</h3>
+            <p id="decision-backtest-summary">Mesure séparée des bets, watchlist et skips prudents.</p>
+          </div>
+          <div class="section-actions">
+            <button class="ghost-btn" id="export-decision-backtest-csv-btn">Exporter décision backtest</button>
+          </div>
+        </div>
+        <div class="match-backtest-grid decision-backtest-grid" id="decision-backtest-grid">
+          <div class="empty">Chargement backtest décision...</div>
+        </div>
+        <div class="match-backtest-grid decision-reason-grid" id="decision-reason-grid">
+          <div class="empty">Chargement raisons décision...</div>
+        </div>
+        <div class="match-backtest-grid decision-tuning-grid" id="decision-tuning-grid">
+          <div class="empty">Chargement réglages prudents...</div>
+        </div>
+        <div class="section-head compact calibration-subhead">
+          <div>
+            <h3>Calibration ligues</h3>
+            <p>Championnats et tranches d'edge les plus représentés dans l'historique réglé.</p>
+          </div>
+        </div>
+        <div class="calibration-split">
+          <div class="calibration-grid compact-calibration-grid" id="calibration-league-grid">
+            <div class="empty">Chargement ligues...</div>
+          </div>
+          <div class="calibration-grid compact-calibration-grid" id="calibration-edge-grid">
+            <div class="empty">Chargement edge...</div>
+          </div>
+        </div>
+        <div class="two-column">
+          <section>
+            <div class="section-head compact">
+              <div>
+                <h3>À venir dans l'historique</h3>
+                <p>Meilleures lignes pending enregistrées.</p>
+              </div>
+            </div>
+            <div class="table-wrap compact-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Match</th>
+                    <th>Marché</th>
+                    <th>Cote</th>
+                    <th>Edge</th>
+                    <th>Qualité</th>
+                  </tr>
+                </thead>
+                <tbody id="history-pending-body">
+                  <tr><td colspan="5" class="empty">Chargement...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+          <section>
+            <div class="section-head compact">
+              <div>
+                <h3>Résultats récents</h3>
+                <p>Picks réglés les plus récents.</p>
+              </div>
+            </div>
+            <div class="table-wrap compact-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Match</th>
+                    <th>Marché</th>
+                    <th>Résultat</th>
+                    <th>Cote</th>
+                    <th>Jour</th>
+                  </tr>
+                </thead>
+                <tbody id="history-settled-body">
+                  <tr><td colspan="5" class="empty">Chargement...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section class="tab-panel" data-panel="agent">
+        <div class="metrics-grid agent-grid">
+          <article class="metric">
+            <span>NAV agent</span>
+            <strong id="agent-nav">-</strong>
+            <small>cagnotte modèle</small>
+          </article>
+          <article class="metric">
+            <span>7 derniers jours</span>
+            <strong id="agent-delta">-</strong>
+            <small id="agent-delta-pct">-</small>
+          </article>
+          <article class="metric">
+            <span>Paris rejoués</span>
+            <strong id="agent-scorable">-</strong>
+            <small>historique rejoué</small>
+          </article>
+          <article class="metric">
+            <span>Exposition jour</span>
+            <strong id="agent-exposure">-</strong>
+            <small id="agent-exposure-sub">-</small>
+          </article>
+          <article class="metric">
+            <span>Drawdown max</span>
+            <strong id="agent-drawdown">-</strong>
+            <small id="agent-drawdown-sub">-</small>
+          </article>
+          <article class="metric">
+            <span>Garde-fou</span>
+            <strong id="agent-guard">-</strong>
+            <small>stop-loss / take-profit</small>
+          </article>
+        </div>
+        <div class="section-head">
+          <div>
+            <h3>Positions agent proposées</h3>
+            <p>Bankroll agent 10 €, Kelly 0.25×, cap 10% par pari et 20% par jour.</p>
+          </div>
+          <div class="section-actions">
+            <button class="ghost-btn" id="export-agent-json-btn">Exporter JSON</button>
+            <button class="ghost-btn" id="export-agent-csv-btn">Exporter CSV</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Match</th>
+                <th>Marché</th>
+                <th>Cote</th>
+                <th>Edge</th>
+                <th>Mise agent</th>
+                <th>Jour</th>
+              </tr>
+            </thead>
+            <tbody id="agent-positions-body">
+              <tr><td colspan="6" class="empty">Chargement des positions agent...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="section-head compact">
+          <div>
+            <h3>Blocages agent</h3>
+            <p>Pourquoi un edge positif reste hors mise autonome.</p>
+          </div>
+        </div>
+        <div class="quality-report-grid" id="agent-blockers-grid">
+          <div class="empty">Chargement des blocages agent...</div>
+        </div>
+        <div class="section-head compact">
+          <div>
+            <h3>Conseils garde-fous</h3>
+            <p>Recommandations prudentes issues du backtest agent, jamais appliquées automatiquement.</p>
+          </div>
+        </div>
+        <div class="quality-report-grid" id="agent-guardrail-grid">
+          <div class="empty">Chargement des conseils garde-fous...</div>
+        </div>
+        <div class="section-head compact">
+          <div>
+            <h3>Réduction de mise</h3>
+            <p>Marchés où le backtest recommande de réduire l'exposition au lieu de forcer.</p>
+          </div>
+        </div>
+        <div class="quality-report-grid" id="stake-reduction-grid">
+          <div class="empty">Chargement du backtest des mises réduites...</div>
+        </div>
+        <div class="section-head compact">
+          <div>
+            <h3>Simulation bankroll</h3>
+            <p>Comparaison locale des politiques agent sur l'historique réglé.</p>
+          </div>
+        </div>
+        <div class="quality-report-grid" id="agent-simulation-grid">
+          <div class="empty">Chargement simulation agent...</div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Match</th>
+                <th>Raison</th>
+                <th>Cote</th>
+                <th>Edge</th>
+                <th>Confiance</th>
+                <th>Départ</th>
+              </tr>
+            </thead>
+            <tbody id="agent-blockers-body">
+              <tr><td colspan="6" class="empty">Chargement du détail des blocages...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="section-head">
+          <div>
+            <h3>Journal de refresh</h3>
+            <p>Ce que le logiciel lance localement quand tu demandes une mise à jour.</p>
+          </div>
+        </div>
+        <pre class="logbox" id="refresh-log">Aucun refresh lancé depuis l'ouverture.</pre>
+      </section>
+
+      <section class="tab-panel" data-panel="data">
+        <div class="section-head">
+          <div>
+            <h3>Fichiers locaux</h3>
+            <p>Etat des sources utilisées par le logiciel.</p>
+          </div>
+          <div class="section-actions">
+            <button class="ghost-btn" id="export-report-json-btn">Rapport JSON</button>
+            <button class="ghost-btn" id="export-picks-csv-btn">Picks CSV</button>
+            <button class="ghost-btn" id="export-context-json-btn">Contextes</button>
+            <button class="ghost-btn" id="export-gaps-csv-btn">Signaux manquants</button>
+            <button class="ghost-btn" id="export-calibration-csv-btn">Calibration</button>
+          </div>
+        </div>
+        <div class="v8-control-room" id="v16-control-room-grid">
+          <div class="empty">Chargement Control Room V16...</div>
+        </div>
+          <div class="empty">Chargement Control Room V15...</div>
+        </div>
+          <div class="empty">Chargement Control Room V14...</div>
+        </div>
+          <div class="empty">Chargement Control Room V13...</div>
+        </div>
+          <div class="empty">Chargement Control Room V12...</div>
+        </div>
+          <div class="empty">Chargement Control Room V8...</div>
+        </div>
+          <div class="empty">Chargement Control Room V9...</div>
+        </div>
+          <div class="empty">Chargement Control Room V10...</div>
+        </div>
+          <div class="empty">Chargement Control Room V11...</div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="export-toast hidden" id="export-toast" role="status" aria-live="polite"></div>
+
+  <div class="modal-backdrop hidden" id="match-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal">
+      <header class="modal-head">
+        <div>
+          <div class="eyebrow">Détail match</div>
+          <h3 id="modal-title">Match</h3>
+          <p id="modal-subtitle"></p>
+        </div>
+        <button class="icon-btn" id="modal-close" aria-label="Fermer">×</button>
+      </header>
+      <div class="modal-tabs" id="modal-tabs">
+        <button class="modal-tab active" data-detail-tab="summary">Synthèse</button>
+        <button class="modal-tab" data-detail-tab="decision">Décision</button>
+        <button class="modal-tab" data-detail-tab="context">Contexte</button>
+        <button class="modal-tab" data-detail-tab="teams">Équipes</button>
+        <button class="modal-tab" data-detail-tab="availability">Effectif</button>
+        <button class="modal-tab" data-detail-tab="signals">Signaux</button>
+        <button class="modal-tab" data-detail-tab="odds">Cotes</button>
+        <button class="modal-tab" data-detail-tab="h2h">H2H</button>
+        <button class="modal-tab" data-detail-tab="timeline">Timeline</button>
+        <button class="modal-tab" data-detail-tab="sources">Sources</button>
+        <button class="modal-tab" data-detail-tab="model">Modèle</button>
+      </div>
+      <div class="modal-content" id="modal-content"></div>
+    </div>
+  </div>
+
+  <script src="/desktop/renderer.js"></script>
+</body>
+</html>
