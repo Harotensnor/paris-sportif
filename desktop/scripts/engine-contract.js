@@ -49,6 +49,9 @@ function testAnalysis() {
   assert(analysis.todayFunnel && analysis.todayFunnel.schema === 'paris-sportif.today_funnel.v1', 'Funnel aujourd’hui absent', analysis.todayFunnel);
   assert(Number(analysis.todayFunnel.today?.displayed || 0) >= 5, 'Moins de 5 picks aujourd’hui affichés', analysis.todayFunnel.today);
   assert(Number(analysis.todayFunnel.today?.ready || 0) >= 5, 'Moins de 5 picks aujourd’hui prêts', analysis.todayFunnel.today);
+  assert(analysis.winamaxMarketAudit && analysis.winamaxMarketAudit.schema === 'paris-sportif.winamax_market_audit.v1', 'Audit marchés Winamax absent', analysis.winamaxMarketAudit);
+  assert(Number(analysis.winamaxMarketAudit.summary?.availableFamilies || 0) >= 8, 'Pas assez de familles de marchés Winamax détectées', analysis.winamaxMarketAudit.summary);
+  assert(Number(analysis.winamaxMarketAudit.summary?.exploitedFamilies || 0) >= 8, 'Pas assez de familles de marchés exploitées', analysis.winamaxMarketAudit.summary);
   assert(Object.keys(analysis).filter((key) => /^v(?:[5-9]|1[0-6])/.test(key)).length === 0, 'Anciennes propriétés V5-V16 encore exposées');
 
   const seen = new Set();
@@ -59,6 +62,7 @@ function testAnalysis() {
     assert(pick.decisionCenter && typeof pick.decisionCenter.canBet === 'boolean', 'Pick sans décision centrale', pick);
     assert(pick.segmentValidation && Number(pick.segmentValidation.realConfidence || 0) > 0, 'Pick sans validation historique réelle', pick);
     assert(Number(pick.adjustedConfidence || 0) > 0, 'Pick sans confiance ajustée', pick);
+    assert(pick.winamaxBetType && pick.winamaxBetType.label, 'Pick sans type de pari Winamax conseillé', pick);
     if (pick.decisionCenter.canBet) {
       assert(Number(pick.stake) > 0, 'Pick prêt sans mise positive', pick);
     } else {
@@ -109,6 +113,11 @@ function testAnalysis() {
   }
 
   const readyUserPicks = (analysis.picks || []).filter((pick) => pick.decisionCenter?.canBet === true);
+  const perMatch = new Map();
+  for (const pick of analysis.dashboardPicks || []) {
+    perMatch.set(pick.id, (perMatch.get(pick.id) || 0) + 1);
+  }
+  assert(Array.from(perMatch.values()).every((count) => count <= 2), 'Dashboard expose plus de 2 picks sur un même match', Array.from(perMatch.entries()).filter(([, count]) => count > 2));
   assert(Number(analysis.decisionCenter?.summary?.ready || 0) >= 10, 'Moins de 10 paris utilisateurs prêts', analysis.decisionCenter?.summary);
   assert(readyUserPicks.length >= 10, 'Moins de 10 paris prêts visibles dans la sélection', readyUserPicks);
 

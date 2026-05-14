@@ -917,7 +917,14 @@ function createLegacyEngineService({ projectRoot }) {
       teamTotal: Boolean(Array.isArray(markets.team_total) && markets.team_total.length),
       dnb: Boolean(markets.dnb || (Array.isArray(markets.dnb_rows) && markets.dnb_rows.length)),
       exactScore: Boolean(Array.isArray(markets.exact_score_rows) && markets.exact_score_rows.length),
-      players: Array.isArray(wx.full_market_keys) && wx.full_market_keys.some((key) => /buteur|joueur|player|marque/i.test(String(key)))
+      doubleChance: Boolean(markets.double_chance || markets.doublechance || (Array.isArray(markets.double_chance_rows) && markets.double_chance_rows.length)),
+      halfTime: Boolean(markets.ht1n2 || markets.ht_total || markets.halftime || (Array.isArray(markets.ht_rows) && markets.ht_rows.length)),
+      handicap: Boolean(markets.handicap || markets.ah || markets.asian_handicap || (Array.isArray(markets.handicap_rows) && markets.handicap_rows.length)),
+      corners: Boolean(markets.corners || markets.corners_ou || (Array.isArray(markets.corners_rows) && markets.corners_rows.length)),
+      cards: Boolean(markets.cards || markets.cards_ou || (Array.isArray(markets.cards_rows) && markets.cards_rows.length)),
+      basketTotal: Boolean(markets.basket_total || markets.basketball_total || markets.basket_team_total),
+      tennis: Boolean(markets.tennis_games || markets.tennis_sets || markets.total_games || markets.sets),
+      players: Array.isArray(wx.full_market_keys) && wx.full_market_keys.some((key) => /buteur|passeur|joueur|player|marque|tir|shot/i.test(String(key)))
     };
     const detailedCount = Number(wx.full_markets_count || 0);
     const availableFamilies = Object.entries(families).filter(([, value]) => value).map(([key]) => key);
@@ -929,6 +936,216 @@ function createLegacyEngineService({ projectRoot }) {
       familyCount: availableFamilies.length,
       availableFamilies,
       missingCore: ['n12', 'ou', 'btts', 'teamTotal'].filter((key) => !families[key])
+    };
+  }
+
+  function winamaxMarketFamily(value) {
+    const key = compactKey(value);
+    if (!key) return 'unknown';
+    if (/1n2|vainqueur|matchwinner|resultatfinal/.test(key)) return '1n2';
+    if (/doublechance|dc/.test(key)) return 'doublechance';
+    if (/btts|les2equipes|bothteamstoscore/.test(key)) return 'btts';
+    if (/corner/.test(key)) return 'corners';
+    if (/carton|card/.test(key)) return 'cards';
+    if (/mitemps|halftime|1ereperiode|ht/.test(key)) return 'halftime';
+    if (/dnb|remboursesinul|drawnobet/.test(key)) return 'dnb';
+    if (/handicap|asian|spread/.test(key)) return 'handicap';
+    if (/exact|scorecorrect|scoreexact/.test(key)) return 'exactscore';
+    if (/buteur|passeur|joueur|player|marqueur|tir|shot/.test(key)) return 'players';
+    if (/teamtotal|totalequipe|totalquipe/.test(key)) return 'teamtotal';
+    if (/basket|baskettotal|points/.test(key)) return 'basket';
+    if (/tennis|jeu|set/.test(key)) return 'tennis';
+    if (/hockey|runs|baseball/.test(key)) return 'sporttotal';
+    if (/over|under|plus|moins|total|ou[0-9]/.test(key)) return 'ou';
+    return 'other';
+  }
+
+  function winamaxMarketFamilyLabel(family) {
+    const labels = {
+      '1n2': '1N2',
+      doublechance: 'Double chance',
+      btts: 'BTTS',
+      corners: 'Corners',
+      cards: 'Cartons',
+      halftime: 'Mi-temps',
+      handicap: 'Handicap',
+      exactscore: 'Score exact',
+      players: 'Joueurs',
+      teamtotal: 'Total équipe',
+      dnb: 'Remboursé si nul',
+      basket: 'Basket totals',
+      tennis: 'Tennis',
+      sporttotal: 'Totals sport',
+      ou: 'Over/Under',
+      other: 'Autres marchés'
+    };
+    return labels[family] || String(family || 'Marché');
+  }
+
+  function collectWinamaxMarketFamilies(match) {
+    const wx = match?.winamax || {};
+    const profile = marketProfile(match);
+    const families = new Set((profile.availableFamilies || []).map((key) => key === 'n12' ? '1n2' : key.toLowerCase()));
+    for (const key of Array.isArray(wx.full_market_keys) ? wx.full_market_keys : []) {
+      families.add(winamaxMarketFamily(key));
+    }
+    for (const key of Object.keys(wx.markets || {})) {
+      families.add(winamaxMarketFamily(key));
+    }
+    return Array.from(families).filter((item) => item && item !== 'unknown').sort();
+  }
+
+  function findBoostLikeValues(value, pathName = '', out = []) {
+    if (!value || typeof value !== 'object') return out;
+    if (Array.isArray(value)) {
+      value.slice(0, 80).forEach((item, index) => findBoostLikeValues(item, `${pathName}[${index}]`, out));
+      return out;
+    }
+    for (const [key, item] of Object.entries(value)) {
+      const nextPath = pathName ? `${pathName}.${key}` : key;
+      if (/boost|promo|freebet|multibet|betplus|bet\+/i.test(key)) {
+        out.push({
+          path: nextPath,
+          key,
+          value: typeof item === 'object' ? null : item,
+          sample: typeof item === 'object' ? JSON.stringify(item).slice(0, 240) : String(item).slice(0, 240)
+        });
+      }
+      if (item && typeof item === 'object') findBoostLikeValues(item, nextPath, out);
+    }
+    return out;
+  }
+
+  function parseBoostOdd(record) {
+    const text = `${record?.sample || ''} ${record?.value || ''}`;
+    const numbers = text.match(/\b\d+(?:[.,]\d{1,2})\b/g)
+      ?.map((item) => Number(String(item).replace(',', '.')))
+      .filter((item) => item > 1 && item < 100) || [];
+    if (numbers.length >= 2) return { from: Math.min(...numbers), to: Math.max(...numbers) };
+    if (numbers.length === 1) return { from: null, to: numbers[0] };
+    return { from: null, to: null };
+  }
+
+  function detectWinamaxBoostsForMatch(match) {
+    const wx = match?.winamax || {};
+    const raw = findBoostLikeValues(wx).slice(0, 20);
+    return raw.map((item) => ({
+      ...item,
+      ...parseBoostOdd(item),
+      title: cleanTitle(match) || match?.name || ''
+    }));
+  }
+
+  function recommendedWinamaxBetType(row) {
+    const odd = Number(row?.odd || 0);
+    const edge = Number(row?.edge || 0);
+    const probability = Number(row?.probability || 0);
+    const marketKey = calibrationUtils.normalizeMarketKey(row?.marketKey || row?.market || '');
+    if (odd > 3.8 || /exactscore|score/.test(marketKey)) {
+      return {
+        type: 'Système',
+        label: 'Système',
+        reason: 'Cote haute : mieux vaut lisser le risque plutôt que charger le single.'
+      };
+    }
+    if ((odd <= 1.45 && probability >= 0.70) || edge < 0.04) {
+      return {
+        type: 'Combiné prudent',
+        label: 'Combiné prudent',
+        reason: 'Cote courte : utile seulement comme jambe solide, pas comme gros single.'
+      };
+    }
+    if (/btts|ou|teamtotal|tennisgames|tennissets|basket|hockey|baseball/.test(marketKey) && edge >= 0.05) {
+      return {
+        type: 'Single',
+        label: 'Single Winamax',
+        reason: 'Marché lisible avec edge positif : le single garde la variance sous contrôle.'
+      };
+    }
+    if (row?.isMarketAlternative) {
+      return {
+        type: 'Single léger',
+        label: 'Single léger',
+        reason: 'Marché alternatif détecté : mise légère tant que le signal reste secondaire.'
+      };
+    }
+    return {
+      type: 'Single',
+      label: 'Single Winamax',
+      reason: 'Le pick principal se joue seul pour garder la décision claire.'
+    };
+  }
+
+  function applyWinamaxProductLayer(row) {
+    const boosts = detectWinamaxBoostsForMatch(row?.match);
+    const betType = recommendedWinamaxBetType(row);
+    const qualityFlags = [];
+    if (Number(row?.edge || 0) > 0.20) qualityFlags.push('edge_high_review');
+    if (row?.marketProfile?.familyCount >= 6) qualityFlags.push('rich_winamax_market');
+    return {
+      ...row,
+      winamaxBetType: betType,
+      winamaxBoost: boosts[0] || null,
+      qualityFlags
+    };
+  }
+
+  function buildWinamaxMarketAudit(events, rows) {
+    const familyCounts = new Map();
+    const sportCounts = new Map();
+    const keyCounts = new Map();
+    const boostRows = [];
+    for (const event of Array.isArray(events) ? events : []) {
+      if (!event?.winamax?.available) continue;
+      const sport = String(event.sport || event.sport_name || 'sport').toLowerCase();
+      sportCounts.set(sport, (sportCounts.get(sport) || 0) + 1);
+      collectWinamaxMarketFamilies(event).forEach((family) => {
+        familyCounts.set(family, (familyCounts.get(family) || 0) + 1);
+      });
+      (Array.isArray(event?.winamax?.full_market_keys) ? event.winamax.full_market_keys : []).forEach((key) => {
+        const normalized = String(key || '').slice(0, 80);
+        keyCounts.set(normalized, (keyCounts.get(normalized) || 0) + 1);
+      });
+      detectWinamaxBoostsForMatch(event).forEach((boost) => boostRows.push({
+        matchId: event?.winamax?.match_id || event?.id || null,
+        title: cleanTitle(event) || event?.name || '',
+        path: boost.path,
+        from: boost.from,
+        to: boost.to,
+        sample: boost.sample
+      }));
+    }
+    const exploited = new Map();
+    for (const row of Array.isArray(rows) ? rows : []) {
+      if (!row || !(row.edge > 0) || !(row.odd > 1)) continue;
+      const family = winamaxMarketFamily(row.marketKey || row.market);
+      exploited.set(family, (exploited.get(family) || 0) + 1);
+    }
+    const availableFamilies = Array.from(familyCounts.entries())
+      .map(([family, count]) => ({ family, label: winamaxMarketFamilyLabel(family), count, exploited: exploited.get(family) || 0 }))
+      .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
+    const sports = Array.from(sportCounts.entries())
+      .map(([sport, count]) => ({ sport, count }))
+      .sort((a, b) => b.count - a.count || a.sport.localeCompare(b.sport));
+    const unexploited = availableFamilies.filter((row) => row.exploited === 0).slice(0, 12);
+    const exploitedFamilies = availableFamilies.filter((row) => row.exploited > 0);
+    return {
+      schema: 'paris-sportif.winamax_market_audit.v1',
+      generatedAt: new Date().toISOString(),
+      summary: {
+        bookableEvents: Array.isArray(events) ? events.filter((event) => event?.winamax?.available).length : 0,
+        availableFamilies: availableFamilies.length,
+        exploitedFamilies: exploitedFamilies.length,
+        positiveRows: Array.isArray(rows) ? rows.filter((row) => row && row.edge > 0 && row.odd > 1).length : 0,
+        boostsDetected: boostRows.length,
+        sportsDetected: sports.length,
+        targetDailyPicks: 15
+      },
+      families: availableFamilies,
+      sports,
+      topRawKeys: Array.from(keyCounts.entries()).map(([key, count]) => ({ key, count })).sort((a, b) => b.count - a.count).slice(0, 25),
+      unexploited,
+      boosts: boostRows.slice(0, 30)
     };
   }
 
@@ -1807,6 +2024,8 @@ function createLegacyEngineService({ projectRoot }) {
     const now = Date.now();
     const horizonMs = 30 * 60 * 60000;
     const todayKey = dayKeyParis(new Date());
+    const maxPerMatch = 2;
+    const maxPerHourSlot = 3;
     const rank = (pick) => [
       pick?.decisionCenter?.canBet ? 1 : 0,
       pick?.decisionCenter?.status === 'ready' ? 1 : 0,
@@ -1833,17 +2052,50 @@ function createLegacyEngineService({ projectRoot }) {
     const todayRows = picks.filter((pick) => dayKeyParis(pick.start) === todayKey);
     const ordered = [];
     const seen = new Set();
-    const addRows = (rows) => {
+    const matchCounts = new Map();
+    const slotCounts = new Map();
+    const skippedByCap = { match: 0, slot: 0 };
+    const matchKey = (row) => String(row?.id || row?.match?.winamax?.match_id || row?.title || '').replace(/^wnx:/, '');
+    const slotKey = (row) => {
+      const ts = Date.parse(row?.start || '');
+      if (!Number.isFinite(ts)) return 'unknown';
+      const date = new Date(ts);
+      return `${dayKeyParis(date)}:${String(date.getHours()).padStart(2, '0')}`;
+    };
+    const canAddByCaps = (row, strict) => {
+      if (!strict) return true;
+      const mk = matchKey(row);
+      const sk = slotKey(row);
+      if ((matchCounts.get(mk) || 0) >= maxPerMatch) {
+        skippedByCap.match += 1;
+        return false;
+      }
+      if ((slotCounts.get(sk) || 0) >= maxPerHourSlot) {
+        skippedByCap.slot += 1;
+        return false;
+      }
+      return true;
+    };
+    const markCaps = (row) => {
+      const mk = matchKey(row);
+      const sk = slotKey(row);
+      matchCounts.set(mk, (matchCounts.get(mk) || 0) + 1);
+      slotCounts.set(sk, (slotCounts.get(sk) || 0) + 1);
+    };
+    const addRows = (rows, { strict = true } = {}) => {
       for (const row of rows) {
         const key = `${row.id}:${row.market}:${row.label}`;
         if (seen.has(key)) continue;
+        if (!canAddByCaps(row, strict)) continue;
         seen.add(key);
+        markCaps(row);
         ordered.push(row);
       }
     };
-    addRows(sortByKickoffThenRank(todayRows));
-    addRows(sortByKickoffThenRank(nearTerm));
-    addRows(sortRows(picks));
+    addRows(sortByKickoffThenRank(todayRows), { strict: true });
+    addRows(sortByKickoffThenRank(nearTerm), { strict: true });
+    addRows(sortRows(picks), { strict: true });
+    if (ordered.length < 5) addRows(sortRows(picks), { strict: false });
     const rows = ordered.slice(0, 24);
     const mode = todayRows.length ? 'todayFirst' : nearTerm.length ? 'next30h' : 'bestAvailable';
     return {
@@ -1851,7 +2103,14 @@ function createLegacyEngineService({ projectRoot }) {
       mode,
       horizonHours: mode === 'next30h' || mode === 'todayFirst' ? 30 : null,
       todayPicks: todayRows.length,
-      todayReady: todayRows.filter((pick) => pick?.decisionCenter?.canBet).length
+      todayReady: todayRows.filter((pick) => pick?.decisionCenter?.canBet).length,
+      qualityPolicy: {
+        maxPerMatch,
+        maxPerHourSlot,
+        skippedByMatchCap: skippedByCap.match,
+        skippedBySlotCap: skippedByCap.slot,
+        displayedToday: rows.filter((row) => dayKeyParis(row.start) === todayKey).length
+      }
     };
   }
 
@@ -2158,7 +2417,8 @@ function createLegacyEngineService({ projectRoot }) {
     const decisionGates = { prebet: prebetGate, critical: criticalGate };
     const allDecisionRows = baseRows
       .map((row) => applyPrebetGate(row, prebetChecklistReport))
-      .map((row) => applyDecisionCenter(row, decisionGates));
+      .map((row) => applyDecisionCenter(row, decisionGates))
+      .map((row) => applyWinamaxProductLayer(row));
     const matches = allDecisionRows.filter((row) => !row.isMarketAlternative);
     const seen = new Set();
     const picks = allDecisionRows
@@ -2177,6 +2437,7 @@ function createLegacyEngineService({ projectRoot }) {
       .slice(0, 120);
     const dashboard = buildDashboardPicks(picks);
     const todayFunnel = buildTodayFunnel(data, matches, picks, dashboard.rows);
+    const winamaxMarketAudit = buildWinamaxMarketAudit(enrichedEvents, allDecisionRows);
     const combines = buildNativeCombines(win, enrichedEvents);
     const scorers = buildNativeScorers(win, enrichedEvents, lineupsIndex, starPlayersIndex);
     const watchlist = buildWatchlist(matches);
@@ -2212,8 +2473,10 @@ function createLegacyEngineService({ projectRoot }) {
         todayReady: dashboard.todayReady || 0,
         totalPicks: picks.length,
         readyPicks: dashboard.rows.filter((row) => row?.decisionCenter?.canBet).length,
-        blocked: decisionCenter.summary.blocked
+        blocked: decisionCenter.summary.blocked,
+        qualityPolicy: dashboard.qualityPolicy || null
       },
+      winamaxMarketAudit,
       todayFunnel,
       decisionCenter,
       combines,

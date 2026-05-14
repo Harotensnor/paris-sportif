@@ -14902,13 +14902,12 @@ return `
           `;
 })();
 // AUDIT 2026-05-09 v41.15 — Section "💰 Sharp money & consensus".
-// Lit ev.odds_consensus + ev.pinnacle_signal + ev.sharp_disagree (injectés
-// par patch_odds_aggregator.py si THE_ODDS_API_KEY config). Affiche side-by-side
-// le consensus marché vs Pinnacle (proxy sharp money). Quand ils diffèrent
+// Lit ev.odds_consensus + ev.sharp_signal + ev.sharp_disagree. Affiche side-by-side
+// le consensus marché vs une référence sharp historique. Quand ils diffèrent
 // >5%, c'est un signal fort que les sharps voient autre chose que le grand public.
 const sharpMoneyHtml = (() => {
   const cons = match?.odds_consensus || null;
-  const pin = match?.pinnacle_signal || null;
+  const pin = match?.sharp_signal || match?.pinnacle_signal || null;
   const disagree = match?.sharp_disagree || null;
   if (!cons && !pin) return '';
   const sides = ['home', 'draw', 'away'];
@@ -14932,20 +14931,20 @@ const sharpMoneyHtml = (() => {
   return `
             <div class="section">
               <h4>💰 Sharp money & consensus marché</h4>
-              <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;">Compare la cote moyenne de ~30 bookmakers (consensus) vs <b>Pinnacle</b> (sharp money). Quand Pinnacle ≠ consensus de >5%, c'est un signal fort que les pros voient autre chose que le grand public.</div>
+              <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;">Compare le consensus historique vs une référence sharp de marché. Quand ils diffèrent de >5%, c'est un signal fort que les pros voient autre chose que le grand public.</div>
               <table style="width:100%;border-collapse:collapse;background:var(--panel);border-radius:var(--r-sm);overflow:hidden;">
                 <thead>
                   <tr style="background:rgba(255,255,255,.04);">
                     <th style="padding:8px;font-size:11px;text-align:left;color:var(--text-dim);font-weight:700;text-transform:uppercase;letter-spacing:.4px;">Côté</th>
                     <th style="padding:8px;font-size:11px;text-align:center;color:var(--text-dim);font-weight:700;text-transform:uppercase;letter-spacing:.4px;">Consensus</th>
-                    <th style="padding:8px;font-size:11px;text-align:center;color:var(--text-dim);font-weight:700;text-transform:uppercase;letter-spacing:.4px;">Pinnacle 🎯</th>
+                    <th style="padding:8px;font-size:11px;text-align:center;color:var(--text-dim);font-weight:700;text-transform:uppercase;letter-spacing:.4px;">Sharp 🎯</th>
                     <th style="padding:8px;font-size:11px;text-align:center;color:var(--text-dim);font-weight:700;text-transform:uppercase;letter-spacing:.4px;">Signal</th>
                   </tr>
                 </thead>
                 <tbody>${rows}</tbody>
               </table>
               <div style="margin-top:8px;font-size:10.5px;color:var(--text-dim2);font-style:italic;line-height:1.4;">
-                ⬇ sharp = Pinnacle a une cote plus basse que le consensus → les sharps adorent ce côté. ⬆ sharp = Pinnacle plus haute → ils fuient. Source : The Odds API (~30 bookmakers).
+                ⬇ sharp = la référence a une cote plus basse que le consensus → les sharps adorent ce côté. ⬆ sharp = référence plus haute → ils fuient. Source : historique de cotes local.
               </div>
             </div>
           `;
@@ -20419,7 +20418,7 @@ return `<tr class="v36-table-row v38-table-row v39-table-row ${soon ? 'is-immine
             const aligned = sm.aligned_with_pick;
             if (!aligned) return '';
             const drop = Number(sm.odd_drop_pct || 0);
-            return `<span title="Sharp money sur notre côté : cote en baisse de ${drop.toFixed(1)}% (Pinnacle / sharp books). +${Math.round(Number(sm.nudge||0)*100)}pt nudge appliqué." style="display:inline-flex;align-items:center;gap:3px;padding:2px 7px;margin-left:6px;background:rgba(168,85,247,.18);border:1px solid rgba(168,85,247,.45);border-radius:999px;font-size:10px;font-weight:800;color:#a855f7;white-space:nowrap;">🦈 Sharp -${drop.toFixed(0)}%</span>`;
+            return `<span title="Sharp money sur notre côté : cote en baisse de ${drop.toFixed(1)}% via historique local. +${Math.round(Number(sm.nudge||0)*100)}pt nudge appliqué." style="display:inline-flex;align-items:center;gap:3px;padding:2px 7px;margin-left:6px;background:rgba(168,85,247,.18);border:1px solid rgba(168,85,247,.45);border-radius:999px;font-size:10px;font-weight:800;color:#a855f7;white-space:nowrap;">🦈 Sharp -${drop.toFixed(0)}%</span>`;
           })()}</td>
           ${v37ShowResultColumn ? `<td class="v38-cell-result">${v37ResultBadge(result)}</td>` : ''}
         </tr>`;

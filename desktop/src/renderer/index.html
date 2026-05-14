@@ -234,6 +234,13 @@
           <div class="simple-card-grid" id="simple-scorers-grid"></div>
         </details>
 
+        <details class="simple-fold-section" id="simple-promos-section">
+          <summary><span>Promos Winamax</span><strong id="simple-promos-count">0</strong></summary>
+          <div class="simple-card-grid" id="simple-promos-grid">
+            <div class="empty compact-empty">Chargement des promos Winamax...</div>
+          </div>
+        </details>
+
         <div class="section-head compact">
           <div>
             <h3 id="picks-section-title">Sélection du jour</h3>
@@ -439,6 +446,16 @@
         <div class="model-performance-grid" id="model-performance-grid">
           <div class="empty">Chargement performance modèle...</div>
         </div>
+        <div class="section-head compact">
+          <div>
+            <h3>Comptabilité bankroll</h3>
+            <p>ROI réel avec dépôts/retraits, séparé du ROI des paris suivis.</p>
+          </div>
+        </div>
+        <div class="model-performance-grid" id="bankroll-accounting-grid">
+          <div class="empty">Comptabilité bankroll en attente.</div>
+        </div>
+        <div class="tracked-bets-chart" id="bankroll-projection-chart"></div>
         <div class="segment-grid" id="model-segment-grid">
           <div class="empty">Chargement segments...</div>
         </div>
@@ -883,6 +900,14 @@
         </div>
 
         <details class="advanced-section" open>
+          <summary>Marchés Winamax exploités</summary>
+          <p>Audit local des familles de marchés disponibles, exploitées et encore dormantes.</p>
+          <div class="quality-report-grid" id="winamax-market-audit-grid">
+            <div class="empty">Chargement audit Winamax...</div>
+          </div>
+        </details>
+
+        <details class="advanced-section" open>
           <summary>Santé des sources</summary>
           <p>Fraîcheur locale des fichiers utilisés par le logiciel.</p>
           <div class="source-grid" id="source-health-grid">
@@ -985,6 +1010,19 @@
             <label>Take-profit jour %<input id="pref-take-profit" type="number" min="0" max="100" step="0.5"></label>
           </article>
           <article class="preference-card">
+            <h4>Comptabilité Winamax</h4>
+            <label>Date<input id="bankroll-tx-date" type="date"></label>
+            <label>Type
+              <select id="bankroll-tx-type">
+                <option value="deposit">Dépôt</option>
+                <option value="withdrawal">Retrait</option>
+              </select>
+            </label>
+            <label>Montant<input id="bankroll-tx-amount" type="number" min="0.01" step="0.01"></label>
+            <button class="ghost-btn" id="add-bankroll-transaction-btn" type="button">Ajouter mouvement</button>
+            <div class="profile-preview" id="bankroll-transaction-list">Aucun mouvement enregistré.</div>
+          </article>
+          <article class="preference-card">
             <h4>Coach prudent</h4>
             <label class="check-line"><input id="pref-coach-enabled" type="checkbox"> Coach actif</label>
             <label class="check-line"><input id="pref-anti-tilt-strict" type="checkbox"> Anti-tilt strict</label>
@@ -1023,6 +1061,7 @@
             </label>
             <button class="ghost-btn" id="check-update-btn" type="button">Vérifier maintenant</button>
             <button class="ghost-btn" id="install-update-btn" type="button">Installer au prochain redémarrage</button>
+            <button class="ghost-btn" id="force-weekly-report-btn" type="button">Voir rapport hebdo</button>
             <p class="match-sub" id="update-status">Aucune vérification de mise à jour lancée.</p>
           </article>
           <article class="preference-card">
@@ -1205,6 +1244,24 @@
         <button class="icon-btn" id="loss-feedback-close" type="button" aria-label="Fermer">×</button>
       </header>
       <div class="feedback-choice-grid" id="loss-feedback-choices"></div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop hidden" id="weekly-report-modal" role="dialog" aria-modal="true" aria-labelledby="weekly-report-title">
+    <div class="feedback-modal">
+      <header class="modal-head">
+        <div>
+          <div class="eyebrow">Rapport hebdo</div>
+          <h3 id="weekly-report-title">Ton rapport hebdo est prêt</h3>
+          <p id="weekly-report-subtitle">Synthèse privée de tes paris suivis.</p>
+        </div>
+        <button class="icon-btn" id="weekly-report-close" type="button" aria-label="Fermer">×</button>
+      </header>
+      <div class="feedback-choice-grid" id="weekly-report-content"></div>
+      <div class="section-actions">
+        <button class="ghost-btn" id="weekly-report-detail" type="button">Voir détail</button>
+        <button class="ghost-btn" id="weekly-report-export" type="button">Exporter PDF</button>
+      </div>
     </div>
   </div>
 

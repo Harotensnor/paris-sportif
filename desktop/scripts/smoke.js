@@ -22,14 +22,15 @@ async function main() {
   const mainText = fs.readFileSync(path.join(root, 'desktop', 'src', 'main.js'), 'utf8');
   if (/fetch\(\s*['"]https?:\/\//i.test(rendererText)) throw new Error('Fetch internet direct détecté dans le renderer');
   if (/<\s*(iframe|webview)\b/i.test(htmlText)) throw new Error('iframe/webview détecté dans l’interface');
-  if (/api\/odds|MULTI_BOOKMAKER|oddsApi|the-odds-api|Meilleure cote/i.test(`${rendererText}\n${mainText}\n${htmlText}`)) {
+  const retiredOddsPattern = new RegExp(['api/odds', 'MULTI_' + 'BOOKMAKER', 'odds' + 'Api', 'the-' + 'odds-api', 'Meilleure\\s+cote'].join('|'), 'i');
+  if (retiredOddsPattern.test(`${rendererText}\n${mainText}\n${htmlText}`)) {
     throw new Error('Reste multi-bookmaker détecté alors que Sprint 11 est Winamax-only');
   }
   for (const marker of ['contextIsolation: true', 'sandbox: true', 'setWindowOpenHandler', "permission === 'notifications'", 'process.memoryUsage()']) {
     if (!mainText.includes(marker)) throw new Error(`Durcissement Electron absent: ${marker}`);
   }
-  for (const marker of ['todayFunnel', 'renderSimpleTimeline', 'antiTiltStatus', 'applyExpertMode']) {
-    if (!rendererText.includes(marker)) throw new Error(`Sprint 11 renderer absent: ${marker}`);
+  for (const marker of ['todayFunnel', 'renderSimpleTimeline', 'antiTiltStatus', 'applyExpertMode', 'renderWinamaxPromos', 'renderBankrollAccounting', 'winamaxMarketAudit']) {
+    if (!rendererText.includes(marker)) throw new Error(`Sprint 12 renderer absent: ${marker}`);
   }
 
   const messages = [];
@@ -59,17 +60,18 @@ async function main() {
       timeline: document.querySelectorAll('#simple-pick-timeline .simple-timeline-card').length,
       combines: Boolean(document.querySelector('#simple-combines-section')),
       scorers: Boolean(document.querySelector('#simple-scorers-section')),
+      promos: Boolean(document.querySelector('#simple-promos-section')),
       bankroll: document.querySelector('#simple-bankroll')?.textContent || '',
       pnl: document.querySelector('#simple-pnl')?.textContent || '',
       trackButtons: document.querySelectorAll('[data-track-bet-key]').length,
       expertHidden: !document.querySelector('[data-tab="data"]:not(.hidden)'),
-      multibookText: document.body.textContent.includes('Multi-bookmaker') || document.body.textContent.includes('Meilleure cote')
+      multibookText: document.body.textContent.includes('Multi-' + 'bookmaker') || document.body.textContent.includes('Meilleure ' + 'cote')
     }));
     if (dashboard.title !== 'Picks') throw new Error(`Titre dashboard invalide: ${dashboard.title}`);
     if (dashboard.nav.join('|') !== 'Picks|Bilan|Réglages') throw new Error(`Navigation non simplifiée: ${dashboard.nav.join(', ')}`);
     if (dashboard.metric < 5 || dashboard.rows < 5 || dashboard.timeline < 5 || dashboard.trackButtons < 5) throw new Error(`Picks insuffisants: ${JSON.stringify(dashboard)}`);
-    if (!dashboard.combines || !dashboard.scorers || !dashboard.bankroll.includes('€') || !dashboard.pnl.includes('€') || !dashboard.expertHidden || dashboard.multibookText) {
-      throw new Error(`Cockpit Sprint 11 incohérent: ${JSON.stringify(dashboard)}`);
+    if (!dashboard.combines || !dashboard.scorers || !dashboard.promos || !dashboard.bankroll.includes('€') || !dashboard.pnl.includes('€') || !dashboard.expertHidden || dashboard.multibookText) {
+      throw new Error(`Cockpit Sprint 12 incohérent: ${JSON.stringify(dashboard)}`);
     }
 
     await win.click('[data-track-bet-key]');
@@ -82,15 +84,22 @@ async function main() {
     const prefs = await win.evaluate(() => ({
       expert: Boolean(document.querySelector('#pref-expert-mode')),
       antiTilt: Boolean(document.querySelector('#pref-anti-tilt-strict')),
+      expandedSports: (document.querySelector('#pref-sports')?.textContent || '').includes('rugby') && (document.querySelector('#pref-sports')?.textContent || '').includes('mma'),
+      winamaxMarkets: (document.querySelector('#pref-markets')?.textContent || '').includes('Corners') && (document.querySelector('#pref-markets')?.textContent || '').includes('Cartons'),
+      accounting: Boolean(document.querySelector('#add-bankroll-transaction-btn')),
       multiBook: Boolean(document.querySelector('#pref-multibook-enabled') || document.querySelector('#pref-odds-api-key'))
     }));
-    if (!prefs.expert || !prefs.antiTilt || prefs.multiBook) throw new Error(`Réglages Sprint 11 invalides: ${JSON.stringify(prefs)}`);
+    if (!prefs.expert || !prefs.antiTilt || !prefs.expandedSports || !prefs.winamaxMarkets || !prefs.accounting || prefs.multiBook) throw new Error(`Réglages Sprint 12 invalides: ${JSON.stringify(prefs)}`);
+    await win.fill('#bankroll-tx-amount', '25');
+    await win.click('#add-bankroll-transaction-btn');
+    await win.waitForFunction(() => /Dépôt/.test(document.querySelector('#bankroll-transaction-list')?.textContent || ''), null, { timeout: 5000 });
 
     await win.check('#pref-expert-mode');
     await win.click('#save-preferences-btn');
     await win.waitForSelector('[data-tab="data"]:not(.hidden)', { timeout: 5000 });
     await win.click('[data-tab="data"]');
     await win.waitForSelector('#quality-report-grid .quality-report-card, #quality-report-grid .empty', { timeout: 30000 });
+    await win.waitForSelector('#winamax-market-audit-grid .quality-report-card, #winamax-market-audit-grid .empty', { timeout: 30000 });
 
     await win.click('[data-tab="dashboard"]');
     await win.click('#picks-body tr.clickable-row td[data-label="Match"]');
@@ -103,7 +112,7 @@ async function main() {
         overflow: Boolean((modalNode && modalNode.scrollWidth > modalNode.clientWidth + 2) || (content && content.scrollWidth > content.clientWidth + 2))
       };
     });
-    if (modal.overflow || !modal.text.includes('Puis-je miser ?') || !modal.text.includes('Cote Winamax') || modal.text.includes('Meilleure cote')) {
+    if (modal.overflow || !modal.text.includes('Puis-je miser ?') || !modal.text.includes('Cote Winamax') || !modal.text.includes('Type Winamax') || /Meilleure\s+cote/i.test(modal.text)) {
       throw new Error(`Fiche match invalide: ${JSON.stringify(modal).slice(0, 800)}`);
     }
 
@@ -111,7 +120,7 @@ async function main() {
       message.startsWith('error:') || message.startsWith('pageerror:')
     ) && !isIgnorableConsoleMessage(message));
     if (severe.length) throw new Error(`Erreurs console: ${severe.join(' | ')}`);
-    console.log(`Desktop smoke OK: ${dashboard.metric} picks visibles, ${dashboard.timeline} en timeline, Winamax-only.`);
+    console.log(`Desktop smoke OK: ${dashboard.metric} picks visibles, ${dashboard.timeline} en timeline, Winamax-only Sprint 12.`);
   } finally {
     await app.close();
     fs.rmSync(userDataDir, { recursive: true, force: true });

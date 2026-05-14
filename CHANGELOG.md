@@ -5,6 +5,19 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 12 — Exploitation Winamax, comptabilité et cockpit 80/20
+
+- Ajout d’un audit moteur `winamaxMarketAudit` : familles de marchés disponibles/exploitées, sports présents dans le catalogue Winamax, boosts détectés et marchés encore dormants. Sur les données fraîches : 194 événements bookables, 16 familles disponibles et 11 familles déjà exploitées.
+- Le dashboard applique désormais une règle qualité lisible : maximum 2 picks par match et 3 picks par créneau horaire dans le cockpit, avec fallback seulement si la journée manque réellement de picks.
+- Chaque pick reçoit un type de pari Winamax conseillé (`Single`, `Combiné prudent`, `Système`, `Single léger`) avec explication dans la fiche match et badges compacts dans les cartes/tableaux.
+- Ajout des promos Winamax côté main process via `/api/winamax/promos` : cache local, timeouts, aucun fetch internet depuis le renderer, section repliée dans `Picks`.
+- Ajout des liens directs `Ouvrir Winamax` sur les picks et conservation du cash-out/deep-link Winamax sur les cartes live suivies.
+- Préférences élargies pour les sports Winamax disponibles dans le catalogue (`rugby`, football américain, MMA, boxe, handball, volley) et marchés complémentaires (`Corners`, `Cartons`).
+- Comptabilité bankroll fine : dépôts/retraits locaux, ROI bankroll réel séparé du ROI paris, projection simple 3/6/12 mois et export profil enrichi.
+- Rapport hebdo en popup : P&L semaine, ROI, WR, top segment, segment à corriger, actions concrètes, export PDF local minimal. Accessible manuellement depuis `Réglages > Avancé`.
+- Nettoyage supplémentaire des traces multi-bookmaker dans le runtime legacy desktop : plus de remontée `Pinnacle`, `Bet365`, `The Odds API`, `best odds`, `compare odds`, `Multi-bookmaker` ou `Meilleure cote` dans le grep desktop.
+- QA Sprint 12 : refresh rapide réel, contrat moteur, tests unitaires/refresh, smoke Electron, Playwright, capture visuelle et audit npm valident 24 picks affichés, 6 picks prêts aujourd’hui, 0 vulnérabilité et UI Winamax-only.
+
 ### Sprint 11 — Winamax-only, picks aujourd’hui et interface simplifiée
 
 - Correction du bug “aucun match aujourd’hui” : le moteur priorise désormais les picks du jour dans le dashboard, puis les 30 prochaines heures, avant les meilleurs picks plus lointains.

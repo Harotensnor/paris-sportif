@@ -17,6 +17,7 @@ const PROFILE_BACKUP_ROOT = path.join(STATE_ROOT, 'backups');
 const DATA_BACKUP_ROOT = path.join(STATE_ROOT, 'data-backups');
 const DATA_BACKUP_PATH = path.join(DATA_BACKUP_ROOT, 'data-latest.js');
 const AI_WEB_ENRICHMENT_PATH = path.join(STATE_ROOT, 'ai-web-enrichment.json');
+const WINAMAX_PROMOS_PATH = path.join(STATE_ROOT, 'winamax-promos.json');
 const WEBHOOK_LOG_PATH = path.join(STATE_ROOT, 'webhook-log.jsonl');
 const UPDATE_STATUS_PATH = path.join(STATE_ROOT, 'update-status.json');
 const SIGNAL_SOURCES = new Set(['all', 'weather', 'referees', 'injuries', 'lineups', 'team_form', 'team_stats', 'h2h', 'context']);
@@ -174,6 +175,57 @@ function readJsonFileDefault(filePath, fallback) {
   } catch {
     return fallback;
   }
+}
+
+function pdfSafeText(value) {
+  return String(value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^\x20-\x7E]/g, ' ')
+    .replace(/[()\\]/g, '\\$&')
+    .slice(0, 120);
+}
+
+function makeSimplePdf(title, lines) {
+  const safeLines = [title || 'Paris-Sportif', ...(Array.isArray(lines) ? lines : [])]
+    .map(pdfSafeText)
+    .filter(Boolean)
+    .slice(0, 45);
+  const content = [
+    'BT',
+    '/F1 12 Tf',
+    '50 790 Td',
+    ...safeLines.map((line, index) => `${index === 0 ? '' : '0 -17 Td'}(${line}) Tj`),
+    'ET'
+  ].join('\n');
+  const objects = [
+    '1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n',
+    '2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n',
+    '3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>\nendobj\n',
+    '4 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\n',
+    `5 0 obj\n<< /Length ${Buffer.byteLength(content, 'ascii')} >>\nstream\n${content}\nendstream\nendobj\n`
+  ];
+  let body = '%PDF-1.4\n';
+  const offsets = [0];
+  objects.forEach((object) => {
+    offsets.push(Buffer.byteLength(body, 'ascii'));
+    body += object;
+  });
+  const xrefAt = Buffer.byteLength(body, 'ascii');
+  body += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
+  offsets.slice(1).forEach((offset) => {
+    body += `${String(offset).padStart(10, '0')} 00000 n \n`;
+  });
+  body += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xrefAt}\n%%EOF\n`;
+  return Buffer.from(body, 'ascii');
+}
+
+function pdfResponse(res, filename, buffer) {
+  res.writeHead(200, {
+    ...baseHeaders('application/pdf'),
+    'Content-Disposition': `attachment; filename="${String(filename || 'rapport.pdf').replace(/"/g, '')}"`
+  });
+  res.end(buffer);
 }
 
 function compactKey(value) {
@@ -461,6 +513,103 @@ async function fetchEnrichmentSource(source, timeoutMs = 10000, rateLimitPerMinu
   } finally {
     clearTimeout(timer);
   }
+}
+
+function parseWinamaxPromosFromText(text, sourceUrl) {
+  const clean = String(text || '')
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  const keywords = [
+    ['Cotes boostées', /cotes?\s+boost|boost[eé]e/i],
+    ['Combo Booster', /combo\s+booster|multibet|multi\s*bet/i],
+    ['Bet+', /\bbet\+\b|bet\s+plus/i],
+    ['Freebet', /freebet|pari\s+gratuit/i],
+    ['Challenge', /challenge|d[eé]fi/i]
+  ];
+  const promos = [];
+  keywords.forEach(([label, pattern]) => {
+    const match = clean.match(pattern);
+    if (!match) return;
+    const index = Math.max(0, match.index || 0);
+    promos.push({
+      label,
+      title: label,
+      detail: clean.slice(index, index + 220),
+      source: sourceUrl,
+      detectedAt: new Date().toISOString()
+    });
+  });
+  return promos.slice(0, 8);
+}
+
+async function fetchWinamaxPromos({ force = false } = {}) {
+  const cached = readJsonFileDefault(WINAMAX_PROMOS_PATH, null);
+  if (!force && cached?.fetchedAt && Date.now() - Date.parse(cached.fetchedAt) < 6 * 60 * 60 * 1000) {
+    return { ...cached, cached: true };
+  }
+  const urls = [
+    'https://www.winamax.fr/paris-sportifs/promotions',
+    'https://www.winamax.fr/paris-sportifs',
+    'https://www.winamax.fr/'
+  ];
+  const attempts = [];
+  let promos = [];
+  for (const target of urls) {
+    const started = Date.now();
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 10000);
+    try {
+      if (!global.fetch) throw new Error('fetch indisponible');
+      const response = await fetch(target, {
+        signal: controller.signal,
+        headers: {
+          'User-Agent': 'Paris-Sportif-Desktop/0.1 (+local-user-agent)',
+          Accept: 'text/html,application/json;q=0.8,*/*;q=0.5'
+        }
+      });
+      const text = await response.text();
+      attempts.push({
+        url: target,
+        status: response.ok ? 'ok' : 'failed',
+        httpStatus: response.status,
+        durationMs: Date.now() - started,
+        error: response.ok ? null : `HTTP ${response.status}`
+      });
+      if (!response.ok) continue;
+      promos = parseWinamaxPromosFromText(text.slice(0, 300000), target);
+      if (promos.length) break;
+    } catch (error) {
+      attempts.push({
+        url: target,
+        status: 'failed',
+        httpStatus: null,
+        durationMs: Date.now() - started,
+        error: error.name === 'AbortError' ? 'timeout 10s' : error.message
+      });
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+  const payload = {
+    schema: 'paris-sportif.winamax_promos.v1',
+    fetchedAt: new Date().toISOString(),
+    source: attempts.find((attempt) => attempt.status === 'ok')?.url || urls[0],
+    promos,
+    attempts,
+    summary: {
+      count: promos.length,
+      ok: attempts.some((attempt) => attempt.status === 'ok'),
+      message: promos.length
+        ? `${promos.length} promo(s) Winamax détectée(s)`
+        : 'Aucune promo Winamax structurée détectée dans les pages publiques'
+    }
+  };
+  atomicWriteJson(WINAMAX_PROMOS_PATH, payload);
+  appendRefreshLine(`[winamax-promos] ${payload.summary.message}`);
+  return payload;
 }
 
 function sourceValidationFromPick(pick) {
@@ -1241,6 +1390,36 @@ async function handleApi(req, res, url) {
     }
     engineService.reload();
     jsonResponse(res, 200, { ok: true });
+    return;
+  }
+  if (url.pathname === '/api/winamax/promos') {
+    try {
+      const force = url.searchParams.get('force') === '1';
+      const payload = await fetchWinamaxPromos({ force });
+      jsonResponse(res, 200, { ok: true, ...payload });
+    } catch (error) {
+      jsonResponse(res, 200, {
+        ok: false,
+        fetchedAt: new Date().toISOString(),
+        promos: [],
+        summary: { count: 0, ok: false, message: error.message }
+      });
+    }
+    return;
+  }
+  if (url.pathname === '/api/report/pdf') {
+    if (req.method !== 'POST') {
+      jsonResponse(res, 405, { ok: false, error: 'POST required' });
+      return;
+    }
+    try {
+      const payload = await readJsonBody(req, 128 * 1024);
+      const title = String(payload.title || 'Rapport Paris-Sportif');
+      const lines = Array.isArray(payload.lines) ? payload.lines : [];
+      pdfResponse(res, payload.filename || 'rapport-paris-sportif.pdf', makeSimplePdf(title, lines));
+    } catch (error) {
+      jsonResponse(res, 400, { ok: false, error: error.message });
+    }
     return;
   }
   if (url.pathname === '/api/data-status') {

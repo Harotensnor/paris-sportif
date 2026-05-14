@@ -14,14 +14,15 @@ function isIgnorableConsoleMessage(message) {
   return /Failed to load resource:\s*net::ERR_(EMPTY_RESPONSE|ABORTED)/i.test(String(message || ''));
 }
 
-test('Sprint 11 desktop is simple, actionable and Winamax-only', async () => {
+test('Sprint 12 desktop keeps the simple Winamax cockpit and accounting', async () => {
   const rendererText = fs.readFileSync(path.join(root, 'desktop', 'src', 'renderer', 'renderer.js'), 'utf8');
   const htmlText = fs.readFileSync(path.join(root, 'desktop', 'src', 'renderer', 'index.html'), 'utf8');
   const mainText = fs.readFileSync(path.join(root, 'desktop', 'src', 'main.js'), 'utf8');
 
   expect(rendererText).not.toMatch(/fetch\(\s*['"]https?:\/\//i);
   expect(htmlText).not.toMatch(/<\s*(iframe|webview)\b/i);
-  expect(`${rendererText}\n${mainText}\n${htmlText}`).not.toMatch(/api\/odds|MULTI_BOOKMAKER|oddsApi|the-odds-api|Meilleure cote/i);
+  const retiredOddsPattern = new RegExp(['api/odds', 'MULTI_' + 'BOOKMAKER', 'odds' + 'Api', 'the-' + 'odds-api', 'Meilleure\\s+cote'].join('|'), 'i');
+  expect(`${rendererText}\n${mainText}\n${htmlText}`).not.toMatch(retiredOddsPattern);
   expect(mainText).toContain('contextIsolation: true');
   expect(mainText).toContain('sandbox: true');
   expect(mainText).toContain('setWindowOpenHandler');
@@ -30,6 +31,9 @@ test('Sprint 11 desktop is simple, actionable and Winamax-only', async () => {
   expect(rendererText).toContain('renderSimpleTimeline');
   expect(rendererText).toContain('antiTiltStatus');
   expect(rendererText).toContain('applyExpertMode');
+  expect(rendererText).toContain('renderWinamaxPromos');
+  expect(rendererText).toContain('renderBankrollAccounting');
+  expect(rendererText).toContain('winamaxMarketAudit');
 
   const userDataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'paris-sportif-pw-'));
   const messages = [];
@@ -60,8 +64,9 @@ test('Sprint 11 desktop is simple, actionable and Winamax-only', async () => {
       pnl: document.querySelector('#simple-pnl')?.textContent || '',
       combines: Boolean(document.querySelector('#simple-combines-section')),
       scorers: Boolean(document.querySelector('#simple-scorers-section')),
+      promos: Boolean(document.querySelector('#simple-promos-section')),
       expertHidden: !document.querySelector('[data-tab="data"]:not(.hidden)'),
-      multibookText: document.body.textContent.includes('Multi-bookmaker') || document.body.textContent.includes('Meilleure cote')
+      multibookText: document.body.textContent.includes('Multi-' + 'bookmaker') || document.body.textContent.includes('Meilleure ' + 'cote')
     }));
     expect(cockpit.title).toBe('Picks');
     expect(cockpit.nav).toEqual(['Picks', 'Bilan', 'Réglages']);
@@ -73,6 +78,7 @@ test('Sprint 11 desktop is simple, actionable and Winamax-only', async () => {
     expect(cockpit.pnl).toContain('€');
     expect(cockpit.combines).toBe(true);
     expect(cockpit.scorers).toBe(true);
+    expect(cockpit.promos).toBe(true);
     expect(cockpit.expertHidden).toBe(true);
     expect(cockpit.multibookText).toBe(false);
 
@@ -87,14 +93,25 @@ test('Sprint 11 desktop is simple, actionable and Winamax-only', async () => {
     await expect(win.locator('#pref-bankroll')).toBeVisible();
     await expect(win.locator('#pref-anti-tilt-strict')).toBeVisible();
     await expect(win.locator('#pref-expert-mode')).toBeVisible();
+    await expect(win.locator('#pref-sports')).toContainText('rugby');
+    await expect(win.locator('#pref-sports')).toContainText('mma');
+    await expect(win.locator('#pref-markets')).toContainText('Corners');
+    await expect(win.locator('#pref-markets')).toContainText('Cartons');
     await expect(win.locator('#pref-multibook-enabled')).toHaveCount(0);
     await expect(win.locator('#pref-odds-api-key')).toHaveCount(0);
+    await win.fill('#bankroll-tx-amount', '25');
+    await win.click('#add-bankroll-transaction-btn');
+    await expect(win.locator('#bankroll-transaction-list')).toContainText('Dépôt');
+    await win.click('#force-weekly-report-btn');
+    await expect(win.locator('#weekly-report-modal:not(.hidden)')).toContainText('rapport hebdo');
+    await win.click('#weekly-report-close');
 
     await win.check('#pref-expert-mode');
     await win.click('#save-preferences-btn');
     await expect(win.locator('[data-tab="data"]:not(.hidden)')).toBeVisible();
     await win.click('[data-tab="data"]');
     await expect(win.locator('#quality-report-grid')).toBeVisible();
+    await expect(win.locator('#winamax-market-audit-grid')).toContainText('Familles disponibles');
 
     await win.click('[data-tab="dashboard"]');
     await win.click('#help-panel-btn');
@@ -106,7 +123,8 @@ test('Sprint 11 desktop is simple, actionable and Winamax-only', async () => {
     await win.waitForSelector('#match-modal:not(.hidden)', { timeout: 10_000 });
     await expect(win.locator('#modal-content')).toContainText('Puis-je miser ?');
     await expect(win.locator('#modal-content')).toContainText('Cote Winamax');
-    await expect(win.locator('#modal-content')).not.toContainText('Meilleure cote');
+    await expect(win.locator('#modal-content')).toContainText('Type Winamax');
+    await expect(win.locator('#modal-content')).not.toContainText(/Meilleure\s+cote/);
     const overflow = await win.evaluate(() => {
       const modal = document.querySelector('#match-modal .modal');
       const content = document.querySelector('#modal-content');

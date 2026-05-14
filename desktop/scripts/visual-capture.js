@@ -42,7 +42,7 @@ async function main() {
     await win.setViewportSize({ width: 1360, height: 900 });
     await win.waitForSelector('[data-panel="dashboard"].active', { timeout: 60000 });
     await win.waitForFunction(() => document.querySelector('#metric-picks')?.textContent !== '-', null, { timeout: 90000 });
-    await safeScreenshot(win, path.join(captureDir, 'desktop-sprint11-picks.png'), { fullPage: true });
+    await safeScreenshot(win, path.join(captureDir, 'desktop-sprint12-picks.png'), { fullPage: true });
 
     const dashboard = await win.evaluate(() => ({
       nav: Array.from(document.querySelectorAll('.nav-btn:not(.hidden)')).map((node) => node.textContent.trim()),
@@ -51,23 +51,24 @@ async function main() {
       timeline: document.querySelectorAll('#simple-pick-timeline .simple-timeline-card').length,
       combines: Boolean(document.querySelector('#simple-combines-section')),
       scorers: Boolean(document.querySelector('#simple-scorers-section')),
-      multibookText: document.body.textContent.includes('Multi-bookmaker') || document.body.textContent.includes('Meilleure cote')
+      promos: Boolean(document.querySelector('#simple-promos-section')),
+      multibookText: document.body.textContent.includes('Multi-' + 'bookmaker') || document.body.textContent.includes('Meilleure ' + 'cote')
     }));
 
     await win.click('[data-tab="history"]');
     await win.waitForSelector('#model-performance-grid .performance-card, #model-performance-grid .empty', { timeout: 30000 });
-    await safeScreenshot(win, path.join(captureDir, 'desktop-sprint11-bilan.png'), { fullPage: true });
+    await safeScreenshot(win, path.join(captureDir, 'desktop-sprint12-bilan.png'), { fullPage: true });
 
     await win.click('[data-tab="preferences"]');
     await win.waitForSelector('#pref-bankroll', { timeout: 10000 });
-    await safeScreenshot(win, path.join(captureDir, 'desktop-sprint11-reglages.png'), { fullPage: true });
+    await safeScreenshot(win, path.join(captureDir, 'desktop-sprint12-reglages.png'), { fullPage: true });
 
     await win.check('#pref-expert-mode');
     await win.click('#save-preferences-btn');
     await win.waitForSelector('[data-tab="data"]:not(.hidden)', { timeout: 5000 });
     await win.click('[data-tab="data"]');
     await win.waitForSelector('#quality-report-grid .quality-report-card, #quality-report-grid .empty', { timeout: 30000 });
-    await safeScreenshot(win, path.join(captureDir, 'desktop-sprint11-avance.png'), { fullPage: true });
+    await safeScreenshot(win, path.join(captureDir, 'desktop-sprint12-avance.png'), { fullPage: true });
 
     await win.click('[data-tab="dashboard"]');
     await win.click('#picks-body tr.clickable-row td[data-label="Match"]');
@@ -77,12 +78,12 @@ async function main() {
       const content = document.querySelector('#modal-content');
       return Boolean((modal && modal.scrollWidth > modal.clientWidth + 2) || (content && content.scrollWidth > content.clientWidth + 2));
     });
-    await safeScreenshot(win, path.join(captureDir, 'desktop-sprint11-fiche.png'), { fullPage: false });
+    await safeScreenshot(win, path.join(captureDir, 'desktop-sprint12-fiche.png'), { fullPage: false });
     await win.click('#modal-close');
 
     await win.setViewportSize({ width: 390, height: 860 });
     await win.click('[data-tab="dashboard"]');
-    await safeScreenshot(win, path.join(captureDir, 'desktop-sprint11-mobile.png'), { fullPage: false });
+    await safeScreenshot(win, path.join(captureDir, 'desktop-sprint12-mobile.png'), { fullPage: false });
     const mobile = await win.evaluate(() => ({
       hasOverflow: document.documentElement.scrollWidth > window.innerWidth + 2,
       rows: document.querySelectorAll('#picks-body tr.clickable-row').length
@@ -93,12 +94,12 @@ async function main() {
     ) && !isIgnorableConsoleMessage(message));
     if (severe.length) throw new Error(`Erreurs console: ${severe.join(' | ')}`);
     if (dashboard.nav.join('|') !== 'Picks|Bilan|Réglages') throw new Error(`Navigation non simplifiée: ${dashboard.nav.join(', ')}`);
-    if (dashboard.metric < 5 || dashboard.rows < 5 || dashboard.timeline < 5 || !dashboard.combines || !dashboard.scorers || dashboard.multibookText) {
-      throw new Error(`Dashboard Sprint 11 invalide: ${JSON.stringify(dashboard)}`);
+    if (dashboard.metric < 5 || dashboard.rows < 5 || dashboard.timeline < 5 || !dashboard.combines || !dashboard.scorers || !dashboard.promos || dashboard.multibookText) {
+      throw new Error(`Dashboard Sprint 12 invalide: ${JSON.stringify(dashboard)}`);
     }
     if (modalOverflow) throw new Error('Overflow horizontal dans la fiche match');
     if (mobile.hasOverflow || mobile.rows <= 0) throw new Error(`Mobile invalide: ${JSON.stringify(mobile)}`);
-    console.log(`Visual capture Sprint 11 OK: ${dashboard.metric} picks, ${dashboard.timeline} timeline, captures écrites.`);
+    console.log(`Visual capture Sprint 12 OK: ${dashboard.metric} picks, ${dashboard.timeline} timeline, captures écrites.`);
   } finally {
     await app.close();
     fs.rmSync(userDataDir, { recursive: true, force: true });
