@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-14T23:46:37Z",
+  "generated_at": "2026-05-14T23:51:47Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815339",
-      "kickoff": "2026-05-14T23:40Z",
-      "league": "MLB",
-      "match": "Kansas City Royals at Chicago White Sox",
-      "home": "Chicago White Sox",
-      "away": "Kansas City Royals",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Chicago White Sox",
-          "pitcher": "Anthony Kay",
-          "label": "Anthony Kay moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.5827,
-          "fair_odds": 1.72,
-          "expected_strikeouts": 4.17,
-          "projected_ip": 5.83,
-          "inputs": {
-            "k9": 6.43,
-            "era": 4.89,
-            "whip": 1.57,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Chicago White Sox",
-          "pitcher": "Anthony Kay",
-          "label": "Anthony Kay concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6314,
-          "fair_odds": 1.58,
-          "expected_hr_allowed": 0.998,
-          "projected_ip": 5.83,
-          "inputs": {
-            "hr9": 1.54,
-            "era": 4.89,
-            "whip": 1.57
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Kansas City Royals",
-          "pitcher": "Kris Bubic",
-          "label": "Kris Bubic plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.5727,
-          "fair_odds": 1.75,
-          "expected_strikeouts": 5.85,
-          "projected_ip": 5.76,
-          "inputs": {
-            "k9": 9.13,
-            "era": 3.5,
-            "whip": 1.17,
-            "hand": "L"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Kansas City Royals",
-          "pitcher": "Kris Bubic",
-          "label": "Kris Bubic ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6898,
-          "fair_odds": 1.45,
-          "expected_hr_allowed": 0.371,
-          "projected_ip": 5.76,
-          "inputs": {
-            "hr9": 0.58,
-            "era": 3.5,
-            "whip": 1.17
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815350",
       "kickoff": "2026-05-15T22:40Z",
@@ -1700,7 +1618,7 @@
       ]
     }
   ],
-  "props": 82,
+  "props": 78,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
