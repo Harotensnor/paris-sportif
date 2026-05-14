@@ -5,6 +5,17 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 11 — Winamax-only, picks aujourd’hui et interface simplifiée
+
+- Correction du bug “aucun match aujourd’hui” : le moteur priorise désormais les picks du jour dans le dashboard, puis les 30 prochaines heures, avant les meilleurs picks plus lointains.
+- Ajout d’un funnel diagnostic `todayFunnel` : événements du jour → bookables Winamax → analysables → positifs → affichés → prêts. Sur les données fraîches du sprint : 33 événements aujourd’hui, 33 Winamax, 14 analysables, 6 picks positifs/prêts affichés.
+- Assouplissement prudent des gates contexte pour les sports non-football : les signaux foot manquants comme xG/compositions/H2H ne bloquent plus automatiquement un pick tennis/baseball/basket/hockey quand le contexte proxy et l’edge sont solides.
+- Refonte de la navigation visible : par défaut l’app n’expose plus que `Picks`, `Bilan` et `Réglages`; `Avancé` reste caché derrière le nouveau `Mode expert`.
+- Simplification du cockpit : bandeau compact bankroll/P&L/fraîcheur, timeline horizontale des prochains picks, sections repliables pour combinés et buteurs, aide discrète via le bouton `?`.
+- Nettoyage complet multi-bookmaker : suppression de la route `/api/odds/compare`, de The Odds API, des réglages de comparaison et de toutes les mentions `Meilleure cote`. Le logiciel est redevenu strictement Winamax-only pour tout pari actionnable.
+- Ajout d’un garde-fou anti-tilt strict : détection 5 paris en 30 minutes, plus de 10% de bankroll engagée en 1h, martingale après pertes ou longue série de défaites.
+- QA Sprint 11 : contrat moteur, smoke Electron, Playwright, capture visuelle, refresh rapide réel et audit npm valident 24 picks affichés, 6 picks prêts aujourd’hui, UI simplifiée, fiche match Winamax-only et aucune erreur console.
+
 ### Sprint 10 — Qualité réelle, live, multi-cotes et patterns avancés
 
 - Ajout d’un audit rétrospectif `modelRealityAudit` sur les 500 derniers picks réglés : chaque pick affiche maintenant une validation historique par segment, un sample, ROI/WR comparables et une `confiance ajustée`.

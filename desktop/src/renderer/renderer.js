@@ -60,6 +60,7 @@
     agentBlockers: null,
     clvSummary: null,
     dashboardMeta: null,
+    todayFunnel: null,
     prematchPlan: null,
     engineReady: false,
     bootStartedAt: typeof performance !== 'undefined' ? performance.now() : Date.now(),
@@ -82,8 +83,6 @@
     aiAssist: null,
     webEnrichments: null,
     webEnrichmentPending: new Set(),
-    multiBookmaker: null,
-    multiBookmakerPending: new Set(),
     focusRow: null,
     feedbackBetId: null,
     updateStatus: null
@@ -106,7 +105,6 @@
   const APP_SESSION_KEY = 'parisSportifDesktopSession';
   const AI_ENGINE_KEY = 'parisSportifAiEngineState';
   const WEB_ENRICHMENT_KEY = 'parisSportifWebEnrichmentState';
-  const MULTI_BOOKMAKER_KEY = 'parisSportifMultiBookmakerState';
   const LIVE_NOTIFICATION_KEY = 'parisSportifLiveNotificationKeys';
   const MODEL_ADJUSTMENTS_KEY = 'parisSportifModelAdjustments';
   const LOSS_FEEDBACK_KEY = 'parisSportifLossFeedbacks';
@@ -162,9 +160,8 @@
     webEnrichmentEnabled: true,
     webEnrichmentCacheMinutes: 120,
     webEnrichmentRateLimit: 5,
-    multiBookmakerEnabled: true,
-    oddsApiKey: '',
-    oddsApiRegions: 'eu',
+    expertMode: false,
+    antiTiltStrict: true,
     autoUpdateEnabled: true,
     updateChannel: 'stable',
     strict: false
@@ -197,7 +194,19 @@
   }
 
   function marketKeyFromRow(row) {
-    return normalizeUiKey(row?.marketKey || row?.market || 'market_unknown') || 'market_unknown';
+    const key = normalizeUiKey(row?.marketKey || row?.market || 'market_unknown') || 'market_unknown';
+    const aliases = {
+      jeuxtennis: 'tennisgames',
+      setstennis: 'tennissets',
+      totalmitemps: 'httotal',
+      totalbasket: 'basketballtotal',
+      totalbuts: 'hockeytotal',
+      totalruns: 'baseballtotal',
+      totalquipe: 'teamtotal',
+      doublechance: 'doublechance',
+      resultatbtts: 'resultbtts'
+    };
+    return aliases[key] || key;
   }
 
   function loadPreferences() {
@@ -860,6 +869,31 @@
     return loadUserBets().filter((bet) => String(bet.day || bet.createdAt || '').slice(0, 10) === today);
   }
 
+  function antiTiltStatus(nextStake = 0, stats = userBetStats(), prefs = loadPreferences()) {
+    if (prefs.antiTiltStrict === false) return { blocked: false, reasons: [] };
+    const bets = todayTrackedBets();
+    const now = Date.now();
+    const recent30 = bets.filter((bet) => now - Date.parse(bet.createdAt || bet.placedAt || bet.day || '') <= 30 * 60 * 1000);
+    const recent60Stake = bets
+      .filter((bet) => now - Date.parse(bet.createdAt || bet.placedAt || bet.day || '') <= 60 * 60 * 1000)
+      .reduce((sum, bet) => sum + (Number(bet.stake || 0) || 0), Number(nextStake || 0) || 0);
+    const bankroll = Math.max(1, Number(prefs.bankroll || getBankroll() || 50));
+    const sorted = bets.slice().sort((a, b) => Date.parse(b.createdAt || '') - Date.parse(a.createdAt || ''));
+    const lastStake = Number(sorted[0]?.stake || 0) || 0;
+    const lossStreak = currentLossStreak(stats);
+    const reasons = [];
+    if (recent30.length >= 5) reasons.push('5 paris ou plus en 30 minutes');
+    if (recent60Stake >= bankroll * 0.10) reasons.push('plus de 10% de bankroll engagé en 1h');
+    if (lossStreak >= 3 && lastStake > 0 && Number(nextStake || 0) >= lastStake * 3) reasons.push('martingale détectée après 3 défaites');
+    if (lossStreak >= 4) reasons.push('série de défaites longue');
+    return {
+      blocked: reasons.length > 0,
+      reasons,
+      label: reasons[0] || 'Anti-tilt OK',
+      detail: reasons.length ? `${reasons.join(' · ')}. Pause 1h recommandée.` : 'Rythme de mise stable.'
+    };
+  }
+
   function currentLossStreak(stats = userBetStats()) {
     return stats.streak?.status === 'lost' ? Number(stats.streak.count || 0) : 0;
   }
@@ -905,6 +939,16 @@
     const bankroll = Math.max(1, Number(prefs.bankroll || getBankroll() || 50));
     const dailyLimit = Math.max(1, Number(prefs.dailyBetLimit || 8) || 8);
     const dailyStakeCap = bankroll * Math.max(1, Number(prefs.dailyStakeCapPct || 20) || 20) / 100;
+    const antiTilt = antiTiltStatus(stake, stats, prefs);
+    if (antiTilt.blocked) {
+      return {
+        allow: false,
+        tone: 'danger',
+        label: 'Pause recommandée',
+        detail: antiTilt.detail,
+        warnings: ['anti_tilt', ...antiTilt.reasons]
+      };
+    }
     if (trackedToday >= dailyLimit) {
       return {
         allow: false,
@@ -1910,8 +1954,8 @@
       state.agentBlockers = null;
       state.clvSummary = null;
       state.dashboardMeta = null;
+      state.todayFunnel = null;
       state.prematchPlan = null;
-      state.multiBookmaker = null;
       renderPicks('Données trop anciennes : le logiciel bloque les recommandations actionnables.');
       renderStakeScenarios('Scénarios bloqués : données trop anciennes.');
       renderCombines();
@@ -2018,6 +2062,7 @@
     state.agentBlockers = analysis.agentBlockers || null;
     state.clvSummary = analysis.clvSummary || null;
     state.dashboardMeta = analysis.dashboardMeta || null;
+    state.todayFunnel = analysis.todayFunnel || null;
     state.prematchPlan = analysis.prematchPlan || null;
     refreshTrackedBetMarketData();
     await autoSettleUserBets('engine_refresh');
@@ -2598,8 +2643,8 @@
     if (!wrap) return;
     const buckets = [
       { key: 'now', title: 'À jouer maintenant', detail: '< 2h', open: true },
-      { key: 'soon', title: 'Bientôt', detail: '2h - 6h', open: true },
-      { key: 'today', title: 'Plus tard aujourd’hui', detail: '6h - fin de journée', open: true },
+      { key: 'soon', title: 'Bientôt', detail: '2h - 6h', open: false },
+      { key: 'today', title: 'Plus tard aujourd’hui', detail: '6h - fin de journée', open: false },
       { key: 'tomorrow', title: 'Demain', detail: 'J+1', open: false },
       { key: 'later', title: 'Prochains jours', detail: 'J+2 à J+7', open: false }
     ];
@@ -2787,120 +2832,6 @@
     });
   }
 
-  function multiBookmakerConfig() {
-    const prefs = loadPreferences();
-    return {
-      enabled: prefs.multiBookmakerEnabled !== false,
-      apiKey: prefs.oddsApiKey || '',
-      regions: prefs.oddsApiRegions || 'eu',
-      cacheMinutes: 30
-    };
-  }
-
-  function oddsCompareKey(row) {
-    return String([
-      userBetKey(row),
-      row?.id,
-      row?.market,
-      row?.label,
-      row?.start
-    ].filter(Boolean).join(':'))
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^a-z0-9.]+/g, ':')
-      .replace(/^:+|:+$/g, '') || userBetKey(row);
-  }
-
-  function storeMultiBookmaker(record, summary) {
-    const store = state.multiBookmaker || readStorageJson(MULTI_BOOKMAKER_KEY, { byKey: {}, runs: [], summary: {} }) || { byKey: {}, runs: [], summary: {} };
-    store.byKey = store.byKey && typeof store.byKey === 'object' ? store.byKey : {};
-    if (record?.key) store.byKey[record.key] = record;
-    store.updatedAt = record?.checkedAt || new Date().toISOString();
-    if (summary) store.summary = summary;
-    state.multiBookmaker = store;
-    writeStorageJson(MULTI_BOOKMAKER_KEY, store);
-  }
-
-  function bestOddsForRow(row) {
-    const store = state.multiBookmaker || readStorageJson(MULTI_BOOKMAKER_KEY, null);
-    const key = oddsCompareKey(row);
-    return store?.byKey?.[key] || store?.byKey?.[userBetKey(row)] || null;
-  }
-
-  function bestOddsBadgeHtml(row) {
-    const record = bestOddsForRow(row);
-    if (!record) return '';
-    if (record.status === 'needs_key') return '<div class="match-sub odds-note">Best odds : clé Odds API non configurée</div>';
-    const best = record.best || {};
-    const bestOdd = Number(best.odd || 0);
-    const winamax = Number(record.winamaxOdd || row?.odd || 0);
-    if (!(bestOdd > 1)) return '<div class="match-sub odds-note">Best odds : non trouvé</div>';
-    const delta = winamax > 1 ? ((bestOdd - winamax) / winamax) : 0;
-    const cls = delta >= 0.10 ? 'value' : delta > 0.01 ? 'better' : 'neutral';
-    return `<div class="match-sub odds-note odds-${escapeHtml(cls)}">Meilleure cote ${escapeHtml(formatOdd(bestOdd))} chez ${escapeHtml(best.bookmaker || 'book')} · ${escapeHtml(formatPct(delta, 1))}</div>`;
-  }
-
-  async function compareOddsForRow(row, { force = false } = {}) {
-    if (!row || !pickHasCoreData(row)) return null;
-    const config = multiBookmakerConfig();
-    if (!config.enabled) return null;
-    const key = oddsCompareKey(row);
-    if (state.multiBookmakerPending.has(key)) return null;
-    const existing = bestOddsForRow(row);
-    const age = existing?.checkedAt ? Date.now() - Date.parse(existing.checkedAt) : Infinity;
-    if (!force && existing && Number.isFinite(age) && age < config.cacheMinutes * 60 * 1000) return existing;
-    state.multiBookmakerPending.add(key);
-    try {
-      const response = await fetchJson('/api/odds/compare', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          config,
-          pick: { ...aiPickPayload(row), winamaxOdd: row.odd, winamaxUrl: row.winamaxUrl || row.match?.winamax?.url || '' },
-          force
-        })
-      });
-      if (response?.record) {
-        storeMultiBookmaker(response.record, response.summary);
-        if (response.record.valueAlert) notifyUser('Value alert multi-bookmaker', `${row.title} · ${response.record.valueAlert}`, row);
-        renderPipelinePanel(state.status);
-        return response.record;
-      }
-      return response || null;
-    } catch (error) {
-      pushLog('warn', `Comparaison cotes indisponible: ${error.message}`);
-      return null;
-    } finally {
-      state.multiBookmakerPending.delete(key);
-    }
-  }
-
-  function scheduleBestOddsChecks(rows) {
-    const prefs = loadPreferences();
-    if (prefs.multiBookmakerEnabled === false) return;
-    const top = (Array.isArray(rows) ? rows : [])
-      .filter((row) => pickHasCoreData(row) && canDisplayStake(row))
-      .slice()
-      .sort((a, b) => realConfidenceValue(b) - realConfidenceValue(a) || Number(b.edge || 0) - Number(a.edge || 0))
-      .slice(0, 5);
-    top.forEach((row, index) => {
-      setTimeout(() => compareOddsForRow(row).catch(() => {}), 1200 + index * 350);
-    });
-  }
-
-  async function loadMultiBookmakerState() {
-    try {
-      const store = await fetchJson('/api/odds/state');
-      if (store && typeof store === 'object') {
-        state.multiBookmaker = store;
-        writeStorageJson(MULTI_BOOKMAKER_KEY, store);
-      }
-    } catch {
-      state.multiBookmaker = readStorageJson(MULTI_BOOKMAKER_KEY, null);
-    }
-  }
-
   function isLiveStatus(value) {
     const text = String(value || '').toLowerCase();
     return ['live', 'inprogress', 'in_progress', 'halftime', 'period', 'q1', 'q2', 'q3', 'q4', 'ot'].some((token) => text.includes(token));
@@ -3062,10 +2993,101 @@
     }
   }
 
+  function renderSimpleTopStrip() {
+    const strip = $('#simple-top-strip');
+    if (!strip) return;
+    const stats = userBetStats();
+    const freshness = state.status?.data?.ageMinutes != null
+      ? `Données ${formatAge(state.status.data.ageMinutes)}`
+      : state.status?.generatedAt
+        ? `Données ${formatDateTime(state.status.generatedAt)}`
+        : 'Données locales';
+    const pnlTone = stats.pnlToday >= 0 ? 'ok' : 'danger';
+    $('#simple-now').textContent = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: '2-digit', month: '2-digit' });
+    $('#simple-bankroll').textContent = `Bankroll ${formatMoney(getBankroll())}`;
+    $('#simple-pnl').textContent = `Jour ${formatMoney(stats.pnlToday)}`;
+    $('#simple-pnl').className = `simple-pnl-${pnlTone}`;
+    $('#simple-freshness').textContent = freshness;
+  }
+
+  function renderTodayFunnelAlert() {
+    const node = $('#today-funnel-alert');
+    if (!node) return;
+    const funnel = state.status?.analysis?.todayFunnel || state.todayFunnel || null;
+    if (!funnel) {
+      node.classList.add('hidden');
+      return;
+    }
+    const today = funnel.today || {};
+    const displayed = Number(today.displayed || 0);
+    const ready = Number(today.ready || 0);
+    const status = funnel.status || (displayed ? 'ok' : 'danger');
+    node.classList.toggle('hidden', status === 'ok' && displayed >= 5);
+    node.className = `today-funnel-alert ${status === 'danger' ? 'danger' : 'warn'}${status === 'ok' && displayed >= 5 ? ' hidden' : ''}`;
+    node.innerHTML = `
+      <strong>${displayed ? `${formatCount(displayed)} pick(s) aujourd'hui visibles` : 'Aucun pick aujourd’hui visible'}</strong>
+      <span>Funnel : ${formatCount(today.events || 0)} matchs → ${formatCount(today.bookable || 0)} Winamax → ${formatCount(today.predictable || 0)} analysables → ${formatCount(today.passingFilters || 0)} positifs → ${formatCount(ready)} prêts.</span>
+      <button class="ghost-btn" type="button" data-tab-target="data">Diagnostic auto</button>
+    `;
+  }
+
+  function renderSimpleTimeline(rows) {
+    const node = $('#simple-pick-timeline');
+    if (!node) return;
+    const upcoming = (Array.isArray(rows) ? rows : [])
+      .filter((row) => pickHasCoreData(row))
+      .slice()
+      .sort((a, b) => Date.parse(a.start || '') - Date.parse(b.start || '') || Number(b.edge || 0) - Number(a.edge || 0))
+      .slice(0, 14);
+    if (!upcoming.length) {
+      node.innerHTML = '<div class="empty compact-empty">Aucun pick à afficher dans la timeline.</div>';
+      return;
+    }
+    node.innerHTML = upcoming.map((row) => `
+      <article class="simple-timeline-card clickable-row" data-match-id="${escapeHtml(row.id)}" tabindex="0" role="button">
+        <span>${escapeHtml(countdownLabel(row.start))}</span>
+        <strong>${escapeHtml(row.title)}</strong>
+        <em>${escapeHtml(`${row.market} · ${row.label}`)}</em>
+        <small>${escapeHtml(formatOdd(row.odd))} · edge ${escapeHtml(formatPct(row.edge || 0, 1))}</small>
+      </article>
+    `).join('');
+  }
+
+  function renderSimpleInlineSections() {
+    const combines = Array.isArray(state.combines) ? state.combines.slice(0, 4) : [];
+    const scorers = Array.isArray(state.scorers) ? state.scorers.slice(0, 6) : [];
+    const combineCount = $('#simple-combines-count');
+    const scorerCount = $('#simple-scorers-count');
+    if (combineCount) combineCount.textContent = formatCount(state.combines?.length || 0);
+    if (scorerCount) scorerCount.textContent = formatCount(state.scorers?.length || 0);
+    const combineGrid = $('#simple-combines-grid');
+    if (combineGrid) {
+      combineGrid.innerHTML = combines.length ? combines.map((combo) => `
+        <article class="simple-inline-card">
+          <strong>${escapeHtml(combo.name || combo.label || 'Combiné')}</strong>
+          <span>${escapeHtml(formatOdd(combo.totalOdd || combo.odd || 0))} · retour 10€ ${escapeHtml(formatMoney((Number(combo.totalOdd || combo.odd || 0) || 0) * 10))}</span>
+          <em>${escapeHtml((combo.legs || []).slice(0, 2).map((leg) => leg.title || leg.match || '').filter(Boolean).join(' · ') || 'Jambes prêtes')}</em>
+        </article>
+      `).join('') : '<div class="empty compact-empty">Aucun combiné solide pour le moment.</div>';
+    }
+    const scorerGrid = $('#simple-scorers-grid');
+    if (scorerGrid) {
+      scorerGrid.innerHTML = scorers.length ? scorers.map((scorer) => `
+        <article class="simple-inline-card clickable-row" data-match-id="${escapeHtml(scorer.id || scorer.matchId || '')}">
+          <strong>${escapeHtml(scorer.name || scorer.player || 'Joueur')}</strong>
+          <span>${escapeHtml(scorer.title || scorer.match || '-')} · ${escapeHtml(formatOdd(scorer.odd || scorer.impliedOdd || 0))}</span>
+          <em>${escapeHtml(`Confiance ${formatPct(scorer.confidence || scorer.probability || 0, 0)} · edge ${formatPct(scorer.edge || 0, 1)}`)}</em>
+        </article>
+      `).join('') : '<div class="empty compact-empty">Aucun pick joueur aujourd’hui.</div>';
+    }
+  }
+
   function renderPicks(emptyMessage) {
     const body = $('#picks-body');
     const metricLabel = $('#metric-picks-label');
     renderUserPnl();
+    renderSimpleTopStrip();
+    renderTodayFunnelAlert();
     renderMorningDashboard();
     renderCoachAdvice();
     renderTodayModelPulse();
@@ -3079,14 +3101,15 @@
     renderTemporalCockpit(displayRows);
     updateWebEnrichmentSummary();
     scheduleVisibleWebEnrichment(displayRows);
-    scheduleBestOddsChecks(displayRows);
+    renderSimpleTimeline(displayRows);
+    renderSimpleInlineSections();
     clearTimeout(state.aiTimer);
     state.aiTimer = setTimeout(() => runBackgroundAi(displayRows), 600);
     const total = state.allPicks.length || state.picks.length || 0;
     const meta = state.dashboardMeta || {};
-    const ready = Number(state.decisionCenter?.summary?.ready || meta.readyPicks || 0);
+    const ready = Number(meta.readyPicks ?? state.decisionCenter?.summary?.ready ?? 0);
     if (metricLabel) metricLabel.textContent = ready > 0 ? 'Paris prêts' : 'Candidats surveillés';
-    $('#metric-picks').textContent = String(ready > 0 ? ready : (state.picks.length || 0));
+    $('#metric-picks').textContent = String(ready > 0 ? ready : (meta.todayPicks || state.picks.length || 0));
     const globalBlocked = Boolean(state.decisionCenter?.summary?.blocked);
     const caption = pickFiltersActive(filters)
       ? `${formatCount(displayRows.length)} pick(s) filtré(s) sur ${formatCount(total)} lignes prêtes.`
@@ -3128,7 +3151,7 @@
             <div class="match-title">${escapeHtml(pick.title)}</div>
             <div class="match-sub">${escapeHtml(pick.sport)} · ${escapeHtml(pick.league)}</div>
           </td>
-          <td data-label="Marché"><span class="pill">${escapeHtml(statusText)}</span> <span class="pill">${escapeHtml(pick.market)}</span><div class="match-sub">${escapeHtml(pick.label)}</div><div class="match-sub selection-reason">${escapeHtml(pickReason(pick))}</div>${calibrationNote(pick)}${segmentValidationHtml(pick)}${bestOddsBadgeHtml(pick)}</td>
+          <td data-label="Marché"><span class="pill">${escapeHtml(statusText)}</span> <span class="pill">${escapeHtml(pick.market)}</span><div class="match-sub">${escapeHtml(pick.label)}</div><div class="match-sub selection-reason">${escapeHtml(pickReason(pick))}</div>${calibrationNote(pick)}${segmentValidationHtml(pick)}</td>
           <td data-label="Cote">@${pick.odd.toFixed(2)}</td>
           <td data-label="Proba">${formatPct(pick.probability, 1)}${adjustedConfidenceHtml(pick)}</td>
           <td data-label="Edge" class="${edgeClass}">${formatPct(pick.edge, 1)}</td>
@@ -5325,6 +5348,17 @@
     return `<label class="check-line"><input type="checkbox" name="${escapeHtml(name)}" value="${escapeHtml(value)}"${checked ? ' checked' : ''}> ${escapeHtml(label)}</label>`;
   }
 
+  function applyExpertMode() {
+    const expert = Boolean(loadPreferences().expertMode);
+    document.body.classList.toggle('expert-mode', expert);
+    $$('.expert-only, .expert-nav').forEach((node) => {
+      node.classList.toggle('hidden', !expert);
+    });
+    if (!expert && $('.tab-panel.active')?.dataset.panel === 'data') {
+      switchTab('preferences');
+    }
+  }
+
   function renderPreferences() {
     const prefs = loadPreferences();
     const bankroll = $('#pref-bankroll');
@@ -5337,6 +5371,10 @@
     if (demo) demo.checked = Boolean(prefs.demoMode);
     const coachEnabled = $('#pref-coach-enabled');
     if (coachEnabled) coachEnabled.checked = prefs.coachEnabled !== false;
+    const antiTiltStrict = $('#pref-anti-tilt-strict');
+    if (antiTiltStrict) antiTiltStrict.checked = prefs.antiTiltStrict !== false;
+    const expertMode = $('#pref-expert-mode');
+    if (expertMode) expertMode.checked = Boolean(prefs.expertMode);
     const aiEnabled = $('#pref-ai-enabled');
     if (aiEnabled) aiEnabled.checked = Boolean(prefs.aiEnabled && prefs.aiApiKey);
     const aiProvider = $('#pref-ai-provider');
@@ -5352,12 +5390,6 @@
     if (webCache) webCache.value = String(prefs.webEnrichmentCacheMinutes || legacyCache);
     const webRate = $('#pref-web-enrichment-rate');
     if (webRate) webRate.value = String(Math.max(1, Math.min(10, Number(prefs.webEnrichmentRateLimit || 5) || 5)));
-    const multiBookmaker = $('#pref-multibook-enabled');
-    if (multiBookmaker) multiBookmaker.checked = prefs.multiBookmakerEnabled !== false;
-    const oddsKey = $('#pref-odds-api-key');
-    if (oddsKey) oddsKey.value = prefs.oddsApiKey || '';
-    const oddsRegions = $('#pref-odds-regions');
-    if (oddsRegions) oddsRegions.value = prefs.oddsApiRegions || 'eu';
     const autoUpdate = $('#pref-auto-update-enabled');
     if (autoUpdate) autoUpdate.checked = prefs.autoUpdateEnabled !== false;
     const updateChannel = $('#pref-update-channel');
@@ -5402,6 +5434,7 @@
     renderOnboarding();
     renderLearningAudit();
     renderActiveModelAdjustments();
+    applyExpertMode();
   }
 
   function renderUpdateStatus() {
@@ -5468,6 +5501,7 @@
       webhookType: $('#pref-webhook-type')?.value || DEFAULT_PREFERENCES.webhookType,
       webhookUrl: ($('#pref-webhook-url')?.value || '').trim(),
       coachEnabled: $('#pref-coach-enabled')?.checked !== false,
+      antiTiltStrict: $('#pref-anti-tilt-strict')?.checked !== false,
       dailyBetLimit: Math.max(1, Number($('#pref-daily-bet-limit')?.value || DEFAULT_PREFERENCES.dailyBetLimit) || DEFAULT_PREFERENCES.dailyBetLimit),
       dailyStakeCapPct: Math.max(1, Number($('#pref-daily-stake-cap')?.value || DEFAULT_PREFERENCES.dailyStakeCapPct) || DEFAULT_PREFERENCES.dailyStakeCapPct),
       coachLossStreakConfirm: Math.max(2, Number($('#pref-loss-streak-confirm')?.value || DEFAULT_PREFERENCES.coachLossStreakConfirm) || DEFAULT_PREFERENCES.coachLossStreakConfirm),
@@ -5479,9 +5513,7 @@
       webEnrichmentEnabled: $('#pref-web-enrichment-enabled')?.checked !== false,
       webEnrichmentCacheMinutes: Math.max(15, Number($('#pref-web-enrichment-cache')?.value || DEFAULT_PREFERENCES.webEnrichmentCacheMinutes) || DEFAULT_PREFERENCES.webEnrichmentCacheMinutes),
       webEnrichmentRateLimit: Math.max(1, Math.min(10, Number($('#pref-web-enrichment-rate')?.value || DEFAULT_PREFERENCES.webEnrichmentRateLimit) || DEFAULT_PREFERENCES.webEnrichmentRateLimit)),
-      multiBookmakerEnabled: $('#pref-multibook-enabled')?.checked !== false,
-      oddsApiKey: ($('#pref-odds-api-key')?.value || '').trim(),
-      oddsApiRegions: ($('#pref-odds-regions')?.value || DEFAULT_PREFERENCES.oddsApiRegions).trim() || DEFAULT_PREFERENCES.oddsApiRegions,
+      expertMode: Boolean($('#pref-expert-mode')?.checked),
       autoUpdateEnabled: $('#pref-auto-update-enabled')?.checked !== false,
       updateChannel: $('#pref-update-channel')?.value || DEFAULT_PREFERENCES.updateChannel,
       strict: Boolean($('#pref-strict')?.checked)
@@ -5494,6 +5526,7 @@
     if (bankrollInput) bankrollInput.value = String(prefs.bankroll || 50);
     localStorage.setItem('userBankroll', String(prefs.bankroll || 50));
     renderPreferences();
+    applyExpertMode();
     renderPicks();
     maybeNotifyPickChanges();
     computePicks().catch(() => {});
@@ -6427,8 +6460,6 @@
     const wx = match.winamax || {};
     const markets = wx.markets || {};
     const oneNtwo = markets['1n2'] || {};
-    const bestOdds = bestOddsForRow(row);
-    const bestOdd = Number(bestOdds?.best?.odd || 0);
     const segmentValidation = row.segmentValidation || {};
     const quality = [
       ['Puis-je miser ?', stakeAllowed ? 'Oui' : 'Non'],
@@ -6516,7 +6547,7 @@
               <span>Pick</span><strong>${escapeHtml(row.label || '-')}</strong>
               <span>Marché</span><strong>${escapeHtml(row.market || '-')}</strong>
               <span>Cote modèle</span><strong>${escapeHtml(fairOdd > 1 ? `@${fairOdd.toFixed(2)}` : '-')}</strong>
-              <span>Meilleure cote</span><strong>${escapeHtml(bestOdd > 1 ? `${formatOdd(bestOdd)} · ${bestOdds.best.bookmaker || 'book'}` : 'Non comparée')}</strong>
+              <span>Cote Winamax</span><strong>${escapeHtml(row.odd > 1 ? `${formatOdd(row.odd)} · actionnable` : 'Non disponible')}</strong>
               <span>Cote consensus</span><strong>${escapeHtml(consensusOdd || 'Non disponible')}</strong>
               <span>Action</span><strong>${escapeHtml(readableAction)}</strong>
               <span>Bookmaker</span><strong>${winamaxLink}</strong>
@@ -9064,20 +9095,21 @@
   }
 
   function switchTab(tab) {
+    if (tab === 'data' && !loadPreferences().expertMode) tab = 'preferences';
     $$('.nav-btn').forEach((btn) => btn.classList.toggle('active', btn.dataset.tab === tab));
     $$('.tab-panel').forEach((panel) => panel.classList.toggle('active', panel.dataset.panel === tab));
     const titles = {
-      dashboard: 'Accueil',
+      dashboard: 'Picks',
       combines: 'Combinés',
       scorers: 'Buteurs',
       matches: 'Tous les matchs',
-      history: 'Historique',
+      history: 'Bilan',
       agent: 'Agent',
-      data: 'Données',
+      data: 'Avancé',
       calendar: 'Calendrier',
       pipeline: 'Pipeline',
       help: 'Aide',
-      preferences: 'Préférences'
+      preferences: 'Réglages'
     };
     $('#page-title').textContent = titles[tab] || 'Paris-Sportif';
     if (tab === 'calendar') renderCalendar();
@@ -9942,6 +9974,8 @@
       });
     });
     $('#reload-engine-btn').addEventListener('click', () => reloadEngine());
+    $('#help-panel-btn')?.addEventListener('click', () => $('#help-panel')?.classList.remove('hidden'));
+    $('#help-panel-close')?.addEventListener('click', () => $('#help-panel')?.classList.add('hidden'));
     $('#export-btn')?.addEventListener('click', exportCsv);
     $('#export-user-bets-btn')?.addEventListener('click', exportUserBetsCsv);
     $('#export-user-bets-btn-history')?.addEventListener('click', exportUserBetsCsv);
@@ -10194,7 +10228,7 @@
         $('#refresh-log').textContent = error.stack || error.message;
       });
     });
-    ['ultimate-bet-card', 'live-cockpit', 'time-cockpit', 'picks-body', 'stake-scenario-body', 'watchlist-grid', 'prematch-final-grid', 'matches-body', 'combines-list', 'scorers-list', 'agent-positions-body', 'agent-blockers-body'].forEach((id) => {
+    ['ultimate-bet-card', 'live-cockpit', 'time-cockpit', 'simple-pick-timeline', 'simple-scorers-grid', 'picks-body', 'stake-scenario-body', 'watchlist-grid', 'prematch-final-grid', 'matches-body', 'combines-list', 'scorers-list', 'agent-positions-body', 'agent-blockers-body'].forEach((id) => {
       const node = $(`#${id}`);
       if (!node) return;
       node.addEventListener('click', openMatchFromEvent);
@@ -10375,15 +10409,9 @@
         if (target && ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName)) return;
         const shortcuts = {
           '1': 'dashboard',
-          '2': 'matches',
-          '3': 'agent',
-          '4': 'data',
-          '5': 'history',
-          '6': 'combines',
-          '7': 'scorers',
-          '8': 'calendar',
-          '9': 'pipeline',
-          '0': 'help'
+          '2': 'history',
+          '3': 'preferences',
+          '4': 'data'
         };
         const tab = shortcuts[event.key];
         if (tab) {
@@ -10467,7 +10495,6 @@
     state.actionHistory = readActionHistory();
     state.aiAssist = readStorageJson(AI_ENGINE_KEY, null);
     state.webEnrichments = readStorageJson(WEB_ENRICHMENT_KEY, null);
-    state.multiBookmaker = readStorageJson(MULTI_BOOKMAKER_KEY, null);
     state.updateStatus = readStorageJson(UPDATE_STATUS_KEY, null);
     renderActionHistory();
     updateWebEnrichmentSummary();
@@ -10481,7 +10508,6 @@
     await statusPromise;
     await computePicks();
     loadWebEnrichmentState().catch(() => {});
-    loadMultiBookmakerState().catch(() => {});
     setTimeout(() => checkForUpdates().catch(() => {}), 2500);
     await logPromise;
     setSideStatus('Calcul prêt', 'ok');

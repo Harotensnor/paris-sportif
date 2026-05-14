@@ -46,6 +46,9 @@ function testAnalysis() {
   assert(analysis.decisionCenter && analysis.decisionCenter.schema, 'DecisionCenter absent', analysis.decisionCenter);
   assert(analysis.modelRealityAudit && analysis.modelRealityAudit.schema === 'paris-sportif.model_reality_audit.v1', 'Audit réalité modèle absent', analysis.modelRealityAudit);
   assert(Number(analysis.modelRealityAudit.sampleSize || 0) > 0, 'Audit réalité sans sample', analysis.modelRealityAudit);
+  assert(analysis.todayFunnel && analysis.todayFunnel.schema === 'paris-sportif.today_funnel.v1', 'Funnel aujourd’hui absent', analysis.todayFunnel);
+  assert(Number(analysis.todayFunnel.today?.displayed || 0) >= 5, 'Moins de 5 picks aujourd’hui affichés', analysis.todayFunnel.today);
+  assert(Number(analysis.todayFunnel.today?.ready || 0) >= 5, 'Moins de 5 picks aujourd’hui prêts', analysis.todayFunnel.today);
   assert(Object.keys(analysis).filter((key) => /^v(?:[5-9]|1[0-6])/.test(key)).length === 0, 'Anciennes propriétés V5-V16 encore exposées');
 
   const seen = new Set();

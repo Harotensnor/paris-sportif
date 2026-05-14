@@ -1573,16 +1573,26 @@ function createLegacyEngineService({ projectRoot }) {
   function decisionCenterForRow(row, gates) {
     const modelStake = Math.max(0, Number(row.modelStake ?? row.stake ?? 0) || 0);
     const currentStake = Math.max(0, Number(row.stake || 0) || 0);
+    const effectiveStake = currentStake > 0 ? currentStake : modelStake;
     const blockingGates = [];
+    const sportKey = String(row.sport || row.match?.sport || '').toLowerCase();
     const quality = row.contextQuality || row.match?.context?.quality || {};
     const hasCriticalSignals = Array.isArray(quality.critical_missing) && quality.critical_missing.length > 0;
     const qualityScore = Number(quality.score);
+    const proxyContextSport = /tennis|baseball|basket|hockey|mma|rugby|nfl|football américain|american football/.test(sportKey);
+    const proxyContextRelease = proxyContextSport &&
+      !hasCriticalSignals &&
+      row.contextGate?.gate !== 'skip' &&
+      Number.isFinite(qualityScore) &&
+      qualityScore >= 50 &&
+      Number(row.edge || 0) >= 0.08 &&
+      modelStake > 0;
     const sourceRepairNeeded = hasCriticalSignals || (Number.isFinite(qualityScore) && qualityScore < 45);
     if (!(Number(row.odd || 0) > 1)) blockingGates.push({ key: 'odds', label: 'Cote Winamax invalide', tone: 'danger' });
     if (!(Number(row.edge || 0) > 0)) blockingGates.push({ key: 'edge', label: 'Edge non positif', tone: 'danger' });
     if (!(modelStake > 0 || currentStake > 0)) blockingGates.push({ key: 'kelly', label: 'Kelly nul', tone: 'warn' });
     if (row.status === 'skip') blockingGates.push({ key: 'model', label: row.statusLabel || 'Skip modèle', tone: 'danger' });
-    if (row.contextGate?.agentEligible === false || hasCriticalSignals) {
+    if ((row.contextGate?.agentEligible === false || hasCriticalSignals) && !proxyContextRelease) {
       blockingGates.push({
         key: 'context',
         label: row.contextGate?.label || (hasCriticalSignals ? 'Signal critique manquant' : 'Contexte insuffisant'),
@@ -1600,7 +1610,8 @@ function createLegacyEngineService({ projectRoot }) {
       gates.prebet?.blocked ? { key: 'agent_checklist', label: gates.prebet.label, tone: 'danger' } : null,
       gates.critical?.blocked ? { key: 'agent_critical', label: gates.critical.label, tone: 'danger' } : null
     ].filter(Boolean);
-    const canBet = !uniqueBlocking.length && row.status === 'bet' && currentStake > 0;
+    const modelAllowsBet = row.status === 'bet' || proxyContextRelease;
+    const canBet = !uniqueBlocking.length && modelAllowsBet && effectiveStake > 0;
     const status = canBet
       ? 'ready'
       : sourceRepairNeeded
@@ -1615,11 +1626,13 @@ function createLegacyEngineService({ projectRoot }) {
         : status === 'watch'
           ? 'Surveiller'
           : 'Écarter';
-    const mainReason = uniqueBlocking[0]?.label || (canBet ? 'Tous les garde-fous sont verts' : row.statusLabel || 'Observation prudente');
+    const mainReason = uniqueBlocking[0]?.label || (canBet
+      ? (proxyContextRelease ? 'Winamax OK · contexte proxy suffisant' : 'Tous les garde-fous sont verts')
+      : row.statusLabel || 'Observation prudente');
     return {
       status,
       canBet,
-      stake: canBet ? currentStake : 0,
+      stake: canBet ? effectiveStake : 0,
       stakeDisplay: canBet ? null : '0 €',
       modelStake,
       mainReason,
@@ -1793,6 +1806,7 @@ function createLegacyEngineService({ projectRoot }) {
   function buildDashboardPicks(picks) {
     const now = Date.now();
     const horizonMs = 30 * 60 * 60000;
+    const todayKey = dayKeyParis(new Date());
     const rank = (pick) => [
       pick?.decisionCenter?.canBet ? 1 : 0,
       pick?.decisionCenter?.status === 'ready' ? 1 : 0,
@@ -1807,17 +1821,86 @@ function createLegacyEngineService({ projectRoot }) {
       }
       return Date.parse(a.start || '') - Date.parse(b.start || '');
     });
+    const sortByKickoffThenRank = (rows) => [...rows].sort((a, b) => {
+      const timeDelta = Date.parse(a.start || '') - Date.parse(b.start || '');
+      if (timeDelta) return timeDelta;
+      return sortRows([a, b])[0] === b ? 1 : -1;
+    });
     const nearTerm = picks.filter((pick) => {
       const ts = Date.parse(pick.start || '');
       return Number.isFinite(ts) && ts >= now - 30 * 60000 && ts <= now + horizonMs;
     });
-    const nearReady = nearTerm.filter((pick) => pick?.decisionCenter?.canBet).length;
-    const useNearTerm = nearTerm.length && nearReady >= 20;
-    const rows = sortRows(useNearTerm ? nearTerm : picks).slice(0, 24);
+    const todayRows = picks.filter((pick) => dayKeyParis(pick.start) === todayKey);
+    const ordered = [];
+    const seen = new Set();
+    const addRows = (rows) => {
+      for (const row of rows) {
+        const key = `${row.id}:${row.market}:${row.label}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        ordered.push(row);
+      }
+    };
+    addRows(sortByKickoffThenRank(todayRows));
+    addRows(sortByKickoffThenRank(nearTerm));
+    addRows(sortRows(picks));
+    const rows = ordered.slice(0, 24);
+    const mode = todayRows.length ? 'todayFirst' : nearTerm.length ? 'next30h' : 'bestAvailable';
     return {
       rows,
-      mode: useNearTerm ? 'next30h' : 'bestAvailable',
-      horizonHours: useNearTerm ? 30 : null
+      mode,
+      horizonHours: mode === 'next30h' || mode === 'todayFirst' ? 30 : null,
+      todayPicks: todayRows.length,
+      todayReady: todayRows.filter((pick) => pick?.decisionCenter?.canBet).length
+    };
+  }
+
+  function rowDayKey(row) {
+    return dayKeyParis(row?.start || row?.date || row?.kickoff || row?.kickoff_utc || row?.ts || row?.__dayKey || '');
+  }
+
+  function buildTodayFunnel(data, matches, picks, dashboardRows) {
+    const today = dayKeyParis(new Date());
+    const tomorrow = dayKeyParis(new Date(Date.now() + 24 * 60 * 60 * 1000));
+    const events = eventListFromDays(data?.days || {});
+    const summarize = (day) => {
+      const eventsForDay = events.filter((event) => rowDayKey(event) === day);
+      const bookableEvents = eventsForDay.filter((event) => event?.winamax?.available === true);
+      const predictableMatches = (matches || []).filter((row) => rowDayKey(row) === day);
+      const passingFilters = (picks || []).filter((row) => rowDayKey(row) === day);
+      const displayed = (dashboardRows || []).filter((row) => rowDayKey(row) === day);
+      return {
+        day,
+        totalEvents: eventsForDay.length,
+        bookableEvents: bookableEvents.length,
+        predictableMatches: predictableMatches.length,
+        passingFilters: passingFilters.length,
+        displayed: displayed.length,
+        ready: passingFilters.filter((row) => row?.decisionCenter?.canBet).length,
+        firstDisplayed: displayed.slice(0, 6).map((row) => ({
+          id: row.id,
+          title: row.title,
+          market: row.market,
+          label: row.label,
+          start: row.start,
+          odd: row.odd,
+          edge: row.edge,
+          canBet: Boolean(row?.decisionCenter?.canBet)
+        }))
+      };
+    };
+    const todaySummary = summarize(today);
+    return {
+      schema: 'paris-sportif.today_funnel.v1',
+      generatedAt: new Date().toISOString(),
+      status: todaySummary.displayed >= 5 ? 'ok' : todaySummary.displayed > 0 ? 'warn' : 'danger',
+      message: todaySummary.displayed >= 5
+        ? `${todaySummary.displayed} picks Winamax visibles aujourd'hui`
+        : todaySummary.displayed > 0
+          ? `${todaySummary.displayed} pick(s) aujourd'hui seulement`
+          : 'Aucun pick affiché aujourd’hui',
+      today: todaySummary,
+      tomorrow: summarize(tomorrow)
     };
   }
 
@@ -2093,6 +2176,7 @@ function createLegacyEngineService({ projectRoot }) {
       })
       .slice(0, 120);
     const dashboard = buildDashboardPicks(picks);
+    const todayFunnel = buildTodayFunnel(data, matches, picks, dashboard.rows);
     const combines = buildNativeCombines(win, enrichedEvents);
     const scorers = buildNativeScorers(win, enrichedEvents, lineupsIndex, starPlayersIndex);
     const watchlist = buildWatchlist(matches);
@@ -2124,10 +2208,13 @@ function createLegacyEngineService({ projectRoot }) {
       dashboardMeta: {
         mode: dashboard.mode,
         horizonHours: dashboard.horizonHours,
+        todayPicks: dashboard.todayPicks || 0,
+        todayReady: dashboard.todayReady || 0,
         totalPicks: picks.length,
-        readyPicks: decisionCenter.summary.ready || 0,
+        readyPicks: dashboard.rows.filter((row) => row?.decisionCenter?.canBet).length,
         blocked: decisionCenter.summary.blocked
       },
+      todayFunnel,
       decisionCenter,
       combines,
       scorers,
