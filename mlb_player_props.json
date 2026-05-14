@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-14T22:51:40Z",
+  "generated_at": "2026-05-14T23:00:08Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815337",
-      "kickoff": "2026-05-14T22:45Z",
-      "league": "MLB",
-      "match": "Philadelphia Phillies at Boston Red Sox",
-      "home": "Boston Red Sox",
-      "away": "Philadelphia Phillies",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Boston Red Sox",
-          "pitcher": "Ranger Suarez",
-          "label": "Ranger Suarez plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.5164,
-          "fair_odds": 1.94,
-          "expected_strikeouts": 4.57,
-          "projected_ip": 5.57,
-          "inputs": {
-            "k9": 7.38,
-            "era": 2.77,
-            "whip": 0.95,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Boston Red Sox",
-          "pitcher": "Ranger Suarez",
-          "label": "Ranger Suarez ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6524,
-          "fair_odds": 1.53,
-          "expected_hr_allowed": 0.427,
-          "projected_ip": 5.57,
-          "inputs": {
-            "hr9": 0.69,
-            "era": 2.77,
-            "whip": 0.95
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Philadelphia Phillies",
-          "pitcher": "Jesús Luzardo",
-          "label": "Jesús Luzardo moins de 7,5 strikeouts",
-          "line": 7.5,
-          "pick": "under",
-          "probability": 0.586,
-          "fair_odds": 1.71,
-          "expected_strikeouts": 7.05,
-          "projected_ip": 5.4,
-          "inputs": {
-            "k9": 11.75,
-            "era": 5.77,
-            "whip": 1.4,
-            "hand": "L"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Philadelphia Phillies",
-          "pitcher": "Jesús Luzardo",
-          "label": "Jesús Luzardo ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.539,
-          "fair_odds": 1.86,
-          "expected_hr_allowed": 0.618,
-          "projected_ip": 5.4,
-          "inputs": {
-            "hr9": 1.03,
-            "era": 5.77,
-            "whip": 1.4
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815334",
       "kickoff": "2026-05-14T23:15Z",
@@ -1700,7 +1618,7 @@
       ]
     }
   ],
-  "props": 82,
+  "props": 78,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
