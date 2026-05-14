@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-14T15:57:08Z",
+  "generated_at": "2026-05-14T16:06:50Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -228,10 +228,10 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.098,
-        "away_score": -0.098,
+        "away_score": 0.66,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Real Oviedo (-0.10)",
+        "reason": "Direction nette: Real Oviedo (+0.66)",
         "detail": [
           {
             "side": "home",
@@ -244,6 +244,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.758
           }
         ]
       }
@@ -279,11 +285,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.498,
-        "away_score": 0.043,
-        "home_fade": 0.55,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Montreal Canadiens (+0.04)",
+        "home_score": -1.147,
+        "away_score": -0.607,
+        "home_fade": 1.55,
+        "away_fade": 1.15,
+        "reason": "Direction nette: Montreal Canadiens (-0.61)",
         "detail": [
           {
             "side": "home",
@@ -302,6 +308,18 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.4
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           }
         ]
       }
@@ -338,10 +356,10 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.098,
-        "away_score": -0.098,
+        "away_score": 0.45,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Pumas UNAM (-0.10)",
+        "reason": "Direction nette: Pumas UNAM (+0.45)",
         "detail": [
           {
             "side": "home",
@@ -354,6 +372,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.548
           }
         ]
       }
@@ -389,11 +413,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.498,
-        "away_score": 0.043,
-        "home_fade": 0.55,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Vegas Golden Knights (+0.04)",
+        "home_score": -1.147,
+        "away_score": -0.607,
+        "home_fade": 1.55,
+        "away_fade": 1.15,
+        "reason": "Direction nette: Vegas Golden Knights (-0.61)",
         "detail": [
           {
             "side": "home",
@@ -412,6 +436,18 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.4
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           }
         ]
       }
