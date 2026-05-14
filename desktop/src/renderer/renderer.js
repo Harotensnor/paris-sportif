@@ -1011,21 +1011,106 @@
     maybeAutoPrematchRefresh();
   }
 
+  function updatePickFilters() {
+    const pool = state.allPicks.length ? state.allPicks : state.picks;
+    const sportSelect = $('#pick-sport-filter');
+    const leagueSelect = $('#pick-league-filter');
+    if (sportSelect) {
+      const current = sportSelect.value || 'all';
+      const sports = Array.from(new Set(pool.map((row) => row.sport).filter(Boolean))).sort();
+      const html = ['<option value="all">Tous sports</option>', ...sports.map((sport) => `<option value="${escapeHtml(sport)}">${escapeHtml(sport)}</option>`)].join('');
+      if (sportSelect.dataset.optionsHtml !== html) {
+        sportSelect.innerHTML = html;
+        sportSelect.dataset.optionsHtml = html;
+        sportSelect.value = sports.includes(current) ? current : 'all';
+      }
+    }
+    if (leagueSelect) {
+      const current = leagueSelect.value || 'all';
+      const leagues = Array.from(new Map(pool.map((row) => {
+        const key = leagueKeyFromRow(row);
+        const label = row.league || key.toUpperCase();
+        return [key, label];
+      })).entries()).sort((a, b) => String(a[1]).localeCompare(String(b[1])));
+      const html = ['<option value="all">Toutes ligues</option>', ...leagues.map(([key, label]) => `<option value="${escapeHtml(key)}">${escapeHtml(label)}</option>`)].join('');
+      if (leagueSelect.dataset.optionsHtml !== html) {
+        leagueSelect.innerHTML = html;
+        leagueSelect.dataset.optionsHtml = html;
+        leagueSelect.value = leagues.some(([key]) => key === current) ? current : 'all';
+      }
+    }
+  }
+
+  function readPickFilters() {
+    const edgeValue = Number(($('#pick-edge-min')?.value || '').replace(',', '.'));
+    const oddValue = Number(($('#pick-odd-min')?.value || '').replace(',', '.'));
+    return {
+      query: ($('#pick-search')?.value || '').trim().toLowerCase(),
+      sport: $('#pick-sport-filter')?.value || 'all',
+      league: $('#pick-league-filter')?.value || 'all',
+      sort: $('#pick-sort')?.value || 'edge',
+      edgeMin: Number.isFinite(edgeValue) && edgeValue > 0 ? edgeValue / 100 : 0,
+      oddMin: Number.isFinite(oddValue) && oddValue > 1 ? oddValue : 0
+    };
+  }
+
+  function pickSearchText(row) {
+    return [
+      row.title,
+      row.sport,
+      row.league,
+      row.market,
+      row.label,
+      row.match?.home,
+      row.match?.away
+    ].filter(Boolean).join(' ').toLowerCase();
+  }
+
+  function pickFiltersActive(filters) {
+    return Boolean(filters.query || filters.sport !== 'all' || filters.league !== 'all' || filters.edgeMin || filters.oddMin || filters.sort !== 'edge');
+  }
+
+  function dashboardPickRows(filters) {
+    const active = pickFiltersActive(filters);
+    const base = active && state.allPicks.length ? state.allPicks : state.picks;
+    const rows = base.filter((row) => {
+      if (!canDisplayStake(row)) return false;
+      if (filters.query && !pickSearchText(row).includes(filters.query)) return false;
+      if (filters.sport !== 'all' && row.sport !== filters.sport) return false;
+      if (filters.league !== 'all' && leagueKeyFromRow(row) !== filters.league) return false;
+      if (filters.edgeMin && Number(row.edge || 0) < filters.edgeMin) return false;
+      if (filters.oddMin && Number(row.odd || 0) < filters.oddMin) return false;
+      return true;
+    });
+    rows.sort((a, b) => {
+      if (filters.sort === 'kickoff') return new Date(a.start || 0) - new Date(b.start || 0);
+      if (filters.sort === 'confidence') return Number(b.confidenceTrust?.score || b.probability || 0) - Number(a.confidenceTrust?.score || a.probability || 0);
+      if (filters.sort === 'odd') return Number(b.odd || 0) - Number(a.odd || 0);
+      return Number(b.edge || 0) - Number(a.edge || 0);
+    });
+    return active ? rows.slice(0, 40) : rows;
+  }
+
   function renderPicks(emptyMessage) {
     const body = $('#picks-body');
     const metricLabel = $('#metric-picks-label');
     renderUserPnl();
+    updatePickFilters();
+    const filters = readPickFilters();
+    const displayRows = dashboardPickRows(filters);
     const total = state.allPicks.length || state.picks.length || 0;
     const meta = state.dashboardMeta || {};
     const ready = Number(state.decisionCenter?.summary?.ready || meta.readyPicks || 0);
     if (metricLabel) metricLabel.textContent = ready > 0 ? 'Paris prêts' : 'Candidats surveillés';
     $('#metric-picks').textContent = String(ready > 0 ? ready : (state.picks.length || 0));
     const globalBlocked = Boolean(state.decisionCenter?.summary?.blocked);
-    const caption = meta.mode === 'bestAvailable'
-      ? 'Moins de 10 picks prêts dans les 30 prochaines heures : affichage des meilleurs picks disponibles.'
-      : ready > 0
-        ? 'Fenêtre proche : seuls les picks prêts affichent une mise.'
-        : 'Aucun pari à jouer maintenant : candidats surveillés sans mise.';
+    const caption = pickFiltersActive(filters)
+      ? `${formatCount(displayRows.length)} pick(s) filtré(s) sur ${formatCount(total)} lignes prêtes.`
+      : meta.mode === 'bestAvailable'
+        ? 'Moins de 10 picks prêts dans les 30 prochaines heures : affichage des meilleurs picks disponibles.'
+        : ready > 0
+          ? 'Fenêtre proche : seuls les picks prêts affichent une mise.'
+          : 'Aucun pari à jouer maintenant : candidats surveillés sans mise.';
     const sectionTitle = $('#picks-section-title');
     if (sectionTitle) sectionTitle.textContent = ready > 0 ? 'À jouer maintenant' : 'Sélection surveillée';
     $('#picks-caption').textContent = caption;
@@ -1034,12 +1119,12 @@
       : globalBlocked
         ? '0 mise tant qu’un gate est rouge'
         : `${formatCount(ready)} prêt(s)`;
-    if (!state.picks.length) {
+    if (!displayRows.length) {
       body.innerHTML = `<tr><td colspan="8" class="empty">${escapeHtml(emptyMessage || 'Aucun pick jouable avec les règles actuelles.')}</td></tr>`;
       return;
     }
     const tracked = new Set(loadUserBets().filter((bet) => bet.status === 'pending').map((bet) => bet.key));
-    body.innerHTML = state.picks.map((pick) => {
+    body.innerHTML = displayRows.map((pick) => {
       const startLabel = formatDateLabel(pick.start);
       const edgeClass = pick.edge >= 0.08 ? 'edge-pos' : 'edge-warn';
       const decision = pick.decisionCenter || {};
@@ -2724,30 +2809,86 @@
     const marketRows = buildMarketRows(markets);
     const h2hHtml = buildH2hHtml(match);
     const calibrationHtml = buildCalibrationDetailHtml(row);
+    const blockList = blockReasons(row);
+    const decisionTone = stakeAllowed ? 'ok' : dc.status === 'repair' ? 'warn' : dc.status === 'skip' ? 'danger' : 'watch';
+    const signalPreview = signalCards.slice(0, 6);
+    const usefulContext = [
+      signalPreview.find((signal) => signal.label === 'Météo'),
+      signalPreview.find((signal) => signal.label === 'Compositions'),
+      signalPreview.find((signal) => signal.label === 'Blessures'),
+      signalPreview.find((signal) => signal.label === 'Stats équipes')
+    ].filter(Boolean);
+    const sourceLine = context.sources && Array.isArray(context.sources)
+      ? `${formatCount(context.sources.length)} source(s) contexte`
+      : row.sourceHealth?.summary
+        ? 'Sources health disponibles'
+        : 'Sources locales lues depuis les derniers fichiers';
 
     return `
       <section class="detail-tab-panel active" data-detail-panel="summary">
-        <div class="modal-grid">
-          <article class="detail-card">
-            <h4>Synthèse</h4>
-            <div class="kv">${quality.map(([k, v]) => `<span>${escapeHtml(k)}</span><strong>${escapeHtml(v)}</strong>`).join('')}</div>
-          </article>
-          <article class="detail-card">
-            <h4>Action</h4>
-            <div class="kv">
-              <span>Bookmaker</span><strong>${winamaxLink}</strong>
-              <span>Discipline</span><strong>${row.edge > 0 ? 'Edge positif uniquement' : 'Pas de mise conseillée'}</strong>
-              <span>Bankroll</span><strong>${formatMoney(getBankroll())}</strong>
-              <span>Erreur modèle</span><strong>${escapeHtml(row.modelError || 'Aucune')}</strong>
+        <div class="match-sheet-summary">
+          <article class="match-decision-hero decision-${escapeHtml(decisionTone)}">
+            <span>Décision</span>
+            <strong>${escapeHtml(stakeAllowed ? 'Je peux miser' : 'Ne pas miser maintenant')}</strong>
+            <p>${escapeHtml(readableReason)}</p>
+            <div class="decision-hero-grid">
+              <div><span>Cote</span><strong>${escapeHtml(row.odd > 1 ? `@${row.odd.toFixed(2)}` : '-')}</strong></div>
+              <div><span>Edge</span><strong>${escapeHtml(row.edge > 0 ? formatPct(row.edge, 1) : '-')}</strong></div>
+              <div><span>Mise</span><strong>${escapeHtml(visibleStakeText(row, decisionBundle))}</strong></div>
+              <div><span>Contexte</span><strong>${escapeHtml(contextScoreLabel(contextQuality))}</strong></div>
             </div>
           </article>
-          ${buildBlockReasonHtml(row)}
-          <article class="detail-card wide">
-            <h4>Lecture modèle</h4>
-            <p class="detail-text">${escapeHtml(explanation)}</p>
+          <article class="match-ticket-card">
+            <h4>Ticket</h4>
+            <div class="kv">
+              <span>Pick</span><strong>${escapeHtml(row.label || '-')}</strong>
+              <span>Marché</span><strong>${escapeHtml(row.market || '-')}</strong>
+              <span>Action</span><strong>${escapeHtml(readableAction)}</strong>
+              <span>Bookmaker</span><strong>${winamaxLink}</strong>
+            </div>
           </article>
-          ${calibrationHtml}
         </div>
+        <article class="detail-card wide sheet-signals-card">
+          <h4>Signaux clés</h4>
+          <div class="sheet-signal-strip">
+            ${signalPreview.map((signal) => `
+              <div class="${signal.ok ? 'ok' : 'missing'}">
+                <span>${escapeHtml(signal.label)}</span>
+                <strong>${escapeHtml(signal.value)}</strong>
+                <em>${escapeHtml(signal.detail)}</em>
+              </div>
+            `).join('')}
+          </div>
+        </article>
+        <div class="modal-grid sheet-grid">
+          <article class="detail-card">
+            <h4>Pourquoi ce pick</h4>
+            <p class="detail-text">${escapeHtml(explanation)}</p>
+            <div class="mini-kpi-row">
+              <span>Proba ${escapeHtml(row.probability > 0 ? formatPct(row.probability, 1) : '-')}</span>
+              <span>Confiance ${escapeHtml(confidenceTrustText(row))}</span>
+              <span>${escapeHtml(sourceLine)}</span>
+            </div>
+          </article>
+          <article class="detail-card">
+            <h4>Contexte utile</h4>
+            <div class="kv">${usefulContext.length ? usefulContext.map((signal) => `<span>${escapeHtml(signal.label)}</span><strong>${escapeHtml(signal.value)}</strong>`).join('') : '<span>Contexte</span><strong>Voir onglet Signaux</strong>'}</div>
+          </article>
+          <article class="detail-card wide">
+            <h4>${blockList.length ? 'Points à vérifier' : 'Garde-fous'}</h4>
+            ${blockList.length ? `<div class="block-reason-list">${blockList.slice(0, 5).map((item) => `
+              <div class="block-reason-item block-${escapeHtml(item.tone || 'warn')}">
+                <span>${escapeHtml(item.label)}</span>
+                <strong>${escapeHtml(item.detail)}</strong>
+              </div>
+            `).join('')}</div>` : '<p class="detail-text">Tous les garde-fous locaux sont verts. La cote Winamax reste à vérifier au moment du clic.</p>'}
+          </article>
+        </div>
+        <details class="advanced-section detail-audit">
+          <summary>Audit technique</summary>
+          <div class="kv">${quality.map(([k, v]) => `<span>${escapeHtml(k)}</span><strong>${escapeHtml(v)}</strong>`).join('')}</div>
+          <div class="audit-card-wrap">${calibrationHtml}</div>
+        </details>
       </section>
       ${buildDecisionHtml(row)}
       ${buildContextHtml(row)}
@@ -2896,7 +3037,7 @@
     if (!reasons.length) {
       return `
         <article class="detail-card wide block-reason-card">
-          <h4>Pourquoi bloqué</h4>
+          <h4>Garde-fous</h4>
           <p class="detail-text">Aucun blocage majeur sur ce match. La cote reste à vérifier au moment du pari.</p>
         </article>`;
     }
@@ -6106,6 +6247,11 @@
     $('#calibration-filter')?.addEventListener('change', renderMatches);
     $('#edge-filter')?.addEventListener('change', renderMatches);
     $('#league-filter')?.addEventListener('change', renderMatches);
+    ['pick-search', 'pick-sport-filter', 'pick-league-filter', 'pick-sort', 'pick-edge-min', 'pick-odd-min'].forEach((id) => {
+      const el = $(`#${id}`);
+      if (!el) return;
+      el.addEventListener(el.tagName === 'INPUT' ? 'input' : 'change', () => renderPicks());
+    });
     $('#quality-alert-filter')?.addEventListener('change', () => {
       if (state.status) renderQualityAlerts(state.status);
     });
@@ -6256,6 +6402,24 @@
     });
     document.addEventListener('keydown', (event) => {
       if (event.key === 'Escape') closeMatchDetail();
+      if (event.ctrlKey && !event.altKey && !event.metaKey) {
+        const target = event.target;
+        if (target && ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName)) return;
+        const shortcuts = {
+          '1': 'dashboard',
+          '2': 'matches',
+          '3': 'agent',
+          '4': 'data',
+          '5': 'history',
+          '6': 'combines',
+          '7': 'scorers'
+        };
+        const tab = shortcuts[event.key];
+        if (tab) {
+          event.preventDefault();
+          switchTab(tab);
+        }
+      }
     });
     $('#bankroll-input').addEventListener('change', () => {
       localStorage.setItem('userBankroll', String(getBankroll()));

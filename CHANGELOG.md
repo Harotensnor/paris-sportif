@@ -5,6 +5,14 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Suite UX / QA
+
+- `npx playwright test` cible désormais l'application Electron locale au lieu de l'ancienne suite site trop longue : test cockpit, tracking `Je mise`, P&L, filtres, fiche match, sécurité renderer et absence d'iframe.
+- Ajout des filtres rapides sur le cockpit : recherche équipe, sport, ligue, tri edge/confiance/kickoff/cote, edge min et cote min.
+- Fiche match refondue en synthèse décisionnelle : verdict immédiat, ticket, cote, edge, mise, contexte, signaux clés météo/arbitre/compos/blessures/stats/xG et audit technique replié.
+- Scénarios de mise repliés par défaut pour garder le premier écran centré sur les picks actionnables.
+- Raccourcis clavier desktop `Ctrl+1` à `Ctrl+7` pour naviguer vite entre les vues principales.
+
 ### Fixes
 
 - Correction du blocage critique `0 pari jouable` dans l'app Electron : le moteur exploite maintenant le pick 1N2 prédit quand la cote Winamax est valide et l'edge est positif, même si l'ancien modèle legacy marquait le match en skip prudent.

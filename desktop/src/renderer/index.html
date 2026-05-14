@@ -128,6 +128,23 @@
             <p id="picks-caption">Chargement des meilleurs candidats proches...</p>
           </div>
         </div>
+        <div class="pick-toolbar" aria-label="Filtres rapides des picks">
+          <input id="pick-search" type="search" placeholder="Rechercher une équipe">
+          <select id="pick-sport-filter">
+            <option value="all">Tous sports</option>
+          </select>
+          <select id="pick-league-filter">
+            <option value="all">Toutes ligues</option>
+          </select>
+          <select id="pick-sort">
+            <option value="edge">Edge</option>
+            <option value="confidence">Confiance</option>
+            <option value="kickoff">Départ</option>
+            <option value="odd">Cote</option>
+          </select>
+          <input id="pick-edge-min" type="number" min="0" max="100" step="1" placeholder="Edge min %">
+          <input id="pick-odd-min" type="number" min="1" max="100" step="0.05" placeholder="Cote min">
+        </div>
         <div class="table-wrap">
           <table>
             <thead>
@@ -148,32 +165,30 @@
           </table>
         </div>
 
-        <div class="section-head compact">
-          <div>
-            <h3>Scénarios de mise</h3>
-            <p>Affichés uniquement si un pick passe les garde-fous.</p>
+        <details class="advanced-section compact-advanced">
+          <summary>Scénarios de mise</summary>
+          <p>Plans de mise alternatifs, masqués par défaut pour garder le cockpit rapide à lire.</p>
+          <div class="stake-scenario-grid" id="stake-scenario-grid">
+            <div class="empty">Aucun scénario actif.</div>
           </div>
-        </div>
-        <div class="stake-scenario-grid" id="stake-scenario-grid">
-          <div class="empty">Aucun scénario actif.</div>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Match</th>
-                <th>Marché</th>
-                <th>Prudent</th>
-                <th>Normal</th>
-                <th>Agressif</th>
-                <th>Edge</th>
-              </tr>
-            </thead>
-            <tbody id="stake-scenario-body">
-              <tr><td colspan="6" class="empty">Aucun détail de mise disponible.</td></tr>
-            </tbody>
-          </table>
-        </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Match</th>
+                  <th>Marché</th>
+                  <th>Prudent</th>
+                  <th>Normal</th>
+                  <th>Agressif</th>
+                  <th>Edge</th>
+                </tr>
+              </thead>
+              <tbody id="stake-scenario-body">
+                <tr><td colspan="6" class="empty">Aucun détail de mise disponible.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
 
       </section>
 

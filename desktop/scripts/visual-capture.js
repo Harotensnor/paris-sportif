@@ -47,6 +47,7 @@ async function main() {
       picksMetric: Number(document.querySelector('#metric-picks')?.textContent || 0),
       trackButtons: document.querySelectorAll('[data-track-bet-key]').length,
       pnlVisible: Boolean(document.querySelector('#user-pnl-total') && document.querySelector('#user-pnl-sub')),
+      filtersVisible: Boolean(document.querySelector('#pick-search') && document.querySelector('#pick-sort')),
       positiveStakeCells: Array.from(document.querySelectorAll('#picks-body td[data-label="Mise"], #stake-scenario-body td[data-label="Prudent"], #stake-scenario-body td[data-label="Normal"], #stake-scenario-body td[data-label="Agressif"]'))
         .filter((node) => /[1-9]\d*(?:[,.]\d+)?\s*€/.test(node.textContent || '')).length
     }));
@@ -97,7 +98,7 @@ async function main() {
     if (/Aucun pari à jouer maintenant|Mise bloquée|blocage/i.test(decisionConsistency.caption) && decisionConsistency.positiveStakeCells > 0) {
       throw new Error(`Mise positive affichée malgré décision bloquée: ${JSON.stringify(decisionConsistency)}`);
     }
-    if (decisionConsistency.picksMetric < 10 || decisionConsistency.trackButtons < 10 || !decisionConsistency.pnlVisible) {
+    if (decisionConsistency.picksMetric < 10 || decisionConsistency.trackButtons < 10 || !decisionConsistency.pnlVisible || !decisionConsistency.filtersVisible) {
       throw new Error(`Cockpit actionnable incomplet: ${JSON.stringify(decisionConsistency)}`);
     }
     if (files <= 0 || sources <= 0 || refreshCards <= 0 || checklist <= 0) {

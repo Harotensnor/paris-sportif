@@ -343,6 +343,28 @@ a:hover {
   color: var(--muted);
 }
 
+.pick-toolbar {
+  display: grid;
+  grid-template-columns: minmax(220px, 1.4fr) repeat(3, minmax(130px, .7fr)) repeat(2, minmax(110px, .5fr));
+  gap: 10px;
+  margin: 10px 0 12px;
+}
+
+.pick-toolbar input,
+.pick-toolbar select {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  padding: 10px 12px;
+  font-weight: 760;
+}
+
+.compact-advanced {
+  margin-top: 18px;
+}
+
 .banner {
   border: 1px solid rgba(248, 113, 113, .55);
   background: rgba(127, 29, 29, .28);
@@ -2095,6 +2117,152 @@ body.modal-open {
   min-width: 0;
 }
 
+.match-sheet-summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(320px, .8fr);
+  gap: 12px;
+  padding: 18px 18px 0;
+  min-width: 0;
+}
+
+.match-decision-hero,
+.match-ticket-card {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(17, 24, 39, .94), rgba(11, 15, 24, .96));
+  padding: 18px;
+  min-width: 0;
+}
+
+.match-decision-hero {
+  border-left: 4px solid var(--accent);
+}
+
+.match-decision-hero.decision-watch {
+  border-left-color: var(--warn);
+}
+
+.match-decision-hero.decision-warn,
+.match-decision-hero.decision-danger {
+  border-left-color: var(--danger);
+}
+
+.match-decision-hero > span,
+.match-ticket-card h4 {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  margin: 0 0 8px;
+}
+
+.match-decision-hero > strong {
+  display: block;
+  font-size: 28px;
+  line-height: 1.05;
+  margin-bottom: 8px;
+}
+
+.match-decision-hero p {
+  color: var(--muted);
+  margin: 0 0 16px;
+  line-height: 1.45;
+}
+
+.decision-hero-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.decision-hero-grid div,
+.mini-kpi-row span {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .035);
+  padding: 10px;
+  min-width: 0;
+}
+
+.decision-hero-grid span,
+.mini-kpi-row span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.decision-hero-grid strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 17px;
+}
+
+.sheet-signals-card {
+  margin: 12px 18px 0;
+}
+
+.sheet-signal-strip {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.sheet-signal-strip div {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .03);
+  padding: 10px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.sheet-signal-strip .ok {
+  border-color: rgba(16, 185, 129, .28);
+}
+
+.sheet-signal-strip .missing {
+  border-color: rgba(245, 158, 11, .32);
+}
+
+.sheet-signal-strip span,
+.sheet-signal-strip em {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  font-style: normal;
+}
+
+.sheet-signal-strip strong {
+  display: block;
+  margin: 5px 0;
+  font-size: 14px;
+}
+
+.sheet-grid {
+  padding-top: 12px;
+}
+
+.mini-kpi-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.detail-audit {
+  margin: 0 18px 18px;
+}
+
+.audit-card-wrap {
+  margin-top: 12px;
+}
+
+.audit-card-wrap .detail-card {
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
 .modal-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2342,6 +2510,12 @@ body.modal-open {
     grid-template-columns: 1fr;
   }
 
+  .pick-toolbar,
+  .match-sheet-summary,
+  .sheet-signal-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .signal-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -2366,6 +2540,9 @@ body.modal-open {
   .metrics-grid,
   .agent-grid,
   .history-grid,
+  .pick-toolbar,
+  .match-sheet-summary,
+  .decision-hero-grid,
   .decision-terminal-grid,
   .decision-ticket-strip,
   .stake-scenario-grid,
@@ -2451,6 +2628,7 @@ body.modal-open {
   .file-row,
   .v8-columns,
   .v8-control-room,
+  .sheet-signal-strip,
   .decision-terminal-grid,
   .decision-ticket-strip,
   .market-row,

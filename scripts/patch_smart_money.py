@@ -1,20 +1,19 @@
 #!/usr/bin/env python3
 """Patch smart_money_signals.json into data.js events."""
 import json
-import re
 from pathlib import Path
 
+try:
+    from scripts._data_io import load_data_js, save_data_js
+except ModuleNotFoundError:
+    from _data_io import load_data_js, save_data_js
+
 ROOT = Path(__file__).resolve().parent.parent
-DATA_JS = ROOT / 'data.js'
 SIDE = ROOT / 'smart_money_signals.json'
 
 
 def load_data():
-    raw = DATA_JS.read_text(encoding='utf-8')
-    m = re.search(r'PRONOSTICS_DATA\s*=\s*(\{.*\})\s*;?\s*$', raw, re.DOTALL)
-    if not m:
-        raise RuntimeError('PRONOSTICS_DATA not found in data.js')
-    return json.loads(m.group(1))
+    return load_data_js()
 
 
 def main():
@@ -39,10 +38,7 @@ def main():
                 if isinstance(sig.get('market_uncertain'), dict):
                     ev['market_uncertain'] = sig['market_uncertain']
                 patched += 1
-    DATA_JS.write_text(
-        'window.PRONOSTICS_DATA = ' + json.dumps(data, ensure_ascii=False, separators=(',', ':')) + ';',
-        encoding='utf-8'
-    )
+    save_data_js(data)
     print(f'[patch_smart_money] patched={patched} cleared={cleared}')
     return 0
 

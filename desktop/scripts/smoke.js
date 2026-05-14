@@ -70,6 +70,7 @@ async function main() {
       scenarioCards: document.querySelectorAll('#stake-scenario-grid .scenario-card').length,
       trackButtons: document.querySelectorAll('[data-track-bet-key]').length,
       pnlVisible: Boolean(document.querySelector('#user-pnl-total') && document.querySelector('#user-pnl-sub')),
+      filtersVisible: Boolean(document.querySelector('#pick-search') && document.querySelector('#pick-sort')),
       positiveStakeCells: Array.from(document.querySelectorAll('#picks-body td[data-label="Mise"], #stake-scenario-body td[data-label="Prudent"], #stake-scenario-body td[data-label="Normal"], #stake-scenario-body td[data-label="Agressif"]'))
         .filter((node) => /[1-9]\d*(?:[,.]\d+)?\s*€/.test(node.textContent || '')).length
     }));
@@ -78,7 +79,7 @@ async function main() {
     if (dashboard.finalCards <= 0 || !dashboard.firstActionButton || !dashboard.criticalButton || !dashboard.t10Button) {
       throw new Error(`Panneau décision incomplet: ${JSON.stringify(dashboard)}`);
     }
-    if (dashboard.picks < 10 || dashboard.trackButtons < 10 || !dashboard.pnlVisible) {
+    if (dashboard.picks < 10 || dashboard.trackButtons < 10 || !dashboard.pnlVisible || !dashboard.filtersVisible) {
       throw new Error(`Cockpit de mise incomplet: ${JSON.stringify(dashboard)}`);
     }
     if (/Aucun pari à jouer maintenant|Mise bloquée|blocage/i.test(dashboard.caption) && dashboard.positiveStakeCells > 0) {
@@ -124,13 +125,15 @@ async function main() {
         ),
         title: document.querySelector('#modal-title')?.textContent || '',
         canBet: document.querySelector('#modal-content')?.textContent.includes('Puis-je miser ?') || false,
+        signals: document.querySelector('#modal-content')?.textContent.includes('Signaux clés') || false,
+        audit: document.querySelector('#modal-content')?.textContent.includes('Audit technique') || false,
         modalStakeBlocked: /Puis-je miser \?\s*Non[\s\S]*Mise affichée\s*0 €/.test(document.querySelector('#modal-content')?.innerText || '')
       };
     });
     for (const tab of ['summary', 'decision', 'context', 'teams', 'availability', 'signals', 'odds', 'h2h', 'timeline', 'sources', 'model']) {
       if (!modal.tabs.includes(tab)) throw new Error(`Onglet détail absent: ${tab}`);
     }
-    if (!modal.title || modal.overflow || !modal.canBet) throw new Error(`Fiche match invalide: ${JSON.stringify(modal)}`);
+    if (!modal.title || modal.overflow || !modal.canBet || !modal.signals || !modal.audit) throw new Error(`Fiche match invalide: ${JSON.stringify(modal)}`);
     if (/Aucun pari à jouer maintenant|Mise bloquée|blocage/i.test(dashboard.caption) && !modal.modalStakeBlocked) {
       throw new Error(`Fiche match incohérente avec gate rouge: ${JSON.stringify(modal)}`);
     }
