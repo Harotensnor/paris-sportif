@@ -50,7 +50,7 @@ const HTML_CSP = [
   "default-src 'self'",
   "script-src 'self'",
   "style-src 'self'",
-  "img-src 'self' data: https://img.sofascore.com",
+  "img-src 'self' data:",
   "connect-src 'self'",
   "frame-src 'none'",
   "object-src 'none'",
@@ -81,6 +81,11 @@ const memoryState = {
   heapUsedMb: null,
   updatedAt: null,
   warning: null
+};
+const aiRuntime = {
+  day: new Date().toISOString().slice(0, 10),
+  calls: 0,
+  cache: new Map()
 };
 
 app.commandLine.appendSwitch('disable-http-cache');
@@ -125,8 +130,8 @@ function readRequestBody(req, maxBytes = 64 * 1024) {
   });
 }
 
-async function readJsonBody(req) {
-  const body = await readRequestBody(req);
+async function readJsonBody(req, maxBytes) {
+  const body = await readRequestBody(req, maxBytes);
   if (!body) return {};
   try {
     return JSON.parse(body);
@@ -140,6 +145,152 @@ function atomicWriteJson(filePath, payload) {
   const tmp = `${filePath}.${process.pid}.tmp`;
   fs.writeFileSync(tmp, JSON.stringify(payload, null, 2), 'utf8');
   fs.renameSync(tmp, filePath);
+}
+
+function compactAiPick(row) {
+  return {
+    key: row.key || row.trackKey || row.id || `${row.title}:${row.market}:${row.label}`,
+    title: row.title,
+    sport: row.sport,
+    league: row.league,
+    market: row.market,
+    label: row.label,
+    odd: row.odd,
+    probability: row.probability,
+    edge: row.edge,
+    confidence: row.confidence,
+    kickoff: row.start,
+    reason: row.reason
+  };
+}
+
+function heuristicAiAssist(task, payload) {
+  if (task === 'curate_ultimate') {
+    const picks = Array.isArray(payload?.picks) ? payload.picks.map(compactAiPick) : [];
+    const sorted = picks.slice().sort((a, b) => Number(b.edge || 0) - Number(a.edge || 0));
+    const selected = sorted.find((row) => Number(row.edge || 0) >= 0.07 && Number(row.probability || row.confidence || 0) >= 0.60) || sorted[0] || null;
+    return selected
+      ? {
+          selectedKey: selected.key,
+          accepted: true,
+          reason: `${selected.market} ${selected.label} ressort comme le meilleur compromis edge, cote et horaire. À garder discipliné : pas de promesse, seulement une value mesurée.`,
+          advice: `Focus sur ${selected.title} si la cote reste disponible.`
+        }
+      : {
+          selectedKey: null,
+          accepted: false,
+          reason: 'Aucun pick ne ressort assez proprement pour devenir le bet ultime.',
+          advice: 'Attendre une fenêtre plus nette ou relancer les données.'
+        };
+  }
+  if (task === 'explain_pick') {
+    const pick = compactAiPick(payload?.pick || {});
+    return {
+      text: `${pick.market || 'Marché'} ${pick.label || ''} est retenu parce que l’edge modèle reste positif, la cote est exploitable et le contexte ne signale pas de blocage majeur. La mise doit rester proportionnée au niveau de confiance et à la fraîcheur des données.`
+    };
+  }
+  if (task === 'detect_anomalies') {
+    const picks = Array.isArray(payload?.picks) ? payload.picks : [];
+    const warnings = picks
+      .filter((row) => Number(row.edge || 0) > 0.20 || Number(row.odd || 0) < 1.01)
+      .slice(0, 8)
+      .map((row) => ({
+        key: row.key || row.id || row.title,
+        severity: 'warn',
+        reason: Number(row.edge || 0) > 0.20 ? 'edge très élevé à revoir' : 'cote impossible'
+      }));
+    return { warnings };
+  }
+  return { ok: true, text: 'Analyse heuristique locale disponible.' };
+}
+
+async function callAiProvider(config, task, payload) {
+  const provider = String(config.provider || '').toLowerCase();
+  const apiKey = String(config.apiKey || '').trim();
+  const model = String(config.model || '').trim();
+  if (!apiKey || !global.fetch) return null;
+  const today = new Date().toISOString().slice(0, 10);
+  if (aiRuntime.day !== today) {
+    aiRuntime.day = today;
+    aiRuntime.calls = 0;
+  }
+  if (aiRuntime.calls >= 50) return { rateLimited: true };
+  aiRuntime.calls += 1;
+  const system = 'Tu es le moteur discret d’un logiciel de pronostics. Réponds uniquement en JSON valide, factuel, prudent, sans garantie de gain.';
+  const user = JSON.stringify({ task, payload }, null, 2).slice(0, 12000);
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 15000);
+  try {
+    if (provider === 'anthropic') {
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        signal: controller.signal,
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01'
+        },
+        body: JSON.stringify({
+          model: model || 'claude-3-5-sonnet-latest',
+          max_tokens: 800,
+          system,
+          messages: [{ role: 'user', content: user }]
+        })
+      });
+      if (!response.ok) throw new Error(`Anthropic HTTP ${response.status}`);
+      const json = await response.json();
+      const text = json.content?.map((part) => part.text || '').join('\n') || '{}';
+      return JSON.parse(text);
+    }
+    const endpoint = provider === 'mistral'
+      ? 'https://api.mistral.ai/v1/chat/completions'
+      : provider === 'ollama'
+        ? 'http://127.0.0.1:11434/v1/chat/completions'
+        : 'https://api.openai.com/v1/chat/completions';
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      signal: controller.signal,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(provider === 'ollama' ? {} : { Authorization: `Bearer ${apiKey}` })
+      },
+      body: JSON.stringify({
+        model: model || (provider === 'mistral' ? 'mistral-small-latest' : provider === 'ollama' ? 'llama3.1' : 'gpt-4o-mini'),
+        temperature: 0.2,
+        response_format: provider === 'ollama' ? undefined : { type: 'json_object' },
+        messages: [
+          { role: 'system', content: system },
+          { role: 'user', content: user }
+        ]
+      })
+    });
+    if (!response.ok) throw new Error(`AI HTTP ${response.status}`);
+    const json = await response.json();
+    const text = json.choices?.[0]?.message?.content || '{}';
+    return JSON.parse(text);
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function aiAssist(config, task, payload) {
+  const cacheKey = `${task}:${JSON.stringify(payload || {}).slice(0, 3000)}`;
+  const cached = aiRuntime.cache.get(cacheKey);
+  if (cached && Date.now() - cached.at < 2 * 60 * 60 * 1000) return { ok: true, cached: true, mode: cached.mode, result: cached.result };
+  let result = null;
+  let mode = 'heuristic';
+  if (config?.enabled && config?.apiKey) {
+    try {
+      result = await callAiProvider(config, task, payload);
+      if (result && !result.rateLimited) mode = 'provider';
+    } catch (error) {
+      appendRefreshLine(`[ai] fallback heuristique: ${error.message}`);
+      result = null;
+    }
+  }
+  if (!result || result.rateLimited) result = heuristicAiAssist(task, payload);
+  aiRuntime.cache.set(cacheKey, { at: Date.now(), mode, result });
+  return { ok: true, mode, callsToday: aiRuntime.calls, result };
 }
 
 function webhookPayload(config, alert) {
@@ -784,6 +935,22 @@ async function handleApi(req, res, url) {
   }
   if (url.pathname === '/api/profile/latest') {
     jsonResponse(res, 200, readLatestProfileBackup());
+    return;
+  }
+  if (url.pathname === '/api/ai/assist') {
+    if (req.method !== 'POST') {
+      jsonResponse(res, 405, { ok: false, error: 'POST required' });
+      return;
+    }
+    try {
+      const payload = await readJsonBody(req, 512 * 1024);
+      const config = payload.config && typeof payload.config === 'object' ? payload.config : {};
+      const task = String(payload.task || 'curate_ultimate');
+      const result = await aiAssist(config, task, payload.payload || {});
+      jsonResponse(res, 200, result);
+    } catch (error) {
+      jsonResponse(res, 200, { ok: true, mode: 'heuristic', result: heuristicAiAssist('fallback', {}), error: error.message });
+    }
     return;
   }
   if (url.pathname === '/api/refresh/cancel') {

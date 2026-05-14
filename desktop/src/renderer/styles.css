@@ -2981,6 +2981,155 @@ td.empty::before,
   line-height: 1.35;
 }
 
+.ultimate-bet-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 220px;
+  gap: 18px;
+  padding: 22px;
+  margin: 18px 0;
+  border: 1px solid rgba(16, 185, 129, .42);
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(16, 185, 129, .18), rgba(99, 102, 241, .08)), var(--surface);
+  box-shadow: 0 18px 44px rgba(2, 6, 23, .26);
+}
+
+.ultimate-copy h3 {
+  margin: 6px 0 8px;
+  font-size: 28px;
+  line-height: 1.1;
+}
+
+.ultimate-copy p {
+  margin: 0;
+  color: var(--muted);
+  max-width: 880px;
+}
+
+.ultimate-tags,
+.time-pick-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.ultimate-tags span,
+.time-pick-meta span {
+  padding: 5px 9px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  background: var(--surface-2);
+  font-size: 12px;
+}
+
+.ultimate-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 10px;
+  text-align: right;
+}
+
+.ultimate-side strong {
+  font-size: 24px;
+  color: var(--accent);
+}
+
+.ultimate-side span {
+  color: var(--muted);
+}
+
+.time-cockpit {
+  display: grid;
+  gap: 12px;
+  margin: 18px 0 22px;
+}
+
+.time-section {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(15, 23, 42, .58);
+  overflow: hidden;
+}
+
+.time-section.hot {
+  border-color: rgba(16, 185, 129, .5);
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.time-section summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 12px;
+  align-items: center;
+  padding: 14px 16px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.time-section summary::-webkit-details-marker {
+  display: none;
+}
+
+.time-section summary span {
+  font-weight: 850;
+  color: var(--text);
+}
+
+.time-section summary strong {
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.time-section summary em {
+  color: var(--muted);
+  font-style: normal;
+  font-size: 12px;
+}
+
+.time-section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 10px;
+  padding: 0 14px 14px;
+}
+
+.time-pick-card {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(2, 6, 23, .26);
+}
+
+.time-pick-card strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.time-pick-card span,
+.time-pick-card p {
+  color: var(--muted);
+}
+
+.time-pick-card p {
+  margin: 0;
+  font-size: 13px;
+}
+
+.time-pick-action {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.scorer-track-btn {
+  width: 100%;
+  margin-top: 8px;
+}
+
 .term-tip {
   display: inline-flex;
   align-items: center;
@@ -3421,6 +3570,7 @@ td.empty::before,
   .file-row,
   .v8-columns,
   .v8-control-room,
+  .ultimate-bet-card,
   .sheet-signal-strip,
   .decision-terminal-grid,
   .decision-ticket-strip,
@@ -3436,6 +3586,11 @@ td.empty::before,
   .signal-gap-grid,
   .quality-report-grid {
     grid-template-columns: 1fr;
+  }
+
+  .ultimate-side {
+    align-items: flex-start;
+    text-align: left;
   }
 }
 

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https://img.sofascore.com; connect-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none'; worker-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none'; worker-src 'none'">
   <title>Paris-Sportif Desktop</title>
   <link rel="stylesheet" href="/desktop/design-tokens.css">
   <link rel="stylesheet" href="/desktop/styles.css">
@@ -198,6 +198,14 @@
           </div>
         </div>
 
+        <section class="ultimate-bet-card" id="ultimate-bet-card" aria-label="Bet ultime du jour">
+          <div class="empty">Sélection du bet ultime en cours...</div>
+        </section>
+
+        <section class="time-cockpit" id="time-cockpit" aria-label="Picks par horizon temporel">
+          <div class="empty">Classement temporel des picks en cours...</div>
+        </section>
+
         <div class="section-head compact">
           <div>
             <h3 id="picks-section-title">Sélection du jour</h3>
@@ -295,6 +303,22 @@
           <div class="section-actions">
             <button class="ghost-btn" id="export-scorers-csv-btn">Exporter buteurs</button>
           </div>
+        </div>
+        <div class="pick-toolbar" aria-label="Filtres buteurs">
+          <input id="scorer-search" type="search" placeholder="Rechercher joueur ou équipe">
+          <select id="scorer-league-filter"><option value="all">Toutes ligues</option></select>
+          <select id="scorer-market-filter">
+            <option value="all">Tous marchés joueurs</option>
+            <option value="buteur">Buteur</option>
+          </select>
+          <input id="scorer-odd-min" type="number" min="1" step="0.05" placeholder="Cote min">
+          <input id="scorer-odd-max" type="number" min="1" step="0.05" placeholder="Cote max">
+          <select id="scorer-sort">
+            <option value="kickoff">Départ puis confiance</option>
+            <option value="confidence">Confiance</option>
+            <option value="edge">Edge/profil</option>
+            <option value="odd">Cote</option>
+          </select>
         </div>
         <div class="scorer-grid" id="scorers-list">
           <div class="empty">Chargement des buteurs...</div>
@@ -890,6 +914,21 @@
             <label>Limite paris / jour<input id="pref-daily-bet-limit" type="number" min="1" max="50" step="1"></label>
             <label>Cap mise jour % bankroll<input id="pref-daily-stake-cap" type="number" min="1" max="100" step="1"></label>
             <label>Confirmation après X défaites<input id="pref-loss-streak-confirm" type="number" min="2" max="10" step="1"></label>
+          </article>
+          <article class="preference-card">
+            <h4>IA moteur</h4>
+            <label class="check-line"><input id="pref-ai-enabled" type="checkbox"> IA active si clé disponible</label>
+            <label>Provider
+              <select id="pref-ai-provider">
+                <option value="openai">OpenAI</option>
+                <option value="anthropic">Anthropic</option>
+                <option value="mistral">Mistral</option>
+                <option value="ollama">Ollama local</option>
+              </select>
+            </label>
+            <label>Modèle<input id="pref-ai-model" type="text" placeholder="gpt-4o-mini"></label>
+            <label>API key<input id="pref-ai-key" type="password" autocomplete="off" placeholder="stockée localement"></label>
+            <p class="match-sub">Elle cure, rédige et détecte les anomalies en arrière-plan. Sans clé, fallback heuristique complet.</p>
           </article>
           <article class="preference-card">
             <h4>Profil local</h4>

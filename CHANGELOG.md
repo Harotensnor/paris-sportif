@@ -5,6 +5,20 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 8 — Settlement verrouillé, cockpit temporel, buteurs triés et IA moteur discrète
+
+- Correction critique du settlement automatique : un pari ne peut plus être réglé avant kickoff, ni sur un vieux résultat homonyme. Le garde-fou exige statut final confirmé, outcome final exploitable, date du résultat proche du pari et marge post-match par sport.
+- Ajout d'une réparation au démarrage des faux settlements auto existants : les victoires/pertes fantômes sont remises en `pending`, avec audit visible dans `Historique`.
+- L'audit `Settlement auto` affiche désormais les refus sécurité et les settlements fantômes annulés pour rendre le système contrôlable.
+- Refonte du cockpit autour du temps : `Bet ultime du jour`, `À jouer maintenant`, `Bientôt`, `Plus tard aujourd’hui`, `Demain` et `Prochains jours`, avec compte à rebours, raison courte et action directe.
+- Le brief du matin remonte le bet ultime quand il existe, au lieu de seulement compter les picks.
+- Vue `Buteurs` enrichie : filtres par recherche/ligue/cote, tri départ-confiance/edge/cote, cartes joueur plus lisibles et action de suivi intégrée.
+- Les combinés sont triés par edge composé décroissant pour placer les tickets les plus intéressants en premier.
+- Ajout d'une section `IA moteur` dans les préférences : provider, modèle, clé locale et activation. Sans clé, le logiciel utilise une curation heuristique locale complète.
+- Le process Electron expose `/api/ai/assist` : la curation du bet ultime, les explications et la détection d'anomalies passent par le main process, jamais par un fetch internet direct depuis le renderer.
+- Sécurité renderer renforcée : suppression des avatars joueurs distants Sofascore et CSP image revenue à `self`/`data`.
+- QA Sprint 8 : Playwright reproduit un pari futur qui ne doit pas être réglé, valide l'annulation d'un settlement fantôme, vérifie le cockpit temporel, les filtres buteurs, l'IA moteur et l'absence de requêtes externes renderer.
+
 ### Sprint 7 — Auto-settlement, coach prudent, backup profil et résilience
 
 - Ajout du settlement automatique au démarrage et après refresh : les paris suivis encore en cours sont rapprochés des résultats archivés et résolus en gagné/perdu quand le marché est évaluable.

@@ -31,6 +31,10 @@ est désactivé dans cette fenêtre.
 - sauvegarde le profil utilisateur localement, permet export/import JSON, fusion/remplacement et restauration depuis le dernier backup propre ;
 - propose un mode démo séparé des vrais paris pour tester les décisions sans toucher à l'historique réel ;
 - garde un backup local de `data.js` valide pour rester utilisable si le fichier courant devient corrompu.
+- protège le settlement automatique contre les faux positifs : pas de règlement avant kickoff, date de résultat vérifiée et rollback des anciens settlements suspects ;
+- classe les picks par horizon temporel avec un `Bet ultime du jour`, les picks à jouer maintenant, bientôt, plus tard, demain et prochains jours ;
+- propose une vue `Buteurs` filtrable et triable, avec suivi manuel intégré pour les profils joueur ;
+- peut utiliser une IA moteur discrète depuis le process Electron pour curer le bet ultime, rédiger des explications et signaler des anomalies, avec fallback heuristique si aucune clé n'est configurée.
 
 ## Raccourcis utiles
 

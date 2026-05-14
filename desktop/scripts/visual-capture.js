@@ -47,6 +47,8 @@ async function main() {
       picksMetric: Number(document.querySelector('#metric-picks')?.textContent || 0),
       morningCards: document.querySelectorAll('#morning-grid .morning-card').length,
       imminentStrip: Boolean(document.querySelector('#imminent-strip')),
+      ultimateVisible: Boolean(document.querySelector('#ultimate-bet-card')),
+      timeSections: document.querySelectorAll('#time-cockpit .time-section').length,
       trackButtons: document.querySelectorAll('[data-track-bet-key]').length,
       pnlVisible: Boolean(document.querySelector('#user-pnl-total') && document.querySelector('#user-pnl-sub')),
       pnlSparkline: Boolean(document.querySelector('#user-pnl-sparkline svg')),
@@ -67,6 +69,8 @@ async function main() {
     await win.click('[data-tab="scorers"]');
     await win.waitForSelector('#scorers-list .scorer-card, #scorers-list .empty', { timeout: 30000 });
     const scorers = await win.locator('#scorers-list .scorer-card, #scorers-list .empty').count();
+    const scorerFilters = await win.locator('#scorer-search, #scorer-league-filter, #scorer-sort').count();
+    const scorerTrackButtons = await win.locator('[data-track-scorer-id]').count();
     await safeScreenshot(win, path.join(captureDir, 'desktop-scorers-audit.png'), { fullPage: true });
 
     await win.click('[data-tab="history"]');
@@ -98,7 +102,7 @@ async function main() {
     const preferenceInputs = await win.locator('#pref-bankroll, input[name="pref-sport"], input[name="pref-market"]').count();
     const disciplineInputs = await win.locator('#pref-stake-mode, #pref-stop-loss, #pref-take-profit').count();
     const webhookControls = await win.locator('#pref-webhook-type, #pref-webhook-url, #test-webhook-btn').count();
-    const profileControls = await win.locator('#export-profile-btn, #import-profile-btn, #pref-coach-enabled, #pref-demo-mode').count();
+    const profileControls = await win.locator('#export-profile-btn, #import-profile-btn, #pref-coach-enabled, #pref-demo-mode, #pref-ai-enabled, #pref-ai-provider').count();
     await safeScreenshot(win, path.join(captureDir, 'desktop-preferences-audit.png'), { fullPage: true });
 
     await win.click('[data-tab="calendar"]');
@@ -152,11 +156,11 @@ async function main() {
     if (/Aucun pari à jouer maintenant|Mise bloquée|blocage/i.test(decisionConsistency.caption) && decisionConsistency.positiveStakeCells > 0) {
       throw new Error(`Mise positive affichée malgré décision bloquée: ${JSON.stringify(decisionConsistency)}`);
     }
-    if (decisionConsistency.picksMetric < 20 || decisionConsistency.morningCards < 4 || decisionConsistency.coachCards < 4 || !decisionConsistency.imminentStrip || decisionConsistency.trackButtons < 20 || !decisionConsistency.pnlVisible || !decisionConsistency.pnlSparkline || !decisionConsistency.filtersVisible) {
+    if (decisionConsistency.picksMetric < 20 || decisionConsistency.morningCards < 4 || decisionConsistency.coachCards < 4 || !decisionConsistency.imminentStrip || !decisionConsistency.ultimateVisible || decisionConsistency.timeSections < 5 || decisionConsistency.trackButtons < 20 || !decisionConsistency.pnlVisible || !decisionConsistency.pnlSparkline || !decisionConsistency.filtersVisible) {
       throw new Error(`Cockpit actionnable incomplet: ${JSON.stringify(decisionConsistency)}`);
     }
-    if (combines <= 0 || scorers <= 0 || performanceCards < 6 || segmentCards <= 0 || learningCards <= 0 || settlementCards <= 0 || modelAuditCards <= 0 || insightCards <= 0 || agentCards <= 0 || preferenceInputs < 8 || disciplineInputs < 3 || webhookControls < 3 || profileControls < 4 || calendarDays < 7 || pipelineCards <= 0 || glossaryCards < 12) {
-      throw new Error(`Captures écrans incomplètes: ${JSON.stringify({ combines, scorers, performanceCards, segmentCards, learningCards, settlementCards, modelAuditCards, insightCards, agentCards, preferenceInputs, disciplineInputs, webhookControls, profileControls, calendarDays, pipelineCards, glossaryCards })}`);
+    if (combines <= 0 || scorers <= 0 || scorerFilters < 3 || scorerTrackButtons <= 0 || performanceCards < 6 || segmentCards <= 0 || learningCards <= 0 || settlementCards <= 0 || modelAuditCards <= 0 || insightCards <= 0 || agentCards <= 0 || preferenceInputs < 8 || disciplineInputs < 3 || webhookControls < 3 || profileControls < 6 || calendarDays < 7 || pipelineCards <= 0 || glossaryCards < 12) {
+      throw new Error(`Captures écrans incomplètes: ${JSON.stringify({ combines, scorers, scorerFilters, scorerTrackButtons, performanceCards, segmentCards, learningCards, settlementCards, modelAuditCards, insightCards, agentCards, preferenceInputs, disciplineInputs, webhookControls, profileControls, calendarDays, pipelineCards, glossaryCards })}`);
     }
     if (!/s|\.\.\./.test(decisionConsistency.performanceMetric) || !/Auto-refresh|Mode économie/.test(decisionConsistency.refreshPolicy)) {
       throw new Error(`Indicateurs cockpit manquants: ${JSON.stringify(decisionConsistency)}`);

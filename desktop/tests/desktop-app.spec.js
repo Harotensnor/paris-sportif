@@ -33,11 +33,17 @@ test('desktop cockpit is actionable and stable', async () => {
   expect(rendererText).toContain('renderCalendar');
   expect(rendererText).toContain('sendExternalAlert');
   expect(rendererText).toContain('autoSettleUserBets');
+  expect(rendererText).toContain('settlementEligibility');
+  expect(rendererText).toContain('ultimateBetCandidate');
+  expect(rendererText).toContain('renderTemporalCockpit');
+  expect(rendererText).toContain('trackScorerBet');
+  expect(rendererText).toContain('aiAssist');
   expect(rendererText).toContain('coachDecisionForBet');
   expect(rendererText).toContain('applyImportedProfile');
   expect(rendererText).toContain("'/api/webhook/send'");
   expect(mainText).toContain('/api/webhook/send');
   expect(mainText).toContain('/api/profile/backup');
+  expect(mainText).toContain('/api/ai/assist');
   expect(mainText).toContain('/api/refresh/cancel');
 
   const userDataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'paris-sportif-pw-'));
@@ -66,6 +72,8 @@ test('desktop cockpit is actionable and stable', async () => {
       exportBets: Boolean(document.querySelector('#export-user-bets-btn')),
       filters: Boolean(document.querySelector('#pick-search') && document.querySelector('#pick-sort') && document.querySelector('#pick-market-filter')),
       morning: Boolean(document.querySelector('#morning-brief') && document.querySelector('#morning-grid .morning-card')),
+      ultimate: Boolean(document.querySelector('#ultimate-bet-card')),
+      timeSections: document.querySelectorAll('#time-cockpit .time-section').length,
       marketChips: document.querySelectorAll('#market-snapshot .market-chip, #market-snapshot .empty').length,
       performanceMetric: document.querySelector('#metric-boot-time')?.textContent || '',
       refreshPolicy: document.querySelector('#refresh-policy')?.textContent || '',
@@ -80,6 +88,8 @@ test('desktop cockpit is actionable and stable', async () => {
     expect(dashboard.exportBets).toBe(true);
     expect(dashboard.filters).toBe(true);
     expect(dashboard.morning).toBe(true);
+    expect(dashboard.ultimate).toBe(true);
+    expect(dashboard.timeSections).toBe(5);
     expect(dashboard.marketChips).toBeGreaterThan(0);
     expect(dashboard.performanceMetric).toMatch(/s|\.{3}/);
     expect(dashboard.refreshPolicy).toMatch(/Auto-refresh|Mode économie/);
@@ -109,6 +119,8 @@ test('desktop cockpit is actionable and stable', async () => {
     await expect(win.locator('#pref-stake-mode')).toBeVisible();
     await expect(win.locator('#pref-webhook-url')).toBeVisible();
     await expect(win.locator('#pref-coach-enabled')).toBeVisible();
+    await expect(win.locator('#pref-ai-enabled')).toBeVisible();
+    await expect(win.locator('#pref-ai-provider')).toBeVisible();
     await expect(win.locator('#export-profile-btn')).toBeVisible();
     await expect(win.locator('#import-profile-btn')).toBeVisible();
     await expect(win.locator('#preference-warning-grid')).toBeVisible();
@@ -132,6 +144,12 @@ test('desktop cockpit is actionable and stable', async () => {
     await win.click('#log-drawer-close');
     await win.keyboard.press('Control+1');
     await expect(win.locator('#page-title')).toHaveText('Accueil');
+
+    await win.click('[data-tab="scorers"]');
+    await expect(win.locator('#scorer-search')).toBeVisible();
+    await expect(win.locator('#scorer-sort')).toBeVisible();
+    await expect(win.locator('[data-track-scorer-id]').first()).toBeVisible();
+    await win.click('[data-tab="dashboard"]');
 
     await win.click('[data-track-bet-key]');
     await win.waitForFunction(() => /1 en cours/.test(document.querySelector('#user-pnl-sub')?.textContent || ''), null, { timeout: 5_000 });
@@ -164,7 +182,9 @@ test('desktop cockpit is actionable and stable', async () => {
         })
         .filter((row) => row && row.completed && Array.isArray(row.competitors) && row.competitors.some((team) => team && team.name && team.winner === true))[0];
       const winner = result.competitors.find((team) => team.winner === true);
-      const bet = {
+      const older = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString();
+      const future = new Date(Date.now() + 6 * 60 * 60 * 1000).toISOString();
+      const eligibleBet = {
         id: 'auto-settle-fixture',
         key: `auto:${result.id}`,
         matchId: result.id,
@@ -186,16 +206,38 @@ test('desktop cockpit is actionable and stable', async () => {
         pnl: 0,
         tags: [],
         note: '',
-        day: new Date().toISOString().slice(0, 10),
-        createdAt: new Date().toISOString()
+        day: older.slice(0, 10),
+        createdAt: older
       };
-      localStorage.setItem('parisSportifUserBets', JSON.stringify([bet]));
+      const futureBet = {
+        ...eligibleBet,
+        id: 'future-auto-settle-guard',
+        key: `future:${result.id}`,
+        start: future,
+        day: future.slice(0, 10),
+        createdAt: new Date().toISOString(),
+        note: 'Doit rester pending avant kickoff'
+      };
+      const phantomBet = {
+        ...futureBet,
+        id: 'phantom-auto-settle-rollback',
+        key: `phantom:${result.id}`,
+        status: 'won',
+        pnl: 5,
+        settlementSource: 'auto',
+        settlementReason: 'Ancien faux positif',
+        note: 'Doit être annulé par le garde-fou'
+      };
+      localStorage.setItem('parisSportifUserBets', JSON.stringify([futureBet, phantomBet, eligibleBet]));
       location.reload();
     });
     await win.waitForSelector('[data-panel="dashboard"].active', { timeout: 60_000 });
     await win.click('[data-tab="history"]');
     await expect(win.locator('#auto-settlement-grid')).toContainText(/Résolus auto|1/);
+    await expect(win.locator('#auto-settlement-grid')).toContainText(/Refusés sécurité|1/);
+    await expect(win.locator('#auto-settlement-grid')).toContainText(/Fantômes annulés|1/);
     await expect(win.locator('#user-bets-body')).toContainText('Gagné');
+    await expect(win.locator('#user-bets-body')).toContainText('Pending');
 
     await win.click('[data-tab="dashboard"]');
     await win.click('#picks-body tr.clickable-row td[data-label="Match"]');

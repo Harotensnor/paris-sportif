@@ -76,7 +76,9 @@
     coachOverride: null,
     profileImportPreview: null,
     crashRecovered: false,
-    safeMode: false
+    safeMode: false,
+    didScrollToNow: false,
+    aiAssist: null
   };
 
   const ACTION_HISTORY_KEY = 'parisSportifActionHistory';
@@ -94,6 +96,7 @@
   const READY_COUNT_KEY = 'parisSportifLastReadyCount';
   const PROFILE_BACKUP_KEY = 'parisSportifLastProfileBackupDay';
   const APP_SESSION_KEY = 'parisSportifDesktopSession';
+  const AI_ENGINE_KEY = 'parisSportifAiEngineState';
   const SPORTS_PREFS = ['football', 'tennis', 'basketball', 'hockey', 'baseball'];
   const MARKET_PREFS = [
     { key: '1n2', label: '1N2' },
@@ -138,6 +141,10 @@
     dailyStakeCapPct: 20,
     coachLossStreakConfirm: 3,
     demoMode: false,
+    aiEnabled: false,
+    aiProvider: 'openai',
+    aiApiKey: '',
+    aiModel: 'gpt-4o-mini',
     strict: false
   };
   const REFRESH_DEFAULT_INTERVAL_MS = 30 * 60 * 1000;
@@ -291,10 +298,12 @@
         return fallback;
       }
     };
+    const prefs = loadPreferences();
+    const exportedPrefs = { ...prefs, aiApiKey: prefs.aiApiKey ? 'stored-locally-not-exported' : '' };
     return {
       version: 1,
       exportedAt: new Date().toISOString(),
-      preferences: loadPreferences(),
+      preferences: exportedPrefs,
       bankroll: localStorage.getItem('userBankroll') || null,
       bets: readRawJson(USER_BETS_KEY, []),
       demoBets: readRawJson(USER_BETS_DEMO_KEY, []),
@@ -323,7 +332,9 @@
     if (!profile || typeof profile !== 'object') throw new Error('Profil invalide');
     const replace = mode === 'replace';
     if (profile.preferences) {
-      const prefs = replace ? profile.preferences : { ...loadPreferences(), ...profile.preferences };
+      const importedPrefs = { ...profile.preferences };
+      if (importedPrefs.aiApiKey === 'stored-locally-not-exported') delete importedPrefs.aiApiKey;
+      const prefs = replace ? { ...DEFAULT_PREFERENCES, ...importedPrefs } : { ...loadPreferences(), ...importedPrefs };
       savePreferences(prefs);
       localStorage.setItem('userBankroll', String(prefs.bankroll || profile.bankroll || 50));
     }
@@ -662,6 +673,7 @@
     if (!grid) return;
     const rows = (state.picks || []).filter((row) => pickHasCoreData(row) && canDisplayStake(row));
     const bigRows = rows.filter((row) => Number(row.edge || 0) >= 0.10);
+    const ultimate = ultimateBetCandidate(rows);
     const nextPick = rows
       .filter((row) => Number.isFinite(Date.parse(row.start || '')))
       .sort((a, b) => Date.parse(a.start || '') - Date.parse(b.start || ''))[0] || rows[0] || null;
@@ -675,11 +687,15 @@
         : 'CLV en apprentissage';
     if (title) {
       title.textContent = rows.length
-        ? `Bonjour, ${formatCount(rows.length)} picks aujourd'hui, dont ${formatCount(bigRows.length)} gros`
+        ? ultimate
+          ? `Bet ultime : ${ultimate.title}`
+          : `Bonjour, ${formatCount(rows.length)} picks aujourd'hui, dont ${formatCount(bigRows.length)} gros`
         : 'Bonjour, aucun pari prêt pour l’instant';
     }
     if (subtitle) {
-      subtitle.textContent = nextPick
+      subtitle.textContent = ultimate
+        ? `${ultimate.market} · ${ultimate.label} ${formatOdd(ultimate.odd)} · ${formatPct(ultimate.edge, 1)} edge · départ ${countdownLabel(ultimate.start)}.`
+        : nextPick
         ? `Prochain match dans ${countdownLabel(nextPick.start)} : ${nextPick.title}, ${nextPick.label} (${formatPct(nextPick.edge, 1)} edge).`
         : 'Le cockpit reste utile : surveille les données, prépare les combinés ou relance un refresh.';
     }
@@ -2326,6 +2342,252 @@
     );
   }
 
+  function pickConfidenceValue(row) {
+    const trust = Number(row?.confidenceTrust?.score);
+    if (Number.isFinite(trust) && trust > 0) return trust / 100;
+    const quality = Number(row?.contextQuality?.score);
+    if (Number.isFinite(quality) && quality > 0 && Number(row?.probability || 0) > 0) {
+      return (Number(row.probability || 0) + quality / 100) / 2;
+    }
+    return Number(row?.probability || 0) || 0;
+  }
+
+  function hasPositiveHistoricalSegment(row) {
+    const level = String(row?.calibration?.level || '').toLowerCase();
+    const tier = String(row?.tier || '').toLowerCase();
+    if (['warm', 'tracked'].includes(level)) return true;
+    if (row?.calibration?.edgeBucket?.level === 'warm') return true;
+    if (tier.includes('lock') || tier.includes('premium') || tier.includes('value')) return true;
+    return Number(row?.edge || 0) >= 0.10 && Number(row?.calibration?.sample || 0) === 0;
+  }
+
+  function ultimateBetCandidate(rows) {
+    const now = Date.now();
+    const horizon = now + 24 * 60 * 60 * 1000;
+    return (Array.isArray(rows) ? rows : [])
+      .filter((row) => canDisplayStake(row))
+      .filter((row) => {
+        const ts = Date.parse(row.start || '');
+        return Number.isFinite(ts) && ts >= now - 30 * 60 * 1000 && ts <= horizon;
+      })
+      .filter((row) => Number(row.edge || 0) >= 0.07)
+      .filter((row) => pickConfidenceValue(row) >= 0.65)
+      .filter(hasPositiveHistoricalSegment)
+      .sort((a, b) => (
+        Number(b.edge || 0) - Number(a.edge || 0)
+        || pickConfidenceValue(b) - pickConfidenceValue(a)
+        || Date.parse(a.start || '') - Date.parse(b.start || '')
+      ))[0] || null;
+  }
+
+  function trackButtonHtml(row, label = 'Je mise') {
+    const tracked = new Set(loadUserBets().filter((bet) => bet.status === 'pending').map((bet) => bet.key));
+    const discipline = bankrollDisciplineStatus();
+    const trackKey = userBetKey(row);
+    const isTracked = tracked.has(trackKey);
+    if (!canDisplayStake(row)) return '<span class="match-sub">0 €</span>';
+    if (discipline.blocked) {
+      return `<button type="button" class="track-bet-btn tracked" disabled title="${escapeHtml(discipline.detail)}">${escapeHtml(discipline.label)}</button>`;
+    }
+    return `<button type="button" class="track-bet-btn${isTracked ? ' tracked' : ''}" data-track-bet-key="${escapeHtml(trackKey)}">${isTracked ? 'Suivi' : escapeHtml(label)}</button>`;
+  }
+
+  function ultimateBetReason(row) {
+    if (!row) return 'Aucun pick ne réunit edge ≥ 7pt, confiance ≥ 65%, segment positif et départ dans les 24h.';
+    const bits = [
+      `${formatPct(row.edge || 0, 1)} d’edge`,
+      `${formatPct(pickConfidenceValue(row), 0)} confiance`,
+      `${formatOdd(row.odd)} Winamax`,
+      countdownLabel(row.start)
+    ];
+    return `${row.market} · ${row.label} : ${bits.join(' · ')}. ${pickReason(row).replace(/^Pourquoi\s*:\s*/i, '')}`;
+  }
+
+  function renderUltimateBet(rows) {
+    const wrap = $('#ultimate-bet-card');
+    if (!wrap) return;
+    const row = aiSelectedUltimate(rows) || ultimateBetCandidate(rows);
+    const aiReason = row && state.aiAssist?.ultimate?.selectedKey === userBetKey(row) ? state.aiAssist?.ultimate?.reason : null;
+    if (!row) {
+      const refusal = state.aiAssist?.ultimate?.accepted === false ? state.aiAssist.ultimate.reason : ultimateBetReason(null);
+      wrap.innerHTML = `
+        <div class="ultimate-copy">
+          <span class="eyebrow">Bet ultime du jour</span>
+          <h3>Aucun bet ultime validé</h3>
+          <p>${escapeHtml(refusal)}</p>
+        </div>
+        <div class="ultimate-side"><strong>Patience</strong><span>Les candidats restent classés par horaire.</span></div>
+      `;
+      return;
+    }
+    wrap.innerHTML = `
+      <div class="ultimate-copy">
+        <span class="eyebrow">Bet ultime du jour</span>
+        <h3>${escapeHtml(row.title)}</h3>
+        <p>${escapeHtml(aiReason || ultimateBetReason(row))}</p>
+        <div class="ultimate-tags">
+          <span>${escapeHtml(row.market)}</span>
+          <span>${escapeHtml(row.label)}</span>
+          <span>${escapeHtml(formatOdd(row.odd))}</span>
+          <span>mise ${escapeHtml(visibleStakeText(row))}</span>
+        </div>
+      </div>
+      <div class="ultimate-side">
+        <strong>${escapeHtml(countdownLabel(row.start))}</strong>
+        <span>${escapeHtml(formatDateLabel(row.start))}</span>
+        ${trackButtonHtml(row, 'Je mise ce bet')}
+      </div>
+    `;
+  }
+
+  function temporalBucketForPick(row) {
+    const ts = Date.parse(row?.start || '');
+    const now = Date.now();
+    if (!Number.isFinite(ts)) return 'later';
+    const diff = ts - now;
+    if (diff < -30 * 60 * 1000) return 'later';
+    if (diff < 2 * 60 * 60 * 1000) return 'now';
+    if (diff < 6 * 60 * 60 * 1000) return 'soon';
+    const today = parisDayKey(new Date());
+    const tomorrow = parisDayKey(new Date(now + 24 * 60 * 60 * 1000));
+    const day = parisDayKey(new Date(ts));
+    if (day === today) return 'today';
+    if (day === tomorrow) return 'tomorrow';
+    return 'later';
+  }
+
+  function timePickCard(row) {
+    return `
+      <article class="time-pick-card clickable-row" data-match-id="${escapeHtml(row.id)}" tabindex="0" role="button">
+        <div>
+          <strong>${escapeHtml(row.title)}</strong>
+          <span>${escapeHtml(row.league || row.sport || '')} · ${escapeHtml(formatDateLabel(row.start))}</span>
+        </div>
+        <div class="time-pick-meta">
+          <span>${escapeHtml(row.market)}</span>
+          <span>${escapeHtml(row.label)}</span>
+          <span>${escapeHtml(formatOdd(row.odd))}</span>
+          <span>edge ${escapeHtml(formatPct(row.edge || 0, 1))}</span>
+          <span>${escapeHtml(countdownLabel(row.start))}</span>
+        </div>
+        <p>${escapeHtml(pickReason(row).replace(/^Pourquoi\s*:\s*/i, ''))}</p>
+        <div class="time-pick-action">${trackButtonHtml(row)}</div>
+      </article>
+    `;
+  }
+
+  function renderTemporalCockpit(rows) {
+    const wrap = $('#time-cockpit');
+    if (!wrap) return;
+    const buckets = [
+      { key: 'now', title: 'À jouer maintenant', detail: '< 2h', open: true },
+      { key: 'soon', title: 'Bientôt', detail: '2h - 6h', open: true },
+      { key: 'today', title: 'Plus tard aujourd’hui', detail: '6h - fin de journée', open: true },
+      { key: 'tomorrow', title: 'Demain', detail: 'J+1', open: false },
+      { key: 'later', title: 'Prochains jours', detail: 'J+2 à J+7', open: false }
+    ];
+    const grouped = new Map(buckets.map((bucket) => [bucket.key, []]));
+    (Array.isArray(rows) ? rows : [])
+      .filter((row) => pickHasCoreData(row) && canDisplayStake(row))
+      .forEach((row) => grouped.get(temporalBucketForPick(row))?.push(row));
+    grouped.forEach((bucketRows) => bucketRows.sort((a, b) => Number(b.edge || 0) - Number(a.edge || 0) || Date.parse(a.start || '') - Date.parse(b.start || '')));
+    wrap.innerHTML = buckets.map((bucket) => {
+      const bucketRows = grouped.get(bucket.key) || [];
+      const rowsHtml = bucketRows.length
+        ? bucketRows.slice(0, bucket.key === 'later' ? 12 : 8).map(timePickCard).join('')
+        : '<div class="empty compact-empty">Aucun pick dans cette fenêtre.</div>';
+      return `
+        <details class="time-section ${bucket.key === 'now' && bucketRows.length ? 'hot' : ''}" data-time-bucket="${escapeHtml(bucket.key)}"${bucket.open ? ' open' : ''}>
+          <summary>
+            <span>${escapeHtml(bucket.title)}</span>
+            <strong>${formatCount(bucketRows.length)}</strong>
+            <em>${escapeHtml(bucket.detail)}</em>
+          </summary>
+          <div class="time-section-grid">${rowsHtml}</div>
+        </details>
+      `;
+    }).join('');
+    const nowSection = wrap.querySelector('[data-time-bucket="now"].hot');
+    if (nowSection && !state.didScrollToNow) {
+      state.didScrollToNow = true;
+      setTimeout(() => nowSection.scrollIntoView({ block: 'nearest', behavior: 'smooth' }), 200);
+    }
+  }
+
+  function aiConfigFromPreferences() {
+    const prefs = loadPreferences();
+    return {
+      enabled: Boolean(prefs.aiEnabled && prefs.aiApiKey),
+      provider: prefs.aiProvider || 'openai',
+      apiKey: prefs.aiApiKey || '',
+      model: prefs.aiModel || 'gpt-4o-mini'
+    };
+  }
+
+  function aiPickPayload(row) {
+    return {
+      key: userBetKey(row),
+      id: row.id,
+      title: row.title,
+      sport: row.sport,
+      league: row.league,
+      market: row.market,
+      label: row.label,
+      odd: row.odd,
+      probability: row.probability,
+      edge: row.edge,
+      confidence: pickConfidenceValue(row),
+      start: row.start,
+      reason: pickReason(row),
+      contextScore: row.contextQuality?.score ?? null,
+      calibrationLevel: row.calibration?.level || null,
+      calibrationSample: row.calibration?.sample || null
+    };
+  }
+
+  async function aiAssist(task, payload) {
+    const response = await fetchJson('/api/ai/assist', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ config: aiConfigFromPreferences(), task, payload })
+    });
+    return response?.result || null;
+  }
+
+  function aiSelectedUltimate(rows) {
+    const selectedKey = state.aiAssist?.ultimate?.selectedKey;
+    if (!selectedKey) return null;
+    return (Array.isArray(rows) ? rows : []).find((row) => userBetKey(row) === selectedKey) || null;
+  }
+
+  async function runBackgroundAi(rows) {
+    const topRows = (Array.isArray(rows) ? rows : [])
+      .filter((row) => pickHasCoreData(row) && canDisplayStake(row))
+      .slice()
+      .sort((a, b) => Number(b.edge || 0) - Number(a.edge || 0))
+      .slice(0, 10);
+    if (!topRows.length) return;
+    try {
+      const [ultimate, anomalies] = await Promise.all([
+        aiAssist('curate_ultimate', { picks: topRows.map(aiPickPayload) }),
+        aiAssist('detect_anomalies', { picks: topRows.map(aiPickPayload), status: state.status })
+      ]);
+      state.aiAssist = {
+        generatedAt: new Date().toISOString(),
+        ultimate,
+        anomalies,
+        provider: aiConfigFromPreferences().enabled ? aiConfigFromPreferences().provider : 'heuristic'
+      };
+      writeStorageJson(AI_ENGINE_KEY, state.aiAssist);
+      const warnings = Array.isArray(anomalies?.warnings) ? anomalies.warnings : [];
+      warnings.forEach((warning) => pushLog('warn', `IA moteur: ${warning.reason || 'anomalie'} (${warning.key || '-'})`));
+      renderUltimateBet(topRows);
+      renderPipelinePanel(state.status);
+    } catch (error) {
+      pushLog('warn', `IA moteur indisponible: ${error.message}`);
+    }
+  }
+
   function renderPicks(emptyMessage) {
     const body = $('#picks-body');
     const metricLabel = $('#metric-picks-label');
@@ -2338,6 +2600,10 @@
     const displayRows = dashboardPickRows(filters);
     rememberDisplayedOdds(displayRows);
     renderMarketSnapshot(displayRows);
+    renderUltimateBet(displayRows);
+    renderTemporalCockpit(displayRows);
+    clearTimeout(state.aiTimer);
+    state.aiTimer = setTimeout(() => runBackgroundAi(displayRows), 600);
     const total = state.allPicks.length || state.picks.length || 0;
     const meta = state.dashboardMeta || {};
     const ready = Number(state.decisionCenter?.summary?.ready || meta.readyPicks || 0);
@@ -3258,7 +3524,12 @@
       return;
     }
     const tracked = new Set(loadUserBets().filter((bet) => bet.status === 'pending').map((bet) => bet.key));
-    wrap.innerHTML = state.combines.map((combo) => {
+    const sortedCombines = state.combines.slice().sort((a, b) => {
+      const edgeA = (Array.isArray(a.legs) ? a.legs : []).reduce((sum, leg) => sum + Number(leg.edge || 0), 0) / Math.max(1, (a.legs || []).length);
+      const edgeB = (Array.isArray(b.legs) ? b.legs : []).reduce((sum, leg) => sum + Number(leg.edge || 0), 0) / Math.max(1, (b.legs || []).length);
+      return edgeB - edgeA || Number(b.totalOdd || 0) - Number(a.totalOdd || 0);
+    });
+    wrap.innerHTML = sortedCombines.map((combo) => {
       const legs = Array.isArray(combo.legs) ? combo.legs : [];
       const key = comboKey(combo);
       const trackedCombo = tracked.has(key);
@@ -3309,21 +3580,111 @@
   }
 
   function scorerAvatarHtml(scorer) {
-    if (scorer.playerId) {
-      return `<img class="player-avatar" src="https://img.sofascore.com/api/v1/player/${encodeURIComponent(scorer.playerId)}/image" alt="">`;
-    }
     const initial = cleanLabel(scorer.name, '?').trim().charAt(0).toUpperCase() || '?';
     return `<div class="avatar-fallback">${escapeHtml(initial)}</div>`;
+  }
+
+  function scorerLeagueKey(scorer) {
+    return normalizeUiKey(scorer?.league || 'ligue');
+  }
+
+  function updateScorerFilters() {
+    const select = $('#scorer-league-filter');
+    if (!select) return;
+    const current = select.value || 'all';
+    const leagues = Array.from(new Map((state.scorers || []).map((scorer) => [scorerLeagueKey(scorer), scorer.league || 'Ligue inconnue'])).entries())
+      .sort((a, b) => String(a[1]).localeCompare(String(b[1])));
+    const html = ['<option value="all">Toutes ligues</option>', ...leagues.map(([key, label]) => `<option value="${escapeHtml(key)}">${escapeHtml(label)}</option>`)].join('');
+    if (select.dataset.optionsHtml !== html) {
+      select.innerHTML = html;
+      select.dataset.optionsHtml = html;
+      select.value = leagues.some(([key]) => key === current) ? current : 'all';
+    }
+  }
+
+  function readScorerFilters() {
+    return {
+      query: normalizeUiKey($('#scorer-search')?.value || ''),
+      league: $('#scorer-league-filter')?.value || 'all',
+      market: $('#scorer-market-filter')?.value || 'all',
+      oddMin: Number($('#scorer-odd-min')?.value || 0) || 0,
+      oddMax: Number($('#scorer-odd-max')?.value || 0) || 0,
+      sort: $('#scorer-sort')?.value || 'kickoff'
+    };
+  }
+
+  function scorerSearchText(scorer) {
+    return normalizeUiKey([scorer?.name, scorer?.teamName, scorer?.title, scorer?.league, scorer?.position].join(' '));
+  }
+
+  function filteredScorers() {
+    updateScorerFilters();
+    const filters = readScorerFilters();
+    const rows = (state.scorers || []).filter((scorer) => {
+      const odd = Number(scorer.impliedOdd || 0);
+      if (filters.query && !scorerSearchText(scorer).includes(filters.query)) return false;
+      if (filters.league !== 'all' && scorerLeagueKey(scorer) !== filters.league) return false;
+      if (filters.market !== 'all' && filters.market !== 'buteur') return false;
+      if (filters.oddMin > 1 && odd < filters.oddMin) return false;
+      if (filters.oddMax > 1 && odd > filters.oddMax) return false;
+      return true;
+    });
+    rows.sort((a, b) => {
+      if (filters.sort === 'confidence') return Number(b.probability || 0) - Number(a.probability || 0);
+      if (filters.sort === 'edge') return Number(b.playerQuality?.score || 0) - Number(a.playerQuality?.score || 0);
+      if (filters.sort === 'odd') return Number(b.impliedOdd || 0) - Number(a.impliedOdd || 0);
+      return Date.parse(a.start || '') - Date.parse(b.start || '') || Number(b.probability || 0) - Number(a.probability || 0);
+    });
+    return rows;
+  }
+
+  function scorerToTrackRow(scorer) {
+    const odd = Number(scorer?.impliedOdd || 0);
+    return {
+      id: scorer?.matchId || scorer?.id || '',
+      match: {
+        id: scorer?.matchId || scorer?.id || '',
+        date: scorer?.start || '',
+        winamax: { available: true, url: scorer?.winamaxUrl || '' }
+      },
+      title: scorer?.title || 'Match joueur',
+      sport: 'football',
+      league: scorer?.league || '',
+      start: scorer?.start || '',
+      market: 'Buteur',
+      marketKey: 'scorer',
+      label: scorer?.name || 'Joueur',
+      odd: odd > 1 ? odd : 1,
+      probability: Number(scorer?.probability || 0) || 0,
+      edge: 0,
+      stake: Math.max(0.5, Math.min(getBankroll() * 0.01, getBankroll() * 0.03)),
+      status: 'bet',
+      statusLabel: 'Buteur à vérifier',
+      decisionCenter: { canBet: true, status: 'ready', mainReason: 'Pick joueur suivi manuellement après vérification Winamax.' },
+      contextQuality: { score: Number(scorer?.playerQuality?.score || 0) || null }
+    };
+  }
+
+  function trackScorerBet(id) {
+    const scorer = (state.scorers || []).find((row) => String(row.id) === String(id));
+    if (!scorer) return;
+    const row = scorerToTrackRow(scorer);
+    trackUserBet(row);
   }
 
   function renderScorers() {
     const wrap = $('#scorers-list');
     if (!wrap) return;
+    const rows = filteredScorers();
     if (!state.scorers.length) {
-      wrap.innerHTML = '<div class="empty">Aucun buteur probable exploitable avec les règles actuelles.</div>';
+      wrap.innerHTML = '<div class="empty">Aucun pick joueur disponible aujourd’hui. Le logiciel l’indique clairement au lieu de remplir avec du bruit.</div>';
       return;
     }
-    wrap.innerHTML = state.scorers.map((scorer) => {
+    if (!rows.length) {
+      wrap.innerHTML = '<div class="empty">Aucun buteur ne correspond aux filtres actuels.</div>';
+      return;
+    }
+    wrap.innerHTML = rows.map((scorer) => {
       const pct = Math.max(0, Math.min(100, Math.round((Number(scorer.probability) || 0) * 100)));
       const meterClass = `meter-w-${Math.round(pct / 5) * 5}`;
       const quality = scorer.playerQuality || {};
@@ -3347,12 +3708,13 @@
             <span>${escapeHtml(quality.label || 'Profil joueur')}</span>
             <strong>${Number.isFinite(Number(quality.score)) ? `${Math.round(Number(quality.score))}/100` : '-'}</strong>
           </div>
-          <p class="scorer-reasons">${escapeHtml(reasonText)}</p>
+          <p class="scorer-reasons">${escapeHtml(`Buteur · ${reasonText}`)}</p>
           <div class="scorer-footer">
             <div class="mini-stat"><span>Cote fair</span><strong>${formatOdd(scorer.impliedOdd)}</strong></div>
             <div class="mini-stat"><span>Départ</span><strong>${escapeHtml(formatDateLabel(scorer.start))}</strong></div>
             <div class="mini-stat"><span>Source</span><strong>${scorer.source === 'star_players' ? 'Profil' : 'Lineup'}</strong></div>
           </div>
+          <button type="button" class="track-bet-btn scorer-track-btn" data-track-scorer-id="${escapeHtml(scorer.id)}">Je mise</button>
         </article>`;
     }).join('');
   }
@@ -3735,6 +4097,68 @@
     };
   }
 
+  function sportSettlementDelayMs(sport) {
+    const key = normalizeUiKey(sport || '');
+    if (key.includes('football') || key.includes('soccer') || key === 'foot') return 90 * 60 * 1000;
+    if (key.includes('tennis')) return 3 * 60 * 60 * 1000;
+    return 150 * 60 * 1000;
+  }
+
+  function settlementDateToleranceMs(sport) {
+    const key = normalizeUiKey(sport || '');
+    if (key.includes('tennis')) return 36 * 60 * 60 * 1000;
+    if (key.includes('baseball')) return 18 * 60 * 60 * 1000;
+    return 12 * 60 * 60 * 1000;
+  }
+
+  function resultStatusText(result) {
+    return normalizeUiKey([
+      result?.status,
+      result?.status_type,
+      result?.statusType,
+      result?.status?.type?.name,
+      result?.status?.type?.state,
+      result?.status?.type?.description,
+      result?.competitions?.[0]?.status?.type?.name,
+      result?.competitions?.[0]?.status?.type?.state,
+      result?.competitions?.[0]?.status?.type?.description
+    ].filter(Boolean).join(' '));
+  }
+
+  function resultHasFinalStatus(result) {
+    if (!result) return false;
+    const text = resultStatusText(result);
+    if (result.completed === true) return true;
+    return /\b(completed|complete|final|ft|fulltime|closed|post)\b/.test(text);
+  }
+
+  function resultHasFinalOutcome(result, sport) {
+    const teams = resultTeams(result);
+    const scores = [teams.home.score, teams.away.score].map((score) => Number.parseInt(score ?? '', 10));
+    if (scores.every(Number.isFinite)) return true;
+    const winners = [teams.home, teams.away].filter((team) => team?.winner === true).length;
+    const sportKey = normalizeUiKey(sport || result?.sport || '');
+    return sportKey.includes('tennis') && winners === 1;
+  }
+
+  function settlementEligibility(bet, result, now = Date.now()) {
+    if (!bet || !result) return { ok: false, reason: 'résultat absent' };
+    const sport = bet.sport || result.sport || '';
+    const kickoff = Date.parse(bet.start || bet.date || '');
+    if (!Number.isFinite(kickoff)) return { ok: false, reason: 'kickoff du pari inconnu' };
+    if (kickoff > now) return { ok: false, reason: 'match pas encore commencé' };
+    const delayMs = sportSettlementDelayMs(sport);
+    if (now - kickoff < delayMs) return { ok: false, reason: 'marge post-match insuffisante' };
+    if (!resultHasFinalStatus(result)) return { ok: false, reason: 'statut final non confirmé' };
+    if (!resultHasFinalOutcome(result, sport)) return { ok: false, reason: 'score final absent' };
+    const resultTs = Date.parse(result.date || result.start || result.startDate || '');
+    if (!Number.isFinite(resultTs)) return { ok: false, reason: 'date résultat inconnue' };
+    if (resultTs > now - delayMs) return { ok: false, reason: 'résultat trop récent ou futur' };
+    const toleranceMs = settlementDateToleranceMs(sport);
+    if (Math.abs(resultTs - kickoff) > toleranceMs) return { ok: false, reason: 'résultat archivé hors date du pari' };
+    return { ok: true, reason: 'final confirmé' };
+  }
+
   function resultTotal(result) {
     const teams = resultTeams(result);
     const hs = Number.parseInt(teams.home.score ?? '', 10);
@@ -3781,7 +4205,7 @@
   }
 
   function evaluateTrackedBetAgainstResult(bet, result) {
-    if (!result?.completed) return null;
+    if (!settlementEligibility(bet, result).ok) return null;
     const key = marketKeyFromRow(bet);
     const label = normalizeResultName(bet.label || '');
     const side = betSideFromLabel(bet, result);
@@ -3839,6 +4263,11 @@
     return Boolean(home && away && betTitle.includes(home) && betTitle.includes(away));
   }
 
+  function findEligibleResultForBet(bet, results, now = Date.now()) {
+    const candidates = (Array.isArray(results) ? results : []).filter((item) => resultMatchesBet(bet, item));
+    return candidates.find((item) => settlementEligibility(bet, item, now).ok) || null;
+  }
+
   async function loadResultsArchive() {
     const text = await fetch('/results_archive.jsonl', { cache: 'no-store' }).then((response) => response.ok ? response.text() : '');
     return text.split(/\r?\n/)
@@ -3853,7 +4282,6 @@
   async function autoSettleUserBets(reason = 'startup') {
     const bets = loadUserBets();
     const pending = bets.filter((bet) => bet.status === 'pending');
-    if (!pending.length) return readStorageJson(AUTO_SETTLEMENT_KEY, null);
     let results = [];
     try {
       results = await loadResultsArchive();
@@ -3861,14 +4289,22 @@
       pushLog('warn', `Settlement auto indisponible: ${error.message}`);
       return null;
     }
+    const rollback = repairUnsafeAutoSettlements(bets, results);
     let settled = 0;
     let won = 0;
     let lost = 0;
     let voided = 0;
     let pnl = 0;
+    let blocked = 0;
+    let blockedReason = null;
     bets.forEach((bet, index) => {
       if (bet.status !== 'pending') return;
-      const result = results.find((item) => resultMatchesBet(bet, item));
+      const matchedResults = results.filter((item) => resultMatchesBet(bet, item));
+      const result = findEligibleResultForBet(bet, matchedResults);
+      if (!result && matchedResults.length) {
+        blocked += 1;
+        blockedReason = settlementEligibility(bet, matchedResults[0]).reason;
+      }
       const status = result ? evaluateTrackedBetAgainstResult(bet, result) : null;
       if (!status) return;
       const applied = settleUserBetAtIndex(bets, index, status, { source: 'auto', reason: `Résultat archivé ${result.id || result.name || ''}` });
@@ -3887,17 +4323,48 @@
       won,
       lost,
       void: voided,
-      pnl
+      pnl,
+      blocked,
+      blockedReason,
+      rollback
     };
     writeStorageJson(AUTO_SETTLEMENT_KEY, audit);
-    if (settled) {
+    if (settled || rollback.reverted) {
       saveUserBets(bets);
       renderUserPnl();
       renderHistory();
       renderPicks();
-      notifyUser('Settlement auto', `${formatCount(settled)} pari(s) résolu(s) · P&L ${formatMoney(pnl)}`);
+      if (settled) notifyUser('Settlement auto', `${formatCount(settled)} pari(s) résolu(s) · P&L ${formatMoney(pnl)}`);
+      if (rollback.reverted) setSideStatus(`${formatCount(rollback.reverted)} settlement fantôme annulé`, 'warn');
     }
     return audit;
+  }
+
+  function repairUnsafeAutoSettlements(bets, results) {
+    const summary = { checked: 0, reverted: 0, reasons: [] };
+    if (!Array.isArray(bets)) return summary;
+    bets.forEach((bet, index) => {
+      if (!['won', 'lost', 'void'].includes(String(bet?.status || ''))) return;
+      if (bet.settlementSource !== 'auto') return;
+      summary.checked += 1;
+      const result = findEligibleResultForBet(bet, results);
+      if (result) return;
+      const matched = (Array.isArray(results) ? results : []).find((item) => resultMatchesBet(bet, item));
+      const reason = matched ? settlementEligibility(bet, matched).reason : 'résultat final introuvable';
+      summary.reverted += 1;
+      if (summary.reasons.length < 5) summary.reasons.push(`${bet.title || bet.label || 'Pari'} : ${reason}`);
+      bets[index] = {
+        ...bet,
+        status: 'pending',
+        pnl: 0,
+        phantomSettlementRevertedAt: new Date().toISOString(),
+        phantomSettlementReason: reason,
+        previousSettlementStatus: bet.status,
+        settlementSource: null,
+        settlementReason: null
+      };
+    });
+    return summary;
   }
 
   function refreshTrackedBetMarketData() {
@@ -4159,7 +4626,9 @@
     grid.innerHTML = [
       ['Vérifiés', formatCount(audit.checked || 0), audit.reason || 'startup'],
       ['Résolus auto', formatCount(audit.settled || 0), `${formatCount(audit.won || 0)}W · ${formatCount(audit.lost || 0)}L · ${formatCount(audit.void || 0)} void`],
-      ['P&L auto', formatMoney(audit.pnl || 0), audit.generatedAt ? formatDateLabel(audit.generatedAt) : '-']
+      ['P&L auto', formatMoney(audit.pnl || 0), audit.generatedAt ? formatDateLabel(audit.generatedAt) : '-'],
+      ['Refusés sécurité', formatCount(audit.blocked || 0), audit.blockedReason || 'Kickoff/date finale protégés'],
+      ['Fantômes annulés', formatCount(audit.rollback?.reverted || 0), audit.rollback?.reasons?.[0] || 'Aucun settlement suspect']
     ].map(([label, value, detail]) => `
       <article class="performance-card">
         <span>${escapeHtml(label)}</span>
@@ -4191,6 +4660,14 @@
     if (demo) demo.checked = Boolean(prefs.demoMode);
     const coachEnabled = $('#pref-coach-enabled');
     if (coachEnabled) coachEnabled.checked = prefs.coachEnabled !== false;
+    const aiEnabled = $('#pref-ai-enabled');
+    if (aiEnabled) aiEnabled.checked = Boolean(prefs.aiEnabled && prefs.aiApiKey);
+    const aiProvider = $('#pref-ai-provider');
+    if (aiProvider) aiProvider.value = prefs.aiProvider || 'openai';
+    const aiModel = $('#pref-ai-model');
+    if (aiModel) aiModel.value = prefs.aiModel || '';
+    const aiKey = $('#pref-ai-key');
+    if (aiKey) aiKey.value = prefs.aiApiKey || '';
     const stakeMode = $('#pref-stake-mode');
     if (stakeMode) stakeMode.value = prefs.stakeMode || 'kelly';
     const sportsGrid = $('#pref-sports');
@@ -4257,6 +4734,10 @@
       dailyStakeCapPct: Math.max(1, Number($('#pref-daily-stake-cap')?.value || DEFAULT_PREFERENCES.dailyStakeCapPct) || DEFAULT_PREFERENCES.dailyStakeCapPct),
       coachLossStreakConfirm: Math.max(2, Number($('#pref-loss-streak-confirm')?.value || DEFAULT_PREFERENCES.coachLossStreakConfirm) || DEFAULT_PREFERENCES.coachLossStreakConfirm),
       demoMode: Boolean($('#pref-demo-mode')?.checked),
+      aiEnabled: Boolean($('#pref-ai-enabled')?.checked && ($('#pref-ai-key')?.value || '').trim()),
+      aiProvider: $('#pref-ai-provider')?.value || DEFAULT_PREFERENCES.aiProvider,
+      aiApiKey: ($('#pref-ai-key')?.value || '').trim(),
+      aiModel: ($('#pref-ai-model')?.value || '').trim() || DEFAULT_PREFERENCES.aiModel,
       strict: Boolean($('#pref-strict')?.checked)
     };
   }
@@ -8435,6 +8916,14 @@
       trackUserCombo(findComboByTrackKey(comboButton.dataset.trackComboKey || ''));
       return;
     }
+    const scorerButton = event.target.closest('[data-track-scorer-id]');
+    if (scorerButton) {
+      event.preventDefault();
+      event.stopPropagation();
+      if (event.type === 'keydown') return;
+      trackScorerBet(scorerButton.dataset.trackScorerId || '');
+      return;
+    }
     if (event.target.closest('button, a, input, select, textarea')) return;
     const row = event.target.closest('[data-match-id]');
     if (!row) return;
@@ -8552,6 +9041,11 @@
       const el = $(`#${id}`);
       if (!el) return;
       el.addEventListener(el.tagName === 'INPUT' ? 'input' : 'change', () => renderPicks());
+    });
+    ['scorer-search', 'scorer-league-filter', 'scorer-market-filter', 'scorer-odd-min', 'scorer-odd-max', 'scorer-sort'].forEach((id) => {
+      const el = $(`#${id}`);
+      if (!el) return;
+      el.addEventListener(el.tagName === 'INPUT' ? 'input' : 'change', () => renderScorers());
     });
     $('#market-snapshot')?.addEventListener('click', (event) => {
       const button = event.target.closest('[data-market-chip]');
@@ -8705,7 +9199,7 @@
         $('#refresh-log').textContent = error.stack || error.message;
       });
     });
-    ['picks-body', 'stake-scenario-body', 'watchlist-grid', 'prematch-final-grid', 'matches-body', 'combines-list', 'scorers-list', 'agent-positions-body', 'agent-blockers-body'].forEach((id) => {
+    ['ultimate-bet-card', 'time-cockpit', 'picks-body', 'stake-scenario-body', 'watchlist-grid', 'prematch-final-grid', 'matches-body', 'combines-list', 'scorers-list', 'agent-positions-body', 'agent-blockers-body'].forEach((id) => {
       const node = $(`#${id}`);
       if (!node) return;
       node.addEventListener('click', openMatchFromEvent);
@@ -8933,6 +9427,7 @@
     markAppSessionStart();
     bindEvents();
     state.actionHistory = readActionHistory();
+    state.aiAssist = readStorageJson(AI_ENGINE_KEY, null);
     renderActionHistory();
     const storedBankroll = Number(localStorage.getItem('userBankroll') || loadPreferences().bankroll || 50);
     if (Number.isFinite(storedBankroll) && storedBankroll > 0) $('#bankroll-input').value = String(storedBankroll);
