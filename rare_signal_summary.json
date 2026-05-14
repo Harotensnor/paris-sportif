@@ -1,26 +1,26 @@
 {
-  "generated_at": "2026-05-14T02:54:54Z",
+  "generated_at": "2026-05-14T02:57:43Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 78,
-    "actionable": 24,
-    "watch": 3,
-    "risk": 51,
+    "active_events": 73,
+    "actionable": 22,
+    "watch": 1,
+    "risk": 50,
     "expired_sample": 0,
     "by_type": {
       "travel_extreme": 7,
       "back_to_back_travel": 8,
       "injury_imbalance": 10,
-      "market_move": 28,
-      "signal_conflict": 9,
-      "market_uncertain": 52
+      "market_move": 24,
+      "signal_conflict": 4,
+      "market_uncertain": 56
     },
     "by_quality": {
-      "actionable": 24,
-      "watch": 3,
-      "risk": 51
+      "actionable": 22,
+      "watch": 1,
+      "risk": 50
     }
   },
   "active_actionable": [
@@ -77,42 +77,6 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 14-8"
-    },
-    {
-      "event_id": "401815344",
-      "date": "2026-05-14T19:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Athletics",
-      "away": "St. Louis Cardinals",
-      "match": "Athletics - St. Louis Cardinals",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 1.0,
-      "context": "Cote away: 1.97 -> 1.56 (+20.9%)"
-    },
-    {
-      "event_id": "748503",
-      "date": "2026-05-14T19:30Z",
-      "sport": "football",
-      "league_code": "esp.1",
-      "league_name": "La Liga",
-      "home": "Real Madrid",
-      "away": "Real Oviedo",
-      "match": "Real Madrid - Real Oviedo",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 1.0,
-      "context": "Cote away: 11.00 -> 8.50 (+22.7%)"
     },
     {
       "event_id": "401815337",
@@ -180,11 +144,11 @@
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
       "type": "market_move",
-      "direction": "steam",
+      "direction": "drift",
       "team": null,
-      "side": "home",
+      "side": "away",
       "strength": 1.0,
-      "context": "Cote home: 1.57 -> 1.24 (+21.1%)"
+      "context": "Cote away: 3.75 -> 4.60 (-22.7%)"
     },
     {
       "event_id": "401871338",
@@ -198,11 +162,11 @@
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
       "type": "market_move",
-      "direction": "drift",
+      "direction": "steam",
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 5.20 -> 8.50 (-63.5%)"
+      "context": "Cote home: 5.20 -> 1.07 (+79.4%)"
     },
     {
       "event_id": "401871421",
@@ -218,27 +182,9 @@
       "type": "market_move",
       "direction": "drift",
       "team": null,
-      "side": "draw",
-      "strength": 1.0,
-      "context": "Cote draw: 8.00 -> 21.00 (-162.5%)"
-    },
-    {
-      "event_id": "401872571",
-      "date": "2026-05-17T01:07Z",
-      "sport": "football",
-      "league_code": "ligamx",
-      "league_name": "Liga MX",
-      "home": "Guadalajara",
-      "away": "Cruz Azul",
-      "match": "Guadalajara - Cruz Azul",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 3.50 -> 1.68 (+52.0%)"
+      "context": "Cote home: 1.06 -> 2.00 (-88.7%)"
     },
     {
       "event_id": "401871339",
@@ -254,9 +200,9 @@
       "type": "market_move",
       "direction": "drift",
       "team": null,
-      "side": "away",
+      "side": "home",
       "strength": 1.0,
-      "context": "Cote away: 5.20 -> 8.50 (-63.5%)"
+      "context": "Cote home: 1.07 -> 5.20 (-386.0%)"
     },
     {
       "event_id": "401871422",
@@ -270,11 +216,11 @@
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
       "type": "market_move",
-      "direction": "drift",
+      "direction": "steam",
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 46.00 -> 100.00 (-117.4%)"
+      "context": "Cote home: 46.00 -> 1.54 (+96.7%)"
     },
     {
       "event_id": "401815402",
@@ -292,7 +238,7 @@
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 3.10 -> 3.75 (-21.0%)"
+      "context": "Cote home: 3.10 -> 4.60 (-48.4%)"
     },
     {
       "event_id": "401815417",
@@ -310,7 +256,7 @@
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 3.10 -> 3.75 (-21.0%)"
+      "context": "Cote home: 3.10 -> 4.60 (-48.4%)"
     },
     {
       "event_id": "401815425",
@@ -346,7 +292,7 @@
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 3.10 -> 3.75 (-21.0%)"
+      "context": "Cote home: 3.10 -> 4.60 (-48.4%)"
     },
     {
       "event_id": "401815335",
@@ -455,62 +401,44 @@
       "side": "away",
       "strength": 0.718,
       "context": "1 match dans les 48h + 938 km de voyage"
+    },
+    {
+      "event_id": "401872571",
+      "date": "2026-05-17T01:07Z",
+      "sport": "football",
+      "league_code": "ligamx",
+      "league_name": "Liga MX",
+      "home": "Guadalajara",
+      "away": "Cruz Azul",
+      "match": "Guadalajara - Cruz Azul",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "away",
+      "strength": 0.694,
+      "context": "Cote away: 2.00 -> 2.25 (-12.5%)"
     }
   ],
   "active_watch": [
     {
-      "event_id": "401872572",
-      "date": "2026-05-15T01:00Z",
-      "sport": "football",
-      "league_code": "ligamx",
-      "league_name": "Liga MX",
-      "home": "Pachuca",
-      "away": "Pumas UNAM",
-      "match": "Pachuca - Pumas UNAM",
+      "event_id": "175986",
+      "date": "2026-05-14T18:30Z",
+      "sport": "tennis",
+      "league_code": "internazionalibnldit",
+      "league_name": "Internazionali BNL d'Italia",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
       "quality": "watch",
       "quality_reason": "Signal rare present mais intensite moyenne",
       "type": "market_move",
-      "direction": "steam",
+      "direction": "drift",
       "team": null,
-      "side": "away",
-      "strength": 0.617,
-      "context": "Cote away: 3.60 -> 3.20 (+11.1%)"
-    },
-    {
-      "event_id": "401871367",
-      "date": "2026-05-14T19:00Z",
-      "sport": "football",
-      "league_code": "leagueone",
-      "league_name": "League One",
-      "home": "Bradford City",
-      "away": "Bolton Wanderers",
-      "match": "Bradford City - Bolton Wanderers",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.606,
-      "context": "Cote away: 2.75 -> 2.45 (+10.9%)"
-    },
-    {
-      "event_id": "401856908",
-      "date": "2026-05-15T00:00Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Dallas Wings",
-      "away": "Minnesota Lynx",
-      "match": "Dallas Wings - Minnesota Lynx",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.579,
-      "context": "Cote away: 2.40 -> 2.15 (+10.4%)"
+      "side": "home",
+      "strength": 0.556,
+      "context": "Cote home: 3.50 -> 3.85 (-10.0%)"
     }
   ],
   "active_risk": [
@@ -1413,24 +1341,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 19.0%"
-    },
-    {
-      "event_id": "401871410",
-      "date": "2026-05-18T04:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Buffalo Sabres",
-      "away": "Montreal Canadiens",
-      "match": "Buffalo Sabres - Montreal Canadiens",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "signal_conflict",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.45,
-      "context": "Signaux opposes: Buffalo Sabres fade 0.60, Montreal Canadiens fade 0.60 -> prudence"
     }
   ],
   "expired_sample": []
