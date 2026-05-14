@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-14T19:14:14Z",
+  "generated_at": "2026-05-14T19:17:06Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815344",
-      "kickoff": "2026-05-14T19:05Z",
-      "league": "MLB",
-      "match": "St. Louis Cardinals at Athletics Athletics",
-      "home": "Athletics",
-      "away": "St. Louis Cardinals",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Athletics",
-          "pitcher": "Jacob Lopez",
-          "label": "Jacob Lopez plus de 3,5 strikeouts",
-          "line": 3.5,
-          "pick": "over",
-          "probability": 0.6194,
-          "fair_odds": 1.61,
-          "expected_strikeouts": 3.97,
-          "projected_ip": 5.01,
-          "inputs": {
-            "k9": 7.13,
-            "era": 6.11,
-            "whip": 1.75,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Athletics",
-          "pitcher": "Jacob Lopez",
-          "label": "Jacob Lopez concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6791,
-          "fair_odds": 1.47,
-          "expected_hr_allowed": 1.137,
-          "projected_ip": 5.01,
-          "inputs": {
-            "hr9": 2.04,
-            "era": 6.11,
-            "whip": 1.75
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "St. Louis Cardinals",
-          "pitcher": "Michael McGreevy",
-          "label": "Michael McGreevy moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.5992,
-          "fair_odds": 1.67,
-          "expected_strikeouts": 4.1,
-          "projected_ip": 5.64,
-          "inputs": {
-            "k9": 6.55,
-            "era": 2.18,
-            "whip": 0.86,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "St. Louis Cardinals",
-          "pitcher": "Michael McGreevy",
-          "label": "Michael McGreevy ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5379,
-          "fair_odds": 1.86,
-          "expected_hr_allowed": 0.62,
-          "projected_ip": 5.64,
-          "inputs": {
-            "hr9": 0.99,
-            "era": 2.18,
-            "whip": 0.86
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815337",
       "kickoff": "2026-05-14T22:45Z",
@@ -332,7 +250,7 @@
       ]
     }
   ],
-  "props": 16,
+  "props": 12,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
