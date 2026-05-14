@@ -1,25 +1,26 @@
 {
-  "generated_at": "2026-05-14T09:21:46Z",
+  "generated_at": "2026-05-14T09:29:02Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 68,
-    "actionable": 16,
-    "watch": 1,
+    "active_events": 72,
+    "actionable": 18,
+    "watch": 3,
     "risk": 51,
     "expired_sample": 0,
     "by_type": {
       "travel_extreme": 7,
       "back_to_back_travel": 7,
       "injury_imbalance": 10,
+      "market_move": 10,
       "market_uncertain": 53,
-      "market_move": 5
+      "signal_conflict": 1
     },
     "by_quality": {
-      "actionable": 16,
-      "risk": 51,
-      "watch": 1
+      "actionable": 18,
+      "watch": 3,
+      "risk": 51
     }
   },
   "active_actionable": [
@@ -76,6 +77,24 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 14-8"
+    },
+    {
+      "event_id": "748503",
+      "date": "2026-05-14T19:30Z",
+      "sport": "football",
+      "league_code": "esp.1",
+      "league_name": "La Liga",
+      "home": "Real Madrid",
+      "away": "Real Oviedo",
+      "match": "Real Madrid - Real Oviedo",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 1.0,
+      "context": "Cote away: 11.00 -> 8.50 (+22.7%)"
     },
     {
       "event_id": "401815337",
@@ -294,6 +313,24 @@
       "context": "Absences severes 8-12"
     },
     {
+      "event_id": "401872572",
+      "date": "2026-05-15T01:00Z",
+      "sport": "football",
+      "league_code": "ligamx",
+      "league_name": "Liga MX",
+      "home": "Pachuca",
+      "away": "Pumas UNAM",
+      "match": "Pachuca - Pumas UNAM",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.722,
+      "context": "Cote away: 3.85 -> 3.35 (+13.0%)"
+    },
+    {
       "event_id": "401815334",
       "date": "2026-05-14T23:15Z",
       "sport": "baseball",
@@ -313,6 +350,42 @@
     }
   ],
   "active_watch": [
+    {
+      "event_id": "401856908",
+      "date": "2026-05-15T00:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Dallas Wings",
+      "away": "Minnesota Lynx",
+      "match": "Dallas Wings - Minnesota Lynx",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.62,
+      "context": "Cote away: 2.42 -> 2.15 (+11.2%)"
+    },
+    {
+      "event_id": "401871367",
+      "date": "2026-05-14T19:00Z",
+      "sport": "football",
+      "league_code": "leagueone",
+      "league_name": "League One",
+      "home": "Bradford City",
+      "away": "Bolton Wanderers",
+      "match": "Bradford City - Bolton Wanderers",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.617,
+      "context": "Cote away: 2.70 -> 2.40 (+11.1%)"
+    },
     {
       "event_id": "746716",
       "date": "2026-05-17T19:00Z",
