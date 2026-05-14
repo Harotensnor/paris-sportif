@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-14T23:22:29Z",
+  "generated_at": "2026-05-14T23:27:12Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815334",
-      "kickoff": "2026-05-14T23:15Z",
-      "league": "MLB",
-      "match": "Chicago Cubs at Atlanta Braves",
-      "home": "Atlanta Braves",
-      "away": "Chicago Cubs",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Atlanta Braves",
-          "pitcher": "Chris Sale",
-          "label": "Chris Sale moins de 7,5 strikeouts",
-          "line": 7.5,
-          "pick": "under",
-          "probability": 0.5952,
-          "fair_odds": 1.68,
-          "expected_strikeouts": 7.0,
-          "projected_ip": 6.12,
-          "inputs": {
-            "k9": 10.29,
-            "era": 2.2,
-            "whip": 0.88,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Atlanta Braves",
-          "pitcher": "Chris Sale",
-          "label": "Chris Sale concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.527,
-          "fair_odds": 1.9,
-          "expected_hr_allowed": 0.749,
-          "projected_ip": 6.12,
-          "inputs": {
-            "hr9": 1.1,
-            "era": 2.2,
-            "whip": 0.88
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Chicago Cubs",
-          "pitcher": "Ben Brown",
-          "label": "Ben Brown moins de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "under",
-          "probability": 0.602,
-          "fair_odds": 1.66,
-          "expected_strikeouts": 6.01,
-          "projected_ip": 6.6,
-          "inputs": {
-            "k9": 8.19,
-            "era": 1.82,
-            "whip": 0.91,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Chicago Cubs",
-          "pitcher": "Ben Brown",
-          "label": "Ben Brown ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.8025,
-          "fair_odds": 1.25,
-          "expected_hr_allowed": 0.22,
-          "projected_ip": 6.6,
-          "inputs": {
-            "hr9": 0.3,
-            "era": 1.82,
-            "whip": 0.91
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815339",
       "kickoff": "2026-05-14T23:40Z",
@@ -1782,7 +1700,7 @@
       ]
     }
   ],
-  "props": 86,
+  "props": 82,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"

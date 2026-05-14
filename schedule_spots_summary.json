@@ -1,23 +1,23 @@
 {
-  "generated_at": "2026-05-14T23:22:37Z",
+  "generated_at": "2026-05-14T23:27:20Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 44,
+    "active_events": 43,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 71,
-      "back_to_back_travel": 7,
+      "lookahead": 70,
       "schedule_congestion": 21,
+      "back_to_back_travel": 6,
       "travel_extreme": 3
     },
     "by_decision": {
       "abstain": 29,
-      "lean_home": 11,
+      "lean_home": 10,
       "lean_away": 4
     },
-    "lean_home": 11,
+    "lean_home": 10,
     "lean_away": 4,
     "abstain": 29,
     "monitor": 0
@@ -968,10 +968,10 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.098,
-        "away_score": 0.372,
+        "away_score": -0.098,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Pumas UNAM (+0.37)",
+        "reason": "Direction nette: Pumas UNAM (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -984,12 +984,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.469
           }
         ]
       }
@@ -1025,11 +1019,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -1.348,
-        "away_score": -0.537,
-        "home_fade": 1.75,
-        "away_fade": 1.15,
-        "reason": "Direction nette: Vegas Golden Knights (-0.54)",
+        "home_score": -0.698,
+        "away_score": 0.112,
+        "home_fade": 0.75,
+        "away_fade": 0.15,
+        "reason": "Direction nette: Vegas Golden Knights (+0.11)",
         "detail": [
           {
             "side": "home",
@@ -1048,18 +1042,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.6
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
           }
         ]
       }
@@ -2279,59 +2261,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.8
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815334",
-      "source_event_ids": [
-        "401815334"
-      ],
-      "kickoff": "2026-05-14T23:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Atlanta Braves",
-      "away": "Chicago Cubs",
-      "match": "Atlanta Braves - Chicago Cubs",
-      "decision": "lean_home",
-      "net_team": "Atlanta Braves",
-      "reason": "Chicago Cubs plus penalise par calendrier/voyage (1.08 vs 0.00)",
-      "pressure_score": 1.518,
-      "home_fade": 0.0,
-      "away_fade": 1.078,
-      "travel_score": 0.718,
-      "lookahead_score": 0.8,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "3 match important/proche dans les 3 jours",
-        "1 match dans les 48h + 938 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.377,
-        "away_score": -1.078,
-        "home_fade": 0.0,
-        "away_fade": 1.078,
-        "reason": "Direction nette: Atlanta Braves (+0.38)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.36
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.718
           }
         ]
       }
