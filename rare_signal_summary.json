@@ -1,25 +1,24 @@
 {
-  "generated_at": "2026-05-14T16:32:47Z",
+  "generated_at": "2026-05-14T16:36:45Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 67,
+    "active_events": 66,
     "actionable": 16,
     "watch": 2,
-    "risk": 49,
+    "risk": 48,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 11,
       "travel_extreme": 7,
       "back_to_back_travel": 7,
       "market_uncertain": 50,
-      "market_move": 9,
-      "signal_conflict": 3
+      "market_move": 9
     },
     "by_quality": {
       "actionable": 16,
-      "risk": 49,
+      "risk": 48,
       "watch": 2
     }
   },
@@ -1215,24 +1214,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 19.0%"
-    },
-    {
-      "event_id": "401871410",
-      "date": "2026-05-18T04:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Buffalo Sabres",
-      "away": "Montreal Canadiens",
-      "match": "Buffalo Sabres - Montreal Canadiens",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "signal_conflict",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.45,
-      "context": "Signaux opposes: Buffalo Sabres fade 0.60, Montreal Canadiens fade 0.60 -> prudence"
     }
   ],
   "expired_sample": []
