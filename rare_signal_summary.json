@@ -1,25 +1,26 @@
 {
-  "generated_at": "2026-05-14T20:52:25Z",
+  "generated_at": "2026-05-14T20:56:46Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 79,
-    "actionable": 25,
-    "watch": 6,
-    "risk": 48,
+    "active_events": 82,
+    "actionable": 28,
+    "watch": 7,
+    "risk": 47,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 28,
+      "injury_imbalance": 30,
+      "market_uncertain": 47,
+      "market_move": 6,
       "back_to_back_travel": 7,
-      "market_uncertain": 45,
-      "signal_conflict": 4,
+      "signal_conflict": 3,
       "travel_extreme": 3
     },
     "by_quality": {
-      "actionable": 25,
-      "watch": 6,
-      "risk": 48
+      "actionable": 28,
+      "watch": 7,
+      "risk": 47
     }
   },
   "active_actionable": [
@@ -40,6 +41,42 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 10-3"
+    },
+    {
+      "event_id": "401871408",
+      "date": "2026-05-14T23:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Buffalo Sabres",
+      "away": "Montreal Canadiens",
+      "match": "Buffalo Sabres - Montreal Canadiens",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 1.82 -> 2.30 (-26.4%)"
+    },
+    {
+      "event_id": "401871428",
+      "date": "2026-05-15T01:30Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Anaheim Ducks",
+      "away": "Vegas Golden Knights",
+      "match": "Anaheim Ducks - Vegas Golden Knights",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 1.93 -> 2.45 (-27.2%)"
     },
     {
       "event_id": "401856909",
@@ -472,6 +509,24 @@
       "side": "away",
       "strength": 0.718,
       "context": "1 match dans les 48h + 938 km de voyage"
+    },
+    {
+      "event_id": "401872572",
+      "date": "2026-05-15T01:00Z",
+      "sport": "football",
+      "league_code": "ligamx",
+      "league_name": "Liga MX",
+      "home": "Pachuca",
+      "away": "Pumas UNAM",
+      "match": "Pachuca - Pumas UNAM",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.676,
+      "context": "Cote away: 3.70 -> 3.25 (+12.2%)"
     }
   ],
   "active_watch": [
@@ -528,6 +583,24 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 8-5"
+    },
+    {
+      "event_id": "401871429",
+      "date": "2026-05-16T21:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Vegas Golden Knights",
+      "away": "Anaheim Ducks",
+      "match": "Vegas Golden Knights - Anaheim Ducks",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Anaheim Ducks",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 1-4"
     },
     {
       "event_id": "401815370",
@@ -1430,24 +1503,6 @@
       "side": null,
       "strength": 0.488,
       "context": "Signaux opposes: Chicago White Sox fade 0.75, Chicago Cubs fade 0.75 -> prudence"
-    },
-    {
-      "event_id": "401871410",
-      "date": "2026-05-18T23:30Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Buffalo Sabres",
-      "away": "Montreal Canadiens",
-      "match": "Buffalo Sabres - Montreal Canadiens",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "signal_conflict",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.45,
-      "context": "Signaux opposes: Buffalo Sabres fade 0.60, Montreal Canadiens fade 0.60 -> prudence"
     }
   ],
   "expired_sample": []
