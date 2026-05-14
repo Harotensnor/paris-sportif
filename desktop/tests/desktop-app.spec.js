@@ -73,6 +73,16 @@ test('desktop cockpit is actionable and stable', async () => {
     await win.fill('#pick-search', '');
     await win.selectOption('#pick-sort', 'kickoff');
     await expect(win.locator('#picks-body tr.clickable-row').first()).toBeVisible();
+    await win.evaluate(() => document.activeElement && document.activeElement.blur());
+
+    await win.keyboard.press('Control+2');
+    await expect(win.locator('#page-title')).toHaveText('Tous les matchs');
+    await win.keyboard.press('Control+3');
+    await expect(win.locator('#page-title')).toHaveText('Agent');
+    await win.keyboard.press('Control+4');
+    await expect(win.locator('#page-title')).toHaveText('Données');
+    await win.keyboard.press('Control+1');
+    await expect(win.locator('#page-title')).toHaveText('Accueil');
 
     await win.click('[data-track-bet-key]');
     await win.waitForFunction(() => /1 en cours/.test(document.querySelector('#user-pnl-sub')?.textContent || ''), null, { timeout: 5_000 });
