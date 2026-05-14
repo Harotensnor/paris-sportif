@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-05-14T17:57:07Z",
+  "generated_at": "2026-05-14T18:06:38Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 65,
-    "actionable": 14,
+    "active_events": 66,
+    "actionable": 15,
     "watch": 4,
     "risk": 47,
     "expired_sample": 0,
@@ -13,11 +13,11 @@
       "injury_imbalance": 12,
       "travel_extreme": 4,
       "back_to_back_travel": 4,
-      "market_uncertain": 49,
-      "market_move": 10
+      "market_move": 12,
+      "market_uncertain": 49
     },
     "by_quality": {
-      "actionable": 14,
+      "actionable": 15,
       "risk": 47,
       "watch": 4
     }
@@ -40,6 +40,24 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 14-9"
+    },
+    {
+      "event_id": "748503",
+      "date": "2026-05-14T19:30Z",
+      "sport": "football",
+      "league_code": "esp.1",
+      "league_name": "La Liga",
+      "home": "Real Madrid",
+      "away": "Real Oviedo",
+      "match": "Real Madrid - Real Oviedo",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 1.0,
+      "context": "Cote away: 10.00 -> 8.00 (+20.0%)"
     },
     {
       "event_id": "401815337",
