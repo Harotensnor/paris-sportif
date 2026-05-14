@@ -26,6 +26,9 @@ ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "xg_team_stats.json"
 COMPAT_OUT = ROOT / "fbref_xg.json"
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from _data_io import write_text_atomic
+
 LEAGUES = {
     "EPL": {"code": "eng.1", "name": "Premier League"},
     "La liga": {"code": "esp.1", "name": "La Liga"},
@@ -248,8 +251,8 @@ def main() -> int:
         return 1
 
     canonical, compat = _build_outputs(by_team, by_league, args.season)
-    OUT.write_text(json.dumps(canonical, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
-    COMPAT_OUT.write_text(json.dumps(compat, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+    write_text_atomic(OUT, json.dumps(canonical, ensure_ascii=False, separators=(",", ":")))
+    write_text_atomic(COMPAT_OUT, json.dumps(compat, ensure_ascii=False, separators=(",", ":")))
     print(
         f"[understat] wrote {OUT.name} ({len(by_team)} teams, failed={len(failed)}) "
         f"+ {COMPAT_OUT.name}",

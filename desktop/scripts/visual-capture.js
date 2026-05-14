@@ -50,6 +50,7 @@ async function main() {
       ultimateVisible: Boolean(document.querySelector('#ultimate-bet-card')),
       timeSections: document.querySelectorAll('#time-cockpit .time-section').length,
       trackButtons: document.querySelectorAll('[data-track-bet-key]').length,
+      focusButtons: document.querySelectorAll('[data-focus-pick-key]').length,
       pnlVisible: Boolean(document.querySelector('#user-pnl-total') && document.querySelector('#user-pnl-sub')),
       pnlSparkline: Boolean(document.querySelector('#user-pnl-sparkline svg')),
       coachCards: document.querySelectorAll('#coach-advice-grid .morning-card').length,
@@ -156,7 +157,7 @@ async function main() {
     if (/Aucun pari à jouer maintenant|Mise bloquée|blocage/i.test(decisionConsistency.caption) && decisionConsistency.positiveStakeCells > 0) {
       throw new Error(`Mise positive affichée malgré décision bloquée: ${JSON.stringify(decisionConsistency)}`);
     }
-    if (decisionConsistency.picksMetric < 20 || decisionConsistency.morningCards < 4 || decisionConsistency.coachCards < 4 || !decisionConsistency.imminentStrip || !decisionConsistency.ultimateVisible || decisionConsistency.timeSections < 5 || decisionConsistency.trackButtons < 20 || !decisionConsistency.pnlVisible || !decisionConsistency.pnlSparkline || !decisionConsistency.filtersVisible) {
+    if (decisionConsistency.picksMetric < 20 || decisionConsistency.morningCards < 4 || decisionConsistency.coachCards < 4 || !decisionConsistency.imminentStrip || !decisionConsistency.ultimateVisible || decisionConsistency.timeSections < 5 || decisionConsistency.trackButtons < 20 || decisionConsistency.focusButtons <= 0 || !decisionConsistency.pnlVisible || !decisionConsistency.pnlSparkline || !decisionConsistency.filtersVisible) {
       throw new Error(`Cockpit actionnable incomplet: ${JSON.stringify(decisionConsistency)}`);
     }
     if (combines <= 0 || scorers <= 0 || scorerFilters < 3 || scorerTrackButtons <= 0 || performanceCards < 6 || segmentCards <= 0 || learningCards <= 0 || settlementCards <= 0 || modelAuditCards <= 0 || insightCards <= 0 || agentCards <= 0 || preferenceInputs < 8 || disciplineInputs < 3 || webhookControls < 3 || profileControls < 6 || calendarDays < 7 || pipelineCards <= 0 || glossaryCards < 12) {

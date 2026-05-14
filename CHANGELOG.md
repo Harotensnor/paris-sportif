@@ -5,6 +5,20 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 9 — Enrichissement visible, performance active, focus et notifications externes
+
+- Enrichissement web rendu visible dans l'app : les picks enrichis affichent un badge `Enrichi à HH:MM`, et la fiche match expose les sources web vérifiées, validations locales, succès/échecs et horodatage.
+- Le process Electron ajoute une route locale `/api/ai/enrich` avec cache, timeouts, journalisation pipeline et limite stricte de 5 fetchs web par minute. Le renderer ne fait toujours aucun fetch internet direct.
+- Vue `Pipeline` enrichie avec le compteur quotidien des enrichissements web réussis/échoués.
+- Préférences `IA moteur` complétées : toggle enrichissement web, durée de cache/rate-limit et test manuel sur un pick proche.
+- Performance modèle active : les segments personnels très perdants durcissent automatiquement edge/confiance, les segments robustes positifs peuvent être assouplis, et les ajustements sont visibles/réinitialisables dans `Historique`.
+- L'audit modèle affiche désormais une mini-courbe Brier 90j/30j/7j, en plus du drift.
+- Ajout du `Mode focus` plein écran sur le bet ultime et les picks temporels : match, compte à rebours XL, ticket, raison et action `Je mise`.
+- Notifications mobiles renforcées : suite de test pour les alertes critiques, journal webhook côté main process et backoff exponentiel en cas d'échec.
+- Apprentissage actif : après un pari perdu, l'app propose une modal optionnelle pour noter la cause, stocke ce feedback dans le pari et l'affiche dans `Mes apprentissages`.
+- Auto-update équivalent GitHub Releases : check de version au démarrage si activé, contrôle manuel et état visible dans `Préférences > Avancé`.
+- QA Sprint 9 : smoke, Playwright et capture visuelle couvrent enrichissement, focus, feedback post-perte, update/webhook, absence de fetch externe renderer et cohérence des vues.
+
 ### Sprint 8 — Settlement verrouillé, cockpit temporel, buteurs triés et IA moteur discrète
 
 - Correction critique du settlement automatique : un pari ne peut plus être réglé avant kickoff, ni sur un vieux résultat homonyme. Le garde-fou exige statut final confirmé, outcome final exploitable, date du résultat proche du pari et marge post-match par sport.

@@ -44,6 +44,9 @@ async function main() {
   for (const mode of ['full', 'signals', 'prematch', 'prematch_t60', 'prematch_t30', 'prematch_t10', 'critical', 'repair_context']) {
     if (!mainText.includes(mode)) throw new Error(`Mode refresh Electron non exposé: ${mode}`);
   }
+  for (const marker of ['/api/ai/enrich', '/api/webhook/log', '/api/update/check']) {
+    if (!mainText.includes(marker)) throw new Error(`API Sprint 9 absente: ${marker}`);
+  }
 
   const messages = [];
   const userDataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'paris-sportif-smoke-'));
@@ -78,6 +81,7 @@ async function main() {
       t10Button: Boolean(document.querySelector('#refresh-prematch-t10-btn')),
       scenarioCards: document.querySelectorAll('#stake-scenario-grid .scenario-card').length,
       trackButtons: document.querySelectorAll('[data-track-bet-key]').length,
+      focusButtons: document.querySelectorAll('[data-focus-pick-key]').length,
       pnlVisible: Boolean(document.querySelector('#user-pnl-total') && document.querySelector('#user-pnl-sub')),
       pnlSparkline: Boolean(document.querySelector('#user-pnl-sparkline svg')),
       userBetExport: Boolean(document.querySelector('#export-user-bets-btn')),
@@ -96,6 +100,7 @@ async function main() {
     if (dashboard.picks < 20 || dashboard.trackButtons < 20 || !dashboard.pnlVisible || !dashboard.pnlSparkline || !dashboard.userBetExport || !dashboard.filtersVisible || dashboard.marketChips <= 0) {
       throw new Error(`Cockpit de mise incomplet: ${JSON.stringify(dashboard)}`);
     }
+    if (dashboard.focusButtons <= 0) throw new Error(`Mode focus absent: ${JSON.stringify(dashboard)}`);
     if (!/s|\.\.\./.test(dashboard.performanceMetric) || !/Auto-refresh|Mode économie/.test(dashboard.refreshPolicy)) {
       throw new Error(`Indicateurs performance/refresh incomplets: ${JSON.stringify(dashboard)}`);
     }
@@ -143,10 +148,12 @@ async function main() {
       markets: document.querySelectorAll('input[name="pref-market"]').length,
       stakeMode: Boolean(document.querySelector('#pref-stake-mode')),
       discipline: Boolean(document.querySelector('#pref-stop-loss') && document.querySelector('#pref-take-profit')),
+      aiWeb: Boolean(document.querySelector('#pref-web-enrichment-enabled') && document.querySelector('#test-web-enrichment-btn')),
+      updates: Boolean(document.querySelector('#pref-auto-update-enabled') && document.querySelector('#check-update-btn')),
       warnings: Boolean(document.querySelector('#preference-warning-grid')),
       save: Boolean(document.querySelector('#save-preferences-btn'))
     }));
-    if (!preferences.bankroll || preferences.sports < 5 || preferences.markets < 5 || !preferences.stakeMode || !preferences.discipline || !preferences.warnings || !preferences.save) {
+    if (!preferences.bankroll || preferences.sports < 5 || preferences.markets < 5 || !preferences.stakeMode || !preferences.discipline || !preferences.aiWeb || !preferences.updates || !preferences.warnings || !preferences.save) {
       throw new Error(`Préférences incomplètes: ${JSON.stringify(preferences)}`);
     }
 

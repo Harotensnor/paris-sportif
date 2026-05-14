@@ -78,7 +78,12 @@
     crashRecovered: false,
     safeMode: false,
     didScrollToNow: false,
-    aiAssist: null
+    aiAssist: null,
+    webEnrichments: null,
+    webEnrichmentPending: new Set(),
+    focusRow: null,
+    feedbackBetId: null,
+    updateStatus: null
   };
 
   const ACTION_HISTORY_KEY = 'parisSportifActionHistory';
@@ -97,6 +102,10 @@
   const PROFILE_BACKUP_KEY = 'parisSportifLastProfileBackupDay';
   const APP_SESSION_KEY = 'parisSportifDesktopSession';
   const AI_ENGINE_KEY = 'parisSportifAiEngineState';
+  const WEB_ENRICHMENT_KEY = 'parisSportifWebEnrichmentState';
+  const MODEL_ADJUSTMENTS_KEY = 'parisSportifModelAdjustments';
+  const LOSS_FEEDBACK_KEY = 'parisSportifLossFeedbacks';
+  const UPDATE_STATUS_KEY = 'parisSportifUpdateStatus';
   const SPORTS_PREFS = ['football', 'tennis', 'basketball', 'hockey', 'baseball'];
   const MARKET_PREFS = [
     { key: '1n2', label: '1N2' },
@@ -145,6 +154,11 @@
     aiProvider: 'openai',
     aiApiKey: '',
     aiModel: 'gpt-4o-mini',
+    webEnrichmentEnabled: true,
+    webEnrichmentCacheMinutes: 120,
+    webEnrichmentRateLimit: 5,
+    autoUpdateEnabled: true,
+    updateChannel: 'stable',
     strict: false
   };
   const REFRESH_DEFAULT_INTERVAL_MS = 30 * 60 * 1000;
@@ -313,7 +327,10 @@
       insights: readStorageJson(INSIGHTS_KEY, null),
       oddsMemory: readStorageJson(ODDS_MEMORY_KEY, {}),
       smartAlerts: readStorageJson(SMART_ALERT_KEY, []),
-      notifiedPicks: readStorageJson(NOTIFIED_PICK_KEY, [])
+      notifiedPicks: readStorageJson(NOTIFIED_PICK_KEY, []),
+      webEnrichment: readStorageJson(WEB_ENRICHMENT_KEY, null),
+      modelAdjustments: readStorageJson(MODEL_ADJUSTMENTS_KEY, null),
+      lossFeedbacks: readStorageJson(LOSS_FEEDBACK_KEY, [])
     };
   }
 
@@ -354,7 +371,10 @@
       [INSIGHTS_KEY, profile.insights],
       [ODDS_MEMORY_KEY, profile.oddsMemory],
       [SMART_ALERT_KEY, profile.smartAlerts],
-      [NOTIFIED_PICK_KEY, profile.notifiedPicks]
+      [NOTIFIED_PICK_KEY, profile.notifiedPicks],
+      [WEB_ENRICHMENT_KEY, profile.webEnrichment],
+      [MODEL_ADJUSTMENTS_KEY, profile.modelAdjustments],
+      [LOSS_FEEDBACK_KEY, profile.lossFeedbacks]
     ].forEach(([key, value]) => {
       if (value != null) writeStorageJson(key, value);
     });
@@ -1882,6 +1902,9 @@
       renderFinalDecisionPanel();
       renderCalendar();
       renderHelp();
+      updateWebEnrichmentSummary();
+      renderActiveModelAdjustments();
+      renderLearningFeedback();
       if (state.status) renderPipelinePanel(state.status);
       return;
     }
@@ -1976,6 +1999,9 @@
     renderAgentSimulation();
     renderCalendar();
     renderHelp();
+    updateWebEnrichmentSummary();
+    renderActiveModelAdjustments();
+    renderLearningFeedback();
     if (state.status) {
       renderQualityReport(state.status);
       renderSourceHealth(state.status);
@@ -2114,6 +2140,13 @@
       if (prefOddMin > 1 && Number(row.odd || 0) < prefOddMin) return false;
       if (prefOddMax > 1 && Number(row.odd || 0) > prefOddMax) return false;
       if ((prefs.strict || prefConfidenceMin > 0) && Number(row.probability || 0) < prefConfidenceMin) return false;
+      const adjustment = adjustmentForRow(row);
+      if (adjustment?.direction === 'harden') {
+        const adjustedEdge = Math.max(prefEdgeMin, 0) + Math.max(0, Number(adjustment.edgeDelta || 0));
+        const adjustedConfidence = Math.max(prefConfidenceMin, 0) + Math.max(0, Number(adjustment.confidenceDelta || 0));
+        if (Number(row.edge || 0) < adjustedEdge) return false;
+        if (Number(row.probability || 0) < adjustedConfidence) return false;
+      }
       if (filters.query && !pickSearchText(row).includes(filters.query)) return false;
       if (filters.sport !== 'all' && row.sport !== filters.sport) return false;
       if (filters.league !== 'all' && leagueKeyFromRow(row) !== filters.league) return false;
@@ -2246,6 +2279,31 @@
     });
     pushLog('info', `Webhook mobile ${options.test ? 'testé' : 'envoyé'}: ${title}`);
     return result;
+  }
+
+  async function sendWebhookTestSuite() {
+    const status = $('#webhook-status');
+    const prefs = collectPreferencesFromForm();
+    savePreferences(prefs);
+    if (!prefs.webhookUrl) {
+      if (status) status.textContent = 'Ajoute une URL webhook avant le test.';
+      return;
+    }
+    const events = [
+      ['Nouveau Bet ultime', 'Simulation : le bet ultime du jour est disponible.'],
+      ['Pick imminent', 'Simulation : un pick démarre dans moins de 30 minutes.'],
+      ['Cote en mouvement', 'Simulation : la cote a bougé de 5%.'],
+      ['Pari settle', 'Simulation : settlement terminé, P&L mis à jour.'],
+      ['Stop-loss atteint', 'Simulation : pause recommandée pour protéger la bankroll.']
+    ];
+    try {
+      for (const [title, body] of events) {
+        await sendExternalAlert(title, body, null, { test: true, dryRun: true });
+      }
+      if (status) status.textContent = `${formatCount(events.length)} notifications critiques simulées et journalisées.`;
+    } catch (error) {
+      if (status) status.textContent = `Webhook en erreur : ${error.message}`;
+    }
   }
 
   function alertOnce(key, title, body, row) {
@@ -2430,11 +2488,13 @@
           <span>${escapeHtml(row.label)}</span>
           <span>${escapeHtml(formatOdd(row.odd))}</span>
           <span>mise ${escapeHtml(visibleStakeText(row))}</span>
+          ${enrichmentBadgeHtml(row)}
         </div>
       </div>
       <div class="ultimate-side">
         <strong>${escapeHtml(countdownLabel(row.start))}</strong>
         <span>${escapeHtml(formatDateLabel(row.start))}</span>
+        <button type="button" class="ghost-btn focus-mode-btn" data-focus-pick-key="${escapeHtml(userBetKey(row))}">Mode focus</button>
         ${trackButtonHtml(row, 'Je mise ce bet')}
       </div>
     `;
@@ -2469,9 +2529,13 @@
           <span>${escapeHtml(formatOdd(row.odd))}</span>
           <span>edge ${escapeHtml(formatPct(row.edge || 0, 1))}</span>
           <span>${escapeHtml(countdownLabel(row.start))}</span>
+          ${enrichmentBadgeHtml(row)}
         </div>
         <p>${escapeHtml(pickReason(row).replace(/^Pourquoi\s*:\s*/i, ''))}</p>
-        <div class="time-pick-action">${trackButtonHtml(row)}</div>
+        <div class="time-pick-action">
+          <button type="button" class="ghost-btn focus-mode-btn" data-focus-pick-key="${escapeHtml(userBetKey(row))}">Mode focus</button>
+          ${trackButtonHtml(row)}
+        </div>
       </article>
     `;
   }
@@ -2545,6 +2609,131 @@
     };
   }
 
+  function webEnrichmentConfig() {
+    const prefs = loadPreferences();
+    const legacyCache = Number(prefs.webEnrichmentRateLimit || 0) > 10 ? Number(prefs.webEnrichmentRateLimit) : 120;
+    return {
+      enabled: prefs.webEnrichmentEnabled !== false,
+      cacheMinutes: Math.max(15, Number(prefs.webEnrichmentCacheMinutes || legacyCache) || 120),
+      rateLimitPerMinute: Math.max(1, Math.min(10, Number(prefs.webEnrichmentRateLimit || 5) || 5)),
+      maxSources: 3
+    };
+  }
+
+  function rowEnrichmentKey(row) {
+    return String([
+      userBetKey(row),
+      row?.id,
+      row?.title,
+      row?.market,
+      row?.label,
+      row?.start
+    ].filter(Boolean).join(':'))
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9.]+/g, ':')
+      .replace(/^:+|:+$/g, '') || userBetKey(row);
+  }
+
+  function enrichmentForRow(row) {
+    const store = state.webEnrichments || readStorageJson(WEB_ENRICHMENT_KEY, null);
+    const key = rowEnrichmentKey(row);
+    return store?.byKey?.[key] || store?.byKey?.[userBetKey(row)] || null;
+  }
+
+  function enrichmentBadgeHtml(row) {
+    const item = enrichmentForRow(row);
+    if (!item || item.status !== 'enriched') return '';
+    const time = item.enrichedAt ? new Date(item.enrichedAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : '--:--';
+    return `<span class="enrichment-badge" title="Sources web vérifiées côté moteur local">Enrichi à ${escapeHtml(time)}</span>`;
+  }
+
+  function updateWebEnrichmentSummary() {
+    const node = $('#web-enrichment-summary');
+    if (!node) return;
+    const store = state.webEnrichments || readStorageJson(WEB_ENRICHMENT_KEY, null);
+    const summary = store?.summary || {};
+    node.innerHTML = `
+      <article class="refresh-card refresh-${Number(summary.failed || 0) ? 'warn' : 'ok'}">
+        <span>Enrichissement web</span>
+        <strong>${formatCount(summary.success || 0)} réussis / ${formatCount(summary.failed || 0)} échoués</strong>
+        <p>Aujourd'hui · cache local ${formatCount(webEnrichmentConfig().cacheMinutes)} min · sources consultées par le moteur.</p>
+        <small>${escapeHtml(store?.updatedAt ? formatDateTime(store.updatedAt) : 'Aucun enrichissement lancé')}</small>
+      </article>
+    `;
+  }
+
+  function storeWebEnrichment(record, summary) {
+    const store = state.webEnrichments || readStorageJson(WEB_ENRICHMENT_KEY, { byKey: {}, runs: [], summary: {} }) || { byKey: {}, runs: [], summary: {} };
+    store.byKey = store.byKey && typeof store.byKey === 'object' ? store.byKey : {};
+    if (record?.key) store.byKey[record.key] = record;
+    store.updatedAt = record?.enrichedAt || new Date().toISOString();
+    if (summary) store.summary = summary;
+    state.webEnrichments = store;
+    writeStorageJson(WEB_ENRICHMENT_KEY, store);
+    updateWebEnrichmentSummary();
+  }
+
+  async function loadWebEnrichmentState() {
+    try {
+      const store = await fetchJson('/api/ai/enrichment-state');
+      if (store && typeof store === 'object') {
+        state.webEnrichments = store;
+        writeStorageJson(WEB_ENRICHMENT_KEY, store);
+        updateWebEnrichmentSummary();
+      }
+    } catch (error) {
+      pushLog('warn', `État enrichissement web indisponible: ${error.message}`);
+      updateWebEnrichmentSummary();
+    }
+  }
+
+  async function enrichPick(row, { force = false, dryRun = false, manual = false } = {}) {
+    if (!row || !pickHasCoreData(row)) return null;
+    const response = await fetchJson('/api/ai/enrich', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        config: webEnrichmentConfig(),
+        pick: { ...aiPickPayload(row), winamaxUrl: row.winamaxUrl || row.match?.winamax?.url || '' },
+        force,
+        dryRun
+      })
+    });
+    if (response?.record) {
+      storeWebEnrichment(response.record, response.summary);
+      if (manual) setSideStatus(response.record.status === 'enriched' ? 'Enrichissement web terminé' : 'Enrichissement tenté', response.record.status === 'enriched' ? 'ok' : 'warn');
+      if (response.record.majorChange) notifyUser('Pick mis à jour après enrichissement', `${row.title} · ouvre la fiche avant de miser.`, row);
+      renderUltimateBet(dashboardPickRows(readPickFilters()));
+      renderTemporalCockpit(dashboardPickRows(readPickFilters()));
+      return response.record;
+    }
+    if (manual) setSideStatus(response?.reason || response?.error || 'Enrichissement non lancé', 'warn');
+    return null;
+  }
+
+  function scheduleVisibleWebEnrichment(rows) {
+    const prefs = loadPreferences();
+    if (prefs.webEnrichmentEnabled === false) return;
+    const top = [
+      aiSelectedUltimate(rows) || ultimateBetCandidate(rows),
+      ...(Array.isArray(rows) ? rows.filter((row) => temporalBucketForPick(row) === 'now').slice(0, 2) : [])
+    ].filter(Boolean);
+    const unique = Array.from(new Map(top.map((row) => [userBetKey(row), row])).values()).slice(0, 3);
+    unique.forEach((row, index) => {
+      if (enrichmentForRow(row)?.status === 'enriched') return;
+      const key = rowEnrichmentKey(row);
+      if (state.webEnrichmentPending.has(key)) return;
+      state.webEnrichmentPending.add(key);
+      setTimeout(() => {
+        enrichPick(row)
+          .catch((error) => pushLog('warn', `Enrichissement web indisponible: ${error.message}`))
+          .finally(() => state.webEnrichmentPending.delete(key));
+      }, 900 + index * 700);
+    });
+  }
+
   async function aiAssist(task, payload) {
     const response = await fetchJson('/api/ai/assist', {
       method: 'POST',
@@ -2602,6 +2791,8 @@
     renderMarketSnapshot(displayRows);
     renderUltimateBet(displayRows);
     renderTemporalCockpit(displayRows);
+    updateWebEnrichmentSummary();
+    scheduleVisibleWebEnrichment(displayRows);
     clearTimeout(state.aiTimer);
     state.aiTimer = setTimeout(() => runBackgroundAi(displayRows), 600);
     const total = state.allPicks.length || state.picks.length || 0;
@@ -2801,6 +2992,7 @@
     const refresh = status?.refresh || {};
     const eta = refresh.running ? refreshEtaInfo(refresh) : null;
     const memory = status?.memory || {};
+    updateWebEnrichmentSummary();
     if (refresh.running) {
       progress.innerHTML = `
         <div class="pipeline-head">
@@ -4080,7 +4272,63 @@
     const dayPnl = userBetStats().pnlToday;
     const { bet, pnl, current } = result;
     if (status === 'won') notifyUser('Pari gagné', `${bet.title} · ${formatMoney(pnl)} · jour ${formatMoney(dayPnl)}`, current || bet);
-    if (status === 'lost') notifyUser('Pari perdu', `${bet.title} · ${formatMoney(pnl)} · jour ${formatMoney(dayPnl)}`, current || bet);
+    if (status === 'lost') {
+      notifyUser('Pari perdu', `${bet.title} · ${formatMoney(pnl)} · jour ${formatMoney(dayPnl)}`, current || bet);
+      showLossFeedbackPrompt(bet.id);
+    }
+  }
+
+  const LOSS_FEEDBACK_OPTIONS = [
+    ['surprise', 'Surprise (modèle bon)'],
+    ['missed_signal', 'Signal raté'],
+    ['late_injury', 'Blessure dernière minute'],
+    ['too_early', 'Pari pris trop tôt'],
+    ['low_price', 'Cote trop basse'],
+    ['bad_segment', 'Mauvais segment pour moi'],
+    ['other', 'Autre']
+  ];
+
+  function showLossFeedbackPrompt(betId) {
+    const bet = loadUserBets().find((item) => item.id === betId);
+    if (!bet || bet.lossFeedback) return;
+    state.feedbackBetId = betId;
+    const modal = $('#loss-feedback-modal');
+    const title = $('#loss-feedback-title');
+    const choices = $('#loss-feedback-choices');
+    if (title) title.textContent = bet.title || 'Pari perdu';
+    if (choices) {
+      choices.innerHTML = LOSS_FEEDBACK_OPTIONS.map(([key, label]) => `
+        <button type="button" class="ghost-btn" data-loss-feedback="${escapeHtml(key)}">${escapeHtml(label)}</button>
+      `).join('');
+    }
+    modal?.classList.remove('hidden');
+  }
+
+  function closeLossFeedbackPrompt() {
+    state.feedbackBetId = null;
+    $('#loss-feedback-modal')?.classList.add('hidden');
+  }
+
+  function saveLossFeedback(reason) {
+    const id = state.feedbackBetId;
+    if (!id) return;
+    const option = LOSS_FEEDBACK_OPTIONS.find(([key]) => key === reason) || LOSS_FEEDBACK_OPTIONS[LOSS_FEEDBACK_OPTIONS.length - 1];
+    const feedback = {
+      reason: option[0],
+      reasonLabel: option[1],
+      at: new Date().toISOString()
+    };
+    const bets = loadUserBets();
+    const index = bets.findIndex((bet) => bet.id === id);
+    if (index >= 0) {
+      bets[index] = { ...bets[index], lossFeedback: feedback };
+      saveUserBets(bets);
+    }
+    const rows = readStorageJson(LOSS_FEEDBACK_KEY, []);
+    writeStorageJson(LOSS_FEEDBACK_KEY, [{ betId: id, ...feedback }, ...(Array.isArray(rows) ? rows : [])].slice(0, 200));
+    closeLossFeedbackPrompt();
+    renderHistory();
+    setSideStatus('Feedback enregistré', 'ok');
   }
 
   function normalizeResultName(value) {
@@ -4297,6 +4545,7 @@
     let pnl = 0;
     let blocked = 0;
     let blockedReason = null;
+    const lostSettledIds = [];
     bets.forEach((bet, index) => {
       if (bet.status !== 'pending') return;
       const matchedResults = results.filter((item) => resultMatchesBet(bet, item));
@@ -4312,7 +4561,10 @@
       settled += 1;
       pnl += applied.pnl;
       if (status === 'won') won += 1;
-      if (status === 'lost') lost += 1;
+      if (status === 'lost') {
+        lost += 1;
+        lostSettledIds.push(applied.bet.id);
+      }
       if (status === 'void') voided += 1;
     });
     const audit = {
@@ -4336,6 +4588,7 @@
       renderPicks();
       if (settled) notifyUser('Settlement auto', `${formatCount(settled)} pari(s) résolu(s) · P&L ${formatMoney(pnl)}`);
       if (rollback.reverted) setSideStatus(`${formatCount(rollback.reverted)} settlement fantôme annulé`, 'warn');
+      if (lostSettledIds.length) setTimeout(() => showLossFeedbackPrompt(lostSettledIds[0]), 600);
     }
     return audit;
   }
@@ -4421,6 +4674,7 @@
           <td data-label="Tags / notes">
             <input class="bet-tags-input" data-bet-tags-id="${escapeHtml(bet.id)}" value="${escapeHtml((bet.tags || []).join(', '))}" placeholder="favori, test">
             <textarea class="bet-note-input" data-bet-note-id="${escapeHtml(bet.id)}" rows="2" placeholder="Note privée">${escapeHtml(bet.note || '')}</textarea>
+            ${bet.lossFeedback?.reasonLabel ? `<div class="match-sub">Feedback: ${escapeHtml(bet.lossFeedback.reasonLabel)}</div>` : ''}
           </td>
           <td data-label="P&L">${escapeHtml(formatMoney(bet.pnl || 0))}</td>
           <td data-label="Action">${action}</td>
@@ -4485,6 +4739,116 @@
     };
     writeStorageJson(USER_AUDIT_KEY, audit);
     return audit;
+  }
+
+  function segmentKeysForRow(row) {
+    return [
+      `sport:${row?.sport || 'inconnu'}`,
+      `league:${row?.league || 'inconnue'}`,
+      `market:${row?.marketKey || marketKeyFromRow(row)}`,
+      `edge:${edgeBucketFor(row?.edge)}`
+    ].map((key) => key.toLowerCase());
+  }
+
+  function modelAdjustmentsFromAudit(audit = trackedLearningAudit()) {
+    const manual = readStorageJson(MODEL_ADJUSTMENTS_KEY, null);
+    if (manual?.disabled) return { generatedAt: new Date().toISOString(), disabled: true, adjustments: [] };
+    const rows = [
+      ...(Array.isArray(audit.warnings) ? audit.warnings : []),
+      ...(Array.isArray(audit.best) ? audit.best : [])
+    ];
+    const byKey = new Map();
+    rows.forEach((row) => {
+      const key = String(row.key || '').toLowerCase();
+      const count = Number(row.count || 0);
+      const roi = Number(row.roi || 0);
+      if (!key || !count) return;
+      if (count >= 10 && roi < -0.10) {
+        byKey.set(key, {
+          key,
+          label: row.label || key,
+          direction: 'harden',
+          edgeDelta: 0.02,
+          confidenceDelta: 0.05,
+          reason: `ROI ${formatPct(roi, 0)} sur ${formatCount(count)} paris suivis`
+        });
+      } else if (count >= 20 && roi > 0.15) {
+        byKey.set(key, {
+          key,
+          label: row.label || key,
+          direction: 'soften',
+          edgeDelta: -0.005,
+          confidenceDelta: -0.02,
+          reason: `ROI ${formatPct(roi, 0)} sur ${formatCount(count)} paris suivis`
+        });
+      }
+    });
+    const payload = {
+      generatedAt: new Date().toISOString(),
+      disabled: false,
+      adjustments: Array.from(byKey.values()).slice(0, 12)
+    };
+    writeStorageJson(MODEL_ADJUSTMENTS_KEY, payload);
+    return payload;
+  }
+
+  function adjustmentForRow(row) {
+    const payload = readStorageJson(MODEL_ADJUSTMENTS_KEY, null) || modelAdjustmentsFromAudit();
+    if (payload?.disabled) return null;
+    const keys = new Set(segmentKeysForRow(row));
+    return (Array.isArray(payload?.adjustments) ? payload.adjustments : []).find((item) => keys.has(String(item.key || '').toLowerCase())) || null;
+  }
+
+  function renderActiveModelAdjustments() {
+    const grid = $('#active-model-adjustments-grid');
+    if (!grid) return;
+    const payload = modelAdjustmentsFromAudit();
+    const rows = Array.isArray(payload.adjustments) ? payload.adjustments : [];
+    if (payload.disabled) {
+      grid.innerHTML = '<div class="empty">Ajustements automatiques désactivés. Les filtres personnels restent appliqués.</div>';
+      return;
+    }
+    if (!rows.length) {
+      grid.innerHTML = '<div class="empty">Aucun ajustement automatique robuste. Le modèle attend plus de paris réglés par segment.</div>';
+      return;
+    }
+    grid.innerHTML = rows.map((row) => `
+      <article class="segment-card ${row.direction === 'harden' ? 'cold' : 'warm'}">
+        <span>${escapeHtml(row.direction === 'harden' ? 'Seuil durci' : 'Seuil assoupli')}</span>
+        <strong>${escapeHtml(row.label || row.key)}</strong>
+        <p>${escapeHtml(`${row.reason} · edge ${formatPct(row.edgeDelta || 0, 1)} · confiance ${formatPct(row.confidenceDelta || 0, 1)}`)}</p>
+        <em>${escapeHtml(row.direction === 'harden' ? 'Protection active' : 'Opportunité surveillée')}</em>
+      </article>
+    `).join('');
+  }
+
+  function lossFeedbackSummary() {
+    const rows = readStorageJson(LOSS_FEEDBACK_KEY, []);
+    const counts = new Map();
+    (Array.isArray(rows) ? rows : []).forEach((item) => {
+      const reason = item.reasonLabel || item.reason || 'Autre';
+      counts.set(reason, (counts.get(reason) || 0) + 1);
+    });
+    return Array.from(counts.entries())
+      .map(([label, count]) => ({ label, count }))
+      .sort((a, b) => b.count - a.count);
+  }
+
+  function renderLearningFeedback() {
+    const grid = $('#learning-feedback-grid');
+    if (!grid) return;
+    const rows = lossFeedbackSummary();
+    if (!rows.length) {
+      grid.innerHTML = '<div class="empty">Aucun feedback post-perte pour le moment.</div>';
+      return;
+    }
+    grid.innerHTML = rows.slice(0, 8).map((row) => `
+      <article class="segment-card sample">
+        <span>Feedback perdu</span>
+        <strong>${escapeHtml(row.label)}</strong>
+        <p>${formatCount(row.count)} occurrence(s). Utilisé dans les insights personnels.</p>
+      </article>
+    `).join('');
   }
 
   function renderLearningAudit() {
@@ -4553,16 +4917,18 @@
     if (!grid) return;
     const audit = modelSelfAudit();
     const driftTone = audit.status === 'drift' ? 'cold' : audit.status === 'ok' ? 'warm' : 'sample';
+    const curve = [audit.brier90, audit.brier30, audit.brier7].filter((value) => value != null).map((value) => Number(value));
     grid.innerHTML = [
       ['Sample perso', formatCount(audit.settled), 'Paris suivis réglés utilisés.'],
       ['Brier 7j', audit.brier7 == null ? '-' : audit.brier7.toFixed(3), 'Plus bas = probabilités mieux calibrées.'],
       ['Brier 30j', audit.brier30 == null ? '-' : audit.brier30.toFixed(3), 'Tendance récente.'],
-      ['Drift', audit.driftPct == null ? '-' : formatPct(audit.driftPct, 1), audit.status === 'drift' ? 'Le modèle se dégrade sur ton usage récent.' : 'Pas de dérive robuste détectée.']
+      ['Drift', audit.driftPct == null ? '-' : formatPct(audit.driftPct, 1), audit.status === 'drift' ? 'Le modèle se dégrade sur ton usage récent.' : 'Pas de dérive robuste détectée.'],
+      ['Brier 90→7j', curve.length ? curve.map((value) => value.toFixed(3)).join(' → ') : '-', curve.length ? sparklineSvg(curve.map((value) => -value)) : 'Courbe en attente de sample.']
     ].map(([label, value, detail], index) => `
       <article class="performance-card ${index === 3 ? driftTone : ''}">
         <span>${escapeHtml(label)}</span>
         <strong>${escapeHtml(value)}</strong>
-        <p>${escapeHtml(detail)}</p>
+        ${String(detail).includes('<svg') ? `<div class="pnl-sparkline">${detail}</div>` : `<p>${escapeHtml(detail)}</p>`}
       </article>
     `).join('');
   }
@@ -4582,6 +4948,7 @@
       add(`market:${bet.marketKey || marketKeyFromRow(bet)}`, `Marché ${bet.market || bet.marketKey || '-'}`, bet);
       add(`hour:${new Date(bet.createdAt || bet.day || Date.now()).getHours() < 18 ? 'day' : 'evening'}`, new Date(bet.createdAt || bet.day || Date.now()).getHours() < 18 ? 'Paris avant 18h' : 'Paris du soir', bet);
       add(`coach:${(bet.coachWarnings || []).length ? 'warned' : 'clean'}`, (bet.coachWarnings || []).length ? 'Avec warning coach' : 'Sans warning coach', bet);
+      if (bet.lossFeedback?.reasonLabel) add(`feedback:${bet.lossFeedback.reason}`, `Feedback ${bet.lossFeedback.reasonLabel}`, bet);
     });
     const insights = Array.from(groups.values())
       .filter((row) => row.count >= 15 && row.stake > 0)
@@ -4668,6 +5035,17 @@
     if (aiModel) aiModel.value = prefs.aiModel || '';
     const aiKey = $('#pref-ai-key');
     if (aiKey) aiKey.value = prefs.aiApiKey || '';
+    const webEnrichment = $('#pref-web-enrichment-enabled');
+    if (webEnrichment) webEnrichment.checked = prefs.webEnrichmentEnabled !== false;
+    const legacyCache = Number(prefs.webEnrichmentRateLimit || 0) > 10 ? Number(prefs.webEnrichmentRateLimit) : 120;
+    const webCache = $('#pref-web-enrichment-cache');
+    if (webCache) webCache.value = String(prefs.webEnrichmentCacheMinutes || legacyCache);
+    const webRate = $('#pref-web-enrichment-rate');
+    if (webRate) webRate.value = String(Math.max(1, Math.min(10, Number(prefs.webEnrichmentRateLimit || 5) || 5)));
+    const autoUpdate = $('#pref-auto-update-enabled');
+    if (autoUpdate) autoUpdate.checked = prefs.autoUpdateEnabled !== false;
+    const updateChannel = $('#pref-update-channel');
+    if (updateChannel) updateChannel.value = prefs.updateChannel || 'stable';
     const stakeMode = $('#pref-stake-mode');
     if (stakeMode) stakeMode.value = prefs.stakeMode || 'kelly';
     const sportsGrid = $('#pref-sports');
@@ -4703,9 +5081,53 @@
     if (webhookType) webhookType.value = prefs.webhookType || 'generic';
     const webhookUrl = $('#pref-webhook-url');
     if (webhookUrl) webhookUrl.value = prefs.webhookUrl || '';
+    renderUpdateStatus();
     renderProfileImportPreview();
     renderOnboarding();
     renderLearningAudit();
+    renderActiveModelAdjustments();
+  }
+
+  function renderUpdateStatus() {
+    const node = $('#update-status');
+    if (!node) return;
+    const status = state.updateStatus || readStorageJson(UPDATE_STATUS_KEY, null);
+    if (!status) {
+      node.textContent = 'Aucune vérification de mise à jour lancée.';
+      return;
+    }
+    if (status.error) {
+      node.textContent = `Update : ${status.error}`;
+      return;
+    }
+    node.textContent = status.available
+      ? `Update disponible ${status.latestVersion || ''} · installation au prochain redémarrage si demandée.`
+      : `À jour (${status.currentVersion || 'version locale'}) · vérifié ${status.checkedAt ? formatDateTime(status.checkedAt) : '-'}.`;
+  }
+
+  async function checkForUpdates({ manual = false } = {}) {
+    const prefs = loadPreferences();
+    if (!manual && prefs.autoUpdateEnabled === false) return null;
+    try {
+      const response = await fetchJson('/api/update/check', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ config: { channel: prefs.updateChannel || 'stable' } })
+      });
+      state.updateStatus = response.status || response;
+      writeStorageJson(UPDATE_STATUS_KEY, state.updateStatus);
+      renderUpdateStatus();
+      if (state.updateStatus.available) {
+        notifyUser('Mise à jour disponible', `Version ${state.updateStatus.latestVersion || ''} prête sur GitHub Releases.`);
+      }
+      if (manual) setSideStatus(state.updateStatus.available ? 'Mise à jour disponible' : 'Application à jour', state.updateStatus.available ? 'warn' : 'ok');
+      return state.updateStatus;
+    } catch (error) {
+      state.updateStatus = { checkedAt: new Date().toISOString(), error: error.message };
+      renderUpdateStatus();
+      if (manual) setSideStatus('Update indisponible', 'warn');
+      return state.updateStatus;
+    }
   }
 
   function collectPreferencesFromForm() {
@@ -4738,6 +5160,11 @@
       aiProvider: $('#pref-ai-provider')?.value || DEFAULT_PREFERENCES.aiProvider,
       aiApiKey: ($('#pref-ai-key')?.value || '').trim(),
       aiModel: ($('#pref-ai-model')?.value || '').trim() || DEFAULT_PREFERENCES.aiModel,
+      webEnrichmentEnabled: $('#pref-web-enrichment-enabled')?.checked !== false,
+      webEnrichmentCacheMinutes: Math.max(15, Number($('#pref-web-enrichment-cache')?.value || DEFAULT_PREFERENCES.webEnrichmentCacheMinutes) || DEFAULT_PREFERENCES.webEnrichmentCacheMinutes),
+      webEnrichmentRateLimit: Math.max(1, Math.min(10, Number($('#pref-web-enrichment-rate')?.value || DEFAULT_PREFERENCES.webEnrichmentRateLimit) || DEFAULT_PREFERENCES.webEnrichmentRateLimit)),
+      autoUpdateEnabled: $('#pref-auto-update-enabled')?.checked !== false,
+      updateChannel: $('#pref-update-channel')?.value || DEFAULT_PREFERENCES.updateChannel,
       strict: Boolean($('#pref-strict')?.checked)
     };
   }
@@ -4771,7 +5198,9 @@
     renderTrackedBets();
     renderAutoSettlementAudit();
     renderModelSelfAudit();
+    renderActiveModelAdjustments();
     renderPersonalInsights();
+    renderLearningFeedback();
     renderCoachAdvice();
     $('#hist-total').textContent = history ? String(history.total) : '-';
     $('#hist-generated').textContent = history?.generatedAt ? new Date(history.generatedAt).toLocaleString('fr-FR') : '-';
@@ -5038,6 +5467,42 @@
     document.body.classList.add('modal-open');
   }
 
+  function openFocusMode(row) {
+    const pick = typeof row === 'string' ? findPickByTrackKey(row) || findMatchRow(row) : row;
+    if (!pick) return;
+    state.focusRow = pick;
+    const overlay = $('#focus-overlay');
+    const title = $('#focus-title');
+    const sub = $('#focus-subtitle');
+    const countdown = $('#focus-countdown');
+    const ticket = $('#focus-ticket');
+    const reason = $('#focus-reason');
+    const action = $('#focus-action');
+    if (title) title.textContent = pick.title || 'Match';
+    if (sub) sub.textContent = `${pick.sport || ''} · ${pick.league || ''} · ${formatDateLabel(pick.start)}`;
+    if (countdown) countdown.textContent = countdownLabel(pick.start);
+    if (ticket) ticket.innerHTML = `
+      <span>${escapeHtml(pick.market || '-')}</span>
+      <strong>${escapeHtml(pick.label || '-')} ${escapeHtml(formatOdd(pick.odd))}</strong>
+      <em>mise ${escapeHtml(visibleStakeText(pick))} · edge ${escapeHtml(formatPct(pick.edge || 0, 1))}</em>
+      ${enrichmentBadgeHtml(pick)}
+    `;
+    if (reason) reason.textContent = pickReason(pick).replace(/^Pourquoi\s*:\s*/i, '');
+    if (action) action.innerHTML = `
+      ${trackButtonHtml(pick, 'Je mise')}
+      <button type="button" class="ghost-btn" id="focus-reminder-btn">Rappel toutes les 5 min</button>
+      <button type="button" class="ghost-btn" id="focus-close-btn">Fermer focus</button>
+    `;
+    overlay?.classList.remove('hidden');
+    document.body.classList.add('modal-open');
+  }
+
+  function closeFocusMode() {
+    $('#focus-overlay')?.classList.add('hidden');
+    state.focusRow = null;
+    if ($('#match-modal')?.classList.contains('hidden')) document.body.classList.remove('modal-open');
+  }
+
   function closeMatchDetail() {
     $('#match-modal').classList.add('hidden');
     document.body.classList.remove('modal-open');
@@ -5201,12 +5666,50 @@
       </section>`;
   }
 
+  function buildEnrichedSourcesHtml(row) {
+    const enrichment = enrichmentForRow(row);
+    if (!enrichment) {
+      return `
+        <article class="detail-card wide enriched-sources-card">
+          <h4>Sources enrichies</h4>
+          <p class="detail-text">Aucun enrichissement web en cache pour ce match. Les signaux locaux restent la base de décision.</p>
+          <div class="quality-alert-actions">
+            <button class="quality-action-btn" data-enrich-pick-key="${escapeHtml(userBetKey(row))}">Tester l'enrichissement</button>
+          </div>
+        </article>`;
+    }
+    const rows = Array.isArray(enrichment.sources) ? enrichment.sources : [];
+    const validations = Array.isArray(enrichment.validations) ? enrichment.validations : [];
+    return `
+      <article class="detail-card wide enriched-sources-card">
+        <h4>Sources enrichies ${enrichmentBadgeHtml(row)}</h4>
+        <p class="detail-text">${escapeHtml(`${formatCount(enrichment.successfulSources || 0)} source(s) OK · ${formatCount(enrichment.failedSources || 0)} échec(s) · ${formatDateTime(enrichment.enrichedAt)}`)}</p>
+        <div class="market-list">
+          ${validations.map((item) => `
+            <div class="market-row">
+              <span>${escapeHtml(item.label || 'validation')}</span>
+              <strong>${escapeHtml(item.status || 'ok')}</strong>
+              <em>${escapeHtml(item.detail || '-')}</em>
+            </div>
+          `).join('')}
+          ${rows.map((source) => `
+            <div class="market-row">
+              <span>${escapeHtml(source.label || source.key || 'source')}</span>
+              <strong>${escapeHtml(source.status === 'ok' ? 'validée' : 'indisponible')}</strong>
+              <em>${escapeHtml(source.summary || source.url || '-')}</em>
+            </div>
+          `).join('') || '<div class="empty compact-empty">Aucune source web enregistrée.</div>'}
+        </div>
+      </article>`;
+  }
+
   function buildSourcesHtml(row) {
     const sources = Array.isArray(row.match?.context?.sources) ? row.match.context.sources : [];
     return `
       <section class="detail-tab-panel" data-detail-panel="sources">
         <div class="modal-grid">
           ${buildIdentityDetailHtml(row)}
+          ${buildEnrichedSourcesHtml(row)}
         </div>
         <article class="detail-card wide">
           <h4>Sources utilisées</h4>
@@ -5561,6 +6064,7 @@
             </div>
           </article>
         </div>
+        ${enrichmentForRow(row) ? buildEnrichedSourcesHtml(row) : ''}
         <article class="detail-card wide sheet-signals-card">
           <h4>Signaux clés</h4>
           <div class="sheet-signal-strip">
@@ -8899,6 +9403,14 @@
 
   function openMatchFromEvent(event) {
     if (event.type === 'keydown' && event.key !== 'Enter' && event.key !== ' ') return;
+    const focusButton = event.target.closest('[data-focus-pick-key]');
+    if (focusButton) {
+      event.preventDefault();
+      event.stopPropagation();
+      if (event.type === 'keydown') return;
+      openFocusMode(focusButton.dataset.focusPickKey || '');
+      return;
+    }
     const trackButton = event.target.closest('[data-track-bet-key]');
     if (trackButton) {
       event.preventDefault();
@@ -9139,6 +9651,29 @@
         if (status) status.textContent = `Webhook en erreur : ${error.message}`;
       }
     });
+    $('#test-webhook-suite-btn')?.addEventListener('click', () => sendWebhookTestSuite());
+    $('#test-web-enrichment-btn')?.addEventListener('click', () => {
+      const row = (dashboardPickRows(readPickFilters()) || [])[0] || state.picks[0] || state.allPicks[0];
+      if (!row) {
+        setSideStatus('Aucun pick à enrichir', 'warn');
+        return;
+      }
+      enrichPick(row, { force: true, dryRun: true, manual: true }).catch((error) => {
+        setSideStatus(`Enrichissement impossible : ${error.message}`, 'danger');
+      });
+    });
+    $('#check-update-btn')?.addEventListener('click', () => checkForUpdates({ manual: true }));
+    $('#install-update-btn')?.addEventListener('click', async () => {
+      try {
+        const response = await fetchJson('/api/update/install-next-restart', { method: 'POST' });
+        state.updateStatus = response.status || state.updateStatus;
+        writeStorageJson(UPDATE_STATUS_KEY, state.updateStatus);
+        renderUpdateStatus();
+        setSideStatus(state.updateStatus?.installOnQuit ? 'Update préparée au redémarrage' : 'Aucune update disponible', state.updateStatus?.installOnQuit ? 'ok' : 'warn');
+      } catch (error) {
+        setSideStatus(`Préparation update impossible : ${error.message}`, 'warn');
+      }
+    });
     $('#export-profile-btn')?.addEventListener('click', exportProfile);
     $('#import-profile-btn')?.addEventListener('click', () => $('#profile-import-input')?.click());
     $('#profile-import-input')?.addEventListener('change', async (event) => {
@@ -9319,6 +9854,13 @@
       if (btn) switchDetailTab(btn.dataset.detailTab);
     });
     $('#modal-content').addEventListener('click', (event) => {
+      const enrichButton = event.target.closest('[data-enrich-pick-key]');
+      if (enrichButton) {
+        event.preventDefault();
+        const row = findPickByTrackKey(enrichButton.dataset.enrichPickKey || '') || state.matches.find((item) => userBetKey(item) === enrichButton.dataset.enrichPickKey);
+        enrichPick(row, { force: true, dryRun: false, manual: true }).catch((error) => setSideStatus(`Enrichissement impossible : ${error.message}`, 'danger'));
+        return;
+      }
       const button = event.target.closest('[data-quality-mode]');
       if (!button) return;
       event.preventDefault();
@@ -9332,8 +9874,37 @@
     $('#match-modal').addEventListener('click', (event) => {
       if (event.target.id === 'match-modal') closeMatchDetail();
     });
+    $('#focus-overlay')?.addEventListener('click', (event) => {
+      if (event.target.id === 'focus-overlay') closeFocusMode();
+      const focusTrack = event.target.closest('[data-track-bet-key]');
+      if (focusTrack) {
+        event.preventDefault();
+        trackUserBet(findPickByTrackKey(focusTrack.dataset.trackBetKey || ''));
+        openFocusMode(state.focusRow);
+      }
+    });
+    $('#focus-close-top')?.addEventListener('click', closeFocusMode);
+    document.addEventListener('click', (event) => {
+      if (event.target.closest('#focus-close-btn')) closeFocusMode();
+      if (event.target.closest('#focus-reminder-btn')) {
+        setSideStatus('Rappel focus activé pour 5 min', 'ok');
+        setTimeout(() => {
+          if (state.focusRow) notifyUser('Rappel focus', `${state.focusRow.title} · ${state.focusRow.label || ''} démarre dans ${countdownLabel(state.focusRow.start)}.`, state.focusRow);
+        }, 5 * 60 * 1000);
+      }
+    });
+    $('#loss-feedback-close')?.addEventListener('click', closeLossFeedbackPrompt);
+    $('#loss-feedback-modal')?.addEventListener('click', (event) => {
+      if (event.target.id === 'loss-feedback-modal') closeLossFeedbackPrompt();
+      const choice = event.target.closest('[data-loss-feedback]');
+      if (choice) saveLossFeedback(choice.dataset.lossFeedback || 'other');
+    });
     document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape') closeMatchDetail();
+      if (event.key === 'Escape') {
+        closeFocusMode();
+        closeLossFeedbackPrompt();
+        closeMatchDetail();
+      }
       if (event.ctrlKey && event.shiftKey && !event.altKey && !event.metaKey && event.key.toLowerCase() === 'l') {
         event.preventDefault();
         openLogDrawer();
@@ -9370,6 +9941,13 @@
     });
     $('#save-preferences-btn')?.addEventListener('click', () => applyPreferences(collectPreferencesFromForm()));
     $('#reset-preferences-btn')?.addEventListener('click', () => applyPreferences({ ...DEFAULT_PREFERENCES }));
+    $('#reset-model-adjustments-btn')?.addEventListener('click', () => {
+      localStorage.removeItem(MODEL_ADJUSTMENTS_KEY);
+      modelAdjustmentsFromAudit();
+      renderActiveModelAdjustments();
+      renderPicks();
+      setSideStatus('Ajustements modèle recalculés', 'ok');
+    });
     $('#pref-level')?.addEventListener('change', () => {
       const defaults = levelDefaults($('#pref-level')?.value || 'intermediate');
       Object.entries({
@@ -9428,7 +10006,10 @@
     bindEvents();
     state.actionHistory = readActionHistory();
     state.aiAssist = readStorageJson(AI_ENGINE_KEY, null);
+    state.webEnrichments = readStorageJson(WEB_ENRICHMENT_KEY, null);
+    state.updateStatus = readStorageJson(UPDATE_STATUS_KEY, null);
     renderActionHistory();
+    updateWebEnrichmentSummary();
     const storedBankroll = Number(localStorage.getItem('userBankroll') || loadPreferences().bankroll || 50);
     if (Number.isFinite(storedBankroll) && storedBankroll > 0) $('#bankroll-input').value = String(storedBankroll);
     switchTab('dashboard');
@@ -9438,6 +10019,8 @@
     const logPromise = refreshLog().catch(() => null);
     await statusPromise;
     await computePicks();
+    loadWebEnrichmentState().catch(() => {});
+    setTimeout(() => checkForUpdates().catch(() => {}), 2500);
     await logPromise;
     setSideStatus('Calcul prêt', 'ok');
     scheduleBackgroundRefresh();

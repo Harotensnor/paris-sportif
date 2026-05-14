@@ -3023,6 +3023,12 @@ td.empty::before,
   font-size: 12px;
 }
 
+.enrichment-badge {
+  border-color: rgba(96, 165, 250, .42) !important;
+  color: var(--blue) !important;
+  background: rgba(96, 165, 250, .10) !important;
+}
+
 .ultimate-side {
   display: flex;
   flex-direction: column;
@@ -3122,7 +3128,14 @@ td.empty::before,
 
 .time-pick-action {
   display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
   justify-content: flex-end;
+}
+
+.focus-mode-btn {
+  min-height: 34px;
+  padding-inline: 12px;
 }
 
 .scorer-track-btn {
@@ -3352,6 +3365,104 @@ td.empty::before,
 .log-drawer .logbox {
   margin: 16px;
   overflow: auto;
+}
+
+.focus-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  display: grid;
+  place-items: center;
+  padding: 28px;
+  background: radial-gradient(circle at 50% 0%, rgba(16, 185, 129, .16), transparent 34%), rgba(2, 6, 23, .88);
+}
+
+.focus-overlay.hidden {
+  display: none;
+}
+
+.focus-panel {
+  position: relative;
+  width: min(980px, 100%);
+  min-height: min(720px, calc(100vh - 56px));
+  display: grid;
+  align-content: center;
+  gap: 18px;
+  border: 1px solid rgba(16, 185, 129, .38);
+  border-radius: 18px;
+  background:
+    linear-gradient(135deg, rgba(16, 185, 129, .12), rgba(96, 165, 250, .08)),
+    var(--graphite);
+  box-shadow: var(--shadow-pop);
+  padding: clamp(28px, 5vw, 56px);
+  text-align: center;
+}
+
+.focus-close-top {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+}
+
+.focus-panel h2 {
+  margin: 0;
+  font-size: clamp(34px, 6vw, 72px);
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.focus-panel p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.focus-countdown {
+  font-size: clamp(48px, 10vw, 112px);
+  line-height: 1;
+  font-weight: 950;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.focus-ticket {
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(15, 23, 42, .64);
+  padding: 18px;
+}
+
+.focus-ticket span,
+.focus-ticket em {
+  color: var(--muted);
+  font-style: normal;
+}
+
+.focus-ticket strong {
+  font-size: clamp(24px, 4vw, 42px);
+}
+
+.focus-actions,
+.feedback-choice-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.feedback-modal {
+  width: min(680px, calc(100vw - 32px));
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--graphite);
+  box-shadow: var(--shadow-pop);
+  overflow: hidden;
+}
+
+.feedback-choice-grid {
+  padding: 18px;
 }
 
 .v8-sheet-hero {
