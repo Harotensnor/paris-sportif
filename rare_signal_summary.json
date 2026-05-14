@@ -1,29 +1,44 @@
 {
-  "generated_at": "2026-05-14T04:56:35Z",
+  "generated_at": "2026-05-14T05:04:07Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 72,
-    "actionable": 17,
-    "watch": 3,
+    "active_events": 66,
+    "actionable": 14,
+    "watch": 0,
     "risk": 52,
     "expired_sample": 0,
     "by_type": {
       "travel_extreme": 7,
       "back_to_back_travel": 7,
       "injury_imbalance": 10,
-      "market_move": 10,
-      "signal_conflict": 2,
-      "market_uncertain": 54
+      "market_uncertain": 52
     },
     "by_quality": {
-      "actionable": 17,
-      "watch": 3,
+      "actionable": 14,
       "risk": 52
     }
   },
   "active_actionable": [
+    {
+      "event_id": "401815335",
+      "date": "2026-05-14T16:35Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Pittsburgh Pirates",
+      "away": "Colorado Rockies",
+      "match": "Pittsburgh Pirates - Colorado Rockies",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Colorado Rockies",
+      "side": "away",
+      "strength": 1.0,
+      "context": "2 match dans les 48h + 2120 km de voyage"
+    },
     {
       "event_id": "401815340",
       "date": "2026-05-14T17:40Z",
@@ -40,7 +55,7 @@
       "team": "Miami Marlins",
       "side": "away",
       "strength": 1.0,
-      "context": "1 match dans les 48h + 2434 km de voyage"
+      "context": "2 match dans les 48h + 2434 km de voyage"
     },
     {
       "event_id": "401815341",
@@ -58,7 +73,7 @@
       "team": "San Diego Padres",
       "side": "away",
       "strength": 1.0,
-      "context": "1 match dans les 48h + 2789 km de voyage"
+      "context": "2 match dans les 48h + 2789 km de voyage"
     },
     {
       "event_id": "401815342",
@@ -79,24 +94,6 @@
       "context": "Absences severes 14-8"
     },
     {
-      "event_id": "748503",
-      "date": "2026-05-14T19:30Z",
-      "sport": "football",
-      "league_code": "esp.1",
-      "league_name": "La Liga",
-      "home": "Real Madrid",
-      "away": "Real Oviedo",
-      "match": "Real Madrid - Real Oviedo",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 1.0,
-      "context": "Cote away: 11.00 -> 8.50 (+22.7%)"
-    },
-    {
       "event_id": "401815337",
       "date": "2026-05-14T22:45Z",
       "sport": "baseball",
@@ -115,42 +112,6 @@
       "context": "Absences severes 10-3"
     },
     {
-      "event_id": "401871408",
-      "date": "2026-05-14T23:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Buffalo Sabres",
-      "away": "Montreal Canadiens",
-      "match": "Buffalo Sabres - Montreal Canadiens",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 1.82 -> 2.25 (-23.6%)"
-    },
-    {
-      "event_id": "401871428",
-      "date": "2026-05-15T01:30Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Anaheim Ducks",
-      "away": "Vegas Golden Knights",
-      "match": "Anaheim Ducks - Vegas Golden Knights",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 1.93 -> 2.40 (-24.6%)"
-    },
-    {
       "event_id": "401815425",
       "date": "2026-05-20T23:40Z",
       "sport": "baseball",
@@ -167,24 +128,6 @@
       "side": "away",
       "strength": 1.0,
       "context": "2 match dans les 48h + 1998 km de voyage"
-    },
-    {
-      "event_id": "401815335",
-      "date": "2026-05-14T16:35Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Pittsburgh Pirates",
-      "away": "Colorado Rockies",
-      "match": "Pittsburgh Pirates - Colorado Rockies",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Colorado Rockies",
-      "side": "away",
-      "strength": 0.954,
-      "context": "1 match dans les 48h + 2120 km de voyage"
     },
     {
       "event_id": "401815410",
@@ -327,66 +270,11 @@
       "direction": "fade",
       "team": "Chicago Cubs",
       "side": "away",
-      "strength": 0.718,
-      "context": "1 match dans les 48h + 938 km de voyage"
+      "strength": 0.798,
+      "context": "2 match dans les 48h + 938 km de voyage"
     }
   ],
-  "active_watch": [
-    {
-      "event_id": "401872572",
-      "date": "2026-05-15T01:00Z",
-      "sport": "football",
-      "league_code": "ligamx",
-      "league_name": "Liga MX",
-      "home": "Pachuca",
-      "away": "Pumas UNAM",
-      "match": "Pachuca - Pumas UNAM",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.617,
-      "context": "Cote away: 3.60 -> 3.20 (+11.1%)"
-    },
-    {
-      "event_id": "401871367",
-      "date": "2026-05-14T19:00Z",
-      "sport": "football",
-      "league_code": "leagueone",
-      "league_name": "League One",
-      "home": "Bradford City",
-      "away": "Bolton Wanderers",
-      "match": "Bradford City - Bolton Wanderers",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.606,
-      "context": "Cote away: 2.75 -> 2.45 (+10.9%)"
-    },
-    {
-      "event_id": "401856908",
-      "date": "2026-05-15T00:00Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Dallas Wings",
-      "away": "Minnesota Lynx",
-      "match": "Dallas Wings - Minnesota Lynx",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.505,
-      "context": "Cote away: 2.42 -> 2.20 (+9.1%)"
-    }
-  ],
+  "active_watch": [],
   "active_risk": [
     {
       "event_id": "401871338",
@@ -965,6 +853,24 @@
       "context": "marge bookmaker anormale 19.2%"
     },
     {
+      "event_id": "401865545",
+      "date": "2026-05-20T22:00Z",
+      "sport": "football",
+      "league_code": "conmebol.libertadores",
+      "league_name": "Copa Libertadores",
+      "home": "Nacional",
+      "away": "Universitario",
+      "match": "Nacional - Universitario",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.7%"
+    },
+    {
       "event_id": "401865436",
       "date": "2026-05-20T22:00Z",
       "sport": "football",
@@ -1019,24 +925,6 @@
       "context": "marge bookmaker anormale 19.0%"
     },
     {
-      "event_id": "401865545",
-      "date": "2026-05-20T22:00Z",
-      "sport": "football",
-      "league_code": "conmebol.libertadores",
-      "league_name": "Copa Libertadores",
-      "home": "Nacional",
-      "away": "Universitario",
-      "match": "Nacional - Universitario",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.7%"
-    },
-    {
       "event_id": "401865442",
       "date": "2026-05-21T00:00Z",
       "sport": "football",
@@ -1063,24 +951,6 @@
       "home": "Independiente Petrolero",
       "away": "Botafogo",
       "match": "Independiente Petrolero - Botafogo",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.7%"
-    },
-    {
-      "event_id": "401865445",
-      "date": "2026-05-21T00:30Z",
-      "sport": "football",
-      "league_code": "conmebol.sudamericana",
-      "league_name": "Copa Sudamericana",
-      "home": "River Plate",
-      "away": "Red Bull Bragantino",
-      "match": "River Plate - Red Bull Bragantino",
       "quality": "risk",
       "quality_reason": "Signal de prudence, pas une opportunite directe",
       "type": "market_uncertain",
@@ -1135,6 +1005,24 @@
       "home": "Palmeiras",
       "away": "Cerro Porteño",
       "match": "Palmeiras - Cerro Porteño",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.7%"
+    },
+    {
+      "event_id": "401865445",
+      "date": "2026-05-21T00:30Z",
+      "sport": "football",
+      "league_code": "conmebol.sudamericana",
+      "league_name": "Copa Sudamericana",
+      "home": "River Plate",
+      "away": "Red Bull Bragantino",
+      "match": "River Plate - Red Bull Bragantino",
       "quality": "risk",
       "quality_reason": "Signal de prudence, pas une opportunite directe",
       "type": "market_uncertain",
