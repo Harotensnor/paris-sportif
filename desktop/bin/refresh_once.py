@@ -26,6 +26,7 @@ STATE_ROOT = PROJECT / "desktop" / "state"
 REFRESH_HISTORY_PATH = STATE_ROOT / "refresh-history.json"
 CONTEXT_REPAIR_PLAN = PROJECT / "context_repair_plan.json"
 SOURCE_RUNS_PATH = PROJECT / "source_runs.jsonl"
+WEATHER_TIMEOUT_SEC = 180
 
 
 @dataclass
@@ -112,7 +113,7 @@ QUICK_STAGES = [
 FULL_EXTRA_STAGES = [
     Stage("fetch_v3.py", 360, required=True),
     Stage("fetch_clubelo.py", 90),
-    Stage("fetch_weather.py", 120),
+    Stage("fetch_weather.py", WEATHER_TIMEOUT_SEC),
     Stage("fetch_referees_soccer.py", 90),
     Stage("fetch_injuries_soccer.py", 210),
     Stage("fetch_lineups_soccer.py", 210),
@@ -124,7 +125,7 @@ FULL_EXTRA_STAGES = [
 ]
 
 SIGNAL_FETCH_STAGES = [
-    Stage("fetch_weather.py", 120),
+    Stage("fetch_weather.py", WEATHER_TIMEOUT_SEC),
     Stage("fetch_referees_soccer.py", 90),
     Stage("fetch_injuries_soccer.py", 210),
     Stage("fetch_lineups_soccer.py", 210),
@@ -156,7 +157,7 @@ PREMATCH_STAGES = [
             "WINAMAX_DETAILS_HORIZON_DAYS": "2",
         },
     ),
-    Stage("fetch_weather.py", 120),
+    Stage("fetch_weather.py", WEATHER_TIMEOUT_SEC),
     Stage("fetch_referees_soccer.py", 90),
     Stage("fetch_injuries_soccer.py", 210),
     Stage("fetch_lineups_soccer.py", 210),
@@ -210,7 +211,7 @@ PREMATCH_STAGES = [
 ]
 
 PREMATCH_T60_STAGES = [
-    Stage("fetch_weather.py", 120),
+    Stage("fetch_weather.py", WEATHER_TIMEOUT_SEC),
     Stage("fetch_injuries_soccer.py", 210),
     Stage("fetch_lineups_soccer.py", 210),
     Stage("fetch_h2h.py", 300),
@@ -428,7 +429,7 @@ SIGNAL_SOURCE_ALIASES = {
 
 SIGNAL_FETCH_BY_SOURCE = {
     "all": SIGNAL_FETCH_STAGES,
-    "weather": [Stage("fetch_weather.py", 120)],
+    "weather": [Stage("fetch_weather.py", WEATHER_TIMEOUT_SEC)],
     "referees": [Stage("fetch_referees_soccer.py", 90)],
     "injuries": [Stage("fetch_injuries_soccer.py", 210)],
     "lineups": [Stage("fetch_lineups_soccer.py", 210)],

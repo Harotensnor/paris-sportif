@@ -35,7 +35,9 @@ async function main() {
     throw new Error('Durcissement Electron incomplet');
   }
   if (!mainText.includes("permission === 'notifications'")) throw new Error('Notifications desktop non autorisées proprement');
+  if (!mainText.includes('process.memoryUsage()')) throw new Error('Monitoring mémoire longue durée absent');
   if (!htmlText.includes('design-tokens.css')) throw new Error('Socle design tokens absent');
+  if (!rendererText.includes('5 * 60 * 1000')) throw new Error('Refresh pré-kickoff 5 min absent');
   for (const marker of ['REFRESH_URGENT_INTERVAL_MS', 'visibilitychange', 'Notification']) {
     if (!rendererText.includes(marker)) throw new Error(`QOL Sprint 3 absente: ${marker}`);
   }
@@ -69,6 +71,8 @@ async function main() {
       picks: Number(document.querySelector('#metric-picks')?.textContent || 0),
       caption: document.querySelector('#final-decision-caption')?.textContent || '',
       finalCards: document.querySelectorAll('#final-decision-grid .quality-report-card, #final-decision-grid .empty').length,
+      morningCards: document.querySelectorAll('#morning-grid .morning-card').length,
+      imminentStrip: Boolean(document.querySelector('#imminent-strip')),
       firstActionButton: Boolean(document.querySelector('#run-first-action-btn')),
       criticalButton: Boolean(document.querySelector('#refresh-critical-btn')),
       t10Button: Boolean(document.querySelector('#refresh-prematch-t10-btn')),
@@ -86,7 +90,7 @@ async function main() {
     }));
     if (dashboard.title !== 'Accueil') throw new Error(`Titre dashboard invalide: ${dashboard.title}`);
     if (dashboard.analyzed <= 0) throw new Error('Aucun match analysé');
-    if (dashboard.finalCards <= 0 || !dashboard.firstActionButton || !dashboard.criticalButton || !dashboard.t10Button) {
+    if (dashboard.finalCards <= 0 || dashboard.morningCards < 4 || !dashboard.imminentStrip || !dashboard.firstActionButton || !dashboard.criticalButton || !dashboard.t10Button) {
       throw new Error(`Panneau décision incomplet: ${JSON.stringify(dashboard)}`);
     }
     if (dashboard.picks < 20 || dashboard.trackButtons < 20 || !dashboard.pnlVisible || !dashboard.pnlSparkline || !dashboard.userBetExport || !dashboard.filtersVisible || dashboard.marketChips <= 0) {
@@ -123,10 +127,11 @@ async function main() {
       performance: document.querySelectorAll('#model-performance-grid .performance-card').length,
       segments: document.querySelectorAll('#model-segment-grid .segment-card, #model-segment-grid .empty').length,
       calibration: document.querySelectorAll('#calibration-plot-grid .calibration-bin, #calibration-plot-grid .empty').length,
+      learning: document.querySelectorAll('#learning-audit-grid .performance-card, #learning-audit-grid .empty').length,
       userBets: Boolean(document.querySelector('#user-bets-body')),
       exportButton: Boolean(document.querySelector('#export-user-bets-btn-history'))
     }));
-    if (history.performance < 5 || history.segments <= 0 || history.calibration <= 0 || !history.userBets || !history.exportButton) {
+    if (history.performance < 6 || history.segments <= 0 || history.calibration <= 0 || history.learning <= 0 || !history.userBets || !history.exportButton) {
       throw new Error(`Performance/Historique incomplet: ${JSON.stringify(history)}`);
     }
 
@@ -136,9 +141,12 @@ async function main() {
       bankroll: Boolean(document.querySelector('#pref-bankroll')),
       sports: document.querySelectorAll('input[name="pref-sport"]').length,
       markets: document.querySelectorAll('input[name="pref-market"]').length,
+      stakeMode: Boolean(document.querySelector('#pref-stake-mode')),
+      discipline: Boolean(document.querySelector('#pref-stop-loss') && document.querySelector('#pref-take-profit')),
+      warnings: Boolean(document.querySelector('#preference-warning-grid')),
       save: Boolean(document.querySelector('#save-preferences-btn'))
     }));
-    if (!preferences.bankroll || preferences.sports < 5 || preferences.markets < 5 || !preferences.save) {
+    if (!preferences.bankroll || preferences.sports < 5 || preferences.markets < 5 || !preferences.stakeMode || !preferences.discipline || !preferences.warnings || !preferences.save) {
       throw new Error(`Préférences incomplètes: ${JSON.stringify(preferences)}`);
     }
 

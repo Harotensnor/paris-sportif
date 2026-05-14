@@ -19,6 +19,9 @@ est désactivé dans cette fenêtre.
 - applique le blocage si les données ont plus de 4h ;
 - lance un refresh local à la demande ;
 - affiche les picks, les combinés, les buteurs probables, tous les matchs, l'historique, l'agent et l'état des données dans le logiciel.
+- affiche un brief d'ouverture avec les picks du jour, la bankroll, le prochain départ et les performances récentes ;
+- suit les paris en un clic avec P&L, CLV, apprentissage par segment, export CSV et discipline bankroll locale ;
+- propose des préférences locales : sports, marchés, seuils, mode de mise, stop-loss et take-profit.
 
 ## Garde-fou
 

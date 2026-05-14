@@ -32,7 +32,7 @@ The JS side (`predictMatch` in pronostics.html) now reads `odds_snapshot`
 as a fallback when `ev.odds` is empty, which lets us compute real
 retrospective picks.
 """
-import json, re, sys
+import json, os, re, sys, time
 from pathlib import Path
 from datetime import datetime, timezone
 
@@ -53,10 +53,22 @@ def load_data(path=DATA_PATH):
 
 
 def save_data(d, path=DATA_PATH):
-    path.write_text(
-        'window.PRONOSTICS_DATA = ' + json.dumps(d, ensure_ascii=False, separators=(',', ':')) + ';\n',
-        encoding='utf-8'
-    )
+    content = 'window.PRONOSTICS_DATA = ' + json.dumps(d, ensure_ascii=False, separators=(',', ':')) + ';\n'
+    tmp = path.with_name(f'{path.name}.{os.getpid()}.snapshot.tmp')
+    last_error = None
+    for attempt in range(3):
+        try:
+            tmp.write_text(content, encoding='utf-8')
+            tmp.replace(path)
+            return
+        except OSError as error:
+            last_error = error
+            try:
+                tmp.unlink(missing_ok=True)
+            except OSError:
+                pass
+            time.sleep(0.25 * (attempt + 1))
+    raise last_error
 
 
 def best_odds_from_array(odds_arr):

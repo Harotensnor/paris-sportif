@@ -75,6 +75,26 @@
       <section class="banner hidden" id="stale-banner"></section>
 
       <section class="tab-panel active" data-panel="dashboard">
+        <section class="morning-brief" id="morning-brief" aria-label="Brief du matin">
+          <div class="morning-main">
+            <span class="eyebrow">Brief du matin</span>
+            <h3 id="morning-title">Chargement du cockpit...</h3>
+            <p id="morning-subtitle">Le logiciel prépare les picks, la bankroll et le prochain départ.</p>
+            <div class="morning-actions">
+              <button class="primary-btn" type="button" data-tab-target="dashboard">Voir tous les picks</button>
+              <button class="ghost-btn" type="button" data-tab-target="combines">Combinés</button>
+              <button class="ghost-btn" type="button" data-tab-target="history">Mes paris</button>
+            </div>
+          </div>
+          <div class="morning-grid" id="morning-grid">
+            <article class="morning-card"><span>Picks</span><strong>-</strong><p>Calcul en cours</p></article>
+            <article class="morning-card"><span>Prochain match</span><strong>-</strong><p>Calcul en cours</p></article>
+            <article class="morning-card"><span>Performance hier</span><strong>-</strong><p>Calcul en cours</p></article>
+            <article class="morning-card"><span>Bankroll</span><strong>-</strong><p>Calcul en cours</p></article>
+          </div>
+          <div class="imminent-strip" id="imminent-strip"></div>
+        </section>
+
         <div class="metrics-grid">
           <article class="metric">
             <span>Fraîcheur</span>
@@ -348,6 +368,16 @@
 
         <div class="section-head compact">
           <div>
+            <h3>Apprentissage depuis mes paris</h3>
+            <p>Le logiciel repère les segments où tes paris suivis gagnent ou coûtent trop cher.</p>
+          </div>
+        </div>
+        <div class="segment-grid" id="learning-audit-grid">
+          <div class="empty">Aucun pari réglé pour l'instant.</div>
+        </div>
+
+        <div class="section-head compact">
+          <div>
             <h3>Mes paris</h3>
             <p>Suivi local des paris ajoutés avec “Je mise”.</p>
           </div>
@@ -378,12 +408,13 @@
                 <th>Cote</th>
                 <th>Mise</th>
                 <th>Statut</th>
+                <th>CLV</th>
                 <th>P&L</th>
                 <th>Action</th>
               </tr>
             </thead>
             <tbody id="user-bets-body">
-              <tr><td colspan="8" class="empty">Aucun pari suivi.</td></tr>
+              <tr><td colspan="9" class="empty">Aucun pari suivi.</td></tr>
             </tbody>
           </table>
         </div>
@@ -766,6 +797,28 @@
             <label>Kickoff notif heures<input id="pref-alert-window" type="number" min="1" max="24" step="1"></label>
             <p class="match-sub">Les notifications restent locales et déclenchées par les picks visibles.</p>
           </article>
+          <article class="preference-card">
+            <h4>Discipline bankroll</h4>
+            <label>Mode mise
+              <select id="pref-stake-mode">
+                <option value="kelly">Kelly plafonné</option>
+                <option value="flat">Flat 1u</option>
+              </select>
+            </label>
+            <label>Flat unit % bankroll<input id="pref-flat-unit" type="number" min="0.1" max="10" step="0.1"></label>
+            <label>Cap mise % bankroll<input id="pref-max-stake" type="number" min="0.1" max="20" step="0.1"></label>
+            <label>Stop-loss jour %<input id="pref-stop-loss" type="number" min="0" max="50" step="0.5"></label>
+            <label>Take-profit jour %<input id="pref-take-profit" type="number" min="0" max="100" step="0.5"></label>
+          </article>
+        </div>
+        <div class="section-head compact">
+          <div>
+            <h3>Warnings personnels</h3>
+            <p>Segments perdants sur tes paris suivis, seulement quand le sample devient significatif.</p>
+          </div>
+        </div>
+        <div class="segment-grid" id="preference-warning-grid">
+          <div class="empty">Aucun warning personnel.</div>
         </div>
       </section>
     </main>

@@ -326,6 +326,110 @@ a:hover {
   color: var(--muted);
 }
 
+.track-bet-btn[disabled] {
+  cursor: not-allowed;
+  opacity: .72;
+}
+
+.morning-brief {
+  display: grid;
+  grid-template-columns: minmax(280px, .9fr) minmax(0, 1.4fr);
+  gap: 14px;
+  margin-bottom: 16px;
+  border: 1px solid rgba(96, 165, 250, .24);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(96, 165, 250, .14), transparent 42%),
+    var(--surface);
+  padding: 16px;
+}
+
+.morning-main h3 {
+  margin: 4px 0 6px;
+  font-size: 24px;
+  letter-spacing: 0;
+}
+
+.morning-main p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.morning-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+.morning-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.morning-card {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(15, 23, 42, .44);
+  padding: 12px;
+}
+
+.morning-card.danger {
+  border-color: rgba(248, 113, 113, .45);
+  background: rgba(127, 29, 29, .18);
+}
+
+.morning-card span,
+.morning-card p,
+.imminent-strip {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.morning-card strong {
+  display: block;
+  margin: 5px 0;
+  font-size: 20px;
+  overflow-wrap: anywhere;
+}
+
+.morning-card p {
+  margin: 0;
+  line-height: 1.35;
+}
+
+.imminent-strip {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-height: 34px;
+  border-top: 1px solid rgba(148, 163, 184, .14);
+  padding-top: 10px;
+}
+
+.imminent-strip strong {
+  color: var(--danger);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  font-size: 11px;
+}
+
+.imminent-strip button {
+  border: 1px solid rgba(248, 113, 113, .32);
+  border-radius: 999px;
+  background: rgba(248, 113, 113, .12);
+  color: var(--text);
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 800;
+}
+
 .pick-toolbar {
   display: grid;
   grid-template-columns: minmax(220px, 1.4fr) repeat(4, minmax(130px, .7fr)) repeat(2, minmax(110px, .5fr));
@@ -2806,6 +2910,8 @@ body.modal-open {
   }
 
   .metrics-grid,
+  .morning-brief,
+  .morning-grid,
   .agent-grid,
   .history-grid,
   .calibration-grid,
@@ -2861,6 +2967,8 @@ body.modal-open {
   }
 
   .metrics-grid,
+  .morning-brief,
+  .morning-grid,
   .agent-grid,
   .history-grid,
   .pick-toolbar,

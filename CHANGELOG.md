@@ -5,6 +5,19 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 5 — Cockpit intelligent, CLV, discipline bankroll et alertes
+
+- Ajout d'un `Brief du matin` en haut de l'accueil : nombre de picks affichés, gros edges, prochain match avec compte à rebours, performance d'hier, bankroll, CLV et accès rapides aux picks, combinés et paris suivis.
+- Suivi utilisateur enrichi : chaque pari conserve cote prise, dernière cote vue, cote de clôture capturée quand le match approche, CLV, bucket d'edge, tier, marché et mode de mise.
+- Vue `Historique` complétée avec CLV moyen et apprentissage depuis les paris suivis : comparaison edge moyen gagnants/perdants, warnings de segments perdants dès qu'un sample devient robuste.
+- Préférences bankroll étendues : mode `Kelly plafonné` ou `Flat 1u`, flat unit, cap par mise, stop-loss journalier et take-profit journalier.
+- Discipline de tracking : si stop-loss ou take-profit journalier est atteint, les boutons `Je mise` passent en pause et l'app prévient localement au lieu d'encourager un pari impulsif.
+- Alertes intelligentes locales : nouveau pick prêt, gros edge proche kickoff, rappel pick <30 min non suivi, cote qui monte/baisse de 5%, signal blessure proche kickoff et notification de settlement manuel.
+- Pré-kickoff plus réactif : l'auto-refresh passe à 5 minutes quand un pick démarre dans moins d'une heure, tout en gardant le mode économie si l'app reste en arrière-plan.
+- Robustesse refresh : `snapshot_odds.py` écrit maintenant atomiquement avec retry, et la météo dispose d'un timeout plus réaliste sur les runs complets/signaux.
+- Stabilité longue durée : monitoring mémoire Electron toutes les 5 minutes, exposé dans l'état local et journalisé si l'app dépasse 500 MB RSS.
+- QA Sprint 5 : pipeline complète réelle exécutée, refresh rapide validé, captures visuelles, smoke Electron, Playwright, moteur, refresh contract et audit dépendances relancés sur données fraîches.
+
 ### Sprint 4 — Multi-marchés, combinés et crédibilité modèle
 
 - Moteur desktop élargi aux marchés Winamax exacts au-delà du 1N2 : le cockpit exploite désormais les alternatives positives par match, avec 120 picks positifs détectés et 24 picks affichés dans la sélection principale.

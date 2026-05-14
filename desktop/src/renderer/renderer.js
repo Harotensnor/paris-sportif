@@ -76,6 +76,9 @@
   const USER_BETS_KEY = 'parisSportifUserBets';
   const USER_PREFS_KEY = 'parisSportifPreferences';
   const USER_PREFS_SEEN_KEY = 'parisSportifPreferencesSeen';
+  const USER_AUDIT_KEY = 'parisSportifUserLearningAudit';
+  const ODDS_MEMORY_KEY = 'parisSportifOddsMemory';
+  const SMART_ALERT_KEY = 'parisSportifSmartAlertKeys';
   const NOTIFIED_PICK_KEY = 'parisSportifNotifiedPickKeys';
   const READY_COUNT_KEY = 'parisSportifLastReadyCount';
   const SPORTS_PREFS = ['football', 'tennis', 'basketball', 'hockey', 'baseball'];
@@ -110,10 +113,15 @@
     confidenceMin: 0,
     alertEdge: 10,
     alertWindowHours: 2,
+    stakeMode: 'kelly',
+    flatUnitPct: 1,
+    maxStakePct: 5,
+    stopLossPct: 5,
+    takeProfitPct: 8,
     strict: false
   };
   const REFRESH_DEFAULT_INTERVAL_MS = 30 * 60 * 1000;
-  const REFRESH_URGENT_INTERVAL_MS = 10 * 60 * 1000;
+  const REFRESH_URGENT_INTERVAL_MS = 5 * 60 * 1000;
   const REFRESH_ECONOMY_AFTER_MS = 60 * 60 * 1000;
   const REFRESH_ESTIMATE_SECONDS = {
     quick: 150,
@@ -225,6 +233,32 @@
     }
   }
 
+  function readStorageJson(key, fallback) {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(key) || 'null');
+      return parsed == null ? fallback : parsed;
+    } catch {
+      return fallback;
+    }
+  }
+
+  function writeStorageJson(key, value) {
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch {
+      // Donnée de confort : l'app reste utilisable même si le profil bloque l'écriture.
+    }
+  }
+
+  function parisDayKey(date = new Date()) {
+    return new Intl.DateTimeFormat('fr-CA', {
+      timeZone: 'Europe/Paris',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    }).format(date);
+  }
+
   function userBetKey(row) {
     return `${row?.id || ''}:${row?.market || ''}:${row?.label || ''}`;
   }
@@ -236,13 +270,23 @@
 
   function userBetStats() {
     const bets = loadUserBets();
-    const today = new Intl.DateTimeFormat('fr-CA', { timeZone: 'Europe/Paris', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
+    const today = parisDayKey();
+    const yesterday = parisDayKey(new Date(Date.now() - 24 * 60 * 60 * 1000));
     let totalStake = 0;
     let settledStake = 0;
     let pnlTotal = 0;
     let pnlToday = 0;
+    let pnlYesterday = 0;
     let pending = 0;
+    let won = 0;
+    let lost = 0;
+    let wonYesterday = 0;
+    let lostYesterday = 0;
+    let clvSamples = 0;
+    let clvSum = 0;
+    let clvPositive = 0;
     const segments = new Map();
+    const dayPnl = new Map();
     const settled = [];
     for (const bet of bets) {
       const stake = Math.max(0, Number(bet.stake || 0) || 0);
@@ -270,6 +314,21 @@
         segment.pnl += pnl;
         segment.settledStake += stake;
         settled.push(bet);
+        if (bet.status === 'won') won += 1;
+        if (bet.status === 'lost') lost += 1;
+        const day = String(bet.day || parisDayKey(new Date(bet.settledAt || bet.createdAt || Date.now()))).slice(0, 10);
+        dayPnl.set(day, (dayPnl.get(day) || 0) + pnl);
+        if (day === yesterday) {
+          pnlYesterday += pnl;
+          if (bet.status === 'won') wonYesterday += 1;
+          if (bet.status === 'lost') lostYesterday += 1;
+        }
+        const clv = Number(bet.clvPct);
+        if (Number.isFinite(clv)) {
+          clvSamples += 1;
+          clvSum += clv;
+          if (clv > 0) clvPositive += 1;
+        }
       }
       segments.set(segmentKey, segment);
       if (String(bet.day || '').slice(0, 10) === today) pnlToday += pnl;
@@ -299,14 +358,29 @@
           : streakRows.findIndex((bet) => bet.status !== status)
       };
     }
+    const last7Series = Array.from({ length: 7 }, (_unused, index) => {
+      const day = parisDayKey(new Date(Date.now() - (6 - index) * 24 * 60 * 60 * 1000));
+      return dayPnl.get(day) || 0;
+    });
+    const last7Pnl = last7Series.reduce((sum, value) => sum + value, 0);
     return {
       bets: bets.length,
       pending,
+      won,
+      lost,
       totalStake,
       settledStake,
       pnlTotal,
       pnlToday,
+      pnlYesterday,
+      wonYesterday,
+      lostYesterday,
+      last7Pnl,
+      last7Series,
       roi: settledStake > 0 ? pnlTotal / settledStake : 0,
+      clvSamples,
+      clvMeanPct: clvSamples ? clvSum / clvSamples : null,
+      clvPositiveRate: clvSamples ? clvPositive / clvSamples : null,
       sparkline,
       bestSegment,
       worstSegment,
@@ -358,8 +432,137 @@
     if (segmentsNode) segmentsNode.textContent = segmentSummaryText(stats);
   }
 
+  function countdownLabel(value) {
+    const ts = Date.parse(value || '');
+    if (!Number.isFinite(ts)) return '-';
+    const diff = ts - Date.now();
+    if (diff <= -30 * 60 * 1000) return 'en cours';
+    if (diff <= 0) return 'maintenant';
+    const minutes = Math.round(diff / 60000);
+    if (minutes < 60) return `${minutes} min`;
+    const hours = Math.floor(minutes / 60);
+    const rest = minutes % 60;
+    return rest ? `${hours}h${String(rest).padStart(2, '0')}` : `${hours}h`;
+  }
+
+  function renderMorningDashboard() {
+    const title = $('#morning-title');
+    const subtitle = $('#morning-subtitle');
+    const grid = $('#morning-grid');
+    const strip = $('#imminent-strip');
+    if (!grid) return;
+    const rows = (state.picks || []).filter((row) => pickHasCoreData(row) && canDisplayStake(row));
+    const bigRows = rows.filter((row) => Number(row.edge || 0) >= 0.10);
+    const nextPick = rows
+      .filter((row) => Number.isFinite(Date.parse(row.start || '')))
+      .sort((a, b) => Date.parse(a.start || '') - Date.parse(b.start || ''))[0] || rows[0] || null;
+    const stats = userBetStats();
+    const bankroll = getBankroll();
+    const discipline = bankrollDisciplineStatus(stats);
+    const clvText = stats.clvSamples
+      ? `CLV suivis ${formatPct(stats.clvMeanPct, 1)}`
+      : state.clvSummary?.summary?.mean_clv_pct != null
+        ? `CLV marché ${Number(state.clvSummary.summary.mean_clv_pct).toFixed(2)}%`
+        : 'CLV en apprentissage';
+    if (title) {
+      title.textContent = rows.length
+        ? `Bonjour, ${formatCount(rows.length)} picks aujourd'hui, dont ${formatCount(bigRows.length)} gros`
+        : 'Bonjour, aucun pari prêt pour l’instant';
+    }
+    if (subtitle) {
+      subtitle.textContent = nextPick
+        ? `Prochain match dans ${countdownLabel(nextPick.start)} : ${nextPick.title}, ${nextPick.label} (${formatPct(nextPick.edge, 1)} edge).`
+        : 'Le cockpit reste utile : surveille les données, prépare les combinés ou relance un refresh.';
+    }
+    grid.innerHTML = [
+      ['Picks du jour', formatCount(rows.length), `${formatCount(bigRows.length)} edge ≥ 10pt · ${formatCount(state.allPicks.length || 0)} détectés`],
+      ['Prochain match', nextPick ? countdownLabel(nextPick.start) : '-', nextPick ? `${nextPick.title} · ${nextPick.market}` : 'Aucun départ proche'],
+      ['Performance hier', formatMoney(stats.pnlYesterday), `${formatCount(stats.wonYesterday)}W / ${formatCount(stats.lostYesterday)}L · 7j ${formatMoney(stats.last7Pnl)}`],
+      ['Bankroll', formatMoney(bankroll), `${discipline.label} · ${clvText}`]
+    ].map(([label, value, detail]) => `
+      <article class="morning-card ${discipline.blocked && label === 'Bankroll' ? 'danger' : ''}">
+        <span>${escapeHtml(label)}</span>
+        <strong>${escapeHtml(value)}</strong>
+        <p>${escapeHtml(detail)}</p>
+      </article>
+    `).join('');
+    if (strip) {
+      const imminent = rows
+        .filter((row) => {
+          const ts = Date.parse(row.start || '');
+          return Number.isFinite(ts) && ts - Date.now() <= 30 * 60 * 1000 && ts > Date.now() - 30 * 60 * 1000;
+        })
+        .slice(0, 4);
+      strip.innerHTML = imminent.length
+        ? `<strong>À jouer maintenant</strong>${imminent.map((row) => `<button type="button" data-match-id="${escapeHtml(row.id)}">${escapeHtml(row.title)} · ${escapeHtml(row.label)} ${escapeHtml(formatOdd(row.odd))}</button>`).join('')}`
+        : '<span>Aucun pick dans les 30 prochaines minutes.</span>';
+    }
+  }
+
+  function edgeBucketFor(edge) {
+    const n = Number(edge || 0);
+    if (n >= 0.15) return 'edge_15_plus';
+    if (n >= 0.10) return 'edge_10_15';
+    if (n >= 0.05) return 'edge_5_10';
+    if (n > 0) return 'edge_0_5';
+    return 'edge_none';
+  }
+
+  function displayStakeAmount(row) {
+    if (!canDisplayStake(row)) return 0;
+    const prefs = loadPreferences();
+    const bankroll = getBankroll();
+    const maxStake = bankroll * Math.max(0.1, Number(prefs.maxStakePct || 5)) / 100;
+    if (prefs.stakeMode === 'flat') {
+      return Math.max(0, Number((bankroll * Math.max(0.1, Number(prefs.flatUnitPct || 1)) / 100).toFixed(2)));
+    }
+    const modelStake = Math.max(0, Number(row?.stake || row?.decisionCenter?.stake || 0) || 0);
+    return Math.max(0, Number(Math.min(modelStake, maxStake).toFixed(2)));
+  }
+
+  function bankrollDisciplineStatus(stats = userBetStats(), prefs = loadPreferences()) {
+    const bankroll = Math.max(1, Number(prefs.bankroll || getBankroll() || 50));
+    const stopLoss = bankroll * Math.max(0, Number(prefs.stopLossPct || 0)) / 100;
+    const takeProfit = bankroll * Math.max(0, Number(prefs.takeProfitPct || 0)) / 100;
+    if (stopLoss > 0 && stats.pnlToday <= -stopLoss) {
+      return {
+        blocked: true,
+        tone: 'danger',
+        label: 'Stop-loss actif',
+        detail: `Perte jour ${formatMoney(stats.pnlToday)} · limite ${formatMoney(-stopLoss)}. Pause recommandée jusqu'à demain.`
+      };
+    }
+    if (takeProfit > 0 && stats.pnlToday >= takeProfit) {
+      return {
+        blocked: true,
+        tone: 'ok',
+        label: 'Take-profit atteint',
+        detail: `Gain jour ${formatMoney(stats.pnlToday)} · objectif ${formatMoney(takeProfit)}. Verrouillage discipline.`
+      };
+    }
+    return {
+      blocked: false,
+      tone: 'ok',
+      label: 'Discipline OK',
+      detail: `${prefs.stakeMode === 'flat' ? 'Flat 1u' : 'Kelly plafonné'} · cap ${Number(prefs.maxStakePct || 5).toFixed(1)}% bankroll.`
+    };
+  }
+
+  function clvPct(openOdd, closeOdd) {
+    const open = Number(openOdd);
+    const close = Number(closeOdd);
+    if (!Number.isFinite(open) || !Number.isFinite(close) || open <= 1 || close <= 1) return null;
+    return (open - close) / close;
+  }
+
   function trackUserBet(row) {
     if (!row || !canDisplayStake(row)) return;
+    const discipline = bankrollDisciplineStatus();
+    if (discipline.blocked) {
+      setSideStatus(discipline.label, discipline.tone === 'danger' ? 'danger' : 'warn');
+      notifyUser(discipline.label, discipline.detail, row);
+      return;
+    }
     const key = userBetKey(row);
     const bets = loadUserBets();
     const existing = bets.find((bet) => bet.key === key && bet.status === 'pending');
@@ -368,7 +571,8 @@
       return;
     }
     const now = new Date();
-    const stake = Math.max(0, Number(row.stake || row.decisionCenter?.stake || 0) || 0);
+    const stake = displayStakeAmount(row);
+    const prefs = loadPreferences();
     bets.push({
       id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
       key,
@@ -380,12 +584,21 @@
       market: row.market,
       label: row.label,
       odd: Number(row.odd || 0),
+      openingOdd: Number(row.odd || 0),
+      lastSeenOdd: Number(row.odd || 0),
+      lastSeenAt: now.toISOString(),
+      closingOdd: null,
+      clvPct: null,
       probability: Number(row.probability || 0),
       edge: Number(row.edge || 0),
+      edgeBucket: edgeBucketFor(row.edge),
+      tier: row.calibration?.level || row.contextQuality?.tier || row.status || 'standard',
+      marketKey: marketKeyFromRow(row),
+      stakeMode: prefs.stakeMode || 'kelly',
       stake,
       status: 'pending',
       pnl: 0,
-      day: new Intl.DateTimeFormat('fr-CA', { timeZone: 'Europe/Paris', year: 'numeric', month: '2-digit', day: '2-digit' }).format(now),
+      day: parisDayKey(now),
       createdAt: now.toISOString()
     });
     saveUserBets(bets);
@@ -406,6 +619,12 @@
 
   function trackUserCombo(combo) {
     if (!combo || !Array.isArray(combo.legs) || !combo.legs.length) return;
+    const discipline = bankrollDisciplineStatus();
+    if (discipline.blocked) {
+      setSideStatus(discipline.label, discipline.tone === 'danger' ? 'danger' : 'warn');
+      notifyUser(discipline.label, discipline.detail);
+      return;
+    }
     const key = comboKey(combo);
     const bets = loadUserBets();
     const existing = bets.find((bet) => bet.key === key && bet.status === 'pending');
@@ -428,11 +647,19 @@
       odd: Number(combo.totalOdd || 0),
       probability: Number(combo.combinedProb || combo.avgProb || 0),
       edge: Number(combo.edge || 0),
+      edgeBucket: edgeBucketFor(combo.edge),
+      tier: combo.type || 'combine',
+      marketKey: 'combine',
+      openingOdd: Number(combo.totalOdd || 0),
+      lastSeenOdd: Number(combo.totalOdd || 0),
+      lastSeenAt: now.toISOString(),
+      closingOdd: null,
+      clvPct: null,
       stake,
       status: 'pending',
       pnl: 0,
       legs: combo.legs,
-      day: new Intl.DateTimeFormat('fr-CA', { timeZone: 'Europe/Paris', year: 'numeric', month: '2-digit', day: '2-digit' }).format(now),
+      day: parisDayKey(now),
       createdAt: now.toISOString()
     });
     saveUserBets(bets);
@@ -669,7 +896,7 @@
       return {
         delayMs: REFRESH_URGENT_INTERVAL_MS,
         mode: 'quick',
-        label: 'Auto-refresh boost 10 min : match proche.'
+        label: 'Auto-refresh boost 5 min : match proche.'
       };
     }
     return {
@@ -1303,6 +1530,7 @@
     state.clvSummary = analysis.clvSummary || null;
     state.dashboardMeta = analysis.dashboardMeta || null;
     state.prematchPlan = analysis.prematchPlan || null;
+    refreshTrackedBetMarketData();
     $('#metric-upcoming').textContent = String(state.matches.length);
     $('#metric-bookable').textContent = `${state.matches.length} analysés par le logiciel`;
     renderPicks();
@@ -1562,6 +1790,46 @@
     }
   }
 
+  function alertOnce(key, title, body, row) {
+    const keys = new Set(readStorageJson(SMART_ALERT_KEY, []));
+    if (keys.has(key)) return false;
+    keys.add(key);
+    writeStorageJson(SMART_ALERT_KEY, Array.from(keys).slice(-160));
+    notifyUser(title, body, row);
+    return true;
+  }
+
+  function hasKeyInjurySignal(row) {
+    const injuries = row?.match?.injuries || {};
+    const all = [
+      ...(Array.isArray(injuries.home) ? injuries.home : []),
+      ...(Array.isArray(injuries.away) ? injuries.away : [])
+    ];
+    return all.some((injury) => String(injury.type || '').toLowerCase() === 'missing' || String(injury.reason_label || '').toLowerCase().includes('suspend'));
+  }
+
+  function updatePriceMoveAlerts(readyRows) {
+    const memory = readStorageJson(ODDS_MEMORY_KEY, {});
+    const next = { ...memory };
+    const nowIso = new Date().toISOString();
+    readyRows.slice(0, 80).forEach((row) => {
+      const key = userBetKey(row);
+      const odd = Number(row.odd || 0);
+      if (!key || !Number.isFinite(odd) || odd <= 1) return;
+      const previous = Number(memory[key]?.odd || 0);
+      if (Number.isFinite(previous) && previous > 1) {
+        const move = (odd - previous) / previous;
+        if (move >= 0.05) {
+          alertOnce(`price-up:${key}:${odd.toFixed(2)}`, 'Cote meilleure maintenant', `${row.title} · ${row.label} passe de ${formatOdd(previous)} à ${formatOdd(odd)}.`, row);
+        } else if (move <= -0.05) {
+          alertOnce(`price-down:${key}:${odd.toFixed(2)}`, 'Cote en baisse', `${row.title} · ${row.label} passe de ${formatOdd(previous)} à ${formatOdd(odd)}. Décide vite.`, row);
+        }
+      }
+      next[key] = { odd, at: nowIso };
+    });
+    writeStorageJson(ODDS_MEMORY_KEY, next);
+  }
+
   function maybeNotifyPickChanges() {
     const readyRows = (state.picks || []).filter((row) => pickHasCoreData(row) && canDisplayStake(row));
     const readyCount = readyRows.length;
@@ -1575,8 +1843,27 @@
     if (previous != null && Number.isFinite(previous) && readyCount > previous) {
       notifyUser('Nouveaux picks prêts', `+${readyCount - previous} pick(s) jouable(s) depuis le dernier calcul.`, readyRows[0]);
     }
+    updatePriceMoveAlerts(readyRows);
     const notified = readNotifiedPickKeys();
     const now = Date.now();
+    const tracked = new Set(loadUserBets().filter((bet) => bet.status === 'pending').map((bet) => bet.key));
+    const reminder = readyRows.find((row) => {
+      const ts = Date.parse(row.start || '');
+      return Number.isFinite(ts)
+        && ts > now
+        && ts - now <= 30 * 60 * 1000
+        && !tracked.has(userBetKey(row));
+    });
+    if (reminder) {
+      alertOnce(`kickoff:${userBetKey(reminder)}`, 'Pick proche du coup d’envoi', `${reminder.title} · ${reminder.label} ${formatOdd(reminder.odd)} démarre dans ${countdownLabel(reminder.start)}.`, reminder);
+    }
+    const injuryPick = readyRows.find((row) => {
+      const ts = Date.parse(row.start || '');
+      return Number.isFinite(ts) && ts > now && ts - now <= 2 * 60 * 60 * 1000 && hasKeyInjurySignal(row);
+    });
+    if (injuryPick) {
+      alertOnce(`injury:${userBetKey(injuryPick)}`, 'Re-check blessure clé', `${injuryPick.title} a un signal absence proche kickoff. Ouvre la fiche avant de miser.`, injuryPick);
+    }
     const bigPick = readyRows.find((row) => {
       const ts = Date.parse(row.start || '');
       const key = userBetKey(row);
@@ -1601,6 +1888,7 @@
     const body = $('#picks-body');
     const metricLabel = $('#metric-picks-label');
     renderUserPnl();
+    renderMorningDashboard();
     updatePickFilters();
     const filters = readPickFilters();
     const displayRows = dashboardPickRows(filters);
@@ -1632,15 +1920,18 @@
       return;
     }
     const tracked = new Set(loadUserBets().filter((bet) => bet.status === 'pending').map((bet) => bet.key));
+    const discipline = bankrollDisciplineStatus();
     body.innerHTML = displayRows.map((pick) => {
-      const startLabel = formatDateLabel(pick.start);
+      const startLabel = `${formatDateLabel(pick.start)} · ${countdownLabel(pick.start)}`;
       const edgeClass = pick.edge >= 0.08 ? 'edge-pos' : 'edge-warn';
       const decision = pick.decisionCenter || {};
       const statusText = decision.canBet ? 'Prêt' : decision.status === 'repair' ? 'À réparer' : decision.status === 'skip' ? 'À éviter' : 'À surveiller';
       const trackKey = userBetKey(pick);
       const isTracked = tracked.has(trackKey);
       const action = canDisplayStake(pick)
-        ? `<button type="button" class="track-bet-btn${isTracked ? ' tracked' : ''}" data-track-bet-key="${escapeHtml(trackKey)}">${isTracked ? 'Suivi' : 'Je mise'}</button>`
+        ? discipline.blocked
+          ? `<button type="button" class="track-bet-btn tracked" disabled title="${escapeHtml(discipline.detail)}">${escapeHtml(discipline.label)}</button>`
+          : `<button type="button" class="track-bet-btn${isTracked ? ' tracked' : ''}" data-track-bet-key="${escapeHtml(trackKey)}">${isTracked ? 'Suivi' : 'Je mise'}</button>`
         : '<span class="match-sub">-</span>';
       return `
         <tr class="clickable-row" data-match-id="${escapeHtml(pick.id)}" tabindex="0" role="button" aria-label="Ouvrir ${escapeHtml(pick.title)}">
@@ -2617,11 +2908,22 @@
     const report = state.modelLab || {};
     const summary = report.summary || {};
     if (grid) {
+      const userStats = userBetStats();
+      const marketClv = state.clvSummary?.summary || {};
+      const clvLabel = userStats.clvSamples
+        ? formatPct(userStats.clvMeanPct, 2)
+        : marketClv.mean_clv_pct != null
+          ? `${Number(marketClv.mean_clv_pct).toFixed(2)}%`
+          : '-';
+      const clvDetail = userStats.clvSamples
+        ? `${formatCount(userStats.clvSamples)} paris suivis · ${formatPct(userStats.clvPositiveRate, 0)} positifs`
+        : marketClv.n ? `${formatCount(marketClv.n)} observations marché · sample ${marketClv.sample_status || 'learning'}` : 'Se remplit avec les paris suivis.';
       const cards = [
         ['Picks réglés', formatCount(summary.settled_rows || state.history?.settled || 0), 'Sample utilisé pour juger la stratégie.'],
         ['ROI cumulé', formatPct(summary.roi || 0, 1), `${formatSignedUnits(summary.pnl_units || 0)} en flat historique.`],
         ['Win rate', formatPct(summary.hit_rate || state.history?.winRate || 0, 1), 'Taux brut, moins important que la calibration.'],
         ['Brier', Number.isFinite(Number(summary.brier)) ? Number(summary.brier).toFixed(3) : '-', 'Plus bas = probabilités mieux calibrées.'],
+        ['CLV moyen', clvLabel, clvDetail],
         ['Drawdown', Number.isFinite(Number(summary.max_drawdown_units)) ? `${Number(summary.max_drawdown_units).toFixed(1)}u` : '-', 'Perte max historique simulée.']
       ];
       grid.innerHTML = cards.map(([label, value, detail]) => `
@@ -2661,6 +2963,7 @@
         `;
       }).join('') : '<div class="empty">Calibration indisponible.</div>';
     }
+    renderLearningAudit();
   }
 
   function filteredUserBets() {
@@ -2699,16 +3002,51 @@
     const stake = Math.max(0, Number(bet.stake || 0) || 0);
     const odd = Math.max(0, Number(bet.odd || 0) || 0);
     const pnl = status === 'won' ? stake * Math.max(0, odd - 1) : status === 'lost' ? -stake : 0;
+    const current = findPickByTrackKey(bet.key);
+    const closingOdd = Number(bet.closingOdd || current?.odd || bet.lastSeenOdd || bet.odd || 0);
+    const clv = clvPct(bet.openingOdd || bet.odd, closingOdd);
+    const settledAt = new Date().toISOString();
     bets[index] = {
       ...bet,
       status,
       pnl,
-      settledAt: new Date().toISOString()
+      closingOdd: Number.isFinite(closingOdd) && closingOdd > 1 ? closingOdd : bet.closingOdd || null,
+      closingCapturedAt: settledAt,
+      clvPct: clv,
+      settledAt
     };
     saveUserBets(bets);
     renderUserPnl();
     renderHistory();
     renderPicks();
+    const dayPnl = userBetStats().pnlToday;
+    if (status === 'won') notifyUser('Pari gagné', `${bet.title} · ${formatMoney(pnl)} · jour ${formatMoney(dayPnl)}`, current || bet);
+    if (status === 'lost') notifyUser('Pari perdu', `${bet.title} · ${formatMoney(pnl)} · jour ${formatMoney(dayPnl)}`, current || bet);
+  }
+
+  function refreshTrackedBetMarketData() {
+    const bets = loadUserBets();
+    if (!bets.length) return;
+    const now = Date.now();
+    let changed = false;
+    const next = bets.map((bet) => {
+      if (bet.status !== 'pending') return bet;
+      const row = findPickByTrackKey(bet.key);
+      if (!row || !Number(row.odd)) return bet;
+      const patch = {
+        lastSeenOdd: Number(row.odd),
+        lastSeenAt: new Date().toISOString()
+      };
+      const kickoff = Date.parse(row.start || bet.start || '');
+      if (!bet.closingOdd && Number.isFinite(kickoff) && kickoff - now <= 10 * 60 * 1000) {
+        patch.closingOdd = Number(row.odd);
+        patch.closingCapturedAt = patch.lastSeenAt;
+        patch.clvPct = clvPct(bet.openingOdd || bet.odd, row.odd);
+      }
+      changed = true;
+      return { ...bet, ...patch };
+    });
+    if (changed) saveUserBets(next);
   }
 
   function renderTrackedBets() {
@@ -2718,7 +3056,7 @@
     const rows = filteredUserBets();
     if (chart) chart.innerHTML = cumulativePnlSvg(loadUserBets());
     if (!rows.length) {
-      body.innerHTML = '<tr><td colspan="8" class="empty">Aucun pari suivi avec ces filtres.</td></tr>';
+      body.innerHTML = '<tr><td colspan="9" class="empty">Aucun pari suivi avec ces filtres.</td></tr>';
       return;
     }
     body.innerHTML = rows.slice(0, 80).map((bet) => {
@@ -2735,11 +3073,89 @@
           <td data-label="Cote">${escapeHtml(formatOdd(bet.odd))}</td>
           <td data-label="Mise">${escapeHtml(formatMoney(bet.stake || 0))}</td>
           <td data-label="Statut" class="${resultClass(bet.status)}">${escapeHtml(resultLabel(bet.status))}</td>
+          <td data-label="CLV">${bet.clvPct != null ? escapeHtml(formatPct(bet.clvPct, 2)) : '<span class="match-sub">en attente</span>'}</td>
           <td data-label="P&L">${escapeHtml(formatMoney(bet.pnl || 0))}</td>
           <td data-label="Action">${action}</td>
         </tr>
       `;
     }).join('');
+  }
+
+  function trackedLearningAudit() {
+    const settled = loadUserBets().filter((bet) => ['won', 'lost', 'void'].includes(String(bet.status || '')));
+    const groups = new Map();
+    const register = (key, label, bet) => {
+      const stake = Math.max(0, Number(bet.stake || 0) || 0);
+      const pnl = Number(bet.pnl || 0) || 0;
+      const row = groups.get(key) || { key, label, count: 0, wins: 0, losses: 0, stake: 0, pnl: 0, edgeSum: 0 };
+      row.count += 1;
+      row.stake += stake;
+      row.pnl += pnl;
+      row.edgeSum += Number(bet.edge || 0) || 0;
+      if (bet.status === 'won') row.wins += 1;
+      if (bet.status === 'lost') row.losses += 1;
+      groups.set(key, row);
+    };
+    settled.forEach((bet) => {
+      register(`sport:${bet.sport || 'inconnu'}`, `Sport · ${bet.sport || 'inconnu'}`, bet);
+      register(`league:${bet.league || 'inconnue'}`, `Ligue · ${bet.league || 'inconnue'}`, bet);
+      register(`market:${bet.marketKey || normalizeUiKey(bet.market || 'market')}`, `Marché · ${bet.market || bet.marketKey || 'market'}`, bet);
+      register(`edge:${bet.edgeBucket || edgeBucketFor(bet.edge)}`, `Bucket · ${bet.edgeBucket || edgeBucketFor(bet.edge)}`, bet);
+    });
+    const segments = Array.from(groups.values()).map((row) => ({
+      ...row,
+      roi: row.stake > 0 ? row.pnl / row.stake : 0,
+      avgEdge: row.count ? row.edgeSum / row.count : 0,
+      winRate: row.wins + row.losses > 0 ? row.wins / (row.wins + row.losses) : 0,
+      warning: row.count >= 10 && row.stake > 0 && row.pnl < 0
+    })).sort((a, b) => a.roi - b.roi);
+    const winners = settled.filter((bet) => bet.status === 'won');
+    const losers = settled.filter((bet) => bet.status === 'lost');
+    const avgEdge = (rows) => rows.length
+      ? rows.reduce((sum, bet) => sum + (Number(bet.edge || 0) || 0), 0) / rows.length
+      : null;
+    const audit = {
+      generatedAt: new Date().toISOString(),
+      settled: settled.length,
+      winners: winners.length,
+      losers: losers.length,
+      winnerAvgEdge: avgEdge(winners),
+      loserAvgEdge: avgEdge(losers),
+      warnings: segments.filter((row) => row.warning).slice(0, 6),
+      best: segments.slice().sort((a, b) => b.roi - a.roi).slice(0, 3),
+      worst: segments.slice(0, 3)
+    };
+    writeStorageJson(USER_AUDIT_KEY, audit);
+    return audit;
+  }
+
+  function renderLearningAudit() {
+    const grid = $('#learning-audit-grid');
+    const prefGrid = $('#preference-warning-grid');
+    const audit = trackedLearningAudit();
+    const warningHtml = audit.warnings.length
+      ? audit.warnings.map((row) => `
+        <article class="segment-card cold">
+          <span>${escapeHtml(row.label)}</span>
+          <strong>${escapeHtml(formatPct(row.roi, 0))}</strong>
+          <p>${formatCount(row.count)} paris · edge moyen ${escapeHtml(formatPct(row.avgEdge, 1))} · P&L ${escapeHtml(formatMoney(row.pnl))}</p>
+          <em>Segment à désactiver ou filtrer</em>
+        </article>
+      `).join('')
+      : '<div class="empty">Aucun segment perdant robuste sur tes paris suivis.</div>';
+    if (grid) {
+      const winnerEdge = audit.winnerAvgEdge == null ? '-' : formatPct(audit.winnerAvgEdge, 1);
+      const loserEdge = audit.loserAvgEdge == null ? '-' : formatPct(audit.loserAvgEdge, 1);
+      grid.innerHTML = `
+        <article class="performance-card">
+          <span>Audit personnel</span>
+          <strong>${formatCount(audit.settled)} réglés</strong>
+          <p>Gagnants edge moyen ${escapeHtml(winnerEdge)} · perdants ${escapeHtml(loserEdge)}.</p>
+        </article>
+        ${warningHtml}
+      `;
+    }
+    if (prefGrid) prefGrid.innerHTML = warningHtml;
   }
 
   function levelDefaults(level) {
@@ -2760,6 +3176,8 @@
     if (level) level.value = prefs.level || 'intermediate';
     const strict = $('#pref-strict');
     if (strict) strict.checked = Boolean(prefs.strict);
+    const stakeMode = $('#pref-stake-mode');
+    if (stakeMode) stakeMode.value = prefs.stakeMode || 'kelly';
     const sportsGrid = $('#pref-sports');
     if (sportsGrid) {
       const active = new Set((prefs.sports || []).map((item) => String(item).toLowerCase()));
@@ -2776,13 +3194,18 @@
       'pref-odd-max': prefs.oddMax,
       'pref-confidence-min': prefs.confidenceMin,
       'pref-alert-edge': prefs.alertEdge,
-      'pref-alert-window': prefs.alertWindowHours
+      'pref-alert-window': prefs.alertWindowHours,
+      'pref-flat-unit': prefs.flatUnitPct,
+      'pref-max-stake': prefs.maxStakePct,
+      'pref-stop-loss': prefs.stopLossPct,
+      'pref-take-profit': prefs.takeProfitPct
     };
     Object.entries(fields).forEach(([id, value]) => {
       const node = $(`#${id}`);
       if (node) node.value = String(value ?? '');
     });
     renderOnboarding();
+    renderLearningAudit();
   }
 
   function collectPreferencesFromForm() {
@@ -2799,6 +3222,11 @@
       confidenceMin: Math.max(0, Number($('#pref-confidence-min')?.value || 0) || 0),
       alertEdge: Math.max(0, Number($('#pref-alert-edge')?.value || 10) || 10),
       alertWindowHours: Math.max(1, Number($('#pref-alert-window')?.value || 2) || 2),
+      stakeMode: $('#pref-stake-mode')?.value || DEFAULT_PREFERENCES.stakeMode,
+      flatUnitPct: Math.max(0.1, Number($('#pref-flat-unit')?.value || DEFAULT_PREFERENCES.flatUnitPct) || DEFAULT_PREFERENCES.flatUnitPct),
+      maxStakePct: Math.max(0.1, Number($('#pref-max-stake')?.value || DEFAULT_PREFERENCES.maxStakePct) || DEFAULT_PREFERENCES.maxStakePct),
+      stopLossPct: Math.max(0, Number($('#pref-stop-loss')?.value || DEFAULT_PREFERENCES.stopLossPct) || DEFAULT_PREFERENCES.stopLossPct),
+      takeProfitPct: Math.max(0, Number($('#pref-take-profit')?.value || DEFAULT_PREFERENCES.takeProfitPct) || DEFAULT_PREFERENCES.takeProfitPct),
       strict: Boolean($('#pref-strict')?.checked)
     };
   }
@@ -3735,7 +4163,8 @@
 
   function visibleStakeText(row, decisions = decisionBundleForRow(row)) {
     if (!canDisplayStake(row, decisions) && decisions?.stakeDisplay) return String(decisions.stakeDisplay);
-    return canDisplayStake(row, decisions) && Number(row?.stake || 0) > 0 ? formatMoney(row.stake) : '0 €';
+    const stake = displayStakeAmount(row);
+    return stake > 0 ? formatMoney(stake) : '0 €';
   }
 
   function noBetStakeReason(row, decisions = decisionBundleForRow(row)) {
@@ -5955,6 +6384,7 @@
     const sourceLabel = signalSourceLabel(status.source || 'all');
     const sourceSelect = $('#refresh-signal-source');
     $('#refresh-btn').disabled = running;
+    if ($('#refresh-full-btn')) $('#refresh-full-btn').disabled = running;
     $('#refresh-signals-btn').disabled = running;
     $('#refresh-prematch-btn').disabled = running;
     $('#refresh-prematch-t60-btn').disabled = running;
@@ -5966,6 +6396,7 @@
       button.disabled = running;
     });
     $('#refresh-btn').textContent = running && !isSignals ? 'Refresh en cours' : 'Rafraîchir';
+    if ($('#refresh-full-btn')) $('#refresh-full-btn').textContent = running && status.mode === 'full' ? 'Complet en cours' : 'Refresh complet';
     $('#refresh-signals-btn').textContent = running && isSignals ? `${sourceLabel} en cours` : 'Signaux lents';
     $('#refresh-prematch-btn').textContent = running && isPrematch ? 'Pré-match en cours' : 'Pré-match final';
     $('#refresh-prematch-t60-btn').textContent = running && isPrematchT60 ? 'T-60 en cours' : 'T-60';
@@ -5998,6 +6429,7 @@
       history: state.status?.refresh?.history || []
     });
     $('#refresh-btn').disabled = true;
+    if ($('#refresh-full-btn')) $('#refresh-full-btn').disabled = true;
     $('#refresh-signals-btn').disabled = true;
     $('#refresh-prematch-btn').disabled = true;
     $('#refresh-prematch-t60-btn').disabled = true;
@@ -6019,6 +6451,7 @@
       button.disabled = true;
     });
     $('#refresh-btn').textContent = mode === 'signals' ? 'Rafraîchir' : 'Refresh en cours';
+    if ($('#refresh-full-btn')) $('#refresh-full-btn').textContent = mode === 'full' ? 'Complet en cours' : 'Refresh complet';
     $('#refresh-signals-btn').textContent = mode === 'signals' ? `${signalSourceLabel(source)} en cours` : 'Signaux lents';
     $('#refresh-prematch-btn').textContent = mode === 'prematch' ? 'Pré-match en cours' : 'Pré-match final';
     $('#refresh-prematch-t60-btn').textContent = mode === 'prematch_t60' ? 'T-60 en cours' : 'T-60';
@@ -6032,6 +6465,7 @@
     } catch (error) {
       renderRefreshEta(null);
       $('#refresh-btn').disabled = false;
+      if ($('#refresh-full-btn')) $('#refresh-full-btn').disabled = false;
       $('#refresh-signals-btn').disabled = false;
       $('#refresh-prematch-btn').disabled = false;
       $('#refresh-prematch-t60-btn').disabled = false;
@@ -6051,6 +6485,7 @@
         button.disabled = false;
       });
       $('#refresh-btn').textContent = 'Rafraîchir';
+      if ($('#refresh-full-btn')) $('#refresh-full-btn').textContent = 'Refresh complet';
       $('#refresh-signals-btn').textContent = 'Signaux lents';
       $('#refresh-prematch-btn').textContent = 'Pré-match final';
       $('#refresh-prematch-t60-btn').textContent = 'T-60';
@@ -6174,7 +6609,7 @@
       pick.odd.toFixed(2),
       pick.probability.toFixed(4),
       pick.edge.toFixed(4),
-      (canDisplayStake(pick) ? Number(pick.stake || 0) : 0).toFixed(2),
+      displayStakeAmount(pick).toFixed(2),
       pick.stakeAdjustment?.applied ? 'yes' : 'no',
       pick.stakeAdjustment?.applied ? Number(pick.stakeAdjustment.factor || 1).toFixed(2) : '1.00',
       pick.start,
@@ -6185,7 +6620,7 @@
 
   function exportUserBetsCsv() {
     const bets = loadUserBets();
-    const headers = ['created_at', 'match', 'sport', 'league', 'market', 'pick', 'odd', 'probability', 'edge', 'stake', 'status', 'pnl'];
+    const headers = ['created_at', 'match', 'sport', 'league', 'market', 'pick', 'odd', 'last_seen_odd', 'closing_odd', 'clv_pct', 'probability', 'edge', 'edge_bucket', 'stake_mode', 'stake', 'status', 'pnl'];
     const rows = bets.map((bet) => [
       bet.createdAt || '',
       bet.title || '',
@@ -6194,13 +6629,18 @@
       bet.market || '',
       bet.label || '',
       Number(bet.odd || 0).toFixed(2),
+      bet.lastSeenOdd ? Number(bet.lastSeenOdd).toFixed(2) : '',
+      bet.closingOdd ? Number(bet.closingOdd).toFixed(2) : '',
+      bet.clvPct != null ? Number(bet.clvPct).toFixed(4) : '',
       Number(bet.probability || 0).toFixed(4),
       Number(bet.edge || 0).toFixed(4),
+      bet.edgeBucket || '',
+      bet.stakeMode || '',
       Number(bet.stake || 0).toFixed(2),
       bet.status || '',
       Number(bet.pnl || 0).toFixed(2)
     ]);
-    if (!rows.length) rows.push(['', 'Aucun pari suivi', '', '', '', '', '', '', '', '', '', '']);
+    if (!rows.length) rows.push(['', 'Aucun pari suivi', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']);
     downloadText(`paris-sportif-paris-suivis-${new Date().toISOString().slice(0, 10)}.csv`, toCsv(headers, rows), 'text/csv;charset=utf-8');
   }
 
@@ -6330,7 +6770,8 @@
           odd: Number(row.odd || 0),
           probability: Number(row.probability || 0),
           edge: Number(row.edge || 0),
-          stake: Number(row.stake || 0),
+          stake: displayStakeAmount(row),
+          modelStake: Number(row.stake || 0),
           status: row.status || '',
           gate: gate.gate || quality.gate || '',
           gateLabel: gate.label || contextGateText(row),
@@ -6909,6 +7350,8 @@
       sourceHealth: state.sourceHealth || null,
       decisionCenter: state.decisionCenter || null,
       clvSummary: state.clvSummary || null,
+      userLearningAudit: readStorageJson(USER_AUDIT_KEY, null),
+      bankrollDiscipline: bankrollDisciplineStatus(),
       actionHistory: state.actionHistory || [],
       watchlist: state.watchlist || [],
       prematchPlan: state.prematchPlan || null,
@@ -6955,6 +7398,10 @@
     $$('.nav-btn').forEach((btn) => btn.addEventListener('click', () => switchTab(btn.dataset.tab)));
     $('#refresh-btn').addEventListener('click', () => startRefresh().catch((error) => {
       setSideStatus('Refresh impossible', 'danger');
+      $('#refresh-log').textContent = error.stack || error.message;
+    }));
+    $('#refresh-full-btn')?.addEventListener('click', () => startRefresh('full').catch((error) => {
+      setSideStatus('Refresh complet impossible', 'danger');
       $('#refresh-log').textContent = error.stack || error.message;
     }));
     $('#refresh-signals-btn').addEventListener('click', () => startRefresh('signals').catch((error) => {
@@ -7076,6 +7523,14 @@
         select.value = key;
         renderPicks();
       }
+    });
+    document.addEventListener('click', (event) => {
+      const tabButton = event.target.closest('[data-tab-target]');
+      if (tabButton) switchTab(tabButton.dataset.tabTarget || 'dashboard');
+    });
+    $('#imminent-strip')?.addEventListener('click', (event) => {
+      const button = event.target.closest('[data-match-id]');
+      if (button) openMatchDetail(button.dataset.matchId || '');
     });
     ['user-bets-status-filter', 'user-bets-period-filter'].forEach((id) => {
       const el = $(`#${id}`);

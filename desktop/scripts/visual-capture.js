@@ -45,6 +45,8 @@ async function main() {
     const decisionConsistency = await win.evaluate(() => ({
       caption: document.querySelector('#final-decision-caption')?.textContent || '',
       picksMetric: Number(document.querySelector('#metric-picks')?.textContent || 0),
+      morningCards: document.querySelectorAll('#morning-grid .morning-card').length,
+      imminentStrip: Boolean(document.querySelector('#imminent-strip')),
       trackButtons: document.querySelectorAll('[data-track-bet-key]').length,
       pnlVisible: Boolean(document.querySelector('#user-pnl-total') && document.querySelector('#user-pnl-sub')),
       pnlSparkline: Boolean(document.querySelector('#user-pnl-sparkline svg')),
@@ -70,6 +72,7 @@ async function main() {
     await win.waitForSelector('#model-performance-grid .performance-card, #model-performance-grid .empty', { timeout: 30000 });
     const performanceCards = await win.locator('#model-performance-grid .performance-card, #model-performance-grid .empty').count();
     const segmentCards = await win.locator('#model-segment-grid .segment-card, #model-segment-grid .empty').count();
+    const learningCards = await win.locator('#learning-audit-grid .performance-card, #learning-audit-grid .empty').count();
     await safeScreenshot(win, path.join(captureDir, 'desktop-history-performance.png'), { fullPage: true });
 
     await win.click('[data-tab="agent"]');
@@ -89,6 +92,7 @@ async function main() {
     await win.click('[data-tab="preferences"]');
     await win.waitForSelector('#pref-bankroll', { timeout: 10000 });
     const preferenceInputs = await win.locator('#pref-bankroll, input[name="pref-sport"], input[name="pref-market"]').count();
+    const disciplineInputs = await win.locator('#pref-stake-mode, #pref-stop-loss, #pref-take-profit').count();
     await safeScreenshot(win, path.join(captureDir, 'desktop-preferences-audit.png'), { fullPage: true });
 
     await win.click('[data-tab="matches"]');
@@ -127,11 +131,11 @@ async function main() {
     if (/Aucun pari à jouer maintenant|Mise bloquée|blocage/i.test(decisionConsistency.caption) && decisionConsistency.positiveStakeCells > 0) {
       throw new Error(`Mise positive affichée malgré décision bloquée: ${JSON.stringify(decisionConsistency)}`);
     }
-    if (decisionConsistency.picksMetric < 20 || decisionConsistency.trackButtons < 20 || !decisionConsistency.pnlVisible || !decisionConsistency.pnlSparkline || !decisionConsistency.filtersVisible) {
+    if (decisionConsistency.picksMetric < 20 || decisionConsistency.morningCards < 4 || !decisionConsistency.imminentStrip || decisionConsistency.trackButtons < 20 || !decisionConsistency.pnlVisible || !decisionConsistency.pnlSparkline || !decisionConsistency.filtersVisible) {
       throw new Error(`Cockpit actionnable incomplet: ${JSON.stringify(decisionConsistency)}`);
     }
-    if (combines <= 0 || scorers <= 0 || performanceCards <= 0 || segmentCards <= 0 || agentCards <= 0 || preferenceInputs < 8) {
-      throw new Error(`Captures écrans incomplètes: ${JSON.stringify({ combines, scorers, performanceCards, segmentCards, agentCards, preferenceInputs })}`);
+    if (combines <= 0 || scorers <= 0 || performanceCards < 6 || segmentCards <= 0 || learningCards <= 0 || agentCards <= 0 || preferenceInputs < 8 || disciplineInputs < 3) {
+      throw new Error(`Captures écrans incomplètes: ${JSON.stringify({ combines, scorers, performanceCards, segmentCards, learningCards, agentCards, preferenceInputs, disciplineInputs })}`);
     }
     if (!/s|\.\.\./.test(decisionConsistency.performanceMetric) || !/Auto-refresh|Mode économie/.test(decisionConsistency.refreshPolicy)) {
       throw new Error(`Indicateurs cockpit manquants: ${JSON.stringify(decisionConsistency)}`);

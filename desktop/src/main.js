@@ -71,6 +71,12 @@ const refreshState = {
 let localServer = null;
 let mainWindow = null;
 const engineService = createLegacyEngineService({ projectRoot: PROJECT_ROOT });
+const memoryState = {
+  rssMb: null,
+  heapUsedMb: null,
+  updatedAt: null,
+  warning: null
+};
 
 app.commandLine.appendSwitch('disable-http-cache');
 
@@ -137,6 +143,18 @@ function persistRefreshHistory() {
 }
 
 loadRefreshHistory();
+sampleMemoryUsage();
+setInterval(sampleMemoryUsage, 5 * 60 * 1000);
+
+function sampleMemoryUsage() {
+  const usage = process.memoryUsage();
+  memoryState.rssMb = Number((usage.rss / 1024 / 1024).toFixed(1));
+  memoryState.heapUsedMb = Number((usage.heapUsed / 1024 / 1024).toFixed(1));
+  memoryState.updatedAt = new Date().toISOString();
+  memoryState.warning = memoryState.rssMb > 500 ? `Mémoire haute: ${memoryState.rssMb} MB RSS` : null;
+  if (memoryState.warning) appendRefreshLine(`[desktop] ${memoryState.warning}`);
+  return memoryState;
+}
 
 function extractDataJs() {
   const filePath = path.join(PROJECT_ROOT, 'data.js');
@@ -260,6 +278,7 @@ function getDataStatus() {
       qualityChecks: health.quality_checks || null,
       sources: health.sources || null
     } : null,
+    memory: sampleMemoryUsage(),
     files: [
       fileMeta('data.js'),
       fileMeta('data_today.json'),
@@ -482,7 +501,8 @@ async function handleApi(req, res, url) {
       version: '0.1.0',
       projectRoot: PROJECT_ROOT,
       desktopRoot: DESKTOP_ROOT,
-      calculationMode: 'desktop-jsdom'
+      calculationMode: 'desktop-jsdom',
+      memory: sampleMemoryUsage()
     });
     return;
   }

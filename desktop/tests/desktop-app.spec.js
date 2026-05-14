@@ -21,8 +21,10 @@ test('desktop cockpit is actionable and stable', async () => {
   expect(mainText).toContain('sandbox: true');
   expect(mainText).toContain('setWindowOpenHandler');
   expect(mainText).toContain("permission === 'notifications'");
+  expect(mainText).toContain('process.memoryUsage()');
   expect(htmlText).toContain('design-tokens.css');
   expect(rendererText).toContain('30 * 60 * 1000');
+  expect(rendererText).toContain('5 * 60 * 1000');
   expect(rendererText).toContain('REFRESH_URGENT_INTERVAL_MS');
   expect(rendererText).toContain('visibilitychange');
   expect(rendererText).toContain('Notification');
@@ -53,6 +55,7 @@ test('desktop cockpit is actionable and stable', async () => {
       sparkline: Boolean(document.querySelector('#user-pnl-sparkline svg')),
       exportBets: Boolean(document.querySelector('#export-user-bets-btn')),
       filters: Boolean(document.querySelector('#pick-search') && document.querySelector('#pick-sort') && document.querySelector('#pick-market-filter')),
+      morning: Boolean(document.querySelector('#morning-brief') && document.querySelector('#morning-grid .morning-card')),
       marketChips: document.querySelectorAll('#market-snapshot .market-chip, #market-snapshot .empty').length,
       performanceMetric: document.querySelector('#metric-boot-time')?.textContent || '',
       refreshPolicy: document.querySelector('#refresh-policy')?.textContent || '',
@@ -66,6 +69,7 @@ test('desktop cockpit is actionable and stable', async () => {
     expect(dashboard.sparkline).toBe(true);
     expect(dashboard.exportBets).toBe(true);
     expect(dashboard.filters).toBe(true);
+    expect(dashboard.morning).toBe(true);
     expect(dashboard.marketChips).toBeGreaterThan(0);
     expect(dashboard.performanceMetric).toMatch(/s|\.{3}/);
     expect(dashboard.refreshPolicy).toMatch(/Auto-refresh|Mode économie/);
@@ -87,9 +91,13 @@ test('desktop cockpit is actionable and stable', async () => {
     await expect(win.locator('#page-title')).toHaveText('Accueil');
     await win.click('[data-tab="history"]');
     await expect(win.locator('#model-performance-grid')).toContainText('ROI');
+    await expect(win.locator('#model-performance-grid')).toContainText('CLV');
+    await expect(win.locator('#learning-audit-grid')).toBeVisible();
     await expect(win.locator('#user-bets-body')).toBeVisible();
     await win.click('[data-tab="preferences"]');
     await expect(win.locator('#pref-bankroll')).toBeVisible();
+    await expect(win.locator('#pref-stake-mode')).toBeVisible();
+    await expect(win.locator('#preference-warning-grid')).toBeVisible();
     await win.keyboard.press('Control+1');
     await expect(win.locator('#page-title')).toHaveText('Accueil');
 
