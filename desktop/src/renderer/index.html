@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https://img.sofascore.com; connect-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none'; worker-src 'none'">
   <title>Paris-Sportif Desktop</title>
+  <link rel="stylesheet" href="/desktop/design-tokens.css">
   <link rel="stylesheet" href="/desktop/styles.css">
 </head>
 <body>
@@ -78,6 +79,7 @@
             <span>Fraîcheur</span>
             <strong id="metric-age">-</strong>
             <small id="metric-generated">-</small>
+            <small id="refresh-policy">Auto-refresh 30 min</small>
           </article>
           <article class="metric">
             <span>Matchs analysés</span>
@@ -101,6 +103,15 @@
             <span>P&L suivi</span>
             <strong id="user-pnl-total">0.00 €</strong>
             <small id="user-pnl-sub">Jour 0.00 € · ROI 0.0%</small>
+            <div class="pnl-sparkline" id="user-pnl-sparkline" aria-label="Courbe P&L des 30 derniers paris"></div>
+            <small id="user-pnl-segments">Segments en attente de paris suivis</small>
+            <button class="mini-export-btn" id="export-user-bets-btn" type="button">Exporter suivis</button>
+          </article>
+          <article class="metric">
+            <span>Performance</span>
+            <strong id="metric-boot-time">-</strong>
+            <small id="metric-boot-sub">Affichage premier pick</small>
+            <small id="metric-refresh-next">Prochain refresh : calcul...</small>
           </article>
         </div>
 

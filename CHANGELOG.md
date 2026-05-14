@@ -5,6 +5,17 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 3 — Design pro, robustesse et qualité de vie
+
+- Ajout d'un socle `design-tokens.css` pour stabiliser la palette, les tailles, les espacements et les rayons de l'interface desktop.
+- Démarrage accéléré du cockpit : préchauffage/cache moteur côté Electron et affichage mesuré des picks autour de 0,5s dans la capture QA.
+- Cockpit enrichi avec indicateur performance, prochaine échéance d'auto-refresh et message plus clair sur les paris réellement prêts.
+- Bankroll suivie améliorée : sparkline P&L des 30 derniers paris, résumé segment/streak et export CSV des paris suivis.
+- Refresh intelligent : 30 min par défaut, 10 min si un pick proche démarre dans moins d'une heure, pause économie si l'app reste en arrière-plan plus d'une heure.
+- Notifications desktop natives autorisées uniquement pour les opportunités importantes : nouveau pick prêt ou gros edge proche, sans fetch internet depuis le renderer.
+- Robustesse données : les données anciennes mais encore présentes restent affichées avec un bandeau clair au lieu de vider l'écran ; les fiches signalent les contextes limités.
+- QA renforcée : Playwright, smoke et capture visuelle vérifient design tokens, P&L enrichi, export suivis, notifications, refresh intelligent et performance cockpit.
+
 ### Suite UX / QA
 
 - `npx playwright test` cible désormais l'application Electron locale au lieu de l'ancienne suite site trop longue : test cockpit, tracking `Je mise`, P&L, filtres, fiche match, sécurité renderer et absence d'iframe.

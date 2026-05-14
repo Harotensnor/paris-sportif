@@ -34,6 +34,11 @@ async function main() {
   if (!mainText.includes('contextIsolation: true') || !mainText.includes('sandbox: true') || !mainText.includes('setWindowOpenHandler')) {
     throw new Error('Durcissement Electron incomplet');
   }
+  if (!mainText.includes("permission === 'notifications'")) throw new Error('Notifications desktop non autorisées proprement');
+  if (!htmlText.includes('design-tokens.css')) throw new Error('Socle design tokens absent');
+  for (const marker of ['REFRESH_URGENT_INTERVAL_MS', 'visibilitychange', 'Notification']) {
+    if (!rendererText.includes(marker)) throw new Error(`QOL Sprint 3 absente: ${marker}`);
+  }
   for (const mode of ['full', 'signals', 'prematch', 'prematch_t60', 'prematch_t30', 'prematch_t10', 'critical', 'repair_context']) {
     if (!mainText.includes(mode)) throw new Error(`Mode refresh Electron non exposé: ${mode}`);
   }
@@ -70,7 +75,11 @@ async function main() {
       scenarioCards: document.querySelectorAll('#stake-scenario-grid .scenario-card').length,
       trackButtons: document.querySelectorAll('[data-track-bet-key]').length,
       pnlVisible: Boolean(document.querySelector('#user-pnl-total') && document.querySelector('#user-pnl-sub')),
+      pnlSparkline: Boolean(document.querySelector('#user-pnl-sparkline svg')),
+      userBetExport: Boolean(document.querySelector('#export-user-bets-btn')),
       filtersVisible: Boolean(document.querySelector('#pick-search') && document.querySelector('#pick-sort')),
+      performanceMetric: document.querySelector('#metric-boot-time')?.textContent || '',
+      refreshPolicy: document.querySelector('#refresh-policy')?.textContent || '',
       positiveStakeCells: Array.from(document.querySelectorAll('#picks-body td[data-label="Mise"], #stake-scenario-body td[data-label="Prudent"], #stake-scenario-body td[data-label="Normal"], #stake-scenario-body td[data-label="Agressif"]'))
         .filter((node) => /[1-9]\d*(?:[,.]\d+)?\s*€/.test(node.textContent || '')).length
     }));
@@ -79,8 +88,11 @@ async function main() {
     if (dashboard.finalCards <= 0 || !dashboard.firstActionButton || !dashboard.criticalButton || !dashboard.t10Button) {
       throw new Error(`Panneau décision incomplet: ${JSON.stringify(dashboard)}`);
     }
-    if (dashboard.picks < 10 || dashboard.trackButtons < 10 || !dashboard.pnlVisible || !dashboard.filtersVisible) {
+    if (dashboard.picks < 10 || dashboard.trackButtons < 10 || !dashboard.pnlVisible || !dashboard.pnlSparkline || !dashboard.userBetExport || !dashboard.filtersVisible) {
       throw new Error(`Cockpit de mise incomplet: ${JSON.stringify(dashboard)}`);
+    }
+    if (!/s|\.\.\./.test(dashboard.performanceMetric) || !/Auto-refresh|Mode économie/.test(dashboard.refreshPolicy)) {
+      throw new Error(`Indicateurs performance/refresh incomplets: ${JSON.stringify(dashboard)}`);
     }
     if (/Aucun pari à jouer maintenant|Mise bloquée|blocage/i.test(dashboard.caption) && dashboard.positiveStakeCells > 0) {
       throw new Error(`Mise positive affichée malgré gate rouge: ${JSON.stringify(dashboard)}`);
@@ -92,6 +104,7 @@ async function main() {
     if (!/Suivi/.test(trackedButton || '')) throw new Error(`Bouton de suivi non mis à jour: ${trackedButton}`);
 
     await expectDownload(win, '#export-btn', 'paris-sportif-desktop-');
+    await expectDownload(win, '#export-user-bets-btn', 'paris-sportif-paris-suivis-');
     await expectDownload(win, '#export-report-json-btn', 'paris-sportif-rapport-');
 
     await win.click('[data-tab="data"]');

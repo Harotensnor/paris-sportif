@@ -61,6 +61,8 @@ function createLegacyEngineService({ projectRoot }) {
   const clvSummaryPath = path.join(root, 'clv_summary.json');
   let current = null;
   let currentKey = null;
+  let analysisCache = null;
+  let analysisCacheKey = null;
 
   function optionalFileKey(filePath) {
     if (!fs.existsSync(filePath)) return 'missing';
@@ -84,6 +86,8 @@ function createLegacyEngineService({ projectRoot }) {
     }
     current = null;
     currentKey = null;
+    analysisCache = null;
+    analysisCacheKey = null;
   }
 
   function localFetch(input) {
@@ -1671,10 +1675,12 @@ function createLegacyEngineService({ projectRoot }) {
   }
 
   function getAnalysis({ bankroll = 50, force = false } = {}) {
+    const safeBankroll = Number.isFinite(Number(bankroll)) && Number(bankroll) > 0 ? Number(bankroll) : 50;
+    const analysisKey = `${fileKey()}:bankroll:${safeBankroll.toFixed(2)}`;
+    if (!force && analysisCache && analysisCacheKey === analysisKey) return analysisCache;
     const engine = ensureEngine({ force });
     const win = engine.win;
     const data = win.PRONOSTICS_DATA || {};
-    const safeBankroll = Number.isFinite(Number(bankroll)) && Number(bankroll) > 0 ? Number(bankroll) : 50;
     const lineupsIndex = readLineupsIndex();
     const starPlayersIndex = readStarPlayersIndex();
     const h2hIndex = readH2hIndex();
@@ -1765,7 +1771,7 @@ function createLegacyEngineService({ projectRoot }) {
     const agentPositions = prebetGate.blocked || criticalGate.blocked ? [] : buildAgentPositions(win, matches);
     const agentBlockers = buildAgentBlockers(matches, agentPositions, win);
 
-    return {
+    const analysis = {
       ok: true,
       generatedAt: data.generated_at || null,
       loadedAt: engine.loadedAt,
@@ -1853,6 +1859,9 @@ function createLegacyEngineService({ projectRoot }) {
       agentBlockers,
       agent: agentSnapshot(win, agentPositions, prebetChecklistReport, candidateAgentPositions, criticalIssueReport)
     };
+    analysisCache = analysis;
+    analysisCacheKey = analysisKey;
+    return analysis;
   }
 
   return {

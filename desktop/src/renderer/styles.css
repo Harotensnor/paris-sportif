@@ -1,21 +1,3 @@
-:root {
-  --bg: #101111;
-  --surface: #17191c;
-  --surface-2: #202327;
-  --line: #34383d;
-  --text: #f7fafc;
-  --muted: #b1b8c4;
-  --muted-2: #7e8794;
-  --brand: #a78bfa;
-  --accent: #10b981;
-  --warn: #f59e0b;
-  --danger: #f87171;
-  --blue: #38bdf8;
-  --graphite: #0b0c0d;
-  --terminal: #151816;
-  --terminal-2: #1c201d;
-}
-
 * {
   box-sizing: border-box;
 }
@@ -26,6 +8,7 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: var(--font-base);
   font-variant-numeric: tabular-nums;
 }
 
@@ -420,7 +403,7 @@ a:hover {
 
 .metrics-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 12px;
   margin-bottom: 20px;
 }
@@ -1107,19 +1090,59 @@ a:hover {
   border: 1px solid var(--line);
   border-radius: 8px;
   padding: 14px;
-  min-height: 118px;
+  min-height: 126px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  gap: 8px;
+  justify-content: flex-start;
 }
 
 .metric strong {
-  font-size: 26px;
+  font-size: 24px;
   line-height: 1.1;
 }
 
 .metric small {
   font-size: 12px;
+}
+
+.metric strong + small,
+.metric small + small {
+  margin-top: -3px;
+}
+
+.pnl-sparkline {
+  height: 34px;
+  width: 100%;
+  border: 1px solid var(--line-soft);
+  border-radius: 6px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, .025), transparent),
+    var(--surface-2);
+  overflow: hidden;
+}
+
+.pnl-sparkline svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.mini-export-btn {
+  width: fit-content;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface-2);
+  color: var(--muted);
+  padding: 6px 8px;
+  font-size: 11px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.mini-export-btn:hover {
+  color: var(--text);
+  border-color: rgba(16, 185, 129, .46);
 }
 
 .bankroll-line {
@@ -2145,6 +2168,11 @@ body.modal-open {
 .match-decision-hero.decision-warn,
 .match-decision-hero.decision-danger {
   border-left-color: var(--danger);
+}
+
+.limited-data-card {
+  border-color: rgba(245, 158, 11, .38);
+  background: rgba(245, 158, 11, .08);
 }
 
 .match-decision-hero > span,

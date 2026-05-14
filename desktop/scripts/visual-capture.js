@@ -47,7 +47,10 @@ async function main() {
       picksMetric: Number(document.querySelector('#metric-picks')?.textContent || 0),
       trackButtons: document.querySelectorAll('[data-track-bet-key]').length,
       pnlVisible: Boolean(document.querySelector('#user-pnl-total') && document.querySelector('#user-pnl-sub')),
+      pnlSparkline: Boolean(document.querySelector('#user-pnl-sparkline svg')),
       filtersVisible: Boolean(document.querySelector('#pick-search') && document.querySelector('#pick-sort')),
+      performanceMetric: document.querySelector('#metric-boot-time')?.textContent || '',
+      refreshPolicy: document.querySelector('#refresh-policy')?.textContent || '',
       positiveStakeCells: Array.from(document.querySelectorAll('#picks-body td[data-label="Mise"], #stake-scenario-body td[data-label="Prudent"], #stake-scenario-body td[data-label="Normal"], #stake-scenario-body td[data-label="Agressif"]'))
         .filter((node) => /[1-9]\d*(?:[,.]\d+)?\s*€/.test(node.textContent || '')).length
     }));
@@ -98,8 +101,11 @@ async function main() {
     if (/Aucun pari à jouer maintenant|Mise bloquée|blocage/i.test(decisionConsistency.caption) && decisionConsistency.positiveStakeCells > 0) {
       throw new Error(`Mise positive affichée malgré décision bloquée: ${JSON.stringify(decisionConsistency)}`);
     }
-    if (decisionConsistency.picksMetric < 10 || decisionConsistency.trackButtons < 10 || !decisionConsistency.pnlVisible || !decisionConsistency.filtersVisible) {
+    if (decisionConsistency.picksMetric < 10 || decisionConsistency.trackButtons < 10 || !decisionConsistency.pnlVisible || !decisionConsistency.pnlSparkline || !decisionConsistency.filtersVisible) {
       throw new Error(`Cockpit actionnable incomplet: ${JSON.stringify(decisionConsistency)}`);
+    }
+    if (!/s|\.\.\./.test(decisionConsistency.performanceMetric) || !/Auto-refresh|Mode économie/.test(decisionConsistency.refreshPolicy)) {
+      throw new Error(`Indicateurs cockpit manquants: ${JSON.stringify(decisionConsistency)}`);
     }
     if (files <= 0 || sources <= 0 || refreshCards <= 0 || checklist <= 0) {
       throw new Error(`Vue Données incomplète: ${JSON.stringify({ files, sources, refreshCards, checklist })}`);

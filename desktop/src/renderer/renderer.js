@@ -61,14 +61,24 @@
     dashboardMeta: null,
     prematchPlan: null,
     engineReady: false,
+    bootStartedAt: typeof performance !== 'undefined' ? performance.now() : Date.now(),
+    windowLoadedAt: null,
+    firstPickRenderedAt: null,
+    hiddenSince: document.hidden ? Date.now() : null,
     refreshTimer: null,
     backgroundRefreshTimer: null,
+    backgroundRefreshNextAt: null,
     exportTimer: null,
     actionHistory: []
   };
 
   const ACTION_HISTORY_KEY = 'parisSportifActionHistory';
   const USER_BETS_KEY = 'parisSportifUserBets';
+  const NOTIFIED_PICK_KEY = 'parisSportifNotifiedPickKeys';
+  const READY_COUNT_KEY = 'parisSportifLastReadyCount';
+  const REFRESH_DEFAULT_INTERVAL_MS = 30 * 60 * 1000;
+  const REFRESH_URGENT_INTERVAL_MS = 10 * 60 * 1000;
+  const REFRESH_ECONOMY_AFTER_MS = 60 * 60 * 1000;
   const REFRESH_ESTIMATE_SECONDS = {
     quick: 150,
     signals: 520,
@@ -153,16 +163,62 @@
     let pnlTotal = 0;
     let pnlToday = 0;
     let pending = 0;
+    const segments = new Map();
+    const settled = [];
     for (const bet of bets) {
       const stake = Math.max(0, Number(bet.stake || 0) || 0);
       const pnl = Number(bet.pnl || 0) || 0;
+      const segmentKey = `${bet.sport || 'Sport'}|||${bet.league || 'Ligue'}`;
+      const segment = segments.get(segmentKey) || {
+        sport: bet.sport || 'Sport',
+        league: bet.league || 'Ligue',
+        bets: 0,
+        pending: 0,
+        stake: 0,
+        pnl: 0,
+        settledStake: 0
+      };
+      segment.bets += 1;
+      segment.stake += stake;
       totalStake += stake;
-      if (bet.status === 'pending') pending += 1;
+      if (bet.status === 'pending') {
+        pending += 1;
+        segment.pending += 1;
+      }
       if (bet.status === 'won' || bet.status === 'lost' || bet.status === 'void') {
         settledStake += stake;
         pnlTotal += pnl;
+        segment.pnl += pnl;
+        segment.settledStake += stake;
+        settled.push(bet);
       }
+      segments.set(segmentKey, segment);
       if (String(bet.day || '').slice(0, 10) === today) pnlToday += pnl;
+    }
+    const orderedSettled = settled
+      .slice()
+      .sort((a, b) => Date.parse(a.createdAt || a.day || 0) - Date.parse(b.createdAt || b.day || 0))
+      .slice(-30);
+    let running = 0;
+    const sparkline = orderedSettled.map((bet) => {
+      running += Number(bet.pnl || 0) || 0;
+      return running;
+    });
+    const meaningfulSegments = Array.from(segments.values())
+      .filter((row) => row.bets > 0)
+      .sort((a, b) => b.pnl - a.pnl);
+    const bestSegment = meaningfulSegments.find((row) => row.settledStake > 0) || meaningfulSegments[0] || null;
+    const worstSegment = meaningfulSegments.slice().reverse().find((row) => row.settledStake > 0) || meaningfulSegments[meaningfulSegments.length - 1] || null;
+    const streakRows = orderedSettled.slice().reverse().filter((bet) => bet.status === 'won' || bet.status === 'lost');
+    let streak = { status: 'none', count: 0 };
+    if (streakRows[0]) {
+      const status = streakRows[0].status;
+      streak = {
+        status,
+        count: streakRows.findIndex((bet) => bet.status !== status) === -1
+          ? streakRows.length
+          : streakRows.findIndex((bet) => bet.status !== status)
+      };
     }
     return {
       bets: bets.length,
@@ -171,18 +227,56 @@
       settledStake,
       pnlTotal,
       pnlToday,
-      roi: settledStake > 0 ? pnlTotal / settledStake : 0
+      roi: settledStake > 0 ? pnlTotal / settledStake : 0,
+      sparkline,
+      bestSegment,
+      worstSegment,
+      streak
     };
+  }
+
+  function sparklineSvg(points) {
+    const values = Array.isArray(points) && points.length ? points : [0, 0];
+    const min = Math.min(...values, 0);
+    const max = Math.max(...values, 0);
+    const range = Math.max(1, max - min);
+    const coords = values.map((value, index) => {
+      const x = values.length === 1 ? 50 : (index / (values.length - 1)) * 100;
+      const y = 28 - ((value - min) / range) * 22;
+      return `${x.toFixed(2)},${y.toFixed(2)}`;
+    }).join(' ');
+    const last = values[values.length - 1] || 0;
+    const color = last >= 0 ? 'var(--accent)' : 'var(--danger)';
+    return `<svg viewBox="0 0 100 34" preserveAspectRatio="none" aria-hidden="true">
+      <polyline points="${escapeHtml(coords)}" fill="none" stroke="${color}" stroke-width="2.4" vector-effect="non-scaling-stroke" />
+      <line x1="0" y1="28" x2="100" y2="28" stroke="rgba(148,163,184,.22)" stroke-width="1" vector-effect="non-scaling-stroke" />
+    </svg>`;
+  }
+
+  function segmentSummaryText(stats) {
+    const best = stats.bestSegment;
+    const worst = stats.worstSegment;
+    const streak = stats.streak?.count
+      ? `${stats.streak.count} ${stats.streak.status === 'won' ? 'wins' : 'losses'}`
+      : 'streak neutre';
+    if (!best && !worst) return `Aucun pari suivi · ${streak}`;
+    const bestText = best ? `Meilleur ${best.sport}: ${formatMoney(best.pnl)}` : 'Meilleur -';
+    const worstText = worst && worst !== best ? `Pire ${worst.sport}: ${formatMoney(worst.pnl)}` : '';
+    return [bestText, worstText, streak].filter(Boolean).join(' · ');
   }
 
   function renderUserPnl() {
     const stats = userBetStats();
     const totalNode = $('#user-pnl-total');
     const subNode = $('#user-pnl-sub');
+    const sparklineNode = $('#user-pnl-sparkline');
+    const segmentsNode = $('#user-pnl-segments');
     if (totalNode) totalNode.textContent = formatMoney(stats.pnlTotal);
     if (subNode) {
       subNode.textContent = `Jour ${formatMoney(stats.pnlToday)} · ROI ${formatPct(stats.roi, 1)} · ${formatCount(stats.pending)} en cours`;
     }
+    if (sparklineNode) sparklineNode.innerHTML = sparklineSvg(stats.sparkline);
+    if (segmentsNode) segmentsNode.textContent = segmentSummaryText(stats);
   }
 
   function trackUserBet(row) {
@@ -398,6 +492,82 @@
     if (remaining) remaining.textContent = remainingLabel;
     if (detailNode) detailNode.textContent = detail;
     if (bar) bar.style.width = `${info.progressPct.toFixed(0)}%`;
+  }
+
+  function markFirstPickVisible(rowCount) {
+    if (!rowCount || state.firstPickRenderedAt) {
+      renderBootPerformance();
+      return;
+    }
+    state.firstPickRenderedAt = typeof performance !== 'undefined' ? performance.now() : Date.now();
+    renderBootPerformance();
+  }
+
+  function renderBootPerformance() {
+    const totalNode = $('#metric-boot-time');
+    const subNode = $('#metric-boot-sub');
+    if (!totalNode || !subNode) return;
+    if (!state.firstPickRenderedAt) {
+      totalNode.textContent = '...';
+      subNode.textContent = 'Premier pick en cours';
+      return;
+    }
+    const base = state.windowLoadedAt && state.windowLoadedAt <= state.firstPickRenderedAt
+      ? state.windowLoadedAt
+      : state.bootStartedAt;
+    const elapsedMs = Math.max(0, state.firstPickRenderedAt - base);
+    totalNode.textContent = `${(elapsedMs / 1000).toFixed(2)}s`;
+    subNode.textContent = elapsedMs <= 2000
+      ? 'Picks visibles sous 2s'
+      : 'Picks visibles, cache local conseillé';
+  }
+
+  function upcomingPickWithin(ms) {
+    const now = Date.now();
+    const rows = [...(state.picks || []), ...(state.allPicks || []), ...(state.watchlist || [])];
+    return rows.some((row) => {
+      const ts = Date.parse(row?.start || row?.date || '');
+      return Number.isFinite(ts) && ts > now && ts - now <= ms;
+    });
+  }
+
+  function nextRefreshPlan() {
+    if (document.hidden && state.hiddenSince && Date.now() - state.hiddenSince > REFRESH_ECONOMY_AFTER_MS) {
+      return {
+        delayMs: null,
+        mode: 'pause',
+        label: 'Mode économie : reprise quand la fenêtre revient au premier plan.'
+      };
+    }
+    if (upcomingPickWithin(60 * 60 * 1000)) {
+      return {
+        delayMs: REFRESH_URGENT_INTERVAL_MS,
+        mode: 'quick',
+        label: 'Auto-refresh boost 10 min : match proche.'
+      };
+    }
+    return {
+      delayMs: REFRESH_DEFAULT_INTERVAL_MS,
+      mode: 'quick',
+      label: 'Auto-refresh 30 min.'
+    };
+  }
+
+  function renderRefreshPolicy() {
+    const plan = nextRefreshPlan();
+    const policyNode = $('#refresh-policy');
+    const nextNode = $('#metric-refresh-next');
+    if (policyNode) policyNode.textContent = plan.label;
+    if (nextNode) {
+      if (!plan.delayMs) {
+        nextNode.textContent = 'Prochain refresh : pause économie';
+      } else if (state.backgroundRefreshNextAt) {
+        const remaining = Math.max(0, Math.round((state.backgroundRefreshNextAt - Date.now()) / 1000));
+        nextNode.textContent = `Prochain refresh : ${formatDurationSeconds(remaining)}`;
+      } else {
+        nextNode.textContent = `Prochain refresh : ${formatDurationSeconds(plan.delayMs / 1000)}`;
+      }
+    }
   }
 
   function readActionHistory() {
@@ -803,7 +973,7 @@
 
   async function computePicks() {
     const status = state.status;
-    if (status && status.ageMinutes > 240) {
+    if (status && status.ageMinutes > 240 && !Number(status.counts?.bookable || 0)) {
       state.picks = [];
       state.allPicks = [];
       state.matches = [];
@@ -1009,6 +1179,8 @@
     }
     maybeAutoCriticalRefresh();
     maybeAutoPrematchRefresh();
+    maybeNotifyPickChanges();
+    scheduleBackgroundRefresh();
   }
 
   function updatePickFilters() {
@@ -1070,10 +1242,26 @@
     return Boolean(filters.query || filters.sport !== 'all' || filters.league !== 'all' || filters.edgeMin || filters.oddMin || filters.sort !== 'edge');
   }
 
+  function pickHasCoreData(row) {
+    if (!row || typeof row !== 'object') return false;
+    const hasWinamax = Boolean(row.winamaxUrl || row.match?.winamax?.available === true || row.match?.winamax?.match_id);
+    return Boolean(
+      row.title &&
+      row.start &&
+      row.market &&
+      row.label &&
+      hasWinamax &&
+      Number(row.odd || 0) > 1 &&
+      Number(row.probability || 0) > 0 &&
+      Number(row.edge || 0) > 0
+    );
+  }
+
   function dashboardPickRows(filters) {
     const active = pickFiltersActive(filters);
     const base = active && state.allPicks.length ? state.allPicks : state.picks;
     const rows = base.filter((row) => {
+      if (!pickHasCoreData(row)) return false;
       if (!canDisplayStake(row)) return false;
       if (filters.query && !pickSearchText(row).includes(filters.query)) return false;
       if (filters.sport !== 'all' && row.sport !== filters.sport) return false;
@@ -1091,6 +1279,83 @@
     return active ? rows.slice(0, 40) : rows;
   }
 
+  function readNotifiedPickKeys() {
+    try {
+      const rows = JSON.parse(localStorage.getItem(NOTIFIED_PICK_KEY) || '[]');
+      return new Set(Array.isArray(rows) ? rows.filter(Boolean).slice(-80) : []);
+    } catch {
+      return new Set();
+    }
+  }
+
+  function writeNotifiedPickKeys(keys) {
+    try {
+      localStorage.setItem(NOTIFIED_PICK_KEY, JSON.stringify(Array.from(keys).slice(-80)));
+    } catch {
+      // Les notifications restent optionnelles.
+    }
+  }
+
+  function notifyUser(title, body, row) {
+    if (!('Notification' in window)) return;
+    const show = () => {
+      try {
+        const notification = new Notification(title, { body, silent: true });
+        notification.onclick = () => {
+          window.focus();
+          if (row?.id) openMatchDetail(row.id);
+        };
+      } catch {
+        // Les notifications natives peuvent être bloquées par le système.
+      }
+    };
+    try {
+      if (Notification.permission === 'granted') show();
+      else if (Notification.permission !== 'denied') {
+        Notification.requestPermission().then((permission) => {
+          if (permission === 'granted') show();
+        }).catch(() => {});
+      }
+    } catch {
+      // Permission API non disponible dans certains profils Electron.
+    }
+  }
+
+  function maybeNotifyPickChanges() {
+    const readyRows = (state.picks || []).filter((row) => pickHasCoreData(row) && canDisplayStake(row));
+    const readyCount = readyRows.length;
+    const previousRaw = localStorage.getItem(READY_COUNT_KEY);
+    const previous = previousRaw == null ? null : Number(previousRaw);
+    try {
+      localStorage.setItem(READY_COUNT_KEY, String(readyCount));
+    } catch {
+      // Compteur purement confort.
+    }
+    if (previous != null && Number.isFinite(previous) && readyCount > previous) {
+      notifyUser('Nouveaux picks prêts', `+${readyCount - previous} pick(s) jouable(s) depuis le dernier calcul.`, readyRows[0]);
+    }
+    const notified = readNotifiedPickKeys();
+    const now = Date.now();
+    const bigPick = readyRows.find((row) => {
+      const ts = Date.parse(row.start || '');
+      const key = userBetKey(row);
+      return !notified.has(key)
+        && Number(row.edge || 0) >= 0.10
+        && Number(row.odd || 0) >= 2
+        && Number.isFinite(ts)
+        && ts > now
+        && ts - now <= 2 * 60 * 60 * 1000;
+    });
+    if (!bigPick) return;
+    notified.add(userBetKey(bigPick));
+    writeNotifiedPickKeys(notified);
+    notifyUser(
+      'Gros pick proche',
+      `${bigPick.title} · ${bigPick.label} ${formatOdd(bigPick.odd)} · edge ${formatPct(bigPick.edge, 1)}`,
+      bigPick
+    );
+  }
+
   function renderPicks(emptyMessage) {
     const body = $('#picks-body');
     const metricLabel = $('#metric-picks-label');
@@ -1106,10 +1371,10 @@
     const globalBlocked = Boolean(state.decisionCenter?.summary?.blocked);
     const caption = pickFiltersActive(filters)
       ? `${formatCount(displayRows.length)} pick(s) filtré(s) sur ${formatCount(total)} lignes prêtes.`
-      : meta.mode === 'bestAvailable'
-        ? 'Moins de 10 picks prêts dans les 30 prochaines heures : affichage des meilleurs picks disponibles.'
-        : ready > 0
-          ? 'Fenêtre proche : seuls les picks prêts affichent une mise.'
+      : ready > 0
+        ? `${formatCount(ready)} pick(s) prêt(s) : seules ces lignes affichent une mise.`
+        : meta.mode === 'bestAvailable'
+          ? 'Aucun pari prêt dans la fenêtre courte : affichage des meilleurs candidats à surveiller.'
           : 'Aucun pari à jouer maintenant : candidats surveillés sans mise.';
     const sectionTitle = $('#picks-section-title');
     if (sectionTitle) sectionTitle.textContent = ready > 0 ? 'À jouer maintenant' : 'Sélection surveillée';
@@ -1121,6 +1386,7 @@
         : `${formatCount(ready)} prêt(s)`;
     if (!displayRows.length) {
       body.innerHTML = `<tr><td colspan="8" class="empty">${escapeHtml(emptyMessage || 'Aucun pick jouable avec les règles actuelles.')}</td></tr>`;
+      markFirstPickVisible(0);
       return;
     }
     const tracked = new Set(loadUserBets().filter((bet) => bet.status === 'pending').map((bet) => bet.key));
@@ -1149,6 +1415,8 @@
           <td data-label="Action">${action}</td>
         </tr>`;
     }).join('');
+    markFirstPickVisible(displayRows.length);
+    renderRefreshPolicy();
   }
 
   function autoPrematchEnabled() {
@@ -2812,6 +3080,13 @@
     const blockList = blockReasons(row);
     const decisionTone = stakeAllowed ? 'ok' : dc.status === 'repair' ? 'warn' : dc.status === 'skip' ? 'danger' : 'watch';
     const signalPreview = signalCards.slice(0, 6);
+    const signalOkCount = signalPreview.filter((signal) => signal.ok).length;
+    const limitedDataHtml = signalOkCount < 2
+      ? `<article class="detail-card limited-data-card">
+          <h4>Données limitées</h4>
+          <p class="detail-text">Moins de deux signaux contextuels solides sont présents. La décision reste prudente et la fiche indique les sources manquantes au lieu de combler les trous.</p>
+        </article>`
+      : '';
     const usefulContext = [
       signalPreview.find((signal) => signal.label === 'Météo'),
       signalPreview.find((signal) => signal.label === 'Compositions'),
@@ -2874,6 +3149,7 @@
             <h4>Contexte utile</h4>
             <div class="kv">${usefulContext.length ? usefulContext.map((signal) => `<span>${escapeHtml(signal.label)}</span><strong>${escapeHtml(signal.value)}</strong>`).join('') : '<span>Contexte</span><strong>Voir onglet Signaux</strong>'}</div>
           </article>
+          ${limitedDataHtml}
           <article class="detail-card wide">
             <h4>${blockList.length ? 'Points à vérifier' : 'Garde-fous'}</h4>
             ${blockList.length ? `<div class="block-reason-list">${blockList.slice(0, 5).map((item) => `
@@ -4414,16 +4690,18 @@
       setSideStatus(`${refreshModeLabel(status.refresh.mode || 'quick')} en cours`, 'warn');
     } else if (status.status === 'blocked') {
       banner.classList.remove('hidden');
-      banner.textContent = `Données trop anciennes (${formatAge(status.ageMinutes)}). Les recommandations sont bloquées tant qu'un refresh ne repasse pas sous 4h.`;
+      banner.textContent = `Données du ${status.generatedAt ? new Date(status.generatedAt).toLocaleString('fr-FR') : 'dernier fichier local'} (${formatAge(status.ageMinutes)}). Le logiciel affiche les dernières données connues et conseille un refresh avant mise.`;
       setSideStatus('Données bloquées', 'danger');
     } else if (status.status === 'stale') {
       banner.classList.remove('hidden');
-      banner.textContent = `Données à surveiller (${formatAge(status.ageMinutes)}). Refresh conseillé avant de miser.`;
+      banner.textContent = `Données à surveiller (${formatAge(status.ageMinutes)}). Dernières données locales conservées, refresh conseillé avant de miser.`;
       setSideStatus('Données à rafraîchir', 'warn');
     } else {
       banner.classList.add('hidden');
       setSideStatus(state.engineReady ? 'Calcul prêt' : 'Données prêtes', 'ok');
     }
+    renderBootPerformance();
+    renderRefreshPolicy();
 
     renderFiles(status.files || []);
     renderQualityReport(status);
@@ -5408,6 +5686,27 @@
     downloadText(`paris-sportif-desktop-${new Date().toISOString().slice(0, 10)}.csv`, toCsv(headers, rows), 'text/csv;charset=utf-8');
   }
 
+  function exportUserBetsCsv() {
+    const bets = loadUserBets();
+    const headers = ['created_at', 'match', 'sport', 'league', 'market', 'pick', 'odd', 'probability', 'edge', 'stake', 'status', 'pnl'];
+    const rows = bets.map((bet) => [
+      bet.createdAt || '',
+      bet.title || '',
+      bet.sport || '',
+      bet.league || '',
+      bet.market || '',
+      bet.label || '',
+      Number(bet.odd || 0).toFixed(2),
+      Number(bet.probability || 0).toFixed(4),
+      Number(bet.edge || 0).toFixed(4),
+      Number(bet.stake || 0).toFixed(2),
+      bet.status || '',
+      Number(bet.pnl || 0).toFixed(2)
+    ]);
+    if (!rows.length) rows.push(['', 'Aucun pari suivi', '', '', '', '', '', '', '', '', '', '']);
+    downloadText(`paris-sportif-paris-suivis-${new Date().toISOString().slice(0, 10)}.csv`, toCsv(headers, rows), 'text/csv;charset=utf-8');
+  }
+
   function exportPrebetChecklistCsv() {
     const report = state.prebetChecklist || {};
     const rows = Array.isArray(report.items) ? report.items : [];
@@ -6183,6 +6482,7 @@
     });
     $('#reload-engine-btn').addEventListener('click', () => reloadEngine());
     $('#export-btn')?.addEventListener('click', exportCsv);
+    $('#export-user-bets-btn')?.addEventListener('click', exportUserBetsCsv);
     $('#export-prebet-csv-btn')?.addEventListener('click', exportPrebetChecklistCsv);
     $('#export-scenarios-csv-btn')?.addEventListener('click', exportStakeScenariosCsv);
     $('#export-scorers-csv-btn')?.addEventListener('click', exportScorersCsv);
@@ -6428,17 +6728,32 @@
   }
 
   function scheduleBackgroundRefresh() {
-    if (state.backgroundRefreshTimer) clearInterval(state.backgroundRefreshTimer);
-    state.backgroundRefreshTimer = setInterval(() => {
-      if (state.status?.refresh?.running) return;
+    if (state.backgroundRefreshTimer) clearTimeout(state.backgroundRefreshTimer);
+    const plan = nextRefreshPlan();
+    if (!plan.delayMs) {
+      state.backgroundRefreshTimer = null;
+      state.backgroundRefreshNextAt = null;
+      renderRefreshPolicy();
+      return;
+    }
+    state.backgroundRefreshNextAt = Date.now() + plan.delayMs;
+    state.backgroundRefreshTimer = setTimeout(() => {
+      if (state.status?.refresh?.running) {
+        scheduleBackgroundRefresh();
+        return;
+      }
       startRefresh('quick').catch((error) => {
         setSideStatus('Auto-refresh impossible', 'warn');
         $('#refresh-log').textContent = error.stack || error.message;
+      }).finally(() => {
+        scheduleBackgroundRefresh();
       });
-    }, 30 * 60 * 1000);
+    }, plan.delayMs);
+    renderRefreshPolicy();
   }
 
   async function boot() {
+    state.bootStartedAt = typeof performance !== 'undefined' ? performance.now() : Date.now();
     bindEvents();
     state.actionHistory = readActionHistory();
     renderActionHistory();
@@ -6446,12 +6761,18 @@
     if (Number.isFinite(storedBankroll) && storedBankroll > 0) $('#bankroll-input').value = String(storedBankroll);
     switchTab('dashboard');
     renderUserPnl();
-    await refreshStatus();
-    await refreshLog();
-    await reloadEngine();
+    const statusPromise = refreshStatus();
+    const logPromise = refreshLog().catch(() => null);
+    await statusPromise;
+    await computePicks();
+    await logPromise;
+    setSideStatus('Calcul prêt', 'ok');
     scheduleBackgroundRefresh();
+    renderBootPerformance();
+    renderRefreshPolicy();
     setInterval(() => refreshStatus().catch(() => {}), 30000);
     setInterval(() => refreshLog().catch(() => {}), 5000);
+    setInterval(renderRefreshPolicy, 1000);
   }
 
   document.addEventListener('DOMContentLoaded', () => {
@@ -6460,5 +6781,13 @@
       setSideStatus('Erreur au démarrage', 'danger');
       renderPicks(`Erreur au démarrage : ${error.message}`);
     });
+  });
+  window.addEventListener('load', () => {
+    state.windowLoadedAt = typeof performance !== 'undefined' ? performance.now() : Date.now();
+    renderBootPerformance();
+  });
+  document.addEventListener('visibilitychange', () => {
+    state.hiddenSince = document.hidden ? Date.now() : null;
+    scheduleBackgroundRefresh();
   });
 }());

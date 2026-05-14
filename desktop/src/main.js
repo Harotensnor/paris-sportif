@@ -582,11 +582,23 @@ function createWindow(port) {
   mainWindow.loadURL(`http://${HOST}:${port}/desktop/`);
 }
 
+function warmEngineAnalysis() {
+  return Promise.resolve().then(() => {
+    engineService.getAnalysis({ bankroll: 50 });
+  }).catch((error) => {
+    appendRefreshLine(`[desktop] préchauffage moteur ignoré: ${error.message}`);
+  });
+}
+
 app.whenReady().then(async () => {
+  const warmup = warmEngineAnalysis();
   const { port } = await startLocalServer();
+  await warmup;
   await session.defaultSession.clearCache().catch(() => {});
   await session.defaultSession.clearStorageData({ storages: ['serviceworkers', 'cachestorage'] }).catch(() => {});
-  session.defaultSession.setPermissionRequestHandler((_webContents, _permission, callback) => callback(false));
+  session.defaultSession.setPermissionRequestHandler((_webContents, permission, callback) => {
+    callback(permission === 'notifications');
+  });
   createWindow(port);
 });
 

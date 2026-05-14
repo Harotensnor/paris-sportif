@@ -20,7 +20,12 @@ test('desktop cockpit is actionable and stable', async () => {
   expect(mainText).toContain('contextIsolation: true');
   expect(mainText).toContain('sandbox: true');
   expect(mainText).toContain('setWindowOpenHandler');
+  expect(mainText).toContain("permission === 'notifications'");
+  expect(htmlText).toContain('design-tokens.css');
   expect(rendererText).toContain('30 * 60 * 1000');
+  expect(rendererText).toContain('REFRESH_URGENT_INTERVAL_MS');
+  expect(rendererText).toContain('visibilitychange');
+  expect(rendererText).toContain('Notification');
   expect(rendererText).toContain('scheduleBackgroundRefresh();');
 
   const userDataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'paris-sportif-pw-'));
@@ -45,7 +50,11 @@ test('desktop cockpit is actionable and stable', async () => {
       ready: Number(document.querySelector('#metric-picks')?.textContent || 0),
       buttons: document.querySelectorAll('[data-track-bet-key]').length,
       pnl: document.querySelector('#user-pnl-total')?.textContent || '',
+      sparkline: Boolean(document.querySelector('#user-pnl-sparkline svg')),
+      exportBets: Boolean(document.querySelector('#export-user-bets-btn')),
       filters: Boolean(document.querySelector('#pick-search') && document.querySelector('#pick-sort')),
+      performanceMetric: document.querySelector('#metric-boot-time')?.textContent || '',
+      refreshPolicy: document.querySelector('#refresh-policy')?.textContent || '',
       caption: document.querySelector('#picks-caption')?.textContent || '',
       rows: document.querySelectorAll('#picks-body tr.clickable-row').length
     }));
@@ -53,7 +62,11 @@ test('desktop cockpit is actionable and stable', async () => {
     expect(dashboard.buttons).toBeGreaterThanOrEqual(10);
     expect(dashboard.rows).toBeGreaterThanOrEqual(10);
     expect(dashboard.pnl).toContain('€');
+    expect(dashboard.sparkline).toBe(true);
+    expect(dashboard.exportBets).toBe(true);
     expect(dashboard.filters).toBe(true);
+    expect(dashboard.performanceMetric).toMatch(/s|\.{3}/);
+    expect(dashboard.refreshPolicy).toMatch(/Auto-refresh|Mode économie/);
 
     await win.fill('#pick-search', 'paris');
     await expect(win.locator('#picks-body')).toContainText(/Paris|Aucun pick/i);
