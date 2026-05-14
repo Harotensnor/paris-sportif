@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-14T16:49:10Z",
+  "generated_at": "2026-05-14T16:52:49Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815338",
-      "kickoff": "2026-05-14T16:40Z",
-      "league": "MLB",
-      "match": "Washington Nationals at Cincinnati Reds",
-      "home": "Cincinnati Reds",
-      "away": "Washington Nationals",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Cincinnati Reds",
-          "pitcher": "Chase Burns",
-          "label": "Chase Burns plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.5127,
-          "fair_odds": 1.95,
-          "expected_strikeouts": 5.56,
-          "projected_ip": 5.33,
-          "inputs": {
-            "k9": 9.38,
-            "era": 2.06,
-            "whip": 1.02,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Cincinnati Reds",
-          "pitcher": "Chase Burns",
-          "label": "Chase Burns ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5119,
-          "fair_odds": 1.95,
-          "expected_hr_allowed": 0.67,
-          "projected_ip": 5.33,
-          "inputs": {
-            "hr9": 1.13,
-            "era": 2.06,
-            "whip": 1.02
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Washington Nationals",
-          "pitcher": "Foster Griffin",
-          "label": "Foster Griffin moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.5675,
-          "fair_odds": 1.76,
-          "expected_strikeouts": 5.2,
-          "projected_ip": 5.78,
-          "inputs": {
-            "k9": 8.1,
-            "era": 2.12,
-            "whip": 1.03,
-            "hand": "L"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Washington Nationals",
-          "pitcher": "Foster Griffin",
-          "label": "Foster Griffin concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5249,
-          "fair_odds": 1.9,
-          "expected_hr_allowed": 0.744,
-          "projected_ip": 5.78,
-          "inputs": {
-            "hr9": 1.16,
-            "era": 2.12,
-            "whip": 1.03
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815336",
       "kickoff": "2026-05-14T17:10Z",
@@ -660,7 +578,7 @@
       ]
     }
   ],
-  "props": 32,
+  "props": 28,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
