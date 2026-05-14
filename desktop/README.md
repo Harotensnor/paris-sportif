@@ -26,6 +26,11 @@ est désactivé dans cette fenêtre.
 - permet d'ajouter des notes privées et tags aux paris suivis, puis de filtrer/exporter ces informations ;
 - peut envoyer les alertes importantes vers un webhook mobile externe configuré par l'utilisateur, depuis le process Electron local ;
 - surveille la mémoire et la stabilité longue durée sans bloquer l'interface.
+- résout automatiquement les paris suivis quand un résultat archivé permet d'évaluer le marché, avec notification et audit local ;
+- intègre un mode coach prudent qui bloque ou avertit avant tracking si limite quotidienne, cap de mise, série de défaites, segment perdant ou mouvement de cote défavorable ;
+- sauvegarde le profil utilisateur localement, permet export/import JSON, fusion/remplacement et restauration depuis le dernier backup propre ;
+- propose un mode démo séparé des vrais paris pour tester les décisions sans toucher à l'historique réel ;
+- garde un backup local de `data.js` valide pour rester utilisable si le fichier courant devient corrompu.
 
 ## Raccourcis utiles
 

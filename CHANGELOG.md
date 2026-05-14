@@ -5,6 +5,19 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 7 — Auto-settlement, coach prudent, backup profil et résilience
+
+- Ajout du settlement automatique au démarrage et après refresh : les paris suivis encore en cours sont rapprochés des résultats archivés et résolus en gagné/perdu quand le marché est évaluable.
+- Notification locale et audit `Settlement auto` dans `Historique` pour afficher combien de paris ont été résolus et le P&L ajouté sans intervention manuelle.
+- Ajout d'un mode coach activé par défaut : limite de paris/jour, cap de mise journalier, avertissement sur série de défaites, segment perdant et cote qui a bougé défavorablement avant de cliquer sur `Je mise`.
+- Le brief d'accueil affiche maintenant des conseils du jour issus du coach : rythme recommandé, segments à éviter, stop-loss/take-profit et état de la discipline bankroll.
+- Audit modèle autonome dans `Historique` : Brier roulant 7j/30j/90j, tendance de dérive et signalement des segments à surveiller quand l'échantillon devient suffisant.
+- Insights automatiques sur les paris suivis : détection des meilleurs/pires segments, comparaison par sport, marché, ligue et moment de la journée avec seuil de sample minimum.
+- Sauvegarde/restauration profil locale : export/import JSON, fusion ou remplacement, backup automatique quotidien dans `desktop/state/backups/` avec rotation 30 jours.
+- Résilience renforcée : backup local de `data.js` parseable, fallback automatique si la donnée principale est corrompue, tentative de restauration profil si les paris suivis deviennent illisibles, et détection de crash précédent avec mode lecture prudent.
+- Ajout d'un mode démo séparé des vrais paris pour tester l'app avec une bankroll virtuelle sans polluer l'historique réel.
+- QA Sprint 7 : Playwright couvre le coach, l'auto-settlement et le profil ; nouveau test multi-jours simulé validant settlement J+3 et backup profil ; capture visuelle enrichie sur coach, audit modèle, insights et préférences profil.
+
 ### Sprint 6 — Polish ultime, aide intégrée, calendrier et stabilité longue durée
 
 - Polish visuel du cockpit desktop : transitions douces entre vues, micro-interactions sur cartes/boutons, toasts unifiés, états vides plus lisibles et respect renforcé des tokens visuels.

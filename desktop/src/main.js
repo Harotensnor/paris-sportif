@@ -13,6 +13,9 @@ const PROJECT_ROOT = path.resolve(DESKTOP_ROOT, '..');
 const HOST = '127.0.0.1';
 const STATE_ROOT = path.join(DESKTOP_ROOT, 'state');
 const REFRESH_HISTORY_PATH = path.join(STATE_ROOT, 'refresh-history.json');
+const PROFILE_BACKUP_ROOT = path.join(STATE_ROOT, 'backups');
+const DATA_BACKUP_ROOT = path.join(STATE_ROOT, 'data-backups');
+const DATA_BACKUP_PATH = path.join(DATA_BACKUP_ROOT, 'data-latest.js');
 const SIGNAL_SOURCES = new Set(['all', 'weather', 'referees', 'injuries', 'lineups', 'team_form', 'team_stats', 'h2h', 'context']);
 const REFRESH_MODES = new Set([
   'quick',
@@ -130,6 +133,13 @@ async function readJsonBody(req) {
   } catch (error) {
     throw new Error(`JSON invalide: ${error.message}`);
   }
+}
+
+function atomicWriteJson(filePath, payload) {
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
+  const tmp = `${filePath}.${process.pid}.tmp`;
+  fs.writeFileSync(tmp, JSON.stringify(payload, null, 2), 'utf8');
+  fs.renameSync(tmp, filePath);
 }
 
 function webhookPayload(config, alert) {
@@ -285,8 +295,7 @@ function sampleMemoryUsage() {
   return memoryState;
 }
 
-function extractDataJs() {
-  const filePath = path.join(PROJECT_ROOT, 'data.js');
+function extractDataJsFrom(filePath, source = 'data.js') {
   try {
     if (!fs.existsSync(filePath)) return { exists: false };
     const text = fs.readFileSync(filePath, 'utf8');
@@ -297,20 +306,88 @@ function extractDataJs() {
         exists: true,
         parseable: false,
         generatedAt: generated ? generated[1] : null,
-        sizeBytes: Buffer.byteLength(text)
+        sizeBytes: Buffer.byteLength(text),
+        source
       };
     }
     const data = JSON.parse(match[1]);
     return {
       exists: true,
       parseable: true,
+      source,
       generatedAt: data.generated_at || null,
       today: data.today || null,
       days: data.days || {},
       sizeBytes: Buffer.byteLength(text)
     };
   } catch (error) {
-    return { exists: true, parseable: false, error: error.message };
+    return { exists: true, parseable: false, source, error: error.message };
+  }
+}
+
+function persistDataBackupIfHealthy(dataInfo) {
+  if (!dataInfo || !dataInfo.parseable || dataInfo.source !== 'data.js') return null;
+  try {
+    const sourcePath = path.join(PROJECT_ROOT, 'data.js');
+    fs.mkdirSync(DATA_BACKUP_ROOT, { recursive: true });
+    const sourceStat = fs.statSync(sourcePath);
+    const backupStat = fs.existsSync(DATA_BACKUP_PATH) ? fs.statSync(DATA_BACKUP_PATH) : null;
+    if (!backupStat || backupStat.size !== sourceStat.size || backupStat.mtimeMs < sourceStat.mtimeMs) {
+      fs.copyFileSync(sourcePath, DATA_BACKUP_PATH);
+    }
+    return { ok: true, path: DATA_BACKUP_PATH };
+  } catch (error) {
+    appendRefreshLine(`[desktop] backup data ignoré: ${error.message}`);
+    return { ok: false, error: error.message };
+  }
+}
+
+function extractDataJs() {
+  const primary = extractDataJsFrom(path.join(PROJECT_ROOT, 'data.js'), 'data.js');
+  if (primary.parseable) {
+    persistDataBackupIfHealthy(primary);
+    return primary;
+  }
+  const backup = extractDataJsFrom(DATA_BACKUP_PATH, 'desktop/state/data-backups/data-latest.js');
+  if (backup.parseable) {
+    return {
+      ...backup,
+      recoveredFromBackup: true,
+      primaryError: primary.error || 'data.js illisible'
+    };
+  }
+  return primary;
+}
+
+function backupProfile(profile) {
+  const now = new Date();
+  const stamp = now.toISOString().replace(/[:.]/g, '-');
+  const payload = {
+    version: 1,
+    backedUpAt: now.toISOString(),
+    profile: profile && typeof profile === 'object' ? profile : {}
+  };
+  const filePath = path.join(PROFILE_BACKUP_ROOT, `profile-${stamp}.json`);
+  const latestPath = path.join(PROFILE_BACKUP_ROOT, 'latest.json');
+  atomicWriteJson(filePath, payload);
+  atomicWriteJson(latestPath, payload);
+  const files = fs.readdirSync(PROFILE_BACKUP_ROOT)
+    .filter((name) => /^profile-.*\.json$/.test(name))
+    .map((name) => ({ name, path: path.join(PROFILE_BACKUP_ROOT, name), stat: fs.statSync(path.join(PROFILE_BACKUP_ROOT, name)) }))
+    .sort((a, b) => b.stat.mtimeMs - a.stat.mtimeMs);
+  for (const file of files.slice(30)) {
+    try { fs.unlinkSync(file.path); } catch {}
+  }
+  return { ok: true, backedUpAt: payload.backedUpAt, file: filePath, kept: Math.min(files.length, 30) };
+}
+
+function readLatestProfileBackup() {
+  const latestPath = path.join(PROFILE_BACKUP_ROOT, 'latest.json');
+  if (!fs.existsSync(latestPath)) return { ok: false, missing: true };
+  try {
+    return { ok: true, backup: JSON.parse(fs.readFileSync(latestPath, 'utf8')) };
+  } catch (error) {
+    return { ok: false, error: error.message };
   }
 }
 
@@ -383,6 +460,11 @@ function getDataStatus() {
     ageMinutes,
     status,
     source: dataJs.parseable ? 'data.js' : 'metadata',
+    recovery: dataJs.recoveredFromBackup ? {
+      recoveredFromBackup: true,
+      source: dataJs.source,
+      primaryError: dataJs.primaryError || null
+    } : null,
     counts: {
       days: dataJs.days ? Object.keys(dataJs.days).length : 0,
       events: allEvents.length,
@@ -689,6 +771,19 @@ async function handleApi(req, res, url) {
     const source = SIGNAL_SOURCES.has(requestedSource) ? requestedSource : 'all';
     const started = startRefresh(mode, source);
     jsonResponse(res, started ? 202 : 200, { ok: true, started, refresh: refreshState });
+    return;
+  }
+  if (url.pathname === '/api/profile/backup') {
+    if (req.method !== 'POST') {
+      jsonResponse(res, 405, { ok: false, error: 'POST required' });
+      return;
+    }
+    const payload = await readJsonBody(req);
+    jsonResponse(res, 200, backupProfile(payload.profile || payload));
+    return;
+  }
+  if (url.pathname === '/api/profile/latest') {
+    jsonResponse(res, 200, readLatestProfileBackup());
     return;
   }
   if (url.pathname === '/api/refresh/cancel') {

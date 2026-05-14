@@ -72,18 +72,28 @@
     actionHistory: [],
     calendarDayFilter: null,
     selectedCalendarDay: null,
-    debugLogs: []
+    debugLogs: [],
+    coachOverride: null,
+    profileImportPreview: null,
+    crashRecovered: false,
+    safeMode: false
   };
 
   const ACTION_HISTORY_KEY = 'parisSportifActionHistory';
   const USER_BETS_KEY = 'parisSportifUserBets';
+  const USER_BETS_DEMO_KEY = 'parisSportifDemoUserBets';
   const USER_PREFS_KEY = 'parisSportifPreferences';
   const USER_PREFS_SEEN_KEY = 'parisSportifPreferencesSeen';
   const USER_AUDIT_KEY = 'parisSportifUserLearningAudit';
+  const AUTO_SETTLEMENT_KEY = 'parisSportifAutoSettlementAudit';
+  const MODEL_AUDIT_KEY = 'parisSportifModelSelfAudit';
+  const INSIGHTS_KEY = 'parisSportifPersonalInsights';
   const ODDS_MEMORY_KEY = 'parisSportifOddsMemory';
   const SMART_ALERT_KEY = 'parisSportifSmartAlertKeys';
   const NOTIFIED_PICK_KEY = 'parisSportifNotifiedPickKeys';
   const READY_COUNT_KEY = 'parisSportifLastReadyCount';
+  const PROFILE_BACKUP_KEY = 'parisSportifLastProfileBackupDay';
+  const APP_SESSION_KEY = 'parisSportifDesktopSession';
   const SPORTS_PREFS = ['football', 'tennis', 'basketball', 'hockey', 'baseball'];
   const MARKET_PREFS = [
     { key: '1n2', label: '1N2' },
@@ -123,6 +133,11 @@
     takeProfitPct: 8,
     webhookType: 'generic',
     webhookUrl: '',
+    coachEnabled: true,
+    dailyBetLimit: 8,
+    dailyStakeCapPct: 20,
+    coachLossStreakConfirm: 3,
+    demoMode: false,
     strict: false
   };
   const REFRESH_DEFAULT_INTERVAL_MS = 30 * 60 * 1000;
@@ -180,10 +195,19 @@
     try {
       localStorage.setItem(USER_PREFS_KEY, JSON.stringify(next));
       localStorage.setItem(USER_PREFS_SEEN_KEY, '1');
+      scheduleProfileBackup();
     } catch {
       setSideStatus('Préférences non enregistrées', 'warn');
     }
     return next;
+  }
+
+  function userBetsStorageKey(preferences = loadPreferences()) {
+    return preferences.demoMode ? USER_BETS_DEMO_KEY : USER_BETS_KEY;
+  }
+
+  function allUserBetKeys() {
+    return [USER_BETS_KEY, USER_BETS_DEMO_KEY];
   }
 
   function escapeHtml(value) {
@@ -223,16 +247,19 @@
 
   function loadUserBets() {
     try {
-      const rows = JSON.parse(localStorage.getItem(USER_BETS_KEY) || '[]');
+      const rows = JSON.parse(localStorage.getItem(userBetsStorageKey()) || '[]');
       return Array.isArray(rows) ? rows.filter((row) => row && typeof row === 'object') : [];
-    } catch {
+    } catch (error) {
+      pushLog('error', `Paris suivis illisibles: ${error.message}`);
+      attemptProfileRestoreFromBackup('Paris suivis corrompus').catch(() => {});
       return [];
     }
   }
 
   function saveUserBets(rows) {
     try {
-      localStorage.setItem(USER_BETS_KEY, JSON.stringify(Array.isArray(rows) ? rows : []));
+      localStorage.setItem(userBetsStorageKey(), JSON.stringify(Array.isArray(rows) ? rows : []));
+      scheduleProfileBackup();
     } catch {
       setSideStatus('Suivi pari indisponible', 'warn');
     }
@@ -252,6 +279,142 @@
       localStorage.setItem(key, JSON.stringify(value));
     } catch {
       // Donnée de confort : l'app reste utilisable même si le profil bloque l'écriture.
+    }
+  }
+
+  function currentProfileSnapshot() {
+    const readRawJson = (key, fallback) => {
+      try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : fallback;
+      } catch {
+        return fallback;
+      }
+    };
+    return {
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      preferences: loadPreferences(),
+      bankroll: localStorage.getItem('userBankroll') || null,
+      bets: readRawJson(USER_BETS_KEY, []),
+      demoBets: readRawJson(USER_BETS_DEMO_KEY, []),
+      learningAudit: readStorageJson(USER_AUDIT_KEY, null),
+      autoSettlementAudit: readStorageJson(AUTO_SETTLEMENT_KEY, null),
+      modelAudit: readStorageJson(MODEL_AUDIT_KEY, null),
+      insights: readStorageJson(INSIGHTS_KEY, null),
+      oddsMemory: readStorageJson(ODDS_MEMORY_KEY, {}),
+      smartAlerts: readStorageJson(SMART_ALERT_KEY, []),
+      notifiedPicks: readStorageJson(NOTIFIED_PICK_KEY, [])
+    };
+  }
+
+  function mergeBets(existing, incoming) {
+    const map = new Map();
+    [...(Array.isArray(existing) ? existing : []), ...(Array.isArray(incoming) ? incoming : [])].forEach((bet) => {
+      if (!bet || typeof bet !== 'object') return;
+      const key = bet.id || `${bet.key || ''}:${bet.createdAt || ''}:${bet.title || ''}`;
+      if (!key) return;
+      map.set(String(key), { ...(map.get(String(key)) || {}), ...bet });
+    });
+    return Array.from(map.values());
+  }
+
+  function applyImportedProfile(profile, mode = 'merge') {
+    if (!profile || typeof profile !== 'object') throw new Error('Profil invalide');
+    const replace = mode === 'replace';
+    if (profile.preferences) {
+      const prefs = replace ? profile.preferences : { ...loadPreferences(), ...profile.preferences };
+      savePreferences(prefs);
+      localStorage.setItem('userBankroll', String(prefs.bankroll || profile.bankroll || 50));
+    }
+    if (profile.bankroll && !profile.preferences) localStorage.setItem('userBankroll', String(profile.bankroll));
+    if (Array.isArray(profile.bets)) {
+      const current = readStorageJson(USER_BETS_KEY, []);
+      localStorage.setItem(USER_BETS_KEY, JSON.stringify(replace ? profile.bets : mergeBets(current, profile.bets)));
+    }
+    if (Array.isArray(profile.demoBets)) {
+      const currentDemo = readStorageJson(USER_BETS_DEMO_KEY, []);
+      localStorage.setItem(USER_BETS_DEMO_KEY, JSON.stringify(replace ? profile.demoBets : mergeBets(currentDemo, profile.demoBets)));
+    }
+    [
+      [USER_AUDIT_KEY, profile.learningAudit],
+      [AUTO_SETTLEMENT_KEY, profile.autoSettlementAudit],
+      [MODEL_AUDIT_KEY, profile.modelAudit],
+      [INSIGHTS_KEY, profile.insights],
+      [ODDS_MEMORY_KEY, profile.oddsMemory],
+      [SMART_ALERT_KEY, profile.smartAlerts],
+      [NOTIFIED_PICK_KEY, profile.notifiedPicks]
+    ].forEach(([key, value]) => {
+      if (value != null) writeStorageJson(key, value);
+    });
+    state.profileImportPreview = null;
+    renderPreferences();
+    renderUserPnl();
+    renderHistory();
+    renderPicks();
+    scheduleProfileBackup({ force: true });
+    return true;
+  }
+
+  function exportProfile() {
+    const profile = currentProfileSnapshot();
+    downloadText(`paris-sportif-profil-${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify(profile, null, 2), 'application/json;charset=utf-8');
+    scheduleProfileBackup({ force: true });
+  }
+
+  function renderProfileImportPreview() {
+    const box = $('#profile-import-preview');
+    const merge = $('#merge-profile-btn');
+    const replace = $('#replace-profile-btn');
+    const profile = state.profileImportPreview;
+    if (!box) return;
+    if (!profile) {
+      box.textContent = 'Aucun profil importé.';
+      merge?.classList.add('hidden');
+      replace?.classList.add('hidden');
+      return;
+    }
+    const bets = Array.isArray(profile.bets) ? profile.bets.length : 0;
+    const demo = Array.isArray(profile.demoBets) ? profile.demoBets.length : 0;
+    box.textContent = `Profil du ${profile.exportedAt ? formatDateLabel(profile.exportedAt) : '-'} · ${formatCount(bets)} pari(s) réel(s) · ${formatCount(demo)} démo · bankroll ${profile.preferences?.bankroll || profile.bankroll || '-'}`;
+    merge?.classList.remove('hidden');
+    replace?.classList.remove('hidden');
+  }
+
+  let profileBackupTimer = null;
+  function scheduleProfileBackup({ force = false } = {}) {
+    const day = parisDayKey();
+    if (!force && localStorage.getItem(PROFILE_BACKUP_KEY) === day) return;
+    clearTimeout(profileBackupTimer);
+    profileBackupTimer = setTimeout(async () => {
+      try {
+        const response = await fetchJson('/api/profile/backup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ profile: currentProfileSnapshot() })
+        });
+        if (response.ok) {
+          localStorage.setItem(PROFILE_BACKUP_KEY, day);
+          pushLog('info', `Backup profil écrit: ${response.backedUpAt || day}`);
+        }
+      } catch (error) {
+        pushLog('warn', `Backup profil indisponible: ${error.message}`);
+      }
+    }, force ? 50 : 1200);
+  }
+
+  async function attemptProfileRestoreFromBackup(reason = 'Recovery') {
+    try {
+      const response = await fetchJson('/api/profile/latest');
+      const profile = response?.backup?.profile;
+      if (!response.ok || !profile) return false;
+      applyImportedProfile(profile, 'merge');
+      setSideStatus(`${reason} : backup restauré`, 'warn');
+      pushLog('warn', `${reason}: dernier backup profil fusionné`);
+      return true;
+    } catch (error) {
+      pushLog('error', `Restore backup impossible: ${error.message}`);
+      return false;
     }
   }
 
@@ -471,7 +634,8 @@
     const segmentsNode = $('#user-pnl-segments');
     if (totalNode) totalNode.textContent = formatMoney(stats.pnlTotal);
     if (subNode) {
-      subNode.textContent = `Jour ${formatMoney(stats.pnlToday)} · ROI ${formatPct(stats.roi, 1)} · ${formatCount(stats.pending)} en cours`;
+      const demo = loadPreferences().demoMode ? 'DÉMO · ' : '';
+      subNode.textContent = `${demo}Jour ${formatMoney(stats.pnlToday)} · ROI ${formatPct(stats.roi, 1)} · ${formatCount(stats.pending)} en cours`;
     }
     if (sparklineNode) sparklineNode.innerHTML = sparklineSvg(stats.sparkline);
     if (segmentsNode) segmentsNode.textContent = segmentSummaryText(stats);
@@ -544,6 +708,59 @@
     }
   }
 
+  function renderCoachAdvice() {
+    const grid = $('#coach-advice-grid');
+    if (!grid) return;
+    const prefs = loadPreferences();
+    const stats = userBetStats();
+    const audit = trackedLearningAudit();
+    const todayBets = todayTrackedBets();
+    const bankroll = Math.max(1, Number(prefs.bankroll || getBankroll() || 50));
+    const cap = bankroll * Math.max(1, Number(prefs.dailyStakeCapPct || 20)) / 100;
+    const stakedToday = todayBets.reduce((sum, bet) => sum + (Number(bet.stake || 0) || 0), 0);
+    const lossStreak = currentLossStreak(stats);
+    const warnings = audit.warnings || [];
+    const cards = [
+      {
+        tone: prefs.coachEnabled === false ? 'warn' : 'ok',
+        label: 'Coach',
+        value: prefs.coachEnabled === false ? 'OFF' : 'ON',
+        detail: prefs.coachEnabled === false ? 'Les clics ne sont plus filtrés par discipline personnelle.' : 'Contrôle avant chaque “Je mise”.'
+      },
+      {
+        tone: todayBets.length >= Number(prefs.dailyBetLimit || 8) ? 'danger' : 'ok',
+        label: 'Rythme du jour',
+        value: `${formatCount(todayBets.length)}/${formatCount(prefs.dailyBetLimit || 8)}`,
+        detail: 'Nombre de paris suivis aujourd’hui.'
+      },
+      {
+        tone: stakedToday > cap ? 'danger' : stakedToday > cap * 0.75 ? 'warn' : 'ok',
+        label: 'Mise jour',
+        value: formatMoney(stakedToday),
+        detail: `Cap coach ${formatMoney(cap)}.`
+      },
+      {
+        tone: lossStreak >= Number(prefs.coachLossStreakConfirm || 3) ? 'warn' : 'ok',
+        label: 'Streak',
+        value: lossStreak ? `${formatCount(lossStreak)} pertes` : 'Calme',
+        detail: lossStreak ? 'Confirmation demandée si tu continues.' : 'Pas de dérive émotionnelle détectée.'
+      },
+      {
+        tone: warnings.length ? 'danger' : 'ok',
+        label: 'Segment à éviter',
+        value: warnings.length ? formatCount(warnings.length) : 'Aucun',
+        detail: warnings[0]?.label || 'Aucun segment perdant robuste.'
+      }
+    ];
+    grid.innerHTML = cards.map((card) => `
+      <article class="morning-card coach-${escapeHtml(card.tone)}">
+        <span>${escapeHtml(card.label)}</span>
+        <strong>${escapeHtml(card.value)}</strong>
+        <p>${escapeHtml(card.detail)}</p>
+      </article>
+    `).join('');
+  }
+
   function edgeBucketFor(edge) {
     const n = Number(edge || 0);
     if (n >= 0.15) return 'edge_15_plus';
@@ -593,6 +810,119 @@
     };
   }
 
+  function todayTrackedBets() {
+    const today = parisDayKey();
+    return loadUserBets().filter((bet) => String(bet.day || bet.createdAt || '').slice(0, 10) === today);
+  }
+
+  function currentLossStreak(stats = userBetStats()) {
+    return stats.streak?.status === 'lost' ? Number(stats.streak.count || 0) : 0;
+  }
+
+  function losingSegmentWarningsFor(row) {
+    const audit = trackedLearningAudit();
+    const sportKey = `sport:${row?.sport || 'inconnu'}`;
+    const leagueKey = `league:${row?.league || 'inconnue'}`;
+    const marketKey = `market:${marketKeyFromRow(row)}`;
+    return (audit.warnings || []).filter((warning) => [sportKey, leagueKey, marketKey].includes(warning.key));
+  }
+
+  function displayedOddMemory(row) {
+    const memory = readStorageJson(ODDS_MEMORY_KEY, {});
+    return memory[userBetKey(row)] || null;
+  }
+
+  function rememberDisplayedOdds(rows) {
+    const memory = readStorageJson(ODDS_MEMORY_KEY, {});
+    const now = new Date().toISOString();
+    (rows || []).slice(0, 80).forEach((row) => {
+      const key = userBetKey(row);
+      const odd = Number(row.odd || 0);
+      if (!key || !(odd > 1)) return;
+      const existing = memory[key] || {};
+      memory[key] = {
+        firstOdd: Number(existing.firstOdd || odd),
+        lastOdd: odd,
+        bestOdd: Math.max(Number(existing.bestOdd || odd), odd),
+        seenAt: now
+      };
+    });
+    writeStorageJson(ODDS_MEMORY_KEY, memory);
+  }
+
+  function coachDecisionForBet(row, stake) {
+    const prefs = loadPreferences();
+    if (!prefs.coachEnabled) return { allow: true, label: 'Coach désactivé', detail: '', warnings: [] };
+    const stats = userBetStats();
+    const todayBets = todayTrackedBets();
+    const trackedToday = todayBets.length;
+    const stakedToday = todayBets.reduce((sum, bet) => sum + (Number(bet.stake || 0) || 0), 0);
+    const bankroll = Math.max(1, Number(prefs.bankroll || getBankroll() || 50));
+    const dailyLimit = Math.max(1, Number(prefs.dailyBetLimit || 8) || 8);
+    const dailyStakeCap = bankroll * Math.max(1, Number(prefs.dailyStakeCapPct || 20) || 20) / 100;
+    if (trackedToday >= dailyLimit) {
+      return {
+        allow: false,
+        tone: 'danger',
+        label: 'Coach : limite jour atteinte',
+        detail: `${formatCount(trackedToday)} pari(s) déjà suivis aujourd'hui · limite ${formatCount(dailyLimit)}.`,
+        warnings: ['daily_limit']
+      };
+    }
+    if (stakedToday + Number(stake || 0) > dailyStakeCap) {
+      return {
+        allow: false,
+        tone: 'danger',
+        label: 'Coach : cap mise jour dépassé',
+        detail: `Mises jour ${formatMoney(stakedToday)} + ${formatMoney(stake)} > cap ${formatMoney(dailyStakeCap)}.`,
+        warnings: ['daily_stake_cap']
+      };
+    }
+    const memory = displayedOddMemory(row);
+    if (memory && Number(memory.bestOdd || memory.firstOdd || 0) > 1 && Number(row.odd || 0) > 1) {
+      const referenceOdd = Number(memory.bestOdd || memory.firstOdd);
+      const drift = (Number(row.odd) - referenceOdd) / referenceOdd;
+      if (drift <= -0.05) {
+        return {
+          allow: false,
+          tone: 'warn',
+          label: 'Coach : cote à rechecker',
+          detail: `La cote a baissé de ${(Math.abs(drift) * 100).toFixed(1)}% depuis l'affichage. Relance le prix avant de suivre.`,
+          warnings: ['price_moved_against']
+        };
+      }
+    }
+    const segmentWarnings = losingSegmentWarningsFor(row);
+    if (segmentWarnings.length) {
+      return {
+        allow: false,
+        tone: 'danger',
+        label: 'Coach : segment perdant',
+        detail: `${segmentWarnings[0].label} est négatif sur ton historique robuste.`,
+        warnings: ['losing_segment', ...segmentWarnings.map((item) => item.key)]
+      };
+    }
+    const lossStreak = currentLossStreak(stats);
+    const threshold = Math.max(2, Number(prefs.coachLossStreakConfirm || 3) || 3);
+    if (lossStreak >= threshold) {
+      const key = userBetKey(row);
+      const override = state.coachOverride;
+      if (!override || override.key !== key || Date.now() - Number(override.at || 0) > 120000) {
+        state.coachOverride = { key, at: Date.now() };
+        return {
+          allow: false,
+          tone: 'warn',
+          label: 'Coach : confirme le pari',
+          detail: `${formatCount(lossStreak)} défaites de suite. Reclique sur “Je mise” dans les 2 minutes si tu confirmes.`,
+          warnings: ['loss_streak_confirm']
+        };
+      }
+    }
+    const warnings = [];
+    if (Number(row.edge || 0) < 0.05) warnings.push('edge_modere');
+    return { allow: true, label: 'Coach OK', detail: 'Garde-fous personnels respectés.', warnings };
+  }
+
   function clvPct(openOdd, closeOdd) {
     const open = Number(openOdd);
     const close = Number(closeOdd);
@@ -617,11 +947,19 @@
     }
     const now = new Date();
     const stake = displayStakeAmount(row);
+    const coach = coachDecisionForBet(row, stake);
+    if (!coach.allow) {
+      setSideStatus(coach.label, coach.tone === 'danger' ? 'danger' : 'warn');
+      notifyUser(coach.label, coach.detail, row);
+      return;
+    }
     const prefs = loadPreferences();
     bets.push({
       id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
       key,
       matchId: row.id,
+      sourceEventId: row.match?.id || row.match?.uid || null,
+      winamaxMatchId: row.match?.winamax?.match_id || row.id || null,
       title: row.title,
       sport: row.sport,
       league: row.league,
@@ -645,6 +983,7 @@
       pnl: 0,
       tags: [],
       note: '',
+      coachWarnings: coach.warnings || [],
       day: parisDayKey(now),
       createdAt: now.toISOString()
     });
@@ -682,6 +1021,12 @@
     }
     const now = new Date();
     const stake = 10;
+    const coach = coachDecisionForBet({ ...combo, id: key, market: 'Combiné', label: combo.title, odd: combo.totalOdd, edge: combo.edge, sport: 'multi', league: combo.sameGame ? 'Same-game' : 'Multi-match' }, stake);
+    if (!coach.allow) {
+      setSideStatus(coach.label, coach.tone === 'danger' ? 'danger' : 'warn');
+      notifyUser(coach.label, coach.detail);
+      return;
+    }
     bets.push({
       id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
       key,
@@ -708,6 +1053,7 @@
       pnl: 0,
       tags: [],
       note: '',
+      coachWarnings: coach.warnings || [],
       legs: combo.legs,
       day: parisDayKey(now),
       createdAt: now.toISOString()
@@ -1584,6 +1930,7 @@
     state.dashboardMeta = analysis.dashboardMeta || null;
     state.prematchPlan = analysis.prematchPlan || null;
     refreshTrackedBetMarketData();
+    await autoSettleUserBets('engine_refresh');
     $('#metric-upcoming').textContent = String(state.matches.length);
     $('#metric-bookable').textContent = `${state.matches.length} analysés par le logiciel`;
     renderPicks();
@@ -1984,10 +2331,12 @@
     const metricLabel = $('#metric-picks-label');
     renderUserPnl();
     renderMorningDashboard();
+    renderCoachAdvice();
     renderTodayModelPulse();
     updatePickFilters();
     const filters = readPickFilters();
     const displayRows = dashboardPickRows(filters);
+    rememberDisplayedOdds(displayRows);
     renderMarketSnapshot(displayRows);
     const total = state.allPicks.length || state.picks.length || 0;
     const meta = state.dashboardMeta || {};
@@ -2236,6 +2585,28 @@
     out.textContent = rows.length
       ? rows.slice(-200).map((row) => `${new Date(row.at).toLocaleTimeString('fr-FR')} [${row.level}] ${row.message}`).join('\n')
       : 'Aucun log capturé.';
+  }
+
+  function markAppSessionStart() {
+    const previous = readStorageJson(APP_SESSION_KEY, null);
+    if (previous && previous.clean === false) {
+      state.crashRecovered = true;
+      state.safeMode = true;
+      pushLog('warn', `Crash précédent détecté: ${previous.startedAt || '-'}`);
+      setSideStatus('Recovery : dernière session non fermée proprement', 'warn');
+    }
+    writeStorageJson(APP_SESSION_KEY, {
+      clean: false,
+      startedAt: new Date().toISOString(),
+      version: 1
+    });
+    window.addEventListener('beforeunload', () => {
+      writeStorageJson(APP_SESSION_KEY, {
+        clean: true,
+        closedAt: new Date().toISOString(),
+        version: 1
+      });
+    });
   }
 
   function openLogDrawer() {
@@ -3311,10 +3682,8 @@
     return sparklineSvg(points.length ? points : [0, 0]);
   }
 
-  function settleUserBet(id, status) {
-    const bets = loadUserBets();
-    const index = bets.findIndex((bet) => bet.id === id);
-    if (index < 0) return;
+  function settleUserBetAtIndex(bets, index, status, options = {}) {
+    if (!Array.isArray(bets) || index < 0 || !bets[index]) return null;
     const bet = bets[index];
     const stake = Math.max(0, Number(bet.stake || 0) || 0);
     const odd = Math.max(0, Number(bet.odd || 0) || 0);
@@ -3330,15 +3699,205 @@
       closingOdd: Number.isFinite(closingOdd) && closingOdd > 1 ? closingOdd : bet.closingOdd || null,
       closingCapturedAt: settledAt,
       clvPct: clv,
-      settledAt
+      settledAt,
+      settlementSource: options.source || bet.settlementSource || 'manual',
+      settlementReason: options.reason || bet.settlementReason || null
     };
+    return { bet: bets[index], pnl, current };
+  }
+
+  function settleUserBet(id, status) {
+    const bets = loadUserBets();
+    const index = bets.findIndex((bet) => bet.id === id);
+    const result = settleUserBetAtIndex(bets, index, status, { source: 'manual' });
+    if (!result) return;
     saveUserBets(bets);
     renderUserPnl();
     renderHistory();
     renderPicks();
     const dayPnl = userBetStats().pnlToday;
+    const { bet, pnl, current } = result;
     if (status === 'won') notifyUser('Pari gagné', `${bet.title} · ${formatMoney(pnl)} · jour ${formatMoney(dayPnl)}`, current || bet);
     if (status === 'lost') notifyUser('Pari perdu', `${bet.title} · ${formatMoney(pnl)} · jour ${formatMoney(dayPnl)}`, current || bet);
+  }
+
+  function normalizeResultName(value) {
+    return normalizeUiKey(value).replace(/[0-9]/g, '');
+  }
+
+  function resultTeams(result) {
+    const comps = Array.isArray(result?.competitors) ? result.competitors : [];
+    return {
+      home: comps[0] || {},
+      away: comps[1] || {},
+      homeName: comps[0]?.name || comps[0]?.short || '',
+      awayName: comps[1]?.name || comps[1]?.short || ''
+    };
+  }
+
+  function resultTotal(result) {
+    const teams = resultTeams(result);
+    const hs = Number.parseInt(teams.home.score ?? '', 10);
+    const as = Number.parseInt(teams.away.score ?? '', 10);
+    if (!Number.isFinite(hs) || !Number.isFinite(as)) return null;
+    return { home: hs, away: as, total: hs + as, margin: hs - as };
+  }
+
+  function isDrawResult(result) {
+    const score = resultTotal(result);
+    if (score) return score.home === score.away;
+    const teams = resultTeams(result);
+    return teams.home.winner !== true && teams.away.winner !== true;
+  }
+
+  function sideWon(result, side) {
+    const score = resultTotal(result);
+    if (score) {
+      if (side === 'home') return score.home > score.away;
+      if (side === 'away') return score.away > score.home;
+      if (side === 'draw') return score.home === score.away;
+    }
+    const teams = resultTeams(result);
+    if (side === 'home') return teams.home.winner === true;
+    if (side === 'away') return teams.away.winner === true;
+    return false;
+  }
+
+  function betSideFromLabel(bet, result) {
+    const label = normalizeResultName(`${bet.label || ''} ${bet.market || ''}`);
+    const teams = resultTeams(result);
+    const homeKey = normalizeResultName(teams.homeName);
+    const awayKey = normalizeResultName(teams.awayName);
+    if (label.includes('nul') || label.includes('draw') || /\bx\b/.test(label)) return 'draw';
+    if (homeKey && label.includes(homeKey)) return 'home';
+    if (awayKey && label.includes(awayKey)) return 'away';
+    return null;
+  }
+
+  function thresholdFromLabel(label, fallback = 2.5) {
+    const text = String(label || '').replace(',', '.');
+    const match = text.match(/(\d+(?:\.\d+)?)/);
+    return match ? Number(match[1]) : fallback;
+  }
+
+  function evaluateTrackedBetAgainstResult(bet, result) {
+    if (!result?.completed) return null;
+    const key = marketKeyFromRow(bet);
+    const label = normalizeResultName(bet.label || '');
+    const side = betSideFromLabel(bet, result);
+    if (key === 'combine') return null;
+    if (key.includes('1n2') || key.includes('vainqueur') || key.includes('matchwinner')) {
+      if (!side) return null;
+      return sideWon(result, side) ? 'won' : 'lost';
+    }
+    if (key.includes('dnb') || key.includes('rembours')) {
+      if (isDrawResult(result)) return 'void';
+      if (!side) return null;
+      return sideWon(result, side) ? 'won' : 'lost';
+    }
+    if (key.includes('doublechance') || key.includes('double')) {
+      const wantsHome = label.includes('1x') || label.includes('12');
+      const wantsAway = label.includes('x2') || label.includes('12');
+      const draw = isDrawResult(result);
+      if (draw && (label.includes('1x') || label.includes('x2'))) return 'won';
+      if (wantsHome && sideWon(result, 'home')) return 'won';
+      if (wantsAway && sideWon(result, 'away')) return 'won';
+      return 'lost';
+    }
+    if (key.includes('btts')) {
+      const score = resultTotal(result);
+      if (!score) return null;
+      const both = score.home > 0 && score.away > 0;
+      const wantsYes = label.includes('oui') || label.includes('yes');
+      const wantsNo = label.includes('non') || label.includes('no');
+      if (!wantsYes && !wantsNo) return null;
+      return both === wantsYes ? 'won' : 'lost';
+    }
+    if (key.includes('ou') || key.includes('total')) {
+      if (key.includes('ht') || label.includes('mitemps') || label.includes('1remitemps')) return null;
+      const score = resultTotal(result);
+      if (!score) return null;
+      const line = thresholdFromLabel(bet.label || bet.market || '', 2.5);
+      const over = label.includes('plus') || label.includes('over');
+      const under = label.includes('moins') || label.includes('under');
+      if (!over && !under) return null;
+      return (over ? score.total > line : score.total < line) ? 'won' : 'lost';
+    }
+    return null;
+  }
+
+  function resultMatchesBet(bet, result) {
+    if (!bet || !result) return false;
+    const resultId = String(result.id || result.uid || '');
+    if (resultId && [bet.sourceEventId, bet.espnId, bet.matchId].map(String).includes(resultId)) return true;
+    const betTitle = normalizeResultName(bet.title || '');
+    const resultName = normalizeResultName(result.name || result.shortName || '');
+    if (betTitle && resultName && (betTitle === resultName || betTitle.includes(resultName) || resultName.includes(betTitle))) return true;
+    const teams = resultTeams(result);
+    const home = normalizeResultName(teams.homeName);
+    const away = normalizeResultName(teams.awayName);
+    return Boolean(home && away && betTitle.includes(home) && betTitle.includes(away));
+  }
+
+  async function loadResultsArchive() {
+    const text = await fetch('/results_archive.jsonl', { cache: 'no-store' }).then((response) => response.ok ? response.text() : '');
+    return text.split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter(Boolean)
+      .map((line) => {
+        try { return JSON.parse(line); } catch { return null; }
+      })
+      .filter(Boolean);
+  }
+
+  async function autoSettleUserBets(reason = 'startup') {
+    const bets = loadUserBets();
+    const pending = bets.filter((bet) => bet.status === 'pending');
+    if (!pending.length) return readStorageJson(AUTO_SETTLEMENT_KEY, null);
+    let results = [];
+    try {
+      results = await loadResultsArchive();
+    } catch (error) {
+      pushLog('warn', `Settlement auto indisponible: ${error.message}`);
+      return null;
+    }
+    let settled = 0;
+    let won = 0;
+    let lost = 0;
+    let voided = 0;
+    let pnl = 0;
+    bets.forEach((bet, index) => {
+      if (bet.status !== 'pending') return;
+      const result = results.find((item) => resultMatchesBet(bet, item));
+      const status = result ? evaluateTrackedBetAgainstResult(bet, result) : null;
+      if (!status) return;
+      const applied = settleUserBetAtIndex(bets, index, status, { source: 'auto', reason: `Résultat archivé ${result.id || result.name || ''}` });
+      if (!applied) return;
+      settled += 1;
+      pnl += applied.pnl;
+      if (status === 'won') won += 1;
+      if (status === 'lost') lost += 1;
+      if (status === 'void') voided += 1;
+    });
+    const audit = {
+      generatedAt: new Date().toISOString(),
+      reason,
+      checked: pending.length,
+      settled,
+      won,
+      lost,
+      void: voided,
+      pnl
+    };
+    writeStorageJson(AUTO_SETTLEMENT_KEY, audit);
+    if (settled) {
+      saveUserBets(bets);
+      renderUserPnl();
+      renderHistory();
+      renderPicks();
+      notifyUser('Settlement auto', `${formatCount(settled)} pari(s) résolu(s) · P&L ${formatMoney(pnl)}`);
+    }
+    return audit;
   }
 
   function refreshTrackedBetMarketData() {
@@ -3490,6 +4049,126 @@
     if (prefGrid) prefGrid.innerHTML = warningHtml;
   }
 
+  function modelSelfAudit() {
+    const settled = loadUserBets()
+      .filter((bet) => ['won', 'lost'].includes(String(bet.status || '')) && Number.isFinite(Number(bet.probability)));
+    const byWindow = (days) => {
+      const minTs = Date.now() - days * 24 * 60 * 60 * 1000;
+      return settled.filter((bet) => Date.parse(bet.settledAt || bet.createdAt || '') >= minTs);
+    };
+    const brier = (rows) => rows.length
+      ? rows.reduce((sum, bet) => {
+        const p = Math.max(0.01, Math.min(0.99, Number(bet.probability || 0)));
+        const y = bet.status === 'won' ? 1 : 0;
+        return sum + ((p - y) ** 2);
+      }, 0) / rows.length
+      : null;
+    const b7 = brier(byWindow(7));
+    const b30 = brier(byWindow(30));
+    const b90 = brier(byWindow(90));
+    const baseline = b90 ?? b30 ?? b7;
+    const drift = b7 != null && baseline != null && baseline > 0 ? (b7 - baseline) / baseline : 0;
+    const audit = {
+      generatedAt: new Date().toISOString(),
+      settled: settled.length,
+      brier7: b7,
+      brier30: b30,
+      brier90: b90,
+      driftPct: drift,
+      status: drift > 0.10 && byWindow(7).length >= 10 ? 'drift' : settled.length >= 10 ? 'ok' : 'learning'
+    };
+    writeStorageJson(MODEL_AUDIT_KEY, audit);
+    return audit;
+  }
+
+  function renderModelSelfAudit() {
+    const grid = $('#model-self-audit-grid');
+    if (!grid) return;
+    const audit = modelSelfAudit();
+    const driftTone = audit.status === 'drift' ? 'cold' : audit.status === 'ok' ? 'warm' : 'sample';
+    grid.innerHTML = [
+      ['Sample perso', formatCount(audit.settled), 'Paris suivis réglés utilisés.'],
+      ['Brier 7j', audit.brier7 == null ? '-' : audit.brier7.toFixed(3), 'Plus bas = probabilités mieux calibrées.'],
+      ['Brier 30j', audit.brier30 == null ? '-' : audit.brier30.toFixed(3), 'Tendance récente.'],
+      ['Drift', audit.driftPct == null ? '-' : formatPct(audit.driftPct, 1), audit.status === 'drift' ? 'Le modèle se dégrade sur ton usage récent.' : 'Pas de dérive robuste détectée.']
+    ].map(([label, value, detail], index) => `
+      <article class="performance-card ${index === 3 ? driftTone : ''}">
+        <span>${escapeHtml(label)}</span>
+        <strong>${escapeHtml(value)}</strong>
+        <p>${escapeHtml(detail)}</p>
+      </article>
+    `).join('');
+  }
+
+  function personalInsights() {
+    const settled = loadUserBets().filter((bet) => ['won', 'lost'].includes(String(bet.status || '')));
+    const groups = new Map();
+    const add = (key, label, bet) => {
+      const row = groups.get(key) || { key, label, count: 0, wins: 0, stake: 0, pnl: 0 };
+      row.count += 1;
+      row.stake += Number(bet.stake || 0) || 0;
+      row.pnl += Number(bet.pnl || 0) || 0;
+      if (bet.status === 'won') row.wins += 1;
+      groups.set(key, row);
+    };
+    settled.forEach((bet) => {
+      add(`market:${bet.marketKey || marketKeyFromRow(bet)}`, `Marché ${bet.market || bet.marketKey || '-'}`, bet);
+      add(`hour:${new Date(bet.createdAt || bet.day || Date.now()).getHours() < 18 ? 'day' : 'evening'}`, new Date(bet.createdAt || bet.day || Date.now()).getHours() < 18 ? 'Paris avant 18h' : 'Paris du soir', bet);
+      add(`coach:${(bet.coachWarnings || []).length ? 'warned' : 'clean'}`, (bet.coachWarnings || []).length ? 'Avec warning coach' : 'Sans warning coach', bet);
+    });
+    const insights = Array.from(groups.values())
+      .filter((row) => row.count >= 15 && row.stake > 0)
+      .map((row) => ({
+        ...row,
+        roi: row.pnl / row.stake,
+        winRate: row.count ? row.wins / row.count : 0
+      }))
+      .sort((a, b) => Math.abs(b.roi) - Math.abs(a.roi))
+      .slice(0, 8);
+    const payload = { generatedAt: new Date().toISOString(), insights };
+    writeStorageJson(INSIGHTS_KEY, payload);
+    return payload;
+  }
+
+  function renderPersonalInsights() {
+    const grid = $('#personal-insights-grid');
+    if (!grid) return;
+    const payload = personalInsights();
+    if (!payload.insights.length) {
+      grid.innerHTML = '<div class="empty">Pas encore 15 paris réglés dans un même segment. Le coach attend un sample robuste.</div>';
+      return;
+    }
+    grid.innerHTML = payload.insights.map((row) => `
+      <article class="segment-card ${row.roi >= 0 ? 'warm' : 'cold'}">
+        <span>${escapeHtml(row.label)}</span>
+        <strong>${escapeHtml(formatPct(row.roi, 0))}</strong>
+        <p>${formatCount(row.count)} paris · WR ${escapeHtml(formatPct(row.winRate, 0))} · P&L ${escapeHtml(formatMoney(row.pnl))}</p>
+        <em>${row.roi >= 0 ? 'À privilégier si les signaux restent bons' : 'À réduire ou éviter'}</em>
+      </article>
+    `).join('');
+  }
+
+  function renderAutoSettlementAudit() {
+    const grid = $('#auto-settlement-grid');
+    if (!grid) return;
+    const audit = readStorageJson(AUTO_SETTLEMENT_KEY, null);
+    if (!audit) {
+      grid.innerHTML = '<div class="empty">Aucun settlement auto pour le moment.</div>';
+      return;
+    }
+    grid.innerHTML = [
+      ['Vérifiés', formatCount(audit.checked || 0), audit.reason || 'startup'],
+      ['Résolus auto', formatCount(audit.settled || 0), `${formatCount(audit.won || 0)}W · ${formatCount(audit.lost || 0)}L · ${formatCount(audit.void || 0)} void`],
+      ['P&L auto', formatMoney(audit.pnl || 0), audit.generatedAt ? formatDateLabel(audit.generatedAt) : '-']
+    ].map(([label, value, detail]) => `
+      <article class="performance-card">
+        <span>${escapeHtml(label)}</span>
+        <strong>${escapeHtml(value)}</strong>
+        <p>${escapeHtml(detail)}</p>
+      </article>
+    `).join('');
+  }
+
   function levelDefaults(level) {
     if (level === 'beginner') return { edgeMin: 5, oddMin: 1.35, oddMax: 6, confidenceMin: 50, strict: true };
     if (level === 'expert') return { edgeMin: 0, oddMin: 1, oddMax: 50, confidenceMin: 0, strict: false };
@@ -3508,6 +4187,10 @@
     if (level) level.value = prefs.level || 'intermediate';
     const strict = $('#pref-strict');
     if (strict) strict.checked = Boolean(prefs.strict);
+    const demo = $('#pref-demo-mode');
+    if (demo) demo.checked = Boolean(prefs.demoMode);
+    const coachEnabled = $('#pref-coach-enabled');
+    if (coachEnabled) coachEnabled.checked = prefs.coachEnabled !== false;
     const stakeMode = $('#pref-stake-mode');
     if (stakeMode) stakeMode.value = prefs.stakeMode || 'kelly';
     const sportsGrid = $('#pref-sports');
@@ -3530,7 +4213,10 @@
       'pref-flat-unit': prefs.flatUnitPct,
       'pref-max-stake': prefs.maxStakePct,
       'pref-stop-loss': prefs.stopLossPct,
-      'pref-take-profit': prefs.takeProfitPct
+      'pref-take-profit': prefs.takeProfitPct,
+      'pref-daily-bet-limit': prefs.dailyBetLimit,
+      'pref-daily-stake-cap': prefs.dailyStakeCapPct,
+      'pref-loss-streak-confirm': prefs.coachLossStreakConfirm
     };
     Object.entries(fields).forEach(([id, value]) => {
       const node = $(`#${id}`);
@@ -3540,6 +4226,7 @@
     if (webhookType) webhookType.value = prefs.webhookType || 'generic';
     const webhookUrl = $('#pref-webhook-url');
     if (webhookUrl) webhookUrl.value = prefs.webhookUrl || '';
+    renderProfileImportPreview();
     renderOnboarding();
     renderLearningAudit();
   }
@@ -3565,6 +4252,11 @@
       takeProfitPct: Math.max(0, Number($('#pref-take-profit')?.value || DEFAULT_PREFERENCES.takeProfitPct) || DEFAULT_PREFERENCES.takeProfitPct),
       webhookType: $('#pref-webhook-type')?.value || DEFAULT_PREFERENCES.webhookType,
       webhookUrl: ($('#pref-webhook-url')?.value || '').trim(),
+      coachEnabled: $('#pref-coach-enabled')?.checked !== false,
+      dailyBetLimit: Math.max(1, Number($('#pref-daily-bet-limit')?.value || DEFAULT_PREFERENCES.dailyBetLimit) || DEFAULT_PREFERENCES.dailyBetLimit),
+      dailyStakeCapPct: Math.max(1, Number($('#pref-daily-stake-cap')?.value || DEFAULT_PREFERENCES.dailyStakeCapPct) || DEFAULT_PREFERENCES.dailyStakeCapPct),
+      coachLossStreakConfirm: Math.max(2, Number($('#pref-loss-streak-confirm')?.value || DEFAULT_PREFERENCES.coachLossStreakConfirm) || DEFAULT_PREFERENCES.coachLossStreakConfirm),
+      demoMode: Boolean($('#pref-demo-mode')?.checked),
       strict: Boolean($('#pref-strict')?.checked)
     };
   }
@@ -3596,6 +4288,10 @@
     const history = state.history;
     renderModelPerformance();
     renderTrackedBets();
+    renderAutoSettlementAudit();
+    renderModelSelfAudit();
+    renderPersonalInsights();
+    renderCoachAdvice();
     $('#hist-total').textContent = history ? String(history.total) : '-';
     $('#hist-generated').textContent = history?.generatedAt ? new Date(history.generatedAt).toLocaleString('fr-FR') : '-';
     $('#hist-settled').textContent = history ? String(history.settled) : '-';
@@ -5952,6 +6648,10 @@
     const banner = $('#stale-banner');
     if (status.refresh?.running) {
       setSideStatus(`${refreshModeLabel(status.refresh.mode || 'quick')} en cours`, 'warn');
+    } else if (status.recovery?.recoveredFromBackup) {
+      banner.classList.remove('hidden');
+      banner.textContent = `Recovery data : data.js est illisible, le logiciel affiche le dernier backup local (${escapeHtml(status.recovery.source || 'backup')}).`;
+      setSideStatus('Mode recovery data', 'warn');
     } else if (status.status === 'blocked') {
       banner.classList.remove('hidden');
       banner.textContent = `Données du ${status.generatedAt ? new Date(status.generatedAt).toLocaleString('fr-FR') : 'dernier fichier local'} (${formatAge(status.ageMinutes)}). Le logiciel affiche les dernières données connues et conseille un refresh avant mise.`;
@@ -7945,6 +8645,40 @@
         if (status) status.textContent = `Webhook en erreur : ${error.message}`;
       }
     });
+    $('#export-profile-btn')?.addEventListener('click', exportProfile);
+    $('#import-profile-btn')?.addEventListener('click', () => $('#profile-import-input')?.click());
+    $('#profile-import-input')?.addEventListener('change', async (event) => {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      try {
+        const text = await file.text();
+        state.profileImportPreview = JSON.parse(text);
+        renderProfileImportPreview();
+        setSideStatus('Profil prêt à importer', 'ok');
+      } catch (error) {
+        state.profileImportPreview = null;
+        renderProfileImportPreview();
+        setSideStatus(`Profil invalide : ${error.message}`, 'danger');
+      } finally {
+        event.target.value = '';
+      }
+    });
+    $('#merge-profile-btn')?.addEventListener('click', () => {
+      applyImportedProfile(state.profileImportPreview, 'merge');
+      setSideStatus('Profil fusionné', 'ok');
+    });
+    $('#replace-profile-btn')?.addEventListener('click', () => {
+      applyImportedProfile(state.profileImportPreview, 'replace');
+      setSideStatus('Profil remplacé', 'warn');
+    });
+    $('#reset-demo-btn')?.addEventListener('click', () => {
+      localStorage.setItem(USER_BETS_DEMO_KEY, '[]');
+      renderUserPnl();
+      renderHistory();
+      renderPicks();
+      scheduleProfileBackup({ force: true });
+      setSideStatus('Démo réinitialisée', 'ok');
+    });
     $('#export-toast')?.addEventListener('click', () => $('#export-toast')?.classList.add('hidden'));
     $('#log-drawer-close')?.addEventListener('click', closeLogDrawer);
     $('#log-level-filter')?.addEventListener('change', renderDebugLogs);
@@ -8196,6 +8930,7 @@
     state.bootStartedAt = typeof performance !== 'undefined' ? performance.now() : Date.now();
     installDebugLogHooks();
     pushLog('info', 'Démarrage du cockpit desktop');
+    markAppSessionStart();
     bindEvents();
     state.actionHistory = readActionHistory();
     renderActionHistory();

@@ -151,6 +151,18 @@
           </div>
         </section>
 
+        <section class="today-model-card" aria-label="Conseils du coach">
+          <div class="section-head compact">
+            <div>
+              <h3>Conseils du jour</h3>
+              <p>Discipline bankroll, segments à éviter et rythme conseillé avant de cliquer sur “Je mise”.</p>
+            </div>
+          </div>
+          <div class="morning-grid" id="coach-advice-grid">
+            <article class="morning-card"><span>Coach</span><strong>Chargement</strong><p>Analyse des paris suivis.</p></article>
+          </div>
+        </section>
+
         <section class="onboarding-card hidden" id="onboarding-card" aria-label="Première configuration">
           <div>
             <span class="eyebrow">Première ouverture</span>
@@ -389,6 +401,36 @@
         </div>
         <div class="segment-grid" id="learning-audit-grid">
           <div class="empty">Aucun pari réglé pour l'instant.</div>
+        </div>
+
+        <div class="section-head compact">
+          <div>
+            <h3>Settlement auto</h3>
+            <p>Résolution automatique des paris suivis quand les résultats locaux deviennent disponibles.</p>
+          </div>
+        </div>
+        <div class="model-performance-grid" id="auto-settlement-grid">
+          <div class="empty">Aucun settlement auto pour le moment.</div>
+        </div>
+
+        <div class="section-head compact">
+          <div>
+            <h3>Audit autonome du modèle</h3>
+            <p>Brier roulant, drift et qualité des probabilités sur tes paris réglés.</p>
+          </div>
+        </div>
+        <div class="model-performance-grid" id="model-self-audit-grid">
+          <div class="empty">Audit modèle en attente de paris réglés.</div>
+        </div>
+
+        <div class="section-head compact">
+          <div>
+            <h3>Tes insights</h3>
+            <p>Patterns robustes détectés dans ta façon de suivre les picks.</p>
+          </div>
+        </div>
+        <div class="segment-grid" id="personal-insights-grid">
+          <div class="empty">Aucun insight robuste pour l'instant.</div>
         </div>
 
         <div class="section-head compact">
@@ -794,6 +836,8 @@
               </select>
             </label>
             <label class="check-line"><input id="pref-strict" type="checkbox"> Mode strict</label>
+            <label class="check-line"><input id="pref-demo-mode" type="checkbox"> Mode démo</label>
+            <button class="ghost-btn" id="reset-demo-btn" type="button">Reset démo</button>
           </article>
           <article class="preference-card">
             <h4>Sports suivis</h4>
@@ -839,6 +883,24 @@
             <label>Cap mise % bankroll<input id="pref-max-stake" type="number" min="0.1" max="20" step="0.1"></label>
             <label>Stop-loss jour %<input id="pref-stop-loss" type="number" min="0" max="50" step="0.5"></label>
             <label>Take-profit jour %<input id="pref-take-profit" type="number" min="0" max="100" step="0.5"></label>
+          </article>
+          <article class="preference-card">
+            <h4>Coach prudent</h4>
+            <label class="check-line"><input id="pref-coach-enabled" type="checkbox"> Coach actif</label>
+            <label>Limite paris / jour<input id="pref-daily-bet-limit" type="number" min="1" max="50" step="1"></label>
+            <label>Cap mise jour % bankroll<input id="pref-daily-stake-cap" type="number" min="1" max="100" step="1"></label>
+            <label>Confirmation après X défaites<input id="pref-loss-streak-confirm" type="number" min="2" max="10" step="1"></label>
+          </article>
+          <article class="preference-card">
+            <h4>Profil local</h4>
+            <button class="ghost-btn" id="export-profile-btn" type="button">Exporter mon profil</button>
+            <button class="ghost-btn" id="import-profile-btn" type="button">Importer un profil</button>
+            <input id="profile-import-input" type="file" accept="application/json,.json" hidden>
+            <div class="profile-preview" id="profile-import-preview">Aucun profil importé.</div>
+            <div class="section-actions">
+              <button class="ghost-btn hidden" id="merge-profile-btn" type="button">Fusionner</button>
+              <button class="ghost-btn hidden" id="replace-profile-btn" type="button">Remplacer</button>
+            </div>
           </article>
         </div>
         <div class="section-head compact">

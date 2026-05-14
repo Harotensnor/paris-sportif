@@ -2957,6 +2957,30 @@ td.empty::before,
   margin-bottom: 20px;
 }
 
+.coach-ok {
+  border-color: rgba(16, 185, 129, .26);
+}
+
+.coach-warn {
+  border-color: rgba(245, 158, 11, .42);
+  background: linear-gradient(135deg, rgba(245, 158, 11, .08), transparent 48%), var(--surface);
+}
+
+.coach-danger {
+  border-color: rgba(248, 113, 113, .42);
+  background: linear-gradient(135deg, rgba(248, 113, 113, .08), transparent 48%), var(--surface);
+}
+
+.profile-preview {
+  min-height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-2);
+  color: var(--muted);
+  padding: 10px 12px;
+  line-height: 1.35;
+}
+
 .term-tip {
   display: inline-flex;
   align-items: center;

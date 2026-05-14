@@ -50,6 +50,7 @@ async function main() {
       trackButtons: document.querySelectorAll('[data-track-bet-key]').length,
       pnlVisible: Boolean(document.querySelector('#user-pnl-total') && document.querySelector('#user-pnl-sub')),
       pnlSparkline: Boolean(document.querySelector('#user-pnl-sparkline svg')),
+      coachCards: document.querySelectorAll('#coach-advice-grid .morning-card').length,
       filtersVisible: Boolean(document.querySelector('#pick-search') && document.querySelector('#pick-sort') && document.querySelector('#pick-market-filter')),
       performanceMetric: document.querySelector('#metric-boot-time')?.textContent || '',
       refreshPolicy: document.querySelector('#refresh-policy')?.textContent || '',
@@ -73,6 +74,9 @@ async function main() {
     const performanceCards = await win.locator('#model-performance-grid .performance-card, #model-performance-grid .empty').count();
     const segmentCards = await win.locator('#model-segment-grid .segment-card, #model-segment-grid .empty').count();
     const learningCards = await win.locator('#learning-audit-grid .performance-card, #learning-audit-grid .empty').count();
+    const settlementCards = await win.locator('#auto-settlement-grid .performance-card, #auto-settlement-grid .empty').count();
+    const modelAuditCards = await win.locator('#model-self-audit-grid .performance-card, #model-self-audit-grid .empty').count();
+    const insightCards = await win.locator('#personal-insights-grid .segment-card, #personal-insights-grid .empty').count();
     await safeScreenshot(win, path.join(captureDir, 'desktop-history-performance.png'), { fullPage: true });
 
     await win.click('[data-tab="agent"]');
@@ -94,6 +98,7 @@ async function main() {
     const preferenceInputs = await win.locator('#pref-bankroll, input[name="pref-sport"], input[name="pref-market"]').count();
     const disciplineInputs = await win.locator('#pref-stake-mode, #pref-stop-loss, #pref-take-profit').count();
     const webhookControls = await win.locator('#pref-webhook-type, #pref-webhook-url, #test-webhook-btn').count();
+    const profileControls = await win.locator('#export-profile-btn, #import-profile-btn, #pref-coach-enabled, #pref-demo-mode').count();
     await safeScreenshot(win, path.join(captureDir, 'desktop-preferences-audit.png'), { fullPage: true });
 
     await win.click('[data-tab="calendar"]');
@@ -147,11 +152,11 @@ async function main() {
     if (/Aucun pari à jouer maintenant|Mise bloquée|blocage/i.test(decisionConsistency.caption) && decisionConsistency.positiveStakeCells > 0) {
       throw new Error(`Mise positive affichée malgré décision bloquée: ${JSON.stringify(decisionConsistency)}`);
     }
-    if (decisionConsistency.picksMetric < 20 || decisionConsistency.morningCards < 4 || !decisionConsistency.imminentStrip || decisionConsistency.trackButtons < 20 || !decisionConsistency.pnlVisible || !decisionConsistency.pnlSparkline || !decisionConsistency.filtersVisible) {
+    if (decisionConsistency.picksMetric < 20 || decisionConsistency.morningCards < 4 || decisionConsistency.coachCards < 4 || !decisionConsistency.imminentStrip || decisionConsistency.trackButtons < 20 || !decisionConsistency.pnlVisible || !decisionConsistency.pnlSparkline || !decisionConsistency.filtersVisible) {
       throw new Error(`Cockpit actionnable incomplet: ${JSON.stringify(decisionConsistency)}`);
     }
-    if (combines <= 0 || scorers <= 0 || performanceCards < 6 || segmentCards <= 0 || learningCards <= 0 || agentCards <= 0 || preferenceInputs < 8 || disciplineInputs < 3 || webhookControls < 3 || calendarDays < 7 || pipelineCards <= 0 || glossaryCards < 12) {
-      throw new Error(`Captures écrans incomplètes: ${JSON.stringify({ combines, scorers, performanceCards, segmentCards, learningCards, agentCards, preferenceInputs, disciplineInputs, webhookControls, calendarDays, pipelineCards, glossaryCards })}`);
+    if (combines <= 0 || scorers <= 0 || performanceCards < 6 || segmentCards <= 0 || learningCards <= 0 || settlementCards <= 0 || modelAuditCards <= 0 || insightCards <= 0 || agentCards <= 0 || preferenceInputs < 8 || disciplineInputs < 3 || webhookControls < 3 || profileControls < 4 || calendarDays < 7 || pipelineCards <= 0 || glossaryCards < 12) {
+      throw new Error(`Captures écrans incomplètes: ${JSON.stringify({ combines, scorers, performanceCards, segmentCards, learningCards, settlementCards, modelAuditCards, insightCards, agentCards, preferenceInputs, disciplineInputs, webhookControls, profileControls, calendarDays, pipelineCards, glossaryCards })}`);
     }
     if (!/s|\.\.\./.test(decisionConsistency.performanceMetric) || !/Auto-refresh|Mode économie/.test(decisionConsistency.refreshPolicy)) {
       throw new Error(`Indicateurs cockpit manquants: ${JSON.stringify(decisionConsistency)}`);

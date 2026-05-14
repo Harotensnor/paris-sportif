@@ -32,8 +32,12 @@ test('desktop cockpit is actionable and stable', async () => {
   expect(rendererText).toContain('renderHelp');
   expect(rendererText).toContain('renderCalendar');
   expect(rendererText).toContain('sendExternalAlert');
+  expect(rendererText).toContain('autoSettleUserBets');
+  expect(rendererText).toContain('coachDecisionForBet');
+  expect(rendererText).toContain('applyImportedProfile');
   expect(rendererText).toContain("'/api/webhook/send'");
   expect(mainText).toContain('/api/webhook/send');
+  expect(mainText).toContain('/api/profile/backup');
   expect(mainText).toContain('/api/refresh/cancel');
 
   const userDataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'paris-sportif-pw-'));
@@ -104,6 +108,9 @@ test('desktop cockpit is actionable and stable', async () => {
     await expect(win.locator('#pref-bankroll')).toBeVisible();
     await expect(win.locator('#pref-stake-mode')).toBeVisible();
     await expect(win.locator('#pref-webhook-url')).toBeVisible();
+    await expect(win.locator('#pref-coach-enabled')).toBeVisible();
+    await expect(win.locator('#export-profile-btn')).toBeVisible();
+    await expect(win.locator('#import-profile-btn')).toBeVisible();
     await expect(win.locator('#preference-warning-grid')).toBeVisible();
     await win.evaluate(() => {
       document.querySelector('#pref-webhook-url').value = `${window.location.origin}/api/webhook/test`;
@@ -130,6 +137,9 @@ test('desktop cockpit is actionable and stable', async () => {
     await win.waitForFunction(() => /1 en cours/.test(document.querySelector('#user-pnl-sub')?.textContent || ''), null, { timeout: 5_000 });
     await expect(win.locator('[data-track-bet-key]').first()).toContainText('Suivi');
     await win.click('[data-tab="history"]');
+    await expect(win.locator('#auto-settlement-grid')).toBeVisible();
+    await expect(win.locator('#model-self-audit-grid')).toBeVisible();
+    await expect(win.locator('#personal-insights-grid')).toBeVisible();
     await win.fill('[data-bet-tags-id]', 'favori, test');
     await win.fill('[data-bet-note-id]', 'Pari suivi pendant le test complet.');
     await win.locator('[data-bet-note-id]').blur();
@@ -138,8 +148,56 @@ test('desktop cockpit is actionable and stable', async () => {
     await expect(win.locator('#user-bets-body')).toContainText('Pari suivi pendant le test complet.');
     await win.click('[data-settle-status="won"]');
     await expect(win.locator('#user-bets-body')).toContainText('Gagné');
+    await win.evaluate(() => {
+      const raw = JSON.parse(localStorage.getItem('parisSportifPreferences') || '{}');
+      localStorage.setItem('parisSportifPreferences', JSON.stringify({ ...raw, coachEnabled: true, dailyBetLimit: 1 }));
+    });
     await win.click('[data-tab="dashboard"]');
+    await win.locator('[data-track-bet-key]').nth(1).click();
+    await expect(win.locator('#side-status')).toContainText(/Coach|limite/i);
 
+    await win.evaluate(async () => {
+      const archiveText = await fetch('/results_archive.jsonl', { cache: 'no-store' }).then((response) => response.text());
+      const result = archiveText.split(/\r?\n/)
+        .map((line) => {
+          try { return JSON.parse(line); } catch { return null; }
+        })
+        .filter((row) => row && row.completed && Array.isArray(row.competitors) && row.competitors.some((team) => team && team.name && team.winner === true))[0];
+      const winner = result.competitors.find((team) => team.winner === true);
+      const bet = {
+        id: 'auto-settle-fixture',
+        key: `auto:${result.id}`,
+        matchId: result.id,
+        sourceEventId: result.id,
+        title: result.name,
+        sport: result.sport,
+        league: result.league_name,
+        start: result.date,
+        market: '1N2',
+        marketKey: '1n2',
+        label: winner.name,
+        odd: 2,
+        openingOdd: 2,
+        lastSeenOdd: 2,
+        stake: 5,
+        probability: 0.6,
+        edge: 0.1,
+        status: 'pending',
+        pnl: 0,
+        tags: [],
+        note: '',
+        day: new Date().toISOString().slice(0, 10),
+        createdAt: new Date().toISOString()
+      };
+      localStorage.setItem('parisSportifUserBets', JSON.stringify([bet]));
+      location.reload();
+    });
+    await win.waitForSelector('[data-panel="dashboard"].active', { timeout: 60_000 });
+    await win.click('[data-tab="history"]');
+    await expect(win.locator('#auto-settlement-grid')).toContainText(/Résolus auto|1/);
+    await expect(win.locator('#user-bets-body')).toContainText('Gagné');
+
+    await win.click('[data-tab="dashboard"]');
     await win.click('#picks-body tr.clickable-row td[data-label="Match"]');
     await win.waitForSelector('#match-modal:not(.hidden)', { timeout: 10_000 });
     await expect(win.locator('#modal-content')).toContainText('Puis-je miser ?');
