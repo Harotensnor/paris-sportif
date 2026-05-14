@@ -42,7 +42,7 @@ async function main() {
     await win.setViewportSize({ width: 1360, height: 900 });
     await win.waitForSelector('[data-panel="dashboard"].active', { timeout: 60000 });
     await win.waitForFunction(() => document.querySelector('#metric-picks')?.textContent !== '-', null, { timeout: 90000 });
-    await safeScreenshot(win, path.join(captureDir, 'desktop-sprint13-picks.png'), { fullPage: true });
+    await safeScreenshot(win, path.join(captureDir, 'desktop-sprint14-picks.png'), { fullPage: true });
 
     const dashboard = await win.evaluate(() => ({
       nav: Array.from(document.querySelectorAll('.nav-btn:not(.hidden)')).map((node) => node.textContent.trim()),
@@ -50,6 +50,9 @@ async function main() {
       rows: document.querySelectorAll('#picks-body tr.clickable-row').length,
       timeline: document.querySelectorAll('#simple-pick-timeline .simple-timeline-card').length,
       safeBadges: document.querySelectorAll('.safe-pick-badge.safe').length,
+      priorityBadges: document.querySelectorAll('.priority-badge').length,
+      topPick: document.body.textContent.includes('TOP PICK'),
+      dailyBudget: document.querySelector('#daily-budget-summary')?.textContent || '',
       hasRollingSections: ['Dans l’heure', 'Dans les 3 heures', 'Cette nuit'].every((label) => document.body.textContent.includes(label)),
       combines: Boolean(document.querySelector('#simple-combines-section')),
       scorers: Boolean(document.querySelector('#simple-scorers-section')),
@@ -59,18 +62,21 @@ async function main() {
 
     await win.click('[data-tab="history"]');
     await win.waitForSelector('#model-performance-grid .performance-card, #model-performance-grid .empty', { timeout: 30000 });
-    await safeScreenshot(win, path.join(captureDir, 'desktop-sprint13-bilan.png'), { fullPage: true });
+    await win.waitForFunction(() => /#1/.test(document.querySelector('#bankroll-allocation-grid')?.textContent || ''), null, { timeout: 10000 });
+    await win.waitForFunction(() => /Simulation/.test(document.querySelector('#paper-simulation-grid')?.textContent || ''), null, { timeout: 10000 });
+    await safeScreenshot(win, path.join(captureDir, 'desktop-sprint14-bilan.png'), { fullPage: true });
 
     await win.click('[data-tab="preferences"]');
     await win.waitForSelector('#pref-bankroll', { timeout: 10000 });
-    await safeScreenshot(win, path.join(captureDir, 'desktop-sprint13-reglages.png'), { fullPage: true });
+    await win.waitForSelector('#pref-allocation-strategy', { timeout: 10000 });
+    await safeScreenshot(win, path.join(captureDir, 'desktop-sprint14-reglages.png'), { fullPage: true });
 
     await win.check('#pref-expert-mode');
     await win.click('#save-preferences-btn');
     await win.waitForSelector('[data-tab="data"]:not(.hidden)', { timeout: 5000 });
     await win.click('[data-tab="data"]');
     await win.waitForSelector('#quality-report-grid .quality-report-card, #quality-report-grid .empty', { timeout: 30000 });
-    await safeScreenshot(win, path.join(captureDir, 'desktop-sprint13-avance.png'), { fullPage: true });
+    await safeScreenshot(win, path.join(captureDir, 'desktop-sprint14-avance.png'), { fullPage: true });
 
     await win.click('[data-tab="dashboard"]');
     await win.click('#picks-body tr.clickable-row td[data-label="Match"]');
@@ -80,12 +86,13 @@ async function main() {
       const content = document.querySelector('#modal-content');
       return Boolean((modal && modal.scrollWidth > modal.clientWidth + 2) || (content && content.scrollWidth > content.clientWidth + 2));
     });
-    await safeScreenshot(win, path.join(captureDir, 'desktop-sprint13-fiche.png'), { fullPage: false });
+    const modalText = await win.textContent('#modal-content');
+    await safeScreenshot(win, path.join(captureDir, 'desktop-sprint14-fiche.png'), { fullPage: false });
     await win.click('#modal-close');
 
     await win.setViewportSize({ width: 390, height: 860 });
     await win.click('[data-tab="dashboard"]');
-    await safeScreenshot(win, path.join(captureDir, 'desktop-sprint13-mobile.png'), { fullPage: false });
+    await safeScreenshot(win, path.join(captureDir, 'desktop-sprint14-mobile.png'), { fullPage: false });
     const mobile = await win.evaluate(() => ({
       hasOverflow: document.documentElement.scrollWidth > window.innerWidth + 2,
       rows: document.querySelectorAll('#picks-body tr.clickable-row').length
@@ -96,12 +103,13 @@ async function main() {
     ) && !isIgnorableConsoleMessage(message));
     if (severe.length) throw new Error(`Erreurs console: ${severe.join(' | ')}`);
     if (dashboard.nav.join('|') !== 'Picks|Bilan|Réglages') throw new Error(`Navigation non simplifiée: ${dashboard.nav.join(', ')}`);
-    if (dashboard.metric < 15 || dashboard.rows < 15 || dashboard.timeline < 10 || dashboard.safeBadges < 10 || !dashboard.hasRollingSections || !dashboard.combines || !dashboard.scorers || !dashboard.promos || dashboard.multibookText) {
-      throw new Error(`Dashboard Sprint 13 invalide: ${JSON.stringify(dashboard)}`);
+    if (dashboard.metric < 15 || dashboard.rows < 15 || dashboard.timeline < 10 || dashboard.safeBadges < 10 || dashboard.priorityBadges < 5 || !dashboard.topPick || !/jour/i.test(dashboard.dailyBudget) || !dashboard.hasRollingSections || !dashboard.combines || !dashboard.scorers || !dashboard.promos || dashboard.multibookText) {
+      throw new Error(`Dashboard Sprint 14 invalide: ${JSON.stringify(dashboard)}`);
     }
     if (modalOverflow) throw new Error('Overflow horizontal dans la fiche match');
+    if (!/Priorité/i.test(modalText || '') || !/Allocation jour/i.test(modalText || '')) throw new Error('Fiche match sans priorité/allocation Sprint 14');
     if (mobile.hasOverflow || mobile.rows <= 0) throw new Error(`Mobile invalide: ${JSON.stringify(mobile)}`);
-    console.log(`Visual capture Sprint 13 OK: ${dashboard.metric} picks, ${dashboard.timeline} timeline, ${dashboard.safeBadges} fiables, captures écrites.`);
+    console.log(`Visual capture Sprint 14 OK: ${dashboard.metric} picks, ${dashboard.timeline} timeline, ${dashboard.safeBadges} fiables, ${dashboard.priorityBadges} priorités, captures écrites.`);
   } finally {
     await app.close();
     fs.rmSync(userDataDir, { recursive: true, force: true });

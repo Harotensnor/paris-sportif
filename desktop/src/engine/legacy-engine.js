@@ -1224,6 +1224,104 @@ function createLegacyEngineService({ projectRoot }) {
     };
   }
 
+  function clamp01(value) {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return 0;
+    return Math.max(0, Math.min(1, n));
+  }
+
+  function urgencyScoreForRow(row) {
+    const ts = Date.parse(row?.start || '');
+    if (!Number.isFinite(ts)) return 0.15;
+    const minutes = (ts - Date.now()) / 60000;
+    if (minutes < -30) return 0.05;
+    if (minutes <= 15) return 1;
+    if (minutes <= 60) return 0.95;
+    if (minutes <= 180) return 0.82;
+    if (minutes <= 360) return 0.66;
+    if (minutes <= 720) return 0.45;
+    if (minutes <= 1440) return 0.25;
+    return 0.10;
+  }
+
+  function reliabilityScoreForRow(row) {
+    const edge = Number(row?.safeEdge ?? row?.edge ?? 0) || 0;
+    const confidence = effectiveConfidence(row);
+    const sample = Number(row?.safeAssessment?.sample ?? row?.segmentValidation?.sample ?? row?.calibration?.sample ?? 0) || 0;
+    const roi = Number(row?.safeAssessment?.roi ?? row?.segmentValidation?.roi ?? row?.calibration?.roi ?? 0);
+    const quality = row?.contextQuality || row?.match?.context?.quality || {};
+    const staleCount = Array.isArray(quality.stale) ? quality.stale.length : 0;
+    const contextScore = Number(quality.score);
+    const edgeScore = clamp01((edge - 0.03) / 0.17);
+    const confidenceScore = clamp01((confidence - 0.55) / 0.40);
+    const segmentScore = sample >= 15
+      ? Number.isFinite(roi) && roi >= 0 ? 1 : 0.20
+      : confidence >= 0.70 ? 0.78 : 0.62;
+    const freshnessScore = staleCount ? 0.70 : Number.isFinite(contextScore) ? clamp01(contextScore / 100) : 0.80;
+    return clamp01(edgeScore * 0.32 + confidenceScore * 0.30 + segmentScore * 0.23 + freshnessScore * 0.15);
+  }
+
+  function historicalVolumeScoreForRow(row) {
+    const sample = Number(row?.safeAssessment?.sample ?? row?.segmentValidation?.sample ?? row?.calibration?.sample ?? 0) || 0;
+    if (sample >= 100) return 1;
+    if (sample >= 50) return 0.85;
+    if (sample >= 15) return 0.55 + (sample - 15) / 35 * 0.25;
+    return 0.35;
+  }
+
+  function priorityReasonForRow(row, parts) {
+    const bits = [];
+    bits.push(`edge ${Math.round(Number(row?.safeEdge ?? row?.edge ?? 0) * 100)}pt`);
+    bits.push(`confiance ${Math.round(effectiveConfidence(row) * 100)}%`);
+    const sample = Number(row?.safeAssessment?.sample ?? row?.segmentValidation?.sample ?? row?.calibration?.sample ?? 0) || 0;
+    const roi = Number(row?.safeAssessment?.roi ?? row?.segmentValidation?.roi ?? row?.calibration?.roi ?? 0);
+    if (sample >= 15) bits.push(`segment ${sample} paris · ROI ${Number.isFinite(roi) ? Math.round(roi * 100) : 0}%`);
+    else bits.push('sample court mais signal fort');
+    bits.push(`départ ${Math.max(0, Math.round(((Date.parse(row?.start || '') || Date.now()) - Date.now()) / 60000))} min`);
+    if (row?.winamaxBoost) bits.push('boost Winamax');
+    if (parts?.diversity >= 0.75) bits.push('diversification sport/ligue');
+    return bits.slice(0, 5).join(' · ');
+  }
+
+  function applyPriorityScores(rows) {
+    const all = Array.isArray(rows) ? rows : [];
+    const sportCounts = new Map();
+    const leagueCounts = new Map();
+    rollingWindowRows(all, 24).forEach((row) => {
+      const sport = String(row?.sport || 'sport').toLowerCase();
+      const league = String(row?.league || 'ligue').toLowerCase();
+      sportCounts.set(sport, (sportCounts.get(sport) || 0) + 1);
+      leagueCounts.set(league, (leagueCounts.get(league) || 0) + 1);
+    });
+    return all.map((row) => {
+      const sport = String(row?.sport || 'sport').toLowerCase();
+      const league = String(row?.league || 'ligue').toLowerCase();
+      const reliability = reliabilityScoreForRow(row);
+      const urgency = urgencyScoreForRow(row);
+      const volume = historicalVolumeScoreForRow(row);
+      const boost = row?.winamaxBoost ? 1 : 0;
+      const diversity = clamp01(1 - Math.min(0.75, ((sportCounts.get(sport) || 1) - 1) * 0.08 + ((leagueCounts.get(league) || 1) - 1) * 0.04));
+      const score = Math.round((reliability * 40 + urgency * 30 + volume * 15 + boost * 10 + diversity * 5) * 10) / 10;
+      const priority = {
+        score,
+        label: score >= 82 ? 'Top priorité' : score >= 70 ? 'Très prioritaire' : score >= 58 ? 'Prioritaire' : score >= 45 ? 'À garder' : 'Secondaire',
+        components: {
+          reliability: Math.round(reliability * 100),
+          urgency: Math.round(urgency * 100),
+          history: Math.round(volume * 100),
+          boost: boost ? 100 : 0,
+          diversity: Math.round(diversity * 100)
+        }
+      };
+      priority.reason = priorityReasonForRow(row, priority.components);
+      return {
+        ...row,
+        priorityScore: score,
+        priority
+      };
+    });
+  }
+
   function buildWinamaxMarketAudit(events, rows) {
     const familyCounts = new Map();
     const sportCounts = new Map();
@@ -2040,6 +2138,8 @@ function createLegacyEngineService({ projectRoot }) {
           odd: row.odd,
           probability: row.probability,
           edge: row.edge,
+          priorityScore: row.priorityScore || 0,
+          priorityRank: row.priorityRank || null,
           status: row.decisionCenter?.status || 'skip',
           canBet: Boolean(row.decisionCenter?.canBet),
           stake: Number(row.decisionCenter?.stake || 0),
@@ -2208,9 +2308,10 @@ function createLegacyEngineService({ projectRoot }) {
     const rolling24 = rollingWindowRows(picks, 24);
     const target24 = rolling24.length >= 18 ? 18 : rolling24.length >= 12 ? 12 : Math.min(8, rolling24.length);
     const rank = (pick) => [
-      pick?.safeAssessment?.reliable ? 1 : 0,
       pick?.decisionCenter?.canBet ? 1 : 0,
+      pick?.safeAssessment?.reliable ? 1 : 0,
       pick?.decisionCenter?.status === 'ready' ? 1 : 0,
+      Number(pick?.priorityScore || 0),
       Number(pick?.safeEdge ?? pick?.edge ?? 0),
       Number(pick?.safeConfidence ?? pick?.probability ?? 0)
     ];
@@ -2282,7 +2383,39 @@ function createLegacyEngineService({ projectRoot }) {
     if (rollingWindowRows(ordered, 24).length < target24) addRows(sortRows(rolling24), { strict: false });
     addRows(sortRows(picks), { strict: true });
     if (ordered.length < 5) addRows(sortRows(picks), { strict: false });
-    const rows = ordered.slice(0, 25);
+    const finalRows = [];
+    const finalSeen = new Set();
+    const finalMatchCounts = new Map();
+    const addFinalRows = (rowsToAdd, limit = 25, options = {}) => {
+      for (const row of rowsToAdd) {
+        if (finalRows.length >= limit) break;
+        const key = `${row.id}:${row.market}:${row.label}`;
+        if (finalSeen.has(key)) continue;
+        const mk = matchKey(row);
+        if (options.enforceMatchCap && (finalMatchCounts.get(mk) || 0) >= maxPerMatch) continue;
+        finalSeen.add(key);
+        finalMatchCounts.set(mk, (finalMatchCounts.get(mk) || 0) + 1);
+        finalRows.push(row);
+      }
+    };
+    const sortedOrdered = sortRows(ordered);
+    const rollingReadyPool = sortRows(rolling24.filter((row) => row?.decisionCenter?.canBet));
+    const sortedRollingReady = sortRows(ordered.filter((row) => {
+      const ts = Date.parse(row?.start || '');
+      return Number.isFinite(ts) && ts >= now - 30 * 60000 && ts <= now + 24 * 60 * 60 * 1000 && row?.decisionCenter?.canBet;
+    }));
+    const rollingReadyTarget = Math.min(15, rollingReadyPool.length, 25);
+    addFinalRows(sortedRollingReady, Math.max(rollingReadyTarget, Math.min(target24, sortedRollingReady.length)));
+    if (rollingWindowRows(finalRows, 24).length < rollingReadyTarget) {
+      addFinalRows(rollingReadyPool, rollingReadyTarget, { enforceMatchCap: true });
+    }
+    addFinalRows(sortedOrdered, 25);
+    const rows = finalRows.slice(0, 25)
+      .map((row, index) => ({
+        ...row,
+        priorityRank: index + 1,
+        priorityLabel: index === 0 ? 'TOP PICK' : index < 5 ? `#${index + 1}` : row.priority?.label || 'Priorité'
+      }));
     const mode = rolling24.length ? 'rolling24h' : todayRows.length ? 'todayFirst' : nearTerm.length ? 'next30h' : 'bestAvailable';
     return {
       rows,
@@ -2672,9 +2805,10 @@ function createLegacyEngineService({ projectRoot }) {
       .map((row) => applyDecisionCenter(row, decisionGates))
       .map((row) => applyWinamaxProductLayer(row))
       .map((row) => applySafeReliabilityLayer(row));
-    const matches = allDecisionRows.filter((row) => !row.isMarketAlternative);
+    const prioritizedDecisionRows = applyPriorityScores(allDecisionRows);
+    const matches = prioritizedDecisionRows.filter((row) => !row.isMarketAlternative);
     const seen = new Set();
-    const picks = allDecisionRows
+    const picks = prioritizedDecisionRows
       .filter((row) => {
         if (!row || row.status === 'skip') return false;
         if (!(Number(row.safeEdge ?? row.edge ?? 0) >= 0.01)) return false;
@@ -2690,7 +2824,8 @@ function createLegacyEngineService({ projectRoot }) {
         if (reliableDelta) return reliableDelta;
         const readyDelta = Number(Boolean(b.decisionCenter?.canBet)) - Number(Boolean(a.decisionCenter?.canBet));
         if (readyDelta) return readyDelta;
-        return (Number(b.safeEdge ?? b.edge ?? 0) - Number(a.safeEdge ?? a.edge ?? 0)) ||
+        return (Number(b.priorityScore || 0) - Number(a.priorityScore || 0)) ||
+          (Number(b.safeEdge ?? b.edge ?? 0) - Number(a.safeEdge ?? a.edge ?? 0)) ||
           (Number(b.safeConfidence ?? b.probability ?? 0) - Number(a.safeConfidence ?? a.probability ?? 0)) ||
           (Date.parse(a.start || '') - Date.parse(b.start || ''));
       })
@@ -2704,11 +2839,11 @@ function createLegacyEngineService({ projectRoot }) {
     const dashboard = buildDashboardPicks(picks);
     const todayFunnel = buildTodayFunnel(data, matches, picks, dashboard.rows);
     const coverage24h = buildRolling24hCoverage(data, matches, picks, dashboard.rows);
-    const winamaxMarketAudit = buildWinamaxMarketAudit(enrichedEvents, allDecisionRows);
+    const winamaxMarketAudit = buildWinamaxMarketAudit(enrichedEvents, prioritizedDecisionRows);
     const combines = buildNativeCombines(win, enrichedEvents);
     const scorers = buildNativeScorers(win, enrichedEvents, lineupsIndex, starPlayersIndex);
     const watchlist = buildWatchlist(matches);
-    const decisionCenter = buildDecisionCenterReport(allDecisionRows, decisionGates);
+    const decisionCenter = buildDecisionCenterReport(prioritizedDecisionRows, decisionGates);
     const agentPositions = prebetGate.blocked || criticalGate.blocked ? [] : buildAgentPositions(win, matches);
     const agentBlockers = buildAgentBlockers(matches, agentPositions, win);
 

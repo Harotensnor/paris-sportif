@@ -5,6 +5,17 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 14 — Priorité, allocation bankroll et simulation 30 jours
+
+- Ajout d'un score de priorité stable par pick (`priorityScore`) : fiabilité, urgence kickoff, volume historique du segment, boost Winamax et diversification bankroll alimentent désormais le tri principal du cockpit.
+- Le cockpit affiche une hiérarchie claire `TOP PICK` puis `#2` à `#5` : le bet ultime est forcément actionnable, avec une justification courte du type edge, confiance, segment et départ.
+- Correction d'un tri moteur qui pouvait laisser des candidats non misables prendre les premières places : les 25 picks dashboard sont maintenant prêts, tout en gardant 15 picks sur 24h glissantes et 3 picks nocturnes dans l'audit courant.
+- Ajout d'une allocation bankroll quotidienne : stratégies Conservateur/Modéré/Agressif, budget jour configurable, répartition automatique entre les meilleurs picks et affichage `Mise suggérée` plafonnée par le modèle.
+- Ajout d'une simulation 30 jours dans `Bilan` : paper trading des picks fiables selon la stratégie d'allocation, comparaison avec les paris suivis réels et conseil synthétique.
+- Alertes pré-match renforcées : rappel 30 minutes avant kickoff pour les picks fiables non misés, notification quand le `#1` change après refresh, déduplication locale et toggles dédiés dans `Réglages`.
+- Live cards enrichies : indicateur `En route` / `À risque` / `À suivre`, bouton cash-out Winamax conservé et ajout de note rapide live sur les paris suivis.
+- QA Sprint 14 : contrat moteur, refresh contract, smoke Electron, Playwright, capture visuelle, multi-jours accéléré, stress 5 minutes et audit npm valident 180 picks positifs, 25 picks dashboard prêts, 15 affichés sur 24h, 0 vulnérabilité et mémoire stress moyenne 309 MB / pic 516 MB.
+
 ### Sprint 13 — Couverture 24h, volume fiable et filtre safe Winamax
 
 - Refonte de la sélection moteur autour d'une fenêtre 24h glissantes : le dashboard privilégie désormais les picks Winamax à venir jour/nuit avant les edges plus lointains.

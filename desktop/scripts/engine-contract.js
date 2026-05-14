@@ -67,6 +67,7 @@ function testAnalysis() {
     assert(pick.winamaxBetType && pick.winamaxBetType.label, 'Pick sans type de pari Winamax conseillé', pick);
     assert(pick.safeAssessment && pick.safeAssessment.status, 'Pick sans filtre fiable et safe', pick);
     assert(Number(pick.safeEdge || pick.edge || 0) >= 0.01, 'Pick sans edge prudent positif', pick);
+    assert(Number.isFinite(Number(pick.priorityScore)) && Number(pick.priorityScore) >= 0, 'Pick sans score de priorité', pick);
     if (pick.decisionCenter.canBet) {
       assert(Number(pick.stake) > 0, 'Pick prêt sans mise positive', pick);
     } else {
@@ -121,6 +122,10 @@ function testAnalysis() {
   for (const pick of analysis.dashboardPicks || []) {
     perMatch.set(pick.id, (perMatch.get(pick.id) || 0) + 1);
   }
+  const topRanks = (analysis.dashboardPicks || []).filter((pick) => Number(pick.priorityRank || 0) >= 1 && Number(pick.priorityRank || 0) <= 5);
+  assert(topRanks.length >= 5, 'Top 5 prioritaire absent du cockpit', topRanks);
+  assert(Number(analysis.dashboardPicks?.[0]?.priorityRank || 0) === 1, 'Le premier pick dashboard doit être le #1 prioritaire', analysis.dashboardPicks?.[0]);
+  assert(String(analysis.dashboardPicks?.[0]?.priorityLabel || '').includes('TOP'), 'Le #1 doit porter le badge TOP PICK', analysis.dashboardPicks?.[0]);
   assert(Array.from(perMatch.values()).every((count) => count <= 2), 'Dashboard expose plus de 2 picks sur un même match', Array.from(perMatch.entries()).filter(([, count]) => count > 2));
   assert(Number(analysis.decisionCenter?.summary?.ready || 0) >= 15, 'Moins de 15 paris utilisateurs prêts', analysis.decisionCenter?.summary);
   assert(readyUserPicks.length >= 15, 'Moins de 15 paris prêts visibles dans la sélection', readyUserPicks);

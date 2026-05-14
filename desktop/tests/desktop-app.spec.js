@@ -14,7 +14,7 @@ function isIgnorableConsoleMessage(message) {
   return /Failed to load resource:\s*net::ERR_(EMPTY_RESPONSE|ABORTED)/i.test(String(message || ''));
 }
 
-test('Sprint 13 desktop keeps the safe 24h Winamax cockpit and accounting', async () => {
+test('Sprint 14 desktop keeps priority, allocation and simulation coherent', async () => {
   const rendererText = fs.readFileSync(path.join(root, 'desktop', 'src', 'renderer', 'renderer.js'), 'utf8');
   const htmlText = fs.readFileSync(path.join(root, 'desktop', 'src', 'renderer', 'index.html'), 'utf8');
   const mainText = fs.readFileSync(path.join(root, 'desktop', 'src', 'main.js'), 'utf8');
@@ -37,6 +37,9 @@ test('Sprint 13 desktop keeps the safe 24h Winamax cockpit and accounting', asyn
   expect(rendererText).toContain('coverage24h');
   expect(rendererText).toContain('safeBadgeHtml');
   expect(rendererText).toContain('renderTemporalCockpit');
+  expect(rendererText).toContain('priorityBadgeHtml');
+  expect(rendererText).toContain('dailyBudgetPlan');
+  expect(rendererText).toContain('renderPaperSimulation');
 
   const userDataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'paris-sportif-pw-'));
   const messages = [];
@@ -64,6 +67,9 @@ test('Sprint 13 desktop keeps the safe 24h Winamax cockpit and accounting', asyn
       timeline: document.querySelectorAll('#simple-pick-timeline .simple-timeline-card').length,
       trackButtons: document.querySelectorAll('[data-track-bet-key]').length,
       safeBadges: document.querySelectorAll('.safe-pick-badge.safe').length,
+      priorityBadges: document.querySelectorAll('.priority-badge').length,
+      topPick: document.body.textContent.includes('TOP PICK'),
+      dailyBudget: document.querySelector('#daily-budget-summary')?.textContent || '',
       hasRollingSections: ['Dans l’heure', 'Dans les 3 heures', 'Cette nuit'].every((label) => document.body.textContent.includes(label)),
       bankroll: document.querySelector('#simple-bankroll')?.textContent || '',
       pnl: document.querySelector('#simple-pnl')?.textContent || '',
@@ -80,6 +86,9 @@ test('Sprint 13 desktop keeps the safe 24h Winamax cockpit and accounting', asyn
     expect(cockpit.timeline).toBeGreaterThanOrEqual(10);
     expect(cockpit.trackButtons).toBeGreaterThanOrEqual(15);
     expect(cockpit.safeBadges).toBeGreaterThanOrEqual(10);
+    expect(cockpit.priorityBadges).toBeGreaterThanOrEqual(5);
+    expect(cockpit.topPick).toBe(true);
+    expect(cockpit.dailyBudget).toContain('jour');
     expect(cockpit.hasRollingSections).toBe(true);
     expect(cockpit.bankroll).toContain('€');
     expect(cockpit.pnl).toContain('€');
@@ -95,10 +104,15 @@ test('Sprint 13 desktop keeps the safe 24h Winamax cockpit and accounting', asyn
 
     await win.keyboard.press('Control+2');
     await expect(win.locator('#page-title')).toHaveText('Bilan');
+    await expect(win.locator('#bankroll-allocation-grid')).toContainText('#1');
+    await expect(win.locator('#paper-simulation-grid')).toContainText('Simulation');
     await win.keyboard.press('Control+3');
     await expect(win.locator('#page-title')).toHaveText('Réglages');
     await expect(win.locator('#pref-bankroll')).toBeVisible();
     await expect(win.locator('#pref-anti-tilt-strict')).toBeVisible();
+    await expect(win.locator('#pref-allocation-strategy')).toBeVisible();
+    await expect(win.locator('#pref-daily-budget')).toBeVisible();
+    await expect(win.locator('#pref-prematch-alerts')).toBeVisible();
     await expect(win.locator('#pref-expert-mode')).toBeVisible();
     await expect(win.locator('#pref-sports')).toContainText('rugby');
     await expect(win.locator('#pref-sports')).toContainText('mma');
@@ -131,6 +145,8 @@ test('Sprint 13 desktop keeps the safe 24h Winamax cockpit and accounting', asyn
     await win.click('#picks-body tr.clickable-row td[data-label="Match"]');
     await win.waitForSelector('#match-modal:not(.hidden)', { timeout: 10_000 });
     await expect(win.locator('#modal-content')).toContainText('Puis-je miser ?');
+    await expect(win.locator('#modal-content')).toContainText('Priorité');
+    await expect(win.locator('#modal-content')).toContainText('Allocation jour');
     await expect(win.locator('#modal-content')).toContainText('Cote Winamax');
     await expect(win.locator('#modal-content')).toContainText('Type Winamax');
     await expect(win.locator('#modal-content')).not.toContainText(/Meilleure\s+cote/);

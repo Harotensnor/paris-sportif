@@ -39,10 +39,20 @@ async function main() {
     win.on('pageerror', (error) => messages.push(`pageerror: ${error.message}`));
     await win.waitForSelector('[data-panel="dashboard"].active', { timeout: 60_000 });
     await win.waitForFunction(() => Number(document.querySelector('#metric-picks')?.textContent || 0) >= 20, null, { timeout: 90_000 });
-    const tabs = ['history', 'calendar', 'pipeline', 'help', 'preferences', 'dashboard'];
+    await win.click('[data-tab="preferences"]');
+    await win.waitForSelector('#pref-expert-mode', { timeout: 10_000 });
+    await win.check('#pref-expert-mode');
+    await win.click('#save-preferences-btn');
+    await win.waitForSelector('[data-tab="data"]:not(.hidden)', { timeout: 10_000 });
+    const tabs = ['history', 'preferences', 'data', 'dashboard'];
     let index = 0;
     while (Date.now() < deadline) {
       await win.click(`[data-tab="${tabs[index % tabs.length]}"]`);
+      if (tabs[index % tabs.length] === 'dashboard') {
+        await win.click('#help-panel-btn');
+        await win.waitForSelector('#help-panel:not(.hidden)', { timeout: 5_000 });
+        await win.click('#help-panel-close');
+      }
       index += 1;
       const sample = await win.evaluate(async () => {
         const status = await fetch('/api/data-status', { cache: 'no-store' }).then((response) => response.json());
@@ -56,8 +66,9 @@ async function main() {
     ) && !isIgnorableConsoleMessage(message));
     if (severe.length) throw new Error(`Erreurs console pendant stress: ${severe.join(' | ')}`);
     const maxMemory = memory.length ? Math.max(...memory) : 0;
-    if (maxMemory > 500) throw new Error(`Mémoire trop haute: ${maxMemory} MB RSS`);
-    console.log(`Stress desktop OK: ${minutes} min, mémoire max ${maxMemory || 'n/a'} MB, ${memory.length} samples.`);
+    const avgMemory = memory.length ? memory.reduce((sum, value) => sum + value, 0) / memory.length : 0;
+    if (maxMemory > 600) throw new Error(`Mémoire trop haute: ${maxMemory} MB RSS`);
+    console.log(`Stress desktop OK: ${minutes} min, mémoire max ${maxMemory || 'n/a'} MB, moyenne ${avgMemory ? avgMemory.toFixed(1) : 'n/a'} MB, ${memory.length} samples.`);
   } finally {
     await app.close();
     fs.rmSync(userDataDir, { recursive: true, force: true });

@@ -123,7 +123,8 @@
               <input id="bankroll-input" type="number" min="1" step="1" value="50">
               <strong>€</strong>
             </div>
-            <small>sert au calcul des mises</small>
+            <small id="daily-budget-summary">Budget jour en calcul</small>
+            <small id="daily-budget-detail">Allocation prioritaire en attente</small>
           </article>
           <article class="metric">
             <span>P&L suivi</span>
@@ -259,6 +260,7 @@
             <option value="all">Tous marchés</option>
           </select>
           <select id="pick-sort">
+            <option value="priority">Priorité</option>
             <option value="real_confidence">Confiance ajustée</option>
             <option value="edge">Edge</option>
             <option value="confidence">Confiance</option>
@@ -456,6 +458,19 @@
           <div class="empty">Comptabilité bankroll en attente.</div>
         </div>
         <div class="tracked-bets-chart" id="bankroll-projection-chart"></div>
+        <div class="section-head compact">
+          <div>
+            <h3>Budget jour & simulation</h3>
+            <p>Allocation des picks prioritaires et paper trading 30 jours.</p>
+          </div>
+        </div>
+        <div class="model-performance-grid" id="bankroll-allocation-grid">
+          <div class="empty">Allocation bankroll en attente.</div>
+        </div>
+        <div class="model-performance-grid" id="paper-simulation-grid">
+          <div class="empty">Simulation 30 jours en attente.</div>
+        </div>
+        <div class="segment-grid" id="paper-simulation-detail"></div>
         <div class="segment-grid" id="model-segment-grid">
           <div class="empty">Chargement segments...</div>
         </div>
@@ -982,6 +997,8 @@
             <h4>Alertes</h4>
             <label>Edge notif %<input id="pref-alert-edge" type="number" min="0" max="50" step="1"></label>
             <label>Kickoff notif heures<input id="pref-alert-window" type="number" min="1" max="24" step="1"></label>
+            <label class="check-line"><input id="pref-prematch-alerts" type="checkbox"> Alertes pré-match 30 min</label>
+            <label class="check-line"><input id="pref-top-pick-alerts" type="checkbox"> Alerte si le #1 change</label>
             <label>Webhook mobile
               <select id="pref-webhook-type">
                 <option value="generic">Générique JSON</option>
@@ -1006,6 +1023,14 @@
             </label>
             <label>Flat unit % bankroll<input id="pref-flat-unit" type="number" min="0.1" max="10" step="0.1"></label>
             <label>Cap mise % bankroll<input id="pref-max-stake" type="number" min="0.1" max="20" step="0.1"></label>
+            <label>Allocation jour
+              <select id="pref-allocation-strategy">
+                <option value="conservative">Conservateur · 3% / top 5</option>
+                <option value="moderate">Modéré · 5% / top 10</option>
+                <option value="aggressive">Agressif · 8% / top 15</option>
+              </select>
+            </label>
+            <label>Budget jour % bankroll<input id="pref-daily-budget" type="number" min="0.5" max="20" step="0.5"></label>
             <label>Stop-loss jour %<input id="pref-stop-loss" type="number" min="0" max="50" step="0.5"></label>
             <label>Take-profit jour %<input id="pref-take-profit" type="number" min="0" max="100" step="0.5"></label>
           </article>

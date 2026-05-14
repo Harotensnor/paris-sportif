@@ -3196,6 +3196,19 @@ td.empty::before,
   background: rgba(96, 165, 250, .10) !important;
 }
 
+.priority-badge {
+  border-color: rgba(250, 204, 21, .44) !important;
+  color: #fde68a !important;
+  background: rgba(250, 204, 21, .12) !important;
+  font-weight: 950 !important;
+}
+
+.priority-badge.top {
+  color: #fef3c7 !important;
+  border-color: rgba(16, 185, 129, .54) !important;
+  background: linear-gradient(135deg, rgba(16, 185, 129, .18), rgba(250, 204, 21, .10)) !important;
+}
+
 .ultimate-side {
   display: flex;
   flex-direction: column;
@@ -3320,6 +3333,17 @@ td.empty::before,
   background: linear-gradient(135deg, rgba(248, 113, 113, .12), rgba(2, 6, 23, .36));
 }
 
+.live-card.live-ok {
+  border-color: rgba(16, 185, 129, .45);
+  border-left-color: var(--accent);
+  background: linear-gradient(135deg, rgba(16, 185, 129, .12), rgba(2, 6, 23, .36));
+}
+
+.live-card.live-watch {
+  border-color: rgba(245, 158, 11, .38);
+  border-left-color: var(--warn);
+}
+
 .live-card > span,
 .live-card p {
   color: var(--muted);
@@ -3336,6 +3360,40 @@ td.empty::before,
   float: right;
   color: var(--danger);
   font-style: normal;
+}
+
+.live-card.live-ok strong em {
+  color: var(--accent);
+}
+
+.live-insight-badge {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 4px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.live-insight-badge.ok {
+  color: var(--accent);
+  border-color: rgba(16, 185, 129, .38);
+  background: rgba(16, 185, 129, .10);
+}
+
+.live-insight-badge.watch {
+  color: var(--warn);
+  border-color: rgba(245, 158, 11, .36);
+  background: rgba(245, 158, 11, .10);
+}
+
+.live-insight-badge.danger {
+  color: var(--danger);
+  border-color: rgba(248, 113, 113, .34);
+  background: rgba(248, 113, 113, .10);
 }
 
 .validation-note,
@@ -3376,6 +3434,32 @@ td.empty::before,
   color: var(--danger);
   border-color: rgba(248, 113, 113, .34);
   background: rgba(248, 113, 113, .10);
+}
+
+.allocation-card {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px;
+  background: var(--surface);
+  display: grid;
+  gap: 6px;
+}
+
+.allocation-card span,
+.allocation-card small {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.allocation-card strong {
+  font-size: 22px;
+  color: var(--accent);
+}
+
+.allocation-card p {
+  margin: 0;
+  color: var(--text);
+  font-size: 13px;
 }
 
 .validation-warm,

@@ -105,6 +105,7 @@
   const SMART_ALERT_KEY = 'parisSportifSmartAlertKeys';
   const NOTIFIED_PICK_KEY = 'parisSportifNotifiedPickKeys';
   const READY_COUNT_KEY = 'parisSportifLastReadyCount';
+  const TOP_PICK_ALERT_KEY = 'parisSportifLastTopPickKey';
   const PROFILE_BACKUP_KEY = 'parisSportifLastProfileBackupDay';
   const APP_SESSION_KEY = 'parisSportifDesktopSession';
   const AI_ENGINE_KEY = 'parisSportifAiEngineState';
@@ -140,7 +141,7 @@
     { key: 'exactscore', label: 'Score exact' }
   ];
   const DEFAULT_PREFERENCES = {
-    preferenceSchemaVersion: 12,
+    preferenceSchemaVersion: 14,
     bankroll: 50,
     level: 'intermediate',
     sports: SPORTS_PREFS,
@@ -151,7 +152,11 @@
     confidenceMin: 0,
     alertEdge: 10,
     alertWindowHours: 2,
+    prematchAlertsEnabled: true,
+    topPickAlertsEnabled: true,
     stakeMode: 'kelly',
+    allocationStrategy: 'moderate',
+    dailyBudgetPct: 5,
     flatUnitPct: 1,
     maxStakePct: 5,
     stopLossPct: 5,
@@ -177,6 +182,12 @@
     strict: false
   };
   const REFRESH_DEFAULT_INTERVAL_MS = 30 * 60 * 1000;
+  const ALLOCATION_STRATEGIES = {
+    conservative: { key: 'conservative', label: 'Conservateur', budgetPct: 3, maxPicks: 5, detail: '3% bankroll/jour, top 5 picks.' },
+    moderate: { key: 'moderate', label: 'Modéré', budgetPct: 5, maxPicks: 10, detail: '5% bankroll/jour, top 10 picks.' },
+    aggressive: { key: 'aggressive', label: 'Agressif', budgetPct: 8, maxPicks: 15, detail: '8% bankroll/jour, top 15 picks.' }
+  };
+  const ALLOCATION_SHARES = [25, 20, 15, 10, 10, 5, 5, 5, 5, 5, 3, 3, 3, 3, 3];
   const REFRESH_LIVE_INTERVAL_MS = 2 * 60 * 1000;
   const REFRESH_URGENT_INTERVAL_MS = 5 * 60 * 1000;
   const REFRESH_ECONOMY_AFTER_MS = 60 * 60 * 1000;
@@ -1096,8 +1107,7 @@
     return 'edge_none';
   }
 
-  function displayStakeAmount(row) {
-    if (!canDisplayStake(row)) return 0;
+  function modelStakeAmount(row) {
     const prefs = loadPreferences();
     const bankroll = getBankroll();
     const maxStake = bankroll * Math.max(0.1, Number(prefs.maxStakePct || 5)) / 100;
@@ -1106,6 +1116,111 @@
     }
     const modelStake = Math.max(0, Number(row?.stake || row?.decisionCenter?.stake || 0) || 0);
     return Math.max(0, Number(Math.min(modelStake, maxStake).toFixed(2)));
+  }
+
+  function allocationConfig(prefs = loadPreferences()) {
+    const base = ALLOCATION_STRATEGIES[prefs.allocationStrategy] || ALLOCATION_STRATEGIES.moderate;
+    const customPct = Number(prefs.dailyBudgetPct);
+    return {
+      ...base,
+      budgetPct: Number.isFinite(customPct) && customPct > 0 ? customPct : base.budgetPct
+    };
+  }
+
+  function sortedPriorityRows(rows = state.picks) {
+    return (Array.isArray(rows) ? rows : [])
+      .filter((row) => pickHasCoreData(row) && canDisplayStake(row))
+      .slice()
+      .sort((a, b) => (
+        priorityValue(b) - priorityValue(a) ||
+        displayEdgeValue(b) - displayEdgeValue(a) ||
+        safeConfidenceValue(b) - safeConfidenceValue(a) ||
+        Date.parse(a.start || '') - Date.parse(b.start || '')
+      ));
+  }
+
+  function dailyBudgetPlan(rows = state.picks, prefs = loadPreferences()) {
+    const config = allocationConfig(prefs);
+    const bankroll = Math.max(1, getBankroll());
+    const budget = bankroll * Math.max(0.1, Number(config.budgetPct || 5)) / 100;
+    const candidates = sortedPriorityRows(rows).slice(0, config.maxPicks);
+    const rawShares = candidates.map((_, index) => ALLOCATION_SHARES[index] || 2);
+    const totalRaw = rawShares.reduce((sum, value) => sum + value, 0) || 1;
+    const rowsOut = candidates.map((row, index) => {
+      const sharePct = rawShares[index] / totalRaw;
+      const allocated = budget * sharePct;
+      const cap = modelStakeAmount(row);
+      const stake = Math.max(0, Number(Math.min(allocated, cap).toFixed(2)));
+      return {
+        row,
+        key: userBetKey(row),
+        rank: index + 1,
+        sharePct,
+        allocated,
+        cap,
+        stake
+      };
+    });
+    return {
+      config,
+      bankroll,
+      budget,
+      rows: rowsOut,
+      used: rowsOut.reduce((sum, item) => sum + item.stake, 0),
+      available: Math.max(0, budget - rowsOut.reduce((sum, item) => sum + item.stake, 0))
+    };
+  }
+
+  function allocationForRow(row) {
+    if (!canDisplayStake(row)) return null;
+    const plan = dailyBudgetPlan();
+    return plan.rows.find((item) => item.key === userBetKey(row)) || null;
+  }
+
+  function allocationSummaryText(row) {
+    const allocation = allocationForRow(row);
+    if (!allocation) return 'Hors budget jour';
+    return `#${allocation.rank} budget · ${formatPct(allocation.sharePct, 0)} du budget jour`;
+  }
+
+  function allocationLongText(row) {
+    const allocation = allocationForRow(row);
+    if (!allocation) return 'Hors budget jour : ce pick reste visible, mais la stratégie du jour favorise les meilleurs priorisés.';
+    return `Mise suggérée ${formatMoney(allocation.stake)} · ${formatPct(allocation.sharePct, 0)} du budget jour · cap modèle ${formatMoney(allocation.cap)}.`;
+  }
+
+  function displayStakeAmount(row) {
+    if (!canDisplayStake(row)) return 0;
+    const allocation = allocationForRow(row);
+    if (allocation) return allocation.stake;
+    return 0;
+  }
+
+  function renderDailyBudgetSummary() {
+    const prefs = loadPreferences();
+    const plan = dailyBudgetPlan(state.picks, prefs);
+    const summary = $('#daily-budget-summary');
+    const used = $('#daily-budget-used');
+    const detail = $('#daily-budget-detail');
+    if (summary) summary.textContent = `${plan.config.label} · ${formatMoney(plan.budget)} / jour`;
+    if (used) used.textContent = `${formatMoney(plan.used)} alloués`;
+    if (detail) {
+      detail.textContent = `${formatCount(plan.rows.length)} pick(s) dans le plan · reste ${formatMoney(plan.available)}`;
+    }
+    const grid = $('#bankroll-allocation-grid');
+    if (!grid) return;
+    if (!plan.rows.length) {
+      grid.innerHTML = '<div class="empty">Aucun pick prêt à allouer avec les règles actuelles.</div>';
+      return;
+    }
+    grid.innerHTML = plan.rows.slice(0, plan.config.maxPicks).map((item) => `
+      <article class="allocation-card clickable-row" data-match-id="${escapeHtml(item.row.id)}" tabindex="0" role="button">
+        <span>${escapeHtml(`#${item.rank} · ${priorityText(item.row)}`)}</span>
+        <strong>${escapeHtml(formatMoney(item.stake))}</strong>
+        <p>${escapeHtml(item.row.title)} · ${escapeHtml(item.row.market)} ${escapeHtml(item.row.label)}</p>
+        <small>${escapeHtml(formatPct(item.sharePct, 0))} budget · edge ${escapeHtml(formatPct(displayEdgeValue(item.row), 1))} · ${escapeHtml(countdownLabel(item.row.start))}</small>
+      </article>
+    `).join('');
   }
 
   function bankrollDisciplineStatus(stats = userBetStats(), prefs = loadPreferences()) {
@@ -1483,6 +1598,25 @@
     const capped = Boolean(row?.safeAssessment?.edgeCapped) && raw > edge + 0.001;
     const title = capped ? `Edge brut ${formatPct(raw, 1)} plafonné par prudence` : 'Edge prudent utilisé pour décider';
     return `<span title="${escapeHtml(title)}">${escapeHtml(formatPct(edge, 1))}</span>${capped ? '<div class="match-sub">edge prudent</div>' : ''}`;
+  }
+
+  function priorityValue(row) {
+    const value = Number(row?.priorityScore || 0);
+    return Number.isFinite(value) ? value : 0;
+  }
+
+  function priorityBadgeHtml(row) {
+    const rank = Number(row?.priorityRank || 0);
+    if (!(rank > 0) || rank > 5) return '';
+    const label = rank === 1 ? '🏆 TOP PICK' : `#${rank}`;
+    const reason = row?.priority?.reason || `Priorité ${priorityValue(row).toFixed(1)}/100`;
+    return `<span class="priority-badge ${rank === 1 ? 'top' : ''}" title="${escapeHtml(reason)}">${escapeHtml(label)}</span>`;
+  }
+
+  function priorityText(row) {
+    const score = priorityValue(row);
+    const label = row?.priority?.label || 'Priorité';
+    return `${label} ${score.toFixed(0)}/100`;
   }
 
   function adjustedConfidenceHtml(row) {
@@ -2486,7 +2620,7 @@
       sport: $('#pick-sport-filter')?.value || 'all',
       league: $('#pick-league-filter')?.value || 'all',
       market: $('#pick-market-filter')?.value || 'all',
-      sort: $('#pick-sort')?.value || 'real_confidence',
+      sort: $('#pick-sort')?.value || 'priority',
       edgeMin: Number.isFinite(edgeValue) && edgeValue > 0 ? edgeValue / 100 : 0,
       oddMin: Number.isFinite(oddValue) && oddValue > 1 ? oddValue : 0
     };
@@ -2505,7 +2639,7 @@
   }
 
   function pickFiltersActive(filters) {
-    return Boolean(filters.query || filters.sport !== 'all' || filters.league !== 'all' || filters.market !== 'all' || filters.edgeMin || filters.oddMin || filters.sort !== 'real_confidence');
+    return Boolean(filters.query || filters.sport !== 'all' || filters.league !== 'all' || filters.market !== 'all' || filters.edgeMin || filters.oddMin || filters.sort !== 'priority');
   }
 
   function pickHasCoreData(row) {
@@ -2559,6 +2693,7 @@
       return true;
     });
     rows.sort((a, b) => {
+      if (filters.sort === 'priority') return priorityValue(b) - priorityValue(a) || displayEdgeValue(b) - displayEdgeValue(a) || new Date(a.start || 0) - new Date(b.start || 0);
       if (filters.sort === 'kickoff') return new Date(a.start || 0) - new Date(b.start || 0);
       if (filters.sort === 'confidence') return Number(b.confidenceTrust?.score || b.probability || 0) - Number(a.confidenceTrust?.score || a.probability || 0);
       if (filters.sort === 'real_confidence') return safeConfidenceValue(b) - safeConfidenceValue(a) || displayEdgeValue(b) - displayEdgeValue(a);
@@ -2750,6 +2885,7 @@
   }
 
   function maybeNotifyPickChanges() {
+    const prefs = loadPreferences();
     const readyRows = (state.picks || []).filter((row) => pickHasCoreData(row) && canDisplayStake(row));
     const readyCount = readyRows.length;
     const previousRaw = localStorage.getItem(READY_COUNT_KEY);
@@ -2763,6 +2899,19 @@
       notifyUser('Nouveaux picks prêts', `+${readyCount - previous} pick(s) jouable(s) depuis le dernier calcul.`, readyRows[0]);
     }
     updatePriceMoveAlerts(readyRows);
+    const topPick = sortedPriorityRows(readyRows)[0] || null;
+    const topKey = topPick ? userBetKey(topPick) : '';
+    const previousTop = localStorage.getItem(TOP_PICK_ALERT_KEY) || '';
+    if (topKey) {
+      try {
+        localStorage.setItem(TOP_PICK_ALERT_KEY, topKey);
+      } catch {
+        // Alerte confort uniquement.
+      }
+      if (prefs.topPickAlertsEnabled !== false && previousTop && previousTop !== topKey) {
+        alertOnce(`top-pick:${topKey}`, 'Nouveau top pick', `${topPick.title} · ${topPick.market} ${topPick.label} · priorité ${priorityValue(topPick).toFixed(0)}/100.`, topPick);
+      }
+    }
     const notified = readNotifiedPickKeys();
     const now = Date.now();
     const tracked = new Set(loadUserBets().filter((bet) => bet.status === 'pending').map((bet) => bet.key));
@@ -2773,8 +2922,8 @@
         && ts - now <= 30 * 60 * 1000
         && !tracked.has(userBetKey(row));
     });
-    if (reminder) {
-      alertOnce(`kickoff:${userBetKey(reminder)}`, 'Pick proche du coup d’envoi', `${reminder.title} · ${reminder.label} ${formatOdd(reminder.odd)} démarre dans ${countdownLabel(reminder.start)}.`, reminder);
+    if (reminder && prefs.prematchAlertsEnabled !== false) {
+      alertOnce(`kickoff:${userBetKey(reminder)}`, 'Pick proche du coup d’envoi', `${reminder.priorityRank ? `#${reminder.priorityRank} · ` : ''}${reminder.title} · ${reminder.label} ${formatOdd(reminder.odd)} démarre dans ${countdownLabel(reminder.start)}.`, reminder);
     }
     const injuryPick = readyRows.find((row) => {
       const ts = Date.parse(row.start || '');
@@ -2835,7 +2984,8 @@
       .filter((row) => safeConfidenceValue(row) >= 0.65)
       .filter(hasPositiveHistoricalSegment)
       .sort((a, b) => (
-        displayEdgeValue(b) - displayEdgeValue(a)
+        priorityValue(b) - priorityValue(a)
+        || displayEdgeValue(b) - displayEdgeValue(a)
         || safeConfidenceValue(b) - safeConfidenceValue(a)
         || Date.parse(a.start || '') - Date.parse(b.start || '')
       ))[0] || null;
@@ -2847,6 +2997,7 @@
     const trackKey = userBetKey(row);
     const isTracked = tracked.has(trackKey);
     if (!canDisplayStake(row)) return '<span class="match-sub">0 €</span>';
+    if (!(displayStakeAmount(row) > 0)) return '<span class="match-sub">Hors budget jour</span>';
     if (discipline.blocked) {
       return `<button type="button" class="track-bet-btn tracked" disabled title="${escapeHtml(discipline.detail)}">${escapeHtml(discipline.label)}</button>`;
     }
@@ -2874,13 +3025,14 @@
 
   function ultimateBetReason(row) {
     if (!row) return 'Aucun pick ne réunit edge ≥ 7pt, confiance ≥ 65%, segment positif et départ dans les 24h.';
+    const prefix = row.priority?.reason ? `Pourquoi #1 ? ${row.priority.reason}. ` : 'Pourquoi #1 ? ';
     const bits = [
       `${formatPct(displayEdgeValue(row), 1)} d’edge`,
       `${formatPct(safeConfidenceValue(row), 0)} confiance`,
       `${formatOdd(row.odd)} Winamax`,
       countdownLabel(row.start)
     ];
-    return `${row.market} · ${row.label} : ${bits.join(' · ')}. ${pickReason(row).replace(/^Pourquoi\s*:\s*/i, '')}`;
+    return `${prefix}${row.market} · ${row.label} : ${bits.join(' · ')}. ${pickReason(row).replace(/^Pourquoi\s*:\s*/i, '')}`;
   }
 
   function renderUltimateBet(rows) {
@@ -2906,10 +3058,11 @@
         <h3>${escapeHtml(row.title)}</h3>
         <p>${escapeHtml(aiReason || ultimateBetReason(row))}</p>
         <div class="ultimate-tags">
+          ${priorityBadgeHtml(row)}
           <span>${escapeHtml(row.market)}</span>
           <span>${escapeHtml(row.label)}</span>
           <span>${escapeHtml(formatOdd(row.odd))}</span>
-          <span>mise ${escapeHtml(visibleStakeText(row))}</span>
+          <span title="${escapeHtml(allocationLongText(row))}">mise ${escapeHtml(visibleStakeText(row))}</span>
           ${safeBadgeHtml(row)}
           ${betTypeBadgeHtml(row)}
           ${boostBadgeHtml(row)}
@@ -2954,18 +3107,20 @@
           <span>${escapeHtml(row.league || row.sport || '')} · ${escapeHtml(formatDateLabel(row.start))}</span>
         </div>
         <div class="time-pick-meta">
+          ${priorityBadgeHtml(row)}
           <span>${escapeHtml(row.market)}</span>
           <span>${escapeHtml(row.label)}</span>
           <span>${escapeHtml(formatOdd(row.odd))}</span>
           <span>edge ${escapeHtml(formatPct(displayEdgeValue(row), 1))}</span>
           <span>conf. ${escapeHtml(formatPct(safeConfidenceValue(row), 0))}</span>
+          <span title="${escapeHtml(allocationLongText(row))}">${escapeHtml(allocationSummaryText(row))}</span>
           <span>${escapeHtml(countdownLabel(row.start))}</span>
           ${safeBadgeHtml(row)}
           ${betTypeBadgeHtml(row)}
           ${boostBadgeHtml(row)}
           ${enrichmentBadgeHtml(row)}
         </div>
-        <p>${escapeHtml(pickReason(row).replace(/^Pourquoi\s*:\s*/i, ''))}</p>
+        <p>${escapeHtml(`${row.priority?.reason || pickReason(row).replace(/^Pourquoi\s*:\s*/i, '')}`)}</p>
         <div class="time-pick-action">
           <button type="button" class="ghost-btn focus-mode-btn" data-focus-pick-key="${escapeHtml(userBetKey(row))}">Mode focus</button>
           ${winamaxOpenButtonHtml(row)}
@@ -3240,13 +3395,15 @@
       <div class="live-card-grid">
         ${rows.slice(0, 8).map(({ row, live, tracked }) => {
           const cashUrl = safeExternalUrl(row.winamaxUrl, 'www.winamax.fr');
+          const insight = liveInsight(row, live);
           return `
-            <article class="live-card clickable-row" data-match-id="${escapeHtml(row.id)}" tabindex="0" role="button">
-              <span>${escapeHtml(live.status)} · ${escapeHtml(String(live.minute || '-'))}</span>
+            <article class="live-card live-${escapeHtml(insight.tone)} clickable-row" data-match-id="${escapeHtml(row.id)}" tabindex="0" role="button">
+              <span>${escapeHtml(live.status)} · ${escapeHtml(String(live.minute || '-'))} · <em class="live-insight-badge ${escapeHtml(insight.tone)}">${escapeHtml(insight.label)}</em></span>
               <strong>${escapeHtml(row.title)} <em>${escapeHtml(live.score)}</em></strong>
-              <p>${escapeHtml(row.market)} · ${escapeHtml(row.label)} · ${escapeHtml(liveVerdict(row, live))}</p>
+              <p>${escapeHtml(row.market)} · ${escapeHtml(row.label)} · ${escapeHtml(insight.detail)}</p>
               <div class="time-pick-action">
                 <span class="pill">${tracked ? 'pari suivi' : 'pick modèle'}</span>
+                <button class="ghost-btn" type="button" data-live-note-key="${escapeHtml(userBetKey(row))}" data-live-note="${escapeHtml(insight.detail)}">Note rapide</button>
                 ${cashUrl ? `<a class="ghost-btn" href="${escapeHtml(cashUrl)}" target="_blank" rel="noreferrer">Cash-out / Winamax</a>` : ''}
               </div>
             </article>
@@ -3255,6 +3412,36 @@
       </div>
     `;
     maybeNotifyLiveRows(rows);
+  }
+
+  function liveInsight(row, live) {
+    const detail = liveVerdict(row, live);
+    if (/gagnant|en route|conforme|va gagner/i.test(detail)) {
+      return { tone: 'ok', label: 'En route', detail };
+    }
+    if (/pression|risque|perdre|besoin|contre/i.test(detail)) {
+      return { tone: 'danger', label: 'À risque', detail };
+    }
+    return { tone: 'watch', label: 'À suivre', detail };
+  }
+
+  function saveLiveQuickNote(trackKey, note) {
+    if (!trackKey) return;
+    const bets = loadUserBets();
+    const index = bets.findIndex((bet) => bet.status === 'pending' && bet.key === trackKey);
+    if (index === -1) {
+      setSideStatus('Note live réservée aux paris suivis', 'warn');
+      return;
+    }
+    const stamp = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+    const current = String(bets[index].note || '').trim();
+    bets[index] = {
+      ...bets[index],
+      note: `${current ? `${current}\n` : ''}${stamp} live · ${String(note || '').slice(0, 140)}`
+    };
+    saveUserBets(bets);
+    renderHistory();
+    setSideStatus('Note live ajoutée', 'ok');
   }
 
   function readLiveNotificationKeys() {
@@ -3308,7 +3495,7 @@
     const topRows = (Array.isArray(rows) ? rows : [])
       .filter((row) => pickHasCoreData(row) && canDisplayStake(row))
       .slice()
-      .sort((a, b) => displayEdgeValue(b) - displayEdgeValue(a))
+      .sort((a, b) => priorityValue(b) - priorityValue(a) || displayEdgeValue(b) - displayEdgeValue(a))
       .slice(0, 10);
     if (!topRows.length) return;
     try {
@@ -3406,7 +3593,7 @@
         <span>${escapeHtml(countdownLabel(row.start))}</span>
         <strong>${escapeHtml(row.title)}</strong>
         <em>${escapeHtml(`${row.market} · ${row.label}`)}</em>
-        <small>${escapeHtml(formatOdd(row.odd))} · edge ${escapeHtml(formatPct(displayEdgeValue(row), 1))} · ${escapeHtml(row.safeAssessment?.label || row.winamaxBetType?.label || 'Single')}</small>
+        <small>${escapeHtml(row.priorityRank && row.priorityRank <= 5 ? `#${row.priorityRank} · ` : '')}${escapeHtml(formatOdd(row.odd))} · edge ${escapeHtml(formatPct(displayEdgeValue(row), 1))} · ${escapeHtml(row.safeAssessment?.label || row.winamaxBetType?.label || 'Single')}</small>
       </article>
     `).join('');
   }
@@ -3531,6 +3718,7 @@
     renderLiveCockpit();
     renderUltimateBet(displayRows);
     renderTemporalCockpit(displayRows);
+    renderDailyBudgetSummary();
     updateWebEnrichmentSummary();
     scheduleVisibleWebEnrichment(displayRows);
     renderSimpleTimeline(displayRows);
@@ -3563,21 +3751,13 @@
       markFirstPickVisible(0);
       return;
     }
-    const tracked = new Set(loadUserBets().filter((bet) => bet.status === 'pending').map((bet) => bet.key));
-    const discipline = bankrollDisciplineStatus();
     body.innerHTML = displayRows.map((pick) => {
       const startLabel = `${formatDateLabel(pick.start)} · ${countdownLabel(pick.start)}`;
       const displayEdge = displayEdgeValue(pick);
       const edgeClass = displayEdge >= 0.08 ? 'edge-pos' : 'edge-warn';
       const decision = pick.decisionCenter || {};
       const statusText = decision.canBet ? 'Prêt' : decision.status === 'repair' ? 'À réparer' : decision.status === 'skip' ? 'À éviter' : 'À surveiller';
-      const trackKey = userBetKey(pick);
-      const isTracked = tracked.has(trackKey);
-      const action = canDisplayStake(pick)
-        ? discipline.blocked
-          ? `<button type="button" class="track-bet-btn tracked" disabled title="${escapeHtml(discipline.detail)}">${escapeHtml(discipline.label)}</button>`
-          : `<button type="button" class="track-bet-btn${isTracked ? ' tracked' : ''}" data-track-bet-key="${escapeHtml(trackKey)}">${isTracked ? 'Suivi' : 'Je mise'}</button>`
-        : '<span class="match-sub">-</span>';
+      const action = trackButtonHtml(pick, 'Je mise');
       const winamaxAction = winamaxOpenButtonHtml(pick, 'Winamax');
       return `
         <tr class="clickable-row" data-match-id="${escapeHtml(pick.id)}" tabindex="0" role="button" aria-label="Ouvrir ${escapeHtml(pick.title)}">
@@ -3585,11 +3765,11 @@
             <div class="match-title">${escapeHtml(pick.title)}</div>
             <div class="match-sub">${escapeHtml(pick.sport)} · ${escapeHtml(pick.league)}</div>
           </td>
-          <td data-label="Marché"><span class="pill">${escapeHtml(statusText)}</span> <span class="pill">${escapeHtml(pick.market)}</span>${safeBadgeHtml(pick)}${betTypeBadgeHtml(pick)}${boostBadgeHtml(pick)}<div class="match-sub">${escapeHtml(pick.label)}</div><div class="match-sub selection-reason">${escapeHtml(pickReason(pick))}</div>${calibrationNote(pick)}${segmentValidationHtml(pick)}</td>
+          <td data-label="Marché"><span class="pill">${escapeHtml(statusText)}</span> ${priorityBadgeHtml(pick)} <span class="pill">${escapeHtml(pick.market)}</span>${safeBadgeHtml(pick)}${betTypeBadgeHtml(pick)}${boostBadgeHtml(pick)}<div class="match-sub">${escapeHtml(pick.label)}</div><div class="match-sub selection-reason">${escapeHtml(pick.priority?.reason || pickReason(pick))}</div>${calibrationNote(pick)}${segmentValidationHtml(pick)}</td>
           <td data-label="Cote">@${pick.odd.toFixed(2)}</td>
           <td data-label="Proba">${formatPct(pick.probability, 1)}${adjustedConfidenceHtml(pick)}</td>
           <td data-label="Edge" class="${edgeClass}">${edgeDisplayHtml(pick)}</td>
-          <td data-label="Mise">${visibleStakeText(pick)}</td>
+          <td data-label="Mise">${visibleStakeText(pick)}<div class="match-sub">${escapeHtml(allocationSummaryText(pick))}</div></td>
           <td data-label="Départ">${escapeHtml(startLabel)}</td>
           <td data-label="Action">${winamaxAction}${action}</td>
         </tr>`;
@@ -5808,6 +5988,10 @@
     if (coachEnabled) coachEnabled.checked = prefs.coachEnabled !== false;
     const antiTiltStrict = $('#pref-anti-tilt-strict');
     if (antiTiltStrict) antiTiltStrict.checked = prefs.antiTiltStrict !== false;
+    const prematchAlerts = $('#pref-prematch-alerts');
+    if (prematchAlerts) prematchAlerts.checked = prefs.prematchAlertsEnabled !== false;
+    const topPickAlerts = $('#pref-top-pick-alerts');
+    if (topPickAlerts) topPickAlerts.checked = prefs.topPickAlertsEnabled !== false;
     const expertMode = $('#pref-expert-mode');
     if (expertMode) expertMode.checked = Boolean(prefs.expertMode);
     const aiEnabled = $('#pref-ai-enabled');
@@ -5831,6 +6015,8 @@
     if (updateChannel) updateChannel.value = prefs.updateChannel || 'stable';
     const stakeMode = $('#pref-stake-mode');
     if (stakeMode) stakeMode.value = prefs.stakeMode || 'kelly';
+    const allocationStrategy = $('#pref-allocation-strategy');
+    if (allocationStrategy) allocationStrategy.value = prefs.allocationStrategy || DEFAULT_PREFERENCES.allocationStrategy;
     const sportsGrid = $('#pref-sports');
     if (sportsGrid) {
       const active = new Set((prefs.sports || []).map((item) => String(item).toLowerCase()));
@@ -5850,6 +6036,7 @@
       'pref-alert-window': prefs.alertWindowHours,
       'pref-flat-unit': prefs.flatUnitPct,
       'pref-max-stake': prefs.maxStakePct,
+      'pref-daily-budget': prefs.dailyBudgetPct,
       'pref-stop-loss': prefs.stopLossPct,
       'pref-take-profit': prefs.takeProfitPct,
       'pref-daily-bet-limit': prefs.dailyBetLimit,
@@ -5870,6 +6057,7 @@
     renderLearningAudit();
     renderActiveModelAdjustments();
     renderBankrollAccounting();
+    renderDailyBudgetSummary();
     applyExpertMode();
   }
 
@@ -5930,6 +6118,8 @@
       alertEdge: Math.max(0, Number($('#pref-alert-edge')?.value || 10) || 10),
       alertWindowHours: Math.max(1, Number($('#pref-alert-window')?.value || 2) || 2),
       stakeMode: $('#pref-stake-mode')?.value || DEFAULT_PREFERENCES.stakeMode,
+      allocationStrategy: $('#pref-allocation-strategy')?.value || DEFAULT_PREFERENCES.allocationStrategy,
+      dailyBudgetPct: Math.max(0.5, Math.min(20, Number($('#pref-daily-budget')?.value || DEFAULT_PREFERENCES.dailyBudgetPct) || DEFAULT_PREFERENCES.dailyBudgetPct)),
       flatUnitPct: Math.max(0.1, Number($('#pref-flat-unit')?.value || DEFAULT_PREFERENCES.flatUnitPct) || DEFAULT_PREFERENCES.flatUnitPct),
       maxStakePct: Math.max(0.1, Number($('#pref-max-stake')?.value || DEFAULT_PREFERENCES.maxStakePct) || DEFAULT_PREFERENCES.maxStakePct),
       stopLossPct: Math.max(0, Number($('#pref-stop-loss')?.value || DEFAULT_PREFERENCES.stopLossPct) || DEFAULT_PREFERENCES.stopLossPct),
@@ -5938,6 +6128,8 @@
       webhookUrl: ($('#pref-webhook-url')?.value || '').trim(),
       coachEnabled: $('#pref-coach-enabled')?.checked !== false,
       antiTiltStrict: $('#pref-anti-tilt-strict')?.checked !== false,
+      prematchAlertsEnabled: $('#pref-prematch-alerts')?.checked !== false,
+      topPickAlertsEnabled: $('#pref-top-pick-alerts')?.checked !== false,
       dailyBetLimit: Math.max(1, Number($('#pref-daily-bet-limit')?.value || DEFAULT_PREFERENCES.dailyBetLimit) || DEFAULT_PREFERENCES.dailyBetLimit),
       dailyStakeCapPct: Math.max(1, Number($('#pref-daily-stake-cap')?.value || DEFAULT_PREFERENCES.dailyStakeCapPct) || DEFAULT_PREFERENCES.dailyStakeCapPct),
       coachLossStreakConfirm: Math.max(2, Number($('#pref-loss-streak-confirm')?.value || DEFAULT_PREFERENCES.coachLossStreakConfirm) || DEFAULT_PREFERENCES.coachLossStreakConfirm),
@@ -6112,6 +6304,136 @@
     node.innerHTML = `<div class="activity-heatmap">${cells.join('')}</div>`;
   }
 
+  function paperSimulationRows() {
+    const historyDays = Array.isArray(state.history?.byDay)
+      ? state.history.byDay
+      : Array.isArray(state.history?.by_day)
+        ? state.history.by_day
+        : [];
+    const cutoff = Date.now() - 30 * 24 * 60 * 60 * 1000;
+    const rows = [];
+    historyDays.forEach((day) => {
+      const picks = Array.isArray(day.picks) ? day.picks : [];
+      picks.forEach((pick) => {
+        const kickoff = Date.parse(pick.kickoff_utc || pick.start || day.date || '');
+        if (!Number.isFinite(kickoff) || kickoff < cutoff) return;
+        const result = String(pick.result || '').toLowerCase();
+        if (!['won', 'lost', 'void'].includes(result)) return;
+        const edge = Math.min(0.20, Math.max(0, Number(pick.edge || 0) || 0));
+        const odd = Number(pick.odd_book || pick.odd || 0);
+        const confidence = Number(pick.trust_score || pick.score_quality || 0) / 100;
+        const segmentOk = Number(pick.score_quality || 0) >= 45 || confidence >= 0.55;
+        const criticalMissing = Array.isArray(pick.context_critical_missing) ? pick.context_critical_missing : [];
+        if (edge < 0.03 || odd < 1.30 || odd > 6 || confidence < 0.55 || !segmentOk || criticalMissing.length) return;
+        rows.push({
+          ...pick,
+          kickoff,
+          result,
+          edge,
+          odd,
+          confidence,
+          title: `${pick.home || 'Home'} - ${pick.away || 'Away'}`,
+          market: formatMarketName(pick.market_key || ''),
+          label: pick.label || pick.selection || '',
+          priorityScore: Math.round((edge / 0.20) * 40 + confidence * 35 + Math.min(25, Number(pick.score_quality || 0) / 4))
+        });
+      });
+    });
+    return rows.sort((a, b) => b.priorityScore - a.priorityScore || a.kickoff - b.kickoff);
+  }
+
+  function paperSimulationReport() {
+    const prefs = loadPreferences();
+    const config = allocationConfig(prefs);
+    const bankroll = Math.max(1, getBankroll());
+    const dailyBudget = bankroll * Math.max(0.1, Number(config.budgetPct || 5)) / 100;
+    const rows = paperSimulationRows();
+    const byDay = new Map();
+    rows.forEach((row) => {
+      const day = parisDayKey(new Date(row.kickoff));
+      const bucket = byDay.get(day) || [];
+      bucket.push(row);
+      byDay.set(day, bucket);
+    });
+    const settled = [];
+    byDay.forEach((dayRows) => {
+      const selected = dayRows
+        .sort((a, b) => b.priorityScore - a.priorityScore || b.edge - a.edge)
+        .slice(0, config.maxPicks);
+      const shares = selected.map((_, index) => ALLOCATION_SHARES[index] || 2);
+      const totalShare = shares.reduce((sum, value) => sum + value, 0) || 1;
+      selected.forEach((row, index) => {
+        const stake = Number((dailyBudget * (shares[index] / totalShare)).toFixed(2));
+        const pnl = row.result === 'won' ? stake * (row.odd - 1) : row.result === 'lost' ? -stake : 0;
+        settled.push({ ...row, stake, pnl });
+      });
+    });
+    const stake = settled.reduce((sum, row) => sum + row.stake, 0);
+    const pnl = settled.reduce((sum, row) => sum + row.pnl, 0);
+    const won = settled.filter((row) => row.result === 'won').length;
+    const lost = settled.filter((row) => row.result === 'lost').length;
+    const realRows = loadUserBets().filter((bet) => Date.parse(bet.createdAt || bet.placedAt || '') >= cutoffDateDays(30));
+    const realStake = realRows.reduce((sum, bet) => sum + Number(bet.stake || 0), 0);
+    const realPnl = realRows.reduce((sum, bet) => sum + Number(bet.pnl || 0), 0);
+    const bySport = bucketUserBets(settled.map((row) => ({
+      ...row,
+      status: row.result,
+      sport: row.sport,
+      league: row.league,
+      market: row.market,
+      stake: row.stake,
+      pnl: row.pnl
+    })), (row) => row.sport || 'Sport inconnu').sort((a, b) => b.roi - a.roi);
+    return {
+      rows,
+      settled,
+      won,
+      lost,
+      stake,
+      pnl,
+      roi: stake > 0 ? pnl / stake : 0,
+      realRows,
+      realStake,
+      realPnl,
+      realRoi: realStake > 0 ? realPnl / realStake : 0,
+      bySport
+    };
+  }
+
+  function cutoffDateDays(days) {
+    return Date.now() - days * 24 * 60 * 60 * 1000;
+  }
+
+  function renderPaperSimulation() {
+    const grid = $('#paper-simulation-grid');
+    const detail = $('#paper-simulation-detail');
+    if (!grid) return;
+    const report = paperSimulationReport();
+    const comparison = report.pnl - report.realPnl;
+    grid.innerHTML = [
+      ['Picks fiables simulés', formatCount(report.settled.length), `${formatCount(report.won)} gagnés · ${formatCount(report.lost)} perdus`],
+      ['Simulation 30j ROI', formatPct(report.roi, 1), `${formatMoney(report.pnl)} sur ${formatMoney(report.stake)} misés`],
+      ['Paris suivis réels', formatCount(report.realRows.length), `${formatMoney(report.realPnl)} · ROI ${formatPct(report.realRoi, 1)}`],
+      ['Écart opportunité', formatMoney(comparison), comparison > 0 ? 'Tu as sous-utilisé des picks fiables.' : 'Tes choix réels font mieux que le plan auto.'],
+      ['Conseil', report.settled.length > report.realRows.length ? 'Suivre plus de top picks' : 'Discipline OK', `Stratégie ${allocationConfig().label.toLowerCase()}.`]
+    ].map(([label, value, text]) => `
+      <article class="quality-report-card ${Number(String(value).replace(',', '.')) < 0 ? 'quality-danger' : 'quality-ok'}">
+        <span>${escapeHtml(label)}</span>
+        <strong>${escapeHtml(value)}</strong>
+        <p>${escapeHtml(text)}</p>
+      </article>
+    `).join('');
+    if (!detail) return;
+    detail.innerHTML = report.bySport.length ? report.bySport.slice(0, 6).map((row) => `
+      <article class="backtest-card ${row.roi >= 0 ? 'warm' : 'cold'}">
+        <span>${escapeHtml(row.key)}</span>
+        <strong>${escapeHtml(formatPct(row.roi, 0))}</strong>
+        <p>${escapeHtml(`${formatCount(row.count)} picks simulés · ${formatMoney(row.pnl)} P&L`)}</p>
+        <small>${escapeHtml(`WR ${formatPct(row.winRate, 0)} · stake ${formatMoney(row.stake)}`)}</small>
+      </article>
+    `).join('') : '<div class="empty">Pas encore assez de picks réglés dans les 30 derniers jours pour simuler.</div>';
+  }
+
   function renderHistory() {
     const history = state.history;
     renderModelPerformance();
@@ -6124,6 +6446,8 @@
     renderActivityHeatmap365();
     renderLearningFeedback();
     renderBankrollAccounting();
+    renderDailyBudgetSummary();
+    renderPaperSimulation();
     renderCoachAdvice();
     $('#hist-total').textContent = history ? String(history.total) : '-';
     $('#hist-generated').textContent = history?.generatedAt ? new Date(history.generatedAt).toLocaleString('fr-FR') : '-';
@@ -6902,6 +7226,8 @@
     const quality = [
       ['Puis-je miser ?', stakeAllowed ? 'Oui' : 'Non'],
       ['Pourquoi ?', readableReason],
+      ['Priorité', row.priorityRank ? `#${row.priorityRank} · ${Math.round(priorityValue(row))}/100` : priorityText(row)],
+      ['Allocation jour', allocationSummaryText(row)],
       ['Action utile', readableAction],
       ['Mise affichée', visibleStakeText(row, decisionBundle)],
       ['Statut', row.statusLabel],
@@ -6974,6 +7300,11 @@
             <span>Décision</span>
             <strong>${escapeHtml(stakeAllowed ? 'Je peux miser' : 'Ne pas miser maintenant')}</strong>
             <p>${escapeHtml(readableReason)}</p>
+            <div class="ultimate-tags detail-priority-strip">
+              ${priorityBadgeHtml(row)}
+              ${safeBadgeHtml(row)}
+              <span title="${escapeHtml(allocationLongText(row))}">${escapeHtml(allocationSummaryText(row))}</span>
+            </div>
             <div class="decision-hero-grid">
               <div><span>Cote</span><strong>${escapeHtml(row.odd > 1 ? `@${row.odd.toFixed(2)}` : '-')}</strong></div>
               <div><span>Edge</span><strong>${escapeHtml(displayEdgeValue(row) > 0 ? formatPct(displayEdgeValue(row), 1) : '-')}</strong></div>
@@ -7127,7 +7458,7 @@
   }
 
   function stakePolicyText(row, decisions = decisionBundleForRow(row)) {
-    if (canDisplayStake(row, decisions)) return stakeAdjustmentText(row);
+    if (canDisplayStake(row, decisions)) return allocationLongText(row);
     return `Bloquée · ${noBetStakeReason(row, decisions)}`;
   }
 
@@ -10375,6 +10706,14 @@
       trackScorerBet(scorerButton.dataset.trackScorerId || '');
       return;
     }
+    const liveNoteButton = event.target.closest('[data-live-note-key]');
+    if (liveNoteButton) {
+      event.preventDefault();
+      event.stopPropagation();
+      if (event.type === 'keydown') return;
+      saveLiveQuickNote(liveNoteButton.dataset.liveNoteKey || '', liveNoteButton.dataset.liveNote || 'Observation live');
+      return;
+    }
     if (event.target.closest('button, a, input, select, textarea')) return;
     const row = event.target.closest('[data-match-id]');
     if (!row) return;
@@ -10688,7 +11027,7 @@
         $('#refresh-log').textContent = error.stack || error.message;
       });
     });
-    ['ultimate-bet-card', 'live-cockpit', 'time-cockpit', 'simple-pick-timeline', 'simple-scorers-grid', 'picks-body', 'stake-scenario-body', 'watchlist-grid', 'prematch-final-grid', 'matches-body', 'combines-list', 'scorers-list', 'agent-positions-body', 'agent-blockers-body'].forEach((id) => {
+    ['ultimate-bet-card', 'live-cockpit', 'time-cockpit', 'simple-pick-timeline', 'simple-scorers-grid', 'bankroll-allocation-grid', 'picks-body', 'stake-scenario-body', 'watchlist-grid', 'prematch-final-grid', 'matches-body', 'combines-list', 'scorers-list', 'agent-positions-body', 'agent-blockers-body'].forEach((id) => {
       const node = $(`#${id}`);
       if (!node) return;
       node.addEventListener('click', openMatchFromEvent);
