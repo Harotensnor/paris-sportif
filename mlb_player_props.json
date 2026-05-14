@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-14T17:46:44Z",
+  "generated_at": "2026-05-14T17:54:26Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815341",
-      "kickoff": "2026-05-14T17:40Z",
-      "league": "MLB",
-      "match": "San Diego Padres at Milwaukee Brewers",
-      "home": "Milwaukee Brewers",
-      "away": "San Diego Padres",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Milwaukee Brewers",
-          "pitcher": "Kyle Harrison",
-          "label": "Kyle Harrison plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.5585,
-          "fair_odds": 1.79,
-          "expected_strikeouts": 5.78,
-          "projected_ip": 4.74,
-          "inputs": {
-            "k9": 10.96,
-            "era": 2.41,
-            "whip": 1.22,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Milwaukee Brewers",
-          "pitcher": "Kyle Harrison",
-          "label": "Kyle Harrison ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.656,
-          "fair_odds": 1.52,
-          "expected_hr_allowed": 0.422,
-          "projected_ip": 4.74,
-          "inputs": {
-            "hr9": 0.8,
-            "era": 2.41,
-            "whip": 1.22
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "San Diego Padres",
-          "pitcher": "Griffin Canning",
-          "label": "Griffin Canning plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.5734,
-          "fair_odds": 1.74,
-          "expected_strikeouts": 5.85,
-          "projected_ip": 4.55,
-          "inputs": {
-            "k9": 11.57,
-            "era": 6.75,
-            "whip": 1.61,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "San Diego Padres",
-          "pitcher": "Griffin Canning",
-          "label": "Griffin Canning ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6155,
-          "fair_odds": 1.62,
-          "expected_hr_allowed": 0.485,
-          "projected_ip": 4.55,
-          "inputs": {
-            "hr9": 0.96,
-            "era": 6.75,
-            "whip": 1.61
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815342",
       "kickoff": "2026-05-14T18:10Z",
@@ -496,7 +414,7 @@
       ]
     }
   ],
-  "props": 24,
+  "props": 20,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
