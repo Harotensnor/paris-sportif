@@ -326,6 +326,23 @@ a:hover {
   opacity: .65;
 }
 
+.track-bet-btn {
+  min-width: 86px;
+  border: 1px solid rgba(16, 185, 129, .48);
+  background: rgba(16, 185, 129, .14);
+  color: var(--accent);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.track-bet-btn.tracked {
+  border-color: rgba(148, 163, 184, .32);
+  background: rgba(148, 163, 184, .12);
+  color: var(--muted);
+}
+
 .banner {
   border: 1px solid rgba(248, 113, 113, .55);
   background: rgba(127, 29, 29, .28);
@@ -420,8 +437,27 @@ a:hover {
 
 .decision-terminal-grid {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 10px;
+}
+
+.advanced-section {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .025);
+  margin: 14px 0;
+  padding: 12px;
+}
+
+.advanced-section summary {
+  cursor: pointer;
+  font-weight: 900;
+  color: var(--text);
+}
+
+.advanced-section > p {
+  color: var(--muted);
+  margin: 6px 0 12px;
 }
 
 .terminal-card,

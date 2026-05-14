@@ -1,20 +1,18 @@
 {
   "name": "paris-sportif",
   "version": "1.0.0",
-  "description": "Static sports betting predictions site (single HTML file). Tests only — no build step.",
+  "description": "Logiciel PC local de prédictions Paris-Sportif.",
   "private": true,
   "scripts": {
-    "test": "playwright test",
-    "test:headed": "playwright test --headed",
-    "test:report": "playwright show-report",
+    "desktop": "npm --prefix desktop start",
+    "test": "npm run qa:unit && npm run qa:refresh && node desktop/scripts/smoke.js",
+    "qa:desktop": "node desktop/scripts/smoke.js",
+    "qa:visual": "node desktop/scripts/visual-capture.js",
     "qa:unit": "node scripts/qa_unit_runner.js",
-    "qa:contract": "python scripts/qa_contract_tests.py",
-    "qa:gates": "python scripts/qa_quality_gate.py",
-    "qa:visual": "node scripts/qa_visual_regression.js",
-    "qa:report": "python scripts/qa_html_report.py"
+    "qa:refresh": "node desktop/scripts/refresh-contract.js",
+    "qa:engine": "node desktop/scripts/engine-contract.js"
   },
   "devDependencies": {
-    "@axe-core/playwright": "^4.10.0",
-    "@playwright/test": "^1.48.0"
+    "playwright": "^1.48.0"
   }
 }

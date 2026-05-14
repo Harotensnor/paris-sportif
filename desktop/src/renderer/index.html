@@ -53,6 +53,8 @@
           </select>
           <button class="ghost-btn" id="refresh-signals-btn">Signaux lents</button>
           <button class="ghost-btn" id="refresh-prematch-btn">Pré-match</button>
+          <button class="ghost-btn" id="refresh-prematch-t60-btn">T-60</button>
+          <button class="ghost-btn" id="refresh-prematch-t30-btn">T-30</button>
           <button class="ghost-btn" id="reload-engine-btn">Recalculer</button>
         </div>
       </header>
@@ -85,7 +87,7 @@
           <article class="metric">
             <span id="metric-picks-label">Candidats détectés</span>
             <strong id="metric-picks">-</strong>
-            <small id="metric-picks-sub">La V8 bloque les mises non prêtes</small>
+            <small id="metric-picks-sub">Aucune mise sans garde-fou vert</small>
           </article>
           <article class="metric">
             <span>Bankroll user</span>
@@ -95,25 +97,82 @@
             </div>
             <small>sert au calcul des mises</small>
           </article>
+          <article class="metric">
+            <span>P&L suivi</span>
+            <strong id="user-pnl-total">0.00 €</strong>
+            <small id="user-pnl-sub">Jour 0.00 € · ROI 0.0%</small>
+          </article>
         </div>
 
-        <div class="v8-cockpit v12-cockpit v14-cockpit" id="v16-cockpit">
-          <div class="v8-cockpit-head">
+        <div class="decision-terminal">
+          <div class="decision-terminal-head">
             <div>
-              <div class="eyebrow">V16 Décision finale</div>
-              <h3 id="v16-main-message">Chargement V16...</h3>
-              <p id="v16-main-caption">Ticket final : prêt, T-10, prix, source, hostile ou écarté.</p>
+              <div class="eyebrow">Décision finale locale</div>
+              <h3>Que faire maintenant ?</h3>
+              <p id="final-decision-caption">Chargement de la décision consolidée...</p>
             </div>
-            <div class="v8-cockpit-actions">
-              <button class="primary-btn" id="v16-finalize-run-btn">Finaliser V16</button>
-              <button class="ghost-btn" id="v16-t10-run-btn">T-10 V16</button>
-              <button class="ghost-btn" id="v16-source-run-btn">Sources V16</button>
-              <button class="ghost-btn" id="v16-ticket-export-btn">Exporter ticket V16</button>
+            <div class="section-actions">
+              <button class="primary-btn" id="run-first-action-btn">Lancer l'action utile</button>
+              <button class="ghost-btn" id="refresh-critical-btn">File critique</button>
+              <button class="ghost-btn" id="refresh-prematch-t10-btn">T-10</button>
             </div>
           </div>
-          <div class="v8-control-room" id="v16-cockpit-grid">
-            <div class="empty">Chargement du cockpit V16...</div>
+          <div class="decision-terminal-grid" id="final-decision-grid">
+            <div class="empty">Chargement de la décision...</div>
           </div>
+        </div>
+
+        <div class="section-head compact">
+          <div>
+            <h3 id="picks-section-title">Sélection du jour</h3>
+            <p id="picks-caption">Chargement des meilleurs candidats proches...</p>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Match</th>
+                <th>Marché</th>
+                <th>Cote</th>
+                <th>Proba</th>
+                <th>Edge</th>
+                <th>Mise</th>
+                <th>Départ</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="picks-body">
+              <tr><td colspan="8" class="empty">Chargement des candidats...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="section-head compact">
+          <div>
+            <h3>Scénarios de mise</h3>
+            <p>Affichés uniquement si un pick passe les garde-fous.</p>
+          </div>
+        </div>
+        <div class="stake-scenario-grid" id="stake-scenario-grid">
+          <div class="empty">Aucun scénario actif.</div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Match</th>
+                <th>Marché</th>
+                <th>Prudent</th>
+                <th>Normal</th>
+                <th>Agressif</th>
+                <th>Edge</th>
+              </tr>
+            </thead>
+            <tbody id="stake-scenario-body">
+              <tr><td colspan="6" class="empty">Aucun détail de mise disponible.</td></tr>
+            </tbody>
+          </table>
         </div>
 
       </section>
@@ -483,36 +542,72 @@
       <section class="tab-panel" data-panel="data">
         <div class="section-head">
           <div>
-            <h3>Fichiers locaux</h3>
-            <p>Etat des sources utilisées par le logiciel.</p>
+            <h3>Control Room</h3>
+            <p>Blocages, actions utiles, sources et fichiers suivis.</p>
           </div>
           <div class="section-actions">
             <button class="ghost-btn" id="export-report-json-btn">Rapport JSON</button>
-            <button class="ghost-btn" id="export-picks-csv-btn">Picks CSV</button>
+            <button class="ghost-btn" id="export-btn">Picks CSV</button>
             <button class="ghost-btn" id="export-context-json-btn">Contextes</button>
             <button class="ghost-btn" id="export-gaps-csv-btn">Signaux manquants</button>
             <button class="ghost-btn" id="export-calibration-csv-btn">Calibration</button>
           </div>
         </div>
-        <div class="v8-control-room" id="v16-control-room-grid">
-          <div class="empty">Chargement Control Room V16...</div>
+        <div class="quality-report-grid" id="quality-report-grid">
+          <div class="empty">Chargement synthèse qualité...</div>
         </div>
-          <div class="empty">Chargement Control Room V15...</div>
+
+        <div class="section-head compact">
+          <div>
+            <h3>Blocages actuels</h3>
+            <p>Blocages qui empêchent l'agent ou l'utilisateur de miser trop tôt.</p>
+          </div>
         </div>
-          <div class="empty">Chargement Control Room V14...</div>
+        <div class="quality-report-grid" id="prebet-checklist-grid">
+          <div class="empty">Chargement checklist...</div>
         </div>
-          <div class="empty">Chargement Control Room V13...</div>
+
+        <div class="section-head compact">
+          <div>
+            <h3>Actions utiles</h3>
+            <p>Sources ou refreshs qui peuvent changer une décision.</p>
+          </div>
         </div>
-          <div class="empty">Chargement Control Room V12...</div>
+        <div class="quality-report-grid" id="refresh-priority-grid">
+          <div class="empty">Chargement file refresh...</div>
         </div>
-          <div class="empty">Chargement Control Room V8...</div>
+        <div class="quality-report-grid" id="context-repair-grid">
+          <div class="empty">Chargement réparations contexte...</div>
         </div>
-          <div class="empty">Chargement Control Room V9...</div>
+
+        <details class="advanced-section" open>
+          <summary>Santé des sources</summary>
+          <p>Fraîcheur locale des fichiers utilisés par le logiciel.</p>
+          <div class="source-grid" id="source-health-grid">
+            <div class="empty">Chargement sources...</div>
+          </div>
+        </details>
+
+        <div class="section-head compact">
+          <div>
+            <h3>Refreshs</h3>
+            <p>Derniers lancements locaux et étapes exécutées.</p>
+          </div>
         </div>
-          <div class="empty">Chargement Control Room V10...</div>
+        <div class="refresh-summary-grid" id="refresh-summary-grid">
+          <div class="empty">Chargement refreshs...</div>
         </div>
-          <div class="empty">Chargement Control Room V11...</div>
+        <div class="refresh-stage-grid" id="refresh-stage-grid">
+          <div class="empty">Aucun détail refresh disponible.</div>
         </div>
+
+        <details class="advanced-section">
+          <summary>Fichiers suivis</summary>
+          <p>Présence et date des fichiers locaux principaux.</p>
+          <div class="file-list" id="file-list">
+            <div class="empty">Chargement fichiers...</div>
+          </div>
+        </details>
       </section>
     </main>
   </div>

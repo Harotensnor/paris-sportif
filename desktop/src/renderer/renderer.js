@@ -55,17 +55,20 @@
     probabilityCalibration: null,
     policyCandidates: null,
     sourceHealth: null,
+    decisionCenter: null,
     agentBlockers: null,
     clvSummary: null,
     dashboardMeta: null,
     prematchPlan: null,
     engineReady: false,
     refreshTimer: null,
+    backgroundRefreshTimer: null,
     exportTimer: null,
     actionHistory: []
   };
 
   const ACTION_HISTORY_KEY = 'parisSportifActionHistory';
+  const USER_BETS_KEY = 'parisSportifUserBets';
   const REFRESH_ESTIMATE_SECONDS = {
     quick: 150,
     signals: 520,
@@ -114,6 +117,109 @@
     const n = Number(value);
     if (!Number.isFinite(n)) return '-';
     return `${(n * 100).toFixed(digits)}%`;
+  }
+
+  function loadUserBets() {
+    try {
+      const rows = JSON.parse(localStorage.getItem(USER_BETS_KEY) || '[]');
+      return Array.isArray(rows) ? rows.filter((row) => row && typeof row === 'object') : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function saveUserBets(rows) {
+    try {
+      localStorage.setItem(USER_BETS_KEY, JSON.stringify(Array.isArray(rows) ? rows : []));
+    } catch {
+      setSideStatus('Suivi pari indisponible', 'warn');
+    }
+  }
+
+  function userBetKey(row) {
+    return `${row?.id || ''}:${row?.market || ''}:${row?.label || ''}`;
+  }
+
+  function findPickByTrackKey(key) {
+    const rows = [...(state.picks || []), ...(state.allPicks || []), ...(state.matches || [])];
+    return rows.find((row) => userBetKey(row) === key) || null;
+  }
+
+  function userBetStats() {
+    const bets = loadUserBets();
+    const today = new Intl.DateTimeFormat('fr-CA', { timeZone: 'Europe/Paris', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
+    let totalStake = 0;
+    let settledStake = 0;
+    let pnlTotal = 0;
+    let pnlToday = 0;
+    let pending = 0;
+    for (const bet of bets) {
+      const stake = Math.max(0, Number(bet.stake || 0) || 0);
+      const pnl = Number(bet.pnl || 0) || 0;
+      totalStake += stake;
+      if (bet.status === 'pending') pending += 1;
+      if (bet.status === 'won' || bet.status === 'lost' || bet.status === 'void') {
+        settledStake += stake;
+        pnlTotal += pnl;
+      }
+      if (String(bet.day || '').slice(0, 10) === today) pnlToday += pnl;
+    }
+    return {
+      bets: bets.length,
+      pending,
+      totalStake,
+      settledStake,
+      pnlTotal,
+      pnlToday,
+      roi: settledStake > 0 ? pnlTotal / settledStake : 0
+    };
+  }
+
+  function renderUserPnl() {
+    const stats = userBetStats();
+    const totalNode = $('#user-pnl-total');
+    const subNode = $('#user-pnl-sub');
+    if (totalNode) totalNode.textContent = formatMoney(stats.pnlTotal);
+    if (subNode) {
+      subNode.textContent = `Jour ${formatMoney(stats.pnlToday)} · ROI ${formatPct(stats.roi, 1)} · ${formatCount(stats.pending)} en cours`;
+    }
+  }
+
+  function trackUserBet(row) {
+    if (!row || !canDisplayStake(row)) return;
+    const key = userBetKey(row);
+    const bets = loadUserBets();
+    const existing = bets.find((bet) => bet.key === key && bet.status === 'pending');
+    if (existing) {
+      setSideStatus('Pari déjà suivi', 'warn');
+      return;
+    }
+    const now = new Date();
+    const stake = Math.max(0, Number(row.stake || row.decisionCenter?.stake || 0) || 0);
+    bets.push({
+      id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+      key,
+      matchId: row.id,
+      title: row.title,
+      sport: row.sport,
+      league: row.league,
+      start: row.start,
+      market: row.market,
+      label: row.label,
+      odd: Number(row.odd || 0),
+      probability: Number(row.probability || 0),
+      edge: Number(row.edge || 0),
+      stake,
+      status: 'pending',
+      pnl: 0,
+      day: new Intl.DateTimeFormat('fr-CA', { timeZone: 'Europe/Paris', year: 'numeric', month: '2-digit', day: '2-digit' }).format(now),
+      createdAt: now.toISOString()
+    });
+    saveUserBets(bets);
+    renderUserPnl();
+    renderPicks();
+    renderStakeScenarios();
+    setSideStatus('Pari ajouté au suivi', 'ok');
   }
 
   function formatOdd(value) {
@@ -335,10 +441,27 @@
   }
 
   function firstNextAction() {
+    const ready = Number(state.decisionCenter?.summary?.ready || 0);
+    if (ready > 0) {
+      return { mode: 'prematch_t10', source: 'all', priority: 'ready', title: 'Finaliser T-10' };
+    }
+    const blockers = Number(state.prebetChecklist?.summary?.blockers || 0);
+    const critical = Number(state.criticalIssueReport?.summary?.critical || 0);
+    if (blockers > 0 || critical > 0 || state.criticalIssueReport?.summary?.blocks_bet) {
+      return { mode: 'critical', source: 'all', priority: 'critical', title: 'File critique' };
+    }
+    const repair = state.contextRepairPlan?.summary || {};
+    if (Number(repair.repair_actions || 0) > 0 || Number(repair.weak_matches || 0) > 0) {
+      return { mode: 'repair_context', source: 'all', priority: 'high', title: 'Réparer contexte' };
+    }
+    const nearPrematch = Number(state.prematchPlan?.autoDue || 0);
+    if (nearPrematch > 0) {
+      return { mode: 'prematch_t10', source: 'all', priority: 'medium', title: 'Pré-match T-10' };
+    }
     const queue = Array.isArray(state.refreshPriorityPlan?.queue) ? state.refreshPriorityPlan.queue : [];
     if (queue[0]) return queue[0];
     const actions = Array.isArray(state.nextActions?.actions) ? state.nextActions.actions : [];
-    return actions[0] || null;
+    return actions[0] || { mode: 'quick', source: 'all', priority: 'low', title: 'Refresh rapide' };
   }
 
   function compactMatchKey(value) {
@@ -385,6 +508,7 @@
 
   function pickReason(row) {
     const reasons = [];
+    if (row?.decisionCenter?.mainReason && !row.decisionCenter.canBet) reasons.push(row.decisionCenter.mainReason);
     if (Number(row?.edge) > 0) reasons.push(`edge ${formatPct(row.edge, 1)}`);
     if (Number(row?.probability) > 0) reasons.push(`proba ${formatPct(row.probability, 1)}`);
     if (Number(row?.stake) > 0) reasons.push(`Kelly ${formatMoney(row.stake)}`);
@@ -731,6 +855,7 @@
       state.probabilityCalibration = null;
       state.policyCandidates = null;
       state.sourceHealth = null;
+      state.decisionCenter = null;
       state.agentBlockers = null;
       state.clvSummary = null;
       state.dashboardMeta = null;
@@ -769,25 +894,6 @@
       renderCoverageRepairEngine();
       renderModelLabV4();
       renderSourceHealthV4();
-      renderV5Dashboard();
-      renderV5CorrectionCenter();
-      renderV6DecisionTerminal();
-      renderV6ControlRoom();
-      renderV7Actionability();
-      renderV8Cockpit();
-      renderV8ControlRoom();
-      renderV9UnlockCenter();
-      renderV9ControlRoom();
-      renderV10Finalizer();
-      renderV10ControlRoom();
-      renderV11Cockpit();
-      renderV11ControlRoom();
-      renderV14Cockpit();
-      renderV14ControlRoom();
-      renderV13Cockpit();
-      renderV13ControlRoom();
-      renderV12Cockpit();
-      renderV12ControlRoom();
       renderActionHistory();
       renderPrebetChecklistBacktest();
       renderFinalDecisionPanel();
@@ -848,6 +954,7 @@
     state.probabilityCalibration = analysis.probabilityCalibration || null;
     state.policyCandidates = analysis.policyCandidates || null;
     state.sourceHealth = analysis.sourceHealth || null;
+    state.decisionCenter = analysis.decisionCenter || null;
     state.agentBlockers = analysis.agentBlockers || null;
     state.clvSummary = analysis.clvSummary || null;
     state.dashboardMeta = analysis.dashboardMeta || null;
@@ -876,14 +983,6 @@
     renderPrebetChecklist();
     renderPrebetChecklistBacktest();
     renderFinalDecisionPanel();
-    renderV6DecisionTerminal();
-    renderV7Actionability();
-    renderV8Cockpit();
-    renderV9UnlockCenter();
-    renderV10Finalizer();
-    renderV16Cockpit();
-    renderV15Cockpit();
-    renderV14Cockpit();
     renderSmartPreparePlan();
     renderAgentSimulation();
     if (state.status) {
@@ -904,28 +1003,6 @@
       renderCoverageRepairEngine();
       renderModelLabV4();
       renderSourceHealthV4();
-      renderV5Dashboard();
-      renderV5CorrectionCenter();
-      renderV6ControlRoom();
-      renderV7Actionability();
-      renderV8Cockpit();
-      renderV8ControlRoom();
-      renderV9UnlockCenter();
-      renderV9ControlRoom();
-    renderV10Finalizer();
-    renderV10ControlRoom();
-    renderV11Cockpit();
-    renderV11ControlRoom();
-    renderV16Cockpit();
-    renderV16ControlRoom();
-    renderV15Cockpit();
-    renderV15ControlRoom();
-    renderV14Cockpit();
-    renderV14ControlRoom();
-    renderV13Cockpit();
-    renderV13ControlRoom();
-    renderV12Cockpit();
-    renderV12ControlRoom();
       renderSignalGapCenter();
       renderQualityAlerts(state.status);
       renderWarnings(state.status);
@@ -937,36 +1014,54 @@
   function renderPicks(emptyMessage) {
     const body = $('#picks-body');
     const metricLabel = $('#metric-picks-label');
-    if (metricLabel) metricLabel.textContent = 'Candidats détectés';
-    $('#metric-picks').textContent = String(state.picks.length || 0);
+    renderUserPnl();
     const total = state.allPicks.length || state.picks.length || 0;
     const meta = state.dashboardMeta || {};
+    const ready = Number(state.decisionCenter?.summary?.ready || meta.readyPicks || 0);
+    if (metricLabel) metricLabel.textContent = ready > 0 ? 'Paris prêts' : 'Candidats surveillés';
+    $('#metric-picks').textContent = String(ready > 0 ? ready : (state.picks.length || 0));
+    const globalBlocked = Boolean(state.decisionCenter?.summary?.blocked);
     const caption = meta.mode === 'bestAvailable'
-      ? 'Aucun pick dans les 30 prochaines heures : affichage des meilleurs picks à venir.'
-      : 'Fenêtre proche : picks des 30 prochaines heures, sans pari forcé.';
+      ? 'Moins de 10 picks prêts dans les 30 prochaines heures : affichage des meilleurs picks disponibles.'
+      : ready > 0
+        ? 'Fenêtre proche : seuls les picks prêts affichent une mise.'
+        : 'Aucun pari à jouer maintenant : candidats surveillés sans mise.';
+    const sectionTitle = $('#picks-section-title');
+    if (sectionTitle) sectionTitle.textContent = ready > 0 ? 'À jouer maintenant' : 'Sélection surveillée';
     $('#picks-caption').textContent = caption;
     $('#metric-picks-sub').textContent = total > state.picks.length
-      ? `${total} picks positifs au total`
-      : 'Kelly strict, edge positif';
+      ? `${state.picks.length} affichés · ${total} picks positifs au total`
+      : globalBlocked
+        ? '0 mise tant qu’un gate est rouge'
+        : `${formatCount(ready)} prêt(s)`;
     if (!state.picks.length) {
-      body.innerHTML = `<tr><td colspan="7" class="empty">${escapeHtml(emptyMessage || 'Aucun pick jouable avec les règles actuelles.')}</td></tr>`;
+      body.innerHTML = `<tr><td colspan="8" class="empty">${escapeHtml(emptyMessage || 'Aucun pick jouable avec les règles actuelles.')}</td></tr>`;
       return;
     }
+    const tracked = new Set(loadUserBets().filter((bet) => bet.status === 'pending').map((bet) => bet.key));
     body.innerHTML = state.picks.map((pick) => {
       const startLabel = formatDateLabel(pick.start);
       const edgeClass = pick.edge >= 0.08 ? 'edge-pos' : 'edge-warn';
+      const decision = pick.decisionCenter || {};
+      const statusText = decision.canBet ? 'Prêt' : decision.status === 'repair' ? 'À réparer' : decision.status === 'skip' ? 'À éviter' : 'À surveiller';
+      const trackKey = userBetKey(pick);
+      const isTracked = tracked.has(trackKey);
+      const action = canDisplayStake(pick)
+        ? `<button type="button" class="track-bet-btn${isTracked ? ' tracked' : ''}" data-track-bet-key="${escapeHtml(trackKey)}">${isTracked ? 'Suivi' : 'Je mise'}</button>`
+        : '<span class="match-sub">-</span>';
       return `
         <tr class="clickable-row" data-match-id="${escapeHtml(pick.id)}" tabindex="0" role="button" aria-label="Ouvrir ${escapeHtml(pick.title)}">
           <td data-label="Match">
             <div class="match-title">${escapeHtml(pick.title)}</div>
             <div class="match-sub">${escapeHtml(pick.sport)} · ${escapeHtml(pick.league)}</div>
           </td>
-          <td data-label="Marché"><span class="pill">${escapeHtml(pick.market)}</span><div class="match-sub">${escapeHtml(pick.label)}</div><div class="match-sub selection-reason">${escapeHtml(pickReason(pick))}</div>${calibrationNote(pick)}</td>
+          <td data-label="Marché"><span class="pill">${escapeHtml(statusText)}</span> <span class="pill">${escapeHtml(pick.market)}</span><div class="match-sub">${escapeHtml(pick.label)}</div><div class="match-sub selection-reason">${escapeHtml(pickReason(pick))}</div>${calibrationNote(pick)}</td>
           <td data-label="Cote">@${pick.odd.toFixed(2)}</td>
           <td data-label="Proba">${formatPct(pick.probability, 1)}</td>
           <td data-label="Edge" class="${edgeClass}">${formatPct(pick.edge, 1)}</td>
-          <td data-label="Mise">${formatMoney(pick.stake)}</td>
+          <td data-label="Mise">${visibleStakeText(pick)}</td>
           <td data-label="Départ">${escapeHtml(startLabel)}</td>
+          <td data-label="Action">${action}</td>
         </tr>`;
     }).join('');
   }
@@ -1416,7 +1511,7 @@
   function renderStakeScenarios(emptyMessage) {
     const wrap = $('#stake-scenario-grid');
     if (!wrap) return;
-    const picks = state.picks.filter((pick) => Number(pick.stake || 0) > 0 && Number(pick.edge || 0) > 0);
+    const picks = state.picks.filter((pick) => canDisplayStake(pick) && Number(pick.edge || 0) > 0);
     const bankroll = getBankroll();
     if (!picks.length || !(bankroll > 0)) {
       wrap.innerHTML = `<div class="empty">${escapeHtml(emptyMessage || 'Aucun scénario actif : pas de pick user jouable.')}</div>`;
@@ -1454,7 +1549,15 @@
     }
     body.innerHTML = visibleRows.map((row) => {
       const edgeClass = row.edge >= 0.08 ? 'edge-pos' : row.edge > 0 ? 'edge-warn' : 'status-skip';
-      const statusClass = row.status === 'bet' ? 'status-bet' : row.status === 'watch' ? 'status-watch' : 'status-skip';
+      const dcStatus = row.decisionCenter?.status || row.status;
+      const statusClass = dcStatus === 'ready' ? 'status-bet' : dcStatus === 'watch' || dcStatus === 'repair' ? 'status-watch' : 'status-skip';
+      const statusLabel = dcStatus === 'ready'
+        ? 'Prêt'
+        : dcStatus === 'repair'
+          ? 'À réparer'
+          : dcStatus === 'skip'
+            ? 'À éviter'
+            : row.decisionCenter?.mainReason || row.statusLabel;
       return `
         <tr class="clickable-row" data-match-id="${escapeHtml(row.id)}" tabindex="0" role="button" aria-label="Ouvrir ${escapeHtml(row.title)}">
           <td data-label="Match">
@@ -1465,7 +1568,7 @@
           <td data-label="Cote">${row.odd > 1 ? `@${row.odd.toFixed(2)}` : '-'}</td>
           <td data-label="Proba">${row.probability > 0 ? formatPct(row.probability, 1) : '-'}</td>
           <td data-label="Edge" class="${edgeClass}">${row.edge > 0 ? formatPct(row.edge, 1) : '-'}</td>
-          <td data-label="Statut" class="${statusClass}">${escapeHtml(row.statusLabel)}</td>
+          <td data-label="Statut" class="${statusClass}">${escapeHtml(statusLabel)}</td>
           <td data-label="Départ">${escapeHtml(formatDateLabel(row.start))}</td>
         </tr>`;
     }).join('');
@@ -2575,15 +2678,20 @@
     const pred = row.pred || {};
     const context = match.context || {};
     const contextQuality = context.quality || row.contextQuality || {};
-    const decisionBundle = {};
+    const decisionBundle = decisionBundleForRow(row);
     const stakeAllowed = canDisplayStake(row, decisionBundle);
-    const readableDecision = row.statusLabel || 'Observation';
+    const dc = decisionBundleForRow(row);
+    const readableDecision = dc.status === 'ready' ? 'Prêt' : dc.status === 'repair' ? 'À réparer' : dc.status === 'skip' ? 'À éviter' : (row.statusLabel || 'Observation');
     const readableReason = noBetStakeReason(row, decisionBundle) || contextGateText(row);
-    const readableAction = stakeAllowed ? 'Jouer maintenant' : 'Surveiller ou finaliser T-10';
+    const readableAction = dc.nextAction || (stakeAllowed ? 'Jouer maintenant' : 'Surveiller ou finaliser T-10');
     const wx = match.winamax || {};
     const markets = wx.markets || {};
     const oneNtwo = markets['1n2'] || {};
     const quality = [
+      ['Puis-je miser ?', stakeAllowed ? 'Oui' : 'Non'],
+      ['Pourquoi ?', readableReason],
+      ['Action utile', readableAction],
+      ['Mise affichée', visibleStakeText(row, decisionBundle)],
       ['Statut', row.statusLabel],
       ['Marché', row.market],
       ['Pick', row.label],
@@ -2591,13 +2699,12 @@
       ['Proba modèle', row.probability > 0 ? formatPct(row.probability, 1) : '-'],
       ['Edge', row.edge > 0 ? formatPct(row.edge, 1) : '-'],
       ['Mise autorisée', visibleStakeText(row, decisionBundle)],
-      ['Kelly théorique', row.stake > 0 && !stakeAllowed ? `${formatMoney(row.stake)} · bloquée` : row.stake > 0 ? formatMoney(row.stake) : '0 €'],
+      ['Kelly théorique', Number(row.modelStake || row.stake || 0) > 0 && !stakeAllowed ? `${formatMoney(row.modelStake || row.stake)} · bloquée` : row.stake > 0 ? formatMoney(row.stake) : '0 €'],
       ['Prudence mise', stakePolicyText(row, decisionBundle)],
       ['Contexte', contextScoreLabel(contextQuality)],
       ['Confiance', confidenceTrustText(row)],
       ['Décision logiciel', readableDecision],
       ['Raison', readableReason],
-      ['Action utile', readableAction],
       ['Marché', row.marketTiming?.label || 'CLV en apprentissage'],
       ['Cote haute', row.oddsGuardrail?.tone && row.oddsGuardrail.tone !== 'ok' ? row.oddsGuardrail.label : 'Pas de garde-fou cote'],
       ['Gate', contextGateText(row)]
@@ -2702,20 +2809,25 @@
     return `${money}${reasons ? ` · ${reasons}` : ''}`;
   }
 
-  function decisionBundleForRow(_row) {
-    return {};
+  function decisionBundleForRow(row) {
+    return row?.decisionCenter || {};
   }
 
-  function canDisplayStake(row, _decisions = decisionBundleForRow(row)) {
+  function canDisplayStake(row, decisions = decisionBundleForRow(row)) {
+    if (decisions && Object.prototype.hasOwnProperty.call(decisions, 'canBet')) {
+      return decisions.canBet === true && Number(row?.stake || 0) > 0;
+    }
     return row?.status === 'bet' && !row?.prebetGate?.blocked && Number(row?.edge || 0) > 0 && Number(row?.stake || 0) > 0;
   }
 
   function visibleStakeText(row, decisions = decisionBundleForRow(row)) {
+    if (!canDisplayStake(row, decisions) && decisions?.stakeDisplay) return String(decisions.stakeDisplay);
     return canDisplayStake(row, decisions) && Number(row?.stake || 0) > 0 ? formatMoney(row.stake) : '0 €';
   }
 
-  function noBetStakeReason(row, _decisions = decisionBundleForRow(row)) {
-    return row?.prebetGate?.first
+  function noBetStakeReason(row, decisions = decisionBundleForRow(row)) {
+    return decisions?.mainReason
+      || row?.prebetGate?.first
       || row?.statusLabel
       || contextGateText(row)
       || 'Gate final non prêt';
@@ -3103,11 +3215,12 @@
     $('#agent-scorable').textContent = String((agent && agent.scorableRaw) || 0);
     const activeExposure = agent?.exposure || {};
     const blockedExposure = agent?.blockedExposure || {};
-    const exposure = Number(blockedExposure.count || 0) > 0 ? blockedExposure : activeExposure;
+    const hasActiveAgentPositions = Array.isArray(agent?.positions) && agent.positions.length > 0;
+    const exposure = hasActiveAgentPositions ? activeExposure : { maxDailyStake: 0, maxDailyPct: 0, count: 0 };
     $('#agent-exposure').textContent = agent ? formatMoney(exposure.maxDailyStake || 0) : '-';
     $('#agent-exposure-sub').textContent = agent
-      ? Number(blockedExposure.count || 0) > 0
-        ? `${formatPct(exposure.maxDailyPct || 0, 1)} bloqués · ${formatCount(blockedExposure.count)} positions`
+      ? Number(blockedExposure.count || 0) > 0 && !hasActiveAgentPositions
+        ? `0 mise ouverte · ${formatCount(blockedExposure.count)} candidat(s) bloqué(s)`
         : `${formatPct(exposure.maxDailyPct || 0, 1)} max/jour · ${formatCount(activeExposure.count || 0)} ouvertes`
       : '-';
     const drawdown = agent?.drawdown || {};
@@ -3868,6 +3981,12 @@
     button.disabled = Boolean(running);
     button.textContent = action.mode === 'signals'
       ? `Lancer ${signalSourceLabel(source)}`
+      : action.mode === 'critical'
+        ? 'File critique'
+        : action.mode === 'repair_context'
+          ? 'Réparer contexte'
+          : action.mode === 'prematch_t10'
+            ? 'Pré-match T-10'
       : action.mode === 'prematch'
         ? 'Lancer pré-match'
         : 'Lancer la priorité';
@@ -4021,65 +4140,46 @@
     const grid = $('#final-decision-grid');
     if (!grid) return;
     const caption = $('#final-decision-caption');
-    const prebetSummary = state.prebetChecklist?.summary || {};
-    const blockers = Number(prebetSummary.blockers || 0);
-    const picks = state.picks.length;
-    const watch = state.watchlist.length;
-    const agentPositions = Array.isArray(state.agent?.positions) ? state.agent.positions.length : 0;
-    const blockedAgent = Array.isArray(state.agent?.blockedPositions) ? state.agent.blockedPositions.length : Number(state.agentBlockers?.summary?.blocked || 0);
+    const summary = state.decisionCenter?.summary || {};
+    const ready = Number(summary.ready || 0);
+    const watch = Number(summary.watch || 0);
+    const repairCount = Number(summary.repair || 0);
+    const skip = Number(summary.skip || 0);
+    const blockers = Number(state.prebetChecklist?.summary?.blockers || 0);
     const repair = state.contextRepairPlan?.summary || {};
-    const firstAction = firstNextAction();
-    const critical = lastCriticalAction();
+    const action = firstNextAction();
     const criticalReport = state.criticalIssueReport?.summary || {};
-    const decision = blockers > 0
-      ? 'Mise bloquée'
-      : Number(criticalReport.critical || 0) > 0
-        ? 'État critique'
-      : picks > 0
-        ? 'Picks user prêts'
-        : watch > 0
-          ? 'Observation'
-          : 'Attente';
     if (caption) {
-      caption.textContent = blockers > 0
-        ? `${formatCount(blockers)} blocage(s) : la file critique passe avant toute mise.`
-        : picks > 0
-          ? `${formatCount(picks)} pick(s) user à vérifier avec la cote live.`
-          : 'Aucun pari propre pour le moment : le logiciel privilégie la prudence.';
+      caption.textContent = ready > 0
+        ? `${formatCount(ready)} pari(s) prêt(s). Les autres restent en observation.`
+        : `Aucun pari à jouer maintenant${summary.first ? ` · ${summary.first}` : ''}.`;
     }
     const cards = [
       {
-        tone: blockers > 0 || Number(criticalReport.critical || 0) > 0 ? 'danger' : picks > 0 ? 'ok' : 'watch',
-        label: 'Décision',
-        value: decision,
-        detail: blockers > 0 ? prebetSummary.first || 'Checklist rouge' : Number(criticalReport.critical || 0) > 0 ? criticalReport.first || 'État critique à corriger' : `${formatCount(picks)} prêts · ${formatCount(watch)} en watchlist.`,
-        button: blockers > 0 || Number(criticalReport.critical || 0) > 0 ? { mode: 'critical', source: 'all', label: 'Lancer file critique' } : null
+        tone: ready > 0 ? 'ok' : 'watch',
+        label: 'À jouer maintenant',
+        value: formatCount(ready),
+        detail: ready > 0 ? 'Mise autorisée uniquement sur ces lignes.' : 'Aucun pari à jouer maintenant.',
+        button: ready > 0 ? { mode: 'prematch_t10', source: 'all', label: 'Finaliser T-10' } : null
       },
       {
-        tone: agentPositions > 0 ? 'ok' : blockedAgent > 0 ? 'warn' : 'watch',
-        label: 'Agent autonome',
-        value: formatCount(agentPositions),
-        detail: `${state.agent?.guard?.label || 'Garde-fou agent'} · ${formatCount(blockedAgent)} edge(s) bloqués.`
+        tone: watch > 0 ? 'watch' : 'ok',
+        label: 'À surveiller',
+        value: formatCount(watch),
+        detail: `${formatCount(state.watchlist.length)} ligne(s) avec edge à rechecker sans mise.`
       },
       {
-        tone: Number(repair.critical || 0) > 0 ? 'danger' : Number(repair.repair_actions || 0) > 0 ? 'warn' : 'ok',
-        label: 'Dossiers à réparer',
-        value: formatCount((repair.weak_matches || 0) + (repair.insufficient_matches || 0)),
-        detail: repair.first || 'Aucune réparation contexte prioritaire.',
-        button: Number(repair.repair_actions || 0) > 0 ? { mode: 'repair_context', source: 'all', label: 'Réparer contexte' } : null
+        tone: repairCount > 0 || blockers > 0 || Number(criticalReport.critical || 0) > 0 ? 'danger' : 'ok',
+        label: 'À réparer',
+        value: formatCount(repairCount || (repair.weak_matches || 0)),
+        detail: criticalReport.first || repair.first || 'Aucune réparation prioritaire.',
+        button: action && ['critical', 'repair_context'].includes(action.mode) ? { mode: action.mode, source: action.source || 'all', label: action.title || refreshModeLabel(action.mode) } : null
       },
       {
-        tone: firstAction ? (firstAction.priority === 'critical' ? 'danger' : 'watch') : 'ok',
-        label: 'Prochaine action',
-        value: firstAction ? firstAction.priority || 'info' : 'OK',
-        detail: firstAction ? firstAction.title || 'Action locale' : 'Aucune priorité locale en attente.',
-        button: firstAction ? { mode: firstAction.mode || 'quick', source: firstAction.source || 'all', label: firstAction.mode === 'signals' ? `Lancer ${signalSourceLabel(firstAction.source || 'context')}` : refreshModeLabel(firstAction.mode || 'quick') } : null
-      },
-      {
-        tone: critical?.status === 'ok' ? 'ok' : critical ? 'watch' : 'warn',
-        label: 'Auto file critique',
-        value: autoCriticalEnabled() ? 'Actif' : 'Coupé',
-        detail: critical ? `${critical.status || 'started'} · ${formatDateTime(critical.finishedAt || critical.startedAt)}` : 'Aucun lancement critique mémorisé sur ce poste.'
+        tone: skip > 0 ? 'warn' : 'ok',
+        label: 'À éviter',
+        value: formatCount(skip),
+        detail: skip > 0 ? 'Écartés par edge, cote, contexte ou modèle.' : 'Aucune ligne écartée dans les candidats.'
       }
     ];
     grid.innerHTML = cards.map((card) => `
@@ -4090,6 +4190,7 @@
         ${card.button ? `<button class="quality-action-btn" data-quality-mode="${escapeHtml(card.button.mode)}" data-quality-source="${escapeHtml(card.button.source)}">${escapeHtml(card.button.label)}</button>` : ''}
       </article>
     `).join('');
+    updateFirstActionButton();
   }
 
   function renderRefreshPriorityPlan() {
@@ -4123,7 +4224,14 @@
     const grid = $('#context-repair-grid');
     if (!grid) return;
     const report = state.contextRepairPlan || {};
-    const rows = Array.isArray(report.queue) ? report.queue : [];
+    const rawRows = Array.isArray(report.queue) ? report.queue : [];
+    const deduped = new Map();
+    rawRows.forEach((row) => {
+      const key = `${row.source || 'context'}:${row.mode || 'signals'}:${row.title || row.label || ''}`;
+      const current = deduped.get(key);
+      if (!current || Number(row.match_count || 0) > Number(current.match_count || 0)) deduped.set(key, row);
+    });
+    const rows = Array.from(deduped.values());
     const summary = report.summary || {};
     if (!rows.length) {
       const label = summary.matches
@@ -4184,7 +4292,6 @@
     renderPrebetChecklist();
     renderPrebetChecklistBacktest();
     renderFinalDecisionPanel();
-    renderV8Cockpit();
     renderSourceFreshnessPlan();
     renderContextRepairPlan();
     renderRefreshPriorityPlan();
@@ -4197,7 +4304,6 @@
     renderCoverageRepairEngine();
     renderModelLabV4();
     renderSourceHealthV4();
-    renderV8ControlRoom();
     renderQualityAlerts(status);
     renderWarnings(status);
   }
@@ -4873,6 +4979,7 @@
 
   function renderWarnings(status) {
     const wrap = $('#warnings');
+    if (!wrap) return;
     const warnings = status.warnings || [];
     const checks = status.health && status.health.qualityChecks ? status.health.qualityChecks : {};
     const exactPct = Number(checks.winamax_exact_ratio);
@@ -5138,17 +5245,20 @@
 
   function exportCsv() {
     if (!state.picks.length) return;
-    const headers = ['match', 'sport', 'league', 'market', 'pick', 'odd', 'probability', 'edge', 'stake', 'stake_adjusted', 'stake_factor', 'start', 'winamax'];
+    const headers = ['match', 'sport', 'league', 'market', 'pick', 'decision_status', 'can_bet', 'reason', 'odd', 'probability', 'edge', 'stake', 'stake_adjusted', 'stake_factor', 'start', 'winamax'];
     const rows = state.picks.map((pick) => [
       pick.title,
       pick.sport,
       pick.league,
       pick.market,
       pick.label,
+      pick.decisionCenter?.status || pick.status || '',
+      pick.decisionCenter?.canBet ? 'yes' : 'no',
+      pick.decisionCenter?.mainReason || '',
       pick.odd.toFixed(2),
       pick.probability.toFixed(4),
       pick.edge.toFixed(4),
-      pick.stake.toFixed(2),
+      (canDisplayStake(pick) ? Number(pick.stake || 0) : 0).toFixed(2),
       pick.stakeAdjustment?.applied ? 'yes' : 'no',
       pick.stakeAdjustment?.applied ? Number(pick.stakeAdjustment.factor || 1).toFixed(2) : '1.00',
       pick.start,
@@ -5184,7 +5294,7 @@
   }
 
   function exportStakeScenariosCsv() {
-    const picks = state.picks.filter((pick) => Number(pick.stake || 0) > 0 && Number(pick.edge || 0) > 0);
+    const picks = state.picks.filter((pick) => canDisplayStake(pick) && Number(pick.edge || 0) > 0);
     if (!picks.length) return;
     const bankroll = getBankroll();
     const plans = stakeScenarioProfiles().map((profile) => stakeScenarioPlan(bankroll, picks, profile));
@@ -5662,9 +5772,9 @@
   function agentExportRows() {
     const agent = state.agent || {};
     const active = Array.isArray(agent.positions) ? agent.positions.map((pos) => ({ state: 'active', ...pos })) : [];
-    const blocked = Array.isArray(agent.blockedPositions) ? agent.blockedPositions.map((pos) => ({ state: 'blocked', ...pos })) : [];
+    const blocked = Array.isArray(agent.blockedPositions) ? agent.blockedPositions.map((pos) => ({ state: 'blocked', ...pos, stake: 0 })) : [];
     const diagnostic = Array.isArray(state.agentBlockers?.rows)
-      ? state.agentBlockers.rows.map((pos) => ({ state: 'diagnostic_blocked', ...pos }))
+      ? state.agentBlockers.rows.map((pos) => ({ state: 'diagnostic_blocked', ...pos, stake: 0 }))
       : [];
     return [...active, ...blocked, ...diagnostic];
   }
@@ -5860,6 +5970,7 @@
       probabilityCalibration: state.probabilityCalibration || null,
       policyCandidates: state.policyCandidates || null,
       sourceHealth: state.sourceHealth || null,
+      decisionCenter: state.decisionCenter || null,
       clvSummary: state.clvSummary || null,
       actionHistory: state.actionHistory || [],
       watchlist: state.watchlist || [],
@@ -5879,6 +5990,16 @@
 
   function openMatchFromEvent(event) {
     if (event.type === 'keydown' && event.key !== 'Enter' && event.key !== ' ') return;
+    const trackButton = event.target.closest('[data-track-bet-key]');
+    if (trackButton) {
+      event.preventDefault();
+      event.stopPropagation();
+      if (event.type === 'keydown') return;
+      const row = findPickByTrackKey(trackButton.dataset.trackBetKey || '');
+      trackUserBet(row);
+      return;
+    }
+    if (event.target.closest('button, a, input, select, textarea')) return;
     const row = event.target.closest('[data-match-id]');
     if (!row) return;
     if (event.type === 'keydown') event.preventDefault();
@@ -5920,7 +6041,7 @@
       });
     });
     $('#reload-engine-btn').addEventListener('click', () => reloadEngine());
-    $('#export-btn').addEventListener('click', exportCsv);
+    $('#export-btn')?.addEventListener('click', exportCsv);
     $('#export-prebet-csv-btn')?.addEventListener('click', exportPrebetChecklistCsv);
     $('#export-scenarios-csv-btn')?.addEventListener('click', exportStakeScenariosCsv);
     $('#export-scorers-csv-btn')?.addEventListener('click', exportScorersCsv);
@@ -6142,6 +6263,17 @@
     });
   }
 
+  function scheduleBackgroundRefresh() {
+    if (state.backgroundRefreshTimer) clearInterval(state.backgroundRefreshTimer);
+    state.backgroundRefreshTimer = setInterval(() => {
+      if (state.status?.refresh?.running) return;
+      startRefresh('quick').catch((error) => {
+        setSideStatus('Auto-refresh impossible', 'warn');
+        $('#refresh-log').textContent = error.stack || error.message;
+      });
+    }, 30 * 60 * 1000);
+  }
+
   async function boot() {
     bindEvents();
     state.actionHistory = readActionHistory();
@@ -6149,15 +6281,18 @@
     const storedBankroll = Number(localStorage.getItem('userBankroll') || 50);
     if (Number.isFinite(storedBankroll) && storedBankroll > 0) $('#bankroll-input').value = String(storedBankroll);
     switchTab('dashboard');
+    renderUserPnl();
     await refreshStatus();
     await refreshLog();
     await reloadEngine();
+    scheduleBackgroundRefresh();
     setInterval(() => refreshStatus().catch(() => {}), 30000);
     setInterval(() => refreshLog().catch(() => {}), 5000);
   }
 
   document.addEventListener('DOMContentLoaded', () => {
     boot().catch((error) => {
+      console.error(error);
       setSideStatus('Erreur au démarrage', 'danger');
       renderPicks(`Erreur au démarrage : ${error.message}`);
     });

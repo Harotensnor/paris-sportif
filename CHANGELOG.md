@@ -3,6 +3,24 @@
 Auto-généré depuis les messages de commit par `scripts/build_changelog.py`.
 Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
+## Desktop — 2026-05-14
+
+### Fixes
+
+- Correction du blocage critique `0 pari jouable` dans l'app Electron : le moteur exploite maintenant le pick 1N2 prédit quand la cote Winamax est valide et l'edge est positif, même si l'ancien modèle legacy marquait le match en skip prudent.
+- Séparation claire entre picks utilisateur et agent autonome : les picks manuels peuvent être affichés comme jouables, tandis que l'agent reste bloqué si la checklist globale est rouge.
+- Données fraîches relancées par le refresh local rapide : catalogue Winamax, marchés détaillés, contexte match, health et rapports recalculés.
+
+### UX
+
+- Accueil recentré sur `Paris prêts` / `À jouer maintenant`, avec 10+ picks visibles, mise uniquement sur les picks autorisés, et bouton `Je mise` pour suivre un pari en un clic.
+- Ajout d'un suivi bankroll local visible en permanence : P&L total, P&L du jour, ROI et nombre de paris suivis.
+- Auto-refresh de fond toutes les 30 minutes et indicateur de fraîcheur moins anxiogène : les données ne sont plus marquées bloquées avant le seuil réel de 4h.
+
+### QA
+
+- Tests desktop renforcés sur le critère vital : au moins 10 picks prêts, boutons `Je mise`, P&L visible, cohérence décisionnelle et agent bloqué quand les gates globaux restent rouges.
+
 ## v37.019 — 2026-05-06
 
 ### Features

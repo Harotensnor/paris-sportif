@@ -58,107 +58,6 @@ function createLegacyEngineService({ projectRoot }) {
   const probabilityCalibrationPath = path.join(root, 'probability_calibration_report.json');
   const policyCandidateRegistryPath = path.join(root, 'policy_candidate_registry.json');
   const sourceHealthReportPath = path.join(root, 'source_health_report.json');
-  const v5FixCampaignPath = path.join(root, 'v5_fix_campaign_report.json');
-  const v5DeadFileManifestPath = path.join(root, 'v5_dead_file_manifest.json');
-  const v5PickReconciliationPath = path.join(root, 'v5_pick_reconciliation.json');
-  const v5UiBugReportPath = path.join(root, 'v5_ui_bug_report.json');
-  const v5RefreshRepairReportPath = path.join(root, 'v5_refresh_repair_report.json');
-  const v5BacktestSanityReportPath = path.join(root, 'v5_backtest_sanity_report.json');
-  const v6CoverageBoostPath = path.join(root, 'v6_coverage_boost_report.json');
-  const v6TeamMatchingFailuresPath = path.join(root, 'v6_team_matching_failures.json');
-  const v6SourceGainPath = path.join(root, 'v6_source_gain_report.json');
-  const v6ProfitEnginePath = path.join(root, 'v6_profit_engine_report.json');
-  const v6BacktestCleanRoomPath = path.join(root, 'v6_backtest_clean_room.json');
-  const v6FinalBetTicketPath = path.join(root, 'v6_final_bet_ticket.json');
-  const v6ControlRoomPath = path.join(root, 'v6_control_room_report.json');
-  const v7RedToGreenPath = path.join(root, 'v7_red_to_green_report.json');
-  const v7ActionQueuePath = path.join(root, 'v7_action_queue.json');
-  const v7ActualCoveragePath = path.join(root, 'v7_actual_coverage_report.json');
-  const v7SourceAbsencePath = path.join(root, 'v7_source_absence_report.json');
-  const v7EdgeReleasePath = path.join(root, 'v7_edge_release_report.json');
-  const v7StakingPolicyPath = path.join(root, 'v7_staking_policy_report.json');
-  const v8DecisionFeedPath = path.join(root, 'v8_decision_feed_report.json');
-  const v8NowNextTicketPath = path.join(root, 'v8_now_next_ticket.json');
-  const v8CoverageRescuePath = path.join(root, 'v8_coverage_rescue_report.json');
-  const v8ProxyStrengthPath = path.join(root, 'v8_proxy_strength_report.json');
-  const v8UiConsistencyPath = path.join(root, 'v8_ui_consistency_report.json');
-  const v8MatchSheetPath = path.join(root, 'v8_match_sheet_report.json');
-  const v8ControlRoomPath = path.join(root, 'v8_control_room_report.json');
-  const v9ReadyUnlockPath = path.join(root, 'v9_ready_unlock_report.json');
-  const v9BlockerMatrixPath = path.join(root, 'v9_blocker_matrix.json');
-  const v9RepairExecutionPath = path.join(root, 'v9_repair_execution_report.json');
-  const v9CoverageAfterRepairPath = path.join(root, 'v9_coverage_after_repair.json');
-  const v9SourceBlockersPath = path.join(root, 'v9_source_blockers_by_match.json');
-  const v9FinalizerPath = path.join(root, 'v9_finalizer_report.json');
-  const v9FinalTicketPath = path.join(root, 'v9_final_ticket.json');
-  const v9ProfitGatePath = path.join(root, 'v9_profit_gate_report.json');
-  const v9ClvMarketPressurePath = path.join(root, 'v9_clv_market_pressure.json');
-  const v10DecisionFeedPath = path.join(root, 'v10_decision_feed.json');
-  const v10FinalBetTicketPath = path.join(root, 'v10_final_bet_ticket.json');
-  const v10T10GatePath = path.join(root, 'v10_t10_gate_report.json');
-  const v10BlockerResolutionPath = path.join(root, 'v10_blocker_resolution_report.json');
-  const v10SignalRescuePath = path.join(root, 'v10_signal_rescue_report.json');
-  const v10ExternalSourceLimitsPath = path.join(root, 'v10_external_source_limits.json');
-  const v10RefreshObserverPath = path.join(root, 'v10_refresh_observer.json');
-  const v10RefreshStageTimingsPath = path.join(root, 'v10_refresh_stage_timings.json');
-  const v10ProfitGuardPath = path.join(root, 'v10_profit_guard_report.json');
-  const v10StakePolicyPath = path.join(root, 'v10_stake_policy_report.json');
-  const v11ReadyUnlockPath = path.join(root, 'v11_ready_unlock_report.json');
-  const v11T10FastPath = path.join(root, 'v11_t10_fast_report.json');
-  const v11T10BlockersPath = path.join(root, 'v11_t10_blockers.json');
-  const v11NowTicketPath = path.join(root, 'v11_now_ticket.json');
-  const v11RepairExecutionPath = path.join(root, 'v11_repair_execution_report.json');
-  const v11HealthReconciliationPath = path.join(root, 'v11_health_reconciliation.json');
-  const v11ProfitGuardPath = path.join(root, 'v11_profit_guard_report.json');
-  const v11ControlRoomPath = path.join(root, 'v11_control_room_report.json');
-  const v12PriceTargetsPath = path.join(root, 'v12_price_targets_report.json');
-  const v12MarketTimingPath = path.join(root, 'v12_market_timing_report.json');
-  const v12ClvWatchPath = path.join(root, 'v12_clv_watch_report.json');
-  const v12ValueReleasePath = path.join(root, 'v12_value_release_report.json');
-  const v12NowTicketPath = path.join(root, 'v12_now_ticket.json');
-  const v12ControlRoomPath = path.join(root, 'v12_control_room_report.json');
-  const v13OddsIdentityPath = path.join(root, 'v13_odds_identity_map.json');
-  const v13PriceMemoryPath = path.join(root, 'v13_price_memory_report.json');
-  const v13LineMovementPath = path.join(root, 'v13_line_movement_report.json');
-  const v13PriceAlertsPath = path.join(root, 'v13_price_alerts_report.json');
-  const v13AlertQueuePath = path.join(root, 'v13_alert_queue.json');
-  const v13T10ResolutionPath = path.join(root, 'v13_t10_resolution_report.json');
-  const v13T10GateMatrixPath = path.join(root, 'v13_t10_gate_matrix.json');
-  const v13FinalGatePath = path.join(root, 'v13_final_gate_report.json');
-  const v13ProfitGuardPath = path.join(root, 'v13_profit_guard_report.json');
-  const v13EdgeExplainabilityPath = path.join(root, 'v13_edge_explainability_report.json');
-  const v13NowTicketPath = path.join(root, 'v13_now_ticket.json');
-  const v13AgentGatePath = path.join(root, 'v13_agent_gate_report.json');
-  const v13ControlRoomPath = path.join(root, 'v13_control_room_report.json');
-  const v13RefreshPerformancePath = path.join(root, 'v13_refresh_performance_report.json');
-  const v14FileAuditPath = path.join(root, 'v14_file_audit_report.json');
-  const v14DeadReferencePath = path.join(root, 'v14_dead_reference_report.json');
-  const v14ContentInventoryPath = path.join(root, 'v14_content_inventory.json');
-  const v14MathIntegrityPath = path.join(root, 'v14_math_integrity_report.json');
-  const v14PickStateReconciliationPath = path.join(root, 'v14_pick_state_reconciliation.json');
-  const v14CrossViewConsistencyPath = path.join(root, 'v14_cross_view_consistency_report.json');
-  const v14CriticalResolutionPath = path.join(root, 'v14_critical_resolution_report.json');
-  const v14PrebetGatePath = path.join(root, 'v14_prebet_gate_report.json');
-  const v14SourceRepairPath = path.join(root, 'v14_source_repair_report.json');
-  const v14SignalTruthPath = path.join(root, 'v14_signal_truth_report.json');
-  const v14MatchingQualityPath = path.join(root, 'v14_matching_quality_report.json');
-  const v14SourceGapByMatchPath = path.join(root, 'v14_source_gap_by_match.json');
-  const v14PriceActionPath = path.join(root, 'v14_price_action_report.json');
-  const v14RecheckSchedulePath = path.join(root, 'v14_recheck_schedule.json');
-  const v14ControlRoomPath = path.join(root, 'v14_control_room_report.json');
-  const v15ActionCockpitPath = path.join(root, 'v15_action_cockpit_report.json');
-  const v15BetReadinessPath = path.join(root, 'v15_bet_readiness_report.json');
-  const v15HealthNoisePath = path.join(root, 'v15_health_noise_report.json');
-  const v15SourceFixPlanPath = path.join(root, 'v15_source_fix_plan.json');
-  const v15CleanupSafetyPath = path.join(root, 'v15_cleanup_safety_report.json');
-  const v15ControlRoomPath = path.join(root, 'v15_control_room_report.json');
-  const v16SourceRefreshPath = path.join(root, 'v16_source_refresh_report.json');
-  const v16SourceDeltaPath = path.join(root, 'v16_source_delta_report.json');
-  const v16T10DecisionPath = path.join(root, 'v16_t10_decision_report.json');
-  const v16CandidateResolutionPath = path.join(root, 'v16_candidate_resolution_report.json');
-  const v16FinalTicketPath = path.join(root, 'v16_final_ticket.json');
-  const v16AgentGatePath = path.join(root, 'v16_agent_gate_report.json');
-  const v16ControlRoomPath = path.join(root, 'v16_control_room_report.json');
   const clvSummaryPath = path.join(root, 'clv_summary.json');
   let current = null;
   let currentKey = null;
@@ -172,7 +71,7 @@ function createLegacyEngineService({ projectRoot }) {
   function fileKey() {
     const dataStat = fs.statSync(dataPath);
     const legacyStat = fs.statSync(legacyPath);
-    return `${dataStat.mtimeMs}:${dataStat.size}:${legacyStat.mtimeMs}:${legacyStat.size}:${optionalFileKey(lineupsPath)}:${optionalFileKey(sofaEventsPath)}:${optionalFileKey(starPlayersPath)}:${optionalFileKey(h2hPath)}:${optionalFileKey(matchContextPath)}:${optionalFileKey(signalGapPath)}:${optionalFileKey(contextBacktestPath)}:${optionalFileKey(decisionBacktestPath)}:${optionalFileKey(decisionTuningPath)}:${optionalFileKey(decisionShadowPath)}:${optionalFileKey(oddsGuardrailsPath)}:${optionalFileKey(agentBlockerBacktestPath)}:${optionalFileKey(agentGuardrailRecommendationsPath)}:${optionalFileKey(stakeReductionBacktestPath)}:${optionalFileKey(signalConflictBacktestPath)}:${optionalFileKey(scorerQualityPath)}:${optionalFileKey(scorerCandidatesSummaryPath)}:${optionalFileKey(scorerSettlementPath)}:${optionalFileKey(scorerPendingAuditPath)}:${optionalFileKey(prematchFocusPath)}:${optionalFileKey(prematchExecutionPath)}:${optionalFileKey(signalCoverageTrendPath)}:${optionalFileKey(nextActionsPath)}:${optionalFileKey(sourceFreshnessPlanPath)}:${optionalFileKey(contextRepairPlanPath)}:${optionalFileKey(refreshPriorityPlanPath)}:${optionalFileKey(prebetChecklistPath)}:${optionalFileKey(prebetChecklistBacktestPath)}:${optionalFileKey(teamIdentityGraphPath)}:${optionalFileKey(matchDecisionTimelinePath)}:${optionalFileKey(agentBankrollSimulationPath)}:${optionalFileKey(smartPreparePlanPath)}:${optionalFileKey(sourceRegistryPath)}:${optionalFileKey(sourceQuarantinePath)}:${optionalFileKey(optionalSourcesPlanPath)}:${optionalFileKey(criticalIssueReportPath)}:${optionalFileKey(dataConsistencyReportPath)}:${optionalFileKey(uiIntegrityReportPath)}:${optionalFileKey(pickIntegrityReportPath)}:${optionalFileKey(coverageRepairEnginePath)}:${optionalFileKey(sourceCoverageTargetsPath)}:${optionalFileKey(leagueSignalQualityPath)}:${optionalFileKey(modelLabReportPath)}:${optionalFileKey(probabilityCalibrationPath)}:${optionalFileKey(policyCandidateRegistryPath)}:${optionalFileKey(sourceHealthReportPath)}:${optionalFileKey(v5FixCampaignPath)}:${optionalFileKey(v5DeadFileManifestPath)}:${optionalFileKey(v5PickReconciliationPath)}:${optionalFileKey(v5UiBugReportPath)}:${optionalFileKey(v5RefreshRepairReportPath)}:${optionalFileKey(v5BacktestSanityReportPath)}:${optionalFileKey(v6CoverageBoostPath)}:${optionalFileKey(v6TeamMatchingFailuresPath)}:${optionalFileKey(v6SourceGainPath)}:${optionalFileKey(v6ProfitEnginePath)}:${optionalFileKey(v6BacktestCleanRoomPath)}:${optionalFileKey(v6FinalBetTicketPath)}:${optionalFileKey(v6ControlRoomPath)}:${optionalFileKey(v7RedToGreenPath)}:${optionalFileKey(v7ActionQueuePath)}:${optionalFileKey(v7ActualCoveragePath)}:${optionalFileKey(v7SourceAbsencePath)}:${optionalFileKey(v7EdgeReleasePath)}:${optionalFileKey(v7StakingPolicyPath)}:${optionalFileKey(v8DecisionFeedPath)}:${optionalFileKey(v8NowNextTicketPath)}:${optionalFileKey(v8CoverageRescuePath)}:${optionalFileKey(v8ProxyStrengthPath)}:${optionalFileKey(v8UiConsistencyPath)}:${optionalFileKey(v8MatchSheetPath)}:${optionalFileKey(v8ControlRoomPath)}:${optionalFileKey(v9ReadyUnlockPath)}:${optionalFileKey(v9BlockerMatrixPath)}:${optionalFileKey(v9RepairExecutionPath)}:${optionalFileKey(v9CoverageAfterRepairPath)}:${optionalFileKey(v9SourceBlockersPath)}:${optionalFileKey(v9FinalizerPath)}:${optionalFileKey(v9FinalTicketPath)}:${optionalFileKey(v9ProfitGatePath)}:${optionalFileKey(v9ClvMarketPressurePath)}:${optionalFileKey(v10DecisionFeedPath)}:${optionalFileKey(v10FinalBetTicketPath)}:${optionalFileKey(v10T10GatePath)}:${optionalFileKey(v10BlockerResolutionPath)}:${optionalFileKey(v10SignalRescuePath)}:${optionalFileKey(v10ExternalSourceLimitsPath)}:${optionalFileKey(v10RefreshObserverPath)}:${optionalFileKey(v10RefreshStageTimingsPath)}:${optionalFileKey(v10ProfitGuardPath)}:${optionalFileKey(v10StakePolicyPath)}:${optionalFileKey(v11ReadyUnlockPath)}:${optionalFileKey(v11T10FastPath)}:${optionalFileKey(v11T10BlockersPath)}:${optionalFileKey(v11NowTicketPath)}:${optionalFileKey(v11RepairExecutionPath)}:${optionalFileKey(v11HealthReconciliationPath)}:${optionalFileKey(v11ProfitGuardPath)}:${optionalFileKey(v11ControlRoomPath)}:${optionalFileKey(v12PriceTargetsPath)}:${optionalFileKey(v12MarketTimingPath)}:${optionalFileKey(v12ClvWatchPath)}:${optionalFileKey(v12ValueReleasePath)}:${optionalFileKey(v12NowTicketPath)}:${optionalFileKey(v12ControlRoomPath)}:${optionalFileKey(v13OddsIdentityPath)}:${optionalFileKey(v13PriceMemoryPath)}:${optionalFileKey(v13LineMovementPath)}:${optionalFileKey(v13PriceAlertsPath)}:${optionalFileKey(v13AlertQueuePath)}:${optionalFileKey(v13T10ResolutionPath)}:${optionalFileKey(v13T10GateMatrixPath)}:${optionalFileKey(v13FinalGatePath)}:${optionalFileKey(v13ProfitGuardPath)}:${optionalFileKey(v13EdgeExplainabilityPath)}:${optionalFileKey(v13NowTicketPath)}:${optionalFileKey(v13AgentGatePath)}:${optionalFileKey(v13ControlRoomPath)}:${optionalFileKey(v13RefreshPerformancePath)}:${optionalFileKey(v14FileAuditPath)}:${optionalFileKey(v14DeadReferencePath)}:${optionalFileKey(v14ContentInventoryPath)}:${optionalFileKey(v14MathIntegrityPath)}:${optionalFileKey(v14PickStateReconciliationPath)}:${optionalFileKey(v14CrossViewConsistencyPath)}:${optionalFileKey(v14CriticalResolutionPath)}:${optionalFileKey(v14PrebetGatePath)}:${optionalFileKey(v14SourceRepairPath)}:${optionalFileKey(v14SignalTruthPath)}:${optionalFileKey(v14MatchingQualityPath)}:${optionalFileKey(v14SourceGapByMatchPath)}:${optionalFileKey(v14PriceActionPath)}:${optionalFileKey(v14RecheckSchedulePath)}:${optionalFileKey(v14ControlRoomPath)}:${optionalFileKey(v15ActionCockpitPath)}:${optionalFileKey(v15BetReadinessPath)}:${optionalFileKey(v15HealthNoisePath)}:${optionalFileKey(v15SourceFixPlanPath)}:${optionalFileKey(v15CleanupSafetyPath)}:${optionalFileKey(v15ControlRoomPath)}:${optionalFileKey(v16SourceRefreshPath)}:${optionalFileKey(v16SourceDeltaPath)}:${optionalFileKey(v16T10DecisionPath)}:${optionalFileKey(v16CandidateResolutionPath)}:${optionalFileKey(v16FinalTicketPath)}:${optionalFileKey(v16AgentGatePath)}:${optionalFileKey(v16ControlRoomPath)}:${optionalFileKey(clvSummaryPath)}`;
+    return `${dataStat.mtimeMs}:${dataStat.size}:${legacyStat.mtimeMs}:${legacyStat.size}:${optionalFileKey(lineupsPath)}:${optionalFileKey(sofaEventsPath)}:${optionalFileKey(starPlayersPath)}:${optionalFileKey(h2hPath)}:${optionalFileKey(matchContextPath)}:${optionalFileKey(signalGapPath)}:${optionalFileKey(contextBacktestPath)}:${optionalFileKey(decisionBacktestPath)}:${optionalFileKey(decisionTuningPath)}:${optionalFileKey(decisionShadowPath)}:${optionalFileKey(oddsGuardrailsPath)}:${optionalFileKey(agentBlockerBacktestPath)}:${optionalFileKey(agentGuardrailRecommendationsPath)}:${optionalFileKey(stakeReductionBacktestPath)}:${optionalFileKey(signalConflictBacktestPath)}:${optionalFileKey(scorerQualityPath)}:${optionalFileKey(scorerCandidatesSummaryPath)}:${optionalFileKey(scorerSettlementPath)}:${optionalFileKey(scorerPendingAuditPath)}:${optionalFileKey(prematchFocusPath)}:${optionalFileKey(prematchExecutionPath)}:${optionalFileKey(signalCoverageTrendPath)}:${optionalFileKey(nextActionsPath)}:${optionalFileKey(sourceFreshnessPlanPath)}:${optionalFileKey(contextRepairPlanPath)}:${optionalFileKey(refreshPriorityPlanPath)}:${optionalFileKey(prebetChecklistPath)}:${optionalFileKey(prebetChecklistBacktestPath)}:${optionalFileKey(teamIdentityGraphPath)}:${optionalFileKey(matchDecisionTimelinePath)}:${optionalFileKey(agentBankrollSimulationPath)}:${optionalFileKey(smartPreparePlanPath)}:${optionalFileKey(sourceRegistryPath)}:${optionalFileKey(sourceQuarantinePath)}:${optionalFileKey(optionalSourcesPlanPath)}:${optionalFileKey(criticalIssueReportPath)}:${optionalFileKey(dataConsistencyReportPath)}:${optionalFileKey(uiIntegrityReportPath)}:${optionalFileKey(pickIntegrityReportPath)}:${optionalFileKey(coverageRepairEnginePath)}:${optionalFileKey(sourceCoverageTargetsPath)}:${optionalFileKey(leagueSignalQualityPath)}:${optionalFileKey(modelLabReportPath)}:${optionalFileKey(probabilityCalibrationPath)}:${optionalFileKey(policyCandidateRegistryPath)}:${optionalFileKey(sourceHealthReportPath)}:${optionalFileKey(clvSummaryPath)}`;
   }
 
   function closeCurrent() {
@@ -563,410 +462,6 @@ function createLegacyEngineService({ projectRoot }) {
     return readJsonSidecar(sourceHealthReportPath, {});
   }
 
-  function readV5FixCampaignReport() {
-    return readJsonSidecar(v5FixCampaignPath, {});
-  }
-
-  function readV5DeadFileManifestReport() {
-    return readJsonSidecar(v5DeadFileManifestPath, {});
-  }
-
-  function readV5PickReconciliationReport() {
-    return readJsonSidecar(v5PickReconciliationPath, {});
-  }
-
-  function readV5UiBugReport() {
-    return readJsonSidecar(v5UiBugReportPath, {});
-  }
-
-  function readV5RefreshRepairReport() {
-    return readJsonSidecar(v5RefreshRepairReportPath, {});
-  }
-
-  function readV5BacktestSanityReport() {
-    return readJsonSidecar(v5BacktestSanityReportPath, {});
-  }
-
-  function readV6CoverageBoostReport() {
-    return readJsonSidecar(v6CoverageBoostPath, {});
-  }
-
-  function readV6TeamMatchingFailuresReport() {
-    return readJsonSidecar(v6TeamMatchingFailuresPath, {});
-  }
-
-  function readV6SourceGainReport() {
-    return readJsonSidecar(v6SourceGainPath, {});
-  }
-
-  function readV6ProfitEngineReport() {
-    return readJsonSidecar(v6ProfitEnginePath, {});
-  }
-
-  function readV6BacktestCleanRoomReport() {
-    return readJsonSidecar(v6BacktestCleanRoomPath, {});
-  }
-
-  function readV6FinalBetTicketReport() {
-    return readJsonSidecar(v6FinalBetTicketPath, {});
-  }
-
-  function readV6ControlRoomReport() {
-    return readJsonSidecar(v6ControlRoomPath, {});
-  }
-
-  function readV7RedToGreenReport() {
-    return readJsonSidecar(v7RedToGreenPath, {});
-  }
-
-  function readV7ActionQueueReport() {
-    return readJsonSidecar(v7ActionQueuePath, {});
-  }
-
-  function readV7ActualCoverageReport() {
-    return readJsonSidecar(v7ActualCoveragePath, {});
-  }
-
-  function readV7SourceAbsenceReport() {
-    return readJsonSidecar(v7SourceAbsencePath, {});
-  }
-
-  function readV7EdgeReleaseReport() {
-    return readJsonSidecar(v7EdgeReleasePath, {});
-  }
-
-  function readV7StakingPolicyReport() {
-    return readJsonSidecar(v7StakingPolicyPath, {});
-  }
-
-  function readV8DecisionFeedReport() {
-    return readJsonSidecar(v8DecisionFeedPath, {});
-  }
-
-  function readV8NowNextTicketReport() {
-    return readJsonSidecar(v8NowNextTicketPath, {});
-  }
-
-  function readV8CoverageRescueReport() {
-    return readJsonSidecar(v8CoverageRescuePath, {});
-  }
-
-  function readV8ProxyStrengthReport() {
-    return readJsonSidecar(v8ProxyStrengthPath, {});
-  }
-
-  function readV8UiConsistencyReport() {
-    return readJsonSidecar(v8UiConsistencyPath, {});
-  }
-
-  function readV8MatchSheetReport() {
-    return readJsonSidecar(v8MatchSheetPath, {});
-  }
-
-  function readV8ControlRoomReport() {
-    return readJsonSidecar(v8ControlRoomPath, {});
-  }
-
-  function readV9ReadyUnlockReport() {
-    return readJsonSidecar(v9ReadyUnlockPath, {});
-  }
-
-  function readV9BlockerMatrixReport() {
-    return readJsonSidecar(v9BlockerMatrixPath, {});
-  }
-
-  function readV9RepairExecutionReport() {
-    return readJsonSidecar(v9RepairExecutionPath, {});
-  }
-
-  function readV9CoverageAfterRepairReport() {
-    return readJsonSidecar(v9CoverageAfterRepairPath, {});
-  }
-
-  function readV9SourceBlockersReport() {
-    return readJsonSidecar(v9SourceBlockersPath, {});
-  }
-
-  function readV9FinalizerReport() {
-    return readJsonSidecar(v9FinalizerPath, {});
-  }
-
-  function readV9FinalTicketReport() {
-    return readJsonSidecar(v9FinalTicketPath, {});
-  }
-
-  function readV9ProfitGateReport() {
-    return readJsonSidecar(v9ProfitGatePath, {});
-  }
-
-  function readV9ClvMarketPressureReport() {
-    return readJsonSidecar(v9ClvMarketPressurePath, {});
-  }
-
-  function readV10DecisionFeedReport() {
-    return readJsonSidecar(v10DecisionFeedPath, {});
-  }
-
-  function readV10FinalBetTicketReport() {
-    return readJsonSidecar(v10FinalBetTicketPath, {});
-  }
-
-  function readV10T10GateReport() {
-    return readJsonSidecar(v10T10GatePath, {});
-  }
-
-  function readV10BlockerResolutionReport() {
-    return readJsonSidecar(v10BlockerResolutionPath, {});
-  }
-
-  function readV10SignalRescueReport() {
-    return readJsonSidecar(v10SignalRescuePath, {});
-  }
-
-  function readV10ExternalSourceLimitsReport() {
-    return readJsonSidecar(v10ExternalSourceLimitsPath, {});
-  }
-
-  function readV10RefreshObserverReport() {
-    return readJsonSidecar(v10RefreshObserverPath, {});
-  }
-
-  function readV10RefreshStageTimingsReport() {
-    return readJsonSidecar(v10RefreshStageTimingsPath, {});
-  }
-
-  function readV10ProfitGuardReport() {
-    return readJsonSidecar(v10ProfitGuardPath, {});
-  }
-
-  function readV10StakePolicyReport() {
-    return readJsonSidecar(v10StakePolicyPath, {});
-  }
-
-  function readV11ReadyUnlockReport() {
-    return readJsonSidecar(v11ReadyUnlockPath, {});
-  }
-
-  function readV11T10FastReport() {
-    return readJsonSidecar(v11T10FastPath, {});
-  }
-
-  function readV11T10BlockersReport() {
-    return readJsonSidecar(v11T10BlockersPath, {});
-  }
-
-  function readV11NowTicketReport() {
-    return readJsonSidecar(v11NowTicketPath, {});
-  }
-
-  function readV11RepairExecutionReport() {
-    return readJsonSidecar(v11RepairExecutionPath, {});
-  }
-
-  function readV11HealthReconciliationReport() {
-    return readJsonSidecar(v11HealthReconciliationPath, {});
-  }
-
-  function readV11ProfitGuardReport() {
-    return readJsonSidecar(v11ProfitGuardPath, {});
-  }
-
-  function readV11ControlRoomReport() {
-    return readJsonSidecar(v11ControlRoomPath, {});
-  }
-
-  function readV12PriceTargetsReport() {
-    return readJsonSidecar(v12PriceTargetsPath, {});
-  }
-
-  function readV12MarketTimingReport() {
-    return readJsonSidecar(v12MarketTimingPath, {});
-  }
-
-  function readV12ClvWatchReport() {
-    return readJsonSidecar(v12ClvWatchPath, {});
-  }
-
-  function readV12ValueReleaseReport() {
-    return readJsonSidecar(v12ValueReleasePath, {});
-  }
-
-  function readV12NowTicketReport() {
-    return readJsonSidecar(v12NowTicketPath, {});
-  }
-
-  function readV12ControlRoomReport() {
-    return readJsonSidecar(v12ControlRoomPath, {});
-  }
-
-  function readV13OddsIdentityReport() {
-    return readJsonSidecar(v13OddsIdentityPath, {});
-  }
-
-  function readV13PriceMemoryReport() {
-    return readJsonSidecar(v13PriceMemoryPath, {});
-  }
-
-  function readV13LineMovementReport() {
-    return readJsonSidecar(v13LineMovementPath, {});
-  }
-
-  function readV13PriceAlertsReport() {
-    return readJsonSidecar(v13PriceAlertsPath, {});
-  }
-
-  function readV13AlertQueueReport() {
-    return readJsonSidecar(v13AlertQueuePath, {});
-  }
-
-  function readV13T10ResolutionReport() {
-    return readJsonSidecar(v13T10ResolutionPath, {});
-  }
-
-  function readV13T10GateMatrixReport() {
-    return readJsonSidecar(v13T10GateMatrixPath, {});
-  }
-
-  function readV13FinalGateReport() {
-    return readJsonSidecar(v13FinalGatePath, {});
-  }
-
-  function readV13ProfitGuardReport() {
-    return readJsonSidecar(v13ProfitGuardPath, {});
-  }
-
-  function readV13EdgeExplainabilityReport() {
-    return readJsonSidecar(v13EdgeExplainabilityPath, {});
-  }
-
-  function readV13NowTicketReport() {
-    return readJsonSidecar(v13NowTicketPath, {});
-  }
-
-  function readV13AgentGateReport() {
-    return readJsonSidecar(v13AgentGatePath, {});
-  }
-
-  function readV13ControlRoomReport() {
-    return readJsonSidecar(v13ControlRoomPath, {});
-  }
-
-  function readV13RefreshPerformanceReport() {
-    return readJsonSidecar(v13RefreshPerformancePath, {});
-  }
-
-  function readV14FileAuditReport() {
-    return readJsonSidecar(v14FileAuditPath, {});
-  }
-
-  function readV14DeadReferenceReport() {
-    return readJsonSidecar(v14DeadReferencePath, {});
-  }
-
-  function readV14ContentInventoryReport() {
-    return readJsonSidecar(v14ContentInventoryPath, {});
-  }
-
-  function readV14MathIntegrityReport() {
-    return readJsonSidecar(v14MathIntegrityPath, {});
-  }
-
-  function readV14PickStateReconciliationReport() {
-    return readJsonSidecar(v14PickStateReconciliationPath, {});
-  }
-
-  function readV14CrossViewConsistencyReport() {
-    return readJsonSidecar(v14CrossViewConsistencyPath, {});
-  }
-
-  function readV14CriticalResolutionReport() {
-    return readJsonSidecar(v14CriticalResolutionPath, {});
-  }
-
-  function readV14PrebetGateReport() {
-    return readJsonSidecar(v14PrebetGatePath, {});
-  }
-
-  function readV14SourceRepairReport() {
-    return readJsonSidecar(v14SourceRepairPath, {});
-  }
-
-  function readV14SignalTruthReport() {
-    return readJsonSidecar(v14SignalTruthPath, {});
-  }
-
-  function readV14MatchingQualityReport() {
-    return readJsonSidecar(v14MatchingQualityPath, {});
-  }
-
-  function readV14SourceGapByMatchReport() {
-    return readJsonSidecar(v14SourceGapByMatchPath, {});
-  }
-
-  function readV14PriceActionReport() {
-    return readJsonSidecar(v14PriceActionPath, {});
-  }
-
-  function readV14RecheckScheduleReport() {
-    return readJsonSidecar(v14RecheckSchedulePath, {});
-  }
-
-  function readV14ControlRoomReport() {
-    return readJsonSidecar(v14ControlRoomPath, {});
-  }
-
-  function readV15ActionCockpitReport() {
-    return readJsonSidecar(v15ActionCockpitPath, {});
-  }
-
-  function readV15BetReadinessReport() {
-    return readJsonSidecar(v15BetReadinessPath, {});
-  }
-
-  function readV15HealthNoiseReport() {
-    return readJsonSidecar(v15HealthNoisePath, {});
-  }
-
-  function readV15SourceFixPlanReport() {
-    return readJsonSidecar(v15SourceFixPlanPath, {});
-  }
-
-  function readV15CleanupSafetyReport() {
-    return readJsonSidecar(v15CleanupSafetyPath, {});
-  }
-
-  function readV15ControlRoomReport() {
-    return readJsonSidecar(v15ControlRoomPath, {});
-  }
-
-  function readV16SourceRefreshReport() {
-    return readJsonSidecar(v16SourceRefreshPath, {});
-  }
-
-  function readV16SourceDeltaReport() {
-    return readJsonSidecar(v16SourceDeltaPath, {});
-  }
-
-  function readV16T10DecisionReport() {
-    return readJsonSidecar(v16T10DecisionPath, {});
-  }
-
-  function readV16CandidateResolutionReport() {
-    return readJsonSidecar(v16CandidateResolutionPath, {});
-  }
-
-  function readV16FinalTicketReport() {
-    return readJsonSidecar(v16FinalTicketPath, {});
-  }
-
-  function readV16AgentGateReport() {
-    return readJsonSidecar(v16AgentGatePath, {});
-  }
-
-  function readV16ControlRoomReport() {
-    return readJsonSidecar(v16ControlRoomPath, {});
-  }
-
   function readClvSummaryReport() {
     return readJsonSidecar(clvSummaryPath, {});
   }
@@ -1225,7 +720,7 @@ function createLegacyEngineService({ projectRoot }) {
 
     try {
       pred = win.predictMatch(match);
-      if (pred && !pred.skip) {
+      if (pred) {
         best = bestFromPrediction(win, match, pred);
         if (best) {
           marketLabel = best.market;
@@ -1236,8 +731,12 @@ function createLegacyEngineService({ projectRoot }) {
           pickLabel = normalizePickLabel(match, marketLabel, pred.pick, 'À surveiller');
         }
         if (best && best.edge > 0 && stake > 0) {
-          status = best.edge >= 0.08 ? 'bet' : 'watch';
-          statusLabel = best.edge >= 0.08 ? 'Priorité' : 'Jouable';
+          status = best.edge >= 0.05 ? 'bet' : 'watch';
+          statusLabel = best.edge >= 0.08
+            ? 'Priorité'
+            : best.edge >= 0.05
+              ? (best.derivedFromSkip ? 'Jouable manuel' : 'Jouable')
+              : 'À surveiller';
         } else {
           statusLabel = 'À surveiller';
         }
@@ -1265,6 +764,8 @@ function createLegacyEngineService({ projectRoot }) {
       probability: best ? best.prob : Number(pred && (pred.reliability ?? pred.prob)) || 0,
       edge: best ? best.edge : 0,
       stake,
+      pickSource: best?.source || (best ? 'runtime_best_pick' : null),
+      modelSkipOverridden: Boolean(best?.derivedFromSkip),
       status,
       statusLabel,
       marketProfile: marketProfile(match),
@@ -1717,16 +1218,11 @@ function createLegacyEngineService({ projectRoot }) {
   function applyPrebetGate(row, checklistReport) {
     const gate = prebetGateForReport(checklistReport);
     if (!gate.blocked) return { ...row, prebetGate: gate };
-    const next = {
+    const modelStake = Number(row.modelStake ?? row.stake ?? 0);
+    return {
       ...row,
+      modelStake,
       prebetGate: gate,
-      status: row.status === 'skip' ? row.status : 'watch',
-      statusLabel: row.status === 'skip' ? row.statusLabel : 'À surveiller · checklist',
-      contextGate: {
-        ...(row.contextGate || {}),
-        agentEligible: false,
-        warnings: [...new Set([...(row.contextGate?.warnings || []), 'prebet_checklist_block'])]
-      },
       confidenceTrust: row.confidenceTrust ? {
         ...row.confidenceTrust,
         score: Math.max(0, Number(row.confidenceTrust.score || 0) - 4),
@@ -1734,17 +1230,133 @@ function createLegacyEngineService({ projectRoot }) {
         drivers: [...(row.confidenceTrust.drivers || []), gate.label]
       } : row.confidenceTrust
     };
-    if (Number(next.stake || 0) > 0) {
-      const before = Number(next.stake || 0);
-      next.stake = before * 0.5;
-      next.stakeAdjustment = mergeStakeAdjustment({
-        ...(next.stakeAdjustment || {}),
-        beforeStake: next.stakeAdjustment?.beforeStake ?? before,
-        afterStake: next.stakeAdjustment?.afterStake ?? before
-      }, 0.5, 'Checklist avant mise rouge');
-      next.stakeAdjustment.afterStake = next.stake;
+  }
+
+  function criticalGateForReport(report) {
+    const summary = report && report.schema ? report.summary || {} : {};
+    const blocked = Boolean(summary.blocks_bet || Number(summary.critical || 0) > 0);
+    return {
+      blocked,
+      issues: Number(summary.issues || 0),
+      critical: Number(summary.critical || 0),
+      label: blocked ? (summary.first || 'État critique à corriger') : 'Aucun état critique bloquant'
+    };
+  }
+
+  function decisionCenterForRow(row, gates) {
+    const modelStake = Math.max(0, Number(row.modelStake ?? row.stake ?? 0) || 0);
+    const currentStake = Math.max(0, Number(row.stake || 0) || 0);
+    const blockingGates = [];
+    const quality = row.contextQuality || row.match?.context?.quality || {};
+    const hasCriticalSignals = Array.isArray(quality.critical_missing) && quality.critical_missing.length > 0;
+    const qualityScore = Number(quality.score);
+    const sourceRepairNeeded = hasCriticalSignals || (Number.isFinite(qualityScore) && qualityScore < 45);
+    if (!(Number(row.odd || 0) > 1)) blockingGates.push({ key: 'odds', label: 'Cote Winamax invalide', tone: 'danger' });
+    if (!(Number(row.edge || 0) > 0)) blockingGates.push({ key: 'edge', label: 'Edge non positif', tone: 'danger' });
+    if (!(modelStake > 0 || currentStake > 0)) blockingGates.push({ key: 'kelly', label: 'Kelly nul', tone: 'warn' });
+    if (row.status === 'skip') blockingGates.push({ key: 'model', label: row.statusLabel || 'Skip modèle', tone: 'danger' });
+    if (row.contextGate?.agentEligible === false || hasCriticalSignals) {
+      blockingGates.push({
+        key: 'context',
+        label: row.contextGate?.label || (hasCriticalSignals ? 'Signal critique manquant' : 'Contexte insuffisant'),
+        tone: hasCriticalSignals ? 'danger' : 'warn'
+      });
     }
-    return next;
+    const uniqueBlocking = [];
+    const seen = new Set();
+    for (const gate of blockingGates) {
+      if (seen.has(gate.key)) continue;
+      seen.add(gate.key);
+      uniqueBlocking.push(gate);
+    }
+    const globalGates = [
+      gates.prebet?.blocked ? { key: 'agent_checklist', label: gates.prebet.label, tone: 'danger' } : null,
+      gates.critical?.blocked ? { key: 'agent_critical', label: gates.critical.label, tone: 'danger' } : null
+    ].filter(Boolean);
+    const canBet = !uniqueBlocking.length && row.status === 'bet' && currentStake > 0;
+    const status = canBet
+      ? 'ready'
+      : sourceRepairNeeded
+        ? 'repair'
+        : row.status === 'skip' || !(Number(row.edge || 0) > 0)
+          ? 'skip'
+          : 'watch';
+    const nextAction = canBet
+      ? 'Jouer maintenant'
+      : status === 'repair'
+        ? (gates.critical?.blocked ? 'Lancer file critique' : gates.prebet?.blocked ? 'Réparer contexte' : 'Compléter contexte')
+        : status === 'watch'
+          ? 'Surveiller'
+          : 'Écarter';
+    const mainReason = uniqueBlocking[0]?.label || (canBet ? 'Tous les garde-fous sont verts' : row.statusLabel || 'Observation prudente');
+    return {
+      status,
+      canBet,
+      stake: canBet ? currentStake : 0,
+      stakeDisplay: canBet ? null : '0 €',
+      modelStake,
+      mainReason,
+      nextAction,
+      blockingGates: uniqueBlocking,
+      globalGates,
+      riskTone: canBet ? 'ok' : status === 'repair' ? 'danger' : status === 'watch' ? 'watch' : 'warn'
+    };
+  }
+
+  function applyDecisionCenter(row, gates) {
+    const decisionCenter = decisionCenterForRow(row, gates);
+    return {
+      ...row,
+      modelStake: decisionCenter.modelStake,
+      stake: decisionCenter.canBet ? decisionCenter.stake : 0,
+      decisionCenter
+    };
+  }
+
+  function buildDecisionCenterReport(rows, gates) {
+    const all = Array.isArray(rows) ? rows : [];
+    const byStatus = { ready: 0, watch: 0, repair: 0, skip: 0 };
+    for (const row of all) {
+      const status = row?.decisionCenter?.status || 'skip';
+      byStatus[status] = (byStatus[status] || 0) + 1;
+    }
+    return {
+      schema: 'paris-sportif.decision_center.v17',
+      generatedAt: new Date().toISOString(),
+      summary: {
+        total: all.length,
+        ready: byStatus.ready || 0,
+        watch: byStatus.watch || 0,
+        repair: byStatus.repair || 0,
+        skip: byStatus.skip || 0,
+        can_bet: byStatus.ready || 0,
+        blocked: false,
+        agent_blocked: Boolean(gates.prebet?.blocked || gates.critical?.blocked),
+        first: byStatus.ready ? 'Paris prêts' : 'Aucun pari à jouer maintenant',
+        agent_first: gates.prebet?.blocked ? gates.prebet.label : gates.critical?.blocked ? gates.critical.label : 'Agent disponible'
+      },
+      rows: all
+        .filter((row) => row && row.edge > 0 && row.odd > 1)
+        .slice(0, 80)
+        .map((row) => ({
+          id: row.id,
+          title: row.title,
+          sport: row.sport,
+          league: row.league,
+          start: row.start,
+          market: row.market,
+          label: row.label,
+          odd: row.odd,
+          probability: row.probability,
+          edge: row.edge,
+          status: row.decisionCenter?.status || 'skip',
+          canBet: Boolean(row.decisionCenter?.canBet),
+          stake: Number(row.decisionCenter?.stake || 0),
+          mainReason: row.decisionCenter?.mainReason || '',
+          nextAction: row.decisionCenter?.nextAction || '',
+          blockingGates: row.decisionCenter?.blockingGates || []
+        }))
+    };
   }
 
   function minutesToKickoff(row) {
@@ -1854,15 +1466,31 @@ function createLegacyEngineService({ projectRoot }) {
   function buildDashboardPicks(picks) {
     const now = Date.now();
     const horizonMs = 30 * 60 * 60000;
+    const rank = (pick) => [
+      pick?.decisionCenter?.canBet ? 1 : 0,
+      pick?.decisionCenter?.status === 'ready' ? 1 : 0,
+      Number(pick?.edge || 0),
+      Number(pick?.probability || 0)
+    ];
+    const sortRows = (rows) => [...rows].sort((a, b) => {
+      const ar = rank(a);
+      const br = rank(b);
+      for (let i = 0; i < ar.length; i += 1) {
+        if (br[i] !== ar[i]) return br[i] - ar[i];
+      }
+      return Date.parse(a.start || '') - Date.parse(b.start || '');
+    });
     const nearTerm = picks.filter((pick) => {
       const ts = Date.parse(pick.start || '');
       return Number.isFinite(ts) && ts >= now - 30 * 60000 && ts <= now + horizonMs;
     });
-    const rows = (nearTerm.length ? nearTerm : picks).slice(0, 12);
+    const nearReady = nearTerm.filter((pick) => pick?.decisionCenter?.canBet).length;
+    const useNearTerm = nearTerm.length && nearReady >= 10;
+    const rows = sortRows(useNearTerm ? nearTerm : picks).slice(0, 12);
     return {
       rows,
-      mode: nearTerm.length ? 'next30h' : 'bestAvailable',
-      horizonHours: nearTerm.length ? 30 : null
+      mode: useNearTerm ? 'next30h' : 'bestAvailable',
+      horizonHours: useNearTerm ? 30 : null
     };
   }
 
@@ -1975,7 +1603,7 @@ function createLegacyEngineService({ projectRoot }) {
     return modelUtils.agentGuard(agent);
   }
 
-  function agentSnapshot(win, positions, prebetReport, blockedPositions = [], criticalReport = null, v5Report = null, v6ProfitReport = null, v6TicketReport = null, v7EdgeReport = null, v7RedReport = null, v8DecisionReport = null, v9FinalTicketReport = null, v10FinalTicketReport = null, v11NowTicketReport = null, v12NowTicketReport = null, v13NowTicketReport = null) {
+  function agentSnapshot(win, positions, prebetReport, blockedPositions = [], criticalReport = null) {
     const api = win.__testAPI;
     if (!api || typeof api._agentReplay !== 'function') return null;
     try {
@@ -1983,7 +1611,7 @@ function createLegacyEngineService({ projectRoot }) {
       const snapshot = bettingUtils.agentSnapshotFromReplay(agent, positions, agentGuard);
       const gate = prebetGateForReport(prebetReport);
       if (gate.blocked) {
-        const blocked = Array.isArray(blockedPositions) ? blockedPositions : [];
+        const blocked = Array.isArray(blockedPositions) ? blockedPositions.map((pos) => ({ ...pos, modelStake: pos.modelStake ?? pos.stake, stake: 0 })) : [];
         const bank = Number(snapshot.nav || 0) > 0 ? Number(snapshot.nav) : 10;
         snapshot.guard = { status: 'paused', label: gate.label, reason: 'prebet_checklist' };
         snapshot.prebetGate = gate;
@@ -1994,7 +1622,7 @@ function createLegacyEngineService({ projectRoot }) {
       }
       const criticalSummary = criticalReport && criticalReport.summary ? criticalReport.summary : {};
       if (!gate.blocked && criticalSummary.blocks_bet) {
-        const blocked = Array.isArray(blockedPositions) ? blockedPositions : [];
+        const blocked = Array.isArray(blockedPositions) ? blockedPositions.map((pos) => ({ ...pos, modelStake: pos.modelStake ?? pos.stake, stake: 0 })) : [];
         const bank = Number(snapshot.nav || 0) > 0 ? Number(snapshot.nav) : 10;
         snapshot.guard = { status: 'paused', label: criticalSummary.first || 'État critique à corriger', reason: 'critical_issue_report' };
         snapshot.criticalGate = {
@@ -2002,173 +1630,6 @@ function createLegacyEngineService({ projectRoot }) {
           label: criticalSummary.first || 'État critique à corriger',
           issues: Number(criticalSummary.issues || 0),
           critical: Number(criticalSummary.critical || 0)
-        };
-        snapshot.blockedPositions = blocked;
-        snapshot.blockedExposure = bettingUtils.summarizeExposure(blocked, bank);
-        snapshot.positions = [];
-        snapshot.exposure = bettingUtils.summarizeExposure([], bank);
-      }
-      const v5Summary = v5Report && v5Report.summary ? v5Report.summary : {};
-      if (!gate.blocked && !criticalSummary.blocks_bet && v5Summary.blocks_bet) {
-        const blocked = Array.isArray(blockedPositions) ? blockedPositions : [];
-        const bank = Number(snapshot.nav || 0) > 0 ? Number(snapshot.nav) : 10;
-        snapshot.guard = { status: 'paused', label: v5Summary.first || 'Campagne V5 rouge', reason: 'v5_fix_campaign' };
-        snapshot.v5Gate = {
-          blocked: true,
-          label: v5Summary.first || 'Campagne V5 rouge',
-          findings: Number(v5Summary.findings || 0),
-          critical: Number(v5Summary.critical || 0)
-        };
-        snapshot.blockedPositions = blocked;
-        snapshot.blockedExposure = bettingUtils.summarizeExposure(blocked, bank);
-        snapshot.positions = [];
-        snapshot.exposure = bettingUtils.summarizeExposure([], bank);
-      }
-      const v6ProfitSummary = v6ProfitReport && v6ProfitReport.summary ? v6ProfitReport.summary : {};
-      const v6TicketSummary = v6TicketReport && v6TicketReport.summary ? v6TicketReport.summary : {};
-      const v6Blocked = v6ProfitSummary.blocks_agent || (v6TicketSummary.final_gate && v6TicketSummary.final_gate !== 'ready');
-      if (!gate.blocked && !criticalSummary.blocks_bet && !v5Summary.blocks_bet && v6Blocked) {
-        const blocked = Array.isArray(blockedPositions) ? blockedPositions : [];
-        const bank = Number(snapshot.nav || 0) > 0 ? Number(snapshot.nav) : 10;
-        snapshot.guard = { status: 'paused', label: v6TicketSummary.first_blocker || 'Gate V6 pré-bet rouge', reason: 'v6_final_gate' };
-        snapshot.v6Gate = {
-          blocked: true,
-          label: v6TicketSummary.first_blocker || 'Gate V6 pré-bet rouge',
-          profitCandidates: Number(v6ProfitSummary.candidates || 0),
-          finalGate: v6TicketSummary.final_gate || 'blocked'
-        };
-        snapshot.blockedPositions = blocked;
-        snapshot.blockedExposure = bettingUtils.summarizeExposure(blocked, bank);
-        snapshot.positions = [];
-        snapshot.exposure = bettingUtils.summarizeExposure([], bank);
-      }
-      const v13Summary = v13NowTicketReport && v13NowTicketReport.summary ? v13NowTicketReport.summary : {};
-      const hasV13Ticket = Boolean(v13NowTicketReport && v13NowTicketReport.summary);
-      const v13Blocked = v13Summary.final_gate && v13Summary.final_gate !== 'ready';
-      if (!gate.blocked && !criticalSummary.blocks_bet && !v5Summary.blocks_bet && !v6Blocked && v13Blocked) {
-        const blocked = Array.isArray(blockedPositions) ? blockedPositions : [];
-        const bank = Number(snapshot.nav || 0) > 0 ? Number(snapshot.nav) : 10;
-        snapshot.guard = { status: 'paused', label: v13Summary.message || 'Aucun pari à jouer maintenant', reason: 'v13_now_ticket' };
-        snapshot.v13Gate = {
-          blocked: true,
-          label: v13Summary.message || 'Aucun pari à jouer maintenant',
-          bettableNow: Number(v13Summary.bettable_now || 0),
-          oneTickAway: Number(v13Summary.one_tick_away || 0),
-          waitBetterPrice: Number(v13Summary.wait_better_price || 0),
-          marketHostile: Number(v13Summary.market_hostile || 0),
-          expired: Number(v13Summary.expired_or_kickoff_too_close || 0)
-        };
-        snapshot.blockedPositions = blocked;
-        snapshot.blockedExposure = bettingUtils.summarizeExposure(blocked, bank);
-        snapshot.positions = [];
-        snapshot.exposure = bettingUtils.summarizeExposure([], bank);
-      }
-      const v12Summary = v12NowTicketReport && v12NowTicketReport.summary ? v12NowTicketReport.summary : {};
-      const hasV12Ticket = Boolean(v12NowTicketReport && v12NowTicketReport.summary);
-      const v12Blocked = v12Summary.final_gate && v12Summary.final_gate !== 'ready';
-      if (!gate.blocked && !criticalSummary.blocks_bet && !v5Summary.blocks_bet && !v6Blocked && !hasV13Ticket && v12Blocked) {
-        const blocked = Array.isArray(blockedPositions) ? blockedPositions : [];
-        const bank = Number(snapshot.nav || 0) > 0 ? Number(snapshot.nav) : 10;
-        snapshot.guard = { status: 'paused', label: v12Summary.message || 'Ticket V12 non prêt', reason: 'v12_now_ticket' };
-        snapshot.v12Gate = {
-          blocked: true,
-          label: v12Summary.message || 'Ticket V12 non prêt',
-          priceReady: Number(v12Summary.price_ready || 0),
-          nearTarget: Number(v12Summary.near_target || 0),
-          waitPrice: Number(v12Summary.wait_price || 0),
-          marketHostile: Number(v12Summary.market_hostile || 0)
-        };
-        snapshot.blockedPositions = blocked;
-        snapshot.blockedExposure = bettingUtils.summarizeExposure(blocked, bank);
-        snapshot.positions = [];
-        snapshot.exposure = bettingUtils.summarizeExposure([], bank);
-      }
-      const v7EdgeSummary = v7EdgeReport && v7EdgeReport.summary ? v7EdgeReport.summary : {};
-      const v7RedSummary = v7RedReport && v7RedReport.summary ? v7RedReport.summary : {};
-      const v7Blocked = v7EdgeSummary.blocks_agent || v7RedSummary.blocks_agent;
-      if (!gate.blocked && !criticalSummary.blocks_bet && !v5Summary.blocks_bet && !v6Blocked && !hasV13Ticket && !v12Blocked && v7Blocked) {
-        const blocked = Array.isArray(blockedPositions) ? blockedPositions : [];
-        const bank = Number(snapshot.nav || 0) > 0 ? Number(snapshot.nav) : 10;
-        snapshot.guard = { status: 'paused', label: v7RedSummary.first || 'Gate V7 actionnable rouge', reason: 'v7_edge_release' };
-        snapshot.v7Gate = {
-          blocked: true,
-          label: v7RedSummary.first || 'Gate V7 actionnable rouge',
-          ready: Number(v7EdgeSummary.ready || 0),
-          watch: Number(v7EdgeSummary.watch || 0),
-          softwareCritical: Number(v7RedSummary.software_critical || 0)
-        };
-        snapshot.blockedPositions = blocked;
-        snapshot.blockedExposure = bettingUtils.summarizeExposure(blocked, bank);
-        snapshot.positions = [];
-        snapshot.exposure = bettingUtils.summarizeExposure([], bank);
-      }
-      const v8Summary = v8DecisionReport && v8DecisionReport.summary ? v8DecisionReport.summary : {};
-      const v8Blocked = v8Summary.ready != null && Number(v8Summary.ready || 0) <= 0;
-      if (!gate.blocked && !criticalSummary.blocks_bet && !v5Summary.blocks_bet && !v6Blocked && !v7Blocked && !hasV13Ticket && !hasV12Ticket && v8Blocked) {
-        const blocked = Array.isArray(blockedPositions) ? blockedPositions : [];
-        const bank = Number(snapshot.nav || 0) > 0 ? Number(snapshot.nav) : 10;
-        snapshot.guard = { status: 'paused', label: v8Summary.message || 'Aucun pari à jouer maintenant', reason: 'v8_decision_feed' };
-        snapshot.v8Gate = {
-          blocked: true,
-          label: v8Summary.message || 'Aucun pari à jouer maintenant',
-          ready: Number(v8Summary.ready || 0),
-          wait: Number(v8Summary.wait || 0),
-          repair: Number(v8Summary.repair || 0)
-        };
-        snapshot.blockedPositions = blocked;
-        snapshot.blockedExposure = bettingUtils.summarizeExposure(blocked, bank);
-        snapshot.positions = [];
-        snapshot.exposure = bettingUtils.summarizeExposure([], bank);
-      }
-      const v9Summary = v9FinalTicketReport && v9FinalTicketReport.summary ? v9FinalTicketReport.summary : {};
-      const v9Blocked = v9Summary.final_gate && v9Summary.final_gate !== 'ready';
-      if (!gate.blocked && !criticalSummary.blocks_bet && !v5Summary.blocks_bet && !v6Blocked && !v7Blocked && !v8Blocked && !hasV13Ticket && !hasV12Ticket && v9Blocked) {
-        const blocked = Array.isArray(blockedPositions) ? blockedPositions : [];
-        const bank = Number(snapshot.nav || 0) > 0 ? Number(snapshot.nav) : 10;
-        snapshot.guard = { status: 'paused', label: v9Summary.message || 'Ticket V9 non prêt', reason: 'v9_final_ticket' };
-        snapshot.v9Gate = {
-          blocked: true,
-          label: v9Summary.message || 'Ticket V9 non prêt',
-          ready: Number(v9Summary.ready || 0),
-          watch: Number(v9Summary.watch || 0),
-          repair: Number(v9Summary.repair || 0)
-        };
-        snapshot.blockedPositions = blocked;
-        snapshot.blockedExposure = bettingUtils.summarizeExposure(blocked, bank);
-        snapshot.positions = [];
-        snapshot.exposure = bettingUtils.summarizeExposure([], bank);
-      }
-      const v10Summary = v10FinalTicketReport && v10FinalTicketReport.summary ? v10FinalTicketReport.summary : {};
-      const v10Blocked = v10Summary.final_gate && v10Summary.final_gate !== 'ready';
-      if (!gate.blocked && !criticalSummary.blocks_bet && !v5Summary.blocks_bet && !v6Blocked && !v7Blocked && !v8Blocked && !v9Blocked && !hasV13Ticket && !hasV12Ticket && v10Blocked && !(v11NowTicketReport && v11NowTicketReport.summary)) {
-        const blocked = Array.isArray(blockedPositions) ? blockedPositions : [];
-        const bank = Number(snapshot.nav || 0) > 0 ? Number(snapshot.nav) : 10;
-        snapshot.guard = { status: 'paused', label: v10Summary.message || 'Ticket V10 non prêt', reason: 'v10_final_ticket' };
-        snapshot.v10Gate = {
-          blocked: true,
-          label: v10Summary.message || 'Ticket V10 non prêt',
-          readyNow: Number(v10Summary.ready_now || 0),
-          waitT10: Number(v10Summary.wait_t10 || 0),
-          repairSource: Number(v10Summary.repair_source || 0)
-        };
-        snapshot.blockedPositions = blocked;
-        snapshot.blockedExposure = bettingUtils.summarizeExposure(blocked, bank);
-        snapshot.positions = [];
-        snapshot.exposure = bettingUtils.summarizeExposure([], bank);
-      }
-      const v11Summary = v11NowTicketReport && v11NowTicketReport.summary ? v11NowTicketReport.summary : {};
-      const v11Blocked = v11Summary.final_gate && v11Summary.final_gate !== 'ready';
-      if (!gate.blocked && !criticalSummary.blocks_bet && !v5Summary.blocks_bet && !v6Blocked && !v7Blocked && !v8Blocked && !v9Blocked && !hasV13Ticket && !hasV12Ticket && v11Blocked) {
-        const blocked = Array.isArray(blockedPositions) ? blockedPositions : [];
-        const bank = Number(snapshot.nav || 0) > 0 ? Number(snapshot.nav) : 10;
-        snapshot.guard = { status: 'paused', label: v11Summary.message || 'Ticket V11 non prêt', reason: 'v11_now_ticket' };
-        snapshot.v11Gate = {
-          blocked: true,
-          label: v11Summary.message || 'Ticket V11 non prêt',
-          readyNow: Number(v11Summary.ready_now || 0),
-          readyIfT10: Number(v11Summary.ready_if_t10 || 0),
-          readyIfPrice: Number(v11Summary.ready_if_price || 0),
-          blockedExternal: Number(v11Summary.blocked_external || 0)
         };
         snapshot.blockedPositions = blocked;
         snapshot.blockedExposure = bettingUtils.summarizeExposure(blocked, bank);
@@ -2259,107 +1720,6 @@ function createLegacyEngineService({ projectRoot }) {
     const probabilityCalibrationReport = readProbabilityCalibrationReport();
     const policyCandidateRegistryReport = readPolicyCandidateRegistryReport();
     const sourceHealthReport = readSourceHealthReport();
-    const v5FixCampaignReport = readV5FixCampaignReport();
-    const v5DeadFileManifestReport = readV5DeadFileManifestReport();
-    const v5PickReconciliationReport = readV5PickReconciliationReport();
-    const v5UiBugReport = readV5UiBugReport();
-    const v5RefreshRepairReport = readV5RefreshRepairReport();
-    const v5BacktestSanityReport = readV5BacktestSanityReport();
-    const v6CoverageBoostReport = readV6CoverageBoostReport();
-    const v6TeamMatchingFailuresReport = readV6TeamMatchingFailuresReport();
-    const v6SourceGainReport = readV6SourceGainReport();
-    const v6ProfitEngineReport = readV6ProfitEngineReport();
-    const v6BacktestCleanRoomReport = readV6BacktestCleanRoomReport();
-    const v6FinalBetTicketReport = readV6FinalBetTicketReport();
-    const v6ControlRoomReport = readV6ControlRoomReport();
-    const v7RedToGreenReport = readV7RedToGreenReport();
-    const v7ActionQueueReport = readV7ActionQueueReport();
-    const v7ActualCoverageReport = readV7ActualCoverageReport();
-    const v7SourceAbsenceReport = readV7SourceAbsenceReport();
-    const v7EdgeReleaseReport = readV7EdgeReleaseReport();
-    const v7StakingPolicyReport = readV7StakingPolicyReport();
-    const v8DecisionFeedReport = readV8DecisionFeedReport();
-    const v8NowNextTicketReport = readV8NowNextTicketReport();
-    const v8CoverageRescueReport = readV8CoverageRescueReport();
-    const v8ProxyStrengthReport = readV8ProxyStrengthReport();
-    const v8UiConsistencyReport = readV8UiConsistencyReport();
-    const v8MatchSheetReport = readV8MatchSheetReport();
-    const v8ControlRoomReport = readV8ControlRoomReport();
-    const v9ReadyUnlockReport = readV9ReadyUnlockReport();
-    const v9BlockerMatrixReport = readV9BlockerMatrixReport();
-    const v9RepairExecutionReport = readV9RepairExecutionReport();
-    const v9CoverageAfterRepairReport = readV9CoverageAfterRepairReport();
-    const v9SourceBlockersReport = readV9SourceBlockersReport();
-    const v9FinalizerReport = readV9FinalizerReport();
-    const v9FinalTicketReport = readV9FinalTicketReport();
-    const v9ProfitGateReport = readV9ProfitGateReport();
-    const v9ClvMarketPressureReport = readV9ClvMarketPressureReport();
-    const v10DecisionFeedReport = readV10DecisionFeedReport();
-    const v10FinalBetTicketReport = readV10FinalBetTicketReport();
-    const v10T10GateReport = readV10T10GateReport();
-    const v10BlockerResolutionReport = readV10BlockerResolutionReport();
-    const v10SignalRescueReport = readV10SignalRescueReport();
-    const v10ExternalSourceLimitsReport = readV10ExternalSourceLimitsReport();
-    const v10RefreshObserverReport = readV10RefreshObserverReport();
-    const v10RefreshStageTimingsReport = readV10RefreshStageTimingsReport();
-    const v10ProfitGuardReport = readV10ProfitGuardReport();
-    const v10StakePolicyReport = readV10StakePolicyReport();
-    const v11ReadyUnlockReport = readV11ReadyUnlockReport();
-    const v11T10FastReport = readV11T10FastReport();
-    const v11T10BlockersReport = readV11T10BlockersReport();
-    const v11NowTicketReport = readV11NowTicketReport();
-    const v11RepairExecutionReport = readV11RepairExecutionReport();
-    const v11HealthReconciliationReport = readV11HealthReconciliationReport();
-    const v11ProfitGuardReport = readV11ProfitGuardReport();
-    const v11ControlRoomReport = readV11ControlRoomReport();
-    const v12PriceTargetsReport = readV12PriceTargetsReport();
-    const v12MarketTimingReport = readV12MarketTimingReport();
-    const v12ClvWatchReport = readV12ClvWatchReport();
-    const v12ValueReleaseReport = readV12ValueReleaseReport();
-    const v12NowTicketReport = readV12NowTicketReport();
-    const v12ControlRoomReport = readV12ControlRoomReport();
-    const v13OddsIdentityReport = readV13OddsIdentityReport();
-    const v13PriceMemoryReport = readV13PriceMemoryReport();
-    const v13LineMovementReport = readV13LineMovementReport();
-    const v13PriceAlertsReport = readV13PriceAlertsReport();
-    const v13AlertQueueReport = readV13AlertQueueReport();
-    const v13T10ResolutionReport = readV13T10ResolutionReport();
-    const v13T10GateMatrixReport = readV13T10GateMatrixReport();
-    const v13FinalGateReport = readV13FinalGateReport();
-    const v13ProfitGuardReport = readV13ProfitGuardReport();
-    const v13EdgeExplainabilityReport = readV13EdgeExplainabilityReport();
-    const v13NowTicketReport = readV13NowTicketReport();
-    const v13AgentGateReport = readV13AgentGateReport();
-    const v13ControlRoomReport = readV13ControlRoomReport();
-    const v13RefreshPerformanceReport = readV13RefreshPerformanceReport();
-    const v14FileAuditReport = readV14FileAuditReport();
-    const v14DeadReferenceReport = readV14DeadReferenceReport();
-    const v14ContentInventoryReport = readV14ContentInventoryReport();
-    const v14MathIntegrityReport = readV14MathIntegrityReport();
-    const v14PickStateReconciliationReport = readV14PickStateReconciliationReport();
-    const v14CrossViewConsistencyReport = readV14CrossViewConsistencyReport();
-    const v14CriticalResolutionReport = readV14CriticalResolutionReport();
-    const v14PrebetGateReport = readV14PrebetGateReport();
-    const v14SourceRepairReport = readV14SourceRepairReport();
-    const v14SignalTruthReport = readV14SignalTruthReport();
-    const v14MatchingQualityReport = readV14MatchingQualityReport();
-    const v14SourceGapByMatchReport = readV14SourceGapByMatchReport();
-    const v14PriceActionReport = readV14PriceActionReport();
-    const v14RecheckScheduleReport = readV14RecheckScheduleReport();
-    const v14ControlRoomReport = readV14ControlRoomReport();
-    const v15ActionCockpitReport = readV15ActionCockpitReport();
-    const v15BetReadinessReport = readV15BetReadinessReport();
-    const v15HealthNoiseReport = readV15HealthNoiseReport();
-    const v15SourceFixPlanReport = readV15SourceFixPlanReport();
-    const v15CleanupSafetyReport = readV15CleanupSafetyReport();
-    const v15ControlRoomReport = readV15ControlRoomReport();
-    const v16SourceRefreshReport = readV16SourceRefreshReport();
-    const v16SourceDeltaReport = readV16SourceDeltaReport();
-    const v16T10DecisionReport = readV16T10DecisionReport();
-    const v16CandidateResolutionReport = readV16CandidateResolutionReport();
-    const v16FinalTicketReport = readV16FinalTicketReport();
-    const v16AgentGateReport = readV16AgentGateReport();
-    const v16ControlRoomReport = readV16ControlRoomReport();
     const clvSummaryReport = readClvSummaryReport();
     const events = dedupeUpcomingBookable(eventListFromDays(data.days)).slice(0, 1200);
     const enrichedEvents = events.map((match) => enrichMatchForModel(match, lineupsIndex, h2hIndex, matchContextIndex));
@@ -2377,11 +1737,19 @@ function createLegacyEngineService({ projectRoot }) {
       .map((row) => applySignalConflict(row, signalConflictBacktestReport));
     const candidateAgentPositions = buildAgentPositions(win, baseMatches);
     const prebetGate = prebetGateForReport(prebetChecklistReport);
-    const matches = baseMatches.map((row) => applyPrebetGate(row, prebetChecklistReport));
+    const criticalGate = criticalGateForReport(criticalIssueReport);
+    const decisionGates = { prebet: prebetGate, critical: criticalGate };
+    const matches = baseMatches
+      .map((row) => applyPrebetGate(row, prebetChecklistReport))
+      .map((row) => applyDecisionCenter(row, decisionGates));
     const seen = new Set();
     const picks = matches
-      .filter((row) => row.status !== 'skip' && row.edge > 0 && row.stake > 0)
-      .sort((a, b) => (b.edge - a.edge) || (b.probability - a.probability))
+      .filter((row) => row.status !== 'skip' && row.edge > 0 && row.odd > 1 && Number(row.decisionCenter?.modelStake || row.modelStake || row.stake || 0) > 0)
+      .sort((a, b) => {
+        const readyDelta = Number(Boolean(b.decisionCenter?.canBet)) - Number(Boolean(a.decisionCenter?.canBet));
+        if (readyDelta) return readyDelta;
+        return (b.edge - a.edge) || (b.probability - a.probability);
+      })
       .filter((pick) => {
         const key = `${pick.id}:${pick.market}:${pick.label}`;
         if (seen.has(key)) return false;
@@ -2393,17 +1761,8 @@ function createLegacyEngineService({ projectRoot }) {
     const combines = buildNativeCombines(win, enrichedEvents);
     const scorers = buildNativeScorers(win, enrichedEvents, lineupsIndex, starPlayersIndex);
     const watchlist = buildWatchlist(matches);
-    const criticalGate = criticalIssueReport?.summary?.blocks_bet;
-    const v5Gate = v5FixCampaignReport?.summary?.blocks_bet || v5PickReconciliationReport?.summary?.blocks_current_bet || v5RefreshRepairReport?.summary?.blocks_bet;
-    const v6Gate = v6ProfitEngineReport?.summary?.blocks_agent || (v6FinalBetTicketReport?.summary?.final_gate && v6FinalBetTicketReport.summary.final_gate !== 'ready');
-    const v7Gate = v7EdgeReleaseReport?.summary?.blocks_agent || v7RedToGreenReport?.summary?.blocks_agent;
-    const v8Gate = v8DecisionFeedReport?.summary && Number(v8DecisionFeedReport.summary.ready || 0) <= 0;
-    const v9Gate = v9FinalTicketReport?.summary && v9FinalTicketReport.summary.final_gate && v9FinalTicketReport.summary.final_gate !== 'ready';
-    const v10Gate = v10FinalBetTicketReport?.summary && v10FinalBetTicketReport.summary.final_gate && v10FinalBetTicketReport.summary.final_gate !== 'ready';
-    const v11Gate = v11NowTicketReport?.summary && v11NowTicketReport.summary.final_gate && v11NowTicketReport.summary.final_gate !== 'ready';
-    const v12Gate = v12NowTicketReport?.summary && v12NowTicketReport.summary.final_gate && v12NowTicketReport.summary.final_gate !== 'ready';
-    const v13Gate = v13NowTicketReport?.summary && v13NowTicketReport.summary.final_gate && v13NowTicketReport.summary.final_gate !== 'ready';
-    const agentPositions = prebetGate.blocked || criticalGate || v5Gate || v6Gate || v7Gate || v8Gate || v9Gate || v10Gate || v11Gate || v12Gate || v13Gate ? [] : buildAgentPositions(win, matches);
+    const decisionCenter = buildDecisionCenterReport(matches, decisionGates);
+    const agentPositions = prebetGate.blocked || criticalGate.blocked ? [] : buildAgentPositions(win, matches);
     const agentBlockers = buildAgentBlockers(matches, agentPositions, win);
 
     return {
@@ -2430,8 +1789,11 @@ function createLegacyEngineService({ projectRoot }) {
       dashboardMeta: {
         mode: dashboard.mode,
         horizonHours: dashboard.horizonHours,
-        totalPicks: picks.length
+        totalPicks: picks.length,
+        readyPicks: decisionCenter.summary.ready || 0,
+        blocked: decisionCenter.summary.blocked
       },
+      decisionCenter,
       combines,
       scorers,
       watchlist,
@@ -2487,110 +1849,9 @@ function createLegacyEngineService({ projectRoot }) {
       probabilityCalibration: probabilityCalibrationReport && probabilityCalibrationReport.schema ? probabilityCalibrationReport : null,
       policyCandidates: policyCandidateRegistryReport && policyCandidateRegistryReport.schema ? policyCandidateRegistryReport : null,
       sourceHealth: sourceHealthReport && sourceHealthReport.schema ? sourceHealthReport : null,
-      v5FixCampaign: v5FixCampaignReport && v5FixCampaignReport.schema ? v5FixCampaignReport : null,
-      v5DeadFileManifest: v5DeadFileManifestReport && v5DeadFileManifestReport.schema ? v5DeadFileManifestReport : null,
-      v5PickReconciliation: v5PickReconciliationReport && v5PickReconciliationReport.schema ? v5PickReconciliationReport : null,
-      v5UiBugReport: v5UiBugReport && v5UiBugReport.schema ? v5UiBugReport : null,
-      v5RefreshRepairReport: v5RefreshRepairReport && v5RefreshRepairReport.schema ? v5RefreshRepairReport : null,
-      v5BacktestSanity: v5BacktestSanityReport && v5BacktestSanityReport.schema ? v5BacktestSanityReport : null,
-      v6CoverageBoost: v6CoverageBoostReport && v6CoverageBoostReport.schema ? v6CoverageBoostReport : null,
-      v6TeamMatchingFailures: v6TeamMatchingFailuresReport && v6TeamMatchingFailuresReport.schema ? v6TeamMatchingFailuresReport : null,
-      v6SourceGain: v6SourceGainReport && v6SourceGainReport.schema ? v6SourceGainReport : null,
-      v6ProfitEngine: v6ProfitEngineReport && v6ProfitEngineReport.schema ? v6ProfitEngineReport : null,
-      v6BacktestCleanRoom: v6BacktestCleanRoomReport && v6BacktestCleanRoomReport.schema ? v6BacktestCleanRoomReport : null,
-      v6FinalBetTicket: v6FinalBetTicketReport && v6FinalBetTicketReport.schema ? v6FinalBetTicketReport : null,
-      v6ControlRoom: v6ControlRoomReport && v6ControlRoomReport.schema ? v6ControlRoomReport : null,
-      v7RedToGreen: v7RedToGreenReport && v7RedToGreenReport.schema ? v7RedToGreenReport : null,
-      v7ActionQueue: v7ActionQueueReport && v7ActionQueueReport.schema ? v7ActionQueueReport : null,
-      v7ActualCoverage: v7ActualCoverageReport && v7ActualCoverageReport.schema ? v7ActualCoverageReport : null,
-      v7SourceAbsence: v7SourceAbsenceReport && v7SourceAbsenceReport.schema ? v7SourceAbsenceReport : null,
-      v7EdgeRelease: v7EdgeReleaseReport && v7EdgeReleaseReport.schema ? v7EdgeReleaseReport : null,
-      v7StakingPolicy: v7StakingPolicyReport && v7StakingPolicyReport.schema ? v7StakingPolicyReport : null,
-      v8DecisionFeed: v8DecisionFeedReport && v8DecisionFeedReport.schema ? v8DecisionFeedReport : null,
-      v8NowNextTicket: v8NowNextTicketReport && v8NowNextTicketReport.schema ? v8NowNextTicketReport : null,
-      v8CoverageRescue: v8CoverageRescueReport && v8CoverageRescueReport.schema ? v8CoverageRescueReport : null,
-      v8ProxyStrength: v8ProxyStrengthReport && v8ProxyStrengthReport.schema ? v8ProxyStrengthReport : null,
-      v8UiConsistency: v8UiConsistencyReport && v8UiConsistencyReport.schema ? v8UiConsistencyReport : null,
-      v8MatchSheet: v8MatchSheetReport && v8MatchSheetReport.schema ? v8MatchSheetReport : null,
-      v8ControlRoom: v8ControlRoomReport && v8ControlRoomReport.schema ? v8ControlRoomReport : null,
-      v9ReadyUnlock: v9ReadyUnlockReport && v9ReadyUnlockReport.schema ? v9ReadyUnlockReport : null,
-      v9BlockerMatrix: v9BlockerMatrixReport && v9BlockerMatrixReport.schema ? v9BlockerMatrixReport : null,
-      v9RepairExecution: v9RepairExecutionReport && v9RepairExecutionReport.schema ? v9RepairExecutionReport : null,
-      v9CoverageAfterRepair: v9CoverageAfterRepairReport && v9CoverageAfterRepairReport.schema ? v9CoverageAfterRepairReport : null,
-      v9SourceBlockers: v9SourceBlockersReport && v9SourceBlockersReport.schema ? v9SourceBlockersReport : null,
-      v9Finalizer: v9FinalizerReport && v9FinalizerReport.schema ? v9FinalizerReport : null,
-      v9FinalTicket: v9FinalTicketReport && v9FinalTicketReport.schema ? v9FinalTicketReport : null,
-      v9ProfitGate: v9ProfitGateReport && v9ProfitGateReport.schema ? v9ProfitGateReport : null,
-      v9ClvMarketPressure: v9ClvMarketPressureReport && v9ClvMarketPressureReport.schema ? v9ClvMarketPressureReport : null,
-      v10DecisionFeed: v10DecisionFeedReport && v10DecisionFeedReport.schema ? v10DecisionFeedReport : null,
-      v10FinalBetTicket: v10FinalBetTicketReport && v10FinalBetTicketReport.schema ? v10FinalBetTicketReport : null,
-      v10T10Gate: v10T10GateReport && v10T10GateReport.schema ? v10T10GateReport : null,
-      v10BlockerResolution: v10BlockerResolutionReport && v10BlockerResolutionReport.schema ? v10BlockerResolutionReport : null,
-      v10SignalRescue: v10SignalRescueReport && v10SignalRescueReport.schema ? v10SignalRescueReport : null,
-      v10ExternalSourceLimits: v10ExternalSourceLimitsReport && v10ExternalSourceLimitsReport.schema ? v10ExternalSourceLimitsReport : null,
-      v10RefreshObserver: v10RefreshObserverReport && v10RefreshObserverReport.schema ? v10RefreshObserverReport : null,
-      v10RefreshStageTimings: v10RefreshStageTimingsReport && v10RefreshStageTimingsReport.schema ? v10RefreshStageTimingsReport : null,
-      v10ProfitGuard: v10ProfitGuardReport && v10ProfitGuardReport.schema ? v10ProfitGuardReport : null,
-      v10StakePolicy: v10StakePolicyReport && v10StakePolicyReport.schema ? v10StakePolicyReport : null,
-      v11ReadyUnlock: v11ReadyUnlockReport && v11ReadyUnlockReport.schema ? v11ReadyUnlockReport : null,
-      v11T10Fast: v11T10FastReport && v11T10FastReport.schema ? v11T10FastReport : null,
-      v11T10Blockers: v11T10BlockersReport && v11T10BlockersReport.schema ? v11T10BlockersReport : null,
-      v11NowTicket: v11NowTicketReport && v11NowTicketReport.schema ? v11NowTicketReport : null,
-      v11RepairExecution: v11RepairExecutionReport && v11RepairExecutionReport.schema ? v11RepairExecutionReport : null,
-      v11HealthReconciliation: v11HealthReconciliationReport && v11HealthReconciliationReport.schema ? v11HealthReconciliationReport : null,
-      v11ProfitGuard: v11ProfitGuardReport && v11ProfitGuardReport.schema ? v11ProfitGuardReport : null,
-      v11ControlRoom: v11ControlRoomReport && v11ControlRoomReport.schema ? v11ControlRoomReport : null,
-      v12PriceTargets: v12PriceTargetsReport && v12PriceTargetsReport.schema ? v12PriceTargetsReport : null,
-      v12MarketTiming: v12MarketTimingReport && v12MarketTimingReport.schema ? v12MarketTimingReport : null,
-      v12ClvWatch: v12ClvWatchReport && v12ClvWatchReport.schema ? v12ClvWatchReport : null,
-      v12ValueRelease: v12ValueReleaseReport && v12ValueReleaseReport.schema ? v12ValueReleaseReport : null,
-      v12NowTicket: v12NowTicketReport && v12NowTicketReport.schema ? v12NowTicketReport : null,
-      v12ControlRoom: v12ControlRoomReport && v12ControlRoomReport.schema ? v12ControlRoomReport : null,
-      v13OddsIdentity: v13OddsIdentityReport && v13OddsIdentityReport.schema ? v13OddsIdentityReport : null,
-      v13PriceMemory: v13PriceMemoryReport && v13PriceMemoryReport.schema ? v13PriceMemoryReport : null,
-      v13LineMovement: v13LineMovementReport && v13LineMovementReport.schema ? v13LineMovementReport : null,
-      v13PriceAlerts: v13PriceAlertsReport && v13PriceAlertsReport.schema ? v13PriceAlertsReport : null,
-      v13AlertQueue: v13AlertQueueReport && v13AlertQueueReport.schema ? v13AlertQueueReport : null,
-      v13T10Resolution: v13T10ResolutionReport && v13T10ResolutionReport.schema ? v13T10ResolutionReport : null,
-      v13T10GateMatrix: v13T10GateMatrixReport && v13T10GateMatrixReport.schema ? v13T10GateMatrixReport : null,
-      v13FinalGate: v13FinalGateReport && v13FinalGateReport.schema ? v13FinalGateReport : null,
-      v13ProfitGuard: v13ProfitGuardReport && v13ProfitGuardReport.schema ? v13ProfitGuardReport : null,
-      v13EdgeExplainability: v13EdgeExplainabilityReport && v13EdgeExplainabilityReport.schema ? v13EdgeExplainabilityReport : null,
-      v13NowTicket: v13NowTicketReport && v13NowTicketReport.schema ? v13NowTicketReport : null,
-      v13AgentGate: v13AgentGateReport && v13AgentGateReport.schema ? v13AgentGateReport : null,
-      v13ControlRoom: v13ControlRoomReport && v13ControlRoomReport.schema ? v13ControlRoomReport : null,
-      v13RefreshPerformance: v13RefreshPerformanceReport && v13RefreshPerformanceReport.schema ? v13RefreshPerformanceReport : null,
-      v14FileAudit: v14FileAuditReport && v14FileAuditReport.schema ? v14FileAuditReport : null,
-      v14DeadReferences: v14DeadReferenceReport && v14DeadReferenceReport.schema ? v14DeadReferenceReport : null,
-      v14ContentInventory: v14ContentInventoryReport && v14ContentInventoryReport.schema ? v14ContentInventoryReport : null,
-      v14MathIntegrity: v14MathIntegrityReport && v14MathIntegrityReport.schema ? v14MathIntegrityReport : null,
-      v14PickStateReconciliation: v14PickStateReconciliationReport && v14PickStateReconciliationReport.schema ? v14PickStateReconciliationReport : null,
-      v14CrossViewConsistency: v14CrossViewConsistencyReport && v14CrossViewConsistencyReport.schema ? v14CrossViewConsistencyReport : null,
-      v14CriticalResolution: v14CriticalResolutionReport && v14CriticalResolutionReport.schema ? v14CriticalResolutionReport : null,
-      v14PrebetGate: v14PrebetGateReport && v14PrebetGateReport.schema ? v14PrebetGateReport : null,
-      v14SourceRepair: v14SourceRepairReport && v14SourceRepairReport.schema ? v14SourceRepairReport : null,
-      v14SignalTruth: v14SignalTruthReport && v14SignalTruthReport.schema ? v14SignalTruthReport : null,
-      v14MatchingQuality: v14MatchingQualityReport && v14MatchingQualityReport.schema ? v14MatchingQualityReport : null,
-      v14SourceGapByMatch: v14SourceGapByMatchReport && v14SourceGapByMatchReport.schema ? v14SourceGapByMatchReport : null,
-      v14PriceAction: v14PriceActionReport && v14PriceActionReport.schema ? v14PriceActionReport : null,
-      v14RecheckSchedule: v14RecheckScheduleReport && v14RecheckScheduleReport.schema ? v14RecheckScheduleReport : null,
-      v14ControlRoom: v14ControlRoomReport && v14ControlRoomReport.schema ? v14ControlRoomReport : null,
-      v15ActionCockpit: v15ActionCockpitReport && v15ActionCockpitReport.schema ? v15ActionCockpitReport : null,
-      v15BetReadiness: v15BetReadinessReport && v15BetReadinessReport.schema ? v15BetReadinessReport : null,
-      v15HealthNoise: v15HealthNoiseReport && v15HealthNoiseReport.schema ? v15HealthNoiseReport : null,
-      v15SourceFixPlan: v15SourceFixPlanReport && v15SourceFixPlanReport.schema ? v15SourceFixPlanReport : null,
-      v15CleanupSafety: v15CleanupSafetyReport && v15CleanupSafetyReport.schema ? v15CleanupSafetyReport : null,
-      v15ControlRoom: v15ControlRoomReport && v15ControlRoomReport.schema ? v15ControlRoomReport : null,
-      v16SourceRefresh: v16SourceRefreshReport && v16SourceRefreshReport.schema ? v16SourceRefreshReport : null,
-      v16SourceDelta: v16SourceDeltaReport && v16SourceDeltaReport.schema ? v16SourceDeltaReport : null,
-      v16T10Decision: v16T10DecisionReport && v16T10DecisionReport.schema ? v16T10DecisionReport : null,
-      v16CandidateResolution: v16CandidateResolutionReport && v16CandidateResolutionReport.schema ? v16CandidateResolutionReport : null,
-      v16FinalTicket: v16FinalTicketReport && v16FinalTicketReport.schema ? v16FinalTicketReport : null,
-      v16AgentGate: v16AgentGateReport && v16AgentGateReport.schema ? v16AgentGateReport : null,
-      v16ControlRoom: v16ControlRoomReport && v16ControlRoomReport.schema ? v16ControlRoomReport : null,
       clvSummary: clvSummaryReport && clvSummaryReport.summary ? clvSummaryReport : null,
       agentBlockers,
-      agent: agentSnapshot(win, agentPositions, prebetChecklistReport, candidateAgentPositions, criticalIssueReport, v5FixCampaignReport, v6ProfitEngineReport, v6FinalBetTicketReport, v7EdgeReleaseReport, v7RedToGreenReport, v8DecisionFeedReport, v9FinalTicketReport, v10FinalBetTicketReport, v11NowTicketReport, v12NowTicketReport, v13NowTicketReport)
+      agent: agentSnapshot(win, agentPositions, prebetChecklistReport, candidateAgentPositions, criticalIssueReport)
     };
   }
 

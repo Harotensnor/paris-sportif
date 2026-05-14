@@ -13,6 +13,17 @@ const HOST = '127.0.0.1';
 const STATE_ROOT = path.join(DESKTOP_ROOT, 'state');
 const REFRESH_HISTORY_PATH = path.join(STATE_ROOT, 'refresh-history.json');
 const SIGNAL_SOURCES = new Set(['all', 'weather', 'referees', 'injuries', 'lineups', 'team_form', 'team_stats', 'h2h', 'context']);
+const REFRESH_MODES = new Set([
+  'quick',
+  'full',
+  'signals',
+  'prematch',
+  'prematch_t60',
+  'prematch_t30',
+  'prematch_t10',
+  'critical',
+  'repair_context'
+]);
 
 const MIME_TYPES = {
   '.html': 'text/html; charset=utf-8',
@@ -216,8 +227,8 @@ function getDataStatus() {
   });
   const status =
     ageMinutes == null ? 'unknown' :
-      ageMinutes <= 30 ? 'fresh' :
-        ageMinutes <= 240 ? 'stale' :
+      ageMinutes <= 240 ? 'fresh' :
+        ageMinutes <= 360 ? 'stale' :
           'blocked';
 
   const payload = {
@@ -311,6 +322,10 @@ function spawnPythonRefresh(mode, source = 'all') {
     full: '--full',
     signals: '--signals',
     prematch: '--prematch',
+    prematch_t60: '--prematch-t60',
+    prematch_t30: '--prematch-t30',
+    prematch_t10: '--prematch-t10',
+    repair_context: '--repair-context',
     critical: '--critical'
   };
   const modeArg = modeArgs[mode] || '--quick';
@@ -371,7 +386,7 @@ function spawnPythonRefresh(mode, source = 'all') {
 
 function startRefresh(mode = 'quick', source = 'all') {
   if (refreshState.running) return false;
-  const normalizedMode = ['full', 'signals', 'prematch', 'critical'].includes(mode) ? mode : 'quick';
+  const normalizedMode = REFRESH_MODES.has(mode) ? mode : 'quick';
   const normalizedSource = SIGNAL_SOURCES.has(source) ? source : 'all';
   refreshState.running = true;
   refreshState.mode = normalizedMode;
@@ -500,7 +515,7 @@ async function handleApi(req, res, url) {
       return;
     }
     const requestedMode = url.searchParams.get('mode');
-    const mode = ['full', 'signals', 'prematch', 'critical'].includes(requestedMode) ? requestedMode : 'quick';
+    const mode = REFRESH_MODES.has(requestedMode) ? requestedMode : 'quick';
     const requestedSource = url.searchParams.get('source') || 'all';
     const source = SIGNAL_SOURCES.has(requestedSource) ? requestedSource : 'all';
     const started = startRefresh(mode, source);

@@ -45,9 +45,55 @@ function runtimeBestPick(win, match, pred) {
   }
 }
 
+function pickKeyFromPrediction(pred) {
+  const pick = pred && pred.pick;
+  const raw = (pick && (pick.key ?? pick.side ?? pick.pick ?? pick.label)) ?? pred?.pickKey ?? pred?.key ?? pred?.side;
+  return String(raw || '').trim().toLowerCase();
+}
+
+function oddForPredictionPick(pred) {
+  const odds = pred && pred.odds && typeof pred.odds === 'object' ? pred.odds : {};
+  const key = pickKeyFromPrediction(pred);
+  if (key === '1' || key === 'home' || key.includes('domicile')) return Number(odds.home);
+  if (key === '2' || key === 'away' || key.includes('exterieur') || key.includes('extérieur')) return Number(odds.away);
+  if (key === 'n' || key === 'x' || key === 'draw' || key.includes('nul')) return Number(odds.draw);
+  return 0;
+}
+
+function probabilityForPredictionPick(pred) {
+  const pick = pred && pred.pick;
+  return Number(
+    (pick && (pick.prob ?? pick.probability ?? pick.rel ?? pick.reliability)) ??
+    pred?.prob ??
+    pred?.reliability
+  ) || 0;
+}
+
+function fallbackFromPredictionPick(match, pred, adapters) {
+  const odd = oddForPredictionPick(pred);
+  const prob = probabilityForPredictionPick(pred);
+  const edge = odd > 1 && prob > 0 ? prob - (1 / odd) : 0;
+  if (!(edge > 0)) return null;
+  const pick = pred && pred.pick;
+  const rawLabel = (pick && (pick.label || pick.team || pick.name || pick.key || pick.side)) ||
+    pred?.pickLabel || pred?.pickKey || pred?.key || pred?.side || 'Pick';
+  const market = adapters.formatMarketName('1n2');
+  return {
+    best: null,
+    odd,
+    prob,
+    edge,
+    market,
+    label: adapters.normalizePickLabel(match, market, rawLabel, 'Pick'),
+    source: 'prediction_pick',
+    derivedFromSkip: Boolean(pred && pred.skip)
+  };
+}
+
 function bestFromPrediction(win, match, pred, adapters) {
   const best = runtimeBestPick(win, match, pred);
-  if (!best && (!pred || pred.skip)) return null;
+  const fallback = fallbackFromPredictionPick(match, pred, adapters);
+  if (!best) return fallback;
   const odd = Number(best && (best.odd ?? best.odds)) || Number(pred && pred.odds) || 0;
   const prob = Number(best && (best.prob ?? best.reliability ?? best.rel)) ||
     Number(pred && (pred.reliability ?? pred.prob)) || 0;
