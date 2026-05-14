@@ -5,6 +5,24 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Version 1.0 — 2026-05-14
+
+- Paris Sportif Desktop passe en `v1.0.0` : cockpit Winamax-only, marchés simples par défaut, hiérarchie `TOP PICK` puis #2-#5, bankroll, settlement sécurisé, alertes, mode démo et profil local.
+- L'expérience standard reste volontairement simple : `Picks`, `Bilan`, `Réglages`, avec `Avancé` uniquement quand le mode expert est activé.
+- Le moteur garde les garde-fous consolidés : pas de marché complexe par défaut, pas de mise hors pick fiable, settlement impossible avant résultat final confirmé et fallback complet sans clé IA.
+- Documentation utilisateur complète ajoutée dans `desktop/README.md` pour l'installation, l'utilisation quotidienne, Winamax, la bankroll, les alertes, l'IA optionnelle, les sauvegardes et le dépannage.
+
+### Sprint 17 — Features finales + v1.0
+
+- Ajout dans `Bilan` d'un encart `Si tu avais suivi le modèle` : comparaison 30 jours entre les paris réels suivis par l'utilisateur et la simulation des picks fiables, avec taux de suivi, ROI, P&L et conseil factuel.
+- Ajout d'une `Suggestion du jour` dans le brief matin : une recommandation courte, cache 1h, dismissable, générée par heuristique locale avec les mêmes données que le cockpit.
+- Ajout de badges ciblés sans complexifier l'écran : `Sure pick` pour les opportunités très solides, `Long shot value` pour les cotes hautes validées, avec mise automatiquement réduite de 50% sur les long shots.
+- Ajout d'un signal de régression imminente dans la suggestion du jour quand un sport ou marché enchaîne 5 défaites ou plus, afin d'avertir sans masquer tout le cockpit.
+- Ajout du brief du soir configurable : récap P&L/journée, meilleur pari réglé, préparation du lendemain, leçon de discipline, notification locale et bouton manuel dans `Réglages > Avancé`.
+- Ajout du tour guidé du mode démo : quatre étapes pour lire le bet ultime, miser virtuellement, comprendre le P&L et retrouver l'historique. Le tour est disponible depuis l'aide et depuis les réglages.
+- Préparation release : `desktop/package.json` est en `1.0.0`, l'écran avancé affiche la version locale et la configuration `electron-builder` produit un build Windows non signé.
+- Validation Sprint 17 : `qa:engine`, tests unitaires/refresh/smoke, Playwright Electron, capture visuelle, multi-jours accéléré J+3, stress court, audit npm et build Windows `Paris Sportif Desktop Setup 1.0.0.exe` passent. Le smoke test du binaire packagé confirme que l'application démarre.
+
 ### Sprint 16 — Consolidation
 
 - Audit complet post-Sprint 15 : les contrôles automatisés couvrent désormais le cockpit simplifié, les marchés simples, le format `PARI / COTE / MISE / Pourquoi`, les gates Winamax-only, les décisions centrales, le settlement sécurisé, les vues expert et la cohérence des mises.

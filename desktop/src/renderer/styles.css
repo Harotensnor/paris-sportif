@@ -401,6 +401,71 @@ a:hover {
   line-height: 1.35;
 }
 
+.daily-suggestion-card {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid rgba(16, 185, 129, .26);
+  border-radius: 12px;
+  background: rgba(16, 185, 129, .08);
+  color: var(--text);
+}
+
+.daily-suggestion-card.hidden {
+  display: none;
+}
+
+.daily-suggestion-card strong {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--accent);
+}
+
+.daily-suggestion-card span {
+  min-width: 0;
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.special-pick-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 6px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(245, 158, 11, .34);
+  background: rgba(245, 158, 11, .12);
+  color: #fbbf24;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.special-pick-badge.longshot {
+  border-color: rgba(167, 139, 250, .34);
+  background: rgba(167, 139, 250, .12);
+  color: var(--brand);
+}
+
+.tour-step-card {
+  display: grid;
+  gap: 8px;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: rgba(15, 23, 42, .54);
+}
+
+.tour-step-card strong {
+  font-size: 18px;
+}
+
 .imminent-strip {
   grid-column: 1 / -1;
   display: flex;

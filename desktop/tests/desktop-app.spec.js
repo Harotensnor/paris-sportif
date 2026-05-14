@@ -40,6 +40,11 @@ test('Sprint 15 desktop shows only clear simple Winamax bets by default', async 
   expect(rendererText).toContain('priorityBadgeHtml');
   expect(rendererText).toContain('dailyBudgetPlan');
   expect(rendererText).toContain('renderPaperSimulation');
+  expect(rendererText).toContain('renderModelVsUser');
+  expect(rendererText).toContain('buildDailySuggestion');
+  expect(rendererText).toContain('specialPatternBadgeHtml');
+  expect(rendererText).toContain('maybeShowEveningBrief');
+  expect(rendererText).toContain('startDemoTour');
   expect(rendererText).toContain('SIMPLE_MARKET_PREFS');
   expect(rendererText).toContain('actionPickHtml');
   expect(rendererText).toContain('userBetLabel');
@@ -79,6 +84,7 @@ test('Sprint 15 desktop shows only clear simple Winamax bets by default', async 
       combines: Boolean(document.querySelector('#simple-combines-section')),
       scorers: Boolean(document.querySelector('#simple-scorers-section')),
       promos: Boolean(document.querySelector('#simple-promos-section')),
+      suggestion: document.querySelector('#daily-suggestion-card')?.textContent || '',
       expertHidden: !document.querySelector('[data-tab="data"]:not(.hidden)'),
       multibookText: document.body.textContent.includes('Multi-' + 'bookmaker') || document.body.textContent.includes('Meilleure ' + 'cote'),
       dashboardText: document.querySelector('[data-panel="dashboard"]')?.innerText || ''
@@ -100,6 +106,7 @@ test('Sprint 15 desktop shows only clear simple Winamax bets by default', async 
     expect(cockpit.combines).toBe(true);
     expect(cockpit.scorers).toBe(true);
     expect(cockpit.promos).toBe(true);
+    expect(cockpit.suggestion).toContain('Suggestion du jour');
     expect(cockpit.expertHidden).toBe(true);
     expect(cockpit.multibookText).toBe(false);
     expect(cockpit.dashboardText).toMatch(/PARI/i);
@@ -116,6 +123,7 @@ test('Sprint 15 desktop shows only clear simple Winamax bets by default', async 
     await expect(win.locator('#page-title')).toHaveText('Bilan');
     await expect(win.locator('#bankroll-allocation-grid')).toContainText('#1');
     await expect(win.locator('#paper-simulation-grid')).toContainText('Simulation');
+    await expect(win.locator('#model-vs-user-grid')).toContainText(/Si tu avais suivi le modèle|Toi sur 30 jours/);
     await win.keyboard.press('Control+3');
     await expect(win.locator('#page-title')).toHaveText('Réglages');
     await expect(win.locator('#pref-bankroll')).toBeVisible();
@@ -123,7 +131,9 @@ test('Sprint 15 desktop shows only clear simple Winamax bets by default', async 
     await expect(win.locator('#pref-allocation-strategy')).toBeVisible();
     await expect(win.locator('#pref-daily-budget')).toBeVisible();
     await expect(win.locator('#pref-prematch-alerts')).toBeVisible();
+    await expect(win.locator('#pref-evening-hour')).toBeVisible();
     await expect(win.locator('#pref-expert-mode')).toBeVisible();
+    await expect(win.locator('#app-version-label')).toContainText('v1.0.0');
     await expect(win.locator('#pref-sports')).toContainText('rugby');
     await expect(win.locator('#pref-sports')).toContainText('mma');
     await expect(win.locator('#pref-markets')).toContainText('Vainqueur du match');
@@ -141,7 +151,14 @@ test('Sprint 15 desktop shows only clear simple Winamax bets by default', async 
     await win.click('#force-weekly-report-btn');
     await expect(win.locator('#weekly-report-modal:not(.hidden)')).toContainText('rapport hebdo');
     await win.click('#weekly-report-close');
+    await win.click('#force-evening-brief-btn');
+    await expect(win.locator('#evening-brief-modal:not(.hidden)')).toContainText('Brief du soir');
+    await win.click('#evening-brief-close');
+    await win.click('#start-demo-tour-btn');
+    await expect(win.locator('#demo-tour-modal:not(.hidden)')).toContainText('Voici ton bet ultime');
+    await win.click('#demo-tour-close');
 
+    await win.click('[data-tab="preferences"]');
     await win.check('#pref-expert-mode');
     await win.click('#save-preferences-btn');
     await expect(win.locator('[data-tab="data"]:not(.hidden)')).toBeVisible();

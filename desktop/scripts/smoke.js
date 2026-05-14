@@ -29,7 +29,7 @@ async function main() {
   for (const marker of ['contextIsolation: true', 'sandbox: true', 'setWindowOpenHandler', "permission === 'notifications'", 'process.memoryUsage()']) {
     if (!mainText.includes(marker)) throw new Error(`Durcissement Electron absent: ${marker}`);
   }
-  for (const marker of ['todayFunnel', 'renderSimpleTimeline', 'antiTiltStatus', 'applyExpertMode', 'renderWinamaxPromos', 'renderBankrollAccounting', 'winamaxMarketAudit', 'coverage24h', 'safeBadgeHtml', 'renderTemporalCockpit', 'priorityBadgeHtml', 'dailyBudgetPlan', 'renderPaperSimulation', 'SIMPLE_MARKET_PREFS', 'actionPickHtml', 'userBetLabel']) {
+  for (const marker of ['todayFunnel', 'renderSimpleTimeline', 'antiTiltStatus', 'applyExpertMode', 'renderWinamaxPromos', 'renderBankrollAccounting', 'winamaxMarketAudit', 'coverage24h', 'safeBadgeHtml', 'renderTemporalCockpit', 'priorityBadgeHtml', 'dailyBudgetPlan', 'renderPaperSimulation', 'renderModelVsUser', 'buildDailySuggestion', 'specialPatternBadgeHtml', 'maybeShowEveningBrief', 'startDemoTour', 'SIMPLE_MARKET_PREFS', 'actionPickHtml', 'userBetLabel']) {
     if (!rendererText.includes(marker)) throw new Error(`Sprint 14 renderer absent: ${marker}`);
   }
 

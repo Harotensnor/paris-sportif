@@ -57,6 +57,7 @@ async function main() {
       combines: Boolean(document.querySelector('#simple-combines-section')),
       scorers: Boolean(document.querySelector('#simple-scorers-section')),
       promos: Boolean(document.querySelector('#simple-promos-section')),
+      suggestion: document.querySelector('#daily-suggestion-card')?.textContent || '',
       multibookText: document.body.textContent.includes('Multi-' + 'bookmaker') || document.body.textContent.includes('Meilleure ' + 'cote'),
       dashboardText: document.querySelector('[data-panel="dashboard"]')?.innerText || ''
     }));
@@ -65,6 +66,7 @@ async function main() {
     await win.waitForSelector('#model-performance-grid .performance-card, #model-performance-grid .empty', { timeout: 30000 });
     await win.waitForFunction(() => /#1/.test(document.querySelector('#bankroll-allocation-grid')?.textContent || ''), null, { timeout: 10000 });
     await win.waitForFunction(() => /Simulation/.test(document.querySelector('#paper-simulation-grid')?.textContent || ''), null, { timeout: 10000 });
+    await win.waitForFunction(() => /Si tu avais suivi le modèle|Toi sur 30 jours/.test(document.querySelector('#model-vs-user-grid')?.textContent || ''), null, { timeout: 10000 });
     await safeScreenshot(win, path.join(captureDir, 'desktop-sprint15-bilan.png'), { fullPage: true });
 
     await win.click('[data-tab="preferences"]');
@@ -107,7 +109,7 @@ async function main() {
     const hasActionCopy = /PARI/i.test(dashboard.dashboardText) && /COTE/i.test(dashboard.dashboardText) && /MISE/i.test(dashboard.dashboardText);
     const hasComplexMarket = /Handicap|Double chance|Jeux tennis|Total mi-temps|Total basket|Total runs|Score exact|Corners|Cartons/i.test(dashboard.dashboardText);
     const hasTechnicalJargon = /\bKelly\b|\bEV\b|\btier\b|\b1N2\b|\bBTTS\b|\bedge\b/i.test(dashboard.dashboardText);
-    if (dashboard.metric < 10 || dashboard.rows < 10 || dashboard.rows > 18 || dashboard.timeline < 8 || dashboard.safeBadges < 5 || dashboard.priorityBadges < 5 || !dashboard.topPick || !/jour/i.test(dashboard.dailyBudget) || !dashboard.hasRollingSections || !dashboard.combines || !dashboard.scorers || !dashboard.promos || dashboard.multibookText || !hasActionCopy || hasComplexMarket || hasTechnicalJargon) {
+    if (dashboard.metric < 10 || dashboard.rows < 10 || dashboard.rows > 18 || dashboard.timeline < 8 || dashboard.safeBadges < 5 || dashboard.priorityBadges < 5 || !dashboard.topPick || !/jour/i.test(dashboard.dailyBudget) || !dashboard.hasRollingSections || !dashboard.combines || !dashboard.scorers || !dashboard.promos || !/Suggestion du jour/.test(dashboard.suggestion || '') || dashboard.multibookText || !hasActionCopy || hasComplexMarket || hasTechnicalJargon) {
       throw new Error(`Dashboard Sprint 15 invalide: ${JSON.stringify({ ...dashboard, dashboardText: dashboard.dashboardText.slice(0, 800), hasActionCopy, hasComplexMarket, hasTechnicalJargon })}`);
     }
     if (modalOverflow) throw new Error('Overflow horizontal dans la fiche match');

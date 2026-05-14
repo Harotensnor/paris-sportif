@@ -89,7 +89,8 @@
     webEnrichmentPending: new Set(),
     focusRow: null,
     feedbackBetId: null,
-    updateStatus: null
+    updateStatus: null,
+    appInfo: null
   };
 
   const ACTION_HISTORY_KEY = 'parisSportifActionHistory';
@@ -117,6 +118,11 @@
   const BANKROLL_TRANSACTIONS_KEY = 'parisSportifBankrollTransactions';
   const WEEKLY_REPORT_KEY = 'parisSportifWeeklyReports';
   const WEEKLY_REPORT_SEEN_KEY = 'parisSportifWeeklyReportSeen';
+  const DAILY_SUGGESTION_KEY = 'parisSportifDailySuggestion';
+  const DAILY_SUGGESTION_DISMISS_KEY = 'parisSportifDailySuggestionDismissed';
+  const EVENING_BRIEF_KEY = 'parisSportifEveningBriefs';
+  const EVENING_BRIEF_SEEN_KEY = 'parisSportifEveningBriefSeen';
+  const DEMO_TOUR_KEY = 'parisSportifDemoTourDone';
   const SPORTS_PREFS = ['football', 'tennis', 'basketball', 'hockey', 'baseball', 'rugby', 'football américain', 'mma', 'boxe', 'handball', 'volleyball'];
   const SIMPLE_MARKET_PREFS = [
     { key: 'winner', label: 'Vainqueur du match', keys: ['1n2', 'matchwinner', 'vainqueur'] },
@@ -150,6 +156,7 @@
     confidenceMin: 0,
     alertEdge: 10,
     alertWindowHours: 2,
+    eveningBriefHour: 22,
     prematchAlertsEnabled: true,
     topPickAlertsEnabled: true,
     stakeMode: 'kelly',
@@ -1167,10 +1174,10 @@
     const bankroll = getBankroll();
     const maxStake = bankroll * Math.max(0.1, Number(prefs.maxStakePct || 5)) / 100;
     if (prefs.stakeMode === 'flat') {
-      return Math.max(0, Number((bankroll * Math.max(0.1, Number(prefs.flatUnitPct || 1)) / 100).toFixed(2)));
+      return Math.max(0, Number((bankroll * Math.max(0.1, Number(prefs.flatUnitPct || 1)) / 100 * specialStakeMultiplier(row)).toFixed(2)));
     }
     const modelStake = Math.max(0, Number(row?.stake || row?.decisionCenter?.stake || 0) || 0);
-    return Math.max(0, Number(Math.min(modelStake, maxStake).toFixed(2)));
+    return Math.max(0, Number((Math.min(modelStake, maxStake) * specialStakeMultiplier(row)).toFixed(2)));
   }
 
   function allocationConfig(prefs = loadPreferences()) {
@@ -1506,6 +1513,9 @@
       probability: Number(row.probability || 0),
       edge: displayEdgeValue(row),
       edgeBucket: edgeBucketFor(row.edge),
+      safeStatus: row.safeAssessment?.status || '',
+      safeReliable: Boolean(row.safeAssessment?.reliable),
+      priorityRank: Number(row.priorityRank || 0) || null,
       tier: row.calibration?.level || row.contextQuality?.tier || row.status || 'standard',
       marketKey: marketKeyFromRow(row),
       stakeMode: prefs.stakeMode || 'kelly',
@@ -1666,6 +1676,56 @@
     const label = rank === 1 ? '🏆 TOP PICK' : `#${rank}`;
     const reason = row?.priority?.reason || `Priorité ${priorityValue(row).toFixed(1)}/100`;
     return `<span class="priority-badge ${rank === 1 ? 'top' : ''}" title="${escapeHtml(reason)}">${escapeHtml(label)}</span>`;
+  }
+
+  function segmentRoiValue(row) {
+    const value = Number(row?.segmentValidation?.roi ?? row?.safeAssessment?.roi ?? row?.calibration?.roi ?? 0);
+    return Number.isFinite(value) ? value : 0;
+  }
+
+  function segmentSampleValue(row) {
+    const value = Number(row?.segmentValidation?.sample ?? row?.safeAssessment?.sample ?? row?.calibration?.sample ?? 0);
+    return Number.isFinite(value) ? value : 0;
+  }
+
+  function isSurePickCandidate(row) {
+    return Boolean(row?.safeAssessment?.reliable)
+      && displayEdgeValue(row) >= 0.12
+      && safeConfidenceValue(row) >= 0.70
+      && segmentRoiValue(row) >= 0
+      && Number(row?.priorityRank || 99) <= 5;
+  }
+
+  function surePickKeys() {
+    return new Set(
+      sortedPriorityRows()
+        .filter(isSurePickCandidate)
+        .slice(0, 2)
+        .map(userBetKey)
+    );
+  }
+
+  function isLongShotValue(row) {
+    return Boolean(row?.safeAssessment?.reliable)
+      && Number(row?.odd || 0) >= 5
+      && displayEdgeValue(row) >= 0.08
+      && segmentSampleValue(row) >= 15
+      && segmentRoiValue(row) >= 0;
+  }
+
+  function specialStakeMultiplier(row) {
+    return isLongShotValue(row) ? 0.5 : 1;
+  }
+
+  function specialPatternBadgeHtml(row) {
+    if (!row) return '';
+    if (surePickKeys().has(userBetKey(row))) {
+      return '<span class="special-pick-badge" title="Edge fort, confiance haute, segment validé et priorité top 5.">Sure pick</span>';
+    }
+    if (isLongShotValue(row)) {
+      return '<span class="special-pick-badge longshot" title="Cote élevée avec value validée. Mise réduite de moitié par prudence.">Long shot value</span>';
+    }
+    return '';
   }
 
   function priorityText(row) {
@@ -2276,6 +2336,8 @@
   function simpleWhyText(row) {
     if (!row) return '';
     const parts = [];
+    if (surePickKeys().has(userBetKey(row))) parts.push('sure pick du jour');
+    if (isLongShotValue(row)) parts.push('cote haute, mise réduite');
     if (row.winamaxBoost) parts.push('cote boostée Winamax');
     if (row.safeAssessment?.reliable) parts.push('profil fiable');
     if (Number(row.priorityScore || 0) >= 60) parts.push('priorité haute');
@@ -3179,6 +3241,7 @@
           ${priorityBadgeHtml(row)}
           <span>${escapeHtml(simpleMarketLabelForRow(row))}</span>
           ${safeBadgeHtml(row)}
+          ${specialPatternBadgeHtml(row)}
           ${boostBadgeHtml(row)}
           ${enrichmentBadgeHtml(row)}
         </div>
@@ -3226,6 +3289,7 @@
           <span title="${escapeHtml(allocationLongText(row))}">${escapeHtml(allocationSummaryText(row))}</span>
           <span>${escapeHtml(countdownLabel(row.start))}</span>
           ${safeBadgeHtml(row)}
+          ${specialPatternBadgeHtml(row)}
           ${boostBadgeHtml(row)}
           ${enrichmentBadgeHtml(row)}
         </div>
@@ -3824,6 +3888,7 @@
     updatePickFilters();
     const filters = readPickFilters();
     const displayRows = dashboardPickRows(filters);
+    renderDailySuggestion(displayRows);
     rememberDisplayedOdds(displayRows);
     renderMarketSnapshot(displayRows);
     renderLiveCockpit();
@@ -3874,7 +3939,7 @@
             <div class="match-title">${escapeHtml(pick.title)}</div>
             <div class="match-sub">${escapeHtml(pick.sport)} · ${escapeHtml(pick.league)}</div>
           </td>
-          <td data-label="Pari"><span class="pill">${escapeHtml(statusText)}</span> ${priorityBadgeHtml(pick)} <span class="pill">${escapeHtml(simpleMarketLabelForRow(pick))}</span>${safeBadgeHtml(pick)}${boostBadgeHtml(pick)}${enrichmentBadgeHtml(pick)}${actionPickHtml(pick, { compact: true })}</td>
+          <td data-label="Pari"><span class="pill">${escapeHtml(statusText)}</span> ${priorityBadgeHtml(pick)} <span class="pill">${escapeHtml(simpleMarketLabelForRow(pick))}</span>${safeBadgeHtml(pick)}${specialPatternBadgeHtml(pick)}${boostBadgeHtml(pick)}${enrichmentBadgeHtml(pick)}${actionPickHtml(pick, { compact: true })}</td>
           <td data-label="Cote">@${pick.odd.toFixed(2)}</td>
           <td data-label="Mise">${visibleStakeText(pick)}<div class="match-sub">${escapeHtml(allocationSummaryText(pick))}</div></td>
           <td data-label="Départ">${escapeHtml(startLabel)}</td>
@@ -6147,6 +6212,7 @@
       'pref-confidence-min': prefs.confidenceMin,
       'pref-alert-edge': prefs.alertEdge,
       'pref-alert-window': prefs.alertWindowHours,
+      'pref-evening-hour': prefs.eveningBriefHour,
       'pref-flat-unit': prefs.flatUnitPct,
       'pref-max-stake': prefs.maxStakePct,
       'pref-daily-budget': prefs.dailyBudgetPct,
@@ -6164,6 +6230,8 @@
     if (webhookType) webhookType.value = prefs.webhookType || 'generic';
     const webhookUrl = $('#pref-webhook-url');
     if (webhookUrl) webhookUrl.value = prefs.webhookUrl || '';
+    const versionLabel = $('#app-version-label');
+    if (versionLabel) versionLabel.textContent = `Paris Sportif Desktop v${state.appInfo?.version || '1.0.0'}`;
     renderUpdateStatus();
     renderProfileImportPreview();
     renderOnboarding();
@@ -6233,6 +6301,7 @@
       confidenceMin: Math.max(0, Number($('#pref-confidence-min')?.value || 0) || 0),
       alertEdge: Math.max(0, Number($('#pref-alert-edge')?.value || 10) || 10),
       alertWindowHours: Math.max(1, Number($('#pref-alert-window')?.value || 2) || 2),
+      eveningBriefHour: Math.max(18, Math.min(23, Number($('#pref-evening-hour')?.value || DEFAULT_PREFERENCES.eveningBriefHour) || DEFAULT_PREFERENCES.eveningBriefHour)),
       stakeMode: $('#pref-stake-mode')?.value || DEFAULT_PREFERENCES.stakeMode,
       allocationStrategy: $('#pref-allocation-strategy')?.value || DEFAULT_PREFERENCES.allocationStrategy,
       dailyBudgetPct: Math.max(0.5, Math.min(20, Number($('#pref-daily-budget')?.value || DEFAULT_PREFERENCES.dailyBudgetPct) || DEFAULT_PREFERENCES.dailyBudgetPct)),
@@ -6550,6 +6619,251 @@
     `).join('') : '<div class="empty">Pas encore assez de picks réglés dans les 30 derniers jours pour simuler.</div>';
   }
 
+  function modelVsUserReport() {
+    const report = paperSimulationReport();
+    const cutoff = cutoffDateDays(30);
+    const realRows = loadUserBets().filter((bet) => Date.parse(bet.createdAt || bet.placedAt || '') >= cutoff);
+    const settled = realRows.filter((bet) => ['won', 'lost', 'void'].includes(String(bet.status || '')));
+    const stake = settled.reduce((sum, bet) => sum + Number(bet.stake || 0), 0);
+    const pnl = settled.reduce((sum, bet) => sum + Number(bet.pnl || 0), 0);
+    const won = settled.filter((bet) => bet.status === 'won').length;
+    const lost = settled.filter((bet) => bet.status === 'lost').length;
+    const unsafe = realRows.filter((bet) => bet.safeStatus && bet.safeStatus !== 'reliable');
+    const modelCount = report.settled.length;
+    const utilization = modelCount ? realRows.length / modelCount : null;
+    const missedPnl = report.pnl - pnl;
+    return {
+      model: report,
+      realRows,
+      settled,
+      won,
+      lost,
+      stake,
+      pnl,
+      roi: stake > 0 ? pnl / stake : 0,
+      utilization,
+      unsafe,
+      missedPnl
+    };
+  }
+
+  function renderModelVsUser() {
+    const grid = $('#model-vs-user-grid');
+    if (!grid) return;
+    const report = modelVsUserReport();
+    const utilizationText = report.utilization == null ? 'Sample modèle absent' : `${formatPct(report.utilization, 0)} des picks fiables suivis`;
+    const advice = report.utilization != null && report.utilization < 0.30 && report.missedPnl > 0
+      ? `Tu pourrais tester un suivi plus systématique des picks fiables : simulation +${formatMoney(report.missedPnl).replace('-', '')}.`
+      : report.unsafe.length
+        ? 'Tu as suivi des picks hors zone fiable : privilégie les badges ✓ Fiable.'
+        : 'Ton suivi reste cohérent avec les garde-fous.';
+    grid.innerHTML = [
+      ['Si tu avais suivi le modèle', formatMoney(report.model.pnl), `${formatCount(report.model.settled.length)} picks simulés · ROI ${formatPct(report.model.roi, 1)}`],
+      ['Toi sur 30 jours', formatMoney(report.pnl), `${formatCount(report.settled.length)} réglés · ROI ${formatPct(report.roi, 1)} · ${formatCount(report.won)}W/${formatCount(report.lost)}L`],
+      ['Utilisation', utilizationText, report.realRows.length ? `${formatCount(report.realRows.length)} pari(s) suivis au total.` : 'Aucun pari réel suivi sur 30 jours.'],
+      ['Conseil', report.missedPnl > 0 ? 'Plus régulier' : 'Discipline OK', advice]
+    ].map(([label, value, detail]) => `
+      <article class="quality-report-card ${label === 'Conseil' && report.unsafe.length ? 'quality-watch' : 'quality-ok'}">
+        <span>${escapeHtml(label)}</span>
+        <strong>${escapeHtml(value)}</strong>
+        <p>${escapeHtml(detail)}</p>
+      </article>
+    `).join('');
+  }
+
+  function regressionWarningText() {
+    const audit = trackedLearningAudit();
+    const cold = (audit.warnings || []).find((row) => row.count >= 5 && row.losses >= 5);
+    if (!cold) return '';
+    return `Prudence : ${cold.label} reste froid sur ${formatCount(cold.losses)} défaites.`;
+  }
+
+  function buildDailySuggestion(rows = sortedPriorityRows()) {
+    const day = parisDayKey();
+    const cached = readStorageJson(DAILY_SUGGESTION_KEY, null);
+    if (cached?.day === day && Date.now() - Number(cached.cachedAt || 0) < 60 * 60 * 1000) return cached;
+    const ultimate = aiSelectedUltimate(rows) || ultimateBetCandidate(rows) || rows[0] || null;
+    const modelVsUser = modelVsUserReport();
+    const regression = regressionWarningText();
+    const text = regression || (ultimate
+      ? `Commence par ${userBetLabel(ultimate)} sur ${ultimate.title} : cote ${formatOdd(ultimate.odd)}, mise ${visibleStakeText(ultimate)}.`
+      : 'Pas de pick ultime aujourd’hui : vise seulement le top 3 fiable, pas de pari forcé.');
+    const follow = modelVsUser.utilization != null && modelVsUser.utilization < 0.30 && modelVsUser.missedPnl > 0
+      ? ` Modèle 30j ${formatMoney(modelVsUser.model.pnl)} vs toi ${formatMoney(modelVsUser.pnl)}.`
+      : '';
+    const suggestion = {
+      day,
+      cachedAt: Date.now(),
+      text: `${text}${follow}`.slice(0, 220),
+      pickKey: ultimate ? userBetKey(ultimate) : ''
+    };
+    writeStorageJson(DAILY_SUGGESTION_KEY, suggestion);
+    return suggestion;
+  }
+
+  function renderDailySuggestion(rows = sortedPriorityRows()) {
+    const node = $('#daily-suggestion-card');
+    if (!node) return;
+    const suggestion = buildDailySuggestion(rows);
+    const dismissed = localStorage.getItem(DAILY_SUGGESTION_DISMISS_KEY) === suggestion.day;
+    node.classList.toggle('hidden', dismissed);
+    const text = node.querySelector('span');
+    if (text) text.textContent = suggestion.text || 'Aucune suggestion disponible.';
+  }
+
+  function buildEveningBrief() {
+    const stats = userBetStats();
+    const tomorrow = parisDayKey(new Date(Date.now() + 24 * 60 * 60 * 1000));
+    const tomorrowRows = sortedPriorityRows(state.picks)
+      .filter((row) => pickDayKey(row) === tomorrow)
+      .slice(0, 8);
+    const todayRows = loadUserBets().filter((bet) => String(bet.day || bet.createdAt || bet.placedAt || bet.settledAt || '').slice(0, 10) === parisDayKey());
+    const todaySettled = todayRows.filter((bet) => ['won', 'lost', 'void'].includes(String(bet.status || '')));
+    const best = todaySettled
+      .sort((a, b) => Number(b.pnl || 0) - Number(a.pnl || 0))[0] || null;
+    const lesson = stats.pnlToday < 0
+      ? 'Reste léger demain, laisse le coach filtrer et évite de doubler les mises.'
+      : stats.pnlToday > 0
+        ? 'Bonne journée : protège le gain, ne force pas les derniers matchs.'
+        : 'Journée neutre : garde le rythme, top picks seulement.';
+    const brief = {
+      id: `evening-${parisDayKey()}`,
+      day: parisDayKey(),
+      generatedAt: new Date().toISOString(),
+      stats: {
+        bets: todayRows.length,
+        pnl: stats.pnlToday,
+        won: todaySettled.filter((bet) => bet.status === 'won').length,
+        lost: todaySettled.filter((bet) => bet.status === 'lost').length
+      },
+      tomorrowCount: tomorrowRows.length,
+      tomorrowNight: tomorrowRows.filter((row) => temporalBucketForPick(row) === 'tonight' || temporalBucketForPick(row) === 'tomorrow_am').length,
+      topTomorrow: tomorrowRows[0] || null,
+      best,
+      lesson
+    };
+    const stored = readStorageJson(EVENING_BRIEF_KEY, []);
+    writeStorageJson(EVENING_BRIEF_KEY, [brief, ...(Array.isArray(stored) ? stored : []).filter((row) => row.id !== brief.id)].slice(0, 30));
+    return brief;
+  }
+
+  function renderEveningBriefModal(brief = buildEveningBrief()) {
+    const modal = $('#evening-brief-modal');
+    const content = $('#evening-brief-content');
+    if (!modal || !content) return;
+    const subtitle = $('#evening-brief-subtitle');
+    if (subtitle) subtitle.textContent = `${brief.day} · ${formatCount(brief.stats.bets)} pari(s) suivis aujourd’hui.`;
+    content.innerHTML = [
+      ['Journée', formatMoney(brief.stats.pnl), `${formatCount(brief.stats.bets)} paris · ${formatCount(brief.stats.won)}W / ${formatCount(brief.stats.lost)}L`],
+      ['Meilleur pick', brief.best ? formatMoney(brief.best.pnl) : '-', brief.best ? `${brief.best.title} · ${brief.best.label}` : 'Aucun pari réglé aujourd’hui'],
+      ['Demain', `${formatCount(brief.tomorrowCount)} fiables`, `${formatCount(brief.tomorrowNight)} nocturne(s) · ${brief.topTomorrow ? userBetLabel(brief.topTomorrow) : 'à confirmer après refresh'}`],
+      ['Leçon', brief.stats.pnl < 0 ? 'Ralentir' : 'Continuer propre', brief.lesson]
+    ].map(([label, value, detail]) => `
+      <article class="glossary-card">
+        <strong>${escapeHtml(label)}</strong>
+        <p><b>${escapeHtml(value)}</b><br>${escapeHtml(detail)}</p>
+      </article>
+    `).join('');
+    modal.classList.remove('hidden');
+  }
+
+  function maybeShowEveningBrief({ force = false } = {}) {
+    const prefs = loadPreferences();
+    const now = new Date();
+    const key = parisDayKey(now);
+    const hour = Number(prefs.eveningBriefHour || 22);
+    if (!force && now.getHours() < hour) return;
+    if (!force && !todayTrackedBets().length) return;
+    if (!force && localStorage.getItem(EVENING_BRIEF_SEEN_KEY) === key) return;
+    const brief = buildEveningBrief();
+    localStorage.setItem(EVENING_BRIEF_SEEN_KEY, key);
+    if (!force) notifyUser('Brief du soir', `Ta journée : ${formatCount(brief.stats.bets)} paris, ${formatMoney(brief.stats.pnl)}.`, null);
+    renderEveningBriefModal(brief);
+  }
+
+  function closeEveningBriefModal() {
+    $('#evening-brief-modal')?.classList.add('hidden');
+  }
+
+  const DEMO_TOUR_STEPS = [
+    {
+      title: 'Voici ton bet ultime',
+      text: 'Le logiciel met le meilleur pari simple en haut. Tu dois pouvoir lire PARI, COTE et MISE sans chercher.'
+    },
+    {
+      title: 'Mise sur ton premier pick',
+      text: 'En mode démo, le bouton “Je mise” ajoute un pari virtuel séparé de ton vrai historique.'
+    },
+    {
+      title: 'Regarde ton P&L',
+      text: 'Après le suivi, Bilan montre la bankroll, le résultat des paris et la comparaison avec le modèle.'
+    },
+    {
+      title: 'Relis ton historique',
+      text: 'Tu peux filtrer, ajouter des notes privées, exporter et apprendre des paris perdus.'
+    }
+  ];
+
+  function renderDemoTour() {
+    const modal = $('#demo-tour-modal');
+    const content = $('#demo-tour-content');
+    if (!modal || !content) return;
+    const step = Math.max(0, Math.min(Number(state.demoTourStep || 0), DEMO_TOUR_STEPS.length - 1));
+    const item = DEMO_TOUR_STEPS[step];
+    const title = $('#demo-tour-title');
+    const subtitle = $('#demo-tour-subtitle');
+    if (title) title.textContent = item.title;
+    if (subtitle) subtitle.textContent = `Étape ${formatCount(step + 1)} / ${formatCount(DEMO_TOUR_STEPS.length)}`;
+    content.innerHTML = `
+      <article class="tour-step-card">
+        <strong>${escapeHtml(item.title)}</strong>
+        <p>${escapeHtml(item.text)}</p>
+        <span class="match-sub">${step === 1 ? 'Astuce : le mode démo est activé automatiquement pendant le tour.' : 'Tu peux fermer à tout moment.'}</span>
+      </article>
+    `;
+    const next = $('#demo-tour-next');
+    if (next) next.textContent = step >= DEMO_TOUR_STEPS.length - 1 ? 'Terminer' : 'Suivant';
+    modal.classList.remove('hidden');
+  }
+
+  function startDemoTour({ force = false } = {}) {
+    const prefs = loadPreferences();
+    if (!prefs.demoMode) {
+      savePreferences({ ...prefs, demoMode: true });
+      renderPreferences();
+      renderUserPnl();
+      renderPicks();
+    }
+    state.demoTourStep = 0;
+    if (force) localStorage.removeItem(DEMO_TOUR_KEY);
+    switchTab('dashboard');
+    renderDemoTour();
+  }
+
+  function nextDemoTourStep() {
+    const step = Number(state.demoTourStep || 0);
+    if (step === 1) {
+      const first = sortedPriorityRows(state.picks)[0];
+      if (first && !loadUserBets().some((bet) => bet.key === userBetKey(first))) {
+        trackUserBet(first);
+      }
+    }
+    if (step === 2) switchTab('history');
+    if (step >= DEMO_TOUR_STEPS.length - 1) {
+      localStorage.setItem(DEMO_TOUR_KEY, '1');
+      $('#demo-tour-modal')?.classList.add('hidden');
+      setSideStatus('Tour démo terminé', 'ok');
+      return;
+    }
+    state.demoTourStep = step + 1;
+    renderDemoTour();
+  }
+
+  function closeDemoTour() {
+    localStorage.setItem(DEMO_TOUR_KEY, '1');
+    $('#demo-tour-modal')?.classList.add('hidden');
+  }
+
   function renderHistory() {
     const history = state.history;
     renderModelPerformance();
@@ -6564,6 +6878,7 @@
     renderBankrollAccounting();
     renderDailyBudgetSummary();
     renderPaperSimulation();
+    renderModelVsUser();
     renderCoachAdvice();
     $('#hist-total').textContent = history ? String(history.total) : '-';
     $('#hist-generated').textContent = history?.generatedAt ? new Date(history.generatedAt).toLocaleString('fr-FR') : '-';
@@ -10883,6 +11198,14 @@
     $('#reload-engine-btn').addEventListener('click', () => reloadEngine());
     $('#help-panel-btn')?.addEventListener('click', () => $('#help-panel')?.classList.remove('hidden'));
     $('#help-panel-close')?.addEventListener('click', () => $('#help-panel')?.classList.add('hidden'));
+    $('#help-demo-tour-btn')?.addEventListener('click', () => {
+      $('#help-panel')?.classList.add('hidden');
+      startDemoTour({ force: true });
+    });
+    $('#daily-suggestion-dismiss')?.addEventListener('click', () => {
+      localStorage.setItem(DAILY_SUGGESTION_DISMISS_KEY, parisDayKey());
+      renderDailySuggestion();
+    });
     $('#export-btn')?.addEventListener('click', exportCsv);
     $('#export-user-bets-btn')?.addEventListener('click', exportUserBetsCsv);
     $('#export-user-bets-btn-history')?.addEventListener('click', exportUserBetsCsv);
@@ -11103,6 +11426,7 @@
     });
     $('#reset-demo-btn')?.addEventListener('click', () => {
       localStorage.setItem(USER_BETS_DEMO_KEY, '[]');
+      localStorage.removeItem(DEMO_TOUR_KEY);
       renderUserPnl();
       renderHistory();
       renderPicks();
@@ -11111,6 +11435,8 @@
     });
     $('#add-bankroll-transaction-btn')?.addEventListener('click', addBankrollTransaction);
     $('#force-weekly-report-btn')?.addEventListener('click', () => maybeShowWeeklyReport({ force: true }));
+    $('#force-evening-brief-btn')?.addEventListener('click', () => maybeShowEveningBrief({ force: true }));
+    $('#start-demo-tour-btn')?.addEventListener('click', () => startDemoTour({ force: true }));
     $('#weekly-report-close')?.addEventListener('click', closeWeeklyReportModal);
     $('#weekly-report-detail')?.addEventListener('click', () => {
       closeWeeklyReportModal();
@@ -11121,6 +11447,20 @@
     });
     $('#weekly-report-modal')?.addEventListener('click', (event) => {
       if (event.target.id === 'weekly-report-modal') closeWeeklyReportModal();
+    });
+    $('#evening-brief-close')?.addEventListener('click', closeEveningBriefModal);
+    $('#evening-brief-detail')?.addEventListener('click', () => {
+      closeEveningBriefModal();
+      switchTab('history');
+    });
+    $('#evening-brief-modal')?.addEventListener('click', (event) => {
+      if (event.target.id === 'evening-brief-modal') closeEveningBriefModal();
+    });
+    $('#demo-tour-close')?.addEventListener('click', closeDemoTour);
+    $('#demo-tour-skip')?.addEventListener('click', closeDemoTour);
+    $('#demo-tour-next')?.addEventListener('click', nextDemoTourStep);
+    $('#demo-tour-modal')?.addEventListener('click', (event) => {
+      if (event.target.id === 'demo-tour-modal') closeDemoTour();
     });
     $('#export-toast')?.addEventListener('click', () => $('#export-toast')?.classList.add('hidden'));
     $('#log-drawer-close')?.addEventListener('click', closeLogDrawer);
@@ -11426,9 +11766,17 @@
     renderPreferences();
     const statusPromise = refreshStatus();
     const logPromise = refreshLog().catch(() => null);
+    fetchJson('/api/app-info').then((info) => {
+      state.appInfo = info || null;
+      renderPreferences();
+    }).catch((error) => pushLog('warn', `Info application indisponible: ${error.message}`));
     await statusPromise;
     await computePicks();
     maybeShowWeeklyReport();
+    maybeShowEveningBrief();
+    if (loadPreferences().demoMode && localStorage.getItem(DEMO_TOUR_KEY) !== '1') {
+      setTimeout(() => startDemoTour(), 800);
+    }
     loadWebEnrichmentState().catch(() => {});
     setTimeout(() => checkForUpdates().catch(() => {}), 2500);
     await logPromise;

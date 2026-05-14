@@ -97,6 +97,11 @@
             <article class="morning-card"><span>Performance hier</span><strong>-</strong><p>Calcul en cours</p></article>
             <article class="morning-card"><span>Bankroll</span><strong>-</strong><p>Calcul en cours</p></article>
           </div>
+          <div class="daily-suggestion-card" id="daily-suggestion-card">
+            <strong>Suggestion du jour</strong>
+            <span>Calcul en cours...</span>
+            <button class="ghost-btn" id="daily-suggestion-dismiss" type="button">Masquer</button>
+          </div>
           <div class="imminent-strip" id="imminent-strip"></div>
         </section>
 
@@ -468,6 +473,9 @@
         </div>
         <div class="model-performance-grid" id="paper-simulation-grid">
           <div class="empty">Simulation 30 jours en attente.</div>
+        </div>
+        <div class="model-performance-grid" id="model-vs-user-grid">
+          <div class="empty">Comparaison modèle/toi en attente.</div>
         </div>
         <div class="segment-grid" id="paper-simulation-detail"></div>
         <div class="segment-grid" id="model-segment-grid">
@@ -1002,6 +1010,7 @@
             <h4>Alertes</h4>
             <label>Edge notif %<input id="pref-alert-edge" type="number" min="0" max="50" step="1"></label>
             <label>Kickoff notif heures<input id="pref-alert-window" type="number" min="1" max="24" step="1"></label>
+            <label>Brief du soir heure<input id="pref-evening-hour" type="number" min="18" max="23" step="1"></label>
             <label class="check-line"><input id="pref-prematch-alerts" type="checkbox"> Alertes pré-match 30 min</label>
             <label class="check-line"><input id="pref-top-pick-alerts" type="checkbox"> Alerte si le #1 change</label>
             <label>Webhook mobile
@@ -1092,6 +1101,9 @@
             <button class="ghost-btn" id="check-update-btn" type="button">Vérifier maintenant</button>
             <button class="ghost-btn" id="install-update-btn" type="button">Installer au prochain redémarrage</button>
             <button class="ghost-btn" id="force-weekly-report-btn" type="button">Voir rapport hebdo</button>
+            <button class="ghost-btn" id="force-evening-brief-btn" type="button">Voir brief du soir</button>
+            <button class="ghost-btn" id="start-demo-tour-btn" type="button">Faire le tour démo</button>
+            <p class="match-sub" id="app-version-label">Paris Sportif Desktop</p>
             <p class="match-sub" id="update-status">Aucune vérification de mise à jour lancée.</p>
           </article>
           <article class="preference-card">
@@ -1198,6 +1210,7 @@
     <p><strong>Kelly</strong> : mise suggérée selon ta bankroll.</p>
     <p><strong>Confiance</strong> : solidité du pick après garde-fous.</p>
     <p><strong>Mode expert</strong> : affiche audits, logs et diagnostics avancés.</p>
+    <button class="ghost-btn" id="help-demo-tour-btn" type="button">Faire le tour rapide</button>
   </aside>
 
   <div class="log-drawer hidden" id="log-drawer" aria-label="Logs debug">
@@ -1291,6 +1304,41 @@
       <div class="section-actions">
         <button class="ghost-btn" id="weekly-report-detail" type="button">Voir détail</button>
         <button class="ghost-btn" id="weekly-report-export" type="button">Exporter PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop hidden" id="evening-brief-modal" role="dialog" aria-modal="true" aria-labelledby="evening-brief-title">
+    <div class="feedback-modal">
+      <header class="modal-head">
+        <div>
+          <div class="eyebrow">Brief du soir</div>
+          <h3 id="evening-brief-title">Récap de ta journée</h3>
+          <p id="evening-brief-subtitle">Bilan local et préparation de demain.</p>
+        </div>
+        <button class="icon-btn" id="evening-brief-close" type="button" aria-label="Fermer">×</button>
+      </header>
+      <div class="feedback-choice-grid" id="evening-brief-content"></div>
+      <div class="section-actions">
+        <button class="ghost-btn" id="evening-brief-detail" type="button">Ouvrir Bilan</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop hidden" id="demo-tour-modal" role="dialog" aria-modal="true" aria-labelledby="demo-tour-title">
+    <div class="feedback-modal">
+      <header class="modal-head">
+        <div>
+          <div class="eyebrow">Mode démo</div>
+          <h3 id="demo-tour-title">Tour rapide</h3>
+          <p id="demo-tour-subtitle">Teste sans toucher à tes vrais paris.</p>
+        </div>
+        <button class="icon-btn" id="demo-tour-close" type="button" aria-label="Fermer">×</button>
+      </header>
+      <div class="feedback-choice-grid" id="demo-tour-content"></div>
+      <div class="section-actions">
+        <button class="ghost-btn" id="demo-tour-skip" type="button">Passer</button>
+        <button class="primary-btn" id="demo-tour-next" type="button">Suivant</button>
       </div>
     </div>
   </div>

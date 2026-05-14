@@ -1,15 +1,67 @@
 {
   "name": "paris-sportif-desktop",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "description": "Application PC locale pour Paris-Sportif.",
+  "author": "Paris-Sportif",
   "main": "src/main.js",
   "scripts": {
     "start": "electron .",
-    "refresh": "python bin/refresh_once.py"
+    "refresh": "python bin/refresh_once.py",
+    "dist": "electron-builder --win nsis --x64"
+  },
+  "build": {
+    "appId": "fr.parissportif.desktop",
+    "productName": "Paris Sportif Desktop",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "bin/**/*",
+      "package.json",
+      "node_modules/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "../data.js",
+        "to": "data.js"
+      },
+      {
+        "from": "../data_today.json",
+        "to": "data_today.json"
+      },
+      {
+        "from": "../health.json",
+        "to": "health.json"
+      },
+      {
+        "from": "../winamax_catalog.json",
+        "to": "winamax_catalog.json"
+      },
+      {
+        "from": "../scripts",
+        "to": "scripts",
+        "filter": [
+          "**/*.py"
+        ]
+      }
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "signAndEditExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true
+    }
   },
   "devDependencies": {
-    "electron": "^42.0.1"
+    "electron": "^42.0.1",
+    "electron-builder": "^26.0.12"
   },
   "dependencies": {
     "jsdom": "^29.1.1"

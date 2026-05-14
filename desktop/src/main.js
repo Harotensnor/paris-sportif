@@ -7,6 +7,7 @@ const path = require('path');
 const { URL } = require('url');
 const { createLegacyEngineService } = require('./engine/legacy-engine');
 const qualityUtils = require('./engine/quality-utils');
+const desktopPackage = require('../package.json');
 
 const DESKTOP_ROOT = path.resolve(__dirname, '..');
 const PROJECT_ROOT = path.resolve(DESKTOP_ROOT, '..');
@@ -1370,7 +1371,7 @@ async function handleApi(req, res, url) {
   if (url.pathname === '/api/app-info') {
     jsonResponse(res, 200, {
       app: 'Paris-Sportif Desktop',
-      version: '0.1.0',
+      version: String(desktopPackage.version || '1.0.0'),
       projectRoot: PROJECT_ROOT,
       desktopRoot: DESKTOP_ROOT,
       calculationMode: 'desktop-jsdom',

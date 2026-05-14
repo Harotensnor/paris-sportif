@@ -1,50 +1,107 @@
-# Paris-Sportif Desktop
+# Paris Sportif Desktop
 
-Première version du logiciel PC local.
+Paris Sportif Desktop est le logiciel PC local pour préparer tes paris Winamax. Il lit les données locales, calcule les picks, affiche les paris simples les plus clairs et garde ton suivi bankroll sur ta machine.
 
-## Lancer
+## Installation
 
-Depuis la racine du projet, double-cliquer sur `LANCER-LOGICIEL.bat`.
+1. Installe Node.js et Python si ce n'est pas déjà fait.
+2. Depuis le dossier du projet, lance `npm --prefix desktop install`.
+3. Lance le logiciel avec `npm --prefix desktop start`.
 
-Le premier lancement installe Electron dans `desktop/node_modules`, puis ouvre
-une fenêtre locale. Rien ne passe par GitHub Pages et le Service Worker du site
-est désactivé dans cette fenêtre.
+Sur Windows, le fichier `LANCER-LOGICIEL.bat` peut aussi ouvrir l'application directement depuis la racine du projet.
 
-## Ce que fait cette version
+## Premier Lancement
 
-- affiche une interface logicielle native, sans montrer le site ;
-- lit les fichiers locaux `data.js`, `data_today.json`, `health.json` ;
-- lance le moteur de calcul dans un service interne au logiciel, sans iframe ;
-- calcule les picks actionnables via le runtime copié dans `desktop/src/engine/runtime/` ;
-- applique le blocage si les données ont plus de 4h ;
-- lance un refresh local à la demande ;
-- affiche les picks, les combinés, les buteurs probables, tous les matchs, l'historique, l'agent et l'état des données dans le logiciel.
-- affiche un brief d'ouverture avec les picks du jour, la bankroll, le prochain départ et les performances récentes ;
-- suit les paris en un clic avec P&L, CLV, apprentissage par segment, export CSV et discipline bankroll locale ;
-- propose des préférences locales : sports, marchés, seuils, mode de mise, stop-loss et take-profit.
-- affiche un calendrier 7 jours des picks, une aide intégrée, un panneau pipeline avec log live et un panneau debug accessible par raccourci ;
-- permet d'ajouter des notes privées et tags aux paris suivis, puis de filtrer/exporter ces informations ;
-- peut envoyer les alertes importantes vers un webhook mobile externe configuré par l'utilisateur, depuis le process Electron local ;
-- surveille la mémoire et la stabilité longue durée sans bloquer l'interface.
-- résout automatiquement les paris suivis quand un résultat archivé permet d'évaluer le marché, avec notification et audit local ;
-- intègre un mode coach prudent qui bloque ou avertit avant tracking si limite quotidienne, cap de mise, série de défaites, segment perdant ou mouvement de cote défavorable ;
-- sauvegarde le profil utilisateur localement, permet export/import JSON, fusion/remplacement et restauration depuis le dernier backup propre ;
-- propose un mode démo séparé des vrais paris pour tester les décisions sans toucher à l'historique réel ;
-- garde un backup local de `data.js` valide pour rester utilisable si le fichier courant devient corrompu.
-- protège le settlement automatique contre les faux positifs : pas de règlement avant kickoff, date de résultat vérifiée et rollback des anciens settlements suspects ;
-- classe les picks par horizon temporel avec un `Bet ultime du jour`, les picks à jouer maintenant, bientôt, plus tard, demain et prochains jours ;
-- propose une vue `Buteurs` filtrable et triable, avec suivi manuel intégré pour les profils joueur ;
-- peut utiliser une IA moteur discrète depuis le process Electron pour curer le bet ultime, rédiger des explications et signaler des anomalies, avec fallback heuristique si aucune clé n'est configurée.
+Au premier démarrage, configure :
 
-## Raccourcis utiles
+- ta bankroll de départ ;
+- les sports que tu veux suivre ;
+- ton niveau de prudence ;
+- le mode démo si tu veux tester sans toucher à ton vrai suivi.
 
-- `Ctrl+1` à `Ctrl+7` : vues principales.
-- `Ctrl+8` : calendrier.
-- `Ctrl+9` : pipeline / refresh.
-- `Ctrl+0` : aide.
-- `Ctrl+Shift+L` : panneau logs debug.
+Le mode standard reste volontairement simple : `Picks`, `Bilan`, `Réglages`. Les diagnostics techniques sont cachés dans `Avancé` quand le Mode expert est activé.
 
-## Garde-fou
+## Utilisation Quotidienne
 
-Cette version ne place pas encore de pari réel automatiquement. Elle prépare le
-poste de pilotage stable avant d'ajouter une action Winamax sensible.
+Ouvre l'app et lis d'abord le haut de la vue `Picks`.
+
+- `Bet ultime du jour` : le meilleur ticket simple si un pick assez solide existe.
+- Sections horaires : dans l'heure, dans les 3 heures, aujourd'hui, cette nuit et demain.
+- Chaque carte affiche `PARI`, `COTE`, `MISE` et `Pourquoi`.
+- Clique `Je mise` pour suivre le pari localement.
+- Clique `Ouvrir Winamax` pour aller sur la page du match.
+
+L'app ne place pas de pari automatiquement. Elle prépare le ticket et suit ton résultat.
+
+## Winamax
+
+Le logiciel est 100% Winamax :
+
+- seules les cotes Winamax sont utilisées pour les tickets actionnables ;
+- les marchés complexes sont masqués par défaut ;
+- les liens ouvrent les pages Winamax quand elles sont disponibles ;
+- les promos/boosts Winamax sont affichés discrètement quand les données les détectent.
+
+## Bilan Et Bankroll
+
+La vue `Bilan` montre :
+
+- P&L total, P&L du jour et ROI ;
+- paris suivis, notes, tags et export CSV ;
+- comparaison `Si tu avais suivi le modèle` ;
+- simulation 30 jours ;
+- comptabilité dépôts/retraits ;
+- patterns personnels et apprentissages.
+
+Les données sont stockées localement. Utilise `Réglages > Profil local` pour exporter ou importer ton profil.
+
+## IA Optionnelle
+
+L'IA moteur est optionnelle. Si tu ajoutes une clé API dans `Réglages > IA`, elle peut aider à rédiger les explications et détecter les anomalies. Sans clé, l'app garde un fallback heuristique complet.
+
+L'IA ne remplace jamais les garde-fous du modèle et ne modifie pas ta bankroll.
+
+## Alertes
+
+Tu peux activer :
+
+- alertes PC pour les picks importants ;
+- webhook mobile générique, Discord, ntfy.sh, Telegram ou Pushover ;
+- brief du soir ;
+- anti-tilt strict ;
+- stop-loss et take-profit.
+
+## Mode Démo
+
+Active `Mode démo` dans `Réglages`, puis clique `Faire le tour démo`. Le logiciel crée un suivi virtuel séparé de tes vrais paris pour apprendre l'app sans risque.
+
+## Sauvegarde Et Restauration
+
+Dans `Réglages > Profil local` :
+
+- `Exporter mon profil` sauvegarde bankroll, paris, notes, tags, préférences et rapports locaux ;
+- `Importer un profil` permet de fusionner ou remplacer ;
+- des backups automatiques sont gardés dans `desktop/state/backups/`.
+
+## Refresh Et Données Anciennes
+
+L'app se rafraîchit en arrière-plan. Si les données sont anciennes ou qu'un refresh échoue, elle garde les dernières données valides et affiche un bandeau clair.
+
+En Mode expert, la vue `Avancé` montre la pipeline, les logs et les diagnostics.
+
+## Dépannage
+
+- Aucun pick visible : vérifie la fraîcheur des données et lance un refresh depuis `Avancé`.
+- Winamax ne s'ouvre pas : certains événements peuvent manquer de lien direct, ouvre le match manuellement sur Winamax.
+- Profil corrompu : importe un export récent ou restaure depuis `desktop/state/backups/`.
+- Notifications absentes : vérifie les permissions Windows et le webhook dans `Réglages`.
+
+## Build Windows
+
+Pour générer un installateur Windows :
+
+```powershell
+npm --prefix desktop run dist
+```
+
+La sortie est écrite dans `desktop/dist/`. Le build embarque l'application Electron, les scripts locaux et les derniers fichiers de données disponibles. Python doit être disponible sur la machine si tu veux relancer la pipeline locale complète.
