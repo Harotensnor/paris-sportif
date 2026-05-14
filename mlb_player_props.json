@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-14T17:11:44Z",
+  "generated_at": "2026-05-14T17:20:26Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815336",
-      "kickoff": "2026-05-14T17:10Z",
-      "league": "MLB",
-      "match": "Detroit Tigers at New York Mets",
-      "home": "New York Mets",
-      "away": "Detroit Tigers",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "New York Mets",
-          "pitcher": "Nolan McLean",
-          "label": "Nolan McLean moins de 7,5 strikeouts",
-          "line": 7.5,
-          "pick": "under",
-          "probability": 0.5781,
-          "fair_odds": 1.73,
-          "expected_strikeouts": 7.09,
-          "projected_ip": 5.64,
-          "inputs": {
-            "k9": 11.32,
-            "era": 2.78,
-            "whip": 0.9,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "New York Mets",
-          "pitcher": "Nolan McLean",
-          "label": "Nolan McLean ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6867,
-          "fair_odds": 1.46,
-          "expected_hr_allowed": 0.376,
-          "projected_ip": 5.64,
-          "inputs": {
-            "hr9": 0.6,
-            "era": 2.78,
-            "whip": 0.9
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Detroit Tigers",
-          "pitcher": "Keider Montero",
-          "label": "Keider Montero moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.6015,
-          "fair_odds": 1.66,
-          "expected_strikeouts": 4.09,
-          "projected_ip": 5.6,
-          "inputs": {
-            "k9": 6.58,
-            "era": 3.18,
-            "whip": 0.96,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Detroit Tigers",
-          "pitcher": "Keider Montero",
-          "label": "Keider Montero ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.655,
-          "fair_odds": 1.53,
-          "expected_hr_allowed": 0.423,
-          "projected_ip": 5.6,
-          "inputs": {
-            "hr9": 0.68,
-            "era": 3.18,
-            "whip": 0.96
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815341",
       "kickoff": "2026-05-14T17:40Z",
@@ -578,7 +496,7 @@
       ]
     }
   ],
-  "props": 28,
+  "props": 24,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
