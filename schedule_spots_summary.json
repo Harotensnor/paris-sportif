@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-14T02:57:43Z",
+  "generated_at": "2026-05-14T03:02:33Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -8,17 +8,17 @@
     "expired_sample": 0,
     "by_type": {
       "travel_extreme": 7,
-      "back_to_back_travel": 8,
+      "back_to_back_travel": 9,
       "lookahead": 24,
-      "schedule_congestion": 8
+      "schedule_congestion": 14
     },
     "by_decision": {
-      "abstain": 11,
-      "lean_home": 10
+      "abstain": 9,
+      "lean_home": 12
     },
-    "lean_home": 10,
+    "lean_home": 12,
     "lean_away": 0,
-    "abstain": 11,
+    "abstain": 9,
     "monitor": 0
   },
   "active": [
@@ -36,34 +36,49 @@
       "match": "San Diego Padres - Los Angeles Dodgers",
       "decision": "abstain",
       "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: San Diego Padres 0.30, Los Angeles Dodgers 0.30",
-      "pressure_score": 1.333,
-      "home_fade": 0.3,
-      "away_fade": 0.3,
+      "reason": "Fatigue/agenda des deux cotes: San Diego Padres 0.90, Los Angeles Dodgers 0.90",
+      "pressure_score": 2.533,
+      "home_fade": 0.9,
+      "away_fade": 0.9,
       "travel_score": 0,
       "lookahead_score": 1.333,
-      "congestion_score": 0,
+      "congestion_score": 1.2,
       "types": {
+        "schedule_congestion": 2,
         "lookahead": 2
       },
       "contexts": [
+        "3 matchs sur les 7 derniers jours",
         "2 match important/proche dans les 3 jours",
+        "3 matchs sur les 7 derniers jours",
         "2 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.915,
-        "away_score": -0.014,
-        "home_fade": 1.3,
-        "away_fade": 1.1,
-        "reason": "Signaux opposes: San Diego Padres fade 1.30, Los Angeles Dodgers fade 1.10 -> prudence",
+        "status": "net",
+        "net_side": "home",
+        "home_score": -0.305,
+        "away_score": -1.385,
+        "home_fade": 0.9,
+        "away_fade": 1.7,
+        "reason": "Direction nette: San Diego Padres (-0.30)",
         "detail": [
+          {
+            "side": "home",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          },
           {
             "side": "home",
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.3
+          },
+          {
+            "side": "away",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
           },
           {
             "side": "away",
@@ -76,18 +91,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.8
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.631
           }
         ]
       }
@@ -146,76 +149,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.4
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815432",
-      "source_event_ids": [
-        "401815432"
-      ],
-      "kickoff": "2026-05-21T00:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Diego Padres",
-      "away": "Los Angeles Dodgers",
-      "match": "San Diego Padres - Los Angeles Dodgers",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: San Diego Padres 0.60, Los Angeles Dodgers 0.60",
-      "pressure_score": 1.2,
-      "home_fade": 0.6,
-      "away_fade": 0.6,
-      "travel_score": 0,
-      "lookahead_score": 0,
-      "congestion_score": 1.2,
-      "types": {
-        "schedule_congestion": 2
-      },
-      "contexts": [
-        "3 matchs sur les 7 derniers jours",
-        "3 matchs sur les 7 derniers jours"
-      ],
-      "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -1.11,
-        "away_score": -0.209,
-        "home_fade": 1.6,
-        "away_fade": 1.4,
-        "reason": "Signaux opposes: San Diego Padres fade 1.60, Los Angeles Dodgers fade 1.40 -> prudence",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.8
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.631
           }
         ]
       }
@@ -303,11 +236,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -1.147,
-        "away_score": -0.607,
-        "home_fade": 1.55,
-        "away_fade": 1.15,
-        "reason": "Direction nette: Montreal Canadiens (-0.61)",
+        "home_score": -0.498,
+        "away_score": 0.043,
+        "home_fade": 0.55,
+        "away_fade": 0.15,
+        "reason": "Direction nette: Montreal Canadiens (+0.04)",
         "detail": [
           {
             "side": "home",
@@ -326,18 +259,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.4
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
           }
         ]
       }
@@ -425,11 +346,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -1.147,
-        "away_score": -0.607,
-        "home_fade": 1.55,
-        "away_fade": 1.15,
-        "reason": "Direction nette: Vegas Golden Knights (-0.61)",
+        "home_score": -0.498,
+        "away_score": 0.043,
+        "home_fade": 0.55,
+        "away_fade": 0.15,
+        "reason": "Direction nette: Vegas Golden Knights (+0.04)",
         "detail": [
           {
             "side": "home",
@@ -448,18 +369,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.4
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
           }
         ]
       }
@@ -494,76 +403,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "home",
-        "home_score": 1.252,
-        "away_score": -1.097,
-        "home_fade": 0.15,
-        "away_fade": 1.15,
-        "reason": "Direction nette: Cleveland Cavaliers (+1.25)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401871421",
-      "source_event_ids": [
-        "401871421"
-      ],
-      "kickoff": "2026-05-16T00:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Minnesota Wild",
-      "away": "Colorado Avalanche",
-      "match": "Minnesota Wild - Colorado Avalanche",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Minnesota Wild 0.15, Colorado Avalanche 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
         "net_side": "away",
-        "home_score": -1.498,
-        "away_score": 1.393,
-        "home_fade": 1.55,
+        "home_score": -0.098,
+        "away_score": -0.098,
+        "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Colorado Avalanche (+1.39)",
+        "reason": "Direction nette: Detroit Pistons (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -576,24 +421,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 1.0
           }
         ]
       }
@@ -709,80 +536,6 @@
       }
     },
     {
-      "event_id": "401815425",
-      "source_event_ids": [
-        "401815425"
-      ],
-      "kickoff": "2026-05-20T23:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Kansas City Royals",
-      "away": "Boston Red Sox",
-      "match": "Kansas City Royals - Boston Red Sox",
-      "decision": "lean_home",
-      "net_team": "Kansas City Royals",
-      "reason": "Boston Red Sox plus penalise par calendrier/voyage (2.06 vs 0.60)",
-      "pressure_score": 2.665,
-      "home_fade": 0.6,
-      "away_fade": 2.065,
-      "travel_score": 1.465,
-      "lookahead_score": 0,
-      "congestion_score": 1.2,
-      "types": {
-        "schedule_congestion": 2,
-        "travel_extreme": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "3 matchs sur les 7 derniers jours",
-        "3 matchs sur les 7 derniers jours",
-        "Deplacement estime 1998 km, decalage ~1.6h",
-        "2 match dans les 48h + 1998 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.403,
-        "away_score": -2.655,
-        "home_fade": 0.6,
-        "away_fade": 2.865,
-        "reason": "Direction nette: Kansas City Royals (+0.40)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.8
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.465
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401815410",
       "source_event_ids": [
         "401815410"
@@ -796,45 +549,51 @@
       "match": "Kansas City Royals - Boston Red Sox",
       "decision": "lean_home",
       "net_team": "Kansas City Royals",
-      "reason": "Boston Red Sox plus penalise par calendrier/voyage (1.54 vs 0.75)",
-      "pressure_score": 2.661,
-      "home_fade": 0.75,
-      "away_fade": 1.544,
+      "reason": "Boston Red Sox plus penalise par calendrier/voyage (2.14 vs 0.95)",
+      "pressure_score": 3.461,
+      "home_fade": 0.95,
+      "away_fade": 2.144,
       "travel_score": 1.394,
       "lookahead_score": 0.667,
-      "congestion_score": 0.6,
+      "congestion_score": 1.4,
       "types": {
-        "schedule_congestion": 1,
+        "schedule_congestion": 2,
         "lookahead": 2,
         "travel_extreme": 1,
         "back_to_back_travel": 1
       },
       "contexts": [
+        "4 matchs sur les 7 derniers jours",
+        "1 match important/proche dans les 3 jours",
         "3 matchs sur les 7 derniers jours",
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours",
-        "Deplacement estime 1998 km, decalage ~1.6h"
+        "1 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.071,
-        "away_score": -2.082,
-        "home_fade": 0.75,
-        "away_fade": 2.344,
-        "reason": "Direction nette: Kansas City Royals (+0.07)",
+        "home_score": 0.081,
+        "away_score": -2.612,
+        "home_fade": 0.95,
+        "away_fade": 2.944,
+        "reason": "Direction nette: Kansas City Royals (+0.08)",
         "detail": [
           {
             "side": "home",
             "type": "schedule_congestion",
             "direction": "fade",
-            "strength": 0.6
+            "strength": 0.8
           },
           {
             "side": "home",
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
           },
           {
             "side": "away",
@@ -877,36 +636,50 @@
       "match": "Kansas City Royals - Boston Red Sox",
       "decision": "lean_home",
       "net_team": "Kansas City Royals",
-      "reason": "Boston Red Sox plus penalise par calendrier/voyage (0.76 vs 0.30)",
-      "pressure_score": 1.798,
-      "home_fade": 0.3,
-      "away_fade": 0.765,
+      "reason": "Boston Red Sox plus penalise par calendrier/voyage (1.36 vs 0.90)",
+      "pressure_score": 2.998,
+      "home_fade": 0.9,
+      "away_fade": 1.365,
       "travel_score": 0.465,
       "lookahead_score": 1.333,
-      "congestion_score": 0,
+      "congestion_score": 1.2,
       "types": {
+        "schedule_congestion": 2,
         "lookahead": 2,
         "travel_extreme": 1
       },
       "contexts": [
+        "3 matchs sur les 7 derniers jours",
         "2 match important/proche dans les 3 jours",
-        "2 match important/proche dans les 3 jours",
-        "Deplacement estime 1998 km, decalage ~1.6h"
+        "3 matchs sur les 7 derniers jours",
+        "2 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.248,
-        "away_score": -1.46,
-        "home_fade": 0.3,
-        "away_fade": 1.565,
-        "reason": "Direction nette: Kansas City Royals (+0.25)",
+        "home_score": -0.142,
+        "away_score": -1.85,
+        "home_fade": 0.9,
+        "away_fade": 2.165,
+        "reason": "Direction nette: Kansas City Royals (-0.14)",
         "detail": [
+          {
+            "side": "home",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          },
           {
             "side": "home",
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.3
+          },
+          {
+            "side": "away",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
           },
           {
             "side": "away",
@@ -925,6 +698,153 @@
             "type": "travel_extreme",
             "direction": "fade",
             "strength": 0.465
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815425",
+      "source_event_ids": [
+        "401815425"
+      ],
+      "kickoff": "2026-05-20T23:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Kansas City Royals",
+      "away": "Boston Red Sox",
+      "match": "Kansas City Royals - Boston Red Sox",
+      "decision": "lean_home",
+      "net_team": "Kansas City Royals",
+      "reason": "Boston Red Sox plus penalise par calendrier/voyage (2.06 vs 0.80)",
+      "pressure_score": 2.865,
+      "home_fade": 0.8,
+      "away_fade": 2.065,
+      "travel_score": 1.465,
+      "lookahead_score": 0,
+      "congestion_score": 1.4,
+      "types": {
+        "schedule_congestion": 2,
+        "travel_extreme": 1,
+        "back_to_back_travel": 1
+      },
+      "contexts": [
+        "4 matchs sur les 7 derniers jours",
+        "3 matchs sur les 7 derniers jours",
+        "Deplacement estime 1998 km, decalage ~1.6h",
+        "2 match dans les 48h + 1998 km de voyage"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": 0.203,
+        "away_score": -2.585,
+        "home_fade": 0.8,
+        "away_fade": 2.865,
+        "reason": "Direction nette: Kansas City Royals (+0.20)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.8
+          },
+          {
+            "side": "away",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.8
+          },
+          {
+            "side": "away",
+            "type": "travel_extreme",
+            "direction": "fade",
+            "strength": 0.465
+          },
+          {
+            "side": "away",
+            "type": "back_to_back_travel",
+            "direction": "fade",
+            "strength": 1.0
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815417",
+      "source_event_ids": [
+        "401815417"
+      ],
+      "kickoff": "2026-05-20T01:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "San Diego Padres",
+      "away": "Los Angeles Dodgers",
+      "match": "San Diego Padres - Los Angeles Dodgers",
+      "decision": "lean_home",
+      "net_team": "San Diego Padres",
+      "reason": "Los Angeles Dodgers plus penalise par calendrier/voyage (0.95 vs 0.75)",
+      "pressure_score": 2.067,
+      "home_fade": 0.75,
+      "away_fade": 0.95,
+      "travel_score": 0,
+      "lookahead_score": 0.667,
+      "congestion_score": 1.4,
+      "types": {
+        "schedule_congestion": 2,
+        "lookahead": 2
+      },
+      "contexts": [
+        "3 matchs sur les 7 derniers jours",
+        "1 match important/proche dans les 3 jours",
+        "4 matchs sur les 7 derniers jours",
+        "1 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": -0.138,
+        "away_score": -1.488,
+        "home_fade": 0.75,
+        "away_fade": 1.75,
+        "reason": "Direction nette: San Diego Padres (-0.14)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.8
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.8
           }
         ]
       }
@@ -956,33 +876,21 @@
       },
       "contexts": [
         "Deplacement estime 3041 km, decalage ~1.8h",
-        "1 match dans les 48h + 3041 km de voyage"
+        "2 match dans les 48h + 3041 km de voyage"
       ],
       "global_resolution": {
-        "status": "mixed",
-        "net_side": null,
-        "home_score": 0.948,
-        "away_score": -2.357,
+        "status": "net",
+        "net_side": "home",
+        "home_score": -0.402,
+        "away_score": -1.357,
         "home_fade": 1.0,
-        "away_fade": 2.707,
-        "reason": "Signaux mitigés: avantage net trop faible (Houston Astros +0.95, Seattle Mariners -2.36)",
+        "away_fade": 1.707,
+        "reason": "Direction nette: Houston Astros (-0.40)",
         "detail": [
           {
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
             "strength": 1.0
           },
           {
@@ -1027,7 +935,7 @@
       },
       "contexts": [
         "Deplacement estime 2789 km, decalage ~1.9h",
-        "1 match dans les 48h + 2789 km de voyage"
+        "2 match dans les 48h + 2789 km de voyage"
       ],
       "global_resolution": {
         "status": "net",
@@ -1080,7 +988,7 @@
       },
       "contexts": [
         "Deplacement estime 2434 km, decalage ~0.9h",
-        "1 match dans les 48h + 2434 km de voyage"
+        "2 match dans les 48h + 2434 km de voyage"
       ],
       "global_resolution": {
         "status": "net",
@@ -1126,11 +1034,11 @@
       "match": "Pittsburgh Pirates - Colorado Rockies",
       "decision": "lean_home",
       "net_team": "Pittsburgh Pirates",
-      "reason": "Colorado Rockies plus penalise par calendrier/voyage (1.45 vs 0.00)",
-      "pressure_score": 1.447,
+      "reason": "Colorado Rockies plus penalise par calendrier/voyage (1.49 vs 0.00)",
+      "pressure_score": 1.493,
       "home_fade": 0.0,
-      "away_fade": 1.447,
-      "travel_score": 1.447,
+      "away_fade": 1.493,
+      "travel_score": 1.493,
       "lookahead_score": 0,
       "congestion_score": 0,
       "types": {
@@ -1139,16 +1047,16 @@
       },
       "contexts": [
         "Deplacement estime 2120 km, decalage ~1.7h",
-        "1 match dans les 48h + 2120 km de voyage"
+        "2 match dans les 48h + 2120 km de voyage"
       ],
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.646,
-        "away_score": -1.847,
+        "home_score": 0.663,
+        "away_score": -1.893,
         "home_fade": 0.0,
-        "away_fade": 1.847,
-        "reason": "Direction nette: Pittsburgh Pirates (+0.65)",
+        "away_fade": 1.893,
+        "reason": "Direction nette: Pittsburgh Pirates (+0.66)",
         "detail": [
           {
             "side": "away",
@@ -1166,49 +1074,49 @@
             "side": "away",
             "type": "back_to_back_travel",
             "direction": "fade",
-            "strength": 0.954
+            "strength": 1.0
           }
         ]
       }
     },
     {
-      "event_id": "401815417",
+      "event_id": "401871421",
       "source_event_ids": [
-        "401815417"
+        "401871421"
       ],
-      "kickoff": "2026-05-20T01:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Diego Padres",
-      "away": "Los Angeles Dodgers",
-      "match": "San Diego Padres - Los Angeles Dodgers",
+      "kickoff": "2026-05-16T00:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Minnesota Wild",
+      "away": "Colorado Avalanche",
+      "match": "Minnesota Wild - Colorado Avalanche",
       "decision": "lean_home",
-      "net_team": "San Diego Padres",
-      "reason": "Los Angeles Dodgers plus penalise par calendrier/voyage (0.75 vs 0.15)",
-      "pressure_score": 1.267,
+      "net_team": "Minnesota Wild",
+      "reason": "Colorado Avalanche plus penalise par calendrier/voyage (0.91 vs 0.15)",
+      "pressure_score": 1.424,
       "home_fade": 0.15,
-      "away_fade": 0.75,
-      "travel_score": 0,
+      "away_fade": 0.907,
+      "travel_score": 0.757,
       "lookahead_score": 0.667,
-      "congestion_score": 0.6,
+      "congestion_score": 0,
       "types": {
         "lookahead": 2,
-        "schedule_congestion": 1
+        "back_to_back_travel": 1
       },
       "contexts": [
         "1 match important/proche dans les 3 jours",
-        "3 matchs sur les 7 derniers jours",
-        "1 match important/proche dans les 3 jours"
+        "1 match important/proche dans les 3 jours",
+        "1 match dans les 48h + 1135 km de voyage"
       ],
       "global_resolution": {
-        "status": "mixed",
-        "net_side": null,
-        "home_score": -0.607,
-        "away_score": -0.516,
-        "home_fade": 1.15,
-        "away_fade": 1.55,
-        "reason": "Signaux mitigés: avantage net trop faible (San Diego Padres -0.61, Los Angeles Dodgers -0.52)",
+        "status": "net",
+        "net_side": "home",
+        "home_score": -0.233,
+        "away_score": -0.714,
+        "home_fade": 0.55,
+        "away_fade": 0.907,
+        "reason": "Direction nette: Minnesota Wild (-0.23)",
         "detail": [
           {
             "side": "home",
@@ -1218,33 +1126,124 @@
           },
           {
             "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.4
+          },
+          {
+            "side": "away",
+            "type": "back_to_back_travel",
+            "direction": "fade",
+            "strength": 0.757
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815432",
+      "source_event_ids": [
+        "401815432"
+      ],
+      "kickoff": "2026-05-21T00:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "San Diego Padres",
+      "away": "Los Angeles Dodgers",
+      "match": "San Diego Padres - Los Angeles Dodgers",
+      "decision": "lean_home",
+      "net_team": "San Diego Padres",
+      "reason": "Los Angeles Dodgers plus penalise par calendrier/voyage (0.80 vs 0.60)",
+      "pressure_score": 1.4,
+      "home_fade": 0.6,
+      "away_fade": 0.8,
+      "travel_score": 0,
+      "lookahead_score": 0,
+      "congestion_score": 1.4,
+      "types": {
+        "schedule_congestion": 2
+      },
+      "contexts": [
+        "3 matchs sur les 7 derniers jours",
+        "4 matchs sur les 7 derniers jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": -0.04,
+        "away_score": -1.39,
+        "home_fade": 0.6,
+        "away_fade": 1.6,
+        "reason": "Direction nette: San Diego Padres (-0.04)",
+        "detail": [
+          {
+            "side": "home",
             "type": "schedule_congestion",
             "direction": "fade",
             "strength": 0.6
           },
           {
             "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.8
           },
           {
             "side": "away",
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.8
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815334",
+      "source_event_ids": [
+        "401815334"
+      ],
+      "kickoff": "2026-05-14T23:15Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Atlanta Braves",
+      "away": "Chicago Cubs",
+      "match": "Atlanta Braves - Chicago Cubs",
+      "decision": "lean_home",
+      "net_team": "Atlanta Braves",
+      "reason": "Chicago Cubs plus penalise par calendrier/voyage (0.80 vs 0.00)",
+      "pressure_score": 0.798,
+      "home_fade": 0.0,
+      "away_fade": 0.798,
+      "travel_score": 0.798,
+      "lookahead_score": 0,
+      "congestion_score": 0,
+      "types": {
+        "back_to_back_travel": 1
+      },
+      "contexts": [
+        "2 match dans les 48h + 938 km de voyage"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": 0.279,
+        "away_score": -0.798,
+        "home_fade": 0.0,
+        "away_fade": 0.798,
+        "reason": "Direction nette: Atlanta Braves (+0.28)",
+        "detail": [
           {
             "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.631
+            "type": "back_to_back_travel",
+            "direction": "fade",
+            "strength": 0.798
           }
         ]
       }
@@ -1279,11 +1278,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 1.755,
-        "away_score": -2.157,
+        "home_score": 0.405,
+        "away_score": -1.157,
         "home_fade": 0.0,
-        "away_fade": 2.157,
-        "reason": "Direction nette: Colorado Avalanche (+1.75)",
+        "away_fade": 1.157,
+        "reason": "Direction nette: Colorado Avalanche (+0.40)",
         "detail": [
           {
             "side": "away",
@@ -1292,67 +1291,10 @@
             "strength": 0.4
           },
           {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
             "side": "away",
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.757
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815334",
-      "source_event_ids": [
-        "401815334"
-      ],
-      "kickoff": "2026-05-14T23:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Atlanta Braves",
-      "away": "Chicago Cubs",
-      "match": "Atlanta Braves - Chicago Cubs",
-      "decision": "lean_home",
-      "net_team": "Atlanta Braves",
-      "reason": "Chicago Cubs plus penalise par calendrier/voyage (0.72 vs 0.00)",
-      "pressure_score": 0.718,
-      "home_fade": 0.0,
-      "away_fade": 0.718,
-      "travel_score": 0.718,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "1 match dans les 48h + 938 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.251,
-        "away_score": -0.718,
-        "home_fade": 0.0,
-        "away_fade": 0.718,
-        "reason": "Direction nette: Atlanta Braves (+0.25)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.718
           }
         ]
       }
