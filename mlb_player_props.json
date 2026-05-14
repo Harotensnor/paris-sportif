@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-14T20:56:40Z",
+  "generated_at": "2026-05-14T21:02:26Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -246,6 +246,52 @@
             "whip": 1.17
           },
           "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815350",
+      "kickoff": "2026-05-15T22:40Z",
+      "league": "MLB",
+      "match": "Philadelphia Phillies at Pittsburgh Pirates",
+      "home": "Pittsburgh Pirates",
+      "away": "Philadelphia Phillies",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Pittsburgh Pirates",
+          "pitcher": "Braxton Ashcraft",
+          "label": "Braxton Ashcraft moins de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "under",
+          "probability": 0.538,
+          "fair_odds": 1.86,
+          "expected_strikeouts": 6.31,
+          "projected_ip": 6.03,
+          "inputs": {
+            "k9": 9.43,
+            "era": 2.77,
+            "whip": 1.05,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Pittsburgh Pirates",
+          "pitcher": "Braxton Ashcraft",
+          "label": "Braxton Ashcraft ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6093,
+          "fair_odds": 1.64,
+          "expected_hr_allowed": 0.495,
+          "projected_ip": 6.03,
+          "inputs": {
+            "hr9": 0.74,
+            "era": 2.77,
+            "whip": 1.05
+          },
+          "side": "home"
         }
       ]
     },
@@ -1116,6 +1162,52 @@
       ]
     },
     {
+      "event_id": "401815365",
+      "kickoff": "2026-05-16T20:05Z",
+      "league": "MLB",
+      "match": "Philadelphia Phillies at Pittsburgh Pirates",
+      "home": "Pittsburgh Pirates",
+      "away": "Philadelphia Phillies",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Pittsburgh Pirates",
+          "pitcher": "Bubba Chandler",
+          "label": "Bubba Chandler moins de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "under",
+          "probability": 0.5612,
+          "fair_odds": 1.78,
+          "expected_strikeouts": 4.25,
+          "projected_ip": 4.88,
+          "inputs": {
+            "k9": 7.85,
+            "era": 4.62,
+            "whip": 1.46,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Pittsburgh Pirates",
+          "pitcher": "Bubba Chandler",
+          "label": "Bubba Chandler concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5265,
+          "fair_odds": 1.9,
+          "expected_hr_allowed": 0.747,
+          "projected_ip": 4.88,
+          "inputs": {
+            "hr9": 1.38,
+            "era": 4.62,
+            "whip": 1.46
+          },
+          "side": "home"
+        }
+      ]
+    },
+    {
       "event_id": "401815363",
       "kickoff": "2026-05-16T20:10Z",
       "league": "MLB",
@@ -1536,7 +1628,7 @@
       ]
     }
   ],
-  "props": 74,
+  "props": 78,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
