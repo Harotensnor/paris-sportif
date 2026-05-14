@@ -1,22 +1,22 @@
 {
-  "generated_at": "2026-05-14T16:42:10Z",
+  "generated_at": "2026-05-14T16:49:19Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 19,
+    "active_events": 18,
     "expired_sample": 0,
     "by_type": {
-      "travel_extreme": 7,
-      "back_to_back_travel": 7,
+      "travel_extreme": 6,
+      "back_to_back_travel": 6,
       "lookahead": 22,
       "schedule_congestion": 8
     },
     "by_decision": {
       "abstain": 10,
-      "lean_home": 9
+      "lean_home": 8
     },
-    "lean_home": 9,
+    "lean_home": 8,
     "lean_away": 0,
     "abstain": 10,
     "monitor": 0
@@ -228,10 +228,10 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.098,
-        "away_score": 0.408,
+        "away_score": -0.098,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Real Oviedo (+0.41)",
+        "reason": "Direction nette: Real Oviedo (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -244,12 +244,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.505
           }
         ]
       }
@@ -285,11 +279,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -1.147,
-        "away_score": -0.607,
-        "home_fade": 1.55,
-        "away_fade": 1.15,
-        "reason": "Direction nette: Montreal Canadiens (-0.61)",
+        "home_score": -0.498,
+        "away_score": 0.043,
+        "home_fade": 0.55,
+        "away_fade": 0.15,
+        "reason": "Direction nette: Montreal Canadiens (+0.04)",
         "detail": [
           {
             "side": "home",
@@ -308,18 +302,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.4
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
           }
         ]
       }
@@ -356,10 +338,10 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.098,
-        "away_score": 0.587,
+        "away_score": -0.098,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Pumas UNAM (+0.59)",
+        "reason": "Direction nette: Pumas UNAM (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -372,12 +354,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.685
           }
         ]
       }
@@ -1008,65 +984,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815335",
-      "source_event_ids": [
-        "401815335"
-      ],
-      "kickoff": "2026-05-14T16:35Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Pittsburgh Pirates",
-      "away": "Colorado Rockies",
-      "match": "Pittsburgh Pirates - Colorado Rockies",
-      "decision": "lean_home",
-      "net_team": "Pittsburgh Pirates",
-      "reason": "Colorado Rockies plus penalise par calendrier/voyage (1.45 vs 0.00)",
-      "pressure_score": 1.447,
-      "home_fade": 0.0,
-      "away_fade": 1.447,
-      "travel_score": 1.447,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "travel_extreme": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "Deplacement estime 2120 km, decalage ~1.7h",
-        "1 match dans les 48h + 2120 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.716,
-        "away_score": -2.047,
-        "home_fade": 0.0,
-        "away_fade": 2.047,
-        "reason": "Direction nette: Pittsburgh Pirates (+0.72)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.493
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.954
           }
         ]
       }

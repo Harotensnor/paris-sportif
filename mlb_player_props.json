@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-14T16:42:02Z",
+  "generated_at": "2026-05-14T16:49:10Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815335",
-      "kickoff": "2026-05-14T16:35Z",
-      "league": "MLB",
-      "match": "Colorado Rockies at Pittsburgh Pirates",
-      "home": "Pittsburgh Pirates",
-      "away": "Colorado Rockies",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Pittsburgh Pirates",
-          "pitcher": "Mason Montgomery",
-          "label": "Mason Montgomery plus de 9,5 strikeouts",
-          "line": 9.5,
-          "pick": "over",
-          "probability": 0.5308,
-          "fair_odds": 1.88,
-          "expected_strikeouts": 9.69,
-          "projected_ip": 6.6,
-          "inputs": {
-            "k9": 13.21,
-            "era": 2.87,
-            "whip": 1.28,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Pittsburgh Pirates",
-          "pitcher": "Mason Montgomery",
-          "label": "Mason Montgomery ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6584,
-          "fair_odds": 1.52,
-          "expected_hr_allowed": 0.418,
-          "projected_ip": 6.6,
-          "inputs": {
-            "hr9": 0.57,
-            "era": 2.87,
-            "whip": 1.28
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Colorado Rockies",
-          "pitcher": "Chase Dollander",
-          "label": "Chase Dollander moins de 7,5 strikeouts",
-          "line": 7.5,
-          "pick": "under",
-          "probability": 0.5539,
-          "fair_odds": 1.81,
-          "expected_strikeouts": 7.22,
-          "projected_ip": 6.6,
-          "inputs": {
-            "k9": 9.84,
-            "era": 3.35,
-            "whip": 1.19,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Colorado Rockies",
-          "pitcher": "Chase Dollander",
-          "label": "Chase Dollander concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.537,
-          "fair_odds": 1.86,
-          "expected_hr_allowed": 0.77,
-          "projected_ip": 6.6,
-          "inputs": {
-            "hr9": 1.05,
-            "era": 3.35,
-            "whip": 1.19
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815338",
       "kickoff": "2026-05-14T16:40Z",
@@ -100,14 +18,14 @@
           "label": "Chase Burns plus de 5,5 strikeouts",
           "line": 5.5,
           "pick": "over",
-          "probability": 0.603,
-          "fair_odds": 1.66,
-          "expected_strikeouts": 6.0,
-          "projected_ip": 5.88,
+          "probability": 0.5127,
+          "fair_odds": 1.95,
+          "expected_strikeouts": 5.56,
+          "projected_ip": 5.33,
           "inputs": {
-            "k9": 9.19,
-            "era": 2.11,
-            "whip": 1.04,
+            "k9": 9.38,
+            "era": 2.06,
+            "whip": 1.02,
             "hand": "R"
           },
           "side": "home"
@@ -116,16 +34,16 @@
           "market": "pitcher_home_run_allowed",
           "team": "Cincinnati Reds",
           "pitcher": "Chase Burns",
-          "label": "Chase Burns concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.528,
-          "fair_odds": 1.89,
-          "expected_hr_allowed": 0.751,
-          "projected_ip": 5.88,
+          "label": "Chase Burns ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5119,
+          "fair_odds": 1.95,
+          "expected_hr_allowed": 0.67,
+          "projected_ip": 5.33,
           "inputs": {
-            "hr9": 1.15,
-            "era": 2.11,
-            "whip": 1.04
+            "hr9": 1.13,
+            "era": 2.06,
+            "whip": 1.02
           },
           "side": "home"
         },
@@ -742,7 +660,7 @@
       ]
     }
   ],
-  "props": 36,
+  "props": 32,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
