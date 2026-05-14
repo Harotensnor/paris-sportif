@@ -1,26 +1,25 @@
 {
-  "generated_at": "2026-05-14T09:47:19Z",
+  "generated_at": "2026-05-14T09:51:38Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 72,
-    "actionable": 18,
-    "watch": 3,
-    "risk": 51,
+    "active_events": 67,
+    "actionable": 16,
+    "watch": 1,
+    "risk": 50,
     "expired_sample": 0,
     "by_type": {
       "travel_extreme": 7,
       "back_to_back_travel": 7,
       "injury_imbalance": 10,
-      "market_move": 10,
-      "signal_conflict": 5,
-      "market_uncertain": 52
+      "market_uncertain": 52,
+      "market_move": 5
     },
     "by_quality": {
-      "actionable": 18,
-      "watch": 3,
-      "risk": 51
+      "actionable": 16,
+      "risk": 50,
+      "watch": 1
     }
   },
   "active_actionable": [
@@ -77,24 +76,6 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 14-8"
-    },
-    {
-      "event_id": "748503",
-      "date": "2026-05-14T19:30Z",
-      "sport": "football",
-      "league_code": "esp.1",
-      "league_name": "La Liga",
-      "home": "Real Madrid",
-      "away": "Real Oviedo",
-      "match": "Real Madrid - Real Oviedo",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 1.0,
-      "context": "Cote away: 11.00 -> 8.50 (+22.7%)"
     },
     {
       "event_id": "401815337",
@@ -313,24 +294,6 @@
       "context": "Absences severes 8-12"
     },
     {
-      "event_id": "401872572",
-      "date": "2026-05-15T01:00Z",
-      "sport": "football",
-      "league_code": "ligamx",
-      "league_name": "Liga MX",
-      "home": "Pachuca",
-      "away": "Pumas UNAM",
-      "match": "Pachuca - Pumas UNAM",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.722,
-      "context": "Cote away: 3.85 -> 3.35 (+13.0%)"
-    },
-    {
       "event_id": "401815334",
       "date": "2026-05-14T23:15Z",
       "sport": "baseball",
@@ -350,42 +313,6 @@
     }
   ],
   "active_watch": [
-    {
-      "event_id": "401856908",
-      "date": "2026-05-15T00:00Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Dallas Wings",
-      "away": "Minnesota Lynx",
-      "match": "Dallas Wings - Minnesota Lynx",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.62,
-      "context": "Cote away: 2.42 -> 2.15 (+11.2%)"
-    },
-    {
-      "event_id": "401871367",
-      "date": "2026-05-14T19:00Z",
-      "sport": "football",
-      "league_code": "leagueone",
-      "league_name": "League One",
-      "home": "Bradford City",
-      "away": "Bolton Wanderers",
-      "match": "Bradford City - Bolton Wanderers",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "home",
-      "strength": 0.524,
-      "context": "Cote home: 2.65 -> 2.40 (+9.4%)"
-    },
     {
       "event_id": "746716",
       "date": "2026-05-17T19:00Z",
@@ -1305,24 +1232,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 19.0%"
-    },
-    {
-      "event_id": "401871410",
-      "date": "2026-05-18T04:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Buffalo Sabres",
-      "away": "Montreal Canadiens",
-      "match": "Buffalo Sabres - Montreal Canadiens",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "signal_conflict",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.45,
-      "context": "Signaux opposes: Buffalo Sabres fade 0.60, Montreal Canadiens fade 0.60 -> prudence"
     }
   ],
   "expired_sample": []
