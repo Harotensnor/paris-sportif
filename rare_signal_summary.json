@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-05-14T20:42:50Z",
+  "generated_at": "2026-05-14T20:47:53Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 82,
-    "actionable": 26,
-    "watch": 7,
-    "risk": 49,
+    "active_events": 81,
+    "actionable": 25,
+    "watch": 8,
+    "risk": 48,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 30,
-      "back_to_back_travel": 8,
+      "back_to_back_travel": 7,
       "signal_conflict": 5,
       "market_uncertain": 45,
       "travel_extreme": 3
     },
     "by_quality": {
-      "actionable": 26,
-      "watch": 7,
-      "risk": 49
+      "actionable": 25,
+      "watch": 8,
+      "risk": 48
     }
   },
   "active_actionable": [
@@ -238,24 +238,6 @@
       "side": "away",
       "strength": 0.93,
       "context": "1 match dans les 48h + 1998 km de voyage"
-    },
-    {
-      "event_id": "401815358",
-      "date": "2026-05-16T01:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Seattle Mariners",
-      "away": "San Diego Padres",
-      "match": "Seattle Mariners - San Diego Padres",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "San Diego Padres",
-      "side": "away",
-      "strength": 0.872,
-      "context": "1 match dans les 48h + 1711 km de voyage"
     },
     {
       "event_id": "401815373",
@@ -546,6 +528,24 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 14-11"
+    },
+    {
+      "event_id": "401815363",
+      "date": "2026-05-16T20:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Tampa Bay Rays",
+      "away": "Miami Marlins",
+      "match": "Tampa Bay Rays - Miami Marlins",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Tampa Bay Rays",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 8-5"
     },
     {
       "event_id": "401871429",
@@ -979,7 +979,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.9%"
+      "context": "marge bookmaker anormale 18.2%"
     },
     {
       "event_id": "401843286",
@@ -1430,24 +1430,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 19.0%"
-    },
-    {
-      "event_id": "401815363",
-      "date": "2026-05-16T20:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Tampa Bay Rays",
-      "away": "Miami Marlins",
-      "match": "Tampa Bay Rays - Miami Marlins",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "signal_conflict",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.688,
-      "context": "Signaux opposes: Tampa Bay Rays fade 0.75, Miami Marlins fade 0.95 -> prudence"
     },
     {
       "event_id": "401815382",
