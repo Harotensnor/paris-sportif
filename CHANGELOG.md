@@ -5,6 +5,18 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 21 — Validation v1.0.1 + raffinements
+
+- Validation post Sprint 20 : QA moteur, tests unitaires/refresh, smoke Electron, Playwright, multi-jours J+3, stress court et audit accessibilité passent sur la base v1.0.2.
+- Correction packaging standalone : en build packagé, l'état runtime est maintenant stocké dans le profil utilisateur Electron, et les rapports JSON/JSONL/exports nécessaires au moteur sont embarqués avec l'exe. Le build installé retrouve donc les mêmes picks actionnables que l'app dev.
+- Build Windows v1.0.2 validé : `Paris Sportif Desktop Setup 1.0.2.exe` généré en sortie de validation, environ 104 MB, installation NSIS silencieuse testée dans un dossier propre, premier lancement avec onboarding et 18 picks visibles.
+- Raffinement modèle quotidien : l'audit réalité modèle couvre maintenant 60 jours / 1200 picks historiques, avec Brier par segment, segments gagnants persistants, segments perdants persistants et ajustements automatiques visibles en Mode expert.
+- Les segments très rentables peuvent assouplir prudemment le plancher edge à +2pt et la cote max à 8 ; les segments froids durcissent à +5pt et 60% de confiance.
+- Ajout des favoris équipes/joueurs dans `Réglages` : recherche locale depuis le catalogue, puces persistées, section `Tes favoris` dans `Picks`, alertes renforcées si un favori a un pick intéressant.
+- Ajout des tendances fortes/froides : badge discret sur les picks concernés, intégration dans la suggestion du jour et déclassement des segments froids hors mise affichée.
+- Performance finale : observer local des pauses UI >100 ms, affiché dans `Avancé > Pipeline`, en plus du stress report et de la mémoire.
+- Accessibilité : nouveau check local `qa:a11y` validant actions clavier, labels boutons icônes, ARIA des modales et contraste AA sur les thèmes.
+
 ### Sprint 20 — Auto-update, thèmes, robustesse
 
 - Audit post-hotfix : le démarrage Electron conserve maintenant le même origin local (`127.0.0.1:17654`), ce qui protège bankroll, préférences et paris suivis entre deux redémarrages.

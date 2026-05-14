@@ -6,6 +6,18 @@ Paris Sportif Desktop est le logiciel PC local pour préparer tes paris Winamax.
 
 ## Installation
 
+### Version installateur Windows
+
+La version v1.0.2 se génère avec :
+
+```powershell
+npm --prefix desktop run dist
+```
+
+Le fichier attendu est `Paris Sportif Desktop Setup 1.0.2.exe`. Le build packagé embarque les données, rapports modèle et scripts nécessaires au démarrage. Python reste recommandé si tu veux relancer une pipeline complète depuis la machine installée.
+
+### Version développeur
+
 1. Installe Node.js et Python si ce n'est pas déjà fait.
 2. Depuis le dossier du projet, lance `npm --prefix desktop install`.
 3. Lance le logiciel avec `npm --prefix desktop start`.
@@ -32,6 +44,7 @@ Ouvre l'app et lis d'abord le haut de la vue `Picks`.
 - Chaque carte affiche `PARI`, `COTE`, `MISE` et `Pourquoi`.
 - Clique `Je mise` pour suivre le pari localement.
 - Clique `Ouvrir Winamax` pour aller sur la page du match.
+- Ajoute tes équipes ou joueurs favoris dans `Réglages > Favoris` pour ne pas rater leurs picks, même quand ils ne sont pas dans le top du jour.
 
 L'app ne place pas de pari automatiquement. Elle prépare le ticket et suit ton résultat.
 
@@ -91,6 +104,17 @@ L'app se rafraîchit en arrière-plan. Si les données sont anciennes ou qu'un r
 
 En Mode expert, la vue `Avancé` montre la pipeline, les logs et les diagnostics.
 
+## Modèle Et Tendances
+
+Le Mode expert affiche l'audit réalité modèle sur 60 jours :
+
+- segments gagnants persistants ;
+- segments froids à durcir ;
+- Brier par sport/marché ;
+- ajustements actifs et bouton de réinitialisation.
+
+Dans la vue standard, seuls les signaux utiles apparaissent : `Tendance forte` ou `Tendance froide` quand un segment récent mérite vraiment ton attention.
+
 ## Dépannage
 
 - Aucun pick visible : vérifie la fraîcheur des données et lance un refresh depuis `Avancé`.
@@ -109,6 +133,13 @@ npm --prefix desktop run dist
 ```
 
 La sortie est écrite dans `desktop/dist/`. Le build embarque l'application Electron, les scripts locaux et les derniers fichiers de données disponibles. Python doit être disponible sur la machine si tu veux relancer la pipeline locale complète.
+
+Si un ancien dossier `desktop/dist/` est verrouillé par Windows, tu peux valider un build équivalent avec une sortie temporaire :
+
+```powershell
+cd desktop
+npx electron-builder --win nsis --x64 --config.directories.output=dist-sprint21b
+```
 
 ## FAQ
 

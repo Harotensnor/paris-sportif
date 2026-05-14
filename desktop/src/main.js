@@ -11,11 +11,11 @@ const qualityUtils = require('./engine/quality-utils');
 const desktopPackage = require('../package.json');
 
 const DESKTOP_ROOT = path.resolve(__dirname, '..');
-const PROJECT_ROOT = path.resolve(DESKTOP_ROOT, '..');
+const PROJECT_ROOT = app.isPackaged ? process.resourcesPath : path.resolve(DESKTOP_ROOT, '..');
 const HOST = '127.0.0.1';
 const DEFAULT_LOCAL_PORT = 17654;
 const LOCAL_PORT = Number(process.env.PARIS_DESKTOP_PORT || DEFAULT_LOCAL_PORT);
-const STATE_ROOT = path.join(DESKTOP_ROOT, 'state');
+const STATE_ROOT = app.isPackaged ? path.join(app.getPath('userData'), 'state') : path.join(DESKTOP_ROOT, 'state');
 const REFRESH_HISTORY_PATH = path.join(STATE_ROOT, 'refresh-history.json');
 const PROFILE_BACKUP_ROOT = path.join(STATE_ROOT, 'backups');
 const DATA_BACKUP_ROOT = path.join(STATE_ROOT, 'data-backups');

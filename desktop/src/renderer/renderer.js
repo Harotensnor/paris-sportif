@@ -93,7 +93,8 @@
     appInfo: null,
     bugReportDraft: null,
     actionTrail: [],
-    shortcutCaptureAction: null
+    shortcutCaptureAction: null,
+    longTasks: []
   };
 
   const ACTION_HISTORY_KEY = 'parisSportifActionHistory';
@@ -129,6 +130,9 @@
   const BUG_REPORTS_KEY = 'parisSportifBugReportsLocal';
   const BUG_REPORT_PROMPT_KEY = 'parisSportifBugReportPrompt';
   const SHORTCUTS_KEY = 'parisSportifKeyboardShortcuts';
+  const FAVORITES_KEY = 'parisSportifFavorites';
+  const FAVORITE_ALERT_KEY = 'parisSportifFavoriteAlerts';
+  const TREND_ALERT_KEY = 'parisSportifTrendAlerts';
   const DEFAULT_SHORTCUTS = {
     dashboard: 'Ctrl+1',
     history: 'Ctrl+2',
@@ -171,7 +175,7 @@
   ];
   const MARKET_PREFS = [...SIMPLE_MARKET_PREFS, ...ADVANCED_MARKET_PREFS];
   const DEFAULT_PREFERENCES = {
-    preferenceSchemaVersion: 15,
+    preferenceSchemaVersion: 16,
     bankroll: 50,
     level: 'intermediate',
     sports: SPORTS_PREFS,
@@ -456,6 +460,27 @@
     }
   }
 
+  function loadFavorites() {
+    const raw = readStorageJson(FAVORITES_KEY, {});
+    const clean = (rows) => Array.from(new Set((Array.isArray(rows) ? rows : [])
+      .map((item) => String(item || '').trim())
+      .filter(Boolean))).slice(0, 80);
+    return {
+      teams: clean(raw.teams),
+      players: clean(raw.players)
+    };
+  }
+
+  function saveFavorites(favorites) {
+    const clean = {
+      teams: Array.from(new Set((favorites?.teams || []).map((item) => String(item || '').trim()).filter(Boolean))).slice(0, 80),
+      players: Array.from(new Set((favorites?.players || []).map((item) => String(item || '').trim()).filter(Boolean))).slice(0, 80)
+    };
+    writeStorageJson(FAVORITES_KEY, clean);
+    scheduleProfileBackup();
+    return clean;
+  }
+
   function currentProfileSnapshot() {
     const readRawJson = (key, fallback) => {
       try {
@@ -481,6 +506,7 @@
       oddsMemory: readStorageJson(ODDS_MEMORY_KEY, {}),
       smartAlerts: readStorageJson(SMART_ALERT_KEY, []),
       notifiedPicks: readStorageJson(NOTIFIED_PICK_KEY, []),
+      favorites: loadFavorites(),
       webEnrichment: readStorageJson(WEB_ENRICHMENT_KEY, null),
       modelAdjustments: readStorageJson(MODEL_ADJUSTMENTS_KEY, null),
       lossFeedbacks: readStorageJson(LOSS_FEEDBACK_KEY, []),
@@ -511,6 +537,13 @@
       localStorage.setItem('userBankroll', String(prefs.bankroll || profile.bankroll || 50));
     }
     if (profile.bankroll && !profile.preferences) localStorage.setItem('userBankroll', String(profile.bankroll));
+    if (profile.favorites) {
+      const currentFavorites = replace ? { teams: [], players: [] } : loadFavorites();
+      saveFavorites({
+        teams: [...(currentFavorites.teams || []), ...(profile.favorites.teams || [])],
+        players: [...(currentFavorites.players || []), ...(profile.favorites.players || [])]
+      });
+    }
     if (Array.isArray(profile.bets)) {
       const current = readStorageJson(USER_BETS_KEY, []);
       localStorage.setItem(USER_BETS_KEY, JSON.stringify(replace ? profile.bets : mergeBets(current, profile.bets)));
@@ -1865,12 +1898,55 @@
       && segmentRoiValue(row) >= 0;
   }
 
+  function trendBucketForRow(row) {
+    const audit = state.modelRealityAudit || {};
+    const byKey = audit.byKey || {};
+    const keys = [
+      row?.segmentValidation?.segmentKey,
+      row?.safeAssessment?.policy?.key,
+      row?.segmentPolicy?.key,
+      ...segmentKeysForRow(row)
+    ].filter(Boolean).map((key) => String(key).toLowerCase());
+    return keys.map((key) => byKey[key] || byKey[String(key).replace(/^market:/, 'market:')]).find(Boolean) || null;
+  }
+
+  function trendForRow(row) {
+    const bucket = trendBucketForRow(row);
+    if (!bucket) return null;
+    const count = Number(bucket.count || 0);
+    const roi = Number(bucket.roi || 0);
+    const last60Roi = Number(bucket.last60Roi);
+    const effectiveRoi = Number.isFinite(last60Roi) && Number(bucket.last60Count || 0) >= 10 ? last60Roi : roi;
+    if (count >= 10 && effectiveRoi > 0.30) {
+      return {
+        tone: 'hot',
+        label: 'Tendance forte',
+        reason: `ROI ${formatPct(effectiveRoi, 0)} sur ${formatCount(count)} paris similaires`
+      };
+    }
+    if (count >= 10 && effectiveRoi < -0.20) {
+      return {
+        tone: 'cold',
+        label: 'Tendance froide',
+        reason: `ROI ${formatPct(effectiveRoi, 0)} sur ${formatCount(count)} paris similaires`
+      };
+    }
+    return null;
+  }
+
   function specialStakeMultiplier(row) {
     return isLongShotValue(row) ? 0.5 : 1;
   }
 
   function specialPatternBadgeHtml(row) {
     if (!row) return '';
+    const trend = trendForRow(row);
+    if (trend?.tone === 'hot') {
+      return `<span class="special-pick-badge hottrend" title="${escapeHtml(trend.reason)}">Tendance forte</span>`;
+    }
+    if (trend?.tone === 'cold') {
+      return `<span class="special-pick-badge coldtrend" title="${escapeHtml(trend.reason)}">Tendance froide</span>`;
+    }
     if (surePickKeys().has(userBetKey(row))) {
       return '<span class="special-pick-badge" title="Edge fort, confiance haute, segment validé et priorité top 5.">Sure pick</span>';
     }
@@ -2490,6 +2566,9 @@
     const parts = [];
     if (surePickKeys().has(userBetKey(row))) parts.push('sure pick du jour');
     if (isLongShotValue(row)) parts.push('cote haute, mise réduite');
+    const trend = trendForRow(row);
+    if (trend?.tone === 'hot') parts.push('segment en tendance forte');
+    if (trend?.tone === 'cold') parts.push('segment à surveiller');
     if (row.winamaxBoost) parts.push('cote boostée Winamax');
     if (row.safeAssessment?.reliable) parts.push('profil fiable');
     if (Number(row.priorityScore || 0) >= 60) parts.push('priorité haute');
@@ -2975,6 +3054,90 @@
     ].filter(Boolean).join(' ').toLowerCase();
   }
 
+  function uniqueCleanLabels(values) {
+    const seen = new Set();
+    const rows = [];
+    (Array.isArray(values) ? values : []).forEach((value) => {
+      const label = String(value || '').trim();
+      const key = normalizeUiKey(label);
+      if (!label || label.length < 2 || seen.has(key)) return;
+      seen.add(key);
+      rows.push(label);
+    });
+    return rows;
+  }
+
+  function rowTeamNames(row) {
+    const match = row?.match || {};
+    const competitors = Array.isArray(match.competitors) ? match.competitors : [];
+    const names = [
+      match.home,
+      match.away,
+      match.homeName,
+      match.awayName,
+      row?.home,
+      row?.away,
+      ...competitors.flatMap((team) => [team?.name, team?.short, team?.displayName])
+    ];
+    const title = String(row?.title || '');
+    if (title.includes(' vs ')) {
+      names.push(...title.split(/\s+vs\s+/i));
+    }
+    return uniqueCleanLabels(names);
+  }
+
+  function rowPlayerName(row) {
+    return String(row?.player || row?.playerName || row?.scorer || row?.athlete || row?.participant || '').trim();
+  }
+
+  function favoriteCatalog() {
+    const teamRows = [];
+    const playerRows = [];
+    [...(state.matches || []), ...(state.allPicks || []), ...(state.picks || [])].forEach((row) => {
+      teamRows.push(...rowTeamNames(row));
+    });
+    (state.scorers || []).forEach((row) => {
+      teamRows.push(...rowTeamNames(row));
+      playerRows.push(rowPlayerName(row), row?.label, row?.name);
+    });
+    return {
+      teams: uniqueCleanLabels(teamRows).sort((a, b) => a.localeCompare(b, 'fr')),
+      players: uniqueCleanLabels(playerRows).sort((a, b) => a.localeCompare(b, 'fr'))
+    };
+  }
+
+  function rowMatchesFavorite(row, favorites = loadFavorites()) {
+    const teamKeys = new Set((favorites.teams || []).map(normalizeUiKey).filter(Boolean));
+    const playerKeys = new Set((favorites.players || []).map(normalizeUiKey).filter(Boolean));
+    if (!teamKeys.size && !playerKeys.size) return false;
+    const teams = rowTeamNames(row).map(normalizeUiKey);
+    if (teams.some((key) => teamKeys.has(key))) return true;
+    const player = normalizeUiKey(rowPlayerName(row) || row?.label || '');
+    if (player && playerKeys.has(player)) return true;
+    const text = normalizeUiKey(pickSearchText(row));
+    return [...teamKeys, ...playerKeys].some((key) => key && text.includes(key));
+  }
+
+  function favoritePickRows() {
+    const favorites = loadFavorites();
+    const seen = new Set();
+    const rows = [...(state.allPicks || []), ...(state.picks || []), ...(state.scorers || [])]
+      .filter((row) => pickHasCoreData(row) && rowMatchesFavorite(row, favorites))
+      .filter((row) => {
+        const key = userBetKey(row);
+        if (!key || seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      })
+      .sort((a, b) => {
+        const aReady = Number(Boolean(canDisplayStake(a)));
+        const bReady = Number(Boolean(canDisplayStake(b)));
+        if (bReady !== aReady) return bReady - aReady;
+        return Date.parse(a.start || '') - Date.parse(b.start || '') || priorityValue(b) - priorityValue(a);
+      });
+    return rows.slice(0, 12);
+  }
+
   function pickFiltersActive(filters) {
     return Boolean(filters.query || filters.sport !== 'all' || filters.league !== 'all' || filters.market !== 'all' || filters.edgeMin || filters.oddMin || filters.sort !== 'priority');
   }
@@ -3222,6 +3385,39 @@
     writeStorageJson(ODDS_MEMORY_KEY, next);
   }
 
+  function maybeNotifyFavoritePicks(rows) {
+    const favorites = loadFavorites();
+    if (!(favorites.teams || []).length && !(favorites.players || []).length) return;
+    const seen = new Set(readStorageJson(FAVORITE_ALERT_KEY, []));
+    const candidate = (rows || []).find((row) => rowMatchesFavorite(row, favorites) && displayEdgeValue(row) >= 0.05);
+    if (!candidate) return;
+    const key = `${userBetKey(candidate)}:${formatOdd(candidate.odd)}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    writeStorageJson(FAVORITE_ALERT_KEY, Array.from(seen).slice(-120));
+    alertOnce(`favorite:${key}`, 'Pick sur ton favori', `${candidate.title} · ${userBetLabel(candidate)} · cote ${formatOdd(candidate.odd)}.`, candidate);
+  }
+
+  function maybeNotifyTrendFormation(rows) {
+    const seen = new Set(readStorageJson(TREND_ALERT_KEY, []));
+    const candidate = (rows || []).find((row) => {
+      const trend = trendForRow(row);
+      return trend?.tone === 'hot' || trend?.tone === 'cold';
+    });
+    if (!candidate) return;
+    const trend = trendForRow(candidate);
+    const key = `${trend.tone}:${trendBucketForRow(candidate)?.key || userBetKey(candidate)}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    writeStorageJson(TREND_ALERT_KEY, Array.from(seen).slice(-80));
+    alertOnce(
+      `trend:${key}`,
+      trend.tone === 'hot' ? 'Tendance forte détectée' : 'Tendance froide détectée',
+      `${candidate.title} · ${trend.reason}.`,
+      candidate
+    );
+  }
+
   function maybeNotifyPickChanges() {
     const prefs = loadPreferences();
     const readyRows = (state.picks || []).filter((row) => pickHasCoreData(row) && canDisplayStake(row));
@@ -3237,6 +3433,8 @@
       notifyUser('Nouveaux picks prêts', `+${readyCount - previous} pick(s) jouable(s) depuis le dernier calcul.`, readyRows[0]);
     }
     updatePriceMoveAlerts(readyRows);
+    maybeNotifyFavoritePicks(readyRows);
+    maybeNotifyTrendFormation(readyRows);
     const topPick = sortedPriorityRows(readyRows)[0] || null;
     const topKey = topPick ? userBetKey(topPick) : '';
     const previousTop = localStorage.getItem(TOP_PICK_ALERT_KEY) || '';
@@ -3955,6 +4153,29 @@
     renderWinamaxPromos();
   }
 
+  function renderFavoritePicksSection() {
+    const section = $('#favorite-picks-section');
+    const grid = $('#favorite-picks-grid');
+    const count = $('#favorite-picks-count');
+    if (!section || !grid) return;
+    const favorites = loadFavorites();
+    const hasFavorites = Boolean((favorites.teams || []).length || (favorites.players || []).length);
+    const rows = favoritePickRows();
+    section.classList.toggle('hidden', !hasFavorites);
+    if (count) count.textContent = formatCount(rows.length);
+    if (!hasFavorites) {
+      grid.innerHTML = '<div class="empty compact-empty">Ajoute une équipe ou un joueur dans Réglages.</div>';
+      return;
+    }
+    grid.innerHTML = rows.length ? rows.map((row) => `
+      <article class="simple-inline-card clickable-row" data-match-id="${escapeHtml(row.id || row.matchId || '')}" tabindex="0" role="button">
+        <strong>${escapeHtml(row.title || 'Match favori')}</strong>
+        <span>PARI : ${escapeHtml(userBetLabel(row))}</span>
+        <em>${escapeHtml(`${formatDateLabel(row.start)} · cote ${formatOdd(row.odd)} · ${canDisplayStake(row) ? `mise ${visibleStakeText(row)}` : 'à surveiller'}`)}</em>
+      </article>
+    `).join('') : '<div class="empty compact-empty">Aucun pick favori dans les prochaines fenêtres.</div>';
+  }
+
   function renderWinamaxPromos() {
     const count = $('#simple-promos-count');
     const grid = $('#simple-promos-grid');
@@ -4051,6 +4272,7 @@
     scheduleVisibleWebEnrichment(displayRows);
     renderSimpleTimeline(displayRows);
     renderSimpleInlineSections();
+    renderFavoritePicksSection();
     clearTimeout(state.aiTimer);
     state.aiTimer = setTimeout(() => runBackgroundAi(displayRows), 600);
     const total = state.allPicks.length || state.picks.length || 0;
@@ -4296,6 +4518,15 @@
     const tone = memory.warning ? 'warn' : 'ok';
     const stress = status?.stressReport || null;
     const update = state.updateStatus || readStorageJson(UPDATE_STATUS_KEY, null);
+    const longTasks = (state.longTasks || []).filter((entry) => Number(entry.duration || 0) > 100);
+    const longTaskHtml = `
+      <article class="refresh-card refresh-${escapeHtml(longTasks.length ? 'warn' : 'ok')}">
+        <span>Réactivité UI</span>
+        <strong>${escapeHtml(longTasks.length ? `${formatCount(longTasks.length)} pause(s)` : 'Fluide')}</strong>
+        <p>${escapeHtml(longTasks.length ? `Plus longue pause ${Math.round(Math.max(...longTasks.map((entry) => Number(entry.duration || 0))))} ms` : 'Aucune pause >100 ms détectée dans cette session.')}</p>
+        <small>Observer local actif, sans bloquer le refresh.</small>
+      </article>
+    `;
     const stressHtml = stress ? `
       <article class="refresh-card refresh-${escapeHtml(stress.ok === false ? 'warn' : 'ok')}">
         <span>Stress test</span>
@@ -4320,6 +4551,7 @@
         <small>${escapeHtml(memory.warning || 'Objectif 7 jours : monitoring actif, UI non bloquante.')}</small>
       </article>
       ${updateHtml}
+      ${longTaskHtml}
       ${stressHtml}
     `;
   }
@@ -4354,6 +4586,23 @@
         version: 1
       });
     });
+  }
+
+  function installPerformanceObserver() {
+    try {
+      if (!('PerformanceObserver' in window)) return;
+      const observer = new PerformanceObserver((list) => {
+        list.getEntries().forEach((entry) => {
+          const duration = Number(entry.duration || 0);
+          if (duration <= 100) return;
+          state.longTasks.push({ at: new Date().toISOString(), duration: Math.round(duration) });
+          state.longTasks = state.longTasks.slice(-40);
+        });
+      });
+      observer.observe({ entryTypes: ['longtask'] });
+    } catch {
+      // Tous les Chromium/Electron ne supportent pas l'observer longtask.
+    }
   }
 
   function openLogDrawer() {
@@ -5436,7 +5685,7 @@
         [termTip('Brier', 'Score de qualité des probabilités : plus il est bas, mieux c’est.'), Number.isFinite(Number(summary.brier)) ? Number(summary.brier).toFixed(3) : '-', 'Plus bas = probabilités mieux calibrées.', true],
         [termTip('CLV moyen', 'Compare la cote prise à la cote proche du coup d’envoi.'), clvLabel, clvDetail, true],
         ['Drawdown', Number.isFinite(Number(summary.max_drawdown_units)) ? `${Number(summary.max_drawdown_units).toFixed(1)}u` : '-', 'Perte max historique simulée.'],
-        ['Validation réelle', `${formatCount(reality.sampleSize || 0)} lignes`, `${formatCount(reality.robustSegments || 0)} segments robustes sur les 500 derniers événements.`]
+        ['Validation réelle', `${formatCount(reality.sampleSize || 0)} lignes`, `${formatCount(reality.robustSegments || 0)} segments robustes sur ${formatCount(reality.windowDays || 60)} jours.`]
       ];
       grid.innerHTML = cards.map(([label, value, detail, htmlLabel]) => `
         <article class="performance-card">
@@ -6096,7 +6345,18 @@
     const grid = $('#active-model-adjustments-grid');
     if (!grid) return;
     const payload = modelAdjustmentsFromAudit();
-    const rows = Array.isArray(payload.adjustments) ? payload.adjustments : [];
+    const userRows = Array.isArray(payload.adjustments) ? payload.adjustments.map((row) => ({
+      ...row,
+      source: 'Paris suivis',
+      oldEdgeMin: 0.03,
+      newEdgeMin: Math.max(0, 0.03 + Number(row.edgeDelta || 0)),
+      oldConfidenceMin: 0.55,
+      newConfidenceMin: Math.max(0, 0.55 + Number(row.confidenceDelta || 0))
+    })) : [];
+    const engineRows = Array.isArray(state.modelRealityAudit?.segmentAdjustments)
+      ? state.modelRealityAudit.segmentAdjustments.map((row) => ({ ...row, source: 'Backtest 60 jours' }))
+      : [];
+    const rows = [...engineRows, ...userRows].slice(0, 16);
     if (payload.disabled) {
       grid.innerHTML = '<div class="empty">Ajustements automatiques désactivés. Les filtres personnels restent appliqués.</div>';
       return;
@@ -6107,10 +6367,10 @@
     }
     grid.innerHTML = rows.map((row) => `
       <article class="segment-card ${row.direction === 'harden' ? 'cold' : 'warm'}">
-        <span>${escapeHtml(row.direction === 'harden' ? 'Seuil durci' : 'Seuil assoupli')}</span>
+        <span>${escapeHtml(row.direction === 'harden' ? 'Seuil durci' : 'Seuil assoupli')} · ${escapeHtml(row.source || 'auto')}</span>
         <strong>${escapeHtml(row.label || row.key)}</strong>
-        <p>${escapeHtml(`${row.reason} · edge ${formatPct(row.edgeDelta || 0, 1)} · confiance ${formatPct(row.confidenceDelta || 0, 1)}`)}</p>
-        <em>${escapeHtml(row.direction === 'harden' ? 'Protection active' : 'Opportunité surveillée')}</em>
+        <p>${escapeHtml(`${row.reason || 'Ajustement automatique'} · edge min ${formatPct(row.oldEdgeMin ?? 0.03, 0)} → ${formatPct(row.newEdgeMin ?? 0.03, 0)} · confiance ${formatPct(row.oldConfidenceMin ?? 0.55, 0)} → ${formatPct(row.newConfidenceMin ?? 0.55, 0)}`)}</p>
+        <em>${escapeHtml(row.direction === 'harden' ? 'Protection active' : `Cote max ${formatOdd(row.oldOddMax || 6)} → ${formatOdd(row.newOddMax || row.oldOddMax || 6)}`)}</em>
       </article>
     `).join('');
   }
@@ -6443,6 +6703,66 @@
     }
   }
 
+  function favoriteButtonHtml(kind, label, selected = false) {
+    const attr = selected ? 'data-favorite-remove' : 'data-favorite-add';
+    return `<button class="${selected ? 'favorite-chip' : 'favorite-suggestion'}" type="button" ${attr}="${escapeHtml(kind)}" data-favorite-value="${escapeHtml(label)}">${escapeHtml(label)}${selected ? '<span aria-hidden="true">×</span>' : ''}</button>`;
+  }
+
+  function renderFavoritePreferences() {
+    const favorites = loadFavorites();
+    const catalog = favoriteCatalog();
+    const teamQuery = normalizeUiKey($('#favorite-team-search')?.value || '');
+    const playerQuery = normalizeUiKey($('#favorite-player-search')?.value || '');
+    const selectedKeys = new Set([...(favorites.teams || []), ...(favorites.players || [])].map(normalizeUiKey));
+    const teamSuggestions = catalog.teams
+      .filter((label) => !selectedKeys.has(normalizeUiKey(label)))
+      .filter((label) => !teamQuery || normalizeUiKey(label).includes(teamQuery))
+      .slice(0, 6);
+    const playerSuggestions = catalog.players
+      .filter((label) => !selectedKeys.has(normalizeUiKey(label)))
+      .filter((label) => !playerQuery || normalizeUiKey(label).includes(playerQuery))
+      .slice(0, 6);
+    const teamNode = $('#favorite-team-suggestions');
+    if (teamNode) teamNode.innerHTML = teamSuggestions.length
+      ? teamSuggestions.map((label) => favoriteButtonHtml('teams', label)).join('')
+      : '<span class="match-sub">Tape un nom présent dans les données.</span>';
+    const playerNode = $('#favorite-player-suggestions');
+    if (playerNode) playerNode.innerHTML = playerSuggestions.length
+      ? playerSuggestions.map((label) => favoriteButtonHtml('players', label)).join('')
+      : '<span class="match-sub">Tape un joueur détecté dans les buteurs.</span>';
+    const selected = $('#favorite-selected-list');
+    if (selected) {
+      const chips = [
+        ...(favorites.teams || []).map((label) => favoriteButtonHtml('teams', label, true)),
+        ...(favorites.players || []).map((label) => favoriteButtonHtml('players', label, true))
+      ];
+      selected.innerHTML = chips.length ? chips.join('') : 'Aucun favori enregistré.';
+    }
+  }
+
+  function addFavorite(kind, value) {
+    const favorites = loadFavorites();
+    const key = kind === 'players' ? 'players' : 'teams';
+    const label = String(value || '').trim();
+    if (!label) return;
+    favorites[key] = uniqueCleanLabels([...(favorites[key] || []), label]);
+    saveFavorites(favorites);
+    renderFavoritePreferences();
+    renderFavoritePicksSection();
+    setSideStatus('Favori ajouté', 'ok');
+  }
+
+  function removeFavorite(kind, value) {
+    const favorites = loadFavorites();
+    const key = kind === 'players' ? 'players' : 'teams';
+    const target = normalizeUiKey(value);
+    favorites[key] = (favorites[key] || []).filter((label) => normalizeUiKey(label) !== target);
+    saveFavorites(favorites);
+    renderFavoritePreferences();
+    renderFavoritePicksSection();
+    setSideStatus('Favori retiré', 'ok');
+  }
+
   function renderPreferences() {
     const prefs = loadPreferences();
     const bankroll = $('#pref-bankroll');
@@ -6542,6 +6862,7 @@
     renderActiveModelAdjustments();
     renderBankrollAccounting();
     renderDailyBudgetSummary();
+    renderFavoritePreferences();
     applyExpertMode();
   }
 
@@ -7023,6 +7344,14 @@
     return `Prudence : ${cold.label} reste froid sur ${formatCount(cold.losses)} défaites.`;
   }
 
+  function strongTrendBriefText(rows = sortedPriorityRows()) {
+    const hot = (rows || []).map((row) => ({ row, trend: trendForRow(row) })).find((item) => item.trend?.tone === 'hot');
+    if (hot) return `Tendance forte : ${userBetLabel(hot.row)} sur ${hot.row.title}. ${hot.trend.reason}.`;
+    const cold = (rows || []).map((row) => ({ row, trend: trendForRow(row) })).find((item) => item.trend?.tone === 'cold');
+    if (cold) return `Prudence : ${cold.row.title} est sur un segment froid. ${cold.trend.reason}.`;
+    return '';
+  }
+
   function buildDailySuggestion(rows = sortedPriorityRows()) {
     const day = parisDayKey();
     const cached = readStorageJson(DAILY_SUGGESTION_KEY, null);
@@ -7030,7 +7359,8 @@
     const ultimate = aiSelectedUltimate(rows) || ultimateBetCandidate(rows) || rows[0] || null;
     const modelVsUser = modelVsUserReport();
     const regression = regressionWarningText();
-    const text = regression || (ultimate
+    const trendText = strongTrendBriefText(rows);
+    const text = trendText || regression || (ultimate
       ? `Commence par ${userBetLabel(ultimate)} sur ${ultimate.title} : cote ${formatOdd(ultimate.odd)}, mise ${visibleStakeText(ultimate)}.`
       : 'Pas de pick ultime aujourd’hui : vise seulement le top 3 fiable, pas de pari forcé.');
     const follow = modelVsUser.utilization != null && modelVsUser.utilization < 0.30 && modelVsUser.missedPnl > 0
@@ -8218,6 +8548,7 @@
   }
 
   function canDisplayStake(row, decisions = decisionBundleForRow(row)) {
+    if (trendForRow(row)?.tone === 'cold') return false;
     if (decisions && Object.prototype.hasOwnProperty.call(decisions, 'canBet')) {
       return decisions.canBet === true && Number(row?.stake || 0) > 0;
     }
@@ -8231,6 +8562,8 @@
   }
 
   function noBetStakeReason(row, decisions = decisionBundleForRow(row)) {
+    const trend = trendForRow(row);
+    if (trend?.tone === 'cold') return trend.reason || 'Tendance froide';
     return decisions?.mainReason
       || row?.prebetGate?.first
       || row?.statusLabel
@@ -11838,6 +12171,20 @@
       savePreferences(prefs);
       applyTheme(prefs);
     });
+    ['favorite-team-search', 'favorite-player-search'].forEach((id) => {
+      const input = $(`#${id}`);
+      if (input) input.addEventListener('input', renderFavoritePreferences);
+    });
+    ['favorite-team-suggestions', 'favorite-player-suggestions', 'favorite-selected-list'].forEach((id) => {
+      const node = $(`#${id}`);
+      if (!node) return;
+      node.addEventListener('click', (event) => {
+        const add = event.target.closest('[data-favorite-add]');
+        const remove = event.target.closest('[data-favorite-remove]');
+        if (add) addFavorite(add.dataset.favoriteAdd || 'teams', add.dataset.favoriteValue || add.textContent || '');
+        if (remove) removeFavorite(remove.dataset.favoriteRemove || 'teams', remove.dataset.favoriteValue || remove.textContent || '');
+      });
+    });
     $('#weekly-report-close')?.addEventListener('click', closeWeeklyReportModal);
     $('#weekly-report-detail')?.addEventListener('click', () => {
       closeWeeklyReportModal();
@@ -11889,7 +12236,7 @@
         $('#refresh-log').textContent = error.stack || error.message;
       });
     });
-    ['ultimate-bet-card', 'live-cockpit', 'time-cockpit', 'simple-pick-timeline', 'simple-scorers-grid', 'bankroll-allocation-grid', 'picks-body', 'stake-scenario-body', 'watchlist-grid', 'prematch-final-grid', 'matches-body', 'combines-list', 'scorers-list', 'agent-positions-body', 'agent-blockers-body'].forEach((id) => {
+    ['ultimate-bet-card', 'live-cockpit', 'time-cockpit', 'simple-pick-timeline', 'favorite-picks-grid', 'simple-scorers-grid', 'bankroll-allocation-grid', 'picks-body', 'stake-scenario-body', 'watchlist-grid', 'prematch-final-grid', 'matches-body', 'combines-list', 'scorers-list', 'agent-positions-body', 'agent-blockers-body'].forEach((id) => {
       const node = $(`#${id}`);
       if (!node) return;
       node.addEventListener('click', openMatchFromEvent);
@@ -12139,6 +12486,7 @@
     state.bootStartedAt = typeof performance !== 'undefined' ? performance.now() : Date.now();
     installDebugLogHooks();
     installGlobalErrorReporting();
+    installPerformanceObserver();
     applyTheme(loadPreferences());
     pushLog('info', 'Démarrage du cockpit desktop');
     markAppSessionStart();

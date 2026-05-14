@@ -59,6 +59,9 @@ test('Sprint 15 desktop shows only clear simple Winamax bets by default', async 
   expect(rendererText).toContain('installGlobalErrorReporting');
   expect(rendererText).toContain('renderShortcutSettings');
   expect(rendererText).toContain('prepareUpdateInstall');
+  expect(rendererText).toContain('renderFavoritePicksSection');
+  expect(rendererText).toContain('trendForRow');
+  expect(rendererText).toContain('installPerformanceObserver');
 
   const userDataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'paris-sportif-pw-'));
   const messages = [];
@@ -147,7 +150,9 @@ test('Sprint 15 desktop shows only clear simple Winamax bets by default', async 
     await expect(win.locator('#pref-expert-mode')).toBeVisible();
     await expect(win.locator('#pref-theme')).toBeVisible();
     await expect(win.locator('#pref-bug-report-prompt')).toBeVisible();
-    await expect(win.locator('#app-version-label')).toContainText('v1.0.1');
+    await expect(win.locator('#favorite-team-search')).toBeVisible();
+    await expect(win.locator('#favorite-player-search')).toBeVisible();
+    await expect(win.locator('#app-version-label')).toContainText('v1.0.2');
     await win.selectOption('#pref-theme', 'light');
     await expect(win.locator('body')).toHaveClass(/theme-light/);
     await win.selectOption('#pref-theme', 'dark');

@@ -14,11 +14,13 @@ Ce guide donne une routine simple pour utiliser l'app sans se disperser.
 - Clique `Je mise` uniquement quand tu places vraiment le ticket chez Winamax.
 - Garde l'anti-tilt strict activé.
 - Ajoute une note courte sur les paris importants.
+- Ajoute 3 à 5 équipes ou joueurs favoris pour recevoir une lecture dédiée sans élargir tous les filtres.
 - Vérifie le `Bilan` en fin de journée.
 
 ## Semaine 3 — Ajuster
 
 - Regarde les segments gagnants et perdants dans `Bilan`.
+- Surveille les badges `Tendance forte` et `Tendance froide` : ils résument l'audit 60 jours sans ouvrir le Mode expert.
 - Désactive les sports ou marchés qui ne te conviennent pas.
 - Compare `Modèle` et `Toi` pour voir si tu suis les picks fiables.
 - Exporte ton profil une fois par semaine.

@@ -453,6 +453,18 @@ a:hover {
   color: var(--brand);
 }
 
+.special-pick-badge.hottrend {
+  border-color: rgba(16, 185, 129, .38);
+  background: rgba(16, 185, 129, .12);
+  color: var(--accent);
+}
+
+.special-pick-badge.coldtrend {
+  border-color: rgba(248, 113, 113, .38);
+  background: rgba(248, 113, 113, .12);
+  color: var(--danger);
+}
+
 .tour-step-card {
   display: grid;
   gap: 8px;
@@ -3211,6 +3223,34 @@ td.empty::before,
   color: var(--muted);
   padding: 10px 12px;
   line-height: 1.35;
+}
+
+.favorite-suggestions,
+.favorite-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-height: 32px;
+  margin-top: -4px;
+}
+
+.favorite-suggestion,
+.favorite-chip {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--text);
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.favorite-chip button {
+  margin-left: 6px;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
 }
 
 .shortcut-grid {

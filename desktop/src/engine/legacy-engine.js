@@ -1158,15 +1158,19 @@ function createLegacyEngineService({ projectRoot }) {
     const confidence = effectiveConfidence(row);
     const sample = Number(row?.segmentValidation?.sample ?? row?.calibration?.sample ?? 0) || 0;
     const roi = Number(row?.segmentValidation?.roi ?? row?.calibration?.roi ?? 0);
+    const policy = row?.segmentPolicy || null;
+    const edgeMin = Number.isFinite(Number(policy?.newEdgeMin)) ? Number(policy.newEdgeMin) : 0.03;
+    const oddMax = Number.isFinite(Number(policy?.newOddMax)) ? Number(policy.newOddMax) : 6.00;
+    const confidenceMin = Number.isFinite(Number(policy?.newConfidenceMin)) ? Number(policy.newConfidenceMin) : 0.55;
     const quality = row?.contextQuality || row?.match?.context?.quality || {};
     const criticalMissing = Array.isArray(quality.critical_missing) ? quality.critical_missing : [];
     const reasons = [];
     const warnings = [];
 
     if (!(rawEdge >= 0.01)) reasons.push('edge < +1pt');
-    if (edge < 0.03) reasons.push('edge prudent < +3pt');
-    if (odd < 1.30 || odd > 6.00) reasons.push('cote hors zone solo 1.30-6.00');
-    if (confidence < 0.55) reasons.push('confiance < 55%');
+    if (edge < edgeMin) reasons.push(`edge prudent < +${Math.round(edgeMin * 100)}pt`);
+    if (odd < 1.30 || odd > oddMax) reasons.push(`cote hors zone solo 1.30-${oddMax.toFixed(2)}`);
+    if (confidence < confidenceMin) reasons.push(`confiance < ${Math.round(confidenceMin * 100)}%`);
     if (sample >= 15 && Number.isFinite(roi) && roi < 0) reasons.push('segment historique négatif');
     if (row?.signalConflict?.active) reasons.push('conflit signaux');
     if (row?.oddsGuardrail?.applied) reasons.push(row.oddsGuardrail.label || 'cote à vérifier');
@@ -1174,8 +1178,10 @@ function createLegacyEngineService({ projectRoot }) {
     if (edgeInfo.capped) warnings.push(`edge brut ${Math.round(rawEdge * 100)}% plafonné par prudence`);
     if (sample > 0 && sample < 15) warnings.push(`sample court ${sample}/15`);
     if (!sample) warnings.push('historique segment absent');
+    if (policy?.direction === 'boost') warnings.push(`segment gagnant : filtre assoupli (${policy.reason})`);
+    if (policy?.direction === 'harden') warnings.push(`segment froid : filtre durci (${policy.reason})`);
 
-    const reliable = !reasons.length && edge >= 0.03 && edge <= 0.20 && odd >= 1.30 && odd <= 6.00 && confidence >= 0.55;
+    const reliable = !reasons.length && edge >= edgeMin && edge <= 0.20 && odd >= 1.30 && odd <= oddMax && confidence >= confidenceMin;
     const displayable = rawEdge >= 0.01 && odd > 1.10 && odd <= 18 && confidence >= 0.30 && row?.decisionCenter?.status !== 'skip';
     return {
       status: reliable ? 'reliable' : displayable ? 'watch' : 'reject',
@@ -1188,6 +1194,14 @@ function createLegacyEngineService({ projectRoot }) {
       confidence,
       sample,
       roi: Number.isFinite(roi) ? roi : null,
+      policy: policy ? {
+        key: policy.key,
+        direction: policy.direction,
+        edgeMin,
+        oddMax,
+        confidenceMin,
+        reason: policy.reason
+      } : null,
       reasons: reasons.slice(0, 5),
       warnings: warnings.slice(0, 4)
     };
@@ -1544,10 +1558,20 @@ function createLegacyEngineService({ projectRoot }) {
     ];
   }
 
+  function historySegmentLabel(key) {
+    const parts = String(key || '').split(':').filter(Boolean);
+    if (!parts.length) return 'Segment';
+    if (parts[0] === 'market') return `Marché ${parts[1] || ''}`.trim();
+    if (parts[0] === 'tier') return `Niveau ${parts[1] || ''}`.trim();
+    if (parts.length >= 3) return `${parts[0]} · ${parts[1]} · ${parts[2]}`;
+    if (parts.length === 2) return `${parts[0]} · ${parts[1]}`;
+    return parts[0];
+  }
+
   function emptySegmentBucket(key, label = 'segment') {
     return {
       key,
-      label,
+      label: label === 'segment' ? historySegmentLabel(key) : label,
       count: 0,
       won: 0,
       lost: 0,
@@ -1557,33 +1581,47 @@ function createLegacyEngineService({ projectRoot }) {
       avgProb: 0,
       avgEdge: 0,
       avgImplied: 0,
+      brierSum: 0,
       last30Count: 0,
       last30Won: 0,
-      last30AvgProb: 0
+      last30AvgProb: 0,
+      last60Count: 0,
+      last60Won: 0,
+      last60Profit: 0,
+      last60Stake: 0
     };
   }
 
-  function updateSegmentBucket(bucket, pick, isRecent30) {
+  function updateSegmentBucket(bucket, pick, recency = {}) {
     const odd = Number(pick.odd_book || pick.odd || 0);
     const prob = Number(pick.prob_model || pick.probability || 0);
     if (!(odd > 1)) return;
+    const outcome = pick.result === 'won' ? 1 : 0;
+    const profit = pick.result === 'won' ? odd - 1 : -1;
     bucket.count += 1;
     bucket.stake += 1;
     bucket.avgOdd += odd;
     bucket.avgProb += prob > 0 ? prob : 0;
     bucket.avgEdge += Number(pick.edge || 0);
     bucket.avgImplied += 1 / odd;
+    if (prob > 0 && prob <= 1) bucket.brierSum += Math.pow(prob - outcome, 2);
     if (pick.result === 'won') {
       bucket.won += 1;
       bucket.profit += odd - 1;
-      if (isRecent30) bucket.last30Won += 1;
+      if (recency.isRecent30) bucket.last30Won += 1;
+      if (recency.isRecent60) bucket.last60Won += 1;
     } else {
       bucket.lost += 1;
       bucket.profit -= 1;
     }
-    if (isRecent30) {
+    if (recency.isRecent30) {
       bucket.last30Count += 1;
       bucket.last30AvgProb += prob > 0 ? prob : 0;
+    }
+    if (recency.isRecent60) {
+      bucket.last60Count += 1;
+      bucket.last60Stake += 1;
+      bucket.last60Profit += profit;
     }
   }
 
@@ -1595,6 +1633,7 @@ function createLegacyEngineService({ projectRoot }) {
     bucket.avgProb /= bucket.count;
     bucket.avgEdge /= bucket.count;
     bucket.avgImplied /= bucket.count;
+    bucket.brier = bucket.brierSum / bucket.count;
     bucket.realizedEdge = bucket.winRate - bucket.avgImplied;
     bucket.edgeGap = bucket.avgEdge - bucket.realizedEdge;
     bucket.sample = bucket.count >= 30 ? 'robuste' : bucket.count >= 10 ? 'moyen' : 'insuffisant';
@@ -1607,33 +1646,125 @@ function createLegacyEngineService({ projectRoot }) {
       bucket.last30WinRate = null;
       bucket.drift30d = Math.max(0, Math.min(0.50, bucket.avgProb - bucket.winRate));
     }
+    if (bucket.last60Count) {
+      bucket.last60WinRate = bucket.last60Won / bucket.last60Count;
+      bucket.last60Roi = bucket.last60Profit / Math.max(1, bucket.last60Stake);
+    } else {
+      bucket.last60WinRate = null;
+      bucket.last60Roi = null;
+    }
     return bucket;
+  }
+
+  function segmentAdjustmentForBucket(bucket) {
+    if (!bucket || bucket.count < 50) return null;
+    const roi = Number(bucket.roi || 0);
+    if (roi > 0.20) {
+      return {
+        key: bucket.key,
+        label: bucket.label || bucket.key,
+        direction: 'boost',
+        tone: 'warm',
+        sample: bucket.count,
+        roi,
+        brier: bucket.brier,
+        oldEdgeMin: 0.03,
+        newEdgeMin: 0.02,
+        oldOddMax: 6,
+        newOddMax: 8,
+        oldConfidenceMin: 0.55,
+        newConfidenceMin: 0.55,
+        reason: `ROI ${Math.round(roi * 100)}% sur ${bucket.count} paris réglés`
+      };
+    }
+    if (roi < -0.10) {
+      return {
+        key: bucket.key,
+        label: bucket.label || bucket.key,
+        direction: 'harden',
+        tone: 'cold',
+        sample: bucket.count,
+        roi,
+        brier: bucket.brier,
+        oldEdgeMin: 0.03,
+        newEdgeMin: 0.05,
+        oldOddMax: 6,
+        newOddMax: 6,
+        oldConfidenceMin: 0.55,
+        newConfidenceMin: 0.60,
+        reason: `ROI ${Math.round(roi * 100)}% sur ${bucket.count} paris réglés`
+      };
+    }
+    return null;
   }
 
   function buildModelRealityAudit(summary) {
     const settled = flattenSettledHistory(summary);
     const byKey = new Map();
-    const recentCutoff = Date.now() - 30 * 24 * 60 * 60 * 1000;
-    for (const pick of settled.slice(0, 500)) {
+    const recentCutoff30 = Date.now() - 30 * 24 * 60 * 60 * 1000;
+    const recentCutoff60 = Date.now() - 60 * 24 * 60 * 60 * 1000;
+    const scoped = settled.filter((pick) => {
       const ts = Date.parse(pick.kickoff_utc || pick.settled_at || pick.day || '');
-      const isRecent30 = Number.isFinite(ts) && ts >= recentCutoff;
+      return Number.isFinite(ts) && ts >= recentCutoff60;
+    });
+    const auditRows = (scoped.length ? scoped : settled).slice(0, 1200);
+    for (const pick of auditRows) {
+      const ts = Date.parse(pick.kickoff_utc || pick.settled_at || pick.day || '');
+      const recency = {
+        isRecent30: Number.isFinite(ts) && ts >= recentCutoff30,
+        isRecent60: Number.isFinite(ts) && ts >= recentCutoff60
+      };
       for (const key of historySegmentKeysForPick(pick)) {
-        const bucket = byKey.get(key) || emptySegmentBucket(key);
-        updateSegmentBucket(bucket, pick, isRecent30);
+        const bucket = byKey.get(key) || emptySegmentBucket(key, historySegmentLabel(key));
+        updateSegmentBucket(bucket, pick, recency);
         byKey.set(key, bucket);
       }
     }
     const buckets = Array.from(byKey.values()).map(finalizeSegmentBucket);
     const robust = buckets.filter((bucket) => bucket.count >= 30);
+    const adjustments = buckets
+      .map(segmentAdjustmentForBucket)
+      .filter(Boolean)
+      .sort((a, b) => {
+        if (a.direction !== b.direction) return a.direction === 'boost' ? -1 : 1;
+        return Math.abs(b.roi) - Math.abs(a.roi) || b.sample - a.sample;
+      });
+    const brierBySportMarket = robust
+      .filter((bucket) => bucket.key.split(':').length === 2 && !bucket.key.startsWith('market:') && !bucket.key.startsWith('tier:'))
+      .sort((a, b) => a.brier - b.brier)
+      .slice(0, 12)
+      .map((bucket) => ({
+        key: bucket.key,
+        count: bucket.count,
+        roi: bucket.roi,
+        brier: bucket.brier,
+        winRate: bucket.winRate
+      }));
     return {
       schema: 'paris-sportif.model_reality_audit.v1',
       generatedAt: new Date().toISOString(),
-      sampleSize: settled.slice(0, 500).length,
+      windowDays: 60,
+      sampleSize: auditRows.length,
+      totalSettledAvailable: settled.length,
       robustSegments: robust.length,
       topSegments: robust.slice().sort((a, b) => b.roi - a.roi || b.count - a.count).slice(0, 10),
       bottomSegments: robust.slice().sort((a, b) => a.roi - b.roi || b.count - a.count).slice(0, 10),
+      persistentWinningSegments: robust.filter((bucket) => bucket.count >= 50 && bucket.roi > 0.20).sort((a, b) => b.roi - a.roi).slice(0, 10),
+      persistentLosingSegments: robust.filter((bucket) => bucket.count >= 50 && bucket.roi < -0.10).sort((a, b) => a.roi - b.roi).slice(0, 10),
+      segmentAdjustments: adjustments,
+      brierBySportMarket,
       byKey: Object.fromEntries(buckets.map((bucket) => [bucket.key, bucket]))
     };
+  }
+
+  function segmentPolicyForRow(row, audit) {
+    const adjustments = Array.isArray(audit?.segmentAdjustments) ? audit.segmentAdjustments : [];
+    if (!adjustments.length) return null;
+    const byKey = new Map(adjustments.map((item) => [item.key, item]));
+    return historySegmentKeys(row)
+      .map((meta) => ({ ...meta, adjustment: byKey.get(meta.key) || null }))
+      .filter((item) => item.adjustment)
+      .sort((a, b) => b.rank - a.rank || Number(b.adjustment.sample || 0) - Number(a.adjustment.sample || 0))[0]?.adjustment || null;
   }
 
   function segmentValidationForRow(row, audit) {
@@ -1684,10 +1815,12 @@ function createLegacyEngineService({ projectRoot }) {
 
   function applyModelReality(row, audit) {
     const segmentValidation = segmentValidationForRow(row, audit);
+    const segmentPolicy = segmentPolicyForRow(row, audit);
     const trust = row.confidenceTrust || {};
     return {
       ...row,
       segmentValidation,
+      segmentPolicy,
       adjustedConfidence: segmentValidation.realConfidence,
       confidenceTrust: {
         ...trust,

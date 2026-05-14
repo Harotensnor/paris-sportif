@@ -230,6 +230,11 @@
           </div>
         </section>
 
+        <details class="simple-fold-section hidden" id="favorite-picks-section">
+          <summary><span>Tes favoris</span><strong id="favorite-picks-count">0</strong></summary>
+          <div class="simple-card-grid" id="favorite-picks-grid"></div>
+        </details>
+
         <details class="simple-fold-section" id="simple-combines-section">
           <summary><span>Combinés du jour</span><strong id="simple-combines-count">0</strong></summary>
           <div class="simple-card-grid" id="simple-combines-grid"></div>
@@ -999,6 +1004,15 @@
           <article class="preference-card">
             <h4>Sports suivis</h4>
             <div class="check-grid" id="pref-sports"></div>
+          </article>
+          <article class="preference-card">
+            <h4>Favoris</h4>
+            <p class="match-sub">Suis tes équipes et joueurs sans polluer les picks principaux.</p>
+            <label>Équipe<input id="favorite-team-search" type="search" placeholder="Real Madrid, Lakers..."></label>
+            <div class="favorite-suggestions" id="favorite-team-suggestions"></div>
+            <label>Joueur<input id="favorite-player-search" type="search" placeholder="Bellingham, Mbappé..."></label>
+            <div class="favorite-suggestions" id="favorite-player-suggestions"></div>
+            <div class="favorite-chip-list" id="favorite-selected-list">Aucun favori enregistré.</div>
           </article>
           <article class="preference-card">
             <h4>Marchés simples</h4>

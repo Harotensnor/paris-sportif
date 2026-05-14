@@ -36,7 +36,7 @@ async function main() {
   for (const marker of ['todayFunnel', 'renderSimpleTimeline', 'antiTiltStatus', 'applyExpertMode', 'renderWinamaxPromos', 'renderBankrollAccounting', 'winamaxMarketAudit', 'coverage24h', 'safeBadgeHtml', 'renderTemporalCockpit', 'priorityBadgeHtml', 'dailyBudgetPlan', 'renderPaperSimulation', 'renderModelVsUser', 'buildDailySuggestion', 'specialPatternBadgeHtml', 'maybeShowEveningBrief', 'startDemoTour', 'SIMPLE_MARKET_PREFS', 'actionPickHtml', 'userBetLabel']) {
     if (!rendererText.includes(marker)) throw new Error(`Sprint 14 renderer absent: ${marker}`);
   }
-  for (const marker of ['applyTheme', 'installGlobalErrorReporting', 'renderShortcutSettings', 'prepareUpdateInstall']) {
+  for (const marker of ['applyTheme', 'installGlobalErrorReporting', 'renderShortcutSettings', 'prepareUpdateInstall', 'renderFavoritePicksSection', 'trendForRow', 'installPerformanceObserver']) {
     if (!rendererText.includes(marker)) throw new Error(`Sprint 20 renderer absent: ${marker}`);
   }
 
@@ -108,6 +108,7 @@ async function main() {
       antiTilt: Boolean(document.querySelector('#pref-anti-tilt-strict')),
       theme: Boolean(document.querySelector('#pref-theme')),
       bugReport: Boolean(document.querySelector('#pref-bug-report-prompt') && document.querySelector('#manual-bug-report-btn')),
+      favorites: Boolean(document.querySelector('#favorite-team-search') && document.querySelector('#favorite-player-search')),
       allocation: Boolean(document.querySelector('#pref-allocation-strategy') && document.querySelector('#pref-daily-budget')),
       prematchAlerts: Boolean(document.querySelector('#pref-prematch-alerts') && document.querySelector('#pref-top-pick-alerts')),
       expandedSports: (document.querySelector('#pref-sports')?.textContent || '').includes('rugby') && (document.querySelector('#pref-sports')?.textContent || '').includes('mma'),
@@ -117,7 +118,7 @@ async function main() {
       accounting: Boolean(document.querySelector('#add-bankroll-transaction-btn')),
       multiBook: Boolean(document.querySelector('#pref-multibook-enabled') || document.querySelector('#pref-odds-api-key'))
     }));
-    if (!prefs.expert || !prefs.antiTilt || !prefs.theme || !prefs.bugReport || !prefs.allocation || !prefs.prematchAlerts || !prefs.expandedSports || !prefs.simpleMarkets || prefs.simpleHasAdvanced || !prefs.advancedMarkets || !prefs.accounting || prefs.multiBook) throw new Error(`Réglages Sprint 20 invalides: ${JSON.stringify(prefs)}`);
+    if (!prefs.expert || !prefs.antiTilt || !prefs.theme || !prefs.bugReport || !prefs.favorites || !prefs.allocation || !prefs.prematchAlerts || !prefs.expandedSports || !prefs.simpleMarkets || prefs.simpleHasAdvanced || !prefs.advancedMarkets || !prefs.accounting || prefs.multiBook) throw new Error(`Réglages Sprint 21 invalides: ${JSON.stringify(prefs)}`);
     await win.selectOption('#pref-theme', 'light');
     await win.waitForFunction(() => document.body.classList.contains('theme-light'), null, { timeout: 5000 });
     await win.selectOption('#pref-theme', 'dark');
