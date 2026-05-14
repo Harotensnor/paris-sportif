@@ -39,6 +39,9 @@ async function main() {
   for (const marker of ['applyTheme', 'installGlobalErrorReporting', 'renderShortcutSettings', 'prepareUpdateInstall', 'renderFavoritePicksSection', 'trendForRow', 'installPerformanceObserver']) {
     if (!rendererText.includes(marker)) throw new Error(`Sprint 20 renderer absent: ${marker}`);
   }
+  for (const marker of ['renderDeepAnalytics', 'deepSearchIndex', 'renderDeepSearch', 'cashOutEstimate', 'renderTradingDesk', 'tierCalibration']) {
+    if (!rendererText.includes(marker) && !mainText.includes(marker)) throw new Error(`Sprint 22 absent: ${marker}`);
+  }
 
   const messages = [];
   const userDataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'paris-sportif-smoke-'));
@@ -83,7 +86,7 @@ async function main() {
       dashboardText: document.querySelector('[data-panel="dashboard"]')?.innerText || ''
     }));
     if (dashboard.title !== 'Picks') throw new Error(`Titre dashboard invalide: ${dashboard.title}`);
-    if (dashboard.nav.join('|') !== 'Picks|Bilan|Réglages') throw new Error(`Navigation non simplifiée: ${dashboard.nav.join(', ')}`);
+    if (dashboard.nav.join('|') !== 'Picks|Bilan|Recherche|Réglages') throw new Error(`Navigation Sprint 22 invalide: ${dashboard.nav.join(', ')}`);
     const hasActionCopy = /PARI/i.test(dashboard.dashboardText) && /COTE/i.test(dashboard.dashboardText) && /MISE/i.test(dashboard.dashboardText);
     const hasComplexMarket = /Handicap|Double chance|Jeux tennis|Total mi-temps|Total basket|Total runs|Score exact|Corners|Cartons/i.test(dashboard.dashboardText);
     const hasTechnicalJargon = /\bKelly\b|\bEV\b|\btier\b|\b1N2\b|\bBTTS\b|\bedge\b/i.test(dashboard.dashboardText);
@@ -101,6 +104,11 @@ async function main() {
     await win.waitForSelector('#model-performance-grid .performance-card, #model-performance-grid .empty', { timeout: 30000 });
     await win.waitForFunction(() => /#1/.test(document.querySelector('#bankroll-allocation-grid')?.textContent || ''), null, { timeout: 10_000 });
     await win.waitForFunction(() => /Simulation/.test(document.querySelector('#paper-simulation-grid')?.textContent || ''), null, { timeout: 10_000 });
+    await win.waitForFunction(() => /Décomposition|Sample|Insight/.test(document.querySelector('#deep-analytics-summary')?.textContent + document.querySelector('#deep-analytics-insights')?.textContent || ''), null, { timeout: 10_000 });
+    await win.click('[data-tab="search"]');
+    await win.waitForSelector('#deep-search-input', { timeout: 10_000 });
+    await win.fill('#deep-search-input', 'Real');
+    await win.waitForSelector('#deep-search-results .search-card, #deep-search-results .empty', { timeout: 10_000 });
     await win.click('[data-tab="preferences"]');
     await win.waitForSelector('#pref-bankroll', { timeout: 10000 });
     const prefs = await win.evaluate(() => ({
@@ -109,6 +117,7 @@ async function main() {
       theme: Boolean(document.querySelector('#pref-theme')),
       bugReport: Boolean(document.querySelector('#pref-bug-report-prompt') && document.querySelector('#manual-bug-report-btn')),
       favorites: Boolean(document.querySelector('#favorite-team-search') && document.querySelector('#favorite-player-search')),
+      trading: Boolean(document.querySelector('#pref-trading-desk')),
       allocation: Boolean(document.querySelector('#pref-allocation-strategy') && document.querySelector('#pref-daily-budget')),
       prematchAlerts: Boolean(document.querySelector('#pref-prematch-alerts') && document.querySelector('#pref-top-pick-alerts')),
       expandedSports: (document.querySelector('#pref-sports')?.textContent || '').includes('rugby') && (document.querySelector('#pref-sports')?.textContent || '').includes('mma'),
@@ -118,7 +127,7 @@ async function main() {
       accounting: Boolean(document.querySelector('#add-bankroll-transaction-btn')),
       multiBook: Boolean(document.querySelector('#pref-multibook-enabled') || document.querySelector('#pref-odds-api-key'))
     }));
-    if (!prefs.expert || !prefs.antiTilt || !prefs.theme || !prefs.bugReport || !prefs.favorites || !prefs.allocation || !prefs.prematchAlerts || !prefs.expandedSports || !prefs.simpleMarkets || prefs.simpleHasAdvanced || !prefs.advancedMarkets || !prefs.accounting || prefs.multiBook) throw new Error(`Réglages Sprint 21 invalides: ${JSON.stringify(prefs)}`);
+    if (!prefs.expert || !prefs.antiTilt || !prefs.theme || !prefs.bugReport || !prefs.favorites || !prefs.trading || !prefs.allocation || !prefs.prematchAlerts || !prefs.expandedSports || !prefs.simpleMarkets || prefs.simpleHasAdvanced || !prefs.advancedMarkets || !prefs.accounting || prefs.multiBook) throw new Error(`Réglages Sprint 22 invalides: ${JSON.stringify(prefs)}`);
     await win.selectOption('#pref-theme', 'light');
     await win.waitForFunction(() => document.body.classList.contains('theme-light'), null, { timeout: 5000 });
     await win.selectOption('#pref-theme', 'dark');
@@ -131,6 +140,7 @@ async function main() {
     await win.waitForFunction(() => /Dépôt/.test(document.querySelector('#bankroll-transaction-list')?.textContent || ''), null, { timeout: 5000 });
 
     await win.check('#pref-expert-mode');
+    await win.check('#pref-trading-desk');
     await win.click('#save-preferences-btn');
     await win.waitForSelector('[data-tab="data"]:not(.hidden)', { timeout: 5000 });
     await win.waitForFunction(() => /Vue Picks/.test(document.querySelector('#shortcut-settings-grid')?.textContent || ''), null, { timeout: 5000 });
@@ -143,6 +153,7 @@ async function main() {
     }
 
     await win.click('[data-tab="dashboard"]');
+    await win.waitForSelector('#trading-desk.active', { timeout: 10_000 });
     await win.click('#picks-body tr.clickable-row td[data-label="Match"]');
     await win.waitForSelector('#match-modal:not(.hidden)', { timeout: 10000 });
     const modal = await win.evaluate(() => {
@@ -161,7 +172,7 @@ async function main() {
       message.startsWith('error:') || message.startsWith('pageerror:')
     ) && !isIgnorableConsoleMessage(message));
     if (severe.length) throw new Error(`Erreurs console: ${severe.join(' | ')}`);
-    console.log(`Desktop smoke OK: ${dashboard.metric} paris simples visibles, ${dashboard.timeline} timeline, ${dashboard.safeBadges} fiables, ${dashboard.priorityBadges} priorités, Winamax-only Sprint 15.`);
+    console.log(`Desktop smoke OK: ${dashboard.metric} paris simples visibles, ${dashboard.timeline} timeline, ${dashboard.safeBadges} fiables, ${dashboard.priorityBadges} priorités, Sprint 22 analytics/recherche/trading OK.`);
   } finally {
     await app.close();
     fs.rmSync(userDataDir, { recursive: true, force: true });

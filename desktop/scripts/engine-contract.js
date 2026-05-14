@@ -53,10 +53,12 @@ function testAnalysis() {
   assert(Array.isArray(analysis.combines), 'Combinés absents');
   assert(Array.isArray(analysis.scorers), 'Buteurs absents');
   assert(analysis.decisionCenter && analysis.decisionCenter.schema, 'DecisionCenter absent', analysis.decisionCenter);
-  assert(analysis.modelRealityAudit && analysis.modelRealityAudit.schema === 'paris-sportif.model_reality_audit.v1', 'Audit réalité modèle absent', analysis.modelRealityAudit);
+  assert(analysis.modelRealityAudit && analysis.modelRealityAudit.schema === 'paris-sportif.model_reality_audit.v2', 'Audit réalité modèle absent', analysis.modelRealityAudit);
   assert(Number(analysis.modelRealityAudit.sampleSize || 0) > 0, 'Audit réalité sans sample', analysis.modelRealityAudit);
   assert(Number(analysis.modelRealityAudit.windowDays || 0) === 60, 'Audit réalité modèle doit couvrir 60 jours', analysis.modelRealityAudit);
   assert(Array.isArray(analysis.modelRealityAudit.segmentAdjustments), 'Ajustements segment 60j absents', analysis.modelRealityAudit);
+  assert(Array.isArray(analysis.modelRealityAudit.tierCalibration), 'Calibration par tier absente', analysis.modelRealityAudit);
+  assert(Array.isArray(analysis.modelRealityAudit.seasonalDrift), 'Drift saisonnier absent', analysis.modelRealityAudit);
   assert(analysis.todayFunnel && analysis.todayFunnel.schema === 'paris-sportif.today_funnel.v1', 'Funnel aujourd’hui absent', analysis.todayFunnel);
   assert(analysis.coverage24h && analysis.coverage24h.schema === 'paris-sportif.coverage_24h.v1', 'Couverture 24h absente', analysis.coverage24h);
   assert(analysis.winamaxMarketAudit && analysis.winamaxMarketAudit.schema === 'paris-sportif.winamax_market_audit.v1', 'Audit marchés Winamax absent', analysis.winamaxMarketAudit);

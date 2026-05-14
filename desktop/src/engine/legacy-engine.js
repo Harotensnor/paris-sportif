@@ -1740,8 +1740,40 @@ function createLegacyEngineService({ projectRoot }) {
         brier: bucket.brier,
         winRate: bucket.winRate
       }));
+    const tierCalibration = buckets
+      .filter((bucket) => bucket.key.startsWith('tier:') && bucket.count >= 20)
+      .map((bucket) => ({
+        key: bucket.key,
+        label: historySegmentLabel(bucket.key),
+        count: bucket.count,
+        roi: bucket.roi,
+        brier: bucket.brier,
+        winRate: bucket.winRate,
+        action: bucket.brier > 0.25 ? 'durcir_selection' : bucket.roi > 0.12 && bucket.brier <= 0.22 ? 'capturer_plus' : 'surveiller',
+        reason: bucket.brier > 0.25
+          ? `Brier ${bucket.brier.toFixed(3)} trop élevé pour ce tier`
+          : bucket.roi > 0.12 && bucket.brier <= 0.22
+            ? `ROI ${Math.round(bucket.roi * 100)}% avec calibration correcte`
+            : 'Calibration correcte, pas de changement fort'
+      }));
+    const seasonalSports = [
+      { sport: 'basketball', months: [8, 9, 10], label: 'Basket nouvelle saison' },
+      { sport: 'hockey', months: [8, 9, 10], label: 'Hockey nouvelle saison' },
+      { sport: 'baseball', months: [1, 2, 3], label: 'Baseball reprise saison' },
+      { sport: 'football américain', months: [7, 8, 9], label: 'NFL reprise saison' },
+      { sport: 'football', months: [6, 7, 8], label: 'Football reprise championnat' }
+    ];
+    const month = new Date().getMonth();
+    const seasonalDrift = seasonalSports
+      .filter((item) => item.months.includes(month))
+      .map((item) => ({
+        sport: item.sport,
+        label: item.label,
+        tone: 'watch',
+        recommendation: 'Historique pré-saison moins fiable pendant 30 jours'
+      }));
     return {
-      schema: 'paris-sportif.model_reality_audit.v1',
+      schema: 'paris-sportif.model_reality_audit.v2',
       generatedAt: new Date().toISOString(),
       windowDays: 60,
       sampleSize: auditRows.length,
@@ -1753,6 +1785,8 @@ function createLegacyEngineService({ projectRoot }) {
       persistentLosingSegments: robust.filter((bucket) => bucket.count >= 50 && bucket.roi < -0.10).sort((a, b) => a.roi - b.roi).slice(0, 10),
       segmentAdjustments: adjustments,
       brierBySportMarket,
+      tierCalibration,
+      seasonalDrift,
       byKey: Object.fromEntries(buckets.map((bucket) => [bucket.key, bucket]))
     };
   }

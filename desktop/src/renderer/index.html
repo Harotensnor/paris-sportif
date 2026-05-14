@@ -21,6 +21,7 @@
       <nav class="nav">
         <button class="nav-btn active" data-tab="dashboard">Picks</button>
         <button class="nav-btn" data-tab="history">Bilan</button>
+        <button class="nav-btn" data-tab="search">Recherche</button>
         <button class="nav-btn" data-tab="preferences">Réglages</button>
         <button class="nav-btn expert-nav" data-tab="data">Avancé</button>
       </nav>
@@ -212,6 +213,21 @@
 
         <section class="live-cockpit" id="live-cockpit" aria-label="Matchs en direct">
           <div class="empty compact-empty">Aucun match live suivi pour le moment.</div>
+        </section>
+
+        <section class="trading-desk expert-only hidden" id="trading-desk" aria-label="Trading Desk">
+          <div class="section-head compact">
+            <div>
+              <h3>Trading Desk</h3>
+              <p>Vue dense pour le Mode expert : top picks, live, bankroll et alertes sans changer l’expérience standard.</p>
+            </div>
+          </div>
+          <div class="trading-grid">
+            <article class="trading-panel" id="trading-top-panel"><div class="empty compact-empty">Top picks en calcul.</div></article>
+            <article class="trading-panel" id="trading-live-panel"><div class="empty compact-empty">Live en attente.</div></article>
+            <article class="trading-panel" id="trading-bankroll-panel"><div class="empty compact-empty">Bankroll en attente.</div></article>
+            <article class="trading-panel" id="trading-alert-panel"><div class="empty compact-empty">Alertes en attente.</div></article>
+          </div>
         </section>
 
         <section class="time-cockpit" id="time-cockpit" aria-label="Picks par horizon temporel">
@@ -481,6 +497,22 @@
         </div>
         <div class="model-performance-grid" id="model-vs-user-grid">
           <div class="empty">Comparaison modèle/toi en attente.</div>
+        </div>
+        <div class="section-head compact">
+          <div>
+            <h3>Décomposition</h3>
+            <p>Comment tu gagnes ton argent : dimensions, heatmaps et recommandations actionnables.</p>
+          </div>
+        </div>
+        <div class="model-performance-grid" id="deep-analytics-summary">
+          <div class="empty">Décomposition en attente de paris réglés.</div>
+        </div>
+        <div class="deep-analytics-layout">
+          <div class="deep-analytics-panel" id="deep-analytics-bars"></div>
+          <div class="deep-analytics-panel" id="deep-analytics-heatmaps"></div>
+        </div>
+        <div class="morning-grid" id="deep-analytics-insights">
+          <div class="empty">Insights personnels en attente de sample.</div>
         </div>
         <div class="segment-grid" id="paper-simulation-detail"></div>
         <div class="segment-grid" id="model-segment-grid">
@@ -964,6 +996,29 @@
         </details>
       </section>
 
+      <section class="tab-panel" data-panel="search">
+        <div class="section-head">
+          <div>
+            <h3>Recherche historique</h3>
+            <p>Retrouve une équipe, un joueur, une ligue ou compare deux profils avant de miser.</p>
+          </div>
+        </div>
+        <div class="deep-search-hero">
+          <input id="deep-search-input" type="search" placeholder="Real Madrid, Mbappé, Liga, NBA..." aria-label="Recherche historique">
+          <div class="deep-search-actions">
+            <select id="compare-left" aria-label="Comparer élément gauche"></select>
+            <select id="compare-right" aria-label="Comparer élément droit"></select>
+            <button class="ghost-btn" id="run-compare-btn" type="button">Comparer</button>
+          </div>
+        </div>
+        <div class="deep-search-results" id="deep-search-results">
+          <div class="empty">Tape une équipe, un joueur ou une ligue.</div>
+        </div>
+        <div class="deep-search-detail" id="deep-search-detail">
+          <div class="empty">Sélectionne un résultat pour ouvrir sa fiche.</div>
+        </div>
+      </section>
+
       <section class="tab-panel" data-panel="preferences">
         <div class="section-head">
           <div>
@@ -1117,6 +1172,7 @@
           <article class="preference-card">
             <h4>Avancé</h4>
             <label class="check-line"><input id="pref-expert-mode" type="checkbox"> Mode expert</label>
+            <label class="check-line"><input id="pref-trading-desk" type="checkbox"> Mode Trading Desk</label>
             <label class="check-line"><input id="pref-auto-update-enabled" type="checkbox"> Auto-update au démarrage</label>
             <label>Canal
               <select id="pref-update-channel">

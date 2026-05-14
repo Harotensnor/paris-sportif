@@ -5,6 +5,18 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 22 — Voir grand : analytics, recherche, live, trading
+
+- Version desktop portée à `v1.1.0` pour les ajouts majeurs post-v1.0.2.
+- Ajout d'une décomposition profonde dans `Bilan` : ROI, WR, P&L et sample par sport, ligue, marché, jour, horaire, taille de mise, moment du mois, streak, tier, cote et avantage prédit.
+- Ajout de heatmaps compactes `sport × jour` et `ligue × horaire`, plus 3-5 insights actionnables et une recommandation mémorisable comme filtre conseillé.
+- Ajout de la vue `Recherche` : recherche locale équipe / joueur / ligue, fiche détaillée avec prochains matchs Winamax, forme récente, blessures locales, performance historique et comparaison side-by-side.
+- Live enrichi : endpoint local `/api/live-scores` côté main process, cache 30s, cartes live avec proba ajustée par score/temps restant, valeur cash-out estimée, alertes flash et deep-link Winamax.
+- Ajout du `Mode Trading Desk` en Mode expert : 4 panneaux top picks / live / bankroll / alertes, hotkeys `J`, `N`, `P`, `F`, `C` et `Espace`, sans toucher au mode standard.
+- Raffinements modèle V2 : audit réalité modèle `v2`, calibration par tier (`TOP`, fiable, surveiller), recommandations de durcissement/capture et détection de drift saisonnier.
+- QA Sprint 22 : contrat moteur, tests unitaires/refresh/smoke, capture visuelle, multi-jours J+3, stress court, Playwright Electron, audit accessibilité et audit npm passent avec les nouvelles surfaces.
+- Build Windows v1.1.0 validé : `Paris Sportif Desktop Setup 1.1.0.exe` généré en sortie propre, environ 109 MB, application packagée et installation NSIS silencieuse testées avec 18 picks visibles, `Recherche` et version `v1.1.0`.
+
 ### Sprint 21 — Validation v1.0.1 + raffinements
 
 - Validation post Sprint 20 : QA moteur, tests unitaires/refresh, smoke Electron, Playwright, multi-jours J+3, stress court et audit accessibilité passent sur la base v1.0.2.

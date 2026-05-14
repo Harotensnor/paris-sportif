@@ -94,7 +94,10 @@
     bugReportDraft: null,
     actionTrail: [],
     shortcutCaptureAction: null,
-    longTasks: []
+    longTasks: [],
+    deepSearchSelection: null,
+    liveScoreState: null,
+    tradingIndex: 0
   };
 
   const ACTION_HISTORY_KEY = 'parisSportifActionHistory';
@@ -133,23 +136,36 @@
   const FAVORITES_KEY = 'parisSportifFavorites';
   const FAVORITE_ALERT_KEY = 'parisSportifFavoriteAlerts';
   const TREND_ALERT_KEY = 'parisSportifTrendAlerts';
+  const ANALYTICS_FILTER_KEY = 'parisSportifAnalyticsSuggestedFilters';
   const DEFAULT_SHORTCUTS = {
     dashboard: 'Ctrl+1',
     history: 'Ctrl+2',
+    search: 'Ctrl+4',
     preferences: 'Ctrl+3',
     expert: 'Ctrl+E',
     refresh: 'Ctrl+R',
     topPick: 'Ctrl+M',
+    nextPick: 'N',
+    previousPick: 'P',
+    favoriteCurrent: 'F',
+    cashoutCurrent: 'C',
+    tradingRefresh: 'Space',
     help: 'Ctrl+/',
     logs: 'Ctrl+Shift+L'
   };
   const SHORTCUT_ACTIONS = {
     dashboard: { label: 'Vue Picks' },
     history: { label: 'Vue Bilan' },
+    search: { label: 'Vue Recherche' },
     preferences: { label: 'Vue Réglages' },
     expert: { label: 'Mode expert' },
     refresh: { label: 'Refresh manuel' },
     topPick: { label: 'Mise rapide top pick' },
+    nextPick: { label: 'Trading Desk · pick suivant' },
+    previousPick: { label: 'Trading Desk · pick précédent' },
+    favoriteCurrent: { label: 'Trading Desk · favori courant' },
+    cashoutCurrent: { label: 'Trading Desk · cash-out courant' },
+    tradingRefresh: { label: 'Trading Desk · refresh' },
     help: { label: 'Aide' },
     logs: { label: 'Logs debug' }
   };
@@ -175,7 +191,7 @@
   ];
   const MARKET_PREFS = [...SIMPLE_MARKET_PREFS, ...ADVANCED_MARKET_PREFS];
   const DEFAULT_PREFERENCES = {
-    preferenceSchemaVersion: 16,
+    preferenceSchemaVersion: 17,
     bankroll: 50,
     level: 'intermediate',
     sports: SPORTS_PREFS,
@@ -215,6 +231,7 @@
     autoUpdateEnabled: true,
     updateChannel: 'stable',
     bugReportPrompt: true,
+    tradingDesk: false,
     theme: 'dark',
     strict: false
   };
@@ -2944,6 +2961,7 @@
     renderAgentSimulation();
     renderCalendar();
     renderHelp();
+    renderDeepSearch();
     updateWebEnrichmentSummary();
     renderActiveModelAdjustments();
     renderLearningFeedback();
@@ -2974,6 +2992,7 @@
     maybeAutoCriticalRefresh();
     maybeAutoPrematchRefresh();
     maybeNotifyPickChanges();
+    refreshLiveScores().catch(() => {});
     scheduleBackgroundRefresh();
   }
 
@@ -3857,6 +3876,8 @@
 
   function rowLiveInfo(row) {
     const match = row?.match || {};
+    const apiLive = liveApiInfoForRow(row);
+    if (apiLive) return apiLive;
     const status = match.status || match.status_type || match.state || match.phase || '';
     const ts = Date.parse(row?.start || match.date || '');
     const now = Date.now();
@@ -3869,6 +3890,19 @@
       status: status || (estimatedLive ? 'LIVE estimé' : 'LIVE'),
       minute,
       score: homeScore != null && awayScore != null ? `${homeScore}-${awayScore}` : 'score indisponible'
+    };
+  }
+
+  function liveApiInfoForRow(row) {
+    const rows = Array.isArray(state.liveScoreState?.rows) ? state.liveScoreState.rows : [];
+    const keys = new Set([row?.id, row?.match?.id, userBetKey(row)].map((value) => String(value || '')).filter(Boolean));
+    const found = rows.find((item) => keys.has(String(item.id || '')) || keys.has(String(item.matchId || '')) || keys.has(String(item.key || '')));
+    if (!found) return null;
+    return {
+      status: found.status || 'LIVE',
+      minute: found.minute || found.clock || '-',
+      score: found.score || 'score indisponible',
+      fetchedAt: found.fetchedAt || state.liveScoreState?.fetchedAt || null
     };
   }
 
@@ -3920,13 +3954,19 @@
         ${rows.slice(0, 8).map(({ row, live, tracked }) => {
           const cashUrl = safeExternalUrl(row.winamaxUrl, 'www.winamax.fr');
           const insight = liveInsight(row, live);
+          const cash = insight.cash || cashOutEstimate(row, live, insight.probability);
           return `
             <article class="live-card live-${escapeHtml(insight.tone)} clickable-row" data-match-id="${escapeHtml(row.id)}" tabindex="0" role="button">
               <span>${escapeHtml(live.status)} · ${escapeHtml(String(live.minute || '-'))} · <em class="live-insight-badge ${escapeHtml(insight.tone)}">${escapeHtml(insight.label)}</em></span>
               <strong>${escapeHtml(row.title)} <em>${escapeHtml(live.score)}</em></strong>
               <p>${escapeHtml(userBetLabel(row))} · ${escapeHtml(insight.detail)}</p>
+              <div class="live-metric-grid">
+                <article><span>Proba live</span><strong>${escapeHtml(formatPct(insight.probability || 0, 0))}</strong><p>Score + temps restant</p></article>
+                <article><span>Cash-out estimé</span><strong>${escapeHtml(cash.value ? formatMoney(cash.value) : '-')}</strong><p>${escapeHtml(cash.advice || 'À surveiller')}</p></article>
+              </div>
               <div class="time-pick-action">
                 <span class="pill">${tracked ? 'pari suivi' : 'pari modèle'}</span>
+                ${cash.advice ? `<span class="cashout-chip ${escapeHtml(cash.tone)}">${escapeHtml(cash.advice)}</span>` : ''}
                 <button class="ghost-btn" type="button" data-live-note-key="${escapeHtml(userBetKey(row))}" data-live-note="${escapeHtml(insight.detail)}">Note rapide</button>
                 ${cashUrl ? `<a class="ghost-btn" href="${escapeHtml(cashUrl)}" target="_blank" rel="noreferrer">Cash-out / Winamax</a>` : ''}
               </div>
@@ -3938,15 +3978,165 @@
     maybeNotifyLiveRows(rows);
   }
 
+  function tradingRows() {
+    return sortedPriorityRows().filter((row) => pickHasCoreData(row)).slice(0, 12);
+  }
+
+  function currentTradingRow() {
+    const rows = tradingRows();
+    if (!rows.length) return null;
+    state.tradingIndex = Math.max(0, Math.min(rows.length - 1, Number(state.tradingIndex || 0)));
+    return rows[state.tradingIndex] || rows[0];
+  }
+
+  function renderTradingDesk() {
+    const desk = $('#trading-desk');
+    if (!desk) return;
+    const prefs = loadPreferences();
+    const active = Boolean(prefs.expertMode && prefs.tradingDesk);
+    desk.classList.toggle('active', active);
+    desk.classList.toggle('hidden', !active);
+    if (!active) return;
+    const rows = tradingRows();
+    const current = currentTradingRow();
+    const live = liveRows();
+    const bankroll = userBetStats();
+    const alerts = [
+      ...(rows.slice(0, 3).map((row, index) => `#${index + 1} ${userBetLabel(row)} · ${row.title}`)),
+      ...(live.slice(0, 2).map(({ row, live: info }) => `Live ${row.title} · ${info.score}`))
+    ].slice(0, 5);
+    const topPanel = $('#trading-top-panel');
+    if (topPanel) {
+      topPanel.innerHTML = `
+        <h4>Top picks</h4>
+        <div class="trading-pick-list">
+          ${rows.slice(0, 5).map((row, index) => `
+            <button class="trading-pick-row${current && userBetKey(row) === userBetKey(current) ? ' active' : ''}" type="button" data-trading-index="${index}">
+              <strong>#${index + 1}</strong>
+              <span>${escapeHtml(row.title)}<br><em>${escapeHtml(userBetLabel(row))} · ${escapeHtml(formatOdd(row.odd))}</em></span>
+              <b>${escapeHtml(visibleStakeText(row))}</b>
+            </button>
+          `).join('')}
+        </div>
+      `;
+    }
+    const livePanel = $('#trading-live-panel');
+    if (livePanel) {
+      livePanel.innerHTML = `
+        <h4>En direct</h4>
+        ${live.length ? live.slice(0, 4).map(({ row, live: info }) => {
+          const insight = liveInsight(row, info);
+          return `<p><strong>${escapeHtml(info.score)}</strong> · ${escapeHtml(row.title)}<br><span class="cashout-chip ${escapeHtml(insight.cash?.tone || 'ok')}">${escapeHtml(insight.detail)}</span></p>`;
+        }).join('') : '<div class="empty compact-empty">Aucun live suivi.</div>'}
+      `;
+    }
+    const bankrollPanel = $('#trading-bankroll-panel');
+    if (bankrollPanel) {
+      bankrollPanel.innerHTML = `
+        <h4>Bankroll</h4>
+        <div class="search-stat-grid">
+          <article><span>Bankroll</span><strong>${escapeHtml(formatMoney(getBankroll()))}</strong><p>Profil local</p></article>
+          <article><span>P&L total</span><strong>${escapeHtml(formatMoney(bankroll.pnlTotal))}</strong><p>ROI ${escapeHtml(formatPct(bankroll.roi, 1))}</p></article>
+          <article><span>Jour</span><strong>${escapeHtml(formatMoney(bankroll.pnlToday))}</strong><p>${formatCount(bankroll.pending)} en cours</p></article>
+        </div>
+      `;
+    }
+    const alertPanel = $('#trading-alert-panel');
+    if (alertPanel) {
+      alertPanel.innerHTML = `
+        <h4>Watchlist & alertes</h4>
+        ${alerts.length ? alerts.map((text) => `<p class="match-sub">${escapeHtml(text)}</p>`).join('') : '<div class="empty compact-empty">Aucune alerte forte.</div>'}
+        <p class="match-sub">Hotkeys : J mise top pick · N/P naviguent · F favori · C cash-out courant · Espace refresh.</p>
+      `;
+    }
+  }
+
+  function moveTradingSelection(delta) {
+    const rows = tradingRows();
+    if (!rows.length) return false;
+    state.tradingIndex = (Number(state.tradingIndex || 0) + delta + rows.length) % rows.length;
+    renderTradingDesk();
+    setSideStatus(`Trading Desk : #${state.tradingIndex + 1}`, 'ok');
+    return true;
+  }
+
+  function toggleFavoriteCurrentPick() {
+    const row = currentTradingRow() || sortedPriorityRows()[0];
+    const team = rowTeamNames(row)[0];
+    if (!team) return false;
+    addFavorite('teams', team);
+    return true;
+  }
+
+  function openCashoutCurrent() {
+    const live = liveRows()[0];
+    const row = live?.row || currentTradingRow();
+    const url = safeExternalUrl(row?.winamaxUrl, 'www.winamax.fr');
+    if (!url) {
+      setSideStatus('Lien Winamax indisponible pour ce pick', 'warn');
+      return false;
+    }
+    window.open(url, '_blank', 'noopener,noreferrer');
+    return true;
+  }
+
   function liveInsight(row, live) {
     const detail = liveVerdict(row, live);
+    const probability = liveWinProbability(row, live);
+    const cash = cashOutEstimate(row, live, probability);
+    const suffix = `${detail} · proba live ${formatPct(probability, 0)}${cash.advice ? ` · ${cash.advice}` : ''}`;
     if (/gagnant|en route|conforme|va gagner/i.test(detail)) {
-      return { tone: 'ok', label: 'En route', detail };
+      return { tone: 'ok', label: 'En route', detail: suffix, probability, cash };
     }
     if (/pression|risque|perdre|besoin|contre/i.test(detail)) {
-      return { tone: 'danger', label: 'À risque', detail };
+      return { tone: 'danger', label: 'À risque', detail: suffix, probability, cash };
     }
-    return { tone: 'watch', label: 'À suivre', detail };
+    return { tone: 'watch', label: 'Incertain', detail: suffix, probability, cash };
+  }
+
+  function liveWinProbability(row, live) {
+    const base = Math.max(0.05, Math.min(0.95, Number(row?.probability || row?.confidence || 0.5) || 0.5));
+    const score = String(live?.score || '');
+    const nums = score.match(/(\d+)\D+(\d+)/);
+    const minute = Math.min(100, Number(String(live?.minute || '').match(/\d+/)?.[0] || 35));
+    if (!nums) return base;
+    const home = Number(nums[1]);
+    const away = Number(nums[2]);
+    const text = `${row?.market || ''} ${row?.label || ''}`.toLowerCase();
+    const progress = Math.max(0, Math.min(1, minute / 95));
+    let delta = 0;
+    if (text.includes('over') || text.includes('plus') || text.includes('ou')) {
+      delta = ((home + away) >= 3 ? 0.28 : -0.10) * progress;
+    } else if (text.includes('under') || text.includes('moins')) {
+      delta = ((home + away) < 3 ? 0.18 : -0.30) * progress;
+    } else if (text.includes('home') || text.includes(row?.match?.home?.toLowerCase?.() || '___')) {
+      delta = Math.sign(home - away) * 0.22 * progress;
+    } else if (text.includes('away') || text.includes(row?.match?.away?.toLowerCase?.() || '___')) {
+      delta = Math.sign(away - home) * 0.22 * progress;
+    }
+    return Math.max(0.03, Math.min(0.97, base + delta));
+  }
+
+  function cashOutEstimate(row, live, probability = liveWinProbability(row, live)) {
+    const tracked = loadUserBets().find((bet) => bet.status === 'pending' && bet.key === userBetKey(row));
+    const stake = Math.max(0, Number(tracked?.stake || displayStakeAmount(row) || 0));
+    const odd = Math.max(1, Number(tracked?.odd || row?.odd || 1));
+    const value = stake ? stake * (0.12 + probability * odd * 0.86) : 0;
+    const ratio = stake ? value / stake : 0;
+    const uncertain = probability > 0.42 && probability < 0.72;
+    let advice = '';
+    let tone = 'ok';
+    if (stake && ratio >= 1.2) {
+      advice = 'Sécuriser le gain ?';
+      tone = 'warn';
+    } else if (stake && ratio >= 0.8 && uncertain) {
+      advice = 'Cash-out recommandé';
+      tone = 'warn';
+    } else if (stake && probability < 0.25) {
+      advice = 'Pari compromis';
+      tone = 'danger';
+    }
+    return { stake, value, ratio, advice, tone };
   }
 
   function saveLiveQuickNote(trackKey, note) {
@@ -3991,13 +4181,27 @@
     rows.forEach(({ row, live }) => {
       const key = `${userBetKey(row)}:${live.score}:${live.minute}`;
       const minute = Number(String(live.minute || '').match(/\d+/)?.[0] || 0);
-      const important = minute >= 85 || /gagnant|pression|suivi live/i.test(liveVerdict(row, live));
+      const insight = liveInsight(row, live);
+      const important = minute >= 85 || /gagnant|pression|suivi live|cash-out|compromis/i.test(insight.detail);
       if (!important || keys.has(key)) return;
       keys.add(key);
       changed = true;
-      notifyUser(`Live ${row.title}`, `${live.score} · ${liveVerdict(row, live)}`, row);
+      notifyUser(`Live ${row.title}`, `${live.score} · ${insight.detail}`, row);
     });
     if (changed) writeLiveNotificationKeys(keys);
+  }
+
+  async function refreshLiveScores() {
+    try {
+      const live = await fetchJson('/api/live-scores');
+      state.liveScoreState = live;
+      renderLiveCockpit();
+      renderTradingDesk();
+      return live;
+    } catch (error) {
+      pushLog('warn', `Scores live indisponibles: ${error.message}`);
+      return null;
+    }
   }
 
   async function aiAssist(task, payload) {
@@ -4265,6 +4469,7 @@
     rememberDisplayedOdds(displayRows);
     renderMarketSnapshot(displayRows);
     renderLiveCockpit();
+    renderTradingDesk();
     renderUltimateBet(displayRows);
     renderTemporalCockpit(displayRows);
     renderDailyBudgetSummary();
@@ -5685,7 +5890,9 @@
         [termTip('Brier', 'Score de qualité des probabilités : plus il est bas, mieux c’est.'), Number.isFinite(Number(summary.brier)) ? Number(summary.brier).toFixed(3) : '-', 'Plus bas = probabilités mieux calibrées.', true],
         [termTip('CLV moyen', 'Compare la cote prise à la cote proche du coup d’envoi.'), clvLabel, clvDetail, true],
         ['Drawdown', Number.isFinite(Number(summary.max_drawdown_units)) ? `${Number(summary.max_drawdown_units).toFixed(1)}u` : '-', 'Perte max historique simulée.'],
-        ['Validation réelle', `${formatCount(reality.sampleSize || 0)} lignes`, `${formatCount(reality.robustSegments || 0)} segments robustes sur ${formatCount(reality.windowDays || 60)} jours.`]
+        ['Validation réelle', `${formatCount(reality.sampleSize || 0)} lignes`, `${formatCount(reality.robustSegments || 0)} segments robustes sur ${formatCount(reality.windowDays || 60)} jours.`],
+        ['Calibration par tier', formatCount(reality.tierCalibration?.length || 0), (reality.tierCalibration || [])[0]?.reason || 'TOP / fiable / surveiller sont relus séparément.'],
+        ['Drift saisonnier', formatCount(reality.seasonalDrift?.length || 0), (reality.seasonalDrift || [])[0]?.recommendation || 'Aucune nouvelle saison critique détectée.']
       ];
       grid.innerHTML = cards.map(([label, value, detail, htmlLabel]) => `
         <article class="performance-card">
@@ -6657,6 +6864,7 @@
     if (target && ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName)) return false;
     if (action === 'dashboard') switchTab('dashboard');
     else if (action === 'history') switchTab('history');
+    else if (action === 'search') switchTab('search');
     else if (action === 'preferences') switchTab('preferences');
     else if (action === 'expert') {
       const prefs = { ...loadPreferences(), expertMode: !loadPreferences().expertMode };
@@ -6670,6 +6878,21 @@
       const row = (dashboardPickRows(readPickFilters()) || [])[0] || state.picks[0] || state.allPicks[0];
       if (row) trackUserBet(row);
       else setSideStatus('Aucun top pick à miser', 'warn');
+    } else if (action === 'nextPick') {
+      if (!loadPreferences().tradingDesk) return false;
+      return moveTradingSelection(1);
+    } else if (action === 'previousPick') {
+      if (!loadPreferences().tradingDesk) return false;
+      return moveTradingSelection(-1);
+    } else if (action === 'favoriteCurrent') {
+      if (!loadPreferences().tradingDesk) return false;
+      return toggleFavoriteCurrentPick();
+    } else if (action === 'cashoutCurrent') {
+      if (!loadPreferences().tradingDesk) return false;
+      return openCashoutCurrent();
+    } else if (action === 'tradingRefresh') {
+      if (!loadPreferences().tradingDesk) return false;
+      startRefresh().catch((error) => setSideStatus(`Refresh impossible : ${error.message}`, 'danger'));
     } else if (action === 'help') toggleHelpPanel();
     else if (action === 'logs') openLogDrawer();
     else return false;
@@ -6688,16 +6911,20 @@
     if (!combo) return false;
     const action = Object.entries(loadShortcuts()).find(([, value]) => normalizeShortcutText(value) === combo)?.[0];
     if (!action) return false;
-    event.preventDefault();
-    return executeShortcut(action, event);
+    const handled = executeShortcut(action, event);
+    if (handled) event.preventDefault();
+    return handled;
   }
 
   function applyExpertMode() {
-    const expert = Boolean(loadPreferences().expertMode);
+    const prefs = loadPreferences();
+    const expert = Boolean(prefs.expertMode);
     document.body.classList.toggle('expert-mode', expert);
+    document.body.classList.toggle('trading-desk-on', expert && Boolean(prefs.tradingDesk));
     $$('.expert-only, .expert-nav').forEach((node) => {
       node.classList.toggle('hidden', !expert);
     });
+    $('#trading-desk')?.classList.toggle('active', expert && Boolean(prefs.tradingDesk));
     if (!expert && $('.tab-panel.active')?.dataset.panel === 'data') {
       switchTab('preferences');
     }
@@ -6785,6 +7012,8 @@
     if (topPickAlerts) topPickAlerts.checked = prefs.topPickAlertsEnabled !== false;
     const bugReportPrompt = $('#pref-bug-report-prompt');
     if (bugReportPrompt) bugReportPrompt.checked = prefs.bugReportPrompt !== false;
+    const tradingDesk = $('#pref-trading-desk');
+    if (tradingDesk) tradingDesk.checked = Boolean(prefs.tradingDesk);
     const expertMode = $('#pref-expert-mode');
     if (expertMode) expertMode.checked = Boolean(prefs.expertMode);
     const aiEnabled = $('#pref-ai-enabled');
@@ -6863,6 +7092,7 @@
     renderBankrollAccounting();
     renderDailyBudgetSummary();
     renderFavoritePreferences();
+    renderTradingDesk();
     applyExpertMode();
   }
 
@@ -6994,6 +7224,7 @@
       expertMode,
       autoUpdateEnabled: $('#pref-auto-update-enabled')?.checked !== false,
       updateChannel: $('#pref-update-channel')?.value || DEFAULT_PREFERENCES.updateChannel,
+      tradingDesk: Boolean($('#pref-trading-desk')?.checked),
       strict: Boolean($('#pref-strict')?.checked)
     };
   }
@@ -7007,6 +7238,7 @@
     renderPreferences();
     applyExpertMode();
     renderPicks();
+    renderTradingDesk();
     maybeNotifyPickChanges();
     computePicks().catch(() => {});
     setSideStatus('Préférences enregistrées', 'ok');
@@ -7337,6 +7569,431 @@
     `).join('');
   }
 
+  function analyticsRows() {
+    const real = settledUserBets()
+      .filter((bet) => ['won', 'lost'].includes(String(bet.status || '')))
+      .map((bet) => ({ ...bet, analyticsSource: 'real' }));
+    if (real.length >= 3) return real;
+    return paperSimulationReport().settled.slice(0, 180).map((row) => ({
+      id: `paper-${row.kickoff}-${row.title}-${row.market}`,
+      title: row.title,
+      sport: row.sport || 'Sport',
+      league: row.league || 'Ligue',
+      market: row.market || row.market_key || 'Marché',
+      label: row.label || row.selection || '',
+      odd: row.odd,
+      edge: row.edge,
+      stake: row.stake,
+      pnl: row.pnl,
+      status: row.result,
+      start: new Date(row.kickoff).toISOString(),
+      placedAt: new Date(row.kickoff).toISOString(),
+      settledAt: new Date(row.kickoff).toISOString(),
+      tier: row.priorityScore >= 70 ? 'TOP' : row.priorityScore >= 55 ? 'Fiable' : 'Surveiller',
+      analyticsSource: 'simulation'
+    }));
+  }
+
+  function analyticsRoiClass(roi) {
+    return roi > 0.10 ? 'warm' : roi < -0.08 ? 'cold' : 'sample';
+  }
+
+  function analyticsDayPart(bet) {
+    const ts = Date.parse(bet.start || bet.kickoff || bet.placedAt || bet.settledAt || '');
+    if (!Number.isFinite(ts)) return 'Inconnu';
+    const hour = new Date(ts).getHours();
+    if (hour < 6) return 'Nuit';
+    if (hour < 12) return 'Matin';
+    if (hour < 14) return 'Midi';
+    if (hour < 18) return 'Après-midi';
+    return 'Soir';
+  }
+
+  function analyticsMonthPart(bet) {
+    const ts = Date.parse(bet.start || bet.kickoff || bet.placedAt || bet.settledAt || '');
+    if (!Number.isFinite(ts)) return 'Mois inconnu';
+    const day = new Date(ts).getDate();
+    if (day <= 10) return 'Début de mois';
+    if (day <= 20) return 'Milieu de mois';
+    return 'Fin de mois';
+  }
+
+  function analyticsOddBucket(bet) {
+    const odd = Number(bet.odd || 0);
+    if (odd < 1.5) return 'Cote < 1.5';
+    if (odd < 2.5) return 'Cote 1.5-2.5';
+    if (odd < 4) return 'Cote 2.5-4';
+    return 'Cote > 4';
+  }
+
+  function analyticsEdgeBucket(bet) {
+    const edge = Number(bet.edge || 0);
+    if (edge < 0.03) return 'Avantage 1-3%';
+    if (edge < 0.05) return 'Avantage 3-5%';
+    if (edge < 0.10) return 'Avantage 5-10%';
+    return 'Avantage 10%+';
+  }
+
+  function analyticsStakeBucket(rows, bet) {
+    const stakes = rows.map((row) => Number(row.stake || 0)).filter((value) => value > 0).sort((a, b) => a - b);
+    const stake = Number(bet.stake || 0);
+    if (!stakes.length || stake <= 0) return 'Mise inconnue';
+    const p33 = stakes[Math.floor(stakes.length * 0.33)] || stakes[0];
+    const p66 = stakes[Math.floor(stakes.length * 0.66)] || stakes[stakes.length - 1];
+    if (stake <= p33) return 'Petite mise';
+    if (stake <= p66) return 'Mise moyenne';
+    return 'Grosse mise';
+  }
+
+  function analyticsStreakBucket(bet) {
+    if (!bet.previousStatus) return 'Premier pari';
+    if (bet.previousStatus === 'won') return 'Après victoire';
+    if (bet.previousStatus === 'lost') return 'Après défaite';
+    return 'Après void';
+  }
+
+  function analyticsTier(bet) {
+    const tier = String(bet.tier || bet.safeStatus || bet.calibrationLevel || '').toLowerCase();
+    if (tier.includes('top') || tier.includes('sure')) return 'TOP';
+    if (tier.includes('fiable') || tier.includes('reliable') || tier.includes('safe')) return 'Fiable';
+    if (tier.includes('watch') || tier.includes('surv')) return 'Surveiller';
+    return 'Standard';
+  }
+
+  function analyticsBucket(rows, label, keyFn) {
+    return bucketUserBets(rows, keyFn)
+      .map((row) => ({ ...row, dimension: label }))
+      .sort((a, b) => b.roi - a.roi || b.count - a.count);
+  }
+
+  function deepAnalyticsReport() {
+    const baseRows = analyticsRows().sort((a, b) => Date.parse(a.placedAt || a.start || a.settledAt || '') - Date.parse(b.placedAt || b.start || b.settledAt || ''));
+    const rows = baseRows.map((row, index) => ({ ...row, previousStatus: baseRows[index - 1]?.status || '' }));
+    const dimensions = {
+      sport: analyticsBucket(rows, 'Sport', (bet) => bet.sport || 'Sport inconnu'),
+      league: analyticsBucket(rows, 'Ligue', (bet) => bet.league || 'Ligue inconnue'),
+      market: analyticsBucket(rows, 'Marché', (bet) => simpleMarketLabelForRow(bet) || bet.market || 'Marché inconnu'),
+      weekday: analyticsBucket(rows, 'Jour', (bet) => {
+        const ts = Date.parse(bet.start || bet.kickoff || bet.placedAt || bet.settledAt || '');
+        return Number.isFinite(ts) ? new Date(ts).toLocaleDateString('fr-FR', { weekday: 'long' }) : 'Jour inconnu';
+      }),
+      dayPart: analyticsBucket(rows, 'Horaire', analyticsDayPart),
+      stake: analyticsBucket(rows, 'Mise', (bet) => analyticsStakeBucket(rows, bet)),
+      month: analyticsBucket(rows, 'Mois', analyticsMonthPart),
+      streak: analyticsBucket(rows, 'Streak', analyticsStreakBucket),
+      tier: analyticsBucket(rows, 'Tier', analyticsTier),
+      odd: analyticsBucket(rows, 'Cote', analyticsOddBucket),
+      edge: analyticsBucket(rows, 'Avantage', analyticsEdgeBucket)
+    };
+    const allBuckets = Object.values(dimensions).flat().filter((row) => row.count >= 3);
+    const best = allBuckets.slice().sort((a, b) => b.roi - a.roi || b.pnl - a.pnl).slice(0, 6);
+    const worst = allBuckets.slice().sort((a, b) => a.roi - b.roi || a.pnl - b.pnl).slice(0, 6);
+    const stake = rows.reduce((sum, row) => sum + Number(row.stake || 0), 0);
+    const pnl = rows.reduce((sum, row) => sum + Number(row.pnl || 0), 0);
+    return {
+      rows,
+      dimensions,
+      best,
+      worst,
+      stake,
+      pnl,
+      roi: stake > 0 ? pnl / stake : 0,
+      source: rows[0]?.analyticsSource || 'real'
+    };
+  }
+
+  function renderAnalyticsBarBlock(title, rows) {
+    const max = Math.max(...rows.map((row) => Math.abs(row.roi)), 0.01);
+    return `
+      <div class="analytics-block">
+        <h4>${escapeHtml(title)}</h4>
+        ${rows.slice(0, 5).map((row) => `
+          <div class="analytics-bar-row ${analyticsRoiClass(row.roi)}">
+            <strong>${escapeHtml(row.key)}</strong>
+            <span class="analytics-bar-track"><span class="analytics-bar-fill" style="--w:${Math.min(100, Math.round(Math.abs(row.roi) / max * 100))}%"></span></span>
+            <em>${escapeHtml(`${formatPct(row.roi, 0)} · ${formatCount(row.count)}`)}</em>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
+
+  function renderAnalyticsHeatmap(title, xRows, yRows) {
+    const combos = [];
+    xRows.slice(0, 4).forEach((x) => {
+      yRows.slice(0, 4).forEach((y) => {
+        combos.push({
+          key: `${x.key} · ${y.key}`,
+          count: Math.min(x.count, y.count),
+          roi: (x.roi + y.roi) / 2,
+          pnl: (x.pnl + y.pnl) / 2
+        });
+      });
+    });
+    return `
+      <div class="analytics-block">
+        <h4>${escapeHtml(title)}</h4>
+        <div class="heatmap-grid">
+          ${combos.slice(0, 12).map((row) => `
+            <div class="heatmap-cell ${analyticsRoiClass(row.roi)}" title="${escapeHtml(`${row.key} · ROI ${formatPct(row.roi, 1)}`)}">
+              <strong>${escapeHtml(row.key)}</strong>
+              <span>${escapeHtml(`${formatPct(row.roi, 0)} · ${formatCount(row.count)} paris`)}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  function deepAnalyticsInsights(report) {
+    const best = report.best[0];
+    const worst = report.worst[0];
+    const weekday = report.dimensions.weekday?.[0];
+    const afterLoss = report.dimensions.streak?.find((row) => row.key === 'Après défaite');
+    const afterWin = report.dimensions.streak?.find((row) => row.key === 'Après victoire');
+    const rows = [];
+    if (best) rows.push(`Ta meilleure zone actuelle : ${best.key} (${formatPct(best.roi, 0)} ROI sur ${formatCount(best.count)} paris).`);
+    if (worst) rows.push(`Point faible : ${worst.key} (${formatPct(worst.roi, 0)}). À réduire tant que ça reste froid.`);
+    if (afterLoss && afterWin) {
+      rows.push(`Après une défaite : ${formatPct(afterLoss.roi, 0)} vs après une victoire : ${formatPct(afterWin.roi, 0)}.`);
+    }
+    if (weekday) rows.push(`${weekday.key} ressort comme journée intéressante (${formatPct(weekday.roi, 0)} ROI).`);
+    return rows.slice(0, 5);
+  }
+
+  function renderDeepAnalytics() {
+    const summary = $('#deep-analytics-summary');
+    const bars = $('#deep-analytics-bars');
+    const heatmaps = $('#deep-analytics-heatmaps');
+    const insights = $('#deep-analytics-insights');
+    if (!summary && !bars && !heatmaps && !insights) return;
+    const report = deepAnalyticsReport();
+    const sourceText = report.source === 'simulation' ? 'Simulation modèle utilisée tant que tes paris réglés sont trop peu nombreux.' : 'Basé sur tes paris suivis réglés.';
+    if (summary) {
+      summary.innerHTML = [
+        ['Sample', formatCount(report.rows.length), sourceText],
+        ['P&L net', formatMoney(report.pnl), `ROI ${formatPct(report.roi, 1)} · mise ${formatMoney(report.stake)}`],
+        ['Meilleure zone', report.best[0]?.key || 'En attente', report.best[0] ? `${report.best[0].dimension} · ${formatPct(report.best[0].roi, 0)}` : 'Sample insuffisant'],
+        ['Zone froide', report.worst[0]?.key || 'En attente', report.worst[0] ? `${report.worst[0].dimension} · ${formatPct(report.worst[0].roi, 0)}` : 'Sample insuffisant']
+      ].map(([label, value, detail]) => `
+        <article class="quality-report-card quality-ok">
+          <span>${escapeHtml(label)}</span>
+          <strong>${escapeHtml(value)}</strong>
+          <p>${escapeHtml(detail)}</p>
+        </article>
+      `).join('');
+    }
+    if (bars) {
+      bars.innerHTML = [
+        renderAnalyticsBarBlock('Top 5 dimensions', report.best),
+        renderAnalyticsBarBlock('Bottom 5 dimensions', report.worst)
+      ].join('');
+    }
+    if (heatmaps) {
+      heatmaps.innerHTML = [
+        renderAnalyticsHeatmap('Sport × jour', report.dimensions.sport || [], report.dimensions.weekday || []),
+        renderAnalyticsHeatmap('Ligue × horaire', report.dimensions.league || [], report.dimensions.dayPart || [])
+      ].join('');
+    }
+    if (insights) {
+      const insightRows = deepAnalyticsInsights(report);
+      const recommendation = report.best[0] || null;
+      insights.innerHTML = insightRows.length ? `
+        ${insightRows.map((text, index) => `
+          <article class="morning-card">
+            <span>Insight ${index + 1}</span>
+            <strong>${escapeHtml(text.split(':')[0])}</strong>
+            <p>${escapeHtml(text)}</p>
+          </article>
+        `).join('')}
+        ${recommendation ? `
+          <article class="morning-card">
+            <span>Recommandation</span>
+            <strong>Appliquer un filtre prudent</strong>
+            <p>${escapeHtml(`Favoriser ${recommendation.key} tant que le ROI reste positif.`)}</p>
+            <button class="ghost-btn" type="button" data-apply-analytics-pref="${escapeHtml(recommendation.dimension)}" data-analytics-value="${escapeHtml(recommendation.key)}">Appliquer ces filtres</button>
+          </article>
+        ` : ''}
+      ` : '<div class="empty">Les insights s’activent avec plus de paris réglés.</div>';
+    }
+  }
+
+  function deepSearchIndex() {
+    const map = new Map();
+    const add = (type, label, payload = {}) => {
+      const clean = String(label || '').trim();
+      if (!clean || clean.length < 2) return;
+      const key = `${type}:${normalizeUiKey(clean)}`;
+      const existing = map.get(key) || { type, key, label: clean, count: 0, rows: [], payload: {} };
+      existing.count += 1;
+      existing.rows.push(payload.row || payload);
+      existing.payload = { ...existing.payload, ...payload };
+      map.set(key, existing);
+    };
+    const pools = [...(state.matches || []), ...(state.allPicks || []), ...(state.scorers || [])];
+    pools.forEach((row) => {
+      rowTeamNames(row).forEach((team) => add('team', team, { row, sport: row.sport, league: row.league }));
+      const player = rowPlayerName(row);
+      if (player) add('player', player, { row, sport: row.sport, league: row.league });
+      if (row.league) add('league', row.league, { row, sport: row.sport, league: row.league });
+    });
+    (state.history?.recentSettled || []).forEach((pick) => {
+      add('team', pick.home, { row: pick, sport: pick.sport, league: pick.league });
+      add('team', pick.away, { row: pick, sport: pick.sport, league: pick.league });
+      if (pick.league) add('league', pick.league, { row: pick, sport: pick.sport, league: pick.league });
+    });
+    return Array.from(map.values()).sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
+  }
+
+  function searchEntityRows(entity) {
+    const key = normalizeUiKey(entity?.label || '');
+    if (!key) return [];
+    const source = [...(state.matches || []), ...(state.allPicks || []), ...(state.scorers || [])];
+    return source.filter((row) => {
+      if (entity.type === 'team') return rowTeamNames(row).some((team) => normalizeUiKey(team) === key);
+      if (entity.type === 'player') return normalizeUiKey(rowPlayerName(row)) === key || pickSearchText(row).includes(key);
+      if (entity.type === 'league') return normalizeUiKey(row.league) === key;
+      return pickSearchText(row).includes(key);
+    });
+  }
+
+  function searchEntityHistory(entity) {
+    const key = normalizeUiKey(entity?.label || '');
+    const rows = analyticsRows();
+    return rows.filter((bet) => {
+      const haystack = [
+        bet.title,
+        bet.league,
+        bet.sport,
+        bet.market,
+        bet.label
+      ].filter(Boolean).join(' ').toLowerCase();
+      return normalizeUiKey(haystack).includes(key);
+    });
+  }
+
+  function entityPerformanceRows(rows) {
+    const bucket = bucketUserBets(rows, (bet) => 'Historique')[0] || { count: 0, winRate: 0, roi: 0, pnl: 0, stake: 0 };
+    return [
+      ['Sample', formatCount(bucket.count || rows.length), `${formatCount(rows.length)} ligne(s) historiques ou simulées.`],
+      ['WR', formatPct(bucket.winRate || 0, 0), 'Win rate sur les paris réglés disponibles.'],
+      ['ROI', formatPct(bucket.roi || 0, 1), `${formatMoney(bucket.pnl || 0)} net · ${formatMoney(bucket.stake || 0)} misés.`]
+    ];
+  }
+
+  function renderDeepSearchOptions(index = deepSearchIndex()) {
+    ['compare-left', 'compare-right'].forEach((id, sideIndex) => {
+      const select = $(`#${id}`);
+      if (!select) return;
+      const current = select.value;
+      const rows = index.slice(0, 80);
+      select.innerHTML = rows.map((row, idx) => `<option value="${escapeHtml(row.key)}"${idx === sideIndex ? ' selected' : ''}>${escapeHtml(`${row.label} · ${row.type}`)}</option>`).join('');
+      if (rows.some((row) => row.key === current)) select.value = current;
+    });
+  }
+
+  function renderSearchEntityDetail(entity) {
+    const detail = $('#deep-search-detail');
+    if (!detail || !entity) return;
+    const rows = searchEntityRows(entity);
+    const historyRows = searchEntityHistory(entity);
+    const upcoming = rows
+      .filter((row) => Date.parse(row.start || row.match?.date || '') >= Date.now() - 60 * 60 * 1000)
+      .sort((a, b) => Date.parse(a.start || a.match?.date || '') - Date.parse(b.start || b.match?.date || ''))
+      .slice(0, 6);
+    const formRows = rows.map((row) => row.match || row).filter(Boolean).slice(0, 10);
+    const form = formRows.map((row) => {
+      const side = (row.competitors || []).find((team) => normalizeUiKey(team.name || team.short) === normalizeUiKey(entity.label));
+      return side?.winner === true ? 'W' : side?.winner === false ? 'L' : 'D';
+    }).filter(Boolean).slice(0, 10).join('') || 'Forme non disponible';
+    const injuries = rows
+      .flatMap((row) => (row.match?.competitors || row.competitors || []).flatMap((team) => team.injuries || []))
+      .filter((injury) => injury?.name)
+      .slice(0, 5);
+    const marketBuckets = bucketUserBets(historyRows, (bet) => simpleMarketLabelForRow(bet) || bet.market || 'Marché').sort((a, b) => b.roi - a.roi).slice(0, 4);
+    detail.innerHTML = `
+      <div class="section-head compact">
+        <div>
+          <h3>${escapeHtml(entity.label)}</h3>
+          <p>${escapeHtml(entity.type === 'team' ? 'Page équipe' : entity.type === 'player' ? 'Page joueur' : 'Page ligue')} · ${escapeHtml(entity.payload?.sport || '')} ${entity.payload?.league ? `· ${escapeHtml(entity.payload.league)}` : ''}</p>
+        </div>
+      </div>
+      <div class="search-stat-grid">
+        ${entityPerformanceRows(historyRows).map(([label, value, text]) => `
+          <article><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong><p>${escapeHtml(text)}</p></article>
+        `).join('')}
+        <article><span>Forme récente</span><strong>${escapeHtml(form)}</strong><p>Lecture W/D/L locale quand disponible.</p></article>
+      </div>
+      <div class="deep-analytics-layout">
+        <div class="deep-analytics-panel">
+          <h4>Prochains matchs Winamax</h4>
+          ${upcoming.length ? upcoming.map((row) => `
+            <button class="search-card" type="button" data-match-id="${escapeHtml(row.id || row.match?.id || '')}">
+              <strong>${escapeHtml(row.title || row.match?.name || '-')}</strong>
+              <span>${escapeHtml(row.start ? countdownLabel(row.start) : formatDateTime(row.match?.date))}</span>
+              <p>${escapeHtml(userBetLabel(row) || 'Match surveillé')}</p>
+            </button>
+          `).join('') : '<div class="empty compact-empty">Aucun prochain match bookable trouvé.</div>'}
+        </div>
+        <div class="deep-analytics-panel">
+          <h4>Marchés rentables</h4>
+          ${marketBuckets.length ? marketBuckets.map((row) => `
+            <div class="analytics-bar-row ${analyticsRoiClass(row.roi)}">
+              <strong>${escapeHtml(row.key)}</strong>
+              <span>${escapeHtml(`${formatPct(row.roi, 0)} ROI`)}</span>
+              <em>${escapeHtml(`${formatCount(row.count)} paris`)}</em>
+            </div>
+          `).join('') : '<div class="empty compact-empty">Sample historique insuffisant.</div>'}
+          <h4>Infos utiles</h4>
+          ${injuries.length ? injuries.map((injury) => `<p class="match-sub">${escapeHtml(injury.name)} · ${escapeHtml(injury.status || injury.pos || '')}</p>`).join('') : '<p class="match-sub">Aucune blessure locale majeure remontée.</p>'}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderDeepSearch() {
+    const results = $('#deep-search-results');
+    if (!results) return;
+    const index = deepSearchIndex();
+    renderDeepSearchOptions(index);
+    const query = normalizeUiKey($('#deep-search-input')?.value || '');
+    const rows = (query ? index.filter((item) => normalizeUiKey(`${item.label} ${item.type}`).includes(query)) : index)
+      .slice(0, 12);
+    if (!state.deepSearchSelection && rows[0]) state.deepSearchSelection = rows[0].key;
+    results.innerHTML = rows.length ? rows.map((item) => `
+      <button class="search-card${state.deepSearchSelection === item.key ? ' active' : ''}" type="button" data-search-entity="${escapeHtml(item.key)}">
+        <h4>${escapeHtml(item.label)}</h4>
+        <span>${escapeHtml(item.type === 'team' ? 'Équipe' : item.type === 'player' ? 'Joueur' : 'Ligue')}</span>
+        <p>${escapeHtml(`${formatCount(item.count)} apparition(s) · ${item.payload?.sport || 'multi-sport'}`)}</p>
+      </button>
+    `).join('') : '<div class="empty">Aucun résultat local. Essaie une équipe, un joueur ou une ligue.</div>';
+    const selected = index.find((item) => item.key === state.deepSearchSelection) || rows[0] || null;
+    if (selected) renderSearchEntityDetail(selected);
+  }
+
+  function renderSearchComparison() {
+    const index = deepSearchIndex();
+    const left = index.find((row) => row.key === $('#compare-left')?.value);
+    const right = index.find((row) => row.key === $('#compare-right')?.value);
+    const detail = $('#deep-search-detail');
+    if (!detail || !left || !right) return;
+    const card = (entity) => {
+      const historyRows = searchEntityHistory(entity);
+      const perf = entityPerformanceRows(historyRows);
+      const upcoming = searchEntityRows(entity).filter((row) => Date.parse(row.start || row.match?.date || '') >= Date.now()).length;
+      return `
+        <article class="deep-analytics-panel">
+          <h3>${escapeHtml(entity.label)}</h3>
+          <p>${escapeHtml(entity.type)} · ${formatCount(upcoming)} match(s) à venir.</p>
+          <div class="search-stat-grid">
+            ${perf.map(([label, value, text]) => `<article><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong><p>${escapeHtml(text)}</p></article>`).join('')}
+          </div>
+        </article>
+      `;
+    };
+    detail.innerHTML = `<div class="deep-analytics-layout">${card(left)}${card(right)}</div>`;
+  }
+
   function regressionWarningText() {
     const audit = trackedLearningAudit();
     const cold = (audit.warnings || []).find((row) => row.count >= 5 && row.losses >= 5);
@@ -7554,6 +8211,7 @@
     renderDailyBudgetSummary();
     renderPaperSimulation();
     renderModelVsUser();
+    renderDeepAnalytics();
     renderCoachAdvice();
     $('#hist-total').textContent = history ? String(history.total) : '-';
     $('#hist-generated').textContent = history?.generatedAt ? new Date(history.generatedAt).toLocaleString('fr-FR') : '-';
@@ -10996,6 +11654,7 @@
       history: 'Bilan',
       agent: 'Agent',
       data: 'Avancé',
+      search: 'Recherche',
       calendar: 'Calendrier',
       pipeline: 'Pipeline',
       help: 'Aide',
@@ -11003,6 +11662,7 @@
     };
     $('#page-title').textContent = titles[tab] || 'Paris-Sportif';
     if (tab === 'calendar') renderCalendar();
+    if (tab === 'search') renderDeepSearch();
     if (tab === 'pipeline') renderPipelinePanel(state.status);
     if (tab === 'help') renderHelp();
   }
@@ -11989,6 +12649,31 @@
         renderPicks();
       }
     });
+    $('#deep-analytics-insights')?.addEventListener('click', (event) => {
+      const button = event.target.closest('[data-apply-analytics-pref]');
+      if (!button) return;
+      const dimension = button.dataset.applyAnalyticsPref || '';
+      const value = button.dataset.analyticsValue || '';
+      writeStorageJson(ANALYTICS_FILTER_KEY, { dimension, value, savedAt: new Date().toISOString() });
+      setSideStatus(`Filtre conseillé mémorisé : ${value}`, 'ok');
+    });
+    $('#deep-search-input')?.addEventListener('input', () => {
+      state.deepSearchSelection = null;
+      renderDeepSearch();
+    });
+    $('#deep-search-results')?.addEventListener('click', (event) => {
+      const card = event.target.closest('[data-search-entity]');
+      if (!card) return;
+      state.deepSearchSelection = card.dataset.searchEntity || null;
+      renderDeepSearch();
+    });
+    $('#run-compare-btn')?.addEventListener('click', renderSearchComparison);
+    $('#trading-desk')?.addEventListener('click', (event) => {
+      const row = event.target.closest('[data-trading-index]');
+      if (!row) return;
+      state.tradingIndex = Number(row.dataset.tradingIndex || 0) || 0;
+      renderTradingDesk();
+    });
     document.addEventListener('click', (event) => {
       const tabButton = event.target.closest('[data-tab-target]');
       if (tabButton) switchTab(tabButton.dataset.tabTarget || 'dashboard');
@@ -12236,7 +12921,7 @@
         $('#refresh-log').textContent = error.stack || error.message;
       });
     });
-    ['ultimate-bet-card', 'live-cockpit', 'time-cockpit', 'simple-pick-timeline', 'favorite-picks-grid', 'simple-scorers-grid', 'bankroll-allocation-grid', 'picks-body', 'stake-scenario-body', 'watchlist-grid', 'prematch-final-grid', 'matches-body', 'combines-list', 'scorers-list', 'agent-positions-body', 'agent-blockers-body'].forEach((id) => {
+    ['ultimate-bet-card', 'live-cockpit', 'time-cockpit', 'simple-pick-timeline', 'favorite-picks-grid', 'simple-scorers-grid', 'bankroll-allocation-grid', 'picks-body', 'stake-scenario-body', 'watchlist-grid', 'prematch-final-grid', 'matches-body', 'combines-list', 'scorers-list', 'agent-positions-body', 'agent-blockers-body', 'deep-search-detail'].forEach((id) => {
       const node = $(`#${id}`);
       if (!node) return;
       node.addEventListener('click', openMatchFromEvent);

@@ -105,6 +105,7 @@ const webhookBackoff = new Map();
 const webEnrichmentRuntime = {
   fetchTimestamps: []
 };
+let liveScoreCache = { fetchedAt: 0, payload: null };
 
 app.commandLine.appendSwitch('disable-http-cache');
 
@@ -182,6 +183,56 @@ function readJsonFileDefault(filePath, fallback) {
   } catch {
     return fallback;
   }
+}
+
+function isLiveLikeStatus(value) {
+  const text = String(value || '').toLowerCase();
+  return ['live', 'inprogress', 'in_progress', 'halftime', 'period', 'q1', 'q2', 'q3', 'q4', 'ot'].some((token) => text.includes(token));
+}
+
+function liveScoreFromRow(row) {
+  const match = row?.match || row || {};
+  const status = match.status || match.status_type || match.state || match.phase || '';
+  const startTs = Date.parse(row?.start || match.date || '');
+  const now = Date.now();
+  const estimatedLive = Number.isFinite(startTs) && now >= startTs && now <= startTs + 3 * 60 * 60 * 1000 && !match.completed;
+  if (!isLiveLikeStatus(status) && !estimatedLive) return null;
+  const competitors = Array.isArray(match.competitors) ? match.competitors : [];
+  const home = competitors.find((team) => team.home_away === 'home') || competitors[0] || {};
+  const away = competitors.find((team) => team.home_away === 'away') || competitors[1] || {};
+  const homeScore = match.home_score ?? match.score_home ?? match.score?.home ?? home.score ?? null;
+  const awayScore = match.away_score ?? match.score_away ?? match.score?.away ?? away.score ?? null;
+  return {
+    id: String(row?.id || match.id || ''),
+    matchId: String(match.id || row?.id || ''),
+    key: `${row?.title || match.name || ''}:${row?.market || ''}:${row?.label || ''}`,
+    title: row?.title || match.name || match.shortName || 'Match live',
+    sport: row?.sport || match.sport || '',
+    league: row?.league || match.league || '',
+    status: status || (estimatedLive ? 'LIVE estimé' : 'LIVE'),
+    minute: match.minute || match.clock || match.status_detail || match.detail || (estimatedLive ? 'live estimé' : ''),
+    score: homeScore != null && awayScore != null ? `${homeScore}-${awayScore}` : 'score indisponible',
+    source: 'snapshot local ESPN/Sofascore',
+    fetchedAt: new Date().toISOString()
+  };
+}
+
+function liveScoresPayload() {
+  if (liveScoreCache.payload && Date.now() - liveScoreCache.fetchedAt < 30 * 1000) return liveScoreCache.payload;
+  const analysis = engineService.getAnalysis({ bankroll: 50 });
+  const map = new Map();
+  [...(analysis.dashboardPicks || []), ...(analysis.picks || []), ...(analysis.matches || [])].forEach((row) => {
+    const live = liveScoreFromRow(row);
+    if (live) map.set(live.matchId || live.id || live.key, live);
+  });
+  const payload = {
+    ok: true,
+    fetchedAt: new Date().toISOString(),
+    source: 'local snapshot, 30s cache',
+    rows: Array.from(map.values()).slice(0, 40)
+  };
+  liveScoreCache = { fetchedAt: Date.now(), payload };
+  return payload;
 }
 
 function cleanupChromiumEphemeralStorage() {
@@ -1553,6 +1604,10 @@ async function handleApi(req, res, url) {
         summary: { count: 0, ok: false, message: error.message }
       });
     }
+    return;
+  }
+  if (url.pathname === '/api/live-scores') {
+    jsonResponse(res, 200, liveScoresPayload());
     return;
   }
   if (url.pathname === '/api/report/pdf') {

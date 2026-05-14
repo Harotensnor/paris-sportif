@@ -15,7 +15,7 @@ function isIgnorableConsoleMessage(message) {
   return /Failed to load resource:\s*net::ERR_(EMPTY_RESPONSE|ABORTED)/i.test(String(message || ''));
 }
 
-test('Sprint 15 desktop shows only clear simple Winamax bets by default', async () => {
+test('Sprint 22 desktop keeps clear Winamax picks with analytics and trading opt-in', async () => {
   const rendererText = fs.readFileSync(path.join(root, 'desktop', 'src', 'renderer', 'renderer.js'), 'utf8');
   const htmlText = fs.readFileSync(path.join(root, 'desktop', 'src', 'renderer', 'index.html'), 'utf8');
   const mainText = fs.readFileSync(path.join(root, 'desktop', 'src', 'main.js'), 'utf8');
@@ -62,6 +62,11 @@ test('Sprint 15 desktop shows only clear simple Winamax bets by default', async 
   expect(rendererText).toContain('renderFavoritePicksSection');
   expect(rendererText).toContain('trendForRow');
   expect(rendererText).toContain('installPerformanceObserver');
+  expect(rendererText).toContain('renderDeepAnalytics');
+  expect(rendererText).toContain('renderDeepSearch');
+  expect(rendererText).toContain('cashOutEstimate');
+  expect(rendererText).toContain('renderTradingDesk');
+  expect(mainText).toContain('/api/live-scores');
 
   const userDataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'paris-sportif-pw-'));
   const messages = [];
@@ -105,7 +110,7 @@ test('Sprint 15 desktop shows only clear simple Winamax bets by default', async 
       dashboardText: document.querySelector('[data-panel="dashboard"]')?.innerText || ''
     }));
     expect(cockpit.title).toBe('Picks');
-    expect(cockpit.nav).toEqual(['Picks', 'Bilan', 'Réglages']);
+    expect(cockpit.nav).toEqual(['Picks', 'Bilan', 'Recherche', 'Réglages']);
     expect(cockpit.metric).toBeGreaterThanOrEqual(10);
     expect(cockpit.rows).toBeGreaterThanOrEqual(10);
     expect(cockpit.rows).toBeLessThanOrEqual(18);
@@ -139,7 +144,14 @@ test('Sprint 15 desktop shows only clear simple Winamax bets by default', async 
     await expect(win.locator('#bankroll-allocation-grid')).toContainText('#1');
     await expect(win.locator('#paper-simulation-grid')).toContainText('Simulation');
     await expect(win.locator('#model-vs-user-grid')).toContainText(/Si tu avais suivi le modèle|Toi sur 30 jours/);
-    await win.keyboard.press('Control+3');
+    await expect(win.locator('#deep-analytics-summary')).toContainText(/Sample|P&L net|Meilleure zone/);
+    await expect(win.locator('#deep-analytics-insights')).toContainText(/Insight|Recommandation|attente/i);
+    await win.keyboard.press('Control+4');
+    await expect(win.locator('#page-title')).toHaveText('Recherche');
+    await expect(win.locator('#deep-search-input')).toBeVisible();
+    await win.fill('#deep-search-input', 'Real');
+    await expect(win.locator('#deep-search-results')).toContainText(/Équipe|Ligue|Joueur|Aucun résultat/);
+    await win.click('[data-tab="preferences"]');
     await expect(win.locator('#page-title')).toHaveText('Réglages');
     await expect(win.locator('#pref-bankroll')).toBeVisible();
     await expect(win.locator('#pref-anti-tilt-strict')).toBeVisible();
@@ -150,9 +162,10 @@ test('Sprint 15 desktop shows only clear simple Winamax bets by default', async 
     await expect(win.locator('#pref-expert-mode')).toBeVisible();
     await expect(win.locator('#pref-theme')).toBeVisible();
     await expect(win.locator('#pref-bug-report-prompt')).toBeVisible();
+    await expect(win.locator('#pref-trading-desk')).toBeVisible();
     await expect(win.locator('#favorite-team-search')).toBeVisible();
     await expect(win.locator('#favorite-player-search')).toBeVisible();
-    await expect(win.locator('#app-version-label')).toContainText('v1.0.2');
+    await expect(win.locator('#app-version-label')).toContainText('v1.1.0');
     await win.selectOption('#pref-theme', 'light');
     await expect(win.locator('body')).toHaveClass(/theme-light/);
     await win.selectOption('#pref-theme', 'dark');
@@ -186,8 +199,14 @@ test('Sprint 15 desktop shows only clear simple Winamax bets by default', async 
 
     await win.click('[data-tab="preferences"]');
     await win.check('#pref-expert-mode');
+    await win.check('#pref-trading-desk');
     await win.click('#save-preferences-btn');
     await expect(win.locator('[data-tab="data"]:not(.hidden)')).toBeVisible();
+    await win.click('[data-tab="dashboard"]');
+    await expect(win.locator('#trading-desk.active')).toBeVisible();
+    await expect(win.locator('#trading-top-panel')).toContainText(/Top picks|#1/);
+    await win.keyboard.press('N');
+    await expect(win.locator('#trading-top-panel')).toContainText(/Top picks|#1/);
     await expect(win.locator('#shortcut-settings-grid')).toContainText('Vue Picks');
     await expect(win.locator('#shortcut-settings-grid')).toContainText('Ctrl+1');
     await win.click('[data-tab="data"]');

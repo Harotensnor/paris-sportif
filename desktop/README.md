@@ -8,13 +8,13 @@ Paris Sportif Desktop est le logiciel PC local pour préparer tes paris Winamax.
 
 ### Version installateur Windows
 
-La version v1.0.2 se génère avec :
+La version v1.1.0 se génère avec :
 
 ```powershell
 npm --prefix desktop run dist
 ```
 
-Le fichier attendu est `Paris Sportif Desktop Setup 1.0.2.exe`. Le build packagé embarque les données, rapports modèle et scripts nécessaires au démarrage. Python reste recommandé si tu veux relancer une pipeline complète depuis la machine installée.
+Le fichier attendu est `Paris Sportif Desktop Setup 1.1.0.exe`. Le build packagé embarque les données, rapports modèle et scripts nécessaires au démarrage. Python reste recommandé si tu veux relancer une pipeline complète depuis la machine installée.
 
 ### Version développeur
 
@@ -65,6 +65,8 @@ La vue `Bilan` montre :
 - paris suivis, notes, tags et export CSV ;
 - comparaison `Si tu avais suivi le modèle` ;
 - simulation 30 jours ;
+- décomposition profonde : sport, ligue, marché, jour, horaire, taille de mise, cote et avantage ;
+- insights actionnables pour comprendre où tu gagnes et où tu perds ;
 - comptabilité dépôts/retraits ;
 - patterns personnels et apprentissages.
 
@@ -75,6 +77,30 @@ Les données sont stockées localement. Utilise `Réglages > Profil local` pour 
 L'IA moteur est optionnelle. Si tu ajoutes une clé API dans `Réglages > IA`, elle peut aider à rédiger les explications et détecter les anomalies. Sans clé, l'app garde un fallback heuristique complet.
 
 L'IA ne remplace jamais les garde-fous du modèle et ne modifie pas ta bankroll.
+
+## Recherche
+
+La vue `Recherche` permet de fouiller la base locale avant de miser :
+
+- cherche une équipe, un joueur ou une ligue ;
+- ouvre une fiche avec prochains matchs Winamax, forme, blessures locales et ROI historique ;
+- compare deux équipes ou ligues côte à côte.
+
+Tout reste local et Winamax-only : aucune cote d'autre bookmaker n'est utilisée.
+
+## Mode Trading Desk
+
+Dans `Réglages > Avancé`, active `Mode expert`, puis `Mode Trading Desk`.
+
+Ce mode ajoute une vue dense pour power users : top picks, live, bankroll et alertes du moment. Les raccourcis utiles sont :
+
+- `J` : miser le top pick ;
+- `N` / `P` : pick suivant / précédent ;
+- `F` : ajouter le pick courant aux favoris ;
+- `C` : ouvrir le cash-out Winamax du live courant ;
+- `Espace` : refresh.
+
+Le mode standard reste inchangé si tu ne l'actives pas.
 
 ## Alertes
 
@@ -111,6 +137,8 @@ Le Mode expert affiche l'audit réalité modèle sur 60 jours :
 - segments gagnants persistants ;
 - segments froids à durcir ;
 - Brier par sport/marché ;
+- calibration par tier ;
+- drift saisonnier ;
 - ajustements actifs et bouton de réinitialisation.
 
 Dans la vue standard, seuls les signaux utiles apparaissent : `Tendance forte` ou `Tendance froide` quand un segment récent mérite vraiment ton attention.
@@ -138,7 +166,7 @@ Si un ancien dossier `desktop/dist/` est verrouillé par Windows, tu peux valide
 
 ```powershell
 cd desktop
-npx electron-builder --win nsis --x64 --config.directories.output=dist-sprint21b
+npx electron-builder --win nsis --x64 --config.directories.output=dist-temp
 ```
 
 ## FAQ
