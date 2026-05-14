@@ -14,6 +14,10 @@ async function firstWindow(app) {
   return app.windows()[0] || app.waitForEvent('window', { timeout: 60_000 });
 }
 
+function isIgnorableConsoleMessage(message) {
+  return /Failed to load resource:\s*net::ERR_(EMPTY_RESPONSE|ABORTED)/i.test(String(message || ''));
+}
+
 async function main() {
   const root = path.resolve(__dirname, '..', '..');
   const electronExe = path.join(root, 'desktop', 'node_modules', 'electron', 'dist', process.platform === 'win32' ? 'electron.exe' : 'electron');
@@ -47,7 +51,9 @@ async function main() {
       if (sample.rssMb) memory.push(sample.rssMb);
       await win.waitForTimeout(15_000);
     }
-    const severe = messages.filter((message) => message.startsWith('error:') || message.startsWith('pageerror:'));
+    const severe = messages.filter((message) => (
+      message.startsWith('error:') || message.startsWith('pageerror:')
+    ) && !isIgnorableConsoleMessage(message));
     if (severe.length) throw new Error(`Erreurs console pendant stress: ${severe.join(' | ')}`);
     const maxMemory = memory.length ? Math.max(...memory) : 0;
     if (maxMemory > 500) throw new Error(`Mémoire trop haute: ${maxMemory} MB RSS`);

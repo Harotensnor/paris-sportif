@@ -44,6 +44,8 @@ function testAnalysis() {
   assert(Array.isArray(analysis.combines), 'Combinés absents');
   assert(Array.isArray(analysis.scorers), 'Buteurs absents');
   assert(analysis.decisionCenter && analysis.decisionCenter.schema, 'DecisionCenter absent', analysis.decisionCenter);
+  assert(analysis.modelRealityAudit && analysis.modelRealityAudit.schema === 'paris-sportif.model_reality_audit.v1', 'Audit réalité modèle absent', analysis.modelRealityAudit);
+  assert(Number(analysis.modelRealityAudit.sampleSize || 0) > 0, 'Audit réalité sans sample', analysis.modelRealityAudit);
   assert(Object.keys(analysis).filter((key) => /^v(?:[5-9]|1[0-6])/.test(key)).length === 0, 'Anciennes propriétés V5-V16 encore exposées');
 
   const seen = new Set();
@@ -52,6 +54,8 @@ function testAnalysis() {
     assert(Number(pick.probability) > 0 && Number(pick.probability) <= 1, 'Pick avec probabilité invalide', pick);
     assert(Number(pick.edge) > 0, 'Pick sans edge positif', pick);
     assert(pick.decisionCenter && typeof pick.decisionCenter.canBet === 'boolean', 'Pick sans décision centrale', pick);
+    assert(pick.segmentValidation && Number(pick.segmentValidation.realConfidence || 0) > 0, 'Pick sans validation historique réelle', pick);
+    assert(Number(pick.adjustedConfidence || 0) > 0, 'Pick sans confiance ajustée', pick);
     if (pick.decisionCenter.canBet) {
       assert(Number(pick.stake) > 0, 'Pick prêt sans mise positive', pick);
     } else {

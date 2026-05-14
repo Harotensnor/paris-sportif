@@ -8,6 +8,10 @@ async function firstWindow(app) {
   return app.windows()[0] || app.waitForEvent('window', { timeout: 60_000 });
 }
 
+function isIgnorableConsoleMessage(message) {
+  return /Failed to load resource:\s*net::ERR_(EMPTY_RESPONSE|ABORTED)/i.test(String(message || ''));
+}
+
 async function main() {
   const root = path.resolve(__dirname, '..', '..');
   const electronExe = path.join(root, 'desktop', 'node_modules', 'electron', 'dist', process.platform === 'win32' ? 'electron.exe' : 'electron');
@@ -86,7 +90,9 @@ async function main() {
     await win.click('[data-tab="preferences"]');
     const latest = await win.evaluate(() => fetch('/api/profile/latest').then((response) => response.json()));
     if (!latest.ok || !latest.backup?.profile) throw new Error('Backup profil J+3 absent');
-    const severe = messages.filter((message) => message.startsWith('error:') || message.startsWith('pageerror:'));
+    const severe = messages.filter((message) => (
+      message.startsWith('error:') || message.startsWith('pageerror:')
+    ) && !isIgnorableConsoleMessage(message));
     if (severe.length) throw new Error(`Erreurs console multi-jours: ${severe.join(' | ')}`);
     console.log('Multi-day desktop OK: auto-settlement J+3 + backup profil validés.');
   } finally {

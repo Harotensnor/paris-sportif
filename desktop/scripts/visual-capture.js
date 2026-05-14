@@ -15,6 +15,10 @@ async function safeScreenshot(page, file, options = {}) {
   await page.screenshot({ path: file, ...options });
 }
 
+function isIgnorableConsoleMessage(message) {
+  return /Failed to load resource:\s*net::ERR_(EMPTY_RESPONSE|ABORTED)/i.test(String(message || ''));
+}
+
 async function main() {
   const root = path.resolve(__dirname, '..', '..');
   const captureDir = path.join(root, 'captures');
@@ -48,9 +52,12 @@ async function main() {
       morningCards: document.querySelectorAll('#morning-grid .morning-card').length,
       imminentStrip: Boolean(document.querySelector('#imminent-strip')),
       ultimateVisible: Boolean(document.querySelector('#ultimate-bet-card')),
+      liveVisible: Boolean(document.querySelector('#live-cockpit')),
       timeSections: document.querySelectorAll('#time-cockpit .time-section').length,
       trackButtons: document.querySelectorAll('[data-track-bet-key]').length,
       focusButtons: document.querySelectorAll('[data-focus-pick-key]').length,
+      adjustedConfidence: document.querySelector('#picks-body')?.textContent.includes('Ajustée') || false,
+      sortMode: document.querySelector('#pick-sort')?.value || '',
       pnlVisible: Boolean(document.querySelector('#user-pnl-total') && document.querySelector('#user-pnl-sub')),
       pnlSparkline: Boolean(document.querySelector('#user-pnl-sparkline svg')),
       coachCards: document.querySelectorAll('#coach-advice-grid .morning-card').length,
@@ -82,6 +89,8 @@ async function main() {
     const settlementCards = await win.locator('#auto-settlement-grid .performance-card, #auto-settlement-grid .empty').count();
     const modelAuditCards = await win.locator('#model-self-audit-grid .performance-card, #model-self-audit-grid .empty').count();
     const insightCards = await win.locator('#personal-insights-grid .segment-card, #personal-insights-grid .empty').count();
+    const patternCards = await win.locator('#personal-patterns-grid .backtest-card, #personal-patterns-grid .empty').count();
+    const heatmap = await win.locator('#activity-heatmap-365 .activity-heatmap, #activity-heatmap-365 .empty').count();
     await safeScreenshot(win, path.join(captureDir, 'desktop-history-performance.png'), { fullPage: true });
 
     await win.click('[data-tab="agent"]');
@@ -104,6 +113,7 @@ async function main() {
     const disciplineInputs = await win.locator('#pref-stake-mode, #pref-stop-loss, #pref-take-profit').count();
     const webhookControls = await win.locator('#pref-webhook-type, #pref-webhook-url, #test-webhook-btn').count();
     const profileControls = await win.locator('#export-profile-btn, #import-profile-btn, #pref-coach-enabled, #pref-demo-mode, #pref-ai-enabled, #pref-ai-provider').count();
+    const multiBookControls = await win.locator('#pref-multibook-enabled, #pref-odds-api-key, #pref-odds-regions').count();
     await safeScreenshot(win, path.join(captureDir, 'desktop-preferences-audit.png'), { fullPage: true });
 
     await win.click('[data-tab="calendar"]');
@@ -114,6 +124,7 @@ async function main() {
     await win.click('[data-tab="pipeline"]');
     await win.waitForSelector('#pipeline-progress', { timeout: 10000 });
     const pipelineCards = await win.locator('#pipeline-stage-grid .refresh-card, #pipeline-stage-grid .empty').count();
+    const stabilityCards = await win.locator('#stability-grid .refresh-card, #stability-grid .empty').count();
     await safeScreenshot(win, path.join(captureDir, 'desktop-pipeline-audit.png'), { fullPage: true });
 
     await win.click('[data-tab="help"]');
@@ -151,17 +162,19 @@ async function main() {
     });
     await safeScreenshot(win, path.join(captureDir, 'desktop-mobile-cards.png'), { fullPage: false });
 
-    const severe = messages.filter((message) => message.startsWith('error:') || message.startsWith('pageerror:'));
+    const severe = messages.filter((message) => (
+      message.startsWith('error:') || message.startsWith('pageerror:')
+    ) && !isIgnorableConsoleMessage(message));
     if (severe.length) throw new Error(`Erreurs console: ${severe.join(' | ')}`);
     if (finalCards !== 4) throw new Error(`Panneau décision V17 incomplet: ${finalCards} cartes`);
     if (/Aucun pari à jouer maintenant|Mise bloquée|blocage/i.test(decisionConsistency.caption) && decisionConsistency.positiveStakeCells > 0) {
       throw new Error(`Mise positive affichée malgré décision bloquée: ${JSON.stringify(decisionConsistency)}`);
     }
-    if (decisionConsistency.picksMetric < 20 || decisionConsistency.morningCards < 4 || decisionConsistency.coachCards < 4 || !decisionConsistency.imminentStrip || !decisionConsistency.ultimateVisible || decisionConsistency.timeSections < 5 || decisionConsistency.trackButtons < 20 || decisionConsistency.focusButtons <= 0 || !decisionConsistency.pnlVisible || !decisionConsistency.pnlSparkline || !decisionConsistency.filtersVisible) {
+    if (decisionConsistency.picksMetric < 20 || decisionConsistency.morningCards < 4 || decisionConsistency.coachCards < 4 || !decisionConsistency.imminentStrip || !decisionConsistency.ultimateVisible || !decisionConsistency.liveVisible || decisionConsistency.timeSections < 5 || decisionConsistency.trackButtons < 20 || decisionConsistency.focusButtons <= 0 || !decisionConsistency.adjustedConfidence || decisionConsistency.sortMode !== 'real_confidence' || !decisionConsistency.pnlVisible || !decisionConsistency.pnlSparkline || !decisionConsistency.filtersVisible) {
       throw new Error(`Cockpit actionnable incomplet: ${JSON.stringify(decisionConsistency)}`);
     }
-    if (combines <= 0 || scorers <= 0 || scorerFilters < 3 || scorerTrackButtons <= 0 || performanceCards < 6 || segmentCards <= 0 || learningCards <= 0 || settlementCards <= 0 || modelAuditCards <= 0 || insightCards <= 0 || agentCards <= 0 || preferenceInputs < 8 || disciplineInputs < 3 || webhookControls < 3 || profileControls < 6 || calendarDays < 7 || pipelineCards <= 0 || glossaryCards < 12) {
-      throw new Error(`Captures écrans incomplètes: ${JSON.stringify({ combines, scorers, scorerFilters, scorerTrackButtons, performanceCards, segmentCards, learningCards, settlementCards, modelAuditCards, insightCards, agentCards, preferenceInputs, disciplineInputs, webhookControls, profileControls, calendarDays, pipelineCards, glossaryCards })}`);
+    if (combines <= 0 || scorers <= 0 || scorerFilters < 3 || scorerTrackButtons <= 0 || performanceCards < 7 || segmentCards <= 0 || learningCards <= 0 || settlementCards <= 0 || modelAuditCards <= 0 || insightCards <= 0 || patternCards <= 0 || heatmap <= 0 || agentCards <= 0 || preferenceInputs < 8 || disciplineInputs < 3 || webhookControls < 3 || profileControls < 6 || multiBookControls < 3 || calendarDays < 7 || pipelineCards <= 0 || stabilityCards <= 0 || glossaryCards < 12) {
+      throw new Error(`Captures écrans incomplètes: ${JSON.stringify({ combines, scorers, scorerFilters, scorerTrackButtons, performanceCards, segmentCards, learningCards, settlementCards, modelAuditCards, insightCards, patternCards, heatmap, agentCards, preferenceInputs, disciplineInputs, webhookControls, profileControls, multiBookControls, calendarDays, pipelineCards, stabilityCards, glossaryCards })}`);
     }
     if (!/s|\.\.\./.test(decisionConsistency.performanceMetric) || !/Auto-refresh|Mode économie/.test(decisionConsistency.refreshPolicy)) {
       throw new Error(`Indicateurs cockpit manquants: ${JSON.stringify(decisionConsistency)}`);

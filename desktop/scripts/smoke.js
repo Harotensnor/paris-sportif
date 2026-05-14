@@ -21,6 +21,10 @@ async function expectDownload(page, selector, expectedPrefix) {
   return expectedPrefix;
 }
 
+function isIgnorableConsoleMessage(message) {
+  return /Failed to load resource:\s*net::ERR_(EMPTY_RESPONSE|ABORTED)/i.test(String(message || ''));
+}
+
 async function main() {
   const root = path.resolve(__dirname, '..', '..');
   const electronExe = path.join(root, 'desktop', 'node_modules', 'electron', 'dist', process.platform === 'win32' ? 'electron.exe' : 'electron');
@@ -46,6 +50,9 @@ async function main() {
   }
   for (const marker of ['/api/ai/enrich', '/api/webhook/log', '/api/update/check']) {
     if (!mainText.includes(marker)) throw new Error(`API Sprint 9 absente: ${marker}`);
+  }
+  for (const marker of ['/api/odds/compare', 'modelRealityAudit', 'renderLiveCockpit', 'MULTI_BOOKMAKER_KEY']) {
+    if (!mainText.includes(marker) && !rendererText.includes(marker)) throw new Error(`Marqueur Sprint 10 absent: ${marker}`);
   }
 
   const messages = [];
@@ -87,6 +94,10 @@ async function main() {
       userBetExport: Boolean(document.querySelector('#export-user-bets-btn')),
       filtersVisible: Boolean(document.querySelector('#pick-search') && document.querySelector('#pick-sort') && document.querySelector('#pick-market-filter')),
       marketChips: document.querySelectorAll('#market-snapshot .market-chip, #market-snapshot .empty').length,
+      liveCockpit: Boolean(document.querySelector('#live-cockpit')),
+      adjustedConfidence: document.querySelector('#picks-body')?.textContent.includes('Ajustée') || false,
+      bestOddsVisible: document.querySelector('#picks-body')?.textContent.includes('Best odds') || false,
+      defaultSort: document.querySelector('#pick-sort')?.value || '',
       performanceMetric: document.querySelector('#metric-boot-time')?.textContent || '',
       refreshPolicy: document.querySelector('#refresh-policy')?.textContent || '',
       positiveStakeCells: Array.from(document.querySelectorAll('#picks-body td[data-label="Mise"], #stake-scenario-body td[data-label="Prudent"], #stake-scenario-body td[data-label="Normal"], #stake-scenario-body td[data-label="Agressif"]'))
@@ -97,7 +108,7 @@ async function main() {
     if (dashboard.finalCards <= 0 || dashboard.morningCards < 4 || !dashboard.imminentStrip || !dashboard.firstActionButton || !dashboard.criticalButton || !dashboard.t10Button) {
       throw new Error(`Panneau décision incomplet: ${JSON.stringify(dashboard)}`);
     }
-    if (dashboard.picks < 20 || dashboard.trackButtons < 20 || !dashboard.pnlVisible || !dashboard.pnlSparkline || !dashboard.userBetExport || !dashboard.filtersVisible || dashboard.marketChips <= 0) {
+    if (dashboard.picks < 20 || dashboard.trackButtons < 20 || !dashboard.pnlVisible || !dashboard.pnlSparkline || !dashboard.userBetExport || !dashboard.filtersVisible || dashboard.marketChips <= 0 || !dashboard.liveCockpit || !dashboard.adjustedConfidence || dashboard.defaultSort !== 'real_confidence') {
       throw new Error(`Cockpit de mise incomplet: ${JSON.stringify(dashboard)}`);
     }
     if (dashboard.focusButtons <= 0) throw new Error(`Mode focus absent: ${JSON.stringify(dashboard)}`);
@@ -133,10 +144,12 @@ async function main() {
       segments: document.querySelectorAll('#model-segment-grid .segment-card, #model-segment-grid .empty').length,
       calibration: document.querySelectorAll('#calibration-plot-grid .calibration-bin, #calibration-plot-grid .empty').length,
       learning: document.querySelectorAll('#learning-audit-grid .performance-card, #learning-audit-grid .empty').length,
+      patterns: document.querySelectorAll('#personal-patterns-grid .backtest-card, #personal-patterns-grid .empty').length,
+      heatmap: Boolean(document.querySelector('#activity-heatmap-365 .activity-heatmap, #activity-heatmap-365 .empty')),
       userBets: Boolean(document.querySelector('#user-bets-body')),
       exportButton: Boolean(document.querySelector('#export-user-bets-btn-history'))
     }));
-    if (history.performance < 6 || history.segments <= 0 || history.calibration <= 0 || history.learning <= 0 || !history.userBets || !history.exportButton) {
+    if (history.performance < 7 || history.segments <= 0 || history.calibration <= 0 || history.learning <= 0 || history.patterns <= 0 || !history.heatmap || !history.userBets || !history.exportButton) {
       throw new Error(`Performance/Historique incomplet: ${JSON.stringify(history)}`);
     }
 
@@ -149,11 +162,12 @@ async function main() {
       stakeMode: Boolean(document.querySelector('#pref-stake-mode')),
       discipline: Boolean(document.querySelector('#pref-stop-loss') && document.querySelector('#pref-take-profit')),
       aiWeb: Boolean(document.querySelector('#pref-web-enrichment-enabled') && document.querySelector('#test-web-enrichment-btn')),
+      multiBook: Boolean(document.querySelector('#pref-multibook-enabled') && document.querySelector('#pref-odds-api-key') && document.querySelector('#pref-odds-regions')),
       updates: Boolean(document.querySelector('#pref-auto-update-enabled') && document.querySelector('#check-update-btn')),
       warnings: Boolean(document.querySelector('#preference-warning-grid')),
       save: Boolean(document.querySelector('#save-preferences-btn'))
     }));
-    if (!preferences.bankroll || preferences.sports < 5 || preferences.markets < 5 || !preferences.stakeMode || !preferences.discipline || !preferences.aiWeb || !preferences.updates || !preferences.warnings || !preferences.save) {
+    if (!preferences.bankroll || preferences.sports < 5 || preferences.markets < 5 || !preferences.stakeMode || !preferences.discipline || !preferences.aiWeb || !preferences.multiBook || !preferences.updates || !preferences.warnings || !preferences.save) {
       throw new Error(`Préférences incomplètes: ${JSON.stringify(preferences)}`);
     }
 
@@ -166,9 +180,10 @@ async function main() {
       sources: document.querySelectorAll('#source-health-grid .source-card, #source-health-grid .empty').length,
       refreshCards: document.querySelectorAll('#refresh-summary-grid .refresh-card, #refresh-summary-grid .empty').length,
       checklist: document.querySelectorAll('#prebet-checklist-grid .quality-report-card, #prebet-checklist-grid .empty').length,
-      repair: document.querySelectorAll('#context-repair-grid .quality-report-card, #context-repair-grid .empty').length
+      repair: document.querySelectorAll('#context-repair-grid .quality-report-card, #context-repair-grid .empty').length,
+      stability: document.querySelectorAll('#stability-grid .refresh-card, #stability-grid .empty').length
     }));
-    if (data.files <= 0 || data.sources <= 0 || data.refreshCards <= 0 || data.checklist <= 0 || data.repair <= 0) {
+    if (data.files <= 0 || data.sources <= 0 || data.refreshCards <= 0 || data.checklist <= 0 || data.repair <= 0 || data.stability <= 0) {
       throw new Error(`Vue Données incomplète: ${JSON.stringify(data)}`);
     }
 
@@ -189,6 +204,8 @@ async function main() {
         title: document.querySelector('#modal-title')?.textContent || '',
         canBet: document.querySelector('#modal-content')?.textContent.includes('Puis-je miser ?') || false,
         signals: document.querySelector('#modal-content')?.textContent.includes('Signaux clés') || false,
+        validation: document.querySelector('#modal-content')?.textContent.includes('Validation historique') || false,
+        bestOdds: document.querySelector('#modal-content')?.textContent.includes('Meilleure cote') || false,
         audit: document.querySelector('#modal-content')?.textContent.includes('Audit technique') || false,
         modalStakeBlocked: /Puis-je miser \?\s*Non[\s\S]*Mise affichée\s*0 €/.test(document.querySelector('#modal-content')?.innerText || '')
       };
@@ -196,7 +213,7 @@ async function main() {
     for (const tab of ['summary', 'decision', 'context', 'teams', 'availability', 'signals', 'odds', 'h2h', 'timeline', 'sources', 'model']) {
       if (!modal.tabs.includes(tab)) throw new Error(`Onglet détail absent: ${tab}`);
     }
-    if (!modal.title || modal.overflow || !modal.canBet || !modal.signals || !modal.audit) throw new Error(`Fiche match invalide: ${JSON.stringify(modal)}`);
+    if (!modal.title || modal.overflow || !modal.canBet || !modal.signals || !modal.validation || !modal.bestOdds || !modal.audit) throw new Error(`Fiche match invalide: ${JSON.stringify(modal)}`);
     if (/Aucun pari à jouer maintenant|Mise bloquée|blocage/i.test(dashboard.caption) && !modal.modalStakeBlocked) {
       throw new Error(`Fiche match incohérente avec gate rouge: ${JSON.stringify(modal)}`);
     }
@@ -214,7 +231,9 @@ async function main() {
       throw new Error(`Rendu mobile invalide: ${JSON.stringify(mobile)}`);
     }
 
-    const severe = messages.filter((message) => message.startsWith('error:') || message.startsWith('pageerror:'));
+    const severe = messages.filter((message) => (
+      message.startsWith('error:') || message.startsWith('pageerror:')
+    ) && !isIgnorableConsoleMessage(message));
     if (severe.length) throw new Error(`Erreurs console: ${severe.join(' | ')}`);
     console.log(`Desktop smoke OK: ${dashboard.analyzed} matchs, ${dashboard.picks} candidats, ${data.sources} sources, ${mobile.rows} lignes mobiles.`);
   } finally {

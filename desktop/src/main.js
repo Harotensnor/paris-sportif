@@ -17,6 +17,7 @@ const PROFILE_BACKUP_ROOT = path.join(STATE_ROOT, 'backups');
 const DATA_BACKUP_ROOT = path.join(STATE_ROOT, 'data-backups');
 const DATA_BACKUP_PATH = path.join(DATA_BACKUP_ROOT, 'data-latest.js');
 const AI_WEB_ENRICHMENT_PATH = path.join(STATE_ROOT, 'ai-web-enrichment.json');
+const ODDS_COMPARISON_PATH = path.join(STATE_ROOT, 'odds-comparison.json');
 const WEBHOOK_LOG_PATH = path.join(STATE_ROOT, 'webhook-log.jsonl');
 const UPDATE_STATUS_PATH = path.join(STATE_ROOT, 'update-status.json');
 const SIGNAL_SOURCES = new Set(['all', 'weather', 'referees', 'injuries', 'lineups', 'team_form', 'team_stats', 'h2h', 'context']);
@@ -83,7 +84,10 @@ const memoryState = {
   rssMb: null,
   heapUsedMb: null,
   updatedAt: null,
-  warning: null
+  warning: null,
+  samples: [],
+  startedAt: new Date().toISOString(),
+  lastGcAt: null
 };
 const aiRuntime = {
   day: new Date().toISOString().slice(0, 10),
@@ -528,6 +532,194 @@ async function webEnrichPick(config, pick, options = {}) {
   return { ok: true, cached: false, record, summary: store.summary };
 }
 
+function oddsComparisonStore() {
+  const base = readJsonFileDefault(ODDS_COMPARISON_PATH, { byKey: {}, runs: [], summary: {} });
+  if (!base || typeof base !== 'object') return { byKey: {}, runs: [], summary: {} };
+  base.byKey = base.byKey && typeof base.byKey === 'object' ? base.byKey : {};
+  base.runs = Array.isArray(base.runs) ? base.runs : [];
+  base.summary = base.summary && typeof base.summary === 'object' ? base.summary : {};
+  return base;
+}
+
+function oddsKeyForPick(pick) {
+  return compactKey([
+    pick?.key,
+    pick?.id,
+    pick?.title,
+    pick?.market,
+    pick?.label,
+    pick?.kickoff || pick?.start
+  ].filter(Boolean).join(':')) || `odds:${Date.now()}`;
+}
+
+function normalizeName(value) {
+  return compactKey(value).replace(/fc|cf|sc|afc|club/g, '');
+}
+
+function teamMatchScore(candidate, expected) {
+  const a = normalizeName(candidate);
+  const b = normalizeName(expected);
+  if (!a || !b) return 0;
+  if (a === b) return 1;
+  if (a.includes(b) || b.includes(a)) return 0.82;
+  const aa = new Set(a.split(/[^a-z0-9]+/).filter(Boolean));
+  const bb = new Set(b.split(/[^a-z0-9]+/).filter(Boolean));
+  const intersection = Array.from(aa).filter((item) => bb.has(item)).length;
+  return intersection / Math.max(1, Math.max(aa.size, bb.size));
+}
+
+function oddsEventScore(event, pick) {
+  const teams = splitMatchTitle(pick?.title || '');
+  const h = teamMatchScore(event.home_team, teams.home);
+  const a = teamMatchScore(event.away_team, teams.away);
+  const rev = teamMatchScore(event.home_team, teams.away) + teamMatchScore(event.away_team, teams.home);
+  const direct = h + a;
+  const timeDelta = Math.abs(Date.parse(event.commence_time || '') - Date.parse(pick?.start || pick?.kickoff || ''));
+  const timeBonus = Number.isFinite(timeDelta) && timeDelta < 4 * 60 * 60 * 1000 ? 0.35 : 0;
+  return Math.max(direct, rev) + timeBonus;
+}
+
+function oddsMarketKind(pick) {
+  const text = compactKey(`${pick?.market || ''} ${pick?.label || ''}`);
+  if (text.includes('handicap') || text.includes('spread')) return 'spreads';
+  if (text.includes('over') || text.includes('under') || text.includes('plus') || text.includes('moins') || text.includes('total')) return 'totals';
+  return 'h2h';
+}
+
+function outcomeMatchesPick(outcome, pick, marketKey) {
+  const label = compactKey(`${pick?.label || ''} ${pick?.market || ''}`);
+  const name = compactKey(outcome?.name || outcome?.description || '');
+  if (!name) return false;
+  if (marketKey === 'totals') {
+    if (label.includes('over') || label.includes('plus')) return name.includes('over') || name.includes('plus');
+    if (label.includes('under') || label.includes('moins')) return name.includes('under') || name.includes('moins');
+  }
+  const teams = splitMatchTitle(pick?.title || '');
+  if (label.includes('nul') || label === 'draw' || label.includes('draw')) return name.includes('draw') || name.includes('nul');
+  return teamMatchScore(name, pick?.label || '') > 0.55 ||
+    teamMatchScore(name, teams.home) > 0.75 ||
+    teamMatchScore(name, teams.away) > 0.75;
+}
+
+async function fetchJsonWithTimeout(url, timeoutMs = 10000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const response = await fetch(url, {
+      signal: controller.signal,
+      headers: {
+        Accept: 'application/json',
+        'User-Agent': 'Paris-Sportif-Desktop/0.1'
+      }
+    });
+    const text = await response.text();
+    if (!response.ok) throw new Error(`HTTP ${response.status}: ${text.slice(0, 160)}`);
+    return JSON.parse(text);
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function compareBookmakerOdds(config, pick, options = {}) {
+  const store = oddsComparisonStore();
+  const key = oddsKeyForPick(pick);
+  const ttlMs = Math.max(5, Number(config.cacheMinutes || 30) || 30) * 60 * 1000;
+  const cached = store.byKey[key];
+  if (!options.force && cached?.checkedAt && Date.now() - Date.parse(cached.checkedAt) < ttlMs) {
+    return { ok: true, cached: true, record: cached, summary: store.summary };
+  }
+  const winamaxOdd = Number(pick?.winamaxOdd || pick?.odd || 0);
+  const baseRecord = {
+    key,
+    title: pick?.title || '',
+    market: pick?.market || '',
+    label: pick?.label || '',
+    checkedAt: new Date().toISOString(),
+    winamaxOdd,
+    best: winamaxOdd > 1 ? { bookmaker: 'Winamax', odd: winamaxOdd, url: cleanPublicUrl(pick?.winamaxUrl || '') } : null,
+    offers: [],
+    status: 'winamax_only',
+    source: 'local'
+  };
+  if (config.enabled === false) {
+    baseRecord.status = 'disabled';
+    store.byKey[key] = baseRecord;
+    atomicWriteJson(ODDS_COMPARISON_PATH, store);
+    return { ok: true, skipped: true, record: baseRecord, summary: store.summary };
+  }
+  const apiKey = String(config.apiKey || '').trim();
+  if (!apiKey) {
+    baseRecord.status = 'needs_key';
+    baseRecord.reason = 'clé The Odds API absente';
+    store.byKey[key] = baseRecord;
+    store.updatedAt = baseRecord.checkedAt;
+    atomicWriteJson(ODDS_COMPARISON_PATH, store);
+    return { ok: true, record: baseRecord, summary: store.summary };
+  }
+  const market = oddsMarketKind(pick);
+  const regions = String(config.regions || 'eu').replace(/[^a-z,]/gi, '') || 'eu';
+  const url = `https://api.the-odds-api.com/v4/sports/upcoming/odds/?apiKey=${encodeURIComponent(apiKey)}&regions=${encodeURIComponent(regions)}&markets=${encodeURIComponent(market)}&oddsFormat=decimal&dateFormat=iso`;
+  try {
+    const events = await fetchJsonWithTimeout(url, 12000);
+    const event = (Array.isArray(events) ? events : [])
+      .map((item) => ({ item, score: oddsEventScore(item, pick) }))
+      .sort((a, b) => b.score - a.score)[0];
+    if (!event || event.score < 1.25) {
+      baseRecord.status = 'unmatched';
+      baseRecord.reason = 'match non reconnu dans la réponse odds';
+    } else {
+      const offers = [];
+      for (const bookmaker of Array.isArray(event.item.bookmakers) ? event.item.bookmakers : []) {
+        for (const marketRow of Array.isArray(bookmaker.markets) ? bookmaker.markets : []) {
+          if (marketRow.key !== market) continue;
+          for (const outcome of Array.isArray(marketRow.outcomes) ? marketRow.outcomes : []) {
+            if (!outcomeMatchesPick(outcome, pick, market)) continue;
+            const odd = Number(outcome.price || 0);
+            if (odd > 1) offers.push({
+              bookmaker: bookmaker.title || bookmaker.key || 'Bookmaker',
+              odd,
+              url: null,
+              market,
+              name: outcome.name || ''
+            });
+          }
+        }
+      }
+      offers.sort((a, b) => b.odd - a.odd);
+      baseRecord.offers = offers.slice(0, 12);
+      baseRecord.best = offers[0] || baseRecord.best;
+      baseRecord.status = offers.length ? 'ok' : 'no_offer';
+      baseRecord.source = 'the-odds-api';
+      baseRecord.matchedEvent = {
+        home: event.item.home_team,
+        away: event.item.away_team,
+        commenceTime: event.item.commence_time,
+        score: Number(event.score.toFixed(2))
+      };
+    }
+  } catch (error) {
+    baseRecord.status = 'failed';
+    baseRecord.reason = error.name === 'AbortError' ? 'timeout odds 12s' : error.message;
+  }
+  const bestOdd = Number(baseRecord.best?.odd || 0);
+  if (bestOdd > 1 && winamaxOdd > 1) {
+    const delta = (bestOdd - winamaxOdd) / winamaxOdd;
+    baseRecord.edgeOnBestOdd = Number((Number(pick?.probability || 0) - 1 / bestOdd).toFixed(4));
+    if (delta >= 0.10) baseRecord.valueAlert = `meilleure cote +${Math.round(delta * 100)}% chez ${baseRecord.best.bookmaker}`;
+  }
+  store.byKey[key] = baseRecord;
+  store.updatedAt = baseRecord.checkedAt;
+  store.runs = [{ at: baseRecord.checkedAt, key, status: baseRecord.status, title: baseRecord.title }, ...store.runs].slice(0, 80);
+  store.summary = {
+    checked: Object.keys(store.byKey).length,
+    valueAlerts: Object.values(store.byKey).filter((row) => row.valueAlert).length,
+    lastStatus: baseRecord.status
+  };
+  atomicWriteJson(ODDS_COMPARISON_PATH, store);
+  appendRefreshLine(`[odds] ${baseRecord.title || key}: ${baseRecord.status}${baseRecord.valueAlert ? ` · ${baseRecord.valueAlert}` : ''}`);
+  return { ok: true, record: baseRecord, summary: store.summary };
+}
+
 async function checkForUpdates(config = {}) {
   const channel = String(config.channel || 'stable').toLowerCase() === 'beta' ? 'beta' : 'stable';
   const status = {
@@ -761,10 +953,25 @@ setInterval(sampleMemoryUsage, 5 * 60 * 1000);
 
 function sampleMemoryUsage() {
   const usage = process.memoryUsage();
+  const now = Date.now();
+  if (typeof global.gc === 'function' && (!memoryState.lastGcAt || now - Date.parse(memoryState.lastGcAt) > 60 * 60 * 1000)) {
+    try {
+      global.gc();
+      memoryState.lastGcAt = new Date(now).toISOString();
+    } catch {
+      // GC explicite facultatif, seulement si Electron est lancé avec --expose-gc.
+    }
+  }
   memoryState.rssMb = Number((usage.rss / 1024 / 1024).toFixed(1));
   memoryState.heapUsedMb = Number((usage.heapUsed / 1024 / 1024).toFixed(1));
   memoryState.updatedAt = new Date().toISOString();
-  memoryState.warning = memoryState.rssMb > 500 ? `Mémoire haute: ${memoryState.rssMb} MB RSS` : null;
+  memoryState.samples.push({ at: memoryState.updatedAt, rssMb: memoryState.rssMb, heapUsedMb: memoryState.heapUsedMb });
+  while (memoryState.samples.length > 24 * 60) memoryState.samples.shift();
+  const avg = memoryState.samples.reduce((sum, row) => sum + Number(row.rssMb || 0), 0) / Math.max(1, memoryState.samples.length);
+  memoryState.avgRssMb = Number(avg.toFixed(1));
+  memoryState.maxRssMb = Number(Math.max(...memoryState.samples.map((row) => Number(row.rssMb || 0)), memoryState.rssMb).toFixed(1));
+  memoryState.uptimeMinutes = Number(((Date.now() - Date.parse(memoryState.startedAt)) / 60000).toFixed(1));
+  memoryState.warning = memoryState.rssMb > 600 ? `Mémoire haute: ${memoryState.rssMb} MB RSS` : null;
   if (memoryState.warning) appendRefreshLine(`[desktop] ${memoryState.warning}`);
   return memoryState;
 }
@@ -1296,6 +1503,26 @@ async function handleApi(req, res, url) {
       jsonResponse(res, 200, result);
     } catch (error) {
       jsonResponse(res, 200, { ok: false, error: error.message, summary: enrichmentStore().summary });
+    }
+    return;
+  }
+  if (url.pathname === '/api/odds/state') {
+    jsonResponse(res, 200, oddsComparisonStore());
+    return;
+  }
+  if (url.pathname === '/api/odds/compare') {
+    if (req.method !== 'POST') {
+      jsonResponse(res, 405, { ok: false, error: 'POST required' });
+      return;
+    }
+    try {
+      const payload = await readJsonBody(req, 256 * 1024);
+      const result = await compareBookmakerOdds(payload.config || {}, payload.pick || {}, {
+        force: Boolean(payload.force)
+      });
+      jsonResponse(res, 200, result);
+    } catch (error) {
+      jsonResponse(res, 200, { ok: false, error: error.message, summary: oddsComparisonStore().summary });
     }
     return;
   }

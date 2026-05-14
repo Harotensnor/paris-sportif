@@ -202,6 +202,10 @@
           <div class="empty">Sélection du bet ultime en cours...</div>
         </section>
 
+        <section class="live-cockpit" id="live-cockpit" aria-label="Matchs en direct">
+          <div class="empty compact-empty">Aucun match live suivi pour le moment.</div>
+        </section>
+
         <section class="time-cockpit" id="time-cockpit" aria-label="Picks par horizon temporel">
           <div class="empty">Classement temporel des picks en cours...</div>
         </section>
@@ -224,6 +228,7 @@
             <option value="all">Tous marchés</option>
           </select>
           <select id="pick-sort">
+            <option value="real_confidence">Confiance ajustée</option>
             <option value="edge">Edge</option>
             <option value="confidence">Confiance</option>
             <option value="kickoff">Départ</option>
@@ -468,6 +473,29 @@
         </div>
         <div class="segment-grid" id="personal-insights-grid">
           <div class="empty">Aucun insight robuste pour l'instant.</div>
+        </div>
+
+        <div class="section-head compact">
+          <div>
+            <h3>Mes patterns avancés</h3>
+            <p>ROI et win rate par jour, horaire, sport, ligue, marché, mise, tier et segment.</p>
+          </div>
+        </div>
+        <div class="morning-grid" id="personal-patterns-insights">
+          <div class="empty">Insights avancés en attente de sample.</div>
+        </div>
+        <div class="personal-patterns-grid" id="personal-patterns-grid">
+          <div class="empty">Aucun pattern avancé calculé.</div>
+        </div>
+
+        <div class="section-head compact">
+          <div>
+            <h3>Calendrier d'activité 365 jours</h3>
+            <p>Chaque case résume une journée de paris suivis : intensité et résultat net.</p>
+          </div>
+        </div>
+        <div class="activity-heatmap-wrap" id="activity-heatmap-365">
+          <div class="empty">Aucun pari suivi réglé sur la période.</div>
         </div>
 
         <div class="section-head compact">
@@ -959,6 +987,20 @@
             <p class="match-sub">Elle cure, rédige, détecte les anomalies et enrichit les matchs en arrière-plan. Sans clé, fallback heuristique complet.</p>
           </article>
           <article class="preference-card">
+            <h4>Multi-bookmaker</h4>
+            <label class="check-line"><input id="pref-multibook-enabled" type="checkbox"> Comparer les meilleures cotes</label>
+            <label>The Odds API key<input id="pref-odds-api-key" type="password" autocomplete="off" placeholder="optionnel"></label>
+            <label>Régions
+              <select id="pref-odds-regions">
+                <option value="eu">Europe</option>
+                <option value="uk">UK</option>
+                <option value="eu,uk">Europe + UK</option>
+                <option value="us">US</option>
+              </select>
+            </label>
+            <p class="match-sub">Sans clé, le logiciel reste Winamax-only et affiche clairement “clé absente”. Avec clé, le process principal compare les cotes en cache 30 min.</p>
+          </article>
+          <article class="preference-card">
             <h4>Avancé</h4>
             <label class="check-line"><input id="pref-auto-update-enabled" type="checkbox"> Auto-update au démarrage</label>
             <label>Canal
@@ -1034,6 +1076,9 @@
         </div>
         <div class="refresh-stage-grid" id="web-enrichment-summary">
           <div class="empty">Enrichissements web en attente.</div>
+        </div>
+        <div class="refresh-stage-grid" id="stability-grid">
+          <div class="empty">Stabilité en cours de mesure.</div>
         </div>
         <div class="refresh-stage-grid" id="pipeline-stage-grid">
           <div class="empty">Historique refresh en attente.</div>

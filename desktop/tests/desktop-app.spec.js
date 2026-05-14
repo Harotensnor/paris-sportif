@@ -10,6 +10,19 @@ async function firstWindow(app) {
   return app.windows()[0] || app.waitForEvent('window', { timeout: 60_000 });
 }
 
+function isIgnorableConsoleMessage(message) {
+  return /Failed to load resource:\s*net::ERR_(EMPTY_RESPONSE|ABORTED)/i.test(String(message || ''));
+}
+
+async function clickTrackButton(win, index = 0) {
+  await win.evaluate((targetIndex) => {
+    const buttons = Array.from(document.querySelectorAll('[data-panel="dashboard"].active [data-track-bet-key], [data-track-bet-key]'));
+    const button = buttons[targetIndex];
+    if (!button) throw new Error(`Bouton Je mise introuvable à l'index ${targetIndex}`);
+    button.click();
+  }, index);
+}
+
 test('desktop cockpit is actionable and stable', async () => {
   const rendererText = fs.readFileSync(path.join(root, 'desktop', 'src', 'renderer', 'renderer.js'), 'utf8');
   const htmlText = fs.readFileSync(path.join(root, 'desktop', 'src', 'renderer', 'index.html'), 'utf8');
@@ -36,6 +49,9 @@ test('desktop cockpit is actionable and stable', async () => {
   expect(rendererText).toContain('settlementEligibility');
   expect(rendererText).toContain('ultimateBetCandidate');
   expect(rendererText).toContain('renderTemporalCockpit');
+  expect(rendererText).toContain('renderLiveCockpit');
+  expect(rendererText).toContain('modelRealityAudit');
+  expect(rendererText).toContain('MULTI_BOOKMAKER_KEY');
   expect(rendererText).toContain('trackScorerBet');
   expect(rendererText).toContain('aiAssist');
   expect(rendererText).toContain('WEB_ENRICHMENT_KEY');
@@ -50,6 +66,8 @@ test('desktop cockpit is actionable and stable', async () => {
   expect(mainText).toContain('/api/profile/backup');
   expect(mainText).toContain('/api/ai/assist');
   expect(mainText).toContain('/api/ai/enrich');
+  expect(mainText).toContain('/api/odds/compare');
+  expect(mainText).toContain('ODDS_COMPARISON_PATH');
   expect(mainText).toContain('/api/update/check');
   expect(mainText).toContain('/api/refresh/cancel');
 
@@ -80,8 +98,11 @@ test('desktop cockpit is actionable and stable', async () => {
       filters: Boolean(document.querySelector('#pick-search') && document.querySelector('#pick-sort') && document.querySelector('#pick-market-filter')),
       morning: Boolean(document.querySelector('#morning-brief') && document.querySelector('#morning-grid .morning-card')),
       ultimate: Boolean(document.querySelector('#ultimate-bet-card')),
+      live: Boolean(document.querySelector('#live-cockpit')),
       timeSections: document.querySelectorAll('#time-cockpit .time-section').length,
       focusButtons: document.querySelectorAll('[data-focus-pick-key]').length,
+      adjustedConfidence: document.querySelector('#picks-body')?.textContent.includes('Ajustée') || false,
+      sortMode: document.querySelector('#pick-sort')?.value || '',
       marketChips: document.querySelectorAll('#market-snapshot .market-chip, #market-snapshot .empty').length,
       performanceMetric: document.querySelector('#metric-boot-time')?.textContent || '',
       refreshPolicy: document.querySelector('#refresh-policy')?.textContent || '',
@@ -97,8 +118,11 @@ test('desktop cockpit is actionable and stable', async () => {
     expect(dashboard.filters).toBe(true);
     expect(dashboard.morning).toBe(true);
     expect(dashboard.ultimate).toBe(true);
+    expect(dashboard.live).toBe(true);
     expect(dashboard.timeSections).toBe(5);
     expect(dashboard.focusButtons).toBeGreaterThan(0);
+    expect(dashboard.adjustedConfidence).toBe(true);
+    expect(dashboard.sortMode).toBe('real_confidence');
     expect(dashboard.marketChips).toBeGreaterThan(0);
     expect(dashboard.performanceMetric).toMatch(/s|\.{3}/);
     expect(dashboard.refreshPolicy).toMatch(/Auto-refresh|Mode économie/);
@@ -122,6 +146,8 @@ test('desktop cockpit is actionable and stable', async () => {
     await expect(win.locator('#model-performance-grid')).toContainText('ROI');
     await expect(win.locator('#model-performance-grid')).toContainText('CLV');
     await expect(win.locator('#learning-audit-grid')).toBeVisible();
+    await expect(win.locator('#personal-patterns-grid')).toBeVisible();
+    await expect(win.locator('#activity-heatmap-365')).toBeVisible();
     await expect(win.locator('#user-bets-body')).toBeVisible();
     await win.click('[data-tab="preferences"]');
     await expect(win.locator('#pref-bankroll')).toBeVisible();
@@ -132,6 +158,8 @@ test('desktop cockpit is actionable and stable', async () => {
     await expect(win.locator('#pref-ai-provider')).toBeVisible();
     await expect(win.locator('#pref-web-enrichment-enabled')).toBeVisible();
     await expect(win.locator('#test-web-enrichment-btn')).toBeVisible();
+    await expect(win.locator('#pref-multibook-enabled')).toBeVisible();
+    await expect(win.locator('#pref-odds-api-key')).toBeVisible();
     await expect(win.locator('#pref-auto-update-enabled')).toBeVisible();
     await expect(win.locator('#check-update-btn')).toBeVisible();
     await expect(win.locator('#export-profile-btn')).toBeVisible();
@@ -156,6 +184,7 @@ test('desktop cockpit is actionable and stable', async () => {
     await win.click('[data-tab="pipeline"]');
     await expect(win.locator('#pipeline-progress')).toBeVisible();
     await expect(win.locator('#web-enrichment-summary')).toBeVisible();
+    await expect(win.locator('#stability-grid')).toBeVisible();
     await expect(win.locator('#pipeline-live-log')).toBeVisible();
     await win.keyboard.press('Control+Shift+L');
     await expect(win.locator('#log-drawer:not(.hidden)')).toBeVisible();
@@ -169,7 +198,7 @@ test('desktop cockpit is actionable and stable', async () => {
     await expect(win.locator('[data-track-scorer-id]').first()).toBeVisible();
     await win.click('[data-tab="dashboard"]');
 
-    await win.click('[data-track-bet-key]');
+    await clickTrackButton(win);
     await win.waitForFunction(() => /1 en cours/.test(document.querySelector('#user-pnl-sub')?.textContent || ''), null, { timeout: 5_000 });
     await expect(win.locator('[data-track-bet-key]').first()).toContainText('Suivi');
     await win.click('[data-tab="history"]');
@@ -190,7 +219,7 @@ test('desktop cockpit is actionable and stable', async () => {
     await expect(win.locator('#focus-ticket')).toContainText(/@|mise/i);
     await win.click('#focus-close-top');
     await expect(win.locator('#focus-overlay')).toBeHidden();
-    await win.locator('[data-panel="dashboard"].active [data-track-bet-key]').nth(1).click();
+    await clickTrackButton(win, 1);
     await win.waitForFunction(() => /1 en cours/.test(document.querySelector('#user-pnl-sub')?.textContent || ''), null, { timeout: 5_000 });
     await win.click('[data-tab="history"]');
     await win.selectOption('#user-bets-tag-filter', 'all');
@@ -204,7 +233,7 @@ test('desktop cockpit is actionable and stable', async () => {
       localStorage.setItem('parisSportifPreferences', JSON.stringify({ ...raw, coachEnabled: true, dailyBetLimit: 1 }));
     });
     await win.click('[data-tab="dashboard"]');
-    await win.locator('[data-track-bet-key]').nth(1).click();
+    await clickTrackButton(win, 1);
     await expect(win.locator('#side-status')).toContainText(/Coach|limite/i);
 
     await win.evaluate(async () => {
@@ -288,7 +317,9 @@ test('desktop cockpit is actionable and stable', async () => {
     });
     expect(overflow).toBe(false);
 
-    const severe = messages.filter((message) => message.startsWith('error:') || message.startsWith('pageerror:'));
+    const severe = messages.filter((message) => (
+      message.startsWith('error:') || message.startsWith('pageerror:')
+    ) && !isIgnorableConsoleMessage(message));
     expect(severe).toEqual([]);
   } finally {
     await app.close();

@@ -3133,6 +3133,111 @@ td.empty::before,
   justify-content: flex-end;
 }
 
+.live-cockpit {
+  display: grid;
+  gap: 12px;
+  margin: 18px 0 22px;
+}
+
+.live-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.live-card {
+  border: 1px solid rgba(248, 113, 113, .42);
+  border-left: 4px solid var(--danger);
+  border-radius: 14px;
+  padding: 14px;
+  background: linear-gradient(135deg, rgba(248, 113, 113, .12), rgba(2, 6, 23, .36));
+}
+
+.live-card > span,
+.live-card p {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.live-card strong {
+  display: block;
+  margin: 6px 0;
+  font-size: 16px;
+}
+
+.live-card strong em {
+  float: right;
+  color: var(--danger);
+  font-style: normal;
+}
+
+.validation-note,
+.odds-note,
+.adjusted-confidence {
+  margin-top: 4px;
+  font-size: 11px;
+}
+
+.validation-warm,
+.validation-tracked,
+.odds-value {
+  color: var(--accent);
+}
+
+.validation-cold {
+  color: var(--danger);
+}
+
+.validation-sample,
+.odds-better,
+.odds-neutral {
+  color: var(--warn);
+}
+
+.personal-patterns-grid {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.pattern-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+.activity-heatmap-wrap {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px;
+  background: var(--surface);
+  margin-bottom: 18px;
+}
+
+.activity-heatmap {
+  display: grid;
+  grid-template-columns: repeat(53, 1fr);
+  gap: 3px;
+}
+
+.activity-cell {
+  aspect-ratio: 1;
+  border-radius: 3px;
+  background: rgba(148, 163, 184, .18);
+}
+
+.activity-cell.win {
+  background: rgba(16, 185, 129, .72);
+}
+
+.activity-cell.loss {
+  background: rgba(248, 113, 113, .72);
+}
+
+.activity-cell.flat {
+  background: rgba(245, 158, 11, .64);
+}
+
 .focus-mode-btn {
   min-height: 34px;
   padding-inline: 12px;

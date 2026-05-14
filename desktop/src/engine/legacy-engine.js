@@ -59,6 +59,7 @@ function createLegacyEngineService({ projectRoot }) {
   const policyCandidateRegistryPath = path.join(root, 'policy_candidate_registry.json');
   const sourceHealthReportPath = path.join(root, 'source_health_report.json');
   const clvSummaryPath = path.join(root, 'clv_summary.json');
+  const picksHistorySummaryPath = path.join(root, 'picks_history_summary.json');
   let current = null;
   let currentKey = null;
   let analysisCache = null;
@@ -73,7 +74,7 @@ function createLegacyEngineService({ projectRoot }) {
   function fileKey() {
     const dataStat = fs.statSync(dataPath);
     const legacyStat = fs.statSync(legacyPath);
-    return `${dataStat.mtimeMs}:${dataStat.size}:${legacyStat.mtimeMs}:${legacyStat.size}:${optionalFileKey(lineupsPath)}:${optionalFileKey(sofaEventsPath)}:${optionalFileKey(starPlayersPath)}:${optionalFileKey(h2hPath)}:${optionalFileKey(matchContextPath)}:${optionalFileKey(signalGapPath)}:${optionalFileKey(contextBacktestPath)}:${optionalFileKey(decisionBacktestPath)}:${optionalFileKey(decisionTuningPath)}:${optionalFileKey(decisionShadowPath)}:${optionalFileKey(oddsGuardrailsPath)}:${optionalFileKey(agentBlockerBacktestPath)}:${optionalFileKey(agentGuardrailRecommendationsPath)}:${optionalFileKey(stakeReductionBacktestPath)}:${optionalFileKey(signalConflictBacktestPath)}:${optionalFileKey(scorerQualityPath)}:${optionalFileKey(scorerCandidatesSummaryPath)}:${optionalFileKey(scorerSettlementPath)}:${optionalFileKey(scorerPendingAuditPath)}:${optionalFileKey(prematchFocusPath)}:${optionalFileKey(prematchExecutionPath)}:${optionalFileKey(signalCoverageTrendPath)}:${optionalFileKey(nextActionsPath)}:${optionalFileKey(sourceFreshnessPlanPath)}:${optionalFileKey(contextRepairPlanPath)}:${optionalFileKey(refreshPriorityPlanPath)}:${optionalFileKey(prebetChecklistPath)}:${optionalFileKey(prebetChecklistBacktestPath)}:${optionalFileKey(teamIdentityGraphPath)}:${optionalFileKey(matchDecisionTimelinePath)}:${optionalFileKey(agentBankrollSimulationPath)}:${optionalFileKey(smartPreparePlanPath)}:${optionalFileKey(sourceRegistryPath)}:${optionalFileKey(sourceQuarantinePath)}:${optionalFileKey(optionalSourcesPlanPath)}:${optionalFileKey(criticalIssueReportPath)}:${optionalFileKey(dataConsistencyReportPath)}:${optionalFileKey(uiIntegrityReportPath)}:${optionalFileKey(pickIntegrityReportPath)}:${optionalFileKey(coverageRepairEnginePath)}:${optionalFileKey(sourceCoverageTargetsPath)}:${optionalFileKey(leagueSignalQualityPath)}:${optionalFileKey(modelLabReportPath)}:${optionalFileKey(probabilityCalibrationPath)}:${optionalFileKey(policyCandidateRegistryPath)}:${optionalFileKey(sourceHealthReportPath)}:${optionalFileKey(clvSummaryPath)}`;
+    return `${dataStat.mtimeMs}:${dataStat.size}:${legacyStat.mtimeMs}:${legacyStat.size}:${optionalFileKey(lineupsPath)}:${optionalFileKey(sofaEventsPath)}:${optionalFileKey(starPlayersPath)}:${optionalFileKey(h2hPath)}:${optionalFileKey(matchContextPath)}:${optionalFileKey(signalGapPath)}:${optionalFileKey(contextBacktestPath)}:${optionalFileKey(decisionBacktestPath)}:${optionalFileKey(decisionTuningPath)}:${optionalFileKey(decisionShadowPath)}:${optionalFileKey(oddsGuardrailsPath)}:${optionalFileKey(agentBlockerBacktestPath)}:${optionalFileKey(agentGuardrailRecommendationsPath)}:${optionalFileKey(stakeReductionBacktestPath)}:${optionalFileKey(signalConflictBacktestPath)}:${optionalFileKey(scorerQualityPath)}:${optionalFileKey(scorerCandidatesSummaryPath)}:${optionalFileKey(scorerSettlementPath)}:${optionalFileKey(scorerPendingAuditPath)}:${optionalFileKey(prematchFocusPath)}:${optionalFileKey(prematchExecutionPath)}:${optionalFileKey(signalCoverageTrendPath)}:${optionalFileKey(nextActionsPath)}:${optionalFileKey(sourceFreshnessPlanPath)}:${optionalFileKey(contextRepairPlanPath)}:${optionalFileKey(refreshPriorityPlanPath)}:${optionalFileKey(prebetChecklistPath)}:${optionalFileKey(prebetChecklistBacktestPath)}:${optionalFileKey(teamIdentityGraphPath)}:${optionalFileKey(matchDecisionTimelinePath)}:${optionalFileKey(agentBankrollSimulationPath)}:${optionalFileKey(smartPreparePlanPath)}:${optionalFileKey(sourceRegistryPath)}:${optionalFileKey(sourceQuarantinePath)}:${optionalFileKey(optionalSourcesPlanPath)}:${optionalFileKey(criticalIssueReportPath)}:${optionalFileKey(dataConsistencyReportPath)}:${optionalFileKey(uiIntegrityReportPath)}:${optionalFileKey(pickIntegrityReportPath)}:${optionalFileKey(coverageRepairEnginePath)}:${optionalFileKey(sourceCoverageTargetsPath)}:${optionalFileKey(leagueSignalQualityPath)}:${optionalFileKey(modelLabReportPath)}:${optionalFileKey(probabilityCalibrationPath)}:${optionalFileKey(policyCandidateRegistryPath)}:${optionalFileKey(sourceHealthReportPath)}:${optionalFileKey(clvSummaryPath)}:${optionalFileKey(picksHistorySummaryPath)}`;
   }
 
   function closeCurrent() {
@@ -456,6 +457,10 @@ function createLegacyEngineService({ projectRoot }) {
 
   function readProbabilityCalibrationReport() {
     return readJsonSidecar(probabilityCalibrationPath, {});
+  }
+
+  function readPicksHistorySummary() {
+    return readJsonSidecar(picksHistorySummaryPath, {});
   }
 
   function readPolicyCandidateRegistryReport() {
@@ -1040,6 +1045,201 @@ function createLegacyEngineService({ projectRoot }) {
       }
     };
     return next;
+  }
+
+  function flattenSettledHistory(summary) {
+    const rows = [];
+    for (const day of Array.isArray(summary?.by_day) ? summary.by_day : []) {
+      for (const pick of Array.isArray(day?.picks) ? day.picks : []) {
+        if (!pick || (pick.result !== 'won' && pick.result !== 'lost')) continue;
+        rows.push({ ...pick, day: day.date });
+      }
+    }
+    rows.sort((a, b) => Date.parse(b.kickoff_utc || b.ts_generated || b.day || '') - Date.parse(a.kickoff_utc || a.ts_generated || a.day || ''));
+    return rows;
+  }
+
+  function historySegmentKeys(row) {
+    const sport = calibrationUtils.normalizeBucketKey(row?.sport || 'sport');
+    const league = calibrationUtils.normalizeBucketKey(row?.league || row?.match?.league_code || row?.match?.league_name || 'league');
+    const market = calibrationUtils.normalizeMarketKey(row?.marketKey || row?.market || row?.market_key || '');
+    const tier = calibrationUtils.normalizeBucketKey(row?.tier || row?.calibration?.level || 'tier_unknown');
+    const edge = calibrationUtils.edgeBucketKey(row?.edge);
+    return [
+      { key: `${sport}:${league}:${market}`, label: 'sport+ligue+marché', rank: 5 },
+      { key: `${sport}:${market}:${edge}`, label: 'sport+marché+edge', rank: 4 },
+      { key: `${sport}:${market}`, label: 'sport+marché', rank: 3 },
+      { key: `market:${market}`, label: 'marché', rank: 2 },
+      { key: `tier:${tier}`, label: 'tier', rank: 1 }
+    ];
+  }
+
+  function historySegmentKeysForPick(pick) {
+    const sport = calibrationUtils.normalizeBucketKey(pick?.sport || 'sport');
+    const league = calibrationUtils.normalizeBucketKey(pick?.league || pick?.league_code || 'league');
+    const market = calibrationUtils.normalizeMarketKey(pick?.market_key || pick?.market || '');
+    const tier = calibrationUtils.normalizeBucketKey(pick?.tier || 'tier_unknown');
+    const edge = calibrationUtils.edgeBucketKey(pick?.edge);
+    return [
+      `${sport}:${league}:${market}`,
+      `${sport}:${market}:${edge}`,
+      `${sport}:${market}`,
+      `market:${market}`,
+      `tier:${tier}`
+    ];
+  }
+
+  function emptySegmentBucket(key, label = 'segment') {
+    return {
+      key,
+      label,
+      count: 0,
+      won: 0,
+      lost: 0,
+      profit: 0,
+      stake: 0,
+      avgOdd: 0,
+      avgProb: 0,
+      avgEdge: 0,
+      avgImplied: 0,
+      last30Count: 0,
+      last30Won: 0,
+      last30AvgProb: 0
+    };
+  }
+
+  function updateSegmentBucket(bucket, pick, isRecent30) {
+    const odd = Number(pick.odd_book || pick.odd || 0);
+    const prob = Number(pick.prob_model || pick.probability || 0);
+    if (!(odd > 1)) return;
+    bucket.count += 1;
+    bucket.stake += 1;
+    bucket.avgOdd += odd;
+    bucket.avgProb += prob > 0 ? prob : 0;
+    bucket.avgEdge += Number(pick.edge || 0);
+    bucket.avgImplied += 1 / odd;
+    if (pick.result === 'won') {
+      bucket.won += 1;
+      bucket.profit += odd - 1;
+      if (isRecent30) bucket.last30Won += 1;
+    } else {
+      bucket.lost += 1;
+      bucket.profit -= 1;
+    }
+    if (isRecent30) {
+      bucket.last30Count += 1;
+      bucket.last30AvgProb += prob > 0 ? prob : 0;
+    }
+  }
+
+  function finalizeSegmentBucket(bucket) {
+    if (!bucket.count) return bucket;
+    bucket.winRate = bucket.won / bucket.count;
+    bucket.roi = bucket.profit / Math.max(1, bucket.stake);
+    bucket.avgOdd /= bucket.count;
+    bucket.avgProb /= bucket.count;
+    bucket.avgEdge /= bucket.count;
+    bucket.avgImplied /= bucket.count;
+    bucket.realizedEdge = bucket.winRate - bucket.avgImplied;
+    bucket.edgeGap = bucket.avgEdge - bucket.realizedEdge;
+    bucket.sample = bucket.count >= 30 ? 'robuste' : bucket.count >= 10 ? 'moyen' : 'insuffisant';
+    bucket.tone = bucket.count < 30 ? 'sample' : bucket.roi > 0.08 ? 'warm' : bucket.roi < -0.08 ? 'cold' : 'tracked';
+    if (bucket.last30Count) {
+      bucket.last30WinRate = bucket.last30Won / bucket.last30Count;
+      bucket.last30AvgProb /= bucket.last30Count;
+      bucket.drift30d = Math.max(0, Math.min(0.50, bucket.last30AvgProb - bucket.last30WinRate));
+    } else {
+      bucket.last30WinRate = null;
+      bucket.drift30d = Math.max(0, Math.min(0.50, bucket.avgProb - bucket.winRate));
+    }
+    return bucket;
+  }
+
+  function buildModelRealityAudit(summary) {
+    const settled = flattenSettledHistory(summary);
+    const byKey = new Map();
+    const recentCutoff = Date.now() - 30 * 24 * 60 * 60 * 1000;
+    for (const pick of settled.slice(0, 500)) {
+      const ts = Date.parse(pick.kickoff_utc || pick.settled_at || pick.day || '');
+      const isRecent30 = Number.isFinite(ts) && ts >= recentCutoff;
+      for (const key of historySegmentKeysForPick(pick)) {
+        const bucket = byKey.get(key) || emptySegmentBucket(key);
+        updateSegmentBucket(bucket, pick, isRecent30);
+        byKey.set(key, bucket);
+      }
+    }
+    const buckets = Array.from(byKey.values()).map(finalizeSegmentBucket);
+    const robust = buckets.filter((bucket) => bucket.count >= 30);
+    return {
+      schema: 'paris-sportif.model_reality_audit.v1',
+      generatedAt: new Date().toISOString(),
+      sampleSize: settled.slice(0, 500).length,
+      robustSegments: robust.length,
+      topSegments: robust.slice().sort((a, b) => b.roi - a.roi || b.count - a.count).slice(0, 10),
+      bottomSegments: robust.slice().sort((a, b) => a.roi - b.roi || b.count - a.count).slice(0, 10),
+      byKey: Object.fromEntries(buckets.map((bucket) => [bucket.key, bucket]))
+    };
+  }
+
+  function segmentValidationForRow(row, audit) {
+    const buckets = historySegmentKeys(row)
+      .map((meta) => ({ ...meta, bucket: audit.byKey?.[meta.key] || null }))
+      .filter((item) => item.bucket && item.bucket.count > 0)
+      .sort((a, b) => {
+        const robustDelta = Number(b.bucket.count >= 30) - Number(a.bucket.count >= 30);
+        if (robustDelta) return robustDelta;
+        return b.rank - a.rank || b.bucket.count - a.bucket.count;
+      });
+    const best = buckets[0];
+    if (!best || best.bucket.count < 10) {
+      return {
+        status: 'insufficient_sample',
+        label: 'Sample insuffisant pour validation rétrospective',
+        sample: best?.bucket?.count || 0,
+        realConfidence: Math.max(0, Math.min(0.99, Number(row.probability || 0))),
+        factor: 1
+      };
+    }
+    const bucket = best.bucket;
+    const drift = Number(bucket.drift30d || 0);
+    const roi = Number(bucket.roi || 0);
+    const bonus = bucket.count >= 30 && roi > 0.15 ? 1.06 : bucket.count >= 30 && roi > 0.08 ? 1.03 : 1;
+    const penalty = Math.max(0.55, 1 - Math.max(0, drift));
+    const factor = Math.max(0.45, Math.min(1.12, penalty * bonus));
+    const realConfidence = Math.max(0.01, Math.min(0.99, Number(row.probability || 0) * factor));
+    return {
+      status: bucket.count >= 30 ? 'validated' : 'learning_sample',
+      label: bucket.count >= 30
+        ? `Sur ${bucket.count} picks similaires : ${Math.round(bucket.winRate * 100)}% WR, ${Math.round(bucket.roi * 100)}% ROI`
+        : `Sample moyen : ${bucket.count} picks similaires`,
+      segmentKey: bucket.key,
+      segmentLabel: best.label,
+      sample: bucket.count,
+      winRate: bucket.winRate,
+      roi: bucket.roi,
+      avgEdge: bucket.avgEdge,
+      realizedEdge: bucket.realizedEdge,
+      edgeGap: bucket.edgeGap,
+      drift30d: drift,
+      tone: bucket.tone,
+      factor,
+      realConfidence
+    };
+  }
+
+  function applyModelReality(row, audit) {
+    const segmentValidation = segmentValidationForRow(row, audit);
+    const trust = row.confidenceTrust || {};
+    return {
+      ...row,
+      segmentValidation,
+      adjustedConfidence: segmentValidation.realConfidence,
+      confidenceTrust: {
+        ...trust,
+        adjustedScore: Math.round(segmentValidation.realConfidence * 100),
+        adjustedLabel: segmentValidation.status === 'insufficient_sample' ? 'Confiance ajustée en apprentissage' : 'Confiance ajustée par historique réel'
+      }
+    };
   }
 
   function oddsGuardrailForRow(row, guardReport) {
@@ -1850,6 +2050,8 @@ function createLegacyEngineService({ projectRoot }) {
     const policyCandidateRegistryReport = readPolicyCandidateRegistryReport();
     const sourceHealthReport = readSourceHealthReport();
     const clvSummaryReport = readClvSummaryReport();
+    const picksHistorySummary = readPicksHistorySummary();
+    const modelRealityAudit = buildModelRealityAudit(picksHistorySummary);
     const events = dedupeUpcomingBookable(eventListFromDays(data.days)).slice(0, 1200);
     const enrichedEvents = events.map((match) => enrichMatchForModel(match, lineupsIndex, h2hIndex, matchContextIndex));
     const coverage = buildSignalCoverage(enrichedEvents);
@@ -1861,6 +2063,7 @@ function createLegacyEngineService({ projectRoot }) {
       calibration
     )
       .map((row) => contextUtils.annotateConfidence(row, contextBacktestReport))
+      .map((row) => applyModelReality(row, modelRealityAudit))
       .map((row) => applyDecisionAndMarketTiming(row, clvSummaryReport, decisionTuningReport))
       .map((row) => applyOddsGuardrails(row, oddsGuardrailsReport))
       .map((row) => applyStakePrudence(row, agentGuardrailRecommendationsReport, stakeReductionBacktestReport))
@@ -1978,6 +2181,7 @@ function createLegacyEngineService({ projectRoot }) {
       sourceCoverageTargets: sourceCoverageTargetsReport && sourceCoverageTargetsReport.schema ? sourceCoverageTargetsReport : null,
       leagueSignalQuality: leagueSignalQualityReport && leagueSignalQualityReport.schema ? leagueSignalQualityReport : null,
       modelLab: modelLabReport && modelLabReport.schema ? modelLabReport : null,
+      modelRealityAudit,
       probabilityCalibration: probabilityCalibrationReport && probabilityCalibrationReport.schema ? probabilityCalibrationReport : null,
       policyCandidates: policyCandidateRegistryReport && policyCandidateRegistryReport.schema ? policyCandidateRegistryReport : null,
       sourceHealth: sourceHealthReport && sourceHealthReport.schema ? sourceHealthReport : null,

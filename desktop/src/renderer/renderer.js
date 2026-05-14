@@ -52,6 +52,7 @@
     sourceCoverageTargets: null,
     leagueSignalQuality: null,
     modelLab: null,
+    modelRealityAudit: null,
     probabilityCalibration: null,
     policyCandidates: null,
     sourceHealth: null,
@@ -81,6 +82,8 @@
     aiAssist: null,
     webEnrichments: null,
     webEnrichmentPending: new Set(),
+    multiBookmaker: null,
+    multiBookmakerPending: new Set(),
     focusRow: null,
     feedbackBetId: null,
     updateStatus: null
@@ -103,6 +106,8 @@
   const APP_SESSION_KEY = 'parisSportifDesktopSession';
   const AI_ENGINE_KEY = 'parisSportifAiEngineState';
   const WEB_ENRICHMENT_KEY = 'parisSportifWebEnrichmentState';
+  const MULTI_BOOKMAKER_KEY = 'parisSportifMultiBookmakerState';
+  const LIVE_NOTIFICATION_KEY = 'parisSportifLiveNotificationKeys';
   const MODEL_ADJUSTMENTS_KEY = 'parisSportifModelAdjustments';
   const LOSS_FEEDBACK_KEY = 'parisSportifLossFeedbacks';
   const UPDATE_STATUS_KEY = 'parisSportifUpdateStatus';
@@ -157,11 +162,15 @@
     webEnrichmentEnabled: true,
     webEnrichmentCacheMinutes: 120,
     webEnrichmentRateLimit: 5,
+    multiBookmakerEnabled: true,
+    oddsApiKey: '',
+    oddsApiRegions: 'eu',
     autoUpdateEnabled: true,
     updateChannel: 'stable',
     strict: false
   };
   const REFRESH_DEFAULT_INTERVAL_MS = 30 * 60 * 1000;
+  const REFRESH_LIVE_INTERVAL_MS = 2 * 60 * 1000;
   const REFRESH_URGENT_INTERVAL_MS = 5 * 60 * 1000;
   const REFRESH_ECONOMY_AFTER_MS = 60 * 60 * 1000;
   const REFRESH_ESTIMATE_SECONDS = {
@@ -1106,6 +1115,38 @@
     return Number.isFinite(n) && n > 1 ? `@${n.toFixed(2)}` : '-';
   }
 
+  function realConfidenceValue(row) {
+    const adjusted = Number(row?.adjustedConfidence);
+    if (Number.isFinite(adjusted) && adjusted > 0) return adjusted;
+    const score = Number(row?.confidenceTrust?.adjustedScore);
+    if (Number.isFinite(score) && score > 0) return score / 100;
+    return pickConfidenceValue(row);
+  }
+
+  function segmentValidationTone(row) {
+    const tone = String(row?.segmentValidation?.tone || row?.segmentValidation?.status || '');
+    if (tone.includes('warm') || tone.includes('validated')) return 'warm';
+    if (tone.includes('cold')) return 'cold';
+    if (tone.includes('insufficient')) return 'sample';
+    return 'tracked';
+  }
+
+  function segmentValidationHtml(row) {
+    const validation = row?.segmentValidation || null;
+    if (!validation) return '';
+    const sample = Number(validation.sample || 0);
+    const label = validation.label || (sample ? `${formatCount(sample)} picks similaires` : 'Sample insuffisant pour validation');
+    const cls = segmentValidationTone(row);
+    return `<div class="match-sub validation-note validation-${escapeHtml(cls)}">${escapeHtml(label)}</div>`;
+  }
+
+  function adjustedConfidenceHtml(row) {
+    const value = realConfidenceValue(row);
+    const validation = row?.segmentValidation || {};
+    const label = validation.status === 'insufficient_sample' ? 'sample court' : 'historique réel';
+    return `<div class="match-sub adjusted-confidence">Ajustée ${escapeHtml(formatPct(value, 0))} · ${escapeHtml(label)}</div>`;
+  }
+
   function formatSignedUnits(value) {
     const n = Number(value);
     if (!Number.isFinite(n)) return '-';
@@ -1322,6 +1363,13 @@
         delayMs: null,
         mode: 'pause',
         label: 'Mode économie : reprise quand la fenêtre revient au premier plan.'
+      };
+    }
+    if (liveRows().length) {
+      return {
+        delayMs: REFRESH_LIVE_INTERVAL_MS,
+        mode: 'quick',
+        label: 'Auto-refresh live 2 min : match en cours suivi.'
       };
     }
     if (upcomingPickWithin(60 * 60 * 1000)) {
@@ -1854,6 +1902,7 @@
       state.sourceCoverageTargets = null;
       state.leagueSignalQuality = null;
       state.modelLab = null;
+      state.modelRealityAudit = null;
       state.probabilityCalibration = null;
       state.policyCandidates = null;
       state.sourceHealth = null;
@@ -1862,6 +1911,7 @@
       state.clvSummary = null;
       state.dashboardMeta = null;
       state.prematchPlan = null;
+      state.multiBookmaker = null;
       renderPicks('Données trop anciennes : le logiciel bloque les recommandations actionnables.');
       renderStakeScenarios('Scénarios bloqués : données trop anciennes.');
       renderCombines();
@@ -1960,6 +2010,7 @@
     state.sourceCoverageTargets = analysis.sourceCoverageTargets || null;
     state.leagueSignalQuality = analysis.leagueSignalQuality || null;
     state.modelLab = analysis.modelLab || null;
+    state.modelRealityAudit = analysis.modelRealityAudit || null;
     state.probabilityCalibration = analysis.probabilityCalibration || null;
     state.policyCandidates = analysis.policyCandidates || null;
     state.sourceHealth = analysis.sourceHealth || null;
@@ -2084,7 +2135,7 @@
       sport: $('#pick-sport-filter')?.value || 'all',
       league: $('#pick-league-filter')?.value || 'all',
       market: $('#pick-market-filter')?.value || 'all',
-      sort: $('#pick-sort')?.value || 'edge',
+      sort: $('#pick-sort')?.value || 'real_confidence',
       edgeMin: Number.isFinite(edgeValue) && edgeValue > 0 ? edgeValue / 100 : 0,
       oddMin: Number.isFinite(oddValue) && oddValue > 1 ? oddValue : 0
     };
@@ -2103,7 +2154,7 @@
   }
 
   function pickFiltersActive(filters) {
-    return Boolean(filters.query || filters.sport !== 'all' || filters.league !== 'all' || filters.market !== 'all' || filters.edgeMin || filters.oddMin || filters.sort !== 'edge');
+    return Boolean(filters.query || filters.sport !== 'all' || filters.league !== 'all' || filters.market !== 'all' || filters.edgeMin || filters.oddMin || filters.sort !== 'real_confidence');
   }
 
   function pickHasCoreData(row) {
@@ -2159,6 +2210,7 @@
     rows.sort((a, b) => {
       if (filters.sort === 'kickoff') return new Date(a.start || 0) - new Date(b.start || 0);
       if (filters.sort === 'confidence') return Number(b.confidenceTrust?.score || b.probability || 0) - Number(a.confidenceTrust?.score || a.probability || 0);
+      if (filters.sort === 'real_confidence') return realConfidenceValue(b) - realConfidenceValue(a) || Number(b.edge || 0) - Number(a.edge || 0);
       if (filters.sort === 'odd') return Number(b.odd || 0) - Number(a.odd || 0);
       return Number(b.edge || 0) - Number(a.edge || 0);
     });
@@ -2528,6 +2580,7 @@
           <span>${escapeHtml(row.label)}</span>
           <span>${escapeHtml(formatOdd(row.odd))}</span>
           <span>edge ${escapeHtml(formatPct(row.edge || 0, 1))}</span>
+          <span>conf. aj. ${escapeHtml(formatPct(realConfidenceValue(row), 0))}</span>
           <span>${escapeHtml(countdownLabel(row.start))}</span>
           ${enrichmentBadgeHtml(row)}
         </div>
@@ -2554,7 +2607,7 @@
     (Array.isArray(rows) ? rows : [])
       .filter((row) => pickHasCoreData(row) && canDisplayStake(row))
       .forEach((row) => grouped.get(temporalBucketForPick(row))?.push(row));
-    grouped.forEach((bucketRows) => bucketRows.sort((a, b) => Number(b.edge || 0) - Number(a.edge || 0) || Date.parse(a.start || '') - Date.parse(b.start || '')));
+    grouped.forEach((bucketRows) => bucketRows.sort((a, b) => realConfidenceValue(b) - realConfidenceValue(a) || Number(b.edge || 0) - Number(a.edge || 0) || Date.parse(a.start || '') - Date.parse(b.start || '')));
     wrap.innerHTML = buckets.map((bucket) => {
       const bucketRows = grouped.get(bucket.key) || [];
       const rowsHtml = bucketRows.length
@@ -2734,6 +2787,238 @@
     });
   }
 
+  function multiBookmakerConfig() {
+    const prefs = loadPreferences();
+    return {
+      enabled: prefs.multiBookmakerEnabled !== false,
+      apiKey: prefs.oddsApiKey || '',
+      regions: prefs.oddsApiRegions || 'eu',
+      cacheMinutes: 30
+    };
+  }
+
+  function oddsCompareKey(row) {
+    return String([
+      userBetKey(row),
+      row?.id,
+      row?.market,
+      row?.label,
+      row?.start
+    ].filter(Boolean).join(':'))
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9.]+/g, ':')
+      .replace(/^:+|:+$/g, '') || userBetKey(row);
+  }
+
+  function storeMultiBookmaker(record, summary) {
+    const store = state.multiBookmaker || readStorageJson(MULTI_BOOKMAKER_KEY, { byKey: {}, runs: [], summary: {} }) || { byKey: {}, runs: [], summary: {} };
+    store.byKey = store.byKey && typeof store.byKey === 'object' ? store.byKey : {};
+    if (record?.key) store.byKey[record.key] = record;
+    store.updatedAt = record?.checkedAt || new Date().toISOString();
+    if (summary) store.summary = summary;
+    state.multiBookmaker = store;
+    writeStorageJson(MULTI_BOOKMAKER_KEY, store);
+  }
+
+  function bestOddsForRow(row) {
+    const store = state.multiBookmaker || readStorageJson(MULTI_BOOKMAKER_KEY, null);
+    const key = oddsCompareKey(row);
+    return store?.byKey?.[key] || store?.byKey?.[userBetKey(row)] || null;
+  }
+
+  function bestOddsBadgeHtml(row) {
+    const record = bestOddsForRow(row);
+    if (!record) return '';
+    if (record.status === 'needs_key') return '<div class="match-sub odds-note">Best odds : clé Odds API non configurée</div>';
+    const best = record.best || {};
+    const bestOdd = Number(best.odd || 0);
+    const winamax = Number(record.winamaxOdd || row?.odd || 0);
+    if (!(bestOdd > 1)) return '<div class="match-sub odds-note">Best odds : non trouvé</div>';
+    const delta = winamax > 1 ? ((bestOdd - winamax) / winamax) : 0;
+    const cls = delta >= 0.10 ? 'value' : delta > 0.01 ? 'better' : 'neutral';
+    return `<div class="match-sub odds-note odds-${escapeHtml(cls)}">Meilleure cote ${escapeHtml(formatOdd(bestOdd))} chez ${escapeHtml(best.bookmaker || 'book')} · ${escapeHtml(formatPct(delta, 1))}</div>`;
+  }
+
+  async function compareOddsForRow(row, { force = false } = {}) {
+    if (!row || !pickHasCoreData(row)) return null;
+    const config = multiBookmakerConfig();
+    if (!config.enabled) return null;
+    const key = oddsCompareKey(row);
+    if (state.multiBookmakerPending.has(key)) return null;
+    const existing = bestOddsForRow(row);
+    const age = existing?.checkedAt ? Date.now() - Date.parse(existing.checkedAt) : Infinity;
+    if (!force && existing && Number.isFinite(age) && age < config.cacheMinutes * 60 * 1000) return existing;
+    state.multiBookmakerPending.add(key);
+    try {
+      const response = await fetchJson('/api/odds/compare', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          config,
+          pick: { ...aiPickPayload(row), winamaxOdd: row.odd, winamaxUrl: row.winamaxUrl || row.match?.winamax?.url || '' },
+          force
+        })
+      });
+      if (response?.record) {
+        storeMultiBookmaker(response.record, response.summary);
+        if (response.record.valueAlert) notifyUser('Value alert multi-bookmaker', `${row.title} · ${response.record.valueAlert}`, row);
+        renderPipelinePanel(state.status);
+        return response.record;
+      }
+      return response || null;
+    } catch (error) {
+      pushLog('warn', `Comparaison cotes indisponible: ${error.message}`);
+      return null;
+    } finally {
+      state.multiBookmakerPending.delete(key);
+    }
+  }
+
+  function scheduleBestOddsChecks(rows) {
+    const prefs = loadPreferences();
+    if (prefs.multiBookmakerEnabled === false) return;
+    const top = (Array.isArray(rows) ? rows : [])
+      .filter((row) => pickHasCoreData(row) && canDisplayStake(row))
+      .slice()
+      .sort((a, b) => realConfidenceValue(b) - realConfidenceValue(a) || Number(b.edge || 0) - Number(a.edge || 0))
+      .slice(0, 5);
+    top.forEach((row, index) => {
+      setTimeout(() => compareOddsForRow(row).catch(() => {}), 1200 + index * 350);
+    });
+  }
+
+  async function loadMultiBookmakerState() {
+    try {
+      const store = await fetchJson('/api/odds/state');
+      if (store && typeof store === 'object') {
+        state.multiBookmaker = store;
+        writeStorageJson(MULTI_BOOKMAKER_KEY, store);
+      }
+    } catch {
+      state.multiBookmaker = readStorageJson(MULTI_BOOKMAKER_KEY, null);
+    }
+  }
+
+  function isLiveStatus(value) {
+    const text = String(value || '').toLowerCase();
+    return ['live', 'inprogress', 'in_progress', 'halftime', 'period', 'q1', 'q2', 'q3', 'q4', 'ot'].some((token) => text.includes(token));
+  }
+
+  function rowLiveInfo(row) {
+    const match = row?.match || {};
+    const status = match.status || match.status_type || match.state || match.phase || '';
+    const ts = Date.parse(row?.start || match.date || '');
+    const now = Date.now();
+    const estimatedLive = Number.isFinite(ts) && now >= ts && now <= ts + 3 * 60 * 60 * 1000 && !match.completed;
+    if (!isLiveStatus(status) && !estimatedLive) return null;
+    const homeScore = match.home_score ?? match.score_home ?? match.score?.home ?? null;
+    const awayScore = match.away_score ?? match.score_away ?? match.score?.away ?? null;
+    const minute = match.minute || match.clock || match.status_detail || (estimatedLive ? 'live estimé' : '');
+    return {
+      status: status || (estimatedLive ? 'LIVE estimé' : 'LIVE'),
+      minute,
+      score: homeScore != null && awayScore != null ? `${homeScore}-${awayScore}` : 'score indisponible'
+    };
+  }
+
+  function liveVerdict(row, live) {
+    const text = `${row?.market || ''} ${row?.label || ''}`.toLowerCase();
+    const score = String(live?.score || '');
+    const nums = score.match(/(\d+)\D+(\d+)/);
+    if (!nums) return 'Verdict provisoire : score non disponible';
+    const total = Number(nums[1]) + Number(nums[2]);
+    if (text.includes('over') || text.includes('plus') || text.includes('ou')) {
+      return total >= 3 ? 'Pick provisoirement gagnant' : 'Encore besoin de buts/points';
+    }
+    if (text.includes('under') || text.includes('moins')) return total < 3 ? 'Pick provisoirement gagnant' : 'Pick sous pression';
+    return 'Suivi live actif';
+  }
+
+  function liveRows() {
+    const map = new Map();
+    [...(state.picks || []), ...(state.allPicks || [])]
+      .filter((row) => pickHasCoreData(row))
+      .forEach((row) => {
+        const live = rowLiveInfo(row);
+        if (live) map.set(userBetKey(row), { row, live });
+      });
+    loadUserBets().filter((bet) => bet.status === 'pending').forEach((bet) => {
+      const row = findPickByTrackKey(bet.key) || null;
+      const live = row ? rowLiveInfo(row) : null;
+      if (row && live) map.set(userBetKey(row), { row, live, tracked: true });
+    });
+    return Array.from(map.values()).sort((a, b) => Date.parse(a.row.start || '') - Date.parse(b.row.start || ''));
+  }
+
+  function renderLiveCockpit() {
+    const wrap = $('#live-cockpit');
+    if (!wrap) return;
+    const rows = liveRows();
+    if (!rows.length) {
+      wrap.innerHTML = '<div class="empty compact-empty">Aucun match live suivi pour le moment.</div>';
+      return;
+    }
+    wrap.innerHTML = `
+      <div class="section-head compact">
+        <div>
+          <h3>EN DIRECT</h3>
+          <p>${formatCount(rows.length)} match(s) suivis, refresh accéléré toutes les 2 minutes.</p>
+        </div>
+      </div>
+      <div class="live-card-grid">
+        ${rows.slice(0, 8).map(({ row, live, tracked }) => {
+          const cashUrl = safeExternalUrl(row.winamaxUrl, 'www.winamax.fr');
+          return `
+            <article class="live-card clickable-row" data-match-id="${escapeHtml(row.id)}" tabindex="0" role="button">
+              <span>${escapeHtml(live.status)} · ${escapeHtml(String(live.minute || '-'))}</span>
+              <strong>${escapeHtml(row.title)} <em>${escapeHtml(live.score)}</em></strong>
+              <p>${escapeHtml(row.market)} · ${escapeHtml(row.label)} · ${escapeHtml(liveVerdict(row, live))}</p>
+              <div class="time-pick-action">
+                <span class="pill">${tracked ? 'pari suivi' : 'pick modèle'}</span>
+                ${cashUrl ? `<a class="ghost-btn" href="${escapeHtml(cashUrl)}" target="_blank" rel="noreferrer">Cash-out / Winamax</a>` : ''}
+              </div>
+            </article>
+          `;
+        }).join('')}
+      </div>
+    `;
+    maybeNotifyLiveRows(rows);
+  }
+
+  function readLiveNotificationKeys() {
+    try {
+      const rows = JSON.parse(localStorage.getItem(LIVE_NOTIFICATION_KEY) || '[]');
+      return new Set(Array.isArray(rows) ? rows.slice(-100) : []);
+    } catch {
+      return new Set();
+    }
+  }
+
+  function writeLiveNotificationKeys(keys) {
+    try {
+      localStorage.setItem(LIVE_NOTIFICATION_KEY, JSON.stringify(Array.from(keys).slice(-100)));
+    } catch {
+      // Notification live facultative.
+    }
+  }
+
+  function maybeNotifyLiveRows(rows) {
+    const keys = readLiveNotificationKeys();
+    let changed = false;
+    rows.forEach(({ row, live }) => {
+      const key = `${userBetKey(row)}:${live.score}:${live.minute}`;
+      const minute = Number(String(live.minute || '').match(/\d+/)?.[0] || 0);
+      const important = minute >= 85 || /gagnant|pression|suivi live/i.test(liveVerdict(row, live));
+      if (!important || keys.has(key)) return;
+      keys.add(key);
+      changed = true;
+      notifyUser(`Live ${row.title}`, `${live.score} · ${liveVerdict(row, live)}`, row);
+    });
+    if (changed) writeLiveNotificationKeys(keys);
+  }
+
   async function aiAssist(task, payload) {
     const response = await fetchJson('/api/ai/assist', {
       method: 'POST',
@@ -2789,10 +3074,12 @@
     const displayRows = dashboardPickRows(filters);
     rememberDisplayedOdds(displayRows);
     renderMarketSnapshot(displayRows);
+    renderLiveCockpit();
     renderUltimateBet(displayRows);
     renderTemporalCockpit(displayRows);
     updateWebEnrichmentSummary();
     scheduleVisibleWebEnrichment(displayRows);
+    scheduleBestOddsChecks(displayRows);
     clearTimeout(state.aiTimer);
     state.aiTimer = setTimeout(() => runBackgroundAi(displayRows), 600);
     const total = state.allPicks.length || state.picks.length || 0;
@@ -2841,9 +3128,9 @@
             <div class="match-title">${escapeHtml(pick.title)}</div>
             <div class="match-sub">${escapeHtml(pick.sport)} · ${escapeHtml(pick.league)}</div>
           </td>
-          <td data-label="Marché"><span class="pill">${escapeHtml(statusText)}</span> <span class="pill">${escapeHtml(pick.market)}</span><div class="match-sub">${escapeHtml(pick.label)}</div><div class="match-sub selection-reason">${escapeHtml(pickReason(pick))}</div>${calibrationNote(pick)}</td>
+          <td data-label="Marché"><span class="pill">${escapeHtml(statusText)}</span> <span class="pill">${escapeHtml(pick.market)}</span><div class="match-sub">${escapeHtml(pick.label)}</div><div class="match-sub selection-reason">${escapeHtml(pickReason(pick))}</div>${calibrationNote(pick)}${segmentValidationHtml(pick)}${bestOddsBadgeHtml(pick)}</td>
           <td data-label="Cote">@${pick.odd.toFixed(2)}</td>
-          <td data-label="Proba">${formatPct(pick.probability, 1)}</td>
+          <td data-label="Proba">${formatPct(pick.probability, 1)}${adjustedConfidenceHtml(pick)}</td>
           <td data-label="Edge" class="${edgeClass}">${formatPct(pick.edge, 1)}</td>
           <td data-label="Mise">${visibleStakeText(pick)}</td>
           <td data-label="Départ">${escapeHtml(startLabel)}</td>
@@ -2993,6 +3280,7 @@
     const eta = refresh.running ? refreshEtaInfo(refresh) : null;
     const memory = status?.memory || {};
     updateWebEnrichmentSummary();
+    renderStabilityPanel(status);
     if (refresh.running) {
       progress.innerHTML = `
         <div class="pipeline-head">
@@ -3033,6 +3321,25 @@
       `;
     }).join('') : '<div class="empty">Aucun refresh enregistré.</div>';
     log.textContent = (refresh.lines && refresh.lines.length ? refresh.lines.slice(-80).join('\n') : 'Aucun log live pour le moment.');
+  }
+
+  function renderStabilityPanel(status = state.status) {
+    const node = $('#stability-grid');
+    if (!node) return;
+    const memory = status?.memory || {};
+    const uptime = Number(memory.uptimeMinutes || 0);
+    const avg = Number(memory.avgRssMb || memory.rssMb || 0);
+    const max = Number(memory.maxRssMb || memory.rssMb || 0);
+    const liveCount = liveRows().length;
+    const tone = memory.warning ? 'warn' : 'ok';
+    node.innerHTML = `
+      <article class="refresh-card refresh-${escapeHtml(tone)}">
+        <span>Stabilité</span>
+        <strong>${escapeHtml(formatDurationSeconds(uptime * 60))} uptime</strong>
+        <p>Moy. ${avg ? `${avg.toFixed(1)} MB` : '-'} · max ${max ? `${max.toFixed(1)} MB` : '-'} · live suivis ${formatCount(liveCount)}</p>
+        <small>${escapeHtml(memory.warning || 'Objectif 7 jours : monitoring actif, UI non bloquante.')}</small>
+      </article>
+    `;
   }
 
   function renderDebugLogs() {
@@ -4130,6 +4437,7 @@
     if (grid) {
       const userStats = userBetStats();
       const marketClv = state.clvSummary?.summary || {};
+      const reality = state.modelRealityAudit || {};
       const clvLabel = userStats.clvSamples
         ? formatPct(userStats.clvMeanPct, 2)
         : marketClv.mean_clv_pct != null
@@ -4144,7 +4452,8 @@
         ['Win rate', formatPct(summary.hit_rate || state.history?.winRate || 0, 1), 'Taux brut, moins important que la calibration.'],
         [termTip('Brier', 'Score de qualité des probabilités : plus il est bas, mieux c’est.'), Number.isFinite(Number(summary.brier)) ? Number(summary.brier).toFixed(3) : '-', 'Plus bas = probabilités mieux calibrées.', true],
         [termTip('CLV moyen', 'Compare la cote prise à la cote proche du coup d’envoi.'), clvLabel, clvDetail, true],
-        ['Drawdown', Number.isFinite(Number(summary.max_drawdown_units)) ? `${Number(summary.max_drawdown_units).toFixed(1)}u` : '-', 'Perte max historique simulée.']
+        ['Drawdown', Number.isFinite(Number(summary.max_drawdown_units)) ? `${Number(summary.max_drawdown_units).toFixed(1)}u` : '-', 'Perte max historique simulée.'],
+        ['Validation réelle', `${formatCount(reality.sampleSize || 0)} lignes`, `${formatCount(reality.robustSegments || 0)} segments robustes sur les 500 derniers événements.`]
       ];
       grid.innerHTML = cards.map(([label, value, detail, htmlLabel]) => `
         <article class="performance-card">
@@ -4155,14 +4464,15 @@
       `).join('');
     }
     if (segmentGrid) {
-      const markets = (Array.isArray(report.by_market) ? report.by_market : []).slice(0, 4);
+      const realityTop = Array.isArray(state.modelRealityAudit?.topSegments) ? state.modelRealityAudit.topSegments.slice(0, 4) : [];
+      const markets = realityTop.length ? realityTop : (Array.isArray(report.by_market) ? report.by_market : []).slice(0, 4);
       const leagues = (Array.isArray(report.by_league) ? report.by_league : []).filter((row) => Number(row.roi || 0) > 0).slice(0, 4);
       const rows = [...markets, ...leagues].slice(0, 8);
       segmentGrid.innerHTML = rows.length ? rows.map((row) => `
         <article class="segment-card ${segmentTone(row)}" data-market-chip="${escapeHtml(normalizeUiKey(row.key || ''))}">
           <span>${escapeHtml(formatMarketName(row.key || row.market || row.league || 'Segment'))}</span>
           <strong>${escapeHtml(formatPct(row.roi || 0, 0))}</strong>
-          <p>${escapeHtml(`${formatCount(row.count || 0)} réglés · WR ${formatPct(row.hit_rate || row.win_rate || 0, 0)} · Brier ${Number(row.brier || 0).toFixed(3)}`)}</p>
+          <p>${escapeHtml(`${formatCount(row.count || 0)} réglés · WR ${formatPct(row.hit_rate || row.win_rate || row.winRate || 0, 0)} · Brier ${Number(row.brier || 0).toFixed(3)}`)}</p>
           <em>${escapeHtml(row.sample_level || 'sample')}</em>
         </article>
       `).join('') : '<div class="empty">Aucun segment robuste à afficher.</div>';
@@ -5042,6 +5352,12 @@
     if (webCache) webCache.value = String(prefs.webEnrichmentCacheMinutes || legacyCache);
     const webRate = $('#pref-web-enrichment-rate');
     if (webRate) webRate.value = String(Math.max(1, Math.min(10, Number(prefs.webEnrichmentRateLimit || 5) || 5)));
+    const multiBookmaker = $('#pref-multibook-enabled');
+    if (multiBookmaker) multiBookmaker.checked = prefs.multiBookmakerEnabled !== false;
+    const oddsKey = $('#pref-odds-api-key');
+    if (oddsKey) oddsKey.value = prefs.oddsApiKey || '';
+    const oddsRegions = $('#pref-odds-regions');
+    if (oddsRegions) oddsRegions.value = prefs.oddsApiRegions || 'eu';
     const autoUpdate = $('#pref-auto-update-enabled');
     if (autoUpdate) autoUpdate.checked = prefs.autoUpdateEnabled !== false;
     const updateChannel = $('#pref-update-channel');
@@ -5163,6 +5479,9 @@
       webEnrichmentEnabled: $('#pref-web-enrichment-enabled')?.checked !== false,
       webEnrichmentCacheMinutes: Math.max(15, Number($('#pref-web-enrichment-cache')?.value || DEFAULT_PREFERENCES.webEnrichmentCacheMinutes) || DEFAULT_PREFERENCES.webEnrichmentCacheMinutes),
       webEnrichmentRateLimit: Math.max(1, Math.min(10, Number($('#pref-web-enrichment-rate')?.value || DEFAULT_PREFERENCES.webEnrichmentRateLimit) || DEFAULT_PREFERENCES.webEnrichmentRateLimit)),
+      multiBookmakerEnabled: $('#pref-multibook-enabled')?.checked !== false,
+      oddsApiKey: ($('#pref-odds-api-key')?.value || '').trim(),
+      oddsApiRegions: ($('#pref-odds-regions')?.value || DEFAULT_PREFERENCES.oddsApiRegions).trim() || DEFAULT_PREFERENCES.oddsApiRegions,
       autoUpdateEnabled: $('#pref-auto-update-enabled')?.checked !== false,
       updateChannel: $('#pref-update-channel')?.value || DEFAULT_PREFERENCES.updateChannel,
       strict: Boolean($('#pref-strict')?.checked)
@@ -5192,6 +5511,138 @@
     }
   }
 
+  function settledUserBets() {
+    return loadUserBets().filter((bet) => ['won', 'lost', 'void'].includes(String(bet.status || '')));
+  }
+
+  function bucketUserBets(rows, keyFn) {
+    const map = new Map();
+    rows.forEach((bet) => {
+      const key = keyFn(bet) || 'Non classé';
+      const bucket = map.get(key) || { key, count: 0, won: 0, lost: 0, stake: 0, pnl: 0 };
+      const stake = Number(bet.stake || 0) || 0;
+      bucket.count += 1;
+      bucket.stake += stake;
+      bucket.pnl += Number(bet.pnl || 0) || 0;
+      if (bet.status === 'won') bucket.won += 1;
+      if (bet.status === 'lost') bucket.lost += 1;
+      map.set(key, bucket);
+    });
+    return Array.from(map.values()).map((bucket) => ({
+      ...bucket,
+      winRate: (bucket.won + bucket.lost) ? bucket.won / (bucket.won + bucket.lost) : 0,
+      roi: bucket.stake > 0 ? bucket.pnl / bucket.stake : 0
+    }));
+  }
+
+  function timeBucketForBet(bet) {
+    const ts = Date.parse(bet.start || bet.kickoff || bet.placedAt || '');
+    if (!Number.isFinite(ts)) return 'Heure inconnue';
+    const hour = new Date(ts).getHours();
+    if (hour < 6) return '00h-06h';
+    if (hour < 12) return '06h-12h';
+    if (hour < 18) return '12h-18h';
+    return '18h-24h';
+  }
+
+  function stakeBucketForBet(bet) {
+    const stake = Number(bet.stake || 0);
+    if (stake >= 3) return '3u+';
+    if (stake >= 2) return '2u';
+    return '1u';
+  }
+
+  function renderPatternGrid(node, title, rows) {
+    if (!node) return;
+    const sorted = rows.slice().sort((a, b) => b.roi - a.roi || b.count - a.count).slice(0, 8);
+    node.innerHTML = sorted.length ? sorted.map((row) => {
+      const cls = row.roi > 0.08 ? 'warm' : row.roi < -0.08 ? 'cold' : 'sample';
+      return `
+        <article class="backtest-card ${cls}">
+          <span>${escapeHtml(title)}</span>
+          <strong>${escapeHtml(row.key)}</strong>
+          <p>${escapeHtml(`${formatCount(row.count)} paris · WR ${formatPct(row.winRate, 0)} · ROI ${formatPct(row.roi, 0)}`)}</p>
+          <small>${escapeHtml(formatMoney(row.pnl))} net · mise ${escapeHtml(formatMoney(row.stake))}</small>
+        </article>
+      `;
+    }).join('') : '<div class="empty">Pas encore assez de paris suivis réglés.</div>';
+  }
+
+  function renderPersonalPatterns() {
+    const root = $('#personal-patterns-grid');
+    const insights = $('#personal-patterns-insights');
+    if (!root && !insights) return;
+    const rows = settledUserBets();
+    const weekday = bucketUserBets(rows, (bet) => {
+      const ts = Date.parse(bet.start || bet.kickoff || bet.placedAt || bet.settledAt || '');
+      return Number.isFinite(ts) ? new Date(ts).toLocaleDateString('fr-FR', { weekday: 'long' }) : 'Jour inconnu';
+    });
+    const hour = bucketUserBets(rows, timeBucketForBet);
+    const sport = bucketUserBets(rows, (bet) => bet.sport || 'Sport inconnu');
+    const league = bucketUserBets(rows, (bet) => bet.league || 'Ligue inconnue');
+    const market = bucketUserBets(rows, (bet) => bet.market || 'Marché inconnu');
+    const stake = bucketUserBets(rows, stakeBucketForBet);
+    const tier = bucketUserBets(rows, (bet) => bet.tier || bet.calibrationLevel || 'Tier inconnu');
+    const segment = bucketUserBets(rows, (bet) => `${bet.sport || 'Sport'} · ${bet.league || 'Ligue'} · ${bet.market || 'Marché'}`);
+    if (root) {
+      root.innerHTML = `
+        <div class="pattern-row" id="pattern-weekday"></div>
+        <div class="pattern-row" id="pattern-hour"></div>
+        <div class="pattern-row" id="pattern-sport"></div>
+        <div class="pattern-row" id="pattern-league"></div>
+        <div class="pattern-row" id="pattern-market"></div>
+        <div class="pattern-row" id="pattern-stake"></div>
+        <div class="pattern-row" id="pattern-tier"></div>
+        <div class="pattern-row" id="pattern-segment"></div>
+      `;
+      renderPatternGrid($('#pattern-weekday'), 'Jour', weekday);
+      renderPatternGrid($('#pattern-hour'), 'Horaire', hour);
+      renderPatternGrid($('#pattern-sport'), 'Sport', sport);
+      renderPatternGrid($('#pattern-league'), 'Ligue', league);
+      renderPatternGrid($('#pattern-market'), 'Marché', market);
+      renderPatternGrid($('#pattern-stake'), 'Mise', stake);
+      renderPatternGrid($('#pattern-tier'), 'Tier', tier);
+      renderPatternGrid($('#pattern-segment'), 'Segment', segment.slice().sort((a, b) => Math.abs(b.roi) - Math.abs(a.roi)).slice(0, 10));
+    }
+    if (insights) {
+      const all = [...weekday, ...hour, ...sport, ...league, ...market, ...stake, ...tier, ...segment].filter((row) => row.count >= 5);
+      const best = all.slice().sort((a, b) => b.roi - a.roi)[0];
+      const worst = all.slice().sort((a, b) => a.roi - b.roi)[0];
+      insights.innerHTML = all.length ? `
+        <article class="morning-card">
+          <span>Insight principal</span>
+          <strong>${escapeHtml(best ? `${best.key} ${formatPct(best.roi, 0)}` : 'Sample court')}</strong>
+          <p>${escapeHtml(worst ? `À surveiller : ${worst.key} ${formatPct(worst.roi, 0)} sur ${formatCount(worst.count)} paris.` : 'Pas encore de segment faible robuste.')}</p>
+        </article>
+      ` : '<div class="empty">Les insights avancés s’activent à partir de 5 paris par bucket.</div>';
+    }
+  }
+
+  function renderActivityHeatmap365() {
+    const node = $('#activity-heatmap-365');
+    if (!node) return;
+    const rows = settledUserBets();
+    const byDay = new Map();
+    rows.forEach((bet) => {
+      const ts = Date.parse(bet.settledAt || bet.day || bet.placedAt || '');
+      if (!Number.isFinite(ts)) return;
+      const key = new Date(ts).toISOString().slice(0, 10);
+      const bucket = byDay.get(key) || { count: 0, pnl: 0 };
+      bucket.count += 1;
+      bucket.pnl += Number(bet.pnl || 0) || 0;
+      byDay.set(key, bucket);
+    });
+    const today = new Date();
+    const cells = Array.from({ length: 365 }, (_, index) => {
+      const date = new Date(today.getTime() - (364 - index) * 24 * 60 * 60 * 1000);
+      const key = date.toISOString().slice(0, 10);
+      const bucket = byDay.get(key) || { count: 0, pnl: 0 };
+      const tone = bucket.count === 0 ? 'empty' : bucket.pnl > 0 ? 'win' : bucket.pnl < 0 ? 'loss' : 'flat';
+      return `<span class="activity-cell ${tone}" title="${escapeHtml(`${key} · ${formatCount(bucket.count)} pari(s) · ${formatMoney(bucket.pnl)}`)}"></span>`;
+    });
+    node.innerHTML = `<div class="activity-heatmap">${cells.join('')}</div>`;
+  }
+
   function renderHistory() {
     const history = state.history;
     renderModelPerformance();
@@ -5200,6 +5651,8 @@
     renderModelSelfAudit();
     renderActiveModelAdjustments();
     renderPersonalInsights();
+    renderPersonalPatterns();
+    renderActivityHeatmap365();
     renderLearningFeedback();
     renderCoachAdvice();
     $('#hist-total').textContent = history ? String(history.total) : '-';
@@ -5974,6 +6427,9 @@
     const wx = match.winamax || {};
     const markets = wx.markets || {};
     const oneNtwo = markets['1n2'] || {};
+    const bestOdds = bestOddsForRow(row);
+    const bestOdd = Number(bestOdds?.best?.odd || 0);
+    const segmentValidation = row.segmentValidation || {};
     const quality = [
       ['Puis-je miser ?', stakeAllowed ? 'Oui' : 'Non'],
       ['Pourquoi ?', readableReason],
@@ -5984,6 +6440,8 @@
       ['Pick', row.label],
       ['Cote', row.odd > 1 ? `@${row.odd.toFixed(2)}` : '-'],
       ['Proba modèle', row.probability > 0 ? formatPct(row.probability, 1) : '-'],
+      ['Confiance ajustée', formatPct(realConfidenceValue(row), 1)],
+      ['Validation historique', segmentValidation.label || 'Sample insuffisant pour validation rétrospective'],
       ['Edge', row.edge > 0 ? formatPct(row.edge, 1) : '-'],
       ['Mise autorisée', visibleStakeText(row, decisionBundle)],
       ['Kelly théorique', Number(row.modelStake || row.stake || 0) > 0 && !stakeAllowed ? `${formatMoney(row.modelStake || row.stake)} · bloquée` : row.stake > 0 ? formatMoney(row.stake) : '0 €'],
@@ -6058,6 +6516,7 @@
               <span>Pick</span><strong>${escapeHtml(row.label || '-')}</strong>
               <span>Marché</span><strong>${escapeHtml(row.market || '-')}</strong>
               <span>Cote modèle</span><strong>${escapeHtml(fairOdd > 1 ? `@${fairOdd.toFixed(2)}` : '-')}</strong>
+              <span>Meilleure cote</span><strong>${escapeHtml(bestOdd > 1 ? `${formatOdd(bestOdd)} · ${bestOdds.best.bookmaker || 'book'}` : 'Non comparée')}</strong>
               <span>Cote consensus</span><strong>${escapeHtml(consensusOdd || 'Non disponible')}</strong>
               <span>Action</span><strong>${escapeHtml(readableAction)}</strong>
               <span>Bookmaker</span><strong>${winamaxLink}</strong>
@@ -6084,9 +6543,10 @@
             ${formStripHtml(match)}
             <div class="mini-kpi-row">
               <span>Proba ${escapeHtml(row.probability > 0 ? formatPct(row.probability, 1) : '-')}</span>
-              <span>Confiance ${escapeHtml(confidenceTrustText(row))}</span>
+              <span>Confiance ajustée ${escapeHtml(formatPct(realConfidenceValue(row), 0))}</span>
               <span>${escapeHtml(sourceLine)}</span>
             </div>
+            <p class="detail-text validation-detail">${escapeHtml(segmentValidation.label || 'Sample insuffisant pour validation rétrospective')}</p>
           </article>
           <article class="detail-card">
             <h4>Contexte utile</h4>
@@ -9734,7 +10194,7 @@
         $('#refresh-log').textContent = error.stack || error.message;
       });
     });
-    ['ultimate-bet-card', 'time-cockpit', 'picks-body', 'stake-scenario-body', 'watchlist-grid', 'prematch-final-grid', 'matches-body', 'combines-list', 'scorers-list', 'agent-positions-body', 'agent-blockers-body'].forEach((id) => {
+    ['ultimate-bet-card', 'live-cockpit', 'time-cockpit', 'picks-body', 'stake-scenario-body', 'watchlist-grid', 'prematch-final-grid', 'matches-body', 'combines-list', 'scorers-list', 'agent-positions-body', 'agent-blockers-body'].forEach((id) => {
       const node = $(`#${id}`);
       if (!node) return;
       node.addEventListener('click', openMatchFromEvent);
@@ -10007,6 +10467,7 @@
     state.actionHistory = readActionHistory();
     state.aiAssist = readStorageJson(AI_ENGINE_KEY, null);
     state.webEnrichments = readStorageJson(WEB_ENRICHMENT_KEY, null);
+    state.multiBookmaker = readStorageJson(MULTI_BOOKMAKER_KEY, null);
     state.updateStatus = readStorageJson(UPDATE_STATUS_KEY, null);
     renderActionHistory();
     updateWebEnrichmentSummary();
@@ -10020,6 +10481,7 @@
     await statusPromise;
     await computePicks();
     loadWebEnrichmentState().catch(() => {});
+    loadMultiBookmakerState().catch(() => {});
     setTimeout(() => checkForUpdates().catch(() => {}), 2500);
     await logPromise;
     setSideStatus('Calcul prêt', 'ok');

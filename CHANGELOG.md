@@ -5,6 +5,19 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 10 — Qualité réelle, live, multi-cotes et patterns avancés
+
+- Ajout d’un audit rétrospectif `modelRealityAudit` sur les 500 derniers picks réglés : chaque pick affiche maintenant une validation historique par segment, un sample, ROI/WR comparables et une `confiance ajustée`.
+- Le tri par défaut du cockpit utilise la confiance ajustée plutôt que l’edge brut, pour privilégier les picks dont le segment réel a déjà prouvé quelque chose.
+- La fiche match affiche désormais la validation historique, la confiance ajustée et la meilleure cote comparée quand elle est disponible.
+- Ajout d’une section `EN DIRECT` dans le cockpit : matchs live détectés, score/minute quand disponibles, verdict provisoire, lien Winamax/cash-out et notifications sur situations importantes.
+- L’auto-refresh passe à 2 minutes quand un match live est suivi, tout en gardant le mode pré-kickoff 5 minutes et le mode économie.
+- Ajout d’une comparaison multi-bookmaker optionnelle via le process Electron (`/api/odds/compare`) avec cache 30 min, The Odds API si clé fournie, fallback Winamax-only clair si aucune clé.
+- Préférences enrichies avec toggle multi-bookmaker, clé The Odds API et régions. Le renderer ne fait toujours aucun fetch internet direct.
+- Historique enrichi avec patterns personnels avancés : jour de semaine, tranche horaire, sport, ligue, marché, taille de mise, tier, segments top/worst et heatmap 365 jours.
+- Vue Pipeline enrichie avec un panneau stabilité : uptime, mémoire moyenne/max, live suivis et alerte au-dessus de 600 MB RSS.
+- QA Sprint 10 : smoke, Playwright, capture visuelle et contrat moteur couvrent `modelRealityAudit`, confiance ajustée, live cockpit, multi-bookmaker, patterns/heatmap, stabilité et absence de fetch externe renderer.
+
 ### Sprint 9 — Enrichissement visible, performance active, focus et notifications externes
 
 - Enrichissement web rendu visible dans l'app : les picks enrichis affichent un badge `Enrichi à HH:MM`, et la fiche match expose les sources web vérifiées, validations locales, succès/échecs et horodatage.
