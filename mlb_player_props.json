@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-14T21:41:30Z",
+  "generated_at": "2026-05-14T21:50:07Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -292,6 +292,42 @@
             "whip": 1.05
           },
           "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Philadelphia Phillies",
+          "pitcher": "Aaron Nola",
+          "label": "Aaron Nola plus de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "over",
+          "probability": 0.5002,
+          "fair_odds": 2.0,
+          "expected_strikeouts": 5.5,
+          "projected_ip": 5.25,
+          "inputs": {
+            "k9": 9.43,
+            "era": 5.14,
+            "whip": 1.48,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Philadelphia Phillies",
+          "pitcher": "Aaron Nola",
+          "label": "Aaron Nola concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5831,
+          "fair_odds": 1.71,
+          "expected_hr_allowed": 0.875,
+          "projected_ip": 5.25,
+          "inputs": {
+            "hr9": 1.5,
+            "era": 5.14,
+            "whip": 1.48
+          },
+          "side": "away"
         }
       ]
     },
@@ -1204,6 +1240,42 @@
             "whip": 1.46
           },
           "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Philadelphia Phillies",
+          "pitcher": "Cristopher Sánchez",
+          "label": "Cristopher Sánchez moins de 7,5 strikeouts",
+          "line": 7.5,
+          "pick": "under",
+          "probability": 0.516,
+          "fair_odds": 1.94,
+          "expected_strikeouts": 7.41,
+          "projected_ip": 6.12,
+          "inputs": {
+            "k9": 10.9,
+            "era": 2.11,
+            "whip": 1.28,
+            "hand": "L"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Philadelphia Phillies",
+          "pitcher": "Cristopher Sánchez",
+          "label": "Cristopher Sánchez ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.7165,
+          "fair_odds": 1.4,
+          "expected_hr_allowed": 0.333,
+          "projected_ip": 6.12,
+          "inputs": {
+            "hr9": 0.49,
+            "era": 2.11,
+            "whip": 1.28
+          },
+          "side": "away"
         }
       ]
     },
@@ -1628,7 +1700,7 @@
       ]
     }
   ],
-  "props": 78,
+  "props": 82,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
