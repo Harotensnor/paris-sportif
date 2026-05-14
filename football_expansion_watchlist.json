@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-14T19:57:32Z",
+  "generated_at": "2026-05-14T20:04:12Z",
   "source": "data.js bookable feed + sofascore_events source feed",
   "status": "ok",
   "categories": {
@@ -77,9 +77,25 @@
     },
     "J5_football_tier2": {
       "label": "Ligues tier 2",
-      "bookable": 0,
+      "bookable": 2,
       "source": 20,
       "samples": [
+        {
+          "event_id": "401872119",
+          "source": "winamax_exact",
+          "kickoff": "2026-05-16T18:00Z",
+          "match": "Monza at Juve Stabia",
+          "league": "Serie B",
+          "code": "ita.2"
+        },
+        {
+          "event_id": "401872121",
+          "source": "winamax_exact",
+          "kickoff": "2026-05-19T18:00Z",
+          "match": "Juve Stabia at Monza",
+          "league": "Serie B",
+          "code": "ita.2"
+        },
         {
           "event_id": "sofa_15345973",
           "source": "sofascore_watch",
@@ -127,25 +143,9 @@
           "match": "Fujieda MYFC vs Fukushima United FC",
           "league": "J2/J3 League, East B",
           "code": "jpn.2"
-        },
-        {
-          "event_id": "sofa_15346049",
-          "source": "sofascore_watch",
-          "kickoff": "2026-05-06T05:00Z",
-          "match": "Hokkaido Consadole Sapporo vs AC Nagano Parceiro",
-          "league": "J2/J3 League, East B",
-          "code": "jpn.2"
-        },
-        {
-          "event_id": "sofa_15346051",
-          "source": "sofascore_watch",
-          "kickoff": "2026-05-06T05:00Z",
-          "match": "RB Omiya Ardija vs Iwaki FC",
-          "league": "J2/J3 League, East B",
-          "code": "jpn.2"
         }
       ],
-      "status": "watch"
+      "status": "ok"
     },
     "J6_coupes": {
       "label": "Coupes",
@@ -293,8 +293,8 @@
     }
   },
   "summary": {
-    "bookable_total": 72,
+    "bookable_total": 74,
     "source_total": 141,
-    "ok_categories": 2
+    "ok_categories": 3
   }
 }
