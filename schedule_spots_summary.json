@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-14T02:35:45Z",
+  "generated_at": "2026-05-14T02:38:43Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -51,13 +51,13 @@
         "2 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.085,
-        "away_score": -0.995,
-        "home_fade": 0.3,
+        "status": "abstain",
+        "net_side": null,
+        "home_score": -0.915,
+        "away_score": -0.645,
+        "home_fade": 1.3,
         "away_fade": 1.1,
-        "reason": "Direction nette: San Diego Padres (+0.09)",
+        "reason": "Signaux opposes: San Diego Padres fade 1.30, Los Angeles Dodgers fade 1.10 -> prudence",
         "detail": [
           {
             "side": "home",
@@ -76,6 +76,12 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.8
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           }
         ]
       }
@@ -167,13 +173,13 @@
         "3 matchs sur les 7 derniers jours"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.11,
-        "away_score": -1.19,
-        "home_fade": 0.6,
+        "status": "abstain",
+        "net_side": null,
+        "home_score": -1.11,
+        "away_score": -0.84,
+        "home_fade": 1.6,
         "away_fade": 1.4,
-        "reason": "Direction nette: San Diego Padres (-0.11)",
+        "reason": "Signaux opposes: San Diego Padres fade 1.60, Los Angeles Dodgers fade 1.40 -> prudence",
         "detail": [
           {
             "side": "home",
@@ -192,6 +198,12 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.8
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           }
         ]
       }
@@ -483,11 +495,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
-        "home_fade": 0.15,
+        "home_score": -1.097,
+        "away_score": 0.252,
+        "home_fade": 1.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Detroit Pistons (-0.10)",
+        "reason": "Direction nette: Detroit Pistons (+0.25)",
         "detail": [
           {
             "side": "home",
@@ -500,6 +512,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           }
         ]
       }
@@ -534,12 +552,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "away",
-        "home_score": -0.498,
-        "away_score": 0.043,
+        "net_side": "home",
+        "home_score": -0.148,
+        "away_score": -0.957,
         "home_fade": 0.55,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Colorado Avalanche (+0.04)",
+        "away_fade": 1.15,
+        "reason": "Direction nette: Minnesota Wild (-0.15)",
         "detail": [
           {
             "side": "home",
@@ -558,6 +576,12 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.4
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           }
         ]
       }
@@ -925,11 +949,11 @@
       "global_resolution": {
         "status": "mixed",
         "net_side": null,
-        "home_score": 0.895,
-        "away_score": -2.206,
+        "home_score": 0.872,
+        "away_score": -2.142,
         "home_fade": 1.0,
-        "away_fade": 2.556,
-        "reason": "Signaux mitigés: avantage net trop faible (Houston Astros +0.89, Seattle Mariners -2.21)",
+        "away_fade": 2.492,
+        "reason": "Signaux mitigés: avantage net trop faible (Houston Astros +0.87, Seattle Mariners -2.14)",
         "detail": [
           {
             "side": "home",
@@ -947,7 +971,7 @@
             "side": "away",
             "type": "market_move",
             "direction": "drift",
-            "strength": 0.849
+            "strength": 0.785
           },
           {
             "side": "away",
@@ -1168,11 +1192,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.392,
-        "away_score": -1.498,
-        "home_fade": 0.15,
+        "home_score": -0.607,
+        "away_score": -1.147,
+        "home_fade": 1.15,
         "away_fade": 1.55,
-        "reason": "Direction nette: San Diego Padres (+0.39)",
+        "reason": "Direction nette: San Diego Padres (-0.61)",
         "detail": [
           {
             "side": "home",
@@ -1197,6 +1221,12 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.8
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           }
         ]
       }
@@ -1229,19 +1259,25 @@
         "1 match dans les 48h + 1135 km de voyage"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.405,
-        "away_score": -1.157,
-        "home_fade": 0.0,
+        "status": "abstain",
+        "net_side": null,
+        "home_score": -0.595,
+        "away_score": -0.807,
+        "home_fade": 1.0,
         "away_fade": 1.157,
-        "reason": "Direction nette: Colorado Avalanche (+0.40)",
+        "reason": "Signaux opposes: Colorado Avalanche fade 1.00, Minnesota Wild fade 1.16 -> prudence",
         "detail": [
           {
             "side": "away",
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.4
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           },
           {
             "side": "away",
