@@ -77,7 +77,8 @@ async function main() {
       pnlVisible: Boolean(document.querySelector('#user-pnl-total') && document.querySelector('#user-pnl-sub')),
       pnlSparkline: Boolean(document.querySelector('#user-pnl-sparkline svg')),
       userBetExport: Boolean(document.querySelector('#export-user-bets-btn')),
-      filtersVisible: Boolean(document.querySelector('#pick-search') && document.querySelector('#pick-sort')),
+      filtersVisible: Boolean(document.querySelector('#pick-search') && document.querySelector('#pick-sort') && document.querySelector('#pick-market-filter')),
+      marketChips: document.querySelectorAll('#market-snapshot .market-chip, #market-snapshot .empty').length,
       performanceMetric: document.querySelector('#metric-boot-time')?.textContent || '',
       refreshPolicy: document.querySelector('#refresh-policy')?.textContent || '',
       positiveStakeCells: Array.from(document.querySelectorAll('#picks-body td[data-label="Mise"], #stake-scenario-body td[data-label="Prudent"], #stake-scenario-body td[data-label="Normal"], #stake-scenario-body td[data-label="Agressif"]'))
@@ -88,7 +89,7 @@ async function main() {
     if (dashboard.finalCards <= 0 || !dashboard.firstActionButton || !dashboard.criticalButton || !dashboard.t10Button) {
       throw new Error(`Panneau décision incomplet: ${JSON.stringify(dashboard)}`);
     }
-    if (dashboard.picks < 10 || dashboard.trackButtons < 10 || !dashboard.pnlVisible || !dashboard.pnlSparkline || !dashboard.userBetExport || !dashboard.filtersVisible) {
+    if (dashboard.picks < 20 || dashboard.trackButtons < 20 || !dashboard.pnlVisible || !dashboard.pnlSparkline || !dashboard.userBetExport || !dashboard.filtersVisible || dashboard.marketChips <= 0) {
       throw new Error(`Cockpit de mise incomplet: ${JSON.stringify(dashboard)}`);
     }
     if (!/s|\.\.\./.test(dashboard.performanceMetric) || !/Auto-refresh|Mode économie/.test(dashboard.refreshPolicy)) {
@@ -106,6 +107,40 @@ async function main() {
     await expectDownload(win, '#export-btn', 'paris-sportif-desktop-');
     await expectDownload(win, '#export-user-bets-btn', 'paris-sportif-paris-suivis-');
     await expectDownload(win, '#export-report-json-btn', 'paris-sportif-rapport-');
+
+    await win.click('[data-tab="combines"]');
+    await win.waitForSelector('#combines-list .combo-card, #combines-list .empty', { timeout: 30000 });
+    const combines = await win.evaluate(() => ({
+      cards: document.querySelectorAll('#combines-list .combo-card').length,
+      buttons: document.querySelectorAll('[data-track-combo-key]').length,
+      text: document.querySelector('#combines-list')?.textContent || ''
+    }));
+    if (combines.cards > 0 && combines.buttons <= 0) throw new Error(`Combinés sans suivi 1-clic: ${JSON.stringify(combines)}`);
+
+    await win.click('[data-tab="history"]');
+    await win.waitForSelector('#model-performance-grid .performance-card', { timeout: 30000 });
+    const history = await win.evaluate(() => ({
+      performance: document.querySelectorAll('#model-performance-grid .performance-card').length,
+      segments: document.querySelectorAll('#model-segment-grid .segment-card, #model-segment-grid .empty').length,
+      calibration: document.querySelectorAll('#calibration-plot-grid .calibration-bin, #calibration-plot-grid .empty').length,
+      userBets: Boolean(document.querySelector('#user-bets-body')),
+      exportButton: Boolean(document.querySelector('#export-user-bets-btn-history'))
+    }));
+    if (history.performance < 5 || history.segments <= 0 || history.calibration <= 0 || !history.userBets || !history.exportButton) {
+      throw new Error(`Performance/Historique incomplet: ${JSON.stringify(history)}`);
+    }
+
+    await win.click('[data-tab="preferences"]');
+    await win.waitForSelector('#pref-bankroll', { timeout: 10000 });
+    const preferences = await win.evaluate(() => ({
+      bankroll: Boolean(document.querySelector('#pref-bankroll')),
+      sports: document.querySelectorAll('input[name="pref-sport"]').length,
+      markets: document.querySelectorAll('input[name="pref-market"]').length,
+      save: Boolean(document.querySelector('#save-preferences-btn'))
+    }));
+    if (!preferences.bankroll || preferences.sports < 5 || preferences.markets < 5 || !preferences.save) {
+      throw new Error(`Préférences incomplètes: ${JSON.stringify(preferences)}`);
+    }
 
     await win.click('[data-tab="data"]');
     await win.evaluate(() => document.querySelectorAll('details.advanced-section').forEach((node) => { node.open = true; }));

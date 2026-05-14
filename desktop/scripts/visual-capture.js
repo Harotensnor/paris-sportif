@@ -48,13 +48,34 @@ async function main() {
       trackButtons: document.querySelectorAll('[data-track-bet-key]').length,
       pnlVisible: Boolean(document.querySelector('#user-pnl-total') && document.querySelector('#user-pnl-sub')),
       pnlSparkline: Boolean(document.querySelector('#user-pnl-sparkline svg')),
-      filtersVisible: Boolean(document.querySelector('#pick-search') && document.querySelector('#pick-sort')),
+      filtersVisible: Boolean(document.querySelector('#pick-search') && document.querySelector('#pick-sort') && document.querySelector('#pick-market-filter')),
       performanceMetric: document.querySelector('#metric-boot-time')?.textContent || '',
       refreshPolicy: document.querySelector('#refresh-policy')?.textContent || '',
       positiveStakeCells: Array.from(document.querySelectorAll('#picks-body td[data-label="Mise"], #stake-scenario-body td[data-label="Prudent"], #stake-scenario-body td[data-label="Normal"], #stake-scenario-body td[data-label="Agressif"]'))
         .filter((node) => /[1-9]\d*(?:[,.]\d+)?\s*€/.test(node.textContent || '')).length
     }));
     await safeScreenshot(win, path.join(captureDir, 'desktop-dashboard-audit.png'), { fullPage: true });
+
+    await win.click('[data-tab="combines"]');
+    await win.waitForSelector('#combines-list .combo-card, #combines-list .empty', { timeout: 30000 });
+    const combines = await win.locator('#combines-list .combo-card, #combines-list .empty').count();
+    await safeScreenshot(win, path.join(captureDir, 'desktop-combines-audit.png'), { fullPage: true });
+
+    await win.click('[data-tab="scorers"]');
+    await win.waitForSelector('#scorers-list .scorer-card, #scorers-list .empty', { timeout: 30000 });
+    const scorers = await win.locator('#scorers-list .scorer-card, #scorers-list .empty').count();
+    await safeScreenshot(win, path.join(captureDir, 'desktop-scorers-audit.png'), { fullPage: true });
+
+    await win.click('[data-tab="history"]');
+    await win.waitForSelector('#model-performance-grid .performance-card, #model-performance-grid .empty', { timeout: 30000 });
+    const performanceCards = await win.locator('#model-performance-grid .performance-card, #model-performance-grid .empty').count();
+    const segmentCards = await win.locator('#model-segment-grid .segment-card, #model-segment-grid .empty').count();
+    await safeScreenshot(win, path.join(captureDir, 'desktop-history-performance.png'), { fullPage: true });
+
+    await win.click('[data-tab="agent"]');
+    await win.waitForSelector('#agent-positions-body tr, #agent-blockers-grid .quality-report-card, #agent-blockers-grid .empty', { timeout: 30000 });
+    const agentCards = await win.locator('#agent-blockers-grid .quality-report-card, #agent-blockers-grid .empty').count();
+    await safeScreenshot(win, path.join(captureDir, 'desktop-agent-audit.png'), { fullPage: true });
 
     await win.click('[data-tab="data"]');
     await win.evaluate(() => document.querySelectorAll('details.advanced-section').forEach((node) => { node.open = true; }));
@@ -64,6 +85,11 @@ async function main() {
     const refreshCards = await win.locator('#refresh-summary-grid .refresh-card, #refresh-summary-grid .empty').count();
     const checklist = await win.locator('#prebet-checklist-grid .quality-report-card, #prebet-checklist-grid .empty').count();
     await safeScreenshot(win, path.join(captureDir, 'desktop-data-health.png'), { fullPage: true });
+
+    await win.click('[data-tab="preferences"]');
+    await win.waitForSelector('#pref-bankroll', { timeout: 10000 });
+    const preferenceInputs = await win.locator('#pref-bankroll, input[name="pref-sport"], input[name="pref-market"]').count();
+    await safeScreenshot(win, path.join(captureDir, 'desktop-preferences-audit.png'), { fullPage: true });
 
     await win.click('[data-tab="matches"]');
     await win.waitForSelector('#matches-body tr.clickable-row', { timeout: 30000 });
@@ -101,8 +127,11 @@ async function main() {
     if (/Aucun pari à jouer maintenant|Mise bloquée|blocage/i.test(decisionConsistency.caption) && decisionConsistency.positiveStakeCells > 0) {
       throw new Error(`Mise positive affichée malgré décision bloquée: ${JSON.stringify(decisionConsistency)}`);
     }
-    if (decisionConsistency.picksMetric < 10 || decisionConsistency.trackButtons < 10 || !decisionConsistency.pnlVisible || !decisionConsistency.pnlSparkline || !decisionConsistency.filtersVisible) {
+    if (decisionConsistency.picksMetric < 20 || decisionConsistency.trackButtons < 20 || !decisionConsistency.pnlVisible || !decisionConsistency.pnlSparkline || !decisionConsistency.filtersVisible) {
       throw new Error(`Cockpit actionnable incomplet: ${JSON.stringify(decisionConsistency)}`);
+    }
+    if (combines <= 0 || scorers <= 0 || performanceCards <= 0 || segmentCards <= 0 || agentCards <= 0 || preferenceInputs < 8) {
+      throw new Error(`Captures écrans incomplètes: ${JSON.stringify({ combines, scorers, performanceCards, segmentCards, agentCards, preferenceInputs })}`);
     }
     if (!/s|\.\.\./.test(decisionConsistency.performanceMetric) || !/Auto-refresh|Mode économie/.test(decisionConsistency.refreshPolicy)) {
       throw new Error(`Indicateurs cockpit manquants: ${JSON.stringify(decisionConsistency)}`);
@@ -116,7 +145,7 @@ async function main() {
     if (!mobile.before.includes('Match') || mobile.hasOverflow || mobile.rows <= 0) {
       throw new Error(`Rendu mobile invalide: ${JSON.stringify(mobile)}`);
     }
-    console.log(`Visual capture OK: décision ${finalCards} cartes, ${sources} sources, ${refreshCards} refresh cards, ${mobile.rows} cartes mobiles.`);
+    console.log(`Visual capture OK: décision ${finalCards} cartes, ${combines} combinés, ${scorers} buteurs, ${sources} sources, ${refreshCards} refresh cards, ${mobile.rows} cartes mobiles.`);
   } finally {
     await app.close();
     fs.rmSync(userDataDir, { recursive: true, force: true });

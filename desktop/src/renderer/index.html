@@ -26,6 +26,7 @@
         <button class="nav-btn" data-tab="history">Historique</button>
         <button class="nav-btn" data-tab="agent">Agent</button>
         <button class="nav-btn" data-tab="data">Données</button>
+        <button class="nav-btn" data-tab="preferences">Préférences</button>
       </nav>
       <div class="side-status" id="side-status">
         <span class="dot dot-idle"></span>
@@ -115,6 +116,23 @@
           </article>
         </div>
 
+        <section class="onboarding-card hidden" id="onboarding-card" aria-label="Première configuration">
+          <div>
+            <span class="eyebrow">Première ouverture</span>
+            <h3>Configure ton cockpit en 30 secondes</h3>
+            <p>Bankroll, sports suivis et niveau de prudence servent à filtrer les picks sans toucher au modèle.</p>
+          </div>
+          <div class="onboarding-actions">
+            <input id="onboarding-bankroll" type="number" min="10" step="10" value="50" aria-label="Bankroll initiale">
+            <select id="onboarding-level" aria-label="Niveau">
+              <option value="intermediate">Intermédiaire</option>
+              <option value="beginner">Débutant</option>
+              <option value="expert">Expert</option>
+            </select>
+            <button class="primary-btn" id="onboarding-save-btn" type="button">Démarrer</button>
+          </div>
+        </section>
+
         <div class="decision-terminal">
           <div class="decision-terminal-head">
             <div>
@@ -147,6 +165,9 @@
           <select id="pick-league-filter">
             <option value="all">Toutes ligues</option>
           </select>
+          <select id="pick-market-filter">
+            <option value="all">Tous marchés</option>
+          </select>
           <select id="pick-sort">
             <option value="edge">Edge</option>
             <option value="confidence">Confiance</option>
@@ -155,6 +176,9 @@
           </select>
           <input id="pick-edge-min" type="number" min="0" max="100" step="1" placeholder="Edge min %">
           <input id="pick-odd-min" type="number" min="1" max="100" step="0.05" placeholder="Cote min">
+        </div>
+        <div class="market-snapshot" id="market-snapshot">
+          <div class="empty compact-empty">Chargement des marchés...</div>
         </div>
         <div class="table-wrap">
           <table>
@@ -303,6 +327,67 @@
       </section>
 
       <section class="tab-panel" data-panel="history">
+        <div class="section-head">
+          <div>
+            <h3>Performance modèle</h3>
+            <p>Crédibilité du modèle sur les lignes réglées : ROI, Brier, calibration et segments à privilégier.</p>
+          </div>
+          <div class="section-actions">
+            <button class="ghost-btn" id="export-user-bets-btn-history" type="button">Exporter mes paris</button>
+          </div>
+        </div>
+        <div class="model-performance-grid" id="model-performance-grid">
+          <div class="empty">Chargement performance modèle...</div>
+        </div>
+        <div class="segment-grid" id="model-segment-grid">
+          <div class="empty">Chargement segments...</div>
+        </div>
+        <div class="calibration-plot" id="calibration-plot-grid">
+          <div class="empty">Chargement calibration...</div>
+        </div>
+
+        <div class="section-head compact">
+          <div>
+            <h3>Mes paris</h3>
+            <p>Suivi local des paris ajoutés avec “Je mise”.</p>
+          </div>
+          <div class="history-filters">
+            <select id="user-bets-status-filter" aria-label="Statut des paris suivis">
+              <option value="all">Tous statuts</option>
+              <option value="pending">En cours</option>
+              <option value="won">Gagnés</option>
+              <option value="lost">Perdus</option>
+              <option value="void">Void</option>
+            </select>
+            <select id="user-bets-period-filter" aria-label="Période des paris suivis">
+              <option value="all">Toute période</option>
+              <option value="7">7 jours</option>
+              <option value="30">30 jours</option>
+              <option value="90">90 jours</option>
+            </select>
+          </div>
+        </div>
+        <div class="tracked-bets-chart" id="tracked-bets-chart"></div>
+        <div class="table-wrap compact-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Match</th>
+                <th>Marché</th>
+                <th>Cote</th>
+                <th>Mise</th>
+                <th>Statut</th>
+                <th>P&L</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="user-bets-body">
+              <tr><td colspan="8" class="empty">Aucun pari suivi.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
         <div class="metrics-grid history-grid">
           <article class="metric">
             <span>Total picks</span>
@@ -634,6 +719,54 @@
             <div class="empty">Chargement fichiers...</div>
           </div>
         </details>
+      </section>
+
+      <section class="tab-panel" data-panel="preferences">
+        <div class="section-head">
+          <div>
+            <h3>Préférences</h3>
+            <p>Réglages locaux : ils filtrent l’expérience, jamais les données brutes du modèle.</p>
+          </div>
+          <div class="section-actions">
+            <button class="primary-btn" id="save-preferences-btn" type="button">Enregistrer</button>
+            <button class="ghost-btn" id="reset-preferences-btn" type="button">Réinitialiser</button>
+          </div>
+        </div>
+        <div class="preferences-grid">
+          <article class="preference-card">
+            <h4>Profil</h4>
+            <label>Bankroll initiale<input id="pref-bankroll" type="number" min="10" step="10"></label>
+            <label>Niveau
+              <select id="pref-level">
+                <option value="beginner">Débutant</option>
+                <option value="intermediate">Intermédiaire</option>
+                <option value="expert">Expert</option>
+              </select>
+            </label>
+            <label class="check-line"><input id="pref-strict" type="checkbox"> Mode strict</label>
+          </article>
+          <article class="preference-card">
+            <h4>Sports suivis</h4>
+            <div class="check-grid" id="pref-sports"></div>
+          </article>
+          <article class="preference-card">
+            <h4>Marchés autorisés</h4>
+            <div class="check-grid" id="pref-markets"></div>
+          </article>
+          <article class="preference-card">
+            <h4>Seuils personnels</h4>
+            <label>Edge min %<input id="pref-edge-min" type="number" min="0" max="50" step="1"></label>
+            <label>Cote min<input id="pref-odd-min" type="number" min="1" max="50" step="0.05"></label>
+            <label>Cote max<input id="pref-odd-max" type="number" min="1" max="100" step="0.05"></label>
+            <label>Confiance min %<input id="pref-confidence-min" type="number" min="0" max="100" step="1"></label>
+          </article>
+          <article class="preference-card">
+            <h4>Alertes</h4>
+            <label>Edge notif %<input id="pref-alert-edge" type="number" min="0" max="50" step="1"></label>
+            <label>Kickoff notif heures<input id="pref-alert-window" type="number" min="1" max="24" step="1"></label>
+            <p class="match-sub">Les notifications restent locales et déclenchées par les picks visibles.</p>
+          </article>
+        </div>
       </section>
     </main>
   </div>

@@ -328,7 +328,7 @@ a:hover {
 
 .pick-toolbar {
   display: grid;
-  grid-template-columns: minmax(220px, 1.4fr) repeat(3, minmax(130px, .7fr)) repeat(2, minmax(110px, .5fr));
+  grid-template-columns: minmax(220px, 1.4fr) repeat(4, minmax(130px, .7fr)) repeat(2, minmax(110px, .5fr));
   gap: 10px;
   margin: 10px 0 12px;
 }
@@ -342,6 +342,69 @@ a:hover {
   color: var(--text);
   padding: 10px 12px;
   font-weight: 760;
+}
+
+.market-snapshot,
+.model-performance-grid,
+.segment-grid,
+.calibration-plot,
+.preferences-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.market-snapshot {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  margin-bottom: 12px;
+}
+
+.market-chip,
+.performance-card,
+.segment-card,
+.calibration-bin,
+.preference-card,
+.onboarding-card {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.market-chip {
+  padding: 10px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.market-chip:hover {
+  border-color: rgba(96, 165, 250, .55);
+}
+
+.market-chip span,
+.performance-card span,
+.segment-card span,
+.calibration-bin span,
+.preference-card label,
+.onboarding-card p {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.market-chip strong,
+.performance-card strong,
+.segment-card strong {
+  display: block;
+  margin-top: 5px;
+  font-size: 18px;
+}
+
+.market-chip em,
+.segment-card em,
+.calibration-bin em {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted-2);
+  font-size: 11px;
+  font-style: normal;
 }
 
 .compact-advanced {
@@ -719,6 +782,103 @@ a:hover {
 
 .history-grid {
   grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.model-performance-grid {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  margin-bottom: 12px;
+}
+
+.performance-card,
+.segment-card,
+.calibration-bin,
+.preference-card {
+  padding: 14px;
+}
+
+.performance-card p,
+.segment-card p,
+.preference-card p {
+  margin: 8px 0 0;
+  color: var(--muted-2);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.segment-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-bottom: 12px;
+}
+
+.segment-card.warm {
+  border-left: 4px solid var(--accent);
+}
+
+.segment-card.cold {
+  border-left: 4px solid var(--danger);
+}
+
+.segment-card.sample {
+  border-left: 4px solid var(--warn);
+}
+
+.calibration-plot {
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  margin-bottom: 18px;
+}
+
+.calibration-bin {
+  min-height: 132px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.calibration-bin-bar {
+  width: 100%;
+  min-height: 6px;
+  height: 6px;
+  border-radius: 6px 6px 2px 2px;
+  background: linear-gradient(180deg, var(--accent), var(--blue));
+  margin: 8px 0;
+}
+
+.cal-h-0 { height: 6px; }
+.cal-h-10 { height: 12px; }
+.cal-h-20 { height: 22px; }
+.cal-h-30 { height: 32px; }
+.cal-h-40 { height: 42px; }
+.cal-h-50 { height: 52px; }
+.cal-h-60 { height: 62px; }
+.cal-h-70 { height: 72px; }
+.cal-h-80 { height: 82px; }
+.cal-h-90 { height: 92px; }
+.cal-h-100 { height: 102px; }
+
+.tracked-bets-chart {
+  min-height: 54px;
+  margin-bottom: 10px;
+}
+
+.tracked-bets-chart svg {
+  width: 100%;
+  height: 54px;
+  display: block;
+}
+
+.history-filters {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.history-filters select {
+  min-height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  padding: 8px 10px;
 }
 
 .calibration-grid {
@@ -1178,6 +1338,82 @@ a:hover {
   margin-top: 0;
 }
 
+.preferences-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.preference-card h4 {
+  margin: 0 0 12px;
+}
+
+.preference-card label {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.preference-card input,
+.preference-card select {
+  min-height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-2);
+  color: var(--text);
+  padding: 8px 10px;
+}
+
+.check-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.check-line {
+  display: flex !important;
+  grid-template-columns: none !important;
+  align-items: center;
+  gap: 8px !important;
+}
+
+.check-line input {
+  min-height: auto;
+}
+
+.onboarding-card {
+  margin: 0 0 16px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border-left: 4px solid var(--accent);
+}
+
+.onboarding-card.hidden {
+  display: none;
+}
+
+.onboarding-card h3 {
+  margin: 4px 0 6px;
+}
+
+.onboarding-actions {
+  display: grid;
+  grid-template-columns: 120px 160px auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.onboarding-actions input,
+.onboarding-actions select {
+  min-height: 40px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-2);
+  color: var(--text);
+  padding: 8px 10px;
+}
+
 .two-column {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1202,6 +1438,7 @@ a:hover {
   justify-content: space-between;
   gap: 12px;
   align-items: flex-start;
+  flex-wrap: wrap;
   margin-bottom: 12px;
 }
 
@@ -1215,6 +1452,12 @@ a:hover {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
   margin-bottom: 12px;
+}
+
+.combo-track-btn {
+  margin-top: 12px;
+  width: 100%;
+  justify-content: center;
 }
 
 .mini-stat {
@@ -2348,6 +2591,53 @@ body.modal-open {
   line-height: 1.55;
 }
 
+.form-strip {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.form-strip-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.form-strip-row span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.form-strip-row div {
+  display: flex;
+  gap: 5px;
+}
+
+.form-strip-row strong {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.form-strip-row .form-w {
+  color: var(--accent);
+}
+
+.form-strip-row .form-d {
+  color: var(--warn);
+}
+
+.form-strip-row .form-l {
+  color: var(--danger);
+}
+
 .signal-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -2528,6 +2818,11 @@ body.modal-open {
   .match-backtest-grid,
   .refresh-stage-grid,
   .signal-gap-grid,
+  .market-snapshot,
+  .model-performance-grid,
+  .segment-grid,
+  .calibration-plot,
+  .preferences-grid,
   .combo-grid,
   .scorer-grid,
   .two-column {
@@ -2569,6 +2864,11 @@ body.modal-open {
   .agent-grid,
   .history-grid,
   .pick-toolbar,
+  .market-snapshot,
+  .model-performance-grid,
+  .segment-grid,
+  .calibration-plot,
+  .preferences-grid,
   .match-sheet-summary,
   .decision-hero-grid,
   .decision-terminal-grid,
@@ -2583,6 +2883,14 @@ body.modal-open {
   .topbar,
   .decision-terminal-head,
   .section-head {
+    grid-template-columns: 1fr;
+  }
+
+  .onboarding-card {
+    display: grid;
+  }
+
+  .onboarding-actions {
     grid-template-columns: 1fr;
   }
 

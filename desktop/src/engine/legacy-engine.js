@@ -602,14 +602,20 @@ function createLegacyEngineService({ projectRoot }) {
       '1n2': '1N2',
       matchwinner: 'Vainqueur',
       teamtotal: 'Total équipe',
+      basketballtotal: 'Total basket',
+      baskettotal: 'Total basket',
       hockeytotal: 'Total buts',
       baseballtotal: 'Total runs',
       httotal: 'Total mi-temps',
       htou: 'Total mi-temps',
+      halftimetotal: 'Total mi-temps',
+      ht1n2: '1N2 mi-temps',
       btts: 'BTTS',
+      resultbtts: 'Résultat + BTTS',
       doublechance: 'Double chance',
       handicap: 'Handicap',
       dnb: 'Remboursé si nul',
+      exactscore: 'Score exact',
       ou: 'Over/Under',
       ou15: 'O/U 1.5',
       ou25: 'O/U 2.5',
@@ -686,6 +692,117 @@ function createLegacyEngineService({ projectRoot }) {
     });
   }
 
+  function candidateScore(candidate) {
+    const investment = Number(candidate?.investment?.score);
+    const ev = Number(candidate?.ev);
+    const edge = Number(candidate?.edge);
+    const prob = Number(candidate?.prob ?? candidate?.rel);
+    return [
+      Number.isFinite(investment) ? investment : 0,
+      Number.isFinite(ev) ? ev : 0,
+      Number.isFinite(edge) ? edge : 0,
+      Number.isFinite(prob) ? prob : 0
+    ];
+  }
+
+  function runtimeMarketCandidates(win, match, pred) {
+    const api = win?.__testAPI || {};
+    const build = typeof api.buildMarketCandidates === 'function' ? api.buildMarketCandidates : null;
+    if (!build || !match || !pred) return [];
+    let candidates = [];
+    try {
+      candidates = build(match, pred, { requireExact: true }) || [];
+    } catch {
+      candidates = [];
+    }
+    const seen = new Set();
+    return (Array.isArray(candidates) ? candidates : [])
+      .filter((candidate) => {
+        const odd = Number(candidate?.odd);
+        const prob = Number(candidate?.prob ?? candidate?.rel);
+        const edge = Number(candidate?.edge);
+        if (!(odd > 1) || !(prob > 0) || !(edge > 0)) return false;
+        if (odd > 18) return false;
+        if (candidate?.source && candidate.source !== 'winamax_exact') return false;
+        if (candidate?.investment?.action === 'skip') return false;
+        const marketKey = calibrationUtils.normalizeMarketKey(candidate.market || candidate.key || '');
+        const labelKey = compactKey(candidate.label || candidate.pickKey || candidate.key || candidate.side || '');
+        const key = `${marketKey}:${labelKey}:${odd.toFixed(2)}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      })
+      .sort((a, b) => {
+        const left = candidateScore(a);
+        const right = candidateScore(b);
+        for (let index = 0; index < left.length; index += 1) {
+          if (right[index] !== left[index]) return right[index] - left[index];
+        }
+        return 0;
+      });
+  }
+
+  function alternativeRowsFromCandidates(win, match, pred, best, baseRow, bankroll) {
+    const candidates = runtimeMarketCandidates(win, match, pred);
+    if (!candidates.length) return [];
+    const primaryMarket = calibrationUtils.normalizeMarketKey(best?.best?.market || best?.best?.key || pred?.market || baseRow.market);
+    const primaryLabel = compactKey(baseRow.label || best?.label || '');
+    const rows = [];
+    const seenMarkets = new Set();
+    for (const candidate of candidates) {
+      const marketKey = calibrationUtils.normalizeMarketKey(candidate.market || candidate.key || '');
+      const market = formatMarketName(candidate.market || marketKey);
+      const label = normalizePickLabel(match, market, candidate.label || candidate.pickLabel || candidate.pickKey || candidate.key || candidate.side, 'Pick');
+      const labelKey = compactKey(label);
+      if (marketKey === primaryMarket && labelKey === primaryLabel) continue;
+      if (seenMarkets.has(marketKey)) continue;
+      seenMarkets.add(marketKey);
+      const odd = Number(candidate.odd) || 0;
+      const probability = Number(candidate.prob ?? candidate.rel) || 0;
+      const edge = Number(candidate.edge) || (odd > 1 && probability > 0 ? probability - (1 / odd) : 0);
+      const stake = stakeFor(win, probability, odd, bankroll);
+      if (!(edge > 0) || !(stake > 0)) continue;
+      rows.push({
+        market,
+        marketKey,
+        label,
+        odd,
+        probability,
+        edge,
+        stake,
+        status: edge >= 0.05 ? 'bet' : 'watch',
+        statusLabel: edge >= 0.08 ? 'Priorité multi-marché' : edge >= 0.05 ? 'Jouable multi-marché' : 'À surveiller',
+        pickSource: 'runtime_market_candidate',
+        isMarketAlternative: true,
+        primaryMarket: baseRow.market,
+        marketCandidate: {
+          market: candidate.market || marketKey,
+          key: candidate.key || candidate.pickKey || null,
+          source: candidate.source || 'winamax_exact',
+          ev: Number(candidate.ev) || null,
+          score: Number(candidate.investment?.score) || null
+        }
+      });
+      if (rows.length >= 3) break;
+    }
+    return rows;
+  }
+
+  function expandAnalyzedRow(row) {
+    const alternatives = Array.isArray(row?.marketAlternatives) ? row.marketAlternatives : [];
+    const primary = { ...row, marketAlternatives: [] };
+    if (!alternatives.length) return [primary];
+    const rows = [primary];
+    for (const alternative of alternatives) {
+      rows.push(contextUtils.applyContextGate({
+        ...primary,
+        ...alternative,
+        marketAlternatives: []
+      }));
+    }
+    return rows;
+  }
+
   function jsonClone(value, fallback = null) {
     try {
       return JSON.parse(JSON.stringify(value));
@@ -721,6 +838,7 @@ function createLegacyEngineService({ projectRoot }) {
     let marketLabel = 'Analyse';
     let pickLabel = 'Aucune mise';
     let modelError = null;
+    let marketAlternatives = [];
 
     try {
       pred = win.predictMatch(match);
@@ -744,6 +862,10 @@ function createLegacyEngineService({ projectRoot }) {
         } else {
           statusLabel = 'À surveiller';
         }
+        marketAlternatives = alternativeRowsFromCandidates(win, match, pred, best, {
+          market: marketLabel,
+          label: pickLabel
+        }, bankroll);
       }
     } catch (error) {
       modelError = error && error.message ? error.message : String(error);
@@ -773,6 +895,7 @@ function createLegacyEngineService({ projectRoot }) {
       status,
       statusLabel,
       marketProfile: marketProfile(match),
+      marketAlternatives,
       winamaxUrl: match.winamax && match.winamax.url,
       modelError
     };
@@ -1489,8 +1612,8 @@ function createLegacyEngineService({ projectRoot }) {
       return Number.isFinite(ts) && ts >= now - 30 * 60000 && ts <= now + horizonMs;
     });
     const nearReady = nearTerm.filter((pick) => pick?.decisionCenter?.canBet).length;
-    const useNearTerm = nearTerm.length && nearReady >= 10;
-    const rows = sortRows(useNearTerm ? nearTerm : picks).slice(0, 12);
+    const useNearTerm = nearTerm.length && nearReady >= 20;
+    const rows = sortRows(useNearTerm ? nearTerm : picks).slice(0, 24);
     return {
       rows,
       mode: useNearTerm ? 'next30h' : 'bestAvailable',
@@ -1732,8 +1855,9 @@ function createLegacyEngineService({ projectRoot }) {
     const coverage = buildSignalCoverage(enrichedEvents);
     const history = readHistorySummary();
     const calibration = history?.calibration || calibrationUtils.buildCalibration([]);
-    const baseMatches = calibrationUtils.annotateMatches(
-      enrichedEvents.map((match) => analyzeMatch(win, match, safeBankroll)),
+    const analyzedRows = enrichedEvents.flatMap((match) => expandAnalyzedRow(analyzeMatch(win, match, safeBankroll)));
+    const baseRows = calibrationUtils.annotateMatches(
+      analyzedRows,
       calibration
     )
       .map((row) => contextUtils.annotateConfidence(row, contextBacktestReport))
@@ -1741,15 +1865,17 @@ function createLegacyEngineService({ projectRoot }) {
       .map((row) => applyOddsGuardrails(row, oddsGuardrailsReport))
       .map((row) => applyStakePrudence(row, agentGuardrailRecommendationsReport, stakeReductionBacktestReport))
       .map((row) => applySignalConflict(row, signalConflictBacktestReport));
-    const candidateAgentPositions = buildAgentPositions(win, baseMatches);
+    const primaryBaseRows = baseRows.filter((row) => !row.isMarketAlternative);
+    const candidateAgentPositions = buildAgentPositions(win, primaryBaseRows);
     const prebetGate = prebetGateForReport(prebetChecklistReport);
     const criticalGate = criticalGateForReport(criticalIssueReport);
     const decisionGates = { prebet: prebetGate, critical: criticalGate };
-    const matches = baseMatches
+    const allDecisionRows = baseRows
       .map((row) => applyPrebetGate(row, prebetChecklistReport))
       .map((row) => applyDecisionCenter(row, decisionGates));
+    const matches = allDecisionRows.filter((row) => !row.isMarketAlternative);
     const seen = new Set();
-    const picks = matches
+    const picks = allDecisionRows
       .filter((row) => row.status !== 'skip' && row.edge > 0 && row.odd > 1 && Number(row.decisionCenter?.modelStake || row.modelStake || row.stake || 0) > 0)
       .sort((a, b) => {
         const readyDelta = Number(Boolean(b.decisionCenter?.canBet)) - Number(Boolean(a.decisionCenter?.canBet));
@@ -1762,12 +1888,12 @@ function createLegacyEngineService({ projectRoot }) {
         seen.add(key);
         return true;
       })
-      .slice(0, 30);
+      .slice(0, 120);
     const dashboard = buildDashboardPicks(picks);
     const combines = buildNativeCombines(win, enrichedEvents);
     const scorers = buildNativeScorers(win, enrichedEvents, lineupsIndex, starPlayersIndex);
     const watchlist = buildWatchlist(matches);
-    const decisionCenter = buildDecisionCenterReport(matches, decisionGates);
+    const decisionCenter = buildDecisionCenterReport(allDecisionRows, decisionGates);
     const agentPositions = prebetGate.blocked || criticalGate.blocked ? [] : buildAgentPositions(win, matches);
     const agentBlockers = buildAgentBlockers(matches, agentPositions, win);
 

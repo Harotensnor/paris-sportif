@@ -74,8 +74,44 @@
 
   const ACTION_HISTORY_KEY = 'parisSportifActionHistory';
   const USER_BETS_KEY = 'parisSportifUserBets';
+  const USER_PREFS_KEY = 'parisSportifPreferences';
+  const USER_PREFS_SEEN_KEY = 'parisSportifPreferencesSeen';
   const NOTIFIED_PICK_KEY = 'parisSportifNotifiedPickKeys';
   const READY_COUNT_KEY = 'parisSportifLastReadyCount';
+  const SPORTS_PREFS = ['football', 'tennis', 'basketball', 'hockey', 'baseball'];
+  const MARKET_PREFS = [
+    { key: '1n2', label: '1N2' },
+    { key: 'ht1n2', label: '1N2 mi-temps' },
+    { key: 'httotal', label: 'Total mi-temps' },
+    { key: 'ou35', label: 'O/U 3.5' },
+    { key: 'ou25', label: 'O/U 2.5' },
+    { key: 'btts', label: 'BTTS' },
+    { key: 'teamtotal', label: 'Total équipe' },
+    { key: 'dnb', label: 'DNB' },
+    { key: 'doublechance', label: 'Double chance' },
+    { key: 'resultbtts', label: 'Résultat + BTTS' },
+    { key: 'baseballtotal', label: 'Total runs' },
+    { key: 'basketballtotal', label: 'Total basket' },
+    { key: 'baskettotal', label: 'Total basket' },
+    { key: 'hockeytotal', label: 'Total buts' },
+    { key: 'tennisgames', label: 'Jeux tennis' },
+    { key: 'tennissets', label: 'Sets tennis' },
+    { key: 'handicap', label: 'Handicap' },
+    { key: 'exactscore', label: 'Score exact' }
+  ];
+  const DEFAULT_PREFERENCES = {
+    bankroll: 50,
+    level: 'intermediate',
+    sports: SPORTS_PREFS,
+    markets: MARKET_PREFS.map((item) => item.key),
+    edgeMin: 0,
+    oddMin: 1,
+    oddMax: 50,
+    confidenceMin: 0,
+    alertEdge: 10,
+    alertWindowHours: 2,
+    strict: false
+  };
   const REFRESH_DEFAULT_INTERVAL_MS = 30 * 60 * 1000;
   const REFRESH_URGENT_INTERVAL_MS = 10 * 60 * 1000;
   const REFRESH_ECONOMY_AFTER_MS = 60 * 60 * 1000;
@@ -93,6 +129,49 @@
 
   const $ = (selector) => document.querySelector(selector);
   const $$ = (selector) => Array.from(document.querySelectorAll(selector));
+
+  function normalizeUiKey(value) {
+    return String(value || '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9.]+/g, '');
+  }
+
+  function marketKeyFromRow(row) {
+    return normalizeUiKey(row?.marketKey || row?.market || 'market_unknown') || 'market_unknown';
+  }
+
+  function loadPreferences() {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(USER_PREFS_KEY) || 'null');
+      if (!parsed || typeof parsed !== 'object') return { ...DEFAULT_PREFERENCES };
+      return {
+        ...DEFAULT_PREFERENCES,
+        ...parsed,
+        sports: Array.isArray(parsed.sports) && parsed.sports.length ? parsed.sports : DEFAULT_PREFERENCES.sports,
+        markets: Array.isArray(parsed.markets) && parsed.markets.length ? parsed.markets : DEFAULT_PREFERENCES.markets
+      };
+    } catch {
+      return { ...DEFAULT_PREFERENCES };
+    }
+  }
+
+  function savePreferences(preferences) {
+    const next = {
+      ...DEFAULT_PREFERENCES,
+      ...(preferences || {}),
+      sports: Array.isArray(preferences?.sports) ? preferences.sports : DEFAULT_PREFERENCES.sports,
+      markets: Array.isArray(preferences?.markets) ? preferences.markets : DEFAULT_PREFERENCES.markets
+    };
+    try {
+      localStorage.setItem(USER_PREFS_KEY, JSON.stringify(next));
+      localStorage.setItem(USER_PREFS_SEEN_KEY, '1');
+    } catch {
+      setSideStatus('Préférences non enregistrées', 'warn');
+    }
+    return next;
+  }
 
   function escapeHtml(value) {
     return String(value ?? '')
@@ -314,6 +393,53 @@
     renderPicks();
     renderStakeScenarios();
     setSideStatus('Pari ajouté au suivi', 'ok');
+  }
+
+  function comboKey(combo) {
+    const legs = Array.isArray(combo?.legs) ? combo.legs : [];
+    return `combo:${combo?.type || 'combine'}:${combo?.title || ''}:${legs.map((leg) => `${leg.id}:${leg.market}:${leg.label}`).join('|')}`;
+  }
+
+  function findComboByTrackKey(key) {
+    return (state.combines || []).find((combo) => comboKey(combo) === key) || null;
+  }
+
+  function trackUserCombo(combo) {
+    if (!combo || !Array.isArray(combo.legs) || !combo.legs.length) return;
+    const key = comboKey(combo);
+    const bets = loadUserBets();
+    const existing = bets.find((bet) => bet.key === key && bet.status === 'pending');
+    if (existing) {
+      setSideStatus('Combiné déjà suivi', 'warn');
+      return;
+    }
+    const now = new Date();
+    const stake = 10;
+    bets.push({
+      id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+      key,
+      matchId: key,
+      title: combo.title || 'Combiné',
+      sport: 'multi',
+      league: combo.sameGame ? 'Same-game' : 'Multi-match',
+      start: combo.legs[0]?.start || '',
+      market: 'Combiné',
+      label: combo.legs.map((leg) => leg.label).join(' + '),
+      odd: Number(combo.totalOdd || 0),
+      probability: Number(combo.combinedProb || combo.avgProb || 0),
+      edge: Number(combo.edge || 0),
+      stake,
+      status: 'pending',
+      pnl: 0,
+      legs: combo.legs,
+      day: new Intl.DateTimeFormat('fr-CA', { timeZone: 'Europe/Paris', year: 'numeric', month: '2-digit', day: '2-digit' }).format(now),
+      createdAt: now.toISOString()
+    });
+    saveUserBets(bets);
+    renderUserPnl();
+    renderCombines();
+    renderHistory();
+    setSideStatus('Combiné ajouté au suivi', 'ok');
   }
 
   function formatOdd(value) {
@@ -661,7 +787,7 @@
   function findMatchRow(idOrTitle) {
     const wanted = new Set([String(idOrTitle || ''), String(idOrTitle || '').replace(/^wnx:/, '')]);
     if (idOrTitle) wanted.add(`title:${compactMatchKey(idOrTitle)}`);
-    const rows = [...state.matches, ...state.picks];
+    const rows = [...state.picks, ...state.allPicks, ...state.matches];
     return rows.find((row) => {
       const keys = matchRowKeys(row);
       return [...wanted].some((key) => keys.has(key));
@@ -741,7 +867,8 @@
   }
 
   function getBankroll() {
-    const raw = Number($('#bankroll-input').value || localStorage.getItem('userBankroll') || 50);
+    const prefs = loadPreferences();
+    const raw = Number($('#bankroll-input')?.value || localStorage.getItem('userBankroll') || prefs.bankroll || 50);
     return Number.isFinite(raw) && raw > 0 ? raw : 50;
   }
 
@@ -805,6 +932,46 @@
     return String(value);
   }
 
+  function formLetters(side) {
+    const last = Array.isArray(side?.last5) ? side.last5 : [];
+    if (last.length) {
+      return last.map((row) => {
+        if (typeof row?.result === 'string') return row.result.slice(0, 1).toUpperCase();
+        if (row?.won === true) return 'W';
+        if (row?.won === false && Number(row?.score_for) === Number(row?.score_against)) return 'D';
+        if (row?.won === false) return 'L';
+        return '';
+      }).filter(Boolean).slice(-5);
+    }
+    return String(side?.team_form_l5 || side?.form || '').slice(0, 5).split('').filter(Boolean);
+  }
+
+  function formStripHtml(match) {
+    const { home, away } = getSides(match || {});
+    const render = (label, letters) => `
+      <div class="form-strip-row">
+        <span>${escapeHtml(label)}</span>
+        <div>${letters.map((letter) => `<strong class="form-${escapeHtml(letter.toLowerCase())}">${escapeHtml(letter === 'W' ? 'V' : letter === 'D' ? 'N' : letter === 'L' ? 'D' : letter)}</strong>`).join('') || '<em>Forme indisponible</em>'}</div>
+      </div>
+    `;
+    return `<div class="form-strip">${render(home.name || 'Domicile', formLetters(home))}${render(away.name || 'Extérieur', formLetters(away))}</div>`;
+  }
+
+  function pickNarrative(row, signalPreview, fallback) {
+    const parts = [];
+    const context = row?.contextQuality?.score ?? row?.match?.context?.quality?.score;
+    parts.push(`${row.market || 'Marché'} : ${row.label || 'pick'} ${formatOdd(row.odd)} avec ${formatPct(row.edge || 0, 1)} d'edge modèle.`);
+    if (Number.isFinite(Number(context))) {
+      parts.push(`Le contexte est noté ${Math.round(Number(context))}/100, donc la mise reste proportionnée à la qualité réelle des signaux.`);
+    }
+    const okSignals = (signalPreview || []).filter((signal) => signal.ok).map((signal) => signal.label).slice(0, 3);
+    const missing = (signalPreview || []).filter((signal) => !signal.ok).map((signal) => signal.label).slice(0, 2);
+    if (okSignals.length) parts.push(`Signaux utiles présents : ${okSignals.join(', ')}.`);
+    if (missing.length) parts.push(`À vérifier avant de miser : ${missing.join(', ')}.`);
+    if (parts.length < 3 && fallback) parts.push(fallback);
+    return parts.slice(0, 4).join(' ');
+  }
+
   function normalizePickLabel(match, market, value, fallback = 'Pick') {
     const raw = cleanLabel(value, fallback);
     const compact = raw.trim();
@@ -865,14 +1032,20 @@
       '1n2': '1N2',
       'matchwinner': 'Vainqueur',
       'teamtotal': 'Total équipe',
+      'basketballtotal': 'Total basket',
+      'baskettotal': 'Total basket',
       'hockeytotal': 'Total buts',
       'baseballtotal': 'Total runs',
       'httotal': 'Total mi-temps',
       'htou': 'Total mi-temps',
+      'halftimetotal': 'Total mi-temps',
+      'ht1n2': '1N2 mi-temps',
       'btts': 'BTTS',
+      'resultbtts': 'Résultat + BTTS',
       'doublechance': 'Double chance',
       'handicap': 'Handicap',
       'dnb': 'Remboursé si nul',
+      'exactscore': 'Score exact',
       'ou': 'Over/Under',
       'ou15': 'O/U 1.5',
       'ou25': 'O/U 2.5',
@@ -1033,6 +1206,7 @@
       renderPicks('Données trop anciennes : le logiciel bloque les recommandations actionnables.');
       renderStakeScenarios('Scénarios bloqués : données trop anciennes.');
       renderCombines();
+      renderPreferences();
       renderScorers();
       renderScorerReport();
       renderScorerPendingAudit();
@@ -1134,6 +1308,7 @@
     renderPicks();
     renderStakeScenarios();
     renderCombines();
+    renderPreferences();
     renderScorers();
     renderScorerReport();
     renderScorerPendingAudit();
@@ -1187,6 +1362,7 @@
     const pool = state.allPicks.length ? state.allPicks : state.picks;
     const sportSelect = $('#pick-sport-filter');
     const leagueSelect = $('#pick-league-filter');
+    const marketSelect = $('#pick-market-filter');
     if (sportSelect) {
       const current = sportSelect.value || 'all';
       const sports = Array.from(new Set(pool.map((row) => row.sport).filter(Boolean))).sort();
@@ -1211,6 +1387,20 @@
         leagueSelect.value = leagues.some(([key]) => key === current) ? current : 'all';
       }
     }
+    if (marketSelect) {
+      const current = marketSelect.value || 'all';
+      const markets = Array.from(new Map(pool.map((row) => {
+        const key = marketKeyFromRow(row);
+        const label = row.market || formatMarketName(key);
+        return [key, label];
+      })).entries()).sort((a, b) => String(a[1]).localeCompare(String(b[1])));
+      const html = ['<option value="all">Tous marchés</option>', ...markets.map(([key, label]) => `<option value="${escapeHtml(key)}">${escapeHtml(label)}</option>`)].join('');
+      if (marketSelect.dataset.optionsHtml !== html) {
+        marketSelect.innerHTML = html;
+        marketSelect.dataset.optionsHtml = html;
+        marketSelect.value = markets.some(([key]) => key === current) ? current : 'all';
+      }
+    }
   }
 
   function readPickFilters() {
@@ -1220,6 +1410,7 @@
       query: ($('#pick-search')?.value || '').trim().toLowerCase(),
       sport: $('#pick-sport-filter')?.value || 'all',
       league: $('#pick-league-filter')?.value || 'all',
+      market: $('#pick-market-filter')?.value || 'all',
       sort: $('#pick-sort')?.value || 'edge',
       edgeMin: Number.isFinite(edgeValue) && edgeValue > 0 ? edgeValue / 100 : 0,
       oddMin: Number.isFinite(oddValue) && oddValue > 1 ? oddValue : 0
@@ -1239,7 +1430,7 @@
   }
 
   function pickFiltersActive(filters) {
-    return Boolean(filters.query || filters.sport !== 'all' || filters.league !== 'all' || filters.edgeMin || filters.oddMin || filters.sort !== 'edge');
+    return Boolean(filters.query || filters.sport !== 'all' || filters.league !== 'all' || filters.market !== 'all' || filters.edgeMin || filters.oddMin || filters.sort !== 'edge');
   }
 
   function pickHasCoreData(row) {
@@ -1260,12 +1451,26 @@
   function dashboardPickRows(filters) {
     const active = pickFiltersActive(filters);
     const base = active && state.allPicks.length ? state.allPicks : state.picks;
+    const prefs = loadPreferences();
+    const allowedSports = new Set((prefs.sports || []).map((item) => String(item).toLowerCase()));
+    const allowedMarkets = new Set((prefs.markets || []).map(normalizeUiKey));
+    const prefEdgeMin = Math.max(0, Number(prefs.edgeMin || 0) / 100);
+    const prefOddMin = Math.max(0, Number(prefs.oddMin || 0));
+    const prefOddMax = Math.max(0, Number(prefs.oddMax || 0));
+    const prefConfidenceMin = Math.max(0, Number(prefs.confidenceMin || 0) / 100);
     const rows = base.filter((row) => {
       if (!pickHasCoreData(row)) return false;
       if (!canDisplayStake(row)) return false;
+      if (allowedSports.size && !allowedSports.has(String(row.sport || '').toLowerCase())) return false;
+      if (allowedMarkets.size && !allowedMarkets.has(marketKeyFromRow(row))) return false;
+      if (prefEdgeMin && Number(row.edge || 0) < prefEdgeMin) return false;
+      if (prefOddMin > 1 && Number(row.odd || 0) < prefOddMin) return false;
+      if (prefOddMax > 1 && Number(row.odd || 0) > prefOddMax) return false;
+      if ((prefs.strict || prefConfidenceMin > 0) && Number(row.probability || 0) < prefConfidenceMin) return false;
       if (filters.query && !pickSearchText(row).includes(filters.query)) return false;
       if (filters.sport !== 'all' && row.sport !== filters.sport) return false;
       if (filters.league !== 'all' && leagueKeyFromRow(row) !== filters.league) return false;
+      if (filters.market !== 'all' && marketKeyFromRow(row) !== filters.market) return false;
       if (filters.edgeMin && Number(row.edge || 0) < filters.edgeMin) return false;
       if (filters.oddMin && Number(row.odd || 0) < filters.oddMin) return false;
       return true;
@@ -1277,6 +1482,42 @@
       return Number(b.edge || 0) - Number(a.edge || 0);
     });
     return active ? rows.slice(0, 40) : rows;
+  }
+
+  function renderMarketSnapshot(rows) {
+    const wrap = $('#market-snapshot');
+    if (!wrap) return;
+    const sourceRows = Array.isArray(rows) && rows.length ? rows : (state.allPicks.length ? state.allPicks : state.picks);
+    const byMarket = new Map();
+    sourceRows.forEach((row) => {
+      if (!pickHasCoreData(row) || !canDisplayStake(row)) return;
+      const key = marketKeyFromRow(row);
+      const bucket = byMarket.get(key) || {
+        key,
+        label: row.market || formatMarketName(key),
+        count: 0,
+        edge: 0,
+        bestOdd: 0
+      };
+      bucket.count += 1;
+      bucket.edge += Number(row.edge || 0);
+      bucket.bestOdd = Math.max(bucket.bestOdd, Number(row.odd || 0));
+      byMarket.set(key, bucket);
+    });
+    const rowsOut = Array.from(byMarket.values())
+      .sort((a, b) => b.count - a.count || (b.edge / Math.max(1, b.count)) - (a.edge / Math.max(1, a.count)))
+      .slice(0, 6);
+    if (!rowsOut.length) {
+      wrap.innerHTML = '<div class="empty compact-empty">Aucun marché prêt avec les préférences actuelles.</div>';
+      return;
+    }
+    wrap.innerHTML = rowsOut.map((item) => `
+      <button class="market-chip" type="button" data-market-chip="${escapeHtml(item.key)}">
+        <span>${escapeHtml(item.label)}</span>
+        <strong>${formatCount(item.count)}</strong>
+        <em>edge moy. ${escapeHtml(formatPct(item.edge / Math.max(1, item.count), 1))} · max ${escapeHtml(formatOdd(item.bestOdd))}</em>
+      </button>
+    `).join('');
   }
 
   function readNotifiedPickKeys() {
@@ -1363,6 +1604,7 @@
     updatePickFilters();
     const filters = readPickFilters();
     const displayRows = dashboardPickRows(filters);
+    renderMarketSnapshot(displayRows);
     const total = state.allPicks.length || state.picks.length || 0;
     const meta = state.dashboardMeta || {};
     const ready = Number(state.decisionCenter?.summary?.ready || meta.readyPicks || 0);
@@ -2058,8 +2300,23 @@
       wrap.innerHTML = '<div class="empty">Aucun combiné exploitable avec les règles actuelles.</div>';
       return;
     }
+    const tracked = new Set(loadUserBets().filter((bet) => bet.status === 'pending').map((bet) => bet.key));
     wrap.innerHTML = state.combines.map((combo) => {
       const legs = Array.isArray(combo.legs) ? combo.legs : [];
+      const key = comboKey(combo);
+      const trackedCombo = tracked.has(key);
+      const totalOdd = Number(combo.totalOdd || 0);
+      const returnForTen = totalOdd > 1 ? totalOdd * 10 : 0;
+      const edgeCompound = legs.reduce((sum, leg) => sum + Number(leg.edge || 0), 0) / Math.max(1, legs.length);
+      const correlation = Number(combo.correlationAvg || combo.avgCorrelation || 0);
+      const titleText = `${combo.type || ''} ${combo.title || ''} ${combo.desc || ''}`.toLowerCase();
+      const variant = titleText.includes('safe') || titleText.includes('lock') || titleText.includes('sûr')
+        ? 'Safe'
+        : legs.some((leg) => /btts|but|total|o\/u|over|under/i.test(`${leg.market} ${leg.label}`))
+          ? 'Buts'
+          : totalOdd >= 5
+            ? 'Outsider'
+            : 'Best Edge';
       return `
         <article class="combo-card">
           <div class="combo-head">
@@ -2067,11 +2324,15 @@
               <h4>${escapeHtml(combo.title)}</h4>
               <p class="match-sub">${escapeHtml(combo.desc || 'Ticket multi-marché')}</p>
             </div>
+            <span class="pill">${escapeHtml(variant)}</span>
             <span class="pill">${combo.sameGame ? 'Same-game' : 'Multi-match'}</span>
           </div>
           <div class="combo-stats">
             <div class="mini-stat"><span>Cote</span><strong>${formatOdd(combo.totalOdd).replace('@', '')}</strong></div>
             <div class="mini-stat"><span>Proba</span><strong>${combo.combinedProb > 0 ? formatPct(combo.combinedProb, 1) : formatPct(combo.avgProb, 1)}</strong></div>
+            <div class="mini-stat"><span>Retour 10€</span><strong>${returnForTen > 0 ? formatMoney(returnForTen) : '-'}</strong></div>
+            <div class="mini-stat"><span>Corrélation</span><strong>${formatPct(correlation, 0)}</strong></div>
+            <div class="mini-stat"><span>Edge moyen</span><strong>${formatPct(edgeCompound, 1)}</strong></div>
             <div class="mini-stat"><span>Jambes</span><strong>${legs.length}</strong></div>
           </div>
           <div class="leg-list">
@@ -2085,6 +2346,7 @@
               </div>
             `).join('')}
           </div>
+          <button class="track-bet-btn combo-track-btn${trackedCombo ? ' tracked' : ''}" type="button" data-track-combo-key="${escapeHtml(key)}">${trackedCombo ? 'Combiné suivi' : 'Je mise le combiné'}</button>
         </article>`;
     }).join('');
   }
@@ -2340,8 +2602,234 @@
     });
   }
 
+  function segmentTone(row) {
+    const roi = Number(row?.roi || 0);
+    const sample = String(row?.sample_level || row?.level || '').toLowerCase();
+    if (roi > 0.05) return 'warm';
+    if (roi < -0.05 && sample !== 'faible') return 'cold';
+    return 'sample';
+  }
+
+  function renderModelPerformance() {
+    const grid = $('#model-performance-grid');
+    const segmentGrid = $('#model-segment-grid');
+    const plot = $('#calibration-plot-grid');
+    const report = state.modelLab || {};
+    const summary = report.summary || {};
+    if (grid) {
+      const cards = [
+        ['Picks réglés', formatCount(summary.settled_rows || state.history?.settled || 0), 'Sample utilisé pour juger la stratégie.'],
+        ['ROI cumulé', formatPct(summary.roi || 0, 1), `${formatSignedUnits(summary.pnl_units || 0)} en flat historique.`],
+        ['Win rate', formatPct(summary.hit_rate || state.history?.winRate || 0, 1), 'Taux brut, moins important que la calibration.'],
+        ['Brier', Number.isFinite(Number(summary.brier)) ? Number(summary.brier).toFixed(3) : '-', 'Plus bas = probabilités mieux calibrées.'],
+        ['Drawdown', Number.isFinite(Number(summary.max_drawdown_units)) ? `${Number(summary.max_drawdown_units).toFixed(1)}u` : '-', 'Perte max historique simulée.']
+      ];
+      grid.innerHTML = cards.map(([label, value, detail]) => `
+        <article class="performance-card">
+          <span>${escapeHtml(label)}</span>
+          <strong>${escapeHtml(value)}</strong>
+          <p>${escapeHtml(detail)}</p>
+        </article>
+      `).join('');
+    }
+    if (segmentGrid) {
+      const markets = (Array.isArray(report.by_market) ? report.by_market : []).slice(0, 4);
+      const leagues = (Array.isArray(report.by_league) ? report.by_league : []).filter((row) => Number(row.roi || 0) > 0).slice(0, 4);
+      const rows = [...markets, ...leagues].slice(0, 8);
+      segmentGrid.innerHTML = rows.length ? rows.map((row) => `
+        <article class="segment-card ${segmentTone(row)}" data-market-chip="${escapeHtml(normalizeUiKey(row.key || ''))}">
+          <span>${escapeHtml(formatMarketName(row.key || row.market || row.league || 'Segment'))}</span>
+          <strong>${escapeHtml(formatPct(row.roi || 0, 0))}</strong>
+          <p>${escapeHtml(`${formatCount(row.count || 0)} réglés · WR ${formatPct(row.hit_rate || row.win_rate || 0, 0)} · Brier ${Number(row.brier || 0).toFixed(3)}`)}</p>
+          <em>${escapeHtml(row.sample_level || 'sample')}</em>
+        </article>
+      `).join('') : '<div class="empty">Aucun segment robuste à afficher.</div>';
+    }
+    if (plot) {
+      const buckets = Array.isArray(state.probabilityCalibration?.buckets) ? state.probabilityCalibration.buckets : [];
+      plot.innerHTML = buckets.length ? buckets.map((bucket) => {
+        const actual = Math.max(0, Math.min(1, Number(bucket.actual || 0)));
+        const expected = Math.max(0, Math.min(1, Number(bucket.expected || 0)));
+        const heightClass = `cal-h-${Math.round(actual * 10) * 10}`;
+        return `
+          <article class="calibration-bin">
+            <span>${escapeHtml(bucket.bucket || '-')}</span>
+            <div class="calibration-bin-bar ${heightClass}"></div>
+            <strong>${escapeHtml(formatPct(actual, 0))}</strong>
+            <em>attendu ${escapeHtml(formatPct(expected, 0))}</em>
+          </article>
+        `;
+      }).join('') : '<div class="empty">Calibration indisponible.</div>';
+    }
+  }
+
+  function filteredUserBets() {
+    const status = $('#user-bets-status-filter')?.value || 'all';
+    const period = $('#user-bets-period-filter')?.value || 'all';
+    const maxAgeMs = period === 'all' ? null : Number(period) * 24 * 60 * 60 * 1000;
+    const now = Date.now();
+    return loadUserBets()
+      .filter((bet) => status === 'all' || bet.status === status)
+      .filter((bet) => {
+        if (!maxAgeMs) return true;
+        const ts = Date.parse(bet.createdAt || bet.day || '');
+        return Number.isFinite(ts) && now - ts <= maxAgeMs;
+      })
+      .sort((a, b) => Date.parse(b.createdAt || b.day || 0) - Date.parse(a.createdAt || a.day || 0));
+  }
+
+  function cumulativePnlSvg(bets) {
+    const settled = (Array.isArray(bets) ? bets : [])
+      .filter((bet) => ['won', 'lost', 'void'].includes(String(bet.status || '')))
+      .slice()
+      .sort((a, b) => Date.parse(a.createdAt || a.day || 0) - Date.parse(b.createdAt || b.day || 0));
+    let running = 0;
+    const points = settled.map((bet) => {
+      running += Number(bet.pnl || 0) || 0;
+      return running;
+    });
+    return sparklineSvg(points.length ? points : [0, 0]);
+  }
+
+  function settleUserBet(id, status) {
+    const bets = loadUserBets();
+    const index = bets.findIndex((bet) => bet.id === id);
+    if (index < 0) return;
+    const bet = bets[index];
+    const stake = Math.max(0, Number(bet.stake || 0) || 0);
+    const odd = Math.max(0, Number(bet.odd || 0) || 0);
+    const pnl = status === 'won' ? stake * Math.max(0, odd - 1) : status === 'lost' ? -stake : 0;
+    bets[index] = {
+      ...bet,
+      status,
+      pnl,
+      settledAt: new Date().toISOString()
+    };
+    saveUserBets(bets);
+    renderUserPnl();
+    renderHistory();
+    renderPicks();
+  }
+
+  function renderTrackedBets() {
+    const body = $('#user-bets-body');
+    const chart = $('#tracked-bets-chart');
+    if (!body) return;
+    const rows = filteredUserBets();
+    if (chart) chart.innerHTML = cumulativePnlSvg(loadUserBets());
+    if (!rows.length) {
+      body.innerHTML = '<tr><td colspan="8" class="empty">Aucun pari suivi avec ces filtres.</td></tr>';
+      return;
+    }
+    body.innerHTML = rows.slice(0, 80).map((bet) => {
+      const action = bet.status === 'pending'
+        ? `<button class="mini-export-btn" type="button" data-settle-bet-id="${escapeHtml(bet.id)}" data-settle-status="won">Win</button>
+           <button class="mini-export-btn" type="button" data-settle-bet-id="${escapeHtml(bet.id)}" data-settle-status="lost">Loss</button>
+           <button class="mini-export-btn" type="button" data-settle-bet-id="${escapeHtml(bet.id)}" data-settle-status="void">Void</button>`
+        : '<span class="match-sub">Réglé</span>';
+      return `
+        <tr>
+          <td data-label="Date">${escapeHtml(formatDateLabel(bet.createdAt || bet.day))}</td>
+          <td data-label="Match"><div class="match-title">${escapeHtml(bet.title || '-')}</div><div class="match-sub">${escapeHtml(bet.sport || '')} · ${escapeHtml(bet.league || '')}</div></td>
+          <td data-label="Marché"><span class="pill">${escapeHtml(bet.market || '-')}</span><div class="match-sub">${escapeHtml(bet.label || '')}</div></td>
+          <td data-label="Cote">${escapeHtml(formatOdd(bet.odd))}</td>
+          <td data-label="Mise">${escapeHtml(formatMoney(bet.stake || 0))}</td>
+          <td data-label="Statut" class="${resultClass(bet.status)}">${escapeHtml(resultLabel(bet.status))}</td>
+          <td data-label="P&L">${escapeHtml(formatMoney(bet.pnl || 0))}</td>
+          <td data-label="Action">${action}</td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  function levelDefaults(level) {
+    if (level === 'beginner') return { edgeMin: 5, oddMin: 1.35, oddMax: 6, confidenceMin: 50, strict: true };
+    if (level === 'expert') return { edgeMin: 0, oddMin: 1, oddMax: 50, confidenceMin: 0, strict: false };
+    return { edgeMin: 2, oddMin: 1.15, oddMax: 12, confidenceMin: 35, strict: false };
+  }
+
+  function checkboxHtml(name, value, label, checked) {
+    return `<label class="check-line"><input type="checkbox" name="${escapeHtml(name)}" value="${escapeHtml(value)}"${checked ? ' checked' : ''}> ${escapeHtml(label)}</label>`;
+  }
+
+  function renderPreferences() {
+    const prefs = loadPreferences();
+    const bankroll = $('#pref-bankroll');
+    if (bankroll) bankroll.value = String(prefs.bankroll || 50);
+    const level = $('#pref-level');
+    if (level) level.value = prefs.level || 'intermediate';
+    const strict = $('#pref-strict');
+    if (strict) strict.checked = Boolean(prefs.strict);
+    const sportsGrid = $('#pref-sports');
+    if (sportsGrid) {
+      const active = new Set((prefs.sports || []).map((item) => String(item).toLowerCase()));
+      sportsGrid.innerHTML = SPORTS_PREFS.map((sport) => checkboxHtml('pref-sport', sport, sport, active.has(sport))).join('');
+    }
+    const marketsGrid = $('#pref-markets');
+    if (marketsGrid) {
+      const active = new Set((prefs.markets || []).map(normalizeUiKey));
+      marketsGrid.innerHTML = MARKET_PREFS.map((market) => checkboxHtml('pref-market', market.key, market.label, active.has(market.key))).join('');
+    }
+    const fields = {
+      'pref-edge-min': prefs.edgeMin,
+      'pref-odd-min': prefs.oddMin,
+      'pref-odd-max': prefs.oddMax,
+      'pref-confidence-min': prefs.confidenceMin,
+      'pref-alert-edge': prefs.alertEdge,
+      'pref-alert-window': prefs.alertWindowHours
+    };
+    Object.entries(fields).forEach(([id, value]) => {
+      const node = $(`#${id}`);
+      if (node) node.value = String(value ?? '');
+    });
+    renderOnboarding();
+  }
+
+  function collectPreferencesFromForm() {
+    const selectedSports = $$('input[name="pref-sport"]:checked').map((node) => node.value);
+    const selectedMarkets = $$('input[name="pref-market"]:checked').map((node) => node.value);
+    return {
+      bankroll: Math.max(10, Number($('#pref-bankroll')?.value || 50) || 50),
+      level: $('#pref-level')?.value || 'intermediate',
+      sports: selectedSports.length ? selectedSports : SPORTS_PREFS,
+      markets: selectedMarkets.length ? selectedMarkets : MARKET_PREFS.map((item) => item.key),
+      edgeMin: Math.max(0, Number($('#pref-edge-min')?.value || 0) || 0),
+      oddMin: Math.max(1, Number($('#pref-odd-min')?.value || 1) || 1),
+      oddMax: Math.max(1, Number($('#pref-odd-max')?.value || 50) || 50),
+      confidenceMin: Math.max(0, Number($('#pref-confidence-min')?.value || 0) || 0),
+      alertEdge: Math.max(0, Number($('#pref-alert-edge')?.value || 10) || 10),
+      alertWindowHours: Math.max(1, Number($('#pref-alert-window')?.value || 2) || 2),
+      strict: Boolean($('#pref-strict')?.checked)
+    };
+  }
+
+  function applyPreferences(preferences) {
+    const prefs = savePreferences(preferences);
+    const bankrollInput = $('#bankroll-input');
+    if (bankrollInput) bankrollInput.value = String(prefs.bankroll || 50);
+    localStorage.setItem('userBankroll', String(prefs.bankroll || 50));
+    renderPreferences();
+    renderPicks();
+    maybeNotifyPickChanges();
+    computePicks().catch(() => {});
+    setSideStatus('Préférences enregistrées', 'ok');
+  }
+
+  function renderOnboarding() {
+    const card = $('#onboarding-card');
+    if (!card) return;
+    const seen = localStorage.getItem(USER_PREFS_SEEN_KEY) === '1';
+    card.classList.toggle('hidden', seen);
+    if (!seen) {
+      const bankroll = $('#onboarding-bankroll');
+      if (bankroll && !bankroll.value) bankroll.value = String(loadPreferences().bankroll || 50);
+    }
+  }
+
   function renderHistory() {
     const history = state.history;
+    renderModelPerformance();
+    renderTrackedBets();
     $('#hist-total').textContent = history ? String(history.total) : '-';
     $('#hist-generated').textContent = history?.generatedAt ? new Date(history.generatedAt).toLocaleString('fr-FR') : '-';
     $('#hist-settled').textContent = history ? String(history.settled) : '-';
@@ -3073,6 +3561,10 @@
     const winamaxLink = winamaxUrl
       ? `<a href="${escapeHtml(winamaxUrl)}" target="_blank" rel="noreferrer">Ouvrir le match Winamax</a>`
       : 'Lien Winamax absent';
+    const fairOdd = row.probability > 0 ? 1 / row.probability : 0;
+    const consensusOdd = Array.isArray(match.odds) && match.odds[0]
+      ? cleanLabel(match.odds[0].details || match.odds[0].provider || '', '')
+      : '';
     const signalCards = buildSignalCards(match, pred);
     const marketRows = buildMarketRows(markets);
     const h2hHtml = buildH2hHtml(match);
@@ -3080,6 +3572,7 @@
     const blockList = blockReasons(row);
     const decisionTone = stakeAllowed ? 'ok' : dc.status === 'repair' ? 'warn' : dc.status === 'skip' ? 'danger' : 'watch';
     const signalPreview = signalCards.slice(0, 6);
+    const narrative = pickNarrative(row, signalPreview, explanation);
     const signalOkCount = signalPreview.filter((signal) => signal.ok).length;
     const limitedDataHtml = signalOkCount < 2
       ? `<article class="detail-card limited-data-card">
@@ -3118,6 +3611,8 @@
             <div class="kv">
               <span>Pick</span><strong>${escapeHtml(row.label || '-')}</strong>
               <span>Marché</span><strong>${escapeHtml(row.market || '-')}</strong>
+              <span>Cote modèle</span><strong>${escapeHtml(fairOdd > 1 ? `@${fairOdd.toFixed(2)}` : '-')}</strong>
+              <span>Cote consensus</span><strong>${escapeHtml(consensusOdd || 'Non disponible')}</strong>
               <span>Action</span><strong>${escapeHtml(readableAction)}</strong>
               <span>Bookmaker</span><strong>${winamaxLink}</strong>
             </div>
@@ -3138,7 +3633,8 @@
         <div class="modal-grid sheet-grid">
           <article class="detail-card">
             <h4>Pourquoi ce pick</h4>
-            <p class="detail-text">${escapeHtml(explanation)}</p>
+            <p class="detail-text">${escapeHtml(narrative)}</p>
+            ${formStripHtml(match)}
             <div class="mini-kpi-row">
               <span>Proba ${escapeHtml(row.probability > 0 ? formatPct(row.probability, 1) : '-')}</span>
               <span>Confiance ${escapeHtml(confidenceTrustText(row))}</span>
@@ -5657,7 +6153,8 @@
       matches: 'Tous les matchs',
       history: 'Historique',
       agent: 'Agent',
-      data: 'Données'
+      data: 'Données',
+      preferences: 'Préférences'
     };
     $('#page-title').textContent = titles[tab] || 'Paris-Sportif';
   }
@@ -6439,6 +6936,14 @@
       trackUserBet(row);
       return;
     }
+    const comboButton = event.target.closest('[data-track-combo-key]');
+    if (comboButton) {
+      event.preventDefault();
+      event.stopPropagation();
+      if (event.type === 'keydown') return;
+      trackUserCombo(findComboByTrackKey(comboButton.dataset.trackComboKey || ''));
+      return;
+    }
     if (event.target.closest('button, a, input, select, textarea')) return;
     const row = event.target.closest('[data-match-id]');
     if (!row) return;
@@ -6483,6 +6988,7 @@
     $('#reload-engine-btn').addEventListener('click', () => reloadEngine());
     $('#export-btn')?.addEventListener('click', exportCsv);
     $('#export-user-bets-btn')?.addEventListener('click', exportUserBetsCsv);
+    $('#export-user-bets-btn-history')?.addEventListener('click', exportUserBetsCsv);
     $('#export-prebet-csv-btn')?.addEventListener('click', exportPrebetChecklistCsv);
     $('#export-scenarios-csv-btn')?.addEventListener('click', exportStakeScenariosCsv);
     $('#export-scorers-csv-btn')?.addEventListener('click', exportScorersCsv);
@@ -6547,10 +7053,38 @@
     $('#calibration-filter')?.addEventListener('change', renderMatches);
     $('#edge-filter')?.addEventListener('change', renderMatches);
     $('#league-filter')?.addEventListener('change', renderMatches);
-    ['pick-search', 'pick-sport-filter', 'pick-league-filter', 'pick-sort', 'pick-edge-min', 'pick-odd-min'].forEach((id) => {
+    ['pick-search', 'pick-sport-filter', 'pick-league-filter', 'pick-market-filter', 'pick-sort', 'pick-edge-min', 'pick-odd-min'].forEach((id) => {
       const el = $(`#${id}`);
       if (!el) return;
       el.addEventListener(el.tagName === 'INPUT' ? 'input' : 'change', () => renderPicks());
+    });
+    $('#market-snapshot')?.addEventListener('click', (event) => {
+      const button = event.target.closest('[data-market-chip]');
+      if (!button) return;
+      const select = $('#pick-market-filter');
+      if (!select) return;
+      select.value = button.dataset.marketChip || 'all';
+      renderPicks();
+    });
+    $('#model-segment-grid')?.addEventListener('click', (event) => {
+      const card = event.target.closest('[data-market-chip]');
+      if (!card) return;
+      const key = card.dataset.marketChip || '';
+      const select = $('#pick-market-filter');
+      if (select && Array.from(select.options).some((option) => option.value === key)) {
+        switchTab('dashboard');
+        select.value = key;
+        renderPicks();
+      }
+    });
+    ['user-bets-status-filter', 'user-bets-period-filter'].forEach((id) => {
+      const el = $(`#${id}`);
+      if (el) el.addEventListener('change', renderTrackedBets);
+    });
+    $('#user-bets-body')?.addEventListener('click', (event) => {
+      const button = event.target.closest('[data-settle-bet-id]');
+      if (!button) return;
+      settleUserBet(button.dataset.settleBetId || '', button.dataset.settleStatus || 'void');
     });
     $('#quality-alert-filter')?.addEventListener('change', () => {
       if (state.status) renderQualityAlerts(state.status);
@@ -6723,7 +7257,35 @@
     });
     $('#bankroll-input').addEventListener('change', () => {
       localStorage.setItem('userBankroll', String(getBankroll()));
+      const prefs = loadPreferences();
+      savePreferences({ ...prefs, bankroll: getBankroll() });
+      renderPreferences();
       computePicks().catch(() => {});
+    });
+    $('#save-preferences-btn')?.addEventListener('click', () => applyPreferences(collectPreferencesFromForm()));
+    $('#reset-preferences-btn')?.addEventListener('click', () => applyPreferences({ ...DEFAULT_PREFERENCES }));
+    $('#pref-level')?.addEventListener('change', () => {
+      const defaults = levelDefaults($('#pref-level')?.value || 'intermediate');
+      Object.entries({
+        'pref-edge-min': defaults.edgeMin,
+        'pref-odd-min': defaults.oddMin,
+        'pref-odd-max': defaults.oddMax,
+        'pref-confidence-min': defaults.confidenceMin
+      }).forEach(([id, value]) => {
+        const node = $(`#${id}`);
+        if (node) node.value = String(value);
+      });
+      const strict = $('#pref-strict');
+      if (strict) strict.checked = Boolean(defaults.strict);
+    });
+    $('#onboarding-save-btn')?.addEventListener('click', () => {
+      const level = $('#onboarding-level')?.value || 'intermediate';
+      applyPreferences({
+        ...DEFAULT_PREFERENCES,
+        ...levelDefaults(level),
+        bankroll: Math.max(10, Number($('#onboarding-bankroll')?.value || 50) || 50),
+        level
+      });
     });
   }
 
@@ -6757,10 +7319,11 @@
     bindEvents();
     state.actionHistory = readActionHistory();
     renderActionHistory();
-    const storedBankroll = Number(localStorage.getItem('userBankroll') || 50);
+    const storedBankroll = Number(localStorage.getItem('userBankroll') || loadPreferences().bankroll || 50);
     if (Number.isFinite(storedBankroll) && storedBankroll > 0) $('#bankroll-input').value = String(storedBankroll);
     switchTab('dashboard');
     renderUserPnl();
+    renderPreferences();
     const statusPromise = refreshStatus();
     const logPromise = refreshLog().catch(() => null);
     await statusPromise;

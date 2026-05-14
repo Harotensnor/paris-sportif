@@ -52,19 +52,21 @@ test('desktop cockpit is actionable and stable', async () => {
       pnl: document.querySelector('#user-pnl-total')?.textContent || '',
       sparkline: Boolean(document.querySelector('#user-pnl-sparkline svg')),
       exportBets: Boolean(document.querySelector('#export-user-bets-btn')),
-      filters: Boolean(document.querySelector('#pick-search') && document.querySelector('#pick-sort')),
+      filters: Boolean(document.querySelector('#pick-search') && document.querySelector('#pick-sort') && document.querySelector('#pick-market-filter')),
+      marketChips: document.querySelectorAll('#market-snapshot .market-chip, #market-snapshot .empty').length,
       performanceMetric: document.querySelector('#metric-boot-time')?.textContent || '',
       refreshPolicy: document.querySelector('#refresh-policy')?.textContent || '',
       caption: document.querySelector('#picks-caption')?.textContent || '',
       rows: document.querySelectorAll('#picks-body tr.clickable-row').length
     }));
     expect(dashboard.ready).toBeGreaterThanOrEqual(10);
-    expect(dashboard.buttons).toBeGreaterThanOrEqual(10);
-    expect(dashboard.rows).toBeGreaterThanOrEqual(10);
+    expect(dashboard.buttons).toBeGreaterThanOrEqual(20);
+    expect(dashboard.rows).toBeGreaterThanOrEqual(20);
     expect(dashboard.pnl).toContain('€');
     expect(dashboard.sparkline).toBe(true);
     expect(dashboard.exportBets).toBe(true);
     expect(dashboard.filters).toBe(true);
+    expect(dashboard.marketChips).toBeGreaterThan(0);
     expect(dashboard.performanceMetric).toMatch(/s|\.{3}/);
     expect(dashboard.refreshPolicy).toMatch(/Auto-refresh|Mode économie/);
 
@@ -81,6 +83,13 @@ test('desktop cockpit is actionable and stable', async () => {
     await expect(win.locator('#page-title')).toHaveText('Agent');
     await win.keyboard.press('Control+4');
     await expect(win.locator('#page-title')).toHaveText('Données');
+    await win.keyboard.press('Control+1');
+    await expect(win.locator('#page-title')).toHaveText('Accueil');
+    await win.click('[data-tab="history"]');
+    await expect(win.locator('#model-performance-grid')).toContainText('ROI');
+    await expect(win.locator('#user-bets-body')).toBeVisible();
+    await win.click('[data-tab="preferences"]');
+    await expect(win.locator('#pref-bankroll')).toBeVisible();
     await win.keyboard.press('Control+1');
     await expect(win.locator('#page-title')).toHaveText('Accueil');
 

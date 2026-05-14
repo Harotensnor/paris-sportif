@@ -5,6 +5,18 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 4 — Multi-marchés, combinés et crédibilité modèle
+
+- Moteur desktop élargi aux marchés Winamax exacts au-delà du 1N2 : le cockpit exploite désormais les alternatives positives par match, avec 120 picks positifs détectés et 24 picks affichés dans la sélection principale.
+- Ajout d'un filtre `Marché` et d'un résumé des marchés dominants pour basculer rapidement entre 1N2, O/U, BTTS, handicaps, totaux mi-temps, baskets/totaux et autres marchés supportés.
+- Vue `Combinés` renforcée : variantes Safe, Best Edge, Buts et Outsider, cote totale, retour pour 10 euros, corrélation moyenne, edge composé et tracking `Je mise le combiné`.
+- Vue `Historique` enrichie en tableau de crédibilité : ROI, win rate, Brier score, calibration par buckets et performance par sport/ligue/tier/marché à partir des rapports de backtest disponibles.
+- Ajout de `Mes paris` détaillé : filtres période/statut, courbe P&L cumulée, settlement manuel, export CSV et cohérence avec la bankroll visible du cockpit.
+- Nouvelle vue `Préférences` : bankroll, niveau, sports suivis, marchés autorisés, seuils personnels, mode strict et paramètres d'alerte persistés localement.
+- Onboarding de première ouverture pour configurer bankroll, sports et niveau sans noyer l'utilisateur dans les réglages avancés.
+- Fiche match enrichie avec une section `Pourquoi ce pick ?`, comparaison cote modèle / Winamax / consensus, signaux lisibles, forme récente et H2H quand disponibles.
+- QA Sprint 4 : capture visuelle de tous les écrans principaux, smoke Electron, Playwright, moteur, refresh et audit dépendances valident 20+ boutons `Je mise`, les nouveaux filtres, les combinés, l'historique, les préférences et l'absence d'iframe.
+
 ### Sprint 3 — Design pro, robustesse et qualité de vie
 
 - Ajout d'un socle `design-tokens.css` pour stabiliser la palette, les tailles, les espacements et les rayons de l'interface desktop.
