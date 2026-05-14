@@ -5,6 +5,17 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 15 — Paris simples et ticket actionnable
+
+- Le cockpit standard filtre désormais les marchés complexes par défaut : seuls `Vainqueur du match`, `Plus / Moins de buts`, `Les deux équipes marquent`, `Buteurs` et `Mi-temps vainqueur` remontent dans la vue `Picks`.
+- Les marchés avancés (`Handicaps`, `Double chance / DNB`, `Score exact`, `Total jeux tennis`, `Corners / Cartons`, etc.) restent disponibles uniquement en `Mode expert > Marchés avancés`, sans polluer l’écran principal.
+- Le moteur limite le dashboard à 18 paris simples maximum et conserve 10+ tickets lisibles au lieu de réouvrir des marchés que l’utilisateur ne veut pas jouer.
+- Chaque carte, ligne de table, timeline et fiche match affiche maintenant un format unique et direct : `PARI`, `COTE`, `MISE`, puis une raison courte en vocabulaire utilisateur.
+- Traduction des libellés techniques en français clair : `1N2` devient `Vainqueur du match`, `OU 2.5` devient `Plus / Moins 2,5 buts`, `BTTS` devient `Les deux équipes marquent`, et les cartes live utilisent aussi le libellé de pari lisible.
+- La fiche match standard est recentrée sur le ticket : pari suggéré, cote Winamax, mise, raison, contexte utile et sources enrichies. Les détails techniques restent dans `Audit technique` ou les onglets expert.
+- Les filtres de marché ne proposent plus les familles avancées quand le mode expert est fermé, ce qui évite les sélections incompréhensibles comme handicap, jeux tennis ou scores exacts.
+- QA Sprint 15 : refresh rapide réel, contrat moteur, unit/refresh/smoke, Playwright, capture visuelle et audit npm valident 187 matchs, 180 picks moteur, 18 paris simples visibles, aucun marché complexe en mode standard, 0 vulnérabilité et aucune erreur console lors des contrôles.
+
 ### Sprint 14 — Priorité, allocation bankroll et simulation 30 jours
 
 - Ajout d'un score de priorité stable par pick (`priorityScore`) : fiabilité, urgence kickoff, volume historique du segment, boost Winamax et diversification bankroll alimentent désormais le tri principal du cockpit.

@@ -29,7 +29,7 @@ async function main() {
   for (const marker of ['contextIsolation: true', 'sandbox: true', 'setWindowOpenHandler', "permission === 'notifications'", 'process.memoryUsage()']) {
     if (!mainText.includes(marker)) throw new Error(`Durcissement Electron absent: ${marker}`);
   }
-  for (const marker of ['todayFunnel', 'renderSimpleTimeline', 'antiTiltStatus', 'applyExpertMode', 'renderWinamaxPromos', 'renderBankrollAccounting', 'winamaxMarketAudit', 'coverage24h', 'safeBadgeHtml', 'renderTemporalCockpit', 'priorityBadgeHtml', 'dailyBudgetPlan', 'renderPaperSimulation']) {
+  for (const marker of ['todayFunnel', 'renderSimpleTimeline', 'antiTiltStatus', 'applyExpertMode', 'renderWinamaxPromos', 'renderBankrollAccounting', 'winamaxMarketAudit', 'coverage24h', 'safeBadgeHtml', 'renderTemporalCockpit', 'priorityBadgeHtml', 'dailyBudgetPlan', 'renderPaperSimulation', 'SIMPLE_MARKET_PREFS', 'actionPickHtml', 'userBetLabel']) {
     if (!rendererText.includes(marker)) throw new Error(`Sprint 14 renderer absent: ${marker}`);
   }
 
@@ -70,11 +70,17 @@ async function main() {
       pnl: document.querySelector('#simple-pnl')?.textContent || '',
       trackButtons: document.querySelectorAll('[data-track-bet-key]').length,
       expertHidden: !document.querySelector('[data-tab="data"]:not(.hidden)'),
-      multibookText: document.body.textContent.includes('Multi-' + 'bookmaker') || document.body.textContent.includes('Meilleure ' + 'cote')
+      multibookText: document.body.textContent.includes('Multi-' + 'bookmaker') || document.body.textContent.includes('Meilleure ' + 'cote'),
+      dashboardText: document.querySelector('[data-panel="dashboard"]')?.innerText || ''
     }));
     if (dashboard.title !== 'Picks') throw new Error(`Titre dashboard invalide: ${dashboard.title}`);
     if (dashboard.nav.join('|') !== 'Picks|Bilan|Réglages') throw new Error(`Navigation non simplifiée: ${dashboard.nav.join(', ')}`);
-    if (dashboard.metric < 15 || dashboard.rows < 15 || dashboard.timeline < 10 || dashboard.trackButtons < 10 || dashboard.safeBadges < 10 || dashboard.priorityBadges < 5 || !dashboard.topPick || !/jour/i.test(dashboard.dailyBudget) || !dashboard.hasRollingSections) throw new Error(`Picks Sprint 14 insuffisants: ${JSON.stringify(dashboard)}`);
+    const hasActionCopy = /PARI/i.test(dashboard.dashboardText) && /COTE/i.test(dashboard.dashboardText) && /MISE/i.test(dashboard.dashboardText);
+    const hasComplexMarket = /Handicap|Double chance|Jeux tennis|Total mi-temps|Total basket|Total runs|Score exact|Corners|Cartons/i.test(dashboard.dashboardText);
+    const hasTechnicalJargon = /\bKelly\b|\bEV\b|\btier\b|\b1N2\b|\bBTTS\b|\bedge\b/i.test(dashboard.dashboardText);
+    if (dashboard.metric < 10 || dashboard.rows < 10 || dashboard.rows > 18 || dashboard.timeline < 8 || dashboard.trackButtons < 10 || dashboard.safeBadges < 5 || dashboard.priorityBadges < 5 || !dashboard.topPick || !/jour/i.test(dashboard.dailyBudget) || !dashboard.hasRollingSections || !hasActionCopy || hasComplexMarket || hasTechnicalJargon) {
+      throw new Error(`Picks Sprint 15 insuffisants: ${JSON.stringify({ ...dashboard, dashboardText: dashboard.dashboardText.slice(0, 800), hasActionCopy, hasComplexMarket, hasTechnicalJargon })}`);
+    }
     if (!dashboard.combines || !dashboard.scorers || !dashboard.promos || !dashboard.bankroll.includes('€') || !dashboard.pnl.includes('€') || !dashboard.expertHidden || dashboard.multibookText) {
       throw new Error(`Cockpit Sprint 14 incohérent: ${JSON.stringify(dashboard)}`);
     }
@@ -94,11 +100,13 @@ async function main() {
       allocation: Boolean(document.querySelector('#pref-allocation-strategy') && document.querySelector('#pref-daily-budget')),
       prematchAlerts: Boolean(document.querySelector('#pref-prematch-alerts') && document.querySelector('#pref-top-pick-alerts')),
       expandedSports: (document.querySelector('#pref-sports')?.textContent || '').includes('rugby') && (document.querySelector('#pref-sports')?.textContent || '').includes('mma'),
-      winamaxMarkets: (document.querySelector('#pref-markets')?.textContent || '').includes('Corners') && (document.querySelector('#pref-markets')?.textContent || '').includes('Cartons'),
+      simpleMarkets: ['Vainqueur du match', 'Plus / Moins de buts', 'Les deux équipes marquent', 'Buteurs', 'Mi-temps vainqueur'].every((label) => (document.querySelector('#pref-markets')?.textContent || '').includes(label)),
+      simpleHasAdvanced: /Handicap|Corners|Cartons|Jeux tennis|Score exact/i.test(document.querySelector('#pref-markets')?.textContent || ''),
+      advancedMarkets: /Handicaps/.test(document.querySelector('#pref-advanced-markets')?.textContent || '') && /Total jeux tennis/.test(document.querySelector('#pref-advanced-markets')?.textContent || ''),
       accounting: Boolean(document.querySelector('#add-bankroll-transaction-btn')),
       multiBook: Boolean(document.querySelector('#pref-multibook-enabled') || document.querySelector('#pref-odds-api-key'))
     }));
-    if (!prefs.expert || !prefs.antiTilt || !prefs.allocation || !prefs.prematchAlerts || !prefs.expandedSports || !prefs.winamaxMarkets || !prefs.accounting || prefs.multiBook) throw new Error(`Réglages Sprint 14 invalides: ${JSON.stringify(prefs)}`);
+    if (!prefs.expert || !prefs.antiTilt || !prefs.allocation || !prefs.prematchAlerts || !prefs.expandedSports || !prefs.simpleMarkets || prefs.simpleHasAdvanced || !prefs.advancedMarkets || !prefs.accounting || prefs.multiBook) throw new Error(`Réglages Sprint 15 invalides: ${JSON.stringify(prefs)}`);
     await win.fill('#bankroll-tx-amount', '25');
     await win.click('#add-bankroll-transaction-btn');
     await win.waitForFunction(() => /Dépôt/.test(document.querySelector('#bankroll-transaction-list')?.textContent || ''), null, { timeout: 5000 });
@@ -119,13 +127,13 @@ async function main() {
     await win.waitForSelector('#match-modal:not(.hidden)', { timeout: 10000 });
     const modal = await win.evaluate(() => {
       const modalNode = document.querySelector('#match-modal .modal');
-      const content = document.querySelector('#modal-content');
+      const content = document.querySelector('#modal-content [data-detail-panel="summary"]') || document.querySelector('#modal-content');
       return {
-        text: content?.textContent || '',
+        text: content?.innerText || '',
         overflow: Boolean((modalNode && modalNode.scrollWidth > modalNode.clientWidth + 2) || (content && content.scrollWidth > content.clientWidth + 2))
       };
     });
-    if (modal.overflow || !modal.text.includes('Puis-je miser ?') || !modal.text.includes('Priorité') || !modal.text.includes('Allocation jour') || !modal.text.includes('Cote Winamax') || !modal.text.includes('Type Winamax') || /Meilleure\s+cote/i.test(modal.text)) {
+    if (modal.overflow || !modal.text.includes('PARI') || !modal.text.includes('COTE') || !modal.text.includes('MISE') || !/Pourquoi ce pari/i.test(modal.text) || /Meilleure\s+cote|Type Winamax|Cote modèle|\b1N2\b|\bKelly\b|\bedge\b/i.test(modal.text)) {
       throw new Error(`Fiche match invalide: ${JSON.stringify(modal).slice(0, 800)}`);
     }
 
@@ -133,7 +141,7 @@ async function main() {
       message.startsWith('error:') || message.startsWith('pageerror:')
     ) && !isIgnorableConsoleMessage(message));
     if (severe.length) throw new Error(`Erreurs console: ${severe.join(' | ')}`);
-    console.log(`Desktop smoke OK: ${dashboard.metric} picks visibles, ${dashboard.timeline} timeline, ${dashboard.safeBadges} fiables, ${dashboard.priorityBadges} priorités, Winamax-only Sprint 14.`);
+    console.log(`Desktop smoke OK: ${dashboard.metric} paris simples visibles, ${dashboard.timeline} timeline, ${dashboard.safeBadges} fiables, ${dashboard.priorityBadges} priorités, Winamax-only Sprint 15.`);
   } finally {
     await app.close();
     fs.rmSync(userDataDir, { recursive: true, force: true });

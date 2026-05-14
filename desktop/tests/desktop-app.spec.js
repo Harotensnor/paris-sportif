@@ -14,7 +14,7 @@ function isIgnorableConsoleMessage(message) {
   return /Failed to load resource:\s*net::ERR_(EMPTY_RESPONSE|ABORTED)/i.test(String(message || ''));
 }
 
-test('Sprint 14 desktop keeps priority, allocation and simulation coherent', async () => {
+test('Sprint 15 desktop shows only clear simple Winamax bets by default', async () => {
   const rendererText = fs.readFileSync(path.join(root, 'desktop', 'src', 'renderer', 'renderer.js'), 'utf8');
   const htmlText = fs.readFileSync(path.join(root, 'desktop', 'src', 'renderer', 'index.html'), 'utf8');
   const mainText = fs.readFileSync(path.join(root, 'desktop', 'src', 'main.js'), 'utf8');
@@ -40,6 +40,9 @@ test('Sprint 14 desktop keeps priority, allocation and simulation coherent', asy
   expect(rendererText).toContain('priorityBadgeHtml');
   expect(rendererText).toContain('dailyBudgetPlan');
   expect(rendererText).toContain('renderPaperSimulation');
+  expect(rendererText).toContain('SIMPLE_MARKET_PREFS');
+  expect(rendererText).toContain('actionPickHtml');
+  expect(rendererText).toContain('userBetLabel');
 
   const userDataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'paris-sportif-pw-'));
   const messages = [];
@@ -77,15 +80,17 @@ test('Sprint 14 desktop keeps priority, allocation and simulation coherent', asy
       scorers: Boolean(document.querySelector('#simple-scorers-section')),
       promos: Boolean(document.querySelector('#simple-promos-section')),
       expertHidden: !document.querySelector('[data-tab="data"]:not(.hidden)'),
-      multibookText: document.body.textContent.includes('Multi-' + 'bookmaker') || document.body.textContent.includes('Meilleure ' + 'cote')
+      multibookText: document.body.textContent.includes('Multi-' + 'bookmaker') || document.body.textContent.includes('Meilleure ' + 'cote'),
+      dashboardText: document.querySelector('[data-panel="dashboard"]')?.innerText || ''
     }));
     expect(cockpit.title).toBe('Picks');
     expect(cockpit.nav).toEqual(['Picks', 'Bilan', 'Réglages']);
-    expect(cockpit.metric).toBeGreaterThanOrEqual(15);
-    expect(cockpit.rows).toBeGreaterThanOrEqual(15);
-    expect(cockpit.timeline).toBeGreaterThanOrEqual(10);
-    expect(cockpit.trackButtons).toBeGreaterThanOrEqual(15);
-    expect(cockpit.safeBadges).toBeGreaterThanOrEqual(10);
+    expect(cockpit.metric).toBeGreaterThanOrEqual(10);
+    expect(cockpit.rows).toBeGreaterThanOrEqual(10);
+    expect(cockpit.rows).toBeLessThanOrEqual(18);
+    expect(cockpit.timeline).toBeGreaterThanOrEqual(8);
+    expect(cockpit.trackButtons).toBeGreaterThanOrEqual(10);
+    expect(cockpit.safeBadges).toBeGreaterThanOrEqual(5);
     expect(cockpit.priorityBadges).toBeGreaterThanOrEqual(5);
     expect(cockpit.topPick).toBe(true);
     expect(cockpit.dailyBudget).toContain('jour');
@@ -97,6 +102,11 @@ test('Sprint 14 desktop keeps priority, allocation and simulation coherent', asy
     expect(cockpit.promos).toBe(true);
     expect(cockpit.expertHidden).toBe(true);
     expect(cockpit.multibookText).toBe(false);
+    expect(cockpit.dashboardText).toMatch(/PARI/i);
+    expect(cockpit.dashboardText).toMatch(/COTE/i);
+    expect(cockpit.dashboardText).toMatch(/MISE/i);
+    expect(cockpit.dashboardText).not.toMatch(/Handicap|Double chance|Jeux tennis|Total mi-temps|Total basket|Total runs|Score exact|Corners|Cartons/i);
+    expect(cockpit.dashboardText).not.toMatch(/\bKelly\b|\bEV\b|\btier\b|\b1N2\b|\bBTTS\b|\bedge\b/i);
 
     await win.click('[data-track-bet-key]');
     await win.waitForFunction(() => /1 en cours/.test(document.querySelector('#user-pnl-sub')?.textContent || ''), null, { timeout: 5_000 });
@@ -116,8 +126,13 @@ test('Sprint 14 desktop keeps priority, allocation and simulation coherent', asy
     await expect(win.locator('#pref-expert-mode')).toBeVisible();
     await expect(win.locator('#pref-sports')).toContainText('rugby');
     await expect(win.locator('#pref-sports')).toContainText('mma');
-    await expect(win.locator('#pref-markets')).toContainText('Corners');
-    await expect(win.locator('#pref-markets')).toContainText('Cartons');
+    await expect(win.locator('#pref-markets')).toContainText('Vainqueur du match');
+    await expect(win.locator('#pref-markets')).toContainText('Plus / Moins de buts');
+    await expect(win.locator('#pref-markets')).toContainText('Les deux équipes marquent');
+    await expect(win.locator('#pref-markets')).toContainText('Buteurs');
+    await expect(win.locator('#pref-markets')).not.toContainText(/Handicap|Corners|Cartons|Jeux tennis|Score exact/);
+    await expect(win.locator('#pref-advanced-markets')).toContainText('Handicaps');
+    await expect(win.locator('#pref-advanced-markets')).toContainText('Total jeux tennis');
     await expect(win.locator('#pref-multibook-enabled')).toHaveCount(0);
     await expect(win.locator('#pref-odds-api-key')).toHaveCount(0);
     await win.fill('#bankroll-tx-amount', '25');
@@ -144,12 +159,13 @@ test('Sprint 14 desktop keeps priority, allocation and simulation coherent', asy
 
     await win.click('#picks-body tr.clickable-row td[data-label="Match"]');
     await win.waitForSelector('#match-modal:not(.hidden)', { timeout: 10_000 });
-    await expect(win.locator('#modal-content')).toContainText('Puis-je miser ?');
-    await expect(win.locator('#modal-content')).toContainText('Priorité');
-    await expect(win.locator('#modal-content')).toContainText('Allocation jour');
-    await expect(win.locator('#modal-content')).toContainText('Cote Winamax');
-    await expect(win.locator('#modal-content')).toContainText('Type Winamax');
-    await expect(win.locator('#modal-content')).not.toContainText(/Meilleure\s+cote/);
+    const summaryPanel = win.locator('#modal-content [data-detail-panel="summary"]');
+    await expect(summaryPanel).toContainText('PARI');
+    await expect(summaryPanel).toContainText('COTE');
+    await expect(summaryPanel).toContainText('MISE');
+    await expect(summaryPanel).toContainText(/Pourquoi ce pari/i);
+    const visibleSummaryText = await summaryPanel.evaluate((node) => node.innerText || '');
+    expect(visibleSummaryText).not.toMatch(/Meilleure\s+cote|Type Winamax|Cote modèle|\b1N2\b|\bKelly\b|\bedge\b/i);
     const overflow = await win.evaluate(() => {
       const modal = document.querySelector('#match-modal .modal');
       const content = document.querySelector('#modal-content');

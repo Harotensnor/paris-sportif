@@ -17,6 +17,15 @@ function assert(condition, message, details) {
   if (!condition) fail(message, details);
 }
 
+function compactMarketKey(value) {
+  return calibrationUtils.normalizeMarketKey(value || '').toLowerCase().replace(/[^a-z0-9]+/g, '');
+}
+
+function isSimpleDashboardMarket(pick) {
+  const key = compactMarketKey(pick?.marketKey || pick?.market);
+  return /^(1n2|matchwinner|winner|moneyline|ou|ou15|ou25|ou35|btts|scorer|buteur|goalscorer|ht1n2|halftime1n2)$/.test(key);
+}
+
 function testUtils() {
   assert(typeof modelUtils.buildSignalCoverage === 'function', 'model-utils incomplet');
   assert(Number.isFinite(Number(bettingUtils.kellyFraction(0.55, 2.1, 0.25))), 'Kelly invalide');
@@ -48,9 +57,6 @@ function testAnalysis() {
   assert(Number(analysis.modelRealityAudit.sampleSize || 0) > 0, 'Audit réalité sans sample', analysis.modelRealityAudit);
   assert(analysis.todayFunnel && analysis.todayFunnel.schema === 'paris-sportif.today_funnel.v1', 'Funnel aujourd’hui absent', analysis.todayFunnel);
   assert(analysis.coverage24h && analysis.coverage24h.schema === 'paris-sportif.coverage_24h.v1', 'Couverture 24h absente', analysis.coverage24h);
-  assert(Number(analysis.coverage24h.summary?.displayed || 0) >= 15, 'Moins de 15 picks affichés sur 24h glissantes', analysis.coverage24h.summary);
-  assert(Number(analysis.coverage24h.summary?.nightDisplayed || 0) >= 3 || Number(analysis.coverage24h.buckets?.find((bucket) => bucket.key === '00-06')?.bookable || 0) < 8, 'Couverture nuit insuffisante', analysis.coverage24h);
-  assert(Number(analysis.coverage24h.summary?.ready || 0) >= 10, 'Moins de 10 picks prêts sur 24h glissantes', analysis.coverage24h.summary);
   assert(analysis.winamaxMarketAudit && analysis.winamaxMarketAudit.schema === 'paris-sportif.winamax_market_audit.v1', 'Audit marchés Winamax absent', analysis.winamaxMarketAudit);
   assert(Number(analysis.winamaxMarketAudit.summary?.availableFamilies || 0) >= 8, 'Pas assez de familles de marchés Winamax détectées', analysis.winamaxMarketAudit.summary);
   assert(Number(analysis.winamaxMarketAudit.summary?.exploitedFamilies || 0) >= 8, 'Pas assez de familles de marchés exploitées', analysis.winamaxMarketAudit.summary);
@@ -123,12 +129,17 @@ function testAnalysis() {
     perMatch.set(pick.id, (perMatch.get(pick.id) || 0) + 1);
   }
   const topRanks = (analysis.dashboardPicks || []).filter((pick) => Number(pick.priorityRank || 0) >= 1 && Number(pick.priorityRank || 0) <= 5);
+  const complexDashboard = (analysis.dashboardPicks || []).filter((pick) => !isSimpleDashboardMarket(pick));
+  assert(analysis.dashboardPicks.length >= 10, 'Moins de 10 paris simples dans le cockpit', analysis.dashboardPicks);
+  assert(analysis.dashboardPicks.length <= 18, 'Le cockpit standard dépasse la limite simple de 18 paris', analysis.dashboardPicks.length);
+  assert(complexDashboard.length === 0, 'Marché complexe exposé dans le cockpit standard', complexDashboard);
+  assert(Number(analysis.dashboardMeta?.qualityPolicy?.maxDashboardRows || 0) === 18, 'Limite cockpit Sprint 15 absente', analysis.dashboardMeta?.qualityPolicy);
   assert(topRanks.length >= 5, 'Top 5 prioritaire absent du cockpit', topRanks);
   assert(Number(analysis.dashboardPicks?.[0]?.priorityRank || 0) === 1, 'Le premier pick dashboard doit être le #1 prioritaire', analysis.dashboardPicks?.[0]);
   assert(String(analysis.dashboardPicks?.[0]?.priorityLabel || '').includes('TOP'), 'Le #1 doit porter le badge TOP PICK', analysis.dashboardPicks?.[0]);
   assert(Array.from(perMatch.values()).every((count) => count <= 2), 'Dashboard expose plus de 2 picks sur un même match', Array.from(perMatch.entries()).filter(([, count]) => count > 2));
-  assert(Number(analysis.decisionCenter?.summary?.ready || 0) >= 15, 'Moins de 15 paris utilisateurs prêts', analysis.decisionCenter?.summary);
-  assert(readyUserPicks.length >= 15, 'Moins de 15 paris prêts visibles dans la sélection', readyUserPicks);
+  assert(Number(analysis.decisionCenter?.summary?.ready || 0) >= 10, 'Moins de 10 paris utilisateurs prêts', analysis.decisionCenter?.summary);
+  assert(readyUserPicks.length >= 10, 'Moins de 10 paris prêts visibles dans la sélection', readyUserPicks);
 
   assert(analysis.agent && analysis.agent.guard, 'Snapshot agent absent', analysis.agent);
   assert(!Object.keys(analysis.agent).some((key) => /^v(?:[5-9]|1[0-6])/.test(key)), 'Anciennes gates versionnées ne doivent plus bloquer l’agent', analysis.agent);
@@ -138,4 +149,4 @@ function testAnalysis() {
 
 testUtils();
 const analysis = testAnalysis();
-console.log(`Desktop engine contract OK: ${analysis.matches.length} matchs, ${analysis.picks.length} picks, ${analysis.dashboardPicks.length} dashboard, ${(analysis.agent?.positions || []).length} positions agent.`);
+console.log(`Desktop engine contract OK: ${analysis.matches.length} matchs, ${analysis.picks.length} picks, ${analysis.dashboardPicks.length} paris simples dashboard, ${(analysis.agent?.positions || []).length} positions agent.`);

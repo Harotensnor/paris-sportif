@@ -261,13 +261,13 @@
           </select>
           <select id="pick-sort">
             <option value="priority">Priorité</option>
-            <option value="real_confidence">Confiance ajustée</option>
-            <option value="edge">Edge</option>
-            <option value="confidence">Confiance</option>
+            <option value="real_confidence">Fiabilité</option>
+            <option value="edge">Avantage</option>
+            <option value="confidence">Fiabilité brute</option>
             <option value="kickoff">Départ</option>
             <option value="odd">Cote</option>
           </select>
-          <input id="pick-edge-min" type="number" min="0" max="100" step="1" placeholder="Edge min %">
+          <input id="pick-edge-min" type="number" min="0" max="100" step="1" placeholder="Avantage min %">
           <input id="pick-odd-min" type="number" min="1" max="100" step="0.05" placeholder="Cote min">
         </div>
         <div class="market-snapshot" id="market-snapshot">
@@ -278,17 +278,16 @@
             <thead>
               <tr>
                 <th>Match</th>
-                <th>Marché</th>
+                <th>Pari</th>
                 <th>Cote</th>
-                <th>Proba</th>
-                <th>Edge</th>
                 <th>Mise</th>
                 <th>Départ</th>
+                <th>Pourquoi</th>
                 <th>Action</th>
               </tr>
             </thead>
             <tbody id="picks-body">
-              <tr><td colspan="8" class="empty">Chargement des candidats...</td></tr>
+              <tr><td colspan="7" class="empty">Chargement des paris...</td></tr>
             </tbody>
           </table>
         </div>
@@ -983,15 +982,21 @@
             <div class="check-grid" id="pref-sports"></div>
           </article>
           <article class="preference-card">
-            <h4>Marchés autorisés</h4>
+            <h4>Marchés simples</h4>
+            <p class="match-sub">Par défaut, seuls les paris faciles à comprendre sont affichés.</p>
             <div class="check-grid" id="pref-markets"></div>
+            <details class="advanced-section expert-only hidden">
+              <summary>Marchés avancés</summary>
+              <p>Handicaps, scores exacts, jeux tennis, corners, cartons et autres marchés techniques.</p>
+              <div class="check-grid" id="pref-advanced-markets"></div>
+            </details>
           </article>
           <article class="preference-card">
             <h4>Seuils personnels</h4>
-            <label>Edge min %<input id="pref-edge-min" type="number" min="0" max="50" step="1"></label>
+            <label>Avantage min %<input id="pref-edge-min" type="number" min="0" max="50" step="1"></label>
             <label>Cote min<input id="pref-odd-min" type="number" min="1" max="50" step="0.05"></label>
             <label>Cote max<input id="pref-odd-max" type="number" min="1" max="100" step="0.05"></label>
-            <label>Confiance min %<input id="pref-confidence-min" type="number" min="0" max="100" step="1"></label>
+            <label>Fiabilité min %<input id="pref-confidence-min" type="number" min="0" max="100" step="1"></label>
           </article>
           <article class="preference-card">
             <h4>Alertes</h4>
@@ -1230,16 +1235,16 @@
       </header>
       <div class="modal-tabs" id="modal-tabs">
         <button class="modal-tab active" data-detail-tab="summary">Synthèse</button>
-        <button class="modal-tab" data-detail-tab="decision">Décision</button>
+        <button class="modal-tab expert-only hidden" data-detail-tab="decision">Décision technique</button>
         <button class="modal-tab" data-detail-tab="context">Contexte</button>
         <button class="modal-tab" data-detail-tab="teams">Équipes</button>
         <button class="modal-tab" data-detail-tab="availability">Effectif</button>
         <button class="modal-tab" data-detail-tab="signals">Signaux</button>
-        <button class="modal-tab" data-detail-tab="odds">Cotes</button>
-        <button class="modal-tab" data-detail-tab="h2h">H2H</button>
-        <button class="modal-tab" data-detail-tab="timeline">Timeline</button>
-        <button class="modal-tab" data-detail-tab="sources">Sources</button>
-        <button class="modal-tab" data-detail-tab="model">Modèle</button>
+        <button class="modal-tab expert-only hidden" data-detail-tab="odds">Cotes avancées</button>
+        <button class="modal-tab" data-detail-tab="h2h">Face-à-face</button>
+        <button class="modal-tab expert-only hidden" data-detail-tab="timeline">Timeline</button>
+        <button class="modal-tab expert-only hidden" data-detail-tab="sources">Sources</button>
+        <button class="modal-tab expert-only hidden" data-detail-tab="model">Modèle</button>
       </div>
       <div class="modal-content" id="modal-content"></div>
     </div>

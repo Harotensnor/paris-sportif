@@ -118,34 +118,32 @@
   const WEEKLY_REPORT_KEY = 'parisSportifWeeklyReports';
   const WEEKLY_REPORT_SEEN_KEY = 'parisSportifWeeklyReportSeen';
   const SPORTS_PREFS = ['football', 'tennis', 'basketball', 'hockey', 'baseball', 'rugby', 'football américain', 'mma', 'boxe', 'handball', 'volleyball'];
-  const MARKET_PREFS = [
-    { key: '1n2', label: '1N2' },
-    { key: 'ht1n2', label: '1N2 mi-temps' },
-    { key: 'httotal', label: 'Total mi-temps' },
-    { key: 'corners', label: 'Corners' },
-    { key: 'cards', label: 'Cartons' },
-    { key: 'ou35', label: 'O/U 3.5' },
-    { key: 'ou25', label: 'O/U 2.5' },
-    { key: 'btts', label: 'BTTS' },
-    { key: 'teamtotal', label: 'Total équipe' },
-    { key: 'dnb', label: 'DNB' },
-    { key: 'doublechance', label: 'Double chance' },
-    { key: 'resultbtts', label: 'Résultat + BTTS' },
-    { key: 'baseballtotal', label: 'Total runs' },
-    { key: 'basketballtotal', label: 'Total basket' },
-    { key: 'baskettotal', label: 'Total basket' },
-    { key: 'hockeytotal', label: 'Total buts' },
-    { key: 'tennisgames', label: 'Jeux tennis' },
-    { key: 'tennissets', label: 'Sets tennis' },
-    { key: 'handicap', label: 'Handicap' },
-    { key: 'exactscore', label: 'Score exact' }
+  const SIMPLE_MARKET_PREFS = [
+    { key: 'winner', label: 'Vainqueur du match', keys: ['1n2', 'matchwinner', 'vainqueur'] },
+    { key: 'goals', label: 'Plus / Moins de buts', keys: ['ou', 'ou15', 'ou25', 'ou35'] },
+    { key: 'btts', label: 'Les deux équipes marquent', keys: ['btts'] },
+    { key: 'scorer', label: 'Buteurs', keys: ['scorer', 'buteur'] },
+    { key: 'halftime', label: 'Mi-temps vainqueur', keys: ['ht1n2', 'ht_1n2'] }
   ];
+  const ADVANCED_MARKET_PREFS = [
+    { key: 'handicaps', label: 'Handicaps', keys: ['handicap', 'ah', 'asianhandicap'] },
+    { key: 'dnb_dc', label: 'Double chance / DNB', keys: ['doublechance', 'dnb'] },
+    { key: 'exact_scores', label: 'Score exact', keys: ['exactscore'] },
+    { key: 'tennis_specials', label: 'Sets exact / Total jeux tennis', keys: ['tennisgames', 'tennissets'] },
+    { key: 'corners_cards', label: 'Corners / Cartons', keys: ['corners', 'cards'] },
+    { key: 'points_totals', label: 'Total points basket/hockey/baseball', keys: ['basketballtotal', 'baskettotal', 'hockeytotal', 'baseballtotal'] },
+    { key: 'half_scores', label: 'Score ou total mi-temps', keys: ['httotal', 'htou', 'halftimetotal'] },
+    { key: 'scorer_specials', label: 'Buteur premier/dernier', keys: ['firstscorer', 'lastscorer'] },
+    { key: 'htft', label: 'Mi-temps / Fin', keys: ['htft', 'mitempsfin'] },
+    { key: 'specifics', label: 'Spécifiques minute / événements', keys: ['teamtotal', 'resultbtts', 'minute', 'special'] }
+  ];
+  const MARKET_PREFS = [...SIMPLE_MARKET_PREFS, ...ADVANCED_MARKET_PREFS];
   const DEFAULT_PREFERENCES = {
-    preferenceSchemaVersion: 14,
+    preferenceSchemaVersion: 15,
     bankroll: 50,
     level: 'intermediate',
     sports: SPORTS_PREFS,
-    markets: MARKET_PREFS.map((item) => item.key),
+    markets: SIMPLE_MARKET_PREFS.map((item) => item.key),
     edgeMin: 0,
     oddMin: 1,
     oddMax: 50,
@@ -236,6 +234,65 @@
     return aliases[key] || key;
   }
 
+  function marketPrefByKey(key) {
+    const normalized = normalizeUiKey(key);
+    return MARKET_PREFS.find((item) => normalizeUiKey(item.key) === normalized) || null;
+  }
+
+  function marketGroupFromKey(key) {
+    const normalized = normalizeUiKey(key);
+    const direct = MARKET_PREFS.find((item) => item.keys?.map(normalizeUiKey).includes(normalized));
+    return direct?.key || normalized;
+  }
+
+  function rowMarketPreferenceKey(row) {
+    return marketGroupFromKey(marketKeyFromRow(row));
+  }
+
+  function isSimpleMarketPreference(key) {
+    const normalized = normalizeUiKey(key);
+    return SIMPLE_MARKET_PREFS.some((item) => normalizeUiKey(item.key) === normalized || item.keys.map(normalizeUiKey).includes(normalized));
+  }
+
+  function expandMarketPreferences(markets, { expert = false } = {}) {
+    const selected = Array.isArray(markets) && markets.length ? markets : DEFAULT_PREFERENCES.markets;
+    const allowedGroups = new Set();
+    const allowedKeys = new Set();
+    selected.forEach((item) => {
+      const pref = marketPrefByKey(item);
+      if (pref) {
+        if (SIMPLE_MARKET_PREFS.includes(pref) || expert) {
+          allowedGroups.add(pref.key);
+          (pref.keys || [pref.key]).forEach((key) => allowedKeys.add(normalizeUiKey(key)));
+        }
+        return;
+      }
+      const group = marketGroupFromKey(item);
+      if (expert || isSimpleMarketPreference(group)) {
+        allowedGroups.add(group);
+        allowedKeys.add(normalizeUiKey(item));
+      }
+    });
+    SIMPLE_MARKET_PREFS.forEach((pref) => {
+      if (allowedGroups.has(pref.key)) (pref.keys || []).forEach((key) => allowedKeys.add(normalizeUiKey(key)));
+    });
+    return { groups: allowedGroups, keys: allowedKeys };
+  }
+
+  function sanitizeMarketPreferences(markets, schemaVersion = 0, expert = false) {
+    const raw = Array.isArray(markets) ? markets.map((item) => String(item)).filter(Boolean) : [];
+    if (schemaVersion < 15) {
+      const simple = raw.map(marketGroupFromKey).filter(isSimpleMarketPreference);
+      return Array.from(new Set(simple.length ? simple : DEFAULT_PREFERENCES.markets));
+    }
+    const allowed = raw.filter((key) => {
+      const pref = marketPrefByKey(key);
+      if (!pref) return expert || isSimpleMarketPreference(key);
+      return expert || SIMPLE_MARKET_PREFS.includes(pref);
+    });
+    return allowed.length ? Array.from(new Set(allowed)) : DEFAULT_PREFERENCES.markets;
+  }
+
   function mergePreferenceList(value, defaults) {
     const input = Array.isArray(value) ? value.map((item) => String(item)).filter(Boolean) : [];
     const seen = new Set(input.map((item) => item.toLowerCase()));
@@ -260,9 +317,7 @@
         sports: parsed.preferenceSchemaVersion >= 12
           ? (Array.isArray(parsed.sports) && parsed.sports.length ? parsed.sports : DEFAULT_PREFERENCES.sports)
           : mergePreferenceList(parsed.sports, DEFAULT_PREFERENCES.sports),
-        markets: parsed.preferenceSchemaVersion >= 12
-          ? (Array.isArray(parsed.markets) && parsed.markets.length ? parsed.markets : DEFAULT_PREFERENCES.markets)
-          : mergePreferenceList(parsed.markets, DEFAULT_PREFERENCES.markets)
+        markets: sanitizeMarketPreferences(parsed.markets, parsed.preferenceSchemaVersion || 0, Boolean(parsed.expertMode))
       };
     } catch {
       return { ...DEFAULT_PREFERENCES };
@@ -274,7 +329,7 @@
       ...DEFAULT_PREFERENCES,
       ...(preferences || {}),
       sports: Array.isArray(preferences?.sports) ? preferences.sports : DEFAULT_PREFERENCES.sports,
-      markets: Array.isArray(preferences?.markets) ? preferences.markets : DEFAULT_PREFERENCES.markets
+      markets: sanitizeMarketPreferences(preferences?.markets, preferences?.preferenceSchemaVersion || DEFAULT_PREFERENCES.preferenceSchemaVersion, Boolean(preferences?.expertMode))
     };
     try {
       localStorage.setItem(USER_PREFS_KEY, JSON.stringify(next));
@@ -1010,19 +1065,19 @@
       title.textContent = rows.length
         ? ultimate
           ? `Bet ultime : ${ultimate.title}`
-          : `Bonjour, ${formatCount(rows.length)} picks aujourd'hui, dont ${formatCount(bigRows.length)} gros`
+          : `Bonjour, ${formatCount(rows.length)} paris simples aujourd'hui`
         : 'Bonjour, aucun pari prêt pour l’instant';
     }
     if (subtitle) {
       subtitle.textContent = ultimate
-        ? `${ultimate.market} · ${ultimate.label} ${formatOdd(ultimate.odd)} · ${formatPct(ultimate.edge, 1)} edge · départ ${countdownLabel(ultimate.start)}.`
+        ? `PARI : ${userBetLabel(ultimate)} · COTE : ${formatOdd(ultimate.odd)} · MISE : ${visibleStakeText(ultimate)} · départ ${countdownLabel(ultimate.start)}.`
         : nextPick
-        ? `Prochain match dans ${countdownLabel(nextPick.start)} : ${nextPick.title}, ${nextPick.label} (${formatPct(nextPick.edge, 1)} edge).`
+        ? `Prochain match dans ${countdownLabel(nextPick.start)} : ${nextPick.title}, ${userBetLabel(nextPick)}.`
         : 'Le cockpit reste utile : surveille les données, prépare les combinés ou relance un refresh.';
     }
     grid.innerHTML = [
-      ['Picks du jour', formatCount(rows.length), `${formatCount(bigRows.length)} edge ≥ 10pt · ${formatCount(state.allPicks.length || 0)} détectés`],
-      ['Prochain match', nextPick ? countdownLabel(nextPick.start) : '-', nextPick ? `${nextPick.title} · ${nextPick.market}` : 'Aucun départ proche'],
+      ['Paris du jour', formatCount(rows.length), `${formatCount(bigRows.length)} très bons signaux · ${formatCount(state.allPicks.length || 0)} analysés`],
+      ['Prochain match', nextPick ? countdownLabel(nextPick.start) : '-', nextPick ? `${nextPick.title} · ${userBetLabel(nextPick)}` : 'Aucun départ proche'],
       ['Performance hier', formatMoney(stats.pnlYesterday), `${formatCount(stats.wonYesterday)}W / ${formatCount(stats.lostYesterday)}L · 7j ${formatMoney(stats.last7Pnl)}`],
       ['Bankroll', formatMoney(bankroll), `${discipline.label} · ${clvText}`]
     ].map(([label, value, detail]) => `
@@ -1205,20 +1260,20 @@
     if (summary) summary.textContent = `${plan.config.label} · ${formatMoney(plan.budget)} / jour`;
     if (used) used.textContent = `${formatMoney(plan.used)} alloués`;
     if (detail) {
-      detail.textContent = `${formatCount(plan.rows.length)} pick(s) dans le plan · reste ${formatMoney(plan.available)}`;
+      detail.textContent = `${formatCount(plan.rows.length)} pari(s) dans le plan · reste ${formatMoney(plan.available)}`;
     }
     const grid = $('#bankroll-allocation-grid');
     if (!grid) return;
     if (!plan.rows.length) {
-      grid.innerHTML = '<div class="empty">Aucun pick prêt à allouer avec les règles actuelles.</div>';
+      grid.innerHTML = '<div class="empty">Aucun pari prêt à allouer avec les règles actuelles.</div>';
       return;
     }
     grid.innerHTML = plan.rows.slice(0, plan.config.maxPicks).map((item) => `
       <article class="allocation-card clickable-row" data-match-id="${escapeHtml(item.row.id)}" tabindex="0" role="button">
         <span>${escapeHtml(`#${item.rank} · ${priorityText(item.row)}`)}</span>
         <strong>${escapeHtml(formatMoney(item.stake))}</strong>
-        <p>${escapeHtml(item.row.title)} · ${escapeHtml(item.row.market)} ${escapeHtml(item.row.label)}</p>
-        <small>${escapeHtml(formatPct(item.sharePct, 0))} budget · edge ${escapeHtml(formatPct(displayEdgeValue(item.row), 1))} · ${escapeHtml(countdownLabel(item.row.start))}</small>
+        <p>${escapeHtml(item.row.title)} · ${escapeHtml(userBetLabel(item.row))}</p>
+        <small>${escapeHtml(formatPct(item.sharePct, 0))} budget · avantage ${escapeHtml(formatPct(displayEdgeValue(item.row), 1))} · ${escapeHtml(countdownLabel(item.row.start))}</small>
       </article>
     `).join('');
   }
@@ -1991,15 +2046,15 @@
   function pickReason(row) {
     const reasons = [];
     if (row?.decisionCenter?.mainReason && !row.decisionCenter.canBet) reasons.push(row.decisionCenter.mainReason);
-    if (displayEdgeValue(row) > 0) reasons.push(`edge ${formatPct(displayEdgeValue(row), 1)}`);
-    if (Number(row?.probability) > 0) reasons.push(`proba ${formatPct(row.probability, 1)}`);
-    if (Number(row?.stake) > 0) reasons.push(`Kelly ${formatMoney(row.stake)}`);
+    if (displayEdgeValue(row) > 0) reasons.push(`avantage ${formatPct(displayEdgeValue(row), 1)}`);
+    if (Number(row?.probability) > 0) reasons.push(`fiabilité ${formatPct(row.probability, 1)}`);
+    if (Number(row?.stake) > 0) reasons.push(`mise modèle ${formatMoney(row.stake)}`);
     if (row?.contextQuality?.score != null) reasons.push(`contexte ${Math.round(Number(row.contextQuality.score))}/100`);
     if (row?.confidenceTrust?.score != null) reasons.push(`confiance ${Math.round(Number(row.confidenceTrust.score))}/100`);
     if (row?.calibration?.level && row.calibration.level !== 'unknown') {
       reasons.push(`${calibrationLevelLabel(row.calibration.level).toLowerCase()} ${formatCount(row.calibration.sample || 0)}`);
     }
-    if (row?.calibration?.edgeBucket?.level === 'warm') reasons.push('edge bucket chaud');
+    if (row?.calibration?.edgeBucket?.level === 'warm') reasons.push('historique favorable');
     if (row?.marketTiming?.tone === 'cold') reasons.push('marché à surveiller');
     if (row?.marketTiming?.tone === 'warm') reasons.push('CLV favorable');
     if (row?.stakeAdjustment?.applied) reasons.push(`mise réduite x${Number(row.stakeAdjustment.factor || 1).toFixed(2)}`);
@@ -2146,7 +2201,7 @@
   function pickNarrative(row, signalPreview, fallback) {
     const parts = [];
     const context = row?.contextQuality?.score ?? row?.match?.context?.quality?.score;
-    parts.push(`${row.market || 'Marché'} : ${row.label || 'pick'} ${formatOdd(row.odd)} avec ${formatPct(displayEdgeValue(row), 1)} d'edge prudent.`);
+    parts.push(`PARI : ${userBetLabel(row)}. Cote ${formatOdd(row.odd)} sur Winamax, mise suggérée ${visibleStakeText(row)}.`);
     if (Number.isFinite(Number(context))) {
       parts.push(`Le contexte est noté ${Math.round(Number(context))}/100, donc la mise reste proportionnée à la qualité réelle des signaux.`);
     }
@@ -2178,6 +2233,68 @@
     if (key === 'yes') return 'Oui';
     if (key === 'no') return 'Non';
     return compact || fallback;
+  }
+
+  function simpleMarketLabelForRow(row) {
+    const group = rowMarketPreferenceKey(row);
+    const labels = {
+      winner: 'Vainqueur du match',
+      goals: 'Plus / Moins de buts',
+      btts: 'Les deux équipes marquent',
+      scorer: 'Buteur',
+      halftime: 'Mi-temps vainqueur'
+    };
+    return labels[group] || formatMarketName(row?.marketKey || row?.market || '');
+  }
+
+  function cleanActionLabel(value) {
+    return cleanLabel(value, '').replace(/\s+/g, ' ').trim();
+  }
+
+  function userBetLabel(row) {
+    const label = cleanActionLabel(row?.label || '');
+    const group = rowMarketPreferenceKey(row);
+    if (group === 'winner') {
+      if (/^(nul|match nul)$/i.test(label)) return 'Match nul';
+      return label || 'Vainqueur du match';
+    }
+    if (group === 'goals') return label || 'Plus / Moins de buts';
+    if (group === 'btts') {
+      if (/^(oui|yes)$/i.test(label)) return 'Les deux équipes marquent';
+      if (/^(non|no)$/i.test(label)) return 'Les deux équipes ne marquent pas';
+      return label || 'Les deux équipes marquent';
+    }
+    if (group === 'scorer') return label ? `${label} marque dans le match` : 'Un joueur marque dans le match';
+    if (group === 'halftime') {
+      if (/nul|match nul/i.test(label)) return 'Match nul à la mi-temps';
+      if (/m[eè]ne|mi-temps/i.test(label)) return label;
+      return label ? `${label} mène à la mi-temps` : 'Vainqueur à la mi-temps';
+    }
+    return label || formatMarketName(row?.marketKey || row?.market || 'Pari');
+  }
+
+  function simpleWhyText(row) {
+    if (!row) return '';
+    const parts = [];
+    if (row.winamaxBoost) parts.push('cote boostée Winamax');
+    if (row.safeAssessment?.reliable) parts.push('profil fiable');
+    if (Number(row.priorityScore || 0) >= 60) parts.push('priorité haute');
+    if (Number(row.contextQuality?.score || row.match?.context?.quality?.score || 0) >= 65) parts.push('contexte solide');
+    if (!parts.length && row.priority?.reason) parts.push('bon signal modèle');
+    if (!parts.length) parts.push('cote Winamax intéressante');
+    return `Pourquoi : ${parts.slice(0, 3).join(', ')}.`;
+  }
+
+  function actionPickHtml(row, { compact = false } = {}) {
+    const stake = visibleStakeText(row);
+    return `
+      <div class="action-pick ${compact ? 'compact' : ''}">
+        <div><span>PARI</span><strong>${escapeHtml(userBetLabel(row))}</strong></div>
+        <div><span>COTE</span><strong>${escapeHtml(formatOdd(row?.odd || 0))} Winamax</strong></div>
+        <div><span>MISE</span><strong>${escapeHtml(stake)}</strong></div>
+        ${compact ? '' : `<p>${escapeHtml(simpleWhyText(row))}</p>`}
+      </div>
+    `;
   }
 
   function isUpcoming(match) {
@@ -2215,8 +2332,8 @@
     const key = String(value || '').trim();
     const normalized = key.toLowerCase().replace(/[\s_-]+/g, '');
     const labels = {
-      '1n2': '1N2',
-      'matchwinner': 'Vainqueur',
+      '1n2': 'Vainqueur du match',
+      'matchwinner': 'Vainqueur du match',
       'teamtotal': 'Total équipe',
       'basketballtotal': 'Total basket',
       'baskettotal': 'Total basket',
@@ -2225,24 +2342,24 @@
       'httotal': 'Total mi-temps',
       'htou': 'Total mi-temps',
       'halftimetotal': 'Total mi-temps',
-      'ht1n2': '1N2 mi-temps',
-      'btts': 'BTTS',
+      'ht1n2': 'Mi-temps vainqueur',
+      'btts': 'Les deux équipes marquent',
       'resultbtts': 'Résultat + BTTS',
       'doublechance': 'Double chance',
       'handicap': 'Handicap',
       'dnb': 'Remboursé si nul',
       'exactscore': 'Score exact',
-      'ou': 'Over/Under',
-      'ou15': 'O/U 1.5',
-      'ou25': 'O/U 2.5',
-      'ou35': 'O/U 3.5',
+      'ou': 'Plus / Moins',
+      'ou15': 'Plus / Moins 1,5 buts',
+      'ou25': 'Plus / Moins 2,5 buts',
+      'ou35': 'Plus / Moins 3,5 buts',
       'tennisgames': 'Jeux tennis',
       'tennissets': 'Sets tennis'
     };
     if (labels[normalized]) return labels[normalized];
     return key
       .replace(/([a-z])([A-Z])/g, '$1 $2')
-      .replace(/\bou(\d)(\d)\b/i, 'O/U $1.$2')
+      .replace(/\bou(\d)(\d)\b/i, 'Plus / Moins $1,$2')
       .replace(/\bht\b/i, 'MT')
       .trim() || 'Marché';
   }
@@ -2568,7 +2685,13 @@
   }
 
   function updatePickFilters() {
-    const pool = state.allPicks.length ? state.allPicks : state.picks;
+    const prefs = loadPreferences();
+    const marketPrefs = expandMarketPreferences(prefs.markets, { expert: Boolean(prefs.expertMode) });
+    const poolRaw = state.allPicks.length ? state.allPicks : state.picks;
+    const pool = poolRaw.filter((row) => {
+      if (!pickHasCoreData(row) || !canDisplayStake(row)) return false;
+      return !marketPrefs.groups.size || marketPrefs.groups.has(rowMarketPreferenceKey(row)) || marketPrefs.keys.has(marketKeyFromRow(row));
+    });
     const sportSelect = $('#pick-sport-filter');
     const leagueSelect = $('#pick-league-filter');
     const marketSelect = $('#pick-market-filter');
@@ -2599,8 +2722,8 @@
     if (marketSelect) {
       const current = marketSelect.value || 'all';
       const markets = Array.from(new Map(pool.map((row) => {
-        const key = marketKeyFromRow(row);
-        const label = row.market || formatMarketName(key);
+        const key = rowMarketPreferenceKey(row);
+        const label = simpleMarketLabelForRow(row);
         return [key, label];
       })).entries()).sort((a, b) => String(a[1]).localeCompare(String(b[1])));
       const html = ['<option value="all">Tous marchés</option>', ...markets.map(([key, label]) => `<option value="${escapeHtml(key)}">${escapeHtml(label)}</option>`)].join('');
@@ -2659,10 +2782,11 @@
 
   function dashboardPickRows(filters) {
     const active = pickFiltersActive(filters);
-    const base = active && state.allPicks.length ? state.allPicks : state.picks;
     const prefs = loadPreferences();
+    const marketPrefs = expandMarketPreferences(prefs.markets, { expert: Boolean(prefs.expertMode) });
+    const advancedSelected = Boolean(prefs.expertMode) && (prefs.markets || []).some((key) => !isSimpleMarketPreference(key));
+    const base = (active || advancedSelected) && state.allPicks.length ? state.allPicks : state.picks;
     const allowedSports = new Set((prefs.sports || []).map((item) => String(item).toLowerCase()));
-    const allowedMarkets = new Set((prefs.markets || []).map(normalizeUiKey));
     const prefEdgeMin = Math.max(0, Number(prefs.edgeMin || 0) / 100);
     const prefOddMin = Math.max(0, Number(prefs.oddMin || 0));
     const prefOddMax = Math.max(0, Number(prefs.oddMax || 0));
@@ -2671,7 +2795,7 @@
       if (!pickHasCoreData(row)) return false;
       if (!canDisplayStake(row)) return false;
       if (allowedSports.size && !allowedSports.has(String(row.sport || '').toLowerCase())) return false;
-      if (allowedMarkets.size && !allowedMarkets.has(marketKeyFromRow(row))) return false;
+      if (marketPrefs.groups.size && !marketPrefs.groups.has(rowMarketPreferenceKey(row)) && !marketPrefs.keys.has(marketKeyFromRow(row))) return false;
       if (prefEdgeMin && displayEdgeValue(row) < prefEdgeMin) return false;
       if (prefOddMin > 1 && Number(row.odd || 0) < prefOddMin) return false;
       if (prefOddMax > 1 && Number(row.odd || 0) > prefOddMax) return false;
@@ -2686,7 +2810,7 @@
       if (filters.query && !pickSearchText(row).includes(filters.query)) return false;
       if (filters.sport !== 'all' && row.sport !== filters.sport) return false;
       if (filters.league !== 'all' && leagueKeyFromRow(row) !== filters.league) return false;
-      if (filters.market !== 'all' && marketKeyFromRow(row) !== filters.market) return false;
+      if (filters.market !== 'all' && rowMarketPreferenceKey(row) !== filters.market && marketKeyFromRow(row) !== filters.market) return false;
       if (filters.edgeMin && displayEdgeValue(row) < filters.edgeMin) return false;
       if (filters.oddMin && Number(row.odd || 0) < filters.oddMin) return false;
       if (state.calendarDayFilter && pickDayKey(row) !== state.calendarDayFilter) return false;
@@ -2710,10 +2834,10 @@
     const byMarket = new Map();
     sourceRows.forEach((row) => {
       if (!pickHasCoreData(row) || !canDisplayStake(row)) return;
-      const key = marketKeyFromRow(row);
+      const key = rowMarketPreferenceKey(row);
       const bucket = byMarket.get(key) || {
         key,
-        label: row.market || formatMarketName(key),
+        label: simpleMarketLabelForRow(row),
         count: 0,
         edge: 0,
         bestOdd: 0
@@ -2734,7 +2858,7 @@
       <button class="market-chip" type="button" data-market-chip="${escapeHtml(item.key)}">
         <span>${escapeHtml(item.label)}</span>
         <strong>${formatCount(item.count)}</strong>
-        <em>edge moy. ${escapeHtml(formatPct(item.edge / Math.max(1, item.count), 1))} · max ${escapeHtml(formatOdd(item.bestOdd))}</em>
+        <em>cote max ${escapeHtml(formatOdd(item.bestOdd))}</em>
       </button>
     `).join('');
   }
@@ -2947,7 +3071,7 @@
     writeNotifiedPickKeys(notified);
     notifyUser(
       'Gros pick proche',
-      `${bigPick.title} · ${bigPick.label} ${formatOdd(bigPick.odd)} · edge ${formatPct(displayEdgeValue(bigPick), 1)}`,
+      `${bigPick.title} · ${userBetLabel(bigPick)} ${formatOdd(bigPick.odd)} · mise ${visibleStakeText(bigPick)}`,
       bigPick
     );
   }
@@ -3024,15 +3148,8 @@
   }
 
   function ultimateBetReason(row) {
-    if (!row) return 'Aucun pick ne réunit edge ≥ 7pt, confiance ≥ 65%, segment positif et départ dans les 24h.';
-    const prefix = row.priority?.reason ? `Pourquoi #1 ? ${row.priority.reason}. ` : 'Pourquoi #1 ? ';
-    const bits = [
-      `${formatPct(displayEdgeValue(row), 1)} d’edge`,
-      `${formatPct(safeConfidenceValue(row), 0)} confiance`,
-      `${formatOdd(row.odd)} Winamax`,
-      countdownLabel(row.start)
-    ];
-    return `${prefix}${row.market} · ${row.label} : ${bits.join(' · ')}. ${pickReason(row).replace(/^Pourquoi\s*:\s*/i, '')}`;
+    if (!row) return 'Aucun pari simple ne réunit assez de signaux pour devenir le pari principal.';
+    return `Pourquoi #1 ? ${userBetLabel(row)} à ${formatOdd(row.odd)} sur Winamax, départ ${countdownLabel(row.start)}. ${simpleWhyText(row).replace(/^Pourquoi\s*:\s*/i, '')}`;
   }
 
   function renderUltimateBet(rows) {
@@ -3056,15 +3173,12 @@
       <div class="ultimate-copy">
         <span class="eyebrow">Bet ultime du jour</span>
         <h3>${escapeHtml(row.title)}</h3>
+        ${actionPickHtml(row)}
         <p>${escapeHtml(aiReason || ultimateBetReason(row))}</p>
         <div class="ultimate-tags">
           ${priorityBadgeHtml(row)}
-          <span>${escapeHtml(row.market)}</span>
-          <span>${escapeHtml(row.label)}</span>
-          <span>${escapeHtml(formatOdd(row.odd))}</span>
-          <span title="${escapeHtml(allocationLongText(row))}">mise ${escapeHtml(visibleStakeText(row))}</span>
+          <span>${escapeHtml(simpleMarketLabelForRow(row))}</span>
           ${safeBadgeHtml(row)}
-          ${betTypeBadgeHtml(row)}
           ${boostBadgeHtml(row)}
           ${enrichmentBadgeHtml(row)}
         </div>
@@ -3074,7 +3188,7 @@
         <span>${escapeHtml(formatDateLabel(row.start))}</span>
         <button type="button" class="ghost-btn focus-mode-btn" data-focus-pick-key="${escapeHtml(userBetKey(row))}">Mode focus</button>
         ${winamaxOpenButtonHtml(row, 'Ouvrir Winamax')}
-        ${trackButtonHtml(row, 'Je mise ce bet')}
+        ${trackButtonHtml(row, `Je mise ${visibleStakeText(row)}`)}
       </div>
     `;
   }
@@ -3108,23 +3222,19 @@
         </div>
         <div class="time-pick-meta">
           ${priorityBadgeHtml(row)}
-          <span>${escapeHtml(row.market)}</span>
-          <span>${escapeHtml(row.label)}</span>
-          <span>${escapeHtml(formatOdd(row.odd))}</span>
-          <span>edge ${escapeHtml(formatPct(displayEdgeValue(row), 1))}</span>
-          <span>conf. ${escapeHtml(formatPct(safeConfidenceValue(row), 0))}</span>
+          <span>${escapeHtml(simpleMarketLabelForRow(row))}</span>
           <span title="${escapeHtml(allocationLongText(row))}">${escapeHtml(allocationSummaryText(row))}</span>
           <span>${escapeHtml(countdownLabel(row.start))}</span>
           ${safeBadgeHtml(row)}
-          ${betTypeBadgeHtml(row)}
           ${boostBadgeHtml(row)}
           ${enrichmentBadgeHtml(row)}
         </div>
-        <p>${escapeHtml(`${row.priority?.reason || pickReason(row).replace(/^Pourquoi\s*:\s*/i, '')}`)}</p>
+        ${actionPickHtml(row, { compact: true })}
+        <p>${escapeHtml(simpleWhyText(row))}</p>
         <div class="time-pick-action">
           <button type="button" class="ghost-btn focus-mode-btn" data-focus-pick-key="${escapeHtml(userBetKey(row))}">Mode focus</button>
           ${winamaxOpenButtonHtml(row)}
-          ${trackButtonHtml(row)}
+          ${trackButtonHtml(row, `Je mise ${visibleStakeText(row)}`)}
         </div>
       </article>
     `;
@@ -3355,9 +3465,9 @@
     if (!nums) return 'Verdict provisoire : score non disponible';
     const total = Number(nums[1]) + Number(nums[2]);
     if (text.includes('over') || text.includes('plus') || text.includes('ou')) {
-      return total >= 3 ? 'Pick provisoirement gagnant' : 'Encore besoin de buts/points';
+      return total >= 3 ? 'Pari provisoirement gagnant' : 'Encore besoin de buts/points';
     }
-    if (text.includes('under') || text.includes('moins')) return total < 3 ? 'Pick provisoirement gagnant' : 'Pick sous pression';
+    if (text.includes('under') || text.includes('moins')) return total < 3 ? 'Pari provisoirement gagnant' : 'Pari sous pression';
     return 'Suivi live actif';
   }
 
@@ -3400,9 +3510,9 @@
             <article class="live-card live-${escapeHtml(insight.tone)} clickable-row" data-match-id="${escapeHtml(row.id)}" tabindex="0" role="button">
               <span>${escapeHtml(live.status)} · ${escapeHtml(String(live.minute || '-'))} · <em class="live-insight-badge ${escapeHtml(insight.tone)}">${escapeHtml(insight.label)}</em></span>
               <strong>${escapeHtml(row.title)} <em>${escapeHtml(live.score)}</em></strong>
-              <p>${escapeHtml(row.market)} · ${escapeHtml(row.label)} · ${escapeHtml(insight.detail)}</p>
+              <p>${escapeHtml(userBetLabel(row))} · ${escapeHtml(insight.detail)}</p>
               <div class="time-pick-action">
-                <span class="pill">${tracked ? 'pari suivi' : 'pick modèle'}</span>
+                <span class="pill">${tracked ? 'pari suivi' : 'pari modèle'}</span>
                 <button class="ghost-btn" type="button" data-live-note-key="${escapeHtml(userBetKey(row))}" data-live-note="${escapeHtml(insight.detail)}">Note rapide</button>
                 ${cashUrl ? `<a class="ghost-btn" href="${escapeHtml(cashUrl)}" target="_blank" rel="noreferrer">Cash-out / Winamax</a>` : ''}
               </div>
@@ -3492,6 +3602,7 @@
   }
 
   async function runBackgroundAi(rows) {
+    if (navigator.webdriver) return;
     const topRows = (Array.isArray(rows) ? rows : [])
       .filter((row) => pickHasCoreData(row) && canDisplayStake(row))
       .slice()
@@ -3552,7 +3663,7 @@
       const status = displayed24h >= 8 ? 'warn' : 'danger';
       node.className = `today-funnel-alert ${status}`;
       node.innerHTML = `
-        <strong>${displayed24h ? `${formatCount(displayed24h)} pick(s) sur 24h glissantes` : 'Aucun pick sur 24h glissantes'}</strong>
+        <strong>${displayed24h ? `${formatCount(displayed24h)} pari(s) simples sur 24h glissantes` : 'Aucun pari simple sur 24h glissantes'}</strong>
         <span>Funnel 24h : ${formatCount(coverage.events || 0)} matchs → ${formatCount(coverage.bookable || 0)} Winamax → ${formatCount(coverage.positive || 0)} positifs → ${formatCount(ready24h)} prêts · ${formatCount(nightDisplayed)} cette nuit.</span>
         <button class="ghost-btn" type="button" data-tab-target="data">Diagnostic auto</button>
       `;
@@ -3570,7 +3681,7 @@
     node.classList.toggle('hidden', status === 'ok' && displayed >= 5);
     node.className = `today-funnel-alert ${status === 'danger' ? 'danger' : 'warn'}${status === 'ok' && displayed >= 5 ? ' hidden' : ''}`;
     node.innerHTML = `
-      <strong>${displayed ? `${formatCount(displayed)} pick(s) aujourd'hui visibles` : 'Aucun pick aujourd’hui visible'}</strong>
+      <strong>${displayed ? `${formatCount(displayed)} pari(s) aujourd'hui visibles` : 'Aucun pari aujourd’hui visible'}</strong>
       <span>Funnel : ${formatCount(today.totalEvents || today.events || 0)} matchs → ${formatCount(today.bookableEvents || today.bookable || 0)} Winamax → ${formatCount(today.predictableMatches || today.predictable || 0)} analysables → ${formatCount(today.passingFilters || 0)} positifs → ${formatCount(ready)} prêts.</span>
       <button class="ghost-btn" type="button" data-tab-target="data">Diagnostic auto</button>
     `;
@@ -3585,15 +3696,15 @@
       .sort((a, b) => Date.parse(a.start || '') - Date.parse(b.start || '') || displayEdgeValue(b) - displayEdgeValue(a))
       .slice(0, 14);
     if (!upcoming.length) {
-      node.innerHTML = '<div class="empty compact-empty">Aucun pick à afficher dans la timeline.</div>';
+      node.innerHTML = '<div class="empty compact-empty">Aucun pari à afficher dans la timeline.</div>';
       return;
     }
     node.innerHTML = upcoming.map((row) => `
       <article class="simple-timeline-card clickable-row" data-match-id="${escapeHtml(row.id)}" tabindex="0" role="button">
         <span>${escapeHtml(countdownLabel(row.start))}</span>
         <strong>${escapeHtml(row.title)}</strong>
-        <em>${escapeHtml(`${row.market} · ${row.label}`)}</em>
-        <small>${escapeHtml(row.priorityRank && row.priorityRank <= 5 ? `#${row.priorityRank} · ` : '')}${escapeHtml(formatOdd(row.odd))} · edge ${escapeHtml(formatPct(displayEdgeValue(row), 1))} · ${escapeHtml(row.safeAssessment?.label || row.winamaxBetType?.label || 'Single')}</small>
+        <em>${escapeHtml(userBetLabel(row))}</em>
+        <small>${escapeHtml(row.priorityRank && row.priorityRank <= 5 ? `#${row.priorityRank} · ` : '')}${escapeHtml(formatOdd(row.odd))} Winamax · mise ${escapeHtml(visibleStakeText(row))}</small>
       </article>
     `).join('');
   }
@@ -3621,9 +3732,9 @@
         <article class="simple-inline-card clickable-row" data-match-id="${escapeHtml(scorer.id || scorer.matchId || '')}">
           <strong>${escapeHtml(scorer.name || scorer.player || 'Joueur')}</strong>
           <span>${escapeHtml(scorer.title || scorer.match || '-')} · ${escapeHtml(formatOdd(scorer.odd || scorer.impliedOdd || 0))}</span>
-          <em>${escapeHtml(`Confiance ${formatPct(scorer.confidence || scorer.probability || 0, 0)} · edge ${formatPct(scorer.edge || 0, 1)}`)}</em>
+          <em>${escapeHtml(`Fiabilité ${formatPct(scorer.confidence || scorer.probability || 0, 0)} · pari : ${scorer.name || scorer.player || 'joueur'} marque`)}</em>
         </article>
-      `).join('') : '<div class="empty compact-empty">Aucun pick joueur aujourd’hui.</div>';
+    `).join('') : '<div class="empty compact-empty">Aucun pari joueur aujourd’hui.</div>';
     }
     renderWinamaxPromos();
   }
@@ -3732,9 +3843,9 @@
     $('#metric-picks').textContent = String(ready > 0 ? ready : (meta.todayPicks || state.picks.length || 0));
     const globalBlocked = Boolean(state.decisionCenter?.summary?.blocked);
     const caption = pickFiltersActive(filters)
-      ? `${formatCount(displayRows.length)} pick(s) filtré(s) sur ${formatCount(total)} lignes prêtes.`
+      ? `${formatCount(displayRows.length)} pari(s) filtré(s) sur ${formatCount(total)} lignes prêtes.`
       : ready > 0
-        ? `${formatCount(ready)} pick(s) prêt(s), ${formatCount(meta.rolling24Displayed || displayRows.length)} sur 24h glissantes.`
+        ? `${formatCount(ready)} pari(s) prêt(s), ${formatCount(meta.rolling24Displayed || displayRows.length)} sur 24h glissantes.`
         : meta.mode === 'bestAvailable'
           ? 'Aucun pari prêt dans la fenêtre courte : affichage des meilleurs candidats à surveiller.'
           : 'Aucun pari à jouer maintenant : candidats surveillés sans mise.';
@@ -3742,22 +3853,20 @@
     if (sectionTitle) sectionTitle.textContent = ready > 0 ? 'À jouer maintenant' : 'Sélection surveillée';
     $('#picks-caption').textContent = caption;
     $('#metric-picks-sub').textContent = total > state.picks.length
-      ? `${state.picks.length} affichés · ${total} picks positifs au total`
+      ? `${state.picks.length} affichés · ${total} paris analysés au total`
       : globalBlocked
         ? '0 mise tant qu’un gate est rouge'
         : `${formatCount(meta.rolling24Displayed || ready)} sur 24h · ${formatCount(state.coverage24h?.summary?.nightDisplayed || 0)} nuit`;
     if (!displayRows.length) {
-      body.innerHTML = `<tr><td colspan="8" class="empty">${escapeHtml(emptyMessage || 'Aucun pick jouable avec les règles actuelles.')}</td></tr>`;
+      body.innerHTML = `<tr><td colspan="7" class="empty">${escapeHtml(emptyMessage || 'Aucun pari simple avec les règles actuelles.')}</td></tr>`;
       markFirstPickVisible(0);
       return;
     }
     body.innerHTML = displayRows.map((pick) => {
       const startLabel = `${formatDateLabel(pick.start)} · ${countdownLabel(pick.start)}`;
-      const displayEdge = displayEdgeValue(pick);
-      const edgeClass = displayEdge >= 0.08 ? 'edge-pos' : 'edge-warn';
       const decision = pick.decisionCenter || {};
       const statusText = decision.canBet ? 'Prêt' : decision.status === 'repair' ? 'À réparer' : decision.status === 'skip' ? 'À éviter' : 'À surveiller';
-      const action = trackButtonHtml(pick, 'Je mise');
+      const action = trackButtonHtml(pick, `Je mise ${visibleStakeText(pick)}`);
       const winamaxAction = winamaxOpenButtonHtml(pick, 'Winamax');
       return `
         <tr class="clickable-row" data-match-id="${escapeHtml(pick.id)}" tabindex="0" role="button" aria-label="Ouvrir ${escapeHtml(pick.title)}">
@@ -3765,12 +3874,11 @@
             <div class="match-title">${escapeHtml(pick.title)}</div>
             <div class="match-sub">${escapeHtml(pick.sport)} · ${escapeHtml(pick.league)}</div>
           </td>
-          <td data-label="Marché"><span class="pill">${escapeHtml(statusText)}</span> ${priorityBadgeHtml(pick)} <span class="pill">${escapeHtml(pick.market)}</span>${safeBadgeHtml(pick)}${betTypeBadgeHtml(pick)}${boostBadgeHtml(pick)}<div class="match-sub">${escapeHtml(pick.label)}</div><div class="match-sub selection-reason">${escapeHtml(pick.priority?.reason || pickReason(pick))}</div>${calibrationNote(pick)}${segmentValidationHtml(pick)}</td>
+          <td data-label="Pari"><span class="pill">${escapeHtml(statusText)}</span> ${priorityBadgeHtml(pick)} <span class="pill">${escapeHtml(simpleMarketLabelForRow(pick))}</span>${safeBadgeHtml(pick)}${boostBadgeHtml(pick)}${enrichmentBadgeHtml(pick)}${actionPickHtml(pick, { compact: true })}</td>
           <td data-label="Cote">@${pick.odd.toFixed(2)}</td>
-          <td data-label="Proba">${formatPct(pick.probability, 1)}${adjustedConfidenceHtml(pick)}</td>
-          <td data-label="Edge" class="${edgeClass}">${edgeDisplayHtml(pick)}</td>
           <td data-label="Mise">${visibleStakeText(pick)}<div class="match-sub">${escapeHtml(allocationSummaryText(pick))}</div></td>
           <td data-label="Départ">${escapeHtml(startLabel)}</td>
+          <td data-label="Pourquoi"><div class="selection-reason">${escapeHtml(simpleWhyText(pick))}</div></td>
           <td data-label="Action">${winamaxAction}${action}</td>
         </tr>`;
     }).join('');
@@ -3797,11 +3905,11 @@
     const target = $('#today-model-pulse');
     if (!target) return;
     target.innerHTML = [
-      ['Picks affichés', formatCount(pulse.rows.length), 'Sélection visible après préférences.'],
-      ['Segments verts', formatCount(pulse.profitable.length), 'Historique ou edge robuste.'],
-      ['Segments rouges', formatCount(pulse.risky.length), 'À surveiller ou à éviter.'],
-      ['Edge moyen jour', formatPct(pulse.avgEdge, 1), `Moyenne globale ${formatPct(pulse.avgAllEdge, 1)}.`],
-      ['Qualité du jour', pulse.level, 'Lecture rapide de la journée de signaux.']
+      ['Paris affichés', formatCount(pulse.rows.length), 'Sélection visible après préférences.'],
+      ['Zones favorables', formatCount(pulse.profitable.length), 'Historique ou avantage robuste.'],
+      ['Zones à éviter', formatCount(pulse.risky.length), 'À surveiller ou à éviter.'],
+      ['Avantage moyen', formatPct(pulse.avgEdge, 1), `Moyenne globale ${formatPct(pulse.avgAllEdge, 1)}.`],
+      ['Qualité du jour', pulse.level, 'Lecture rapide de la journée.']
     ].map(([label, value, detail]) => `
       <article class="morning-card">
         <span>${escapeHtml(label)}</span>
@@ -3853,7 +3961,7 @@
         <button class="calendar-day ${density} ${selected === day.key ? 'active' : ''}" type="button" data-calendar-day="${escapeHtml(day.key)}">
           <span>${escapeHtml(formatDayKey(day.date.toISOString()))}</span>
           <strong>${formatCount(day.count)}</strong>
-          <small>${formatCount(day.big)} gros · edge moy. ${escapeHtml(formatPct(day.avgEdge, 1))}</small>
+          <small>${formatCount(day.big)} forts · avantage moy. ${escapeHtml(formatPct(day.avgEdge, 1))}</small>
         </button>
       `;
     }).join('');
@@ -3861,14 +3969,14 @@
     const title = $('#calendar-day-title');
     const caption = $('#calendar-day-caption');
     if (title) title.textContent = day ? `Timeline ${formatDayKey(day.date.toISOString())}` : 'Timeline';
-    if (caption) caption.textContent = day?.count ? `${formatCount(day.count)} pick(s), triés par coup d'envoi.` : 'Aucun pick prêt ce jour-là.';
+    if (caption) caption.textContent = day?.count ? `${formatCount(day.count)} pari(s), triés par coup d'envoi.` : 'Aucun pari prêt ce jour-là.';
     timeline.innerHTML = day?.rows.length ? day.rows.slice(0, 40).map((row) => `
       <button class="timeline-row" type="button" data-match-id="${escapeHtml(row.id)}">
         <span>${escapeHtml(new Date(row.start).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }))}</span>
         <strong>${escapeHtml(row.title)}</strong>
-        <em>${escapeHtml(row.market)} · ${escapeHtml(row.label)} · ${escapeHtml(formatOdd(row.odd))} · edge ${escapeHtml(formatPct(displayEdgeValue(row), 1))}</em>
+        <em>${escapeHtml(userBetLabel(row))} · ${escapeHtml(formatOdd(row.odd))} · mise ${escapeHtml(visibleStakeText(row))}</em>
       </button>
-    `).join('') : '<div class="empty">Aucun pick prêt sur cette journée.</div>';
+    `).join('') : '<div class="empty">Aucun pari prêt sur cette journée.</div>';
   }
 
   function glossaryRows() {
@@ -6025,7 +6133,12 @@
     const marketsGrid = $('#pref-markets');
     if (marketsGrid) {
       const active = new Set((prefs.markets || []).map(normalizeUiKey));
-      marketsGrid.innerHTML = MARKET_PREFS.map((market) => checkboxHtml('pref-market', market.key, market.label, active.has(market.key))).join('');
+      marketsGrid.innerHTML = SIMPLE_MARKET_PREFS.map((market) => checkboxHtml('pref-market', market.key, market.label, active.has(normalizeUiKey(market.key)))).join('');
+    }
+    const advancedMarketsGrid = $('#pref-advanced-markets');
+    if (advancedMarketsGrid) {
+      const active = new Set((prefs.markets || []).map(normalizeUiKey));
+      advancedMarketsGrid.innerHTML = ADVANCED_MARKET_PREFS.map((market) => checkboxHtml('pref-market', market.key, market.label, active.has(normalizeUiKey(market.key)))).join('');
     }
     const fields = {
       'pref-edge-min': prefs.edgeMin,
@@ -6106,11 +6219,14 @@
   function collectPreferencesFromForm() {
     const selectedSports = $$('input[name="pref-sport"]:checked').map((node) => node.value);
     const selectedMarkets = $$('input[name="pref-market"]:checked').map((node) => node.value);
+    const expertMode = Boolean($('#pref-expert-mode')?.checked);
+    const simpleSelected = selectedMarkets.filter(isSimpleMarketPreference);
+    const expertSelected = expertMode ? selectedMarkets.filter((key) => !isSimpleMarketPreference(key)) : [];
     return {
       bankroll: Math.max(10, Number($('#pref-bankroll')?.value || 50) || 50),
       level: $('#pref-level')?.value || 'intermediate',
       sports: selectedSports.length ? selectedSports : SPORTS_PREFS,
-      markets: selectedMarkets.length ? selectedMarkets : MARKET_PREFS.map((item) => item.key),
+      markets: [...(simpleSelected.length ? simpleSelected : DEFAULT_PREFERENCES.markets), ...expertSelected],
       edgeMin: Math.max(0, Number($('#pref-edge-min')?.value || 0) || 0),
       oddMin: Math.max(1, Number($('#pref-odd-min')?.value || 1) || 1),
       oddMax: Math.max(1, Number($('#pref-odd-max')?.value || 50) || 50),
@@ -6141,7 +6257,7 @@
       webEnrichmentEnabled: $('#pref-web-enrichment-enabled')?.checked !== false,
       webEnrichmentCacheMinutes: Math.max(15, Number($('#pref-web-enrichment-cache')?.value || DEFAULT_PREFERENCES.webEnrichmentCacheMinutes) || DEFAULT_PREFERENCES.webEnrichmentCacheMinutes),
       webEnrichmentRateLimit: Math.max(1, Math.min(10, Number($('#pref-web-enrichment-rate')?.value || DEFAULT_PREFERENCES.webEnrichmentRateLimit) || DEFAULT_PREFERENCES.webEnrichmentRateLimit)),
-      expertMode: Boolean($('#pref-expert-mode')?.checked),
+      expertMode,
       autoUpdateEnabled: $('#pref-auto-update-enabled')?.checked !== false,
       updateChannel: $('#pref-update-channel')?.value || DEFAULT_PREFERENCES.updateChannel,
       strict: Boolean($('#pref-strict')?.checked)
@@ -6928,6 +7044,12 @@
     }
     const rows = Array.isArray(enrichment.sources) ? enrichment.sources : [];
     const validations = Array.isArray(enrichment.validations) ? enrichment.validations : [];
+    const validationDetail = (item) => {
+      const label = String(item?.label || '');
+      const detail = item?.detail || '-';
+      if (/march/i.test(label) || /^1n2$/i.test(String(detail))) return simpleMarketLabelForRow(row);
+      return detail;
+    };
     return `
       <article class="detail-card wide enriched-sources-card">
         <h4>Sources enrichies ${enrichmentBadgeHtml(row)}</h4>
@@ -6937,7 +7059,7 @@
             <div class="market-row">
               <span>${escapeHtml(item.label || 'validation')}</span>
               <strong>${escapeHtml(item.status || 'ok')}</strong>
-              <em>${escapeHtml(item.detail || '-')}</em>
+              <em>${escapeHtml(validationDetail(item))}</em>
             </div>
           `).join('')}
           ${rows.map((source) => `
@@ -7297,32 +7419,32 @@
       <section class="detail-tab-panel active" data-detail-panel="summary">
         <div class="match-sheet-summary">
           <article class="match-decision-hero decision-${escapeHtml(decisionTone)}">
-            <span>Décision</span>
+            <span>Pari suggéré</span>
             <strong>${escapeHtml(stakeAllowed ? 'Je peux miser' : 'Ne pas miser maintenant')}</strong>
-            <p>${escapeHtml(readableReason)}</p>
+            ${actionPickHtml(row)}
+            <p>${escapeHtml(simpleWhyText(row))}</p>
             <div class="ultimate-tags detail-priority-strip">
               ${priorityBadgeHtml(row)}
               ${safeBadgeHtml(row)}
               <span title="${escapeHtml(allocationLongText(row))}">${escapeHtml(allocationSummaryText(row))}</span>
             </div>
             <div class="decision-hero-grid">
+              <div><span>Pari</span><strong>${escapeHtml(userBetLabel(row))}</strong></div>
               <div><span>Cote</span><strong>${escapeHtml(row.odd > 1 ? `@${row.odd.toFixed(2)}` : '-')}</strong></div>
-              <div><span>Edge</span><strong>${escapeHtml(displayEdgeValue(row) > 0 ? formatPct(displayEdgeValue(row), 1) : '-')}</strong></div>
               <div><span>Mise</span><strong>${escapeHtml(visibleStakeText(row, decisionBundle))}</strong></div>
-              <div><span>Contexte</span><strong>${escapeHtml(contextScoreLabel(contextQuality))}</strong></div>
+              <div><span>Départ</span><strong>${escapeHtml(countdownLabel(row.start))}</strong></div>
             </div>
           </article>
           <article class="match-ticket-card">
-            <h4>Ticket</h4>
+            <h4>À jouer</h4>
             <div class="kv">
-              <span>Pick</span><strong>${escapeHtml(row.label || '-')}</strong>
-              <span>Marché</span><strong>${escapeHtml(row.market || '-')}</strong>
-              <span>Cote modèle</span><strong>${escapeHtml(fairOdd > 1 ? `@${fairOdd.toFixed(2)}` : '-')}</strong>
-              <span>Cote Winamax</span><strong>${escapeHtml(row.odd > 1 ? `${formatOdd(row.odd)} · actionnable` : 'Non disponible')}</strong>
-              <span>Type Winamax</span><strong>${escapeHtml(row.winamaxBetType?.label || 'Single Winamax')}</strong>
+              <span>PARI</span><strong>${escapeHtml(userBetLabel(row))}</strong>
+              <span>COTE</span><strong>${escapeHtml(row.odd > 1 ? `${formatOdd(row.odd)} Winamax` : 'Non disponible')}</strong>
+              <span>MISE</span><strong>${escapeHtml(visibleStakeText(row, decisionBundle))}</strong>
+              <span>Marché</span><strong>${escapeHtml(simpleMarketLabelForRow(row))}</strong>
               <span>Boost Winamax</span><strong>${escapeHtml(row.winamaxBoost ? (row.winamaxBoost.to ? `${row.winamaxBoost.from ? `${Number(row.winamaxBoost.from).toFixed(2)} → ` : ''}${Number(row.winamaxBoost.to).toFixed(2)}` : 'détecté') : 'Aucun')}</strong>
               <span>Action</span><strong>${escapeHtml(readableAction)}</strong>
-              <span>Bookmaker</span><strong>${winamaxLink}</strong>
+              <span>Winamax</span><strong>${winamaxLink}</strong>
             </div>
           </article>
         </div>
@@ -7341,15 +7463,14 @@
         </article>
         <div class="modal-grid sheet-grid">
           <article class="detail-card">
-            <h4>Pourquoi ce pick</h4>
+            <h4>Pourquoi ce pari</h4>
             <p class="detail-text">${escapeHtml(narrative)}</p>
             ${formStripHtml(match)}
             <div class="mini-kpi-row">
-              <span>Proba ${escapeHtml(row.probability > 0 ? formatPct(row.probability, 1) : '-')}</span>
-              <span>Confiance ajustée ${escapeHtml(formatPct(realConfidenceValue(row), 0))}</span>
+              <span>Fiabilité ${escapeHtml(formatPct(realConfidenceValue(row), 0))}</span>
+              <span>Marché simple</span>
               <span>${escapeHtml(sourceLine)}</span>
             </div>
-            <p class="detail-text validation-detail">${escapeHtml(segmentValidation.label || 'Sample insuffisant pour validation rétrospective')}</p>
           </article>
           <article class="detail-card">
             <h4>Contexte utile</h4>

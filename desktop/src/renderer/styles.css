@@ -3209,6 +3209,58 @@ td.empty::before,
   background: linear-gradient(135deg, rgba(16, 185, 129, .18), rgba(250, 204, 21, .10)) !important;
 }
 
+.action-pick {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 12px 0;
+  padding: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.44);
+}
+
+.action-pick.compact {
+  grid-template-columns: 1fr;
+  gap: 4px;
+  margin: 8px 0 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.action-pick div {
+  min-width: 0;
+}
+
+.action-pick span {
+  display: block;
+  margin-bottom: 3px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .04em;
+}
+
+.action-pick strong {
+  display: block;
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.action-pick.compact strong {
+  font-size: 14px;
+}
+
+.action-pick p {
+  grid-column: 1 / -1;
+  margin: 2px 0 0;
+  color: var(--text-dim);
+  line-height: 1.45;
+}
+
 .ultimate-side {
   display: flex;
   flex-direction: column;

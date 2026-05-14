@@ -636,6 +636,21 @@ function createLegacyEngineService({ projectRoot }) {
       .trim() || 'Marché';
   }
 
+  function simpleMarketGroup(value) {
+    const key = calibrationUtils.normalizeMarketKey(value || '');
+    const compact = String(key || value || '').toLowerCase().replace(/[^a-z0-9]+/g, '');
+    if (/^(1n2|vainqueur|matchwinner|winner|moneyline)$/.test(compact)) return 'winner';
+    if (/^(ou|ou15|ou25|ou35|overunder|totalgoals)$/.test(compact)) return 'goals';
+    if (/^(btts|les2equipes|bothteamstoscore)$/.test(compact)) return 'btts';
+    if (/^(scorer|buteur|playergoal|goalscorer)$/.test(compact)) return 'scorer';
+    if (/^(ht1n2|ht_1n2|halftime1n2|mitempsvainqueur)$/.test(compact)) return 'halftime';
+    return '';
+  }
+
+  function isSimpleUserMarket(row) {
+    return Boolean(simpleMarketGroup(row?.marketKey || row?.market));
+  }
+
   function normalizePickLabel(match, market, value, fallback = 'Pick') {
     const raw = cleanLabel(value, fallback);
     const compact = raw.trim();
@@ -2305,7 +2320,10 @@ function createLegacyEngineService({ projectRoot }) {
     const todayKey = dayKeyParis(new Date());
     const maxPerMatch = 2;
     const maxPerHourSlot = 3;
-    const rolling24 = rollingWindowRows(picks, 24);
+    const maxDashboardRows = 18;
+    const simplePicks = (Array.isArray(picks) ? picks : []).filter(isSimpleUserMarket);
+    const sourcePicks = simplePicks.length ? simplePicks : [];
+    const rolling24 = rollingWindowRows(sourcePicks, 24);
     const target24 = rolling24.length >= 18 ? 18 : rolling24.length >= 12 ? 12 : Math.min(8, rolling24.length);
     const rank = (pick) => [
       pick?.decisionCenter?.canBet ? 1 : 0,
@@ -2328,11 +2346,11 @@ function createLegacyEngineService({ projectRoot }) {
       if (timeDelta) return timeDelta;
       return sortRows([a, b])[0] === b ? 1 : -1;
     });
-    const nearTerm = picks.filter((pick) => {
+    const nearTerm = sourcePicks.filter((pick) => {
       const ts = Date.parse(pick.start || '');
       return Number.isFinite(ts) && ts >= now - 30 * 60000 && ts <= now + horizonMs;
     });
-    const todayRows = picks.filter((pick) => dayKeyParis(pick.start) === todayKey);
+    const todayRows = sourcePicks.filter((pick) => dayKeyParis(pick.start) === todayKey);
     const ordered = [];
     const seen = new Set();
     const matchCounts = new Map();
@@ -2381,12 +2399,12 @@ function createLegacyEngineService({ projectRoot }) {
     addRows(sortByKickoffThenRank(nearTerm), { strict: true });
     if (rollingWindowRows(ordered, 24).length < target24) addRows(sortRows(rolling24), { strict: true, relaxSlot: true });
     if (rollingWindowRows(ordered, 24).length < target24) addRows(sortRows(rolling24), { strict: false });
-    addRows(sortRows(picks), { strict: true });
-    if (ordered.length < 5) addRows(sortRows(picks), { strict: false });
+    addRows(sortRows(sourcePicks), { strict: true });
+    if (ordered.length < 5) addRows(sortRows(sourcePicks), { strict: false });
     const finalRows = [];
     const finalSeen = new Set();
     const finalMatchCounts = new Map();
-    const addFinalRows = (rowsToAdd, limit = 25, options = {}) => {
+    const addFinalRows = (rowsToAdd, limit = maxDashboardRows, options = {}) => {
       for (const row of rowsToAdd) {
         if (finalRows.length >= limit) break;
         const key = `${row.id}:${row.market}:${row.label}`;
@@ -2409,8 +2427,8 @@ function createLegacyEngineService({ projectRoot }) {
     if (rollingWindowRows(finalRows, 24).length < rollingReadyTarget) {
       addFinalRows(rollingReadyPool, rollingReadyTarget, { enforceMatchCap: true });
     }
-    addFinalRows(sortedOrdered, 25);
-    const rows = finalRows.slice(0, 25)
+    addFinalRows(sortedOrdered, maxDashboardRows);
+    const rows = finalRows.slice(0, maxDashboardRows)
       .map((row, index) => ({
         ...row,
         priorityRank: index + 1,
@@ -2423,12 +2441,14 @@ function createLegacyEngineService({ projectRoot }) {
       horizonHours: mode === 'rolling24h' ? 24 : mode === 'next30h' || mode === 'todayFirst' ? 30 : null,
       todayPicks: todayRows.length,
       todayReady: todayRows.filter((pick) => pick?.decisionCenter?.canBet).length,
+      simplePicks: sourcePicks.length,
       rolling24Picks: rolling24.length,
       rolling24Displayed: rollingWindowRows(rows, 24).length,
       rolling24Target: target24,
       qualityPolicy: {
         maxPerMatch,
         maxPerHourSlot,
+        maxDashboardRows,
         skippedByMatchCap: skippedByCap.match,
         skippedBySlotCap: skippedByCap.slot,
         displayedToday: rows.filter((row) => dayKeyParis(row.start) === todayKey).length,
