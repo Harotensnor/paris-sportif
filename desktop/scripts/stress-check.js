@@ -38,7 +38,7 @@ async function main() {
     });
     win.on('pageerror', (error) => messages.push(`pageerror: ${error.message}`));
     await win.waitForSelector('[data-panel="dashboard"].active', { timeout: 60_000 });
-    await win.waitForFunction(() => Number(document.querySelector('#metric-picks')?.textContent || 0) >= 20, null, { timeout: 90_000 });
+    await win.waitForFunction(() => Number(document.querySelector('#metric-picks')?.textContent || 0) >= 10, null, { timeout: 90_000 });
     await win.click('[data-tab="preferences"]');
     await win.waitForSelector('#pref-expert-mode', { timeout: 10_000 });
     await win.check('#pref-expert-mode');

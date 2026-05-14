@@ -73,6 +73,16 @@ function testAnalysis() {
     assert(pick.winamaxBetType && pick.winamaxBetType.label, 'Pick sans type de pari Winamax conseillé', pick);
     assert(pick.safeAssessment && pick.safeAssessment.status, 'Pick sans filtre fiable et safe', pick);
     assert(Number(pick.safeEdge || pick.edge || 0) >= 0.01, 'Pick sans edge prudent positif', pick);
+    const safeSample = Number(pick.safeAssessment?.sample ?? pick.segmentValidation?.sample ?? 0) || 0;
+    const safeRoi = Number(pick.safeAssessment?.roi ?? pick.segmentValidation?.roi ?? 0);
+    assert(!(pick.safeAssessment?.reliable && safeSample >= 15 && Number.isFinite(safeRoi) && safeRoi < 0), 'Pick fiable malgré segment historique négatif', {
+      id: pick.id,
+      label: pick.label,
+      market: pick.market,
+      sample: safeSample,
+      roi: safeRoi,
+      safeAssessment: pick.safeAssessment
+    });
     assert(Number.isFinite(Number(pick.priorityScore)) && Number(pick.priorityScore) >= 0, 'Pick sans score de priorité', pick);
     if (pick.decisionCenter.canBet) {
       assert(Number(pick.stake) > 0, 'Pick prêt sans mise positive', pick);

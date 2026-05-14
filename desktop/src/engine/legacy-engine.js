@@ -1158,15 +1158,6 @@ function createLegacyEngineService({ projectRoot }) {
     const confidence = effectiveConfidence(row);
     const sample = Number(row?.segmentValidation?.sample ?? row?.calibration?.sample ?? 0) || 0;
     const roi = Number(row?.segmentValidation?.roi ?? row?.calibration?.roi ?? 0);
-    const calibrationSample = Number(row?.calibration?.sample || 0) || 0;
-    const calibrationRoi = Number(row?.calibration?.roi || 0);
-    const mildBroadNegativeCovered = sample >= 15 &&
-      Number.isFinite(roi) &&
-      roi >= -0.05 &&
-      calibrationSample >= 15 &&
-      Number.isFinite(calibrationRoi) &&
-      calibrationRoi >= 0 &&
-      row?.calibration?.blocked !== true;
     const quality = row?.contextQuality || row?.match?.context?.quality || {};
     const criticalMissing = Array.isArray(quality.critical_missing) ? quality.critical_missing : [];
     const reasons = [];
@@ -1176,7 +1167,7 @@ function createLegacyEngineService({ projectRoot }) {
     if (edge < 0.03) reasons.push('edge prudent < +3pt');
     if (odd < 1.30 || odd > 6.00) reasons.push('cote hors zone solo 1.30-6.00');
     if (confidence < 0.55) reasons.push('confiance < 55%');
-    if (sample >= 15 && Number.isFinite(roi) && roi < 0 && !mildBroadNegativeCovered) reasons.push('segment historique négatif');
+    if (sample >= 15 && Number.isFinite(roi) && roi < 0) reasons.push('segment historique négatif');
     if (row?.signalConflict?.active) reasons.push('conflit signaux');
     if (row?.oddsGuardrail?.applied) reasons.push(row.oddsGuardrail.label || 'cote à vérifier');
     if (criticalMissing.length) reasons.push(`signal critique manquant: ${criticalMissing.slice(0, 2).join(', ')}`);

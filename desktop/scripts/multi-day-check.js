@@ -29,7 +29,7 @@ async function main() {
     });
     win.on('pageerror', (error) => messages.push(`pageerror: ${error.message}`));
     await win.waitForSelector('[data-panel="dashboard"].active', { timeout: 60_000 });
-    await win.waitForFunction(() => Number(document.querySelector('#metric-picks')?.textContent || 0) >= 20, null, { timeout: 90_000 });
+    await win.waitForFunction(() => Number(document.querySelector('#metric-picks')?.textContent || 0) >= 10, null, { timeout: 90_000 });
 
     await win.evaluate(async () => {
       const archiveText = await fetch('/results_archive.jsonl', { cache: 'no-store' }).then((response) => response.text());

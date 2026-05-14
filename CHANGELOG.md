@@ -5,6 +5,17 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 16 — Consolidation
+
+- Audit complet post-Sprint 15 : les contrôles automatisés couvrent désormais le cockpit simplifié, les marchés simples, le format `PARI / COTE / MISE / Pourquoi`, les gates Winamax-only, les décisions centrales, le settlement sécurisé, les vues expert et la cohérence des mises.
+- Correction QA : les scripts multi-jours et stress attendaient encore l'ancien volume de 20 picks alors que Sprint 15 limite volontairement le cockpit standard à 18 paris simples. Le seuil de validation est aligné sur l'objectif actuel de 10+ paris lisibles.
+- Correction modèle : un pick pouvait encore recevoir le badge `✓ Fiable` malgré un segment historique négatif quand la calibration large était positive. Le filtre safe est désormais strict : sample segment >= 15 et ROI < 0 déclasse le pick.
+- Ajout d'un garde-fou dans le contrat moteur : toute régression `fiable + segment historique négatif` fait échouer `qa:engine` avec le match, le marché, le sample et le ROI concernés.
+- Audit modèle 30 jours : `model_lab_report.json` couvre 1827 picks réglés, Brier 0,2251 et ROI global +17,14%. Les marchés simples affichent ROI +31,18%; le win rate brut reste bas car les cotes moyennes sont élevées, donc la consolidation privilégie ROI/Brier plutôt qu'un seuil WR artificiel.
+- Contrôle couverture nocturne courant : deux picks nocturnes prêts sont visibles sur les données actuelles; un troisième candidat existe mais reste bloqué par l'edge prudent < +3pt. La règle safe n'est pas assouplie pour gonfler artificiellement le volume.
+- Validation Sprint 16 : contrat moteur, multi-jours accéléré J+3 et stress court confirment la cohérence des picks simples, des settlements, du profil backup/restore et de la mémoire applicative sans réouvrir les marchés complexes.
+- QA finale Sprint 16 : `qa:engine`, `npm test`, Playwright Electron, capture visuelle, multi-jours accéléré, stress court et audit npm passent. La capture valide 18 paris simples, 14 entrées timeline, 89 picks fiables et 0 vulnérabilité dépendance.
+
 ### Sprint 15 — Paris simples et ticket actionnable
 
 - Le cockpit standard filtre désormais les marchés complexes par défaut : seuls `Vainqueur du match`, `Plus / Moins de buts`, `Les deux équipes marquent`, `Buteurs` et `Mi-temps vainqueur` remontent dans la vue `Picks`.
