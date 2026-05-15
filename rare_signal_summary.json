@@ -1,27 +1,46 @@
 {
-  "generated_at": "2026-05-15T16:09:08Z",
+  "generated_at": "2026-05-15T16:12:10Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 78,
-    "actionable": 24,
-    "watch": 10,
+    "active_events": 81,
+    "actionable": 26,
+    "watch": 11,
     "risk": 44,
     "expired_sample": 0,
     "by_type": {
+      "market_move": 3,
       "injury_imbalance": 30,
       "market_uncertain": 44,
       "back_to_back_travel": 8,
       "signal_conflict": 1
     },
     "by_quality": {
-      "actionable": 24,
-      "watch": 10,
+      "actionable": 26,
+      "watch": 11,
       "risk": 44
     }
   },
   "active_actionable": [
+    {
+      "event_id": "748956",
+      "date": "2026-05-15T18:30Z",
+      "sport": "football",
+      "league_code": "laliga2",
+      "league_name": "La Liga 2",
+      "home": "Castellón",
+      "away": "Cádiz",
+      "match": "Castellón - Cádiz",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 1.0,
+      "context": "Cote away: 10.50 -> 8.00 (+23.8%)"
+    },
     {
       "event_id": "401815349",
       "date": "2026-05-15T23:15Z",
@@ -291,6 +310,24 @@
       "side": "away",
       "strength": 0.83,
       "context": "1 match dans les 48h + 1498 km de voyage"
+    },
+    {
+      "event_id": "401856910",
+      "date": "2026-05-15T23:30Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Connecticut Sun",
+      "away": "Las Vegas Aces",
+      "match": "Connecticut Sun - Las Vegas Aces",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 0.817,
+      "context": "Cote home: 8.50 -> 7.25 (+14.7%)"
     },
     {
       "event_id": "401815345",
@@ -635,6 +672,24 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 8-5"
+    },
+    {
+      "event_id": "401856913",
+      "date": "2026-05-16T02:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Phoenix Mercury",
+      "away": "Chicago Sky",
+      "match": "Phoenix Mercury - Chicago Sky",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.454,
+      "context": "Cote away: 2.45 -> 2.25 (+8.2%)"
     }
   ],
   "active_risk": [
