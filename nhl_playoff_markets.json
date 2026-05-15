@@ -1,8 +1,61 @@
 {
-  "generated_at": "2026-05-15T00:57:07Z",
+  "generated_at": "2026-05-15T01:04:09Z",
   "source": "derived from nhl_stats already patched into data.js",
   "status": "ok",
   "events": [
+    {
+      "event_id": "401871428",
+      "kickoff": "2026-05-15T01:30Z",
+      "league": "NHL",
+      "match": "Vegas Golden Knights at Anaheim Ducks",
+      "home": "Anaheim Ducks",
+      "away": "Vegas Golden Knights",
+      "projection": {
+        "home_goals": 3.31,
+        "away_goals": 3.42,
+        "total_goals": 6.73,
+        "home_goalie": "Lukas Dostal",
+        "away_goalie": "Carter Hart"
+      },
+      "markets": {
+        "winner": {
+          "pick": "away",
+          "probability": 0.68,
+          "fair_odds": 1.47
+        },
+        "totals": [
+          {
+            "line": 4.5,
+            "pick": "over",
+            "probability": 0.8971,
+            "fair_odds": 1.11
+          },
+          {
+            "line": 5.5,
+            "pick": "over",
+            "probability": 0.7576,
+            "fair_odds": 1.32
+          },
+          {
+            "line": 6.5,
+            "pick": "over",
+            "probability": 0.5524,
+            "fair_odds": 1.81
+          },
+          {
+            "line": 7.5,
+            "pick": "under",
+            "probability": 0.6682,
+            "fair_odds": 1.5
+          }
+        ],
+        "first_period_total_1_5": {
+          "pick": "over",
+          "probability": 0.7379,
+          "fair_odds": 1.36
+        }
+      }
+    },
     {
       "event_id": "401871429",
       "kickoff": "2026-05-16T21:00Z",
@@ -163,5 +216,5 @@
       }
     }
   ],
-  "markets": 18
+  "markets": 24
 }
