@@ -144,6 +144,8 @@ test('Sprint 23 desktop keeps clear Winamax picks with supervised workflows', as
     expect(cockpit.dashboardText).not.toMatch(/\bKelly\b|\bEV\b|\btier\b|\b1N2\b|\bBTTS\b|\bedge\b/i);
     await expect(win.locator('#saved-strategy-select')).toBeVisible();
     await expect(win.locator('#save-current-strategy-btn')).toBeVisible();
+    await win.click('#save-current-strategy-btn');
+    await expect(win.locator('#saved-strategy-select')).toContainText('Stratégie Winamax');
 
     await win.locator('[data-track-bet-key]:visible').first().click();
     await win.waitForFunction(() => /1 en cours/.test(document.querySelector('#user-pnl-sub')?.textContent || ''), null, { timeout: 5_000 });
@@ -155,7 +157,7 @@ test('Sprint 23 desktop keeps clear Winamax picks with supervised workflows', as
     await expect(win.locator('#paper-simulation-grid')).toContainText('Simulation');
     await expect(win.locator('#model-vs-user-grid')).toContainText(/Si tu avais suivi le modèle|Toi sur 30 jours/);
     await expect(win.locator('#winamax-reconciliation-grid')).toContainText(/Aucun import Winamax confirmé|Solde Winamax/);
-    await expect(win.locator('#saved-strategies-grid')).toContainText(/Aucune stratégie sauvegardée|stratégie/i);
+    await expect(win.locator('#saved-strategies-grid')).toContainText(/Stratégie Winamax|stratégie/i);
     await expect(win.locator('#deep-analytics-summary')).toContainText(/Sample|P&L net|Meilleure zone/);
     await expect(win.locator('#deep-analytics-insights')).toContainText(/Insight|Recommandation|attente/i);
     await win.keyboard.press('Control+4');
@@ -181,7 +183,7 @@ test('Sprint 23 desktop keeps clear Winamax picks with supervised workflows', as
     await expect(win.locator('#pref-auto-tracking-enabled')).toHaveCount(1);
     await expect(win.locator('#pref-live-news-watcher')).toBeVisible();
     await expect(win.locator('#pref-language')).toBeVisible();
-    await expect(win.locator('#app-version-label')).toContainText('v1.2.0');
+    await expect(win.locator('#app-version-label')).toContainText('v1.2.1');
     await win.selectOption('#pref-theme', 'light');
     await expect(win.locator('body')).toHaveClass(/theme-light/);
     await win.selectOption('#pref-theme', 'dark');

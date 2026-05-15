@@ -8297,7 +8297,16 @@
   function saveCurrentStrategy() {
     const filters = currentPickFilterSnapshot();
     const defaultName = [filters.sport !== 'all' ? filters.sport : '', filters.market !== 'all' ? filters.market : '', filters.edgeMin ? `edge ${filters.edgeMin}%` : ''].filter(Boolean).join(' · ') || 'Stratégie Winamax';
-    const name = (window.prompt('Nom de la stratégie', defaultName) || '').trim();
+    let name = defaultName;
+    if (typeof window.prompt === 'function') {
+      try {
+        const answer = window.prompt('Nom de la stratégie', defaultName);
+        if (answer === null) return;
+        name = String(answer || defaultName).trim() || defaultName;
+      } catch {
+        name = defaultName;
+      }
+    }
     if (!name) return;
     const strategy = {
       id: `strategy-${Date.now()}`,

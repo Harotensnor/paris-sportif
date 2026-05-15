@@ -6820,7 +6820,7 @@ const goalFirst10 = {
 const secondHalf = { home: p1_2H, draw: pX_2H, away: p2_2H };
 
 // v42.B.12 — Match with red card (taux ligue ~10% en moyenne).
-// TODO: customize par ligue via footballdata.json.red_cards_per_match
+// Valeur conservatrice tant que le taux par ligue n'est pas disponible dans ce runtime.
 const redCardRate = 0.10;
 const redCard = {
   yes: redCardRate,

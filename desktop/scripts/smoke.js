@@ -103,6 +103,9 @@ async function main() {
       throw new Error(`Cockpit Sprint 14 incohérent: ${JSON.stringify(dashboard)}`);
     }
 
+    await win.click('#save-current-strategy-btn');
+    await win.waitForFunction(() => /Stratégie Winamax/.test(document.querySelector('#saved-strategy-select')?.textContent || ''), null, { timeout: 5000 });
+
     await win.locator('[data-track-bet-key]:visible').first().click();
     await win.waitForFunction(() => /1 en cours/.test(document.querySelector('#user-pnl-sub')?.textContent || ''), null, { timeout: 5000 });
 

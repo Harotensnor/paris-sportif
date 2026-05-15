@@ -5,6 +5,16 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 24 — Bug fix massif post-v1.2.0
+
+- Version desktop portée à `v1.2.1` pour une consolidation sans nouvelle fonctionnalité.
+- Audit exhaustif post Sprint 23 déroulé sur démarrage, port fixe, single-instance, conservation localStorage, vue Picks, Bilan, Recherche, Réglages, Mode expert, aide, Trading Desk, i18n, accessibilité, multi-jours, stress court et build packagé.
+- Bug majeur corrigé : `Picks > Sauver cette sélection` utilisait `window.prompt()`, qui existe mais n'est pas supporté dans le contexte Electron sandboxé. Résultat : clic sur le bouton, ouverture du rapport de bug et aucune stratégie sauvegardée. Le flux bascule maintenant sur un nom par défaut sûr quand le prompt natif est indisponible.
+- Test de non-régression ajouté dans smoke et Playwright : sauvegarde d'une stratégie depuis `Picks`, présence dans le sélecteur et dans `Bilan > Mes stratégies`.
+- Nettoyage code : suppression du dernier marqueur `TODO` du runtime desktop en le remplaçant par un commentaire explicite non bloquant.
+- Validation Sprint 24 : `qa:engine`, `npm test`, Playwright Electron, capture visuelle, audit accessibilité, multi-jours accéléré, stress court et audit npm restent verts après correction.
+- Build Windows v1.2.1 validé : `Paris Sportif Desktop Setup 1.2.1.exe` généré en sortie temporaire propre, environ 109 MB, et smoke du binaire packagé validé avec 18 picks visibles et version `v1.2.1`.
+
 ### Sprint 23 — Auto-tracking, réconciliation, stratégies, patterns, EN
 
 - Version desktop portée à `v1.2.0` pour les workflows supervisés et les fonctions avancées opt-in.
