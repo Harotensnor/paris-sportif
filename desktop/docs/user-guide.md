@@ -190,6 +190,8 @@ Si beaucoup de matchs Winamax existent mais peu de picks simples ressortent, l'a
 
 Depuis v1.4.0, les segments avec peu d'historique ne sont plus penalises automatiquement si le signal est fort : l'app peut valider un pari avec peu de sample quand l'avantage, la confiance et la cote restent dans une zone prudente.
 
+Depuis v1.5.0, l'app peut aussi afficher un signal `Confiance limitee` quand la cote Winamax est claire mais que le contexte local reste leger. Ce signal aide a ne pas rater un match, mais il ne doit pas etre joue tant que le bouton `Je mise` n'apparait pas.
+
 ## 16. Sauvegarde et restauration
 
 Exporte ton profil regulierement depuis `Reglages > Profil local`.

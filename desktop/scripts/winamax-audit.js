@@ -167,7 +167,7 @@ function main() {
     .sort((a, b) => b.bookableToday - a.bookableToday || a.sport.localeCompare(b.sport));
 
   const report = {
-    schema: 'paris-sportif.winamax_audit_sprint28.v1',
+    schema: 'paris-sportif.winamax_audit_sprint29.v1',
     generatedAt: new Date().toISOString(),
     dataGeneratedAt: data.generated_at || null,
     today,
@@ -197,7 +197,7 @@ function main() {
     }
   };
 
-  const output = path.join(root, 'desktop', 'state', 'winamax-audit-sprint28.json');
+  const output = path.join(root, 'desktop', 'state', 'winamax-audit-sprint29.json');
   fs.mkdirSync(path.dirname(output), { recursive: true });
   fs.writeFileSync(output, JSON.stringify(report, null, 2));
   console.log(JSON.stringify({

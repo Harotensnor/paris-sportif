@@ -8,13 +8,13 @@ Paris Sportif Desktop est le logiciel PC local pour préparer tes paris Winamax.
 
 ### Version installateur Windows
 
-La version v1.4.0 se génère avec :
+La version v1.5.0 se génère avec :
 
 ```powershell
 npm --prefix desktop run dist
 ```
 
-Le fichier attendu est `Paris Sportif Desktop Setup 1.4.0.exe`. Le build packagé embarque les données, rapports modèle et scripts nécessaires au démarrage. Python reste recommandé si tu veux relancer une pipeline complète depuis la machine installée.
+Le fichier attendu est `Paris Sportif Desktop Setup 1.5.0.exe`. Le build packagé embarque les données, rapports modèle et scripts nécessaires au démarrage. Python reste recommandé si tu veux relancer une pipeline complète depuis la machine installée.
 
 ### Version développeur
 
@@ -47,6 +47,8 @@ Ouvre l'app et lis d'abord le haut de la vue `Picks`.
 - Ajoute tes équipes ou joueurs favoris dans `Réglages > Favoris` pour ne pas rater leurs picks, même quand ils ne sont pas dans le top du jour.
 
 Si le modèle trouve trop peu de paris simples aujourd'hui alors que Winamax propose beaucoup de matchs, l'app affiche `Modèle trop strict aujourd'hui` avec le funnel complet. C'est volontaire : elle préfère dire clairement qu'elle manque de signaux fiables plutôt que de remplir l'écran avec des paris faibles ou des marchés complexes.
+
+Depuis v1.5.0, certains matchs avec peu de contexte secondaire peuvent apparaître en `Confiance limitée`. Ils augmentent la couverture du jour, mais restent non actionnables tant qu'ils n'ont pas de mise claire.
 
 L'app ne place pas de pari automatiquement. Elle prépare le ticket et suit ton résultat.
 

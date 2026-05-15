@@ -149,12 +149,13 @@ async function main() {
     const hasActionCopy = /PARI/i.test(dashboard.dashboardText) && /COTE/i.test(dashboard.dashboardText) && /MISE/i.test(dashboard.dashboardText);
     const hasComplexMarket = /Handicap|Double chance|Jeux tennis|Total basket|Total runs|Score exact|Corners|Cartons/i.test(dashboard.dashboardText);
     const hasTechnicalJargon = /\bKelly\b|\bEV\b|\btier\b|\b1N2\b|\bBTTS\b|\bedge\b/i.test(dashboard.dashboardText);
+    const hasExpertRepairLabel = /À réparer/i.test(dashboard.dashboardText);
     const sprint23Runtime = await win.evaluate(() => ({
       autoTracking: /Dry-run|Actif|Inactif|pari/i.test(document.querySelector('#auto-tracking-audit')?.textContent || ''),
       importPreview: /Real Madrid|Non suivi/.test(document.querySelector('#winamax-import-preview')?.textContent || ''),
       i18n: Boolean(window.t && typeof window.t === 'function')
     }));
-    if (dashboard.rows < 10 || dashboard.rows > 18 || dashboard.timeline < 8 || dashboard.safeBadges < 5 || !/aujourd’hui|à venir|surveill/i.test(dashboard.metricLabel) || (dashboard.metric < 10 && !/trop strict|Winamax/i.test(dashboard.funnelAlert)) || !(dashboard.topPick || dashboard.noUltimate) || !/jour/i.test(dashboard.dailyBudget) || !dashboard.hasRollingSections || !dashboard.combines || !dashboard.scorers || !dashboard.promos || !/Suggestion du jour/.test(dashboard.suggestion || '') || dashboard.multibookText || !hasActionCopy || hasComplexMarket || hasTechnicalJargon) {
+    if (dashboard.rows < 10 || dashboard.rows > 18 || dashboard.timeline < 8 || dashboard.safeBadges < 5 || !/aujourd’hui|à venir|surveill/i.test(dashboard.metricLabel) || (dashboard.metric < 10 && !/trop strict|Winamax/i.test(dashboard.funnelAlert)) || !(dashboard.topPick || dashboard.noUltimate) || !/jour/i.test(dashboard.dailyBudget) || !dashboard.hasRollingSections || !dashboard.combines || !dashboard.scorers || !dashboard.promos || !/Suggestion du jour/.test(dashboard.suggestion || '') || dashboard.multibookText || !hasActionCopy || hasComplexMarket || hasTechnicalJargon || hasExpertRepairLabel) {
       throw new Error(`Dashboard Sprint 23 invalide: ${JSON.stringify({ ...dashboard, dashboardText: dashboard.dashboardText.slice(0, 800), hasActionCopy, hasComplexMarket, hasTechnicalJargon })}`);
     }
     if (!sprint23Runtime.autoTracking || !sprint23Runtime.importPreview || !sprint23Runtime.i18n) throw new Error(`Workflow Sprint 23 invalide: ${JSON.stringify(sprint23Runtime)}`);

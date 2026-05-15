@@ -165,6 +165,7 @@ async function main() {
       assert(/trop strict|modèle trop strict/i.test(dom.alertText), 'Terrain: le garde-fou trop strict n’est pas visible', { todayFunnel, alertText: dom.alertText });
     }
     assert(dom.hasActionCopy, 'Terrain: format PARI/COTE/MISE absent', dom);
+    assert(!/À réparer/i.test(dom.dashboardText), 'Terrain: libellé expert "À réparer" visible dans le cockpit standard', dom.dashboardText.slice(0, 1200));
     assert(!/STATUS_SCHEDULED|LIVE estimé|live estimé/i.test(dom.liveText), 'Terrain: faux live détecté sur statut programmé', dom.liveText);
     assert(!dom.hasStartedButton, 'Terrain: bouton actionnable pour match déjà commencé', dom);
     assert(!dom.hiddenAdvancedVisible, 'Terrain: Avancé visible sans Mode expert', dom);

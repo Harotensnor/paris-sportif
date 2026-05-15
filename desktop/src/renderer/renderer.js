@@ -2287,7 +2287,9 @@
     if (!assessment) return '';
     const status = assessment.status || 'watch';
     const cls = status === 'reliable' ? 'safe' : status === 'watch' ? 'watch' : 'danger';
-    const label = status === 'reliable' ? '✓ Fiable' : status === 'watch' ? 'À surveiller' : 'Écarté';
+    const label = row?.limitedConfidence
+      ? 'Confiance limitée'
+      : status === 'reliable' ? '✓ Fiable' : status === 'watch' ? 'À surveiller' : 'Écarté';
     const reason = (assessment.reasons || assessment.warnings || []).slice(0, 2).join(' · ') || 'Filtre fiable et safe';
     return `<span class="safe-pick-badge ${escapeHtml(cls)}" title="${escapeHtml(reason)}">${escapeHtml(label)}</span>`;
   }
@@ -5057,7 +5059,7 @@
     body.innerHTML = displayRows.map((pick) => {
       const startLabel = `${formatDateLabel(pick.start)} · ${countdownLabel(pick.start)}`;
       const decision = pick.decisionCenter || {};
-      const statusText = decision.canBet ? 'Prêt' : decision.status === 'repair' ? 'À réparer' : decision.status === 'skip' ? 'À éviter' : 'À surveiller';
+      const statusText = decision.canBet ? 'Prêt' : decision.status === 'skip' ? 'À éviter' : 'À surveiller';
       const action = trackButtonHtml(pick, `Je mise ${visibleStakeText(pick)}`);
       const winamaxAction = winamaxOpenButtonHtml(pick, 'Ouvrir Winamax');
       return `

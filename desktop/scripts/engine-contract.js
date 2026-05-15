@@ -81,6 +81,10 @@ function testAnalysis() {
     assert(Number(pick.adjustedConfidence || 0) > 0, 'Pick sans confiance ajustée', pick);
     assert(pick.winamaxBetType && pick.winamaxBetType.label, 'Pick sans type de pari Winamax conseillé', pick);
     assert(pick.safeAssessment && pick.safeAssessment.status, 'Pick sans filtre fiable et safe', pick);
+    if (pick.limitedConfidence) {
+      assert(!pick.decisionCenter.canBet && Number(pick.stake || 0) === 0, 'Confiance limitée ne doit jamais être actionnable', pick);
+      assert(pick.safeAssessment.status !== 'reliable' && !pick.safeAssessment.reliable, 'Confiance limitée ne doit jamais être fiable', pick);
+    }
     assert(Number(pick.safeEdge || pick.edge || 0) >= 0.01, 'Pick sans edge prudent positif', pick);
     const safeSample = Number(pick.safeAssessment?.sample ?? pick.segmentValidation?.sample ?? 0) || 0;
     const safeRoi = Number(pick.safeAssessment?.roi ?? pick.segmentValidation?.roi ?? 0);

@@ -99,7 +99,8 @@ async function main() {
     const hasActionCopy = /PARI/i.test(dashboard.dashboardText) && /COTE/i.test(dashboard.dashboardText) && /MISE/i.test(dashboard.dashboardText);
     const hasComplexMarket = /Handicap|Double chance|Jeux tennis|Total basket|Total runs|Score exact|Corners|Cartons/i.test(dashboard.dashboardText);
     const hasTechnicalJargon = /\bKelly\b|\bEV\b|\btier\b|\b1N2\b|\bBTTS\b|\bedge\b/i.test(dashboard.dashboardText);
-    if (dashboard.rows < 10 || dashboard.rows > 18 || dashboard.timeline < 8 || dashboard.trackButtons < 10 || dashboard.safeBadges < 5 || !/aujourd’hui|à venir|surveill/i.test(dashboard.metricLabel) || (dashboard.metric < 10 && !/trop strict|Winamax/i.test(dashboard.funnelAlert)) || !(dashboard.topPick || dashboard.noUltimate) || !/jour/i.test(dashboard.dailyBudget) || !dashboard.hasRollingSections || !hasActionCopy || hasComplexMarket || hasTechnicalJargon) {
+    const hasExpertRepairLabel = /À réparer/i.test(dashboard.dashboardText);
+    if (dashboard.rows < 10 || dashboard.rows > 18 || dashboard.timeline < 8 || dashboard.trackButtons < 10 || dashboard.safeBadges < 5 || !/aujourd’hui|à venir|surveill/i.test(dashboard.metricLabel) || (dashboard.metric < 10 && !/trop strict|Winamax/i.test(dashboard.funnelAlert)) || !(dashboard.topPick || dashboard.noUltimate) || !/jour/i.test(dashboard.dailyBudget) || !dashboard.hasRollingSections || !hasActionCopy || hasComplexMarket || hasTechnicalJargon || hasExpertRepairLabel) {
       throw new Error(`Picks Sprint 15 insuffisants: ${JSON.stringify({ ...dashboard, dashboardText: dashboard.dashboardText.slice(0, 800), hasActionCopy, hasComplexMarket, hasTechnicalJargon })}`);
     }
     if (!dashboard.combines || !dashboard.scorers || !dashboard.promos || !dashboard.bankroll.includes('€') || !dashboard.pnl.includes('€') || !dashboard.expertHidden || dashboard.multibookText) {

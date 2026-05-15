@@ -846,6 +846,130 @@ function createLegacyEngineService({ projectRoot }) {
     return rows;
   }
 
+  function matchWinnerOptions(match) {
+    const teams = getTeamNames(match);
+    const markets = match?.winamax?.markets || {};
+    const rows = [];
+    const push = (side, odd, label, source = 'winamax_market') => {
+      const value = Number(odd);
+      if (!(value >= 1.25 && value <= 2.40)) return;
+      if (!['home', 'away'].includes(side)) return;
+      rows.push({
+        side,
+        odd: value,
+        label: cleanLabel(label, side === 'home' ? teams.home : teams.away),
+        source
+      });
+    };
+    const marketRows = Array.isArray(markets.match_winner) ? markets.match_winner : [];
+    for (const row of marketRows) push(row?.side, row?.odd, row?.label, row?.source || 'winamax_detail');
+    const n12 = markets['1n2'] || {};
+    push('home', n12.home, n12.home_name || teams.home);
+    push('away', n12.away, n12.away_name || teams.away);
+    const seen = new Map();
+    for (const row of rows) {
+      const key = row.side;
+      if (!seen.has(key) || Number(row.odd) < Number(seen.get(key).odd)) seen.set(key, row);
+    }
+    return Array.from(seen.values()).sort((a, b) => a.odd - b.odd);
+  }
+
+  function oddsBasedFallback(win, match, bankroll) {
+    const options = matchWinnerOptions(match);
+    if (options.length < 1) return null;
+    const favorite = options[0];
+    const challenger = options[1];
+    const gap = challenger ? challenger.odd / favorite.odd : 1;
+    const sportKey = String(match?.sport || '').toLowerCase();
+    const qualityScore = Number(match?.context?.quality?.score || 0);
+    const majorNightSport = /basket|baseball|hockey|football américain|nfl/.test(sportKey);
+    const strongFavorite = favorite.odd >= 1.30 && favorite.odd <= 1.55;
+    const clearMarketFavorite = challenger && favorite.odd <= 1.78 && gap >= 1.10;
+    const widerMarketFavorite = challenger && favorite.odd <= 1.92 && gap >= 1.18 && (qualityScore >= 45 || majorNightSport);
+    if (!(strongFavorite || clearMarketFavorite || widerMarketFavorite)) return null;
+    const implied = 1 / favorite.odd;
+    const gapBonus = Math.min(0.030, Math.max(0, (gap - 1.10) * 0.024));
+    const contextBonus = qualityScore >= 75 ? 0.012 : qualityScore >= 60 ? 0.006 : 0;
+    const sportBonus = /basket|baseball|hockey|tennis|football américain|nfl|mma/.test(sportKey) ? 0.008 : 0;
+    const priceBonus = strongFavorite ? 0.010 : 0;
+    const edge = Math.min(0.065, 0.016 + gapBonus + contextBonus + sportBonus + priceBonus);
+    if (!(edge >= 0.012)) return null;
+    const probability = Math.max(0.30, Math.min(0.78, implied + edge));
+    const stake = 0;
+    const modelStake = Math.max(0.10, Math.min(1.50, Number((Math.max(1, bankroll) * 0.004).toFixed(2))));
+    return {
+      best: {
+        market: '1n2',
+        key: '1n2',
+        odd: favorite.odd,
+        prob: probability,
+        edge,
+        source: 'winamax_odds_fallback'
+      },
+      market: 'Vainqueur',
+      marketKey: '1n2',
+      label: favorite.label,
+      odd: favorite.odd,
+      probability,
+      edge,
+      stake,
+      modelStake,
+      status: 'watch',
+      statusLabel: 'Confiance limitée · à surveiller',
+      pickSource: 'winamax_odds_fallback',
+      limitedConfidence: true,
+      confidenceTrust: {
+        score: Math.round(Math.max(45, Math.min(62, probability * 100 - 6))),
+        level: 'limité',
+        drivers: ['Cote Winamax claire', gap >= 1.35 ? 'Favori net' : 'Favori modéré']
+      },
+      contextQuality: {
+        ...(match?.context?.quality || {}),
+        score: Number.isFinite(qualityScore) && qualityScore > 0 ? qualityScore : 55,
+        tier: qualityScore >= 70 ? 'correct' : 'limité',
+        critical_missing: []
+      },
+      contextGate: {
+        gate: 'odds_fallback',
+        agentEligible: true,
+        label: 'Confiance limitée : cote Winamax + contexte léger',
+        warnings: ['Signal basé sur la cote Winamax, à surveiller avant mise']
+      },
+      modelSkipOverridden: true
+    };
+  }
+
+  function fallbackAlternativeRow(fallback, primaryMarket) {
+    if (!fallback) return null;
+    return {
+      market: fallback.market,
+      marketKey: fallback.marketKey,
+      label: fallback.label,
+      odd: fallback.odd,
+      probability: fallback.probability,
+      edge: fallback.edge,
+      stake: fallback.stake,
+      modelStake: fallback.modelStake,
+      status: fallback.status,
+      statusLabel: fallback.statusLabel,
+      pickSource: fallback.pickSource,
+      limitedConfidence: fallback.limitedConfidence,
+      confidenceTrust: fallback.confidenceTrust,
+      contextQuality: fallback.contextQuality,
+      contextGate: fallback.contextGate,
+      modelSkipOverridden: fallback.modelSkipOverridden,
+      isMarketAlternative: true,
+      primaryMarket,
+      marketCandidate: {
+        market: fallback.best?.market || fallback.marketKey,
+        key: fallback.best?.key || fallback.marketKey,
+        source: fallback.best?.source || fallback.pickSource,
+        ev: Number(fallback.edge) || null,
+        score: Number(fallback.confidenceTrust?.score) || null
+      }
+    };
+  }
+
   function expandAnalyzedRow(row) {
     const alternatives = Array.isArray(row?.marketAlternatives) ? row.marketAlternatives : [];
     const primary = { ...row, marketAlternatives: [] };
@@ -897,6 +1021,7 @@ function createLegacyEngineService({ projectRoot }) {
     let pickLabel = 'Aucune mise';
     let modelError = null;
     let marketAlternatives = [];
+    let fallbackDetails = null;
 
     try {
       pred = win.predictMatch(match);
@@ -910,6 +1035,21 @@ function createLegacyEngineService({ projectRoot }) {
           marketLabel = formatMarketName(pred.market || '1n2');
           pickLabel = normalizePickLabel(match, marketLabel, pred.pick, 'À surveiller');
         }
+        const fallback = oddsBasedFallback(win, match, bankroll);
+        let fallbackApplied = false;
+        if (fallback) {
+          const shouldReplacePrimary = !best || !(best.edge > 0);
+          if (shouldReplacePrimary) {
+            best = fallback.best;
+            marketLabel = fallback.market;
+            pickLabel = fallback.label;
+            stake = fallback.stake;
+            status = fallback.status;
+            statusLabel = fallback.statusLabel;
+            fallbackDetails = fallback;
+            fallbackApplied = true;
+          }
+        }
         if (best && best.edge > 0 && stake > 0) {
           status = best.edge >= 0.05 ? 'bet' : 'watch';
           statusLabel = best.edge >= 0.08
@@ -917,13 +1057,24 @@ function createLegacyEngineService({ projectRoot }) {
             : best.edge >= 0.05
               ? (best.derivedFromSkip ? 'Jouable manuel' : 'Jouable')
               : 'À surveiller';
-        } else {
+        } else if (!fallbackApplied) {
           statusLabel = 'À surveiller';
         }
         marketAlternatives = alternativeRowsFromCandidates(win, match, pred, best, {
           market: marketLabel,
           label: pickLabel
         }, bankroll);
+        if (fallback && !fallbackApplied) {
+          const primaryMarket = calibrationUtils.normalizeMarketKey(best?.market || best?.key || pred?.market || marketLabel);
+          const primaryLabel = compactKey(pickLabel || best?.label || '');
+          const fallbackMarket = calibrationUtils.normalizeMarketKey(fallback.marketKey || fallback.best?.market || fallback.market);
+          const fallbackLabel = compactKey(fallback.label || '');
+          const primaryIsReady = stake > 0 && status === 'bet';
+          const fallbackIsDistinct = fallbackMarket !== primaryMarket || fallbackLabel !== primaryLabel;
+          if (fallbackIsDistinct && (!primaryIsReady || Number(fallback.edge || 0) > Number(best?.edge || 0) + 0.005)) {
+            marketAlternatives.unshift(fallbackAlternativeRow(fallback, marketLabel));
+          }
+        }
       }
     } catch (error) {
       modelError = error && error.message ? error.message : String(error);
@@ -942,14 +1093,14 @@ function createLegacyEngineService({ projectRoot }) {
       league: match.league_name || match.league_code || '',
       start: match.date || '',
       market: marketLabel,
-      marketKey: calibrationUtils.normalizeMarketKey(best?.best?.market || best?.best?.key || pred?.market || marketLabel),
+      marketKey: calibrationUtils.normalizeMarketKey(best?.best?.market || best?.best?.key || best?.market || best?.key || pred?.market || marketLabel),
       label: pickLabel,
       odd: best ? best.odd : 0,
       probability: best ? best.prob : Number(pred && (pred.reliability ?? pred.prob)) || 0,
       edge: best ? best.edge : 0,
       stake,
       pickSource: best?.source || (best ? 'runtime_best_pick' : null),
-      modelSkipOverridden: Boolean(best?.derivedFromSkip),
+      modelSkipOverridden: Boolean(best?.derivedFromSkip || best?.source === 'winamax_odds_fallback'),
       status,
       statusLabel,
       marketProfile: marketProfile(match),
@@ -957,7 +1108,16 @@ function createLegacyEngineService({ projectRoot }) {
       winamaxUrl: match.winamax && match.winamax.url,
       modelError
     };
-    return contextUtils.applyContextGate(row);
+    return contextUtils.applyContextGate({
+      ...row,
+      ...(fallbackDetails ? {
+        limitedConfidence: true,
+        pickSource: fallbackDetails.pickSource,
+        confidenceTrust: fallbackDetails.confidenceTrust,
+        contextQuality: fallbackDetails.contextQuality,
+        contextGate: fallbackDetails.contextGate
+      } : {})
+    });
   }
 
   function marketProfile(match) {
@@ -1228,6 +1388,38 @@ function createLegacyEngineService({ projectRoot }) {
     if (!sample) warnings.push('historique segment absent');
     if (policy?.direction === 'boost') warnings.push(`segment gagnant : filtre assoupli (${policy.reason})`);
     if (policy?.direction === 'harden') warnings.push(`segment froid : filtre durci (${policy.reason})`);
+
+    if (row?.limitedConfidence) {
+      const limitedDisplayable = rawEdge >= 0.01 &&
+        odd >= 1.30 &&
+        odd <= 6.00 &&
+        confidence >= 0.30 &&
+        !row?.signalConflict?.active &&
+        !row?.oddsGuardrail?.applied;
+      return {
+        status: limitedDisplayable ? 'watch' : 'reject',
+        label: limitedDisplayable ? 'À surveiller' : 'Écarté',
+        reliable: false,
+        displayable: limitedDisplayable,
+        conservativeEdge: edge,
+        rawEdge,
+        edgeCapped: edgeInfo.capped,
+        confidence,
+        sample,
+        roi: Number.isFinite(roi) ? roi : null,
+        policy: policy ? {
+          key: policy.key,
+          direction: policy.direction,
+          edgeMin,
+          oddMax,
+          confidenceMin,
+          reason: policy.reason
+        } : null,
+        reliableRule: null,
+        reasons: ['confiance limitée : cote Winamax + contexte léger'],
+        warnings: ['À surveiller avant mise', ...warnings].slice(0, 4)
+      };
+    }
 
     const reliable = Boolean(reliableRule) && edge <= 0.20;
     const displayable = rawEdge >= 0.01 && odd > 1.10 && odd <= 18 && confidence >= 0.30 && row?.decisionCenter?.status !== 'skip';

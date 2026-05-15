@@ -5,6 +5,20 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 29 — Génération signaux + couverture nuit
+
+- Version desktop portée à `v1.5.0` après test terrain obligatoire sur pipeline réelle, app Electron ouverte, clics, captures et build packagé. Le sprint améliore la génération de signaux sans rouvrir les marchés complexes ni quitter Winamax.
+- Terrain initial Sprint 29 : `refresh_once.py --full` terminé avec `health.json generated_at=2026-05-15T17:03:06Z` et `data.js generated_at=2026-05-15T17:03:10Z`. Le catalogue Winamax réel contient 845 matchs, 19 sports, 22 matchs Winamax aujourd'hui et 11 matchs futurs encore jouables au moment du test.
+- Conversion corrigée : les matchs futurs du jour passent à 6 affichés sur 11 bookables (`54,5%`) et le 24h glissant affiche 89 signaux positifs sur 89 événements Winamax, 15 lignes cockpit, 10 prêts, 35 fiables et 1 pick de nuit. La bannière `Volume prêt limité aujourd'hui` reste visible car seulement 1 pari est réellement prêt aujourd'hui.
+- Ajout d'un fallback Winamax-only basé sur la cote `Vainqueur` quand les données secondaires sont trop légères mais que le marché Winamax désigne un favori clair. Ces lignes sont marquées `Confiance limitée`, restent en `À surveiller`, n'ont jamais de bouton `Je mise` et ne peuvent pas recevoir le badge `✓ Fiable`.
+- Couverture nuit renforcée : le fallback accepte les sports US/nuit avec prudence (`basketball`, `baseball`, `hockey`, `football américain`) et l'audit 24h montre 26 événements Winamax dans la tranche `Cette nuit`, 4 fiables, 1 prêt et 1 affiché.
+- Bug terrain corrigé : des lignes non actionnables apparaissaient en vue standard avec le libellé expert `À réparer`. Le cockpit standard affiche maintenant `À surveiller`; `qa:terrain`, smoke, visual et Playwright échouent si `À réparer` réapparaît dans `Picks`.
+- Audit Winamax Sprint 29 : `qa:winamax-audit` produit `desktop/state/winamax-audit-sprint29.json`, avec 15 familles disponibles, 12 exploitées, aucun dormant standard et dormants expert uniquement (`exactscore`, `sporttotal`, `cards`).
+- Validation modèle : `probability_calibration_report` reste à Brier `0.2255`, `decision_backtest_report` mesure 1 853 lignes settled avec ROI `+51,53%` sur le bucket `bet`, ROI `+66,70%` sur `watchlist` et `picks_history_summary` conserve un ROI flat historique `+17,06%`.
+- Captures terrain Sprint 29 : `captures/desktop-sprint29-terrain-picks.png`, `desktop-sprint29-terrain-scorers.png` et `desktop-sprint29-terrain-funnel.png` documentent le cockpit réel, les buteurs et le funnel/audit Mode expert.
+- Validation Sprint 29 : syntaxe Node, `qa:engine`, `qa:terrain -- --skip-refresh`, `qa:winamax-audit`, `npm test`, Playwright Electron, `qa:visual` et `qa:a11y` passent avec 0 erreur console sévère observée en usage réel.
+- Build Windows v1.5.0 validé : `desktop/dist-sprint29/Paris Sportif Desktop Setup 1.5.0.exe` généré à 104,1 MB, et smoke du binaire packagé validé avec version `v1.5.0`, 18 lignes cockpit, 0 erreur console sévère et aucun libellé `À réparer` en mode standard.
+
 ### Sprint 28 — Buteurs + assouplissement intelligent + sports élargis
 
 - Version desktop portée à `v1.4.0` après test terrain obligatoire sur pipeline réelle et app ouverte. Le sprint active la famille standard `players`/buteurs avec cotes Winamax réelles et assouplit le filtre fiable sans rouvrir les marchés complexes.
