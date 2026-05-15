@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-15T04:57:47Z",
+  "generated_at": "2026-05-15T05:03:41Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -9,16 +9,16 @@
     "by_type": {
       "lookahead": 75,
       "back_to_back_travel": 7,
-      "schedule_congestion": 14
+      "schedule_congestion": 16
     },
     "by_decision": {
-      "abstain": 32,
-      "lean_home": 11,
+      "abstain": 31,
+      "lean_home": 12,
       "lean_away": 1
     },
-    "lean_home": 11,
+    "lean_home": 12,
     "lean_away": 1,
-    "abstain": 32,
+    "abstain": 31,
     "monitor": 0
   },
   "active": [
@@ -50,17 +50,17 @@
       "contexts": [
         "4 matchs sur les 7 derniers jours",
         "2 match important/proche dans les 3 jours",
-        "5 matchs sur les 7 derniers jours",
+        "6 matchs sur les 7 derniers jours",
         "1 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -1.417,
-        "away_score": -0.221,
-        "home_fade": 2.1,
+        "status": "net",
+        "net_side": "home",
+        "home_score": -0.418,
+        "away_score": -1.565,
+        "home_fade": 1.1,
         "away_fade": 1.95,
-        "reason": "Signaux opposes: San Diego Padres fade 2.10, Los Angeles Dodgers fade 1.95 -> prudence",
+        "reason": "Direction nette: San Diego Padres (-0.42)",
         "detail": [
           {
             "side": "home",
@@ -91,18 +91,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.8
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.994
           }
         ]
       }
@@ -135,16 +123,16 @@
       "contexts": [
         "5 matchs sur les 7 derniers jours",
         "1 match important/proche dans les 3 jours",
-        "6 matchs sur les 7 derniers jours"
+        "7 matchs sur les 7 derniers jours"
       ],
       "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -1.52,
-        "away_score": -0.054,
-        "home_fade": 2.15,
+        "status": "net",
+        "net_side": "home",
+        "home_score": -0.52,
+        "away_score": -1.397,
+        "home_fade": 1.15,
         "away_fade": 1.8,
-        "reason": "Signaux opposes: San Diego Padres fade 2.15, Los Angeles Dodgers fade 1.80 -> prudence",
+        "reason": "Direction nette: San Diego Padres (-0.52)",
         "detail": [
           {
             "side": "home",
@@ -169,18 +157,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.8
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.994
           }
         ]
       }
@@ -1823,64 +1799,6 @@
       }
     },
     {
-      "event_id": "401815374",
-      "source_event_ids": [
-        "401815374"
-      ],
-      "kickoff": "2026-05-17T01:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Athletics",
-      "away": "San Francisco Giants",
-      "match": "Athletics - San Francisco Giants",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Athletics 0.15, San Francisco Giants 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.252,
-        "away_score": -1.097,
-        "home_fade": 0.15,
-        "away_fade": 1.15,
-        "reason": "Direction nette: Athletics (+0.25)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401815402",
       "source_event_ids": [
         "401815402"
@@ -1894,13 +1812,13 @@
       "match": "San Diego Padres - Los Angeles Dodgers",
       "decision": "lean_home",
       "net_team": "San Diego Padres",
-      "reason": "Los Angeles Dodgers plus penalise par calendrier/voyage (1.10 vs 0.90)",
-      "pressure_score": 2.733,
+      "reason": "Los Angeles Dodgers plus penalise par calendrier/voyage (1.30 vs 0.90)",
+      "pressure_score": 2.933,
       "home_fade": 0.9,
-      "away_fade": 1.1,
+      "away_fade": 1.3,
       "travel_score": 0,
       "lookahead_score": 1.333,
-      "congestion_score": 1.4,
+      "congestion_score": 1.6,
       "types": {
         "schedule_congestion": 2,
         "lookahead": 2
@@ -1908,17 +1826,17 @@
       "contexts": [
         "3 matchs sur les 7 derniers jours",
         "2 match important/proche dans les 3 jours",
-        "4 matchs sur les 7 derniers jours",
+        "5 matchs sur les 7 derniers jours",
         "2 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -1.235,
-        "away_score": -0.241,
-        "home_fade": 1.9,
-        "away_fade": 1.9,
-        "reason": "Signaux opposes: San Diego Padres fade 1.90, Los Angeles Dodgers fade 1.90 -> prudence",
+        "status": "net",
+        "net_side": "home",
+        "home_score": -0.165,
+        "away_score": -1.785,
+        "home_fade": 0.9,
+        "away_fade": 2.1,
+        "reason": "Direction nette: San Diego Padres (-0.16)",
         "detail": [
           {
             "side": "home",
@@ -1936,7 +1854,7 @@
             "side": "away",
             "type": "schedule_congestion",
             "direction": "fade",
-            "strength": 0.8
+            "strength": 1.0
           },
           {
             "side": "away",
@@ -1949,18 +1867,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.8
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.994
           }
         ]
       }
@@ -2145,6 +2051,72 @@
       }
     },
     {
+      "event_id": "401815372",
+      "source_event_ids": [
+        "401815372"
+      ],
+      "kickoff": "2026-05-17T01:38Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Los Angeles Angels",
+      "away": "Los Angeles Dodgers",
+      "match": "Los Angeles Angels - Los Angeles Dodgers",
+      "decision": "lean_home",
+      "net_team": "Los Angeles Angels",
+      "reason": "Los Angeles Dodgers plus penalise par calendrier/voyage (0.90 vs 0.15)",
+      "pressure_score": 1.6,
+      "home_fade": 0.15,
+      "away_fade": 0.9,
+      "travel_score": 0,
+      "lookahead_score": 1.0,
+      "congestion_score": 0.6,
+      "types": {
+        "lookahead": 2,
+        "schedule_congestion": 1
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours",
+        "3 matchs sur les 7 derniers jours",
+        "2 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": 0.445,
+        "away_score": -1.647,
+        "home_fade": 0.15,
+        "away_fade": 1.7,
+        "reason": "Direction nette: Los Angeles Angels (+0.44)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.3
+          },
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.8
+          }
+        ]
+      }
+    },
+    {
       "event_id": "401815452",
       "source_event_ids": [
         "401815452"
@@ -2263,6 +2235,65 @@
       }
     },
     {
+      "event_id": "401815387",
+      "source_event_ids": [
+        "401815387"
+      ],
+      "kickoff": "2026-05-17T20:07Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Los Angeles Angels",
+      "away": "Los Angeles Dodgers",
+      "match": "Los Angeles Angels - Los Angeles Dodgers",
+      "decision": "lean_home",
+      "net_team": "Los Angeles Angels",
+      "reason": "Los Angeles Dodgers plus penalise par calendrier/voyage (1.10 vs 0.00)",
+      "pressure_score": 1.467,
+      "home_fade": 0.0,
+      "away_fade": 1.1,
+      "travel_score": 0,
+      "lookahead_score": 0.667,
+      "congestion_score": 0.8,
+      "types": {
+        "schedule_congestion": 1,
+        "lookahead": 1
+      },
+      "contexts": [
+        "4 matchs sur les 7 derniers jours",
+        "2 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": 0.665,
+        "away_score": -1.9,
+        "home_fade": 0.0,
+        "away_fade": 1.9,
+        "reason": "Direction nette: Los Angeles Angels (+0.67)",
+        "detail": [
+          {
+            "side": "away",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.8
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.3
+          },
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.8
+          }
+        ]
+      }
+    },
+    {
       "event_id": "401815371",
       "source_event_ids": [
         "401815371"
@@ -2329,43 +2360,50 @@
       }
     },
     {
-      "event_id": "401815387",
+      "event_id": "401815374",
       "source_event_ids": [
-        "401815387"
+        "401815374"
       ],
-      "kickoff": "2026-05-17T20:07Z",
+      "kickoff": "2026-05-17T01:40Z",
       "sport": "baseball",
       "league_code": "mlb",
       "league_name": "MLB",
-      "home": "Los Angeles Angels",
-      "away": "Los Angeles Dodgers",
-      "match": "Los Angeles Angels - Los Angeles Dodgers",
+      "home": "Athletics",
+      "away": "San Francisco Giants",
+      "match": "Athletics - San Francisco Giants",
       "decision": "lean_home",
-      "net_team": "Los Angeles Angels",
-      "reason": "Los Angeles Dodgers plus penalise par calendrier/voyage (0.90 vs 0.00)",
+      "net_team": "Athletics",
+      "reason": "San Francisco Giants plus penalise par calendrier/voyage (0.75 vs 0.15)",
       "pressure_score": 1.267,
-      "home_fade": 0.0,
-      "away_fade": 0.9,
+      "home_fade": 0.15,
+      "away_fade": 0.75,
       "travel_score": 0,
       "lookahead_score": 0.667,
       "congestion_score": 0.6,
       "types": {
-        "schedule_congestion": 1,
-        "lookahead": 1
+        "lookahead": 2,
+        "schedule_congestion": 1
       },
       "contexts": [
+        "1 match important/proche dans les 3 jours",
         "3 matchs sur les 7 derniers jours",
-        "2 match important/proche dans les 3 jours"
+        "1 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.595,
-        "away_score": -1.7,
-        "home_fade": 0.0,
-        "away_fade": 1.7,
-        "reason": "Direction nette: Los Angeles Angels (+0.59)",
+        "home_score": 0.462,
+        "away_score": -1.698,
+        "home_fade": 0.15,
+        "away_fade": 1.75,
+        "reason": "Direction nette: Athletics (+0.46)",
         "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
           {
             "side": "away",
             "type": "schedule_congestion",
@@ -2376,71 +2414,13 @@
             "side": "away",
             "type": "lookahead",
             "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.8
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815372",
-      "source_event_ids": [
-        "401815372"
-      ],
-      "kickoff": "2026-05-17T01:38Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Los Angeles Angels",
-      "away": "Los Angeles Dodgers",
-      "match": "Los Angeles Angels - Los Angeles Dodgers",
-      "decision": "lean_home",
-      "net_team": "Los Angeles Angels",
-      "reason": "Los Angeles Dodgers plus penalise par calendrier/voyage (0.30 vs 0.15)",
-      "pressure_score": 1.0,
-      "home_fade": 0.15,
-      "away_fade": 0.3,
-      "travel_score": 0,
-      "lookahead_score": 1.0,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "2 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.235,
-        "away_score": -1.048,
-        "home_fade": 0.15,
-        "away_fade": 1.1,
-        "reason": "Direction nette: Los Angeles Angels (+0.24)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
             "strength": 0.15
           },
           {
             "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.8
+            "strength": 1.0
           }
         ]
       }
@@ -2486,6 +2466,57 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.91
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815389",
+      "source_event_ids": [
+        "401815389"
+      ],
+      "kickoff": "2026-05-17T20:05Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Athletics",
+      "away": "San Francisco Giants",
+      "match": "Athletics - San Francisco Giants",
+      "decision": "lean_home",
+      "net_team": "Athletics",
+      "reason": "San Francisco Giants plus penalise par calendrier/voyage (0.80 vs 0.00)",
+      "pressure_score": 0.8,
+      "home_fade": 0.0,
+      "away_fade": 0.8,
+      "travel_score": 0,
+      "lookahead_score": 0,
+      "congestion_score": 0.8,
+      "types": {
+        "schedule_congestion": 1
+      },
+      "contexts": [
+        "4 matchs sur les 7 derniers jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": 0.63,
+        "away_score": -1.8,
+        "home_fade": 0.0,
+        "away_fade": 1.8,
+        "reason": "Direction nette: Athletics (+0.63)",
+        "detail": [
+          {
+            "side": "away",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.8
+          },
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 1.0
           }
         ]
       }
@@ -2537,57 +2568,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.799
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815389",
-      "source_event_ids": [
-        "401815389"
-      ],
-      "kickoff": "2026-05-17T20:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Athletics",
-      "away": "San Francisco Giants",
-      "match": "Athletics - San Francisco Giants",
-      "decision": "lean_home",
-      "net_team": "Athletics",
-      "reason": "San Francisco Giants plus penalise par calendrier/voyage (0.60 vs 0.00)",
-      "pressure_score": 0.6,
-      "home_fade": 0.0,
-      "away_fade": 0.6,
-      "travel_score": 0,
-      "lookahead_score": 0,
-      "congestion_score": 0.6,
-      "types": {
-        "schedule_congestion": 1
-      },
-      "contexts": [
-        "3 matchs sur les 7 derniers jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.56,
-        "away_score": -1.6,
-        "home_fade": 0.0,
-        "away_fade": 1.6,
-        "reason": "Direction nette: Athletics (+0.56)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
           }
         ]
       }
