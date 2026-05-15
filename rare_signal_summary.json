@@ -1,24 +1,25 @@
 {
-  "generated_at": "2026-05-15T23:04:56Z",
+  "generated_at": "2026-05-15T23:10:36Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 76,
-    "actionable": 23,
+    "active_events": 77,
+    "actionable": 25,
     "watch": 10,
-    "risk": 43,
+    "risk": 42,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 29,
-      "market_uncertain": 42,
+      "market_uncertain": 41,
+      "market_move": 4,
       "back_to_back_travel": 8,
       "signal_conflict": 1
     },
     "by_quality": {
-      "actionable": 23,
+      "actionable": 25,
       "watch": 10,
-      "risk": 43
+      "risk": 42
     }
   },
   "active_actionable": [
@@ -435,6 +436,42 @@
       "side": "away",
       "strength": 0.726,
       "context": "1 match dans les 48h + 979 km de voyage"
+    },
+    {
+      "event_id": "401815366",
+      "date": "2026-05-16T17:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Detroit Tigers",
+      "away": "Toronto Blue Jays",
+      "match": "Detroit Tigers - Toronto Blue Jays",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.694,
+      "context": "Cote away: 1.76 -> 1.54 (+12.5%)"
+    },
+    {
+      "event_id": "401815381",
+      "date": "2026-05-17T17:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Detroit Tigers",
+      "away": "Toronto Blue Jays",
+      "match": "Detroit Tigers - Toronto Blue Jays",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.694,
+      "context": "Cote away: 1.76 -> 1.54 (+12.5%)"
     }
   ],
   "active_watch": [
@@ -655,24 +692,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.3%"
-    },
-    {
-      "event_id": "175353",
-      "date": "2026-05-16T13:00Z",
-      "sport": "tennis",
-      "league_code": "internazionalibnldit",
-      "league_name": "Internazionali BNL d'Italia",
-      "home": "",
-      "away": "",
-      "match": "? - ?",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 12.2%"
     },
     {
       "event_id": "401859395",
@@ -1320,7 +1339,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.5%"
+      "context": "marge bookmaker anormale 19.0%"
     },
     {
       "event_id": "401865543",

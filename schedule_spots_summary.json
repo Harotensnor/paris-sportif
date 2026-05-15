@@ -1,23 +1,23 @@
 {
-  "generated_at": "2026-05-15T23:04:56Z",
+  "generated_at": "2026-05-15T23:10:36Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 40,
+    "active_events": 39,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 68,
+      "lookahead": 66,
       "back_to_back_travel": 8,
       "schedule_congestion": 6
     },
     "by_decision": {
-      "abstain": 32,
+      "abstain": 31,
       "lean_home": 8
     },
     "lean_home": 8,
     "lean_away": 0,
-    "abstain": 32,
+    "abstain": 31,
     "monitor": 0
   },
   "active": [
@@ -825,58 +825,6 @@
       }
     },
     {
-      "event_id": "401871338",
-      "source_event_ids": [
-        "401871338"
-      ],
-      "kickoff": "2026-05-15T23:00Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "Cleveland Cavaliers",
-      "away": "Detroit Pistons",
-      "match": "Cleveland Cavaliers - Detroit Pistons",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Cleveland Cavaliers 0.15, Detroit Pistons 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
-        "home_fade": 0.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Detroit Pistons (-0.10)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401871157",
       "source_event_ids": [
         "401871157"
@@ -1011,11 +959,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.498,
-        "away_score": 0.043,
-        "home_fade": 0.55,
+        "home_score": -1.053,
+        "away_score": 0.931,
+        "home_fade": 1.106,
         "away_fade": 0.15,
-        "reason": "Direction nette: Toronto Blue Jays (+0.04)",
+        "reason": "Direction nette: Toronto Blue Jays (+0.93)",
         "detail": [
           {
             "side": "home",
@@ -1034,6 +982,18 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.4
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 0.556
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.694
           }
         ]
       }
