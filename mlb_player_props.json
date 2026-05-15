@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-15T14:01:56Z",
+  "generated_at": "2026-05-15T14:10:16Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -96,18 +96,18 @@
         {
           "market": "pitcher_strikeouts",
           "team": "Detroit Tigers",
-          "pitcher": "Ty Madden",
-          "label": "Ty Madden moins de 5,5 strikeouts",
-          "line": 5.5,
+          "pitcher": "Brenan Hanifee",
+          "label": "Brenan Hanifee moins de 3,5 strikeouts",
+          "line": 3.5,
           "pick": "under",
-          "probability": 0.5585,
-          "fair_odds": 1.79,
-          "expected_strikeouts": 5.24,
-          "projected_ip": 4.8,
+          "probability": 0.5945,
+          "fair_odds": 1.68,
+          "expected_strikeouts": 3.17,
+          "projected_ip": 6.6,
           "inputs": {
-            "k9": 9.82,
-            "era": 2.45,
-            "whip": 0.73,
+            "k9": 4.32,
+            "era": 1.08,
+            "whip": 1.08,
             "hand": "R"
           },
           "side": "home"
@@ -115,17 +115,17 @@
         {
           "market": "pitcher_home_run_allowed",
           "team": "Detroit Tigers",
-          "pitcher": "Ty Madden",
-          "label": "Ty Madden ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6458,
-          "fair_odds": 1.55,
-          "expected_hr_allowed": 0.437,
-          "projected_ip": 4.8,
+          "pitcher": "Brenan Hanifee",
+          "label": "Brenan Hanifee concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5471,
+          "fair_odds": 1.83,
+          "expected_hr_allowed": 0.792,
+          "projected_ip": 6.6,
           "inputs": {
-            "hr9": 0.82,
-            "era": 2.45,
-            "whip": 0.73
+            "hr9": 1.08,
+            "era": 1.08,
+            "whip": 1.08
           },
           "side": "home"
         },
