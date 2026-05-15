@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-15T23:31:51Z",
+  "generated_at": "2026-05-15T23:36:48Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -124,12 +124,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "home",
-        "home_score": 0.404,
+        "net_side": "away",
+        "home_score": -0.195,
         "away_score": -0.195,
         "home_fade": 0.3,
         "away_fade": 0.3,
-        "reason": "Direction nette: Chicago White Sox (+0.40)",
+        "reason": "Direction nette: Chicago Cubs (-0.20)",
         "detail": [
           {
             "side": "home",
@@ -142,12 +142,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.3
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.599
           }
         ]
       }
@@ -184,10 +178,10 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.795,
-        "away_score": 0.875,
+        "away_score": 0.015,
         "home_fade": 0.9,
         "away_fade": 0.3,
-        "reason": "Direction nette: Texas Rangers (+0.87)",
+        "reason": "Direction nette: Texas Rangers (+0.01)",
         "detail": [
           {
             "side": "home",
@@ -206,12 +200,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.86
           }
         ]
       }
@@ -363,11 +351,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 1.337,
-        "away_score": -1.715,
+        "home_score": 0.155,
+        "away_score": -1.195,
         "home_fade": 0.3,
-        "away_fade": 1.82,
-        "reason": "Direction nette: Los Angeles Angels (+1.34)",
+        "away_fade": 1.3,
+        "reason": "Direction nette: Los Angeles Angels (+0.15)",
         "detail": [
           {
             "side": "home",
@@ -386,18 +374,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 1.0
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 0.52
           }
         ]
       }
@@ -705,11 +681,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -1.053,
-        "away_score": 0.931,
-        "home_fade": 1.106,
+        "home_score": -1.498,
+        "away_score": 1.393,
+        "home_fade": 1.55,
         "away_fade": 0.15,
-        "reason": "Direction nette: Toronto Blue Jays (+0.93)",
+        "reason": "Direction nette: Toronto Blue Jays (+1.39)",
         "detail": [
           {
             "side": "home",
@@ -733,13 +709,13 @@
             "side": "home",
             "type": "market_move",
             "direction": "drift",
-            "strength": 0.556
+            "strength": 1.0
           },
           {
             "side": "away",
             "type": "market_move",
             "direction": "steam",
-            "strength": 0.694
+            "strength": 1.0
           }
         ]
       }
@@ -885,11 +861,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.252,
+        "home_score": 0.94,
         "away_score": -1.097,
         "home_fade": 0.15,
         "away_fade": 1.15,
-        "reason": "Direction nette: Washington Nationals (+0.25)",
+        "reason": "Direction nette: Washington Nationals (+0.94)",
         "detail": [
           {
             "side": "home",
@@ -908,6 +884,12 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 1.0
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.688
           }
         ]
       }
@@ -1051,13 +1033,13 @@
         "1 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.183,
-        "away_score": -0.898,
-        "home_fade": 0.15,
+        "status": "abstain",
+        "net_side": null,
+        "home_score": -0.817,
+        "away_score": 0.452,
+        "home_fade": 1.15,
         "away_fade": 0.95,
-        "reason": "Direction nette: Cleveland Guardians (+0.18)",
+        "reason": "Signaux opposes: Cleveland Guardians fade 1.15, Cincinnati Reds fade 0.95 -> prudence",
         "detail": [
           {
             "side": "home",
@@ -1076,6 +1058,18 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.8
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
           }
         ]
       }
@@ -1163,11 +1157,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
-        "home_fade": 0.15,
+        "home_score": -0.814,
+        "away_score": 0.981,
+        "home_fade": 0.867,
         "away_fade": 0.15,
-        "reason": "Direction nette: Milwaukee Brewers (-0.10)",
+        "reason": "Direction nette: Milwaukee Brewers (+0.98)",
         "detail": [
           {
             "side": "home",
@@ -1180,6 +1174,18 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 0.717
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.827
           }
         ]
       }
