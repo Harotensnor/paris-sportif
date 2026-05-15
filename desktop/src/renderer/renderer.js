@@ -86,6 +86,7 @@
     didScrollToNow: false,
     aiAssist: null,
     webEnrichments: null,
+    newsWatcher: null,
     webEnrichmentPending: new Set(),
     focusRow: null,
     feedbackBetId: null,
@@ -120,6 +121,7 @@
   const APP_SESSION_KEY = 'parisSportifDesktopSession';
   const AI_ENGINE_KEY = 'parisSportifAiEngineState';
   const WEB_ENRICHMENT_KEY = 'parisSportifWebEnrichmentState';
+  const NEWS_WATCHER_KEY = 'parisSportifNewsWatcherState';
   const LIVE_NOTIFICATION_KEY = 'parisSportifLiveNotificationKeys';
   const MODEL_ADJUSTMENTS_KEY = 'parisSportifModelAdjustments';
   const LOSS_FEEDBACK_KEY = 'parisSportifLossFeedbacks';
@@ -2987,7 +2989,7 @@
   function pickNarrative(row, signalPreview, fallback) {
     const sport = String(row?.sport || row?.match?.sport || '').toLowerCase();
     const sentences = [
-      `Le pari proposé est ${userBetLabel(row)}, à ${formatOdd(row.odd)} sur Winamax, avec une mise suggérée de ${visibleStakeText(row)}.`
+      `Le pari proposé est ${userBetLabel(row)}, à ${formatOdd(row.odd)} sur Winamax, ${stakeNarrativeText(row)}.`
     ];
     if (sport.includes('football') || sport.includes('soccer')) {
       sentences.push(...footballNarrativeSentences(row));
@@ -3019,6 +3021,13 @@
       .slice(0, 220);
   }
 
+  function stakeNarrativeText(row) {
+    const stake = displayStakeAmount(row);
+    if (stake > 0) return `avec une mise suggérée de ${formatMoney(stake)}`;
+    const reason = noBetStakeReason(row);
+    return `mais aucune mise n’est recommandée pour l’instant${reason ? ` (${userFacingGuardText(reason)})` : ''}`;
+  }
+
   function numericText(value, suffix = '', digits = 1) {
     const n = Number(value);
     if (!Number.isFinite(n)) return 'non confirmé';
@@ -3026,15 +3035,26 @@
   }
 
   function teamContext(row, side) {
-    return row?.match?.context?.teams?.[side] || {};
+    const contextTeam = row?.match?.context?.teams?.[side] || {};
+    const sides = getSides(row?.match || {});
+    const competitor = side === 'home' ? sides.home : sides.away;
+    return { ...(competitor || {}), ...contextTeam };
   }
 
   function lineupContext(row, side) {
-    return row?.match?.lineups?.[side] || teamContext(row, side)?.lineup || row?.match?.context?.availability?.[side]?.lineup || {};
+    const sides = getSides(row?.match || {});
+    const competitor = side === 'home' ? sides.home : sides.away;
+    return row?.match?.lineups?.[side] || teamContext(row, side)?.lineup || competitor?.lineup || row?.match?.context?.availability?.[side]?.lineup || {};
   }
 
   function availabilityContext(row, side) {
-    return row?.match?.context?.availability?.[side] || {};
+    const sides = getSides(row?.match || {});
+    const competitor = side === 'home' ? sides.home : sides.away;
+    const contextAvailability = row?.match?.context?.availability?.[side] || {};
+    return {
+      ...(competitor?.injuries ? { injuries: { list: competitor.injuries, total: competitor.injuries_count || competitor.injuries.length, severe: competitor.injuries_severe || 0 } } : {}),
+      ...contextAvailability
+    };
   }
 
   function teamDisplayName(row, side) {
@@ -3059,6 +3079,12 @@
   function sideGoalText(side) {
     const fd = side?.history?.football_data || {};
     const xg = side?.xg || side?.history?.xg || {};
+    const xgFor = Number(side?.xg_for_avg ?? side?.xg_per90 ?? xg.for_avg);
+    const xgAgainst = Number(side?.xg_against_avg ?? side?.xga_per90 ?? xg.against_avg);
+    const avgGf5 = Number(side?.form_stats?.avg_gf5 ?? side?.avg_gf5);
+    const avgGa5 = Number(side?.form_stats?.avg_ga5 ?? side?.avg_ga5);
+    if (Number.isFinite(avgGf5) || Number.isFinite(avgGa5)) return `${numericText(avgGf5, ' but/m sur 5', 2)} · ${numericText(avgGa5, ' encaissé/m sur 5', 2)}`;
+    if (Number.isFinite(xgFor) || Number.isFinite(xgAgainst)) return `${numericText(xgFor, ' xG pour', 2)} · ${numericText(xgAgainst, ' xG contre', 2)}`;
     if (fd.matches) return `${numericText(fd.avg_for, ' but/m', 2)} · ${numericText(fd.avg_against, ' encaissé/m', 2)}`;
     if (xg.present) return `${numericText(xg.for_avg, ' xG pour', 2)} · ${numericText(xg.against_avg, ' xG contre', 2)}`;
     return 'buts récents à confirmer';
@@ -3069,9 +3095,11 @@
     const xg = side?.xg || side?.history?.xg || {};
     const over25 = Number(fd.over25_rate);
     const btts = Number(fd.btts_rate);
-    const xgFor = Number(xg.for_avg);
-    const xgAgainst = Number(xg.against_avg);
+    const xgFor = Number(side?.xg_for_avg ?? side?.xg_per90 ?? xg.for_avg);
+    const xgAgainst = Number(side?.xg_against_avg ?? side?.xga_per90 ?? xg.against_avg);
+    const ppda = Number(side?.ppda ?? side?.history?.ppda);
     if (Number.isFinite(xgFor) && xgFor >= 1.75) return 'jeu offensif, volume haut';
+    if (Number.isFinite(ppda) && ppda <= 10.5) return 'pressing haut, récupération agressive';
     if (Number.isFinite(over25) && over25 >= 0.58) return 'matchs ouverts, rythme élevé';
     if (Number.isFinite(btts) && btts >= 0.58) return 'attaque active mais défense exposée';
     if (Number.isFinite(xgAgainst) && xgAgainst <= 1.05) return 'bloc plutôt compact';
@@ -3098,12 +3126,158 @@
     const rawScore = star?.star_score ?? (player?.rating != null ? player.rating : undefined);
     const score = Number(rawScore);
     const scoreText = Number.isFinite(score) ? `forme ${Math.max(0, Math.min(10, score)).toFixed(1)}/10` : 'forme 5 derniers à enrichir';
-    const goals = Number(star?.goals_per_match);
-    const xg = Number(star?.xG_per_match);
+    const goals = Number(star?.goals_per_match ?? player?.goals_per_match);
+    const xg = Number(star?.xG_per_match ?? star?.xg_per_match ?? player?.xG_per_match);
+    const xa = Number(star?.xA_per_match ?? star?.xa_per_match ?? player?.xA_per_match);
+    const shots = Number(star?.shots_on_target_per_match ?? star?.shots_per_match ?? player?.shots_on_target_per_match);
+    const keyPasses = Number(star?.key_passes_per_match ?? player?.key_passes_per_match);
     const parts = [scoreText];
     if (Number.isFinite(goals)) parts.push(`${goals.toFixed(2)} but/m`);
     if (Number.isFinite(xg)) parts.push(`${xg.toFixed(2)} xG/m`);
+    if (Number.isFinite(xa)) parts.push(`${xa.toFixed(2)} xA/m`);
+    if (Number.isFinite(shots)) parts.push(`${shots.toFixed(1)} tir cadré/m`);
+    if (Number.isFinite(keyPasses)) parts.push(`${keyPasses.toFixed(1)} passe clé/m`);
     return parts.join(' · ');
+  }
+
+  function playerAdvancedStats(player, star = {}) {
+    const merged = { ...(star || {}), ...(player || {}) };
+    const goals = Number(merged.goals_season ?? merged.goals ?? merged.season_goals);
+    const assists = Number(merged.assists_season ?? merged.assists ?? merged.season_assists);
+    const xgSeason = Number(merged.xG_season ?? merged.xg_season ?? (Number(merged.xG_per_match) * Number(merged.minutes || 900) / 90));
+    const xaSeason = Number(merged.xA_season ?? merged.xa_season ?? (Number(merged.xA_per_match) * Number(merged.minutes || 900) / 90));
+    const shots = Number(merged.shots_on_target_per_match ?? merged.shots_per_match);
+    const dribbles = Number(merged.dribbles_success_per_match ?? merged.dribbles_per_match);
+    const keyPasses = Number(merged.key_passes_per_match);
+    const cards = Number(merged.yellow_cards ?? merged.cards_yellow ?? merged.cards);
+    const minutes = Number(merged.minutes ?? merged.minutes_played);
+    const conversion = Number(merged.shot_conversion ?? (Number.isFinite(goals) && Number.isFinite(shots) && shots > 0 && minutes > 0 ? goals / Math.max(1, shots * minutes / 90) : NaN));
+    return {
+      xgSeason,
+      xaSeason,
+      shots,
+      dribbles,
+      keyPasses,
+      conversion,
+      cards,
+      minutes,
+      goals,
+      assists,
+      formScore: Number(merged.star_score ?? merged.rating ?? 0)
+    };
+  }
+
+  function statChip(label, value, suffix = '', digits = 1) {
+    const n = Number(value);
+    const text = Number.isFinite(n)
+      ? `${n.toFixed(digits).replace(/\.0$/, '')}${suffix}`
+      : 'à enrichir';
+    return `<span title="${escapeHtml(label)}">${escapeHtml(label)} <strong>${escapeHtml(text)}</strong></span>`;
+  }
+
+  function keyPlayersForSide(row, side) {
+    const players = lineupPlayers(row, side);
+    const stars = starIndex(row, side);
+    const enriched = players.map((player) => {
+      const star = player.star || stars.get(normalizeUiKey(player.name || '')) || {};
+      const stats = playerAdvancedStats(player, star);
+      const score = Number(stats.formScore || 0) + Number(stats.xgSeason || 0) * 0.4 + Number(stats.xaSeason || 0) * 0.35 + Number(stats.goals || 0) * 0.25;
+      return { player, star, stats, score };
+    });
+    return enriched.sort((a, b) => b.score - a.score).slice(0, 3);
+  }
+
+  function buildKeyPlayersHtml(row) {
+    const groups = ['home', 'away'].map((side) => {
+      const rows = keyPlayersForSide(row, side);
+      return `
+        <div class="key-player-side">
+          <h5>${escapeHtml(teamDisplayName(row, side))}</h5>
+          ${rows.length ? rows.map(({ player, star, stats }) => {
+            const form = stats.formScore >= 6 ? 'En forme' : stats.formScore > 0 && stats.formScore < 4 ? 'En méforme' : 'À confirmer';
+            return `
+              <article class="key-player-card">
+                <strong>${escapeHtml(player.name || star.name || 'Joueur clé')}</strong>
+                <em>${escapeHtml(`${player.pos || star.position || 'poste ?'} · ${form}`)}</em>
+                <div class="stat-chip-row">
+                  ${statChip('xG saison', stats.xgSeason, '', 1)}
+                  ${statChip('xA saison', stats.xaSeason, '', 1)}
+                  ${statChip('Tirs cadrés/m', stats.shots, '', 1)}
+                  ${statChip('Dribbles/m', stats.dribbles, '', 1)}
+                  ${statChip('Passes clés/m', stats.keyPasses, '', 1)}
+                  ${statChip('Conversion', Number.isFinite(stats.conversion) ? stats.conversion * 100 : NaN, '%', 0)}
+                  ${statChip('Cartons', stats.cards, '', 0)}
+                  ${statChip('Minutes', stats.minutes, '', 0)}
+                </div>
+              </article>
+            `;
+          }).join('') : `
+            <article class="key-player-card">
+              <strong>Joueurs clés à enrichir</strong>
+              <em>La feuille de match n’est pas encore publiée, mais la fiche surveille ces stats dès qu’elles arrivent.</em>
+              <div class="stat-chip-row">
+                ${statChip('xG saison', NaN, '', 1)}
+                ${statChip('xA saison', NaN, '', 1)}
+                ${statChip('Tirs cadrés/m', NaN, '', 1)}
+                ${statChip('Dribbles/m', NaN, '', 1)}
+                ${statChip('Passes clés/m', NaN, '', 1)}
+                ${statChip('Conversion', NaN, '%', 0)}
+                ${statChip('Cartons', NaN, '', 0)}
+                ${statChip('Minutes', NaN, '', 0)}
+              </div>
+            </article>
+          `}
+        </div>
+      `;
+    }).join('');
+    return `
+      <article class="detail-card wide key-players-card">
+        <h4>Joueurs clés</h4>
+        <p class="detail-text">Les trois profils les plus utiles par équipe, avec xG/xA, tirs, création et disponibilité quand la source les fournit.</p>
+        <div class="key-player-grid">${groups}</div>
+      </article>
+    `;
+  }
+
+  function buildTacticalDuelsHtml(row) {
+    const home = keyPlayersForSide(row, 'home');
+    const away = keyPlayersForSide(row, 'away');
+    const duels = [];
+    if (home[0] && away[0]) duels.push([home[0], away[0], 'Duel principal']);
+    if (home[1] && away[1]) duels.push([home[1], away[1], 'Création vs bloc adverse']);
+    if (home[2] && away[2]) duels.push([home[2], away[2], 'Impact banc / second rideau']);
+    const homeStyle = inferFootballStyle(teamContext(row, 'home'));
+    const awayStyle = inferFootballStyle(teamContext(row, 'away'));
+    return `
+      <article class="detail-card wide tactical-card">
+        <h4>Analyse tactique</h4>
+        <div class="match-context-band">
+          <span>${escapeHtml(teamDisplayName(row, 'home'))}</span>
+          <strong>${escapeHtml(homeStyle)}</strong>
+          <em>${escapeHtml(`${teamDisplayName(row, 'away')} : ${awayStyle}`)}</em>
+        </div>
+        <div class="tactical-duel-grid">
+          ${duels.length ? duels.map(([left, right, label]) => {
+            const leftStats = left.stats || {};
+            const rightStats = right.stats || {};
+            const leftPower = Number(leftStats.xgSeason || 0) + Number(leftStats.xaSeason || 0) + Number(leftStats.formScore || 0) / 10;
+            const rightPower = Number(rightStats.xgSeason || 0) + Number(rightStats.xaSeason || 0) + Number(rightStats.formScore || 0) / 10;
+            const read = leftPower > rightPower + 0.8
+              ? `${left.player.name || left.star.name} a l’avantage statistique`
+              : rightPower > leftPower + 0.8
+                ? `${right.player.name || right.star.name} peut contenir le duel`
+                : 'duel équilibré à confirmer par la compo';
+            return `
+              <div class="tactical-duel">
+                <span>${escapeHtml(label)}</span>
+                <strong>${escapeHtml(left.player.name || left.star.name || 'Joueur A')} vs ${escapeHtml(right.player.name || right.star.name || 'Joueur B')}</strong>
+                <em>${escapeHtml(read)}</em>
+              </div>
+            `;
+          }).join('') : '<div class="empty compact-empty">Duels clés à générer dès que les titulaires sont confirmés.</div>'}
+        </div>
+      </article>
+    `;
   }
 
   function lineupPlayers(row, side) {
@@ -3193,6 +3367,8 @@
           </div>
         </div>
       </article>
+      ${buildKeyPlayersHtml(row)}
+      ${buildTacticalDuelsHtml(row)}
     `;
   }
 
@@ -3256,6 +3432,22 @@
         <div class="sport-insight-grid">
           ${rows.map(([label, value]) => `<div><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`).join('')}
         </div>
+        <div class="key-player-grid">
+          ${[home, away].map((player, index) => `
+            <article class="key-player-card">
+              <strong>${escapeHtml(player?.name || `Joueur ${index + 1}`)}</strong>
+              <em>${escapeHtml(index === 0 ? 'Profil joueur gauche' : 'Profil joueur droit')}</em>
+              <div class="stat-chip-row">
+                ${statChip('Aces moyens', player?.aces_per_match, '', 1)}
+                ${statChip('1er service', player?.first_serve_pct, '%', 0)}
+                ${statChip('Break sauvés', player?.break_points_saved_pct, '%', 0)}
+                ${statChip('WR dur', player?.hard_win_rate, '%', 0)}
+                ${statChip('WR terre', player?.clay_win_rate, '%', 0)}
+                ${statChip('Titres saison', player?.season_titles, '', 0)}
+              </div>
+            </article>
+          `).join('')}
+        </div>
       </article>
     `;
   }
@@ -3264,6 +3456,8 @@
     const match = row?.match || {};
     const { home, away } = getSides(match);
     const sport = String(row?.sport || match.sport || '').toLowerCase();
+    const homeAdv = home?.mlb_advanced || home?.advanced || {};
+    const awayAdv = away?.mlb_advanced || away?.advanced || {};
     const sportRows = sport.includes('baseball')
       ? [['Starter clé', 'pitcher titulaire, ERA et WHIP à confirmer'], ['Bullpen', 'fraîcheur bullpen à enrichir'], ['Forme', `${sideFormText(home)} / ${sideFormText(away)}`]]
       : sport.includes('hockey')
@@ -3276,6 +3470,25 @@
         <h4>Fiche ${escapeHtml(row?.sport || 'sport')} enrichie</h4>
         <div class="sport-insight-grid">
           ${sportRows.map(([label, value]) => `<div><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`).join('')}
+        </div>
+        <div class="key-player-grid">
+          ${[
+            [home?.name || 'Équipe 1', homeAdv],
+            [away?.name || 'Équipe 2', awayAdv]
+          ].map(([label, stats]) => `
+            <article class="key-player-card">
+              <strong>${escapeHtml(label)}</strong>
+              <em>Stats équipe avancées</em>
+              <div class="stat-chip-row">
+                ${statChip('Runs/pts par match', stats?.runs_per_game ?? stats?.points_per_game, '', 2)}
+                ${statChip('OPS', stats?.team_OPS, '', 3)}
+                ${statChip('ERA', stats?.team_ERA, '', 2)}
+                ${statChip('WHIP', stats?.team_WHIP, '', 2)}
+                ${statChip('Forme attaque', stats?.attack_rating, '', 0)}
+                ${statChip('Forme défense', stats?.defense_rating, '', 0)}
+              </div>
+            </article>
+          `).join('')}
         </div>
       </article>
     `;
@@ -3294,7 +3507,9 @@
       .replace(/availability_missing_near_kickoff/gi, 'infos effectif manquantes proche du coup d’envoi')
       .replace(/team_strength_context_missing/gi, 'niveau d’équipe à consolider')
       .replace(/\bedge\b/gi, 'avantage')
+      .replace(/\bKelly nul\b/gi, 'mise non positive')
       .replace(/\bKelly\b/gi, 'mise')
+      .replace(/\bmise nul\b/gi, 'mise non positive')
       .replace(/\b1N2\b/gi, 'vainqueur du match')
       .replace(/_/g, ' ');
   }
@@ -4174,6 +4389,21 @@
     return all.some((injury) => String(injury.type || '').toLowerCase() === 'missing' || String(injury.reason_label || '').toLowerCase().includes('suspend'));
   }
 
+  function richPrematchContext(row) {
+    const news = newsForRow(row);
+    const newsText = news?.headline ? `${news.headline}` : 'news watcher prêt';
+    const homeLineup = lineupContext(row, 'home');
+    const awayLineup = lineupContext(row, 'away');
+    const lineupText = (homeLineup.confirmed || awayLineup.confirmed)
+      ? 'compositions sorties'
+      : (homeLineup.present || awayLineup.present || homeLineup.projected || awayLineup.projected)
+        ? 'compositions probables lues'
+        : 'compositions à re-checker';
+    const injuryText = hasKeyInjurySignal(row) ? 'absence clé à vérifier' : 'pas d’absence clé forte';
+    const edgeText = displayEdgeValue(row) > 0 ? `avantage ${formatPct(displayEdgeValue(row), 1)}` : 'avantage à confirmer';
+    return `${lineupText} · ${injuryText} · ${newsText} · ${edgeText}`;
+  }
+
   function updatePriceMoveAlerts(readyRows) {
     const memory = readStorageJson(ODDS_MEMORY_KEY, {});
     const next = { ...memory };
@@ -4270,7 +4500,12 @@
         && !tracked.has(userBetKey(row));
     });
     if (reminder && prefs.prematchAlertsEnabled !== false) {
-      alertOnce(`kickoff:${userBetKey(reminder)}`, 'Pick proche du coup d’envoi', `${reminder.priorityRank ? `#${reminder.priorityRank} · ` : ''}${reminder.title} · ${reminder.label} ${formatOdd(reminder.odd)} démarre dans ${countdownLabel(reminder.start)}.`, reminder);
+      alertOnce(
+        `kickoff:${userBetKey(reminder)}`,
+        'Pick proche du coup d’envoi',
+        `${reminder.priorityRank ? `#${reminder.priorityRank} · ` : ''}${reminder.title} · ${userBetLabel(reminder)} ${formatOdd(reminder.odd)} dans ${countdownLabel(reminder.start)}. ${richPrematchContext(reminder)}.`,
+        reminder
+      );
     }
     const injuryPick = readyRows.find((row) => {
       const ts = Date.parse(row.start || '');
@@ -4597,13 +4832,21 @@
     const node = $('#web-enrichment-summary');
     if (!node) return;
     const store = state.webEnrichments || readStorageJson(WEB_ENRICHMENT_KEY, null);
+    const news = state.newsWatcher || readStorageJson(NEWS_WATCHER_KEY, null);
     const summary = store?.summary || {};
+    const newsSummary = news?.summary || {};
     node.innerHTML = `
       <article class="refresh-card refresh-${Number(summary.failed || 0) ? 'warn' : 'ok'}">
         <span>Enrichissement web</span>
         <strong>${formatCount(summary.success || 0)} réussis / ${formatCount(summary.failed || 0)} échoués</strong>
         <p>Aujourd'hui · cache local ${formatCount(webEnrichmentConfig().cacheMinutes)} min · sources consultées par le moteur.</p>
         <small>${escapeHtml(store?.updatedAt ? formatDateTime(store.updatedAt) : 'Aucun enrichissement lancé')}</small>
+      </article>
+      <article class="refresh-card refresh-${Number(newsSummary.impact || 0) ? 'warn' : 'ok'}">
+        <span>News watcher</span>
+        <strong>${formatCount(newsSummary.checked || 0)} checks · ${formatCount(newsSummary.impact || 0)} impactant(s)</strong>
+        <p>Kickoff &lt; 6h · compos, blessures, météo, suspensions.</p>
+        <small>${escapeHtml(news?.updatedAt ? formatDateTime(news.updatedAt) : 'Aucun re-check news')}</small>
       </article>
     `;
   }
@@ -4631,6 +4874,95 @@
       pushLog('warn', `État enrichissement web indisponible: ${error.message}`);
       updateWebEnrichmentSummary();
     }
+  }
+
+  function newsForRow(row) {
+    const store = state.newsWatcher || readStorageJson(NEWS_WATCHER_KEY, null);
+    const key = rowEnrichmentKey(row);
+    return store?.byKey?.[key] || store?.byKey?.[userBetKey(row)] || null;
+  }
+
+  async function loadNewsWatcherState() {
+    try {
+      const store = await fetchJson('/api/news-watch/state');
+      if (store && typeof store === 'object') {
+        state.newsWatcher = store;
+        writeStorageJson(NEWS_WATCHER_KEY, store);
+        updateWebEnrichmentSummary();
+      }
+    } catch (error) {
+      pushLog('warn', `News watcher indisponible: ${error.message}`);
+    }
+  }
+
+  async function runNewsWatcher(rows, { force = false, dryRun = false } = {}) {
+    const prefs = loadPreferences();
+    const candidates = (Array.isArray(rows) ? rows : [])
+      .filter((row) => pickHasCoreData(row))
+      .filter((row) => {
+        const minutes = minutesToKickoffValue(row.start);
+        return minutes >= 0 && minutes <= 6 * 60;
+      })
+      .slice(0, 4);
+    if (!candidates.length) return null;
+    const response = await fetchJson('/api/news-watch/run', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        config: {
+          cacheMinutes: 30,
+          maxPicks: 4,
+          maxSources: 5,
+          rateLimitPerMinute: prefs.webEnrichmentRateLimit || 5
+        },
+        picks: candidates.map((row) => ({ ...aiPickPayload(row), winamaxUrl: row.winamaxUrl || row.match?.winamax?.url || '' })),
+        force,
+        dryRun
+      })
+    });
+    const store = response?.store || (response?.summary ? { summary: response.summary, byKey: Object.fromEntries((response.records || []).map((record) => [record.key, record])) } : null);
+    if (store) {
+      state.newsWatcher = {
+        ...(state.newsWatcher || {}),
+        ...store,
+        byKey: {
+          ...((state.newsWatcher || {}).byKey || {}),
+          ...(store.byKey || {})
+        }
+      };
+      writeStorageJson(NEWS_WATCHER_KEY, state.newsWatcher);
+      updateWebEnrichmentSummary();
+    }
+    (response?.records || []).filter((record) => record.status === 'impact').forEach((record) => {
+      const row = candidates.find((candidate) => rowEnrichmentKey(candidate) === record.key);
+      if (row) alertOnce(`news-impact:${record.key}:${record.headline}`, 'Re-check news', `${row.title} · ${record.headline}.`, row);
+    });
+    return response;
+  }
+
+  function buildNewsWatcherHtml(row) {
+    const item = newsForRow(row);
+    const tone = item?.tone || 'watch';
+    const sources = Array.isArray(item?.sources) ? item.sources : [];
+    return `
+      <article class="detail-card wide news-watcher-card news-${escapeHtml(tone)}">
+        <h4>News watcher temps réel</h4>
+        <div class="match-context-band">
+          <span>${escapeHtml(item?.checkedAt ? `Re-check ${formatDateTime(item.checkedAt)}` : 'Re-check non lancé')}</span>
+          <strong>${escapeHtml(item?.headline || 'Surveillance prête')}</strong>
+          <em>${escapeHtml(item?.detail || 'Les news publiques sont vérifiées automatiquement pour les picks proches du coup d’envoi.')}</em>
+        </div>
+        <div class="source-mini-grid">
+          ${sources.length ? sources.slice(0, 5).map((source) => `
+            <div class="${source.status === 'ok' ? 'ok' : 'missing'}">
+              <span>${escapeHtml(source.label || source.key || 'Source')}</span>
+              <strong>${escapeHtml(source.status === 'ok' ? 'OK' : 'À relancer')}</strong>
+              <em>${escapeHtml(source.summary || '-')}</em>
+            </div>
+          `).join('') : '<div class="empty compact-empty">Aucune source news en cache pour ce match. Le prochain refresh pré-match déclenchera le watcher.</div>'}
+        </div>
+      </article>
+    `;
   }
 
   async function enrichPick(row, { force = false, dryRun = false, manual = false } = {}) {
@@ -4685,24 +5017,23 @@
           .finally(() => state.webEnrichmentPending.delete(key));
       }, 900 + index * 700);
     });
-    if (prefs.liveNewsWatcher) {
+    if (prefs.webEnrichmentEnabled !== false) {
       const imminent = (Array.isArray(rows) ? rows : [])
         .filter((row) => minutesToKickoffValue(row.start) <= 6 * 60)
-        .slice(0, 2);
-      imminent.forEach((row, index) => {
+        .slice(0, 4);
+      imminent.forEach((row) => {
         const newsKey = `news:${rowEnrichmentKey(row)}:${parisDayKey()}`;
         const store = readStorageJson(LIVE_NEWS_KEY, {});
         if (store[newsKey] && Date.now() - Date.parse(store[newsKey]) < 60 * 60 * 1000) return;
         store[newsKey] = new Date().toISOString();
         writeStorageJson(LIVE_NEWS_KEY, store);
-        setTimeout(() => {
-          enrichPick(row, { force: true })
-            .then((record) => {
-              if (record?.majorChange) notifyUser('News impactante détectée', `${row.title} : re-check avant mise.`, row);
-            })
-            .catch((error) => pushLog('warn', `Live news watcher indisponible: ${error.message}`));
-        }, 2_000 + index * 1_000);
       });
+      if (imminent.length) {
+        setTimeout(() => {
+          runNewsWatcher(imminent)
+            .catch((error) => pushLog('warn', `Live news watcher indisponible: ${error.message}`));
+        }, 2_000);
+      }
     }
   }
 
@@ -4746,10 +5077,16 @@
     const nums = score.match(/(\d+)\D+(\d+)/);
     if (!nums) return 'Verdict provisoire : score non disponible';
     const total = Number(nums[1]) + Number(nums[2]);
+    const minute = Number(String(live?.minute || '').match(/\d+/)?.[0] || 0);
+    const line = Number(String(row?.label || row?.market || '').replace(',', '.').match(/(\d+(?:\.\d+)?)/)?.[1] || 2.5);
+    const targetGoals = Number.isFinite(line) ? Math.floor(line) + 1 : 3;
     if (text.includes('over') || text.includes('plus') || text.includes('ou')) {
-      return total >= 3 ? 'Pari provisoirement gagnant' : 'Encore besoin de buts/points';
+      const needed = Math.max(0, targetGoals - total);
+      return needed <= 0
+        ? `Pari provisoirement gagnant : ${total} but(s)/point(s) au score`
+        : `Encore ${needed} but(s)/point(s) à trouver${minute ? ` en ${Math.max(0, 95 - minute)} min environ` : ''}`;
     }
-    if (text.includes('under') || text.includes('moins')) return total < 3 ? 'Pari provisoirement gagnant' : 'Pari sous pression';
+    if (text.includes('under') || text.includes('moins')) return total < targetGoals ? `Pari provisoirement gagnant : marge ${targetGoals - total}` : 'Pari sous pression';
     return 'Suivi live actif';
   }
 
@@ -10045,11 +10382,11 @@
     const context = match.context || {};
     const contextQuality = context.quality || row.contextQuality || {};
     const decisionBundle = decisionBundleForRow(row);
-    const stakeAllowed = canDisplayStake(row, decisionBundle);
+    const stakeAllowed = displayStakeAmount(row) > 0;
     const dc = decisionBundleForRow(row);
     const readableDecision = dc.status === 'ready' ? 'Prêt' : dc.status === 'repair' ? 'À réparer' : dc.status === 'skip' ? 'À éviter' : (row.statusLabel || 'Observation');
     const readableReason = noBetStakeReason(row, decisionBundle) || contextGateText(row);
-    const readableAction = dc.nextAction || (stakeAllowed ? 'Jouer maintenant' : 'Surveiller ou finaliser T-10');
+    const readableAction = stakeAllowed ? (dc.nextAction || 'Jouer maintenant') : 'Surveiller ou finaliser T-10';
     const wx = match.winamax || {};
     const markets = wx.markets || {};
     const oneNtwo = markets['1n2'] || {};
@@ -10131,7 +10468,7 @@
           <article class="match-decision-hero decision-${escapeHtml(decisionTone)}">
             <span>Pari suggéré</span>
             <strong>${escapeHtml(stakeAllowed ? 'Je peux miser' : 'Ne pas miser maintenant')}</strong>
-            ${actionPickHtml(row)}
+            ${actionPickHtml(row, { compact: true })}
             <p>${escapeHtml(simpleWhyText(row))}</p>
             <div class="ultimate-tags detail-priority-strip">
               ${priorityBadgeHtml(row)}
@@ -10159,6 +10496,7 @@
           </article>
         </div>
         ${buildEnrichedSourcesHtml(row)}
+        ${buildNewsWatcherHtml(row)}
         <article class="detail-card wide sheet-signals-card">
           <h4>Signaux clés</h4>
           <div class="sheet-signal-strip">
@@ -10282,9 +10620,13 @@
   }
 
   function visibleStakeText(row, decisions = decisionBundleForRow(row)) {
-    if (!canDisplayStake(row, decisions) && decisions?.stakeDisplay) return String(decisions.stakeDisplay);
+    if (!canDisplayStake(row, decisions)) {
+      const allocation = allocationForRow(row);
+      if (!allocation && decisions?.canBet === true) return 'Hors budget jour';
+      return 'Pas de mise recommandée';
+    }
     const stake = displayStakeAmount(row);
-    return stake > 0 ? formatMoney(stake) : '0 €';
+    return stake > 0 ? formatMoney(stake) : 'Hors budget jour';
   }
 
   function noBetStakeReason(row, decisions = decisionBundleForRow(row)) {
@@ -14284,6 +14626,7 @@
     state.actionHistory = readActionHistory();
     state.aiAssist = readStorageJson(AI_ENGINE_KEY, null);
     state.webEnrichments = readStorageJson(WEB_ENRICHMENT_KEY, null);
+    state.newsWatcher = readStorageJson(NEWS_WATCHER_KEY, null);
     state.updateStatus = readStorageJson(UPDATE_STATUS_KEY, null);
     loadBugReports().catch(() => {});
     renderActionHistory();
@@ -14307,6 +14650,7 @@
       setTimeout(() => startDemoTour(), 800);
     }
     loadWebEnrichmentState().catch(() => {});
+    loadNewsWatcherState().catch(() => {});
     setTimeout(() => checkForUpdates().catch(() => {}), 2500);
     await logPromise;
     setSideStatus('Calcul prêt', 'ok');

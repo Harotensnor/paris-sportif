@@ -5,6 +5,17 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 31 — Stats avancées + tactique + news live + workflow riche
+
+- Version desktop portée à `v1.7.0` sur la base du Sprint 30 `eb4c51e21`. Test terrain obligatoire relancé avec pipeline réelle : `data.js` généré le 15/05/2026 à 20:02 UTC, 259 événements, 13 événements Winamax aujourd'hui, puis correction d'une régression critique où `winamax_markets.json` n'était plus rattaché aux events avant le filtre bookable.
+- Bug terrain corrigé : le moteur desktop passait à `0` match analysable malgré 85 events Winamax sur 24h. Les marchés Winamax frais sont maintenant attachés par `match_id` avant `dedupeUpcomingBookable`; après correction : 199 matchs analysés, 180 picks, 18 lignes cockpit, 15 affichées sur 24h.
+- Fiches foot poussées au niveau analyse : section `Joueurs clés` avec xG/xA saison, tirs cadrés, dribbles, passes clés, conversion, discipline et minutes quand les sources les exposent; section `Analyse tactique` avec styles inférés, duels clés et lecture joueur-vs-joueur.
+- News watcher temps réel ajouté côté main process : endpoint local `/api/news-watch/run`, cache local, rate limit, sources publiques via le plan d'enrichissement (`ESPN`, `Wikipédia`, `Sofascore`, `L'Équipe`, `Transfermarkt` quand accessible) et classification blessure/compo/suspension/météo/coach. Les fiches affichent `News watcher temps réel` avec sources OK/à relancer.
+- Workflow utilisateur enrichi : les alertes pré-match intègrent désormais compositions probables/confirmées, absence clé, news watcher et avantage du modèle; les updates live indiquent combien de buts/points restent nécessaires et gardent l'estimation cash-out.
+- UX corrigée en terrain : les cartes/fiches hors budget n'affichent plus `MISE : 0 €`; elles indiquent `Pas de mise recommandée` ou `Hors budget jour`. Le doublon `Pourquoi : ...` dans le hero de fiche est supprimé.
+- Fiches tennis et autres sports renforcées : la fiche tennis affiche des blocs joueur avec aces, 1er service, break points sauvés, WR surface et titres quand disponibles; baseball/basket/hockey affichent des stats équipe avancées ou les champs à enrichir source par source.
+- Validation terrain Sprint 31 : `qa:engine` et `qa:terrain` passent sur le snapshot réel avec 0 `Match nul` standard, 0 `MISE : 0 €` visible en cockpit, fiches foot/tennis/baseball ouvertes et captures `captures/desktop-sprint31-after-picks.png`, `desktop-sprint31-after-football-detail.png`, `desktop-sprint31-after-tennis-detail.png`, `desktop-sprint31-after-other-detail.png`.
+
 ### Sprint 30 — Fiches enrichies + texte narratif + anti-nul + accueil aéré
 
 - Version desktop portée à `v1.6.0` après test terrain obligatoire sur pipeline réelle, app Electron ouverte, clics et captures. Terrain initial : `refresh_once.py --full` a rafraîchi `data.js` le 15/05/2026, avec 267 événements, 21 matchs Winamax aujourd'hui au moment de l'audit, et le cockpit exposait encore un `PARI : Match nul` sur Aston Villa - Liverpool.

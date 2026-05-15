@@ -290,6 +290,41 @@ function createLegacyEngineService({ projectRoot }) {
     }
   }
 
+  function winamaxMarketEntryForMatch(winamaxMarketsIndex, match) {
+    if (!match || !winamaxMarketsIndex || typeof winamaxMarketsIndex !== 'object') return null;
+    const ids = [
+      match?.winamax?.match_id,
+      match?.match_id,
+      match?.id,
+      match?.uid,
+      String(match?.id || '').replace(/^espn_/, ''),
+      String(match?.id || '').replace(/^sofa_/, '')
+    ].filter(Boolean).map(String);
+    for (const id of ids) {
+      if (winamaxMarketsIndex[id]) return winamaxMarketsIndex[id];
+    }
+    return null;
+  }
+
+  function attachWinamaxMarkets(match, winamaxMarketsIndex) {
+    const entry = winamaxMarketEntryForMatch(winamaxMarketsIndex, match);
+    const markets = entry?.markets || entry?.odds || null;
+    if (!markets || typeof markets !== 'object') return match;
+    const winamax = match?.winamax || {};
+    return {
+      ...match,
+      winamax: {
+        ...winamax,
+        markets,
+        full_markets_count: Number(winamax.full_markets_count || entry?.odds?.all_markets?.length || entry?.markets?.all_markets?.length || 0),
+        full_market_keys: Array.isArray(winamax.full_market_keys)
+          ? winamax.full_market_keys
+          : Object.keys(markets),
+        details_fetched_at: winamax.details_fetched_at || entry?.details_fetched_at || entry?.fetched_at || null
+      }
+    };
+  }
+
   function readH2hIndex() {
     if (!fs.existsSync(h2hPath)) return {};
     try {
@@ -3346,7 +3381,9 @@ function createLegacyEngineService({ projectRoot }) {
     const clvSummaryReport = readClvSummaryReport();
     const picksHistorySummary = readPicksHistorySummary();
     const modelRealityAudit = buildModelRealityAudit(picksHistorySummary);
-    const events = dedupeUpcomingBookable(eventListFromDays(data.days)).slice(0, 1200);
+    const events = dedupeUpcomingBookable(
+      eventListFromDays(data.days).map((match) => attachWinamaxMarkets(match, playerOddsIndex))
+    ).slice(0, 1200);
     const enrichedEvents = events.map((match) => enrichMatchForModel(match, lineupsIndex, h2hIndex, matchContextIndex));
     const scorers = buildNativeScorers(win, enrichedEvents, lineupsIndex, starPlayersIndex, playerOddsIndex);
     const matchById = new Map(enrichedEvents.map((match) => [String(match?.winamax?.match_id || match?.id || match?.uid || ''), match]));

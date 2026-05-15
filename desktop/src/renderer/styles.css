@@ -3505,9 +3505,105 @@ td.empty::before,
   overflow-wrap: anywhere;
 }
 
+.key-player-grid,
+.tactical-duel-grid,
+.source-mini-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.key-player-side {
+  display: grid;
+  gap: 10px;
+}
+
+.key-player-side h5 {
+  margin: 0;
+  color: var(--text);
+}
+
+.key-player-card,
+.tactical-duel,
+.source-mini-grid > div {
+  min-width: 0;
+  display: grid;
+  gap: 6px;
+  padding: 11px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-2);
+}
+
+.key-player-card strong,
+.tactical-duel strong {
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+.key-player-card em,
+.tactical-duel em,
+.source-mini-grid em {
+  color: var(--muted);
+  font-style: normal;
+  font-size: 12px;
+}
+
+.stat-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.stat-chip-row span {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 4px 7px;
+  color: var(--muted);
+  font-size: 11px;
+  background: var(--surface);
+}
+
+.stat-chip-row strong {
+  color: var(--text);
+  font-size: 11px;
+}
+
+.news-watcher-card.news-danger {
+  border-color: rgba(252, 165, 165, .55);
+}
+
+.news-watcher-card.news-warn,
+.news-watcher-card.news-watch {
+  border-color: rgba(251, 191, 36, .45);
+}
+
+.source-mini-grid .ok strong {
+  color: var(--accent);
+}
+
+.source-mini-grid .missing strong {
+  color: var(--warn);
+}
+
+.time-pick-card,
+.ultimate-bet-card,
+.detail-card,
+.export-toast {
+  transition: transform 200ms ease-out, border-color 200ms ease-out, box-shadow 200ms ease-out, opacity 200ms ease-out;
+}
+
+.time-pick-card:hover,
+.detail-card:hover {
+  transform: translateY(-1px);
+}
+
 @media (max-width: 860px) {
   .match-context-band,
-  .lineup-pitch {
+  .lineup-pitch,
+  .key-player-grid,
+  .tactical-duel-grid {
     grid-template-columns: 1fr;
   }
 }

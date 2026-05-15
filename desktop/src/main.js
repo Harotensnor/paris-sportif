@@ -27,6 +27,8 @@ const DATA_BACKUP_ROOT = path.join(STATE_ROOT, 'data-backups');
 const DATA_BACKUP_PATH = path.join(DATA_BACKUP_ROOT, 'data-latest.js');
 const AI_WEB_ENRICHMENT_PATH = path.join(STATE_ROOT, 'ai-web-enrichment.json');
 const AI_WEB_ENRICHMENT_PLAN_VERSION = 2;
+const NEWS_WATCHER_PATH = path.join(STATE_ROOT, 'news-watcher.json');
+const NEWS_WATCHER_PLAN_VERSION = 1;
 const WINAMAX_PROMOS_PATH = path.join(STATE_ROOT, 'winamax-promos.json');
 const WEBHOOK_LOG_PATH = path.join(STATE_ROOT, 'webhook-log.jsonl');
 const UPDATE_STATUS_PATH = path.join(STATE_ROOT, 'update-status.json');
@@ -559,6 +561,12 @@ function enrichmentSourcePlan(pick) {
       kind: 'team-profile'
     },
     {
+      key: 'transfermarkt_search',
+      label: 'Transfermarkt',
+      url: query ? `https://www.transfermarkt.com/schnellsuche/ergebnis/schnellsuche?query=${query}` : null,
+      kind: 'team-player-profile'
+    },
+    {
       key: 'official_winamax',
       label: 'Winamax',
       url: cleanPublicUrl(pick?.winamaxUrl || pick?.match?.winamax?.url),
@@ -781,6 +789,144 @@ async function webEnrichPick(config, pick, options = {}) {
   atomicWriteJson(AI_WEB_ENRICHMENT_PATH, store);
   appendRefreshLine(`[ai-web] ${record.title || key}: ${success}/${sources.length} source(s) enrichies`);
   return { ok: true, cached: false, record, summary: store.summary };
+}
+
+function newsWatcherStore() {
+  const base = readJsonFileDefault(NEWS_WATCHER_PATH, {
+    version: NEWS_WATCHER_PLAN_VERSION,
+    updatedAt: null,
+    byKey: {},
+    runs: [],
+    summary: { today: todayKey(), checked: 0, impact: 0, failed: 0 }
+  });
+  base.byKey = base.byKey && typeof base.byKey === 'object' ? base.byKey : {};
+  base.runs = Array.isArray(base.runs) ? base.runs : [];
+  const summary = base.summary && typeof base.summary === 'object' ? base.summary : {};
+  if (summary.today !== todayKey()) {
+    base.summary = { today: todayKey(), checked: 0, impact: 0, failed: 0 };
+  } else {
+    base.summary = {
+      today: summary.today,
+      checked: Number(summary.checked || 0),
+      impact: Number(summary.impact || 0),
+      failed: Number(summary.failed || 0)
+    };
+  }
+  return base;
+}
+
+function cleanNewsSample(value) {
+  return String(value || '')
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;|&#160;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 500);
+}
+
+function classifyNewsImpact(pick, sources) {
+  const text = cleanNewsSample(sources.map((source) => `${source.label} ${source.sample || source.summary || source.error || ''}`).join(' '));
+  const rules = [
+    { key: 'injury', tone: 'danger', label: 'Blessure à re-checker', pattern: /bless|injur|incertain|forfait|out|absent/i },
+    { key: 'lineup', tone: 'warn', label: 'Composition à confirmer', pattern: /compo|lineup|titulaire|starting|XI|onze|rempla/i },
+    { key: 'suspension', tone: 'danger', label: 'Suspension possible', pattern: /suspend|carton rouge|ban|suspension/i },
+    { key: 'weather', tone: 'warn', label: 'Météo à surveiller', pattern: /pluie|vent|orage|weather|rain|wind|storm/i },
+    { key: 'coach', tone: 'warn', label: 'Contexte coach', pattern: /coach|entraîneur|manager|limog|interim|intérim/i }
+  ];
+  const hits = rules.filter((rule) => rule.pattern.test(text)).slice(0, 3);
+  const checkedSources = sources.filter((source) => source.status === 'ok').length;
+  if (!hits.length) {
+    return {
+      status: checkedSources ? 'clear' : 'limited',
+      tone: checkedSources ? 'ok' : 'watch',
+      headline: checkedSources ? 'Aucune alerte forte détectée' : 'News non confirmées',
+      detail: checkedSources
+        ? `${checkedSources} source(s) vérifiée(s). Aucun signal blessure/compo/suspension fort dans les extraits publics.`
+        : 'Les sources publiques n’ont pas répondu assez proprement. Re-check manuel conseillé avant mise.',
+      events: []
+    };
+  }
+  return {
+    status: 'impact',
+    tone: hits.some((hit) => hit.tone === 'danger') ? 'danger' : 'warn',
+    headline: hits[0].label,
+    detail: `${pick?.title || 'Match'} : ${hits.map((hit) => hit.label.toLowerCase()).join(', ')}. Ouvre la fiche avant de confirmer chez Winamax.`,
+    events: hits.map((hit) => ({ key: hit.key, tone: hit.tone, label: hit.label }))
+  };
+}
+
+async function runNewsWatch(config, picks = [], options = {}) {
+  const store = newsWatcherStore();
+  const now = Date.now();
+  const ttlMs = Math.max(15, Number(config.cacheMinutes || 30) || 30) * 60 * 1000;
+  const candidates = (Array.isArray(picks) ? picks : [])
+    .filter((pick) => pick && (pick.id || pick.title))
+    .slice(0, Math.max(1, Math.min(8, Number(config.maxPicks || 4) || 4)));
+  const records = [];
+  for (const pick of candidates) {
+    const key = enrichmentKeyForPick(pick);
+    const cached = store.byKey[key];
+    if (!options.force && cached?.checkedAt && Date.now() - Date.parse(cached.checkedAt) < ttlMs) {
+      records.push(cached);
+      continue;
+    }
+    const plan = enrichmentSourcePlan(pick)
+      .filter((source) => /news|lineup|context/i.test(`${source.kind} ${source.key}`))
+      .slice(0, Math.max(2, Math.min(5, Number(config.maxSources || 4) || 4)));
+    const sources = options.dryRun
+      ? plan.map((source) => ({
+          ...source,
+          status: 'ok',
+          httpStatus: 200,
+          durationMs: 0,
+          checkedAt: new Date().toISOString(),
+          sample: `${pick.title || ''} composition probable confirmée sans blessure majeure de dernière minute.`
+        }))
+      : await Promise.all(plan.map((source) => fetchEnrichmentSource(source, 10000, config.rateLimitPerMinute || 5)));
+    const impact = classifyNewsImpact(pick, sources);
+    const record = {
+      key,
+      title: pick.title || '',
+      market: pick.market || '',
+      label: pick.label || '',
+      checkedAt: new Date().toISOString(),
+      planVersion: NEWS_WATCHER_PLAN_VERSION,
+      status: impact.status,
+      tone: impact.tone,
+      headline: impact.headline,
+      detail: impact.detail,
+      events: impact.events,
+      successfulSources: sources.filter((source) => source.status === 'ok').length,
+      failedSources: sources.filter((source) => source.status !== 'ok').length,
+      sources: sources.map((source) => ({
+        key: source.key,
+        label: source.label,
+        kind: source.kind,
+        url: source.url,
+        status: source.status,
+        httpStatus: source.httpStatus || null,
+        checkedAt: source.checkedAt,
+        durationMs: source.durationMs,
+        summary: source.summary || source.error || cleanNewsSample(source.sample) || '-'
+      }))
+    };
+    store.byKey[key] = record;
+    records.push(record);
+    store.summary.checked += 1;
+    if (record.status === 'impact') store.summary.impact += 1;
+    if (!record.successfulSources) store.summary.failed += 1;
+    appendRefreshLine(`[news-watch] ${record.title || key}: ${record.headline}`);
+  }
+  store.updatedAt = new Date().toISOString();
+  store.runs = [
+    { at: store.updatedAt, count: records.length, impact: records.filter((record) => record.status === 'impact').length },
+    ...store.runs
+  ].slice(0, 80);
+  atomicWriteJson(NEWS_WATCHER_PATH, store);
+  return { ok: true, records, summary: store.summary, store };
 }
 
 async function checkForUpdates(config = {}) {
@@ -1719,6 +1865,27 @@ async function handleApi(req, res, url) {
       jsonResponse(res, 200, result);
     } catch (error) {
       jsonResponse(res, 200, { ok: false, error: error.message, summary: enrichmentStore().summary });
+    }
+    return;
+  }
+  if (url.pathname === '/api/news-watch/state') {
+    jsonResponse(res, 200, newsWatcherStore());
+    return;
+  }
+  if (url.pathname === '/api/news-watch/run') {
+    if (req.method !== 'POST') {
+      jsonResponse(res, 405, { ok: false, error: 'POST required' });
+      return;
+    }
+    try {
+      const payload = await readJsonBody(req, 512 * 1024);
+      const result = await runNewsWatch(payload.config || {}, payload.picks || [], {
+        force: Boolean(payload.force),
+        dryRun: Boolean(payload.dryRun)
+      });
+      jsonResponse(res, 200, result);
+    } catch (error) {
+      jsonResponse(res, 200, { ok: false, error: error.message, store: newsWatcherStore() });
     }
     return;
   }
