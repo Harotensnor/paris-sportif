@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-15T09:44:33Z",
+  "generated_at": "2026-05-15T09:47:41Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -492,6 +492,52 @@
             "whip": 0.81
           },
           "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815354",
+      "kickoff": "2026-05-15T23:10Z",
+      "league": "MLB",
+      "match": "Milwaukee Brewers at Minnesota Twins",
+      "home": "Minnesota Twins",
+      "away": "Milwaukee Brewers",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Minnesota Twins",
+          "pitcher": "Joe Ryan",
+          "label": "Joe Ryan plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.6022,
+          "fair_odds": 1.66,
+          "expected_strikeouts": 4.95,
+          "projected_ip": 4.91,
+          "inputs": {
+            "k9": 9.07,
+            "era": 3.43,
+            "whip": 1.03,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Minnesota Twins",
+          "pitcher": "Joe Ryan",
+          "label": "Joe Ryan ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.7208,
+          "fair_odds": 1.39,
+          "expected_hr_allowed": 0.327,
+          "projected_ip": 4.91,
+          "inputs": {
+            "hr9": 0.6,
+            "era": 3.43,
+            "whip": 1.03
+          },
+          "side": "home"
         }
       ]
     },
@@ -3078,7 +3124,7 @@
       ]
     }
   ],
-  "props": 148,
+  "props": 150,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
