@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-15T11:41:45Z",
+  "generated_at": "2026-05-15T11:47:46Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -467,11 +467,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.195,
-        "away_score": -0.195,
-        "home_fade": 0.3,
+        "home_score": -0.896,
+        "away_score": 0.775,
+        "home_fade": 1.001,
         "away_fade": 0.3,
-        "reason": "Direction nette: Milwaukee Brewers (-0.20)",
+        "reason": "Direction nette: Milwaukee Brewers (+0.78)",
         "detail": [
           {
             "side": "home",
@@ -484,6 +484,18 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.3
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 0.701
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.725
           }
         ]
       }
@@ -1128,10 +1140,10 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.098,
-        "away_score": -0.098,
+        "away_score": 0.353,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Toronto Tempo (-0.10)",
+        "reason": "Direction nette: Toronto Tempo (+0.35)",
         "detail": [
           {
             "side": "home",
@@ -1144,6 +1156,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.45
           }
         ]
       }
@@ -1804,12 +1822,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "home",
-        "home_score": 0.043,
-        "away_score": -0.498,
+        "net_side": "away",
+        "home_score": -0.098,
+        "away_score": -0.098,
         "home_fade": 0.15,
-        "away_fade": 0.55,
-        "reason": "Direction nette: Montreal Canadiens (+0.04)",
+        "away_fade": 0.15,
+        "reason": "Direction nette: Buffalo Sabres (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -1822,12 +1840,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
           }
         ]
       }
