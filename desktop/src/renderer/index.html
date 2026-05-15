@@ -295,6 +295,10 @@
           </select>
           <input id="pick-edge-min" type="number" min="0" max="100" step="1" placeholder="Avantage min %">
           <input id="pick-odd-min" type="number" min="1" max="100" step="0.05" placeholder="Cote min">
+          <select id="saved-strategy-select" aria-label="Mes stratégies">
+            <option value="">Mes stratégies</option>
+          </select>
+          <button class="ghost-btn" id="save-current-strategy-btn" type="button">Sauver cette sélection</button>
         </div>
         <div class="market-snapshot" id="market-snapshot">
           <div class="empty compact-empty">Chargement des marchés...</div>
@@ -497,6 +501,24 @@
         </div>
         <div class="model-performance-grid" id="model-vs-user-grid">
           <div class="empty">Comparaison modèle/toi en attente.</div>
+        </div>
+        <div class="section-head compact">
+          <div>
+            <h3>Réconciliation Winamax</h3>
+            <p>P&L réel importé depuis Winamax comparé au suivi local de l'app.</p>
+          </div>
+        </div>
+        <div class="model-performance-grid" id="winamax-reconciliation-grid">
+          <div class="empty">Aucun import Winamax confirmé.</div>
+        </div>
+        <div class="section-head compact">
+          <div>
+            <h3>Mes stratégies</h3>
+            <p>Pré-filtres sauvegardés, application rapide et ROI observé par stratégie.</p>
+          </div>
+        </div>
+        <div class="model-performance-grid" id="saved-strategies-grid">
+          <div class="empty">Aucune stratégie sauvegardée.</div>
         </div>
         <div class="section-head compact">
           <div>
@@ -1141,6 +1163,12 @@
             <label>Montant<input id="bankroll-tx-amount" type="number" min="0.01" step="0.01"></label>
             <button class="ghost-btn" id="add-bankroll-transaction-btn" type="button">Ajouter mouvement</button>
             <div class="profile-preview" id="bankroll-transaction-list">Aucun mouvement enregistré.</div>
+            <label>Importer paris Winamax<textarea id="winamax-import-paste" rows="5" placeholder="Colle ici les lignes de Mes Paris Winamax : date, match, cote, mise, statut..."></textarea></label>
+            <div class="section-actions">
+              <button class="ghost-btn" id="preview-winamax-import-btn" type="button">Analyser l'import</button>
+              <button class="ghost-btn" id="confirm-winamax-import-btn" type="button">Confirmer import</button>
+            </div>
+            <div class="profile-preview" id="winamax-import-preview">Aucun import Winamax analysé.</div>
           </article>
           <article class="preference-card">
             <h4>Coach prudent</h4>
@@ -1169,10 +1197,37 @@
             <button class="ghost-btn" id="test-web-enrichment-btn" type="button">Tester sur un pick proche</button>
             <p class="match-sub">Elle cure, rédige, détecte les anomalies et enrichit les matchs en arrière-plan. Sans clé, fallback heuristique complet.</p>
           </article>
+          <article class="preference-card expert-only hidden">
+            <h4>Auto-tracking supervisé</h4>
+            <p class="match-sub">Traque automatiquement dans l'app, sans jamais placer le pari réel chez Winamax.</p>
+            <label class="check-line"><input id="pref-auto-tracking-confirmed" type="checkbox"> Je comprends : tracking interne uniquement, confirmation Winamax manuelle</label>
+            <label class="check-line"><input id="pref-auto-tracking-enabled" type="checkbox"> Auto-tracking actif</label>
+            <label class="check-line"><input id="pref-auto-tracking-dry-run" type="checkbox"> Dry-run uniquement</label>
+            <label>Niveau de pick
+              <select id="pref-auto-tracking-level">
+                <option value="top">TOP pick uniquement</option>
+                <option value="safe">Tous les fiables</option>
+                <option value="all">Tous les picks prêts</option>
+              </select>
+            </label>
+            <label>Edge min %<input id="pref-auto-tracking-edge" type="number" min="0" max="25" step="1"></label>
+            <label>Cote min<input id="pref-auto-tracking-odd-min" type="number" min="1" max="20" step="0.05"></label>
+            <label>Cote max<input id="pref-auto-tracking-odd-max" type="number" min="1" max="50" step="0.05"></label>
+            <label>Budget max jour €<input id="pref-auto-tracking-budget" type="number" min="0" max="1000" step="1"></label>
+            <label>Paris max / jour<input id="pref-auto-tracking-limit" type="number" min="1" max="20" step="1"></label>
+            <label>Heure début Paris<input id="pref-auto-tracking-start" type="number" min="0" max="23" step="1"></label>
+            <label>Heure fin Paris<input id="pref-auto-tracking-end" type="number" min="0" max="24" step="1"></label>
+            <div class="section-actions">
+              <button class="primary-btn" id="run-auto-tracking-btn" type="button">Tester maintenant</button>
+              <button class="danger-btn" id="stop-auto-tracking-btn" type="button">Stopper l'auto-tracking</button>
+            </div>
+            <div class="profile-preview" id="auto-tracking-audit">Aucun auto-tracking exécuté.</div>
+          </article>
           <article class="preference-card">
             <h4>Avancé</h4>
             <label class="check-line"><input id="pref-expert-mode" type="checkbox"> Mode expert</label>
             <label class="check-line"><input id="pref-trading-desk" type="checkbox"> Mode Trading Desk</label>
+            <label class="check-line"><input id="pref-live-news-watcher" type="checkbox"> Live news watcher</label>
             <label class="check-line"><input id="pref-auto-update-enabled" type="checkbox"> Auto-update au démarrage</label>
             <label>Canal
               <select id="pref-update-channel">
@@ -1186,6 +1241,13 @@
             <button class="ghost-btn" id="force-evening-brief-btn" type="button">Voir brief du soir</button>
             <button class="ghost-btn" id="start-demo-tour-btn" type="button">Faire le tour démo</button>
             <button class="ghost-btn" id="manual-bug-report-btn" type="button">Signaler un bug</button>
+            <label>Langue
+              <select id="pref-language">
+                <option value="fr">Français</option>
+                <option value="en">English</option>
+                <option value="auto">Auto</option>
+              </select>
+            </label>
             <p class="match-sub" id="app-version-label">Paris Sportif Desktop</p>
             <p class="match-sub" id="update-status">Aucune vérification de mise à jour lancée.</p>
             <div class="profile-preview" id="bug-report-list">Aucun rapport de bug local.</div>

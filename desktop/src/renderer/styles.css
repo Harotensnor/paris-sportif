@@ -1561,13 +1561,30 @@ a:hover {
 }
 
 .preference-card input,
-.preference-card select {
+.preference-card select,
+.preference-card textarea {
   min-height: 38px;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--surface-2);
   color: var(--text);
   padding: 8px 10px;
+}
+
+.preference-card textarea {
+  resize: vertical;
+  min-height: 110px;
+}
+
+.danger-btn {
+  border: 1px solid rgba(248, 113, 113, .45);
+  color: var(--danger);
+  background: rgba(248, 113, 113, .10);
+  border-radius: 8px;
+  min-height: 36px;
+  padding: 8px 12px;
+  font-weight: 800;
+  cursor: pointer;
 }
 
 .check-grid {

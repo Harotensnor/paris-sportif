@@ -5,6 +5,18 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 23 — Auto-tracking, réconciliation, stratégies, patterns, EN
+
+- Version desktop portée à `v1.2.0` pour les workflows supervisés et les fonctions avancées opt-in.
+- Ajout de l'auto-tracking supervisé en Mode expert : activation avec confirmation forte, règles sport/marché/cote/edge/budget/horaire, mode dry-run, audit dédié, bouton kill switch et annulation possible d'un auto-tracking récent. Le logiciel ne place toujours jamais le pari réel chez Winamax.
+- Ajout de la réconciliation Winamax assistée : import par copier-coller de `Mes paris`, parsing local, comparaison avec les paris suivis dans l'app, détection des montants différents et encart `Solde Winamax / App / Écart` dans `Bilan`.
+- Ajout des stratégies utilisateur sauvegardées : la vue `Picks` peut mémoriser la sélection active, la réappliquer en un clic et suivre ROI, WR, P&L et sample par stratégie dans `Bilan`.
+- Ajout de patterns sportifs avancés dans les fiches : cluster blessures, fatigue calendrier, changement coach, déplacement long et densité de planning, affichés comme badges sobres et détails utiles sans surcharger le mode standard.
+- Le watcher de news live reste opt-in en Mode expert : il réutilise l'enrichissement côté main process, avec cache et logs, pour signaler les changements majeurs sur les picks imminents.
+- Première couche i18n FR/EN : dictionnaires `desktop/src/i18n/fr.json` et `en.json`, helper `t()`, toggle langue dans les réglages et traduction des surfaces de navigation/recherche/stratégies critiques.
+- QA Sprint 23 : `qa:engine`, `npm test`, Playwright Electron, capture visuelle Sprint 23 et audit accessibilité passent avec auto-tracking dry-run, import Winamax, stratégies, Recherche et Trading Desk.
+- Build Windows v1.2.0 validé : `Paris Sportif Desktop Setup 1.2.0.exe` généré en sortie propre temporaire, environ 109 MB, et smoke du binaire packagé validé avec 18 picks visibles et version `v1.2.0`.
+
 ### Sprint 22 — Voir grand : analytics, recherche, live, trading
 
 - Version desktop portée à `v1.1.0` pour les ajouts majeurs post-v1.0.2.

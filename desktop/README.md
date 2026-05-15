@@ -8,13 +8,13 @@ Paris Sportif Desktop est le logiciel PC local pour préparer tes paris Winamax.
 
 ### Version installateur Windows
 
-La version v1.1.0 se génère avec :
+La version v1.2.0 se génère avec :
 
 ```powershell
 npm --prefix desktop run dist
 ```
 
-Le fichier attendu est `Paris Sportif Desktop Setup 1.1.0.exe`. Le build packagé embarque les données, rapports modèle et scripts nécessaires au démarrage. Python reste recommandé si tu veux relancer une pipeline complète depuis la machine installée.
+Le fichier attendu est `Paris Sportif Desktop Setup 1.2.0.exe`. Le build packagé embarque les données, rapports modèle et scripts nécessaires au démarrage. Python reste recommandé si tu veux relancer une pipeline complète depuis la machine installée.
 
 ### Version développeur
 
@@ -48,6 +48,8 @@ Ouvre l'app et lis d'abord le haut de la vue `Picks`.
 
 L'app ne place pas de pari automatiquement. Elle prépare le ticket et suit ton résultat.
 
+En Mode expert, l'auto-tracking supervisé peut suivre automatiquement certains tickets dans l'app selon tes règles. C'est uniquement un suivi interne : tu dois toujours ouvrir Winamax et confirmer toi-même le pari réel.
+
 ## Winamax
 
 Le logiciel est 100% Winamax :
@@ -69,6 +71,8 @@ La vue `Bilan` montre :
 - insights actionnables pour comprendre où tu gagnes et où tu perds ;
 - comptabilité dépôts/retraits ;
 - patterns personnels et apprentissages.
+- réconciliation Winamax : colle tes paris depuis `Mes paris`, l'app compare ce qui est suivi localement et ce qui manque.
+- stratégies sauvegardées : ROI, WR et P&L par sélection de filtres que tu as mémorisée.
 
 Les données sont stockées localement. Utilise `Réglages > Profil local` pour exporter ou importer ton profil.
 
@@ -87,6 +91,33 @@ La vue `Recherche` permet de fouiller la base locale avant de miser :
 - compare deux équipes ou ligues côte à côte.
 
 Tout reste local et Winamax-only : aucune cote d'autre bookmaker n'est utilisée.
+
+## Stratégies Et Réconciliation
+
+Dans `Picks`, le bouton `Sauver cette sélection` mémorise les filtres actifs comme une stratégie. Tu peux ensuite la réappliquer depuis le menu `Mes stratégies`, puis suivre sa performance dans `Bilan`.
+
+Dans `Réglages > Bankroll`, `Importer paris Winamax` accepte un copier-coller de la page `Mes paris`. L'app extrait date, match, marché, cote, mise et statut, puis indique :
+
+- `Suivi dans l'app` si le pari correspond déjà ;
+- `Non suivi` si Winamax contient un pari absent de l'app ;
+- `Montant différent` si la mise locale ne correspond pas.
+
+Ces données restent locales et servent seulement à aligner ton bilan réel avec le suivi de l'app.
+
+## Auto-tracking Supervisé
+
+L'auto-tracking est caché dans `Réglages > Avancé` et demande une confirmation explicite.
+
+- `Dry-run` simule les règles sans créer de pari suivi.
+- Les règles couvrent niveau de pick, edge minimum, cote min/max, sports, marchés, budget journalier, limite de paris et horaires.
+- Le bouton `Stopper l'auto-tracking` coupe tout immédiatement pour la journée.
+- Quand un ticket est auto-tracké, tu reçois une notification et tu peux ouvrir Winamax pour confirmer manuellement.
+
+Ce mode ne parie jamais à ta place.
+
+## Langue
+
+Dans `Réglages > Apparence`, tu peux choisir Français, English ou Auto. La couche FR/EN couvre les surfaces critiques de navigation, recherche, stratégies et réglages ; les rapports historiques restent lisibles dans leur langue d'origine.
 
 ## Mode Trading Desk
 
@@ -196,3 +227,7 @@ npx electron-builder --win nsis --x64 --config.directories.output=dist-temp
 23. **Pourquoi je reçois une alerte anti-tilt ?** Tu dépasses tes limites de rythme, perte ou mise.
 24. **Pourquoi un pick disparaît après refresh ?** La cote, la donnée ou le garde-fou a changé.
 25. **Quelle routine suivre le premier mois ?** Lis le guide `docs/first-month.md`.
+26. **L'auto-tracking mise-t-il réellement ?** Non. Il crée seulement un suivi interne et t'invite à confirmer chez Winamax.
+27. **Comment réconcilier Winamax ?** Colle tes lignes `Mes paris` dans `Réglages > Bankroll > Importer paris Winamax`.
+28. **À quoi servent les stratégies ?** À rejouer un ensemble de filtres et suivre son ROI séparément.
+29. **Puis-je passer l'app en anglais ?** Oui, dans `Réglages > Apparence > Langue`.

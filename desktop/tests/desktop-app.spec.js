@@ -15,7 +15,8 @@ function isIgnorableConsoleMessage(message) {
   return /Failed to load resource:\s*net::ERR_(EMPTY_RESPONSE|ABORTED)/i.test(String(message || ''));
 }
 
-test('Sprint 22 desktop keeps clear Winamax picks with analytics and trading opt-in', async () => {
+test('Sprint 23 desktop keeps clear Winamax picks with supervised workflows', async () => {
+  test.setTimeout(180_000);
   const rendererText = fs.readFileSync(path.join(root, 'desktop', 'src', 'renderer', 'renderer.js'), 'utf8');
   const htmlText = fs.readFileSync(path.join(root, 'desktop', 'src', 'renderer', 'index.html'), 'utf8');
   const mainText = fs.readFileSync(path.join(root, 'desktop', 'src', 'main.js'), 'utf8');
@@ -66,6 +67,13 @@ test('Sprint 22 desktop keeps clear Winamax picks with analytics and trading opt
   expect(rendererText).toContain('renderDeepSearch');
   expect(rendererText).toContain('cashOutEstimate');
   expect(rendererText).toContain('renderTradingDesk');
+  expect(rendererText).toContain('runAutoTracking');
+  expect(rendererText).toContain('parseWinamaxPaste');
+  expect(rendererText).toContain('renderSavedStrategies');
+  expect(rendererText).toContain('advancedSportsSignals');
+  expect(rendererText).toContain('applyI18n');
+  expect(fs.existsSync(path.join(root, 'desktop', 'src', 'i18n', 'fr.json'))).toBe(true);
+  expect(fs.existsSync(path.join(root, 'desktop', 'src', 'i18n', 'en.json'))).toBe(true);
   expect(mainText).toContain('/api/live-scores');
 
   const userDataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'paris-sportif-pw-'));
@@ -134,16 +142,20 @@ test('Sprint 22 desktop keeps clear Winamax picks with analytics and trading opt
     expect(cockpit.dashboardText).toMatch(/MISE/i);
     expect(cockpit.dashboardText).not.toMatch(/Handicap|Double chance|Jeux tennis|Total mi-temps|Total basket|Total runs|Score exact|Corners|Cartons/i);
     expect(cockpit.dashboardText).not.toMatch(/\bKelly\b|\bEV\b|\btier\b|\b1N2\b|\bBTTS\b|\bedge\b/i);
+    await expect(win.locator('#saved-strategy-select')).toBeVisible();
+    await expect(win.locator('#save-current-strategy-btn')).toBeVisible();
 
-    await win.click('[data-track-bet-key]');
+    await win.locator('[data-track-bet-key]:visible').first().click();
     await win.waitForFunction(() => /1 en cours/.test(document.querySelector('#user-pnl-sub')?.textContent || ''), null, { timeout: 5_000 });
-    await expect(win.locator('[data-track-bet-key]').first()).toContainText('Suivi');
+    await win.waitForFunction(() => Array.from(document.querySelectorAll('[data-track-bet-key]')).some((node) => /Suivi/.test(node.textContent || '')), null, { timeout: 5_000 });
 
     await win.keyboard.press('Control+2');
     await expect(win.locator('#page-title')).toHaveText('Bilan');
     await expect(win.locator('#bankroll-allocation-grid')).toContainText('#1');
     await expect(win.locator('#paper-simulation-grid')).toContainText('Simulation');
     await expect(win.locator('#model-vs-user-grid')).toContainText(/Si tu avais suivi le modèle|Toi sur 30 jours/);
+    await expect(win.locator('#winamax-reconciliation-grid')).toContainText(/Aucun import Winamax confirmé|Solde Winamax/);
+    await expect(win.locator('#saved-strategies-grid')).toContainText(/Aucune stratégie sauvegardée|stratégie/i);
     await expect(win.locator('#deep-analytics-summary')).toContainText(/Sample|P&L net|Meilleure zone/);
     await expect(win.locator('#deep-analytics-insights')).toContainText(/Insight|Recommandation|attente/i);
     await win.keyboard.press('Control+4');
@@ -165,7 +177,11 @@ test('Sprint 22 desktop keeps clear Winamax picks with analytics and trading opt
     await expect(win.locator('#pref-trading-desk')).toBeVisible();
     await expect(win.locator('#favorite-team-search')).toBeVisible();
     await expect(win.locator('#favorite-player-search')).toBeVisible();
-    await expect(win.locator('#app-version-label')).toContainText('v1.1.0');
+    await expect(win.locator('#winamax-import-paste')).toBeVisible();
+    await expect(win.locator('#pref-auto-tracking-enabled')).toHaveCount(1);
+    await expect(win.locator('#pref-live-news-watcher')).toBeVisible();
+    await expect(win.locator('#pref-language')).toBeVisible();
+    await expect(win.locator('#app-version-label')).toContainText('v1.2.0');
     await win.selectOption('#pref-theme', 'light');
     await expect(win.locator('body')).toHaveClass(/theme-light/);
     await win.selectOption('#pref-theme', 'dark');
@@ -184,6 +200,17 @@ test('Sprint 22 desktop keeps clear Winamax picks with analytics and trading opt
     await expect(win.locator('#pref-advanced-markets')).toContainText('Total jeux tennis');
     await expect(win.locator('#pref-multibook-enabled')).toHaveCount(0);
     await expect(win.locator('#pref-odds-api-key')).toHaveCount(0);
+    await win.fill('#winamax-import-paste', '12/05 Real Madrid - Barcelone Plus de 2,5 buts cote 1.85 mise 12 gagné');
+    await win.click('#preview-winamax-import-btn');
+    await expect(win.locator('#winamax-import-preview')).toContainText(/Real Madrid|Plus\/Moins|Non suivi/);
+    await win.click('#confirm-winamax-import-btn');
+    await expect(win.locator('#winamax-import-preview')).toContainText(/Real Madrid|Aucun import/);
+    await win.selectOption('#pref-language', 'en');
+    await win.click('[data-tab="preferences"]');
+    await expect(win.locator('#page-title')).toHaveText('Settings');
+    await win.selectOption('#pref-language', 'fr');
+    await win.click('[data-tab="preferences"]');
+    await expect(win.locator('#page-title')).toHaveText('Réglages');
     await win.fill('#bankroll-tx-amount', '25');
     await win.click('#add-bankroll-transaction-btn');
     await expect(win.locator('#bankroll-transaction-list')).toContainText('Dépôt');
@@ -199,8 +226,17 @@ test('Sprint 22 desktop keeps clear Winamax picks with analytics and trading opt
 
     await win.click('[data-tab="preferences"]');
     await win.check('#pref-expert-mode');
-    await win.check('#pref-trading-desk');
     await win.click('#save-preferences-btn');
+    await win.waitForFunction(() => !document.querySelector('#pref-auto-tracking-confirmed')?.closest('.expert-only')?.classList.contains('hidden'), null, { timeout: 5000 });
+    await win.check('#pref-trading-desk');
+    await win.check('#pref-auto-tracking-confirmed');
+    await win.check('#pref-auto-tracking-enabled');
+    await win.check('#pref-auto-tracking-dry-run');
+    await win.fill('#pref-auto-tracking-edge', '1');
+    await win.fill('#pref-auto-tracking-limit', '2');
+    await win.click('#save-preferences-btn');
+    await win.click('#run-auto-tracking-btn');
+    await expect(win.locator('#auto-tracking-audit')).toContainText(/Dry-run|Actif|Inactif|pari/i);
     await expect(win.locator('[data-tab="data"]:not(.hidden)')).toBeVisible();
     await win.click('[data-tab="dashboard"]');
     await expect(win.locator('#trading-desk.active')).toBeVisible();

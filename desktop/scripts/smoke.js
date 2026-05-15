@@ -42,6 +42,12 @@ async function main() {
   for (const marker of ['renderDeepAnalytics', 'deepSearchIndex', 'renderDeepSearch', 'cashOutEstimate', 'renderTradingDesk', 'tierCalibration']) {
     if (!rendererText.includes(marker) && !mainText.includes(marker)) throw new Error(`Sprint 22 absent: ${marker}`);
   }
+  for (const marker of ['runAutoTracking', 'parseWinamaxPaste', 'renderSavedStrategies', 'advancedSportsSignals', 'applyI18n']) {
+    if (!rendererText.includes(marker)) throw new Error(`Sprint 23 renderer absent: ${marker}`);
+  }
+  for (const rel of ['desktop/src/i18n/fr.json', 'desktop/src/i18n/en.json']) {
+    if (!fs.existsSync(path.join(root, rel))) throw new Error(`Fichier i18n absent: ${rel}`);
+  }
 
   const messages = [];
   const userDataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'paris-sportif-smoke-'));
@@ -97,7 +103,7 @@ async function main() {
       throw new Error(`Cockpit Sprint 14 incohérent: ${JSON.stringify(dashboard)}`);
     }
 
-    await win.click('[data-track-bet-key]');
+    await win.locator('[data-track-bet-key]:visible').first().click();
     await win.waitForFunction(() => /1 en cours/.test(document.querySelector('#user-pnl-sub')?.textContent || ''), null, { timeout: 5000 });
 
     await win.click('[data-tab="history"]');
@@ -125,9 +131,13 @@ async function main() {
       simpleHasAdvanced: /Handicap|Corners|Cartons|Jeux tennis|Score exact/i.test(document.querySelector('#pref-markets')?.textContent || ''),
       advancedMarkets: /Handicaps/.test(document.querySelector('#pref-advanced-markets')?.textContent || '') && /Total jeux tennis/.test(document.querySelector('#pref-advanced-markets')?.textContent || ''),
       accounting: Boolean(document.querySelector('#add-bankroll-transaction-btn')),
+      winamaxImport: Boolean(document.querySelector('#winamax-import-paste') && document.querySelector('#preview-winamax-import-btn')),
+      autoTracking: Boolean(document.querySelector('#pref-auto-tracking-enabled') && document.querySelector('#pref-auto-tracking-dry-run') && document.querySelector('#stop-auto-tracking-btn')),
+      liveNews: Boolean(document.querySelector('#pref-live-news-watcher')),
+      language: Boolean(document.querySelector('#pref-language')),
       multiBook: Boolean(document.querySelector('#pref-multibook-enabled') || document.querySelector('#pref-odds-api-key'))
     }));
-    if (!prefs.expert || !prefs.antiTilt || !prefs.theme || !prefs.bugReport || !prefs.favorites || !prefs.trading || !prefs.allocation || !prefs.prematchAlerts || !prefs.expandedSports || !prefs.simpleMarkets || prefs.simpleHasAdvanced || !prefs.advancedMarkets || !prefs.accounting || prefs.multiBook) throw new Error(`Réglages Sprint 22 invalides: ${JSON.stringify(prefs)}`);
+    if (!prefs.expert || !prefs.antiTilt || !prefs.theme || !prefs.bugReport || !prefs.favorites || !prefs.trading || !prefs.allocation || !prefs.prematchAlerts || !prefs.expandedSports || !prefs.simpleMarkets || prefs.simpleHasAdvanced || !prefs.advancedMarkets || !prefs.accounting || !prefs.winamaxImport || !prefs.autoTracking || !prefs.liveNews || !prefs.language || prefs.multiBook) throw new Error(`Réglages Sprint 23 invalides: ${JSON.stringify(prefs)}`);
     await win.selectOption('#pref-theme', 'light');
     await win.waitForFunction(() => document.body.classList.contains('theme-light'), null, { timeout: 5000 });
     await win.selectOption('#pref-theme', 'dark');
@@ -138,10 +148,23 @@ async function main() {
     await win.fill('#bankroll-tx-amount', '25');
     await win.click('#add-bankroll-transaction-btn');
     await win.waitForFunction(() => /Dépôt/.test(document.querySelector('#bankroll-transaction-list')?.textContent || ''), null, { timeout: 5000 });
+    await win.fill('#winamax-import-paste', '15/05 Real Madrid - Barcelona PARI Real Madrid gagne cote 1.85 mise 12€ gagné');
+    await win.click('#preview-winamax-import-btn');
+    await win.waitForFunction(() => /Real Madrid|Suivi|confirmer/i.test(document.querySelector('#winamax-import-preview')?.textContent || ''), null, { timeout: 5000 });
+    await win.selectOption('#pref-language', 'en');
+    await win.waitForFunction(() => document.documentElement.lang === 'en' && /Settings/.test(document.querySelector('[data-tab="preferences"]')?.textContent || ''), null, { timeout: 5000 });
+    await win.selectOption('#pref-language', 'fr');
 
     await win.check('#pref-expert-mode');
-    await win.check('#pref-trading-desk');
     await win.click('#save-preferences-btn');
+    await win.waitForFunction(() => !document.querySelector('#pref-auto-tracking-confirmed')?.closest('.expert-only')?.classList.contains('hidden'), null, { timeout: 5000 });
+    await win.check('#pref-trading-desk');
+    await win.check('#pref-auto-tracking-confirmed');
+    await win.check('#pref-auto-tracking-enabled');
+    await win.check('#pref-auto-tracking-dry-run');
+    await win.click('#save-preferences-btn');
+    await win.click('#run-auto-tracking-btn');
+    await win.waitForFunction(() => /Dry-run|Règle|auto/i.test(document.querySelector('#auto-tracking-audit')?.textContent || ''), null, { timeout: 5000 });
     await win.waitForSelector('[data-tab="data"]:not(.hidden)', { timeout: 5000 });
     await win.waitForFunction(() => /Vue Picks/.test(document.querySelector('#shortcut-settings-grid')?.textContent || ''), null, { timeout: 5000 });
     await win.click('[data-tab="data"]');
@@ -172,7 +195,7 @@ async function main() {
       message.startsWith('error:') || message.startsWith('pageerror:')
     ) && !isIgnorableConsoleMessage(message));
     if (severe.length) throw new Error(`Erreurs console: ${severe.join(' | ')}`);
-    console.log(`Desktop smoke OK: ${dashboard.metric} paris simples visibles, ${dashboard.timeline} timeline, ${dashboard.safeBadges} fiables, ${dashboard.priorityBadges} priorités, Sprint 22 analytics/recherche/trading OK.`);
+    console.log(`Desktop smoke OK: ${dashboard.metric} paris simples visibles, ${dashboard.timeline} timeline, ${dashboard.safeBadges} fiables, ${dashboard.priorityBadges} priorités, Sprint 23 auto-tracking/réconciliation/i18n OK.`);
   } finally {
     await app.close();
     fs.rmSync(userDataDir, { recursive: true, force: true });

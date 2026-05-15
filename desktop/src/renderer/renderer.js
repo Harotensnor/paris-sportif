@@ -97,7 +97,9 @@
     longTasks: [],
     deepSearchSelection: null,
     liveScoreState: null,
-    tradingIndex: 0
+    tradingIndex: 0,
+    autoTrackingLastRunAt: 0,
+    winamaxImportPreview: null
   };
 
   const ACTION_HISTORY_KEY = 'parisSportifActionHistory';
@@ -137,6 +139,14 @@
   const FAVORITE_ALERT_KEY = 'parisSportifFavoriteAlerts';
   const TREND_ALERT_KEY = 'parisSportifTrendAlerts';
   const ANALYTICS_FILTER_KEY = 'parisSportifAnalyticsSuggestedFilters';
+  const AUTO_TRACKING_AUDIT_KEY = 'parisSportifAutoTrackingAudit';
+  const AUTO_TRACKING_STOP_KEY = 'parisSportifAutoTrackingStopped';
+  const WINAMAX_IMPORT_KEY = 'parisSportifWinamaxImports';
+  const SAVED_STRATEGIES_KEY = 'parisSportifSavedStrategies';
+  const STRATEGY_ALERT_KEY = 'parisSportifStrategySuggestion';
+  const LIVE_NEWS_KEY = 'parisSportifLiveNewsWatcher';
+  const SPORT_PATTERNS_KEY = 'parisSportifAdvancedSportPatterns';
+  const I18N_LANGUAGE_KEY = 'parisSportifLanguage';
   const DEFAULT_SHORTCUTS = {
     dashboard: 'Ctrl+1',
     history: 'Ctrl+2',
@@ -191,7 +201,7 @@
   ];
   const MARKET_PREFS = [...SIMPLE_MARKET_PREFS, ...ADVANCED_MARKET_PREFS];
   const DEFAULT_PREFERENCES = {
-    preferenceSchemaVersion: 17,
+    preferenceSchemaVersion: 18,
     bankroll: 50,
     level: 'intermediate',
     sports: SPORTS_PREFS,
@@ -232,6 +242,21 @@
     updateChannel: 'stable',
     bugReportPrompt: true,
     tradingDesk: false,
+    autoTrackingEnabled: false,
+    autoTrackingConfirmed: false,
+    autoTrackingDryRun: true,
+    autoTrackingLevel: 'top',
+    autoTrackingEdgeMin: 5,
+    autoTrackingOddMin: 1.3,
+    autoTrackingOddMax: 6,
+    autoTrackingDailyBudget: 5,
+    autoTrackingDailyLimit: 3,
+    autoTrackingStartHour: 8,
+    autoTrackingEndHour: 22,
+    autoTrackingSports: SPORTS_PREFS,
+    autoTrackingMarkets: SIMPLE_MARKET_PREFS.map((item) => item.key),
+    liveNewsWatcher: false,
+    language: 'fr',
     theme: 'dark',
     strict: false
   };
@@ -256,9 +281,72 @@
     critical: 260,
     repair_context: 340
   };
+  const I18N_MESSAGES = {
+    fr: {
+      navPicks: 'Picks',
+      navHistory: 'Bilan',
+      navSearch: 'Recherche',
+      navSettings: 'Réglages',
+      autoTracking: 'Auto-tracking supervisé',
+      winamaxImport: 'Importer paris Winamax',
+      saveStrategy: 'Sauver cette sélection',
+      strategySelect: 'Mes stratégies',
+      language: 'Langue',
+      searchPlaceholder: 'Real Madrid, Mbappé, Liga, NBA...'
+    },
+    en: {
+      navPicks: 'Picks',
+      navHistory: 'Results',
+      navSearch: 'Search',
+      navSettings: 'Settings',
+      autoTracking: 'Supervised auto-tracking',
+      winamaxImport: 'Import Winamax bets',
+      saveStrategy: 'Save this selection',
+      strategySelect: 'My strategies',
+      language: 'Language',
+      searchPlaceholder: 'Real Madrid, Mbappe, Liga, NBA...'
+    }
+  };
 
   const $ = (selector) => document.querySelector(selector);
   const $$ = (selector) => Array.from(document.querySelectorAll(selector));
+
+  function t(key, params = {}) {
+    const pref = loadPreferences?.() || DEFAULT_PREFERENCES;
+    const rawLang = localStorage.getItem(I18N_LANGUAGE_KEY) || pref.language || 'fr';
+    const resolvedLang = rawLang === 'auto'
+      ? ((navigator.language || '').toLowerCase().startsWith('en') ? 'en' : 'fr')
+      : rawLang;
+    const lang = (resolvedLang === 'en' || resolvedLang === 'fr') ? resolvedLang : 'fr';
+    let text = I18N_MESSAGES[lang]?.[key] || I18N_MESSAGES.fr[key] || key;
+    Object.entries(params || {}).forEach(([name, value]) => {
+      text = text.replace(new RegExp(`\\{${name}\\}`, 'g'), String(value));
+    });
+    return text;
+  }
+
+  window.t = t;
+
+  function applyI18n(language = 'fr') {
+    const lang = language === 'auto'
+      ? ((navigator.language || '').toLowerCase().startsWith('en') ? 'en' : 'fr')
+      : (language === 'en' ? 'en' : 'fr');
+    localStorage.setItem(I18N_LANGUAGE_KEY, language || 'fr');
+    document.documentElement.lang = lang;
+    document.querySelector('[data-tab="dashboard"]') && (document.querySelector('[data-tab="dashboard"]').textContent = t('navPicks'));
+    document.querySelector('[data-tab="history"]') && (document.querySelector('[data-tab="history"]').textContent = t('navHistory'));
+    document.querySelector('[data-tab="search"]') && (document.querySelector('[data-tab="search"]').textContent = t('navSearch'));
+    document.querySelector('[data-tab="preferences"]') && (document.querySelector('[data-tab="preferences"]').textContent = t('navSettings'));
+    const strategy = $('#saved-strategy-select option[value=""]');
+    if (strategy) strategy.textContent = t('strategySelect');
+    const saveStrategy = $('#save-current-strategy-btn');
+    if (saveStrategy) saveStrategy.textContent = t('saveStrategy');
+    const search = $('#deep-search-input');
+    if (search) search.placeholder = t('searchPlaceholder');
+    const activePanel = document.querySelector('.tab-panel.active')?.dataset?.panel;
+    const titleKey = activePanel === 'history' ? 'navHistory' : activePanel === 'search' ? 'navSearch' : activePanel === 'preferences' ? 'navSettings' : activePanel === 'dashboard' ? 'navPicks' : '';
+    if (titleKey && $('#page-title')) $('#page-title').textContent = t(titleKey);
+  }
 
   function normalizeUiKey(value) {
     return String(value || '')
@@ -477,6 +565,39 @@
     }
   }
 
+  function appendStorageRow(key, row, limit = 500) {
+    const rows = readStorageJson(key, []);
+    const next = [...(Array.isArray(rows) ? rows : []), row].slice(-limit);
+    writeStorageJson(key, next);
+    return next;
+  }
+
+  function loadAutoTrackingAudit() {
+    const rows = readStorageJson(AUTO_TRACKING_AUDIT_KEY, []);
+    return Array.isArray(rows) ? rows : [];
+  }
+
+  function appendAutoTrackingAudit(row) {
+    return appendStorageRow(AUTO_TRACKING_AUDIT_KEY, {
+      at: new Date().toISOString(),
+      ...row
+    }, 800);
+  }
+
+  function loadWinamaxImports() {
+    const rows = readStorageJson(WINAMAX_IMPORT_KEY, []);
+    return Array.isArray(rows) ? rows : [];
+  }
+
+  function loadSavedStrategies() {
+    const rows = readStorageJson(SAVED_STRATEGIES_KEY, []);
+    return Array.isArray(rows) ? rows : [];
+  }
+
+  function saveSavedStrategies(rows) {
+    writeStorageJson(SAVED_STRATEGIES_KEY, Array.isArray(rows) ? rows : []);
+  }
+
   function loadFavorites() {
     const raw = readStorageJson(FAVORITES_KEY, {});
     const clean = (rows) => Array.from(new Set((Array.isArray(rows) ? rows : [])
@@ -528,7 +649,12 @@
       modelAdjustments: readStorageJson(MODEL_ADJUSTMENTS_KEY, null),
       lossFeedbacks: readStorageJson(LOSS_FEEDBACK_KEY, []),
       bankrollTransactions: readStorageJson(BANKROLL_TRANSACTIONS_KEY, []),
-      weeklyReports: readStorageJson(WEEKLY_REPORT_KEY, [])
+      weeklyReports: readStorageJson(WEEKLY_REPORT_KEY, []),
+      autoTrackingAudit: readStorageJson(AUTO_TRACKING_AUDIT_KEY, []),
+      winamaxImports: readStorageJson(WINAMAX_IMPORT_KEY, []),
+      savedStrategies: readStorageJson(SAVED_STRATEGIES_KEY, []),
+      liveNewsWatcher: readStorageJson(LIVE_NEWS_KEY, {}),
+      sportPatterns: readStorageJson(SPORT_PATTERNS_KEY, {})
     };
   }
 
@@ -581,7 +707,12 @@
       [MODEL_ADJUSTMENTS_KEY, profile.modelAdjustments],
       [LOSS_FEEDBACK_KEY, profile.lossFeedbacks],
       [BANKROLL_TRANSACTIONS_KEY, profile.bankrollTransactions],
-      [WEEKLY_REPORT_KEY, profile.weeklyReports]
+      [WEEKLY_REPORT_KEY, profile.weeklyReports],
+      [AUTO_TRACKING_AUDIT_KEY, profile.autoTrackingAudit],
+      [WINAMAX_IMPORT_KEY, profile.winamaxImports],
+      [SAVED_STRATEGIES_KEY, profile.savedStrategies],
+      [LIVE_NEWS_KEY, profile.liveNewsWatcher],
+      [SPORT_PATTERNS_KEY, profile.sportPatterns]
     ].forEach(([key, value]) => {
       if (value != null) writeStorageJson(key, value);
     });
@@ -1102,6 +1233,130 @@
         <div class="match-sub">Projection simple : 3 mois ${formatMoney(accounting.projections[0]?.value || 0)} · 6 mois ${formatMoney(accounting.projections[1]?.value || 0)} · 12 mois ${formatMoney(accounting.projections[2]?.value || 0)}</div>
       `;
     }
+  }
+
+  function parseWinamaxPaste(text) {
+    return String(text || '')
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter((line) => line.length > 8)
+      .map((line, index) => {
+        const odd = Number((line.match(/(?:cote|@)\s*:?\s*(\d+[,.]\d{1,2})/i)?.[1] || '').replace(',', '.'));
+        const stakeToken = line.match(/(?:mise|stake)\s*:?\s*(\d+[,.]?\d*)\s*€?/i)?.[1]
+          || line.match(/\b(\d+[,.]?\d*)\s*€/i)?.[1]
+          || '';
+        const stake = Number(stakeToken.replace(',', '.'));
+        const status = /gagn|won/i.test(line) ? 'won' : /perd|lost/i.test(line) ? 'lost' : /void|annul|rembours/i.test(line) ? 'void' : 'pending';
+        const date = line.match(/\b(\d{1,2}[\/.-]\d{1,2}(?:[\/.-]\d{2,4})?)\b/)?.[1] || new Date().toISOString().slice(0, 10);
+        const match = line
+          .replace(/(?:cote|mise|stake|gagné|perdu|pending|en cours|won|lost|void|annulé|remboursé)/ig, ' ')
+          .replace(/\d+[,.]?\d*\s*€?/g, ' ')
+          .replace(/\s+/g, ' ')
+          .trim();
+        return {
+          id: `wmx-${Date.now()}-${index}`,
+          raw: line,
+          date,
+          match: match || line.slice(0, 80),
+          market: /buteur/i.test(line) ? 'Buteur' : /plus|moins|over|under/i.test(line) ? 'Plus/Moins' : /marquent|btts/i.test(line) ? 'Les deux équipes marquent' : 'Vainqueur',
+          odd: Number.isFinite(odd) && odd > 1 ? odd : null,
+          stake: Number.isFinite(stake) && stake > 0 ? stake : null,
+          status
+        };
+      });
+  }
+
+  function reconcileWinamaxRows(importRows = loadWinamaxImports()) {
+    const appBets = loadUserBets();
+    const appKeys = appBets.map((bet) => ({ bet, key: compactUiKey(`${bet.title || ''} ${bet.label || ''} ${bet.market || ''}`) }));
+    return importRows.map((row) => {
+      const key = compactUiKey(`${row.match || ''} ${row.market || ''}`);
+      const match = appKeys.find(({ key: appKey }) => key && appKey && (appKey.includes(key.slice(0, 14)) || key.includes(appKey.slice(0, 14))));
+      const stakeDiff = match && row.stake != null ? Number(row.stake || 0) - Number(match.bet.stake || 0) : 0;
+      return {
+        ...row,
+        appBetId: match?.bet?.id || null,
+        reconciliation: match ? (Math.abs(stakeDiff) > 0.25 ? 'amount_diff' : 'tracked') : 'not_tracked',
+        stakeDiff
+      };
+    });
+  }
+
+  function renderWinamaxImportPreview() {
+    const node = $('#winamax-import-preview');
+    if (!node) return;
+    const preview = state.winamaxImportPreview || [];
+    const confirmed = reconcileWinamaxRows();
+    const rows = preview.length ? preview : confirmed.slice(-6).reverse();
+    if (!rows.length) {
+      node.textContent = 'Aucun import Winamax analysé.';
+      return;
+    }
+    node.innerHTML = rows.slice(0, 8).map((row) => {
+      const status = row.reconciliation === 'tracked' ? '✓ Suivi dans l’app' : row.reconciliation === 'amount_diff' ? 'Montant différent' : row.reconciliation === 'not_tracked' ? 'Non suivi' : 'À confirmer';
+      return `${escapeHtml(row.match || '-')} · ${escapeHtml(row.market || '-')} · ${row.odd ? formatOdd(row.odd) : '-'} · ${row.stake ? formatMoney(row.stake) : '-'} · ${escapeHtml(status)}`;
+    }).join('<br>');
+  }
+
+  function previewWinamaxImport() {
+    const rows = parseWinamaxPaste($('#winamax-import-paste')?.value || '');
+    state.winamaxImportPreview = reconcileWinamaxRows(rows);
+    renderWinamaxImportPreview();
+    setSideStatus(rows.length ? `${formatCount(rows.length)} pari(s) Winamax détecté(s)` : 'Aucune ligne Winamax détectée', rows.length ? 'ok' : 'warn');
+  }
+
+  function confirmWinamaxImport() {
+    const rows = state.winamaxImportPreview?.length ? state.winamaxImportPreview : reconcileWinamaxRows(parseWinamaxPaste($('#winamax-import-paste')?.value || ''));
+    if (!rows.length) {
+      setSideStatus('Import Winamax vide', 'warn');
+      return;
+    }
+    const merged = [...loadWinamaxImports(), ...rows.map((row) => ({ ...row, importedAt: new Date().toISOString() }))].slice(-1000);
+    writeStorageJson(WINAMAX_IMPORT_KEY, merged);
+    state.winamaxImportPreview = null;
+    if ($('#winamax-import-paste')) $('#winamax-import-paste').value = '';
+    renderWinamaxImportPreview();
+    renderWinamaxReconciliation();
+    renderHistory();
+    setSideStatus('Import Winamax confirmé', 'ok');
+  }
+
+  function winamaxReconciliationSummary() {
+    const rows = reconcileWinamaxRows();
+    const stake = rows.reduce((sum, row) => sum + Number(row.stake || 0), 0);
+    const pnl = rows.reduce((sum, row) => {
+      if (row.status === 'won') return sum + Number(row.stake || 0) * (Number(row.odd || 1) - 1);
+      if (row.status === 'lost') return sum - Number(row.stake || 0);
+      return sum;
+    }, 0);
+    const tracked = rows.filter((row) => row.reconciliation === 'tracked').length;
+    const missing = rows.filter((row) => row.reconciliation === 'not_tracked').length;
+    const diff = rows.filter((row) => row.reconciliation === 'amount_diff').length;
+    const app = userBetStats();
+    return { rows, stake, pnl, roi: stake > 0 ? pnl / stake : null, tracked, missing, diff, app };
+  }
+
+  function renderWinamaxReconciliation() {
+    const grid = $('#winamax-reconciliation-grid');
+    if (!grid) return;
+    const summary = winamaxReconciliationSummary();
+    if (!summary.rows.length) {
+      grid.innerHTML = '<div class="empty">Aucun import Winamax confirmé.</div>';
+      return;
+    }
+    const appPnl = Number(summary.app.pnlTotal || 0);
+    grid.innerHTML = [
+      ['Solde Winamax importé', formatMoney(summary.pnl), `ROI réel ${summary.roi == null ? '-' : formatPct(summary.roi, 1)} · mise ${formatMoney(summary.stake)}`],
+      ['App locale', formatMoney(appPnl), `${formatCount(summary.app.pending || 0)} en cours · ${formatCount(summary.app.settled || 0)} réglés`],
+      ['Écart', formatMoney(summary.pnl - appPnl), `${formatCount(summary.missing)} non suivi(s) · ${formatCount(summary.diff)} montant(s) différent(s)`],
+      ['Réconciliés', `${formatCount(summary.tracked)}/${formatCount(summary.rows.length)}`, '✓ Suivi dans l’app vs historique Winamax collé']
+    ].map(([label, value, detail]) => `
+      <article class="metric">
+        <span>${escapeHtml(label)}</span>
+        <strong>${escapeHtml(value)}</strong>
+        <small>${escapeHtml(detail)}</small>
+      </article>
+    `).join('');
   }
 
   function addBankrollTransaction() {
@@ -1669,34 +1924,12 @@
     return (open - close) / close;
   }
 
-  function trackUserBet(row) {
-    if (!row || !canDisplayStake(row)) return;
-    recordUserAction('track-bet', row.title || row.label || '');
-    const discipline = bankrollDisciplineStatus();
-    if (discipline.blocked) {
-      setSideStatus(discipline.label, discipline.tone === 'danger' ? 'danger' : 'warn');
-      notifyUser(discipline.label, discipline.detail, row);
-      return;
-    }
-    const key = userBetKey(row);
-    const bets = loadUserBets();
-    const existing = bets.find((bet) => bet.key === key && bet.status === 'pending');
-    if (existing) {
-      setSideStatus('Pari déjà suivi', 'warn');
-      return;
-    }
+  function buildUserBetRecord(row, { stake = displayStakeAmount(row), source = 'manual', status = 'pending', tags = [], note = '', extra = {} } = {}) {
     const now = new Date();
-    const stake = displayStakeAmount(row);
-    const coach = coachDecisionForBet(row, stake);
-    if (!coach.allow) {
-      setSideStatus(coach.label, coach.tone === 'danger' ? 'danger' : 'warn');
-      notifyUser(coach.label, coach.detail, row);
-      return;
-    }
     const prefs = loadPreferences();
-    bets.push({
+    return {
       id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
-      key,
+      key: userBetKey(row),
       matchId: row.id,
       sourceEventId: row.match?.id || row.match?.uid || null,
       winamaxMatchId: row.match?.winamax?.match_id || row.id || null,
@@ -1722,20 +1955,176 @@
       marketKey: marketKeyFromRow(row),
       stakeMode: prefs.stakeMode || 'kelly',
       stake,
-      status: 'pending',
+      status,
       pnl: 0,
-      tags: [],
-      note: '',
-      coachWarnings: coach.warnings || [],
+      tags,
+      note,
+      trackingSource: source,
       day: parisDayKey(now),
-      createdAt: now.toISOString()
-    });
+      createdAt: now.toISOString(),
+      ...extra
+    };
+  }
+
+  function trackUserBet(row) {
+    if (!row || !canDisplayStake(row)) return;
+    recordUserAction('track-bet', row.title || row.label || '');
+    const discipline = bankrollDisciplineStatus();
+    if (discipline.blocked) {
+      setSideStatus(discipline.label, discipline.tone === 'danger' ? 'danger' : 'warn');
+      notifyUser(discipline.label, discipline.detail, row);
+      return;
+    }
+    const key = userBetKey(row);
+    const bets = loadUserBets();
+    const existing = bets.find((bet) => bet.key === key && bet.status === 'pending');
+    if (existing) {
+      setSideStatus('Pari déjà suivi', 'warn');
+      return;
+    }
+    const stake = displayStakeAmount(row);
+    const coach = coachDecisionForBet(row, stake);
+    if (!coach.allow) {
+      setSideStatus(coach.label, coach.tone === 'danger' ? 'danger' : 'warn');
+      notifyUser(coach.label, coach.detail, row);
+      return;
+    }
+    bets.push(buildUserBetRecord(row, { stake, source: 'manual', extra: { coachWarnings: coach.warnings || [] } }));
     saveUserBets(bets);
     renderUserPnl();
     renderPicks();
     renderStakeScenarios();
     renderHistory();
     setSideStatus('Pari ajouté au suivi', 'ok');
+  }
+
+  function autoTrackingStopped() {
+    const stopped = readStorageJson(AUTO_TRACKING_STOP_KEY, null);
+    return stopped && stopped.day === parisDayKey();
+  }
+
+  function setAutoTrackingStopped(stopped = true) {
+    if (stopped) writeStorageJson(AUTO_TRACKING_STOP_KEY, { day: parisDayKey(), at: new Date().toISOString() });
+    else localStorage.removeItem(AUTO_TRACKING_STOP_KEY);
+  }
+
+  function autoTrackingAllowedLevel(row, level) {
+    if (level === 'all') return true;
+    if (level === 'safe') return Boolean(row.safeAssessment?.reliable || row.safeStatus === 'safe');
+    return Number(row.priorityRank || 99) === 1 || Boolean(row.isUltimate || row.ultimate);
+  }
+
+  function withinAutoTrackingHours(prefs) {
+    const now = new Date();
+    const hour = Number(new Intl.DateTimeFormat('fr-FR', { hour: '2-digit', hour12: false, timeZone: 'Europe/Paris' }).format(now));
+    const start = Number(prefs.autoTrackingStartHour ?? 0);
+    const end = Number(prefs.autoTrackingEndHour ?? 24);
+    if (start === end) return true;
+    return start < end ? hour >= start && hour < end : hour >= start || hour < end;
+  }
+
+  function autoTrackingEligibleRows() {
+    const prefs = loadPreferences();
+    if (!prefs.autoTrackingEnabled || !prefs.autoTrackingConfirmed || autoTrackingStopped()) return [];
+    if (!withinAutoTrackingHours(prefs)) return [];
+    const sports = new Set((prefs.autoTrackingSports || SPORTS_PREFS).map((item) => String(item).toLowerCase()));
+    const markets = new Set((prefs.autoTrackingMarkets || DEFAULT_PREFERENCES.markets).map(normalizeUiKey));
+    const minEdge = Number(prefs.autoTrackingEdgeMin || 0) / 100;
+    const oddMin = Number(prefs.autoTrackingOddMin || 1.3);
+    const oddMax = Number(prefs.autoTrackingOddMax || 6);
+    return (state.picks || [])
+      .filter((row) => canDisplayStake(row))
+      .filter((row) => autoTrackingAllowedLevel(row, prefs.autoTrackingLevel || 'top'))
+      .filter((row) => displayEdgeValue(row) >= minEdge)
+      .filter((row) => Number(row.odd || 0) >= oddMin && Number(row.odd || 0) <= oddMax)
+      .filter((row) => !sports.size || sports.has(String(row.sport || '').toLowerCase()))
+      .filter((row) => !markets.size || markets.has(normalizeUiKey(marketGroupFromKey(marketKeyFromRow(row)))))
+      .sort((a, b) => (Number(a.priorityRank || 99) - Number(b.priorityRank || 99)) || priorityValue(b) - priorityValue(a));
+  }
+
+  function runAutoTracking({ manual = false } = {}) {
+    const prefs = loadPreferences();
+    const now = Date.now();
+    if (!manual && now - Number(state.autoTrackingLastRunAt || 0) < 60_000) return;
+    state.autoTrackingLastRunAt = now;
+    if (!prefs.autoTrackingEnabled || !prefs.autoTrackingConfirmed) {
+      renderAutoTrackingAudit();
+      return;
+    }
+    if (autoTrackingStopped()) {
+      renderAutoTrackingAudit();
+      return;
+    }
+    const today = parisDayKey();
+    const existing = loadUserBets();
+    let autoToday = existing.filter((bet) => bet.day === today && bet.trackingSource === 'auto').length;
+    let auditToday = loadAutoTrackingAudit().filter((row) => row.day === today && ['tracked', 'dry-run'].includes(row.status)).length;
+    const limit = Math.max(1, Number(prefs.autoTrackingDailyLimit || 1));
+    const budget = Math.max(0, Number(prefs.autoTrackingDailyBudget || 0));
+    let spent = existing.filter((bet) => bet.day === today && bet.trackingSource === 'auto').reduce((sum, bet) => sum + Number(bet.stake || 0), 0);
+    const candidates = autoTrackingEligibleRows().filter((row) => !existing.some((bet) => bet.key === userBetKey(row) && bet.status === 'pending'));
+    let changed = false;
+    candidates.forEach((row) => {
+      if (prefs.autoTrackingDryRun) {
+        if (auditToday >= limit) return;
+        const key = userBetKey(row);
+        const already = loadAutoTrackingAudit().some((item) => item.day === today && item.key === key && item.status === 'dry-run');
+        if (already) return;
+        appendAutoTrackingAudit({ day: today, status: 'dry-run', key, title: row.title, label: userBetLabel(row), odd: row.odd, stake: displayStakeAmount(row), reason: 'Règles validées en dry-run.' });
+        auditToday += 1;
+        changed = true;
+        return;
+      }
+      if (autoToday >= limit) return;
+      const stake = displayStakeAmount(row);
+      if (budget > 0 && spent + stake > budget) return;
+      existing.push(buildUserBetRecord(row, {
+        stake,
+        source: 'auto',
+        status: 'pending',
+        tags: ['auto-tracking'],
+        note: 'Auto-tracking supervisé : confirme le pari chez Winamax.',
+        extra: { autoTracked: true, autoTrackingStatus: 'auto-tracked', undoUntil: new Date(Date.now() + 5 * 60_000).toISOString() }
+      }));
+      appendAutoTrackingAudit({ day: today, status: 'tracked', key: userBetKey(row), title: row.title, label: userBetLabel(row), odd: row.odd, stake, reason: 'Règles auto-tracking validées.' });
+      notifyUser('Pari auto-tracké', `${userBetLabel(row)} · ${formatOdd(row.odd)} · mise ${formatMoney(stake)}. Ouvre Winamax pour confirmer.`, row);
+      autoToday += 1;
+      spent += stake;
+      changed = true;
+    });
+    if (changed && !prefs.autoTrackingDryRun) {
+      saveUserBets(existing);
+      renderUserPnl();
+      renderPicks();
+      renderHistory();
+    }
+    renderAutoTrackingAudit();
+    if (manual) setSideStatus(changed ? 'Auto-tracking exécuté' : 'Aucun pick ne passe les règles', changed ? 'ok' : 'warn');
+  }
+
+  function renderAutoTrackingAudit() {
+    const node = $('#auto-tracking-audit');
+    if (!node) return;
+    const prefs = loadPreferences();
+    const rows = loadAutoTrackingAudit().slice(-8).reverse();
+    const status = prefs.autoTrackingEnabled && prefs.autoTrackingConfirmed && !autoTrackingStopped()
+      ? (prefs.autoTrackingDryRun ? 'Dry-run actif' : 'Actif')
+      : autoTrackingStopped() ? 'Stoppé pour aujourd’hui' : 'Inactif';
+    node.innerHTML = `
+      <strong>${escapeHtml(status)}</strong>
+      <p>Règle : ${escapeHtml(prefs.autoTrackingLevel || 'top')} · edge min ${escapeHtml(`${prefs.autoTrackingEdgeMin || 0}%`)} · ${formatCount(prefs.autoTrackingDailyLimit || 0)} pari(s)/jour.</p>
+      ${rows.length ? rows.map((row) => `<p>${escapeHtml(formatDateTime(row.at))} · ${escapeHtml(row.status)} · ${escapeHtml(row.title || '-')} · ${escapeHtml(row.label || '-')} · ${escapeHtml(row.stake != null ? formatMoney(row.stake) : '-')}</p>`).join('') : '<p>Aucun pick auto-tracké ou simulé.</p>'}
+    `;
+  }
+
+  function stopAutoTracking() {
+    setAutoTrackingStopped(true);
+    const prefs = { ...loadPreferences(), autoTrackingEnabled: false };
+    savePreferences(prefs);
+    appendAutoTrackingAudit({ day: parisDayKey(), status: 'stopped', reason: 'Kill switch utilisateur.' });
+    renderPreferences();
+    setSideStatus('Auto-tracking stoppé', 'danger');
+    notifyUser('Auto-tracking stoppé', 'Aucun nouveau pari ne sera auto-tracké aujourd’hui.');
   }
 
   function comboKey(combo) {
@@ -1951,12 +2340,56 @@
     return null;
   }
 
+  function recentMatchCount(side) {
+    const rows = [
+      ...(Array.isArray(side?.recent) ? side.recent : []),
+      ...(Array.isArray(side?.matches) ? side.matches : []),
+      ...(Array.isArray(side?.history?.recent) ? side.history.recent : [])
+    ];
+    const since = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    return rows.filter((item) => Date.parse(item.date || item.start || item.kickoff || '') >= since).length;
+  }
+
+  function advancedSportsSignals(row) {
+    const match = row?.match || {};
+    const context = match.context || {};
+    const availability = context.availability || {};
+    const teams = context.teams || {};
+    const signals = [];
+    ['home', 'away'].forEach((sideKey) => {
+      const side = availability[sideKey] || teams[sideKey] || {};
+      const injuries = side.injuries || {};
+      const severe = Number(injuries.severe || 0);
+      const total = Number(injuries.total || (Array.isArray(side.injuries) ? side.injuries.length : 0));
+      if (severe >= 3 || total >= 5) {
+        signals.push({ tone: 'danger', label: 'Cluster blessures', detail: `${side.team || side.name || sideKey} · ${severe || total} absences clés`, impact: -0.06 });
+      }
+      const games7 = recentMatchCount(side);
+      if (games7 >= 4) signals.push({ tone: 'warn', label: 'Fatigue forte', detail: `${side.team || side.name || sideKey} · ${games7} matchs en 7 jours`, impact: -0.08 });
+      else if (games7 >= 3) signals.push({ tone: 'watch', label: 'Fatigue', detail: `${side.team || side.name || sideKey} · ${games7} matchs en 7 jours`, impact: -0.04 });
+    });
+    const coach = match.coach_change || context.coach_change || row.coachChange || null;
+    const coachDays = Number(coach?.days || coach?.days_since || coach?.age_days);
+    if (coach && (!Number.isFinite(coachDays) || coachDays <= 30)) {
+      signals.push({ tone: 'warn', label: 'Nouveau coach', detail: `${coach.team || 'équipe'} depuis ${Number.isFinite(coachDays) ? `${Math.max(0, coachDays)} jours` : 'moins de 30 jours'}`, impact: -0.05 });
+    }
+    const travelKm = Number(match.travel_km || context.travel_km || row.travelKm);
+    if (travelKm >= 5000) signals.push({ tone: 'watch', label: 'Voyage long', detail: `${Math.round(travelKm)} km estimés`, impact: -0.03 });
+    const density = match.schedule_density || context.schedule_density || null;
+    if (density?.international_between_club) signals.push({ tone: 'watch', label: 'Calendrier dense', detail: 'Fenêtre internationale entre deux matchs club', impact: -0.04 });
+    return signals.slice(0, 6);
+  }
+
   function specialStakeMultiplier(row) {
     return isLongShotValue(row) ? 0.5 : 1;
   }
 
   function specialPatternBadgeHtml(row) {
     if (!row) return '';
+    const advanced = advancedSportsSignals(row)[0];
+    if (advanced) {
+      return `<span class="special-pick-badge ${escapeHtml(advanced.tone === 'danger' ? 'coldtrend' : 'hottrend')}" title="${escapeHtml(advanced.detail)}">${escapeHtml(advanced.label)}</span>`;
+    }
     const trend = trendForRow(row);
     if (trend?.tone === 'hot') {
       return `<span class="special-pick-badge hottrend" title="${escapeHtml(trend.reason)}">Tendance forte</span>`;
@@ -2992,6 +3425,7 @@
     maybeAutoCriticalRefresh();
     maybeAutoPrematchRefresh();
     maybeNotifyPickChanges();
+    runAutoTracking();
     refreshLiveScores().catch(() => {});
     scheduleBackgroundRefresh();
   }
@@ -3867,6 +4301,25 @@
           .finally(() => state.webEnrichmentPending.delete(key));
       }, 900 + index * 700);
     });
+    if (prefs.liveNewsWatcher) {
+      const imminent = (Array.isArray(rows) ? rows : [])
+        .filter((row) => minutesToKickoffValue(row.start) <= 6 * 60)
+        .slice(0, 2);
+      imminent.forEach((row, index) => {
+        const newsKey = `news:${rowEnrichmentKey(row)}:${parisDayKey()}`;
+        const store = readStorageJson(LIVE_NEWS_KEY, {});
+        if (store[newsKey] && Date.now() - Date.parse(store[newsKey]) < 60 * 60 * 1000) return;
+        store[newsKey] = new Date().toISOString();
+        writeStorageJson(LIVE_NEWS_KEY, store);
+        setTimeout(() => {
+          enrichPick(row, { force: true })
+            .then((record) => {
+              if (record?.majorChange) notifyUser('News impactante détectée', `${row.title} : re-check avant mise.`, row);
+            })
+            .catch((error) => pushLog('warn', `Live news watcher indisponible: ${error.message}`));
+        }, 2_000 + index * 1_000);
+      });
+    }
   }
 
   function isLiveStatus(value) {
@@ -4463,6 +4916,7 @@
     renderCoachAdvice();
     renderTodayModelPulse();
     updatePickFilters();
+    renderSavedStrategySelect();
     const filters = readPickFilters();
     const displayRows = dashboardPickRows(filters);
     renderDailySuggestion(displayRows);
@@ -6406,8 +6860,10 @@
       return;
     }
     body.innerHTML = rows.slice(0, 80).map((bet) => {
+      const canUndoAuto = bet.trackingSource === 'auto' && Date.parse(bet.undoUntil || '') > Date.now();
       const action = bet.status === 'pending'
-        ? `<button class="mini-export-btn" type="button" data-settle-bet-id="${escapeHtml(bet.id)}" data-settle-status="won">Win</button>
+        ? `${canUndoAuto ? `<button class="mini-export-btn" type="button" data-cancel-auto-bet-id="${escapeHtml(bet.id)}">Annuler auto</button>` : ''}
+           <button class="mini-export-btn" type="button" data-settle-bet-id="${escapeHtml(bet.id)}" data-settle-status="won">Win</button>
            <button class="mini-export-btn" type="button" data-settle-bet-id="${escapeHtml(bet.id)}" data-settle-status="lost">Loss</button>
            <button class="mini-export-btn" type="button" data-settle-bet-id="${escapeHtml(bet.id)}" data-settle-status="void">Void</button>`
         : '<span class="match-sub">Réglé</span>';
@@ -6430,6 +6886,19 @@
         </tr>
       `;
     }).join('');
+  }
+
+  function cancelAutoTrackedBet(id) {
+    const bets = loadUserBets();
+    const index = bets.findIndex((bet) => bet.id === id && bet.trackingSource === 'auto' && bet.status === 'pending');
+    if (index < 0) return;
+    const [removed] = bets.splice(index, 1);
+    saveUserBets(bets);
+    appendAutoTrackingAudit({ day: parisDayKey(), status: 'cancelled', key: removed.key, title: removed.title, label: removed.label, stake: removed.stake, reason: 'Annulation utilisateur dans la fenêtre de 5 minutes.' });
+    renderTrackedBets();
+    renderUserPnl();
+    renderPicks();
+    setSideStatus('Auto-tracking annulé', 'warn');
   }
 
   function updateTrackedBetText(id, patch) {
@@ -7014,6 +7483,18 @@
     if (bugReportPrompt) bugReportPrompt.checked = prefs.bugReportPrompt !== false;
     const tradingDesk = $('#pref-trading-desk');
     if (tradingDesk) tradingDesk.checked = Boolean(prefs.tradingDesk);
+    const language = $('#pref-language');
+    if (language) language.value = prefs.language || localStorage.getItem(I18N_LANGUAGE_KEY) || 'fr';
+    const liveNews = $('#pref-live-news-watcher');
+    if (liveNews) liveNews.checked = Boolean(prefs.liveNewsWatcher);
+    const autoTrackingEnabled = $('#pref-auto-tracking-enabled');
+    if (autoTrackingEnabled) autoTrackingEnabled.checked = Boolean(prefs.autoTrackingEnabled);
+    const autoTrackingConfirmed = $('#pref-auto-tracking-confirmed');
+    if (autoTrackingConfirmed) autoTrackingConfirmed.checked = Boolean(prefs.autoTrackingConfirmed);
+    const autoTrackingDryRun = $('#pref-auto-tracking-dry-run');
+    if (autoTrackingDryRun) autoTrackingDryRun.checked = prefs.autoTrackingDryRun !== false;
+    const autoTrackingLevel = $('#pref-auto-tracking-level');
+    if (autoTrackingLevel) autoTrackingLevel.value = prefs.autoTrackingLevel || 'top';
     const expertMode = $('#pref-expert-mode');
     if (expertMode) expertMode.checked = Boolean(prefs.expertMode);
     const aiEnabled = $('#pref-ai-enabled');
@@ -7069,7 +7550,14 @@
       'pref-take-profit': prefs.takeProfitPct,
       'pref-daily-bet-limit': prefs.dailyBetLimit,
       'pref-daily-stake-cap': prefs.dailyStakeCapPct,
-      'pref-loss-streak-confirm': prefs.coachLossStreakConfirm
+      'pref-loss-streak-confirm': prefs.coachLossStreakConfirm,
+      'pref-auto-tracking-edge': prefs.autoTrackingEdgeMin,
+      'pref-auto-tracking-odd-min': prefs.autoTrackingOddMin,
+      'pref-auto-tracking-odd-max': prefs.autoTrackingOddMax,
+      'pref-auto-tracking-budget': prefs.autoTrackingDailyBudget,
+      'pref-auto-tracking-limit': prefs.autoTrackingDailyLimit,
+      'pref-auto-tracking-start': prefs.autoTrackingStartHour,
+      'pref-auto-tracking-end': prefs.autoTrackingEndHour
     };
     Object.entries(fields).forEach(([id, value]) => {
       const node = $(`#${id}`);
@@ -7092,7 +7580,10 @@
     renderBankrollAccounting();
     renderDailyBudgetSummary();
     renderFavoritePreferences();
+    renderAutoTrackingAudit();
+    renderWinamaxImportPreview();
     renderTradingDesk();
+    applyI18n(prefs.language || 'fr');
     applyExpertMode();
   }
 
@@ -7225,6 +7716,21 @@
       autoUpdateEnabled: $('#pref-auto-update-enabled')?.checked !== false,
       updateChannel: $('#pref-update-channel')?.value || DEFAULT_PREFERENCES.updateChannel,
       tradingDesk: Boolean($('#pref-trading-desk')?.checked),
+      autoTrackingEnabled: Boolean($('#pref-auto-tracking-enabled')?.checked),
+      autoTrackingConfirmed: Boolean($('#pref-auto-tracking-confirmed')?.checked),
+      autoTrackingDryRun: $('#pref-auto-tracking-dry-run')?.checked !== false,
+      autoTrackingLevel: $('#pref-auto-tracking-level')?.value || DEFAULT_PREFERENCES.autoTrackingLevel,
+      autoTrackingEdgeMin: Math.max(0, Math.min(25, Number($('#pref-auto-tracking-edge')?.value || DEFAULT_PREFERENCES.autoTrackingEdgeMin) || DEFAULT_PREFERENCES.autoTrackingEdgeMin)),
+      autoTrackingOddMin: Math.max(1, Number($('#pref-auto-tracking-odd-min')?.value || DEFAULT_PREFERENCES.autoTrackingOddMin) || DEFAULT_PREFERENCES.autoTrackingOddMin),
+      autoTrackingOddMax: Math.max(1, Number($('#pref-auto-tracking-odd-max')?.value || DEFAULT_PREFERENCES.autoTrackingOddMax) || DEFAULT_PREFERENCES.autoTrackingOddMax),
+      autoTrackingDailyBudget: Math.max(0, Number($('#pref-auto-tracking-budget')?.value || DEFAULT_PREFERENCES.autoTrackingDailyBudget) || DEFAULT_PREFERENCES.autoTrackingDailyBudget),
+      autoTrackingDailyLimit: Math.max(1, Number($('#pref-auto-tracking-limit')?.value || DEFAULT_PREFERENCES.autoTrackingDailyLimit) || DEFAULT_PREFERENCES.autoTrackingDailyLimit),
+      autoTrackingStartHour: Math.max(0, Math.min(23, Number($('#pref-auto-tracking-start')?.value || DEFAULT_PREFERENCES.autoTrackingStartHour) || DEFAULT_PREFERENCES.autoTrackingStartHour)),
+      autoTrackingEndHour: Math.max(0, Math.min(24, Number($('#pref-auto-tracking-end')?.value || DEFAULT_PREFERENCES.autoTrackingEndHour) || DEFAULT_PREFERENCES.autoTrackingEndHour)),
+      autoTrackingSports: selectedSports.length ? selectedSports : SPORTS_PREFS,
+      autoTrackingMarkets: [...(simpleSelected.length ? simpleSelected : DEFAULT_PREFERENCES.markets), ...expertSelected],
+      liveNewsWatcher: Boolean($('#pref-live-news-watcher')?.checked),
+      language: $('#pref-language')?.value || DEFAULT_PREFERENCES.language,
       strict: Boolean($('#pref-strict')?.checked)
     };
   }
@@ -7761,6 +8267,107 @@
     return rows.slice(0, 5);
   }
 
+  function currentPickFilterSnapshot() {
+    return {
+      sport: $('#pick-sport-filter')?.value || 'all',
+      league: $('#pick-league-filter')?.value || 'all',
+      market: $('#pick-market-filter')?.value || 'all',
+      sort: $('#pick-sort')?.value || 'priority',
+      search: ($('#pick-search')?.value || '').trim(),
+      edgeMin: Number($('#pick-edge-min')?.value || 0) || 0,
+      oddMin: Number($('#pick-odd-min')?.value || 1) || 1
+    };
+  }
+
+  function applyPickFilterSnapshot(filters = {}) {
+    const set = (id, value) => {
+      const node = $(`#${id}`);
+      if (node && value != null) node.value = String(value);
+    };
+    set('pick-sport-filter', filters.sport || 'all');
+    set('pick-league-filter', filters.league || 'all');
+    set('pick-market-filter', filters.market || 'all');
+    set('pick-sort', filters.sort || 'priority');
+    set('pick-search', filters.search || '');
+    set('pick-edge-min', filters.edgeMin || '');
+    set('pick-odd-min', Number(filters.oddMin || 1) > 1 ? filters.oddMin : '');
+    renderPicks();
+  }
+
+  function saveCurrentStrategy() {
+    const filters = currentPickFilterSnapshot();
+    const defaultName = [filters.sport !== 'all' ? filters.sport : '', filters.market !== 'all' ? filters.market : '', filters.edgeMin ? `edge ${filters.edgeMin}%` : ''].filter(Boolean).join(' · ') || 'Stratégie Winamax';
+    const name = (window.prompt('Nom de la stratégie', defaultName) || '').trim();
+    if (!name) return;
+    const strategy = {
+      id: `strategy-${Date.now()}`,
+      name,
+      description: `Filtres sauvegardés le ${formatDateTime(new Date())}`,
+      filters,
+      createdAt: new Date().toISOString()
+    };
+    saveSavedStrategies([strategy, ...loadSavedStrategies()].slice(0, 60));
+    renderSavedStrategySelect();
+    renderSavedStrategies();
+    setSideStatus('Stratégie sauvegardée', 'ok');
+  }
+
+  function strategyMatchesBet(strategy, bet) {
+    const f = strategy?.filters || {};
+    if (f.sport && f.sport !== 'all' && compactUiKey(bet.sport) !== compactUiKey(f.sport)) return false;
+    if (f.league && f.league !== 'all' && compactUiKey(bet.league) !== compactUiKey(f.league)) return false;
+    if (f.market && f.market !== 'all' && compactUiKey(simpleMarketLabelForRow(bet) || bet.market) !== compactUiKey(f.market)) return false;
+    if (f.search && !compactUiKey(`${bet.title || ''} ${bet.label || ''}`).includes(compactUiKey(f.search))) return false;
+    if (Number(f.edgeMin || 0) > 0 && Number(bet.edge || 0) * 100 < Number(f.edgeMin)) return false;
+    if (Number(f.oddMin || 1) > 1 && Number(bet.odd || 0) < Number(f.oddMin)) return false;
+    return true;
+  }
+
+  function renderSavedStrategySelect() {
+    const select = $('#saved-strategy-select');
+    if (!select) return;
+    const current = select.value;
+    const rows = loadSavedStrategies();
+    select.innerHTML = '<option value="">Mes stratégies</option>' + rows.map((row) => `<option value="${escapeHtml(row.id)}">${escapeHtml(row.name)}</option>`).join('');
+    select.value = rows.some((row) => row.id === current) ? current : '';
+  }
+
+  function renderSavedStrategies() {
+    const grid = $('#saved-strategies-grid');
+    if (!grid) return;
+    const strategies = loadSavedStrategies();
+    if (!strategies.length) {
+      const suggestion = suggestImplicitStrategy();
+      grid.innerHTML = suggestion ? `<div class="empty">${escapeHtml(suggestion.label)}</div>` : '<div class="empty">Aucune stratégie sauvegardée. Sauve une sélection depuis la vue Picks.</div>';
+      return;
+    }
+    const bets = loadUserBets().filter((bet) => ['won', 'lost', 'void'].includes(bet.status));
+    grid.innerHTML = strategies.slice(0, 8).map((strategy) => {
+      const rows = bets.filter((bet) => strategyMatchesBet(strategy, bet));
+      const stake = rows.reduce((sum, bet) => sum + Number(bet.stake || 0), 0);
+      const pnl = rows.reduce((sum, bet) => sum + Number(bet.pnl || 0), 0);
+      const won = rows.filter((bet) => bet.status === 'won').length;
+      const roi = stake > 0 ? pnl / stake : null;
+      return `
+        <article class="metric">
+          <span>${escapeHtml(strategy.name)}</span>
+          <strong>${escapeHtml(roi == null ? 'Sample en attente' : formatPct(roi, 1))}</strong>
+          <small>${escapeHtml(`${formatCount(rows.length)} pari(s) · WR ${rows.length ? formatPct(won / rows.length, 0) : '-'} · P&L ${formatMoney(pnl)}`)}</small>
+        </article>
+      `;
+    }).join('');
+  }
+
+  function suggestImplicitStrategy() {
+    const report = deepAnalyticsReport();
+    const best = report.best?.find((row) => row.count >= 5 && row.roi > 0.15);
+    if (!best) return null;
+    return {
+      id: `suggested-${compactUiKey(best.dimension)}-${compactUiKey(best.key)}`,
+      label: `Tu sembles performer sur ${best.key} (${formatPct(best.roi, 0)} ROI). Sauve cette stratégie si tu veux la rejouer en 1 clic.`
+    };
+  }
+
   function renderDeepAnalytics() {
     const summary = $('#deep-analytics-summary');
     const bars = $('#deep-analytics-bars');
@@ -8212,6 +8819,8 @@
     renderPaperSimulation();
     renderModelVsUser();
     renderDeepAnalytics();
+    renderWinamaxReconciliation();
+    renderSavedStrategies();
     renderCoachAdvice();
     $('#hist-total').textContent = history ? String(history.total) : '-';
     $('#hist-generated').textContent = history?.generatedAt ? new Date(history.generatedAt).toLocaleString('fr-FR') : '-';
@@ -9044,6 +9653,7 @@
     const decisionTone = stakeAllowed ? 'ok' : dc.status === 'repair' ? 'warn' : dc.status === 'skip' ? 'danger' : 'watch';
     const signalPreview = signalCards.slice(0, 6);
     const narrative = pickNarrative(row, signalPreview, explanation);
+    const advancedSignals = advancedSportsSignals(row);
     const signalOkCount = signalPreview.filter((signal) => signal.ok).length;
     const limitedDataHtml = signalOkCount < 2
       ? `<article class="detail-card limited-data-card">
@@ -9123,6 +9733,10 @@
           <article class="detail-card">
             <h4>Contexte utile</h4>
             <div class="kv">${usefulContext.length ? usefulContext.map((signal) => `<span>${escapeHtml(signal.label)}</span><strong>${escapeHtml(signal.value)}</strong>`).join('') : '<span>Contexte</span><strong>Voir onglet Signaux</strong>'}</div>
+          </article>
+          <article class="detail-card">
+            <h4>Patterns avancés</h4>
+            <div class="kv">${advancedSignals.length ? advancedSignals.map((signal) => `<span>${escapeHtml(signal.label)}</span><strong>${escapeHtml(signal.detail)}</strong>`).join('') : '<span>Sport</span><strong>Aucun red flag avancé détecté</strong>'}</div>
           </article>
           ${limitedDataHtml}
           <article class="detail-card wide">
@@ -11647,18 +12261,18 @@
     $$('.nav-btn').forEach((btn) => btn.classList.toggle('active', btn.dataset.tab === tab));
     $$('.tab-panel').forEach((panel) => panel.classList.toggle('active', panel.dataset.panel === tab));
     const titles = {
-      dashboard: 'Picks',
+      dashboard: t('navPicks'),
       combines: 'Combinés',
       scorers: 'Buteurs',
       matches: 'Tous les matchs',
-      history: 'Bilan',
+      history: t('navHistory'),
       agent: 'Agent',
       data: 'Avancé',
-      search: 'Recherche',
+      search: t('navSearch'),
       calendar: 'Calendrier',
       pipeline: 'Pipeline',
       help: 'Aide',
-      preferences: 'Réglages'
+      preferences: t('navSettings')
     };
     $('#page-title').textContent = titles[tab] || 'Paris-Sportif';
     if (tab === 'calendar') renderCalendar();
@@ -12625,6 +13239,14 @@
       if (!el) return;
       el.addEventListener(el.tagName === 'INPUT' ? 'input' : 'change', () => renderPicks());
     });
+    $('#save-current-strategy-btn')?.addEventListener('click', saveCurrentStrategy);
+    $('#saved-strategy-select')?.addEventListener('change', (event) => {
+      const strategy = loadSavedStrategies().find((row) => row.id === event.target.value);
+      if (strategy) {
+        applyPickFilterSnapshot(strategy.filters);
+        setSideStatus(`Stratégie appliquée : ${strategy.name}`, 'ok');
+      }
+    });
     ['scorer-search', 'scorer-league-filter', 'scorer-market-filter', 'scorer-odd-min', 'scorer-odd-max', 'scorer-sort'].forEach((id) => {
       const el = $(`#${id}`);
       if (!el) return;
@@ -12668,6 +13290,14 @@
       renderDeepSearch();
     });
     $('#run-compare-btn')?.addEventListener('click', renderSearchComparison);
+    $('#pref-language')?.addEventListener('change', (event) => applyI18n(event.target.value || 'fr'));
+    $('#run-auto-tracking-btn')?.addEventListener('click', () => {
+      applyPreferences(collectPreferencesFromForm());
+      runAutoTracking({ manual: true });
+    });
+    $('#stop-auto-tracking-btn')?.addEventListener('click', stopAutoTracking);
+    $('#preview-winamax-import-btn')?.addEventListener('click', previewWinamaxImport);
+    $('#confirm-winamax-import-btn')?.addEventListener('click', confirmWinamaxImport);
     $('#trading-desk')?.addEventListener('click', (event) => {
       const row = event.target.closest('[data-trading-index]');
       if (!row) return;
@@ -12687,6 +13317,11 @@
       if (el) el.addEventListener('change', renderTrackedBets);
     });
     $('#user-bets-body')?.addEventListener('click', (event) => {
+      const cancel = event.target.closest('[data-cancel-auto-bet-id]');
+      if (cancel) {
+        cancelAutoTrackedBet(cancel.dataset.cancelAutoBetId || '');
+        return;
+      }
       const button = event.target.closest('[data-settle-bet-id]');
       if (!button) return;
       settleUserBet(button.dataset.settleBetId || '', button.dataset.settleStatus || 'void');

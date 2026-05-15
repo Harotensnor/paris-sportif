@@ -16,6 +16,7 @@ Ce guide donne une routine simple pour utiliser l'app sans se disperser.
 - Ajoute une note courte sur les paris importants.
 - Ajoute 3 à 5 équipes ou joueurs favoris pour recevoir une lecture dédiée sans élargir tous les filtres.
 - Vérifie le `Bilan` en fin de journée.
+- Si tu as aussi placé des paris directement sur Winamax, colle-les une fois dans `Réglages > Bankroll > Importer paris Winamax` pour garder le bilan aligné.
 
 ## Semaine 3 — Ajuster
 
@@ -25,6 +26,7 @@ Ce guide donne une routine simple pour utiliser l'app sans se disperser.
 - Surveille les badges `Tendance forte` et `Tendance froide` : ils résument l'audit 60 jours sans ouvrir le Mode expert.
 - Désactive les sports ou marchés qui ne te conviennent pas.
 - Compare `Modèle` et `Toi` pour voir si tu suis les picks fiables.
+- Sauve une première stratégie simple, par exemple un sport + un marché que tu comprends bien, puis regarde son ROI séparément dans `Bilan`.
 - Exporte ton profil une fois par semaine.
 
 ## Semaine 4 — Stabiliser
@@ -32,6 +34,7 @@ Ce guide donne une routine simple pour utiliser l'app sans se disperser.
 - Choisis une stratégie bankroll et garde-la pendant toute la semaine.
 - Lis le rapport hebdo le lundi.
 - Active le `Mode Trading Desk` seulement si tu veux une vue dense pendant les lives.
+- Teste l'auto-tracking uniquement en `Dry-run` pendant quelques jours avant de l'activer réellement dans ton suivi local.
 - Garde le Mode expert fermé sauf pour diagnostiquer un souci.
 - Si les données semblent anciennes, lance un refresh puis attends le bandeau de fin.
 
