@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-15T11:18:47Z",
+  "generated_at": "2026-05-15T11:26:45Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -467,11 +467,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.195,
-        "away_score": -0.195,
-        "home_fade": 0.3,
+        "home_score": -0.751,
+        "away_score": -0.001,
+        "home_fade": 0.856,
         "away_fade": 0.3,
-        "reason": "Direction nette: Milwaukee Brewers (-0.20)",
+        "reason": "Direction nette: Milwaukee Brewers (-0.00)",
         "detail": [
           {
             "side": "home",
@@ -484,6 +484,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.3
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 0.556
           }
         ]
       }
@@ -1128,10 +1134,10 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.098,
-        "away_score": 0.353,
+        "away_score": -0.098,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Toronto Tempo (+0.35)",
+        "reason": "Direction nette: Toronto Tempo (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -1144,12 +1150,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.45
           }
         ]
       }
@@ -1631,11 +1631,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
-        "home_fade": 0.15,
+        "home_score": -0.653,
+        "away_score": 0.097,
+        "home_fade": 0.706,
         "away_fade": 0.15,
-        "reason": "Direction nette: Milwaukee Brewers (-0.10)",
+        "reason": "Direction nette: Milwaukee Brewers (+0.10)",
         "detail": [
           {
             "side": "home",
@@ -1648,6 +1648,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 0.556
           }
         ]
       }
