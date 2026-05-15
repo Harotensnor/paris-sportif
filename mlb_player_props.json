@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-15T09:56:57Z",
+  "generated_at": "2026-05-15T10:02:55Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -1736,6 +1736,88 @@
       ]
     },
     {
+      "event_id": "401815369",
+      "kickoff": "2026-05-16T23:10Z",
+      "league": "MLB",
+      "match": "Milwaukee Brewers at Minnesota Twins",
+      "home": "Minnesota Twins",
+      "away": "Milwaukee Brewers",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Minnesota Twins",
+          "pitcher": "Connor Prielipp",
+          "label": "Connor Prielipp moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.5553,
+          "fair_odds": 1.8,
+          "expected_strikeouts": 5.25,
+          "projected_ip": 4.75,
+          "inputs": {
+            "k9": 9.95,
+            "era": 3.32,
+            "whip": 1.0,
+            "hand": "L"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Minnesota Twins",
+          "pitcher": "Connor Prielipp",
+          "label": "Connor Prielipp concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5274,
+          "fair_odds": 1.9,
+          "expected_hr_allowed": 0.749,
+          "projected_ip": 4.75,
+          "inputs": {
+            "hr9": 1.42,
+            "era": 3.32,
+            "whip": 1.0
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Milwaukee Brewers",
+          "pitcher": "Logan Henderson",
+          "label": "Logan Henderson moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.5365,
+          "fair_odds": 1.86,
+          "expected_strikeouts": 5.33,
+          "projected_ip": 4.33,
+          "inputs": {
+            "k9": 11.08,
+            "era": 4.15,
+            "whip": 0.92,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Milwaukee Brewers",
+          "pitcher": "Logan Henderson",
+          "label": "Logan Henderson ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.7173,
+          "fair_odds": 1.39,
+          "expected_hr_allowed": 0.332,
+          "projected_ip": 4.33,
+          "inputs": {
+            "hr9": 0.69,
+            "era": 4.15,
+            "whip": 0.92
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
       "event_id": "401815370",
       "kickoff": "2026-05-16T23:10Z",
       "league": "MLB",
@@ -2740,6 +2822,52 @@
       ]
     },
     {
+      "event_id": "401815384",
+      "kickoff": "2026-05-17T18:10Z",
+      "league": "MLB",
+      "match": "Milwaukee Brewers at Minnesota Twins",
+      "home": "Minnesota Twins",
+      "away": "Milwaukee Brewers",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Minnesota Twins",
+          "pitcher": "Bailey Ober",
+          "label": "Bailey Ober moins de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "under",
+          "probability": 0.5409,
+          "fair_odds": 1.85,
+          "expected_strikeouts": 4.33,
+          "projected_ip": 5.78,
+          "inputs": {
+            "k9": 6.75,
+            "era": 3.46,
+            "whip": 1.02,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Minnesota Twins",
+          "pitcher": "Bailey Ober",
+          "label": "Bailey Ober ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5721,
+          "fair_odds": 1.75,
+          "expected_hr_allowed": 0.559,
+          "projected_ip": 5.78,
+          "inputs": {
+            "hr9": 0.87,
+            "era": 3.46,
+            "whip": 1.02
+          },
+          "side": "home"
+        }
+      ]
+    },
+    {
       "event_id": "401815385",
       "kickoff": "2026-05-17T18:10Z",
       "league": "MLB",
@@ -3124,7 +3252,7 @@
       ]
     }
   ],
-  "props": 150,
+  "props": 156,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
