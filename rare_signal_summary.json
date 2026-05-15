@@ -1,24 +1,25 @@
 {
-  "generated_at": "2026-05-15T08:08:14Z",
+  "generated_at": "2026-05-15T08:16:13Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 76,
+    "active_events": 79,
     "actionable": 25,
-    "watch": 10,
-    "risk": 41,
+    "watch": 14,
+    "risk": 40,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 30,
-      "market_uncertain": 41,
+      "market_uncertain": 40,
+      "market_move": 4,
       "back_to_back_travel": 8,
       "signal_conflict": 1
     },
     "by_quality": {
       "actionable": 25,
-      "watch": 10,
-      "risk": 41
+      "watch": 14,
+      "risk": 40
     }
   },
   "active_actionable": [
@@ -475,6 +476,24 @@
   ],
   "active_watch": [
     {
+      "event_id": "748506",
+      "date": "2026-05-17T17:00Z",
+      "sport": "football",
+      "league_code": "esp.1",
+      "league_name": "La Liga",
+      "home": "Athletic Club",
+      "away": "Celta Vigo",
+      "match": "Athletic Club - Celta Vigo",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "away",
+      "strength": 0.608,
+      "context": "Cote away: 3.20 -> 3.55 (-10.9%)"
+    },
+    {
       "event_id": "401815348",
       "date": "2026-05-15T23:10Z",
       "sport": "baseball",
@@ -653,6 +672,60 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 8-5"
+    },
+    {
+      "event_id": "401867719",
+      "date": "2026-05-16T11:30Z",
+      "sport": "football",
+      "league_code": "scottishpremiership",
+      "league_name": "Scottish Premiership",
+      "home": "Celtic",
+      "away": "Heart of Midlothian",
+      "match": "Celtic - Heart of Midlothian",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "away",
+      "strength": 0.529,
+      "context": "Cote away: 4.20 -> 4.60 (-9.5%)"
+    },
+    {
+      "event_id": "750223",
+      "date": "2026-05-16T17:00Z",
+      "sport": "football",
+      "league_code": "superlig",
+      "league_name": "Süper Lig",
+      "home": "Gaziantep FK",
+      "away": "Istanbul Basaksehir",
+      "match": "Gaziantep FK - Istanbul Basaksehir",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 0.483,
+      "context": "Cote home: 3.45 -> 3.75 (-8.7%)"
+    },
+    {
+      "event_id": "748511",
+      "date": "2026-05-17T17:00Z",
+      "sport": "football",
+      "league_code": "esp.1",
+      "league_name": "La Liga",
+      "home": "Osasuna",
+      "away": "Espanyol",
+      "match": "Osasuna - Espanyol",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "away",
+      "strength": 0.457,
+      "context": "Cote away: 3.65 -> 3.95 (-8.2%)"
     }
   ],
   "active_risk": [
@@ -1033,24 +1106,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.8%"
-    },
-    {
-      "event_id": "401865447",
-      "date": "2026-05-20T22:00Z",
-      "sport": "football",
-      "league_code": "conmebol.sudamericana",
-      "league_name": "Copa Sudamericana",
-      "home": "Club Olimpia",
-      "away": "Vasco da Gama",
-      "match": "Club Olimpia - Vasco da Gama",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 19.8%"
     },
     {
       "event_id": "401865442",
