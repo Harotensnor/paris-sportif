@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-05-15T23:49:51Z",
+  "generated_at": "2026-05-15T23:54:02Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 77,
-    "actionable": 25,
-    "watch": 9,
-    "risk": 43,
+    "actionable": 28,
+    "watch": 7,
+    "risk": 42,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 26,
+      "market_move": 21,
       "market_uncertain": 42,
-      "market_move": 15,
       "back_to_back_travel": 8,
       "signal_conflict": 3
     },
     "by_quality": {
-      "watch": 9,
-      "actionable": 25,
-      "risk": 43
+      "actionable": 28,
+      "watch": 7,
+      "risk": 42
     }
   },
   "active_actionable": [
@@ -57,7 +57,7 @@
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 2.00 -> 4.00 (-100.0%)"
+      "context": "Cote home: 2.00 -> 2.95 (-47.5%)"
     },
     {
       "event_id": "401815360",
@@ -93,7 +93,7 @@
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 1.68 -> 2.90 (-72.6%)"
+      "context": "Cote home: 1.68 -> 2.55 (-51.8%)"
     },
     {
       "event_id": "401815364",
@@ -132,6 +132,24 @@
       "context": "Absences severes 7-13"
     },
     {
+      "event_id": "401871339",
+      "date": "2026-05-17T04:00Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "Detroit Pistons",
+      "away": "Cleveland Cavaliers",
+      "match": "Detroit Pistons - Cleveland Cavaliers",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 2.40 -> 1.52 (+36.7%)"
+    },
+    {
       "event_id": "401815375",
       "date": "2026-05-17T17:35Z",
       "sport": "baseball",
@@ -165,7 +183,7 @@
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 1.68 -> 2.90 (-72.6%)"
+      "context": "Cote home: 1.68 -> 2.55 (-51.8%)"
     },
     {
       "event_id": "401815379",
@@ -201,7 +219,7 @@
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 2.00 -> 4.00 (-100.0%)"
+      "context": "Cote home: 2.00 -> 2.95 (-47.5%)"
     },
     {
       "event_id": "401815387",
@@ -274,6 +292,24 @@
       "side": "away",
       "strength": 0.872,
       "context": "1 match dans les 48h + 1711 km de voyage"
+    },
+    {
+      "event_id": "401815355",
+      "date": "2026-05-16T00:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Houston Astros",
+      "away": "Texas Rangers",
+      "match": "Houston Astros - Texas Rangers",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.86,
+      "context": "Cote away: 1.89 -> 1.60 (+15.5%)"
     },
     {
       "event_id": "401815361",
@@ -456,6 +492,24 @@
       "context": "Absences severes 12-8"
     },
     {
+      "event_id": "401815452",
+      "date": "2026-05-23T01:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "San Diego Padres",
+      "away": "Athletics",
+      "match": "San Diego Padres - Athletics",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "San Diego Padres",
+      "side": null,
+      "strength": 0.8,
+      "context": "Absences severes 9-5"
+    },
+    {
       "event_id": "401872904",
       "date": "2026-05-23T00:00Z",
       "sport": "hockey",
@@ -475,24 +529,6 @@
     }
   ],
   "active_watch": [
-    {
-      "event_id": "401815355",
-      "date": "2026-05-16T00:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Houston Astros",
-      "away": "Texas Rangers",
-      "match": "Houston Astros - Texas Rangers",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Houston Astros",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 14-11"
-    },
     {
       "event_id": "401815353",
       "date": "2026-05-16T00:15Z",
@@ -618,24 +654,6 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 3-6"
-    },
-    {
-      "event_id": "401815452",
-      "date": "2026-05-23T01:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Diego Padres",
-      "away": "Athletics",
-      "match": "San Diego Padres - Athletics",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "San Diego Padres",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 8-5"
     }
   ],
   "active_risk": [
@@ -674,24 +692,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.3%"
-    },
-    {
-      "event_id": "401871339",
-      "date": "2026-05-17T04:00Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "Detroit Pistons",
-      "away": "Cleveland Cavaliers",
-      "match": "Detroit Pistons - Cleveland Cavaliers",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 15.5%"
     },
     {
       "event_id": "401859395",

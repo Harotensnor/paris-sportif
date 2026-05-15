@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-15T23:49:43Z",
+  "generated_at": "2026-05-15T23:53:54Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815352",
-      "kickoff": "2026-05-15T23:40Z",
-      "league": "MLB",
-      "match": "Chicago Cubs at Chicago White Sox",
-      "home": "Chicago White Sox",
-      "away": "Chicago Cubs",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Chicago White Sox",
-          "pitcher": "Sean Burke",
-          "label": "Sean Burke moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.5476,
-          "fair_odds": 1.83,
-          "expected_strikeouts": 5.29,
-          "projected_ip": 6.43,
-          "inputs": {
-            "k9": 7.4,
-            "era": 3.8,
-            "whip": 1.11,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Chicago White Sox",
-          "pitcher": "Sean Burke",
-          "label": "Sean Burke concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5105,
-          "fair_odds": 1.96,
-          "expected_hr_allowed": 0.714,
-          "projected_ip": 6.43,
-          "inputs": {
-            "hr9": 1.0,
-            "era": 3.8,
-            "whip": 1.11
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Chicago Cubs",
-          "pitcher": "Edward Cabrera",
-          "label": "Edward Cabrera moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.534,
-          "fair_odds": 1.87,
-          "expected_strikeouts": 5.35,
-          "projected_ip": 5.76,
-          "inputs": {
-            "k9": 8.35,
-            "era": 3.88,
-            "whip": 1.32,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Chicago Cubs",
-          "pitcher": "Edward Cabrera",
-          "label": "Edward Cabrera concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5814,
-          "fair_odds": 1.72,
-          "expected_hr_allowed": 0.871,
-          "projected_ip": 5.76,
-          "inputs": {
-            "hr9": 1.36,
-            "era": 3.88,
-            "whip": 1.32
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815355",
       "kickoff": "2026-05-16T00:10Z",
@@ -2678,7 +2596,7 @@
       ]
     }
   ],
-  "props": 128,
+  "props": 124,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
