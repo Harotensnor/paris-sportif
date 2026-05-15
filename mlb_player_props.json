@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-15T20:27:33Z",
+  "generated_at": "2026-05-15T20:33:14Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -1194,6 +1194,52 @@
             "whip": 1.05
           },
           "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815366",
+      "kickoff": "2026-05-16T17:10Z",
+      "league": "MLB",
+      "match": "Toronto Blue Jays at Detroit Tigers",
+      "home": "Detroit Tigers",
+      "away": "Toronto Blue Jays",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Detroit Tigers",
+          "pitcher": "Casey Mize",
+          "label": "Casey Mize plus de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "over",
+          "probability": 0.5701,
+          "fair_odds": 1.75,
+          "expected_strikeouts": 5.83,
+          "projected_ip": 5.17,
+          "inputs": {
+            "k9": 10.16,
+            "era": 2.9,
+            "whip": 1.19,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Detroit Tigers",
+          "pitcher": "Casey Mize",
+          "label": "Casey Mize ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.7168,
+          "fair_odds": 1.4,
+          "expected_hr_allowed": 0.333,
+          "projected_ip": 5.17,
+          "inputs": {
+            "hr9": 0.58,
+            "era": 2.9,
+            "whip": 1.19
+          },
+          "side": "home"
         }
       ]
     },
@@ -3288,7 +3334,7 @@
       ]
     }
   ],
-  "props": 158,
+  "props": 160,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
