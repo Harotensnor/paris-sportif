@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-15T19:25:14Z",
+  "generated_at": "2026-05-15T19:29:50Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -125,11 +125,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -1.195,
-        "away_score": 1.155,
-        "home_fade": 1.3,
+        "home_score": -0.195,
+        "away_score": -0.195,
+        "home_fade": 0.3,
         "away_fade": 0.3,
-        "reason": "Direction nette: Philadelphia Phillies (+1.15)",
+        "reason": "Direction nette: Philadelphia Phillies (-0.20)",
         "detail": [
           {
             "side": "home",
@@ -142,18 +142,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.3
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 1.0
           }
         ]
       }
@@ -361,13 +349,13 @@
         "2 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "mixed",
-        "net_side": null,
-        "home_score": -0.265,
+        "status": "net",
+        "net_side": "away",
+        "home_score": -0.795,
         "away_score": 0.015,
         "home_fade": 0.9,
         "away_fade": 0.3,
-        "reason": "Signaux mitigés: avantage net trop faible (Tampa Bay Rays -0.26, Miami Marlins +0.01)",
+        "reason": "Direction nette: Miami Marlins (+0.01)",
         "detail": [
           {
             "side": "home",
@@ -386,12 +374,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.6
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.53
           }
         ]
       }
@@ -480,10 +462,10 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.195,
-        "away_score": 0.509,
+        "away_score": -0.195,
         "home_fade": 0.3,
         "away_fade": 0.3,
-        "reason": "Direction nette: Boston Red Sox (+0.51)",
+        "reason": "Direction nette: Boston Red Sox (-0.20)",
         "detail": [
           {
             "side": "home",
@@ -496,12 +478,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.704
           }
         ]
       }
@@ -535,13 +511,13 @@
         "2 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "mixed",
-        "net_side": null,
-        "home_score": -0.374,
+        "status": "net",
+        "net_side": "away",
+        "home_score": -1.195,
         "away_score": 0.155,
         "home_fade": 1.3,
         "away_fade": 0.3,
-        "reason": "Signaux mitigés: avantage net trop faible (New York Mets -0.37, New York Yankees +0.15)",
+        "reason": "Direction nette: New York Yankees (+0.15)",
         "detail": [
           {
             "side": "home",
@@ -560,12 +536,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 1.0
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.821
           }
         ]
       }
@@ -600,12 +570,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "home",
-        "home_score": 0.561,
+        "net_side": "away",
+        "home_score": -0.195,
         "away_score": -0.195,
         "home_fade": 0.3,
         "away_fade": 0.3,
-        "reason": "Direction nette: Chicago White Sox (+0.56)",
+        "reason": "Direction nette: Chicago Cubs (-0.20)",
         "detail": [
           {
             "side": "home",
@@ -618,12 +588,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.3
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.756
           }
         ]
       }
@@ -660,10 +624,10 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.795,
-        "away_score": 0.816,
+        "away_score": 0.015,
         "home_fade": 0.9,
         "away_fade": 0.3,
-        "reason": "Direction nette: Texas Rangers (+0.82)",
+        "reason": "Direction nette: Texas Rangers (+0.01)",
         "detail": [
           {
             "side": "home",
@@ -682,12 +646,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.801
           }
         ]
       }
@@ -839,11 +797,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 1.376,
-        "away_score": -1.826,
+        "home_score": 0.085,
+        "away_score": -0.995,
         "home_fade": 0.3,
-        "away_fade": 1.931,
-        "reason": "Direction nette: Los Angeles Angels (+1.38)",
+        "away_fade": 1.1,
+        "reason": "Direction nette: Los Angeles Angels (+0.09)",
         "detail": [
           {
             "side": "home",
@@ -862,18 +820,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.8
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 0.831
           }
         ]
       }
