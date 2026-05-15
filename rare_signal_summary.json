@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-05-15T11:26:45Z",
+  "generated_at": "2026-05-15T11:29:08Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 80,
-    "actionable": 27,
-    "watch": 14,
+    "actionable": 30,
+    "watch": 11,
     "risk": 39,
     "expired_sample": 0,
     "by_type": {
-      "market_move": 8,
+      "market_move": 11,
       "injury_imbalance": 30,
       "market_uncertain": 39,
       "back_to_back_travel": 8,
       "signal_conflict": 1
     },
     "by_quality": {
-      "actionable": 27,
-      "watch": 14,
+      "actionable": 30,
+      "watch": 11,
       "risk": 39
     }
   },
@@ -58,6 +58,24 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 14-6"
+    },
+    {
+      "event_id": "401815354",
+      "date": "2026-05-15T23:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Minnesota Twins",
+      "away": "Milwaukee Brewers",
+      "match": "Minnesota Twins - Milwaukee Brewers",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 1.80 -> 2.15 (-19.4%)"
     },
     {
       "event_id": "401815356",
@@ -114,6 +132,24 @@
       "context": "Absences severes 7-12"
     },
     {
+      "event_id": "401815369",
+      "date": "2026-05-16T23:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Minnesota Twins",
+      "away": "Milwaukee Brewers",
+      "match": "Minnesota Twins - Milwaukee Brewers",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 1.80 -> 2.15 (-19.4%)"
+    },
+    {
       "event_id": "401815364",
       "date": "2026-05-16T23:15Z",
       "sport": "baseball",
@@ -166,6 +202,24 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 14-6"
+    },
+    {
+      "event_id": "401815384",
+      "date": "2026-05-17T18:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Minnesota Twins",
+      "away": "Milwaukee Brewers",
+      "match": "Minnesota Twins - Milwaukee Brewers",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 1.80 -> 2.15 (-19.4%)"
     },
     {
       "event_id": "401815386",
@@ -708,60 +762,6 @@
       "side": "home",
       "strength": 0.589,
       "context": "Cote home: 3.30 -> 2.95 (+10.6%)"
-    },
-    {
-      "event_id": "401815354",
-      "date": "2026-05-15T23:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Minnesota Twins",
-      "away": "Milwaukee Brewers",
-      "match": "Minnesota Twins - Milwaukee Brewers",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "home",
-      "strength": 0.556,
-      "context": "Cote home: 1.80 -> 1.98 (-10.0%)"
-    },
-    {
-      "event_id": "401815369",
-      "date": "2026-05-16T23:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Minnesota Twins",
-      "away": "Milwaukee Brewers",
-      "match": "Minnesota Twins - Milwaukee Brewers",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "home",
-      "strength": 0.556,
-      "context": "Cote home: 1.80 -> 1.98 (-10.0%)"
-    },
-    {
-      "event_id": "401815384",
-      "date": "2026-05-17T18:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Minnesota Twins",
-      "away": "Milwaukee Brewers",
-      "match": "Minnesota Twins - Milwaukee Brewers",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "home",
-      "strength": 0.556,
-      "context": "Cote home: 1.80 -> 1.98 (-10.0%)"
     }
   ],
   "active_risk": [
