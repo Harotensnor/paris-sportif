@@ -37,7 +37,7 @@ Par defaut, l'app affiche les marches simples :
 - vainqueur du match ;
 - plus / moins de buts ;
 - les deux equipes marquent ;
-- buteur ;
+- buteur, uniquement si la cote Winamax reelle est confirmee ;
 - vainqueur a la mi-temps.
 
 Les handicaps, jeux tennis, scores exacts, cartons, corners et autres marches plus complexes restent caches en mode standard. Active le Mode expert seulement si tu veux volontairement les revoir.
@@ -50,7 +50,7 @@ Les handicaps, jeux tennis, scores exacts, cartons, corners et autres marches pl
 - `Tendance forte` : segment recemment performant.
 - `Tendance froide` : segment a traiter avec prudence.
 
-Un pick sans bouton `Je mise` ne doit pas etre joue automatiquement. Il sert a comprendre le programme du jour.
+Un pick sans bouton `Je mise` ne doit pas etre joue automatiquement. Il sert a comprendre le programme du jour. Pour les buteurs, l'app exige une cote Winamax reelle : une cote theorique seule ne suffit pas.
 
 ## 5. Bilan et bankroll
 
@@ -181,12 +181,14 @@ npm --prefix desktop run qa:winamax-audit
 
 Si les donnees sont anciennes, l'app affiche un bandeau de fraicheur.
 
-Si beaucoup de matchs Winamax existent mais peu de picks simples ressortent, l'app affiche `Modèle trop strict aujourd'hui`. Dans ce cas :
+Si beaucoup de matchs Winamax existent mais peu de picks simples ressortent, l'app affiche `Modèle trop strict aujourd'hui`, `Aucun pari prêt aujourd'hui` ou `Volume prêt limité aujourd'hui`. Dans ce cas :
 
 1. lance un refresh ;
 2. ouvre `Avance > Pipeline` ;
 3. lis le funnel ;
 4. n'ouvre les marches avances que si tu acceptes volontairement plus de complexite.
+
+Depuis v1.4.0, les segments avec peu d'historique ne sont plus penalises automatiquement si le signal est fort : l'app peut valider un pari avec peu de sample quand l'avantage, la confiance et la cote restent dans une zone prudente.
 
 ## 16. Sauvegarde et restauration
 

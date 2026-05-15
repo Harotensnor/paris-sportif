@@ -15,6 +15,7 @@ function createLegacyEngineService({ projectRoot }) {
   const lineupsPath = path.join(root, 'lineups_soccer.json');
   const sofaEventsPath = path.join(root, 'sofascore_events.json');
   const starPlayersPath = path.join(root, 'star_players.json');
+  const winamaxMarketsPath = path.join(root, 'winamax_markets.json');
   const h2hPath = path.join(root, 'h2h_extended.json');
   const matchContextPath = path.join(root, 'match_context.json');
   const signalGapPath = path.join(root, 'signal_gap_report.json');
@@ -74,7 +75,7 @@ function createLegacyEngineService({ projectRoot }) {
   function fileKey() {
     const dataStat = fs.statSync(dataPath);
     const legacyStat = fs.statSync(legacyPath);
-    return `${dataStat.mtimeMs}:${dataStat.size}:${legacyStat.mtimeMs}:${legacyStat.size}:${optionalFileKey(lineupsPath)}:${optionalFileKey(sofaEventsPath)}:${optionalFileKey(starPlayersPath)}:${optionalFileKey(h2hPath)}:${optionalFileKey(matchContextPath)}:${optionalFileKey(signalGapPath)}:${optionalFileKey(contextBacktestPath)}:${optionalFileKey(decisionBacktestPath)}:${optionalFileKey(decisionTuningPath)}:${optionalFileKey(decisionShadowPath)}:${optionalFileKey(oddsGuardrailsPath)}:${optionalFileKey(agentBlockerBacktestPath)}:${optionalFileKey(agentGuardrailRecommendationsPath)}:${optionalFileKey(stakeReductionBacktestPath)}:${optionalFileKey(signalConflictBacktestPath)}:${optionalFileKey(scorerQualityPath)}:${optionalFileKey(scorerCandidatesSummaryPath)}:${optionalFileKey(scorerSettlementPath)}:${optionalFileKey(scorerPendingAuditPath)}:${optionalFileKey(prematchFocusPath)}:${optionalFileKey(prematchExecutionPath)}:${optionalFileKey(signalCoverageTrendPath)}:${optionalFileKey(nextActionsPath)}:${optionalFileKey(sourceFreshnessPlanPath)}:${optionalFileKey(contextRepairPlanPath)}:${optionalFileKey(refreshPriorityPlanPath)}:${optionalFileKey(prebetChecklistPath)}:${optionalFileKey(prebetChecklistBacktestPath)}:${optionalFileKey(teamIdentityGraphPath)}:${optionalFileKey(matchDecisionTimelinePath)}:${optionalFileKey(agentBankrollSimulationPath)}:${optionalFileKey(smartPreparePlanPath)}:${optionalFileKey(sourceRegistryPath)}:${optionalFileKey(sourceQuarantinePath)}:${optionalFileKey(optionalSourcesPlanPath)}:${optionalFileKey(criticalIssueReportPath)}:${optionalFileKey(dataConsistencyReportPath)}:${optionalFileKey(uiIntegrityReportPath)}:${optionalFileKey(pickIntegrityReportPath)}:${optionalFileKey(coverageRepairEnginePath)}:${optionalFileKey(sourceCoverageTargetsPath)}:${optionalFileKey(leagueSignalQualityPath)}:${optionalFileKey(modelLabReportPath)}:${optionalFileKey(probabilityCalibrationPath)}:${optionalFileKey(policyCandidateRegistryPath)}:${optionalFileKey(sourceHealthReportPath)}:${optionalFileKey(clvSummaryPath)}:${optionalFileKey(picksHistorySummaryPath)}`;
+    return `${dataStat.mtimeMs}:${dataStat.size}:${legacyStat.mtimeMs}:${legacyStat.size}:${optionalFileKey(lineupsPath)}:${optionalFileKey(sofaEventsPath)}:${optionalFileKey(starPlayersPath)}:${optionalFileKey(winamaxMarketsPath)}:${optionalFileKey(h2hPath)}:${optionalFileKey(matchContextPath)}:${optionalFileKey(signalGapPath)}:${optionalFileKey(contextBacktestPath)}:${optionalFileKey(decisionBacktestPath)}:${optionalFileKey(decisionTuningPath)}:${optionalFileKey(decisionShadowPath)}:${optionalFileKey(oddsGuardrailsPath)}:${optionalFileKey(agentBlockerBacktestPath)}:${optionalFileKey(agentGuardrailRecommendationsPath)}:${optionalFileKey(stakeReductionBacktestPath)}:${optionalFileKey(signalConflictBacktestPath)}:${optionalFileKey(scorerQualityPath)}:${optionalFileKey(scorerCandidatesSummaryPath)}:${optionalFileKey(scorerSettlementPath)}:${optionalFileKey(scorerPendingAuditPath)}:${optionalFileKey(prematchFocusPath)}:${optionalFileKey(prematchExecutionPath)}:${optionalFileKey(signalCoverageTrendPath)}:${optionalFileKey(nextActionsPath)}:${optionalFileKey(sourceFreshnessPlanPath)}:${optionalFileKey(contextRepairPlanPath)}:${optionalFileKey(refreshPriorityPlanPath)}:${optionalFileKey(prebetChecklistPath)}:${optionalFileKey(prebetChecklistBacktestPath)}:${optionalFileKey(teamIdentityGraphPath)}:${optionalFileKey(matchDecisionTimelinePath)}:${optionalFileKey(agentBankrollSimulationPath)}:${optionalFileKey(smartPreparePlanPath)}:${optionalFileKey(sourceRegistryPath)}:${optionalFileKey(sourceQuarantinePath)}:${optionalFileKey(optionalSourcesPlanPath)}:${optionalFileKey(criticalIssueReportPath)}:${optionalFileKey(dataConsistencyReportPath)}:${optionalFileKey(uiIntegrityReportPath)}:${optionalFileKey(pickIntegrityReportPath)}:${optionalFileKey(coverageRepairEnginePath)}:${optionalFileKey(sourceCoverageTargetsPath)}:${optionalFileKey(leagueSignalQualityPath)}:${optionalFileKey(modelLabReportPath)}:${optionalFileKey(probabilityCalibrationPath)}:${optionalFileKey(policyCandidateRegistryPath)}:${optionalFileKey(sourceHealthReportPath)}:${optionalFileKey(clvSummaryPath)}:${optionalFileKey(picksHistorySummaryPath)}`;
   }
 
   function closeCurrent() {
@@ -274,6 +275,16 @@ function createLegacyEngineService({ projectRoot }) {
     try {
       const parsed = JSON.parse(fs.readFileSync(starPlayersPath, 'utf8'));
       return parsed && parsed.teams && typeof parsed.teams === 'object' ? parsed.teams : {};
+    } catch {
+      return {};
+    }
+  }
+
+  function readWinamaxMarketsIndex() {
+    if (!fs.existsSync(winamaxMarketsPath)) return {};
+    try {
+      const parsed = JSON.parse(fs.readFileSync(winamaxMarketsPath, 'utf8'));
+      return parsed && parsed.matches && typeof parsed.matches === 'object' ? parsed.matches : {};
     } catch {
       return {};
     }
@@ -1191,24 +1202,34 @@ function createLegacyEngineService({ projectRoot }) {
     const confidenceMin = Number.isFinite(Number(policy?.newConfidenceMin)) ? Number(policy.newConfidenceMin) : 0.55;
     const quality = row?.contextQuality || row?.match?.context?.quality || {};
     const criticalMissing = Array.isArray(quality.critical_missing) ? quality.critical_missing : [];
+    const hardCriticalMissing = criticalMissing.filter((item) => !/^availability_missing/i.test(String(item || '')));
+    const softAvailabilityMissing = criticalMissing.length > 0 && hardCriticalMissing.length === 0;
     const reasons = [];
     const warnings = [];
 
+    const segmentNegative = sample >= 15 && Number.isFinite(roi) && roi < 0;
+    const baseZone = rawEdge >= 0.01 && odd >= 1.30 && odd <= 6.00 && !row?.signalConflict?.active && !row?.oddsGuardrail?.applied && !hardCriticalMissing.length;
+    const ruleA = baseZone && edge >= edgeMin && odd <= oddMax && confidence >= confidenceMin && !segmentNegative;
+    const ruleB = baseZone && sample < 5 && edge >= 0.05 && odd <= 5.00 && confidence >= 0.65;
+    const ruleC = baseZone && sample >= 5 && sample < 15 && edge >= 0.04 && odd <= 5.00 && confidence >= 0.60;
+    const reliableRule = ruleA ? 'A' : ruleB ? 'B' : ruleC ? 'C' : null;
+
     if (!(rawEdge >= 0.01)) reasons.push('edge < +1pt');
-    if (edge < edgeMin) reasons.push(`edge prudent < +${Math.round(edgeMin * 100)}pt`);
-    if (odd < 1.30 || odd > oddMax) reasons.push(`cote hors zone solo 1.30-${oddMax.toFixed(2)}`);
-    if (confidence < confidenceMin) reasons.push(`confiance < ${Math.round(confidenceMin * 100)}%`);
-    if (sample >= 15 && Number.isFinite(roi) && roi < 0) reasons.push('segment historique négatif');
+    if (!reliableRule && edge < Math.min(edgeMin, sample < 5 ? 0.05 : sample < 15 ? 0.04 : edgeMin)) reasons.push('edge prudent insuffisant');
+    if (odd < 1.30 || odd > (sample < 15 ? Math.min(5.00, oddMax) : oddMax)) reasons.push(`cote hors zone solo 1.30-${(sample < 15 ? Math.min(5.00, oddMax) : oddMax).toFixed(2)}`);
+    if (!reliableRule && confidence < (sample < 5 ? 0.65 : sample < 15 ? 0.60 : confidenceMin)) reasons.push('confiance insuffisante');
+    if (segmentNegative) reasons.push('segment historique négatif');
     if (row?.signalConflict?.active) reasons.push('conflit signaux');
     if (row?.oddsGuardrail?.applied) reasons.push(row.oddsGuardrail.label || 'cote à vérifier');
-    if (criticalMissing.length) reasons.push(`signal critique manquant: ${criticalMissing.slice(0, 2).join(', ')}`);
+    if (hardCriticalMissing.length) reasons.push(`signal critique manquant: ${hardCriticalMissing.slice(0, 2).join(', ')}`);
+    if (softAvailabilityMissing) warnings.push('disponibilités joueurs incomplètes');
     if (edgeInfo.capped) warnings.push(`edge brut ${Math.round(rawEdge * 100)}% plafonné par prudence`);
     if (sample > 0 && sample < 15) warnings.push(`sample court ${sample}/15`);
     if (!sample) warnings.push('historique segment absent');
     if (policy?.direction === 'boost') warnings.push(`segment gagnant : filtre assoupli (${policy.reason})`);
     if (policy?.direction === 'harden') warnings.push(`segment froid : filtre durci (${policy.reason})`);
 
-    const reliable = !reasons.length && edge >= edgeMin && edge <= 0.20 && odd >= 1.30 && odd <= oddMax && confidence >= confidenceMin;
+    const reliable = Boolean(reliableRule) && edge <= 0.20;
     const displayable = rawEdge >= 0.01 && odd > 1.10 && odd <= 18 && confidence >= 0.30 && row?.decisionCenter?.status !== 'skip';
     return {
       status: reliable ? 'reliable' : displayable ? 'watch' : 'reject',
@@ -1229,6 +1250,7 @@ function createLegacyEngineService({ projectRoot }) {
         confidenceMin,
         reason: policy.reason
       } : null,
+      reliableRule,
       reasons: reasons.slice(0, 5),
       warnings: warnings.slice(0, 4)
     };
@@ -1240,6 +1262,11 @@ function createLegacyEngineService({ projectRoot }) {
     let nextStake = row.stake;
     let status = row.status;
     let statusLabel = row.statusLabel;
+    if (assessment.status === 'reliable' && nextDecision.canBet) {
+      nextStake = Math.max(0, Number(nextDecision.stake ?? nextStake ?? 0) || 0);
+      status = 'bet';
+      statusLabel = `✓ Fiable · règle ${assessment.reliableRule || 'safe'}`;
+    }
     if (assessment.status !== 'reliable' && nextDecision.canBet) {
       nextDecision = {
         ...nextDecision,
@@ -2226,7 +2253,9 @@ function createLegacyEngineService({ projectRoot }) {
     const blockingGates = [];
     const sportKey = String(row.sport || row.match?.sport || '').toLowerCase();
     const quality = row.contextQuality || row.match?.context?.quality || {};
-    const hasCriticalSignals = Array.isArray(quality.critical_missing) && quality.critical_missing.length > 0;
+    const criticalSignals = Array.isArray(quality.critical_missing) ? quality.critical_missing : [];
+    const hardCriticalSignals = criticalSignals.filter((item) => !/^availability_missing/i.test(String(item || '')));
+    const hasCriticalSignals = criticalSignals.length > 0;
     const qualityScore = Number(quality.score);
     const proxyContextSport = /tennis|baseball|basket|hockey|mma|rugby|nfl|football américain|american football/.test(sportKey);
     const proxyContextRelease = proxyContextSport &&
@@ -2236,16 +2265,23 @@ function createLegacyEngineService({ projectRoot }) {
       qualityScore >= 50 &&
       Number(row.edge || 0) >= 0.08 &&
       modelStake > 0;
-    const sourceRepairNeeded = hasCriticalSignals || (Number.isFinite(qualityScore) && qualityScore < 45);
+    const softAvailabilityRelease = hardCriticalSignals.length === 0 &&
+      hasCriticalSignals &&
+      row.contextGate?.gate !== 'skip' &&
+      Number(row.edge || 0) >= 0.08 &&
+      Number(row.probability || 0) >= 0.60 &&
+      modelStake > 0;
+    const contextRelease = proxyContextRelease || softAvailabilityRelease;
+    const sourceRepairNeeded = (hasCriticalSignals && !contextRelease) || (Number.isFinite(qualityScore) && qualityScore < 45);
     if (!(Number(row.odd || 0) > 1)) blockingGates.push({ key: 'odds', label: 'Cote Winamax invalide', tone: 'danger' });
     if (!(Number(row.edge || 0) > 0)) blockingGates.push({ key: 'edge', label: 'Edge non positif', tone: 'danger' });
     if (!(modelStake > 0 || currentStake > 0)) blockingGates.push({ key: 'kelly', label: 'Kelly nul', tone: 'warn' });
     if (row.status === 'skip') blockingGates.push({ key: 'model', label: row.statusLabel || 'Skip modèle', tone: 'danger' });
-    if ((row.contextGate?.agentEligible === false || hasCriticalSignals) && !proxyContextRelease) {
+    if ((row.contextGate?.agentEligible === false || hasCriticalSignals) && !contextRelease) {
       blockingGates.push({
         key: 'context',
-        label: row.contextGate?.label || (hasCriticalSignals ? 'Signal critique manquant' : 'Contexte insuffisant'),
-        tone: hasCriticalSignals ? 'danger' : 'warn'
+        label: row.contextGate?.label || (hardCriticalSignals.length ? 'Signal critique manquant' : 'Contexte insuffisant'),
+        tone: hardCriticalSignals.length ? 'danger' : 'warn'
       });
     }
     const uniqueBlocking = [];
@@ -2259,7 +2295,7 @@ function createLegacyEngineService({ projectRoot }) {
       gates.prebet?.blocked ? { key: 'agent_checklist', label: gates.prebet.label, tone: 'danger' } : null,
       gates.critical?.blocked ? { key: 'agent_critical', label: gates.critical.label, tone: 'danger' } : null
     ].filter(Boolean);
-    const modelAllowsBet = row.status === 'bet' || proxyContextRelease;
+    const modelAllowsBet = row.status === 'bet' || contextRelease;
     const canBet = !uniqueBlocking.length && modelAllowsBet && effectiveStake > 0;
     const status = canBet
       ? 'ready'
@@ -2276,7 +2312,7 @@ function createLegacyEngineService({ projectRoot }) {
           ? 'Surveiller'
           : 'Écarter';
     const mainReason = uniqueBlocking[0]?.label || (canBet
-      ? (proxyContextRelease ? 'Winamax OK · contexte proxy suffisant' : 'Tous les garde-fous sont verts')
+      ? (softAvailabilityRelease ? 'Signal fort malgré disponibilités incomplètes' : proxyContextRelease ? 'Winamax OK · contexte proxy suffisant' : 'Tous les garde-fous sont verts')
       : row.statusLabel || 'Observation prudente');
     return {
       status,
@@ -2709,11 +2745,17 @@ function createLegacyEngineService({ projectRoot }) {
     };
     const todaySummary = summarize(today);
     const sprint27TooStrict = todaySummary.bookableEvents >= 30 && todaySummary.displayed < 10;
+    const noReadyToday = todaySummary.bookableEvents >= 10 && todaySummary.ready < 1;
+    const lowReadyToday = todaySummary.bookableEvents >= 10 && todaySummary.ready > 0 && todaySummary.ready < 8;
     return {
       schema: 'paris-sportif.today_funnel.v1',
       generatedAt: new Date().toISOString(),
-      status: sprint27TooStrict ? 'warn' : todaySummary.displayed >= 5 ? 'ok' : todaySummary.displayed > 0 ? 'warn' : 'danger',
-      message: sprint27TooStrict
+      status: noReadyToday || lowReadyToday || sprint27TooStrict ? 'warn' : todaySummary.displayed >= 5 ? 'ok' : todaySummary.displayed > 0 ? 'warn' : 'danger',
+      message: noReadyToday
+        ? `${todaySummary.displayed} opportunités visibles mais aucun pari prêt aujourd'hui`
+        : lowReadyToday
+        ? `${todaySummary.ready} pari prêt aujourd'hui : volume limité pour ${todaySummary.bookableEvents} events Winamax`
+        : sprint27TooStrict
         ? `${todaySummary.displayed} picks visibles : modèle trop strict pour ${todaySummary.bookableEvents} events Winamax`
         : todaySummary.displayed >= 5
         ? `${todaySummary.displayed} picks Winamax visibles aujourd'hui`
@@ -2944,18 +2986,88 @@ function createLegacyEngineService({ projectRoot }) {
     });
   }
 
-  function buildNativeScorers(win, matches, providedLineupsIndex = null, providedStarPlayersIndex = null) {
+  function buildNativeScorers(win, matches, providedLineupsIndex = null, providedStarPlayersIndex = null, providedPlayerOddsIndex = null) {
     const lineupsIndex = providedLineupsIndex || readLineupsIndex();
     const starPlayersIndex = providedStarPlayersIndex || readStarPlayersIndex();
+    const playerOddsIndex = providedPlayerOddsIndex || readWinamaxMarketsIndex();
     return contentUtils.buildNativeScorers(win, matches, {
       lineupsIndex,
       starPlayersIndex,
+      playerOddsIndex,
       findLineupForMatch,
       matchWithLineups,
       fallbackScorersFromStars,
       getTeamNames,
       cleanLabel
     });
+  }
+
+  function scorerPickRowsFromScorers(win, scorers, matchById, bankroll) {
+    const rows = [];
+    for (const scorer of Array.isArray(scorers) ? scorers : []) {
+      const odd = Number(scorer?.odd || 0);
+      const probability = Math.max(0, Math.min(0.75, Number(scorer?.probability || 0) || 0));
+      const qualityScore = Number(scorer?.playerQuality?.score || 0);
+      const edge = odd > 1 && probability > 0 ? probability - (1 / odd) : 0;
+      if (!(odd >= 1.30 && odd <= 4.00) || !(qualityScore >= 50) || !(edge >= 0.01)) continue;
+      const match = matchById.get(String(scorer.matchId || '')) || {};
+      const market = 'Buteur';
+      const label = scorer.name || scorer.winamaxPlayerMarket?.label || 'Joueur';
+      const stake = edge >= 0.03 ? stakeFor(win, probability, odd, bankroll) : 0;
+      const status = edge >= 0.03 && stake > 0 ? 'bet' : 'watch';
+      rows.push({
+        id: `${scorer.matchId}:scorer:${compactKey(label)}`,
+        match: jsonClone(match, {}),
+        pred: null,
+        title: scorer.title || cleanTitle(match) || 'Match joueur',
+        sport: match.sport || 'football',
+        league: scorer.league || match.league_name || match.league_code || '',
+        start: scorer.start || match.date || '',
+        market,
+        marketKey: 'scorer',
+        label,
+        player: label,
+        odd,
+        probability,
+        edge,
+        stake,
+        pickSource: 'winamax_player_scorer',
+        status,
+        statusLabel: status === 'bet' ? 'Buteur Winamax' : 'Buteur à surveiller',
+        marketProfile: {
+          detailed: true,
+          detailedCount: Number(match?.winamax?.full_markets_count || 0),
+          keys: ['buteur'],
+          families: { players: true },
+          familyCount: 1,
+          availableFamilies: ['players'],
+          missingCore: []
+        },
+        scorer,
+        contextQuality: {
+          score: qualityScore,
+          tier: qualityScore >= 70 ? 'fort' : 'correct',
+          missing: scorer.playerQuality?.reasons || [],
+          critical_missing: []
+        },
+        contextGate: {
+          gate: 'player_market',
+          agentEligible: true,
+          label: 'Marché buteur Winamax validé',
+          warnings: []
+        },
+        confidenceTrust: {
+          score: Math.max(50, Math.min(100, qualityScore)),
+          level: qualityScore >= 70 ? 'fort' : 'correct',
+          drivers: scorer.playerQuality?.reasons || ['Marché buteur Winamax']
+        },
+        winamaxUrl: scorer.winamaxUrl || match?.winamax?.url || null,
+        winamaxPlayerMarket: scorer.winamaxPlayerMarket || null
+      });
+    }
+    return rows
+      .sort((a, b) => Number(b.edge || 0) - Number(a.edge || 0) || Date.parse(a.start || '') - Date.parse(b.start || ''))
+      .slice(0, 24);
   }
 
   function readHistorySummary() {
@@ -2971,6 +3083,7 @@ function createLegacyEngineService({ projectRoot }) {
     const data = win.PRONOSTICS_DATA || {};
     const lineupsIndex = readLineupsIndex();
     const starPlayersIndex = readStarPlayersIndex();
+    const playerOddsIndex = readWinamaxMarketsIndex();
     const h2hIndex = readH2hIndex();
     const matchContextIndex = readMatchContextIndex();
     const signalGapReport = readSignalGapReport();
@@ -3019,10 +3132,15 @@ function createLegacyEngineService({ projectRoot }) {
     const modelRealityAudit = buildModelRealityAudit(picksHistorySummary);
     const events = dedupeUpcomingBookable(eventListFromDays(data.days)).slice(0, 1200);
     const enrichedEvents = events.map((match) => enrichMatchForModel(match, lineupsIndex, h2hIndex, matchContextIndex));
+    const scorers = buildNativeScorers(win, enrichedEvents, lineupsIndex, starPlayersIndex, playerOddsIndex);
+    const matchById = new Map(enrichedEvents.map((match) => [String(match?.winamax?.match_id || match?.id || match?.uid || ''), match]));
     const coverage = buildSignalCoverage(enrichedEvents);
     const history = readHistorySummary();
     const calibration = history?.calibration || calibrationUtils.buildCalibration([]);
-    const analyzedRows = enrichedEvents.flatMap((match) => expandAnalyzedRow(analyzeMatch(win, match, safeBankroll)));
+    const analyzedRows = [
+      ...enrichedEvents.flatMap((match) => expandAnalyzedRow(analyzeMatch(win, match, safeBankroll))),
+      ...scorerPickRowsFromScorers(win, scorers, matchById, safeBankroll)
+    ];
     const baseRows = calibrationUtils.annotateMatches(
       analyzedRows,
       calibration
@@ -3092,7 +3210,6 @@ function createLegacyEngineService({ projectRoot }) {
     const coverage24h = buildRolling24hCoverage(data, matches, dashboardCandidates, dashboard.rows);
     const winamaxMarketAudit = buildWinamaxMarketAudit(enrichedEvents, prioritizedDecisionRows);
     const combines = buildNativeCombines(win, enrichedEvents);
-    const scorers = buildNativeScorers(win, enrichedEvents, lineupsIndex, starPlayersIndex);
     const watchlist = buildWatchlist(matches);
     const decisionCenter = buildDecisionCenterReport(prioritizedDecisionRows, decisionGates);
     const agentPositions = prebetGate.blocked || criticalGate.blocked ? [] : buildAgentPositions(win, matches);

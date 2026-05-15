@@ -5,6 +5,26 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 28 — Buteurs + assouplissement intelligent + sports élargis
+
+- Version desktop portée à `v1.4.0` après test terrain obligatoire sur pipeline réelle et app ouverte. Le sprint active la famille standard `players`/buteurs avec cotes Winamax réelles et assouplit le filtre fiable sans rouvrir les marchés complexes.
+- Terrain Sprint 28 : `refresh_once.py --full` terminé avec `health.json generated_at=2026-05-15T14:16:33Z` et `data.js generated_at=2026-05-15T14:16:36Z`. Le snapshot réel contient 269 événements, 23 événements aujourd'hui, 23 Winamax aujourd'hui, 6 signaux simples positifs, 5 opportunités standard affichées aujourd'hui et 1 pari prêt aujourd'hui après correction.
+- Bugs terrain trouvés et corrigés :
+  1. Majeur : le bandeau diagnostic ne signalait plus clairement le cas `0 pari prêt aujourd'hui` dès que des opportunités à surveiller existaient. Le funnel affiche maintenant `Aucun pari prêt aujourd'hui` ou `Volume prêt limité aujourd'hui` selon le niveau réel.
+  2. Majeur : le brief du matin pouvait promouvoir un pari futur alors qu'aucune mise du jour n'était validée. Il annonce maintenant les opportunités à surveiller du jour sans fausse mise.
+  3. Majeur UX : la timeline affichait des rangs `#1/#2` et `mise 0 €` sur des lignes non misables. Les rangs et la mise ne sont visibles que sur les paris réellement validés.
+  4. Critique volume : la famille `players` était classée dormante car les marchés `scorer/goalscorer` n'étaient pas reconnus dans l'audit. Ils sont maintenant rattachés à `players`.
+  5. Critique confiance : les buteurs utilisaient une cote implicite modèle au lieu de la cote Winamax réelle. Le moteur matche maintenant les joueurs avec `winamax_markets.json` et ne propose `Je mise` que si la cote réelle est positive.
+  6. Majeur cohérence : une ligne pouvait être marquée `canBet` par le centre de décision mais rester en statut `À surveiller`. La couche fiable synchronise maintenant statut, mise et libellé.
+- Activation buteurs standard : les picks buteurs utilisent les marchés `Buteur` Winamax détaillés, cote 1.30-4.00, edge positif et qualité joueur >= 50. Le cockpit standard affiche `PARI : joueur marque · COTE : Winamax · MISE : ...`, et les buteurs sans cote réelle restent non misables.
+- Assouplissement fiable A/B/C : règle A conserve le filtre historique ; règle B accepte un très fort signal sans sample (`edge >= +5pt`, cote <= 5, confiance >= 65%) ; règle C accepte un sample court 5-14 paris (`edge >= +4pt`, cote <= 5, confiance >= 60%). Les segments négatifs avec 15+ paris restent bloqués.
+- Sports sous-exploités : l'audit terrain Sprint 28 détecte football, baseball, basketball, hockey et tennis sur 24h glissantes. Les sports US/nuit restent supportés via le moteur générique ; sur le jour courant, seuls football et tennis étaient disponibles aujourd'hui, et le tennis visible tombait sur `Jeux tennis`, toujours masqué en standard conformément au choix utilisateur.
+- Validation modèle : les rapports générés par la pipeline donnent `probability_calibration_report` à 1849 lignes settled avec Brier `0.2255`, `decision_backtest_report` avec ROI `+51.53%` sur le bucket `bet` et ROI global historique `+16.84%` dans `picks_history_summary`. Le seuil produit `ROI >= +5%` reste donc respecté après assouplissement.
+- Audit Winamax Sprint 28 : `qa:winamax-audit` produit `desktop/state/winamax-audit-sprint28.json`, avec 15 familles disponibles, 12 exploitées et plus aucun dormant standard ; les dormants restants sont expert (`exactscore`, `sporttotal`, `cards`).
+- Captures terrain Sprint 28 : `captures/desktop-sprint28-after-picks.png`, `desktop-sprint28-buteurs.png` et `desktop-sprint28-audit.png` documentent le cockpit corrigé, les buteurs réels et l'audit Winamax.
+- Validation Sprint 28 : syntaxe Node, `qa:engine`, `qa:winamax-audit`, `qa:terrain -- --skip-refresh`, `npm test`, Playwright Electron, `qa:visual`, `qa:a11y` et multi-jours J+3 passent. Le test terrain final mesure 23 events Winamax aujourd'hui, 6 simples positifs, 5 affichés, 1 prêt aujourd'hui, 15 opportunités 24h et 0 erreur console sévère.
+- Build Windows v1.4.0 validé : `desktop/dist-sprint28/Paris Sportif Desktop Setup 1.4.0.exe` généré à 109,1 MB, et smoke du binaire unpacked validé avec process vivant après 18 secondes. Le dossier historique `desktop/dist/` reste verrouillé par Windows sur un ancien `app.asar`, donc la validation release utilise la sortie propre `dist-sprint28`.
+
 ### Sprint 27 — Audit marchés/sports + stabilité + v1.3.0
 
 - Version desktop portée à `v1.3.0` après test terrain obligatoire sur pipeline réelle et app ouverte. La release stabilise le diagnostic volume plutôt que de fabriquer des paris quand les signaux simples du jour ne le permettent pas.

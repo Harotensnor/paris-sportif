@@ -53,7 +53,7 @@ function familyFor(value) {
   if (/dnb|remboursesinul|drawnobet/.test(key)) return 'dnb';
   if (/handicap|asian|spread/.test(key)) return 'handicap';
   if (/exact|scorecorrect|scoreexact/.test(key)) return 'exactscore';
-  if (/buteur|passeur|joueur|player|marqueur|tir|shot/.test(key)) return 'players';
+  if (/buteur|passeur|joueur|player|scorer|goalscorer|marqueur|tir|shot/.test(key)) return 'players';
   if (/teamtotal|totalequipe|totalquipe/.test(key)) return 'teamtotal';
   if (/basket|baskettotal|points/.test(key)) return 'basket';
   if (/tennis|jeu|set/.test(key)) return 'tennis';
@@ -167,7 +167,7 @@ function main() {
     .sort((a, b) => b.bookableToday - a.bookableToday || a.sport.localeCompare(b.sport));
 
   const report = {
-    schema: 'paris-sportif.winamax_audit_sprint27.v1',
+    schema: 'paris-sportif.winamax_audit_sprint28.v1',
     generatedAt: new Date().toISOString(),
     dataGeneratedAt: data.generated_at || null,
     today,
@@ -197,7 +197,7 @@ function main() {
     }
   };
 
-  const output = path.join(root, 'desktop', 'state', 'winamax-audit-sprint27.json');
+  const output = path.join(root, 'desktop', 'state', 'winamax-audit-sprint28.json');
   fs.mkdirSync(path.dirname(output), { recursive: true });
   fs.writeFileSync(output, JSON.stringify(report, null, 2));
   console.log(JSON.stringify({

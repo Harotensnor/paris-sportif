@@ -1569,7 +1569,9 @@
               : 'Bonjour, aucun pari prêt pour l’instant';
     }
     if (subtitle) {
-      subtitle.textContent = ultimate
+      subtitle.textContent = !readyToday.length && watchToday.length
+        ? `${formatCount(watchToday.length)} opportunité(s) à surveiller aujourd’hui, mais aucune mise n’est validée.`
+        : ultimate
         ? `PARI : ${userBetLabel(ultimate)} · COTE : ${formatOdd(ultimate.odd)} · MISE : ${visibleStakeText(ultimate)} · départ ${countdownLabel(ultimate.start)}.`
         : nextPick
         ? `Prochain match dans ${countdownLabel(nextPick.start)} : ${nextPick.title}, ${userBetLabel(nextPick)}.`
@@ -4781,12 +4783,14 @@
       const ready = Number(today.ready || 0);
       const bookable = Number(today.bookableEvents || today.bookable || 0);
       const tooStrictForDailyTarget = bookable >= 30 && displayed < 10;
-      if ((bookable > 0 && displayed < 5) || tooStrictForDailyTarget) {
+      const noReadyToday = bookable >= 10 && ready < 1;
+      const lowReadyToday = bookable >= 10 && ready > 0 && ready < 8;
+      if ((bookable > 0 && displayed < 5) || tooStrictForDailyTarget || noReadyToday || lowReadyToday) {
         const simpleReady = Number(today.simpleReady || 0);
         const advancedReady = Number(today.advancedReady || 0);
         node.className = 'today-funnel-alert danger';
         node.innerHTML = `
-          <strong>${tooStrictForDailyTarget ? 'Modèle trop strict aujourd’hui' : displayed ? `${formatCount(displayed)} pari(s) aujourd'hui seulement` : 'Aucun pari simple aujourd’hui visible'}</strong>
+          <strong>${noReadyToday ? 'Aucun pari prêt aujourd’hui' : lowReadyToday ? 'Volume prêt limité aujourd’hui' : tooStrictForDailyTarget ? 'Modèle trop strict aujourd’hui' : displayed ? `${formatCount(displayed)} pari(s) aujourd'hui seulement` : 'Aucun pari simple aujourd’hui visible'}</strong>
           <span>Aujourd’hui : ${formatCount(today.totalEvents || today.events || 0)} matchs → ${formatCount(bookable)} Winamax → ${formatCount(today.predictableMatches || today.predictable || 0)} analysables → ${formatCount(today.simplePassingFilters || 0)} simples positifs → ${formatCount(simpleReady)} simples prêts. ${advancedReady ? `${formatCount(advancedReady)} prêts avancés restent cachés en mode standard.` : ''}</span>
           <button class="ghost-btn" type="button" data-tab-target="data">Diagnostic auto</button>
         `;
@@ -4847,18 +4851,21 @@
         <span>${escapeHtml(countdownLabel(row.start))}</span>
         <strong>${escapeHtml(row.title)}</strong>
         <em>${escapeHtml(userBetLabel(row))}</em>
-        <small>${escapeHtml(row.priorityRank && row.priorityRank <= 5 ? `#${row.priorityRank} · ` : '')}${escapeHtml(formatOdd(row.odd))} Winamax · mise ${escapeHtml(visibleStakeText(row))}</small>
+        <small>${escapeHtml(canDisplayStake(row) && row.priorityRank && row.priorityRank <= 5 ? `#${row.priorityRank} · ` : '')}${escapeHtml(formatOdd(row.odd))} Winamax · mise ${escapeHtml(canDisplayStake(row) ? visibleStakeText(row) : 'non validée')}</small>
       </article>
     `).join('');
   }
 
   function renderSimpleInlineSections() {
     const combines = Array.isArray(state.combines) ? state.combines.slice(0, 4) : [];
-    const scorers = Array.isArray(state.scorers) ? state.scorers.slice(0, 6) : [];
+    const realScorers = (Array.isArray(state.scorers) ? state.scorers : [])
+      .filter((scorer) => Number(scorer?.odd || 0) > 1 && Number(scorer?.edge || 0) >= 0.01 && Number(scorer?.playerQuality?.score || 0) >= 50)
+      .sort((a, b) => (Number(b.edge || 0) - Number(a.edge || 0)) || (Number(b.probability || 0) - Number(a.probability || 0)));
+    const scorers = realScorers.slice(0, 6);
     const combineCount = $('#simple-combines-count');
     const scorerCount = $('#simple-scorers-count');
     if (combineCount) combineCount.textContent = formatCount(state.combines?.length || 0);
-    if (scorerCount) scorerCount.textContent = formatCount(state.scorers?.length || 0);
+    if (scorerCount) scorerCount.textContent = formatCount(realScorers.length || 0);
     const combineGrid = $('#simple-combines-grid');
     if (combineGrid) {
       combineGrid.innerHTML = combines.length ? combines.map((combo) => `
@@ -4874,10 +4881,10 @@
       scorerGrid.innerHTML = scorers.length ? scorers.map((scorer) => `
         <article class="simple-inline-card clickable-row" data-match-id="${escapeHtml(scorer.id || scorer.matchId || '')}">
           <strong>${escapeHtml(scorer.name || scorer.player || 'Joueur')}</strong>
-          <span>${escapeHtml(scorer.title || scorer.match || '-')} · ${escapeHtml(formatOdd(scorer.odd || scorer.impliedOdd || 0))}</span>
-          <em>${escapeHtml(`Fiabilité ${formatPct(scorer.confidence || scorer.probability || 0, 0)} · pari : ${scorer.name || scorer.player || 'joueur'} marque`)}</em>
+          <span>${escapeHtml(scorer.title || scorer.match || '-')} · COTE : ${escapeHtml(formatOdd(scorer.odd || 0))}</span>
+          <em>${escapeHtml(`PARI : ${scorer.name || scorer.player || 'joueur'} marque · ${formatPct(scorer.edge || 0, 1)} d’avantage`)}</em>
         </article>
-    `).join('') : '<div class="empty compact-empty">Aucun pari joueur aujourd’hui.</div>';
+    `).join('') : '<div class="empty compact-empty">Aucun buteur Winamax fiable avec cote réelle pour le moment.</div>';
     }
     renderWinamaxPromos();
   }
@@ -6098,7 +6105,7 @@
     updateScorerFilters();
     const filters = readScorerFilters();
     const rows = (state.scorers || []).filter((scorer) => {
-      const odd = Number(scorer.impliedOdd || 0);
+      const odd = Number(scorer.odd || scorer.impliedOdd || 0);
       if (filters.query && !scorerSearchText(scorer).includes(filters.query)) return false;
       if (filters.league !== 'all' && scorerLeagueKey(scorer) !== filters.league) return false;
       if (filters.market !== 'all' && filters.market !== 'buteur') return false;
@@ -6108,8 +6115,8 @@
     });
     rows.sort((a, b) => {
       if (filters.sort === 'confidence') return Number(b.probability || 0) - Number(a.probability || 0);
-      if (filters.sort === 'edge') return Number(b.playerQuality?.score || 0) - Number(a.playerQuality?.score || 0);
-      if (filters.sort === 'odd') return Number(b.impliedOdd || 0) - Number(a.impliedOdd || 0);
+      if (filters.sort === 'edge') return Number(b.edge || b.playerQuality?.score || 0) - Number(a.edge || a.playerQuality?.score || 0);
+      if (filters.sort === 'odd') return Number(b.odd || b.impliedOdd || 0) - Number(a.odd || a.impliedOdd || 0);
       return Date.parse(a.start || '') - Date.parse(b.start || '') || Number(b.probability || 0) - Number(a.probability || 0);
     });
     return rows;
@@ -6117,6 +6124,8 @@
 
   function scorerToTrackRow(scorer) {
     const odd = Number(scorer?.odd || 0);
+    const probability = Number(scorer?.probability || 0) || 0;
+    const edge = odd > 1 && probability > 0 ? probability - (1 / odd) : 0;
     return {
       id: scorer?.matchId || scorer?.id || '',
       match: {
@@ -6132,16 +6141,16 @@
       marketKey: 'scorer',
       label: scorer?.name || 'Joueur',
       odd: odd > 1 ? odd : 1,
-      probability: Number(scorer?.probability || 0) || 0,
-      edge: 0,
-      stake: odd > 1 ? Math.max(0.5, Math.min(getBankroll() * 0.01, getBankroll() * 0.03)) : 0,
-      status: odd > 1 ? 'bet' : 'watch',
-      statusLabel: odd > 1 ? 'Buteur Winamax' : 'Cote buteur Winamax à vérifier',
+      probability,
+      edge,
+      stake: odd > 1 && edge >= 0.01 ? Math.max(0.5, Math.min(getBankroll() * 0.01, getBankroll() * 0.03)) : 0,
+      status: odd > 1 && edge >= 0.01 ? 'bet' : 'watch',
+      statusLabel: odd > 1 && edge >= 0.01 ? 'Buteur Winamax' : 'Cote buteur Winamax à vérifier',
       decisionCenter: {
-        canBet: odd > 1,
-        status: odd > 1 ? 'ready' : 'watch',
-        mainReason: odd > 1 ? 'Cote joueur Winamax disponible.' : 'Pas de cote buteur Winamax confirmée dans le snapshot local.',
-        stakeDisplay: odd > 1 ? undefined : 'À vérifier'
+        canBet: odd > 1 && edge >= 0.01,
+        status: odd > 1 && edge >= 0.01 ? 'ready' : 'watch',
+        mainReason: odd > 1 && edge >= 0.01 ? 'Cote joueur Winamax disponible avec avantage positif.' : 'Pas de cote buteur Winamax positive confirmée dans le snapshot local.',
+        stakeDisplay: odd > 1 && edge >= 0.01 ? undefined : 'À vérifier'
       },
       contextQuality: { score: Number(scorer?.playerQuality?.score || 0) || null }
     };
@@ -6173,6 +6182,7 @@
       const qualityClass = quality.gate === 'strong' ? 'strong' : quality.gate === 'fragile' ? 'fragile' : 'watch';
       const reasonText = Array.isArray(quality.reasons) && quality.reasons.length ? quality.reasons.join(' · ') : 'Profil joueur';
       const realOdd = Number(scorer.odd || 0);
+      const canTrackScorer = realOdd > 1 && Number(scorer.edge || 0) >= 0.01 && Number(quality.score || 0) >= 50;
       const winamaxUrl = safeExternalUrl(scorer.winamaxUrl, 'www.winamax.fr');
       return `
         <article class="scorer-card scorer-${qualityClass} clickable-row" data-match-id="${escapeHtml(scorer.matchId)}" tabindex="0" role="button" aria-label="Ouvrir ${escapeHtml(scorer.title)}">
@@ -6198,7 +6208,7 @@
             <div class="mini-stat"><span>Départ</span><strong>${escapeHtml(formatDateLabel(scorer.start))}</strong></div>
             <div class="mini-stat"><span>Source</span><strong>${scorer.source === 'star_players' ? 'Profil' : 'Lineup'}</strong></div>
           </div>
-          ${realOdd > 1
+          ${canTrackScorer
             ? `<button type="button" class="track-bet-btn scorer-track-btn" data-track-scorer-id="${escapeHtml(scorer.id)}">Je mise</button>`
             : `${winamaxUrl ? `<a class="ghost-btn" href="${escapeHtml(winamaxUrl)}" target="_blank" rel="noreferrer">Vérifier sur Winamax</a>` : '<span class="match-sub">Cote Winamax non confirmée</span>'}`}
         </article>`;

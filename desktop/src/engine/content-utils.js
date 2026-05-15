@@ -156,6 +156,26 @@ function hasPlayerMarket(match) {
   return Boolean(markets.buteur || markets.scorer || markets.player_goals || markets.anytime_scorer);
 }
 
+function playerMarketOddForScorer(match, scorer, oddsIndex) {
+  const matchId = String(match?.winamax?.match_id || match?.id || match?.uid || '');
+  const rows = oddsIndex?.[matchId]?.odds?.all_markets || [];
+  if (!Array.isArray(rows) || !rows.length) return null;
+  const candidates = rows
+    .filter((row) => /^buteur$/i.test(String(row?.market_key || '')) || /^buteur$/i.test(String(row?.title || '')))
+    .filter((row) => Number(row?.odd) >= 1.30 && Number(row?.odd) <= 4.00)
+    .filter((row) => nameMatches(row?.label || row?.side || '', scorer?.name));
+  candidates.sort((a, b) => Number(a.odd || 99) - Number(b.odd || 99));
+  const best = candidates[0];
+  if (!best) return null;
+  return {
+    odd: Number(best.odd),
+    label: best.label || best.side || scorer?.name || 'Joueur',
+    marketKey: best.market_key || 'buteur',
+    title: best.title || 'Buteur',
+    source: best.source || 'winamax_detail'
+  };
+}
+
 function minutesToKickoff(match) {
   const ts = Date.parse(match?.date || match?.start || '');
   if (!Number.isFinite(ts)) return null;
@@ -262,10 +282,13 @@ function normalizeScorer(scorer, matchForScorers, teams, adapters) {
   const matchId = String(matchForScorers.winamax?.match_id || matchForScorers.id || matchForScorers.uid || `${matchForScorers.date}-${teams.home}-${teams.away}`);
   const prob = Number(scorer && scorer.prob) || 0;
   if (prob < 0.18) return null;
+  const playerOdd = playerMarketOddForScorer(matchForScorers, scorer, adapters.playerOddsIndex);
   const quality = scorerQuality(scorer, matchForScorers, teams, prob);
   if (quality.gate === 'skip') return null;
   const adjustedProb = quality.adjustedProbability;
   if (adjustedProb < 0.16 || quality.score < 38) return null;
+  const playerOddValue = Number(playerOdd?.odd || 0);
+  const playerEdge = playerOddValue > 1 ? adjustedProb - (1 / playerOddValue) : 0;
   return {
     id: `${matchId}:${cleanLabel(scorer.name, 'joueur')}`,
     matchId,
@@ -275,7 +298,10 @@ function normalizeScorer(scorer, matchForScorers, teams, adapters) {
     teamName: cleanLabel(scorer.teamName || scorer.teamShort || scorer.teamAbbr, ''),
     probability: adjustedProb,
     rawProbability: prob,
+    odd: playerOddValue || 0,
     impliedOdd: adjustedProb > 0 ? 1 / adjustedProb : Number(scorer.impliedOdd) || 0,
+    edge: playerEdge,
+    winamaxPlayerMarket: playerOdd,
     playerId: scorer.pid || null,
     source: scorer.source || 'lineups',
     starScore: Number(scorer.starScore || scorer.star_score || 0),
