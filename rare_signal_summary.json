@@ -1,46 +1,27 @@
 {
-  "generated_at": "2026-05-15T17:47:53Z",
+  "generated_at": "2026-05-15T17:52:07Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 79,
-    "actionable": 27,
+    "active_events": 77,
+    "actionable": 25,
     "watch": 10,
     "risk": 42,
     "expired_sample": 0,
     "by_type": {
-      "market_move": 2,
       "injury_imbalance": 30,
       "market_uncertain": 42,
       "back_to_back_travel": 8,
       "signal_conflict": 1
     },
     "by_quality": {
-      "actionable": 27,
+      "actionable": 25,
       "watch": 10,
       "risk": 42
     }
   },
   "active_actionable": [
-    {
-      "event_id": "748956",
-      "date": "2026-05-15T18:30Z",
-      "sport": "football",
-      "league_code": "laliga2",
-      "league_name": "La Liga 2",
-      "home": "Castellón",
-      "away": "Cádiz",
-      "match": "Castellón - Cádiz",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 1.0,
-      "context": "Cote away: 11.00 -> 8.00 (+27.3%)"
-    },
     {
       "event_id": "401815349",
       "date": "2026-05-15T23:15Z",
@@ -58,24 +39,6 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 14-6"
-    },
-    {
-      "event_id": "401856910",
-      "date": "2026-05-15T23:30Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Connecticut Sun",
-      "away": "Las Vegas Aces",
-      "match": "Connecticut Sun - Las Vegas Aces",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 9.00 -> 7.25 (+19.4%)"
     },
     {
       "event_id": "401815356",
