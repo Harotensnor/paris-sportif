@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-05-15T02:19:42Z",
+  "generated_at": "2026-05-15T02:22:48Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 94,
-    "actionable": 36,
-    "watch": 16,
+    "actionable": 37,
+    "watch": 15,
     "risk": 42,
     "expired_sample": 0,
     "by_type": {
@@ -17,8 +17,8 @@
       "signal_conflict": 2
     },
     "by_quality": {
-      "actionable": 36,
-      "watch": 16,
+      "actionable": 37,
+      "watch": 15,
       "risk": 42
     }
   },
@@ -618,6 +618,24 @@
       "context": "Absences severes 8-12"
     },
     {
+      "event_id": "401856912",
+      "date": "2026-05-16T02:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Los Angeles Sparks",
+      "away": "Toronto Tempo",
+      "match": "Los Angeles Sparks - Toronto Tempo",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.794,
+      "context": "Cote away: 3.50 -> 3.00 (+14.3%)"
+    },
+    {
       "event_id": "401861381",
       "date": "2026-05-15T11:35Z",
       "sport": "football",
@@ -924,24 +942,6 @@
       "side": "away",
       "strength": 0.517,
       "context": "Cote away: 4.30 -> 3.90 (+9.3%)"
-    },
-    {
-      "event_id": "401856912",
-      "date": "2026-05-16T02:00Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Los Angeles Sparks",
-      "away": "Toronto Tempo",
-      "match": "Los Angeles Sparks - Toronto Tempo",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.505,
-      "context": "Cote away: 3.30 -> 3.00 (+9.1%)"
     },
     {
       "event_id": "401861384",
