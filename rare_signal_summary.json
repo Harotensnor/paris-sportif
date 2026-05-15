@@ -1,27 +1,46 @@
 {
-  "generated_at": "2026-05-15T21:16:51Z",
+  "generated_at": "2026-05-15T21:20:58Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 76,
-    "actionable": 24,
+    "active_events": 82,
+    "actionable": 30,
     "watch": 10,
     "risk": 42,
     "expired_sample": 0,
     "by_type": {
+      "market_move": 12,
       "injury_imbalance": 30,
-      "market_uncertain": 41,
-      "back_to_back_travel": 8,
-      "signal_conflict": 1
+      "signal_conflict": 2,
+      "market_uncertain": 42,
+      "back_to_back_travel": 8
     },
     "by_quality": {
-      "actionable": 24,
+      "actionable": 30,
       "watch": 10,
       "risk": 42
     }
   },
   "active_actionable": [
+    {
+      "event_id": "401815350",
+      "date": "2026-05-15T22:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Pittsburgh Pirates",
+      "away": "Philadelphia Phillies",
+      "match": "Pittsburgh Pirates - Philadelphia Phillies",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 1.74 -> 2.35 (-35.4%)"
+    },
     {
       "event_id": "401815349",
       "date": "2026-05-15T23:15Z",
@@ -75,6 +94,24 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 5-10"
+    },
+    {
+      "event_id": "175353",
+      "date": "2026-05-16T13:00Z",
+      "sport": "tennis",
+      "league_code": "internazionalibnldit",
+      "league_name": "Internazionali BNL d'Italia",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 9.40 -> 6.25 (+33.5%)"
     },
     {
       "event_id": "401815364",
@@ -185,6 +222,24 @@
       "context": "Absences severes 7-12"
     },
     {
+      "event_id": "401815355",
+      "date": "2026-05-16T00:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Houston Astros",
+      "away": "Texas Rangers",
+      "match": "Houston Astros - Texas Rangers",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.998,
+      "context": "Cote away: 1.93 -> 1.58 (+18.0%)"
+    },
+    {
       "event_id": "401815388",
       "date": "2026-05-17T23:20Z",
       "sport": "baseball",
@@ -201,6 +256,24 @@
       "side": "away",
       "strength": 0.952,
       "context": "2 match dans les 48h + 1711 km de voyage"
+    },
+    {
+      "event_id": "401856910",
+      "date": "2026-05-15T23:30Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Connecticut Sun",
+      "away": "Las Vegas Aces",
+      "match": "Connecticut Sun - Las Vegas Aces",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 0.926,
+      "context": "Cote home: 9.00 -> 7.50 (+16.7%)"
     },
     {
       "event_id": "401815376",
@@ -437,6 +510,24 @@
       "context": "Absences severes 12-8"
     },
     {
+      "event_id": "401815352",
+      "date": "2026-05-15T23:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Chicago White Sox",
+      "away": "Chicago Cubs",
+      "match": "Chicago White Sox - Chicago Cubs",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 0.756,
+      "context": "Cote home: 2.13 -> 1.84 (+13.6%)"
+    },
+    {
       "event_id": "401872904",
       "date": "2026-05-23T00:00Z",
       "sport": "hockey",
@@ -453,6 +544,24 @@
       "side": "away",
       "strength": 0.726,
       "context": "1 match dans les 48h + 979 km de voyage"
+    },
+    {
+      "event_id": "401815346",
+      "date": "2026-05-15T23:15Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Atlanta Braves",
+      "away": "Boston Red Sox",
+      "match": "Atlanta Braves - Boston Red Sox",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.704,
+      "context": "Cote away: 2.29 -> 2.00 (+12.7%)"
     }
   ],
   "active_watch": [
@@ -473,24 +582,6 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 8-5"
-    },
-    {
-      "event_id": "401815355",
-      "date": "2026-05-16T00:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Houston Astros",
-      "away": "Texas Rangers",
-      "match": "Houston Astros - Texas Rangers",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Houston Astros",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 14-11"
     },
     {
       "event_id": "401815353",
@@ -635,6 +726,24 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 8-5"
+    },
+    {
+      "event_id": "401871157",
+      "date": "2026-05-16T01:30Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "Minnesota Timberwolves",
+      "away": "San Antonio Spurs",
+      "match": "Minnesota Timberwolves - San Antonio Spurs",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 0.479,
+      "context": "Cote home: 2.90 -> 2.65 (+8.6%)"
     }
   ],
   "active_risk": [
