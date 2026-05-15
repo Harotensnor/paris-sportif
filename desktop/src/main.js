@@ -585,7 +585,7 @@ async function fetchEnrichmentSource(source, timeoutMs = 10000, rateLimitPerMinu
   webEnrichmentRuntime.fetchTimestamps = webEnrichmentRuntime.fetchTimestamps.filter((ts) => now - ts < 60 * 1000);
   const limit = Math.max(1, Math.min(10, Number(rateLimitPerMinute || 5) || 5));
   if (webEnrichmentRuntime.fetchTimestamps.length >= limit) {
-    return { ...source, status: 'failed', error: `rate limit ${limit} fetches/min`, durationMs: 0, checkedAt: new Date().toISOString() };
+    return { ...source, status: 'deferred', error: `rate limit ${limit} fetches/min`, durationMs: 0, checkedAt: new Date().toISOString() };
   }
   webEnrichmentRuntime.fetchTimestamps.push(now);
   const controller = new AbortController();
@@ -838,6 +838,16 @@ function classifyNewsImpact(pick, sources) {
   ];
   const hits = rules.filter((rule) => rule.pattern.test(text)).slice(0, 3);
   const checkedSources = sources.filter((source) => source.status === 'ok').length;
+  const deferredSources = sources.filter((source) => source.status === 'deferred').length;
+  if (!checkedSources && deferredSources) {
+    return {
+      status: 'deferred',
+      tone: 'watch',
+      headline: 'Re-check planifié par rate limit',
+      detail: `${deferredSources} source(s) attendent le prochain créneau de rate limit. Aucun impact négatif n’est appliqué tant que la news n’est pas confirmée.`,
+      events: []
+    };
+  }
   if (!hits.length) {
     return {
       status: checkedSources ? 'clear' : 'limited',
@@ -885,7 +895,13 @@ async function runNewsWatch(config, picks = [], options = {}) {
           checkedAt: new Date().toISOString(),
           sample: `${pick.title || ''} composition probable confirmée sans blessure majeure de dernière minute.`
         }))
-      : await Promise.all(plan.map((source) => fetchEnrichmentSource(source, 10000, config.rateLimitPerMinute || 5)));
+      : [];
+    if (!options.dryRun) {
+      for (const source of plan) {
+        const result = await fetchEnrichmentSource(source, 10000, config.rateLimitPerMinute || 5);
+        sources.push(result);
+      }
+    }
     const impact = classifyNewsImpact(pick, sources);
     const record = {
       key,
@@ -900,7 +916,8 @@ async function runNewsWatch(config, picks = [], options = {}) {
       detail: impact.detail,
       events: impact.events,
       successfulSources: sources.filter((source) => source.status === 'ok').length,
-      failedSources: sources.filter((source) => source.status !== 'ok').length,
+      failedSources: sources.filter((source) => source.status !== 'ok' && source.status !== 'deferred').length,
+      deferredSources: sources.filter((source) => source.status === 'deferred').length,
       sources: sources.map((source) => ({
         key: source.key,
         label: source.label,

@@ -27,6 +27,7 @@ Ouvre d'abord `Picks`.
    - `Pourquoi` : la raison courte.
 5. Clique `Je mise` pour suivre le pari dans l'app.
 6. Clique `Ouvrir Winamax` pour confirmer manuellement sur Winamax.
+7. Avant un pari important, ouvre la fiche enrichie : elle regroupe le texte narratif, les compositions, la forme, les joueurs cles, la meteo, le H2H et les sources verifiees.
 
 Si tu vois `Modèle trop strict aujourd'hui`, ce n'est pas un bug automatique. L'app a trouve beaucoup de matchs mais pas assez de signaux simples assez propres. Ouvre le diagnostic si tu veux voir le funnel exact.
 
@@ -52,7 +53,19 @@ Les handicaps, jeux tennis, scores exacts, cartons, corners et autres marches pl
 
 Un pick sans bouton `Je mise` ne doit pas etre joue automatiquement. Il sert a comprendre le programme du jour. Pour les buteurs, l'app exige une cote Winamax reelle : une cote theorique seule ne suffit pas.
 
-## 5. Bilan et bankroll
+## 5. Lire une fiche enrichie
+
+La fiche match sert a te rassurer sans jargon.
+
+- `PARI / COTE / MISE` : le ticket exact a reproduire chez Winamax.
+- `Pourquoi ce pari` : 4 a 6 phrases factuelles avec les chiffres disponibles.
+- `Joueurs cles` : forme, xG/xA, tirs, passes cles, aces, break points ou stats sportives selon le sport.
+- `Analyse tactique` : surtout pour le foot, les duels et styles qui expliquent le sens du pick.
+- `Sources enrichies` et `News watcher` : ce qui a ete verifie, ce qui est indisponible, et ce qui doit etre relance avant le coup d'envoi.
+
+Si une source est absente, l'app l'indique clairement. Elle ne transforme pas une absence de donnee en preuve positive.
+
+## 6. Bilan et bankroll
 
 La vue `Bilan` regroupe :
 
@@ -67,7 +80,7 @@ La vue `Bilan` regroupe :
 
 Dans `Reglages > Bankroll`, tu peux ajouter depots et retraits. L'app separe le ROI bankroll du ROI des paris pour eviter les lectures trompeuses.
 
-## 6. Strategies
+## 7. Strategies
 
 Quand tu filtres une selection utile dans `Picks`, clique `Sauver cette selection`.
 
@@ -79,13 +92,13 @@ Tu peux ensuite :
 
 Les strategies ne changent pas le modele. Elles t'aident a suivre tes habitudes.
 
-## 7. Favoris
+## 8. Favoris
 
 Dans `Reglages > Favoris`, ajoute les equipes ou joueurs que tu veux suivre.
 
 Quand un favori a un match Winamax a venir, l'app peut le remonter dans `Picks`, meme si ce n'est pas le meilleur pick global. C'est pratique pour ne pas rater un match que tu surveilles.
 
-## 8. Alertes
+## 9. Alertes
 
 Les alertes disponibles couvrent :
 
@@ -99,7 +112,7 @@ Les alertes disponibles couvrent :
 
 Garde les alertes importantes actives, mais evite de tout activer si tu veux une experience calme.
 
-## 9. Mode demo
+## 10. Mode demo
 
 Le mode demo utilise une bankroll virtuelle separee.
 
@@ -108,11 +121,12 @@ Utilise-le pour :
 - faire le tour guide ;
 - tester `Je mise` ;
 - verifier le P&L ;
-- comprendre l'historique sans toucher a ton vrai suivi.
+- comprendre l'historique sans toucher a ton vrai suivi ;
+- apprendre a lire une fiche enrichie avec le texte narratif et les joueurs cles.
 
 Tu peux le reinitialiser depuis les reglages.
 
-## 10. Auto-tracking supervise
+## 11. Auto-tracking supervise
 
 Cette option est cachee en Mode expert. Elle peut suivre automatiquement des paris dans l'app selon tes regles, mais elle ne place jamais le pari reel chez Winamax.
 

@@ -7,6 +7,8 @@ Ce guide donne une routine simple pour utiliser l'app sans se disperser.
 - Ouvre l'app chaque matin.
 - Lis le `TOP PICK`, puis les sections `Dans l'heure` et `Dans les 3 heures`.
 - Ne joue que les cartes avec le format clair `PARI / COTE / MISE / Pourquoi`.
+- Ouvre au moins une fiche enrichie par jour : lis le texte `Pourquoi ce pari`, les joueurs clés et les sources avant de confirmer.
+- Si la fiche indique `News watcher à relancer` ou `source indisponible`, attends le prochain refresh pré-match plutôt que de forcer la mise.
 - Active le mode démo si tu veux tester sans toucher à ton suivi réel.
 
 ## Semaine 2 — Suivre proprement
@@ -17,12 +19,15 @@ Ce guide donne une routine simple pour utiliser l'app sans se disperser.
 - Ajoute 3 à 5 équipes ou joueurs favoris pour recevoir une lecture dédiée sans élargir tous les filtres.
 - Vérifie le `Bilan` en fin de journée.
 - Si tu as aussi placé des paris directement sur Winamax, colle-les une fois dans `Réglages > Bankroll > Importer paris Winamax` pour garder le bilan aligné.
+- Pour le foot, vérifie les compositions et l'analyse tactique : un bon pick doit rester cohérent avec les joueurs clés et les absences.
+- Pour le tennis, vérifie la surface et les confrontations directes quand elles sont disponibles.
 
 ## Semaine 3 — Ajuster
 
 - Regarde les segments gagnants et perdants dans `Bilan`.
 - Ouvre `Bilan > Décomposition` pour repérer les vrais patterns personnels : sport, ligue, horaire, cote et taille de mise.
 - Utilise `Recherche` avant un match important pour relire la forme, les prochains matchs Winamax et l'historique local.
+- Utilise le news watcher comme un filet de sécurité : une blessure, une compo ou une météo défavorable doit te pousser à re-checker le pick.
 - Surveille les badges `Tendance forte` et `Tendance froide` : ils résument l'audit 60 jours sans ouvrir le Mode expert.
 - Désactive les sports ou marchés qui ne te conviennent pas.
 - Compare `Modèle` et `Toi` pour voir si tu suis les picks fiables.

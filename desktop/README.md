@@ -8,13 +8,13 @@ Paris Sportif Desktop est le logiciel PC local pour préparer tes paris Winamax.
 
 ### Version installateur Windows
 
-La version v1.5.0 se génère avec :
+La version v1.7.1 se génère avec :
 
 ```powershell
 npm --prefix desktop run dist
 ```
 
-Le fichier attendu est `Paris Sportif Desktop Setup 1.5.0.exe`. Le build packagé embarque les données, rapports modèle et scripts nécessaires au démarrage. Python reste recommandé si tu veux relancer une pipeline complète depuis la machine installée.
+Le fichier attendu est `Paris Sportif Desktop Setup 1.7.1.exe`. Le build packagé embarque les données, rapports modèle et scripts nécessaires au démarrage. Python reste recommandé si tu veux relancer une pipeline complète depuis la machine installée.
 
 ### Version développeur
 
@@ -53,6 +53,19 @@ Depuis v1.5.0, certains matchs avec peu de contexte secondaire peuvent apparaît
 L'app ne place pas de pari automatiquement. Elle prépare le ticket et suit ton résultat.
 
 En Mode expert, l'auto-tracking supervisé peut suivre automatiquement certains tickets dans l'app selon tes règles. C'est uniquement un suivi interne : tu dois toujours ouvrir Winamax et confirmer toi-même le pari réel.
+
+## Nouveautés v1.7
+
+Les fiches match sont devenues le centre de décision :
+
+- texte narratif rassurant en 4 à 6 phrases, avec les chiffres disponibles ;
+- foot : compositions, joueurs clés, xG/xA, tirs cadrés, dribbles, conversion, forme, coach, arbitre, météo, H2H et duels tactiques ;
+- tennis : surface, forme, H2H, aces, premier service, break points et bilan par surface quand les sources les exposent ;
+- autres sports : starters probables, stats équipe/joueur utiles, forme récente et contexte live selon le sport ;
+- `News watcher temps réel` : vérifie les sources publiques proches du coup d'envoi, classe blessure/compo/suspension/météo/coach, puis demande un re-check si nécessaire ;
+- aucun `Match nul` en mode standard : ce marché reste réservé au Mode expert.
+
+Pour lire une fiche enrichie : ouvre une carte, lis d'abord `PARI / COTE / MISE`, puis `Pourquoi ce pari`, puis les `Joueurs clés` et `Analyse tactique`. Les sources indisponibles sont affichées franchement au lieu d'être inventées.
 
 ## Winamax
 
@@ -245,3 +258,9 @@ npx electron-builder --win nsis --x64 --config.directories.output=dist-temp
 27. **Comment réconcilier Winamax ?** Colle tes lignes `Mes paris` dans `Réglages > Bankroll > Importer paris Winamax`.
 28. **À quoi servent les stratégies ?** À rejouer un ensemble de filtres et suivre son ROI séparément.
 29. **Puis-je passer l'app en anglais ?** Oui, dans `Réglages > Apparence > Langue`.
+30. **C'est quoi xG ?** `Expected Goals` : une estimation de la qualité des occasions, plus utile qu'un simple total de tirs.
+31. **Comment lire l'analyse tactique ?** Regarde les duels clés : si le pari dépend d'un couloir, d'un buteur ou d'un rythme de match, la fiche te dit quel matchup le soutient.
+32. **Pourquoi pas de match nul ?** Tu as indiqué ne pas vouloir le jouer. L'app le masque en mode standard pour garder les picks simples.
+33. **Comment activer le news watcher ?** Il tourne automatiquement sur les picks proches. En Mode expert, la Pipeline montre les sources vérifiées, différées ou à relancer.
+34. **Que faire si Sofascore ou une source répond 403 ?** L'app garde les données locales, marque la source à relancer et ne déclasse pas un pick sans confirmation négative.
+35. **Comment lire une fiche enrichie ?** Commence par le ticket, puis le texte narratif, puis les joueurs clés, la tactique et les sources. Les détails techniques restent sous les sections avancées.

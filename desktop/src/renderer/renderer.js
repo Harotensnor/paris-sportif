@@ -294,7 +294,12 @@
       saveStrategy: 'Sauver cette sélection',
       strategySelect: 'Mes stratégies',
       language: 'Langue',
-      searchPlaceholder: 'Real Madrid, Mbappé, Liga, NBA...'
+      searchPlaceholder: 'Real Madrid, Mbappé, Liga, NBA...',
+      enrichedSheet: 'Fiche enrichie',
+      reassuringNarrative: 'Pourquoi ce pari',
+      newsWatcher: 'News watcher temps réel',
+      keyPlayers: 'Joueurs clés',
+      tacticalAnalysis: 'Analyse tactique'
     },
     en: {
       navPicks: 'Picks',
@@ -306,7 +311,12 @@
       saveStrategy: 'Save this selection',
       strategySelect: 'My strategies',
       language: 'Language',
-      searchPlaceholder: 'Real Madrid, Mbappe, Liga, NBA...'
+      searchPlaceholder: 'Real Madrid, Mbappe, Liga, NBA...',
+      enrichedSheet: 'Enriched match sheet',
+      reassuringNarrative: 'Why this bet',
+      newsWatcher: 'Real-time news watcher',
+      keyPlayers: 'Key players',
+      tacticalAnalysis: 'Tactical analysis'
     }
   };
 
@@ -3232,7 +3242,7 @@
     }).join('');
     return `
       <article class="detail-card wide key-players-card">
-        <h4>Joueurs clés</h4>
+        <h4>${escapeHtml(t('keyPlayers'))}</h4>
         <p class="detail-text">Les trois profils les plus utiles par équipe, avec xG/xA, tirs, création et disponibilité quand la source les fournit.</p>
         <div class="key-player-grid">${groups}</div>
       </article>
@@ -3250,7 +3260,7 @@
     const awayStyle = inferFootballStyle(teamContext(row, 'away'));
     return `
       <article class="detail-card wide tactical-card">
-        <h4>Analyse tactique</h4>
+        <h4>${escapeHtml(t('tacticalAnalysis'))}</h4>
         <div class="match-context-band">
           <span>${escapeHtml(teamDisplayName(row, 'home'))}</span>
           <strong>${escapeHtml(homeStyle)}</strong>
@@ -3471,6 +3481,7 @@
         <div class="sport-insight-grid">
           ${sportRows.map(([label, value]) => `<div><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`).join('')}
         </div>
+        <h5>${escapeHtml(t('keyPlayers'))}</h5>
         <div class="key-player-grid">
           ${[
             [home?.name || 'Équipe 1', homeAdv],
@@ -3574,9 +3585,50 @@
     return label || formatMarketName(row?.marketKey || row?.market || 'Pari');
   }
 
+  function compactConcreteSignals(row) {
+    const sport = String(row?.sport || row?.match?.sport || '').toLowerCase();
+    const items = [];
+    if (sport.includes('football') || sport.includes('soccer')) {
+      const homeName = teamDisplayName(row, 'home');
+      const awayName = teamDisplayName(row, 'away');
+      const home = teamContext(row, 'home');
+      const away = teamContext(row, 'away');
+      const homeForm = sideFormText(home);
+      const awayForm = sideFormText(away);
+      if (!/non confirm/i.test(homeForm) || !/non confirm/i.test(awayForm)) {
+        items.push(`${homeName} ${homeForm}, ${awayName} ${awayForm}`);
+      }
+      const goals = [sideGoalText(home), sideGoalText(away)].filter((text) => text && !/confirmer/i.test(text)).slice(0, 2);
+      if (goals.length) items.push(`rythme récent: ${goals.join(' / ')}`);
+    } else if (sport.includes('tennis')) {
+      const match = row?.match || {};
+      const { home, away } = getSides(match);
+      const surface = match.surface || match.draw;
+      if (surface) items.push(`surface ${surface}`);
+      const ranks = [home?.rank ? `${home.name} #${home.rank}` : '', away?.rank ? `${away.name} #${away.rank}` : ''].filter(Boolean);
+      if (ranks.length) items.push(ranks.join(' · '));
+      const h2h = Array.isArray(match.h2h?.meetings) ? match.h2h.meetings.length : 0;
+      if (h2h) items.push(`${formatCount(h2h)} H2H locaux`);
+    } else {
+      const match = row?.match || {};
+      const { home, away } = getSides(match);
+      const advanced = match.mlb_advanced || match.nba_advanced || match.nhl_advanced || match.team_stats || {};
+      const stat = advanced.era || advanced.ops || advanced.pace || advanced.goals_for_avg || advanced.points_for_avg;
+      items.push(`${home?.name || 'Domicile'} vs ${away?.name || 'extérieur'}`);
+      if (stat) items.push('stats avancées sport disponibles');
+    }
+    if (row?.safeAssessment?.reliable) items.push('profil fiable');
+    if (row?.winamaxBoost) items.push('cote boostée Winamax');
+    return items.filter(Boolean).slice(0, 3);
+  }
+
   function simpleWhyText(row) {
     if (!row) return '';
-    const parts = [];
+    const concrete = compactConcreteSignals(row);
+    if (concrete.length >= 2) {
+      return `Pourquoi : ${concrete.join(' · ')}.`;
+    }
+    const parts = concrete.slice();
     if (surePickKeys().has(userBetKey(row))) parts.push('sure pick du jour');
     if (isLongShotValue(row)) parts.push('cote haute, mise réduite');
     const trend = trendForRow(row);
@@ -4946,7 +4998,7 @@
     const sources = Array.isArray(item?.sources) ? item.sources : [];
     return `
       <article class="detail-card wide news-watcher-card news-${escapeHtml(tone)}">
-        <h4>News watcher temps réel</h4>
+        <h4>${escapeHtml(t('newsWatcher'))}</h4>
         <div class="match-context-band">
           <span>${escapeHtml(item?.checkedAt ? `Re-check ${formatDateTime(item.checkedAt)}` : 'Re-check non lancé')}</span>
           <strong>${escapeHtml(item?.headline || 'Surveillance prête')}</strong>
@@ -4954,10 +5006,10 @@
         </div>
         <div class="source-mini-grid">
           ${sources.length ? sources.slice(0, 5).map((source) => `
-            <div class="${source.status === 'ok' ? 'ok' : 'missing'}">
+            <div class="${source.status === 'ok' ? 'ok' : source.status === 'deferred' ? 'watch' : 'missing'}">
               <span>${escapeHtml(source.label || source.key || 'Source')}</span>
-              <strong>${escapeHtml(source.status === 'ok' ? 'OK' : 'À relancer')}</strong>
-              <em>${escapeHtml(source.summary || '-')}</em>
+              <strong>${escapeHtml(source.status === 'ok' ? 'OK' : source.status === 'deferred' ? 'Planifiée' : 'À relancer')}</strong>
+              <em>${escapeHtml(source.summary || source.error || '-')}</em>
             </div>
           `).join('') : '<div class="empty compact-empty">Aucune source news en cache pour ce match. Le prochain refresh pré-match déclenchera le watcher.</div>'}
         </div>
@@ -9523,6 +9575,10 @@
       text: 'En mode démo, le bouton “Je mise” ajoute un pari virtuel séparé de ton vrai historique.'
     },
     {
+      title: 'Lis la fiche enrichie',
+      text: 'Clique une carte pour voir le texte rassurant, les compositions, les joueurs clés, la tactique, les H2H et le news watcher avant de confirmer.'
+    },
+    {
       title: 'Regarde ton P&L',
       text: 'Après le suivi, Bilan montre la bankroll, le résultat des paris et la comparaison avec le modèle.'
     },
@@ -9576,7 +9632,14 @@
         trackUserBet(first);
       }
     }
-    if (step === 2) switchTab('history');
+    if (step === 2) {
+      const first = sortedPriorityRows(state.picks)[0];
+      if (first) openMatchDetail(first.id);
+    }
+    if (step === 3) {
+      closeMatchDetail();
+      switchTab('history');
+    }
     if (step >= DEMO_TOUR_STEPS.length - 1) {
       localStorage.setItem(DEMO_TOUR_KEY, '1');
       $('#demo-tour-modal')?.classList.add('hidden');
@@ -10511,7 +10574,7 @@
         </article>
         <div class="modal-grid sheet-grid">
           <article class="detail-card">
-            <h4>Pourquoi ce pari</h4>
+            <h4>${escapeHtml(t('reassuringNarrative'))}</h4>
             <p class="detail-text">${escapeHtml(narrative)}</p>
             ${formStripHtml(match)}
             <div class="mini-kpi-row">

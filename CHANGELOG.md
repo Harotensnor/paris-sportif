@@ -5,6 +5,18 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 32 — Consolidation post-refonte + news live validé
+
+- Version desktop portée à `v1.7.1` après test terrain post-v1.7.0 sur pipeline réelle. Snapshot terrain : `data.js` généré le 15/05/2026 à 21:58 UTC, 255 events Winamax conservés, 86 events bookables sur 24h, 72 prédictibles, 15 affichés, 35 fiables, 15 prêts.
+- Audit terrain fiches : 5 fiches ouvertes et capturées (`captures/desktop-sprint32-final-picks.png`, `desktop-sprint32-final-fiche-1.png` à `desktop-sprint32-final-fiche-5.png`). Le cockpit reste sans `Match nul` standard et sans `MISE : 0 €`; 18 lignes visibles et 14 cartes timeline.
+- Texte narratif poli : la raison courte des cartes utilise désormais des signaux concrets (forme récente, xG/buts, surface tennis, stats sport) au lieu de phrases génériques du type “profil fiable, contexte solide”.
+- Bugs terrain corrigés : le smoke détectait `cartons/match` dans l’accueil standard comme un marché avancé; cette stat reste dans la fiche enrichie mais n’apparaît plus dans la carte d’accueil. Les fiches autres sports affichent aussi un libellé `Joueurs clés` au-dessus des stats équipe avancées pour éviter les fiches perçues comme incomplètes.
+- News watcher consolidé : les sources bloquées par rate limit sont marquées `Planifiée` / `Re-check planifié` au lieu d’être classées comme échec de donnée. Les fetches news sont séquentiels pour mieux respecter le rate limit côté main process.
+- Mode démo enrichi : le tour guidé inclut une étape “Lis la fiche enrichie” et ouvre une fiche pour montrer le texte rassurant, les joueurs clés, la tactique et le news watcher.
+- i18n complétée pour les nouvelles surfaces critiques (`Fiche enrichie`, `Pourquoi ce pari`, `News watcher`, `Joueurs clés`, `Analyse tactique`) en FR/EN.
+- Documentation utilisateur mise à jour : README desktop avec nouveautés v1.7, FAQ xG/analyse tactique/news watcher/match nul; `docs/first-month.md` et `docs/user-guide.md` intègrent la routine fiche enrichie.
+- Validation finale : `qa:engine`, `qa:terrain`, `qa:winamax-audit`, `qa:desktop`, `npm test`, Playwright Electron, `qa:visual`, `qa:a11y`, `qa:multiday` et stress court 5 min passent. Build packagé `Paris Sportif Desktop Setup 1.7.1.exe` généré (104,68 MB) et exécutable `win-unpacked` testé sur profil vide avec 18 lignes, top pick, 0 match nul standard et 0 mise à 0 €.
+
 ### Sprint 31 — Stats avancées + tactique + news live + workflow riche
 
 - Version desktop portée à `v1.7.0` sur la base du Sprint 30 `eb4c51e21`. Test terrain obligatoire relancé avec pipeline réelle : `data.js` généré le 15/05/2026 à 20:02 UTC, 259 événements, 13 événements Winamax aujourd'hui, puis correction d'une régression critique où `winamax_markets.json` n'était plus rattaché aux events avant le filtre bookable.
