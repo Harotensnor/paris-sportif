@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-15T22:52:05Z",
+  "generated_at": "2026-05-15T22:57:29Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815345",
-      "kickoff": "2026-05-15T22:45Z",
-      "league": "MLB",
-      "match": "Baltimore Orioles at Washington Nationals",
-      "home": "Washington Nationals",
-      "away": "Baltimore Orioles",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Washington Nationals",
-          "pitcher": "Zack Littell",
-          "label": "Zack Littell moins de 3,5 strikeouts",
-          "line": 3.5,
-          "pick": "under",
-          "probability": 0.6183,
-          "fair_odds": 1.62,
-          "expected_strikeouts": 3.09,
-          "projected_ip": 6.6,
-          "inputs": {
-            "k9": 4.21,
-            "era": 6.94,
-            "whip": 1.6,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Washington Nationals",
-          "pitcher": "Zack Littell",
-          "label": "Zack Littell concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.9215,
-          "fair_odds": 1.09,
-          "expected_hr_allowed": 2.545,
-          "projected_ip": 6.6,
-          "inputs": {
-            "hr9": 3.47,
-            "era": 6.94,
-            "whip": 1.6
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Baltimore Orioles",
-          "pitcher": "Shane Baz",
-          "label": "Shane Baz plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.5522,
-          "fair_odds": 1.81,
-          "expected_strikeouts": 4.72,
-          "projected_ip": 5.51,
-          "inputs": {
-            "k9": 7.71,
-            "era": 5.48,
-            "whip": 1.56,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Baltimore Orioles",
-          "pitcher": "Shane Baz",
-          "label": "Shane Baz ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5354,
-          "fair_odds": 1.87,
-          "expected_hr_allowed": 0.625,
-          "projected_ip": 5.51,
-          "inputs": {
-            "hr9": 1.02,
-            "era": 5.48,
-            "whip": 1.56
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815347",
       "kickoff": "2026-05-15T23:10Z",
@@ -3170,7 +3088,7 @@
       ]
     }
   ],
-  "props": 152,
+  "props": 148,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
