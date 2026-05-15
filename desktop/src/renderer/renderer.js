@@ -1504,6 +1504,24 @@
     return rest ? `${hours}h${String(rest).padStart(2, '0')}` : `${hours}h`;
   }
 
+  function rowKickoffTime(row) {
+    return Date.parse(row?.start || row?.date || row?.kickoff || row?.match?.date || '');
+  }
+
+  function isBeforeKickoff(row) {
+    const ts = rowKickoffTime(row);
+    return Number.isFinite(ts) && ts > Date.now();
+  }
+
+  function canDisplayPickCard(row) {
+    return Boolean(
+      pickHasCoreData(row) &&
+      isBeforeKickoff(row) &&
+      row?.status !== 'skip' &&
+      row?.safeAssessment?.displayable !== false
+    );
+  }
+
   function renderMorningDashboard() {
     const title = $('#morning-title');
     const subtitle = $('#morning-subtitle');
@@ -1528,7 +1546,7 @@
       title.textContent = rows.length
         ? ultimate
           ? `Bet ultime : ${ultimate.title}`
-          : `Bonjour, ${formatCount(rows.length)} paris simples aujourd'hui`
+          : `Bonjour, ${formatCount(rows.length)} paris simples prêts`
         : 'Bonjour, aucun pari prêt pour l’instant';
     }
     if (subtitle) {
@@ -1539,7 +1557,7 @@
         : 'Le cockpit reste utile : surveille les données, prépare les combinés ou relance un refresh.';
     }
     grid.innerHTML = [
-      ['Paris du jour', formatCount(rows.length), `${formatCount(bigRows.length)} très bons signaux · ${formatCount(state.allPicks.length || 0)} analysés`],
+      ['Paris prêts', formatCount(rows.length), `${formatCount(bigRows.length)} très bons signaux · ${formatCount(state.allPicks.length || 0)} analysés`],
       ['Prochain match', nextPick ? countdownLabel(nextPick.start) : '-', nextPick ? `${nextPick.title} · ${userBetLabel(nextPick)}` : 'Aucun départ proche'],
       ['Performance hier', formatMoney(stats.pnlYesterday), `${formatCount(stats.wonYesterday)}W / ${formatCount(stats.lostYesterday)}L · 7j ${formatMoney(stats.last7Pnl)}`],
       ['Bankroll', formatMoney(bankroll), `${discipline.label} · ${clvText}`]
@@ -1967,7 +1985,12 @@
   }
 
   function trackUserBet(row) {
-    if (!row || !canDisplayStake(row)) return;
+    if (!row) return;
+    if (!isBeforeKickoff(row)) {
+      setSideStatus('Match déjà commencé : pari non suivi', 'warn');
+      return;
+    }
+    if (!canDisplayStake(row)) return;
     recordUserAction('track-bet', row.title || row.label || '');
     const discipline = bankrollDisciplineStatus();
     if (discipline.blocked) {
@@ -3623,7 +3646,7 @@
     const prefConfidenceMin = Math.max(0, Number(prefs.confidenceMin || 0) / 100);
     const rows = base.filter((row) => {
       if (!pickHasCoreData(row)) return false;
-      if (!canDisplayStake(row)) return false;
+      if (!canDisplayStake(row) && !canDisplayPickCard(row)) return false;
       if (allowedSports.size && !allowedSports.has(String(row.sport || '').toLowerCase())) return false;
       if (marketPrefs.groups.size && !marketPrefs.groups.has(rowMarketPreferenceKey(row)) && !marketPrefs.keys.has(marketKeyFromRow(row))) return false;
       if (prefEdgeMin && displayEdgeValue(row) < prefEdgeMin) return false;
@@ -3647,7 +3670,11 @@
       return true;
     });
     rows.sort((a, b) => {
-      if (filters.sort === 'priority') return priorityValue(b) - priorityValue(a) || displayEdgeValue(b) - displayEdgeValue(a) || new Date(a.start || 0) - new Date(b.start || 0);
+      if (filters.sort === 'priority') {
+        const readyDelta = Number(Boolean(canDisplayStake(b))) - Number(Boolean(canDisplayStake(a)));
+        if (readyDelta) return readyDelta;
+        return priorityValue(b) - priorityValue(a) || displayEdgeValue(b) - displayEdgeValue(a) || new Date(a.start || 0) - new Date(b.start || 0);
+      }
       if (filters.sort === 'kickoff') return new Date(a.start || 0) - new Date(b.start || 0);
       if (filters.sort === 'confidence') return Number(b.confidenceTrust?.score || b.probability || 0) - Number(a.confidenceTrust?.score || a.probability || 0);
       if (filters.sort === 'real_confidence') return safeConfidenceValue(b) - safeConfidenceValue(a) || displayEdgeValue(b) - displayEdgeValue(a);
@@ -3967,7 +3994,7 @@
       .filter((row) => canDisplayStake(row))
       .filter((row) => {
         const ts = Date.parse(row.start || '');
-        return Number.isFinite(ts) && ts >= now - 30 * 60 * 1000 && ts <= horizon;
+        return Number.isFinite(ts) && ts > now && ts <= horizon;
       })
       .filter((row) => displayEdgeValue(row) >= 0.07)
       .filter((row) => safeConfidenceValue(row) >= 0.65)
@@ -3985,7 +4012,8 @@
     const discipline = bankrollDisciplineStatus();
     const trackKey = userBetKey(row);
     const isTracked = tracked.has(trackKey);
-    if (!canDisplayStake(row)) return '<span class="match-sub">0 €</span>';
+    if (!isBeforeKickoff(row)) return '<span class="match-sub">Déjà commencé</span>';
+    if (!canDisplayStake(row)) return '<span class="match-sub">À surveiller</span>';
     if (!(displayStakeAmount(row) > 0)) return '<span class="match-sub">Hors budget jour</span>';
     if (discipline.blocked) {
       return `<button type="button" class="track-bet-btn tracked" disabled title="${escapeHtml(discipline.detail)}">${escapeHtml(discipline.label)}</button>`;
@@ -4121,7 +4149,7 @@
     ];
     const grouped = new Map(buckets.map((bucket) => [bucket.key, []]));
     (Array.isArray(rows) ? rows : [])
-      .filter((row) => pickHasCoreData(row) && canDisplayStake(row))
+      .filter(canDisplayPickCard)
       .forEach((row) => grouped.get(temporalBucketForPick(row))?.push(row));
     grouped.forEach((bucketRows) => bucketRows.sort((a, b) => Date.parse(a.start || '') - Date.parse(b.start || '') || safeConfidenceValue(b) - safeConfidenceValue(a) || displayEdgeValue(b) - displayEdgeValue(a)));
     wrap.innerHTML = buckets.map((bucket) => {
@@ -4332,15 +4360,12 @@
     const apiLive = liveApiInfoForRow(row);
     if (apiLive) return apiLive;
     const status = match.status || match.status_type || match.state || match.phase || '';
-    const ts = Date.parse(row?.start || match.date || '');
-    const now = Date.now();
-    const estimatedLive = Number.isFinite(ts) && now >= ts && now <= ts + 3 * 60 * 60 * 1000 && !match.completed;
-    if (!isLiveStatus(status) && !estimatedLive) return null;
+    if (!isLiveStatus(status)) return null;
     const homeScore = match.home_score ?? match.score_home ?? match.score?.home ?? null;
     const awayScore = match.away_score ?? match.score_away ?? match.score?.away ?? null;
-    const minute = match.minute || match.clock || match.status_detail || (estimatedLive ? 'live estimé' : '');
+    const minute = match.minute || match.clock || match.status_detail || '';
     return {
-      status: status || (estimatedLive ? 'LIVE estimé' : 'LIVE'),
+      status: status || 'LIVE',
       minute,
       score: homeScore != null && awayScore != null ? `${homeScore}-${awayScore}` : 'score indisponible'
     };
@@ -4669,7 +4694,8 @@
   function aiSelectedUltimate(rows) {
     const selectedKey = state.aiAssist?.ultimate?.selectedKey;
     if (!selectedKey) return null;
-    return (Array.isArray(rows) ? rows : []).find((row) => userBetKey(row) === selectedKey) || null;
+    const selected = (Array.isArray(rows) ? rows : []).find((row) => userBetKey(row) === selectedKey) || null;
+    return selected && canDisplayStake(selected) ? selected : null;
   }
 
   async function runBackgroundAi(rows) {
@@ -4741,7 +4767,7 @@
     }
     const coverage = state.coverage24h?.summary || state.status?.analysis?.coverage24h?.summary || null;
     if (coverage) {
-      const displayed24h = Number(coverage.displayed || 0);
+      const displayed24h = Number(state.dashboardMeta?.rolling24Displayed || coverage.displayed || 0);
       const ready24h = Number(coverage.ready || 0);
       const nightDisplayed = Number(coverage.nightDisplayed || 0);
       const healthy24h = displayed24h >= 15 && ready24h >= 10 && nightDisplayed >= 3;
@@ -4751,9 +4777,10 @@
       }
       const status = displayed24h >= 8 ? 'warn' : 'danger';
       node.className = `today-funnel-alert ${status}`;
+      const watch24h = Math.max(0, displayed24h - ready24h);
       node.innerHTML = `
-        <strong>${displayed24h ? `${formatCount(displayed24h)} pari(s) simples sur 24h glissantes` : 'Aucun pari simple sur 24h glissantes'}</strong>
-        <span>Funnel 24h : ${formatCount(coverage.events || 0)} matchs → ${formatCount(coverage.bookable || 0)} Winamax → ${formatCount(coverage.positive || 0)} positifs → ${formatCount(ready24h)} prêts · ${formatCount(nightDisplayed)} cette nuit.</span>
+        <strong>${displayed24h ? `${formatCount(displayed24h)} opportunité(s) simples sur 24h glissantes` : 'Aucune opportunité simple sur 24h glissantes'}</strong>
+        <span>Funnel 24h : ${formatCount(coverage.events || 0)} matchs → ${formatCount(coverage.bookable || 0)} Winamax → ${formatCount(coverage.positive || 0)} positifs → ${formatCount(ready24h)} prêts${watch24h ? ` · ${formatCount(watch24h)} à surveiller` : ''} · ${formatCount(nightDisplayed)} cette nuit.</span>
         <button class="ghost-btn" type="button" data-tab-target="data">Diagnostic auto</button>
       `;
       return;
@@ -4779,7 +4806,7 @@
     const node = $('#simple-pick-timeline');
     if (!node) return;
     const upcoming = (Array.isArray(rows) ? rows : [])
-      .filter((row) => pickHasCoreData(row))
+      .filter(canDisplayPickCard)
       .slice()
       .sort((a, b) => Date.parse(a.start || '') - Date.parse(b.start || '') || displayEdgeValue(b) - displayEdgeValue(a))
       .slice(0, 14);
@@ -6046,7 +6073,7 @@
   }
 
   function scorerToTrackRow(scorer) {
-    const odd = Number(scorer?.impliedOdd || 0);
+    const odd = Number(scorer?.odd || 0);
     return {
       id: scorer?.matchId || scorer?.id || '',
       match: {
@@ -6064,10 +6091,15 @@
       odd: odd > 1 ? odd : 1,
       probability: Number(scorer?.probability || 0) || 0,
       edge: 0,
-      stake: Math.max(0.5, Math.min(getBankroll() * 0.01, getBankroll() * 0.03)),
-      status: 'bet',
-      statusLabel: 'Buteur à vérifier',
-      decisionCenter: { canBet: true, status: 'ready', mainReason: 'Pick joueur suivi manuellement après vérification Winamax.' },
+      stake: odd > 1 ? Math.max(0.5, Math.min(getBankroll() * 0.01, getBankroll() * 0.03)) : 0,
+      status: odd > 1 ? 'bet' : 'watch',
+      statusLabel: odd > 1 ? 'Buteur Winamax' : 'Cote buteur Winamax à vérifier',
+      decisionCenter: {
+        canBet: odd > 1,
+        status: odd > 1 ? 'ready' : 'watch',
+        mainReason: odd > 1 ? 'Cote joueur Winamax disponible.' : 'Pas de cote buteur Winamax confirmée dans le snapshot local.',
+        stakeDisplay: odd > 1 ? undefined : 'À vérifier'
+      },
       contextQuality: { score: Number(scorer?.playerQuality?.score || 0) || null }
     };
   }
@@ -6097,6 +6129,8 @@
       const quality = scorer.playerQuality || {};
       const qualityClass = quality.gate === 'strong' ? 'strong' : quality.gate === 'fragile' ? 'fragile' : 'watch';
       const reasonText = Array.isArray(quality.reasons) && quality.reasons.length ? quality.reasons.join(' · ') : 'Profil joueur';
+      const realOdd = Number(scorer.odd || 0);
+      const winamaxUrl = safeExternalUrl(scorer.winamaxUrl, 'www.winamax.fr');
       return `
         <article class="scorer-card scorer-${qualityClass} clickable-row" data-match-id="${escapeHtml(scorer.matchId)}" tabindex="0" role="button" aria-label="Ouvrir ${escapeHtml(scorer.title)}">
           <div class="player-line">
@@ -6117,11 +6151,13 @@
           </div>
           <p class="scorer-reasons">${escapeHtml(`Buteur · ${reasonText}`)}</p>
           <div class="scorer-footer">
-            <div class="mini-stat"><span>Cote fair</span><strong>${formatOdd(scorer.impliedOdd)}</strong></div>
+            <div class="mini-stat"><span>Cote</span><strong>${realOdd > 1 ? `${formatOdd(realOdd)} Winamax` : 'à vérifier'}</strong></div>
             <div class="mini-stat"><span>Départ</span><strong>${escapeHtml(formatDateLabel(scorer.start))}</strong></div>
             <div class="mini-stat"><span>Source</span><strong>${scorer.source === 'star_players' ? 'Profil' : 'Lineup'}</strong></div>
           </div>
-          <button type="button" class="track-bet-btn scorer-track-btn" data-track-scorer-id="${escapeHtml(scorer.id)}">Je mise</button>
+          ${realOdd > 1
+            ? `<button type="button" class="track-bet-btn scorer-track-btn" data-track-scorer-id="${escapeHtml(scorer.id)}">Je mise</button>`
+            : `${winamaxUrl ? `<a class="ghost-btn" href="${escapeHtml(winamaxUrl)}" target="_blank" rel="noreferrer">Vérifier sur Winamax</a>` : '<span class="match-sub">Cote Winamax non confirmée</span>'}`}
         </article>`;
     }).join('');
   }
@@ -9846,6 +9882,7 @@
   }
 
   function canDisplayStake(row, decisions = decisionBundleForRow(row)) {
+    if (!isBeforeKickoff(row)) return false;
     if (trendForRow(row)?.tone === 'cold') return false;
     if (decisions && Object.prototype.hasOwnProperty.call(decisions, 'canBet')) {
       return decisions.canBet === true && Number(row?.stake || 0) > 0;

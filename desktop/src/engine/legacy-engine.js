@@ -679,7 +679,26 @@ function createLegacyEngineService({ projectRoot }) {
   function isUpcoming(match) {
     if (!match || match.completed) return false;
     const ts = Date.parse(match.date || match.startDate || '');
-    return Number.isFinite(ts) && ts > Date.now() - 30 * 60000;
+    return Number.isFinite(ts) && ts > Date.now();
+  }
+
+  function startTimestamp(row) {
+    return Date.parse(row?.start || row?.date || row?.kickoff || row?.startDate || '');
+  }
+
+  function isFutureStart(row, now = Date.now()) {
+    const ts = startTimestamp(row);
+    return Number.isFinite(ts) && ts > now;
+  }
+
+  function isDashboardDisplayCandidate(row) {
+    if (!row || row.status === 'skip') return false;
+    if (!isSimpleUserMarket(row)) return false;
+    if (!isFutureStart(row)) return false;
+    if (!(Number(row.safeEdge ?? row.edge ?? 0) >= 0.01)) return false;
+    if (!(Number(row.odd || 0) > 1)) return false;
+    if (row.safeAssessment?.displayable === false) return false;
+    return true;
   }
 
   function isBookable(match) {
@@ -2475,8 +2494,8 @@ function createLegacyEngineService({ projectRoot }) {
     const now = Date.now();
     const end = now + hours * 60 * 60 * 1000;
     return (Array.isArray(rows) ? rows : []).filter((row) => {
-      const ts = Date.parse(row?.start || row?.date || row?.kickoff || '');
-      return Number.isFinite(ts) && ts >= now - 30 * 60000 && ts <= end;
+      const ts = startTimestamp(row);
+      return Number.isFinite(ts) && ts > now && ts <= end;
     });
   }
 
@@ -2513,8 +2532,8 @@ function createLegacyEngineService({ projectRoot }) {
       return sortRows([a, b])[0] === b ? 1 : -1;
     });
     const nearTerm = sourcePicks.filter((pick) => {
-      const ts = Date.parse(pick.start || '');
-      return Number.isFinite(ts) && ts >= now - 30 * 60000 && ts <= now + horizonMs;
+      const ts = startTimestamp(pick);
+      return Number.isFinite(ts) && ts > now && ts <= now + horizonMs;
     });
     const todayRows = sourcePicks.filter((pick) => dayKeyParis(pick.start) === todayKey);
     const ordered = [];
@@ -2577,7 +2596,8 @@ function createLegacyEngineService({ projectRoot }) {
         const key = `${row.id}:${row.market}:${row.label}`;
         if (finalSeen.has(key)) continue;
         const mk = matchKey(row);
-        if (options.enforceMatchCap && (finalMatchCounts.get(mk) || 0) >= maxPerMatch) continue;
+        const cap = Number(options.matchCap || 0) || (options.enforceMatchCap ? maxPerMatch : 0);
+        if (cap && (finalMatchCounts.get(mk) || 0) >= cap) continue;
         finalSeen.add(key);
         finalMatchCounts.set(mk, (finalMatchCounts.get(mk) || 0) + 1);
         finalRows.push(row);
@@ -2585,13 +2605,15 @@ function createLegacyEngineService({ projectRoot }) {
     };
     const sortedOrdered = sortRows(ordered);
     const sortedTodayReady = sortRows(todayRows.filter((row) => row?.decisionCenter?.canBet === true));
+    const sortedTodayDisplayable = sortRows(todayRows.filter(isDashboardDisplayCandidate));
     const rollingReadyPool = sortRows(rolling24.filter((row) => row?.decisionCenter?.canBet));
     const sortedRollingReady = sortRows(ordered.filter((row) => {
-      const ts = Date.parse(row?.start || '');
-      return Number.isFinite(ts) && ts >= now - 30 * 60000 && ts <= now + 24 * 60 * 60 * 1000 && row?.decisionCenter?.canBet;
+      const ts = startTimestamp(row);
+      return Number.isFinite(ts) && ts > now && ts <= now + 24 * 60 * 60 * 1000 && row?.decisionCenter?.canBet;
     }));
     const rollingReadyTarget = Math.min(15, rollingReadyPool.length, 25);
     const todayReadyTarget = Math.min(5, sortedTodayReady.length);
+    const todayVisibleTarget = Math.min(10, sortedTodayDisplayable.length);
     if (todayReadyTarget > 0) {
       addFinalRows(sortedTodayReady, todayReadyTarget, { enforceMatchCap: true });
       if (finalRows.length < todayReadyTarget) {
@@ -2599,11 +2621,18 @@ function createLegacyEngineService({ projectRoot }) {
         addFinalRows(sortedTodayReady, todayReadyTarget, { enforceMatchCap: false });
       }
     }
+    if (todayVisibleTarget > 0 && finalRows.filter((row) => dayKeyParis(row.start) === todayKey).length < todayVisibleTarget) {
+      addFinalRows(sortedTodayDisplayable, todayVisibleTarget, { enforceMatchCap: true });
+      if (finalRows.filter((row) => dayKeyParis(row.start) === todayKey).length < todayVisibleTarget) {
+        todayCapRelaxed = true;
+        addFinalRows(sortedTodayDisplayable, todayVisibleTarget, { matchCap: maxPerMatch + 1 });
+      }
+    }
     addFinalRows(sortedRollingReady, Math.max(rollingReadyTarget, Math.min(target24, sortedRollingReady.length)));
     if (rollingWindowRows(finalRows, 24).length < rollingReadyTarget) {
       addFinalRows(rollingReadyPool, rollingReadyTarget, { enforceMatchCap: true });
     }
-    addFinalRows(sortedOrdered, maxDashboardRows);
+    addFinalRows(sortedOrdered, maxDashboardRows, { matchCap: todayCapRelaxed ? maxPerMatch + 1 : maxPerMatch });
     const rows = finalRows.slice(0, maxDashboardRows)
       .map((row, index) => ({
         ...row,
@@ -3042,9 +3071,22 @@ function createLegacyEngineService({ projectRoot }) {
         return true;
       })
       .slice(0, 180);
-    const dashboard = buildDashboardPicks(picks);
-    const todayFunnel = buildTodayFunnel(data, matches, picks, dashboard.rows);
-    const coverage24h = buildRolling24hCoverage(data, matches, picks, dashboard.rows);
+    const dashboardCandidates = prioritizedDecisionRows
+      .filter(isDashboardDisplayCandidate)
+      .sort((a, b) => {
+        const aWindow = rollingWindowRows([a], 24).length ? 1 : 0;
+        const bWindow = rollingWindowRows([b], 24).length ? 1 : 0;
+        if (bWindow !== aWindow) return bWindow - aWindow;
+        const readyDelta = Number(Boolean(b.decisionCenter?.canBet)) - Number(Boolean(a.decisionCenter?.canBet));
+        if (readyDelta) return readyDelta;
+        return (Number(b.priorityScore || 0) - Number(a.priorityScore || 0)) ||
+          (Number(b.safeEdge ?? b.edge ?? 0) - Number(a.safeEdge ?? a.edge ?? 0)) ||
+          (Number(b.safeConfidence ?? b.probability ?? 0) - Number(a.safeConfidence ?? a.probability ?? 0)) ||
+          (Date.parse(a.start || '') - Date.parse(b.start || ''));
+      });
+    const dashboard = buildDashboardPicks(dashboardCandidates);
+    const todayFunnel = buildTodayFunnel(data, matches, dashboardCandidates, dashboard.rows);
+    const coverage24h = buildRolling24hCoverage(data, matches, dashboardCandidates, dashboard.rows);
     const winamaxMarketAudit = buildWinamaxMarketAudit(enrichedEvents, prioritizedDecisionRows);
     const combines = buildNativeCombines(win, enrichedEvents);
     const scorers = buildNativeScorers(win, enrichedEvents, lineupsIndex, starPlayersIndex);

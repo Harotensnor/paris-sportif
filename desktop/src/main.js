@@ -198,10 +198,7 @@ function isLiveLikeStatus(value) {
 function liveScoreFromRow(row) {
   const match = row?.match || row || {};
   const status = match.status || match.status_type || match.state || match.phase || '';
-  const startTs = Date.parse(row?.start || match.date || '');
-  const now = Date.now();
-  const estimatedLive = Number.isFinite(startTs) && now >= startTs && now <= startTs + 3 * 60 * 60 * 1000 && !match.completed;
-  if (!isLiveLikeStatus(status) && !estimatedLive) return null;
+  if (!isLiveLikeStatus(status)) return null;
   const competitors = Array.isArray(match.competitors) ? match.competitors : [];
   const home = competitors.find((team) => team.home_away === 'home') || competitors[0] || {};
   const away = competitors.find((team) => team.home_away === 'away') || competitors[1] || {};
@@ -214,8 +211,8 @@ function liveScoreFromRow(row) {
     title: row?.title || match.name || match.shortName || 'Match live',
     sport: row?.sport || match.sport || '',
     league: row?.league || match.league || '',
-    status: status || (estimatedLive ? 'LIVE estimé' : 'LIVE'),
-    minute: match.minute || match.clock || match.status_detail || match.detail || (estimatedLive ? 'live estimé' : ''),
+    status: status || 'LIVE',
+    minute: match.minute || match.clock || match.status_detail || match.detail || '',
     score: homeScore != null && awayScore != null ? `${homeScore}-${awayScore}` : 'score indisponible',
     source: 'snapshot local ESPN/Sofascore',
     fetchedAt: new Date().toISOString()

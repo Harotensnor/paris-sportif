@@ -26,6 +26,11 @@ function isSimpleDashboardMarket(pick) {
   return /^(1n2|matchwinner|winner|moneyline|ou|ou15|ou25|ou35|httotal|htou|halftimetotal|btts|scorer|buteur|goalscorer|ht1n2|halftime1n2)$/.test(key);
 }
 
+function isFuturePick(pick) {
+  const ts = Date.parse(pick?.start || pick?.date || pick?.kickoff || '');
+  return Number.isFinite(ts) && ts > Date.now();
+}
+
 function testUtils() {
   assert(typeof modelUtils.buildSignalCoverage === 'function', 'model-utils incomplet');
   assert(Number.isFinite(Number(bettingUtils.kellyFraction(0.55, 2.1, 0.25))), 'Kelly invalide');
@@ -144,9 +149,11 @@ function testAnalysis() {
   }
   const topRanks = (analysis.dashboardPicks || []).filter((pick) => Number(pick.priorityRank || 0) >= 1 && Number(pick.priorityRank || 0) <= 5);
   const complexDashboard = (analysis.dashboardPicks || []).filter((pick) => !isSimpleDashboardMarket(pick));
+  const pastDashboard = (analysis.dashboardPicks || []).filter((pick) => !isFuturePick(pick));
   assert(analysis.dashboardPicks.length >= 10, 'Moins de 10 paris simples dans le cockpit', analysis.dashboardPicks);
   assert(analysis.dashboardPicks.length <= 18, 'Le cockpit standard dépasse la limite simple de 18 paris', analysis.dashboardPicks.length);
   assert(complexDashboard.length === 0, 'Marché complexe exposé dans le cockpit standard', complexDashboard);
+  assert(pastDashboard.length === 0, 'Le cockpit expose un match déjà commencé', pastDashboard.map((pick) => ({ title: pick.title, market: pick.market, start: pick.start })));
   assert(Number(analysis.dashboardMeta?.qualityPolicy?.maxDashboardRows || 0) === 18, 'Limite cockpit Sprint 15 absente', analysis.dashboardMeta?.qualityPolicy);
   assert(topRanks.length >= 5, 'Top 5 prioritaire absent du cockpit', topRanks);
   assert(Number(analysis.dashboardPicks?.[0]?.priorityRank || 0) === 1, 'Le premier pick dashboard doit être le #1 prioritaire', analysis.dashboardPicks?.[0]);
@@ -156,6 +163,9 @@ function testAnalysis() {
   const today = analysis.todayFunnel?.today || {};
   if (Number(today.bookableEvents || 0) >= 20 && Number(today.simpleReady || 0) >= 5) {
     assert(Number(today.displayed || 0) >= 5, 'Moins de 5 paris simples affichés aujourd’hui malgré une offre Winamax suffisante', today);
+  }
+  if (Number(today.bookableEvents || 0) >= 20 && Number(today.simplePassingFilters || 0) >= 10) {
+    assert(Number(today.displayed || 0) >= 10, 'Moins de 10 opportunités simples affichées aujourd’hui malgré 10+ signaux simples positifs', today);
   }
   assert(Number(analysis.decisionCenter?.summary?.ready || 0) >= 10, 'Moins de 10 paris utilisateurs prêts', analysis.decisionCenter?.summary);
   assert(readyUserPicks.length >= 10, 'Moins de 10 paris prêts visibles dans la sélection', readyUserPicks);

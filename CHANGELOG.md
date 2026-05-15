@@ -5,6 +5,23 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 26 — Push volume + terrain hardening
+
+- Version desktop portée à `v1.2.3` après test terrain obligatoire sur pipeline réelle, app ouverte, clic de mise, console et build packagé.
+- Terrain initial Sprint 26 : `refresh_once.py --full` terminé avec `health.json generated_at=2026-05-15T11:36:12Z`, `data.js generated_at=2026-05-15T11:36:22Z`, 273 événements totaux, 30 événements Winamax aujourd'hui, 30 bookables, 30 avec marchés Winamax.
+- Bugs terrain trouvés et corrigés :
+  1. Critique : des matchs déjà commencés restaient dans le cockpit et pouvaient devenir `TOP PICK`. Le moteur exclut maintenant tout coup d'envoi passé des fenêtres actionnables.
+  2. Critique : `Je mise` acceptait encore un pari après kickoff si la ligne était restée affichée. Le renderer refuse désormais la mise dès que le coup d'envoi est passé.
+  3. Majeur : les statuts `STATUS_SCHEDULED` étaient interprétés comme live par estimation horaire, ce qui créait un faux `EN DIRECT`, un faux cash-out et un refresh live 2 min. Main process et renderer n'affichent le live que sur un statut live confirmé.
+  4. Majeur : le moteur produisait des lignes simples `À surveiller`, mais la vue principale les retirait avant affichage. Elles restent maintenant visibles sans bouton de mise, pour augmenter la lecture du jour sans forcer de stake.
+  5. Majeur : les buteurs utilisaient une cote fair calculée comme si c'était une cote Winamax réelle. Les cartes buteurs n'affichent plus `Je mise` sans cote Winamax confirmée et proposent seulement de vérifier sur Winamax.
+  6. Mineur : le brief disait `paris simples aujourd'hui` pour des paris prêts sur plusieurs jours. Le libellé devient `paris simples prêts`, et l'alerte 24h distingue `prêts` et `à surveiller`.
+- Push volume prudent : avec les données terrain du 15/05 après le début de plusieurs matchs, il ne reste que 8 signaux simples positifs futurs aujourd'hui. L'app en affiche 7 après anti-doublon match, plus 1 cette nuit, et garde 18 opportunités cockpit dont 14 prêtes. Si 10+ signaux simples positifs existent un jour donné, `qa:engine` et `qa:terrain` exigent maintenant 10+ opportunités affichées.
+- Nouveau garde-fou `qa:terrain` : lance la vraie pipeline sauf `--skip-refresh`, lit `health.json/data.js`, vérifie fraîcheur, funnel du jour, absence de match passé dans le cockpit, absence de faux live `STATUS_SCHEDULED`, format `PARI/COTE/MISE`, clic réel sur `Je mise` et 0 erreur console.
+- Captures terrain : `captures/desktop-sprint26-terrain-picks.png` montre le bug initial avec faux live / match commencé ; `captures/desktop-sprint26-after-picks.png` montre le cockpit corrigé avec 18 lignes, 7 opportunités aujourd'hui, 1 cette nuit et aucun faux live.
+- Validation Sprint 26 : `qa:engine`, `qa:terrain -- --skip-refresh`, `npm test`, Playwright Electron, `qa:visual`, `qa:a11y` et audit npm passent après correction.
+- Build Windows v1.2.3 validé : `desktop/dist-sprint26/Paris Sportif Desktop Setup 1.2.3.exe` généré à 104,1 MB, et smoke du binaire packagé validé avec version `v1.2.3`, 18 lignes cockpit, vue `Picks` et 0 faux live.
+
 ### Sprint 25 — Bug fix terrain
 
 - Version desktop portée à `v1.2.2` après un test terrain sur données réelles, sans ajout de fonctionnalité produit.
