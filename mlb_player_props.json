@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-15T01:11:37Z",
+  "generated_at": "2026-05-15T01:14:24Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -906,6 +906,88 @@
       ]
     },
     {
+      "event_id": "401815357",
+      "kickoff": "2026-05-16T01:38Z",
+      "league": "MLB",
+      "match": "Los Angeles Dodgers at Los Angeles Angels",
+      "home": "Los Angeles Angels",
+      "away": "Los Angeles Dodgers",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Los Angeles Angels",
+          "pitcher": "José Soriano",
+          "label": "José Soriano plus de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "over",
+          "probability": 0.5483,
+          "fair_odds": 1.82,
+          "expected_strikeouts": 6.75,
+          "projected_ip": 6.01,
+          "inputs": {
+            "k9": 10.1,
+            "era": 1.66,
+            "whip": 1.05,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Los Angeles Angels",
+          "pitcher": "José Soriano",
+          "label": "José Soriano ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5744,
+          "fair_odds": 1.74,
+          "expected_hr_allowed": 0.554,
+          "projected_ip": 6.01,
+          "inputs": {
+            "hr9": 0.83,
+            "era": 1.66,
+            "whip": 1.05
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Los Angeles Dodgers",
+          "pitcher": "Justin Wrobleski",
+          "label": "Justin Wrobleski moins de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "under",
+          "probability": 0.5709,
+          "fair_odds": 1.75,
+          "expected_strikeouts": 3.25,
+          "projected_ip": 6.6,
+          "inputs": {
+            "k9": 4.43,
+            "era": 2.42,
+            "whip": 0.99,
+            "hand": "L"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Los Angeles Dodgers",
+          "pitcher": "Justin Wrobleski",
+          "label": "Justin Wrobleski ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.7458,
+          "fair_odds": 1.34,
+          "expected_hr_allowed": 0.293,
+          "projected_ip": 6.6,
+          "inputs": {
+            "hr9": 0.4,
+            "era": 2.42,
+            "whip": 0.99
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
       "event_id": "401815358",
       "kickoff": "2026-05-16T01:40Z",
       "league": "MLB",
@@ -948,6 +1030,88 @@
             "whip": 1.16
           },
           "side": "home"
+        }
+      ]
+    },
+    {
+      "event_id": "401815359",
+      "kickoff": "2026-05-16T01:40Z",
+      "league": "MLB",
+      "match": "San Francisco Giants at Athletics Athletics",
+      "home": "Athletics",
+      "away": "San Francisco Giants",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Athletics",
+          "pitcher": "Luis Severino",
+          "label": "Luis Severino moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.5736,
+          "fair_odds": 1.74,
+          "expected_strikeouts": 5.17,
+          "projected_ip": 5.36,
+          "inputs": {
+            "k9": 8.69,
+            "era": 4.07,
+            "whip": 1.52,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Athletics",
+          "pitcher": "Luis Severino",
+          "label": "Luis Severino ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5784,
+          "fair_odds": 1.73,
+          "expected_hr_allowed": 0.547,
+          "projected_ip": 5.36,
+          "inputs": {
+            "hr9": 0.92,
+            "era": 4.07,
+            "whip": 1.52
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "San Francisco Giants",
+          "pitcher": "Trevor McDonald",
+          "label": "Trevor McDonald plus de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "over",
+          "probability": 0.5813,
+          "fair_odds": 1.72,
+          "expected_strikeouts": 5.89,
+          "projected_ip": 6.05,
+          "inputs": {
+            "k9": 8.76,
+            "era": 2.92,
+            "whip": 1.05,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "San Francisco Giants",
+          "pitcher": "Trevor McDonald",
+          "label": "Trevor McDonald concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.6252,
+          "fair_odds": 1.6,
+          "expected_hr_allowed": 0.981,
+          "projected_ip": 6.05,
+          "inputs": {
+            "hr9": 1.46,
+            "era": 2.92,
+            "whip": 1.05
+          },
+          "side": "away"
         }
       ]
     },
@@ -2658,7 +2822,7 @@
       ]
     }
   ],
-  "props": 128,
+  "props": 136,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
