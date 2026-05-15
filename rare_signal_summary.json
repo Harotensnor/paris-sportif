@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-05-15T22:44:00Z",
+  "generated_at": "2026-05-15T22:49:12Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 78,
-    "actionable": 25,
+    "active_events": 81,
+    "actionable": 29,
     "watch": 10,
-    "risk": 43,
+    "risk": 42,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 30,
+      "market_move": 9,
+      "signal_conflict": 2,
       "market_uncertain": 42,
-      "market_move": 1,
-      "back_to_back_travel": 8,
-      "signal_conflict": 1
+      "back_to_back_travel": 8
     },
     "by_quality": {
-      "actionable": 25,
+      "actionable": 29,
       "watch": 10,
-      "risk": 43
+      "risk": 42
     }
   },
   "active_actionable": [
@@ -78,22 +78,22 @@
       "context": "Absences severes 7-12"
     },
     {
-      "event_id": "401815359",
-      "date": "2026-05-16T01:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Athletics",
-      "away": "San Francisco Giants",
-      "match": "Athletics - San Francisco Giants",
+      "event_id": "175353",
+      "date": "2026-05-16T13:00Z",
+      "sport": "tennis",
+      "league_code": "internazionalibnldit",
+      "league_name": "Internazionali BNL d'Italia",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "San Francisco Giants",
-      "side": null,
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
       "strength": 1.0,
-      "context": "Absences severes 5-10"
+      "context": "Cote home: 9.40 -> 6.25 (+33.5%)"
     },
     {
       "event_id": "401815360",
@@ -150,24 +150,6 @@
       "context": "Absences severes 7-12"
     },
     {
-      "event_id": "401815374",
-      "date": "2026-05-17T01:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Athletics",
-      "away": "San Francisco Giants",
-      "match": "Athletics - San Francisco Giants",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "San Francisco Giants",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 5-10"
-    },
-    {
       "event_id": "401815375",
       "date": "2026-05-17T17:35Z",
       "sport": "baseball",
@@ -202,24 +184,6 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 14-7"
-    },
-    {
-      "event_id": "401815389",
-      "date": "2026-05-17T20:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Athletics",
-      "away": "San Francisco Giants",
-      "match": "Athletics - San Francisco Giants",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "San Francisco Giants",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 5-10"
     },
     {
       "event_id": "401815387",
@@ -258,6 +222,24 @@
       "context": "2 match dans les 48h + 1711 km de voyage"
     },
     {
+      "event_id": "401856910",
+      "date": "2026-05-15T23:30Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Connecticut Sun",
+      "away": "Las Vegas Aces",
+      "match": "Connecticut Sun - Las Vegas Aces",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 0.926,
+      "context": "Cote home: 9.00 -> 7.50 (+16.7%)"
+    },
+    {
       "event_id": "401815376",
       "date": "2026-05-17T17:35Z",
       "sport": "baseball",
@@ -292,6 +274,24 @@
       "side": "away",
       "strength": 0.872,
       "context": "1 match dans les 48h + 1711 km de voyage"
+    },
+    {
+      "event_id": "401815355",
+      "date": "2026-05-16T00:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Houston Astros",
+      "away": "Texas Rangers",
+      "match": "Houston Astros - Texas Rangers",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.86,
+      "context": "Cote away: 1.89 -> 1.60 (+15.5%)"
     },
     {
       "event_id": "401815361",
@@ -348,6 +348,24 @@
       "context": "Absences severes 8-12"
     },
     {
+      "event_id": "401815359",
+      "date": "2026-05-16T01:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Athletics",
+      "away": "San Francisco Giants",
+      "match": "Athletics - San Francisco Giants",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "San Francisco Giants",
+      "side": null,
+      "strength": 0.8,
+      "context": "Absences severes 5-9"
+    },
+    {
       "event_id": "401815371",
       "date": "2026-05-16T19:10Z",
       "sport": "baseball",
@@ -382,6 +400,24 @@
       "side": null,
       "strength": 0.8,
       "context": "Absences severes 3-7"
+    },
+    {
+      "event_id": "401815374",
+      "date": "2026-05-17T01:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Athletics",
+      "away": "San Francisco Giants",
+      "match": "Athletics - San Francisco Giants",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "San Francisco Giants",
+      "side": null,
+      "strength": 0.8,
+      "context": "Absences severes 5-9"
     },
     {
       "event_id": "401815377",
@@ -420,6 +456,24 @@
       "context": "Absences severes 8-12"
     },
     {
+      "event_id": "401815389",
+      "date": "2026-05-17T20:05Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Athletics",
+      "away": "San Francisco Giants",
+      "match": "Athletics - San Francisco Giants",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "San Francisco Giants",
+      "side": null,
+      "strength": 0.8,
+      "context": "Absences severes 5-9"
+    },
+    {
       "event_id": "401815440",
       "date": "2026-05-22T01:40Z",
       "sport": "baseball",
@@ -454,6 +508,24 @@
       "side": "away",
       "strength": 0.726,
       "context": "1 match dans les 48h + 979 km de voyage"
+    },
+    {
+      "event_id": "401815352",
+      "date": "2026-05-15T23:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Chicago White Sox",
+      "away": "Chicago Cubs",
+      "match": "Chicago White Sox - Chicago Cubs",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 0.718,
+      "context": "Cote home: 2.09 -> 1.82 (+12.9%)"
     },
     {
       "event_id": "401843344",
@@ -492,24 +564,6 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 8-5"
-    },
-    {
-      "event_id": "401815355",
-      "date": "2026-05-16T00:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Houston Astros",
-      "away": "Texas Rangers",
-      "match": "Houston Astros - Texas Rangers",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Houston Astros",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 14-11"
     },
     {
       "event_id": "401815353",
@@ -654,6 +708,24 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 8-5"
+    },
+    {
+      "event_id": "401815346",
+      "date": "2026-05-15T23:15Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Atlanta Braves",
+      "away": "Boston Red Sox",
+      "match": "Atlanta Braves - Boston Red Sox",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.471,
+      "context": "Cote away: 2.24 -> 2.05 (+8.5%)"
     }
   ],
   "active_risk": [
@@ -692,24 +764,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.3%"
-    },
-    {
-      "event_id": "175353",
-      "date": "2026-05-16T13:00Z",
-      "sport": "tennis",
-      "league_code": "internazionalibnldit",
-      "league_name": "Internazionali BNL d'Italia",
-      "home": "",
-      "away": "",
-      "match": "? - ?",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 12.2%"
     },
     {
       "event_id": "401859395",
