@@ -5,6 +5,25 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 25 — Bug fix terrain
+
+- Version desktop portée à `v1.2.2` après un test terrain sur données réelles, sans ajout de fonctionnalité produit.
+- Bugs terrain trouvés et corrigés :
+  1. Critique : `refresh_once.py --full` réécrivait `data.js` avec ESPN brut puis lançait des fetchs lents avant de repatcher Winamax. Si le refresh était interrompu, l'app ouvrait une donnée fraîche mais non actionnable, avec 0 pick Winamax. La pipeline full construit maintenant un snapshot Winamax actionnable immédiatement après `fetch_v3`, puis enrichit ensuite.
+  2. Critique : la fenêtre Electron attendait le préchauffage complet du moteur avant d'être créée. Sur données terrain, le démarrage pouvait dépasser plusieurs minutes et faire croire que l'app ne se lançait pas. Le préchauffage passe en arrière-plan après création de la fenêtre.
+  3. Majeur : le cockpit standard affichait 0 pari aujourd'hui alors que 33 événements Winamax étaient présents, 24 analysables et 11 prêts moteur. Les alternatives de marchés simples étaient écrasées par les marchés avancés.
+  4. Majeur : les marchés `Plus/Moins de buts en 1re mi-temps`, pourtant lisibles par l'utilisateur, étaient classés comme avancés et disparaissaient du mode standard. Ils rejoignent la famille simple `Plus / Moins de buts`.
+  5. Majeur : la sélection dashboard triait les meilleurs picks de demain devant les picks jouables aujourd'hui. Le cockpit réserve maintenant les meilleurs paris jouables du jour quand ils existent.
+  6. Majeur : l'alerte de diagnostic priorisait le volume 24h et masquait le vrai problème "0 aujourd'hui". Elle affiche maintenant le funnel du jour en premier quand moins de 5 paris simples sont visibles.
+  7. Majeur : les alternatives par match étaient limitées aux trois meilleurs marchés globaux, ce qui supprimait des marchés simples positifs. Le moteur préserve d'abord les alternatives simples avant de compléter avec les marchés avancés.
+  8. Majeur : `qa:engine` ne vérifiait pas la couverture réelle du jour. Il échoue désormais si 20+ événements Winamax et 5+ paris simples prêts donnent moins de 5 paris affichés aujourd'hui.
+  9. Majeur : le smoke Electron passait par une isolation de profil qui masquait un blocage au lancement. Le démarrage est maintenant validé avec fenêtre créée avant calcul moteur.
+  10. Mineur : les tests Electron attendaient encore `v1.2.1`; ils vérifient maintenant `v1.2.2`.
+- Résultat terrain après correction : `data.js` frais du 15/05/2026 11:38, 33 événements Winamax aujourd'hui, 24 analysables, 15 positifs, 5 paris simples affichés aujourd'hui et 18 paris simples au total dans le cockpit.
+- Captures terrain : `captures/desktop-sprint25-terrain-picks.png` montre le bug initial (0 aujourd'hui) ; `captures/desktop-sprint25-after-picks.png` montre le correctif avec le top pick Beijing Guoan - Qingdao Hainiu aujourd'hui.
+- Validation Sprint 25 : `qa:refresh`, `qa:engine`, `npm test`, Playwright Electron, `qa:visual`, `qa:a11y`, multi-jours J+3, stress court et audit npm passent après correction.
+- Build Windows v1.2.2 validé : `desktop/dist-sprint25c/Paris Sportif Desktop Setup 1.2.2.exe` généré à 109 MB, et smoke du binaire packagé validé avec 18 picks visibles, version `v1.2.2`, top pick du jour et 0 erreur console.
+
 ### Sprint 24 — Bug fix massif post-v1.2.0
 
 - Version desktop portée à `v1.2.1` pour une consolidation sans nouvelle fonctionnalité.

@@ -640,7 +640,7 @@ function createLegacyEngineService({ projectRoot }) {
     const key = calibrationUtils.normalizeMarketKey(value || '');
     const compact = String(key || value || '').toLowerCase().replace(/[^a-z0-9]+/g, '');
     if (/^(1n2|vainqueur|matchwinner|winner|moneyline)$/.test(compact)) return 'winner';
-    if (/^(ou|ou15|ou25|ou35|overunder|totalgoals)$/.test(compact)) return 'goals';
+    if (/^(ou|ou15|ou25|ou35|overunder|totalgoals|httotal|htou|halftimetotal)$/.test(compact)) return 'goals';
     if (/^(btts|les2equipes|bothteamstoscore)$/.test(compact)) return 'btts';
     if (/^(scorer|buteur|playergoal|goalscorer)$/.test(compact)) return 'scorer';
     if (/^(ht1n2|ht_1n2|halftime1n2|mitempsvainqueur)$/.test(compact)) return 'halftime';
@@ -649,6 +649,10 @@ function createLegacyEngineService({ projectRoot }) {
 
   function isSimpleUserMarket(row) {
     return Boolean(simpleMarketGroup(row?.marketKey || row?.market));
+  }
+
+  function isSimpleMarketCandidate(candidate) {
+    return Boolean(simpleMarketGroup(candidate?.market || candidate?.key || ''));
   }
 
   function normalizePickLabel(match, market, value, fallback = 'Pick') {
@@ -769,7 +773,11 @@ function createLegacyEngineService({ projectRoot }) {
     const primaryLabel = compactKey(baseRow.label || best?.label || '');
     const rows = [];
     const seenMarkets = new Set();
-    for (const candidate of candidates) {
+    const orderedCandidates = [
+      ...candidates.filter(isSimpleMarketCandidate),
+      ...candidates.filter((candidate) => !isSimpleMarketCandidate(candidate))
+    ];
+    for (const candidate of orderedCandidates) {
       const marketKey = calibrationUtils.normalizeMarketKey(candidate.market || candidate.key || '');
       const market = formatMarketName(candidate.market || marketKey);
       const label = normalizePickLabel(match, market, candidate.label || candidate.pickLabel || candidate.pickKey || candidate.key || candidate.side, 'Pick');
@@ -803,7 +811,7 @@ function createLegacyEngineService({ projectRoot }) {
           score: Number(candidate.investment?.score) || null
         }
       });
-      if (rows.length >= 3) break;
+      if (rows.length >= 5) break;
     }
     return rows;
   }
@@ -2562,6 +2570,7 @@ function createLegacyEngineService({ projectRoot }) {
     const finalRows = [];
     const finalSeen = new Set();
     const finalMatchCounts = new Map();
+    let todayCapRelaxed = false;
     const addFinalRows = (rowsToAdd, limit = maxDashboardRows, options = {}) => {
       for (const row of rowsToAdd) {
         if (finalRows.length >= limit) break;
@@ -2575,12 +2584,21 @@ function createLegacyEngineService({ projectRoot }) {
       }
     };
     const sortedOrdered = sortRows(ordered);
+    const sortedTodayReady = sortRows(todayRows.filter((row) => row?.decisionCenter?.canBet === true));
     const rollingReadyPool = sortRows(rolling24.filter((row) => row?.decisionCenter?.canBet));
     const sortedRollingReady = sortRows(ordered.filter((row) => {
       const ts = Date.parse(row?.start || '');
       return Number.isFinite(ts) && ts >= now - 30 * 60000 && ts <= now + 24 * 60 * 60 * 1000 && row?.decisionCenter?.canBet;
     }));
     const rollingReadyTarget = Math.min(15, rollingReadyPool.length, 25);
+    const todayReadyTarget = Math.min(5, sortedTodayReady.length);
+    if (todayReadyTarget > 0) {
+      addFinalRows(sortedTodayReady, todayReadyTarget, { enforceMatchCap: true });
+      if (finalRows.length < todayReadyTarget) {
+        todayCapRelaxed = true;
+        addFinalRows(sortedTodayReady, todayReadyTarget, { enforceMatchCap: false });
+      }
+    }
     addFinalRows(sortedRollingReady, Math.max(rollingReadyTarget, Math.min(target24, sortedRollingReady.length)));
     if (rollingWindowRows(finalRows, 24).length < rollingReadyTarget) {
       addFinalRows(rollingReadyPool, rollingReadyTarget, { enforceMatchCap: true });
@@ -2609,6 +2627,7 @@ function createLegacyEngineService({ projectRoot }) {
         maxDashboardRows,
         skippedByMatchCap: skippedByCap.match,
         skippedBySlotCap: skippedByCap.slot,
+        todayCapRelaxed,
         displayedToday: rows.filter((row) => dayKeyParis(row.start) === todayKey).length,
         displayed24h: rollingWindowRows(rows, 24).length,
         target24h: target24
@@ -2630,14 +2649,23 @@ function createLegacyEngineService({ projectRoot }) {
       const predictableMatches = (matches || []).filter((row) => rowDayKey(row) === day);
       const passingFilters = (picks || []).filter((row) => rowDayKey(row) === day);
       const displayed = (dashboardRows || []).filter((row) => rowDayKey(row) === day);
+      const simplePassingFilters = passingFilters.filter(isSimpleUserMarket);
+      const simpleDisplayed = displayed.filter(isSimpleUserMarket);
+      const readyRows = passingFilters.filter((row) => row?.decisionCenter?.canBet);
+      const simpleReady = readyRows.filter(isSimpleUserMarket);
+      const advancedReady = readyRows.filter((row) => !isSimpleUserMarket(row));
       return {
         day,
         totalEvents: eventsForDay.length,
         bookableEvents: bookableEvents.length,
         predictableMatches: predictableMatches.length,
         passingFilters: passingFilters.length,
+        simplePassingFilters: simplePassingFilters.length,
         displayed: displayed.length,
-        ready: passingFilters.filter((row) => row?.decisionCenter?.canBet).length,
+        simpleDisplayed: simpleDisplayed.length,
+        ready: readyRows.length,
+        simpleReady: simpleReady.length,
+        advancedReady: advancedReady.length,
         firstDisplayed: displayed.slice(0, 6).map((row) => ({
           id: row.id,
           title: row.title,

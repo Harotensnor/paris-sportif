@@ -15,6 +15,11 @@ const PROJECT_ROOT = app.isPackaged ? process.resourcesPath : path.resolve(DESKT
 const HOST = '127.0.0.1';
 const DEFAULT_LOCAL_PORT = 17654;
 const LOCAL_PORT = Number(process.env.PARIS_DESKTOP_PORT || DEFAULT_LOCAL_PORT);
+if (process.env.PARIS_DESKTOP_USER_DATA_DIR && !app.isPackaged) {
+  const isolatedUserData = path.resolve(process.env.PARIS_DESKTOP_USER_DATA_DIR);
+  fs.mkdirSync(isolatedUserData, { recursive: true });
+  app.setPath('userData', isolatedUserData);
+}
 const STATE_ROOT = app.isPackaged ? path.join(app.getPath('userData'), 'state') : path.join(DESKTOP_ROOT, 'state');
 const REFRESH_HISTORY_PATH = path.join(STATE_ROOT, 'refresh-history.json');
 const PROFILE_BACKUP_ROOT = path.join(STATE_ROOT, 'backups');
@@ -1891,13 +1896,14 @@ if (!gotSingleInstanceLock) {
 
   app.whenReady().then(async () => {
     cleanupChromiumEphemeralStorage();
-    const warmup = warmEngineAnalysis();
     const { port } = await startLocalServer();
-    await warmup;
     session.defaultSession.setPermissionRequestHandler((_webContents, permission, callback) => {
       callback(permission === 'notifications');
     });
     createWindow(port);
+    setTimeout(() => {
+      warmEngineAnalysis();
+    }, 1000);
   });
 
   app.on('activate', () => {

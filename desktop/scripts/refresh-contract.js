@@ -47,6 +47,10 @@ function before(stages, first, second, label) {
   assert(a >= 0 && b >= 0 && a < b, `${label} ordre invalide`, { first, second, stages });
 }
 
+function count(stages, name) {
+  return stages.filter((stage) => stage === name).length;
+}
+
 function commonDecisionOutputs(stages, label) {
   for (const stage of [
     'build_team_identity_graph.py',
@@ -110,7 +114,10 @@ function testFull() {
     includes(stages, stage, `full ${stage}`);
   }
   commonDecisionOutputs(stages, 'full');
-  before(stages, 'fetch_v3.py', 'fetch_live.py', 'full extra avant quick');
+  assert(count(stages, 'finalize_inline.py') >= 2, 'full doit produire un snapshot actionnable avant les sources lentes puis après enrichissement', { stages });
+  before(stages, 'fetch_v3.py', 'fetch_live.py', 'full fetch_v3 avant bootstrap Winamax');
+  before(stages, 'fetch_live.py', 'fetch_clubelo.py', 'full bootstrap Winamax avant sources lentes');
+  before(stages, 'finalize_inline.py', 'fetch_clubelo.py', 'full inline actionnable avant sources lentes');
   before(stages, 'fetch_understat_xg.py', 'fetch_team_stats.py', 'full xG avant team stats');
 }
 

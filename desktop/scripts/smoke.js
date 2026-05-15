@@ -56,8 +56,8 @@ async function main() {
     executablePath: electronExe,
     cwd: path.join(root, 'desktop'),
     acceptDownloads: true,
-    env: { ...process.env, PARIS_DESKTOP_PORT: String(testPort) },
-    args: [`--user-data-dir=${userDataDir}`, '.']
+    env: { ...process.env, PARIS_DESKTOP_PORT: String(testPort), PARIS_DESKTOP_USER_DATA_DIR: userDataDir },
+    args: ['.']
   });
 
   try {

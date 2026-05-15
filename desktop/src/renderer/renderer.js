@@ -182,7 +182,7 @@
   const SPORTS_PREFS = ['football', 'tennis', 'basketball', 'hockey', 'baseball', 'rugby', 'football américain', 'mma', 'boxe', 'handball', 'volleyball'];
   const SIMPLE_MARKET_PREFS = [
     { key: 'winner', label: 'Vainqueur du match', keys: ['1n2', 'matchwinner', 'vainqueur'] },
-    { key: 'goals', label: 'Plus / Moins de buts', keys: ['ou', 'ou15', 'ou25', 'ou35'] },
+    { key: 'goals', label: 'Plus / Moins de buts', keys: ['ou', 'ou15', 'ou25', 'ou35', 'httotal', 'htou', 'halftimetotal'] },
     { key: 'btts', label: 'Les deux équipes marquent', keys: ['btts'] },
     { key: 'scorer', label: 'Buteurs', keys: ['scorer', 'buteur'] },
     { key: 'halftime', label: 'Mi-temps vainqueur', keys: ['ht1n2', 'ht_1n2'] }
@@ -194,7 +194,7 @@
     { key: 'tennis_specials', label: 'Sets exact / Total jeux tennis', keys: ['tennisgames', 'tennissets'] },
     { key: 'corners_cards', label: 'Corners / Cartons', keys: ['corners', 'cards'] },
     { key: 'points_totals', label: 'Total points basket/hockey/baseball', keys: ['basketballtotal', 'baskettotal', 'hockeytotal', 'baseballtotal'] },
-    { key: 'half_scores', label: 'Score ou total mi-temps', keys: ['httotal', 'htou', 'halftimetotal'] },
+    { key: 'half_scores', label: 'Score mi-temps', keys: ['halftimescore', 'correctscorehalftime'] },
     { key: 'scorer_specials', label: 'Buteur premier/dernier', keys: ['firstscorer', 'lastscorer'] },
     { key: 'htft', label: 'Mi-temps / Fin', keys: ['htft', 'mitempsfin'] },
     { key: 'specifics', label: 'Spécifiques minute / événements', keys: ['teamtotal', 'resultbtts', 'minute', 'special'] }
@@ -4721,6 +4721,24 @@
   function renderTodayFunnelAlert() {
     const node = $('#today-funnel-alert');
     if (!node) return;
+    const funnel = state.status?.analysis?.todayFunnel || state.todayFunnel || null;
+    if (funnel) {
+      const today = funnel.today || {};
+      const displayed = Number(today.displayed || 0);
+      const ready = Number(today.ready || 0);
+      const bookable = Number(today.bookableEvents || today.bookable || 0);
+      if (bookable > 0 && displayed < 5) {
+        const simpleReady = Number(today.simpleReady || 0);
+        const advancedReady = Number(today.advancedReady || 0);
+        node.className = 'today-funnel-alert danger';
+        node.innerHTML = `
+          <strong>${displayed ? `${formatCount(displayed)} pari(s) aujourd'hui seulement` : 'Aucun pari simple aujourd’hui visible'}</strong>
+          <span>Aujourd’hui : ${formatCount(today.totalEvents || today.events || 0)} matchs → ${formatCount(bookable)} Winamax → ${formatCount(today.predictableMatches || today.predictable || 0)} analysables → ${formatCount(today.simplePassingFilters || 0)} simples positifs → ${formatCount(simpleReady)} simples prêts. ${advancedReady ? `${formatCount(advancedReady)} prêts avancés restent cachés en mode standard.` : ''}</span>
+          <button class="ghost-btn" type="button" data-tab-target="data">Diagnostic auto</button>
+        `;
+        return;
+      }
+    }
     const coverage = state.coverage24h?.summary || state.status?.analysis?.coverage24h?.summary || null;
     if (coverage) {
       const displayed24h = Number(coverage.displayed || 0);
@@ -4740,7 +4758,6 @@
       `;
       return;
     }
-    const funnel = state.status?.analysis?.todayFunnel || state.todayFunnel || null;
     if (!funnel) {
       node.classList.add('hidden');
       return;

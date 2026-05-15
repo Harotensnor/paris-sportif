@@ -23,7 +23,7 @@ function compactMarketKey(value) {
 
 function isSimpleDashboardMarket(pick) {
   const key = compactMarketKey(pick?.marketKey || pick?.market);
-  return /^(1n2|matchwinner|winner|moneyline|ou|ou15|ou25|ou35|btts|scorer|buteur|goalscorer|ht1n2|halftime1n2)$/.test(key);
+  return /^(1n2|matchwinner|winner|moneyline|ou|ou15|ou25|ou35|httotal|htou|halftimetotal|btts|scorer|buteur|goalscorer|ht1n2|halftime1n2)$/.test(key);
 }
 
 function testUtils() {
@@ -151,7 +151,12 @@ function testAnalysis() {
   assert(topRanks.length >= 5, 'Top 5 prioritaire absent du cockpit', topRanks);
   assert(Number(analysis.dashboardPicks?.[0]?.priorityRank || 0) === 1, 'Le premier pick dashboard doit être le #1 prioritaire', analysis.dashboardPicks?.[0]);
   assert(String(analysis.dashboardPicks?.[0]?.priorityLabel || '').includes('TOP'), 'Le #1 doit porter le badge TOP PICK', analysis.dashboardPicks?.[0]);
-  assert(Array.from(perMatch.values()).every((count) => count <= 2), 'Dashboard expose plus de 2 picks sur un même match', Array.from(perMatch.entries()).filter(([, count]) => count > 2));
+  const relaxedTodayCoverage = Boolean(analysis.dashboardMeta?.qualityPolicy?.todayCapRelaxed);
+  assert(Array.from(perMatch.values()).every((count) => count <= (relaxedTodayCoverage ? 3 : 2)), 'Dashboard expose trop de picks sur un même match', Array.from(perMatch.entries()).filter(([, count]) => count > (relaxedTodayCoverage ? 3 : 2)));
+  const today = analysis.todayFunnel?.today || {};
+  if (Number(today.bookableEvents || 0) >= 20 && Number(today.simpleReady || 0) >= 5) {
+    assert(Number(today.displayed || 0) >= 5, 'Moins de 5 paris simples affichés aujourd’hui malgré une offre Winamax suffisante', today);
+  }
   assert(Number(analysis.decisionCenter?.summary?.ready || 0) >= 10, 'Moins de 10 paris utilisateurs prêts', analysis.decisionCenter?.summary);
   assert(readyUserPicks.length >= 10, 'Moins de 10 paris prêts visibles dans la sélection', readyUserPicks);
 

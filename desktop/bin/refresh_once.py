@@ -704,7 +704,14 @@ def main() -> int:
         stages.extend(source_stages)
     elif args.full:
         mode = "full"
-        stages.extend(FULL_EXTRA_STAGES)
+        # Terrain fix Sprint 25:
+        # fetch_v3 rewrites data.js from ESPN. If slow secondary fetches run before
+        # Winamax patching and the user interrupts the refresh, the app can open a
+        # fresh-but-non-actionable snapshot with 0 Winamax picks today. Build an
+        # actionable Winamax snapshot immediately after fetch_v3, then enrich it.
+        stages.extend(FULL_EXTRA_STAGES[:1])
+        stages.extend(QUICK_STAGES)
+        stages.extend(FULL_EXTRA_STAGES[1:])
         stages.extend(QUICK_STAGES)
     else:
         stages.extend(QUICK_STAGES)
