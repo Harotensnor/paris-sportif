@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-15T15:54:33Z",
+  "generated_at": "2026-05-15T15:57:20Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -414,88 +414,6 @@
       ]
     },
     {
-      "event_id": "401815349",
-      "kickoff": "2026-05-15T23:10Z",
-      "league": "MLB",
-      "match": "New York Yankees at New York Mets",
-      "home": "New York Mets",
-      "away": "New York Yankees",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "New York Mets",
-          "pitcher": "Clay Holmes",
-          "label": "Clay Holmes plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.5245,
-          "fair_odds": 1.91,
-          "expected_strikeouts": 4.6,
-          "projected_ip": 6.01,
-          "inputs": {
-            "k9": 6.89,
-            "era": 1.86,
-            "whip": 1.01,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "New York Mets",
-          "pitcher": "Clay Holmes",
-          "label": "Clay Holmes ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6879,
-          "fair_odds": 1.45,
-          "expected_hr_allowed": 0.374,
-          "projected_ip": 6.01,
-          "inputs": {
-            "hr9": 0.56,
-            "era": 1.86,
-            "whip": 1.01
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "New York Yankees",
-          "pitcher": "Cam Schlittler",
-          "label": "Cam Schlittler plus de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "over",
-          "probability": 0.5059,
-          "fair_odds": 1.98,
-          "expected_strikeouts": 6.53,
-          "projected_ip": 5.9,
-          "inputs": {
-            "k9": 9.96,
-            "era": 1.35,
-            "whip": 0.81,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "New York Yankees",
-          "pitcher": "Cam Schlittler",
-          "label": "Cam Schlittler ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.8945,
-          "fair_odds": 1.12,
-          "expected_hr_allowed": 0.111,
-          "projected_ip": 5.9,
-          "inputs": {
-            "hr9": 0.17,
-            "era": 1.35,
-            "whip": 0.81
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
       "event_id": "401815354",
       "kickoff": "2026-05-15T23:10Z",
       "league": "MLB",
@@ -618,6 +536,88 @@
             "hr9": 1.05,
             "era": 3.16,
             "whip": 1.22
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815349",
+      "kickoff": "2026-05-15T23:15Z",
+      "league": "MLB",
+      "match": "New York Yankees at New York Mets",
+      "home": "New York Mets",
+      "away": "New York Yankees",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "New York Mets",
+          "pitcher": "Clay Holmes",
+          "label": "Clay Holmes plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.5245,
+          "fair_odds": 1.91,
+          "expected_strikeouts": 4.6,
+          "projected_ip": 6.01,
+          "inputs": {
+            "k9": 6.89,
+            "era": 1.86,
+            "whip": 1.01,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "New York Mets",
+          "pitcher": "Clay Holmes",
+          "label": "Clay Holmes ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6879,
+          "fair_odds": 1.45,
+          "expected_hr_allowed": 0.374,
+          "projected_ip": 6.01,
+          "inputs": {
+            "hr9": 0.56,
+            "era": 1.86,
+            "whip": 1.01
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "New York Yankees",
+          "pitcher": "Cam Schlittler",
+          "label": "Cam Schlittler plus de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "over",
+          "probability": 0.5059,
+          "fair_odds": 1.98,
+          "expected_strikeouts": 6.53,
+          "projected_ip": 5.9,
+          "inputs": {
+            "k9": 9.96,
+            "era": 1.35,
+            "whip": 0.81,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "New York Yankees",
+          "pitcher": "Cam Schlittler",
+          "label": "Cam Schlittler ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.8945,
+          "fair_odds": 1.12,
+          "expected_hr_allowed": 0.111,
+          "projected_ip": 5.9,
+          "inputs": {
+            "hr9": 0.17,
+            "era": 1.35,
+            "whip": 0.81
           },
           "side": "away"
         }
