@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-15T19:43:37Z",
+  "generated_at": "2026-05-15T19:47:50Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -456,6 +456,42 @@
             "whip": 1.03
           },
           "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Milwaukee Brewers",
+          "pitcher": "Coleman Crow",
+          "label": "Coleman Crow plus de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "over",
+          "probability": 0.5844,
+          "fair_odds": 1.71,
+          "expected_strikeouts": 3.82,
+          "projected_ip": 5.1,
+          "inputs": {
+            "k9": 6.75,
+            "era": 3.38,
+            "whip": 0.94,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Milwaukee Brewers",
+          "pitcher": "Coleman Crow",
+          "label": "Coleman Crow ne concède pas de home run",
+          "pick": "no",
+          "probability": 1.0,
+          "fair_odds": 1.01,
+          "expected_hr_allowed": 0.0,
+          "projected_ip": 5.1,
+          "inputs": {
+            "hr9": 0.0,
+            "era": 3.38,
+            "whip": 0.94
+          },
+          "side": "away"
         }
       ]
     },
@@ -3252,7 +3288,7 @@
       ]
     }
   ],
-  "props": 156,
+  "props": 158,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
