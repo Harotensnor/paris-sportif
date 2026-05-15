@@ -1,46 +1,27 @@
 {
-  "generated_at": "2026-05-15T15:24:02Z",
+  "generated_at": "2026-05-15T15:27:51Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 79,
-    "actionable": 27,
+    "active_events": 78,
+    "actionable": 24,
     "watch": 10,
-    "risk": 42,
+    "risk": 44,
     "expired_sample": 0,
     "by_type": {
-      "market_move": 2,
       "injury_imbalance": 30,
-      "market_uncertain": 42,
+      "market_uncertain": 44,
       "back_to_back_travel": 8,
       "signal_conflict": 1
     },
     "by_quality": {
-      "actionable": 27,
+      "actionable": 24,
       "watch": 10,
-      "risk": 42
+      "risk": 44
     }
   },
   "active_actionable": [
-    {
-      "event_id": "748956",
-      "date": "2026-05-15T18:30Z",
-      "sport": "football",
-      "league_code": "laliga2",
-      "league_name": "La Liga 2",
-      "home": "Castellón",
-      "away": "Cádiz",
-      "match": "Castellón - Cádiz",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 1.0,
-      "context": "Cote away: 10.50 -> 7.50 (+28.6%)"
-    },
     {
       "event_id": "401815349",
       "date": "2026-05-15T23:10Z",
@@ -312,24 +293,6 @@
       "context": "1 match dans les 48h + 1498 km de voyage"
     },
     {
-      "event_id": "401856910",
-      "date": "2026-05-15T23:30Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Connecticut Sun",
-      "away": "Las Vegas Aces",
-      "match": "Connecticut Sun - Las Vegas Aces",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "home",
-      "strength": 0.817,
-      "context": "Cote home: 8.50 -> 7.25 (+14.7%)"
-    },
-    {
       "event_id": "401815345",
       "date": "2026-05-15T22:45Z",
       "sport": "baseball",
@@ -490,24 +453,6 @@
       "side": null,
       "strength": 0.8,
       "context": "Absences severes 8-12"
-    },
-    {
-      "event_id": "401872904",
-      "date": "2026-05-23T00:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Colorado Avalanche",
-      "away": "Vegas Golden Knights",
-      "match": "Colorado Avalanche - Vegas Golden Knights",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Vegas Golden Knights",
-      "side": "away",
-      "strength": 0.726,
-      "context": "1 match dans les 48h + 979 km de voyage"
     }
   ],
   "active_watch": [
@@ -1144,6 +1089,24 @@
       "context": "marge bookmaker anormale 18.7%"
     },
     {
+      "event_id": "401872903",
+      "date": "2026-05-21T00:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Colorado Avalanche",
+      "away": "Vegas Golden Knights",
+      "match": "Colorado Avalanche - Vegas Golden Knights",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.3%"
+    },
+    {
       "event_id": "401865445",
       "date": "2026-05-21T00:30Z",
       "sport": "football",
@@ -1448,6 +1411,24 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 19.0%"
+    },
+    {
+      "event_id": "401872904",
+      "date": "2026-05-23T00:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Colorado Avalanche",
+      "away": "Vegas Golden Knights",
+      "match": "Colorado Avalanche - Vegas Golden Knights",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.3%"
     }
   ],
   "expired_sample": []
