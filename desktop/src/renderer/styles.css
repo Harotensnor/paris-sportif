@@ -3382,6 +3382,136 @@ td.empty::before,
   background: rgba(96, 165, 250, .10) !important;
 }
 
+.match-context-band {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  margin: 8px 0 14px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-2);
+}
+
+.match-context-band span,
+.match-context-band em {
+  color: var(--muted);
+  font-style: normal;
+  font-size: 12px;
+}
+
+.match-context-band strong {
+  color: var(--text);
+}
+
+.lineup-pitch {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.pitch-column {
+  min-width: 0;
+  border: 1px solid rgba(16, 185, 129, .22);
+  border-radius: 14px;
+  padding: 12px;
+  background:
+    linear-gradient(0deg, rgba(16, 185, 129, .08), rgba(16, 185, 129, .08)),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.025), rgba(255,255,255,.025) 1px, transparent 1px, transparent 18px),
+    var(--surface);
+}
+
+.pitch-column h5 {
+  margin: 0 0 3px;
+  color: var(--text);
+  font-size: 14px;
+}
+
+.pitch-column > small {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--muted);
+}
+
+.pitch-players {
+  display: grid;
+  gap: 7px;
+}
+
+.pitch-player {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  gap: 4px 8px;
+  align-items: center;
+  padding: 7px 8px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(2, 6, 23, .22);
+}
+
+.pitch-player.hot {
+  border-color: rgba(16, 185, 129, .38);
+  background: rgba(16, 185, 129, .10);
+}
+
+.pitch-player span {
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.pitch-player strong {
+  min-width: 0;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+.pitch-player em {
+  grid-column: 2;
+  color: var(--muted);
+  font-style: normal;
+  font-size: 11px;
+}
+
+.sport-insight-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.sport-insight-grid > div {
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-2);
+}
+
+.sport-insight-grid span,
+.sport-insight-grid em {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  font-style: normal;
+}
+
+.sport-insight-grid strong {
+  display: block;
+  margin: 4px 0;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 860px) {
+  .match-context-band,
+  .lineup-pitch {
+    grid-template-columns: 1fr;
+  }
+}
+
 .priority-badge {
   border-color: rgba(250, 204, 21, .44) !important;
   color: #fde68a !important;

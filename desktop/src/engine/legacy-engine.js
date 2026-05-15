@@ -659,11 +659,35 @@ function createLegacyEngineService({ projectRoot }) {
   }
 
   function isSimpleUserMarket(row) {
-    return Boolean(simpleMarketGroup(row?.marketKey || row?.market));
+    return Boolean(simpleMarketGroup(row?.marketKey || row?.market)) && !isDrawSelection(row);
   }
 
   function isSimpleMarketCandidate(candidate) {
     return Boolean(simpleMarketGroup(candidate?.market || candidate?.key || ''));
+  }
+
+  function isDrawSelection(row) {
+    const marketGroup = simpleMarketGroup(row?.marketKey || row?.market);
+    if (marketGroup !== 'winner' && marketGroup !== 'halftime') return false;
+    const value = String([
+      row?.label,
+      row?.pickLabel,
+      row?.pick,
+      row?.selection,
+      row?.side,
+      row?.value
+    ].filter(Boolean).join(' ')).toLowerCase();
+    const compact = value
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '');
+    return /(^|[^a-z])(?:nul|draw|match\s*nul|egalite)(?:[^a-z]|$)/i.test(value)
+      || compact === 'x'
+      || compact === 'n'
+      || compact === 'nul'
+      || compact === 'draw'
+      || compact === 'matchnul'
+      || compact === 'egalite';
   }
 
   function normalizePickLabel(match, market, value, fallback = 'Pick') {

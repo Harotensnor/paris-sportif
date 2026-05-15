@@ -57,6 +57,19 @@ async function firstWindow(app) {
   return app.windows()[0] || app.waitForEvent('window', { timeout: 10000 });
 }
 
+async function closeElectronApp(app) {
+  if (!app) return;
+  try {
+    await Promise.race([
+      app.close(),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('app.close timeout')), 5000))
+    ]);
+  } catch {
+    const proc = typeof app.process === 'function' ? app.process() : null;
+    if (proc && !proc.killed) proc.kill('SIGKILL');
+  }
+}
+
 function isIgnorableConsoleMessage(message) {
   return /Failed to load resource:\s*net::ERR_(EMPTY_RESPONSE|ABORTED)/i.test(String(message || ''));
 }
@@ -165,6 +178,7 @@ async function main() {
       assert(/trop strict|modèle trop strict/i.test(dom.alertText), 'Terrain: le garde-fou trop strict n’est pas visible', { todayFunnel, alertText: dom.alertText });
     }
     assert(dom.hasActionCopy, 'Terrain: format PARI/COTE/MISE absent', dom);
+    assert(!/PARI\s*:?\s*Match nul/i.test(dom.dashboardText), 'Terrain: Match nul visible dans le cockpit standard', dom.dashboardText.slice(0, 1200));
     assert(!/À réparer/i.test(dom.dashboardText), 'Terrain: libellé expert "À réparer" visible dans le cockpit standard', dom.dashboardText.slice(0, 1200));
     assert(!/STATUS_SCHEDULED|LIVE estimé|live estimé/i.test(dom.liveText), 'Terrain: faux live détecté sur statut programmé', dom.liveText);
     assert(!dom.hasStartedButton, 'Terrain: bouton actionnable pour match déjà commencé', dom);
@@ -183,7 +197,7 @@ async function main() {
 
     console.log(`qa:terrain OK: health ${health.generated_at || data.generated_at}, ${todayEvents.length} events aujourd'hui, ${todayBookable.length} Winamax, funnel ${todayFunnel.simplePassingFilters || 0} positifs simples -> ${todayFunnel.displayed || 0} affichés, cockpit ${dashboard.length}, coverage24h ${coverage.displayed || 0}, launch ${launchMs}ms.`);
   } finally {
-    await app.close();
+    await closeElectronApp(app);
     fs.rmSync(userDataDir, { recursive: true, force: true });
   }
 }

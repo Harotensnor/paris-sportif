@@ -2985,18 +2985,318 @@
   }
 
   function pickNarrative(row, signalPreview, fallback) {
-    const parts = [];
-    const context = row?.contextQuality?.score ?? row?.match?.context?.quality?.score;
-    parts.push(`PARI : ${userBetLabel(row)}. Cote ${formatOdd(row.odd)} sur Winamax, mise suggérée ${visibleStakeText(row)}.`);
-    if (Number.isFinite(Number(context))) {
-      parts.push(`Le contexte est noté ${Math.round(Number(context))}/100, donc la mise reste proportionnée à la qualité réelle des signaux.`);
+    const sport = String(row?.sport || row?.match?.sport || '').toLowerCase();
+    const sentences = [
+      `Le pari proposé est ${userBetLabel(row)}, à ${formatOdd(row.odd)} sur Winamax, avec une mise suggérée de ${visibleStakeText(row)}.`
+    ];
+    if (sport.includes('football') || sport.includes('soccer')) {
+      sentences.push(...footballNarrativeSentences(row));
+    } else if (sport.includes('tennis')) {
+      sentences.push(...tennisNarrativeSentences(row));
+    } else {
+      sentences.push(...genericSportNarrativeSentences(row));
     }
     const okSignals = (signalPreview || []).filter((signal) => signal.ok).map((signal) => signal.label).slice(0, 3);
-    const missing = (signalPreview || []).filter((signal) => !signal.ok).map((signal) => signal.label).slice(0, 2);
-    if (okSignals.length) parts.push(`Signaux utiles présents : ${okSignals.join(', ')}.`);
-    if (missing.length) parts.push(`À vérifier avant de miser : ${missing.join(', ')}.`);
-    if (parts.length < 3 && fallback) parts.push(fallback);
-    return parts.slice(0, 4).join(' ');
+    if (okSignals.length) {
+      sentences.push(`Les signaux qui appuient le plus la lecture sont ${okSignals.join(', ').toLowerCase()}.`);
+    } else if (fallback) {
+      sentences.push(cleanExplanation(fallback).replace(/\bheadline\s*:\s*/i, '').replace(/\bsummary\s*:\s*/i, ''));
+    }
+    if (row?.safeAssessment?.status === 'watch' || row?.limitedConfidence || row?.match?.context?.quality?.gate === 'watch') {
+      sentences.push('La fiche reste prudente : la cote est intéressante, mais il faut recontrôler les infos proches du coup d’envoi.');
+    } else {
+      sentences.push(`Ce n’est jamais garanti, mais les informations disponibles convergent vers ${userBetLabel(row)} plutôt qu’un pari plus risqué.`);
+    }
+    return sentences.filter(Boolean).slice(0, 6).join(' ');
+  }
+
+  function compactNarrativePreview(row) {
+    const signals = buildSignalCards(row?.match || {}, row?.pred || {}).slice(0, 6);
+    return pickNarrative(row, signals, pickReason(row))
+      .split(/(?<=\.)\s+/)
+      .slice(1, 3)
+      .join(' ')
+      .slice(0, 220);
+  }
+
+  function numericText(value, suffix = '', digits = 1) {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return 'non confirmé';
+    return `${n.toFixed(digits).replace(/\.0$/, '')}${suffix}`;
+  }
+
+  function teamContext(row, side) {
+    return row?.match?.context?.teams?.[side] || {};
+  }
+
+  function lineupContext(row, side) {
+    return row?.match?.lineups?.[side] || teamContext(row, side)?.lineup || row?.match?.context?.availability?.[side]?.lineup || {};
+  }
+
+  function availabilityContext(row, side) {
+    return row?.match?.context?.availability?.[side] || {};
+  }
+
+  function teamDisplayName(row, side) {
+    const matchSides = getSides(row?.match || {});
+    return teamContext(row, side)?.name
+      || availabilityContext(row, side)?.team
+      || (side === 'home' ? matchSides.home?.name : matchSides.away?.name)
+      || (side === 'home' ? 'Domicile' : 'Extérieur');
+  }
+
+  function sideFormText(side) {
+    const letters = formLetters(side || {});
+    if (letters.length) return letters.map((letter) => letter === 'W' ? 'V' : letter === 'D' ? 'N' : letter === 'L' ? 'D' : letter).join('');
+    const direct = String(side?.form5 || side?.team_form_l5 || side?.form || side?.history?.latest_form || '').trim();
+    if (direct) return direct.slice(0, 5).replace(/W/g, 'V').replace(/L/g, 'D');
+    const wdl = side?.form5_wdl || {};
+    const sample = Number(wdl.sample || 0);
+    if (sample) return `${formatCount(wdl.wins || 0)}V-${formatCount(wdl.draws || 0)}N-${formatCount(wdl.losses || 0)}D`;
+    return 'forme non confirmée';
+  }
+
+  function sideGoalText(side) {
+    const fd = side?.history?.football_data || {};
+    const xg = side?.xg || side?.history?.xg || {};
+    if (fd.matches) return `${numericText(fd.avg_for, ' but/m', 2)} · ${numericText(fd.avg_against, ' encaissé/m', 2)}`;
+    if (xg.present) return `${numericText(xg.for_avg, ' xG pour', 2)} · ${numericText(xg.against_avg, ' xG contre', 2)}`;
+    return 'buts récents à confirmer';
+  }
+
+  function inferFootballStyle(side) {
+    const fd = side?.history?.football_data || {};
+    const xg = side?.xg || side?.history?.xg || {};
+    const over25 = Number(fd.over25_rate);
+    const btts = Number(fd.btts_rate);
+    const xgFor = Number(xg.for_avg);
+    const xgAgainst = Number(xg.against_avg);
+    if (Number.isFinite(xgFor) && xgFor >= 1.75) return 'jeu offensif, volume haut';
+    if (Number.isFinite(over25) && over25 >= 0.58) return 'matchs ouverts, rythme élevé';
+    if (Number.isFinite(btts) && btts >= 0.58) return 'attaque active mais défense exposée';
+    if (Number.isFinite(xgAgainst) && xgAgainst <= 1.05) return 'bloc plutôt compact';
+    return 'profil équilibré à confirmer par les compositions';
+  }
+
+  function previousChampionForLeague(league) {
+    return league ? 'à confirmer via enrichissement web' : 'champion passé non confirmé localement';
+  }
+
+  function seasonStakeText(row) {
+    const match = row?.match || {};
+    const league = match.league_name || row?.league || '';
+    const detail = String(match.detail || match.round || match.notes || '').trim();
+    const date = new Date(row?.start || match.date || Date.now());
+    if (/finale|final|playoff|play-off|demi|semi/i.test(`${league} ${detail}`)) return detail || 'match à élimination ou enjeu renforcé';
+    if (date.getMonth() >= 3 && date.getMonth() <= 5 && String(row?.sport || match.sport || '').toLowerCase().includes('football')) {
+      return 'fin de saison : titre, Europe ou maintien peuvent peser selon le classement';
+    }
+    return 'enjeu de saison à confirmer avec le classement frais';
+  }
+
+  function playerStatLine(player, star) {
+    const rawScore = star?.star_score ?? (player?.rating != null ? player.rating : undefined);
+    const score = Number(rawScore);
+    const scoreText = Number.isFinite(score) ? `forme ${Math.max(0, Math.min(10, score)).toFixed(1)}/10` : 'forme 5 derniers à enrichir';
+    const goals = Number(star?.goals_per_match);
+    const xg = Number(star?.xG_per_match);
+    const parts = [scoreText];
+    if (Number.isFinite(goals)) parts.push(`${goals.toFixed(2)} but/m`);
+    if (Number.isFinite(xg)) parts.push(`${xg.toFixed(2)} xG/m`);
+    return parts.join(' · ');
+  }
+
+  function lineupPlayers(row, side) {
+    const lineup = lineupContext(row, side);
+    const starters = Array.isArray(lineup?.starters) ? lineup.starters : [];
+    if (starters.length) return starters.slice(0, 11);
+    const stars = Array.isArray(availabilityContext(row, side)?.stars) ? availabilityContext(row, side).stars : [];
+    return stars.slice(0, 8).map((star) => ({ name: star.name, pos: star.position, shirt: '', star }));
+  }
+
+  function starIndex(row, side) {
+    const stars = Array.isArray(availabilityContext(row, side)?.stars) ? availabilityContext(row, side).stars : [];
+    const map = new Map();
+    stars.forEach((star) => map.set(normalizeUiKey(star.name || ''), star));
+    return map;
+  }
+
+  function buildPitchColumn(row, side) {
+    const players = lineupPlayers(row, side);
+    const stars = starIndex(row, side);
+    const lineup = lineupContext(row, side);
+    const title = `${teamDisplayName(row, side)}${lineup.formation ? ` · ${lineup.formation}` : ''}`;
+    const source = lineup.confirmed ? 'composition confirmée' : lineup.projected || lineup.present ? 'composition probable' : 'composition à confirmer';
+    return `
+      <div class="pitch-column">
+        <h5>${escapeHtml(title)}</h5>
+        <small>${escapeHtml(source)}</small>
+        <div class="pitch-players">
+          ${players.length ? players.map((player) => {
+            const star = player.star || stars.get(normalizeUiKey(player.name || ''));
+            const hot = Number(star?.star_score || player?.rating || 0) >= 6;
+            return `
+              <div class="pitch-player ${hot ? 'hot' : ''}">
+                <span>${escapeHtml(player.shirt != null && player.shirt !== '' ? `#${player.shirt}` : player.pos || star?.position || '-')}</span>
+                <strong>${escapeHtml(player.name || star?.name || 'Joueur à confirmer')}</strong>
+                <em>${escapeHtml(playerStatLine(player, star))}</em>
+              </div>
+            `;
+          }).join('') : '<div class="empty compact-empty">Feuille de match non publiée par les sources locales.</div>'}
+        </div>
+      </div>
+    `;
+  }
+
+  function buildFootballInsightHtml(row) {
+    const match = row?.match || {};
+    const home = teamContext(row, 'home');
+    const away = teamContext(row, 'away');
+    const referee = match.referee || match.referee_context || row?.pred?.referee || {};
+    const weather = match.weather || {};
+    const homeInjuries = availabilityContext(row, 'home')?.injuries || home.injuries || {};
+    const awayInjuries = availabilityContext(row, 'away')?.injuries || away.injuries || {};
+    const h2hCount = Array.isArray(match.h2h?.meetings) ? match.h2h.meetings.length : 0;
+    const refereeCards = Number(referee.cardsPerGame ?? referee.yellowPerGame ?? referee.cards_per_match);
+    return `
+      <article class="detail-card wide sport-insight-card">
+        <h4>Fiche foot enrichie</h4>
+        <div class="match-context-band">
+          <span>${escapeHtml(match.league_name || row.league || 'Compétition')}</span>
+          <strong>${escapeHtml(seasonStakeText(row))}</strong>
+          <em>${escapeHtml(`Champion passé : ${previousChampionForLeague(match.league_name || row.league)}`)}</em>
+        </div>
+        <div class="lineup-pitch" aria-label="Feuille de match probable">
+          ${buildPitchColumn(row, 'home')}
+          ${buildPitchColumn(row, 'away')}
+        </div>
+        <div class="sport-insight-grid">
+          <div>
+            <span>Forme récente</span>
+            <strong>${escapeHtml(teamDisplayName(row, 'home'))} : ${escapeHtml(sideFormText(home))} · ${escapeHtml(teamDisplayName(row, 'away'))} : ${escapeHtml(sideFormText(away))}</strong>
+            <em>${escapeHtml(`${sideGoalText(home)} / ${sideGoalText(away)}`)}</em>
+          </div>
+          <div>
+            <span>Entraîneurs & style</span>
+            <strong>${escapeHtml(`${lineupContext(row, 'home')?.coach || 'Coach domicile non confirmé'} · ${inferFootballStyle(home)}`)}</strong>
+            <em>${escapeHtml(`${lineupContext(row, 'away')?.coach || 'Coach extérieur non confirmé'} · ${inferFootballStyle(away)}`)}</em>
+          </div>
+          <div>
+            <span>Arbitre</span>
+            <strong>${escapeHtml(referee.name || 'Arbitre non confirmé')}</strong>
+            <em>${escapeHtml(Number.isFinite(refereeCards) ? `${refereeCards.toFixed(1)} cartons/match · penalties/fautes à enrichir` : 'stats cartons/penalties à enrichir')}</em>
+          </div>
+          <div>
+            <span>Contexte</span>
+            <strong>${escapeHtml(weather.city ? `${weather.city} · ${numericText(weather.temp_c, '°C', 0)} · vent ${numericText(weather.wind_kmh, ' km/h', 0)}` : 'météo non attachée')}</strong>
+            <em>${escapeHtml(`Absents : ${homeInjuries.total || 0} / ${awayInjuries.total || 0} · H2H ${formatCount(h2hCount)} match(s)`)}</em>
+          </div>
+        </div>
+      </article>
+    `;
+  }
+
+  function tennisNarrativeSentences(row) {
+    const match = row?.match || {};
+    const { home, away } = getSides(match);
+    const surface = match.surface || match.draw || 'surface à confirmer';
+    const rankText = [home?.rank ? `${home.name} rang ${home.rank}` : '', away?.rank ? `${away.name} rang ${away.rank}` : ''].filter(Boolean).join(', ');
+    return [
+      `${home?.name || 'Le premier joueur'} et ${away?.name || 'son adversaire'} jouent sur ${surface}, un paramètre central pour lire le rythme et la durée du match.`,
+      rankText ? `Le classement disponible donne ${rankText}, ce qui aide le modèle à éviter une lecture purement basée sur la cote.` : 'Le classement et les bilans récents restent à compléter par les sources tennis avant de renforcer la mise.',
+      'La fiche vérifie la forme récente, le bilan par surface et les confrontations directes dès qu’ils sont présents dans les sources locales.'
+    ];
+  }
+
+  function footballNarrativeSentences(row) {
+    const home = teamContext(row, 'home');
+    const away = teamContext(row, 'away');
+    const homeName = teamDisplayName(row, 'home');
+    const awayName = teamDisplayName(row, 'away');
+    const homeGoals = sideGoalText(home);
+    const awayGoals = sideGoalText(away);
+    const injuries = [
+      availabilityContext(row, 'home')?.injuries?.severe ? `${homeName} a ${availabilityContext(row, 'home').injuries.severe} absence(s) sévère(s)` : '',
+      availabilityContext(row, 'away')?.injuries?.severe ? `${awayName} a ${availabilityContext(row, 'away').injuries.severe} absence(s) sévère(s)` : ''
+    ].filter(Boolean);
+    return [
+      `${homeName} arrive avec une dynamique ${sideFormText(home)}, tandis que ${awayName} affiche ${sideFormText(away)} sur la période récente.`,
+      `Les chiffres d’attaque/défense donnent ${homeName} à ${homeGoals} et ${awayName} à ${awayGoals}.`,
+      injuries.length ? `${injuries.join(' ; ')}, ce qui pèse dans la lecture du match.` : 'Aucun cluster d’absences sévères n’est lisible dans le dossier local, donc le pari repose surtout sur forme, cotes et contexte.'
+    ];
+  }
+
+  function genericSportNarrativeSentences(row) {
+    const match = row?.match || {};
+    const { home, away } = getSides(match);
+    const sport = row?.sport || match.sport || 'sport';
+    return [
+      `${home?.name || 'Le favori local'} et ${away?.name || 'son adversaire'} sont évalués avec les cotes Winamax, la forme récente et les signaux disponibles pour ce ${sport}.`,
+      'Quand les compositions ou titulaires ne sont pas encore confirmés, la confiance reste limitée plutôt que de forcer une conclusion.',
+      'La fiche met en avant les données concrètes disponibles et garde le reste en points à vérifier.'
+    ];
+  }
+
+  function buildTennisInsightHtml(row) {
+    const match = row?.match || {};
+    const { home, away } = getSides(match);
+    const h2h = Array.isArray(match.h2h?.meetings) ? match.h2h.meetings : [];
+    const rows = [
+      ['Tournoi', `${match.league_name || row.league || '-'} · ${match.round || match.draw || 'tour à confirmer'}`],
+      ['Surface', match.surface || 'surface à confirmer'],
+      ['Classement', `${home?.name || 'Joueur 1'} ${home?.rank ? `#${home.rank}` : 'rang ?'} · ${away?.name || 'Joueur 2'} ${away?.rank ? `#${away.rank}` : 'rang ?'}`],
+      ['Forme 5 derniers', `${sideFormText(home)} / ${sideFormText(away)}`],
+      ['H2H', h2h.length ? `${formatCount(h2h.length)} confrontation(s) locales` : 'historique direct à enrichir'],
+      ['Bilan par surface', 'dur / terre / gazon / indoor à enrichir depuis sources tennis'],
+      ['Stats avancées', 'aces, 1er service, balles de break et fatigue à enrichir']
+    ];
+    return `
+      <article class="detail-card wide sport-insight-card">
+        <h4>Fiche tennis enrichie</h4>
+        <div class="sport-insight-grid">
+          ${rows.map(([label, value]) => `<div><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`).join('')}
+        </div>
+      </article>
+    `;
+  }
+
+  function buildOtherSportInsightHtml(row) {
+    const match = row?.match || {};
+    const { home, away } = getSides(match);
+    const sport = String(row?.sport || match.sport || '').toLowerCase();
+    const sportRows = sport.includes('baseball')
+      ? [['Starter clé', 'pitcher titulaire, ERA et WHIP à confirmer'], ['Bullpen', 'fraîcheur bullpen à enrichir'], ['Forme', `${sideFormText(home)} / ${sideFormText(away)}`]]
+      : sport.includes('hockey')
+        ? [['Gardien', 'titulaire et SV% à confirmer'], ['Unités spéciales', 'power play / penalty kill à enrichir'], ['Forme', `${sideFormText(home)} / ${sideFormText(away)}`]]
+        : sport.includes('basket')
+          ? [['Cinq majeur', 'starters et minutes à confirmer'], ['Stats joueurs', 'PTS / AST / REB saison + 5 derniers à enrichir'], ['Forme', `${sideFormText(home)} / ${sideFormText(away)}`]]
+          : [['Composition', 'titulaires ou combattants clés à confirmer'], ['Forme', `${sideFormText(home)} / ${sideFormText(away)}`], ['Contexte', 'records, fatigue et déplacement à enrichir']];
+    return `
+      <article class="detail-card wide sport-insight-card">
+        <h4>Fiche ${escapeHtml(row?.sport || 'sport')} enrichie</h4>
+        <div class="sport-insight-grid">
+          ${sportRows.map(([label, value]) => `<div><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`).join('')}
+        </div>
+      </article>
+    `;
+  }
+
+  function buildSportInsightHtml(row) {
+    const sport = String(row?.sport || row?.match?.sport || '').toLowerCase();
+    if (sport.includes('football') || sport.includes('soccer')) return buildFootballInsightHtml(row);
+    if (sport.includes('tennis')) return buildTennisInsightHtml(row);
+    return buildOtherSportInsightHtml(row);
+  }
+
+  function userFacingGuardText(value) {
+    return cleanLabel(value, '')
+      .replace(/lineup_missing_near_kickoff/gi, 'composition manquante proche du coup d’envoi')
+      .replace(/availability_missing_near_kickoff/gi, 'infos effectif manquantes proche du coup d’envoi')
+      .replace(/team_strength_context_missing/gi, 'niveau d’équipe à consolider')
+      .replace(/\bedge\b/gi, 'avantage')
+      .replace(/\bKelly\b/gi, 'mise')
+      .replace(/\b1N2\b/gi, 'vainqueur du match')
+      .replace(/_/g, ' ');
   }
 
   function normalizePickLabel(match, market, value, fallback = 'Pick') {
@@ -4093,12 +4393,17 @@
       `;
       return;
     }
+    const signalPreview = buildSignalCards(row.match || {}, row.pred || {}).slice(0, 6);
+    const narrativePreview = pickNarrative(row, signalPreview, pickReason(row))
+      .split(/(?<=\.)\s+/)
+      .slice(0, 2)
+      .join(' ');
     wrap.innerHTML = `
       <div class="ultimate-copy">
         <span class="eyebrow">Bet ultime du jour</span>
         <h3>${escapeHtml(row.title)}</h3>
         ${actionPickHtml(row)}
-        <p>${escapeHtml(aiReason || ultimateBetReason(row))}</p>
+        <p>${escapeHtml(narrativePreview || aiReason || ultimateBetReason(row))}</p>
         <div class="ultimate-tags">
           ${priorityBadgeHtml(row)}
           <span>${escapeHtml(simpleMarketLabelForRow(row))}</span>
@@ -4156,7 +4461,7 @@
           ${enrichmentBadgeHtml(row)}
         </div>
         ${actionPickHtml(row, { compact: true })}
-        <p>${escapeHtml(simpleWhyText(row))}</p>
+        <p>${escapeHtml(compactNarrativePreview(row) || simpleWhyText(row))}</p>
         <div class="time-pick-action">
           <button type="button" class="ghost-btn focus-mode-btn" data-focus-pick-key="${escapeHtml(userBetKey(row))}">Mode focus</button>
           ${winamaxOpenButtonHtml(row)}
@@ -4170,18 +4475,22 @@
     const wrap = $('#time-cockpit');
     if (!wrap) return;
     const buckets = [
-      { key: 'hour', title: 'Dans l’heure', detail: '< 60 min', open: true },
-      { key: 'three', title: 'Dans les 3 heures', detail: '1h - 3h', open: true },
+      { key: 'next', title: 'À jouer prochainement', detail: '5 à 10 prochains départs', open: true },
+      { key: 'hour', title: 'Dans l’heure', detail: '< 60 min', open: false },
+      { key: 'three', title: 'Dans les 3 heures', detail: '1h - 3h', open: false },
       { key: 'today', title: 'Aujourd’hui', detail: 'après 3h', open: false },
       { key: 'tonight', title: 'Cette nuit', detail: '00h - 06h Paris', open: false },
       { key: 'tomorrow_am', title: 'Demain matin-midi', detail: '06h - 14h', open: false },
       { key: 'tomorrow_pm', title: 'Demain après-midi/soir', detail: '14h - 00h', open: false },
       { key: 'later', title: 'Prochains jours', detail: 'J+2 à J+7', open: false }
     ];
-    const grouped = new Map(buckets.map((bucket) => [bucket.key, []]));
-    (Array.isArray(rows) ? rows : [])
+    const baseRows = (Array.isArray(rows) ? rows : [])
       .filter(canDisplayPickCard)
-      .forEach((row) => grouped.get(temporalBucketForPick(row))?.push(row));
+      .slice()
+      .sort((a, b) => Date.parse(a.start || '') - Date.parse(b.start || '') || safeConfidenceValue(b) - safeConfidenceValue(a) || displayEdgeValue(b) - displayEdgeValue(a));
+    const grouped = new Map(buckets.map((bucket) => [bucket.key, []]));
+    grouped.set('next', baseRows.slice(0, 10));
+    baseRows.forEach((row) => grouped.get(temporalBucketForPick(row))?.push(row));
     grouped.forEach((bucketRows) => bucketRows.sort((a, b) => Date.parse(a.start || '') - Date.parse(b.start || '') || safeConfidenceValue(b) - safeConfidenceValue(a) || displayEdgeValue(b) - displayEdgeValue(a)));
     wrap.innerHTML = buckets.map((bucket) => {
       const bucketRows = grouped.get(bucket.key) || [];
@@ -4199,10 +4508,10 @@
         </details>
       `;
     }).join('');
-    const nowSection = wrap.querySelector('[data-time-bucket="hour"].hot');
-    if (nowSection && !state.didScrollToNow) {
+    const nextSection = wrap.querySelector('[data-time-bucket="next"]');
+    if (nextSection && !state.didScrollToNow) {
       state.didScrollToNow = true;
-      setTimeout(() => nowSection.scrollIntoView({ block: 'nearest', behavior: 'smooth' }), 200);
+      setTimeout(() => nextSection.scrollIntoView({ block: 'nearest', behavior: 'smooth' }), 200);
     }
   }
 
@@ -4244,7 +4553,7 @@
       enabled: prefs.webEnrichmentEnabled !== false,
       cacheMinutes: Math.max(15, Number(prefs.webEnrichmentCacheMinutes || legacyCache) || 120),
       rateLimitPerMinute: Math.max(1, Math.min(10, Number(prefs.webEnrichmentRateLimit || 5) || 5)),
-      maxSources: 3
+      maxSources: 5
     };
   }
 
@@ -4268,6 +4577,13 @@
     const store = state.webEnrichments || readStorageJson(WEB_ENRICHMENT_KEY, null);
     const key = rowEnrichmentKey(row);
     return store?.byKey?.[key] || store?.byKey?.[userBetKey(row)] || null;
+  }
+
+  function enrichmentIsCurrent(row) {
+    const item = enrichmentForRow(row);
+    if (!item || item.status !== 'enriched') return false;
+    if (Number(item.planVersion || 0) < 2) return false;
+    return Number(item.successfulSources || 0) >= 3;
   }
 
   function enrichmentBadgeHtml(row) {
@@ -4344,13 +4660,22 @@
   function scheduleVisibleWebEnrichment(rows) {
     const prefs = loadPreferences();
     if (prefs.webEnrichmentEnabled === false) return;
+    const now = Date.now();
+    const topWindow = (Array.isArray(rows) ? rows : [])
+      .filter((row) => canDisplayPickCard(row))
+      .filter((row) => {
+        const ts = Date.parse(row.start || '');
+        return Number.isFinite(ts) && ts > now && ts - now <= 48 * 60 * 60 * 1000;
+      })
+      .sort((a, b) => Number(Boolean(canDisplayStake(b))) - Number(Boolean(canDisplayStake(a))) || priorityValue(b) - priorityValue(a))
+      .slice(0, 5);
     const top = [
       aiSelectedUltimate(rows) || ultimateBetCandidate(rows),
-      ...(Array.isArray(rows) ? rows.filter((row) => temporalBucketForPick(row) === 'hour').slice(0, 2) : [])
+      ...topWindow
     ].filter(Boolean);
-    const unique = Array.from(new Map(top.map((row) => [userBetKey(row), row])).values()).slice(0, 3);
+    const unique = Array.from(new Map(top.map((row) => [userBetKey(row), row])).values()).slice(0, 5);
     unique.forEach((row, index) => {
-      if (enrichmentForRow(row)?.status === 'enriched') return;
+      if (enrichmentIsCurrent(row)) return;
       const key = rowEnrichmentKey(row);
       if (state.webEnrichmentPending.has(key)) return;
       state.webEnrichmentPending.add(key);
@@ -9313,7 +9638,7 @@
       ['Score contexte', contextScoreLabel(quality)],
       ['Confiance confiance', confidenceTrustText(row)],
       ['Décision contexte', contextGateText(row)],
-      ['Agent', row.contextGate?.agentEligible === false ? 'Mise agent bloquée' : 'Éligible si Kelly positif'],
+      ['Agent', row.contextGate?.agentEligible === false ? 'Mise agent bloquée' : 'Éligible si mise positive'],
       ['Kickoff', quality.minutes_to_kickoff != null ? `${Math.round(quality.minutes_to_kickoff)} min` : '-'],
       ['Manques', missing.length ? missing.join(', ') : 'Aucun manque majeur'],
       ['Périmé', stale.length ? stale.join(', ') : 'Rien de périmé'],
@@ -9590,7 +9915,7 @@
             <h4>Décision</h4>
             <div class="kv">
               <span>Statut</span><strong>${escapeHtml(row.statusLabel || row.status || '-')}</strong>
-              <span>Agent</span><strong>${escapeHtml(row.contextGate?.agentEligible === false || row.prebetGate?.blocked ? 'Bloqué' : 'Éligible si Kelly positif')}</strong>
+              <span>Agent</span><strong>${escapeHtml(row.contextGate?.agentEligible === false || row.prebetGate?.blocked ? 'Bloqué' : 'Éligible si mise positive')}</strong>
               <span>Edge</span><strong>${escapeHtml(formatPct(displayEdgeValue(row), 1))}</strong>
               <span>Mise autorisée</span><strong>${escapeHtml(visibleStakeText(row, decisions))}</strong>
               <span>Raison mise</span><strong>${escapeHtml(stakePolicyText(row, decisions))}</strong>
@@ -9739,15 +10064,15 @@
       ['Statut', row.statusLabel],
       ['Marché', row.market],
       ['Pick', row.label],
-      ['Type Winamax', row.winamaxBetType?.label || 'Single Winamax'],
+      ['Format pari', row.winamaxBetType?.label || 'Single Winamax'],
       ['Boost Winamax', row.winamaxBoost ? (row.winamaxBoost.to ? `${row.winamaxBoost.from ? `${Number(row.winamaxBoost.from).toFixed(2)} → ` : ''}${Number(row.winamaxBoost.to).toFixed(2)}` : 'détecté') : 'Aucun boost détecté'],
       ['Cote', row.odd > 1 ? `@${row.odd.toFixed(2)}` : '-'],
-      ['Proba modèle', row.probability > 0 ? formatPct(row.probability, 1) : '-'],
-      ['Confiance ajustée', formatPct(safeConfidenceValue(row), 1)],
+      ['Lecture modèle', row.probability > 0 ? formatPct(row.probability, 1) : '-'],
+      ['Confiance', formatPct(safeConfidenceValue(row), 1)],
       ['Validation historique', segmentValidation.label || 'Sample insuffisant pour validation rétrospective'],
-      ['Edge', displayEdgeValue(row) > 0 ? formatPct(displayEdgeValue(row), 1) : '-'],
+      ['Avantage', displayEdgeValue(row) > 0 ? formatPct(displayEdgeValue(row), 1) : '-'],
       ['Mise autorisée', visibleStakeText(row, decisionBundle)],
-      ['Kelly théorique', Number(row.modelStake || row.stake || 0) > 0 && !stakeAllowed ? `${formatMoney(row.modelStake || row.stake)} · bloquée` : row.stake > 0 ? formatMoney(row.stake) : '0 €'],
+      ['Mise théorique', Number(row.modelStake || row.stake || 0) > 0 && !stakeAllowed ? `${formatMoney(row.modelStake || row.stake)} · bloquée` : row.stake > 0 ? formatMoney(row.stake) : '0 €'],
       ['Prudence mise', stakePolicyText(row, decisionBundle)],
       ['Contexte', contextScoreLabel(contextQuality)],
       ['Confiance', confidenceTrustText(row)],
@@ -9833,7 +10158,7 @@
             </div>
           </article>
         </div>
-        ${enrichmentForRow(row) ? buildEnrichedSourcesHtml(row) : ''}
+        ${buildEnrichedSourcesHtml(row)}
         <article class="detail-card wide sheet-signals-card">
           <h4>Signaux clés</h4>
           <div class="sheet-signal-strip">
@@ -9857,6 +10182,7 @@
               <span>${escapeHtml(sourceLine)}</span>
             </div>
           </article>
+          ${buildSportInsightHtml(row)}
           <article class="detail-card">
             <h4>Contexte utile</h4>
             <div class="kv">${usefulContext.length ? usefulContext.map((signal) => `<span>${escapeHtml(signal.label)}</span><strong>${escapeHtml(signal.value)}</strong>`).join('') : '<span>Contexte</span><strong>Voir onglet Signaux</strong>'}</div>
@@ -9871,7 +10197,7 @@
             ${blockList.length ? `<div class="block-reason-list">${blockList.slice(0, 5).map((item) => `
               <div class="block-reason-item block-${escapeHtml(item.tone || 'warn')}">
                 <span>${escapeHtml(item.label)}</span>
-                <strong>${escapeHtml(item.detail)}</strong>
+                <strong>${escapeHtml(userFacingGuardText(item.detail))}</strong>
               </div>
             `).join('')}</div>` : '<p class="detail-text">Tous les garde-fous locaux sont verts. La cote Winamax reste à vérifier au moment du clic.</p>'}
           </article>

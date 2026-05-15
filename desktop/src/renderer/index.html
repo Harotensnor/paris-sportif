@@ -81,7 +81,7 @@
           <small id="simple-freshness">Données en cours</small>
         </section>
 
-        <section class="morning-brief" id="morning-brief" aria-label="Brief du matin">
+        <section class="morning-brief expert-only hidden" id="morning-brief" aria-label="Brief du matin">
           <div class="morning-main">
             <span class="eyebrow">Brief du matin</span>
             <h3 id="morning-title">Chargement du cockpit...</h3>
@@ -106,7 +106,7 @@
           <div class="imminent-strip" id="imminent-strip"></div>
         </section>
 
-        <div class="metrics-grid">
+        <div class="metrics-grid expert-only hidden">
           <article class="metric">
             <span>Fraîcheur</span>
             <strong id="metric-age">-</strong>
@@ -148,7 +148,7 @@
           </article>
         </div>
 
-        <section class="today-model-card" aria-label="Modèle aujourd'hui">
+        <section class="today-model-card expert-only hidden" aria-label="Modèle aujourd'hui">
           <div class="section-head compact">
             <div>
               <h3>Modèle aujourd'hui</h3>
@@ -160,7 +160,7 @@
           </div>
         </section>
 
-        <section class="today-model-card" aria-label="Conseils du coach">
+        <section class="today-model-card expert-only hidden" aria-label="Conseils du coach">
           <div class="section-head compact">
             <div>
               <h3>Conseils du jour</h3>
@@ -189,7 +189,7 @@
           </div>
         </section>
 
-        <div class="decision-terminal">
+        <div class="decision-terminal expert-only hidden">
           <div class="decision-terminal-head">
             <div>
               <div class="eyebrow">Décision finale locale</div>
@@ -234,17 +234,12 @@
           <div class="empty">Classement temporel des picks en cours...</div>
         </section>
 
-        <section class="simple-timeline-section">
-          <div class="section-head compact">
-            <div>
-              <h3>Prochains picks</h3>
-              <p>Triés par heure de départ.</p>
-            </div>
-          </div>
+        <details class="simple-fold-section" id="simple-timeline-section">
+          <summary><span>Timeline complète</span><strong>24h</strong></summary>
           <div class="simple-pick-timeline" id="simple-pick-timeline">
             <div class="empty compact-empty">Chargement de la timeline...</div>
           </div>
-        </section>
+        </details>
 
         <details class="simple-fold-section hidden" id="favorite-picks-section">
           <summary><span>Tes favoris</span><strong id="favorite-picks-count">0</strong></summary>

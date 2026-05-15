@@ -5,6 +5,20 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 30 — Fiches enrichies + texte narratif + anti-nul + accueil aéré
+
+- Version desktop portée à `v1.6.0` après test terrain obligatoire sur pipeline réelle, app Electron ouverte, clics et captures. Terrain initial : `refresh_once.py --full` a rafraîchi `data.js` le 15/05/2026, avec 267 événements, 21 matchs Winamax aujourd'hui au moment de l'audit, et le cockpit exposait encore un `PARI : Match nul` sur Aston Villa - Liverpool.
+- Bug produit corrigé : les sélections `Match nul`/`Draw`/`X` sont retirées du cockpit standard dès le moteur. `qa:engine`, `qa:terrain` et Playwright échouent maintenant si un `PARI : Match nul` réapparaît en mode standard.
+- Fiches match enrichies : la fiche foot ajoute une vraie feuille de match visuelle, formations, titulaires, forme joueur, stats but/xG quand disponibles, entraîneurs/style inféré, arbitre, météo, blessures, H2H, enjeu de saison et champion passé explicitement marqué `à confirmer via enrichissement web` quand la donnée n'est pas sourcée localement.
+- Texte narratif rassurant : chaque fiche génère 4-6 phrases factuelles qui relient le pari aux signaux concrets, sans promesse de certitude. Le top pick reprend aussi une prévisualisation narrative, par exemple `Le pari proposé est ... Aston Villa arrive avec une dynamique ...`.
+- Enrichissement web actif renforcé : le moteur côté main process consulte maintenant jusqu'à 5 sources par pick prioritaire (`ESPN`, `Wikipédia`, `Sofascore`, `L'Équipe`, `TheSportsDB`, plus Winamax selon le plan), invalide les anciens caches d'enrichissement et relance automatiquement l'enrichissement des picks top/48h sans bloquer l'UI. Les fiches affichent les réussites/échecs, par exemple 4 sources OK et Sofascore HTTP 403 journalisé proprement.
+- Fiches tennis et autres sports : ajout de sections adaptées tennis (tournoi, surface, classement, H2H, bilan surface, stats avancées à enrichir) et autres sports (baseball pitcher/bullpen, hockey gardien/unités spéciales, basket starters/stats joueurs, fallback NFL/MMA/rugby) au lieu d'une fiche générique vide.
+- Accueil aéré : le mode standard masque le brief détaillé, les métriques complètes, le modèle du jour, le coach et le terminal de décision en Mode expert. La vue Picks conserve le bandeau compact, le top pick XL, une seule section ouverte `À jouer prochainement`, puis timeline, combinés, buteurs et promos repliés.
+- Bug QA terrain corrigé : `qa:terrain` ne reste plus pendu si Electron refuse de fermer ; le script force une fermeture propre après timeout et nettoie le profil temporaire.
+- Captures Sprint 30 : `captures/desktop-sprint30-before-picks.png`, `desktop-sprint30-before-foot.png`, `desktop-sprint30-after-picks.png`, `desktop-sprint30-after-foot-enriched.png` et `desktop-sprint30-after-other-sport-enriched.png` documentent l'avant/après accueil, la fiche foot enrichie et une fiche autre sport.
+- Validation Sprint 30 : syntaxe Node, `qa:engine`, `qa:terrain` sur données réelles fraîches, `qa:winamax-audit`, `npm test`, Playwright Electron, `qa:visual`, `qa:a11y` et multi-jours J+3 passent avec 0 erreur console sévère observée en usage réel. Le snapshot final, plus tard dans la soirée, n'a plus qu'un match futur aujourd'hui : la bannière `Aucun pari prêt aujourd'hui` affiche le funnel honnête.
+- Build Windows v1.6.0 validé : `desktop/dist-sprint30/Paris Sportif Desktop Setup 1.6.0.exe` généré à 109,1 MB. Le dossier historique `desktop/dist/` reste verrouillé par Windows sur un ancien `app.asar`, donc la release a été générée dans `dist-sprint30`; le binaire unpacked démarre avec `Paris Sportif Desktop v1.6.0`, 18 lignes cockpit, 0 `Match nul` standard et 0 erreur console.
+
 ### Sprint 29 — Génération signaux + couverture nuit
 
 - Version desktop portée à `v1.5.0` après test terrain obligatoire sur pipeline réelle, app Electron ouverte, clics, captures et build packagé. Le sprint améliore la génération de signaux sans rouvrir les marchés complexes ni quitter Winamax.

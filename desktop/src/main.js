@@ -26,6 +26,7 @@ const PROFILE_BACKUP_ROOT = path.join(STATE_ROOT, 'backups');
 const DATA_BACKUP_ROOT = path.join(STATE_ROOT, 'data-backups');
 const DATA_BACKUP_PATH = path.join(DATA_BACKUP_ROOT, 'data-latest.js');
 const AI_WEB_ENRICHMENT_PATH = path.join(STATE_ROOT, 'ai-web-enrichment.json');
+const AI_WEB_ENRICHMENT_PLAN_VERSION = 2;
 const WINAMAX_PROMOS_PATH = path.join(STATE_ROOT, 'winamax-promos.json');
 const WEBHOOK_LOG_PATH = path.join(STATE_ROOT, 'webhook-log.jsonl');
 const UPDATE_STATUS_PATH = path.join(STATE_ROOT, 'update-status.json');
@@ -525,11 +526,30 @@ function splitMatchTitle(title) {
 function enrichmentSourcePlan(pick) {
   const teams = splitMatchTitle(pick?.title || pick?.match || '');
   const query = encodeURIComponent([teams.query, pick?.league, pick?.sport].filter(Boolean).join(' '));
+  const teamQuery = encodeURIComponent([teams.home, teams.away, pick?.league].filter(Boolean).join(' '));
   const sources = [
     {
       key: 'espn_search',
       label: 'ESPN',
       url: query ? `https://site.web.api.espn.com/apis/search/v2?query=${query}&region=fr&lang=fr` : null,
+      kind: 'news-search'
+    },
+    {
+      key: 'wikipedia_context',
+      label: 'Wikipédia',
+      url: teamQuery ? `https://fr.wikipedia.org/w/api.php?action=opensearch&search=${teamQuery}&limit=5&namespace=0&format=json&origin=*` : null,
+      kind: 'context-search'
+    },
+    {
+      key: 'sofascore_search',
+      label: 'Sofascore',
+      url: query ? `https://www.sofascore.com/api/v1/search/all?q=${query}` : null,
+      kind: 'lineup-stats-search'
+    },
+    {
+      key: 'lequipe_search',
+      label: "L'Équipe",
+      url: query ? `https://www.lequipe.fr/recherche?q=${query}` : null,
       kind: 'news-search'
     },
     {
@@ -708,13 +728,13 @@ async function webEnrichPick(config, pick, options = {}) {
   const key = enrichmentKeyForPick(pick);
   const cached = store.byKey[key];
   const ttlMs = Math.max(15, Number(config.cacheMinutes || 120) || 120) * 60 * 1000;
-  if (!options.force && cached?.enrichedAt && Date.now() - Date.parse(cached.enrichedAt) < ttlMs) {
+  if (!options.force && cached?.planVersion === AI_WEB_ENRICHMENT_PLAN_VERSION && cached?.enrichedAt && Date.now() - Date.parse(cached.enrichedAt) < ttlMs) {
     return { ok: true, cached: true, record: cached, summary: store.summary };
   }
   if (config.enabled === false) {
     return { ok: false, skipped: true, reason: 'enrichissement web désactivé', summary: store.summary };
   }
-  const plan = enrichmentSourcePlan(pick).slice(0, Math.max(1, Math.min(4, Number(config.maxSources || 3) || 3)));
+  const plan = enrichmentSourcePlan(pick).slice(0, Math.max(1, Math.min(6, Number(config.maxSources || 5) || 5)));
   const startedAt = new Date().toISOString();
   const sources = options.dryRun
     ? plan.map((source) => ({
@@ -736,6 +756,7 @@ async function webEnrichPick(config, pick, options = {}) {
     enrichedAt: new Date().toISOString(),
     mode: options.dryRun ? 'dry-run' : 'web',
     status: success ? 'enriched' : 'attempted',
+    planVersion: AI_WEB_ENRICHMENT_PLAN_VERSION,
     successfulSources: success,
     failedSources: failed,
     majorChange: false,

@@ -148,6 +148,7 @@ test('Sprint 23 desktop keeps clear Winamax picks with supervised workflows', as
     expect(cockpit.dashboardText).not.toMatch(/Handicap|Double chance|Jeux tennis|Total basket|Total runs|Score exact|Corners|Cartons/i);
     expect(cockpit.dashboardText).not.toMatch(/\bKelly\b|\bEV\b|\btier\b|\b1N2\b|\bBTTS\b|\bedge\b/i);
     expect(cockpit.dashboardText).not.toMatch(/À réparer/i);
+    expect(cockpit.dashboardText).not.toMatch(/PARI\s*:?\s*Match nul/i);
     await expect(win.locator('#saved-strategy-select')).toBeVisible();
     await expect(win.locator('#save-current-strategy-btn')).toBeVisible();
     await win.click('#save-current-strategy-btn');
@@ -189,7 +190,7 @@ test('Sprint 23 desktop keeps clear Winamax picks with supervised workflows', as
     await expect(win.locator('#pref-auto-tracking-enabled')).toHaveCount(1);
     await expect(win.locator('#pref-live-news-watcher')).toBeVisible();
     await expect(win.locator('#pref-language')).toBeVisible();
-    await expect(win.locator('#app-version-label')).toContainText('v1.5.0');
+    await expect(win.locator('#app-version-label')).toContainText('v1.6.0');
     await win.selectOption('#pref-theme', 'light');
     await expect(win.locator('body')).toHaveClass(/theme-light/);
     await win.selectOption('#pref-theme', 'dark');
