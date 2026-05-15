@@ -1,25 +1,26 @@
 {
-  "generated_at": "2026-05-15T00:05:35Z",
+  "generated_at": "2026-05-15T00:10:42Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 78,
-    "actionable": 22,
+    "active_events": 79,
+    "actionable": 24,
     "watch": 11,
-    "risk": 45,
+    "risk": 44,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 32,
+      "injury_imbalance": 30,
+      "market_move": 9,
       "market_uncertain": 42,
       "back_to_back_travel": 7,
-      "signal_conflict": 5,
+      "signal_conflict": 7,
       "travel_extreme": 3
     },
     "by_quality": {
+      "actionable": 24,
       "watch": 11,
-      "actionable": 22,
-      "risk": 45
+      "risk": 44
     }
   },
   "active_actionable": [
@@ -150,6 +151,42 @@
       "context": "Absences severes 7-12"
     },
     {
+      "event_id": "401815396",
+      "date": "2026-05-18T23:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Kansas City Royals",
+      "away": "Boston Red Sox",
+      "match": "Kansas City Royals - Boston Red Sox",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 1.70 -> 2.10 (-23.5%)"
+    },
+    {
+      "event_id": "401815410",
+      "date": "2026-05-19T23:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Kansas City Royals",
+      "away": "Boston Red Sox",
+      "match": "Kansas City Royals - Boston Red Sox",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 1.70 -> 2.10 (-23.5%)"
+    },
+    {
       "event_id": "401815425",
       "date": "2026-05-20T23:40Z",
       "sport": "baseball",
@@ -160,12 +197,12 @@
       "match": "Kansas City Royals - Boston Red Sox",
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Boston Red Sox",
-      "side": "away",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
       "strength": 1.0,
-      "context": "2 match dans les 48h + 1998 km de voyage"
+      "context": "Cote home: 1.70 -> 2.10 (-23.5%)"
     },
     {
       "event_id": "401815440",
@@ -222,24 +259,6 @@
       "context": "2 match dans les 48h + 1711 km de voyage"
     },
     {
-      "event_id": "401815410",
-      "date": "2026-05-19T23:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Kansas City Royals",
-      "away": "Boston Red Sox",
-      "match": "Kansas City Royals - Boston Red Sox",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Boston Red Sox",
-      "side": "away",
-      "strength": 0.93,
-      "context": "1 match dans les 48h + 1998 km de voyage"
-    },
-    {
       "event_id": "401815373",
       "date": "2026-05-16T23:15Z",
       "sport": "baseball",
@@ -256,6 +275,24 @@
       "side": "away",
       "strength": 0.872,
       "context": "1 match dans les 48h + 1711 km de voyage"
+    },
+    {
+      "event_id": "401856910",
+      "date": "2026-05-15T23:30Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Connecticut Sun",
+      "away": "Las Vegas Aces",
+      "match": "Connecticut Sun - Las Vegas Aces",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 0.823,
+      "context": "Cote home: 6.75 -> 7.75 (-14.8%)"
     },
     {
       "event_id": "401815345",
@@ -422,24 +459,6 @@
   ],
   "active_watch": [
     {
-      "event_id": "401871428",
-      "date": "2026-05-15T01:30Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Anaheim Ducks",
-      "away": "Vegas Golden Knights",
-      "match": "Anaheim Ducks - Vegas Golden Knights",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Anaheim Ducks",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 4-1"
-    },
-    {
       "event_id": "401815348",
       "date": "2026-05-15T23:10Z",
       "sport": "baseball",
@@ -530,24 +549,6 @@
       "context": "Absences severes 8-5"
     },
     {
-      "event_id": "401871429",
-      "date": "2026-05-16T21:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Vegas Golden Knights",
-      "away": "Anaheim Ducks",
-      "match": "Vegas Golden Knights - Anaheim Ducks",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Anaheim Ducks",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 1-4"
-    },
-    {
       "event_id": "401815370",
       "date": "2026-05-16T23:10Z",
       "sport": "baseball",
@@ -618,27 +619,45 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 3-6"
+    },
+    {
+      "event_id": "401871409",
+      "date": "2026-05-17T00:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Montreal Canadiens",
+      "away": "Buffalo Sabres",
+      "match": "Montreal Canadiens - Buffalo Sabres",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "draw",
+      "strength": 0.526,
+      "context": "Cote draw: 3.70 -> 3.35 (+9.5%)"
+    },
+    {
+      "event_id": "401871410",
+      "date": "2026-05-18T23:30Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Buffalo Sabres",
+      "away": "Montreal Canadiens",
+      "match": "Buffalo Sabres - Montreal Canadiens",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "draw",
+      "strength": 0.526,
+      "context": "Cote draw: 3.70 -> 3.35 (+9.5%)"
     }
   ],
   "active_risk": [
-    {
-      "event_id": "401815396",
-      "date": "2026-05-18T23:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Kansas City Royals",
-      "away": "Boston Red Sox",
-      "match": "Kansas City Royals - Boston Red Sox",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "signal_conflict",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 1.0,
-      "context": "Signaux opposes: Kansas City Royals fade 1.30, Boston Red Sox fade 1.56 -> prudence"
-    },
     {
       "event_id": "401859392",
       "date": "2026-05-16T07:00Z",
