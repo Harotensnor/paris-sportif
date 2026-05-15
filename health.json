@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-05-15T17:12:10Z",
-  "calculated_at": "2026-05-15T17:12:10Z",
+  "generated_at": "2026-05-15T17:14:15Z",
+  "calculated_at": "2026-05-15T17:14:15Z",
   "source_of_truth": "data.js",
   "data_age_min": 1,
   "data_file_age_min": 0,
@@ -320,16 +320,15 @@
     "daily_insights": {
       "age_min": 1,
       "insights": 7,
-      "events_today": 8,
-      "events_next_36h": 90,
+      "events_today": 6,
+      "events_next_36h": 89,
       "sources_loaded": 8
     },
     "detected_angles": {
       "age_min": 0,
-      "events": 98,
-      "angles": 171,
+      "events": 95,
+      "angles": 168,
       "by_type": {
-        "market_move": 3,
         "lookahead": 74,
         "injury_imbalance": 35,
         "market_uncertain": 44,
@@ -348,9 +347,8 @@
     },
     "rare_signals": {
       "age_min": 0,
-      "signals": 86,
+      "signals": 83,
       "by_type": {
-        "market_move": 3,
         "injury_imbalance": 30,
         "market_uncertain": 44,
         "back_to_back_travel": 8,
@@ -359,18 +357,18 @@
     },
     "rare_signal_summary": {
       "age_min": 0,
-      "active": 81,
-      "actionable": 26,
-      "watch": 11,
+      "active": 78,
+      "actionable": 24,
+      "watch": 10,
       "risk": 44,
       "status": "ok"
     },
     "timing_edges": {
       "age_min": 0,
-      "events": 232,
-      "bet_now": 228,
-      "wait": 1,
-      "price_shortening": 3
+      "events": 233,
+      "bet_now": 231,
+      "wait": 2,
+      "price_shortening": 0
     },
     "injuries_multisport": {
       "age_min": 1,
@@ -1053,7 +1051,7 @@
   ],
   "overall": "warning",
   "quality_checks": {
-    "data_generated_at": "2026-05-15T17:11:00.377555Z",
+    "data_generated_at": "2026-05-15T17:13:08.790313Z",
     "truth_scope": "all_events",
     "all_winamax_available": 239,
     "all_winamax_exact": 238,
@@ -1070,7 +1068,7 @@
     "winamax_detail_gap_to_target": 0,
     "winamax_detail_fetch_cap_reco": 90,
     "winamax_detail_status": "ok",
-    "actionable_external_odds": 24,
+    "actionable_external_odds": 0,
     "football_invalid_form": 0,
     "events_with_xg": 91,
     "winamax_coverage": {
@@ -1132,7 +1130,7 @@
   "data_truth": {
     "source_of_truth": "data.js",
     "scope": "all_events",
-    "data_generated_at": "2026-05-15T17:11:00.377555Z",
+    "data_generated_at": "2026-05-15T17:13:08.790313Z",
     "winamax_available": 239,
     "winamax_exact": 238,
     "winamax_exact_ratio": 0.9958,
@@ -1152,7 +1150,7 @@
     "anomalies_emitted": 4
   },
   "source_health": {
-    "generated_at": "2026-05-15T17:12:10Z",
+    "generated_at": "2026-05-15T17:14:15Z",
     "sources_total": 11,
     "sources_ok": 7,
     "sources_warning": 4,
@@ -1252,7 +1250,7 @@
   },
   "observability": {
     "pipeline_traces": {
-      "generated_at": "2026-05-15T17:12:10Z",
+      "generated_at": "2026-05-15T17:14:15Z",
       "runs_observed": 99,
       "by_status": {
         "warning": 67,
@@ -1264,13 +1262,13 @@
           "runs": 99,
           "errors": 1,
           "last_status": "ok",
-          "max_duration_ms": 1442
+          "max_duration_ms": 1395
         }
       }
     }
   },
   "data_lineage": {
-    "generated_at": "2026-05-15T17:12:10Z",
+    "generated_at": "2026-05-15T17:14:15Z",
     "status": "ok",
     "events": 239,
     "events_missing_inline_lineage": 0,
@@ -1278,7 +1276,7 @@
     "source_counts": {
       "espn": 239,
       "winamax": 239,
-      "h2h": 177,
+      "h2h": 201,
       "weather": 162,
       "xg": 92,
       "clubelo": 84,
@@ -1342,6 +1340,7 @@
         "league": "superlig",
         "lineage": [
           "espn",
+          "h2h",
           "weather",
           "winamax"
         ]
@@ -1362,6 +1361,7 @@
         "lineage": [
           "clubelo",
           "espn",
+          "h2h",
           "weather",
           "winamax"
         ]
