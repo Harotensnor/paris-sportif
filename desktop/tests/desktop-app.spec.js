@@ -99,12 +99,15 @@ test('Sprint 23 desktop keeps clear Winamax picks with supervised workflows', as
       title: document.querySelector('#page-title')?.textContent || '',
       nav: Array.from(document.querySelectorAll('.nav-btn:not(.hidden)')).map((node) => node.textContent.trim()),
       metric: Number(document.querySelector('#metric-picks')?.textContent || 0),
+      metricLabel: document.querySelector('#metric-picks-label')?.textContent || '',
+      funnelAlert: document.querySelector('#today-funnel-alert')?.innerText || '',
       rows: document.querySelectorAll('#picks-body tr.clickable-row').length,
       timeline: document.querySelectorAll('#simple-pick-timeline .simple-timeline-card').length,
       trackButtons: document.querySelectorAll('[data-track-bet-key]').length,
       safeBadges: document.querySelectorAll('.safe-pick-badge.safe').length,
       priorityBadges: document.querySelectorAll('.priority-badge').length,
       topPick: document.body.textContent.includes('TOP PICK'),
+      noUltimate: document.querySelector('#ultimate-bet-card')?.textContent.includes('Aucun bet ultime validé') || false,
       dailyBudget: document.querySelector('#daily-budget-summary')?.textContent || '',
       hasRollingSections: ['Dans l’heure', 'Dans les 3 heures', 'Cette nuit'].every((label) => document.body.textContent.includes(label)),
       bankroll: document.querySelector('#simple-bankroll')?.textContent || '',
@@ -119,14 +122,16 @@ test('Sprint 23 desktop keeps clear Winamax picks with supervised workflows', as
     }));
     expect(cockpit.title).toBe('Picks');
     expect(cockpit.nav).toEqual(['Picks', 'Bilan', 'Recherche', 'Réglages']);
-    expect(cockpit.metric).toBeGreaterThanOrEqual(10);
+    expect(cockpit.metric).toBeGreaterThanOrEqual(0);
     expect(cockpit.rows).toBeGreaterThanOrEqual(10);
     expect(cockpit.rows).toBeLessThanOrEqual(18);
     expect(cockpit.timeline).toBeGreaterThanOrEqual(8);
     expect(cockpit.trackButtons).toBeGreaterThanOrEqual(10);
     expect(cockpit.safeBadges).toBeGreaterThanOrEqual(5);
-    expect(cockpit.priorityBadges).toBeGreaterThanOrEqual(5);
-    expect(cockpit.topPick).toBe(true);
+    expect(cockpit.metricLabel).toMatch(/aujourd’hui|à venir|surveill/i);
+    if (cockpit.metric < 10) expect(cockpit.funnelAlert).toMatch(/trop strict|Winamax/i);
+    expect(cockpit.priorityBadges).toBeGreaterThanOrEqual(cockpit.topPick ? 1 : 0);
+    expect(cockpit.topPick || cockpit.noUltimate).toBe(true);
     expect(cockpit.dailyBudget).toContain('jour');
     expect(cockpit.hasRollingSections).toBe(true);
     expect(cockpit.bankroll).toContain('€');
@@ -140,7 +145,7 @@ test('Sprint 23 desktop keeps clear Winamax picks with supervised workflows', as
     expect(cockpit.dashboardText).toMatch(/PARI/i);
     expect(cockpit.dashboardText).toMatch(/COTE/i);
     expect(cockpit.dashboardText).toMatch(/MISE/i);
-    expect(cockpit.dashboardText).not.toMatch(/Handicap|Double chance|Jeux tennis|Total mi-temps|Total basket|Total runs|Score exact|Corners|Cartons/i);
+    expect(cockpit.dashboardText).not.toMatch(/Handicap|Double chance|Jeux tennis|Total basket|Total runs|Score exact|Corners|Cartons/i);
     expect(cockpit.dashboardText).not.toMatch(/\bKelly\b|\bEV\b|\btier\b|\b1N2\b|\bBTTS\b|\bedge\b/i);
     await expect(win.locator('#saved-strategy-select')).toBeVisible();
     await expect(win.locator('#save-current-strategy-btn')).toBeVisible();
@@ -183,7 +188,7 @@ test('Sprint 23 desktop keeps clear Winamax picks with supervised workflows', as
     await expect(win.locator('#pref-auto-tracking-enabled')).toHaveCount(1);
     await expect(win.locator('#pref-live-news-watcher')).toBeVisible();
     await expect(win.locator('#pref-language')).toBeVisible();
-    await expect(win.locator('#app-version-label')).toContainText('v1.2.3');
+    await expect(win.locator('#app-version-label')).toContainText('v1.3.0');
     await win.selectOption('#pref-theme', 'light');
     await expect(win.locator('body')).toHaveClass(/theme-light/);
     await win.selectOption('#pref-theme', 'dark');

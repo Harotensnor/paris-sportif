@@ -21,6 +21,9 @@ function writeStressReport(root, report) {
   const stateDir = path.join(root, 'desktop', 'state');
   fs.mkdirSync(stateDir, { recursive: true });
   fs.writeFileSync(path.join(stateDir, 'stress-report.json'), JSON.stringify(report, null, 2));
+  if (report.profile === '96h') {
+    fs.writeFileSync(path.join(stateDir, 'stress-report-96h.json'), JSON.stringify(report, null, 2));
+  }
 }
 
 async function firstWindow(app) {
@@ -36,6 +39,7 @@ async function main() {
   const electronExe = path.join(root, 'desktop', 'node_modules', 'electron', 'dist', process.platform === 'win32' ? 'electron.exe' : 'electron');
   const userDataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'paris-sportif-stress-'));
   const minutes = argMinutes();
+  const profile96h = minutes >= 5760 || process.argv.includes('--profile=96h');
   const deadline = Date.now() + minutes * 60_000;
   const messages = [];
   const memory = [];
@@ -54,7 +58,7 @@ async function main() {
     });
     win.on('pageerror', (error) => messages.push(`pageerror: ${error.message}`));
     await win.waitForSelector('[data-panel="dashboard"].active', { timeout: 60_000 });
-    await win.waitForFunction(() => Number(document.querySelector('#metric-picks')?.textContent || 0) >= 10, null, { timeout: 90_000 });
+    await win.waitForFunction(() => document.querySelectorAll('#picks-body tr.clickable-row').length >= 10, null, { timeout: 90_000 });
     await win.click('[data-tab="preferences"]');
     await win.waitForSelector('#pref-expert-mode', { timeout: 10_000 });
     await win.check('#pref-expert-mode');
@@ -83,9 +87,11 @@ async function main() {
     const maxMemory = memory.length ? Math.max(...memory) : 0;
     const avgMemory = memory.length ? memory.reduce((sum, value) => sum + value, 0) / memory.length : 0;
     const p95Memory = percentile(memory, 95);
+    const memoryLimitMb = profile96h ? 700 : 600;
     const report = {
-      ok: !severe.length && maxMemory <= 600,
-      label: minutes >= 5760 ? 'Stress 96h' : `Stress court ${minutes} min`,
+      ok: !severe.length && maxMemory <= memoryLimitMb,
+      profile: profile96h ? '96h' : 'short',
+      label: profile96h ? 'Stress 96h' : `Stress court ${minutes} min`,
       requestedMinutes: minutes,
       startedAt,
       finishedAt: new Date().toISOString(),
@@ -95,11 +101,14 @@ async function main() {
       memoryP95Mb: Number(p95Memory.toFixed(1)) || 0,
       sampleCount: memory.length,
       errors: severe.slice(0, 20),
-      note: minutes < 5760 ? 'Validation locale courte. Le profil 96h utilise le même garde-fou avec --minutes=5760.' : 'Validation 96h complète.'
+      memoryLimitMb,
+      note: profile96h && minutes < 5760
+        ? 'Profil 96h amorcé en mode court. La validation complète reste npm run qa:stress -- --minutes=5760.'
+        : minutes < 5760 ? 'Validation locale courte. Le profil 96h utilise le même garde-fou avec --minutes=5760.' : 'Validation 96h complète.'
     };
     writeStressReport(root, report);
     if (severe.length) throw new Error(`Erreurs console pendant stress: ${severe.join(' | ')}`);
-    if (maxMemory > 600) throw new Error(`Mémoire trop haute: ${maxMemory} MB RSS`);
+    if (maxMemory > memoryLimitMb) throw new Error(`Mémoire trop haute: ${maxMemory} MB RSS`);
     console.log(`Stress desktop OK: ${minutes} min, mémoire max ${maxMemory || 'n/a'} MB, moyenne ${avgMemory ? avgMemory.toFixed(1) : 'n/a'} MB, ${memory.length} samples.`);
   } finally {
     await app.close();

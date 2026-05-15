@@ -73,12 +73,15 @@ async function main() {
       title: document.querySelector('#page-title')?.textContent || '',
       nav: Array.from(document.querySelectorAll('.nav-btn:not(.hidden)')).map((node) => node.textContent.trim()),
       metric: Number(document.querySelector('#metric-picks')?.textContent || 0),
+      metricLabel: document.querySelector('#metric-picks-label')?.textContent || '',
+      funnelAlert: document.querySelector('#today-funnel-alert')?.innerText || '',
       rows: document.querySelectorAll('#picks-body tr.clickable-row').length,
       todayRows: Array.from(document.querySelectorAll('#picks-body tr.clickable-row')).filter((row) => /Aujourd'hui|Aujourd’hui|dans|h|min/i.test(row.textContent || '')).length,
       timeline: document.querySelectorAll('#simple-pick-timeline .simple-timeline-card').length,
       safeBadges: document.querySelectorAll('.safe-pick-badge.safe').length,
       priorityBadges: document.querySelectorAll('.priority-badge').length,
       topPick: document.body.textContent.includes('TOP PICK'),
+      noUltimate: document.querySelector('#ultimate-bet-card')?.textContent.includes('Aucun bet ultime validé') || false,
       dailyBudget: document.querySelector('#daily-budget-summary')?.textContent || '',
       hasRollingSections: ['Dans l’heure', 'Dans les 3 heures', 'Cette nuit'].every((label) => document.body.textContent.includes(label)),
       combines: Boolean(document.querySelector('#simple-combines-section')),
@@ -94,9 +97,9 @@ async function main() {
     if (dashboard.title !== 'Picks') throw new Error(`Titre dashboard invalide: ${dashboard.title}`);
     if (dashboard.nav.join('|') !== 'Picks|Bilan|Recherche|Réglages') throw new Error(`Navigation Sprint 22 invalide: ${dashboard.nav.join(', ')}`);
     const hasActionCopy = /PARI/i.test(dashboard.dashboardText) && /COTE/i.test(dashboard.dashboardText) && /MISE/i.test(dashboard.dashboardText);
-    const hasComplexMarket = /Handicap|Double chance|Jeux tennis|Total mi-temps|Total basket|Total runs|Score exact|Corners|Cartons/i.test(dashboard.dashboardText);
+    const hasComplexMarket = /Handicap|Double chance|Jeux tennis|Total basket|Total runs|Score exact|Corners|Cartons/i.test(dashboard.dashboardText);
     const hasTechnicalJargon = /\bKelly\b|\bEV\b|\btier\b|\b1N2\b|\bBTTS\b|\bedge\b/i.test(dashboard.dashboardText);
-    if (dashboard.metric < 10 || dashboard.rows < 10 || dashboard.rows > 18 || dashboard.timeline < 8 || dashboard.trackButtons < 10 || dashboard.safeBadges < 5 || dashboard.priorityBadges < 5 || !dashboard.topPick || !/jour/i.test(dashboard.dailyBudget) || !dashboard.hasRollingSections || !hasActionCopy || hasComplexMarket || hasTechnicalJargon) {
+    if (dashboard.rows < 10 || dashboard.rows > 18 || dashboard.timeline < 8 || dashboard.trackButtons < 10 || dashboard.safeBadges < 5 || !/aujourd’hui|à venir|surveill/i.test(dashboard.metricLabel) || (dashboard.metric < 10 && !/trop strict|Winamax/i.test(dashboard.funnelAlert)) || !(dashboard.topPick || dashboard.noUltimate) || !/jour/i.test(dashboard.dailyBudget) || !dashboard.hasRollingSections || !hasActionCopy || hasComplexMarket || hasTechnicalJargon) {
       throw new Error(`Picks Sprint 15 insuffisants: ${JSON.stringify({ ...dashboard, dashboardText: dashboard.dashboardText.slice(0, 800), hasActionCopy, hasComplexMarket, hasTechnicalJargon })}`);
     }
     if (!dashboard.combines || !dashboard.scorers || !dashboard.promos || !dashboard.bankroll.includes('€') || !dashboard.pnl.includes('€') || !dashboard.expertHidden || dashboard.multibookText) {

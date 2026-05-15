@@ -8,6 +8,7 @@ from datetime import date, datetime, timedelta
 import concurrent.futures
 import os
 import time
+import tempfile
 from pathlib import Path
 
 DATA_JS = str(Path(__file__).resolve().parent.parent / 'data.js')
@@ -602,10 +603,13 @@ def main():
     result['standings'] = fetch_standings()
     print(f'  -> {len(result["standings"])} leagues', flush=True)
 
-    with open(DATA_JS, 'w', encoding='utf-8') as f:
+    data_path = Path(DATA_JS)
+    fd, tmp_name = tempfile.mkstemp(prefix=f'.{data_path.name}.', suffix='.tmp', dir=str(data_path.parent))
+    with os.fdopen(fd, 'w', encoding='utf-8') as f:
         f.write('window.PRONOSTICS_DATA = ')
         json.dump(result, f, ensure_ascii=False, separators=(',', ':'))
         f.write(';\n')
+    os.replace(tmp_name, DATA_JS)
 
     total = sum(len(v) for v in result['days'].values())
     size = os.path.getsize(DATA_JS)

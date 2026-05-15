@@ -148,6 +148,7 @@ async function main() {
         rows: rows.length,
         timeline: document.querySelectorAll('#simple-pick-timeline .simple-timeline-card').length,
         trackButtons: trackButtons.length,
+        alertText: document.querySelector('#today-funnel-alert')?.innerText || '',
         dashboardText: text,
         liveText: document.querySelector('#live-cockpit')?.innerText || '',
         sideStatus: document.querySelector('#side-status')?.innerText || '',
@@ -159,14 +160,18 @@ async function main() {
     });
     assert(dom.title === 'Picks', 'Terrain: la vue Picks ne s’ouvre pas par défaut', dom);
     assert(dom.nav.join('|') === 'Picks|Bilan|Recherche|Réglages', 'Terrain: navigation standard non simplifiée', dom.nav);
-    assert(dom.metric >= 10 && dom.rows >= 10 && dom.rows <= 18 && dom.timeline >= 8, 'Terrain: cockpit réel insuffisant', dom);
+    assert(dom.rows >= 10 && dom.rows <= 18 && dom.timeline >= 8, 'Terrain: cockpit réel insuffisant', dom);
+    if (Number(todayFunnel.bookableEvents || 0) >= 30 && Number(todayFunnel.displayed || 0) < 10) {
+      assert(/trop strict|modèle trop strict/i.test(dom.alertText), 'Terrain: le garde-fou trop strict n’est pas visible', { todayFunnel, alertText: dom.alertText });
+    }
     assert(dom.hasActionCopy, 'Terrain: format PARI/COTE/MISE absent', dom);
     assert(!/STATUS_SCHEDULED|LIVE estimé|live estimé/i.test(dom.liveText), 'Terrain: faux live détecté sur statut programmé', dom.liveText);
     assert(!dom.hasStartedButton, 'Terrain: bouton actionnable pour match déjà commencé', dom);
     assert(!dom.hiddenAdvancedVisible, 'Terrain: Avancé visible sans Mode expert', dom);
 
-    if (dom.trackButtons > 0) {
-      await win.locator('[data-track-bet-key]').first().click();
+    const visibleTrackButtons = win.locator('[data-track-bet-key]:visible');
+    if (await visibleTrackButtons.count()) {
+      await visibleTrackButtons.first().click();
       await win.waitForFunction(() => /Pari ajouté au suivi|Pari déjà suivi/.test(document.querySelector('#side-status')?.innerText || ''), null, { timeout: 5000 });
     }
 

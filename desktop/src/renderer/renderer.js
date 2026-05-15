@@ -1522,6 +1522,18 @@
     );
   }
 
+  function isTodayPick(row) {
+    return pickDayKey(row) === parisDayKey();
+  }
+
+  function todayReadyRows(rows = state.picks) {
+    return (Array.isArray(rows) ? rows : []).filter((row) => pickHasCoreData(row) && isTodayPick(row) && canDisplayStake(row));
+  }
+
+  function todayWatchRows(rows = state.picks) {
+    return (Array.isArray(rows) ? rows : []).filter((row) => pickHasCoreData(row) && isTodayPick(row) && canDisplayPickCard(row) && !canDisplayStake(row));
+  }
+
   function renderMorningDashboard() {
     const title = $('#morning-title');
     const subtitle = $('#morning-subtitle');
@@ -1529,9 +1541,12 @@
     const strip = $('#imminent-strip');
     if (!grid) return;
     const rows = (state.picks || []).filter((row) => pickHasCoreData(row) && canDisplayStake(row));
+    const readyToday = todayReadyRows(state.picks);
+    const watchToday = todayWatchRows(state.picks);
+    const todayVisible = [...readyToday, ...watchToday];
     const bigRows = rows.filter((row) => displayEdgeValue(row) >= 0.10);
     const ultimate = ultimateBetCandidate(rows);
-    const nextPick = rows
+    const nextPick = (todayVisible.length ? todayVisible : rows)
       .filter((row) => Number.isFinite(Date.parse(row.start || '')))
       .sort((a, b) => Date.parse(a.start || '') - Date.parse(b.start || ''))[0] || rows[0] || null;
     const stats = userBetStats();
@@ -1543,11 +1558,15 @@
         ? `CLV marché ${Number(state.clvSummary.summary.mean_clv_pct).toFixed(2)}%`
         : 'CLV en apprentissage';
     if (title) {
-      title.textContent = rows.length
-        ? ultimate
-          ? `Bet ultime : ${ultimate.title}`
-          : `Bonjour, ${formatCount(rows.length)} paris simples prêts`
-        : 'Bonjour, aucun pari prêt pour l’instant';
+      title.textContent = readyToday.length
+        ? `Aujourd’hui : ${formatCount(readyToday.length)} pari(s) prêt(s)`
+        : watchToday.length
+          ? `Aujourd’hui : ${formatCount(watchToday.length)} opportunité(s) à surveiller`
+          : ultimate
+            ? `Bet ultime : ${ultimate.title}`
+            : rows.length
+              ? `${formatCount(rows.length)} pari(s) prêt(s) à venir`
+              : 'Bonjour, aucun pari prêt pour l’instant';
     }
     if (subtitle) {
       subtitle.textContent = ultimate
@@ -1557,7 +1576,7 @@
         : 'Le cockpit reste utile : surveille les données, prépare les combinés ou relance un refresh.';
     }
     grid.innerHTML = [
-      ['Paris prêts', formatCount(rows.length), `${formatCount(bigRows.length)} très bons signaux · ${formatCount(state.allPicks.length || 0)} analysés`],
+      [readyToday.length ? 'Prêts aujourd’hui' : 'Aujourd’hui', readyToday.length ? formatCount(readyToday.length) : formatCount(watchToday.length), readyToday.length ? `${formatCount(bigRows.length)} très bons signaux · ${formatCount(state.allPicks.length || 0)} analysés` : `${formatCount(rows.length)} prêts à venir · ${formatCount(state.allPicks.length || 0)} analysés`],
       ['Prochain match', nextPick ? countdownLabel(nextPick.start) : '-', nextPick ? `${nextPick.title} · ${userBetLabel(nextPick)}` : 'Aucun départ proche'],
       ['Performance hier', formatMoney(stats.pnlYesterday), `${formatCount(stats.wonYesterday)}W / ${formatCount(stats.lostYesterday)}L · 7j ${formatMoney(stats.last7Pnl)}`],
       ['Bankroll', formatMoney(bankroll), `${discipline.label} · ${clvText}`]
@@ -2285,7 +2304,8 @@
   }
 
   function priorityBadgeHtml(row) {
-    const rank = Number(row?.priorityRank || 0);
+    if (!canDisplayStake(row)) return '';
+    const rank = Number(allocationForRow(row)?.rank || row?.priorityRank || 0);
     if (!(rank > 0) || rank > 5) return '';
     const label = rank === 1 ? '🏆 TOP PICK' : `#${rank}`;
     const reason = row?.priority?.reason || `Priorité ${priorityValue(row).toFixed(1)}/100`;
@@ -2303,7 +2323,8 @@
   }
 
   function isSurePickCandidate(row) {
-    return Boolean(row?.safeAssessment?.reliable)
+    return canDisplayStake(row)
+      && Boolean(row?.safeAssessment?.reliable)
       && displayEdgeValue(row) >= 0.12
       && safeConfidenceValue(row) >= 0.70
       && segmentRoiValue(row) >= 0
@@ -3055,9 +3076,9 @@
     const stake = visibleStakeText(row);
     return `
       <div class="action-pick ${compact ? 'compact' : ''}">
-        <div><span>PARI</span><strong>${escapeHtml(userBetLabel(row))}</strong></div>
-        <div><span>COTE</span><strong>${escapeHtml(formatOdd(row?.odd || 0))} Winamax</strong></div>
-        <div><span>MISE</span><strong>${escapeHtml(stake)}</strong></div>
+        <div><span>PARI :</span><strong>${escapeHtml(userBetLabel(row))}</strong></div>
+        <div><span>COTE :</span><strong>${escapeHtml(formatOdd(row?.odd || 0))} Winamax</strong></div>
+        <div><span>MISE :</span><strong>${escapeHtml(stake)}</strong></div>
         ${compact ? '' : `<p>${escapeHtml(simpleWhyText(row))}</p>`}
       </div>
     `;
@@ -3671,6 +3692,12 @@
     });
     rows.sort((a, b) => {
       if (filters.sort === 'priority') {
+        const todayKey = parisDayKey();
+        const todayReadyCount = rows.filter((row) => pickDayKey(row) === todayKey && canDisplayStake(row)).length;
+        if (!todayReadyCount) {
+          const todayDelta = Number(pickDayKey(b) === todayKey) - Number(pickDayKey(a) === todayKey);
+          if (todayDelta) return todayDelta;
+        }
         const readyDelta = Number(Boolean(canDisplayStake(b))) - Number(Boolean(canDisplayStake(a)));
         if (readyDelta) return readyDelta;
         return priorityValue(b) - priorityValue(a) || displayEdgeValue(b) - displayEdgeValue(a) || new Date(a.start || 0) - new Date(b.start || 0);
@@ -4021,7 +4048,7 @@
     return `<button type="button" class="track-bet-btn${isTracked ? ' tracked' : ''}" data-track-bet-key="${escapeHtml(trackKey)}">${isTracked ? 'Suivi' : escapeHtml(label)}</button>`;
   }
 
-  function winamaxOpenButtonHtml(row, label = 'Winamax') {
+  function winamaxOpenButtonHtml(row, label = 'Ouvrir Winamax') {
     const url = safeExternalUrl(row?.winamaxUrl || row?.match?.winamax?.url, 'www.winamax.fr');
     if (!url) return '';
     return `<a class="ghost-btn winamax-open-btn" href="${escapeHtml(url)}" target="_blank" rel="noreferrer">${escapeHtml(label)}</a>`;
@@ -4753,12 +4780,13 @@
       const displayed = Number(today.displayed || 0);
       const ready = Number(today.ready || 0);
       const bookable = Number(today.bookableEvents || today.bookable || 0);
-      if (bookable > 0 && displayed < 5) {
+      const tooStrictForDailyTarget = bookable >= 30 && displayed < 10;
+      if ((bookable > 0 && displayed < 5) || tooStrictForDailyTarget) {
         const simpleReady = Number(today.simpleReady || 0);
         const advancedReady = Number(today.advancedReady || 0);
         node.className = 'today-funnel-alert danger';
         node.innerHTML = `
-          <strong>${displayed ? `${formatCount(displayed)} pari(s) aujourd'hui seulement` : 'Aucun pari simple aujourd’hui visible'}</strong>
+          <strong>${tooStrictForDailyTarget ? 'Modèle trop strict aujourd’hui' : displayed ? `${formatCount(displayed)} pari(s) aujourd'hui seulement` : 'Aucun pari simple aujourd’hui visible'}</strong>
           <span>Aujourd’hui : ${formatCount(today.totalEvents || today.events || 0)} matchs → ${formatCount(bookable)} Winamax → ${formatCount(today.predictableMatches || today.predictable || 0)} analysables → ${formatCount(today.simplePassingFilters || 0)} simples positifs → ${formatCount(simpleReady)} simples prêts. ${advancedReady ? `${formatCount(advancedReady)} prêts avancés restent cachés en mode standard.` : ''}</span>
           <button class="ghost-btn" type="button" data-tab-target="data">Diagnostic auto</button>
         `;
@@ -4981,18 +5009,33 @@
     const total = state.allPicks.length || state.picks.length || 0;
     const meta = state.dashboardMeta || {};
     const ready = Number(meta.readyPicks ?? state.decisionCenter?.summary?.ready ?? 0);
-    if (metricLabel) metricLabel.textContent = ready > 0 ? 'Paris prêts' : 'Candidats surveillés';
-    $('#metric-picks').textContent = String(ready > 0 ? ready : (meta.todayPicks || state.picks.length || 0));
+    const today = state.todayFunnel?.today || state.status?.analysis?.todayFunnel?.today || {};
+    const todayReady = Number(today.ready || meta.todayReady || 0);
+    const todayDisplayed = Number(today.displayed || 0);
+    if (metricLabel) {
+      metricLabel.textContent = todayReady > 0
+        ? 'Paris prêts aujourd’hui'
+        : todayDisplayed > 0
+          ? 'À surveiller aujourd’hui'
+          : ready > 0
+            ? 'Paris prêts à venir'
+            : 'Candidats surveillés';
+    }
+    $('#metric-picks').textContent = String(todayReady > 0 ? todayReady : todayDisplayed > 0 ? todayDisplayed : ready > 0 ? ready : (meta.todayPicks || state.picks.length || 0));
     const globalBlocked = Boolean(state.decisionCenter?.summary?.blocked);
     const caption = pickFiltersActive(filters)
       ? `${formatCount(displayRows.length)} pari(s) filtré(s) sur ${formatCount(total)} lignes prêtes.`
-      : ready > 0
-        ? `${formatCount(ready)} pari(s) prêt(s), ${formatCount(meta.rolling24Displayed || displayRows.length)} sur 24h glissantes.`
-        : meta.mode === 'bestAvailable'
-          ? 'Aucun pari prêt dans la fenêtre courte : affichage des meilleurs candidats à surveiller.'
-          : 'Aucun pari à jouer maintenant : candidats surveillés sans mise.';
+      : todayReady > 0
+        ? `${formatCount(todayReady)} pari(s) prêt(s) aujourd’hui, ${formatCount(meta.rolling24Displayed || displayRows.length)} sur 24h glissantes.`
+        : todayDisplayed > 0
+          ? `${formatCount(todayDisplayed)} opportunité(s) aujourd’hui à surveiller, ${formatCount(ready)} pari(s) prêt(s) à venir.`
+          : ready > 0
+            ? `${formatCount(ready)} pari(s) prêt(s), ${formatCount(meta.rolling24Displayed || displayRows.length)} sur 24h glissantes.`
+            : meta.mode === 'bestAvailable'
+              ? 'Aucun pari prêt dans la fenêtre courte : affichage des meilleurs candidats à surveiller.'
+              : 'Aucun pari à jouer maintenant : candidats surveillés sans mise.';
     const sectionTitle = $('#picks-section-title');
-    if (sectionTitle) sectionTitle.textContent = ready > 0 ? 'À jouer maintenant' : 'Sélection surveillée';
+    if (sectionTitle) sectionTitle.textContent = todayReady > 0 ? 'À jouer aujourd’hui' : todayDisplayed > 0 ? 'Aujourd’hui à surveiller' : ready > 0 ? 'À venir' : 'Sélection surveillée';
     $('#picks-caption').textContent = caption;
     $('#metric-picks-sub').textContent = total > state.picks.length
       ? `${state.picks.length} affichés · ${total} paris analysés au total`
@@ -5009,7 +5052,7 @@
       const decision = pick.decisionCenter || {};
       const statusText = decision.canBet ? 'Prêt' : decision.status === 'repair' ? 'À réparer' : decision.status === 'skip' ? 'À éviter' : 'À surveiller';
       const action = trackButtonHtml(pick, `Je mise ${visibleStakeText(pick)}`);
-      const winamaxAction = winamaxOpenButtonHtml(pick, 'Winamax');
+      const winamaxAction = winamaxOpenButtonHtml(pick, 'Ouvrir Winamax');
       return `
         <tr class="clickable-row" data-match-id="${escapeHtml(pick.id)}" tabindex="0" role="button" aria-label="Ouvrir ${escapeHtml(pick.title)}">
           <td data-label="Match">
@@ -8680,21 +8723,31 @@
 
   function buildDailySuggestion(rows = sortedPriorityRows()) {
     const day = parisDayKey();
+    const readyRows = (Array.isArray(rows) ? rows : []).filter((row) => pickHasCoreData(row) && canDisplayStake(row));
+    const readyToday = readyRows.filter(isTodayPick);
+    const watchToday = todayWatchRows(rows);
+    const cacheSignature = `${readyToday.length}:${watchToday.length}:${readyRows[0] ? userBetKey(readyRows[0]) : ''}`;
     const cached = readStorageJson(DAILY_SUGGESTION_KEY, null);
-    if (cached?.day === day && Date.now() - Number(cached.cachedAt || 0) < 60 * 60 * 1000) return cached;
-    const ultimate = aiSelectedUltimate(rows) || ultimateBetCandidate(rows) || rows[0] || null;
+    if (cached?.day === day && cached?.signature === cacheSignature && Date.now() - Number(cached.cachedAt || 0) < 60 * 60 * 1000) return cached;
+    const ultimate = aiSelectedUltimate(readyRows) || ultimateBetCandidate(readyRows) || readyRows[0] || null;
     const modelVsUser = modelVsUserReport();
     const regression = regressionWarningText();
-    const trendText = strongTrendBriefText(rows);
-    const text = trendText || regression || (ultimate
-      ? `Commence par ${userBetLabel(ultimate)} sur ${ultimate.title} : cote ${formatOdd(ultimate.odd)}, mise ${visibleStakeText(ultimate)}.`
-      : 'Pas de pick ultime aujourd’hui : vise seulement le top 3 fiable, pas de pari forcé.');
+    const trendText = strongTrendBriefText(readyRows);
+    const todayPick = readyToday[0] || null;
+    const text = trendText || regression || (todayPick
+      ? `Commence par ${userBetLabel(todayPick)} sur ${todayPick.title} : cote ${formatOdd(todayPick.odd)}, mise ${visibleStakeText(todayPick)}.`
+      : ultimate
+        ? `Aucun pari prêt aujourd’hui. Le prochain prêt est ${userBetLabel(ultimate)} sur ${ultimate.title}, mise ${visibleStakeText(ultimate)}.`
+        : watchToday.length
+          ? `${formatCount(watchToday.length)} opportunité(s) aujourd’hui restent à surveiller, mais aucune mise n’est validée.`
+          : 'Pas de pick ultime aujourd’hui : pas de pari forcé.');
     const follow = modelVsUser.utilization != null && modelVsUser.utilization < 0.30 && modelVsUser.missedPnl > 0
       ? ` Modèle 30j ${formatMoney(modelVsUser.model.pnl)} vs toi ${formatMoney(modelVsUser.pnl)}.`
       : '';
     const suggestion = {
       day,
       cachedAt: Date.now(),
+      signature: cacheSignature,
       text: `${text}${follow}`.slice(0, 220),
       pickKey: ultimate ? userBetKey(ultimate) : ''
     };
@@ -13354,6 +13407,22 @@
     });
     $('#run-compare-btn')?.addEventListener('click', renderSearchComparison);
     $('#pref-language')?.addEventListener('change', (event) => applyI18n(event.target.value || 'fr'));
+    $('#pref-expert-mode')?.addEventListener('change', (event) => {
+      const prefs = { ...loadPreferences(), expertMode: Boolean(event.target.checked) };
+      savePreferences(prefs);
+      applyExpertMode();
+      renderPreferences();
+      renderPicks();
+      setSideStatus(prefs.expertMode ? 'Mode expert actif' : 'Mode expert masqué', 'ok');
+    });
+    $('#pref-trading-desk')?.addEventListener('change', (event) => {
+      const prefs = { ...loadPreferences(), tradingDesk: Boolean(event.target.checked), expertMode: loadPreferences().expertMode || Boolean(event.target.checked) };
+      savePreferences(prefs);
+      applyExpertMode();
+      renderPreferences();
+      renderPicks();
+      setSideStatus(prefs.tradingDesk ? 'Trading Desk actif' : 'Trading Desk désactivé', 'ok');
+    });
     $('#run-auto-tracking-btn')?.addEventListener('click', () => {
       applyPreferences(collectPreferencesFromForm());
       runAutoTracking({ manual: true });

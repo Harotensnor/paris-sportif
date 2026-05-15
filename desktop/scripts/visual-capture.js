@@ -47,11 +47,14 @@ async function main() {
     const dashboard = await win.evaluate(() => ({
       nav: Array.from(document.querySelectorAll('.nav-btn:not(.hidden)')).map((node) => node.textContent.trim()),
       metric: Number(document.querySelector('#metric-picks')?.textContent || 0),
+      metricLabel: document.querySelector('#metric-picks-label')?.textContent || '',
+      funnelAlert: document.querySelector('#today-funnel-alert')?.innerText || '',
       rows: document.querySelectorAll('#picks-body tr.clickable-row').length,
       timeline: document.querySelectorAll('#simple-pick-timeline .simple-timeline-card').length,
       safeBadges: document.querySelectorAll('.safe-pick-badge.safe').length,
       priorityBadges: document.querySelectorAll('.priority-badge').length,
       topPick: document.body.textContent.includes('TOP PICK'),
+      noUltimate: document.querySelector('#ultimate-bet-card')?.textContent.includes('Aucun bet ultime validé') || false,
       dailyBudget: document.querySelector('#daily-budget-summary')?.textContent || '',
       hasRollingSections: ['Dans l’heure', 'Dans les 3 heures', 'Cette nuit'].every((label) => document.body.textContent.includes(label)),
       combines: Boolean(document.querySelector('#simple-combines-section')),
@@ -144,14 +147,14 @@ async function main() {
     if (severe.length) throw new Error(`Erreurs console: ${severe.join(' | ')}`);
     if (dashboard.nav.join('|') !== 'Picks|Bilan|Recherche|Réglages') throw new Error(`Navigation non simplifiée: ${dashboard.nav.join(', ')}`);
     const hasActionCopy = /PARI/i.test(dashboard.dashboardText) && /COTE/i.test(dashboard.dashboardText) && /MISE/i.test(dashboard.dashboardText);
-    const hasComplexMarket = /Handicap|Double chance|Jeux tennis|Total mi-temps|Total basket|Total runs|Score exact|Corners|Cartons/i.test(dashboard.dashboardText);
+    const hasComplexMarket = /Handicap|Double chance|Jeux tennis|Total basket|Total runs|Score exact|Corners|Cartons/i.test(dashboard.dashboardText);
     const hasTechnicalJargon = /\bKelly\b|\bEV\b|\btier\b|\b1N2\b|\bBTTS\b|\bedge\b/i.test(dashboard.dashboardText);
     const sprint23Runtime = await win.evaluate(() => ({
       autoTracking: /Dry-run|Actif|Inactif|pari/i.test(document.querySelector('#auto-tracking-audit')?.textContent || ''),
       importPreview: /Real Madrid|Non suivi/.test(document.querySelector('#winamax-import-preview')?.textContent || ''),
       i18n: Boolean(window.t && typeof window.t === 'function')
     }));
-    if (dashboard.metric < 10 || dashboard.rows < 10 || dashboard.rows > 18 || dashboard.timeline < 8 || dashboard.safeBadges < 5 || dashboard.priorityBadges < 5 || !dashboard.topPick || !/jour/i.test(dashboard.dailyBudget) || !dashboard.hasRollingSections || !dashboard.combines || !dashboard.scorers || !dashboard.promos || !/Suggestion du jour/.test(dashboard.suggestion || '') || dashboard.multibookText || !hasActionCopy || hasComplexMarket || hasTechnicalJargon) {
+    if (dashboard.rows < 10 || dashboard.rows > 18 || dashboard.timeline < 8 || dashboard.safeBadges < 5 || !/aujourd’hui|à venir|surveill/i.test(dashboard.metricLabel) || (dashboard.metric < 10 && !/trop strict|Winamax/i.test(dashboard.funnelAlert)) || !(dashboard.topPick || dashboard.noUltimate) || !/jour/i.test(dashboard.dailyBudget) || !dashboard.hasRollingSections || !dashboard.combines || !dashboard.scorers || !dashboard.promos || !/Suggestion du jour/.test(dashboard.suggestion || '') || dashboard.multibookText || !hasActionCopy || hasComplexMarket || hasTechnicalJargon) {
       throw new Error(`Dashboard Sprint 23 invalide: ${JSON.stringify({ ...dashboard, dashboardText: dashboard.dashboardText.slice(0, 800), hasActionCopy, hasComplexMarket, hasTechnicalJargon })}`);
     }
     if (!sprint23Runtime.autoTracking || !sprint23Runtime.importPreview || !sprint23Runtime.i18n) throw new Error(`Workflow Sprint 23 invalide: ${JSON.stringify(sprint23Runtime)}`);

@@ -5,6 +5,28 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 27 — Audit marchés/sports + stabilité + v1.3.0
+
+- Version desktop portée à `v1.3.0` après test terrain obligatoire sur pipeline réelle et app ouverte. La release stabilise le diagnostic volume plutôt que de fabriquer des paris quand les signaux simples du jour ne le permettent pas.
+- Terrain Sprint 27 : `refresh_once.py --full` terminé avec `health.json generated_at=2026-05-15T13:02:08Z` et `data.js generated_at=2026-05-15T13:02:11Z`. Le snapshot réel contient 276 événements Winamax, 30 événements aujourd'hui, 18 analysables par le moteur, 7 signaux simples positifs, 6 opportunités standard affichées aujourd'hui, 0 pari simple prêt aujourd'hui et 12 paris prêts à venir.
+- Bugs terrain trouvés et corrigés :
+  1. Majeur : les cartes n'affichaient pas littéralement le format promis `PARI : / COTE : / MISE :`. Les libellés sont maintenant uniformes partout dans la vue standard.
+  2. Majeur : le bouton de table disait `Winamax` au lieu de l'action claire `Ouvrir Winamax`. Tous les liens actionnables utilisent maintenant le même vocabulaire.
+  3. Critique UX : le bandeau disait `12 paris simples prêts` alors qu'il s'agissait de paris futurs, pas de paris aujourd'hui. Le cockpit distingue maintenant `prêts aujourd'hui`, `à surveiller aujourd'hui` et `prêts à venir`.
+  4. Majeur : quand aucun pari prêt n'existait aujourd'hui, le tri remontait les futurs paris prêts devant les opportunités du jour, ce qui recréait la sensation "rien aujourd'hui". Les lignes du jour restent prioritaires pour expliquer la réalité du jour.
+  5. Majeur : le toggle Mode expert ne s'appliquait pas instantanément si l'utilisateur ne sauvegardait pas les réglages. Mode expert et Trading Desk se propagent maintenant dès le clic.
+  6. Majeur : la suggestion du jour pouvait recommander une mise à `0 €` sur une opportunité `À surveiller`. Elle ne recommande plus que les paris réellement misables et explique l'absence de pari prêt si nécessaire.
+  7. Majeur : un badge `TOP PICK` pouvait apparaître sur une ligne non misable. Les badges priorité et `Sure pick` exigent maintenant un pari avec mise affichable.
+  8. Majeur QA : les scripts terrain/smoke/visual/multi-jours validaient un compteur global trompeur au lieu de la réalité du jour. Ils acceptent désormais moins de 10 paris aujourd'hui uniquement si l'alerte `Modèle trop strict aujourd'hui` et le funnel réel sont visibles.
+  9. Mineur pipeline : `fetch_v3.py` pouvait échouer sur Windows pendant l'écriture de `data.js`. L'écriture est maintenant atomique via fichier temporaire puis remplacement.
+- Audit Winamax Sprint 27 : catalogue réel de 830 matchs et 19 sports, 15 familles de marchés détectées, 12 exploitées par le moteur standard/expert, famille standard dormante `players`, familles expert dormantes `exactscore` et `cards`. Aucun boost/promo structuré détecté dans le snapshot du jour.
+- Audit sports Sprint 27 : football majoritaire dans les 30 événements bookables du jour ; tennis présent mais ses meilleurs signaux du jour tombent sur `Jeux tennis`, marché volontairement masqué en standard à la demande utilisateur. Aucun autre sport n'avait plus de 10 événements bookables aujourd'hui dans le snapshot terrain.
+- Push volume : l'objectif `12+ aujourd'hui` n'est pas activé artificiellement sur ce snapshot, car il n'existe que 7 signaux simples positifs et 0 signal simple prêt conforme aux garde-fous. L'app affiche donc 6 opportunités `À surveiller`, 12 paris prêts à venir et une bannière `Modèle trop strict aujourd'hui` avec le funnel complet et l'action diagnostic.
+- Nouveau script `qa:winamax-audit` : produit `desktop/state/winamax-audit-sprint27.json` avec familles de marchés, sports disponibles, conversions par sport, dormants standard/expert, boosts/promos et volume cockpit.
+- Captures terrain Sprint 27 : `captures/desktop-sprint27-after-picks.png`, `desktop-sprint27-after-reglages-expert.png`, `desktop-sprint27-after-avance.png`, `desktop-sprint27-after-bilan.png` et `desktop-sprint27-after-recherche.png` documentent le cockpit corrigé, le Mode expert instantané, l'audit Winamax et les vues principales.
+- Validation Sprint 27 : `qa:engine`, `qa:winamax-audit`, `qa:terrain -- --skip-refresh`, `npm test`, Playwright Electron, `qa:visual`, `qa:a11y`, multi-jours J+3 et stress profil 96h court passent. Le profil 96h écrit `desktop/state/stress-report-96h.json` avec seuil mémoire 700 MB ; le stress court a mesuré 429,5 MB max, et une vraie session murale de 96h reste un run de durée réelle à laisser tourner hors sprint.
+- Build Windows v1.3.0 validé : `desktop/dist-sprint27/Paris Sportif Desktop Setup 1.3.0.exe` généré à 104,1 MB, et smoke du binaire packagé validé avec version `v1.3.0`, 18 lignes cockpit, métrique `6 À surveiller aujourd'hui` et 0 erreur console fatale.
+
 ### Sprint 26 — Push volume + terrain hardening
 
 - Version desktop portée à `v1.2.3` après test terrain obligatoire sur pipeline réelle, app ouverte, clic de mise, console et build packagé.

@@ -1,6 +1,6 @@
 {
   "name": "paris-sportif-desktop",
-  "version": "1.2.3",
+  "version": "1.3.0",
   "private": true,
   "description": "Application PC locale pour Paris-Sportif.",
   "author": "Paris-Sportif",
@@ -8,7 +8,8 @@
   "scripts": {
     "start": "electron .",
     "refresh": "python bin/refresh_once.py",
-    "dist": "electron-builder --win nsis --x64"
+    "dist": "electron-builder --win nsis --x64",
+    "qa:winamax-audit": "node scripts/winamax-audit.js"
   },
   "build": {
     "appId": "fr.parissportif.desktop",

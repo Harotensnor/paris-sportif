@@ -2708,11 +2708,14 @@ function createLegacyEngineService({ projectRoot }) {
       };
     };
     const todaySummary = summarize(today);
+    const sprint27TooStrict = todaySummary.bookableEvents >= 30 && todaySummary.displayed < 10;
     return {
       schema: 'paris-sportif.today_funnel.v1',
       generatedAt: new Date().toISOString(),
-      status: todaySummary.displayed >= 5 ? 'ok' : todaySummary.displayed > 0 ? 'warn' : 'danger',
-      message: todaySummary.displayed >= 5
+      status: sprint27TooStrict ? 'warn' : todaySummary.displayed >= 5 ? 'ok' : todaySummary.displayed > 0 ? 'warn' : 'danger',
+      message: sprint27TooStrict
+        ? `${todaySummary.displayed} picks visibles : modèle trop strict pour ${todaySummary.bookableEvents} events Winamax`
+        : todaySummary.displayed >= 5
         ? `${todaySummary.displayed} picks Winamax visibles aujourd'hui`
         : todaySummary.displayed > 0
           ? `${todaySummary.displayed} pick(s) aujourd'hui seulement`

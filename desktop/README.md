@@ -8,13 +8,13 @@ Paris Sportif Desktop est le logiciel PC local pour préparer tes paris Winamax.
 
 ### Version installateur Windows
 
-La version v1.2.3 se génère avec :
+La version v1.3.0 se génère avec :
 
 ```powershell
 npm --prefix desktop run dist
 ```
 
-Le fichier attendu est `Paris Sportif Desktop Setup 1.2.3.exe`. Le build packagé embarque les données, rapports modèle et scripts nécessaires au démarrage. Python reste recommandé si tu veux relancer une pipeline complète depuis la machine installée.
+Le fichier attendu est `Paris Sportif Desktop Setup 1.3.0.exe`. Le build packagé embarque les données, rapports modèle et scripts nécessaires au démarrage. Python reste recommandé si tu veux relancer une pipeline complète depuis la machine installée.
 
 ### Version développeur
 
@@ -45,6 +45,8 @@ Ouvre l'app et lis d'abord le haut de la vue `Picks`.
 - Clique `Je mise` pour suivre le pari localement.
 - Clique `Ouvrir Winamax` pour aller sur la page du match.
 - Ajoute tes équipes ou joueurs favoris dans `Réglages > Favoris` pour ne pas rater leurs picks, même quand ils ne sont pas dans le top du jour.
+
+Si le modèle trouve trop peu de paris simples aujourd'hui alors que Winamax propose beaucoup de matchs, l'app affiche `Modèle trop strict aujourd'hui` avec le funnel complet. C'est volontaire : elle préfère dire clairement qu'elle manque de signaux fiables plutôt que de remplir l'écran avec des paris faibles ou des marchés complexes.
 
 L'app ne place pas de pari automatiquement. Elle prépare le ticket et suit ton résultat.
 
@@ -161,6 +163,14 @@ L'app se rafraîchit en arrière-plan. Si les données sont anciennes ou qu'un r
 
 En Mode expert, la vue `Avancé` montre la pipeline, les logs et les diagnostics.
 
+Le diagnostic Winamax détaillé se lance aussi avec :
+
+```powershell
+npm --prefix desktop run qa:winamax-audit
+```
+
+Il indique les sports disponibles, familles de marchés exploitées, marchés dormants, boosts/promos détectés et conversion du jour.
+
 ## Modèle Et Tendances
 
 Le Mode expert affiche l'audit réalité modèle sur 60 jours :
@@ -192,6 +202,8 @@ npm --prefix desktop run dist
 ```
 
 La sortie est écrite dans `desktop/dist/`. Le build embarque l'application Electron, les scripts locaux et les derniers fichiers de données disponibles. Python doit être disponible sur la machine si tu veux relancer la pipeline locale complète.
+
+Un guide utilisateur plus complet est disponible dans `desktop/docs/user-guide.md`.
 
 Si un ancien dossier `desktop/dist/` est verrouillé par Windows, tu peux valider un build équivalent avec une sortie temporaire :
 
