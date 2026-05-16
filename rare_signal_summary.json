@@ -1,25 +1,24 @@
 {
-  "generated_at": "2026-05-16T22:59:15Z",
+  "generated_at": "2026-05-16T23:04:34Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 64,
-    "actionable": 21,
+    "active_events": 61,
+    "actionable": 19,
     "watch": 3,
-    "risk": 40,
+    "risk": 39,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 19,
-      "market_move": 8,
-      "market_uncertain": 41,
-      "back_to_back_travel": 6,
+      "back_to_back_travel": 8,
+      "market_uncertain": 39,
       "signal_conflict": 3
     },
     "by_quality": {
       "watch": 3,
-      "actionable": 21,
-      "risk": 40
+      "actionable": 19,
+      "risk": 39
     }
   },
   "active_actionable": [
@@ -40,24 +39,6 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 15-7"
-    },
-    {
-      "event_id": "401871409",
-      "date": "2026-05-17T00:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Montreal Canadiens",
-      "away": "Buffalo Sabres",
-      "match": "Montreal Canadiens - Buffalo Sabres",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 1.56 -> 1.90 (-22.1%)"
     },
     {
       "event_id": "401815372",
@@ -96,24 +77,6 @@
       "context": "Absences severes 5-10"
     },
     {
-      "event_id": "401815378",
-      "date": "2026-05-17T16:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Tampa Bay Rays",
-      "away": "Miami Marlins",
-      "match": "Tampa Bay Rays - Miami Marlins",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 1.31 -> 1.78 (-35.9%)"
-    },
-    {
       "event_id": "401815375",
       "date": "2026-05-17T17:35Z",
       "sport": "baseball",
@@ -130,24 +93,6 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 8-13"
-    },
-    {
-      "event_id": "401815380",
-      "date": "2026-05-17T17:35Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Pittsburgh Pirates",
-      "away": "Philadelphia Phillies",
-      "match": "Pittsburgh Pirates - Philadelphia Phillies",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 23.00 -> 1.66 (+92.8%)"
     },
     {
       "event_id": "401815379",
@@ -236,12 +181,48 @@
       "direction": "fade",
       "team": "San Diego Padres",
       "side": "away",
-      "strength": 0.872,
-      "context": "1 match dans les 48h + 1711 km de voyage"
+      "strength": 0.952,
+      "context": "2 match dans les 48h + 1711 km de voyage"
     },
     {
       "event_id": "401815376",
       "date": "2026-05-17T17:35Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Atlanta Braves",
+      "away": "Boston Red Sox",
+      "match": "Atlanta Braves - Boston Red Sox",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Boston Red Sox",
+      "side": "away",
+      "strength": 0.91,
+      "context": "2 match dans les 48h + 1498 km de voyage"
+    },
+    {
+      "event_id": "401815373",
+      "date": "2026-05-16T23:15Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Seattle Mariners",
+      "away": "San Diego Padres",
+      "match": "Seattle Mariners - San Diego Padres",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "San Diego Padres",
+      "side": "away",
+      "strength": 0.872,
+      "context": "1 match dans les 48h + 1711 km de voyage"
+    },
+    {
+      "event_id": "401815361",
+      "date": "2026-05-16T23:15Z",
       "sport": "baseball",
       "league_code": "mlb",
       "league_name": "MLB",
@@ -382,45 +363,9 @@
       "side": "away",
       "strength": 0.726,
       "context": "1 match dans les 48h + 979 km de voyage"
-    },
-    {
-      "event_id": "401815373",
-      "date": "2026-05-16T23:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Seattle Mariners",
-      "away": "San Diego Padres",
-      "match": "Seattle Mariners - San Diego Padres",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.66,
-      "context": "Cote away: 2.44 -> 2.15 (+11.9%)"
     }
   ],
   "active_watch": [
-    {
-      "event_id": "401872571",
-      "date": "2026-05-17T01:07Z",
-      "sport": "football",
-      "league_code": "ligamx",
-      "league_name": "Liga MX",
-      "home": "Guadalajara",
-      "away": "Cruz Azul",
-      "match": "Guadalajara - Cruz Azul",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.608,
-      "context": "Cote away: 3.20 -> 2.85 (+10.9%)"
-    },
     {
       "event_id": "401815370",
       "date": "2026-05-16T23:10Z",
@@ -438,6 +383,24 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 14-11"
+    },
+    {
+      "event_id": "401815378",
+      "date": "2026-05-17T16:15Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Tampa Bay Rays",
+      "away": "Miami Marlins",
+      "match": "Tampa Bay Rays - Miami Marlins",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Tampa Bay Rays",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 8-5"
     },
     {
       "event_id": "401815385",
@@ -586,6 +549,24 @@
       "context": "marge bookmaker anormale 18.2%"
     },
     {
+      "event_id": "401865537",
+      "date": "2026-05-19T22:00Z",
+      "sport": "football",
+      "league_code": "conmebol.libertadores",
+      "league_name": "Copa Libertadores",
+      "home": "Coquimbo Unido",
+      "away": "Deportes Tolima",
+      "match": "Coquimbo Unido - Deportes Tolima",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.8%"
+    },
+    {
       "event_id": "401865438",
       "date": "2026-05-19T22:00Z",
       "sport": "football",
@@ -620,24 +601,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.5%"
-    },
-    {
-      "event_id": "401865537",
-      "date": "2026-05-19T22:00Z",
-      "sport": "football",
-      "league_code": "conmebol.libertadores",
-      "league_name": "Copa Libertadores",
-      "home": "Coquimbo Unido",
-      "away": "Deportes Tolima",
-      "match": "Coquimbo Unido - Deportes Tolima",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.8%"
     },
     {
       "event_id": "401865539",
@@ -676,24 +639,6 @@
       "context": "marge bookmaker anormale 18.3%"
     },
     {
-      "event_id": "401865443",
-      "date": "2026-05-20T00:30Z",
-      "sport": "football",
-      "league_code": "conmebol.sudamericana",
-      "league_name": "Copa Sudamericana",
-      "home": "São Paulo",
-      "away": "Millonarios",
-      "match": "São Paulo - Millonarios",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.7%"
-    },
-    {
       "event_id": "401865538",
       "date": "2026-05-20T00:30Z",
       "sport": "football",
@@ -710,6 +655,24 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.4%"
+    },
+    {
+      "event_id": "401865443",
+      "date": "2026-05-20T00:30Z",
+      "sport": "football",
+      "league_code": "conmebol.sudamericana",
+      "league_name": "Copa Sudamericana",
+      "home": "São Paulo",
+      "away": "Millonarios",
+      "match": "São Paulo - Millonarios",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.7%"
     },
     {
       "event_id": "401865435",
@@ -998,24 +961,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.0%"
-    },
-    {
-      "event_id": "401866585",
-      "date": "2026-05-21T16:00Z",
-      "sport": "football",
-      "league_code": "superleaguegrece",
-      "league_name": "Super League Grèce",
-      "home": "Panetolikos",
-      "away": "Asteras Tripoli",
-      "match": "Panetolikos - Asteras Tripoli",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.3%"
     },
     {
       "event_id": "401842777",
