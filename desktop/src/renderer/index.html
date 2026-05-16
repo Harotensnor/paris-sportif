@@ -94,6 +94,16 @@
           <small id="simple-freshness">Données en cours</small>
         </section>
 
+        <!-- Sprint 59 (UX simplification) : résumé en une phrase pour
+             ne plus avoir d'écran "incompréhensible". -->
+        <section class="day-summary" id="day-summary" aria-label="Résumé du jour">
+          <div class="day-summary-content">
+            <span class="day-summary-eyebrow">Aujourd'hui sur Winamax</span>
+            <strong id="day-summary-headline">Calcul du résumé du jour...</strong>
+            <p id="day-summary-detail">Le logiciel agrège les paris et le contexte.</p>
+          </div>
+        </section>
+
         <section class="morning-brief expert-only hidden" id="morning-brief" aria-label="Brief du matin">
           <div class="morning-main">
             <span class="eyebrow">Brief du matin</span>
@@ -247,7 +257,9 @@
           </div>
         </section>
 
-        <section class="picks-view-switch" id="picks-view-switch" aria-label="Organisation des picks">
+        <!-- Sprint 59 (UX simplification) : picks-view-switch passe en
+             Mode expert. 3 modes de vue dès le boot est confus pour le user. -->
+        <section class="picks-view-switch expert-only hidden" id="picks-view-switch" aria-label="Organisation des picks">
           <span>Voir par</span>
           <button type="button" data-picks-view-mode="time">Horaire</button>
           <button type="button" data-picks-view-mode="type">Type</button>
@@ -259,36 +271,37 @@
         </section>
 
         <details class="simple-fold-section" id="simple-timeline-section">
-          <summary><span>Timeline complète</span><strong>24h</strong></summary>
+          <summary><span>Voir tous les paris (24h)</span><strong>24h</strong></summary>
           <div class="simple-pick-timeline" id="simple-pick-timeline">
             <div class="empty compact-empty">Chargement de la timeline...</div>
           </div>
         </details>
 
         <details class="simple-fold-section hidden" id="favorite-picks-section">
-          <summary><span>Tes favoris</span><strong id="favorite-picks-count">0</strong></summary>
+          <summary><span>⭐ Tes favoris</span><strong id="favorite-picks-count">0</strong></summary>
           <div class="simple-card-grid" id="favorite-picks-grid"></div>
         </details>
 
         <details class="simple-fold-section" id="simple-combines-section">
-          <summary><span>Combinés du jour</span><strong id="simple-combines-count">0</strong></summary>
+          <summary><span>🎲 Combinés du jour</span><strong id="simple-combines-count">0</strong></summary>
           <div class="simple-card-grid" id="simple-combines-grid"></div>
         </details>
 
         <details class="simple-fold-section" id="simple-scorers-section">
-          <summary><span>Buteurs et joueurs décisifs</span><strong id="simple-scorers-count">0</strong></summary>
+          <summary><span>👤 Buteurs &amp; joueurs</span><strong id="simple-scorers-count">0</strong></summary>
           <div class="simple-card-grid" id="simple-scorers-grid"></div>
         </details>
 
-        <details class="simple-fold-section" id="simple-promos-section">
-          <summary><span>Promos Winamax</span><strong id="simple-promos-count">0</strong></summary>
+        <!-- Sprint 59 : promos + scanner passent en Mode expert pour décharger -->
+        <details class="simple-fold-section expert-only hidden" id="simple-promos-section">
+          <summary><span>🔥 Promos Winamax</span><strong id="simple-promos-count">0</strong></summary>
           <div class="simple-card-grid" id="simple-promos-grid">
             <div class="empty compact-empty">Chargement des promos Winamax...</div>
           </div>
         </details>
 
-        <details class="simple-fold-section" id="market-scanner-section">
-          <summary><span>Scanner du jour</span><strong id="market-scanner-count">0</strong></summary>
+        <details class="simple-fold-section expert-only hidden" id="market-scanner-section">
+          <summary><span>📡 Scanner du jour</span><strong id="market-scanner-count">0</strong></summary>
           <div class="simple-card-grid" id="market-scanner-grid">
             <div class="empty compact-empty">Analyse des patterns inter-matchs...</div>
           </div>

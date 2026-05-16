@@ -5,6 +5,28 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 59 — Simplification radicale accueil
+
+Feedback utilisateur : "accueil encore beaucoup trop de chose, accueil incompréhensible".
+
+Bannière "Résumé du jour" en tête
+- Nouvelle section `#day-summary` juste après le bandeau compact.
+- Affiche en gros : "X paris prêts à miser maintenant" (ou "Aucun pari sûr aujourd'hui — N à surveiller", ou "Aucun pari disponible aujourd'hui").
+- Sous-titre concis : mise totale, prochain départ, paris à surveiller.
+- Visuel : gradient indigo + liseré gauche 4px, ::before couleur sémantique.
+- Calcul live dans `renderDaySummary(rows)` appelé en début de `renderPicks()`.
+
+Sections secondaires repoussées en Mode expert
+- `picks-view-switch` (les 3 modes Horaire/Type/Sport) → expert-only par défaut. L'utilisateur n'a pas besoin de 3 vues au boot.
+- `simple-promos-section` (Promos Winamax) → expert-only.
+- `market-scanner-section` (Scanner du jour) → expert-only.
+
+Sections clés rendues plus identifiables
+- Sections repliées en gardent des emojis : 🎲 Combinés, 👤 Buteurs & joueurs, ⭐ Tes favoris.
+- "Timeline complète" renommée "Voir tous les paris (24h)".
+
+Validation : smoke OK avec 11 paris ready (vs 1 précédemment grâce au fix sprint 58 qui élimine les fausses cotes ht_ou15 polluées), 14 timeline, 14 fiables, 10 priorités.
+
 ### Sprint 58 — 🚨 FIX CRITIQUE : cote fausse sur bet ultime
 
 Feedback utilisateur : "Je vois des cotes fausses, le bet ultime a une cote fausse j'ai vérifié sur Winamax."

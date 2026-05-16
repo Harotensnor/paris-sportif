@@ -5120,6 +5120,35 @@
     return `Pourquoi #1 ? ${userBetLabel(row)} à ${formatOdd(row.odd)} sur Winamax, départ ${countdownLabel(row.start)}. ${simpleWhyText(row).replace(/^Pourquoi\s*:\s*/i, '')}`;
   }
 
+  // Sprint 59 (UX simplification) : résumé en 1 phrase clair pour la home.
+  function renderDaySummary(rows) {
+    const headline = $('#day-summary-headline');
+    const detail = $('#day-summary-detail');
+    if (!headline || !detail) return;
+    const allRows = Array.isArray(rows) ? rows : [];
+    const ready = allRows.filter((row) => (row?.decisionCenter?.canBet === true || row?.safeAssessment?.reliable === true) && row?.limitedConfidence !== true);
+    const watch = allRows.filter((row) => row?.limitedConfidence === true || (!row?.safeAssessment?.reliable && row?.safeAssessment?.displayable !== false));
+    const next = allRows
+      .filter((row) => row?.start && Date.parse(row.start) > Date.now())
+      .sort((a, b) => Date.parse(a.start) - Date.parse(b.start))[0];
+    const nextLabel = next ? `${next.title} dans ${countdownLabel(next.start)}` : null;
+    if (ready.length > 0) {
+      headline.textContent = `${ready.length} pari${ready.length > 1 ? 's' : ''} prêt${ready.length > 1 ? 's' : ''} à miser maintenant`;
+      const stake = ready.reduce((sum, row) => sum + Number(row.recommendedStake ?? row.stake ?? 0), 0);
+      const parts = [];
+      if (stake > 0) parts.push(`Mise totale suggérée ${formatMoney(stake)}`);
+      if (watch.length) parts.push(`${watch.length} à surveiller`);
+      if (nextLabel) parts.push(`prochain départ : ${nextLabel}`);
+      detail.textContent = parts.join(' · ') || 'Tout est prêt — clique sur "Je mise" pour suivre.';
+    } else if (watch.length > 0) {
+      headline.textContent = `Aucun pari sûr aujourd'hui — ${watch.length} à surveiller`;
+      detail.textContent = nextLabel ? `Modèle prudent. Prochain match : ${nextLabel}.` : 'Modèle prudent : ne mise que si tu as une conviction propre.';
+    } else {
+      headline.textContent = 'Aucun pari disponible aujourd\'hui';
+      detail.textContent = nextLabel ? `Prochain match : ${nextLabel}.` : 'Relance la pipeline ou attends le prochain refresh.';
+    }
+  }
+
   // Sprint 45 (UX) : section "À MISER MAINTENANT" en gros, juste sous le bet
   // ultime. Affiche les 3-6 picks les plus solides du jour (status bet OR
   // safeAssessment.reliable) — pas de pics "À surveiller". Si rien :
@@ -6493,6 +6522,7 @@
     renderMarketSnapshot(displayRows);
     renderLiveCockpit();
     renderTradingDesk();
+    renderDaySummary(displayRows);
     renderUltimateBet(displayRows);
     renderReadyPicksHero(displayRows);
     // Sprint 50 (UX) : badge compteur "paris prêts" dans la nav Picks.
