@@ -1,5 +1,93 @@
 # Backlog — post v35.502
 
+## Desktop Sprint 80+ — Suite après Sprints 73-79
+
+### Sprint 80 — Compositions visuelles 11vs11 enrichies (D3)
+Sprint 60 a posé `buildPitchColumn` (terrain SVG simple). Sprint 80 enrichit :
+- Positions précises sur le terrain selon formation (4-3-3, 4-2-3-1, 3-5-2, etc.)
+- Star players highlight gold border (lit `star_players.json` quality_score >= 70)
+- Indicateur titulaire (gros cercle) vs suppléant probable (petit cercle gris)
+- Coach name au-dessus du terrain
+- Effort M (3-4h)
+
+### Sprint 81 — Player props inline (D4)
+Cross-link `winamax_markets.scorer` ↔ lineups confirmées :
+- Card cliquable "Mbappé buteur @2.10 · 47% modèle" sous chaque équipe sur le terrain
+- Filtre titulaires seulement (suppléants → masqué)
+- Click → ouvre la modal détail buteur dédiée (existante)
+- Effort M (3h)
+
+### Sprint 82 — Historique cotes Winamax 72h (D7)
+- Indexer `odds_history.jsonl` par `match_id` au boot (Map<id, timestamps[]>)
+- Mini-graph SVG dans la modal détail "cotes 72h" : ligne d'évolution
+- Annotations : cote ouverte / cote actuelle / closing (si match passé)
+- Indicateur ↑↓ % vs cote ouverte
+- Effort M (3-4h)
+
+### Sprint 83 — Performance critique (E1+E2+E3)
+- **E1 Lazy-load WMK** : afficher dashboard avec data lite d'abord, hydrate `winamax_markets.json` après. Boot 38s → 10s. Effort M (3-4h).
+- **E2 JSDOM cache séparé** : invalidation granulaire au lieu de tout refaire si 1 sidecar bouge. Effort M (3h).
+- **E3 Pre-computed picks JSON** : pipeline Python pré-calcule `desktop_dashboard.json`. Electron lit juste ce JSON. Boot ~3s. Effort L (1j).
+
+### Sprint 84 — Multi-sport calibration (C2) — BLOQUÉ DATA
+**Pré-requis** : étendre `snapshot_odds.py` à capturer cotes per-marché multi-sport. Actuellement `picks_history.jsonl` est 96% football → impossible de calibrer tennis/baseball/hockey/basket par marché (n<30 par segment).
+
+Plan une fois data prête :
+- Étendre `build_prob_calibration.py` à grouper par `(sport, market)` (déjà `bins_by_sport`, à enrichir `bins_by_sport_market`).
+- Runtime `_calibrateProb` route hiérarchique : `(sport, market)` > `market` > `sport` > global.
+- Étendre `_V45_LEAGUE_OFFSETS` par sport (NHL, NBA, MLB avec cotes US converties decimal).
+
+Effort L (1-2j) une fois data dispo.
+
+### Sprint 85 — Sharp money + multi-bookmaker (C4+C5) — BLOQUÉ API KEY
+**Pré-requis** : secret GitHub `THE_ODDS_API_KEY` (free tier 500 calls/mois suffisant pour 10 ligues quotidien).
+
+Plan :
+- `scripts/fetch_sharp_money.py` : pull cotes Pinnacle via TheOddsAPI, compare vs Winamax.
+- Inject `ev.sharp_money = { aligned: bool, drop_pct, source: 'pinnacle' }` dans `data.js`.
+- Frontend : badge 🦈 dans cards quand aligned (boost confiance) ou disagree (warn reverse line movement).
+- Multi-bookmaker comparison : "Best odd: 2.10 chez Unibet vs 1.95 Winamax (+8%)" sur cards.
+
+Effort M total (6-7h).
+
+### Sprint 86 — Live picks <30min (C7)
+- Fetcher live ciblé : refresh `data.js` toutes les 5 min sur matchs avec kickoff < 30 min.
+- Frontend : indicateur cote movement (↑↓ %) sur les cards.
+- Notif push "Cote en mouvement +8% sur ${match}".
+- Effort M (4-5h).
+
+### Sprint 87 — Mode tactique (D8)
+Sub-tab "Tactique" dans la modal détail :
+- Formation visuelle home vs away (3D-like via CSS transforms ou Canvas).
+- Heatmap zones force/faiblesse (lit `team_priors.json` defensive/offensive ratings).
+- xG défensif/offensif comparé.
+- Effort L (1j).
+
+### Sprint 88 — Sync multi-device (F5)
+- Encrypt profil JSON (paris + prefs + favoris) avec passphrase user → push vers Gist privé GitHub via PAT.
+- Pull au boot autre PC : prompt passphrase, decrypt, merge.
+- Conflict resolution : prendre le plus récent timestamp par bet.
+- Effort L (1j).
+
+### Sprint 89 — ESM split legacy-app.js (G1) — BLOQUÉ PRÉ-REQUIS
+**Pré-requis** : étendre les tests intégration Sprint 70 vers couverture pickGeneration / marketSelection / userBetTracking AVANT le split (sinon impossible de valider qu'on n'a rien cassé). Effort L (1j G2) + XL (1-2j G1) = sprint dédié 2-3j.
+
+Plan G2 (tests préalables) :
+- `desktop/scripts/pick-generation-check.js` : pour N=20 matchs aléatoires, vérifier que `_v37PickPoolRaw` retourne stable pour même data.
+- `desktop/scripts/market-selection-check.js` : `selectBestMarket` retourne le même candidate top sur 50 matchs.
+- `desktop/scripts/user-bet-tracking-check.js` : `_addUserBet` + `_settleUserBets` cycle complet.
+
+Plan G1 (split) :
+- `core/` : predictMatch, _applyCalibration, _v45PlattBoost, _calibrateProb (~3000 lignes)
+- `markets/` : selectBestMarket, buildMarketCandidates, _v35AddCandidate, poissonMarketsExtended (~4000 lignes)
+- `calibration/` : calibration_method, prob_calibration loader, isotonic (~1500 lignes)
+- `signals/` : trust score, segment validation, signal conflict (~3000 lignes)
+- `ui-bridge/` : exports window.X = Y, render hooks (~500 lignes)
+- `enrichment/` : web enrichment, news watcher, lineups (~4000 lignes)
+- `legacy-misc/` : reste (~21 000 lignes encore à trier)
+
+Approche : ESM natif via `vm.SourceTextModule` Node 17+ ou eval module-by-module dans JSDOM.
+
 ## P1 — Desktop Sprint 72 différés (plan UX/pronostics maximum)
 
 Items du plan d'amélioration "tout" mais non-faisables en une session :

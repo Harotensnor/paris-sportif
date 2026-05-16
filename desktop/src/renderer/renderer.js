@@ -235,6 +235,7 @@
     dailyBetLimit: 8,
     dailyStakeCapPct: 20,
     coachLossStreakConfirm: 3,
+    coachReduceStake: true, // Sprint 78 F6 — mise auto -50% si 3L de suite
     demoMode: false,
     aiEnabled: false,
     aiProvider: 'openai',
@@ -1972,12 +1973,19 @@
       const override = state.coachOverride;
       if (!override || override.key !== key || Date.now() - Number(override.at || 0) > 120000) {
         state.coachOverride = { key, at: Date.now() };
+        // Sprint 78 F6 — Mode Coach anti-tilt : reduit la mise -50% automatiquement
+        // si toggle coachReduceStake actif (default true).
+        const reduce = prefs.coachReduceStake !== false;
+        const detail = reduce
+          ? `${formatCount(lossStreak)} défaites de suite. Mise auto réduite -50% pour limiter la casse. Reclique pour confirmer.`
+          : `${formatCount(lossStreak)} défaites de suite. Reclique sur "Je mise" dans les 2 minutes si tu confirmes.`;
         return {
           allow: false,
           tone: 'warn',
-          label: 'Coach : confirme le pari',
-          detail: `${formatCount(lossStreak)} défaites de suite. Reclique sur “Je mise” dans les 2 minutes si tu confirmes.`,
-          warnings: ['loss_streak_confirm']
+          label: 'Coach : tilt protection',
+          detail,
+          warnings: ['loss_streak_confirm', reduce ? 'stake_reduced' : 'confirm_required'],
+          stakeReductionFactor: reduce ? 0.5 : 1
         };
       }
     }
@@ -5412,6 +5420,8 @@
   function renderUltimateBet(rows) {
     // Sprint 72 A3 — Update temporal zones strip en meme temps
     try { renderTemporalZonesStrip(rows); } catch { /* noop */ }
+    // Sprint 78 F3 — Check custom notif rules
+    try { checkCustomNotifs(rows); } catch { /* noop */ }
     const wrap = $('#ultimate-bet-card');
     if (!wrap) return;
     const row = aiSelectedUltimate(rows) || ultimateBetCandidate(rows);
@@ -9392,6 +9402,8 @@
     if (topPickAlerts) topPickAlerts.checked = prefs.topPickAlertsEnabled !== false;
     const notifyQuietOff = $('#pref-notify-quiet-off');
     if (notifyQuietOff) notifyQuietOff.checked = prefs.notifyQuietHoursOff === true;
+    const coachReduceStake = $('#pref-coach-reduce-stake');
+    if (coachReduceStake) coachReduceStake.checked = prefs.coachReduceStake !== false;
     const bugReportPrompt = $('#pref-bug-report-prompt');
     if (bugReportPrompt) bugReportPrompt.checked = prefs.bugReportPrompt !== false;
     const tradingDesk = $('#pref-trading-desk');
@@ -9618,6 +9630,7 @@
       prematchAlertsEnabled: $('#pref-prematch-alerts')?.checked !== false,
       topPickAlertsEnabled: $('#pref-top-pick-alerts')?.checked !== false,
       notifyQuietHoursOff: Boolean($('#pref-notify-quiet-off')?.checked),
+      coachReduceStake: $('#pref-coach-reduce-stake')?.checked !== false,
       bugReportPrompt: $('#pref-bug-report-prompt')?.checked !== false,
       dailyBetLimit: Math.max(1, Number($('#pref-daily-bet-limit')?.value || DEFAULT_PREFERENCES.dailyBetLimit) || DEFAULT_PREFERENCES.dailyBetLimit),
       dailyStakeCapPct: Math.max(1, Number($('#pref-daily-stake-cap')?.value || DEFAULT_PREFERENCES.dailyStakeCapPct) || DEFAULT_PREFERENCES.dailyStakeCapPct),
@@ -10805,6 +10818,77 @@
     localStorage.setItem(DEMO_TOUR_KEY, '1');
     $('#demo-tour-modal')?.classList.add('hidden');
   }
+
+  // Sprint 78 F3 — Notifications custom via règles user-defined.
+  // Stockage : localStorage.parisSportif.customNotifRules = [{ id, name, conditions: { team?, league?, sport?, edgeMin?, confMin?, oddMin?, oddMax? }, active }]
+  const CUSTOM_NOTIF_RULES_KEY = 'parisSportif.customNotifRules';
+
+  function loadCustomNotifRules() {
+    try {
+      const raw = localStorage.getItem(CUSTOM_NOTIF_RULES_KEY);
+      const arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr : [];
+    } catch { return []; }
+  }
+
+  function saveCustomNotifRules(rules) {
+    try {
+      localStorage.setItem(CUSTOM_NOTIF_RULES_KEY, JSON.stringify(Array.isArray(rules) ? rules : []));
+    } catch { /* noop */ }
+  }
+
+  function pickMatchesCustomRule(row, rule) {
+    if (!rule || !rule.active) return false;
+    const c = rule.conditions || {};
+    const sport = String(row?.sport || row?.match?.sport || '').toLowerCase();
+    const league = String(row?.league || row?.match?.league_name || '').toLowerCase();
+    const home = String(row?.match?.competitors?.[0]?.name || '').toLowerCase();
+    const away = String(row?.match?.competitors?.[1]?.name || '').toLowerCase();
+    const edge = Number(row?.edge || 0);
+    const conf = Number(row?.safeAssessment?.confidence || row?.probability || 0);
+    const odd = Number(row?.odd || 0);
+    if (c.team) {
+      const t = String(c.team).toLowerCase();
+      if (!home.includes(t) && !away.includes(t)) return false;
+    }
+    if (c.league && !league.includes(String(c.league).toLowerCase())) return false;
+    if (c.sport && !sport.includes(String(c.sport).toLowerCase())) return false;
+    if (c.edgeMin != null && edge < Number(c.edgeMin)) return false;
+    if (c.confMin != null && conf < Number(c.confMin)) return false;
+    if (c.oddMin != null && odd < Number(c.oddMin)) return false;
+    if (c.oddMax != null && odd > Number(c.oddMax)) return false;
+    return true;
+  }
+
+  function checkCustomNotifs(rows) {
+    if (typeof notifyUser !== 'function') return;
+    const rules = loadCustomNotifRules().filter((r) => r?.active);
+    if (!rules.length) return;
+    const seenKey = 'parisSportif.customNotifSeen';
+    let seen = new Set();
+    try { seen = new Set(JSON.parse(localStorage.getItem(seenKey) || '[]')); } catch { /* noop */ }
+    let dirty = false;
+    for (const row of (Array.isArray(rows) ? rows : []).slice(0, 100)) {
+      for (const rule of rules) {
+        if (!pickMatchesCustomRule(row, rule)) continue;
+        const sig = `${rule.id}|${row.id || ''}|${row.label || ''}`;
+        if (seen.has(sig)) continue;
+        seen.add(sig);
+        dirty = true;
+        try {
+          notifyUser(
+            `🔔 ${rule.name || 'Alerte personnalisée'}`,
+            `${row.title || ''} · ${row.label || ''} @${Number(row.odd || 0).toFixed(2)}`,
+            row
+          );
+        } catch { /* noop */ }
+      }
+    }
+    if (dirty) {
+      try { localStorage.setItem(seenKey, JSON.stringify(Array.from(seen).slice(-200))); } catch { /* noop */ }
+    }
+  }
+  try { window.checkCustomNotifs = checkCustomNotifs; } catch { /* noop */ }
 
   // Sprint 73 F7 — Achievements badges progressifs
   function computeAchievements() {
@@ -12915,9 +12999,39 @@
     `).join('')}</div>`;
   }
 
+  // Sprint 74 D2 — H2H expanded avec streak detection
+  function h2hStreaksAnalysis(meetings) {
+    if (!meetings.length) return null;
+    let lowScoring = 0, highScoring = 0, btts = 0, draws = 0;
+    let homeBetterCount = 0; // Combien de fois le home a gagné
+    let lastNHomeForm = []; // [W/D/L pour le home des 5 derniers]
+    for (const m of meetings.slice(0, 10)) {
+      const hs = Number(m.home_score), as = Number(m.away_score);
+      if (!Number.isFinite(hs) || !Number.isFinite(as)) continue;
+      const total = hs + as;
+      if (total < 2.5) lowScoring++;
+      if (total > 2.5) highScoring++;
+      if (hs > 0 && as > 0) btts++;
+      if (hs === as) { draws++; lastNHomeForm.push('D'); }
+      else if (hs > as) { homeBetterCount++; lastNHomeForm.push('W'); }
+      else lastNHomeForm.push('L');
+    }
+    const n = meetings.length;
+    return {
+      n,
+      lowScoring,
+      highScoring,
+      btts,
+      draws,
+      homeBetterCount,
+      lastNHomeForm: lastNHomeForm.slice(0, 5)
+    };
+  }
+
   function buildH2hHtml(match) {
     const { home, away } = getSides(match);
-    const meetings = Array.isArray(match.h2h?.meetings) ? match.h2h.meetings.slice(0, 8) : [];
+    const meetings = Array.isArray(match.h2h?.meetings) ? match.h2h.meetings.slice(0, 10) : [];
+    const stats = h2hStreaksAnalysis(meetings);
     return `
       <div class="modal-grid">
         <article class="detail-card">
@@ -12928,17 +13042,58 @@
           <h4>Forme extérieur</h4>
           ${buildFormList(away)}
         </article>
+        ${stats && stats.n >= 3 ? `
+        <article class="detail-card wide h2h-stats-card">
+          <h4>📊 Patterns sur ${stats.n} H2H récents</h4>
+          <div class="h2h-stats-grid">
+            <div class="h2h-stat ${stats.lowScoring >= stats.n * 0.6 ? 'h2h-stat-strong' : ''}">
+              <span>Matchs &lt; 2.5 buts</span>
+              <strong>${stats.lowScoring}/${stats.n}</strong>
+              ${stats.lowScoring >= stats.n * 0.6 ? '<em>Tendance Moins de 2,5 forte</em>' : ''}
+            </div>
+            <div class="h2h-stat ${stats.highScoring >= stats.n * 0.6 ? 'h2h-stat-strong' : ''}">
+              <span>Matchs &gt; 2.5 buts</span>
+              <strong>${stats.highScoring}/${stats.n}</strong>
+              ${stats.highScoring >= stats.n * 0.6 ? '<em>Tendance Plus de 2,5 forte</em>' : ''}
+            </div>
+            <div class="h2h-stat ${stats.btts >= stats.n * 0.6 ? 'h2h-stat-strong' : ''}">
+              <span>BTTS</span>
+              <strong>${stats.btts}/${stats.n}</strong>
+              ${stats.btts >= stats.n * 0.6 ? '<em>BTTS Yes fréquent</em>' : ''}
+            </div>
+            <div class="h2h-stat ${stats.homeBetterCount >= stats.n * 0.5 ? 'h2h-stat-strong' : ''}">
+              <span>Domicile vainqueur</span>
+              <strong>${stats.homeBetterCount}/${stats.n}</strong>
+              ${stats.homeBetterCount >= stats.n * 0.5 ? '<em>Domicile dominant</em>' : ''}
+            </div>
+          </div>
+          ${stats.lastNHomeForm.length ? `
+            <div class="h2h-form-sequence">
+              <span>Forme home sur les ${stats.lastNHomeForm.length} derniers :</span>
+              ${stats.lastNHomeForm.map((r) => `<span class="form-pill form-${r === 'W' ? 'w' : r === 'D' ? 'd' : 'l'}">${r}</span>`).join('')}
+            </div>
+          ` : ''}
+        </article>
+        ` : ''}
         <article class="detail-card wide">
-          <h4>Face-à-face</h4>
+          <h4>📜 Face-à-face détaillé (${meetings.length})</h4>
           ${meetings.length ? `
-            <div class="market-list">
-              ${meetings.map((item) => `
-                <div class="market-row">
-                  <span>${escapeHtml(item.date || '-')}</span>
-                  <strong>${escapeHtml(`${item.home || 'Home'} - ${item.away || 'Away'}`)}</strong>
-                  <em>${escapeHtml(`${item.home_score ?? '?'}-${item.away_score ?? '?'}`)}</em>
-                </div>
-              `).join('')}
+            <div class="h2h-list">
+              ${meetings.map((item) => {
+                const hs = Number(item.home_score), as = Number(item.away_score);
+                const total = Number.isFinite(hs) && Number.isFinite(as) ? hs + as : null;
+                const result = Number.isFinite(hs) && Number.isFinite(as)
+                  ? (hs > as ? 'home' : as > hs ? 'away' : 'draw')
+                  : 'unknown';
+                return `
+                  <div class="h2h-row h2h-${result}">
+                    <span class="h2h-date">${escapeHtml(item.date || '-')}</span>
+                    <strong class="h2h-teams">${escapeHtml(`${item.home || 'Home'} - ${item.away || 'Away'}`)}</strong>
+                    <em class="h2h-score">${escapeHtml(`${item.home_score ?? '?'}-${item.away_score ?? '?'}`)}</em>
+                    ${total !== null ? `<span class="h2h-total ${total > 2.5 ? 'h2h-total-high' : 'h2h-total-low'}">${total > 2.5 ? '🔥' : '🔒'} ${total}</span>` : ''}
+                  </div>
+                `;
+              }).join('')}
             </div>
           ` : '<div class="empty compact-empty">Aucun historique H2H exploitable pour ce match.</div>'}
         </article>

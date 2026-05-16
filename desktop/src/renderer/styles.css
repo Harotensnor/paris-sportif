@@ -3769,6 +3769,111 @@ body.theme-light .hover-preview {
   .hover-preview { display: none !important; }
 }
 
+/* Sprint 74 D2 — H2H stats card + list */
+.h2h-stats-card {
+  background: linear-gradient(135deg, rgba(99, 102, 241, .04), rgba(15, 23, 42, .25));
+}
+
+.h2h-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.h2h-stat {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, .03);
+}
+
+.h2h-stat.h2h-stat-strong {
+  border-color: rgba(16, 185, 129, .35);
+  background: rgba(16, 185, 129, .06);
+}
+
+.h2h-stat span {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+
+.h2h-stat strong {
+  display: block;
+  margin: 4px 0 2px;
+  font-size: 22px;
+  letter-spacing: -.02em;
+}
+
+.h2h-stat em {
+  display: block;
+  font-style: normal;
+  font-size: 11px;
+  color: #34d399;
+}
+
+.h2h-form-sequence {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.form-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 700;
+  color: white;
+}
+
+.form-pill.form-w { background: #10b981; }
+.form-pill.form-d { background: #94a3b8; }
+.form-pill.form-l { background: #ef4444; }
+
+.h2h-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.h2h-row {
+  display: grid;
+  grid-template-columns: 80px 1fr auto auto;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .025);
+  border-left: 3px solid transparent;
+  font-size: 12px;
+}
+
+.h2h-row.h2h-home { border-left-color: rgba(16, 185, 129, .6); }
+.h2h-row.h2h-away { border-left-color: rgba(239, 68, 68, .6); }
+.h2h-row.h2h-draw { border-left-color: rgba(148, 163, 184, .6); }
+
+.h2h-date { color: var(--muted); font-size: 11px; }
+.h2h-teams { font-size: 12px; font-weight: 500; }
+.h2h-score { font-weight: 700; color: var(--text); font-size: 14px; font-style: normal; }
+.h2h-total { font-size: 11px; padding: 2px 8px; border-radius: 999px; }
+.h2h-total.h2h-total-high { background: rgba(245, 158, 11, .15); color: #fbbf24; }
+.h2h-total.h2h-total-low { background: rgba(99, 102, 241, .15); color: #a5b4fc; }
+
+body.theme-light .h2h-row { background: rgba(15, 23, 42, .03); }
+body.theme-light .h2h-stat em { color: #047857; }
+body.theme-light .h2h-total.h2h-total-high { color: #c2410c; }
+body.theme-light .h2h-total.h2h-total-low { color: #4338ca; }
+
 .modal-head h3,
 .modal-head p {
   margin: 0;

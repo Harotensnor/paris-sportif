@@ -2229,13 +2229,13 @@ function DataQualityBadge(p) {
         flags.push({ icon: '🚨', label: `Vig ${(vig*100).toFixed(0)}%`, title: `Vig anormalement haute (Winamax normal: 5-7%) — odds possiblement stale ou bookmaker en mode protection` });
       }
     }
-  } catch (e) {}
+  } catch (e) { logSafeError('dataQualityFlags vig', e); }
   // Live match (mais pas flagué)
   try {
     if (typeof _isMatchLikelyLive === 'function' && _isMatchLikelyLive(m) && !m.live) {
       flags.push({ icon: '🔴', label: 'Live (non flagué)', title: 'Match probablement en cours (score>0) mais le fetcher ne l\'a pas marqué live' });
     }
-  } catch (e) {}
+  } catch (e) { logSafeError('dataQualityFlags live detect', e); }
   if (!flags.length) return '';
   return flags.map(f =>
     `<span class="data-quality-badge" title="${esc(f.title)}" style="display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border:1px solid var(--warn,#f59e0b);background:rgba(245,158,11,.10);color:var(--warn,#f59e0b);border-radius:999px;font-size:10px;font-weight:700;cursor:help;">${f.icon} ${esc(f.label)}</span>`
@@ -20157,8 +20157,8 @@ window.v43ProfitableMode = () => {
   } catch (e) { return false; }
 };
 window.v43SetProfitableMode = (on) => {
-  try { localStorage.setItem('v43_profitable_mode', on ? '1' : '0'); } catch (e) {}
-  try { document.dispatchEvent(new CustomEvent('v43:profitable-mode-changed', { detail: { on } })); } catch (e) {}
+  try { localStorage.setItem('v43_profitable_mode', on ? '1' : '0'); } catch (e) { logSafeError('v43 profitable mode setItem', e); }
+  try { document.dispatchEvent(new CustomEvent('v43:profitable-mode-changed', { detail: { on } })); } catch (e) { logSafeError('v43 profitable mode dispatch', e); }
 };
 // Filter helper utilisable par n'importe quelle page : si profitableMode actif,
 // ne garde QUE les picks Outsider+Value. Sinon retourne l'array tel quel.
@@ -21170,12 +21170,12 @@ const _heroAccueil = (() => {
       const ko = m.date ? new Date(m.date).getTime() : 0;
       if (m.completed || ko < now - 60 * 1000) continue;
       let pred = null;
-      try { pred = predictMatch(m); } catch (e) {}
+      try { pred = predictMatch(m); } catch (e) { logSafeError('loop predictMatch', e); }
       if (!pred || pred.skip) continue;
       // v54.7 — Le hero compte uniquement les paris réellement jouables :
       // marché Winamax exact, cote éligible, edge/EV positifs, kickoff futur.
       let best = null;
-      try { best = (typeof selectBestMarket === 'function') ? selectBestMarket(m, pred) : null; } catch(e) {}
+      try { best = (typeof selectBestMarket === 'function') ? selectBestMarket(m, pred) : null; } catch(e) { logSafeError('loop selectBestMarket', e); }
       if (!best || !best.odd) continue;
       predicted++;
       const edge = Number(best.edge || 0);
@@ -21201,11 +21201,11 @@ const _heroAccueil = (() => {
     for (const m of (data.days?.[yesterdayIso] || [])) {
       if (!m.completed) continue;
       let pred = null;
-      try { pred = predictMatch(m); } catch (e) {}
+      try { pred = predictMatch(m); } catch (e) { logSafeError('loop predictMatch', e); }
       if (!pred || pred.skip) continue;
       yPicks++;
       let res = null;
-      try { res = (typeof evaluateModelPick === 'function') ? evaluateModelPick(m, pred) : null; } catch (e) {}
+      try { res = (typeof evaluateModelPick === 'function') ? evaluateModelPick(m, pred) : null; } catch (e) { logSafeError('loop evaluateModelPick', e); }
       if (res === 'won') yWon++;
       else if (res === 'lost') yLost++;
     }
@@ -21282,10 +21282,10 @@ const _calendar14d = (() => {
         for (const m of events) {
           if (!m.completed) continue;
           let pred = null;
-          try { pred = predictMatch(m); } catch (e) {}
+          try { pred = predictMatch(m); } catch (e) { logSafeError('loop predictMatch', e); }
           if (!pred || pred.skip) continue;
           let res = null;
-          try { res = (typeof evaluateModelPick === 'function') ? evaluateModelPick(m, pred) : null; } catch (e) {}
+          try { res = (typeof evaluateModelPick === 'function') ? evaluateModelPick(m, pred) : null; } catch (e) { logSafeError('loop evaluateModelPick', e); }
           if (res === 'won') {
             won++;
             const odd = pred.odds && (pred.pick.key === '1' ? pred.odds.home : pred.pick.key === '2' ? pred.odds.away : pred.odds.draw);
@@ -23937,7 +23937,7 @@ const _calendar14d = (() => {
       let picks = 0, won = 0, lost = 0, pushed = 0, pending = 0, pl = 0;
       for (const m of events) {
         let pred = null;
-        try { pred = predictMatch(m); } catch (e) {}
+        try { pred = predictMatch(m); } catch (e) { logSafeError('loop predictMatch', e); }
         if (!pred || pred.skip) continue;
         const best = (typeof selectBestMarket === 'function') ? selectBestMarket(m, pred) : null;
         if (!best) continue;

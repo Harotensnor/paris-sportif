@@ -5,6 +5,51 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 73-79 — Plan continuation : quick wins + H2H + Coach + notifs + sweep + plan Sprint 80+
+
+**Sprint 73 — Quick wins**
+- D6 Arbitre profile : tier 🟥 Strict / 🟢 Permissif / 🟨 Moyen + penalties/match si dispo
+- F7 Achievements card : 10 badges progressifs (first-bet, ten-bets, fifty-bets, first-win, streak-3, streak-7, roi-positif, roi-10, week-active, month-active) avec progress bar gradient
+- D10 Hover preview : popover floating 600ms au survol des rows du tableau, 3 KPIs (Confiance/Avantage/Mise), hidden sur touch
+- G4 Visual baseline : `desktop/scripts/visual-baseline.js` capture/compare fingerprint structurel (rows, badges, sections, charLen, booleans). Drift > 50% number ou changement booléen = warn. Scripts `npm run qa:visual-capture` et `qa:visual`.
+
+**Sprint 74 D2 — H2H expanded**
+- `h2hStreaksAnalysis(meetings)` : analyse les 10 derniers H2H
+- Card "📊 Patterns sur N H2H récents" avec 4 stats colorées (low/high scoring, BTTS, home dominance) + highlight si tendance > 60%
+- Liste H2H détaillée avec border-left coloré (vert home win / rouge away win / gris draw) + chip total 🔥/🔒
+- Sequence "Forme home sur 5 derniers" avec pills W/D/L
+- Limite étendue 8 → 10 meetings
+
+**Sprint 78 F6 — Mode Coach anti-tilt**
+- `coachReduceStake` pref (default true) : si user a 3 défaites de suite, mise auto réduite -50%
+- `stakeReductionFactor: 0.5` retourné par le coach guard
+- Détail message adapté : "Mise auto réduite -50%" vs "Reclique pour confirmer"
+- Toggle dans Réglages > Antitilt
+
+**Sprint 78 F3 — Notifs custom (règles user-defined)**
+- `loadCustomNotifRules()` / `saveCustomNotifRules()` : règles dans `localStorage.parisSportif.customNotifRules`
+- `pickMatchesCustomRule(row, rule)` : conditions team/league/sport/edgeMin/confMin/oddMin/oddMax
+- `checkCustomNotifs(rows)` : appelée dans `renderUltimateBet`, dédoublonne via seen Set
+- Backbone prêt, UI de création de règles à venir (CRUD dans Réglages)
+
+**Sprint 79 G3 — Sweep catch silencieux partiel**
+- 11/33 catches silencieux migrés vers `logSafeError(ctx, e)` : boucles `predictMatch` (4 occurrences), `selectBestMarket` (1), `evaluateModelPick` (1), `dataQualityFlags` vig+live (2), `v43_profitable_mode` setItem+dispatch (2), `dashboardFlags` (1)
+- Restant : 22 catches sur `try { window.X = Y } catch(e) {}` légitimes (sandbox/CSP peut empêcher assignation globale)
+
+**Sprint 80+ planifié dans BACKLOG.md** :
+- Sprint 80 : D3 Compositions 11vs11 enrichies (M 3-4h)
+- Sprint 81 : D4 Player props inline (M 3h)
+- Sprint 82 : D7 Historique cotes 72h (M 3-4h)
+- Sprint 83 : E1+E2+E3 Performance critique (M+M+L)
+- Sprint 84 : C2 Multi-sport calibration (BLOQUÉ data)
+- Sprint 85 : C4+C5 Sharp money + multi-bookmaker (BLOQUÉ API key)
+- Sprint 86 : C7 Live picks <30min (M 4-5h)
+- Sprint 87 : D8 Mode tactique (L 1j)
+- Sprint 88 : F5 Sync multi-device (L 1j)
+- Sprint 89 : G2 tests intégration + G1 ESM split (L+XL, 2-3j sprint dédié)
+
+Engine OK : 171 matchs, 94 picks. Tests verts.
+
 ### Sprint 72 — Plan UX/pronostics maximum (Rounds 1-5)
 
 Implémentation du plan complet "améliorer UX au maximum + pronostics + fiches match" en 4 rounds d'exécution + 1 round documentation.
