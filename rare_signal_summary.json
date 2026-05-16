@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-16T18:50:40Z",
+  "generated_at": "2026-05-16T18:54:13Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
@@ -10,11 +10,11 @@
     "risk": 39,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 23,
-      "market_uncertain": 39,
-      "market_move": 3,
-      "back_to_back_travel": 6,
-      "signal_conflict": 3
+      "injury_imbalance": 22,
+      "market_move": 12,
+      "signal_conflict": 7,
+      "market_uncertain": 40,
+      "back_to_back_travel": 6
     },
     "by_quality": {
       "actionable": 21,
@@ -58,24 +58,6 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 15-7"
-    },
-    {
-      "event_id": "401871409",
-      "date": "2026-05-17T00:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Montreal Canadiens",
-      "away": "Buffalo Sabres",
-      "match": "Montreal Canadiens - Buffalo Sabres",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 1.57 -> 1.90 (-20.9%)"
     },
     {
       "event_id": "401815372",
@@ -166,6 +148,24 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 0-5"
+    },
+    {
+      "event_id": "401872121",
+      "date": "2026-05-19T18:00Z",
+      "sport": "football",
+      "league_code": "ita.2",
+      "league_name": "Serie B",
+      "home": "Monza",
+      "away": "Juve Stabia",
+      "match": "Monza - Juve Stabia",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "draw",
+      "strength": 1.0,
+      "context": "Cote draw: 2.85 -> 2.00 (+29.8%)"
     },
     {
       "event_id": "401815388",
@@ -276,24 +276,6 @@
       "context": "Absences severes 3-7"
     },
     {
-      "event_id": "401815383",
-      "date": "2026-05-17T18:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "St. Louis Cardinals",
-      "away": "Kansas City Royals",
-      "match": "St. Louis Cardinals - Kansas City Royals",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Kansas City Royals",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 2-6"
-    },
-    {
       "event_id": "401815386",
       "date": "2026-05-17T19:10Z",
       "sport": "baseball",
@@ -384,6 +366,24 @@
       "context": "Absences severes 9-5"
     },
     {
+      "event_id": "401815381",
+      "date": "2026-05-17T17:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Detroit Tigers",
+      "away": "Toronto Blue Jays",
+      "match": "Detroit Tigers - Toronto Blue Jays",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "away",
+      "strength": 0.758,
+      "context": "Cote away: 1.76 -> 2.00 (-13.6%)"
+    },
+    {
       "event_id": "401872904",
       "date": "2026-05-23T00:00Z",
       "sport": "hockey",
@@ -403,24 +403,6 @@
     }
   ],
   "active_watch": [
-    {
-      "event_id": "401872571",
-      "date": "2026-05-17T01:07Z",
-      "sport": "football",
-      "league_code": "ligamx",
-      "league_name": "Liga MX",
-      "home": "Guadalajara",
-      "away": "Cruz Azul",
-      "match": "Guadalajara - Cruz Azul",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.608,
-      "context": "Cote away: 3.20 -> 2.85 (+10.9%)"
-    },
     {
       "event_id": "401815363",
       "date": "2026-05-16T20:10Z",
@@ -492,6 +474,24 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 14-11"
+    },
+    {
+      "event_id": "401866583",
+      "date": "2026-05-17T12:00Z",
+      "sport": "football",
+      "league_code": "superleaguegrece",
+      "league_name": "Super League Grèce",
+      "home": "Panserraikos FC",
+      "away": "Panetolikos",
+      "match": "Panserraikos FC - Panetolikos",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 0.582,
+      "context": "Cote home: 2.10 -> 1.88 (+10.5%)"
     }
   ],
   "active_risk": [
@@ -550,7 +550,7 @@
       "context": "marge bookmaker anormale 18.1%"
     },
     {
-      "event_id": "175485",
+      "event_id": "175501",
       "date": "2026-05-18T04:00Z",
       "sport": "tennis",
       "league_code": "gonetgenevaopen",
@@ -565,7 +565,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 12.1%"
+      "context": "marge bookmaker anormale 12.2%"
     },
     {
       "event_id": "175441",
@@ -586,7 +586,7 @@
       "context": "marge bookmaker anormale 12.3%"
     },
     {
-      "event_id": "176118",
+      "event_id": "176117",
       "date": "2026-05-18T04:00Z",
       "sport": "tennis",
       "league_code": "internationauxdestra",
@@ -601,7 +601,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 12.3%"
+      "context": "marge bookmaker anormale 12.1%"
     },
     {
       "event_id": "401861386",

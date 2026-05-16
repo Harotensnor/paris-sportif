@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-16T18:50:33Z",
+  "generated_at": "2026-05-16T18:54:05Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -1746,88 +1746,6 @@
       ]
     },
     {
-      "event_id": "401815383",
-      "kickoff": "2026-05-17T18:15Z",
-      "league": "MLB",
-      "match": "Kansas City Royals at St. Louis Cardinals",
-      "home": "St. Louis Cardinals",
-      "away": "Kansas City Royals",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "St. Louis Cardinals",
-          "pitcher": "Andre Pallante",
-          "label": "Andre Pallante moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.5987,
-          "fair_odds": 1.67,
-          "expected_strikeouts": 4.1,
-          "projected_ip": 5.26,
-          "inputs": {
-            "k9": 7.02,
-            "era": 4.46,
-            "whip": 1.37,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "St. Louis Cardinals",
-          "pitcher": "Andre Pallante",
-          "label": "Andre Pallante ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.538,
-          "fair_odds": 1.86,
-          "expected_hr_allowed": 0.62,
-          "projected_ip": 5.26,
-          "inputs": {
-            "hr9": 1.06,
-            "era": 4.46,
-            "whip": 1.37
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Kansas City Royals",
-          "pitcher": "Stephen Kolek",
-          "label": "Stephen Kolek moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.549,
-          "fair_odds": 1.82,
-          "expected_strikeouts": 4.3,
-          "projected_ip": 5.1,
-          "inputs": {
-            "k9": 7.59,
-            "era": 6.75,
-            "whip": 1.13,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Kansas City Royals",
-          "pitcher": "Stephen Kolek",
-          "label": "Stephen Kolek concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.7616,
-          "fair_odds": 1.31,
-          "expected_hr_allowed": 1.434,
-          "projected_ip": 5.1,
-          "inputs": {
-            "hr9": 2.53,
-            "era": 6.75,
-            "whip": 1.13
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
       "event_id": "401815386",
       "kickoff": "2026-05-17T19:10Z",
       "league": "MLB",
@@ -2084,7 +2002,7 @@
       ]
     }
   ],
-  "props": 100,
+  "props": 96,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
