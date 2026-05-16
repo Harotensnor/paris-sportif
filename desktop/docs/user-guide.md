@@ -19,7 +19,7 @@ Ouvre d'abord `Picks`.
 
 1. Lis le bandeau : fraicheur des donnees, bankroll, P&L du jour.
 2. Regarde le `TOP PICK` si disponible.
-3. Parcours les sections horaires : dans l'heure, dans les 3 heures, aujourd'hui, cette nuit, demain.
+3. Choisis l'organisation qui te parle le plus : `Horaire`, `Type` ou `Sport`. Les sections vides sont cachees pour garder l'accueil propre.
 4. Pour chaque carte, lis seulement quatre lignes :
    - `PARI` : ce que tu dois choisir chez Winamax ;
    - `COTE` : la cote Winamax utilisee ;
@@ -50,6 +50,7 @@ Les handicaps, jeux tennis, scores exacts, cartons, corners et autres marches pl
 - `Ecarte` : signal insuffisant ou risque trop eleve.
 - `Tendance forte` : segment recemment performant.
 - `Tendance froide` : segment a traiter avec prudence.
+- `Securite 2-0` : sur certains Vainqueurs foot, Winamax peut payer plus tot si l'equipe mene de deux buts; verifie toujours l'eligibilite sur la page du match.
 
 Un pick sans bouton `Je mise` ne doit pas etre joue automatiquement. Il sert a comprendre le programme du jour. Pour les buteurs, l'app exige une cote Winamax reelle : une cote theorique seule ne suffit pas.
 
@@ -61,6 +62,8 @@ La fiche match sert a te rassurer sans jargon.
 - `Pourquoi ce pari` : 4 a 6 phrases factuelles avec les chiffres disponibles.
 - `Joueurs cles` : forme, xG/xA, tirs, passes cles, aces, break points ou stats sportives selon le sport.
 - `Analyse tactique` : surtout pour le foot, les duels et styles qui expliquent le sens du pick.
+- `Terrain & compositions` : les titulaires sont places par lignes de formation quand une compo probable ou confirmee est disponible.
+- `Filet de securite 2-0 Winamax` : la fiche affiche la probabilite estimee que l'equipe choisie prenne deux buts d'avance sur un Vainqueur foot eligible.
 - `Sources enrichies` et `News watcher` : ce qui a ete verifie, ce qui est indisponible, et ce qui doit etre relance avant le coup d'envoi.
 
 Si une source est absente, l'app l'indique clairement. Elle ne transforme pas une absence de donnee en preuve positive.
@@ -195,10 +198,6 @@ Une distribution large n'interdit pas le pari, mais elle conseille une mise plus
 ### Twitter/X watcher et news watcher
 
 Le watcher social utilise des sources publiques cote main process, avec cache et rate limit. Il cherche les news qui peuvent changer le pari : blessure, composition, suspension, coach, meteo. Si une source ne repond pas, l'app l'indique et ne l'invente pas.
-
-### Brief audio
-
-Le bouton `Ecouter le brief` lit le brief matin/soir avec la synthese vocale locale d'Electron. Le texte reste court : top pick, nombre de paris prets, nuit, bilan recent et consigne de prudence.
 
 ### Dashboard custom
 

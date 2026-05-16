@@ -927,9 +927,10 @@ function createLegacyEngineService({ projectRoot }) {
     const teams = getTeamNames(match);
     const markets = match?.winamax?.markets || {};
     const rows = [];
+    const minOdd = isFootballMatch(match) ? 1.08 : 1.20;
     const push = (side, odd, label, source = 'winamax_market') => {
       const value = Number(odd);
-      if (!(value >= 1.25 && value <= 2.40)) return;
+      if (!(value >= minOdd && value <= 2.40)) return;
       if (!['home', 'away'].includes(side)) return;
       rows.push({
         side,
@@ -951,6 +952,113 @@ function createLegacyEngineService({ projectRoot }) {
     return Array.from(seen.values()).sort((a, b) => a.odd - b.odd);
   }
 
+  function isFootballMatch(match) {
+    const sport = String(match?.sport || match?.sport_name || match?.league || '').toLowerCase();
+    return /soccer|football|foot/.test(sport) && !/américain|american|nfl/.test(sport);
+  }
+
+  function selectedWinnerSide(row) {
+    const group = simpleMarketGroup(row?.marketKey || row?.market);
+    if (group !== 'winner') return '';
+    const value = String([
+      row?.side,
+      row?.selection,
+      row?.label,
+      row?.pickLabel,
+      row?.pick
+    ].filter(Boolean).join(' ')).toLowerCase();
+    if (/\b(home|domicile|1)\b/.test(value)) return 'home';
+    if (/\b(away|exterieur|extérieur|2)\b/.test(value)) return 'away';
+    const teams = getTeamNames(row?.match || row || {});
+    const labelKey = compactKey(value);
+    const homeKey = compactKey(teams.home || '');
+    const awayKey = compactKey(teams.away || '');
+    if (homeKey && labelKey.includes(homeKey)) return 'home';
+    if (awayKey && labelKey.includes(awayKey)) return 'away';
+    return '';
+  }
+
+  function poissonPmf(lambda, goals) {
+    const l = Math.max(0.05, Math.min(4.8, Number(lambda) || 1.1));
+    const k = Math.max(0, Math.min(12, Number(goals) || 0));
+    let factorial = 1;
+    for (let index = 2; index <= k; index += 1) factorial *= index;
+    return Math.exp(-l) * (l ** k) / factorial;
+  }
+
+  function twoGoalSafetyForWinner(row) {
+    const match = row?.match || {};
+    if (!isFootballMatch(match) || isDrawSelection(row)) return null;
+    const side = selectedWinnerSide(row);
+    if (!side) return null;
+    const poisson = row?.pred?.poisson || {};
+    const baseWinProb = Math.max(0.30, Math.min(0.86, Number(row?.probability || row?.safeConfidence || 0.55) || 0.55));
+    let homeXg = Number(poisson.xgH ?? poisson.homeXg ?? poisson.home);
+    let awayXg = Number(poisson.xgA ?? poisson.awayXg ?? poisson.away);
+    if (!(homeXg > 0) || !(awayXg > 0)) {
+      const selectedXg = 0.90 + baseWinProb * 1.35;
+      const opponentXg = 1.95 - baseWinProb * 1.10;
+      homeXg = side === 'home' ? selectedXg + 0.12 : opponentXg;
+      awayXg = side === 'away' ? selectedXg : Math.max(0.55, opponentXg - 0.05);
+    }
+    homeXg = Math.max(0.45, Math.min(3.25, homeXg));
+    awayXg = Math.max(0.35, Math.min(3.10, awayXg));
+    let margin2Plus = 0;
+    for (let homeGoals = 0; homeGoals <= 8; homeGoals += 1) {
+      for (let awayGoals = 0; awayGoals <= 8; awayGoals += 1) {
+        const prob = poissonPmf(homeXg, homeGoals) * poissonPmf(awayXg, awayGoals);
+        if (side === 'home' && homeGoals - awayGoals >= 2) margin2Plus += prob;
+        if (side === 'away' && awayGoals - homeGoals >= 2) margin2Plus += prob;
+      }
+    }
+    const homeBonus = side === 'home' ? 0.035 : 0.010;
+    const leadTwoProbability = Math.max(
+      margin2Plus,
+      Math.min(0.92, margin2Plus * 1.18 + baseWinProb * 0.06 + homeBonus)
+    );
+    const boost = Math.min(0.045, leadTwoProbability * (side === 'home' ? 0.070 : 0.055));
+    return {
+      eligible: true,
+      side,
+      leadTwoProbability,
+      finalMarginTwoProbability: margin2Plus,
+      homeXg,
+      awayXg,
+      probabilityBoost: boost,
+      label: `${Math.round(leadTwoProbability * 100)}% sécurité 2-0`,
+      source: 'winamax_early_payout_model'
+    };
+  }
+
+  function applyWinamaxTwoGoalRule(row, win, bankroll) {
+    const safety = twoGoalSafetyForWinner(row);
+    if (!safety || !(safety.probabilityBoost > 0)) return row;
+    const beforeProbability = Number(row?.probability || 0) || 0;
+    const beforeEdge = Number(row?.edge || 0) || 0;
+    const probability = Math.min(0.88, beforeProbability + safety.probabilityBoost);
+    const odd = Number(row?.odd || 0);
+    const edge = odd > 1 ? Math.max(beforeEdge, probability - (1 / odd)) : beforeEdge;
+    const stake = edge > 0 && odd > 1 ? stakeFor(win, probability, odd, bankroll) : Number(row?.stake || 0);
+    return {
+      ...row,
+      probability,
+      edge,
+      stake: Math.max(Number(row?.stake || 0) || 0, stake),
+      modelStake: Math.max(Number(row?.modelStake || 0) || 0, stake),
+      winamaxTwoGoalRule: {
+        ...safety,
+        beforeProbability,
+        beforeEdge,
+        afterProbability: probability,
+        afterEdge: edge
+      },
+      reason: [
+        row?.reason,
+        `Filet Winamax 2-0 estimé à ${Math.round(safety.leadTwoProbability * 100)}% sur ce Vainqueur.`
+      ].filter(Boolean).join(' ')
+    };
+  }
+
   function oddsBasedFallback(win, match, bankroll) {
     const options = matchWinnerOptions(match);
     if (options.length < 1) return null;
@@ -960,18 +1068,26 @@ function createLegacyEngineService({ projectRoot }) {
     const sportKey = String(match?.sport || '').toLowerCase();
     const qualityScore = Number(match?.context?.quality?.score || 0);
     const majorNightSport = /basket|baseball|hockey|football américain|nfl/.test(sportKey);
+    const footballTwoGoalCandidate = isFootballMatch(match)
+      && favorite.side === 'home'
+      && favorite.odd >= 1.08
+      && favorite.odd <= 2.35
+      && (!challenger || gap >= 1.03)
+      && qualityScore >= 0;
     const strongFavorite = favorite.odd >= 1.30 && favorite.odd <= 1.55;
     const clearMarketFavorite = challenger && favorite.odd <= 1.78 && gap >= 1.10;
     const widerMarketFavorite = challenger && favorite.odd <= 1.92 && gap >= 1.18 && (qualityScore >= 45 || majorNightSport);
-    if (!(strongFavorite || clearMarketFavorite || widerMarketFavorite)) return null;
+    if (!(strongFavorite || clearMarketFavorite || widerMarketFavorite || footballTwoGoalCandidate)) return null;
     const implied = 1 / favorite.odd;
     const gapBonus = Math.min(0.030, Math.max(0, (gap - 1.10) * 0.024));
     const contextBonus = qualityScore >= 75 ? 0.012 : qualityScore >= 60 ? 0.006 : 0;
     const sportBonus = /basket|baseball|hockey|tennis|football américain|nfl|mma/.test(sportKey) ? 0.008 : 0;
+    const twoGoalBonus = footballTwoGoalCandidate ? 0.010 : 0;
     const priceBonus = strongFavorite ? 0.010 : 0;
-    const edge = Math.min(0.065, 0.016 + gapBonus + contextBonus + sportBonus + priceBonus);
+    const edge = Math.min(0.065, 0.016 + gapBonus + contextBonus + sportBonus + priceBonus + twoGoalBonus);
     if (!(edge >= 0.012)) return null;
-    const probability = Math.max(0.30, Math.min(0.78, implied + edge));
+    const probabilityCap = footballTwoGoalCandidate ? 0.94 : 0.78;
+    const probability = Math.max(0.30, Math.min(probabilityCap, implied + edge));
     const stake = 0;
     const modelStake = Math.max(0.10, Math.min(1.50, Number((Math.max(1, bankroll) * 0.004).toFixed(2))));
     return {
@@ -986,6 +1102,8 @@ function createLegacyEngineService({ projectRoot }) {
       market: 'Vainqueur',
       marketKey: '1n2',
       label: favorite.label,
+      side: favorite.side,
+      selection: favorite.side,
       odd: favorite.odd,
       probability,
       edge,
@@ -998,7 +1116,7 @@ function createLegacyEngineService({ projectRoot }) {
       confidenceTrust: {
         score: Math.round(Math.max(45, Math.min(62, probability * 100 - 6))),
         level: 'limité',
-        drivers: ['Cote Winamax claire', gap >= 1.35 ? 'Favori net' : 'Favori modéré']
+        drivers: ['Cote Winamax claire', footballTwoGoalCandidate ? 'Filet 2-0 possible' : gap >= 1.35 ? 'Favori net' : 'Favori modéré']
       },
       contextQuality: {
         ...(match?.context?.quality || {}),
@@ -1009,8 +1127,8 @@ function createLegacyEngineService({ projectRoot }) {
       contextGate: {
         gate: 'odds_fallback',
         agentEligible: true,
-        label: 'Confiance limitée : cote Winamax + contexte léger',
-        warnings: ['Signal basé sur la cote Winamax, à surveiller avant mise']
+        label: footballTwoGoalCandidate ? 'Confiance limitée : cote Winamax + filet 2-0 à vérifier' : 'Confiance limitée : cote Winamax + contexte léger',
+        warnings: [footballTwoGoalCandidate ? 'Vainqueur à surveiller : vérifier la règle 2-0 sur Winamax' : 'Signal basé sur la cote Winamax, à surveiller avant mise']
       },
       modelSkipOverridden: true
     };
@@ -1022,6 +1140,8 @@ function createLegacyEngineService({ projectRoot }) {
       market: fallback.market,
       marketKey: fallback.marketKey,
       label: fallback.label,
+      side: fallback.side,
+      selection: fallback.selection || fallback.side,
       odd: fallback.odd,
       probability: fallback.probability,
       edge: fallback.edge,
@@ -1148,7 +1268,8 @@ function createLegacyEngineService({ projectRoot }) {
           const fallbackLabel = compactKey(fallback.label || '');
           const primaryIsReady = stake > 0 && status === 'bet';
           const fallbackIsDistinct = fallbackMarket !== primaryMarket || fallbackLabel !== primaryLabel;
-          if (fallbackIsDistinct && (!primaryIsReady || Number(fallback.edge || 0) > Number(best?.edge || 0) + 0.005)) {
+          const fallbackHasTwoGoalSafety = /filet 2-0/i.test(String(fallback.contextGate?.label || fallback.statusLabel || ''));
+          if (fallbackIsDistinct && (fallbackHasTwoGoalSafety || !primaryIsReady || Number(fallback.edge || 0) > Number(best?.edge || 0) + 0.005)) {
             marketAlternatives.unshift(fallbackAlternativeRow(fallback, marketLabel));
           }
         }
@@ -1190,6 +1311,8 @@ function createLegacyEngineService({ projectRoot }) {
       ...(fallbackDetails ? {
         limitedConfidence: true,
         pickSource: fallbackDetails.pickSource,
+        side: fallbackDetails.side,
+        selection: fallbackDetails.selection || fallbackDetails.side,
         confidenceTrust: fallbackDetails.confidenceTrust,
         contextQuality: fallbackDetails.contextQuality,
         contextGate: fallbackDetails.contextGate
@@ -1523,8 +1646,9 @@ function createLegacyEngineService({ projectRoot }) {
     if (policy?.direction === 'harden') warnings.push(`segment froid : filtre durci (${policy.reason})`);
 
     if (row?.limitedConfidence) {
+      const limitedHasTwoGoalSafety = Boolean(row?.winamaxTwoGoalRule?.eligible);
       const limitedDisplayable = rawEdge >= 0.01 &&
-        odd >= 1.30 &&
+        odd >= (limitedHasTwoGoalSafety ? 1.08 : 1.30) &&
         odd <= 6.00 &&
         confidence >= 0.30 &&
         !row?.signalConflict?.active &&
@@ -1549,7 +1673,7 @@ function createLegacyEngineService({ projectRoot }) {
           reason: policy.reason
         } : null,
         reliableRule: null,
-        reasons: ['confiance limitée : cote Winamax + contexte léger'],
+        reasons: [limitedHasTwoGoalSafety ? 'confiance limitée : cote Winamax + filet 2-0 à vérifier' : 'confiance limitée : cote Winamax + contexte léger'],
         warnings: ['À surveiller avant mise', ...warnings].slice(0, 4)
       };
     }
@@ -1657,7 +1781,8 @@ function createLegacyEngineService({ projectRoot }) {
       ? Number.isFinite(roi) && roi >= 0 ? 1 : 0.20
       : confidence >= 0.70 ? 0.78 : 0.62;
     const freshnessScore = staleCount ? 0.70 : Number.isFinite(contextScore) ? clamp01(contextScore / 100) : 0.80;
-    return clamp01(edgeScore * 0.32 + confidenceScore * 0.30 + segmentScore * 0.23 + freshnessScore * 0.15);
+    const twoGoalBonus = clamp01(Number(row?.winamaxTwoGoalRule?.leadTwoProbability || 0) / 0.60) * 0.08;
+    return clamp01(edgeScore * 0.30 + confidenceScore * 0.28 + segmentScore * 0.22 + freshnessScore * 0.12 + twoGoalBonus);
   }
 
   function historicalVolumeScoreForRow(row) {
@@ -1678,6 +1803,7 @@ function createLegacyEngineService({ projectRoot }) {
     else bits.push('sample court mais signal fort');
     bits.push(`départ ${Math.max(0, Math.round(((Date.parse(row?.start || '') || Date.now()) - Date.now()) / 60000))} min`);
     if (row?.winamaxBoost) bits.push('boost Winamax');
+    if (row?.winamaxTwoGoalRule?.eligible) bits.push(`filet 2-0 ${Math.round(Number(row.winamaxTwoGoalRule.leadTwoProbability || 0) * 100)}%`);
     if (parts?.diversity >= 0.75) bits.push('diversification sport/ligue');
     return bits.slice(0, 5).join(' · ');
   }
@@ -2868,7 +2994,7 @@ function createLegacyEngineService({ projectRoot }) {
     const maxPerHourSlot = 4;
     const maxDashboardRows = 25;
     const maxPerSport = Math.max(3, Math.ceil(maxDashboardRows * 0.30));
-    const maxPerMarket = Math.max(3, Math.ceil(maxDashboardRows * 0.25));
+    const maxPerMarket = Math.max(5, Math.ceil(maxDashboardRows * 0.35));
     const maxPerLeague = Math.max(2, Math.ceil(maxDashboardRows * 0.20));
     const simplePicks = (Array.isArray(picks) ? picks : [])
       .filter(isSimpleUserMarket)
@@ -2988,7 +3114,7 @@ function createLegacyEngineService({ projectRoot }) {
     let todayCapRelaxed = false;
     let diversityCapRelaxed = false;
     const sportKey = (row) => String(row?.sport || 'sport').toLowerCase();
-    const marketKey = (row) => canonicalMarketKey(row?.marketKey || row?.market || 'market');
+    const marketKey = (row) => simpleMarketGroup(row?.marketKey || row?.market) || canonicalMarketKey(row?.marketKey || row?.market || 'market');
     const leagueKey = (row) => compactKey(row?.match?.league_code || row?.league || row?.match?.league_name || 'league');
     const teamTokens = (value) => String(value || '')
       .normalize('NFD')
@@ -3046,14 +3172,16 @@ function createLegacyEngineService({ projectRoot }) {
     const sortedOrdered = sortRows(ordered);
     const sortedTodayReady = sortRows(todayRows.filter((row) => row?.decisionCenter?.canBet === true));
     const sortedTodayDisplayable = sortRows(todayRows.filter(isDashboardDisplayCandidate));
+    const twoGoalWinnerRows = sortRows(sourcePicks.filter((row) => row?.winamaxTwoGoalRule?.eligible && isDashboardDisplayCandidate(row)));
+    const winnerRows = sortRows(sourcePicks.filter((row) => simpleMarketGroup(row?.marketKey || row?.market) === 'winner' && isDashboardDisplayCandidate(row)));
     const rollingReadyPool = sortRows(rolling24.filter((row) => row?.decisionCenter?.canBet));
     const sortedRollingReady = sortRows(ordered.filter((row) => {
       const ts = startTimestamp(row);
       return Number.isFinite(ts) && ts > now && ts <= now + 24 * 60 * 60 * 1000 && row?.decisionCenter?.canBet;
     }));
     const rollingReadyTarget = Math.min(maxDashboardRows, rollingReadyPool.length, Math.max(target24, 10));
-    const todayReadyTarget = Math.min(5, sortedTodayReady.length);
-    const todayVisibleTarget = Math.min(10, sortedTodayDisplayable.length);
+    const todayReadyTarget = Math.min(8, sortedTodayReady.length);
+    const todayVisibleTarget = Math.min(20, sortedTodayDisplayable.length);
     if (todayReadyTarget > 0) {
       addFinalRows(sortedTodayReady, todayReadyTarget, { enforceMatchCap: true });
       if (finalRows.length < todayReadyTarget) {
@@ -3076,6 +3204,30 @@ function createLegacyEngineService({ projectRoot }) {
         relaxLeague: true,
         relaxMarket: true
       });
+    }
+    if (twoGoalWinnerRows.length) {
+      const twoGoalTarget = Math.min(4, twoGoalWinnerRows.length);
+      const currentTwoGoal = () => finalRows.filter((row) => row?.winamaxTwoGoalRule?.eligible).length;
+      if (currentTwoGoal() < twoGoalTarget) {
+        addFinalRows(twoGoalWinnerRows, Math.min(maxDashboardRows, finalRows.length + twoGoalTarget - currentTwoGoal()), {
+          matchCap: maxPerMatch,
+          relaxSport: true,
+          relaxLeague: true,
+          relaxMarket: true
+        });
+      }
+    }
+    if (winnerRows.length) {
+      const winnerTarget = Math.min(winnerRows.length, Math.max(6, Math.ceil(maxDashboardRows * 0.40)));
+      const currentWinners = () => finalRows.filter((row) => simpleMarketGroup(row?.marketKey || row?.market) === 'winner').length;
+      if (currentWinners() < Math.min(winnerTarget, maxDashboardRows)) {
+        addFinalRows(winnerRows, Math.min(maxDashboardRows, finalRows.length + Math.max(0, winnerTarget - currentWinners())), {
+          matchCap: maxPerMatch,
+          relaxSport: true,
+          relaxLeague: true,
+          relaxMarket: true
+        });
+      }
     }
     addFinalRows(sortedRollingReady, Math.max(rollingReadyTarget, Math.min(target24, sortedRollingReady.length)));
     if (rollingWindowRows(finalRows, 24).length < rollingReadyTarget) {
@@ -3575,6 +3727,7 @@ function createLegacyEngineService({ projectRoot }) {
       .map((row) => contextUtils.annotateConfidence(row, contextBacktestReport))
       .map((row) => applyModelReality(row, modelRealityAudit))
       .map((row) => applyProbabilityRealityCalibration(row, probabilityCalibrationReport, win, safeBankroll))
+      .map((row) => applyWinamaxTwoGoalRule(row, win, safeBankroll))
       .map((row) => applyDecisionAndMarketTiming(row, clvSummaryReport, decisionTuningReport))
       .map((row) => applyOddsGuardrails(row, oddsGuardrailsReport))
       .map((row) => applyStakePrudence(row, agentGuardrailRecommendationsReport, stakeReductionBacktestReport))

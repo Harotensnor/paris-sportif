@@ -152,6 +152,7 @@
   const SPORT_PATTERNS_KEY = 'parisSportifAdvancedSportPatterns';
   const I18N_LANGUAGE_KEY = 'parisSportifLanguage';
   const DASHBOARD_LAYOUT_KEY = 'parisSportifDashboardLayouts';
+  const PICKS_VIEW_MODE_KEY = 'parisSportifPicksViewMode';
   const DEFAULT_SHORTCUTS = {
     dashboard: 'Ctrl+1',
     history: 'Ctrl+2',
@@ -262,8 +263,6 @@
     autoTrackingMarkets: SIMPLE_MARKET_PREFS.map((item) => item.key),
     liveNewsWatcher: false,
     twitterWatcher: false,
-    audioBriefEnabled: false,
-    audioBriefRate: 1,
     dashboardCustom: false,
     dashboardPreset: 'matin',
     language: 'fr',
@@ -3108,6 +3107,10 @@
     } else if (fallback) {
       sentences.push(cleanExplanation(fallback).replace(/\bheadline\s*:\s*/i, '').replace(/\bsummary\s*:\s*/i, ''));
     }
+    if (row?.winamaxTwoGoalRule?.eligible) {
+      const safety = row.winamaxTwoGoalRule;
+      sentences.push(`Le filet Winamax 2-0 ajoute une protection intéressante : le modèle estime ${Math.round(Number(safety.leadTwoProbability || 0) * 100)}% de chances que l’équipe choisie mène de deux buts à un moment, ce qui peut payer le Vainqueur avant la fin si le pari est éligible.`);
+    }
     if (row?.safeAssessment?.status === 'watch' || row?.limitedConfidence || row?.match?.context?.quality?.gate === 'watch') {
       sentences.push('La fiche reste prudente : la cote est intéressante, mais il faut recontrôler les infos proches du coup d’envoi.');
     } else {
@@ -3136,6 +3139,11 @@
     const n = Number(value);
     if (!Number.isFinite(n)) return 'non confirmé';
     return `${n.toFixed(digits).replace(/\.0$/, '')}${suffix}`;
+  }
+
+  function hasMeaningfulMetric(value, min = 0.05) {
+    const n = Number(value);
+    return Number.isFinite(n) && Math.abs(n) >= min;
   }
 
   function teamContext(row, side) {
@@ -3187,10 +3195,10 @@
     const xgAgainst = Number(side?.xg_against_avg ?? side?.xga_per90 ?? xg.against_avg);
     const avgGf5 = Number(side?.form_stats?.avg_gf5 ?? side?.avg_gf5);
     const avgGa5 = Number(side?.form_stats?.avg_ga5 ?? side?.avg_ga5);
-    if (Number.isFinite(avgGf5) || Number.isFinite(avgGa5)) return `${numericText(avgGf5, ' but/m sur 5', 2)} · ${numericText(avgGa5, ' encaissé/m sur 5', 2)}`;
-    if (Number.isFinite(xgFor) || Number.isFinite(xgAgainst)) return `${numericText(xgFor, ' xG pour', 2)} · ${numericText(xgAgainst, ' xG contre', 2)}`;
+    if (hasMeaningfulMetric(avgGf5) || hasMeaningfulMetric(avgGa5)) return `${numericText(avgGf5, ' but/m sur 5', 2)} · ${numericText(avgGa5, ' encaissé/m sur 5', 2)}`;
+    if (hasMeaningfulMetric(xgFor) || hasMeaningfulMetric(xgAgainst)) return `${numericText(xgFor, ' xG pour', 2)} · ${numericText(xgAgainst, ' xG contre', 2)}`;
     if (fd.matches) return `${numericText(fd.avg_for, ' but/m', 2)} · ${numericText(fd.avg_against, ' encaissé/m', 2)}`;
-    if (xg.present) return `${numericText(xg.for_avg, ' xG pour', 2)} · ${numericText(xg.against_avg, ' xG contre', 2)}`;
+    if (xg.present && (hasMeaningfulMetric(xg.for_avg) || hasMeaningfulMetric(xg.against_avg))) return `${numericText(xg.for_avg, ' xG pour', 2)} · ${numericText(xg.against_avg, ' xG contre', 2)}`;
     return 'buts récents à confirmer';
   }
 
@@ -3273,9 +3281,10 @@
 
   function statChip(label, value, suffix = '', digits = 1) {
     const n = Number(value);
-    const text = Number.isFinite(n)
-      ? `${n.toFixed(digits).replace(/\.0$/, '')}${suffix}`
-      : 'à enrichir';
+    if (!Number.isFinite(n)) return '';
+    const zeroIsMissing = /xg|xa|tirs|dribbles|passes clés|conversion|minutes/i.test(label);
+    if (zeroIsMissing && n <= 0) return '';
+    const text = `${n.toFixed(digits).replace(/\.0$/, '')}${suffix}`;
     return `<span title="${escapeHtml(label)}">${escapeHtml(label)} <strong>${escapeHtml(text)}</strong></span>`;
   }
 
@@ -3319,16 +3328,6 @@
             <article class="key-player-card">
               <strong>Joueurs clés à enrichir</strong>
               <em>La feuille de match n’est pas encore publiée, mais la fiche surveille ces stats dès qu’elles arrivent.</em>
-              <div class="stat-chip-row">
-                ${statChip('xG saison', NaN, '', 1)}
-                ${statChip('xA saison', NaN, '', 1)}
-                ${statChip('Tirs cadrés/m', NaN, '', 1)}
-                ${statChip('Dribbles/m', NaN, '', 1)}
-                ${statChip('Passes clés/m', NaN, '', 1)}
-                ${statChip('Conversion', NaN, '%', 0)}
-                ${statChip('Cartons', NaN, '', 0)}
-                ${statChip('Minutes', NaN, '', 0)}
-              </div>
             </article>
           `}
         </div>
@@ -3403,10 +3402,10 @@
     const rows = [
       ['Buteurs probables', likelyScorers.length ? likelyScorers.map((item) => item.player?.name || item.star?.name).filter(Boolean).join(' · ') : 'à confirmer dès que les titulaires sortent'],
       ['Cartons probables', match.referee?.cardsPerGame ? `${Number(match.referee.cardsPerGame).toFixed(1)} cartons/m arbitre` : 'arbitre ou historique cartons à enrichir'],
-      ['Coups de pied arrêtés', Number.isFinite(homeSetPieces) || Number.isFinite(awaySetPieces) ? `${teamDisplayName(row, 'home')} ${numericText(homeSetPieces, ' xG CPA', 2)} · ${teamDisplayName(row, 'away')} ${numericText(awaySetPieces, ' xG CPA', 2)}` : 'signal corners/coups francs surveillé mais non confirmé'],
+      ['Coups de pied arrêtés', hasMeaningfulMetric(homeSetPieces) || hasMeaningfulMetric(awaySetPieces) ? `${teamDisplayName(row, 'home')} ${numericText(homeSetPieces, ' xG CPA', 2)} · ${teamDisplayName(row, 'away')} ${numericText(awaySetPieces, ' xG CPA', 2)}` : 'signal corners/coups francs surveillé mais non confirmé'],
       ['Pénalty', Number.isFinite(homePenalty) || Number.isFinite(awayPenalty) ? `${numericText(homePenalty * 100, '% domicile', 0)} · ${numericText(awayPenalty * 100, '% extérieur', 0)}` : 'tendance penalties à confirmer'],
       ['Pressing', Number.isFinite(homePress) || Number.isFinite(awayPress) ? `${teamDisplayName(row, 'home')} PPDA ${numericText(homePress, '', 1)} · ${teamDisplayName(row, 'away')} PPDA ${numericText(awayPress, '', 1)}` : `${inferFootballStyle(home)} / ${inferFootballStyle(away)}`],
-      ['Construction', Number.isFinite(homeXg) || Number.isFinite(awayXg) ? `xG attaque ${numericText(homeXg, '', 2)} / ${numericText(awayXg, '', 2)}` : 'build-up estimé via style et volume offensif']
+      ['Construction', hasMeaningfulMetric(homeXg) || hasMeaningfulMetric(awayXg) ? `xG attaque ${numericText(homeXg, '', 2)} / ${numericText(awayXg, '', 2)}` : 'build-up estimé via style et volume offensif']
     ];
     return `
       <article class="detail-card wide phase2-card">
@@ -3434,28 +3433,64 @@
     return map;
   }
 
+  function formationNumbers(value) {
+    const nums = String(value || '4-3-3').match(/\d+/g)?.map((item) => Number(item)).filter((item) => item > 0) || [4, 3, 3];
+    return nums.length >= 2 ? nums.slice(0, 4) : [4, 3, 3];
+  }
+
+  function pitchRowsForPlayers(players, formation) {
+    const starters = Array.isArray(players) ? players.slice(0, 11) : [];
+    if (!starters.length) return [];
+    const keeper = starters.find((player) => /^(g|gb|gk)$/i.test(String(player?.pos || player?.position || ''))) || starters[0];
+    const rest = starters.filter((player) => player !== keeper);
+    const byPos = {
+      defense: rest.filter((player) => /^d/i.test(String(player?.pos || player?.position || ''))),
+      middle: rest.filter((player) => /^m/i.test(String(player?.pos || player?.position || ''))),
+      attack: rest.filter((player) => /^(f|a|st|fw)/i.test(String(player?.pos || player?.position || '')))
+    };
+    const unknown = rest.filter((player) => !byPos.defense.includes(player) && !byPos.middle.includes(player) && !byPos.attack.includes(player));
+    const nums = formationNumbers(formation);
+    const fill = (key, target) => {
+      while (byPos[key].length < target && unknown.length) byPos[key].push(unknown.shift());
+    };
+    fill('defense', nums[0] || 4);
+    fill('middle', nums[1] || 3);
+    fill('attack', nums.slice(2).reduce((sum, n) => sum + n, 0) || 3);
+    return [
+      { label: 'Attaque', players: byPos.attack },
+      { label: 'Milieu', players: byPos.middle },
+      { label: 'Défense', players: byPos.defense },
+      { label: 'Gardien', players: [keeper] }
+    ].filter((line) => line.players.length);
+  }
+
   function buildPitchColumn(row, side) {
     const players = lineupPlayers(row, side);
     const stars = starIndex(row, side);
     const lineup = lineupContext(row, side);
     const title = `${teamDisplayName(row, side)}${lineup.formation ? ` · ${lineup.formation}` : ''}`;
     const source = lineup.confirmed ? 'composition confirmée' : lineup.projected || lineup.present ? 'composition probable' : 'composition à confirmer';
+    const pitchLines = pitchRowsForPlayers(players, lineup.formation);
+    const renderPlayer = (player) => {
+      const star = player.star || stars.get(normalizeUiKey(player.name || ''));
+      const hot = Number(star?.star_score || player?.rating || 0) >= 6;
+      return `
+        <div class="pitch-player-token ${hot ? 'hot' : ''}" title="${escapeHtml(playerStatLine(player, star))}">
+          <span>${escapeHtml(player.shirt != null && player.shirt !== '' ? String(player.shirt) : player.pos || star?.position || '-')}</span>
+          <strong>${escapeHtml(player.name || star?.name || 'À confirmer')}</strong>
+        </div>
+      `;
+    };
     return `
       <div class="pitch-column">
         <h5>${escapeHtml(title)}</h5>
         <small>${escapeHtml(source)}</small>
         <div class="pitch-players">
-          ${players.length ? players.map((player) => {
-            const star = player.star || stars.get(normalizeUiKey(player.name || ''));
-            const hot = Number(star?.star_score || player?.rating || 0) >= 6;
-            return `
-              <div class="pitch-player ${hot ? 'hot' : ''}">
-                <span>${escapeHtml(player.shirt != null && player.shirt !== '' ? `#${player.shirt}` : player.pos || star?.position || '-')}</span>
-                <strong>${escapeHtml(player.name || star?.name || 'Joueur à confirmer')}</strong>
-                <em>${escapeHtml(playerStatLine(player, star))}</em>
-              </div>
-            `;
-          }).join('') : '<div class="empty compact-empty">Feuille de match non publiée par les sources locales.</div>'}
+          ${pitchLines.length ? pitchLines.map((line) => `
+            <div class="pitch-line" data-line="${escapeHtml(line.label)}">
+              ${line.players.map(renderPlayer).join('')}
+            </div>
+          `).join('') : '<div class="empty compact-empty">Feuille de match non publiée par les sources locales.</div>'}
         </div>
       </div>
     `;
@@ -4839,6 +4874,14 @@
     return `<span title="${escapeHtml(boost.sample || 'Boost Winamax détecté dans les données locales')}">Boost Winamax${odds ? ` ${escapeHtml(odds)}` : ''}</span>`;
   }
 
+  function twoGoalSafetyBadgeHtml(row) {
+    const safety = row?.winamaxTwoGoalRule;
+    if (!safety?.eligible) return '';
+    const pct = Math.round(Number(safety.leadTwoProbability || 0) * 100);
+    if (!(pct > 0)) return '';
+    return `<span class="two-goal-badge" title="Paiement anticipé Winamax estimé si l’équipe mène de 2 buts sur ce Vainqueur foot">🛡 ${escapeHtml(String(pct))}% sécurité 2-0</span>`;
+  }
+
   function ultimateBetReason(row) {
     if (!row) return 'Aucun pari simple ne réunit assez de signaux pour devenir le pari principal.';
     return `Pourquoi #1 ? ${userBetLabel(row)} à ${formatOdd(row.odd)} sur Winamax, départ ${countdownLabel(row.start)}. ${simpleWhyText(row).replace(/^Pourquoi\s*:\s*/i, '')}`;
@@ -4880,6 +4923,7 @@
           ${safeBadgeHtml(row)}
           ${specialPatternBadgeHtml(row)}
           ${boostBadgeHtml(row)}
+          ${twoGoalSafetyBadgeHtml(row)}
           ${enrichmentBadgeHtml(row)}
         </div>
       </div>
@@ -4931,6 +4975,7 @@
           ${safeBadgeHtml(row)}
           ${specialPatternBadgeHtml(row)}
           ${boostBadgeHtml(row)}
+          ${twoGoalSafetyBadgeHtml(row)}
           ${enrichmentBadgeHtml(row)}
         </div>
         ${actionPickHtml(row, { compact: true })}
@@ -4944,9 +4989,93 @@
     `;
   }
 
+  function picksViewMode() {
+    try {
+      const mode = localStorage.getItem(PICKS_VIEW_MODE_KEY);
+      return ['time', 'type', 'sport'].includes(mode) ? mode : 'time';
+    } catch {
+      return 'time';
+    }
+  }
+
+  function updatePicksViewSwitch(mode = picksViewMode()) {
+    $$('#picks-view-switch [data-picks-view-mode]').forEach((button) => {
+      button.classList.toggle('active', button.dataset.picksViewMode === mode);
+    });
+  }
+
+  function groupRowsByDefinition(rows, definitions, fallbackKey = 'other') {
+    const grouped = new Map(definitions.map((definition) => [definition.key, []]));
+    (Array.isArray(rows) ? rows : []).forEach((row) => {
+      const key = definitions.find((definition) => definition.match(row))?.key || fallbackKey;
+      if (!grouped.has(key)) grouped.set(key, []);
+      grouped.get(key).push(row);
+    });
+    grouped.forEach((bucketRows) => bucketRows.sort((a, b) => Date.parse(a.start || '') - Date.parse(b.start || '') || safeConfidenceValue(b) - safeConfidenceValue(a) || displayEdgeValue(b) - displayEdgeValue(a)));
+    return grouped;
+  }
+
+  function renderGroupedCockpit(rows, definitions, { emptyText = 'Aucun pari dans cette catégorie.' } = {}) {
+    return definitions
+      .map((definition) => ({ ...definition, rows: rows.get(definition.key) || [] }))
+      .filter((definition) => definition.rows.length || definition.open)
+      .map((definition) => {
+        const rowsHtml = definition.rows.length
+          ? definition.rows.slice(0, definition.limit || 10).map(timePickCard).join('')
+          : `<div class="empty compact-empty">${escapeHtml(emptyText)}</div>`;
+        return `
+          <details class="time-section ${definition.hot && definition.rows.length ? 'hot' : ''}" data-time-bucket="${escapeHtml(definition.key)}"${definition.open ? ' open' : ''}>
+            <summary>
+              <span>${escapeHtml(definition.title)}</span>
+              <strong>${formatCount(definition.rows.length)}</strong>
+              <em>${escapeHtml(definition.detail || '')}</em>
+            </summary>
+            <div class="time-section-grid">${rowsHtml}</div>
+          </details>
+        `;
+      }).join('');
+  }
+
+  function renderTypeCockpit(baseRows) {
+    const definitions = [
+      { key: 'winner', title: 'Vainqueurs du jour', detail: 'priorité diversité', open: true, limit: 12, match: (row) => rowMarketPreferenceKey(row) === 'winner' },
+      { key: 'goals', title: 'Buts', detail: 'Plus/Moins + BTTS', open: false, limit: 12, match: (row) => ['goals', 'btts'].includes(rowMarketPreferenceKey(row)) },
+      { key: 'scorer', title: 'Buteurs', detail: 'joueurs décisifs', open: false, limit: 10, match: (row) => rowMarketPreferenceKey(row) === 'scorer' },
+      { key: 'halftime', title: 'Mi-temps', detail: 'lecture simple', open: false, limit: 8, match: (row) => rowMarketPreferenceKey(row) === 'halftime' },
+      { key: 'other', title: 'Autres paris simples', detail: 'à vérifier', open: false, limit: 8, match: () => true }
+    ];
+    return renderGroupedCockpit(groupRowsByDefinition(baseRows, definitions), definitions);
+  }
+
+  function renderSportCockpit(baseRows) {
+    const sportDefs = [
+      ['football', 'Football', 'foot + buteurs', /football|soccer|foot/i],
+      ['tennis', 'Tennis', 'ATP / WTA', /tennis/i],
+      ['basket', 'Basket', 'NBA + Europe', /basket/i],
+      ['hockey', 'Hockey', 'NHL + Europe', /hockey/i],
+      ['baseball', 'Baseball', 'MLB', /baseball|mlb/i],
+      ['nfl', 'NFL', 'football américain', /nfl|football américain|american football/i],
+      ['other', 'Autres sports', 'rugby, MMA, boxe', /.*/i]
+    ].map(([key, title, detail, pattern], index, arr) => ({
+      key,
+      title,
+      detail,
+      open: index === 0,
+      limit: 10,
+      match: (row) => {
+        const sport = `${row?.sport || ''} ${row?.league || ''}`;
+        if (key === 'other') return !arr.slice(0, -1).some((item) => item[3].test(sport));
+        return pattern.test(sport);
+      }
+    }));
+    return renderGroupedCockpit(groupRowsByDefinition(baseRows, sportDefs), sportDefs);
+  }
+
   function renderTemporalCockpit(rows) {
     const wrap = $('#time-cockpit');
     if (!wrap) return;
+    const mode = picksViewMode();
+    updatePicksViewSwitch(mode);
     const buckets = [
       { key: 'next', title: 'À jouer prochainement', detail: '5 à 10 prochains départs', open: true },
       { key: 'hour', title: 'Dans l’heure', detail: '< 60 min', open: false },
@@ -4961,15 +5090,25 @@
       .filter(canDisplayPickCard)
       .slice()
       .sort((a, b) => Date.parse(a.start || '') - Date.parse(b.start || '') || safeConfidenceValue(b) - safeConfidenceValue(a) || displayEdgeValue(b) - displayEdgeValue(a));
+    if (mode === 'type') {
+      wrap.innerHTML = renderTypeCockpit(baseRows);
+      return;
+    }
+    if (mode === 'sport') {
+      wrap.innerHTML = renderSportCockpit(baseRows);
+      return;
+    }
     const grouped = new Map(buckets.map((bucket) => [bucket.key, []]));
     grouped.set('next', baseRows.slice(0, 10));
     baseRows.forEach((row) => grouped.get(temporalBucketForPick(row))?.push(row));
     grouped.forEach((bucketRows) => bucketRows.sort((a, b) => Date.parse(a.start || '') - Date.parse(b.start || '') || safeConfidenceValue(b) - safeConfidenceValue(a) || displayEdgeValue(b) - displayEdgeValue(a)));
-    wrap.innerHTML = buckets.map((bucket) => {
+    wrap.innerHTML = buckets
+      .filter((bucket) => bucket.key === 'next' || (grouped.get(bucket.key) || []).length)
+      .map((bucket) => {
       const bucketRows = grouped.get(bucket.key) || [];
       const rowsHtml = bucketRows.length
         ? bucketRows.slice(0, bucket.key === 'later' ? 12 : 8).map(timePickCard).join('')
-        : '<div class="empty compact-empty">Aucun pick dans cette fenêtre.</div>';
+        : '<div class="empty compact-empty">Les prochains paris apparaîtront ici dès que la pipeline trouve une ligne fiable.</div>';
       return `
         <details class="time-section ${bucket.key === 'hour' && bucketRows.length ? 'hot' : ''}" data-time-bucket="${escapeHtml(bucket.key)}"${bucket.open ? ' open' : ''}>
           <summary>
@@ -5998,37 +6137,6 @@
       .map((node) => node.dataset.bentoWidget)
       .filter(Boolean);
     saveDashboardLayout(prefs.dashboardPreset || 'matin', order);
-  }
-
-  function briefAudioText(rows = state.currentDashboardRows || state.picks) {
-    const stats = userBetStats();
-    const pool = (Array.isArray(rows) ? rows : []).filter(canDisplayPickCard);
-    const top = aiSelectedUltimate(pool) || ultimateBetCandidate(pool) || pool[0] || null;
-    const night = pool.filter((row) => temporalBucketForPick(row) === 'tonight').length;
-    if (!top) {
-      return `Bonjour. Le logiciel n'a pas encore de pari validé. Lance un refresh et vérifie le diagnostic avant de miser. Ton bilan suivi est ${formatMoney(stats.pnlToday)} aujourd'hui.`;
-    }
-    return `Bonjour. Aujourd'hui ${formatCount(pool.filter(canDisplayStake).length)} paris sont prêts, dont ${formatCount(night)} cette nuit. Le top pick est ${top.title}: ${userBetLabel(top)}, cote ${formatOdd(top.odd)}, mise ${visibleStakeText(top)}. ${compactNarrativePreview(top) || simpleWhyText(top)} Ton bilan d'hier et d'aujourd'hui reste visible dans Bilan.`;
-  }
-
-  function speakBrief({ manual = false } = {}) {
-    if (!('speechSynthesis' in window) || !window.SpeechSynthesisUtterance) {
-      setSideStatus('Brief audio indisponible sur ce système', 'warn');
-      return;
-    }
-    const prefs = loadPreferences();
-    const utterance = new SpeechSynthesisUtterance(briefAudioText());
-    const lang = document.documentElement.lang || loadPreferences().language || 'fr';
-    utterance.lang = String(lang).startsWith('en') ? 'en-US' : 'fr-FR';
-    utterance.rate = Math.max(0.75, Math.min(1.5, Number(prefs.audioBriefRate || 1) || 1));
-    const button = $('#listen-brief-btn');
-    const stopPulse = () => button?.classList.remove('is-speaking');
-    utterance.onend = stopPulse;
-    utterance.onerror = stopPulse;
-    window.speechSynthesis.cancel();
-    button?.classList.add('is-speaking');
-    window.speechSynthesis.speak(utterance);
-    setSideStatus(manual ? 'Lecture du brief en cours' : 'Brief audio lancé', 'ok');
   }
 
   function renderWinamaxMarketAudit() {
@@ -8692,10 +8800,6 @@
     if (liveNews) liveNews.checked = Boolean(prefs.liveNewsWatcher);
     const twitterWatcher = $('#pref-twitter-watcher');
     if (twitterWatcher) twitterWatcher.checked = Boolean(prefs.twitterWatcher);
-    const audioBrief = $('#pref-audio-brief');
-    if (audioBrief) audioBrief.checked = Boolean(prefs.audioBriefEnabled);
-    const audioRate = $('#pref-audio-rate');
-    if (audioRate) audioRate.value = String(prefs.audioBriefRate || 1);
     const autoTrackingEnabled = $('#pref-auto-tracking-enabled');
     if (autoTrackingEnabled) autoTrackingEnabled.checked = Boolean(prefs.autoTrackingEnabled);
     const autoTrackingConfirmed = $('#pref-auto-tracking-confirmed');
@@ -8940,8 +9044,6 @@
       autoTrackingMarkets: [...(simpleSelected.length ? simpleSelected : DEFAULT_PREFERENCES.markets), ...expertSelected],
       liveNewsWatcher: Boolean($('#pref-live-news-watcher')?.checked),
       twitterWatcher: Boolean($('#pref-twitter-watcher')?.checked),
-      audioBriefEnabled: Boolean($('#pref-audio-brief')?.checked),
-      audioBriefRate: Math.max(0.75, Math.min(1.5, Number($('#pref-audio-rate')?.value || DEFAULT_PREFERENCES.audioBriefRate) || DEFAULT_PREFERENCES.audioBriefRate)),
       dashboardCustom: Boolean($('#pref-dashboard-custom')?.checked),
       dashboardPreset: loadPreferences().dashboardPreset || DEFAULT_PREFERENCES.dashboardPreset,
       language: $('#pref-language')?.value || DEFAULT_PREFERENCES.language,
@@ -10476,7 +10578,7 @@
     const rows = [
       ['Forme L5', side?.form5 || '-'],
       ['Forme L10', side?.form10 || '-'],
-      ['xG pour/contre', xg.present ? `${xg.for_avg ?? '-'} / ${xg.against_avg ?? '-'}` : 'Non disponible'],
+      ['xG pour/contre', xg.present && (hasMeaningfulMetric(xg.for_avg) || hasMeaningfulMetric(xg.against_avg)) ? `${numericText(xg.for_avg, '', 2)} / ${numericText(xg.against_avg, '', 2)}` : 'Non disponible'],
       ['Elo', elo.value != null ? `${Math.round(Number(elo.value))}` : history.elo != null ? `${Math.round(Number(history.elo))}` : 'Non disponible'],
       ['Historique local', history.events_seen ? `${formatCount(history.events_seen)} observations` : 'Non disponible'],
       ['Football-Data', fd?.matches ? `${formatCount(fd.matches)} matchs · BTTS ${formatPct(fd.btts_rate || 0, 0)}` : 'Non disponible']
@@ -10490,9 +10592,20 @@
 
   function buildTeamsHtml(row) {
     const teams = row.match?.context?.teams || {};
+    const sport = String(row?.sport || row?.match?.sport || '').toLowerCase();
+    const footballPitch = sport.includes('football') || sport.includes('soccer') ? `
+      <article class="detail-card wide">
+        <h4>Terrain & compositions</h4>
+        <div class="lineup-pitch" aria-label="Feuille de match probable">
+          ${buildPitchColumn(row, 'home')}
+          ${buildPitchColumn(row, 'away')}
+        </div>
+      </article>
+    ` : '';
     return `
       <section class="detail-tab-panel" data-detail-panel="teams">
         <div class="modal-grid">
+          ${footballPitch}
           ${teamContextCard(teams.home, 'Domicile')}
           ${teamContextCard(teams.away, 'Extérieur')}
         </div>
@@ -10889,6 +11002,25 @@
     `;
   }
 
+  function buildTwoGoalSafetyHtml(row) {
+    const safety = row?.winamaxTwoGoalRule;
+    if (!safety?.eligible) return '';
+    const pct = Math.round(Number(safety.leadTwoProbability || 0) * 100);
+    const margin = Math.round(Number(safety.finalMarginTwoProbability || 0) * 100);
+    const boost = Math.round(Number(safety.probabilityBoost || 0) * 1000) / 10;
+    return `
+      <article class="detail-card wide two-goal-card">
+        <h4>Filet de sécurité 2-0 Winamax</h4>
+        <p class="detail-text">Sur les Vainqueurs foot éligibles, Winamax peut payer le pari plus tôt si l’équipe choisie mène de deux buts. Le logiciel modélise ce filet avec prudence, sans remplacer la vérification de la page du match.</p>
+        <div class="match-context-band">
+          <span>${escapeHtml(`${pct}% sécurité 2-0 estimée`)}</span>
+          <strong>${escapeHtml(`Marge finale 2+ buts : ${margin}%`)}</strong>
+          <em>${escapeHtml(boost > 0 ? `Bonus prudent appliqué au score : +${boost} pt` : 'Pas de bonus de score appliqué')}</em>
+        </div>
+      </article>
+    `;
+  }
+
   function personalModelForRow(row) {
     const settled = loadUserBets().filter((bet) => ['won', 'lost'].includes(String(bet.status || '')));
     const sportKey = normalizeUiKey(row?.sport || '');
@@ -11042,6 +11174,7 @@
             <div class="ultimate-tags detail-priority-strip">
               ${priorityBadgeHtml(row)}
               ${safeBadgeHtml(row)}
+              ${twoGoalSafetyBadgeHtml(row)}
               <span title="${escapeHtml(allocationLongText(row))}">${escapeHtml(allocationSummaryText(row))}</span>
             </div>
             <div class="decision-hero-grid">
@@ -11059,6 +11192,7 @@
               <span>MISE</span><strong>${escapeHtml(visibleStakeText(row, decisionBundle))}</strong>
               <span>Marché</span><strong>${escapeHtml(simpleMarketLabelForRow(row))}</strong>
               <span>Boost Winamax</span><strong>${escapeHtml(row.winamaxBoost ? (row.winamaxBoost.to ? `${row.winamaxBoost.from ? `${Number(row.winamaxBoost.from).toFixed(2)} → ` : ''}${Number(row.winamaxBoost.to).toFixed(2)}` : 'détecté') : 'Aucun')}</strong>
+              <span>Filet 2-0</span><strong>${escapeHtml(row.winamaxTwoGoalRule?.eligible ? `${Math.round(Number(row.winamaxTwoGoalRule.leadTwoProbability || 0) * 100)}% estimé` : 'Non applicable')}</strong>
               <span>Action</span><strong>${escapeHtml(readableAction)}</strong>
               <span>Winamax</span><strong>${winamaxLink}</strong>
             </div>
@@ -11091,6 +11225,7 @@
             </div>
           </article>
           ${buildSportInsightHtml(row)}
+          ${buildTwoGoalSafetyHtml(row)}
           ${buildMonteCarloHtml(row)}
           ${buildPersonalModelHtml(row)}
           <article class="detail-card">
@@ -14535,7 +14670,6 @@
       localStorage.setItem(DAILY_SUGGESTION_DISMISS_KEY, parisDayKey());
       renderDailySuggestion();
     });
-    $('#listen-brief-btn')?.addEventListener('click', () => speakBrief({ manual: true }));
     $('#export-btn')?.addEventListener('click', exportCsv);
     $('#export-user-bets-btn')?.addEventListener('click', exportUserBetsCsv);
     $('#export-user-bets-btn-history')?.addEventListener('click', exportUserBetsCsv);
@@ -14756,6 +14890,15 @@
     document.addEventListener('click', (event) => {
       const tabButton = event.target.closest('[data-tab-target]');
       if (tabButton) switchTab(tabButton.dataset.tabTarget || 'dashboard');
+      const picksModeButton = event.target.closest('[data-picks-view-mode]');
+      if (picksModeButton) {
+        try {
+          localStorage.setItem(PICKS_VIEW_MODE_KEY, picksModeButton.dataset.picksViewMode || 'time');
+        } catch {
+          // Le choix de vue est un confort : si le profil bloque l'écriture, on garde la vue courante.
+        }
+        renderTemporalCockpit(dashboardPickRows(readPickFilters()));
+      }
     });
     $('#imminent-strip')?.addEventListener('click', (event) => {
       const button = event.target.closest('[data-match-id]');
@@ -15286,7 +15429,6 @@
     if (loadPreferences().demoMode && localStorage.getItem(DEMO_TOUR_KEY) !== '1') {
       setTimeout(() => startDemoTour(), 800);
     }
-    if (loadPreferences().audioBriefEnabled) setTimeout(() => speakBrief({ manual: false }), 4500);
     loadWebEnrichmentState().catch(() => {});
     loadNewsWatcherState().catch(() => {});
     setTimeout(() => checkForUpdates().catch(() => {}), 2500);

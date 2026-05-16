@@ -88,7 +88,6 @@
             <p id="morning-subtitle">Le logiciel prépare les picks, la bankroll et le prochain départ.</p>
             <div class="morning-actions">
               <button class="primary-btn" type="button" data-tab-target="dashboard">Voir les picks</button>
-              <button class="ghost-btn" id="listen-brief-btn" type="button">Écouter le brief</button>
               <button class="ghost-btn" type="button" data-tab-target="history">Bilan</button>
               <button class="ghost-btn" type="button" data-tab-target="preferences">Réglages</button>
             </div>
@@ -229,6 +228,13 @@
             <article class="trading-panel" id="trading-bankroll-panel"><div class="empty compact-empty">Bankroll en attente.</div></article>
             <article class="trading-panel" id="trading-alert-panel"><div class="empty compact-empty">Alertes en attente.</div></article>
           </div>
+        </section>
+
+        <section class="picks-view-switch" id="picks-view-switch" aria-label="Organisation des picks">
+          <span>Voir par</span>
+          <button type="button" data-picks-view-mode="time">Horaire</button>
+          <button type="button" data-picks-view-mode="type">Type</button>
+          <button type="button" data-picks-view-mode="sport">Sport</button>
         </section>
 
         <section class="time-cockpit" id="time-cockpit" aria-label="Picks par horizon temporel">
@@ -1251,8 +1257,6 @@
             <label class="check-line"><input id="pref-dashboard-custom" type="checkbox"> Dashboard custom</label>
             <label class="check-line"><input id="pref-live-news-watcher" type="checkbox"> Live news watcher</label>
             <label class="check-line"><input id="pref-twitter-watcher" type="checkbox"> Twitter/X watcher public</label>
-            <label class="check-line"><input id="pref-audio-brief" type="checkbox"> Brief audio au boot</label>
-            <label>Vitesse audio<input id="pref-audio-rate" type="number" min="0.75" max="1.5" step="0.05"></label>
             <label class="check-line"><input id="pref-auto-update-enabled" type="checkbox"> Auto-update au démarrage</label>
             <label>Canal
               <select id="pref-update-channel">
@@ -1273,7 +1277,7 @@
                 <option value="auto">Auto</option>
               </select>
             </label>
-            <p class="match-sub" id="app-version-label">Paris Sportif Desktop v2.0.1</p>
+            <p class="match-sub" id="app-version-label">Paris Sportif Desktop v2.1.0</p>
             <p class="match-sub" id="update-status">Aucune vérification de mise à jour lancée.</p>
             <div class="profile-preview" id="bug-report-list">Aucun rapport de bug local.</div>
           </article>

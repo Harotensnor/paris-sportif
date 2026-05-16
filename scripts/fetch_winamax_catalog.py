@@ -25,6 +25,8 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
+from _data_io import write_text_atomic
+
 try:
     from curl_cffi import requests as cr
 except ImportError:
@@ -352,8 +354,8 @@ def main() -> int:
     if n_tourns < 10 or n_matches < 50:
         print('  SUSPICIOUS (below safety threshold) — keeping previous files unchanged')
         return 1
-    OUT_CAT.write_text(json.dumps(catalog, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
-    OUT_MARKETS.write_text(json.dumps(markets, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+    write_text_atomic(OUT_CAT, json.dumps(catalog, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+    write_text_atomic(OUT_MARKETS, json.dumps(markets, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
     print(f'  wrote {OUT_CAT.name} ({OUT_CAT.stat().st_size/1024:.1f}KB) + {OUT_MARKETS.name} ({OUT_MARKETS.stat().st_size/1024:.1f}KB)', flush=True)
     return 0
 

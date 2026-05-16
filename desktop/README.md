@@ -8,13 +8,13 @@ Paris Sportif Desktop est le logiciel PC local pour préparer tes paris Winamax.
 
 ### Version installateur Windows
 
-La version v2.0.1 se génère avec :
+La version v2.1.0 se génère avec :
 
 ```powershell
 npm --prefix desktop run dist
 ```
 
-Le fichier attendu est `Paris Sportif Desktop Setup 2.0.1.exe`. Le build packagé embarque les données, rapports modèle et scripts nécessaires au démarrage. Python reste recommandé si tu veux relancer une pipeline complète depuis la machine installée.
+Le fichier attendu est `Paris Sportif Desktop Setup 2.1.0.exe`. Le build packagé embarque les données, rapports modèle et scripts nécessaires au démarrage. Python reste recommandé si tu veux relancer une pipeline complète depuis la machine installée.
 
 ### Version développeur
 
@@ -40,7 +40,7 @@ Le mode standard reste volontairement simple : `Picks`, `Bilan`, `Réglages`. Le
 Ouvre l'app et lis d'abord le haut de la vue `Picks`.
 
 - `Bet ultime du jour` : le meilleur ticket simple si un pick assez solide existe.
-- Sections horaires : dans l'heure, dans les 3 heures, aujourd'hui, cette nuit et demain.
+- Organisation au choix : `Horaire`, `Type` ou `Sport`, avec les sections vides masquées.
 - Chaque carte affiche `PARI`, `COTE`, `MISE` et `Pourquoi`.
 - Clique `Je mise` pour suivre le pari localement.
 - Clique `Ouvrir Winamax` pour aller sur la page du match.
@@ -53,6 +53,16 @@ Depuis v1.5.0, certains matchs avec peu de contexte secondaire peuvent apparaît
 L'app ne place pas de pari automatiquement. Elle prépare le ticket et suit ton résultat.
 
 En Mode expert, l'auto-tracking supervisé peut suivre automatiquement certains tickets dans l'app selon tes règles. C'est uniquement un suivi interne : tu dois toujours ouvrir Winamax et confirmer toi-même le pari réel.
+
+## Nouveautés v2.1.0
+
+La v2.1.0 répond aux retours terrain sur la lisibilité et la variété :
+
+- brief audio retiré : l'app reste en brief texte, sans lecture vocale ;
+- règle Winamax 2-0 prise en compte sur les Vainqueurs foot éligibles, avec badge `sécurité 2-0` et détail dans la fiche ;
+- cockpit rééquilibré vers plus de paris `Vainqueur du match`, moins de domination Plus/Moins ;
+- vues `Horaire`, `Type` et `Sport` pour décharger l'accueil ;
+- fiches nettoyées : pas de faux xG à 0, chips vides cachées et compositions foot affichées sur un terrain par lignes de formation.
 
 ## Nouveautés v2.0.1
 
@@ -76,7 +86,6 @@ La v2.0 garde le mode standard simple, mais ajoute une couche Ultra en Mode expe
 - `Modèle personnel` : score de cohérence avec ton style gagnant si ton historique contient assez de paris réglés, sinon fallback explicite ;
 - `Scanner du jour` : patterns inter-matchs, repliés par défaut ;
 - `Dashboard custom` en Mode expert avec presets Matin / Soir / Live, glisser-déposer et reset ;
-- `Écouter le brief` : lecture audio locale du brief si tu l'actives ;
 - watcher Twitter/X public optionnel côté main process, avec cache et rate limit ;
 - `Ajustements 24h` : les segments sont durcis ou assouplis prudemment selon le backtest et ton historique local.
 
@@ -297,5 +306,5 @@ npx electron-builder --win nsis --x64 --config.directories.output=dist-temp
 36. **C'est quoi Monte Carlo ?** Une simulation locale de 10 000 scénarios du match pour visualiser si le pari gagne souvent, rarement ou dans des scénarios très serrés.
 37. **Comment fonctionne le modèle personnel ?** Il compare les picks à tes paris réglés. Avant 50 paris, il affiche un fallback prudent et indique que le sample est insuffisant.
 38. **Twitter/X watcher sert à quoi ?** Il surveille des sources publiques et sociales pour repérer blessure, compo, suspension ou news tardive avant le match.
-39. **Comment activer le brief audio ?** Active `Brief audio` en Mode expert, puis clique `Écouter le brief` dans le haut de la vue Picks.
+39. **Pourquoi le brief reste en texte ?** Le brief reste lisible et discret : pas de lecture vocale, pas de bouton supplémentaire.
 40. **Pourquoi une ligne de nuit peut être `À surveiller` ?** L'app préfère te montrer le match nocturne important sans bouton de mise plutôt que forcer un pari quand les signaux ne sont pas assez robustes.

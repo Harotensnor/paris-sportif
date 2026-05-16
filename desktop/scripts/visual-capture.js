@@ -59,7 +59,8 @@ async function main() {
       topPick: document.body.textContent.includes('TOP PICK'),
       noUltimate: document.querySelector('#ultimate-bet-card')?.textContent.includes('Aucun bet ultime validé') || false,
       dailyBudget: document.querySelector('#daily-budget-summary')?.textContent || '',
-      hasRollingSections: ['Dans l’heure', 'Dans les 3 heures', 'Cette nuit'].every((label) => document.body.textContent.includes(label)),
+      viewModes: Array.from(document.querySelectorAll('#picks-view-switch [data-picks-view-mode]')).map((node) => node.textContent.trim()),
+      emptyTimeSections: Array.from(document.querySelectorAll('#time-cockpit .time-section')).filter((section) => /Aucun pick dans cette fenêtre/i.test(section.textContent || '')).length,
       combines: Boolean(document.querySelector('#simple-combines-section')),
       scorers: Boolean(document.querySelector('#simple-scorers-section')),
       promos: Boolean(document.querySelector('#simple-promos-section')),
@@ -70,7 +71,7 @@ async function main() {
     const ultraDashboard = await win.evaluate(() => ({
       visuals: document.querySelectorAll('.match-visual').length,
       scanner: document.querySelector('#market-scanner-section')?.innerText || '',
-      audioBrief: Boolean(document.querySelector('#listen-brief-btn')),
+      voiceBriefRemoved: !document.querySelector('#listen-brief-btn') && !/lecture vocale/i.test(document.body.innerText || ''),
       heroImage: Boolean(document.querySelector('.ultimate-hero-media img'))
     }));
 
@@ -116,7 +117,6 @@ async function main() {
     await win.check('#pref-trading-desk');
     await win.check('#pref-dashboard-custom');
     await win.check('#pref-twitter-watcher');
-    await win.check('#pref-audio-brief');
     await win.check('#pref-auto-tracking-confirmed');
     await win.check('#pref-auto-tracking-enabled');
     await win.check('#pref-auto-tracking-dry-run');
@@ -172,24 +172,6 @@ async function main() {
         sources: Array.isArray(record?.sources) ? record.sources.map((source) => `${source.label}:${source.status}`).join(' | ') : ''
       };
     });
-    await win.evaluate(() => {
-      if (window.speechSynthesis) {
-        window.__briefSpoken = 0;
-        window.__briefText = '';
-        window.speechSynthesis.speak = (utterance) => {
-          window.__briefSpoken += 1;
-          window.__briefText = utterance.text || '';
-          setTimeout(() => utterance.onend && utterance.onend(), 50);
-        };
-      }
-    });
-    await win.click('#listen-brief-btn');
-    await win.waitForFunction(() => /Lecture du brief|Brief audio/.test(document.querySelector('#side-status')?.innerText || ''), null, { timeout: 5000 });
-    const audioRun = await win.evaluate(() => ({
-      spoken: Number(window.__briefSpoken || 0),
-      textLength: String(window.__briefText || '').length,
-      status: document.querySelector('#side-status')?.innerText || ''
-    }));
 
     await win.waitForSelector('[data-tab="data"]:not(.hidden)', { timeout: 5000 });
     await win.click('[data-tab="data"]');
@@ -249,16 +231,16 @@ async function main() {
       i18n: Boolean(window.t && typeof window.t === 'function')
     }));
     sprint23Runtime.importPreview = importPreviewOk;
-    if (dashboard.rows < 18 || dashboard.rows > 25 || dashboard.timeline < 8 || dashboard.safeBadges < 5 || !/aujourd’hui|à venir|surveill/i.test(dashboard.metricLabel) || (dashboard.metric < 8 && !/trop strict|Winamax/i.test(dashboard.funnelAlert)) || !(dashboard.topPick || dashboard.noUltimate) || !/jour/i.test(dashboard.dailyBudget) || !dashboard.hasRollingSections || !dashboard.combines || !dashboard.scorers || !dashboard.promos || !/Suggestion du jour/.test(dashboard.suggestion || '') || dashboard.multibookText || !hasActionCopy || hasComplexMarket || hasTechnicalJargon || hasExpertRepairLabel) {
+    const hasViewModes = JSON.stringify(dashboard.viewModes) === JSON.stringify(['Horaire', 'Type', 'Sport']);
+    if (dashboard.rows < 18 || dashboard.rows > 25 || dashboard.timeline < 8 || dashboard.safeBadges < 5 || !/aujourd’hui|à venir|surveill/i.test(dashboard.metricLabel) || (dashboard.metric < 8 && !/trop strict|Winamax|Volume prêt limité/i.test(dashboard.funnelAlert)) || !(dashboard.topPick || dashboard.noUltimate) || !/jour/i.test(dashboard.dailyBudget) || !hasViewModes || dashboard.emptyTimeSections !== 0 || !dashboard.combines || !dashboard.scorers || !dashboard.promos || !/Suggestion du jour/.test(dashboard.suggestion || '') || dashboard.multibookText || !hasActionCopy || hasComplexMarket || hasTechnicalJargon || hasExpertRepairLabel) {
       throw new Error(`Dashboard Sprint 23 invalide: ${JSON.stringify({ ...dashboard, dashboardText: dashboard.dashboardText.slice(0, 800), hasActionCopy, hasComplexMarket, hasTechnicalJargon })}`);
     }
-    if (ultraDashboard.visuals < 8 || !/Scanner du jour|Aucun pattern/i.test(ultraDashboard.scanner || '') || !ultraDashboard.audioBrief || !ultraDashboard.heroImage) {
+    if (ultraDashboard.visuals < 8 || !/Scanner du jour|Aucun pattern/i.test(ultraDashboard.scanner || '') || !ultraDashboard.voiceBriefRemoved || !ultraDashboard.heroImage) {
       throw new Error(`Dashboard Ultra incomplet: ${JSON.stringify(ultraDashboard)}`);
     }
     if (dashboardDragBefore.length >= 2 && dashboardDragAfter.order.join('|') === dashboardDragBefore.join('|')) throw new Error(`Dashboard custom non déplaçable: ${JSON.stringify({ dashboardDragBefore, dashboardDragAfter })}`);
     if (dashboardDragBefore.length >= 2 && !Object.values(dashboardDragAfter.stored || {}).some((order) => Array.isArray(order) && order.join('|') === dashboardDragAfter.order.join('|'))) throw new Error(`Dashboard custom non persisté: ${JSON.stringify(dashboardDragAfter)}`);
     if (!newsRun.ok || !newsRun.records || !newsRun.checkedSources || !newsRun.successfulSources) throw new Error(`News watcher réel incomplet: ${JSON.stringify(newsRun)}`);
-    if (!audioRun.spoken || audioRun.textLength < 80) throw new Error(`Brief audio non déclenché: ${JSON.stringify(audioRun)}`);
     if (!sprint23Runtime.autoTracking || !sprint23Runtime.importPreview || !sprint23Runtime.i18n) throw new Error(`Workflow Sprint 23 invalide: ${JSON.stringify(sprint23Runtime)}`);
     if (!searchAudit.hasInput || searchAudit.compareOptions < 2 || !searchAudit.hasResults || !/Recherche|Comparer/i.test(searchAudit.text || '')) throw new Error(`Recherche Sprint 22 invalide: ${JSON.stringify(searchAudit)}`);
     if (modalOverflow) throw new Error('Overflow horizontal dans la fiche match');

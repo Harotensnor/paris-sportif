@@ -5,6 +5,16 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 36 — Refonte UX + Winamax 2-0 + compos visuelles + photos + plus de Vainqueur
+
+- Version desktop portée à `v2.1.0`. Le brief audio est retiré complètement : plus de bouton d’écoute, plus de préférence Speech Synthesis, plus de lecture automatique au boot et la documentation ne présente plus cette option.
+- Règle Winamax 2-0 intégrée au modèle Vainqueur foot : le moteur calcule une probabilité prudente que l’équipe choisie mène de deux buts, applique un bonus plafonné au score, ajoute un badge `sécurité 2-0` sur les cartes et une section dédiée dans la fiche match. La règle est documentée dans `desktop/docs/winamax-rules.md`.
+- Rééquilibrage du cockpit : quota de diversité assoupli pour les Vainqueurs, plafond par marché basé sur les familles simples et injection prioritaire de Vainqueurs quand des signaux fiables existent. Objectif produit : moins de domination Plus/Moins, plus de variété lisible.
+- Accueil aéré : les sections temporelles vides sont cachées, et l’utilisateur peut basculer entre vues `Horaire`, `Type` et `Sport` avec préférence persistée. Les catégories permettent de décharger l’accueil sans perdre les picks.
+- Fiches match nettoyées : les xG/xA et stats à zéro ne s’affichent plus comme de fausses valeurs, les chips vides sont masquées et les compositions foot passent sur un terrain visuel par lignes de formation.
+- Robustesse terrain : l’écriture de `winamax_catalog.json` / `winamax_markets.json` utilise désormais l’écriture atomique avec retry Windows pour éviter qu’un fichier verrouillé fasse échouer le refresh catalogue.
+- Validation Sprint 36 : pipeline terrain réelle OK (`133` events Winamax aujourd’hui, `32` signaux simples positifs, `18` affichés aujourd’hui, `25` lignes cockpit, `24` lignes sur 24h). `qa:engine`, `qa:terrain`, `qa:desktop`, `qa:visual`, `qa:a11y` et Playwright Electron passent. Build Windows v2.1.0 généré dans `desktop/dist-sprint36-final/Paris Sportif Desktop Setup 2.1.0.exe` (`106 MB`) et smoke packagé OK.
+
 ### Sprint 34 — Validation v2.0.0 + push nuit + docs
 
 - Version desktop portée à `v2.0.1` après test terrain post-v2.0.0 sur pipeline réelle. Dernier refresh complet terminé le 16/05/2026 à 07:57 UTC : 256 events Winamax conservés, 70 events Winamax aujourd'hui dans le terrain app, 29 signaux simples positifs, 25 lignes cockpit, 17 opportunités 24h et 10 lignes affichées aujourd'hui sur le snapshot.

@@ -109,7 +109,8 @@ test('Sprint 23 desktop keeps clear Winamax picks with supervised workflows', as
       topPick: document.body.textContent.includes('TOP PICK'),
       noUltimate: document.querySelector('#ultimate-bet-card')?.textContent.includes('Aucun bet ultime validé') || false,
       dailyBudget: document.querySelector('#daily-budget-summary')?.textContent || '',
-      hasRollingSections: ['Dans l’heure', 'Dans les 3 heures', 'Cette nuit'].every((label) => document.body.textContent.includes(label)),
+      viewModes: Array.from(document.querySelectorAll('#picks-view-switch [data-picks-view-mode]')).map((node) => node.textContent.trim()),
+      emptyTimeSections: Array.from(document.querySelectorAll('#time-cockpit .time-section')).filter((section) => /Aucun pick dans cette fenêtre/i.test(section.textContent || '')).length,
       bankroll: document.querySelector('#simple-bankroll')?.textContent || '',
       pnl: document.querySelector('#simple-pnl')?.textContent || '',
       combines: Boolean(document.querySelector('#simple-combines-section')),
@@ -133,7 +134,8 @@ test('Sprint 23 desktop keeps clear Winamax picks with supervised workflows', as
     expect(cockpit.priorityBadges).toBeGreaterThanOrEqual(cockpit.topPick ? 1 : 0);
     expect(cockpit.topPick || cockpit.noUltimate).toBe(true);
     expect(cockpit.dailyBudget).toContain('jour');
-    expect(cockpit.hasRollingSections).toBe(true);
+    expect(cockpit.viewModes).toEqual(['Horaire', 'Type', 'Sport']);
+    expect(cockpit.emptyTimeSections).toBe(0);
     expect(cockpit.bankroll).toContain('€');
     expect(cockpit.pnl).toContain('€');
     expect(cockpit.combines).toBe(true);
@@ -190,7 +192,7 @@ test('Sprint 23 desktop keeps clear Winamax picks with supervised workflows', as
     await expect(win.locator('#pref-auto-tracking-enabled')).toHaveCount(1);
     await expect(win.locator('#pref-live-news-watcher')).toBeVisible();
     await expect(win.locator('#pref-language')).toBeVisible();
-    await expect(win.locator('#app-version-label')).toContainText('v2.0.1');
+    await expect(win.locator('#app-version-label')).toContainText('v2.1.0');
     await win.selectOption('#pref-theme', 'light');
     await expect(win.locator('body')).toHaveClass(/theme-light/);
     await win.selectOption('#pref-theme', 'dark');
