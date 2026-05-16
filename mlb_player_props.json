@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-16T20:17:19Z",
+  "generated_at": "2026-05-16T20:21:37Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815363",
-      "kickoff": "2026-05-16T20:10Z",
-      "league": "MLB",
-      "match": "Miami Marlins at Tampa Bay Rays",
-      "home": "Tampa Bay Rays",
-      "away": "Miami Marlins",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Tampa Bay Rays",
-          "pitcher": "Nick Martinez",
-          "label": "Nick Martinez plus de 3,5 strikeouts",
-          "line": 3.5,
-          "pick": "over",
-          "probability": 0.5868,
-          "fair_odds": 1.7,
-          "expected_strikeouts": 3.83,
-          "projected_ip": 5.9,
-          "inputs": {
-            "k9": 5.85,
-            "era": 1.7,
-            "whip": 1.05,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Tampa Bay Rays",
-          "pitcher": "Nick Martinez",
-          "label": "Nick Martinez ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6882,
-          "fair_odds": 1.45,
-          "expected_hr_allowed": 0.374,
-          "projected_ip": 5.9,
-          "inputs": {
-            "hr9": 0.57,
-            "era": 1.7,
-            "whip": 1.05
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Miami Marlins",
-          "pitcher": "Sandy Alcantara",
-          "label": "Sandy Alcantara moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.5491,
-          "fair_odds": 1.82,
-          "expected_strikeouts": 4.3,
-          "projected_ip": 6.36,
-          "inputs": {
-            "k9": 6.09,
-            "era": 3.9,
-            "whip": 1.27,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Miami Marlins",
-          "pitcher": "Sandy Alcantara",
-          "label": "Sandy Alcantara ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6454,
-          "fair_odds": 1.55,
-          "expected_hr_allowed": 0.438,
-          "projected_ip": 6.36,
-          "inputs": {
-            "hr9": 0.62,
-            "era": 3.9,
-            "whip": 1.27
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815362",
       "kickoff": "2026-05-16T22:10Z",
@@ -1838,7 +1756,7 @@
       ]
     }
   ],
-  "props": 88,
+  "props": 84,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
