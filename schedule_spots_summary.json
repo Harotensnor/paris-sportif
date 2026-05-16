@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-16T11:04:03Z",
+  "generated_at": "2026-05-16T11:08:50Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -805,12 +805,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
+        "net_side": "home",
+        "home_score": 0.043,
+        "away_score": -0.498,
         "home_fade": 0.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Buffalo Sabres (-0.10)",
+        "away_fade": 0.55,
+        "reason": "Direction nette: Montreal Canadiens (+0.04)",
         "detail": [
           {
             "side": "home",
@@ -823,6 +823,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.4
           }
         ]
       }

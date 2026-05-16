@@ -1,24 +1,25 @@
 {
-  "generated_at": "2026-05-16T11:04:03Z",
+  "generated_at": "2026-05-16T11:08:50Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 66,
     "actionable": 21,
-    "watch": 6,
-    "risk": 39,
+    "watch": 7,
+    "risk": 38,
     "expired_sample": 0,
     "by_type": {
+      "market_move": 1,
       "injury_imbalance": 24,
       "back_to_back_travel": 9,
-      "market_uncertain": 37,
+      "market_uncertain": 36,
       "signal_conflict": 3
     },
     "by_quality": {
-      "watch": 6,
+      "watch": 7,
       "actionable": 21,
-      "risk": 39
+      "risk": 38
     }
   },
   "active_actionable": [
@@ -509,6 +510,24 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 3-6"
+    },
+    {
+      "event_id": "747021",
+      "date": "2026-05-16T13:30Z",
+      "sport": "football",
+      "league_code": "ger.1",
+      "league_name": "Bundesliga",
+      "home": "St. Pauli",
+      "away": "VfL Wolfsburg",
+      "match": "St. Pauli - VfL Wolfsburg",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "draw",
+      "strength": 0.598,
+      "context": "Cote draw: 3.25 -> 3.60 (-10.8%)"
     }
   ],
   "active_risk": [
@@ -547,24 +566,6 @@
       "side": null,
       "strength": 0.938,
       "context": "Signaux opposes: Arizona Diamondbacks fade 1.40, Colorado Rockies fade 1.32 -> prudence"
-    },
-    {
-      "event_id": "401859395",
-      "date": "2026-05-17T05:00Z",
-      "sport": "football",
-      "league_code": "jleague",
-      "league_name": "J-League",
-      "home": "Fagiano Okayama",
-      "away": "Shimizu S-Pulse",
-      "match": "Fagiano Okayama - Shimizu S-Pulse",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.0%"
     },
     {
       "event_id": "401842716",
