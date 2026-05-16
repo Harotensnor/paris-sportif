@@ -4129,6 +4129,33 @@
     return `Pourquoi : ${[...new Set(parts)].slice(0, 4).join(' · ')}.`;
   }
 
+  // Sprint 72 C6 — Detection hedging : compte combien de paris user actifs
+  // visent le meme match (sur-exposition). Retourne {count, matchId} si >=2.
+  function detectHedgingForRow(row) {
+    if (!row?.match?.id && !row?.id) return null;
+    const matchId = String(row.match?.id || row.id || '');
+    const bets = (typeof loadUserBets === 'function') ? loadUserBets() : [];
+    const onThis = bets.filter((b) => {
+      if (String(b.status || '').toLowerCase() !== 'pending') return false;
+      return String(b.matchId || b.match_id || '') === matchId;
+    });
+    if (onThis.length < 1) return null;
+    return { count: onThis.length, matchId, bets: onThis };
+  }
+
+  // Sprint 72 C3 — Wilson 95% CI sur la prob du pick + ROI segment.
+  // Retourne [lo, hi] avec smoothing Beta(1,1) Laplace. n>=5 sinon null.
+  function wilsonCi(wins, n, z = 1.96) {
+    if (!Number.isFinite(wins) || !Number.isFinite(n) || n < 5) return null;
+    const p = wins / n;
+    const z2 = z * z;
+    const denom = 1 + z2 / n;
+    const center = (p + z2 / (2 * n)) / denom;
+    const margin = (z * Math.sqrt((p * (1 - p) + z2 / (4 * n)) / n)) / denom;
+    return [Math.max(0, center - margin), Math.min(1, center + margin)];
+  }
+  try { window.wilsonCi = wilsonCi; } catch { /* noop */ }
+
   // Sprint 72 D9 — Checklist visuelle "Why this bet" : analyse contexte du pick
   // pour donner ✅/⚠️/❌ par catégorie clé (forme, cote, modèle, météo, etc.)
   function whyChecklistBullets(row) {
@@ -10779,6 +10806,48 @@
     $('#demo-tour-modal')?.classList.add('hidden');
   }
 
+  // Sprint 72 C10 — Carte Brier modèle : visualise la qualité actuelle de
+  // calibration. < 0.20 excellent, < 0.25 bon, < 0.30 moyen, > 0.30 mauvais.
+  function renderModelBrierCard() {
+    const node = $('#model-brier-card');
+    if (!node) return;
+    const report = state.backtestReport || (typeof window !== 'undefined' ? window.__backtestReportV2 : null);
+    const overall = report?.overall || {};
+    const brier = Number(overall.brier);
+    const n = Number(overall.n || 0);
+    if (!Number.isFinite(brier) || n < 5) {
+      node.innerHTML = `
+        <article class="brier-card">
+          <h4>🎯 Qualité de calibration (Brier)</h4>
+          <p class="match-sub">Pas encore assez de paris settled pour calculer un Brier fiable (${formatCount(n)} paris). Le backtest se régénère quotidiennement à 04h UTC.</p>
+        </article>`;
+      return;
+    }
+    let tier, tone, advice;
+    if (brier < 0.18) { tier = 'Excellent'; tone = 'ok'; advice = "Modèle très bien calibré. Confiance forte sur les picks."; }
+    else if (brier < 0.22) { tier = 'Bon'; tone = 'ok'; advice = "Calibration solide. Probas modèle proches de la réalité."; }
+    else if (brier < 0.27) { tier = 'Moyen'; tone = 'warn'; advice = "Calibration moyenne. Suivre les seuils Fiable strictement."; }
+    else { tier = 'Faible'; tone = 'bad'; advice = "Calibration dégradée. Privilégier 1n2 (mieux calibré) et éviter OU/derivés."; }
+    const pct = Math.max(0, Math.min(100, Math.round(brier * 200)));
+    node.innerHTML = `
+      <article class="brier-card brier-${tone}">
+        <header>
+          <h4>🎯 Qualité de calibration</h4>
+          <span class="brier-tier">${escapeHtml(tier)}</span>
+        </header>
+        <div class="brier-value">
+          <strong>${brier.toFixed(3)}</strong>
+          <span>Brier global</span>
+        </div>
+        <div class="brier-meter">
+          <div class="brier-meter-fill" style="width: ${pct}%"></div>
+          <span class="brier-meter-marks">0 · 0.25 · 0.50</span>
+        </div>
+        <p class="brier-advice">${escapeHtml(advice)}</p>
+        <small>Sur ${formatCount(n)} paris settled · cible &lt; 0.20</small>
+      </article>`;
+  }
+
   // Sprint 65 — Mon mois : stats glissantes 30j de l'utilisateur
   function myMonthStats() {
     const bets = loadUserBets();
@@ -10999,6 +11068,7 @@
     const history = state.history;
     // Tier 1 — critique, synchrone (apparait immediatement)
     renderModelPerformance();
+    renderModelBrierCard();
     renderMyMonth();
     renderTrackedBets();
     renderPersonalInsights();
@@ -12179,6 +12249,17 @@
           <article class="match-decision-hero decision-${escapeHtml(decisionTone)}">
             <span>Pari suggéré</span>
             <strong>${escapeHtml(stakeAllowed ? 'Je peux miser' : 'Ne pas miser maintenant')}</strong>
+            ${(() => {
+              // Sprint 72 C6 — Bandeau hedging si user a deja parie sur ce match
+              const hedge = detectHedgingForRow(row);
+              if (!hedge || hedge.count < 1) return '';
+              const labels = hedge.bets.map((b) => b.label || b.selection || 'Pari').filter(Boolean).slice(0, 3).join(' · ');
+              return `
+                <div class="hedging-banner">
+                  <strong>⚠ Tu as déjà ${hedge.count} pari${hedge.count > 1 ? 's' : ''} en cours sur ce match</strong>
+                  <span>Sur-exposition possible. Existant : ${escapeHtml(labels)}</span>
+                </div>`;
+            })()}
             ${actionPickHtml(row, { compact: true })}
             <p>${escapeHtml(simpleWhyText(row))}</p>
             ${(() => {
@@ -12201,6 +12282,26 @@
                       return `<li class="why-check why-${escapeHtml(c.tone)}"><span class="why-sign">${sign}</span><span class="why-icon">${escapeHtml(c.icon)}</span><span class="why-label">${escapeHtml(c.label)}</span><span class="why-detail">${escapeHtml(c.detail)}</span></li>`;
                     }).join('')}
                   </ul>
+                </div>`;
+            })()}
+            ${(() => {
+              // Sprint 72 C3 — Wilson CI 95% sur la confiance du modele
+              // affiche aussi le CI ROI segment si sample >= 15
+              const conf = Number(row.safeAssessment?.confidence || row.probability || 0);
+              const sample = Number(row.segmentValidation?.sample || row.calibration?.sample || 0);
+              const wins = Number(row.segmentValidation?.wins || row.calibration?.wins || Math.round(sample * (Number(row.segmentValidation?.win_rate || 0) || 0)));
+              const ci = sample >= 5 ? wilsonCi(wins, sample) : null;
+              if (!conf && !ci) return '';
+              const confPct = Math.round(conf * 100);
+              const ciTxt = ci ? `${Math.round(ci[0] * 100)}-${Math.round(ci[1] * 100)}%` : null;
+              return `
+                <div class="confidence-bar">
+                  <span class="cb-label">Confiance modèle</span>
+                  <div class="cb-track" title="Probabilité estimée du pick">
+                    <div class="cb-fill" style="width: ${Math.min(100, Math.max(0, confPct))}%"></div>
+                    <span class="cb-value">${confPct}%</span>
+                  </div>
+                  ${ciTxt ? `<span class="cb-ci" title="Intervalle de confiance Wilson 95% sur le segment historique (${sample} paris)">IC 95% segment : ${escapeHtml(ciTxt)}</span>` : '<span class="cb-ci muted">Segment historique insuffisant</span>'}
                 </div>`;
             })()}
             <div class="ultimate-tags detail-priority-strip">
