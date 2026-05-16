@@ -87,7 +87,8 @@ async function main() {
       topPick: document.body.textContent.includes('TOP PICK'),
       noUltimate: document.querySelector('#ultimate-bet-card')?.textContent.includes('Aucun bet ultime validé') || false,
       dailyBudget: document.querySelector('#daily-budget-summary')?.textContent || '',
-      hasRollingSections: ['Dans l’heure', 'Dans les 3 heures', 'Cette nuit'].every((label) => document.body.textContent.includes(label)),
+      hasRollingSections: document.body.textContent.includes('À jouer prochainement')
+        && ['Dans l’heure', 'Dans les 3 heures', 'Cette nuit', 'Demain matin', 'Demain après', 'Prochains jours'].some((label) => document.body.textContent.includes(label)),
       combines: Boolean(document.querySelector('#simple-combines-section')),
       scorers: Boolean(document.querySelector('#simple-scorers-section')),
       promos: Boolean(document.querySelector('#simple-promos-section')),

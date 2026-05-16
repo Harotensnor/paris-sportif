@@ -5,6 +5,15 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 38 — Quota Vainqueurs 50% + cases vides masquées + smoke ajusté
+
+- Quota `Vainqueurs` du cockpit relevé de 40% à **50%** dans `legacy-engine.js`, target absolu min `8` rows (vs 6). L'utilisateur a explicitement demandé "+ de Vainqueurs", il y a maintenant plus de marchés "Vainqueur du match" et moins de "Plus / Moins" en top de liste quand des signaux Vainqueur fiables existent.
+- Section "Joueurs clés" des fiches match : si aucune équipe ne remonte de joueur clé, la section entière est masquée (au lieu d'afficher "Joueurs clés à enrichir" comme placeholder). Si seule une équipe a des joueurs, l'autre côté est caché.
+- Cards joueur : la `stat-chip-row` n'est rendue que si au moins une chip a une valeur utile (xG, xA, tirs, dribbles, passes clés, conversion, cartons, minutes). Plus de cards joueurs vides avec uniquement un titre et un sous-titre.
+- Nouveau helper `renderDetailPairs(pairs)` + `looksLikePlaceholderValue(value)` qui détectent les valeurs placeholders ("à enrichir", "à confirmer", "non publiée", "non confirmée", "non disponible", "—", "n/a", "indisponible", "0%", etc.) et les retirent des `sport-insight-grid`. Appliqué à la lecture tactique avancée, à la fiche tennis enrichie, et aux autres fiches sport (basket / hockey / baseball / NFL / MMA / rugby).
+- `desktop/scripts/smoke.js` mis à jour pour rester cohérent avec le sprint 36 : `hasRollingSections` exige maintenant la section "À jouer prochainement" + au moins une autre section temporelle visible (Dans l'heure, Dans les 3 heures, Cette nuit, Demain matin, Demain après, Prochains jours), au lieu d'exiger les trois sections proches qui peuvent être cachées si elles sont vides.
+- Validation : `qa:engine`, smoke desktop (7 paris simples, 14 timeline, 38 fiables), `qa:terrain` (133 events, 27 simples, 15 affichés, cockpit 25) et `qa:a11y` (167 actions clavier, contrastes AA, ARIA modales OK) tous verts.
+
 ### Sprint 37 — Vraies photos joueurs + logos équipes (Wikipedia Commons)
 
 - Nouveau service `desktop/src/image-service.js` : résolution de vrais logos d'équipes et de photos de joueurs via l'API Wikipedia/Commons, côté main process uniquement. Cache disque local (`desktop/state/images/`) avec TTL 30 jours pour les logos et 7 jours pour les photos joueurs. Misses cachées 24h pour ne pas hammerer l'API.

@@ -3218,7 +3218,10 @@ function createLegacyEngineService({ projectRoot }) {
       }
     }
     if (winnerRows.length) {
-      const winnerTarget = Math.min(winnerRows.length, Math.max(6, Math.ceil(maxDashboardRows * 0.40)));
+      // Quota Vainqueurs renforcé : cible 50% du cockpit standard pour
+      // ne plus avoir l'impression de "ne miser que sur des nombres de buts".
+      // L'utilisateur a explicitement demandé plus de Vainqueurs.
+      const winnerTarget = Math.min(winnerRows.length, Math.max(8, Math.ceil(maxDashboardRows * 0.50)));
       const currentWinners = () => finalRows.filter((row) => simpleMarketGroup(row?.marketKey || row?.market) === 'winner').length;
       if (currentWinners() < Math.min(winnerTarget, maxDashboardRows)) {
         addFinalRows(winnerRows, Math.min(maxDashboardRows, finalRows.length + Math.max(0, winnerTarget - currentWinners())), {

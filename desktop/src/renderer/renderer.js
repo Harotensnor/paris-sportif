@@ -3347,6 +3347,41 @@
     };
   }
 
+  // Pair value is "placeholder-only" (à confirmer / à enrichir / non publiée /
+  // non confirmé / inconnu …) → caller can hide the row instead of showing
+  // a filler. Centralised so every section uses the same definition.
+  const PLACEHOLDER_VALUE_PATTERNS = [
+    /à\s+enrichir/i,
+    /à\s+confirmer/i,
+    /non\s+publi/i,
+    /non\s+confirm/i,
+    /non\s+disponible/i,
+    /^\s*(—|-|n\/a|na|inconnu|inconnue|indisponible|aucun|aucune|0|0,0|0\.0|0%|—%)\s*$/i,
+    /historique\s+direct\s+à\s+enrichir/i,
+    /sources?\s+(à|à\s+)?enrichir/i
+  ];
+
+  function looksLikePlaceholderValue(value) {
+    if (value == null) return true;
+    const text = String(value).trim();
+    if (!text) return true;
+    return PLACEHOLDER_VALUE_PATTERNS.some((re) => re.test(text));
+  }
+
+  // Render a list of [label, value] pairs but hide entries whose value is
+  // a placeholder. Keeps the layout dense and removes "à enrichir" noise.
+  function renderDetailPairs(pairs, { keepLabels = [], minRows = 0 } = {}) {
+    const list = Array.isArray(pairs) ? pairs : [];
+    const filtered = list.filter(([label, value]) => {
+      if (keepLabels.includes(label)) return true;
+      return !looksLikePlaceholderValue(value);
+    });
+    const final = filtered.length >= minRows ? filtered : list.slice(0, Math.max(minRows, filtered.length));
+    return final
+      .map(([label, value]) => `<div><span>${escapeHtml(label)}</span><strong>${escapeHtml(String(value))}</strong></div>`)
+      .join('');
+  }
+
   function statChip(label, value, suffix = '', digits = 1) {
     const n = Number(value);
     if (!Number.isFinite(n)) return '';
@@ -3369,45 +3404,43 @@
   }
 
   function buildKeyPlayersHtml(row) {
-    const groups = ['home', 'away'].map((side) => {
-      const rows = keyPlayersForSide(row, side);
-      return `
+    const sides = ['home', 'away'].map((side) => ({ side, rows: keyPlayersForSide(row, side) }));
+    const hasAnyRows = sides.some(({ rows }) => rows.length > 0);
+    if (!hasAnyRows) return '';
+    const groups = sides
+      .filter(({ rows }) => rows.length > 0)
+      .map(({ side, rows }) => `
         <div class="key-player-side">
           <h5>${escapeHtml(teamDisplayName(row, side))}</h5>
-          ${rows.length ? rows.map(({ player, star, stats }) => {
+          ${rows.map(({ player, star, stats }) => {
             const form = stats.formScore >= 6 ? 'En forme' : stats.formScore > 0 && stats.formScore < 4 ? 'En méforme' : 'À confirmer';
             const playerName = player.name || star.name || 'Joueur clé';
             const sportHint = row?.sport || row?.match?.sport || '';
+            const chips = [
+              statChip('xG saison', stats.xgSeason, '', 1),
+              statChip('xA saison', stats.xaSeason, '', 1),
+              statChip('Tirs cadrés/m', stats.shots, '', 1),
+              statChip('Dribbles/m', stats.dribbles, '', 1),
+              statChip('Passes clés/m', stats.keyPasses, '', 1),
+              statChip('Conversion', Number.isFinite(stats.conversion) ? stats.conversion * 100 : NaN, '%', 0),
+              statChip('Cartons', stats.cards, '', 0),
+              statChip('Minutes', stats.minutes, '', 0)
+            ].filter(Boolean);
             return `
               <article class="key-player-card has-photo">
                 <div class="key-player-photo-wrap">${playerPhotoHtml(playerName, { sport: sportHint }, { size: 64 })}</div>
                 <strong>${escapeHtml(playerName)}</strong>
                 <em>${escapeHtml(`${player.pos || star.position || 'poste ?'} · ${form}`)}</em>
-                <div class="stat-chip-row">
-                  ${statChip('xG saison', stats.xgSeason, '', 1)}
-                  ${statChip('xA saison', stats.xaSeason, '', 1)}
-                  ${statChip('Tirs cadrés/m', stats.shots, '', 1)}
-                  ${statChip('Dribbles/m', stats.dribbles, '', 1)}
-                  ${statChip('Passes clés/m', stats.keyPasses, '', 1)}
-                  ${statChip('Conversion', Number.isFinite(stats.conversion) ? stats.conversion * 100 : NaN, '%', 0)}
-                  ${statChip('Cartons', stats.cards, '', 0)}
-                  ${statChip('Minutes', stats.minutes, '', 0)}
-                </div>
+                ${chips.length ? `<div class="stat-chip-row">${chips.join('')}</div>` : ''}
               </article>
             `;
-          }).join('') : `
-            <article class="key-player-card">
-              <strong>Joueurs clés à enrichir</strong>
-              <em>La feuille de match n’est pas encore publiée, mais la fiche surveille ces stats dès qu’elles arrivent.</em>
-            </article>
-          `}
+          }).join('')}
         </div>
-      `;
-    }).join('');
+      `).join('');
     return `
       <article class="detail-card wide key-players-card">
         <h4>${escapeHtml(t('keyPlayers'))}</h4>
-        <p class="detail-text">Les trois profils les plus utiles par équipe, avec xG/xA, tirs, création et disponibilité quand la source les fournit.</p>
+        <p class="detail-text">Les profils les plus utiles, avec xG/xA, tirs, création et disponibilité quand la source les fournit.</p>
         <div class="key-player-grid">${groups}</div>
       </article>
     `;
@@ -3483,7 +3516,7 @@
         <h4>Lecture tactique avancée</h4>
         <p class="detail-text">Buteurs probables, coups de pied arrêtés, discipline et pressing sont intégrés comme signaux prudents, sans remplacer la cote Winamax.</p>
         <div class="sport-insight-grid">
-          ${rows.map(([label, value]) => `<div><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`).join('')}
+          ${renderDetailPairs(rows)}
         </div>
       </article>
     `;
@@ -3702,7 +3735,7 @@
       <article class="detail-card wide sport-insight-card">
         <h4>Fiche tennis enrichie</h4>
         <div class="sport-insight-grid">
-          ${rows.map(([label, value]) => `<div><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`).join('')}
+          ${renderDetailPairs(rows)}
         </div>
         <div class="key-player-grid">
           ${[home, away].map((player, index) => `
@@ -3762,7 +3795,7 @@
       <article class="detail-card wide sport-insight-card">
         <h4>Fiche ${escapeHtml(row?.sport || 'sport')} enrichie</h4>
         <div class="sport-insight-grid">
-          ${sportRows.map(([label, value]) => `<div><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`).join('')}
+          ${renderDetailPairs(sportRows)}
         </div>
         <h5>${escapeHtml(t('keyPlayers'))}</h5>
         <div class="key-player-grid">
