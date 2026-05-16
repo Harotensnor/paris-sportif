@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-16T19:50:53Z",
+  "generated_at": "2026-05-16T19:53:53Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -108,13 +108,13 @@
         "1 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "mixed",
-        "net_side": null,
+        "status": "net",
+        "net_side": "home",
         "home_score": 0.252,
-        "away_score": -0.493,
+        "away_score": -1.097,
         "home_fade": 0.15,
         "away_fade": 1.15,
-        "reason": "Signaux mitigés: avantage net trop faible (Washington Nationals +0.25, Baltimore Orioles -0.49)",
+        "reason": "Direction nette: Washington Nationals (+0.25)",
         "detail": [
           {
             "side": "home",
@@ -133,12 +133,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.604
           }
         ]
       }
@@ -615,10 +609,10 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.098,
-        "away_score": 0.563,
+        "away_score": -0.098,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: San Diego Padres (+0.56)",
+        "reason": "Direction nette: San Diego Padres (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -631,12 +625,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.66
           }
         ]
       }
@@ -672,11 +660,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": -0.607,
-        "away_score": -1.147,
-        "home_fade": 1.15,
-        "away_fade": 1.55,
-        "reason": "Direction nette: Montreal Canadiens (-0.61)",
+        "home_score": 0.043,
+        "away_score": -0.498,
+        "home_fade": 0.15,
+        "away_fade": 0.55,
+        "reason": "Direction nette: Montreal Canadiens (+0.04)",
         "detail": [
           {
             "side": "home",
@@ -695,18 +683,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.4
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
           }
         ]
       }
@@ -800,11 +776,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.679,
+        "home_score": 0.183,
         "away_score": -0.898,
         "home_fade": 0.15,
         "away_fade": 0.95,
-        "reason": "Direction nette: Athletics (+0.68)",
+        "reason": "Direction nette: Athletics (+0.18)",
         "detail": [
           {
             "side": "home",
@@ -823,12 +799,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.8
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.496
           }
         ]
       }
