@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-16T19:13:43Z",
+  "generated_at": "2026-05-16T19:20:04Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815371",
-      "kickoff": "2026-05-16T19:10Z",
-      "league": "MLB",
-      "match": "Arizona Diamondbacks at Colorado Rockies",
-      "home": "Colorado Rockies",
-      "away": "Arizona Diamondbacks",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Colorado Rockies",
-          "pitcher": "Tomoyuki Sugano",
-          "label": "Tomoyuki Sugano plus de 2,5 strikeouts",
-          "line": 2.5,
-          "pick": "over",
-          "probability": 0.6439,
-          "fair_odds": 1.55,
-          "expected_strikeouts": 3.0,
-          "projected_ip": 5.25,
-          "inputs": {
-            "k9": 5.14,
-            "era": 4.07,
-            "whip": 1.19,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Colorado Rockies",
-          "pitcher": "Tomoyuki Sugano",
-          "label": "Tomoyuki Sugano concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6756,
-          "fair_odds": 1.48,
-          "expected_hr_allowed": 1.126,
-          "projected_ip": 5.25,
-          "inputs": {
-            "hr9": 1.93,
-            "era": 4.07,
-            "whip": 1.19
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Arizona Diamondbacks",
-          "pitcher": "Eduardo Rodriguez",
-          "label": "Eduardo Rodriguez moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.5931,
-          "fair_odds": 1.69,
-          "expected_strikeouts": 4.13,
-          "projected_ip": 6.0,
-          "inputs": {
-            "k9": 6.19,
-            "era": 2.25,
-            "whip": 1.21,
-            "hand": "L"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Arizona Diamondbacks",
-          "pitcher": "Eduardo Rodriguez",
-          "label": "Eduardo Rodriguez ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6065,
-          "fair_odds": 1.65,
-          "expected_hr_allowed": 0.5,
-          "projected_ip": 6.0,
-          "inputs": {
-            "hr9": 0.75,
-            "era": 2.25,
-            "whip": 1.21
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815360",
       "kickoff": "2026-05-16T20:05Z",
@@ -2002,7 +1920,7 @@
       ]
     }
   ],
-  "props": 96,
+  "props": 92,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"

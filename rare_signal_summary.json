@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-05-16T19:13:51Z",
+  "generated_at": "2026-05-16T19:20:12Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 66,
-    "actionable": 20,
-    "watch": 5,
+    "active_events": 64,
+    "actionable": 19,
+    "watch": 4,
     "risk": 41,
-    "expired_sample": 0,
+    "expired_sample": 1,
     "by_type": {
       "injury_imbalance": 22,
-      "market_move": 4,
-      "signal_conflict": 4,
-      "market_uncertain": 42,
-      "back_to_back_travel": 6
+      "market_uncertain": 41,
+      "back_to_back_travel": 6,
+      "market_move": 2,
+      "signal_conflict": 3
     },
     "by_quality": {
-      "actionable": 20,
-      "watch": 5,
+      "actionable": 19,
+      "watch": 4,
       "risk": 41
     }
   },
@@ -58,24 +58,6 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 15-7"
-    },
-    {
-      "event_id": "401871409",
-      "date": "2026-05-17T00:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Montreal Canadiens",
-      "away": "Buffalo Sabres",
-      "match": "Montreal Canadiens - Buffalo Sabres",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 1.56 -> 1.90 (-22.1%)"
     },
     {
       "event_id": "401815372",
@@ -202,24 +184,6 @@
       "side": "away",
       "strength": 0.83,
       "context": "1 match dans les 48h + 1498 km de voyage"
-    },
-    {
-      "event_id": "401815371",
-      "date": "2026-05-16T19:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Colorado Rockies",
-      "away": "Arizona Diamondbacks",
-      "match": "Colorado Rockies - Arizona Diamondbacks",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Arizona Diamondbacks",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 8-12"
     },
     {
       "event_id": "401815362",
@@ -366,6 +330,24 @@
       "context": "Absences severes 9-5"
     },
     {
+      "event_id": "401815381",
+      "date": "2026-05-17T17:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Detroit Tigers",
+      "away": "Toronto Blue Jays",
+      "match": "Detroit Tigers - Toronto Blue Jays",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 0.754,
+      "context": "Cote home: 1.62 -> 1.84 (-13.6%)"
+    },
+    {
       "event_id": "401872904",
       "date": "2026-05-23T00:00Z",
       "sport": "hockey",
@@ -385,24 +367,6 @@
     }
   ],
   "active_watch": [
-    {
-      "event_id": "401872571",
-      "date": "2026-05-17T01:07Z",
-      "sport": "football",
-      "league_code": "ligamx",
-      "league_name": "Liga MX",
-      "home": "Guadalajara",
-      "away": "Cruz Azul",
-      "match": "Guadalajara - Cruz Azul",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.608,
-      "context": "Cote away: 3.20 -> 2.85 (+10.9%)"
-    },
     {
       "event_id": "401815363",
       "date": "2026-05-16T20:10Z",
@@ -1216,5 +1180,24 @@
       "context": "marge bookmaker anormale 19.4%"
     }
   ],
-  "expired_sample": []
+  "expired_sample": [
+    {
+      "event_id": "401815371",
+      "date": "2026-05-16T19:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Colorado Rockies",
+      "away": "Arizona Diamondbacks",
+      "match": "Colorado Rockies - Arizona Diamondbacks",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Arizona Diamondbacks",
+      "side": null,
+      "strength": 0.8,
+      "context": "Absences severes 8-12"
+    }
+  ]
 }
