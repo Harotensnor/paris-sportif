@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-15T23:56:24Z",
+  "generated_at": "2026-05-16T00:09:36Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -374,6 +374,42 @@
             "whip": 1.16
           },
           "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "San Diego Padres",
+          "pitcher": "Walker Buehler",
+          "label": "Walker Buehler plus de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "over",
+          "probability": 0.5906,
+          "fair_odds": 1.69,
+          "expected_strikeouts": 3.85,
+          "projected_ip": 4.51,
+          "inputs": {
+            "k9": 7.68,
+            "era": 5.2,
+            "whip": 1.35,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "San Diego Padres",
+          "pitcher": "Walker Buehler",
+          "label": "Walker Buehler ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.69,
+          "fair_odds": 1.45,
+          "expected_hr_allowed": 0.371,
+          "projected_ip": 4.51,
+          "inputs": {
+            "hr9": 0.74,
+            "era": 5.2,
+            "whip": 1.35
+          },
+          "side": "away"
         }
       ]
     },
@@ -1300,8 +1336,8 @@
           "projected_ip": 5.55,
           "inputs": {
             "k9": 10.72,
-            "era": 2.78,
-            "whip": 0.88,
+            "era": 1.99,
+            "whip": 0.84,
             "hand": "L"
           },
           "side": "away"
@@ -1318,8 +1354,8 @@
           "projected_ip": 5.55,
           "inputs": {
             "hr9": 0.79,
-            "era": 2.78,
-            "whip": 0.88
+            "era": 1.99,
+            "whip": 0.84
           },
           "side": "away"
         }
@@ -1414,6 +1450,42 @@
             "whip": 1.16
           },
           "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "San Diego Padres",
+          "pitcher": "Walker Buehler",
+          "label": "Walker Buehler plus de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "over",
+          "probability": 0.5906,
+          "fair_odds": 1.69,
+          "expected_strikeouts": 3.85,
+          "projected_ip": 4.51,
+          "inputs": {
+            "k9": 7.68,
+            "era": 5.2,
+            "whip": 1.35,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "San Diego Padres",
+          "pitcher": "Walker Buehler",
+          "label": "Walker Buehler ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.69,
+          "fair_odds": 1.45,
+          "expected_hr_allowed": 0.371,
+          "projected_ip": 4.51,
+          "inputs": {
+            "hr9": 0.74,
+            "era": 5.2,
+            "whip": 1.35
+          },
+          "side": "away"
         }
       ]
     },
@@ -2596,7 +2668,7 @@
       ]
     }
   ],
-  "props": 124,
+  "props": 128,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
