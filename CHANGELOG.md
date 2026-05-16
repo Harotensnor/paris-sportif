@@ -5,6 +5,39 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 52 — Refonte visuelle de chaque page (UX overhaul P2)
+
+Chaque tab-panel (Matchs / Buteurs / Combinés / Bilan / Recherche / Réglages / Calendrier) reçoit :
+- Un nouvel en-tête `page-section-head` avec titre 22px + emoji + sous-titre 14px max 720px + bordure subtile.
+- Une `page-filters-bar` repensée pour les pages avec filtres (Matchs, Buteurs) :
+  * input search 220px flex avec emoji 🔍 et focus indigo
+  * selects avec hover indigo
+  * boutons ghost-btn 8/14px
+
+`simple-top-strip` modernisée
+- Padding 10/14px → 12/20px, min-height 40→48px, radius 8→12px.
+- Gradient subtil indigo+blue + backdrop-filter blur.
+- Séparateurs verticaux entre Bankroll / P&L / Fraîcheur (border-left 1px).
+- Tailles typo dédiées : bankroll 16px, P&L 14px, fraîcheur 11px uppercase.
+
+`ultimate-bet-card` hero modernisé
+- Padding 22→26/28, margin-bottom +6, radius 18→20px.
+- Bordure 42→55% opacité, gradient renforcé.
+- Box-shadow double : ombre profonde 35% + highlight intérieur top.
+- Hover : translateY(-2px) + shadow agrandie.
+- Liseré arc-en-ciel (vert→indigo→bleu) au top via ::before.
+
+Titres de page personnalisés avec emojis
+- ⚽ Tous les matchs Winamax
+- 👤 Buteurs & joueurs décisifs
+- 🎲 Combinés du jour
+- 📊 Bilan & Performance
+- 🔍 Recherche historique
+- ⚙️ Réglages & Préférences
+- 📅 Calendrier 7 jours
+
+Validation : smoke OK (1 ready, 14 timeline, 24 fiables, 10 priorités).
+
 ### Sprint 51 — Refonte navigation + nouvelles catégories
 
 **Feedback utilisateur : "revoie complétement l'affichage de chaque page, navigation, catégories supplémentaires"**

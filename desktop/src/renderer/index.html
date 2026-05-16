@@ -394,10 +394,10 @@
       </section>
 
       <section class="tab-panel" data-panel="combines">
-        <div class="section-head">
+        <div class="section-head page-section-head">
           <div>
-            <h3>Combinés</h3>
-            <p>Tickets construits avec les marchés Winamax exacts et anti-corrélation.</p>
+            <h3>🎲 Combinés du jour</h3>
+            <p>Tickets construits automatiquement avec les marchés Winamax exacts et un anti-corrélation strict. 4 variantes : Safe (locks ≥70%), Best Edge, Buts (OU + BTTS), Outsider (cote ≥5).</p>
           </div>
         </div>
         <div class="combo-grid" id="combines-list">
@@ -406,13 +406,13 @@
       </section>
 
       <section class="tab-panel" data-panel="scorers">
-        <div class="section-head">
+        <div class="section-head page-section-head">
           <div>
-            <h3>Buteurs probables</h3>
-            <p>Lecture secondaire issue du modèle joueurs, à vérifier dans le marché buteur Winamax.</p>
+            <h3>👤 Buteurs &amp; joueurs décisifs</h3>
+            <p>Lecture secondaire issue du modèle joueurs, à vérifier dans le marché buteur Winamax. Cotes Winamax réelles affichées quand matchées (filtre quality ≥ 35, edge ≥ +0.5pt).</p>
           </div>
           <div class="section-actions">
-            <button class="ghost-btn" id="export-scorers-csv-btn">Exporter buteurs</button>
+            <button class="ghost-btn" id="export-scorers-csv-btn">⬇ Exporter</button>
           </div>
         </div>
         <div class="pick-toolbar" aria-label="Filtres buteurs">
@@ -455,22 +455,20 @@
       </section>
 
       <section class="tab-panel" data-panel="matches">
-        <div class="section-head">
+        <div class="section-head page-section-head">
           <div>
-            <h3>Tous les matchs</h3>
-            <p>Liste native du logiciel, limitée aux matchs Winamax exacts.</p>
+            <h3>⚽ Tous les matchs Winamax</h3>
+            <p>Exploration complète : tous les matchs bookable Winamax, avec leurs picks modèles, edges et statuts. Utilise les filtres pour drilldown par sport, ligue, ou niveau de risque.</p>
           </div>
-          <div class="filters">
-            <input id="match-search" type="search" placeholder="Rechercher une équipe">
+        </div>
+        <div class="page-filters-bar">
+          <div class="page-filters-group">
+            <input id="match-search" type="search" placeholder="🔍 Rechercher une équipe...">
             <select id="sport-filter" aria-label="Filtrer par sport">
               <option value="all">Tous sports</option>
             </select>
-            <select id="calibration-filter" aria-label="Filtrer par calibration">
-              <option value="all">Tous risques</option>
-              <option value="cold">Froids</option>
-              <option value="warm">Chauds</option>
-              <option value="blocked">Freinés</option>
-              <option value="unknown">Sans historique</option>
+            <select id="league-filter" aria-label="Filtrer par ligue">
+              <option value="all">Toutes ligues</option>
             </select>
             <select id="edge-filter" aria-label="Filtrer par edge">
               <option value="all">Tous edges</option>
@@ -479,10 +477,14 @@
               <option value="edge_10_20">Edge 10-20%</option>
               <option value="edge_20_plus">Edge 20%+</option>
             </select>
-            <select id="league-filter" aria-label="Filtrer par ligue">
-              <option value="all">Toutes ligues</option>
+            <select id="calibration-filter" aria-label="Filtrer par calibration">
+              <option value="all">Tous risques</option>
+              <option value="cold">Froids</option>
+              <option value="warm">Chauds</option>
+              <option value="blocked">Freinés</option>
+              <option value="unknown">Sans historique</option>
             </select>
-            <button class="ghost-btn" id="export-filter-backtest-csv-btn">Exporter backtest</button>
+            <button class="ghost-btn" id="export-filter-backtest-csv-btn">⬇ Exporter</button>
           </div>
         </div>
         <div class="match-backtest-grid" id="matches-backtest-grid">
@@ -509,13 +511,13 @@
       </section>
 
       <section class="tab-panel" data-panel="history">
-        <div class="section-head">
+        <div class="section-head page-section-head">
           <div>
-            <h3>Performance modèle</h3>
-            <p>Crédibilité du modèle sur les lignes réglées : ROI, Brier, calibration et segments à privilégier.</p>
+            <h3>📊 Bilan &amp; Performance</h3>
+            <p>Crédibilité du modèle sur les lignes réglées : ROI, Brier, calibration, segments rentables. Et ton bilan personnel : paris suivis, P&amp;L cumulé, projection bankroll.</p>
           </div>
           <div class="section-actions">
-            <button class="ghost-btn" id="export-user-bets-btn-history" type="button">Exporter mes paris</button>
+            <button class="ghost-btn" id="export-user-bets-btn-history" type="button">⬇ Exporter mes paris</button>
           </div>
         </div>
         <div class="model-performance-grid" id="model-performance-grid">
@@ -1063,10 +1065,10 @@
       </section>
 
       <section class="tab-panel" data-panel="search">
-        <div class="section-head">
+        <div class="section-head page-section-head">
           <div>
-            <h3>Recherche historique</h3>
-            <p>Retrouve une équipe, un joueur, une ligue ou compare deux profils avant de miser.</p>
+            <h3>🔍 Recherche historique</h3>
+            <p>Retrouve une équipe, un joueur, une ligue. Compare deux profils côte à côte avant de miser. Inclut les stats des 30 derniers jours, forme, H2H, blessures.</p>
           </div>
         </div>
         <div class="deep-search-hero">
@@ -1086,14 +1088,14 @@
       </section>
 
       <section class="tab-panel" data-panel="preferences">
-        <div class="section-head">
+        <div class="section-head page-section-head">
           <div>
-            <h3>Préférences</h3>
-            <p>Réglages locaux : ils filtrent l’expérience, jamais les données brutes du modèle.</p>
+            <h3>⚙️ Réglages &amp; Préférences</h3>
+            <p>Réglages locaux : ils filtrent l'expérience, jamais les données brutes du modèle. Bankroll, discipline anti-tilt, sports/marchés suivis, IA, alertes, thème.</p>
           </div>
           <div class="section-actions">
-            <button class="primary-btn" id="save-preferences-btn" type="button">Enregistrer</button>
-            <button class="ghost-btn" id="reset-preferences-btn" type="button">Réinitialiser</button>
+            <button class="primary-btn" id="save-preferences-btn" type="button">💾 Enregistrer</button>
+            <button class="ghost-btn" id="reset-preferences-btn" type="button">↺ Réinitialiser</button>
           </div>
         </div>
         <div class="preferences-grid">
@@ -1330,13 +1332,13 @@
       </section>
 
       <section class="tab-panel" data-panel="calendar">
-        <div class="section-head">
+        <div class="section-head page-section-head">
           <div>
-            <h3>Calendrier</h3>
-            <p>Vue 7 jours des picks : densité, horaires et actions rapides.</p>
+            <h3>📅 Calendrier 7 jours</h3>
+            <p>Vue 7 jours des picks : densité par jour, horaires des matchs, actions rapides. Clique un jour pour filtrer le cockpit.</p>
           </div>
           <div class="section-actions">
-            <button class="ghost-btn" id="clear-calendar-filter-btn" type="button">Voir tous les jours</button>
+            <button class="ghost-btn" id="clear-calendar-filter-btn" type="button">↺ Tous les jours</button>
           </div>
         </div>
         <div class="calendar-grid" id="calendar-grid">

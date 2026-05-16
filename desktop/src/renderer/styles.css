@@ -3114,14 +3114,16 @@ body.modal-open {
 .simple-top-strip {
   display: grid;
   grid-template-columns: 1fr auto auto auto;
-  gap: 12px;
+  gap: 18px;
   align-items: center;
-  min-height: 40px;
-  margin-bottom: 14px;
-  padding: 10px 14px;
+  min-height: 48px;
+  margin-bottom: 20px;
+  padding: 12px 20px;
   border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--surface);
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(99, 102, 241, .08) 0%, rgba(14, 165, 233, .04) 100%);
+  backdrop-filter: blur(4px);
+  position: relative;
 }
 
 .simple-top-strip strong,
@@ -3129,6 +3131,43 @@ body.modal-open {
 .simple-top-strip small {
   font-style: normal;
   font-weight: 850;
+}
+
+.simple-top-strip > * {
+  position: relative;
+}
+
+.simple-top-strip > *:not(:first-child)::before {
+  content: '';
+  position: absolute;
+  left: -10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1px;
+  height: 22px;
+  background: var(--line-soft);
+}
+
+.simple-top-strip #simple-now {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.simple-top-strip #simple-bankroll {
+  font-size: 16px;
+  color: var(--text);
+}
+
+.simple-top-strip #simple-pnl {
+  font-size: 14px;
+}
+
+.simple-top-strip #simple-freshness {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--muted-2);
 }
 
 .simple-pnl-ok {
@@ -3401,15 +3440,38 @@ td.empty::before,
 .ultimate-bet-card {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 220px;
-  gap: 18px;
-  padding: 22px;
-  margin: 18px 0;
-  border: 1px solid rgba(16, 185, 129, .42);
-  border-radius: 18px;
-  background: linear-gradient(135deg, rgba(16, 185, 129, .18), rgba(99, 102, 241, .08)), var(--surface);
-  box-shadow: 0 18px 44px rgba(2, 6, 23, .26);
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 22px;
+  padding: 26px 28px;
+  margin: 20px 0 24px 0;
+  border: 1px solid rgba(16, 185, 129, .55);
+  border-radius: 20px;
+  background:
+    linear-gradient(135deg, rgba(16, 185, 129, .22) 0%, rgba(99, 102, 241, .12) 100%),
+    var(--surface);
+  box-shadow:
+    0 22px 60px rgba(2, 6, 23, .35),
+    inset 0 1px 0 rgba(255, 255, 255, .04);
   overflow: hidden;
+  transition: transform 220ms ease-out, box-shadow 220ms ease-out;
+}
+
+.ultimate-bet-card:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 28px 70px rgba(2, 6, 23, .42),
+    inset 0 1px 0 rgba(255, 255, 255, .06);
+}
+
+.ultimate-bet-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, rgba(16, 185, 129, 1), rgba(99, 102, 241, 1), rgba(14, 165, 233, 1));
+  border-radius: 20px 20px 0 0;
 }
 
 .ultimate-hero-media {
@@ -3519,6 +3581,85 @@ td.empty::before,
   border: 1px solid rgba(148, 163, 184, .35);
   box-shadow: 0 4px 16px rgba(15, 23, 42, .35);
   flex-shrink: 0;
+}
+
+/* Sprint 52 (refonte UX) : en-têtes de page modernes + filtres */
+.page-section-head {
+  margin-bottom: 20px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.page-section-head h3 {
+  font-size: 22px;
+  font-weight: 800;
+  margin: 0 0 6px 0;
+  letter-spacing: -0.3px;
+}
+
+.page-section-head p {
+  font-size: 14px;
+  color: var(--muted);
+  margin: 0;
+  max-width: 720px;
+  line-height: 1.5;
+}
+
+.page-filters-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding: 12px 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.page-filters-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+}
+
+.page-filters-group input[type="search"] {
+  flex: 1;
+  min-width: 220px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-2);
+  color: var(--text);
+  font-size: 13px;
+  transition: border-color 160ms ease-out;
+}
+
+.page-filters-group input[type="search"]:focus {
+  outline: none;
+  border-color: rgba(99, 102, 241, .55);
+  background: var(--surface);
+}
+
+.page-filters-group select {
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-2);
+  color: var(--text);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.page-filters-group select:hover {
+  border-color: rgba(99, 102, 241, .35);
+}
+
+.page-filters-group button {
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 700;
 }
 
 /* Sprint 50 (UX) : badge compteur "paris à miser" dans la nav Picks */
