@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-16T22:18:43Z",
+  "generated_at": "2026-05-16T22:23:14Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815362",
-      "kickoff": "2026-05-16T22:10Z",
-      "league": "MLB",
-      "match": "Cincinnati Reds at Cleveland Guardians",
-      "home": "Cleveland Guardians",
-      "away": "Cincinnati Reds",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Cleveland Guardians",
-          "pitcher": "Joey Cantillo",
-          "label": "Joey Cantillo moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.6002,
-          "fair_odds": 1.67,
-          "expected_strikeouts": 4.1,
-          "projected_ip": 4.6,
-          "inputs": {
-            "k9": 8.02,
-            "era": 2.93,
-            "whip": 1.33,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Cleveland Guardians",
-          "pitcher": "Joey Cantillo",
-          "label": "Joey Cantillo ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.606,
-          "fair_odds": 1.65,
-          "expected_hr_allowed": 0.501,
-          "projected_ip": 4.6,
-          "inputs": {
-            "hr9": 0.98,
-            "era": 2.93,
-            "whip": 1.33
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Cincinnati Reds",
-          "pitcher": "Chris Paddack",
-          "label": "Chris Paddack moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.5172,
-          "fair_odds": 1.93,
-          "expected_strikeouts": 4.43,
-          "projected_ip": 5.03,
-          "inputs": {
-            "k9": 7.92,
-            "era": 7.63,
-            "whip": 1.66,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Cincinnati Reds",
-          "pitcher": "Chris Paddack",
-          "label": "Chris Paddack concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6263,
-          "fair_odds": 1.6,
-          "expected_hr_allowed": 0.984,
-          "projected_ip": 5.03,
-          "inputs": {
-            "hr9": 1.76,
-            "era": 7.63,
-            "whip": 1.66
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815367",
       "kickoff": "2026-05-16T23:10Z",
@@ -1792,7 +1710,7 @@
       ]
     }
   ],
-  "props": 86,
+  "props": 82,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"

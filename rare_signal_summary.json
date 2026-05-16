@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-05-16T22:18:50Z",
+  "generated_at": "2026-05-16T22:23:20Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 62,
+    "active_events": 63,
     "actionable": 19,
-    "watch": 3,
+    "watch": 4,
     "risk": 40,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 20,
+      "injury_imbalance": 19,
+      "market_move": 4,
       "market_uncertain": 41,
-      "market_move": 2,
-      "back_to_back_travel": 6,
-      "signal_conflict": 3
+      "signal_conflict": 4,
+      "back_to_back_travel": 6
     },
     "by_quality": {
+      "watch": 4,
       "actionable": 19,
-      "watch": 3,
       "risk": 40
     }
   },
@@ -186,24 +186,6 @@
       "context": "1 match dans les 48h + 1498 km de voyage"
     },
     {
-      "event_id": "401815362",
-      "date": "2026-05-16T22:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Cleveland Guardians",
-      "away": "Cincinnati Reds",
-      "match": "Cleveland Guardians - Cincinnati Reds",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Cincinnati Reds",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 3-7"
-    },
-    {
       "event_id": "401815374",
       "date": "2026-05-17T01:40Z",
       "sport": "baseball",
@@ -364,9 +346,45 @@
       "side": "away",
       "strength": 0.726,
       "context": "1 match dans les 48h + 979 km de voyage"
+    },
+    {
+      "event_id": "401815373",
+      "date": "2026-05-16T23:15Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Seattle Mariners",
+      "away": "San Diego Padres",
+      "match": "Seattle Mariners - San Diego Padres",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.66,
+      "context": "Cote away: 2.44 -> 2.15 (+11.9%)"
     }
   ],
   "active_watch": [
+    {
+      "event_id": "401872571",
+      "date": "2026-05-17T01:07Z",
+      "sport": "football",
+      "league_code": "ligamx",
+      "league_name": "Liga MX",
+      "home": "Guadalajara",
+      "away": "Cruz Azul",
+      "match": "Guadalajara - Cruz Azul",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.608,
+      "context": "Cote away: 3.20 -> 2.85 (+10.9%)"
+    },
     {
       "event_id": "401815370",
       "date": "2026-05-16T23:10Z",
