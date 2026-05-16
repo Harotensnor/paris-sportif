@@ -1,24 +1,23 @@
 {
-  "generated_at": "2026-05-16T18:39:11Z",
+  "generated_at": "2026-05-16T18:42:23Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 65,
-    "actionable": 21,
-    "watch": 5,
+    "active_events": 63,
+    "actionable": 20,
+    "watch": 4,
     "risk": 39,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 23,
-      "market_uncertain": 39,
-      "market_move": 3,
+      "market_uncertain": 38,
       "back_to_back_travel": 6,
       "signal_conflict": 3
     },
     "by_quality": {
-      "actionable": 21,
-      "watch": 5,
+      "actionable": 20,
+      "watch": 4,
       "risk": 39
     }
   },
@@ -58,24 +57,6 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 15-7"
-    },
-    {
-      "event_id": "401871409",
-      "date": "2026-05-17T00:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Montreal Canadiens",
-      "away": "Buffalo Sabres",
-      "match": "Montreal Canadiens - Buffalo Sabres",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 1.57 -> 1.90 (-20.9%)"
     },
     {
       "event_id": "401815372",
@@ -403,24 +384,6 @@
     }
   ],
   "active_watch": [
-    {
-      "event_id": "401872571",
-      "date": "2026-05-17T01:07Z",
-      "sport": "football",
-      "league_code": "ligamx",
-      "league_name": "Liga MX",
-      "home": "Guadalajara",
-      "away": "Cruz Azul",
-      "match": "Guadalajara - Cruz Azul",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.608,
-      "context": "Cote away: 3.20 -> 2.85 (+10.9%)"
-    },
     {
       "event_id": "401815363",
       "date": "2026-05-16T20:10Z",
