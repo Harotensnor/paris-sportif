@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-05-16T19:53:53Z",
+  "generated_at": "2026-05-16T20:01:40Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 65,
-    "actionable": 20,
-    "watch": 4,
+    "active_events": 68,
+    "actionable": 22,
+    "watch": 5,
     "risk": 41,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 21,
-      "market_uncertain": 41,
-      "back_to_back_travel": 6,
-      "market_move": 6,
-      "signal_conflict": 4
+      "market_move": 12,
+      "signal_conflict": 6,
+      "market_uncertain": 42,
+      "back_to_back_travel": 6
     },
     "by_quality": {
-      "actionable": 20,
-      "watch": 4,
+      "actionable": 22,
+      "watch": 5,
       "risk": 41
     }
   },
@@ -58,6 +58,24 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 15-7"
+    },
+    {
+      "event_id": "401871409",
+      "date": "2026-05-17T00:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Montreal Canadiens",
+      "away": "Buffalo Sabres",
+      "match": "Montreal Canadiens - Buffalo Sabres",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 1.56 -> 1.90 (-22.1%)"
     },
     {
       "event_id": "401815372",
@@ -382,9 +400,45 @@
       "side": "away",
       "strength": 0.726,
       "context": "1 match dans les 48h + 979 km de voyage"
+    },
+    {
+      "event_id": "401815373",
+      "date": "2026-05-16T23:15Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Seattle Mariners",
+      "away": "San Diego Padres",
+      "match": "Seattle Mariners - San Diego Padres",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.66,
+      "context": "Cote away: 2.44 -> 2.15 (+11.9%)"
     }
   ],
   "active_watch": [
+    {
+      "event_id": "401872571",
+      "date": "2026-05-17T01:07Z",
+      "sport": "football",
+      "league_code": "ligamx",
+      "league_name": "Liga MX",
+      "home": "Guadalajara",
+      "away": "Cruz Azul",
+      "match": "Guadalajara - Cruz Azul",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.608,
+      "context": "Cote away: 3.20 -> 2.85 (+10.9%)"
+    },
     {
       "event_id": "401815363",
       "date": "2026-05-16T20:10Z",
@@ -514,6 +568,24 @@
       "context": "marge bookmaker anormale 18.1%"
     },
     {
+      "event_id": "176117",
+      "date": "2026-05-18T04:00Z",
+      "sport": "tennis",
+      "league_code": "internationauxdestra",
+      "league_name": "Internationaux de Strasbourg presented by Mammotion",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 12.1%"
+    },
+    {
       "event_id": "175501",
       "date": "2026-05-18T04:00Z",
       "sport": "tennis",
@@ -548,24 +620,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 12.3%"
-    },
-    {
-      "event_id": "176117",
-      "date": "2026-05-18T04:00Z",
-      "sport": "tennis",
-      "league_code": "internationauxdestra",
-      "league_name": "Internationaux de Strasbourg presented by Mammotion",
-      "home": "",
-      "away": "",
-      "match": "? - ?",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 12.1%"
     },
     {
       "event_id": "401861386",
