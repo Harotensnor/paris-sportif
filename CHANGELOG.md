@@ -5,6 +5,16 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 43 — Exploitation famille `players` / buteurs (P2 audit)
+
+- Audit terrain : 19 419 marchés buteurs Winamax dans le catalogue → **1 seul pick affiché** avant. Cause : matching `playerMarketOddForScorer` exigeait `market_key === 'buteur'` exactement et cote ≤ 4.00 ; le filtre `scorerPickRowsFromScorers` exigeait quality ≥ 50 et edge ≥ 0.01.
+- Fix `content-utils.js` : matching élargi aux `market_key` ∈ {buteur, anytime_scorer, goalscorer, scorer, premier_buteur} et titres équivalents. Cote acceptée jusqu'à 5.00.
+- Fix `legacy-engine.js` : `scorerPickRowsFromScorers` accepte qualité ≥ 35 (vs 50), edge ≥ 0.005 (vs 0.01), cote max 5.00 (vs 4.00).
+- Injection explicite : nouveau bloc dans la sélection dashboard qui ajoute jusqu'à 5 buteurs simples bypassant le quota market — sinon les buteurs étaient mangés par le quota Vainqueurs 50% et le maxPerMarket 9.
+- Résultat terrain : **3 picks buteur affichés** (Karim Dermane @4.90, Mohamed Ali Cho @2.70, Jean Victor Makengo @4.40) avec cote Winamax réelle et edge calculé. Dashboard total : 25 picks répartis (foot 11, tennis 2, baseball 11, hockey 1, buteurs 3).
+- smoke.js : seuil `trackButtons` ramené de 10 à 6 et `metric` de 8 à 6 pour refléter que les nouveaux picks tennis/baseball/buteurs sont en `À surveiller` sans bouton `Je mise` (intentionnel, pas de pari à perte).
+- Validation : qa:engine (215 matchs, 144 picks, 25 dashboard), smoke (14 timeline, 22 fiables, 8 priorités).
+
 ### Sprint 42 — Débloquer tennis/baseball/basket (P1 audit)
 
 - Audit terrain : 92 events football → 15 affichés / 7 prêts, mais **0 picks tennis (sur 5 events) et 0 baseball (sur 6 events)**. Cause identifiée : le moteur produisait soit un best sur un marché expert (`Jeux tennis` masqué standard), soit des edges légèrement négatifs sur les sports avec cotes serrées.

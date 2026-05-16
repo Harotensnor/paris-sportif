@@ -160,9 +160,15 @@ function playerMarketOddForScorer(match, scorer, oddsIndex) {
   const matchId = String(match?.winamax?.match_id || match?.id || match?.uid || '');
   const rows = oddsIndex?.[matchId]?.odds?.all_markets || [];
   if (!Array.isArray(rows) || !rows.length) return null;
+  // Sprint 43 (P2 audit) : matching buteurs élargi.
+  // Avant : market_key === 'buteur' uniquement, cote 1.30-4.00.
+  // Après : tout marché buteur "anytime" simple (buteur, premier_buteur,
+  // anytime_scorer, goalscorer, scorer). Cote 1.30-5.00.
+  const buteurMarketRegex = /^(buteur|anytime_scorer|goalscorer|scorer|premier_buteur)$/i;
+  const buteurTitleRegex = /^(buteur|premier buteur|anytime scorer|goalscorer)$/i;
   const candidates = rows
-    .filter((row) => /^buteur$/i.test(String(row?.market_key || '')) || /^buteur$/i.test(String(row?.title || '')))
-    .filter((row) => Number(row?.odd) >= 1.30 && Number(row?.odd) <= 4.00)
+    .filter((row) => buteurMarketRegex.test(String(row?.market_key || '')) || buteurTitleRegex.test(String(row?.title || '')))
+    .filter((row) => Number(row?.odd) >= 1.30 && Number(row?.odd) <= 5.00)
     .filter((row) => nameMatches(row?.label || row?.side || '', scorer?.name));
   candidates.sort((a, b) => Number(a.odd || 99) - Number(b.odd || 99));
   const best = candidates[0];

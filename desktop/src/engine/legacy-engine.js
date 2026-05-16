@@ -3210,6 +3210,10 @@ function createLegacyEngineService({ projectRoot }) {
     const sortedTodayDisplayable = sortRows(todayRows.filter(isDashboardDisplayCandidate));
     const twoGoalWinnerRows = sortRows(sourcePicks.filter((row) => row?.winamaxTwoGoalRule?.eligible && isDashboardDisplayCandidate(row)));
     const winnerRows = sortRows(sourcePicks.filter((row) => simpleMarketGroup(row?.marketKey || row?.market) === 'winner' && isDashboardDisplayCandidate(row)));
+    // Sprint 43 (P2 audit) : buteurs explicitement injectés dans le dashboard.
+    // Sans cette injection, les buteurs avec cote Winamax confirmée mais
+    // confiance < 55% restent invisibles à cause du quota market.
+    const scorerRows = sortRows(sourcePicks.filter((row) => simpleMarketGroup(row?.marketKey || row?.market) === 'scorer' && isDashboardDisplayCandidate(row)));
     const rollingReadyPool = sortRows(rolling24.filter((row) => row?.decisionCenter?.canBet));
     const sortedRollingReady = sortRows(ordered.filter((row) => {
       const ts = startTimestamp(row);
@@ -3262,6 +3266,21 @@ function createLegacyEngineService({ projectRoot }) {
       if (currentWinners() < Math.min(winnerTarget, maxDashboardRows)) {
         addFinalRows(winnerRows, Math.min(maxDashboardRows, finalRows.length + Math.max(0, winnerTarget - currentWinners())), {
           matchCap: maxPerMatch,
+          relaxSport: true,
+          relaxLeague: true,
+          relaxMarket: true
+        });
+      }
+    }
+    if (scorerRows.length) {
+      // Sprint 43 (P2 audit) : injection explicite des picks buteur.
+      // Cible 3-5 buteurs par jour quand la famille `players` produit des
+      // candidats avec cote Winamax validée et qualité ≥ 35.
+      const scorerTarget = Math.min(scorerRows.length, 5);
+      const currentScorers = () => finalRows.filter((row) => simpleMarketGroup(row?.marketKey || row?.market) === 'scorer').length;
+      if (currentScorers() < scorerTarget) {
+        addFinalRows(scorerRows, Math.min(maxDashboardRows, finalRows.length + Math.max(0, scorerTarget - currentScorers())), {
+          matchCap: maxPerMatch + 1,
           relaxSport: true,
           relaxLeague: true,
           relaxMarket: true
@@ -3625,7 +3644,14 @@ function createLegacyEngineService({ projectRoot }) {
       const probability = Math.max(0, Math.min(0.75, Number(scorer?.probability || 0) || 0));
       const qualityScore = Number(scorer?.playerQuality?.score || 0);
       const edge = odd > 1 && probability > 0 ? probability - (1 / odd) : 0;
-      if (!(odd >= 1.30 && odd <= 4.00) || !(qualityScore >= 50) || !(edge >= 0.01)) continue;
+      // Sprint 43 (P2 audit) : exploiter la famille `players` (19 419 marchés
+      // Winamax dont seulement 1 pick avant). Filtres assouplis :
+      // - cote max 5.00 (vs 4.00) pour intégrer les buteurs réguliers
+      //   value à cote 4-5
+      // - qualité joueur ≥ 35 (vs 50) pour les jeunes / remplaçants
+      //   probables qui n'ont pas un score 50+ encore
+      // - edge ≥ 0.005 (vs 0.01) — pratiquement zéro mais positif
+      if (!(odd >= 1.30 && odd <= 5.00) || !(qualityScore >= 35) || !(edge >= 0.005)) continue;
       const match = matchById.get(String(scorer.matchId || '')) || {};
       const market = 'Buteur';
       const label = scorer.name || scorer.winamaxPlayerMarket?.label || 'Joueur';
