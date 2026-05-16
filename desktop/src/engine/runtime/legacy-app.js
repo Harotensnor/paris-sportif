@@ -3328,7 +3328,19 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
 
     const ext = pred.markets?.extended || {};
     const raw = ext.raw || {};
+    // Sprint 58 (bug critique cotes) : même filtre que ht_ou — ne garder
+    // que le vrai marché "Plus / Moins de X buts" simple, pas les
+    // combinés "Résultat et plus/moins de X buts" ni "Nombre de buts de [équipe]".
+    const isSimpleTotalRow = (row) => {
+      const title = String(row && row.title || '').toLowerCase();
+      if (!title) return true;
+      if (/r[éeè]sultat\s+et\s+(plus|moins|nombre)/i.test(title)) return false;
+      if (/nombre\s+de\s+buts?\s+de\s+/i.test(title)) return false;
+      if (/^les\s+deux\s+/i.test(title)) return false;
+      return true;
+    };
     for (const row of _v35Rows(wxMk.ou)) {
+      if (!isSimpleTotalRow(row)) continue;
       const isHockeyOu = match.sport === 'hockey';
       if (match.sport && match.sport !== 'football' && !isHockeyOu) continue;
       const prob = _v35ModelTotalProb(pred, isHockeyOu ? 'hockey_total' : 'football_ou', row.line, row.side);
@@ -3348,20 +3360,34 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
         _v35AddCandidate(out, { odd, side, line, label: `${side === 'over' ? 'Plus' : 'Moins'} de ${line}` }, prob, mk, `${side === 'over' ? 'O' : 'U'}${line}`, `${side === 'over' ? 'Plus' : 'Moins'} de ${line} buts`);
       });
     });
+    // Sprint 58 (bug critique cotes) : filtrer pour ne garder QUE le marché
+    // simple "Mi-temps - Nombre de buts". Les rows ht_ou contiennent aussi
+    // "Mi-temps - Résultat et nombre de buts" (cote combinée "Match nul et
+    // moins de 1,5" à 2.55 vs vrai "Moins de 1,5" à 1.32) qui produisaient
+    // une cote affichée fausse sur le bet ultime.
+    const isSimpleHtTotalRow = (row) => {
+      const title = String(row && row.title || '').toLowerCase();
+      // On accepte uniquement "Mi-temps - Nombre de buts" pile (pas les
+      // variants par équipe ni résultat-combiné).
+      if (!title) return true; // pas de title : on garde par défaut (compat)
+      if (/r[éeè]sultat\s+et\s+nombre\s+de\s+buts?/i.test(title)) return false;
+      if (/nombre\s+de\s+buts?\s+de\s+/i.test(title)) return false; // "de Monza", "de Stabia"
+      return true;
+    };
     for (const row of _v35Rows(wxMk.ht_ou)) {
+      if (!isSimpleHtTotalRow(row)) continue;
       const prob = _v35ModelTotalProb(pred, 'football_ht_ou', row.line, row.side);
       const key = `HT_${row.side === 'over' ? 'O' : 'U'}${row.line}`;
       _v35AddCandidate(out, row, prob, 'htTotal', key, `${row.side === 'over' ? 'Plus' : 'Moins'} de ${row.line} but(s) en 1re mi-temps`);
     }
-    [['ht_ou05', 0.5], ['ht_ou15', 1.5]].forEach(([mk, line]) => {
-      const block = wxMk[mk];
-      if (!block) return;
-      ['over', 'under'].forEach(side => {
-        const prob = _v35ModelTotalProb(pred, 'football_ht_ou', line, side);
-        const odd = Number(block[side]);
-        _v35AddCandidate(out, { odd, side, line, label: `${side === 'over' ? 'Plus' : 'Moins'} de ${line}` }, prob, 'htTotal', `HT_${side === 'over' ? 'O' : 'U'}${line}`, `${side === 'over' ? 'Plus' : 'Moins'} de ${line} but(s) en 1re mi-temps`);
-      });
-    });
+    // Sprint 58 (bug critique cotes) : DÉSACTIVÉ. Les blocs résolus
+    // ht_ou05/ht_ou15 sont parfois pollués par les marchés combinés
+    // "Résultat et nombre de buts" upstream (patch_winamax_markets.py).
+    // Le loop précédent sur wxMk.ht_ou filtré couvre déjà ces lignes
+    // depuis l'all_markets brut avec validation par title. Cela évite
+    // d'afficher une cote ht_ou15.under=5.3 quand le vrai marché simple
+    // "Moins de 1,5 MT" est à 1.32.
+    // (Code archivé : reactivable quand patch_winamax_markets sera fixé.)
     for (const row of _v35Rows(wxMk.corners_ou)) {
       if (match.sport && match.sport !== 'football') continue;
       const prob = _v35ModelTotalProb(pred, 'football_corners', row.line, row.side) ?? _v35NoVigProb(row, wxMk.corners_ou);

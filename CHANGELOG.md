@@ -5,6 +5,22 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 58 — 🚨 FIX CRITIQUE : cote fausse sur bet ultime
+
+Feedback utilisateur : "Je vois des cotes fausses, le bet ultime a une cote fausse j'ai vérifié sur Winamax."
+
+Bug racine identifié sur le pick "Moins de 1,5 buts en 1re mi-temps" (Stabia-Monza)
+- Cote affichée : **2.55** (fausse — c'était en fait la cote du marché combiné "Match nul et moins de 1,5 MT")
+- Vraie cote Winamax pour "Moins de 1,5 MT" simple : **1.32**
+- Cause : le moteur prenait la première occurrence du marché `ht_ou` avec line=1.5 side=under, sans distinguer le marché simple "Mi-temps - Nombre de buts" des combinés "Mi-temps - Résultat et nombre de buts" et "Mi-temps - Nombre de buts de [équipe]".
+
+Fix appliqué dans `desktop/src/engine/runtime/legacy-app.js` (`buildMarketCandidates`) :
+- Nouveau filtre `isSimpleHtTotalRow(row)` sur `wxMk.ht_ou` : rejette les rows dont le `title` contient "Résultat et nombre de buts" ou "Nombre de buts de [équipe]".
+- Nouveau filtre `isSimpleTotalRow(row)` symétrique sur `wxMk.ou` (marché Plus/Moins de buts plein match).
+- Désactivation du second loop sur les blocs résolus `ht_ou05` / `ht_ou15` qui étaient pollués par les marchés combinés upstream (patch_winamax_markets.py). Le loop sur `wxMk.ht_ou` filtré couvre déjà ces lignes.
+
+Validation manuelle : le pick problématique disparaît du dashboard. Le nouveau TOP PICK respecte les cotes Winamax réelles.
+
 ### Sprint 55+56+57 — Cards picks + Bilan + Combinés + Light + Mobile + Animations (UX overhaul finale)
 
 Les 7 dernières pistes de refonte sont livrées.
