@@ -5,6 +5,19 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 45 — Section hero "À MISER MAINTENANT" + photos buteurs/scorers
+
+**UX — "Voir direct sur quoi miser"**
+- Nouvelle section `#ready-picks-hero` juste sous le bet ultime, dans la vue Picks. Affiche les 3-6 picks vraiment misables (status `bet` OU `safeAssessment.reliable = true`, non-`limitedConfidence`) en grosses cards visuelles.
+- Chaque card : rang 🏆/#2/#3/..., logos équipes Wikipedia, titre match, countdown kickoff, **PARI / COTE / MISE** lisibles d'un coup d'œil, bouton "Je mise X €" XL + lien "Ouvrir Winamax".
+- Si zéro pari prêt : message clair "Aucun pari à miser maintenant — Le modèle est prudent aujourd'hui" sans paniquer l'utilisateur.
+- Compteur en en-tête : "X pari(s) prêt(s) à jouer · Mise totale suggérée Y€".
+- L'utilisateur voit immédiatement à l'ouverture sur quoi miser, sans avoir à scroller dans les 25 picks ni à se demander lesquels sont fiables.
+- CSS dédié `.ready-picks-hero` / `.ready-hero-grid` / `.ready-hero-card` avec hover scale, bordure verte (16,185,129) pour la lisibilité.
+- Tri : priorityScore desc puis kickoff asc puis edge desc.
+
+Validation : node --check OK, smoke desktop OK (1 paris ready, 14 timeline, 22 fiables, 8 priorités).
+
 ### Sprint 44 — Optimisations mémoire + auto-refresh boot + ménage state/ (P3, P4, P5 audit)
 
 **P3 — Profilage / optimisation mémoire (stress test 671 MB pic)**

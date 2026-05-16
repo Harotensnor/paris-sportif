@@ -5075,6 +5075,62 @@
     return `Pourquoi #1 ? ${userBetLabel(row)} à ${formatOdd(row.odd)} sur Winamax, départ ${countdownLabel(row.start)}. ${simpleWhyText(row).replace(/^Pourquoi\s*:\s*/i, '')}`;
   }
 
+  // Sprint 45 (UX) : section "À MISER MAINTENANT" en gros, juste sous le bet
+  // ultime. Affiche les 3-6 picks les plus solides du jour (status bet OR
+  // safeAssessment.reliable) — pas de pics "À surveiller". Si rien :
+  // bannière claire avec explication.
+  function renderReadyPicksHero(rows) {
+    const wrap = $('#ready-picks-hero');
+    if (!wrap) return;
+    const readyRows = (Array.isArray(rows) ? rows : [])
+      .filter((row) => row?.decisionCenter?.canBet === true || row?.safeAssessment?.reliable === true)
+      .filter(canDisplayPickCard)
+      .filter((row) => row?.limitedConfidence !== true)
+      .sort((a, b) => Number(b.priorityScore || 0) - Number(a.priorityScore || 0)
+        || Date.parse(a.start || '') - Date.parse(b.start || '')
+        || Number(b.edge || 0) - Number(a.edge || 0))
+      .slice(0, 6);
+    if (!readyRows.length) {
+      wrap.innerHTML = `
+        <div class="ready-hero-empty">
+          <h3>Aucun pari à miser maintenant</h3>
+          <p>Le modèle est prudent aujourd'hui. Regarde les opportunités "À surveiller" plus bas pour la culture, ou attends le prochain refresh.</p>
+        </div>
+      `;
+      return;
+    }
+    wrap.innerHTML = `
+      <div class="ready-hero-head">
+        <h3>🎯 À MISER MAINTENANT</h3>
+        <p>${formatCount(readyRows.length)} pari(s) prêt(s) à jouer · Mise totale suggérée ${escapeHtml(formatMoney(readyRows.reduce((sum, row) => sum + Number(row.recommendedStake ?? row.stake ?? 0), 0)))}</p>
+      </div>
+      <div class="ready-hero-grid">
+        ${readyRows.map((row, index) => `
+          <article class="ready-hero-card clickable-row" data-match-id="${escapeHtml(row.id)}" tabindex="0" role="button" aria-label="Ouvrir ${escapeHtml(row.title || '')}">
+            <header>
+              <span class="ready-hero-rank">${index === 0 ? '🏆' : `#${index + 1}`}</span>
+              ${matchVisualHtml(row, 'match-visual compact')}
+            </header>
+            <strong class="ready-hero-title">${escapeHtml(row.title || 'Match')}</strong>
+            <em class="ready-hero-time">${escapeHtml(countdownLabel(row.start) || '—')} · ${escapeHtml(row.league || '')}</em>
+            <div class="ready-hero-bet">
+              <span class="ready-hero-label">PARI</span>
+              <strong>${escapeHtml(userBetLabel(row) || row.label || '')}</strong>
+            </div>
+            <div class="ready-hero-odds">
+              <span><em>COTE</em><strong>@${escapeHtml(formatOdd(row.odd))}</strong></span>
+              <span><em>MISE</em><strong>${escapeHtml(visibleStakeText(row))}</strong></span>
+            </div>
+            <div class="ready-hero-actions">
+              <button type="button" class="primary ready-hero-action" data-track-bet-id="${escapeHtml(row.id)}">Je mise ${escapeHtml(visibleStakeText(row))}</button>
+              ${row.winamaxUrl ? `<a class="ghost-btn" href="${escapeHtml(row.winamaxUrl)}" target="_blank" rel="noreferrer">Ouvrir Winamax</a>` : ''}
+            </div>
+          </article>
+        `).join('')}
+      </div>
+    `;
+  }
+
   function renderUltimateBet(rows) {
     const wrap = $('#ultimate-bet-card');
     if (!wrap) return;
@@ -6393,6 +6449,7 @@
     renderLiveCockpit();
     renderTradingDesk();
     renderUltimateBet(displayRows);
+    renderReadyPicksHero(displayRows);
     renderTemporalCockpit(displayRows);
     renderDailyBudgetSummary();
     updateWebEnrichmentSummary();
