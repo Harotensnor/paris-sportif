@@ -1,8 +1,90 @@
 {
-  "generated_at": "2026-05-16T02:26:56Z",
+  "generated_at": "2026-05-16T02:35:52Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
+    {
+      "event_id": "401815366",
+      "kickoff": "2026-05-16T17:10Z",
+      "league": "MLB",
+      "match": "Toronto Blue Jays at Detroit Tigers",
+      "home": "Detroit Tigers",
+      "away": "Toronto Blue Jays",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Detroit Tigers",
+          "pitcher": "Casey Mize",
+          "label": "Casey Mize plus de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "over",
+          "probability": 0.5701,
+          "fair_odds": 1.75,
+          "expected_strikeouts": 5.83,
+          "projected_ip": 5.17,
+          "inputs": {
+            "k9": 10.16,
+            "era": 2.9,
+            "whip": 1.19,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Detroit Tigers",
+          "pitcher": "Casey Mize",
+          "label": "Casey Mize ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.7168,
+          "fair_odds": 1.4,
+          "expected_hr_allowed": 0.333,
+          "projected_ip": 5.17,
+          "inputs": {
+            "hr9": 0.58,
+            "era": 2.9,
+            "whip": 1.19
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Toronto Blue Jays",
+          "pitcher": "Mason Fluharty",
+          "label": "Mason Fluharty moins de 8,5 strikeouts",
+          "line": 8.5,
+          "pick": "under",
+          "probability": 0.5247,
+          "fair_odds": 1.91,
+          "expected_strikeouts": 8.36,
+          "projected_ip": 6.6,
+          "inputs": {
+            "k9": 11.4,
+            "era": 5.4,
+            "whip": 1.4,
+            "hand": "L"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Toronto Blue Jays",
+          "pitcher": "Mason Fluharty",
+          "label": "Mason Fluharty ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.644,
+          "fair_odds": 1.55,
+          "expected_hr_allowed": 0.44,
+          "projected_ip": 6.6,
+          "inputs": {
+            "hr9": 0.6,
+            "era": 5.4,
+            "whip": 1.4
+          },
+          "side": "away"
+        }
+      ]
+    },
     {
       "event_id": "401815368",
       "kickoff": "2026-05-16T18:15Z",
@@ -2048,7 +2130,7 @@
       ]
     }
   ],
-  "props": 98,
+  "props": 102,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
