@@ -5,19 +5,30 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-16
 
+### Hotfix v2.1.1 — Changements visibles via le lanceur Windows
+
+Correctif ciblé après retour utilisateur : `LANCER-LOGICIEL.vbs` relançait parfois une ancienne fenêtre Electron déjà en mémoire, donc les changements semblaient absents.
+- `LANCER-LOGICIEL.bat` ferme uniquement l'ancienne instance Electron de ce projet avant de redémarrer.
+- Un second lancement recharge le renderer sans cache si l'app est déjà ouverte.
+- Version desktop passée en `v2.1.1` pour vérifier visuellement que la bonne build est lancée.
+- Validation terrain : accueil compact visible dans Electron, `Cockpit pronostics` en premier, 7 catégories, 3 cartes hero, anciens blocs denses cachés, 0 erreur console.
+
 ### Sprint pronostics — Accueil compact + Cockpit par catégories
 
 Focus demandé sur les pronostics : l'accueil devient une page de décision rapide, le détail passe dans un Cockpit dédié.
 - Accueil allégé : seuls le top pick, les meilleurs paris immédiats, le résumé Winamax et les catégories restent visibles.
-- Le hero "À miser maintenant" est limité au Top 4 pour éviter l'effet mur de cartes.
-- Nouveau bloc catégories : `Vainqueurs`, `Nuit`, `Buts`, `Buteurs`, `Par sport`, `À surveiller`, `Cockpit complet`.
+- Le hero "À miser maintenant" est limité au Top 3 pour éviter l'effet mur de cartes.
+- Nouveau bloc catégories : `Cockpit pronostics`, `Vainqueurs`, `Nuit`, `Buts`, `Buteurs`, `Par sport`, `À surveiller`.
 - Nouveau panneau `Cockpit pronostics` fermé par défaut : exploration complète par horaire, type, sport, favoris, combinés, buteurs, filtres et tableau.
 - Clic sur une catégorie ouvre directement le cockpit au bon endroit, par exemple `Vainqueurs` ouvre la vue par type sur les paris Vainqueur.
 - Les filtres ne sont plus ouverts par défaut dans l'accueil, pour garder l'écran principal petit et actionnable.
+- Le lanceur `LANCER-LOGICIEL.vbs` / `.bat` ferme maintenant l'ancienne instance Electron de ce projet avant relance : fini l'impression de "ne pas voir les changements" quand une vieille fenêtre était encore en mémoire.
+- Un second lancement recharge aussi le renderer sans cache si l'app est déjà ouverte.
 - `qa:terrain:quick` vérifie maintenant que les catégories existent, que le Cockpit n'est pas ouvert par défaut et que la catégorie `Vainqueurs` ouvre bien le cockpit.
 
 Validation :
 - Syntaxe renderer/main : OK.
+- Vérification visuelle Electron : `Cockpit pronostics` visible en premier, 7 catégories, 3 cartes hero, cockpit fermé par défaut, anciens blocs denses cachés, 0 erreur console.
 - `npm run qa:terrain` : OK avec pipeline complète, `health.json` généré à `2026-05-16T21:20:45Z`.
 - `npm run qa:terrain:quick`, `npm test`, `npm run qa:engine`, `npm run qa:safe`, `npm run qa:a11y`, `node desktop/scripts/visual-capture.js` : OK.
 - `npm run dist` : OK, installeur `Paris Sportif Desktop Setup 2.1.0.exe` généré.

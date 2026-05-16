@@ -6170,16 +6170,16 @@ body.theme-light .sidebar {
 
 .home-category-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 10px;
-  margin: 10px 0 16px;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 8px;
+  margin: 8px 0 12px;
 }
 
 .home-category-card {
   display: grid;
   gap: 5px;
   text-align: left;
-  padding: 12px;
+  padding: 10px;
   border: 1px solid var(--line);
   border-radius: 12px;
   background: rgba(15, 23, 42, .44);
@@ -6203,7 +6203,7 @@ body.theme-light .sidebar {
 }
 
 .home-category-card strong {
-  font-size: 20px;
+  font-size: 18px;
   line-height: 1.1;
   color: var(--text);
   font-variant-numeric: tabular-nums;
@@ -6231,9 +6231,17 @@ body.theme-light .sidebar {
 }
 
 .cockpit-detail-section {
-  margin: 12px 0 18px;
+  margin: 10px 0 16px;
   border-color: rgba(148, 163, 184, .22);
   background: rgba(15, 23, 42, .34);
+}
+
+/* Accueil plus petit : ces infos restent disponibles dans le cockpit,
+   mais ne prennent plus de place sur la première vue. */
+.tab-panel.active > .dashboard-info-strip,
+.tab-panel.active > .day-summary-compact,
+.tab-panel.active > .temporal-zones-strip {
+  display: none;
 }
 
 .cockpit-detail-section > summary {

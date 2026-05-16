@@ -2166,6 +2166,12 @@ if (!gotSingleInstanceLock) {
     if (mainWindow.isMinimized()) mainWindow.restore();
     mainWindow.show();
     mainWindow.focus();
+    try {
+      appendRefreshLine('[desktop] second lancement détecté : reload renderer pour éviter une UI stale');
+      mainWindow.webContents.reloadIgnoringCache();
+    } catch (error) {
+      appendRefreshLine(`[desktop] reload second lancement ignoré: ${error.message}`);
+    }
   });
 
   app.whenReady().then(async () => {

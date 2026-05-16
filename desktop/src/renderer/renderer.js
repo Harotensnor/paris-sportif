@@ -5425,7 +5425,7 @@
   function renderReadyPicksHero(rows) {
     const wrap = $('#ready-picks-hero');
     if (!wrap) return;
-    const readyRows = balancedReadySelection(rollingReadyRows(rows), 4);
+    const readyRows = balancedReadySelection(rollingReadyRows(rows), 3);
     if (!readyRows.length) {
       wrap.innerHTML = `
         <div class="ready-hero-empty">
@@ -5500,6 +5500,13 @@
     const sportCount = uniqueCleanLabels(cockpitRows.map((row) => row.sport)).length;
     const cards = [
       {
+        key: 'cockpit',
+        icon: '🎛',
+        title: 'Cockpit pronostics',
+        rows: cockpitRows,
+        detail: 'Tout classer par horaire, type ou sport'
+      },
+      {
         key: 'winner',
         icon: '🏆',
         title: 'Vainqueurs',
@@ -5540,13 +5547,6 @@
         title: 'À surveiller',
         rows: marketCategoryRows(allRows, 'watch'),
         detail: 'Signaux utiles, sans bouton de mise'
-      },
-      {
-        key: 'cockpit',
-        icon: '🎛',
-        title: 'Cockpit complet',
-        rows: cockpitRows,
-        detail: 'Horaire, type, sport, filtres et tableau'
       }
     ].map((card) => {
       const ready = card.rows.filter(isReadyToStakeRow).length;
