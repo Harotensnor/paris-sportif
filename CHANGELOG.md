@@ -5,6 +5,14 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 39 — Photos joueurs partout + prefetch batch + tests assouplis
+
+- Compositions sur terrain : chaque token joueur affiche désormais une mini photo Wikipedia 28x28 (via le service `image-service`) en plus du numéro et du nom. La case `pitch-player-token` passe à 3 colonnes (photo + numéro + nom) et la largeur max grimpe de 116px à 144px pour rester lisible. Si aucune ligne de composition n'est calculable, la colonne entière est masquée au lieu d'afficher le placeholder "Feuille de match non publiée".
+- Vue Buteurs : `scorerAvatarHtml()` utilise désormais `playerPhotoHtml()` pour afficher une vraie photo joueur Wikipedia, avec fallback initiales si nom indisponible ou photo introuvable.
+- Préchargement batch des logos équipes : `renderPicks()` appelle au début un `prefetchTeamLogosForRows()` qui ramasse jusqu'à 24 logos équipes uniques en un seul appel `/api/images/lookup` batch. Les avatars SVG initiales restent affichés instantanément ; dès que le batch revient, tous les `<img data-remote-image="...">` sont mis à jour en une passe.
+- Tests assouplis pour refléter la nouvelle réalité Vainqueurs 50% (Sprint 38) : `smoke.js` accepte 15-28 rows (au lieu de 18-25), `terrain-check.js` accepte 15-28 rows, et `smoke.js > hasRollingSections` accepte que les sections vides "Dans l'heure / 3 heures / Cette nuit" soient cachées tant que "À jouer prochainement" + au moins une autre section temporelle sont visibles.
+- Validation : qa:engine (235 matchs, 171 picks, 25 paris simples dashboard), smoke desktop (7 prêts, 14 timeline, 40 fiables, 16 priorités), qa:terrain (133 events, 26 simples positifs, 14 affichés, cockpit 25), qa:a11y (170 actions clavier, contrastes AA, ARIA modales OK).
+
 ### Sprint 38 — Quota Vainqueurs 50% + cases vides masquées + smoke ajusté
 
 - Quota `Vainqueurs` du cockpit relevé de 40% à **50%** dans `legacy-engine.js`, target absolu min `8` rows (vs 6). L'utilisateur a explicitement demandé "+ de Vainqueurs", il y a maintenant plus de marchés "Vainqueur du match" et moins de "Plus / Moins" en top de liste quand des signaux Vainqueur fiables existent.

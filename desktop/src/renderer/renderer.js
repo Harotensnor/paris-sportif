@@ -3019,6 +3019,53 @@
     return `${kind}|${String(name || '').trim().toLowerCase()}|${String(sport || '').trim().toLowerCase()}`;
   }
 
+  function prefetchTeamLogosForRows(rows) {
+    if (!Array.isArray(rows) || rows.length === 0) return;
+    const items = [];
+    const seen = new Set();
+    for (const row of rows) {
+      const sport = row?.sport || row?.match?.sport || '';
+      const names = getTeamNames(row?.match || {});
+      for (const side of ['home', 'away']) {
+        const name = side === 'away' ? names.away : names.home;
+        if (!name) continue;
+        const key = remoteImageKey('team', name, sport);
+        if (seen.has(key) || REMOTE_IMAGE_CACHE.has(key) || REMOTE_IMAGE_PENDING.has(key)) continue;
+        seen.add(key);
+        items.push({ kind: 'team', name, hints: { sport }, _key: key });
+      }
+      if (items.length >= 24) break; // batch budget
+    }
+    if (!items.length) return;
+    items.forEach((item) => REMOTE_IMAGE_PENDING.set(item._key, true));
+    fetch('/api/images/lookup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ items: items.map(({ kind, name, hints }) => ({ kind, name, hints })) })
+    })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((payload) => {
+        const results = payload && Array.isArray(payload.results) ? payload.results : [];
+        items.forEach((item, idx) => {
+          const result = results[idx] || {};
+          const url = result.ok && result.url ? String(result.url) : null;
+          REMOTE_IMAGE_CACHE.set(item._key, url);
+          REMOTE_IMAGE_PENDING.delete(item._key);
+          if (url) {
+            document.querySelectorAll(`img[data-remote-image="${item._key}"]`).forEach((img) => {
+              img.setAttribute('src', url);
+              img.classList.add('remote-loaded');
+            });
+          }
+        });
+      })
+      .catch(() => {
+        items.forEach((item) => {
+          REMOTE_IMAGE_PENDING.delete(item._key);
+        });
+      });
+  }
+
   function queueRemoteImage(kind, name, sport) {
     const key = remoteImageKey(kind, name, sport);
     if (REMOTE_IMAGE_CACHE.has(key) || REMOTE_IMAGE_PENDING.has(key)) return;
@@ -3575,26 +3622,34 @@
     const title = `${teamDisplayName(row, side)}${lineup.formation ? ` · ${lineup.formation}` : ''}`;
     const source = lineup.confirmed ? 'composition confirmée' : lineup.projected || lineup.present ? 'composition probable' : 'composition à confirmer';
     const pitchLines = pitchRowsForPlayers(players, lineup.formation);
+    const sportHint = row?.sport || row?.match?.sport || 'football';
     const renderPlayer = (player) => {
       const star = player.star || stars.get(normalizeUiKey(player.name || ''));
       const hot = Number(star?.star_score || player?.rating || 0) >= 6;
+      const playerName = player.name || star?.name || '';
+      // Trigger remote photo lookup as a side-effect; result swaps in
+      // automatically via data-remote-image attribute.
+      const photoHtml = playerName ? playerPhotoHtml(playerName, { sport: sportHint }, { size: 32 }) : '';
+      const numberOrPos = player.shirt != null && player.shirt !== '' ? String(player.shirt) : (player.pos || star?.position || '-');
       return `
         <div class="pitch-player-token ${hot ? 'hot' : ''}" title="${escapeHtml(playerStatLine(player, star))}">
-          <span>${escapeHtml(player.shirt != null && player.shirt !== '' ? String(player.shirt) : player.pos || star?.position || '-')}</span>
-          <strong>${escapeHtml(player.name || star?.name || 'À confirmer')}</strong>
+          ${photoHtml ? `<span class="pitch-player-photo">${photoHtml}</span>` : ''}
+          <span class="pitch-player-num">${escapeHtml(numberOrPos)}</span>
+          <strong>${escapeHtml(playerName || 'À confirmer')}</strong>
         </div>
       `;
     };
+    if (!pitchLines.length) return ''; // hide column entirely when no lineup at all
     return `
       <div class="pitch-column">
         <h5>${escapeHtml(title)}</h5>
         <small>${escapeHtml(source)}</small>
         <div class="pitch-players">
-          ${pitchLines.length ? pitchLines.map((line) => `
+          ${pitchLines.map((line) => `
             <div class="pitch-line" data-line="${escapeHtml(line.label)}">
               ${line.players.map(renderPlayer).join('')}
             </div>
-          `).join('') : '<div class="empty compact-empty">Feuille de match non publiée par les sources locales.</div>'}
+          `).join('')}
         </div>
       </div>
     `;
@@ -6298,6 +6353,11 @@
     const filters = readPickFilters();
     const displayRows = dashboardPickRows(filters);
     state.currentDashboardRows = displayRows.slice();
+    // Sprint 38 follow-up: prefetch real team logos for every pick of
+    // the cockpit in a single batch request. This warms the image cache
+    // so the swap from SVG initials to real Wikipedia logos happens in
+    // one render cycle instead of N (one per card).
+    prefetchTeamLogosForRows(displayRows);
     renderDailySuggestion(displayRows);
     rememberDisplayedOdds(displayRows);
     renderMarketSnapshot(displayRows);
@@ -7371,7 +7431,12 @@
   }
 
   function scorerAvatarHtml(scorer) {
-    const initial = cleanLabel(scorer.name, '?').trim().charAt(0).toUpperCase() || '?';
+    const playerName = cleanLabel(scorer.name, '');
+    if (playerName && playerName !== '?') {
+      // Use the real Wikipedia photo with initials fallback.
+      return playerPhotoHtml(playerName, { sport: 'football' }, { size: 48 });
+    }
+    const initial = (playerName || '?').trim().charAt(0).toUpperCase() || '?';
     return `<div class="avatar-fallback">${escapeHtml(initial)}</div>`;
   }
 

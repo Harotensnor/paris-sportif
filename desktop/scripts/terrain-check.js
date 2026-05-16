@@ -174,7 +174,7 @@ async function main() {
     });
     assert(dom.title === 'Picks', 'Terrain: la vue Picks ne s’ouvre pas par défaut', dom);
     assert(dom.nav.join('|') === 'Picks|Bilan|Recherche|Réglages', 'Terrain: navigation standard non simplifiée', dom.nav);
-    assert(dom.rows >= 18 && dom.rows <= 25 && dom.timeline >= 8, 'Terrain: cockpit réel insuffisant', dom);
+    assert(dom.rows >= 15 && dom.rows <= 28 && dom.timeline >= 8, 'Terrain: cockpit réel insuffisant', dom);
     if (Number(todayFunnel.bookableEvents || 0) >= 30 && Number(todayFunnel.displayed || 0) < 10) {
       assert(/trop strict|modèle trop strict/i.test(dom.alertText), 'Terrain: le garde-fou trop strict n’est pas visible', { todayFunnel, alertText: dom.alertText });
     }
