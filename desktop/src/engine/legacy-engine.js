@@ -1375,10 +1375,63 @@ function createLegacyEngineService({ projectRoot }) {
     };
   }
 
+  function calibratedProbabilityFromReport(probability, report) {
+    const raw = Math.max(0.01, Math.min(0.99, Number(probability || 0) || 0));
+    const buckets = Array.isArray(report?.buckets) ? report.buckets : [];
+    if (!buckets.length) return raw;
+    const bucket = buckets.find((item) => {
+      const [from, to] = String(item.bucket || '').split('-').map(Number);
+      return Number.isFinite(from) && Number.isFinite(to) && raw >= from && raw < to;
+    }) || buckets[buckets.length - 1];
+    const actual = Number(bucket?.actual);
+    const expected = Number(bucket?.expected);
+    const count = Number(bucket?.count || 0) || 0;
+    if (!Number.isFinite(actual) || !Number.isFinite(expected)) return raw;
+    const error = expected - actual;
+    if (error <= 0.015) return raw;
+    const shrinkRatio = count >= 30 ? 0.92 : count >= 12 ? 0.68 : 0.45;
+    const empiricalAnchor = count >= 30 ? actual + 0.035 : actual + 0.06;
+    const bucketFloor = raw >= 0.90 ? 0.40 : raw >= 0.80 ? 0.48 : raw >= 0.70 ? 0.52 : raw >= 0.60 ? 0.45 : 0.28;
+    const calibrated = Math.max(empiricalAnchor, raw - (error * shrinkRatio));
+    return Math.max(bucketFloor, Math.min(raw, calibrated));
+  }
+
+  function applyProbabilityRealityCalibration(row, report, win, bankroll) {
+    if (!report?.schema || !(Number(row?.probability || 0) > 0) || !(Number(row?.odd || 0) > 1)) return row;
+    const before = Number(row.probability || 0);
+    const after = calibratedProbabilityFromReport(before, report);
+    const changed = Math.abs(after - before) >= 0.005;
+    if (!changed) return row;
+    const odd = Number(row.odd || 0);
+    const beforeEdge = Number(row.edge || 0);
+    const edge = after - (1 / odd);
+    const stake = edge > 0 ? stakeFor(win, after, odd, bankroll) : 0;
+    return {
+      ...row,
+      rawProbability: before,
+      rawEdge: beforeEdge,
+      probability: after,
+      edge,
+      stake,
+      modelStake: stake,
+      probabilityRealityCalibration: {
+        applied: true,
+        before,
+        after,
+        delta: after - before,
+        source: 'probability_calibration_report',
+        brier: report.summary?.brier ?? null
+      }
+    };
+  }
+
   function effectiveConfidence(row) {
     const raw = Math.max(0, Math.min(0.99, Number(row?.probability || 0) || 0));
     const trustScore = Number(row?.confidenceTrust?.score);
-    const modelTrust = Number.isFinite(trustScore) && trustScore > 0 ? Math.max(0, Math.min(0.99, trustScore / 100)) : 0;
+    const modelTrustRaw = Number.isFinite(trustScore) && trustScore > 0 ? Math.max(0, Math.min(0.99, trustScore / 100)) : 0;
+    const modelTrust = row?.probabilityRealityCalibration?.applied
+      ? Math.min(modelTrustRaw, Math.min(0.99, raw + 0.08))
+      : modelTrustRaw;
     const adjusted = Number(row?.adjustedConfidence);
     const segmentSample = Number(row?.segmentValidation?.sample ?? row?.calibration?.sample ?? 0) || 0;
     const segmentRoi = Number(row?.segmentValidation?.roi ?? row?.calibration?.roi ?? 0);
@@ -1386,12 +1439,15 @@ function createLegacyEngineService({ projectRoot }) {
     const calibrationRoi = Number(row?.calibration?.roi || 0);
     if (Number.isFinite(adjusted) && adjusted > 0) {
       const cleaned = Math.max(0, Math.min(0.99, adjusted));
+      const effectiveAdjusted = row?.probabilityRealityCalibration?.applied
+        ? Math.min(cleaned, Math.min(0.99, raw + 0.08))
+        : cleaned;
       if (segmentSample < 30 ||
         (segmentSample >= 15 && Number.isFinite(segmentRoi) && segmentRoi >= 0) ||
         (calibrationSample >= 15 && Number.isFinite(calibrationRoi) && calibrationRoi >= 0 && row?.calibration?.blocked !== true)) {
-        return Math.max(cleaned, raw, modelTrust);
+        return Math.max(effectiveAdjusted, raw, modelTrust);
       }
-      return Math.max(cleaned, modelTrust);
+      return Math.max(effectiveAdjusted, modelTrust);
     }
     const adjustedScore = Number(row?.confidenceTrust?.adjustedScore);
     if (Number.isFinite(adjustedScore) && adjustedScore > 0) return Math.max(modelTrust, Math.max(0, Math.min(0.99, adjustedScore / 100)));
@@ -2791,12 +2847,17 @@ function createLegacyEngineService({ projectRoot }) {
     const horizonMs = 30 * 60 * 60000;
     const todayKey = dayKeyParis(new Date());
     const maxPerMatch = 2;
-    const maxPerHourSlot = 3;
-    const maxDashboardRows = 18;
-    const simplePicks = (Array.isArray(picks) ? picks : []).filter(isSimpleUserMarket);
+    const maxPerHourSlot = 4;
+    const maxDashboardRows = 25;
+    const maxPerSport = Math.max(3, Math.ceil(maxDashboardRows * 0.30));
+    const maxPerMarket = Math.max(3, Math.ceil(maxDashboardRows * 0.25));
+    const maxPerLeague = Math.max(2, Math.ceil(maxDashboardRows * 0.20));
+    const simplePicks = (Array.isArray(picks) ? picks : [])
+      .filter(isSimpleUserMarket)
+      .filter((row) => row?.contextGate?.gate !== 'skip');
     const sourcePicks = simplePicks.length ? simplePicks : [];
     const rolling24 = rollingWindowRows(sourcePicks, 24);
-    const target24 = rolling24.length >= 18 ? 18 : rolling24.length >= 12 ? 12 : Math.min(8, rolling24.length);
+    const target24 = rolling24.length >= 25 ? 25 : rolling24.length >= 18 ? 18 : rolling24.length >= 12 ? 12 : Math.min(8, rolling24.length);
     const rank = (pick) => [
       pick?.decisionCenter?.canBet ? 1 : 0,
       pick?.safeAssessment?.reliable ? 1 : 0,
@@ -2876,7 +2937,14 @@ function createLegacyEngineService({ projectRoot }) {
     const finalRows = [];
     const finalSeen = new Set();
     const finalMatchCounts = new Map();
+    const finalSportCounts = new Map();
+    const finalMarketCounts = new Map();
+    const finalLeagueCounts = new Map();
     let todayCapRelaxed = false;
+    let diversityCapRelaxed = false;
+    const sportKey = (row) => String(row?.sport || 'sport').toLowerCase();
+    const marketKey = (row) => canonicalMarketKey(row?.marketKey || row?.market || 'market');
+    const leagueKey = (row) => compactKey(row?.match?.league_code || row?.league || row?.match?.league_name || 'league');
     const addFinalRows = (rowsToAdd, limit = maxDashboardRows, options = {}) => {
       for (const row of rowsToAdd) {
         if (finalRows.length >= limit) break;
@@ -2885,8 +2953,19 @@ function createLegacyEngineService({ projectRoot }) {
         const mk = matchKey(row);
         const cap = Number(options.matchCap || 0) || (options.enforceMatchCap ? maxPerMatch : 0);
         if (cap && (finalMatchCounts.get(mk) || 0) >= cap) continue;
+        if (options.enforceDiversity !== false) {
+          const sk = sportKey(row);
+          const mk2 = marketKey(row);
+          const lk = leagueKey(row);
+          if (!options.relaxSport && (finalSportCounts.get(sk) || 0) >= maxPerSport) continue;
+          if (!options.relaxMarket && (finalMarketCounts.get(mk2) || 0) >= maxPerMarket) continue;
+          if (!options.relaxLeague && (finalLeagueCounts.get(lk) || 0) >= maxPerLeague) continue;
+        }
         finalSeen.add(key);
         finalMatchCounts.set(mk, (finalMatchCounts.get(mk) || 0) + 1);
+        finalSportCounts.set(sportKey(row), (finalSportCounts.get(sportKey(row)) || 0) + 1);
+        finalMarketCounts.set(marketKey(row), (finalMarketCounts.get(marketKey(row)) || 0) + 1);
+        finalLeagueCounts.set(leagueKey(row), (finalLeagueCounts.get(leagueKey(row)) || 0) + 1);
         finalRows.push(row);
       }
     };
@@ -2898,21 +2977,21 @@ function createLegacyEngineService({ projectRoot }) {
       const ts = startTimestamp(row);
       return Number.isFinite(ts) && ts > now && ts <= now + 24 * 60 * 60 * 1000 && row?.decisionCenter?.canBet;
     }));
-    const rollingReadyTarget = Math.min(15, rollingReadyPool.length, 25);
+    const rollingReadyTarget = Math.min(maxDashboardRows, rollingReadyPool.length, Math.max(target24, 10));
     const todayReadyTarget = Math.min(5, sortedTodayReady.length);
     const todayVisibleTarget = Math.min(10, sortedTodayDisplayable.length);
     if (todayReadyTarget > 0) {
       addFinalRows(sortedTodayReady, todayReadyTarget, { enforceMatchCap: true });
       if (finalRows.length < todayReadyTarget) {
         todayCapRelaxed = true;
-        addFinalRows(sortedTodayReady, todayReadyTarget, { enforceMatchCap: false });
+        addFinalRows(sortedTodayReady, todayReadyTarget, { enforceMatchCap: false, relaxSport: true, relaxLeague: true });
       }
     }
     if (todayVisibleTarget > 0 && finalRows.filter((row) => dayKeyParis(row.start) === todayKey).length < todayVisibleTarget) {
       addFinalRows(sortedTodayDisplayable, todayVisibleTarget, { enforceMatchCap: true });
       if (finalRows.filter((row) => dayKeyParis(row.start) === todayKey).length < todayVisibleTarget) {
         todayCapRelaxed = true;
-        addFinalRows(sortedTodayDisplayable, todayVisibleTarget, { matchCap: maxPerMatch + 1 });
+        addFinalRows(sortedTodayDisplayable, todayVisibleTarget, { matchCap: maxPerMatch + 1, relaxSport: true, relaxLeague: true });
       }
     }
     addFinalRows(sortedRollingReady, Math.max(rollingReadyTarget, Math.min(target24, sortedRollingReady.length)));
@@ -2920,6 +2999,11 @@ function createLegacyEngineService({ projectRoot }) {
       addFinalRows(rollingReadyPool, rollingReadyTarget, { enforceMatchCap: true });
     }
     addFinalRows(sortedOrdered, maxDashboardRows, { matchCap: todayCapRelaxed ? maxPerMatch + 1 : maxPerMatch });
+    if (finalRows.length < Math.min(maxDashboardRows, sourcePicks.length)) {
+      diversityCapRelaxed = true;
+      addFinalRows(sortedOrdered, maxDashboardRows, { matchCap: maxPerMatch + 1, relaxSport: true, relaxLeague: true });
+      addFinalRows(sortRows(sourcePicks), maxDashboardRows, { matchCap: maxPerMatch + 1, relaxSport: true, relaxLeague: true });
+    }
     const rows = finalRows.slice(0, maxDashboardRows)
       .map((row, index) => ({
         ...row,
@@ -2940,13 +3024,20 @@ function createLegacyEngineService({ projectRoot }) {
       qualityPolicy: {
         maxPerMatch,
         maxPerHourSlot,
+        maxPerSport,
+        maxPerMarket,
+        maxPerLeague,
         maxDashboardRows,
         skippedByMatchCap: skippedByCap.match,
         skippedBySlotCap: skippedByCap.slot,
         todayCapRelaxed,
+        diversityCapRelaxed,
         displayedToday: rows.filter((row) => dayKeyParis(row.start) === todayKey).length,
         displayed24h: rollingWindowRows(rows, 24).length,
-        target24h: target24
+        target24h: target24,
+        sportCounts: Object.fromEntries(finalSportCounts),
+        marketCounts: Object.fromEntries(finalMarketCounts),
+        leagueCounts: Object.fromEntries(finalLeagueCounts)
       }
     };
   }
@@ -3400,6 +3491,7 @@ function createLegacyEngineService({ projectRoot }) {
     )
       .map((row) => contextUtils.annotateConfidence(row, contextBacktestReport))
       .map((row) => applyModelReality(row, modelRealityAudit))
+      .map((row) => applyProbabilityRealityCalibration(row, probabilityCalibrationReport, win, safeBankroll))
       .map((row) => applyDecisionAndMarketTiming(row, clvSummaryReport, decisionTuningReport))
       .map((row) => applyOddsGuardrails(row, oddsGuardrailsReport))
       .map((row) => applyStakePrudence(row, agentGuardrailRecommendationsReport, stakeReductionBacktestReport))

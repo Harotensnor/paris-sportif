@@ -8,13 +8,13 @@ Paris Sportif Desktop est le logiciel PC local pour préparer tes paris Winamax.
 
 ### Version installateur Windows
 
-La version v1.7.1 se génère avec :
+La version v2.0.0 se génère avec :
 
 ```powershell
 npm --prefix desktop run dist
 ```
 
-Le fichier attendu est `Paris Sportif Desktop Setup 1.7.1.exe`. Le build packagé embarque les données, rapports modèle et scripts nécessaires au démarrage. Python reste recommandé si tu veux relancer une pipeline complète depuis la machine installée.
+Le fichier attendu est `Paris Sportif Desktop Setup 2.0.0.exe`. Le build packagé embarque les données, rapports modèle et scripts nécessaires au démarrage. Python reste recommandé si tu veux relancer une pipeline complète depuis la machine installée.
 
 ### Version développeur
 
@@ -53,6 +53,22 @@ Depuis v1.5.0, certains matchs avec peu de contexte secondaire peuvent apparaît
 L'app ne place pas de pari automatiquement. Elle prépare le ticket et suit ton résultat.
 
 En Mode expert, l'auto-tracking supervisé peut suivre automatiquement certains tickets dans l'app selon tes règles. C'est uniquement un suivi interne : tu dois toujours ouvrir Winamax et confirmer toi-même le pari réel.
+
+## Nouveautés v2.0
+
+La v2.0 garde le mode standard simple, mais ajoute une couche Ultra en Mode expert :
+
+- cockpit jusqu'à 25 lignes avec rotation sport/marché/ligue pour éviter un écran rempli du même type de pari ;
+- logos/avatars locaux dans les cartes et image hero sur le top pick ;
+- calibration plus stricte des probabilités hautes pour éviter les picks trop sûrs sur le papier ;
+- `Simulation Monte Carlo` dans la fiche match : 10 000 scénarios locaux pour visualiser la probabilité de gain et le risque ;
+- `Modèle personnel` : score de cohérence avec ton style gagnant si ton historique contient assez de paris réglés, sinon fallback explicite ;
+- `Scanner du jour` : patterns inter-matchs, repliés par défaut ;
+- `Dashboard custom` en Mode expert avec presets Matin / Soir / Live ;
+- `Écouter le brief` : lecture audio locale du brief si tu l'actives ;
+- watcher Twitter/X public optionnel côté main process, avec cache et rate limit.
+
+Les objectifs de volume restent soumis aux données réelles Winamax du jour. Si la nuit ou un sport manque de matchs exploitables, l'app le dit au lieu de fabriquer des recommandations faibles.
 
 ## Nouveautés v1.7
 

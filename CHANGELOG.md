@@ -5,6 +5,28 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 33 ULTRA — Volume + diversité + ML perso + Monte Carlo + Twitter + audio + dashboard + scanner
+
+- Version desktop portée à `v2.0.0` après audit terrain obligatoire sur pipeline réelle. Snapshot terrain : `health.json generated_at=2026-05-15T23:31:25Z`, 75 événements Winamax aujourd'hui, 60 prédictibles, 32 signaux simples positifs après recalibration, 25 lignes cockpit, 15 lignes sur 24h glissantes et 2 lignes nocturnes. La cible ambitieuse 8+ nuit n'est pas artificiellement remplie sur ce snapshot : le garde-fou reste honnête plutôt que d'inventer des paris faibles.
+- Hit-rate utilisateur investigué : le profil local de test ne contient pas assez de paris utilisateur settled pour calculer un vrai hit-rate personnel. En revanche, les rapports modèle montraient une surconfiance forte dans les buckets 0.8-1.0 ; la calibration réalité est durcie et le `safeConfidence` ne peut plus réutiliser une confiance brute non corrigée après calibration.
+- Push volume/diversité : le cockpit standard monte à 25 lignes maximum, avec rotation forcée sport/marché/ligue et plafond de concentration. Les lignes gardent Winamax-only, marchés simples, aucun match nul standard, et privilégient les lignes actionnables sans rouvrir les marchés complexes.
+- Bugs terrain corrigés :
+  1. Majeur : les nouveaux visuels injectaient des `style=""` dynamiques et violaient la CSP Electron. Les avatars, hero images et barres Monte Carlo utilisent maintenant des classes CSS fixes.
+  2. Majeur : `/api/profile/backup` coupait la connexion locale sur gros profil temporaire, générant `ERR_CONNECTION_RESET` dans le smoke. La route accepte 2 MB, journalise les refus et répond toujours en JSON.
+  3. Majeur modèle : les probabilités hautes restaient trop optimistes malgré le rapport de calibration. Les buckets historiques assez fournis ancrent maintenant la probabilité sur le taux réel observé.
+- Images/icônes : les cartes affichent maintenant des avatars/logo SVG locaux 32px, le top pick a une image hero floutée, les fiches et tableaux reprennent les visuels, sans dépendre d'images externes ni bloquer l'UI.
+- Fiches match phase 2 : ajout des blocs sport avancés dans la fiche détail. Foot : buteurs probables, cartons, coups de pied arrêtés, penalty, pressing et build-up. Tennis : service, retour, tie-breaks et spécialiste surface. Basket/baseball/hockey : pace, ratings, repos, pitcher/bullpen/park, goalie/SV%, PP/PK et voyage quand disponibles.
+- Features expert opt-in ajoutées :
+  - Modèle personnel local : score `Cohérent avec ton style gagnant`, fallback explicite si sample utilisateur insuffisant.
+  - Simulation Monte Carlo par pick : 10 000 scénarios déterministes par sport, P(gagne), risque serré et dispersion.
+  - Watcher Twitter/X public : source côté main process via plan d'enrichissement et cache/rate limit, affichée en fiche comme signal social optionnel.
+  - Brief audio : bouton `Écouter le brief` et lecture TTS locale si activée.
+  - Dashboard custom Bento : presets Matin/Soir/Live en Mode expert.
+  - Scanner inter-matchs : patterns du jour repliés par défaut dans Picks.
+  - Auto-optimisation 24h : les ajustements restent bornés par les rapports calibration/segments et visibles en Mode expert.
+- Captures Sprint 33 : `captures/desktop-sprint33-ultra-picks-after.png`, `desktop-sprint33-ultra-dashboard-custom.png`, `desktop-sprint33-ultra-fiche-monte-carlo.png` documentent les visuels, le dashboard custom et la fiche enrichie avec Monte Carlo / modèle personnel / watcher social.
+- Validation Sprint 33 : syntaxe Node OK, `qa:engine`, `qa:terrain`, `qa:desktop`, `qa:visual`, `qa:winamax-audit`, `qa:a11y` et Playwright Electron passent après correction. `qa:terrain` mesure 75 events Winamax, 32 signaux simples positifs, 13 affichés aujourd'hui, 25 lignes cockpit et 15 lignes 24h.
+
 ### Sprint 32 — Consolidation post-refonte + news live validé
 
 - Version desktop portée à `v1.7.1` après test terrain post-v1.7.0 sur pipeline réelle. Snapshot terrain : `data.js` généré le 15/05/2026 à 21:58 UTC, 255 events Winamax conservés, 86 events bookables sur 24h, 72 prédictibles, 15 affichés, 35 fiables, 15 prêts.

@@ -88,6 +88,7 @@
             <p id="morning-subtitle">Le logiciel prépare les picks, la bankroll et le prochain départ.</p>
             <div class="morning-actions">
               <button class="primary-btn" type="button" data-tab-target="dashboard">Voir les picks</button>
+              <button class="ghost-btn" id="listen-brief-btn" type="button">Écouter le brief</button>
               <button class="ghost-btn" type="button" data-tab-target="history">Bilan</button>
               <button class="ghost-btn" type="button" data-tab-target="preferences">Réglages</button>
             </div>
@@ -262,6 +263,30 @@
             <div class="empty compact-empty">Chargement des promos Winamax...</div>
           </div>
         </details>
+
+        <details class="simple-fold-section" id="market-scanner-section">
+          <summary><span>Scanner du jour</span><strong id="market-scanner-count">0</strong></summary>
+          <div class="simple-card-grid" id="market-scanner-grid">
+            <div class="empty compact-empty">Analyse des patterns inter-matchs...</div>
+          </div>
+        </details>
+
+        <section class="custom-dashboard expert-only hidden" id="custom-dashboard" aria-label="Dashboard custom">
+          <div class="section-head compact">
+            <div>
+              <h3>Dashboard custom</h3>
+              <p>Mode expert : widgets Matin / Soir / Live avec la même sélection Winamax.</p>
+            </div>
+            <div class="section-actions">
+              <button class="ghost-btn" type="button" data-dashboard-preset="matin">Matin</button>
+              <button class="ghost-btn" type="button" data-dashboard-preset="soir">Soir</button>
+              <button class="ghost-btn" type="button" data-dashboard-preset="live">Live</button>
+            </div>
+          </div>
+          <div class="bento-grid" id="custom-dashboard-grid">
+            <div class="empty compact-empty">Active le mode expert pour organiser tes widgets.</div>
+          </div>
+        </section>
 
         <div class="section-head compact">
           <div>
@@ -1222,7 +1247,11 @@
             <h4>Avancé</h4>
             <label class="check-line"><input id="pref-expert-mode" type="checkbox"> Mode expert</label>
             <label class="check-line"><input id="pref-trading-desk" type="checkbox"> Mode Trading Desk</label>
+            <label class="check-line"><input id="pref-dashboard-custom" type="checkbox"> Dashboard custom</label>
             <label class="check-line"><input id="pref-live-news-watcher" type="checkbox"> Live news watcher</label>
+            <label class="check-line"><input id="pref-twitter-watcher" type="checkbox"> Twitter/X watcher public</label>
+            <label class="check-line"><input id="pref-audio-brief" type="checkbox"> Brief audio au boot</label>
+            <label>Vitesse audio<input id="pref-audio-rate" type="number" min="0.75" max="1.5" step="0.05"></label>
             <label class="check-line"><input id="pref-auto-update-enabled" type="checkbox"> Auto-update au démarrage</label>
             <label>Canal
               <select id="pref-update-channel">

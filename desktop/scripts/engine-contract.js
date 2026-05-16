@@ -165,11 +165,11 @@ function testAnalysis() {
   const drawDashboard = (analysis.dashboardPicks || []).filter(isDrawDashboardPick);
   const pastDashboard = (analysis.dashboardPicks || []).filter((pick) => !isFuturePick(pick));
   assert(analysis.dashboardPicks.length >= 10, 'Moins de 10 paris simples dans le cockpit', analysis.dashboardPicks);
-  assert(analysis.dashboardPicks.length <= 18, 'Le cockpit standard dépasse la limite simple de 18 paris', analysis.dashboardPicks.length);
+  assert(analysis.dashboardPicks.length <= 25, 'Le cockpit standard dépasse la limite simple de 25 paris', analysis.dashboardPicks.length);
   assert(complexDashboard.length === 0, 'Marché complexe exposé dans le cockpit standard', complexDashboard);
   assert(drawDashboard.length === 0, 'Match nul exposé dans le cockpit standard', drawDashboard.map((pick) => ({ title: pick.title, market: pick.market, label: pick.label })));
   assert(pastDashboard.length === 0, 'Le cockpit expose un match déjà commencé', pastDashboard.map((pick) => ({ title: pick.title, market: pick.market, start: pick.start })));
-  assert(Number(analysis.dashboardMeta?.qualityPolicy?.maxDashboardRows || 0) === 18, 'Limite cockpit Sprint 15 absente', analysis.dashboardMeta?.qualityPolicy);
+  assert(Number(analysis.dashboardMeta?.qualityPolicy?.maxDashboardRows || 0) === 25, 'Limite cockpit Sprint 33 absente', analysis.dashboardMeta?.qualityPolicy);
   assert(topRanks.length >= 5, 'Top 5 prioritaire absent du cockpit', topRanks);
   assert(Number(analysis.dashboardPicks?.[0]?.priorityRank || 0) === 1, 'Le premier pick dashboard doit être le #1 prioritaire', analysis.dashboardPicks?.[0]);
   assert(String(analysis.dashboardPicks?.[0]?.priorityLabel || '').includes('TOP'), 'Le #1 doit porter le badge TOP PICK', analysis.dashboardPicks?.[0]);

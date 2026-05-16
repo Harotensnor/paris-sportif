@@ -555,6 +555,12 @@ function enrichmentSourcePlan(pick) {
       kind: 'news-search'
     },
     {
+      key: 'x_public_rss',
+      label: 'Twitter/X public',
+      url: query ? `https://nitter.net/search/rss?f=tweets&q=${query}` : null,
+      kind: 'social-news-search'
+    },
+    {
       key: 'thesportsdb_home',
       label: 'TheSportsDB',
       url: teams.home ? `https://www.thesportsdb.com/api/v1/json/3/searchteams.php?t=${encodeURIComponent(teams.home)}` : null,
@@ -1838,8 +1844,13 @@ async function handleApi(req, res, url) {
       jsonResponse(res, 405, { ok: false, error: 'POST required' });
       return;
     }
-    const payload = await readJsonBody(req);
-    jsonResponse(res, 200, backupProfile(payload.profile || payload));
+    try {
+      const payload = await readJsonBody(req, 2 * 1024 * 1024);
+      jsonResponse(res, 200, backupProfile(payload.profile || payload));
+    } catch (error) {
+      appendRefreshLine(`[desktop] backup profil refusé: ${error.message}`);
+      jsonResponse(res, 400, { ok: false, error: error.message });
+    }
     return;
   }
   if (url.pathname === '/api/profile/latest') {

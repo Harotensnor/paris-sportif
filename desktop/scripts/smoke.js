@@ -50,6 +50,7 @@ async function main() {
   }
 
   const messages = [];
+  const failedRequests = [];
   const userDataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'paris-sportif-smoke-'));
   const testPort = 21000 + Math.floor(Math.random() * 2000);
   const app = await electron.launch({
@@ -64,6 +65,9 @@ async function main() {
     const win = await firstWindow(app);
     win.on('console', (msg) => {
       if (['error', 'warning'].includes(msg.type())) messages.push(`${msg.type()}: ${msg.text()}`);
+    });
+    win.on('requestfailed', (request) => {
+      failedRequests.push(`${request.url()} :: ${request.failure()?.errorText || 'failed'}`);
     });
     win.on('pageerror', (error) => messages.push(`pageerror: ${error.message}`));
 
@@ -100,7 +104,7 @@ async function main() {
     const hasComplexMarket = /Handicap|Double chance|Jeux tennis|Total basket|Total runs|Score exact|Corners|Cartons/i.test(dashboard.dashboardText);
     const hasTechnicalJargon = /\bKelly\b|\bEV\b|\btier\b|\b1N2\b|\bBTTS\b|\bedge\b/i.test(dashboard.dashboardText);
     const hasExpertRepairLabel = /À réparer/i.test(dashboard.dashboardText);
-    if (dashboard.rows < 10 || dashboard.rows > 18 || dashboard.timeline < 8 || dashboard.trackButtons < 10 || dashboard.safeBadges < 5 || !/aujourd’hui|à venir|surveill/i.test(dashboard.metricLabel) || (dashboard.metric < 10 && !/trop strict|Winamax/i.test(dashboard.funnelAlert)) || !(dashboard.topPick || dashboard.noUltimate) || !/jour/i.test(dashboard.dailyBudget) || !dashboard.hasRollingSections || !hasActionCopy || hasComplexMarket || hasTechnicalJargon || hasExpertRepairLabel) {
+    if (dashboard.rows < 18 || dashboard.rows > 25 || dashboard.timeline < 8 || dashboard.trackButtons < 10 || dashboard.safeBadges < 5 || !/aujourd’hui|à venir|surveill/i.test(dashboard.metricLabel) || (dashboard.metric < 10 && !/trop strict|Winamax/i.test(dashboard.funnelAlert)) || !(dashboard.topPick || dashboard.noUltimate) || !/jour/i.test(dashboard.dailyBudget) || !dashboard.hasRollingSections || !hasActionCopy || hasComplexMarket || hasTechnicalJargon || hasExpertRepairLabel) {
       throw new Error(`Picks Sprint 15 insuffisants: ${JSON.stringify({ ...dashboard, dashboardText: dashboard.dashboardText.slice(0, 800), hasActionCopy, hasComplexMarket, hasTechnicalJargon })}`);
     }
     if (!dashboard.combines || !dashboard.scorers || !dashboard.promos || !dashboard.bankroll.includes('€') || !dashboard.pnl.includes('€') || !dashboard.expertHidden || dashboard.multibookText) {
@@ -201,7 +205,7 @@ async function main() {
     const severe = messages.filter((message) => (
       message.startsWith('error:') || message.startsWith('pageerror:')
     ) && !isIgnorableConsoleMessage(message));
-    if (severe.length) throw new Error(`Erreurs console: ${severe.join(' | ')}`);
+    if (severe.length) throw new Error(`Erreurs console: ${severe.join(' | ')}${failedRequests.length ? ` | requêtes: ${failedRequests.join(' | ')}` : ''}`);
     console.log(`Desktop smoke OK: ${dashboard.metric} paris simples visibles, ${dashboard.timeline} timeline, ${dashboard.safeBadges} fiables, ${dashboard.priorityBadges} priorités, Sprint 23 auto-tracking/réconciliation/i18n OK.`);
   } finally {
     await app.close();

@@ -105,7 +105,7 @@ async function main() {
     market: pick.market,
     start: pick.start
   })));
-  assert(dashboard.length >= 10, 'Terrain: moins de 10 opportunités simples cockpit', { count: dashboard.length });
+  assert(dashboard.length >= 18, 'Terrain: moins de 18 opportunités simples cockpit', { count: dashboard.length });
   if (Number(todayFunnel.bookableEvents || 0) >= 20 && Number(todayFunnel.simplePassingFilters || 0) >= 10) {
     assert(Number(todayFunnel.displayed || 0) >= 10, 'Terrain: 10+ signaux simples positifs mais moins de 10 affichés aujourd’hui', todayFunnel);
   }
@@ -173,7 +173,7 @@ async function main() {
     });
     assert(dom.title === 'Picks', 'Terrain: la vue Picks ne s’ouvre pas par défaut', dom);
     assert(dom.nav.join('|') === 'Picks|Bilan|Recherche|Réglages', 'Terrain: navigation standard non simplifiée', dom.nav);
-    assert(dom.rows >= 10 && dom.rows <= 18 && dom.timeline >= 8, 'Terrain: cockpit réel insuffisant', dom);
+    assert(dom.rows >= 18 && dom.rows <= 25 && dom.timeline >= 8, 'Terrain: cockpit réel insuffisant', dom);
     if (Number(todayFunnel.bookableEvents || 0) >= 30 && Number(todayFunnel.displayed || 0) < 10) {
       assert(/trop strict|modèle trop strict/i.test(dom.alertText), 'Terrain: le garde-fou trop strict n’est pas visible', { todayFunnel, alertText: dom.alertText });
     }
