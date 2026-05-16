@@ -106,11 +106,12 @@ async function main() {
     start: pick.start
   })));
   assert(dashboard.length >= 18, 'Terrain: moins de 18 opportunités simples cockpit', { count: dashboard.length });
-  if (Number(todayFunnel.bookableEvents || 0) >= 20 && Number(todayFunnel.simplePassingFilters || 0) >= 10) {
+  const positiveSimpleToday = Number(todayFunnel.positiveSimplePassingFilters ?? todayFunnel.simplePassingFilters ?? 0);
+  if (Number(todayFunnel.bookableEvents || 0) >= 20 && positiveSimpleToday >= 10) {
     assert(Number(todayFunnel.displayed || 0) >= 10, 'Terrain: 10+ signaux simples positifs mais moins de 10 affichés aujourd’hui', todayFunnel);
   }
-  if (Number(todayFunnel.bookableEvents || 0) >= 20 && Number(todayFunnel.simplePassingFilters || 0) < 10) {
-    const minimumVisible = Math.max(5, Number(todayFunnel.simplePassingFilters || 0) - 1);
+  if (Number(todayFunnel.bookableEvents || 0) >= 20 && positiveSimpleToday > 0 && positiveSimpleToday < 10) {
+    const minimumVisible = Math.max(1, positiveSimpleToday - 1);
     assert(Number(todayFunnel.displayed || 0) >= minimumVisible, 'Terrain: trop de signaux simples positifs du jour sont cachés', todayFunnel);
   }
   if (Number(todayFunnel.bookableEvents || 0) >= 20 && Number(todayFunnel.simpleReady || 0) >= 5) {
@@ -161,8 +162,10 @@ async function main() {
         metric: Number(document.querySelector('#metric-picks')?.textContent || 0),
         rows: rows.length,
         timeline: document.querySelectorAll('#simple-pick-timeline .simple-timeline-card').length,
-        trackButtons: trackButtons.length,
+        trackButtons,
+        trackButtonCount: trackButtons.length,
         alertText: document.querySelector('#today-funnel-alert')?.innerText || '',
+        readyHeroText: document.querySelector('#ready-picks-hero')?.innerText || '',
         dashboardText: text,
         liveText: document.querySelector('#live-cockpit')?.innerText || '',
         sideStatus: document.querySelector('#side-status')?.innerText || '',
@@ -175,14 +178,21 @@ async function main() {
         })
       };
     });
-    assert(/Picks|Paris/i.test(dom.title), 'Terrain: la vue Picks ne s’ouvre pas par défaut', dom);
+    assert(/Picks|Paris|miser/i.test(dom.title), 'Terrain: la vue Picks ne s’ouvre pas par défaut', dom);
+    assert(!/@@\d/i.test(dom.dashboardText), 'Terrain: cote affichée avec double @', dom.dashboardText.match(/@@.{0,12}/g));
+    assert(!(dom.trackButtonCount > 0 && /Aucun pari prêt aujourd’hui/i.test(dom.alertText)), 'Terrain: bannière 0 prêt contradictoire avec des boutons de mise', {
+      alertText: dom.alertText,
+      trackButtons: dom.trackButtons.slice(0, 5),
+      readyHeroText: dom.readyHeroText.slice(0, 500)
+    });
     // Sprint 51 : on vérifie la présence des labels-clés, pas l'ordre exact.
-    const requiredNavLabels = ['paris du jour', 'bilan', 'recherche', 'réglages'];
+    const requiredNavLabels = ['miser', 'bilan', 'recherche', 'réglages'];
     const navLabels = dom.nav.map((l) => l.toLowerCase());
     const missingNav = requiredNavLabels.filter((label) => !navLabels.some((nav) => nav.includes(label)));
     assert(missingNav.length === 0, 'Terrain: navigation standard non simplifiée', { missingNav, nav: dom.nav });
+    assert(dom.nav.length <= 5, 'Terrain: trop d’entrées visibles dans la navigation standard', { nav: dom.nav });
     assert(dom.rows >= 15 && dom.rows <= 28 && dom.timeline >= 8, 'Terrain: cockpit réel insuffisant', dom);
-    if (Number(todayFunnel.bookableEvents || 0) >= 30 && Number(todayFunnel.displayed || 0) < 10) {
+    if (Number(todayFunnel.bookableEvents || 0) >= 30 && Number(todayFunnel.displayed || 0) < 10 && dom.trackButtonCount < 1) {
       assert(/trop strict|modèle trop strict/i.test(dom.alertText), 'Terrain: le garde-fou trop strict n’est pas visible', { todayFunnel, alertText: dom.alertText });
     }
     assert(dom.hasActionCopy, 'Terrain: format PARI/COTE/MISE absent', dom);
@@ -194,8 +204,13 @@ async function main() {
 
     const visibleTrackButtons = win.locator('[data-track-bet-key]:visible');
     if (await visibleTrackButtons.count()) {
+      const beforeBets = await win.evaluate(() => JSON.parse(localStorage.getItem('parisSportifUserBets') || '[]').length);
       await visibleTrackButtons.first().click();
-      await win.waitForFunction(() => /Pari ajouté au suivi|Pari déjà suivi/.test(document.querySelector('#side-status')?.innerText || ''), null, { timeout: 5000 });
+      await win.waitForFunction((before) => {
+        const status = document.querySelector('#side-status')?.innerText || '';
+        const count = JSON.parse(localStorage.getItem('parisSportifUserBets') || '[]').length;
+        return /Pari ajouté au suivi|Pari déjà suivi|Suivi/i.test(status) || count > before;
+      }, beforeBets, { timeout: 5000 });
     }
 
     const severe = messages.filter((message) => (

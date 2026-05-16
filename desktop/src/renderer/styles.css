@@ -365,9 +365,9 @@ a:hover {
 }
 
 .primary-btn {
-  background: linear-gradient(135deg, var(--accent) 0%, #14b884 100%);
-  color: #05251b;
-  border-color: rgba(16, 185, 129, .55);
+  background: linear-gradient(135deg, #047857 0%, #036b55 100%);
+  color: #ffffff;
+  border-color: rgba(4, 120, 87, .75);
   box-shadow: 0 2px 8px rgba(16, 185, 129, .25);
 }
 
@@ -5961,8 +5961,8 @@ body.theme-light .sidebar {
   display: none;
   margin-left: 6px;
   padding: 2px 8px;
-  background: linear-gradient(135deg, rgba(16, 185, 129, .9), rgba(14, 165, 233, .85));
-  color: #0b1120;
+  background: #065f46;
+  color: #ffffff;
   font-size: 11px;
   font-weight: 900;
   border-radius: 999px;
@@ -7966,5 +7966,36 @@ body.trading-desk-on .trading-desk {
 
   .timeline-row em {
     grid-column: auto;
+  }
+}
+
+/* Sprint terrain : les règles <840px arrivaient après la bottom-nav <640px
+   et remettaient la sidebar en position statique. Résultat réel mobile :
+   certains blocs du feed interceptaient les clics de navigation. */
+@media (max-width: 640px) {
+  .app-shell {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: 1fr auto;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: auto;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    z-index: 80;
+    flex-direction: row;
+    padding: 6px 8px env(safe-area-inset-bottom) 8px;
+    border-right: none;
+    border-top: 1px solid var(--line);
+    border-bottom: 0;
+    overflow-x: auto;
+  }
+
+  .main {
+    padding: 16px 12px 88px;
   }
 }

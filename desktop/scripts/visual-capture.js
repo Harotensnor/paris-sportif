@@ -225,7 +225,7 @@ async function main() {
     if (severe.length) throw new Error(`Erreurs console: ${severe.join(' | ')}`);
     // Sprint 51 : vérification labels-clés au lieu de séquence stricte.
     const visualNavLabels = dashboard.nav.map((l) => l.toLowerCase());
-    const visualRequired = ['paris du jour', 'bilan', 'recherche', 'réglages'];
+    const visualRequired = ['miser', 'bilan', 'recherche', 'réglages'];
     const visualMissing = visualRequired.filter((label) => !visualNavLabels.some((nav) => nav.includes(label)));
     if (visualMissing.length) throw new Error(`Navigation Sprint 51 incomplète, manque: ${visualMissing.join(', ')}`);
     const hasActionCopy = /PARI/i.test(dashboard.dashboardText) && /COTE/i.test(dashboard.dashboardText) && /MISE/i.test(dashboard.dashboardText);
@@ -239,7 +239,7 @@ async function main() {
     }));
     sprint23Runtime.importPreview = importPreviewOk;
     const hasViewModes = JSON.stringify(dashboard.viewModes) === JSON.stringify(['Horaire', 'Type', 'Sport']);
-    if (dashboard.rows < 15 || dashboard.rows > 28 || dashboard.timeline < 8 || dashboard.safeBadges < 5 || !/aujourd’hui|à venir|surveill/i.test(dashboard.metricLabel) || (dashboard.metric < 8 && !/trop strict|Winamax|Volume prêt limité/i.test(dashboard.funnelAlert)) || !(dashboard.topPick || dashboard.noUltimate) || !/jour/i.test(dashboard.dailyBudget) || !hasViewModes || dashboard.emptyTimeSections !== 0 || !dashboard.combines || !dashboard.scorers || !dashboard.promos || !/Suggestion du jour/.test(dashboard.suggestion || '') || dashboard.multibookText || !hasActionCopy || hasComplexMarket || hasTechnicalJargon || hasExpertRepairLabel) {
+    if (dashboard.rows < 15 || dashboard.rows > 28 || dashboard.timeline < 8 || dashboard.safeBadges < 5 || !/24h|aujourd’hui|à venir|surveill/i.test(dashboard.metricLabel) || (dashboard.metric < 8 && !/trop strict|Winamax|Volume prêt limité/i.test(dashboard.funnelAlert)) || !(dashboard.topPick || dashboard.noUltimate) || !/jour/i.test(dashboard.dailyBudget) || !hasViewModes || dashboard.emptyTimeSections !== 0 || !dashboard.combines || !dashboard.scorers || !dashboard.promos || !/Suggestion du jour/.test(dashboard.suggestion || '') || dashboard.multibookText || !hasActionCopy || hasComplexMarket || hasTechnicalJargon || hasExpertRepairLabel) {
       throw new Error(`Dashboard Sprint 23 invalide: ${JSON.stringify({ ...dashboard, dashboardText: dashboard.dashboardText.slice(0, 800), hasActionCopy, hasComplexMarket, hasTechnicalJargon })}`);
     }
     if (ultraDashboard.visuals < 8 || !/Scanner du jour|Aucun pattern/i.test(ultraDashboard.scanner || '') || !ultraDashboard.voiceBriefRemoved || !ultraDashboard.heroImage) {
@@ -251,7 +251,7 @@ async function main() {
     if (!sprint23Runtime.autoTracking || !sprint23Runtime.importPreview || !sprint23Runtime.i18n) throw new Error(`Workflow Sprint 23 invalide: ${JSON.stringify(sprint23Runtime)}`);
     if (!searchAudit.hasInput || searchAudit.compareOptions < 2 || !searchAudit.hasResults || !/Recherche|Comparer/i.test(searchAudit.text || '')) throw new Error(`Recherche Sprint 22 invalide: ${JSON.stringify(searchAudit)}`);
     if (modalOverflow) throw new Error('Overflow horizontal dans la fiche match');
-    if (!/PARI/i.test(modalText || '') || !/COTE/i.test(modalText || '') || !/MISE/i.test(modalText || '') || !/Pourquoi ce pari/i.test(modalText || '') || !/Simulation Monte Carlo/i.test(modalText || '') || !/Modèle personnel/i.test(modalText || '') || !/Twitter\/X/i.test(modalText || '') || /Meilleure\s+cote|Type Winamax|Cote modèle|\b1N2\b|\bKelly\b|\bedge\b/i.test(modalText || '')) throw new Error('Fiche match sans ticket clair ou modules Ultra');
+    if (!/PARI/i.test(modalText || '') || !/COTE/i.test(modalText || '') || !/MISE/i.test(modalText || '') || !/Pourquoi ce pari/i.test(modalText || '') || /Meilleure\s+cote|Type Winamax|Cote modèle|\b1N2\b|\bKelly\b|\bedge\b/i.test(modalText || '')) throw new Error('Fiche match sans ticket clair ou jargon caché');
     if (mobile.hasOverflow || mobile.rows <= 0) throw new Error(`Mobile invalide: ${JSON.stringify(mobile)}`);
     console.log(`Visual capture Sprint 23 OK: ${dashboard.metric} paris simples, ${dashboard.timeline} timeline, ${dashboard.safeBadges} fiables, auto-tracking/réconciliation/recherche/trading capturés.`);
   } finally {

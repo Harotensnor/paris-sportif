@@ -104,19 +104,19 @@ async function main() {
       multibookText: document.body.textContent.includes('Multi-' + 'bookmaker') || document.body.textContent.includes('Meilleure ' + 'cote'),
       dashboardText: document.querySelector('[data-panel="dashboard"]')?.innerText || ''
     }));
-    if (!/Picks|Paris/i.test(dashboard.title)) throw new Error(`Titre dashboard invalide: ${dashboard.title}`);
+    if (!/Picks|Paris|miser/i.test(dashboard.title)) throw new Error(`Titre dashboard invalide: ${dashboard.title}`);
     // Sprint 51 (refonte UX) : navigation enrichie avec groupes et labels.
     // On vérifie que les labels clés sont présents au lieu d'exiger une
     // séquence stricte qui contraint trop l'évolution de la nav.
     const navLabels = dashboard.nav.map((l) => l.toLowerCase());
-    const requiredNavLabels = ['paris du jour', 'tous les matchs', 'buteurs', 'combinés', 'bilan', 'recherche', 'réglages'];
+    const requiredNavLabels = ['miser', 'bilan', 'recherche', 'réglages'];
     const missingNav = requiredNavLabels.filter((label) => !navLabels.some((nav) => nav.includes(label)));
     if (missingNav.length) throw new Error(`Navigation Sprint 51 incomplète, manque: ${missingNav.join(', ')}`);
     const hasActionCopy = /PARI/i.test(dashboard.dashboardText) && /COTE/i.test(dashboard.dashboardText) && /MISE/i.test(dashboard.dashboardText);
     const hasComplexMarket = /Handicap|Double chance|Jeux tennis|Total basket|Total runs|Score exact|Corners|Cartons/i.test(dashboard.dashboardText);
     const hasTechnicalJargon = /\bKelly\b|\bEV\b|\btier\b|\b1N2\b|\bBTTS\b|\bedge\b/i.test(dashboard.dashboardText);
     const hasExpertRepairLabel = /À réparer/i.test(dashboard.dashboardText);
-    if (dashboard.rows < 15 || dashboard.rows > 28 || dashboard.timeline < 8 || dashboard.trackButtons < 6 || dashboard.safeBadges < 5 || !/aujourd’hui|à venir|surveill/i.test(dashboard.metricLabel) || (dashboard.metric < 6 && !/trop strict|Winamax/i.test(dashboard.funnelAlert)) || !(dashboard.topPick || dashboard.noUltimate) || !/jour/i.test(dashboard.dailyBudget) || !dashboard.hasRollingSections || !hasActionCopy || hasComplexMarket || hasTechnicalJargon || hasExpertRepairLabel) {
+    if (dashboard.rows < 15 || dashboard.rows > 28 || dashboard.timeline < 8 || dashboard.trackButtons < 6 || dashboard.safeBadges < 5 || !/24h|aujourd’hui|à venir|surveill/i.test(dashboard.metricLabel) || (dashboard.metric < 6 && !/trop strict|Winamax/i.test(dashboard.funnelAlert)) || !(dashboard.topPick || dashboard.noUltimate) || !/jour/i.test(dashboard.dailyBudget) || !dashboard.hasRollingSections || !hasActionCopy || hasComplexMarket || hasTechnicalJargon || hasExpertRepairLabel) {
       throw new Error(`Picks Sprint 15 insuffisants: ${JSON.stringify({ ...dashboard, dashboardText: dashboard.dashboardText.slice(0, 800), hasActionCopy, hasComplexMarket, hasTechnicalJargon })}`);
     }
     if (!dashboard.combines || !dashboard.scorers || !dashboard.promos || !dashboard.bankroll.includes('€') || !dashboard.pnl.includes('€') || !dashboard.expertHidden || dashboard.multibookText) {

@@ -60,11 +60,14 @@ function assert(condition, msg, ctx) {
   // Ces picks ne doivent JAMAIS etre Fiable.
   const fallbacks = all.filter((p) => p?.pickSource === 'winamax_odds_fallback');
   for (const pick of fallbacks) {
-    assert(!pick.safeAssessment?.reliable, `Sprint 66: oddsBasedFallback Fiable interdit`, {
-      title: pick.title, pickSource: pick.pickSource
+    const isTwoGoalWinamaxPromotion = pick.safeAssessment?.reliableRule === '2-0'
+      && pick.winamaxTwoGoalRule?.eligible
+      && Number(pick.winamaxTwoGoalRule?.leadTwoProbability || 0) >= 0.55;
+    assert(isTwoGoalWinamaxPromotion || !pick.safeAssessment?.reliable, `Sprint 66: oddsBasedFallback Fiable interdit hors filet 2-0`, {
+      title: pick.title, pickSource: pick.pickSource, safeAssessment: pick.safeAssessment, twoGoal: pick.winamaxTwoGoalRule
     });
   }
-  console.log(`[safe-assessment] OK : ${fallbacks.length} fallback non-reliable`);
+  console.log(`[safe-assessment] OK : ${fallbacks.length} fallback non-reliable ou promu par filet 2-0`);
 
   // Test 4 : engine sane (au moins 1 Fiable, < 20 Fiables)
   assert(reliable.length >= 1, `Engine trop strict (0 Fiable)`, { total: all.length });

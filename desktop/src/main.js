@@ -100,7 +100,7 @@ const RENDERER_ROOT = path.resolve(DESKTOP_ROOT, 'src', 'renderer');
 const HTML_CSP = [
   "default-src 'self'",
   "script-src 'self'",
-  "style-src 'self'",
+  "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: https://upload.wikimedia.org",
   "connect-src 'self'",
   "frame-src 'none'",

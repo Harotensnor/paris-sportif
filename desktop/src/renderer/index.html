@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https://upload.wikimedia.org; connect-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none'; worker-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://upload.wikimedia.org; connect-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none'; worker-src 'none'">
   <title>Paris-Sportif Desktop</title>
   <link rel="stylesheet" href="/desktop/design-tokens.css">
   <link rel="stylesheet" href="/desktop/styles.css">
@@ -21,15 +21,15 @@
       <nav class="nav">
         <div class="nav-group">
           <span class="nav-group-label">À MISER</span>
-          <button class="nav-btn active" data-tab="dashboard"><span class="nav-icon">🎯</span><span class="nav-label">Paris du jour</span><span class="nav-badge" id="nav-picks-badge" aria-hidden="true"></span></button>
-          <button class="nav-btn" data-tab="matches"><span class="nav-icon">⚽</span><span class="nav-label">Tous les matchs</span></button>
-          <button class="nav-btn" data-tab="scorers"><span class="nav-icon">👤</span><span class="nav-label">Buteurs</span></button>
-          <button class="nav-btn" data-tab="combines"><span class="nav-icon">🎲</span><span class="nav-label">Combinés</span></button>
+          <button class="nav-btn active" data-tab="dashboard"><span class="nav-icon">🎯</span><span class="nav-label">À miser</span><span class="nav-badge" id="nav-picks-badge" aria-hidden="true"></span></button>
+          <button class="nav-btn nav-legacy hidden" data-tab="matches"><span class="nav-icon">⚽</span><span class="nav-label">Tous les matchs</span></button>
+          <button class="nav-btn nav-legacy hidden" data-tab="scorers"><span class="nav-icon">👤</span><span class="nav-label">Buteurs</span></button>
+          <button class="nav-btn nav-legacy hidden" data-tab="combines"><span class="nav-icon">🎲</span><span class="nav-label">Combinés</span></button>
         </div>
         <div class="nav-group">
           <span class="nav-group-label">SUIVI</span>
           <button class="nav-btn" data-tab="history"><span class="nav-icon">📊</span><span class="nav-label">Bilan & Stats</span></button>
-          <button class="nav-btn" data-tab="calendar"><span class="nav-icon">📅</span><span class="nav-label">Calendrier</span></button>
+          <button class="nav-btn nav-legacy hidden" data-tab="calendar"><span class="nav-icon">📅</span><span class="nav-label">Calendrier</span></button>
           <button class="nav-btn" data-tab="search"><span class="nav-icon">🔍</span><span class="nav-label">Recherche</span></button>
         </div>
         <div class="nav-group">
@@ -48,7 +48,7 @@
       <header class="topbar">
         <div>
           <div class="eyebrow">Analyse locale Winamax-only</div>
-          <h2 id="page-title">Accueil</h2>
+          <h2 id="page-title">À miser maintenant</h2>
         </div>
         <div class="actions decision-actions">
           <button class="primary-btn" id="refresh-btn">Refresh</button>
@@ -259,13 +259,13 @@
           <button class="zone-btn zone-today" data-zone="today" type="button">
             <span class="zone-icon">⏰</span>
             <strong class="zone-count" id="zone-count-today">-</strong>
-            <span class="zone-label">Aujourd'hui</span>
+            <span class="zone-label">Prochaines heures</span>
             <span class="zone-detail">1-12h</span>
           </button>
           <button class="zone-btn zone-tomorrow" data-zone="tomorrow" type="button">
             <span class="zone-icon">🌙</span>
             <strong class="zone-count" id="zone-count-tomorrow">-</strong>
-            <span class="zone-label">Demain</span>
+            <span class="zone-label">12-36h</span>
             <span class="zone-detail">&gt; 12h</span>
           </button>
         </section>
@@ -290,18 +290,14 @@
           </div>
         </section>
 
-        <!-- Sprint 59 (UX simplification) : picks-view-switch passe en
-             Mode expert. 3 modes de vue dès le boot est confus pour le user. -->
-        <section class="picks-view-switch expert-only hidden" id="picks-view-switch" aria-label="Organisation des picks">
+        <section class="picks-view-switch" id="picks-view-switch" aria-label="Organisation des picks">
           <span>Voir par</span>
           <button type="button" data-picks-view-mode="time">Horaire</button>
           <button type="button" data-picks-view-mode="type">Type</button>
           <button type="button" data-picks-view-mode="sport">Sport</button>
         </section>
 
-        <!-- Sprint 80 A5 — time-cockpit retire (redondant avec temporal-zones-strip).
-             Passe en expert-only pour ne pas casser les call sites renderTemporalCockpit. -->
-        <section class="time-cockpit expert-only hidden" id="time-cockpit" aria-label="Picks par horizon temporel">
+        <section class="time-cockpit" id="time-cockpit" aria-label="Picks par horizon temporel">
           <div class="empty">Classement temporel des picks en cours...</div>
         </section>
 
@@ -1547,8 +1543,8 @@
         <button class="modal-tab expert-only hidden" data-detail-tab="decision">Décision technique</button>
         <button class="modal-tab" data-detail-tab="context">Contexte</button>
         <button class="modal-tab" data-detail-tab="teams">Équipes</button>
-        <button class="modal-tab" data-detail-tab="availability">Effectif</button>
-        <button class="modal-tab" data-detail-tab="signals">Signaux</button>
+        <button class="modal-tab expert-only hidden" data-detail-tab="availability">Effectif</button>
+        <button class="modal-tab expert-only hidden" data-detail-tab="signals">Signaux</button>
         <button class="modal-tab expert-only hidden" data-detail-tab="odds">Cotes avancées</button>
         <button class="modal-tab" data-detail-tab="h2h">Face-à-face</button>
         <button class="modal-tab expert-only hidden" data-detail-tab="timeline">Timeline</button>

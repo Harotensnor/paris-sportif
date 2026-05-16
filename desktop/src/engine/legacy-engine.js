@@ -1742,6 +1742,43 @@ function createLegacyEngineService({ projectRoot }) {
 
     if (row?.limitedConfidence) {
       const limitedHasTwoGoalSafety = Boolean(row?.winamaxTwoGoalRule?.eligible);
+      const twoGoalPct = Number(row?.winamaxTwoGoalRule?.leadTwoProbability || 0);
+      const twoGoalWinnerReliable = limitedHasTwoGoalSafety
+        && rawEdge >= 0.01
+        && edge >= 0.01
+        && odd >= 1.25
+        && odd <= 4.00
+        && confidence >= 0.68
+        && twoGoalPct >= 0.55
+        && !segmentNegative
+        && !row?.signalConflict?.active
+        && !row?.oddsGuardrail?.applied
+        && !hardCriticalMissing.length;
+      if (twoGoalWinnerReliable) {
+        return {
+          status: 'reliable',
+          label: 'Fiable',
+          reliable: true,
+          displayable: true,
+          conservativeEdge: edge,
+          rawEdge,
+          edgeCapped: edgeInfo.capped,
+          confidence,
+          sample,
+          roi: Number.isFinite(roi) ? roi : null,
+          policy: policy ? {
+            key: policy.key,
+            direction: policy.direction,
+            edgeMin,
+            oddMax,
+            confidenceMin,
+            reason: policy.reason
+          } : null,
+          reliableRule: '2-0',
+          reasons: [],
+          warnings: [`Filet 2-0 Winamax ${Math.round(twoGoalPct * 100)}%`, ...warnings].slice(0, 4)
+        };
+      }
       // Sprint 42 : pour les sports hors foot (tennis/baseball/basket/
       // hockey), les fallbacks cote-based peuvent avoir un edge brut
       // légèrement négatif (jusqu'à -4pt) à cause des cotes serrées.
@@ -1823,6 +1860,21 @@ function createLegacyEngineService({ projectRoot }) {
     let nextStake = row.stake;
     let status = row.status;
     let statusLabel = row.statusLabel;
+    if (assessment.status === 'reliable' && !nextDecision.canBet && Number(row?.modelStake ?? row?.stake ?? 0) > 0 && row?.status !== 'skip') {
+      const promotedStake = Number(row?.modelStake ?? row?.stake ?? 0) || 0;
+      nextDecision = {
+        ...nextDecision,
+        status: 'ready',
+        canBet: true,
+        stake: promotedStake,
+        stakeDisplay: null,
+        mainReason: 'Tous les garde-fous sont verts',
+        nextAction: 'Miser',
+        blockingGates: [],
+        riskTone: 'ok'
+      };
+      nextStake = promotedStake;
+    }
     if (assessment.status === 'reliable' && nextDecision.canBet) {
       nextStake = Math.max(0, Number(nextDecision.stake ?? nextStake ?? 0) || 0);
       status = 'bet';
@@ -3425,6 +3477,7 @@ function createLegacyEngineService({ projectRoot }) {
       const predictableMatches = (matches || []).filter((row) => rowDayKey(row) === day);
       const passingFilters = (picks || []).filter((row) => rowDayKey(row) === day);
       const displayed = (dashboardRows || []).filter((row) => rowDayKey(row) === day);
+      const positiveSimplePassingFilters = passingFilters.filter((row) => isSimpleUserMarket(row) && Number(row?.safeEdge ?? row?.edge ?? 0) >= 0.01);
       const simplePassingFilters = passingFilters.filter(isSimpleUserMarket);
       const simpleDisplayed = displayed.filter(isSimpleUserMarket);
       const readyRows = passingFilters.filter((row) => row?.decisionCenter?.canBet);
@@ -3437,6 +3490,7 @@ function createLegacyEngineService({ projectRoot }) {
         predictableMatches: predictableMatches.length,
         passingFilters: passingFilters.length,
         simplePassingFilters: simplePassingFilters.length,
+        positiveSimplePassingFilters: positiveSimplePassingFilters.length,
         displayed: displayed.length,
         simpleDisplayed: simpleDisplayed.length,
         ready: readyRows.length,
@@ -3511,7 +3565,7 @@ function createLegacyEngineService({ projectRoot }) {
     add(windowEvents, 'events');
     add(windowEvents, 'bookable', (event) => event?.winamax?.available === true);
     add(windowMatches, 'predictable');
-    add(windowPicks, 'positive');
+    add(windowPicks, 'positive', (row) => Number(row?.safeEdge ?? row?.edge ?? 0) >= 0.01);
     add(windowPicks, 'reliable', (row) => row?.safeAssessment?.reliable === true);
     add(windowDashboard, 'displayed');
     add(windowDashboard, 'ready', (row) => row?.decisionCenter?.canBet === true);
@@ -3523,7 +3577,7 @@ function createLegacyEngineService({ projectRoot }) {
         events: windowEvents.length,
         bookable: windowEvents.filter((event) => event?.winamax?.available === true).length,
         predictable: windowMatches.length,
-        positive: windowPicks.length,
+        positive: windowPicks.filter((row) => Number(row?.safeEdge ?? row?.edge ?? 0) >= 0.01).length,
         displayed: windowDashboard.length,
         reliable: total('reliable'),
         ready: total('ready'),
@@ -4053,4 +4107,3 @@ function createLegacyEngineService({ projectRoot }) {
 module.exports = {
   createLegacyEngineService
 };
-

@@ -3,6 +3,46 @@
 Auto-généré depuis les messages de commit par `scripts/build_changelog.py`.
 Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
+## Desktop — 2026-05-16
+
+### Sprint terrain — Audit utilisateur réel + corrections cockpit
+
+Audit terrain lancé avec pipeline complète réelle puis app Electron pilotée comme un utilisateur qui veut miser vite :
+- Pipeline fraîche validée : `health.json` généré à `2026-05-16T20:30:45Z`.
+- Snapshot terrain : 23 événements Winamax encore aujourd'hui, 25 lignes cockpit, 23 opportunités sur 24h glissantes.
+- `qa:terrain` et `qa:terrain:quick` exécutent désormais le clic réel "Je mise" et vérifient la cohérence bannière/boutons.
+- Capture visuelle complète relancée avec dashboard, fiche match, Bilan, Recherche, Réglages, Avancé, Trading Desk et mobile.
+
+**Bugs réels trouvés et corrigés**
+- Contradiction accueil : l'app affichait "Aucun pari prêt aujourd'hui" alors que des boutons "Je mise" étaient visibles sur les prochaines 24h. Le cockpit, le funnel et la suggestion raisonnent maintenant en fenêtre 24h glissante.
+- Hero trompeur : un top pick de demain était présenté comme pari du jour. L'eyebrow indique maintenant `maintenant / ce soir / demain / à venir`.
+- Bouton "Je mise" du hero : attribut non géré dans le handler terrain, donc clic non fiable. Le hero utilise maintenant le composant commun `trackButtonHtml`.
+- Double arobase sur les cotes (`@@1.82`) corrigée.
+- Navigation trop chargée : les anciennes entrées Buteurs / Combinés / Calendrier restent cachées en mode standard ; libellé principal simplifié en `À miser`.
+- Onglets fiche match trop techniques en standard : `Sources` et `Signaux` sont cachés hors Mode expert.
+- Fiches non-foot polluées par signaux foot : météo/arbitre/xG/compositions sont masqués quand ils ne sont pas pertinents.
+- Stats à zéro trompeuses : xG/xA/tirs/dribbles/conversion/minutes à `0` sont traités comme manquants quand la source n'est pas fiable, au lieu d'afficher un faux zéro.
+- Intervalle de confiance aberrant `0-1%` caché quand le sample réel n'est pas disponible.
+- Checklist contradictoire : un pick misable n'affiche plus un blocage rouge hérité du prebet gate.
+- Suggestion du jour : ne dit plus "aucun pari prêt aujourd'hui" quand un pari est prêt dans la fenêtre 24h.
+- CSP Electron : `style-src` ré-aligné avec l'interface réelle pour supprimer les erreurs console de styles inline.
+- Responsive mobile : les règles `<840px` écrasaient la bottom-nav `<640px`, ce qui faisait intercepter les clics de navigation par le feed. La bottom-nav mobile est restaurée en priorité.
+- Test visuel : attentes mises à jour sur le produit actuel (`À miser`, métrique 24h, fiche standard sans modules experts forcés).
+
+**Modèle et volume**
+- La règle Winamax "filet 2-0" peut maintenant promouvoir un Vainqueur foot limité en sample si le pari a edge positif, confiance forte, probabilité 2-0 élevée et aucun segment historique propre négatif.
+- Sélection prête équilibrée : le hero favorise davantage les Vainqueurs quand ils existent au lieu de laisser Plus/Moins monopoliser l'écran.
+- Diagnostic `todayFunnel` distingue les signaux simples positifs des opportunités seulement "à surveiller".
+
+**Validation**
+- `npm run qa:terrain` : OK avec pipeline complète.
+- `npm run qa:terrain:quick` : OK après corrections.
+- `npm run qa:engine`, `npm run qa:safe`, `npm run qa:a11y`, `npm run qa:desktop`, `npm test` : OK.
+- `npm run qa:winamax-audit` : OK, 15 familles disponibles / 14 exploitées, aucun dormant standard.
+- `node scripts/visual-capture.js` : OK, captures régénérées.
+- `npm run dist` : OK, installeur `Paris Sportif Desktop Setup 2.1.0.exe` généré.
+- Syntaxe renderer/main : OK.
+
 ## Desktop — 2026-05-14
 
 ### Sprint 80-85 — Refonte radicale (RIEN au-dessus du bet ultime + magazine + discipline + mobile)

@@ -91,8 +91,11 @@ function testAnalysis() {
     assert(pick.winamaxBetType && pick.winamaxBetType.label, 'Pick sans type de pari Winamax conseillé', pick);
     assert(pick.safeAssessment && pick.safeAssessment.status, 'Pick sans filtre fiable et safe', pick);
     if (pick.limitedConfidence) {
-      assert(!pick.decisionCenter.canBet && Number(pick.stake || 0) === 0, 'Confiance limitée ne doit jamais être actionnable', pick);
-      assert(pick.safeAssessment.status !== 'reliable' && !pick.safeAssessment.reliable, 'Confiance limitée ne doit jamais être fiable', pick);
+      const isTwoGoalWinamaxPromotion = pick.safeAssessment?.reliableRule === '2-0'
+        && pick.winamaxTwoGoalRule?.eligible
+        && Number(pick.winamaxTwoGoalRule?.leadTwoProbability || 0) >= 0.55;
+      assert(isTwoGoalWinamaxPromotion || (!pick.decisionCenter.canBet && Number(pick.stake || 0) === 0), 'Confiance limitée actionnable hors filet 2-0 Winamax', pick);
+      assert(isTwoGoalWinamaxPromotion || (pick.safeAssessment.status !== 'reliable' && !pick.safeAssessment.reliable), 'Confiance limitée fiable hors filet 2-0 Winamax', pick);
     }
     assert(Number(pick.safeEdge || pick.edge || 0) >= 0.01, 'Pick sans edge prudent positif', pick);
     const safeSample = Number(pick.safeAssessment?.sample ?? pick.segmentValidation?.sample ?? 0) || 0;

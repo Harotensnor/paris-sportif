@@ -294,7 +294,7 @@
   };
   const I18N_MESSAGES = {
     fr: {
-      navPicks: 'Paris du jour',
+      navPicks: 'À miser',
       navHistory: 'Bilan & Stats',
       navSearch: 'Recherche',
       navSettings: 'Réglages',
@@ -421,6 +421,10 @@
 
   function rowMarketPreferenceKey(row) {
     return marketGroupFromKey(marketKeyFromRow(row));
+  }
+
+  function isWinnerRow(row) {
+    return rowMarketPreferenceKey(row) === 'winner';
   }
 
   function isSimpleMarketPreference(key) {
@@ -1552,6 +1556,33 @@
     );
   }
 
+  function isReadyToStakeRow(row) {
+    return Boolean(pickHasCoreData(row) && canDisplayPickCard(row) && canDisplayStake(row));
+  }
+
+  function isRolling24hRow(row) {
+    const ts = rowKickoffTime(row);
+    return Number.isFinite(ts) && ts > Date.now() && ts <= Date.now() + 24 * 60 * 60 * 1000;
+  }
+
+  function rolling24hRows(rows = state.picks, predicate = canDisplayPickCard) {
+    return (Array.isArray(rows) ? rows : [])
+      .filter((row) => pickHasCoreData(row) && isRolling24hRow(row) && predicate(row))
+      .sort((a, b) => Date.parse(a.start || '') - Date.parse(b.start || '') || priorityValue(b) - priorityValue(a));
+  }
+
+  function rollingReadyRows(rows = state.picks) {
+    return rolling24hRows(rows, isReadyToStakeRow);
+  }
+
+  function nightPickRows(rows = state.picks, predicate = canDisplayPickCard) {
+    return rolling24hRows(rows, predicate).filter((row) => {
+      const parts = parisDateParts(row.start);
+      const hour = parts?.hour ?? new Date(row.start).getHours();
+      return hour >= 0 && hour < 7;
+    });
+  }
+
   function isTodayPick(row) {
     return pickDayKey(row) === parisDayKey();
   }
@@ -1570,7 +1601,7 @@
     const grid = $('#morning-grid');
     const strip = $('#imminent-strip');
     if (!grid) return;
-    const rows = (state.picks || []).filter((row) => pickHasCoreData(row) && canDisplayStake(row));
+    const rows = rollingReadyRows(state.picks);
     const readyToday = todayReadyRows(state.picks);
     const watchToday = todayWatchRows(state.picks);
     const todayVisible = [...readyToday, ...watchToday];
@@ -1588,10 +1619,10 @@
         ? `CLV marché ${Number(state.clvSummary.summary.mean_clv_pct).toFixed(2)}%`
         : 'CLV en apprentissage';
     if (title) {
-      title.textContent = readyToday.length
-        ? `Aujourd’hui : ${formatCount(readyToday.length)} pari(s) prêt(s)`
+      title.textContent = rows.length
+        ? `${formatCount(rows.length)} pari(s) prêt(s) sur 24h`
         : watchToday.length
-          ? `Aujourd’hui : ${formatCount(watchToday.length)} opportunité(s) à surveiller`
+          ? `Avant minuit : ${formatCount(watchToday.length)} opportunité(s) à surveiller`
           : ultimate
             ? `Bet ultime : ${ultimate.title}`
             : rows.length
@@ -1599,8 +1630,8 @@
               : 'Bonjour, aucun pari prêt pour l’instant';
     }
     if (subtitle) {
-      subtitle.textContent = !readyToday.length && watchToday.length
-        ? `${formatCount(watchToday.length)} opportunité(s) à surveiller aujourd’hui, mais aucune mise n’est validée.`
+      subtitle.textContent = !rows.length && watchToday.length
+        ? `${formatCount(watchToday.length)} opportunité(s) à surveiller avant minuit, mais aucune mise n’est validée.`
         : ultimate
         ? `PARI : ${userBetLabel(ultimate)} · COTE : ${formatOdd(ultimate.odd)} · MISE : ${visibleStakeText(ultimate)} · départ ${countdownLabel(ultimate.start)}.`
         : nextPick
@@ -1608,7 +1639,7 @@
         : 'Le cockpit reste utile : surveille les données, prépare les combinés ou relance un refresh.';
     }
     grid.innerHTML = [
-      [readyToday.length ? 'Prêts aujourd’hui' : 'Aujourd’hui', readyToday.length ? formatCount(readyToday.length) : formatCount(watchToday.length), readyToday.length ? `${formatCount(bigRows.length)} très bons signaux · ${formatCount(state.allPicks.length || 0)} analysés` : `${formatCount(rows.length)} prêts à venir · ${formatCount(state.allPicks.length || 0)} analysés`],
+      ['Prêts 24h', formatCount(rows.length), rows.length ? `${formatCount(bigRows.length)} très bons signaux · ${formatCount(state.allPicks.length || 0)} analysés` : `${formatCount(watchToday.length)} à surveiller avant minuit · ${formatCount(state.allPicks.length || 0)} analysés`],
       ['Prochain match', nextPick ? countdownLabel(nextPick.start) : '-', nextPick ? `${nextPick.title} · ${userBetLabel(nextPick)}` : 'Aucun départ proche'],
       ['Performance hier', formatMoney(stats.pnlYesterday), `${formatCount(stats.wonYesterday)}W / ${formatCount(stats.lostYesterday)}L · 7j ${formatMoney(stats.last7Pnl)}`],
       ['Bankroll', formatMoney(bankroll), `${discipline.label} · ${clvText}`]
@@ -3946,6 +3977,11 @@
     return buildOtherSportInsightHtml(row);
   }
 
+  function isFootballRow(row) {
+    const sport = String(row?.sport || row?.match?.sport || '').toLowerCase();
+    return sport.includes('football') || sport.includes('soccer') || sport === 'foot';
+  }
+
   function userFacingGuardText(value) {
     return cleanLabel(value, '')
       .replace(/lineup_missing_near_kickoff/gi, 'composition manquante proche du coup d’envoi')
@@ -5313,20 +5349,60 @@
     return `Pourquoi #1 ? ${userBetLabel(row)} à ${formatOdd(row.odd)} sur Winamax, départ ${countdownLabel(row.start)}. ${simpleWhyText(row).replace(/^Pourquoi\s*:\s*/i, '')}`;
   }
 
+  function topPickEyebrow(row, rows = []) {
+    if (!row) return 'Top pick';
+    const ts = rowKickoffTime(row);
+    const now = Date.now();
+    const today = parisDayKey(new Date(now));
+    const tomorrow = parisDayKey(new Date(now + 24 * 60 * 60 * 1000));
+    const day = Number.isFinite(ts) ? parisDayKey(new Date(ts)) : '';
+    const scope = Number.isFinite(ts) && ts - now <= 3 * 60 * 60 * 1000
+      ? 'Top pick maintenant'
+      : day === today
+        ? 'Top pick ce soir'
+        : day === tomorrow
+          ? 'Top pick demain'
+          : 'Top pick à venir';
+    return `${scope} · #1 sur ${formatCount((rows || []).filter(isReadyToStakeRow).length || rows.length || 1)} paris prêts`;
+  }
+
+  function balancedReadySelection(rows, limit = 8) {
+    const sorted = (Array.isArray(rows) ? rows : [])
+      .slice()
+      .sort((a, b) => Number(b.priorityScore || 0) - Number(a.priorityScore || 0)
+        || Date.parse(a.start || '') - Date.parse(b.start || '')
+        || Number(b.edge || 0) - Number(a.edge || 0));
+    const winnerTarget = Math.min(
+      sorted.filter(isWinnerRow).length,
+      Math.max(1, Math.ceil(limit * 0.40))
+    );
+    const selected = [];
+    const seen = new Set();
+    const add = (row) => {
+      const key = userBetKey(row);
+      if (!key || seen.has(key) || selected.length >= limit) return;
+      seen.add(key);
+      selected.push(row);
+    };
+    sorted.filter(isWinnerRow).slice(0, winnerTarget).forEach(add);
+    sorted.forEach(add);
+    return selected.slice(0, limit);
+  }
+
   // Sprint 59 (UX simplification) : résumé en 1 phrase clair pour la home.
   function renderDaySummary(rows) {
     const headline = $('#day-summary-headline');
     const detail = $('#day-summary-detail');
     if (!headline || !detail) return;
     const allRows = Array.isArray(rows) ? rows : [];
-    const ready = allRows.filter((row) => (row?.decisionCenter?.canBet === true || row?.safeAssessment?.reliable === true) && row?.limitedConfidence !== true);
+    const ready = rollingReadyRows(allRows);
     const watch = allRows.filter((row) => row?.limitedConfidence === true || (!row?.safeAssessment?.reliable && row?.safeAssessment?.displayable !== false));
     const next = allRows
       .filter((row) => row?.start && Date.parse(row.start) > Date.now())
       .sort((a, b) => Date.parse(a.start) - Date.parse(b.start))[0];
     const nextLabel = next ? `${next.title} dans ${countdownLabel(next.start)}` : null;
     if (ready.length > 0) {
-      headline.textContent = `${ready.length} pari${ready.length > 1 ? 's' : ''} prêt${ready.length > 1 ? 's' : ''} à miser maintenant`;
+      headline.textContent = `${ready.length} pari${ready.length > 1 ? 's' : ''} prêt${ready.length > 1 ? 's' : ''} sur 24h`;
       const stake = ready.reduce((sum, row) => sum + Number(row.recommendedStake ?? row.stake ?? 0), 0);
       const parts = [];
       if (stake > 0) parts.push(`Mise totale suggérée ${formatMoney(stake)}`);
@@ -5334,10 +5410,10 @@
       if (nextLabel) parts.push(`prochain départ : ${nextLabel}`);
       detail.textContent = parts.join(' · ') || 'Tout est prêt — clique sur "Je mise" pour suivre.';
     } else if (watch.length > 0) {
-      headline.textContent = `Aucun pari sûr aujourd'hui — ${watch.length} à surveiller`;
+      headline.textContent = `Aucun pari sûr maintenant — ${watch.length} à surveiller`;
       detail.textContent = nextLabel ? `Modèle prudent. Prochain match : ${nextLabel}.` : 'Modèle prudent : ne mise que si tu as une conviction propre.';
     } else {
-      headline.textContent = 'Aucun pari disponible aujourd\'hui';
+      headline.textContent = 'Aucun pari disponible maintenant';
       detail.textContent = nextLabel ? `Prochain match : ${nextLabel}.` : 'Relance la pipeline ou attends le prochain refresh.';
     }
   }
@@ -5349,19 +5425,12 @@
   function renderReadyPicksHero(rows) {
     const wrap = $('#ready-picks-hero');
     if (!wrap) return;
-    const readyRows = (Array.isArray(rows) ? rows : [])
-      .filter((row) => row?.decisionCenter?.canBet === true || row?.safeAssessment?.reliable === true)
-      .filter(canDisplayPickCard)
-      .filter((row) => row?.limitedConfidence !== true)
-      .sort((a, b) => Number(b.priorityScore || 0) - Number(a.priorityScore || 0)
-        || Date.parse(a.start || '') - Date.parse(b.start || '')
-        || Number(b.edge || 0) - Number(a.edge || 0))
-      .slice(0, 6);
+    const readyRows = balancedReadySelection(rollingReadyRows(rows), 8);
     if (!readyRows.length) {
       wrap.innerHTML = `
         <div class="ready-hero-empty">
           <h3>Aucun pari à miser maintenant</h3>
-          <p>Le modèle est prudent aujourd'hui. Regarde les opportunités "À surveiller" plus bas pour la culture, ou attends le prochain refresh.</p>
+          <p>Le modèle est prudent sur les prochaines 24h. Les lignes à surveiller restent visibles sans bouton de mise.</p>
         </div>
       `;
       return;
@@ -5369,7 +5438,7 @@
     wrap.innerHTML = `
       <div class="ready-hero-head">
         <h3>🎯 À MISER MAINTENANT</h3>
-        <p>${formatCount(readyRows.length)} pari(s) prêt(s) à jouer · Mise totale suggérée ${escapeHtml(formatMoney(readyRows.reduce((sum, row) => sum + Number(row.recommendedStake ?? row.stake ?? 0), 0)))}</p>
+        <p>${formatCount(readyRows.length)} pari(s) prêt(s) sur 24h · Mise totale suggérée ${escapeHtml(formatMoney(readyRows.reduce((sum, row) => sum + displayStakeAmount(row), 0)))}</p>
       </div>
       <div class="ready-hero-grid">
         ${readyRows.map((row, index) => `
@@ -5385,11 +5454,11 @@
               <strong>${escapeHtml(userBetLabel(row) || row.label || '')}</strong>
             </div>
             <div class="ready-hero-odds">
-              <span><em>COTE</em><strong>@${escapeHtml(formatOdd(row.odd))}</strong></span>
+              <span><em>COTE</em><strong>${escapeHtml(formatOdd(row.odd))}</strong></span>
               <span><em>MISE</em><strong>${escapeHtml(visibleStakeText(row))}</strong></span>
             </div>
             <div class="ready-hero-actions">
-              <button type="button" class="primary ready-hero-action" data-track-bet-id="${escapeHtml(row.id)}">Je mise ${escapeHtml(visibleStakeText(row))}</button>
+              ${trackButtonHtml(row, `Je mise ${visibleStakeText(row)}`)}
               ${row.winamaxUrl ? `<a class="ghost-btn" href="${escapeHtml(row.winamaxUrl)}" target="_blank" rel="noreferrer">Ouvrir Winamax</a>` : ''}
             </div>
           </article>
@@ -5435,8 +5504,8 @@
       const refusal = state.aiAssist?.ultimate?.accepted === false ? state.aiAssist.ultimate.reason : ultimateBetReason(null);
       wrap.innerHTML = `
         <div class="ultimate-copy">
-          <span class="eyebrow">🎯 Bet du jour</span>
-          <h3>Aucun bet ultime validé aujourd'hui</h3>
+          <span class="eyebrow">🎯 Top pick</span>
+          <h3>Aucun top pick validé maintenant</h3>
           <p>${escapeHtml(refusal)}</p>
           ${next ? `<p class="next-day-hint">⏭ Demain : <strong>${escapeHtml(next.title)}</strong> · ${escapeHtml(simpleMarketLabelForRow(next))} @${(Number(next.odd)||0).toFixed(2)}</p>` : ''}
         </div>
@@ -5461,7 +5530,7 @@
     wrap.innerHTML = `
       <div class="ultimate-hero-media"><img src="${escapeHtml(visualSvgUrl(row.title, row, { wide: true }))}" alt=""></div>
       <div class="ultimate-copy">
-        <span class="eyebrow">🎯 Bet du jour · #1 sur ${formatCount(rows.length)} paris analysés</span>
+        <span class="eyebrow">🎯 ${escapeHtml(topPickEyebrow(row, rows))}</span>
         <h3>${escapeHtml(row.title)}</h3>
         ${matchVisualHtml(row, 'match-visual hero')}
         ${actionPickHtml(row)}
@@ -6370,7 +6439,9 @@
     if (!strip) return;
     const stats = userBetStats();
     const freshness = state.status?.data?.ageMinutes != null
-      ? `Données ${formatAge(state.status.data.ageMinutes)}`
+      ? Number(state.status.data.ageMinutes) <= 15
+        ? 'Données fraîches'
+        : `Données ${formatAge(state.status.data.ageMinutes)}`
       : state.status?.generatedAt
         ? `Données ${formatDateTime(state.status.generatedAt)}`
         : 'Données locales';
@@ -6386,6 +6457,23 @@
     const node = $('#today-funnel-alert');
     if (!node) return;
     const funnel = state.status?.analysis?.todayFunnel || state.todayFunnel || null;
+    const coverage = state.coverage24h?.summary || state.status?.analysis?.coverage24h?.summary || null;
+    const readyRows24h = rollingReadyRows(state.currentDashboardRows?.length ? state.currentDashboardRows : state.picks);
+    const ready24hActual = readyRows24h.length;
+    if (coverage && ready24hActual > 0) {
+      const displayed24h = Number(state.dashboardMeta?.rolling24Displayed || coverage.displayed || 0);
+      const nightActual = nightPickRows(state.currentDashboardRows?.length ? state.currentDashboardRows : state.picks, isReadyToStakeRow).length;
+      const watch24h = Math.max(0, displayed24h - ready24hActual);
+      const status = ready24hActual >= 10 && nightActual >= 3 ? 'ok' : 'warn';
+      node.className = `today-funnel-alert ${status === 'ok' ? 'hidden' : 'warn'}`;
+      if (status === 'ok') return;
+      node.innerHTML = `
+        <strong>${formatCount(ready24hActual)} pari(s) prêt(s) sur les prochaines 24h</strong>
+        <span>Lecture utile : ${formatCount(coverage.events || 0)} matchs → ${formatCount(coverage.bookable || 0)} Winamax → ${formatCount(coverage.positive || 0)} signaux → ${formatCount(ready24hActual)} prêts${watch24h ? ` · ${formatCount(watch24h)} à surveiller` : ''} · ${formatCount(nightActual)} prêt(s) cette nuit.</span>
+        <button class="ghost-btn" type="button" data-tab-target="data">Diagnostic auto</button>
+      `;
+      return;
+    }
     if (funnel) {
       const today = funnel.today || {};
       const displayed = Number(today.displayed || 0);
@@ -6400,13 +6488,12 @@
         node.className = 'today-funnel-alert danger';
         node.innerHTML = `
           <strong>${noReadyToday ? 'Aucun pari prêt aujourd’hui' : lowReadyToday ? 'Volume prêt limité aujourd’hui' : tooStrictForDailyTarget ? 'Modèle trop strict aujourd’hui' : displayed ? `${formatCount(displayed)} pari(s) aujourd'hui seulement` : 'Aucun pari simple aujourd’hui visible'}</strong>
-          <span>Aujourd’hui : ${formatCount(today.totalEvents || today.events || 0)} matchs → ${formatCount(bookable)} Winamax → ${formatCount(today.predictableMatches || today.predictable || 0)} analysables → ${formatCount(today.simplePassingFilters || 0)} simples positifs → ${formatCount(simpleReady)} simples prêts. ${advancedReady ? `${formatCount(advancedReady)} prêts avancés restent cachés en mode standard.` : ''}</span>
+          <span>Aujourd’hui : ${formatCount(today.totalEvents || today.events || 0)} matchs → ${formatCount(bookable)} Winamax → ${formatCount(today.predictableMatches || today.predictable || 0)} analysables → ${formatCount(today.positiveSimplePassingFilters ?? today.simplePassingFilters ?? 0)} simples à edge positif → ${formatCount(simpleReady)} simples prêts. ${advancedReady ? `${formatCount(advancedReady)} prêts avancés restent cachés en mode standard.` : ''}</span>
           <button class="ghost-btn" type="button" data-tab-target="data">Diagnostic auto</button>
         `;
         return;
       }
     }
-    const coverage = state.coverage24h?.summary || state.status?.analysis?.coverage24h?.summary || null;
     if (coverage) {
       const displayed24h = Number(state.dashboardMeta?.rolling24Displayed || coverage.displayed || 0);
       const ready24h = Number(coverage.ready || 0);
@@ -6438,7 +6525,7 @@
     node.className = `today-funnel-alert ${status === 'danger' ? 'danger' : 'warn'}${status === 'ok' && displayed >= 5 ? ' hidden' : ''}`;
     node.innerHTML = `
       <strong>${displayed ? `${formatCount(displayed)} pari(s) aujourd'hui visibles` : 'Aucun pari aujourd’hui visible'}</strong>
-      <span>Funnel : ${formatCount(today.totalEvents || today.events || 0)} matchs → ${formatCount(today.bookableEvents || today.bookable || 0)} Winamax → ${formatCount(today.predictableMatches || today.predictable || 0)} analysables → ${formatCount(today.passingFilters || 0)} positifs → ${formatCount(ready)} prêts.</span>
+      <span>Funnel : ${formatCount(today.totalEvents || today.events || 0)} matchs → ${formatCount(today.bookableEvents || today.bookable || 0)} Winamax → ${formatCount(today.predictableMatches || today.predictable || 0)} analysables → ${formatCount(today.positiveSimplePassingFilters ?? today.passingFilters ?? 0)} à edge positif → ${formatCount(ready)} prêts.</span>
       <button class="ghost-btn" type="button" data-tab-target="data">Diagnostic auto</button>
     `;
   }
@@ -6778,9 +6865,7 @@
     // Sprint 50 (UX) : badge compteur "paris prêts" dans la nav Picks.
     try {
       const readyCount = (displayRows || [])
-        .filter((row) => row?.decisionCenter?.canBet === true || row?.safeAssessment?.reliable === true)
-        .filter((row) => row?.limitedConfidence !== true)
-        .filter(canDisplayPickCard)
+        .filter(isReadyToStakeRow)
         .length;
       const badge = $('#nav-picks-badge');
       if (badge) badge.textContent = readyCount > 0 ? String(readyCount) : '';
@@ -6800,40 +6885,38 @@
     state.aiTimer = setTimeout(() => runBackgroundAi(displayRows), 600);
     const total = state.allPicks.length || state.picks.length || 0;
     const meta = state.dashboardMeta || {};
-    const ready = Number(meta.readyPicks ?? state.decisionCenter?.summary?.ready ?? 0);
+    const readyRows = rollingReadyRows(displayRows);
+    const ready = readyRows.length;
+    const nightReady = nightPickRows(displayRows, isReadyToStakeRow).length;
     const today = state.todayFunnel?.today || state.status?.analysis?.todayFunnel?.today || {};
     const todayReady = Number(today.ready || meta.todayReady || 0);
     const todayDisplayed = Number(today.displayed || 0);
     if (metricLabel) {
-      metricLabel.textContent = todayReady > 0
-        ? 'Paris prêts aujourd’hui'
+      metricLabel.textContent = ready > 0
+        ? 'Paris prêts sur 24h'
         : todayDisplayed > 0
-          ? 'À surveiller aujourd’hui'
-          : ready > 0
-            ? 'Paris prêts à venir'
-            : 'Candidats surveillés';
+          ? 'À surveiller avant minuit'
+          : 'Candidats surveillés';
     }
-    $('#metric-picks').textContent = String(todayReady > 0 ? todayReady : todayDisplayed > 0 ? todayDisplayed : ready > 0 ? ready : (meta.todayPicks || state.picks.length || 0));
+    $('#metric-picks').textContent = String(ready > 0 ? ready : todayDisplayed > 0 ? todayDisplayed : (meta.todayPicks || state.picks.length || 0));
     const globalBlocked = Boolean(state.decisionCenter?.summary?.blocked);
     const caption = pickFiltersActive(filters)
       ? `${formatCount(displayRows.length)} pari(s) filtré(s) sur ${formatCount(total)} lignes prêtes.`
-      : todayReady > 0
-        ? `${formatCount(todayReady)} pari(s) prêt(s) aujourd’hui, ${formatCount(meta.rolling24Displayed || displayRows.length)} sur 24h glissantes.`
+      : ready > 0
+        ? `${formatCount(ready)} pari(s) prêt(s) sur les prochaines 24h, dont ${formatCount(nightReady)} cette nuit.`
         : todayDisplayed > 0
-          ? `${formatCount(todayDisplayed)} opportunité(s) aujourd’hui à surveiller, ${formatCount(ready)} pari(s) prêt(s) à venir.`
-          : ready > 0
-            ? `${formatCount(ready)} pari(s) prêt(s), ${formatCount(meta.rolling24Displayed || displayRows.length)} sur 24h glissantes.`
+          ? `${formatCount(todayDisplayed)} opportunité(s) avant minuit à surveiller, aucune mise validée.`
             : meta.mode === 'bestAvailable'
               ? 'Aucun pari prêt dans la fenêtre courte : affichage des meilleurs candidats à surveiller.'
               : 'Aucun pari à jouer maintenant : candidats surveillés sans mise.';
     const sectionTitle = $('#picks-section-title');
-    if (sectionTitle) sectionTitle.textContent = todayReady > 0 ? 'À jouer aujourd’hui' : todayDisplayed > 0 ? 'Aujourd’hui à surveiller' : ready > 0 ? 'À venir' : 'Sélection surveillée';
+    if (sectionTitle) sectionTitle.textContent = ready > 0 ? 'À miser maintenant' : todayDisplayed > 0 ? 'À surveiller avant minuit' : 'Sélection surveillée';
     $('#picks-caption').textContent = caption;
     $('#metric-picks-sub').textContent = total > state.picks.length
       ? `${state.picks.length} affichés · ${total} paris analysés au total`
       : globalBlocked
         ? '0 mise tant qu’un gate est rouge'
-        : `${formatCount(meta.rolling24Displayed || ready)} sur 24h · ${formatCount(state.coverage24h?.summary?.nightDisplayed || 0)} nuit`;
+        : `${formatCount(meta.rolling24Displayed || ready)} sur 24h · ${formatCount(nightReady)} nuit prête`;
     if (!displayRows.length) {
       body.innerHTML = `<tr><td colspan="7" class="empty">${escapeHtml(emptyMessage || 'Aucun pari simple avec les règles actuelles.')}</td></tr>`;
       markFirstPickVisible(0);
@@ -9691,13 +9774,16 @@
     const card = $('#onboarding-card');
     if (!card) return;
     const seen = localStorage.getItem(USER_PREFS_SEEN_KEY) === '1';
-    // Sprint 80 A3 — first-launch : afficher en mode modal au lieu d'occuper le dashboard
+    // Sprint 36 terrain : ne jamais bloquer le cockpit avec un modal.
+    // Le parieur doit voir les picks immédiatement ; l'aide reste disponible
+    // via "?" et le tour démo.
     if (!seen) {
-      card.classList.add('onboarding-modal-mode');
+      card.classList.remove('onboarding-modal-mode');
+      card.classList.add('hidden');
     } else {
       card.classList.remove('onboarding-modal-mode');
+      card.classList.add('hidden');
     }
-    card.classList.toggle('hidden', seen);
     if (!seen) {
       const bankroll = $('#onboarding-bankroll');
       if (bankroll && !bankroll.value) bankroll.value = String(loadPreferences().bankroll || 50);
@@ -10594,10 +10680,11 @@
 
   function buildDailySuggestion(rows = sortedPriorityRows()) {
     const day = parisDayKey();
-    const readyRows = (Array.isArray(rows) ? rows : []).filter((row) => pickHasCoreData(row) && canDisplayStake(row));
+    const allReadyRows = (Array.isArray(rows) ? rows : []).filter((row) => pickHasCoreData(row) && canDisplayStake(row));
+    const readyRows = rollingReadyRows(allReadyRows);
     const readyToday = readyRows.filter(isTodayPick);
-    const watchToday = todayWatchRows(rows);
-    const cacheSignature = `${readyToday.length}:${watchToday.length}:${readyRows[0] ? userBetKey(readyRows[0]) : ''}`;
+    const watchToday = rolling24hRows(todayWatchRows(rows), (row) => !canDisplayStake(row));
+    const cacheSignature = `${readyRows.length}:${readyToday.length}:${watchToday.length}:${readyRows[0] ? userBetKey(readyRows[0]) : ''}`;
     const cached = readStorageJson(DAILY_SUGGESTION_KEY, null);
     if (cached?.day === day && cached?.signature === cacheSignature && Date.now() - Number(cached.cachedAt || 0) < 60 * 60 * 1000) return cached;
     const ultimate = aiSelectedUltimate(readyRows) || ultimateBetCandidate(readyRows) || readyRows[0] || null;
@@ -10608,7 +10695,7 @@
     const text = trendText || regression || (todayPick
       ? `Commence par ${userBetLabel(todayPick)} sur ${todayPick.title} : cote ${formatOdd(todayPick.odd)}, mise ${visibleStakeText(todayPick)}.`
       : ultimate
-        ? `Aucun pari prêt aujourd’hui. Le prochain prêt est ${userBetLabel(ultimate)} sur ${ultimate.title}, mise ${visibleStakeText(ultimate)}.`
+        ? `Sur les prochaines 24h, commence par ${userBetLabel(ultimate)} sur ${ultimate.title} : cote ${formatOdd(ultimate.odd)}, mise ${visibleStakeText(ultimate)}.`
         : watchToday.length
           ? `${formatCount(watchToday.length)} opportunité(s) aujourd’hui restent à surveiller, mais aucune mise n’est validée.`
           : 'Pas de pick ultime aujourd’hui : pas de pari forcé.');
@@ -11779,16 +11866,26 @@
     const referee = matchup.referee || row.match?.referee || row.match?.referee_context || null;
     const angles = Array.isArray(matchup.angles) ? matchup.angles : [];
     const timing = Array.isArray(matchup.timing) ? matchup.timing : [];
+    const football = isFootballRow(row);
+    const encounterRows = [];
+    if (football && weather) {
+      encounterRows.push(['Météo', cleanLabel([weather.city, weather.temp_c != null ? `${Math.round(Number(weather.temp_c))}°C` : '', weather.wind_kmh != null ? `${Math.round(Number(weather.wind_kmh))} km/h` : ''].filter(Boolean).join(' · '))]);
+    }
+    if (football && referee) {
+      encounterRows.push(['Arbitre', cleanLabel(referee.name || referee.source || 'Contexte arbitre')]);
+    }
+    if (matchup.h2h_present) encounterRows.push(['Face-à-face', 'Historique disponible']);
+    if (timing[0]?.recommendation || timing[0]?.advice) encounterRows.push(['Timing marché', timing[0].recommendation || timing[0].advice]);
     const contextRows = [
       ['Score contexte', contextScoreLabel(quality)],
       ['Confiance confiance', confidenceTrustText(row)],
       ['Décision contexte', contextGateText(row)],
       ['Agent', row.contextGate?.agentEligible === false ? 'Mise agent bloquée' : 'Éligible si mise positive'],
       ['Kickoff', quality.minutes_to_kickoff != null ? `${Math.round(quality.minutes_to_kickoff)} min` : '-'],
-      ['Manques', missing.length ? missing.join(', ') : 'Aucun manque majeur'],
-      ['Périmé', stale.length ? stale.join(', ') : 'Rien de périmé'],
-      ['Critique', critical.length ? critical.join(', ') : 'Non']
-    ];
+      missing.length ? ['Manques utiles', missing.filter((item) => football || !/xg|weather|referee|lineup/i.test(item)).slice(0, 4).join(', ')] : null,
+      stale.length ? ['Périmé', stale.slice(0, 4).join(', ')] : null,
+      critical.length ? ['Critique', critical.filter((item) => football || !/xg|weather|referee|lineup/i.test(item)).slice(0, 4).join(', ')] : null
+    ].filter((item) => item && item[1]);
     return `
       <section class="detail-tab-panel" data-detail-panel="context">
         <div class="modal-grid">
@@ -11798,12 +11895,7 @@
           </article>
           <article class="detail-card">
             <h4>Rencontre</h4>
-            <div class="kv">
-              <span>Météo</span><strong>${escapeHtml(weather ? cleanLabel([weather.city, weather.temp_c != null ? `${Math.round(Number(weather.temp_c))}°C` : '', weather.wind_kmh != null ? `${Math.round(Number(weather.wind_kmh))} km/h` : ''].filter(Boolean).join(' · ')) : 'Non disponible')}</strong>
-              <span>Arbitre</span><strong>${escapeHtml(referee ? cleanLabel(referee.name || referee.source || 'Contexte arbitre') : 'Non disponible')}</strong>
-              <span>H2H</span><strong>${escapeHtml(matchup.h2h_present ? 'Disponible' : 'Non disponible')}</strong>
-              <span>Timing marché</span><strong>${escapeHtml(timing[0]?.recommendation || timing[0]?.advice || 'Non signalé')}</strong>
-            </div>
+            <div class="kv">${encounterRows.length ? encounterRows.map(([k, v]) => `<span>${escapeHtml(k)}</span><strong>${escapeHtml(v)}</strong>`).join('') : '<span>Contexte</span><strong>Données sportives non bloquantes</strong>'}</div>
           </article>
           <article class="detail-card wide">
             <h4>Signaux de contexte</h4>
@@ -12071,7 +12163,7 @@
             <h4>Décision</h4>
             <div class="kv">
               <span>Statut</span><strong>${escapeHtml(row.statusLabel || row.status || '-')}</strong>
-              <span>Agent</span><strong>${escapeHtml(row.contextGate?.agentEligible === false || row.prebetGate?.blocked ? 'Bloqué' : 'Éligible si mise positive')}</strong>
+              <span>Agent</span><strong>${escapeHtml(row.contextGate?.agentEligible === false ? 'Bloqué' : canDisplayStake(row, decisions) ? 'Non bloquant pour ce pari' : row.prebetGate?.blocked ? 'Bloqué' : 'Éligible si mise positive')}</strong>
               <span>Edge</span><strong>${escapeHtml(formatPct(displayEdgeValue(row), 1))}</strong>
               <span>Mise autorisée</span><strong>${escapeHtml(visibleStakeText(row, decisions))}</strong>
               <span>Raison mise</span><strong>${escapeHtml(stakePolicyText(row, decisions))}</strong>
@@ -12333,7 +12425,7 @@
     const context = match.context || {};
     const contextQuality = context.quality || row.contextQuality || {};
     const decisionBundle = decisionBundleForRow(row);
-    const stakeAllowed = displayStakeAmount(row) > 0;
+    const stakeAllowed = canDisplayStake(row, decisionBundle);
     const dc = decisionBundleForRow(row);
     const readableDecision = dc.status === 'ready' ? 'Prêt' : dc.status === 'repair' ? 'À réparer' : dc.status === 'skip' ? 'À éviter' : (row.statusLabel || 'Observation');
     const readableReason = noBetStakeReason(row, decisionBundle) || contextGateText(row);
@@ -12386,12 +12478,20 @@
       ? cleanLabel(match.odds[0].details || match.odds[0].provider || '', '')
       : '';
     const signalCards = buildSignalCards(match, pred);
+    const visibleSignalCards = signalCards.filter((signal) => {
+      if (!signal) return false;
+      const label = String(signal.label || '');
+      const value = String(signal.value || '');
+      if (!isFootballRow(row) && /météo|arbitre|composition|xg/i.test(label)) return false;
+      if (!signal.ok && /non disponible|n\/a|^-$|^0(?:\.0)?%?$|à enrichir/i.test(value)) return false;
+      return true;
+    });
     const marketRows = buildMarketRows(markets);
     const h2hHtml = buildH2hHtml(match);
     const calibrationHtml = buildCalibrationDetailHtml(row);
     const blockList = blockReasons(row);
     const decisionTone = stakeAllowed ? 'ok' : dc.status === 'repair' ? 'warn' : dc.status === 'skip' ? 'danger' : 'watch';
-    const signalPreview = signalCards.slice(0, 6);
+    const signalPreview = visibleSignalCards.filter((signal) => signal.ok).slice(0, 6);
     const narrative = pickNarrative(row, signalPreview, explanation);
     const advancedSignals = advancedSportsSignals(row);
     const signalOkCount = signalPreview.filter((signal) => signal.ok).length;
@@ -12406,6 +12506,16 @@
       signalPreview.find((signal) => signal.label === 'Compositions'),
       signalPreview.find((signal) => signal.label === 'Blessures'),
       signalPreview.find((signal) => signal.label === 'Stats équipes')
+    ].filter(Boolean);
+    const ticketRows = [
+      ['PARI', userBetLabel(row)],
+      ['COTE', row.odd > 1 ? `${formatOdd(row.odd)} Winamax` : 'Non disponible'],
+      ['MISE', visibleStakeText(row, decisionBundle)],
+      ['Marché', simpleMarketLabelForRow(row)],
+      row.winamaxBoost ? ['Boost Winamax', row.winamaxBoost.to ? `${row.winamaxBoost.from ? `${Number(row.winamaxBoost.from).toFixed(2)} → ` : ''}${Number(row.winamaxBoost.to).toFixed(2)}` : 'détecté'] : null,
+      row.winamaxTwoGoalRule?.eligible ? ['Filet 2-0', `${Math.round(Number(row.winamaxTwoGoalRule.leadTwoProbability || 0) * 100)}% estimé`] : null,
+      ['Action', readableAction],
+      ['Winamax', winamaxLink]
     ].filter(Boolean);
     const sourceLine = context.sources && Array.isArray(context.sources)
       ? `${formatCount(context.sources.length)} source(s) contexte`
@@ -12459,8 +12569,11 @@
               // affiche aussi le CI ROI segment si sample >= 15
               const conf = Number(row.safeAssessment?.confidence || row.probability || 0);
               const sample = Number(row.segmentValidation?.sample || row.calibration?.sample || 0);
-              const wins = Number(row.segmentValidation?.wins || row.calibration?.wins || Math.round(sample * (Number(row.segmentValidation?.win_rate || 0) || 0)));
-              const ci = sample >= 5 ? wilsonCi(wins, sample) : null;
+              const winRateRaw = Number(row.segmentValidation?.win_rate ?? row.calibration?.win_rate);
+              const winsRaw = Number(row.segmentValidation?.wins ?? row.calibration?.wins);
+              const hasWinSample = Number.isFinite(winsRaw) && winsRaw > 0 || Number.isFinite(winRateRaw) && winRateRaw > 0;
+              const wins = Number.isFinite(winsRaw) ? winsRaw : hasWinSample ? Math.round(sample * winRateRaw) : NaN;
+              const ci = sample >= 5 && Number.isFinite(wins) && wins >= 0 ? wilsonCi(wins, sample) : null;
               if (!conf && !ci) return '';
               const confPct = Math.round(conf * 100);
               const ciTxt = ci ? `${Math.round(ci[0] * 100)}-${Math.round(ci[1] * 100)}%` : null;
@@ -12492,14 +12605,7 @@
           <article class="match-ticket-card">
             <h4>À jouer</h4>
             <div class="kv">
-              <span>PARI</span><strong>${escapeHtml(userBetLabel(row))}</strong>
-              <span>COTE</span><strong>${escapeHtml(row.odd > 1 ? `${formatOdd(row.odd)} Winamax` : 'Non disponible')}</strong>
-              <span>MISE</span><strong>${escapeHtml(visibleStakeText(row, decisionBundle))}</strong>
-              <span>Marché</span><strong>${escapeHtml(simpleMarketLabelForRow(row))}</strong>
-              <span>Boost Winamax</span><strong>${escapeHtml(row.winamaxBoost ? (row.winamaxBoost.to ? `${row.winamaxBoost.from ? `${Number(row.winamaxBoost.from).toFixed(2)} → ` : ''}${Number(row.winamaxBoost.to).toFixed(2)}` : 'détecté') : 'Aucun')}</strong>
-              <span>Filet 2-0</span><strong>${escapeHtml(row.winamaxTwoGoalRule?.eligible ? `${Math.round(Number(row.winamaxTwoGoalRule.leadTwoProbability || 0) * 100)}% estimé` : 'Non applicable')}</strong>
-              <span>Action</span><strong>${escapeHtml(readableAction)}</strong>
-              <span>Winamax</span><strong>${winamaxLink}</strong>
+              ${ticketRows.map(([k, v]) => `<span>${escapeHtml(k)}</span><strong>${k === 'Winamax' ? v : escapeHtml(v)}</strong>`).join('')}
             </div>
           </article>
         </div>
@@ -12517,13 +12623,13 @@
         <article class="detail-card wide sheet-signals-card">
           <h4>Signaux clés</h4>
           <div class="sheet-signal-strip">
-            ${signalPreview.map((signal) => `
+            ${signalPreview.length ? signalPreview.map((signal) => `
               <div class="${signal.ok ? 'ok' : 'missing'}">
                 <span>${escapeHtml(signal.label)}</span>
                 <strong>${escapeHtml(signal.value)}</strong>
                 <em>${escapeHtml(signal.detail)}</em>
               </div>
-            `).join('')}
+            `).join('') : '<div class="ok"><span>Lecture prudente</span><strong>Signaux essentiels seulement</strong><em>Les blocs vides sont masqués au lieu d’inventer des stats.</em></div>'}
           </div>
         </article>
         <div class="modal-grid sheet-grid">
@@ -12579,13 +12685,13 @@
       ${buildAvailabilityHtml(row)}
       <section class="detail-tab-panel" data-detail-panel="signals">
         <div class="signal-grid">
-          ${signalCards.map((signal) => `
+          ${visibleSignalCards.length ? visibleSignalCards.map((signal) => `
             <article class="signal-card ${signal.ok ? 'signal-ok' : 'signal-missing'}">
               <span>${escapeHtml(signal.label)}</span>
               <strong>${escapeHtml(signal.value)}</strong>
               <small>${escapeHtml(signal.detail)}</small>
             </article>
-          `).join('')}
+          `).join('') : '<article class="signal-card signal-ok"><span>Signaux</span><strong>Pas de signal utile affichable</strong><small>Les données manquantes ou non pertinentes pour ce sport sont cachées.</small></article>'}
         </div>
       </section>
       <section class="detail-tab-panel" data-detail-panel="odds">
@@ -12674,7 +12780,7 @@
   function blockReasons(row) {
     const reasons = [];
     const quality = row?.contextQuality || row?.match?.context?.quality || {};
-    if (row?.prebetGate?.blocked) {
+    if (row?.prebetGate?.blocked && !canDisplayStake(row)) {
       reasons.push({
         label: 'Checklist avant mise',
         detail: `${row.prebetGate.label || 'Checklist rouge'}${row.prebetGate.first ? ` · ${row.prebetGate.first}` : ''}`,
@@ -12712,9 +12818,13 @@
     const critical = Array.isArray(quality.critical_missing) ? quality.critical_missing : [];
     const missing = Array.isArray(quality.missing) ? quality.missing : [];
     const stale = Array.isArray(quality.stale) ? quality.stale : [];
-    if (critical.length) reasons.push({ label: 'Signal critique', detail: critical.slice(0, 4).join(' · '), tone: 'danger' });
-    if (missing.length) reasons.push({ label: 'Signaux manquants', detail: missing.slice(0, 5).join(' · '), tone: 'warn' });
-    if (stale.length) reasons.push({ label: 'Signaux périmés', detail: stale.slice(0, 4).join(' · '), tone: 'warn' });
+    const relevant = (items) => items.filter((item) => isFootballRow(row) || !/xg|weather|referee|lineup|composition/i.test(String(item)));
+    const criticalRelevant = relevant(critical);
+    const missingRelevant = relevant(missing);
+    const staleRelevant = relevant(stale);
+    if (criticalRelevant.length) reasons.push({ label: 'Signal critique', detail: criticalRelevant.slice(0, 4).join(' · '), tone: 'danger' });
+    if (missingRelevant.length) reasons.push({ label: 'Signaux manquants', detail: missingRelevant.slice(0, 5).join(' · '), tone: 'warn' });
+    if (staleRelevant.length) reasons.push({ label: 'Signaux périmés', detail: staleRelevant.slice(0, 4).join(' · '), tone: 'warn' });
     const seen = new Set();
     return reasons.filter((item) => {
       const key = `${item.label}:${item.detail}`;
@@ -15167,7 +15277,7 @@
     $$('.nav-btn').forEach((btn) => btn.classList.toggle('active', btn.dataset.tab === tab));
     $$('.tab-panel').forEach((panel) => panel.classList.toggle('active', panel.dataset.panel === tab));
     const titles = {
-      dashboard: 'Paris du jour',
+      dashboard: 'À miser maintenant',
       combines: 'Combinés du jour',
       scorers: 'Buteurs & joueurs',
       matches: 'Tous les matchs Winamax',

@@ -9,6 +9,8 @@
     "start": "electron .",
     "refresh": "python bin/refresh_once.py",
     "dist": "electron-builder --win nsis --x64",
+    "qa:terrain": "node scripts/terrain-check.js",
+    "qa:terrain:quick": "node scripts/terrain-check.js --skip-refresh",
     "qa:winamax-audit": "node scripts/winamax-audit.js"
   },
   "build": {
