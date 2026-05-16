@@ -7,7 +7,7 @@
     "desktop": "npm --prefix desktop start",
     "test": "npm run qa:unit && npm run qa:refresh && node desktop/scripts/smoke.js",
     "qa:desktop": "node desktop/scripts/smoke.js",
-    "qa:visual": "node desktop/scripts/visual-capture.js",
+    "qa:visual-capture-png": "node desktop/scripts/visual-capture.js",
     "qa:stress": "node desktop/scripts/stress-check.js",
     "qa:a11y": "node desktop/scripts/a11y-check.js",
     "qa:multiday": "node desktop/scripts/multi-day-check.js",
@@ -16,6 +16,8 @@
     "qa:engine": "node desktop/scripts/engine-contract.js",
     "qa:safe": "node desktop/scripts/safe-assessment-check.js",
     "qa:calibration": "node desktop/scripts/calibration-check.js",
+    "qa:visual": "node desktop/scripts/visual-baseline.js",
+    "qa:visual-capture": "node desktop/scripts/visual-baseline.js capture",
     "qa:terrain": "node desktop/scripts/terrain-check.js",
     "qa:winamax-audit": "node desktop/scripts/winamax-audit.js"
   },

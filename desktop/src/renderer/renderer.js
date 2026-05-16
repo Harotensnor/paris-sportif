@@ -10806,6 +10806,82 @@
     $('#demo-tour-modal')?.classList.add('hidden');
   }
 
+  // Sprint 73 F7 — Achievements badges progressifs
+  function computeAchievements() {
+    const bets = (typeof loadUserBets === 'function') ? loadUserBets() : [];
+    const settled = bets.filter((b) => ['won', 'lost', 'void'].includes(String(b.status || '')));
+    const tracked = bets.length;
+    const won = settled.filter((b) => b.status === 'won').length;
+    const totalPnl = settled.reduce((s, b) => s + (Number(b.pnl || 0) || 0), 0);
+    const totalStake = settled.reduce((s, b) => s + (Number(b.stake || 0) || 0), 0);
+    const roi = totalStake > 0 ? totalPnl / totalStake : 0;
+    // Compte streak gagnant max
+    const ordered = settled.slice().sort((a, b) =>
+      Date.parse(a.settledAt || a.createdAt || 0) - Date.parse(b.settledAt || b.createdAt || 0));
+    let curStreak = 0, maxStreak = 0;
+    for (const b of ordered) {
+      if (b.status === 'won') { curStreak++; if (curStreak > maxStreak) maxStreak = curStreak; }
+      else if (b.status === 'lost') curStreak = 0;
+    }
+    // Jours actifs distincts
+    const days = new Set();
+    settled.forEach((b) => {
+      const day = String(b.day || (b.settledAt || b.createdAt || '').slice(0, 10));
+      if (day) days.add(day);
+    });
+    return [
+      { id: 'first-bet', label: 'Premier pari', desc: 'Tracker ton premier pari', icon: '🎯',
+        unlocked: tracked >= 1, progress: Math.min(1, tracked) },
+      { id: 'ten-bets', label: '10 paris suivis', desc: 'Tracker 10 paris', icon: '📋',
+        unlocked: tracked >= 10, progress: Math.min(1, tracked / 10), text: `${tracked}/10` },
+      { id: 'fifty-bets', label: '50 paris suivis', desc: 'Tracker 50 paris', icon: '🏆',
+        unlocked: tracked >= 50, progress: Math.min(1, tracked / 50), text: `${tracked}/50` },
+      { id: 'first-win', label: 'Premier gain', desc: 'Gagner ton premier pari', icon: '✅',
+        unlocked: won >= 1, progress: Math.min(1, won) },
+      { id: 'streak-3', label: 'Triple gagnant', desc: '3 victoires de suite', icon: '🔥',
+        unlocked: maxStreak >= 3, progress: Math.min(1, maxStreak / 3), text: `${maxStreak}/3` },
+      { id: 'streak-7', label: 'Hot streak', desc: '7 victoires de suite', icon: '🚀',
+        unlocked: maxStreak >= 7, progress: Math.min(1, maxStreak / 7), text: `${maxStreak}/7` },
+      { id: 'roi-positif', label: 'ROI positif', desc: 'Atteindre +5% ROI sur 10+ paris settled', icon: '📈',
+        unlocked: settled.length >= 10 && roi >= 0.05, progress: settled.length >= 10 ? Math.min(1, Math.max(0, roi / 0.05)) : 0, text: `${(roi * 100).toFixed(1)}%` },
+      { id: 'roi-10', label: 'Top sharp', desc: 'Atteindre +10% ROI sur 20+ paris settled', icon: '💎',
+        unlocked: settled.length >= 20 && roi >= 0.10, progress: settled.length >= 20 ? Math.min(1, Math.max(0, roi / 0.10)) : 0, text: `${(roi * 100).toFixed(1)}%` },
+      { id: 'week-active', label: '7 jours actifs', desc: 'Tracker des paris sur 7 jours distincts', icon: '📅',
+        unlocked: days.size >= 7, progress: Math.min(1, days.size / 7), text: `${days.size}/7` },
+      { id: 'month-active', label: 'Joueur du mois', desc: '30 jours d\'activité', icon: '🏅',
+        unlocked: days.size >= 30, progress: Math.min(1, days.size / 30), text: `${days.size}/30` }
+    ];
+  }
+
+  function renderAchievementsCard() {
+    const node = $('#achievements-card');
+    if (!node) return;
+    const list = computeAchievements();
+    const unlocked = list.filter((a) => a.unlocked);
+    const locked = list.filter((a) => !a.unlocked);
+    const ratio = `${unlocked.length}/${list.length}`;
+    node.innerHTML = `
+      <article class="achievements-card">
+        <header>
+          <h4>🏆 Achievements</h4>
+          <span class="achievements-count">${escapeHtml(ratio)}</span>
+        </header>
+        <ul class="achievements-list">
+          ${list.map((a) => `
+            <li class="achievement ${a.unlocked ? 'unlocked' : 'locked'}" title="${escapeHtml(a.desc)}">
+              <span class="ach-icon">${escapeHtml(a.icon)}</span>
+              <div class="ach-meta">
+                <strong>${escapeHtml(a.label)}</strong>
+                <span class="ach-desc">${escapeHtml(a.desc)}${a.text ? ` · ${escapeHtml(a.text)}` : ''}</span>
+                <div class="ach-progress"><div class="ach-progress-fill" style="width: ${Math.round((a.progress || 0) * 100)}%"></div></div>
+              </div>
+              ${a.unlocked ? '<span class="ach-check">✓</span>' : ''}
+            </li>
+          `).join('')}
+        </ul>
+      </article>`;
+  }
+
   // Sprint 72 C10 — Carte Brier modèle : visualise la qualité actuelle de
   // calibration. < 0.20 excellent, < 0.25 bon, < 0.30 moyen, > 0.30 mauvais.
   function renderModelBrierCard() {
@@ -11071,6 +11147,7 @@
     renderModelBrierCard();
     renderMyMonth();
     renderTrackedBets();
+    renderAchievementsCard();
     renderPersonalInsights();
     // Tier 2 — secondaire, defer idle
     const tier2 = [
@@ -12623,7 +12700,19 @@
         weather.precip_mm != null ? `${Number(weather.precip_mm).toFixed(1)} mm pluie` : null
       ].filter(Boolean).join(' · ')
       : 'Non disponible';
+    // Sprint 73 D6 — Arbitre profile enrichi : tier (permissif/strict/moyen)
+    // + pénaltys donnés + ligue moyenne pour contexte
     const cardsText = Number.isFinite(cards) ? `${cards.toFixed(1)} cartons/match` : 'Non disponible';
+    const refereeTier = Number.isFinite(cards)
+      ? (cards >= 4.5 ? '🟥 Strict' : cards <= 2.8 ? '🟢 Permissif' : '🟨 Moyen')
+      : null;
+    const refereePenalties = Number(referee?.penaltiesPerGame ?? referee?.pens_per_match);
+    const refereePenText = Number.isFinite(refereePenalties) && refereePenalties > 0
+      ? `· ${refereePenalties.toFixed(2)} pen/m`
+      : '';
+    const cardsTextFull = refereeTier
+      ? `${cardsText} ${refereeTier}${refereePenText}`
+      : cardsText;
     const lineupText = homeLineup || awayLineup
       ? `${homeLineup?.starters?.length || 0} + ${awayLineup?.starters?.length || 0} titulaires`
       : 'Non disponible';
@@ -12645,7 +12734,7 @@
       {
         label: 'Arbitre',
         ok: Boolean(referee && Number.isFinite(cards)),
-        value: cardsText,
+        value: cardsTextFull,
         detail: referee?.leagueAverage ? 'Moyenne de ligue utilisée faute d’arbitre confirmé.' : referee?.name || 'Pas de profil arbitre.'
       },
       {
@@ -16475,6 +16564,66 @@
       if (event.key === 'ArrowLeft') { event.preventDefault(); navigateModal('prev'); }
       else if (event.key === 'ArrowRight') { event.preventDefault(); navigateModal('next'); }
     });
+    // Sprint 73 D10 — Hover preview au survol des lignes du tableau picks
+    let hoverPreviewEl = null;
+    let hoverPreviewTimer = null;
+    const ensureHoverPreview = () => {
+      if (!hoverPreviewEl) {
+        hoverPreviewEl = document.createElement('div');
+        hoverPreviewEl.className = 'hover-preview';
+        document.body.appendChild(hoverPreviewEl);
+      }
+      return hoverPreviewEl;
+    };
+    const positionHoverPreview = (el, x, y) => {
+      const margin = 12;
+      const winW = window.innerWidth;
+      const winH = window.innerHeight;
+      const rect = el.getBoundingClientRect();
+      let left = x + margin;
+      let top = y + margin;
+      if (left + rect.width + margin > winW) left = x - rect.width - margin;
+      if (top + rect.height + margin > winH) top = y - rect.height - margin;
+      el.style.left = `${Math.max(margin, left)}px`;
+      el.style.top = `${Math.max(margin, top)}px`;
+    };
+    const showHoverPreview = (row, mouseEvent) => {
+      if (!row) return;
+      const el = ensureHoverPreview();
+      const conf = Math.round(Number(row?.safeAssessment?.confidence || row?.probability || 0) * 100);
+      const edgeRaw = Number(row?.edge || 0);
+      const edgeTxt = `${edgeRaw > 0 ? '+' : ''}${(edgeRaw * 100).toFixed(1)}pt`;
+      const stake = (typeof visibleStakeText === 'function') ? visibleStakeText(row) : `${Number(row?.stake || 0).toFixed(2)} €`;
+      el.innerHTML = `
+        <div class="hover-preview-title">${escapeHtml(row.title || '')}</div>
+        <div class="hover-preview-kpis">
+          <div class="hover-preview-kpi"><span>Confiance</span><strong>${conf}%</strong></div>
+          <div class="hover-preview-kpi"><span>Avantage</span><strong>${edgeTxt}</strong></div>
+          <div class="hover-preview-kpi"><span>Mise</span><strong>${escapeHtml(stake)}</strong></div>
+        </div>`;
+      positionHoverPreview(el, mouseEvent.clientX, mouseEvent.clientY);
+      el.classList.add('visible');
+    };
+    const hideHoverPreview = () => {
+      if (hoverPreviewEl) hoverPreviewEl.classList.remove('visible');
+      if (hoverPreviewTimer) { clearTimeout(hoverPreviewTimer); hoverPreviewTimer = null; }
+    };
+    document.addEventListener('mouseover', (event) => {
+      const tr = event.target.closest('tr.clickable-row[data-match-id]');
+      if (!tr) return;
+      const id = tr.dataset.matchId;
+      if (!id) return;
+      const row = findMatchRow(id);
+      if (!row) return;
+      if (hoverPreviewTimer) clearTimeout(hoverPreviewTimer);
+      hoverPreviewTimer = setTimeout(() => showHoverPreview(row, event), 600);
+    });
+    document.addEventListener('mouseout', (event) => {
+      const tr = event.target.closest('tr.clickable-row[data-match-id]');
+      if (tr) hideHoverPreview();
+    });
+    document.addEventListener('scroll', hideHoverPreview, { capture: true });
+
     // Sprint 72 B4 — Sub-tabs Bilan (filter sections par focus)
     const HISTORY_SUBTAB_KEY = 'parisSportif.historySubtab';
     function applyHistorySubtab(name) {
