@@ -37,6 +37,36 @@ const BUG_REPORT_ROOT = path.join(STATE_ROOT, 'bug-reports');
 const STRESS_REPORT_PATH = path.join(STATE_ROOT, 'stress-report.json');
 const IMAGE_CACHE_ROOT = path.join(STATE_ROOT, 'images');
 imageService.init({ cacheDir: IMAGE_CACHE_ROOT });
+
+// Sprint 44 (P5 audit) : rotation automatique des rapports sprintXX-*.json
+// laissés dans desktop/state/. On garde les 30 derniers jours pour pouvoir
+// auditer les sprints récents, mais on évite l'accumulation infinie.
+function rotateSprintReports() {
+  try {
+    if (!fs.existsSync(STATE_ROOT)) return;
+    const cutoff = Date.now() - 30 * 24 * 60 * 60 * 1000; // 30 jours
+    const entries = fs.readdirSync(STATE_ROOT);
+    let purged = 0;
+    for (const name of entries) {
+      if (!/^sprint\d+[\-_].*\.(json|jsonl|md)$/i.test(name)) continue;
+      const fp = path.join(STATE_ROOT, name);
+      try {
+        const stat = fs.statSync(fp);
+        if (stat.mtimeMs < cutoff) {
+          fs.unlinkSync(fp);
+          purged += 1;
+        }
+      } catch {
+        // skip
+      }
+    }
+    if (purged > 0) console.log(`[paris-desktop] state/ : ${purged} rapports sprint > 30j purgés`);
+  } catch {
+    // best-effort
+  }
+}
+rotateSprintReports();
+setInterval(rotateSprintReports, 24 * 60 * 60 * 1000); // tourne tous les jours
 const SIGNAL_SOURCES = new Set(['all', 'weather', 'referees', 'injuries', 'lineups', 'team_form', 'team_stats', 'h2h', 'context']);
 const REFRESH_MODES = new Set([
   'quick',

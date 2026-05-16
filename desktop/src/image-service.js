@@ -83,6 +83,12 @@ function rememberCache(key, url, ttlMs, miss = false) {
   const expiresAt = Date.now() + ttlMs;
   const payload = { url: url || null, expiresAt, miss: Boolean(miss) };
   STATE.cache.set(key, payload);
+  // Sprint 44 (P3 audit) : limite mémoire — garde 500 entrées max,
+  // évince les plus anciennes (FIFO) pour ne pas grossir indéfiniment.
+  if (STATE.cache.size > 500) {
+    const firstKey = STATE.cache.keys().next().value;
+    if (firstKey) STATE.cache.delete(firstKey);
+  }
   writeDiskCache(key, payload);
   return payload;
 }

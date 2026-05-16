@@ -15632,12 +15632,34 @@
     setTimeout(() => checkForUpdates().catch(() => {}), 2500);
     await logPromise;
     setSideStatus('Calcul prêt', 'ok');
+    // Sprint 44 (P4 audit) : force-refresh au boot si data > 30 min.
+    // L'utilisateur ferme l'app la nuit et au matin la data est obsolète.
+    // Un refresh quick au démarrage garantit qu'il voit les picks frais
+    // sans intervention manuelle.
+    try {
+      const generatedAt = Date.parse(state.engine?.generatedAt || state.engine?.data?.generated_at || '');
+      const ageMs = Number.isFinite(generatedAt) ? Date.now() - generatedAt : Infinity;
+      if (ageMs > 30 * 60 * 1000 && !state.status?.refresh?.running) {
+        setSideStatus('Données > 30 min — refresh auto au boot', 'warn');
+        setTimeout(() => {
+          startRefresh('quick').catch((error) => {
+            setSideStatus(`Boot refresh impossible: ${error.message}`, 'warn');
+          });
+        }, 1500);
+      }
+    } catch {
+      // pas grave — l'auto-refresh interval prend le relais
+    }
     scheduleBackgroundRefresh();
     renderBootPerformance();
     renderRefreshPolicy();
     setInterval(() => refreshStatus().catch(() => {}), 30000);
-    setInterval(() => refreshLog().catch(() => {}), 5000);
-    setInterval(renderRefreshPolicy, 1000);
+    // Sprint 44 (P3 audit) : refreshLog et renderRefreshPolicy étaient
+    // appelés toutes les 5s et 1s respectivement — overkill qui contribuait
+    // au pic mémoire 671 MB observé en stress test. Cadence ramenée à 30s
+    // et 15s pour rester réactif sans hammerer l'UI.
+    setInterval(() => refreshLog().catch(() => {}), 30000);
+    setInterval(renderRefreshPolicy, 15000);
   }
 
   document.addEventListener('DOMContentLoaded', () => {

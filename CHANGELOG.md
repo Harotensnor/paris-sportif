@@ -5,6 +5,24 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 44 — Optimisations mémoire + auto-refresh boot + ménage state/ (P3, P4, P5 audit)
+
+**P3 — Profilage / optimisation mémoire (stress test 671 MB pic)**
+- `setInterval(refreshLog, 5000)` → cadence ramenée à **30 s**. Le log était re-rendu 12 fois par minute pour rien dans 99% des cas.
+- `setInterval(renderRefreshPolicy, 1000)` → cadence ramenée à **15 s**. Affichage de la politique de refresh re-render 60 fois/minute = overkill.
+- `image-service.js` cache mémoire plafonné à **500 entrées** (FIFO eviction) pour éviter accumulation infinie sur usage long.
+
+**P4 — Auto-refresh pipeline au boot**
+- Au démarrage, si `data.js generated_at` > 30 minutes ET pas de refresh en cours : déclenche automatiquement un `startRefresh('quick')` après 1.5 s. L'utilisateur qui ferme l'app la nuit retrouve des données fraîches au matin sans intervention manuelle.
+- L'auto-refresh background existant (30 min standard, 5 min pré-kickoff, 2 min live) reste actif et prend le relais ensuite.
+
+**P5 — Ménage state/**
+- Nouvelle fonction `rotateSprintReports()` côté main process qui supprime les rapports `sprintXX-*.{json,jsonl,md}` plus vieux que 30 jours.
+- Tourne au boot + toutes les 24 h tant que l'app est ouverte.
+- Évite l'accumulation infinie des audits sprint 27/28/29/32/33/34 visible dans `desktop/state/`.
+
+Validation : node --check OK sur main.js / renderer.js / image-service.js. smoke desktop OK (14 timeline, 22 fiables, 8 priorités).
+
 ### Sprint 43 — Exploitation famille `players` / buteurs (P2 audit)
 
 - Audit terrain : 19 419 marchés buteurs Winamax dans le catalogue → **1 seul pick affiché** avant. Cause : matching `playerMarketOddForScorer` exigeait `market_key === 'buteur'` exactement et cote ≤ 4.00 ; le filtre `scorerPickRowsFromScorers` exigeait quality ≥ 50 et edge ≥ 0.01.
