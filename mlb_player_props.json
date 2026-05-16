@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-16T20:56:31Z",
+  "generated_at": "2026-05-16T21:06:38Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -1126,36 +1126,36 @@
         {
           "market": "pitcher_strikeouts",
           "team": "New York Yankees",
-          "pitcher": "Ryan Weathers",
-          "label": "Ryan Weathers plus de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "over",
-          "probability": 0.5491,
-          "fair_odds": 1.82,
-          "expected_strikeouts": 6.75,
-          "projected_ip": 5.62,
+          "pitcher": "Elmer Rodríguez",
+          "label": "Elmer Rodríguez moins de 2,5 strikeouts",
+          "line": 2.5,
+          "pick": "under",
+          "probability": 0.545,
+          "fair_odds": 1.83,
+          "expected_strikeouts": 2.36,
+          "projected_ip": 4.1,
           "inputs": {
-            "k9": 10.8,
-            "era": 3.0,
-            "whip": 1.11,
-            "hand": "L"
+            "k9": 5.19,
+            "era": 5.19,
+            "whip": 2.08,
+            "hand": "R"
           },
           "side": "away"
         },
         {
           "market": "pitcher_home_run_allowed",
           "team": "New York Yankees",
-          "pitcher": "Ryan Weathers",
-          "label": "Ryan Weathers concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5276,
-          "fair_odds": 1.9,
-          "expected_hr_allowed": 0.75,
-          "projected_ip": 5.62,
+          "pitcher": "Elmer Rodríguez",
+          "label": "Elmer Rodríguez ne concède pas de home run",
+          "pick": "no",
+          "probability": 1.0,
+          "fair_odds": 1.01,
+          "expected_hr_allowed": 0.0,
+          "projected_ip": 4.1,
           "inputs": {
-            "hr9": 1.2,
-            "era": 3.0,
-            "whip": 1.11
+            "hr9": 0.0,
+            "era": 5.19,
+            "whip": 2.08
           },
           "side": "away"
         }
