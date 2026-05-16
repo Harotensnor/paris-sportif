@@ -776,17 +776,24 @@ function createLegacyEngineService({ projectRoot }) {
     const ts = startTimestamp(row);
     if (!Number.isFinite(ts) || ts <= Date.now() || ts > Date.now() + 48 * 60 * 60 * 1000) return false;
     const hour = parisHour(ts);
-    if (!(hour >= 0 && hour < 6)) return false;
+    // Fenêtre nuit élargie 0h-7h Paris (couvre matchs US west coast jusqu'à
+    // 06h30 Paris + matchs Asie matin) — user a demandé "+ de pronos la nuit
+    // tout sport".
+    if (!(hour >= 0 && hour < 7)) return false;
     if (isDrawSelection(row)) return false;
     const sport = String(row?.sport || '').toLowerCase();
     const market = simpleMarketGroup(row?.marketKey || row?.market);
-    if (!['baseball', 'basketball', 'hockey', 'football'].includes(sport)) return false;
-    if (!['winner', 'goals'].includes(market)) return false;
+    // Sports nuit élargis : ajout du tennis (tournois Asie/Australie) et
+    // de mma/boxe/rugby qui peuvent avoir des matchs nocturnes.
+    if (!['baseball', 'basketball', 'hockey', 'football', 'tennis', 'mma', 'boxe', 'rugby'].includes(sport)) return false;
+    // Tous les marchés simples acceptés (winner, goals, btts, scorer, halftime).
+    if (!market) return false;
     const edge = Number(row?.safeEdge ?? row?.edge ?? 0);
     const probability = Number(row?.probability || 0);
     const odd = Number(row?.odd || 0);
-    if (!(odd >= 1.30 && odd <= 4.00)) return false;
-    return edge >= -0.07 && probability >= 0.36 && row?.contextGate?.gate !== 'skip';
+    // Cote max élargie à 5.00 (vs 4.00) pour intégrer plus d'outsiders nuit.
+    if (!(odd >= 1.30 && odd <= 5.00)) return false;
+    return edge >= -0.08 && probability >= 0.32 && row?.contextGate?.gate !== 'skip';
   }
 
   function isBookable(match) {

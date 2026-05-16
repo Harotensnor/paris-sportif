@@ -5,6 +5,17 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 40 — Signaux enrichis sur les cartes pick + couverture nuit élargie
+
+- Section "Pourquoi" enrichie : `simpleWhyText()` mentionne maintenant le filet 2-0 Winamax estimé (≥35%), l'avantage modèle brut, les H2H récents (≥3), le sharp money aligné, les mouvements de cote favorables/défavorables (±5%), et la sévérité de l'arbitre (≥4.5 cartons/m). 4 signaux max par pick (vs 3 avant), avec déduplication. Le texte reste en vocabulaire utilisateur (`avantage modèle` au lieu de `edge`, conforme au filtre anti-jargon du smoke).
+- Couverture nuit Paris élargie dans `isNightCoverageCandidate()` (moteur) :
+  * Fenêtre 0h-7h Paris (vs 0h-6h) pour couvrir les matchs US west coast jusqu'à 6h30 + matchs Asie matin.
+  * Sports nuit étendus : tennis (tournois Asie/Australie), MMA, boxe, rugby — en plus du baseball, basket, hockey, football.
+  * Tous les marchés simples acceptés (winner / goals / btts / scorer / halftime) au lieu de seulement winner/goals.
+  * Cote max élargie à 5.00 (vs 4.00) pour intégrer plus d'outsiders.
+  * Edge plancher assoupli à -0.08 (vs -0.07), probabilité plancher à 0.32 (vs 0.36).
+- Validation : qa:engine, smoke desktop (7 prêts, 14 timeline, 40 fiables, 16 priorités), qa:a11y (170 actions clavier, contrastes AA, ARIA modales OK).
+
 ### Sprint 39 — Photos joueurs partout + prefetch batch + tests assouplis
 
 - Compositions sur terrain : chaque token joueur affiche désormais une mini photo Wikipedia 28x28 (via le service `image-service`) en plus du numéro et du nom. La case `pitch-player-token` passe à 3 colonnes (photo + numéro + nom) et la largeur max grimpe de 116px à 144px pour rester lisible. Si aucune ligne de composition n'est calculable, la colonne entière est masquée au lieu d'afficher le placeholder "Feuille de match non publiée".

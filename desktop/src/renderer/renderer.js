@@ -4000,22 +4000,42 @@
   function simpleWhyText(row) {
     if (!row) return '';
     const concrete = compactConcreteSignals(row);
-    if (concrete.length >= 2) {
-      return `Pourquoi : ${concrete.join(' · ')}.`;
-    }
     const parts = concrete.slice();
+    // Ajout de signaux additionnels : H2H, arbitre, météo, sécurité 2-0,
+    // sharp money, etc. — pour répondre au feedback "manque de signaux".
     if (surePickKeys().has(userBetKey(row))) parts.push('sure pick du jour');
     if (isLongShotValue(row)) parts.push('cote haute, mise réduite');
     const trend = trendForRow(row);
     if (trend?.tone === 'hot') parts.push('segment en tendance forte');
     if (trend?.tone === 'cold') parts.push('segment à surveiller');
     if (row.winamaxBoost) parts.push('cote boostée Winamax');
+    // Sécurité 2-0 Winamax (Sprint 36) : avantage net pour les Vainqueurs
+    const twoGoalRule = row?.winamaxTwoGoalRule;
+    if (twoGoalRule?.eligible && Number(twoGoalRule.leadTwoProbability || 0) >= 0.35) {
+      parts.push(`filet 2-0 ~${Math.round(Number(twoGoalRule.leadTwoProbability || 0) * 100)}%`);
+    }
+    // Avantage modèle fort (raw, pas le clamped)
+    const rawEdge = Number(row?.edgeRaw ?? row?.edge ?? 0);
+    if (Number.isFinite(rawEdge) && rawEdge >= 0.05) {
+      parts.push(`avantage modèle +${Math.round(rawEdge * 100)}pt`);
+    }
+    // Confrontations directes (foot, basket, etc.)
+    const h2hMeetings = Array.isArray(row?.match?.h2h?.meetings) ? row.match.h2h.meetings.length : 0;
+    if (h2hMeetings >= 3) parts.push(`${h2hMeetings} H2H récents`);
+    // Sharp money / mouvement de cote favorable
+    if (row?.sharpMoney?.aligned) parts.push('sharp money aligné');
+    if (Number(row?.oddsMovementPct || 0) >= 0.05) parts.push('cote en hausse');
+    if (Number(row?.oddsMovementPct || 0) <= -0.05) parts.push('cote en baisse rapide');
+    // Météo / arbitre signal foot
+    const refereeCards = Number(row?.match?.referee?.cardsPerGame);
+    if (Number.isFinite(refereeCards) && refereeCards >= 4.5) parts.push(`arbitre sévère (${refereeCards.toFixed(1)} cartons/m)`);
+    // Avantage modèle
     if (row.safeAssessment?.reliable) parts.push('profil fiable');
     if (Number(row.priorityScore || 0) >= 60) parts.push('priorité haute');
     if (Number(row.contextQuality?.score || row.match?.context?.quality?.score || 0) >= 65) parts.push('contexte solide');
     if (!parts.length && row.priority?.reason) parts.push('bon signal modèle');
     if (!parts.length) parts.push('cote Winamax intéressante');
-    return `Pourquoi : ${parts.slice(0, 3).join(', ')}.`;
+    return `Pourquoi : ${[...new Set(parts)].slice(0, 4).join(' · ')}.`;
   }
 
   function actionPickHtml(row, { compact = false } = {}) {
