@@ -1,54 +1,8 @@
 {
-  "generated_at": "2026-05-16T01:42:19Z",
+  "generated_at": "2026-05-16T01:47:21Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815366",
-      "kickoff": "2026-05-16T17:10Z",
-      "league": "MLB",
-      "match": "Toronto Blue Jays at Detroit Tigers",
-      "home": "Detroit Tigers",
-      "away": "Toronto Blue Jays",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Detroit Tigers",
-          "pitcher": "Casey Mize",
-          "label": "Casey Mize plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.5701,
-          "fair_odds": 1.75,
-          "expected_strikeouts": 5.83,
-          "projected_ip": 5.17,
-          "inputs": {
-            "k9": 10.16,
-            "era": 2.9,
-            "whip": 1.19,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Detroit Tigers",
-          "pitcher": "Casey Mize",
-          "label": "Casey Mize ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.7168,
-          "fair_odds": 1.4,
-          "expected_hr_allowed": 0.333,
-          "projected_ip": 5.17,
-          "inputs": {
-            "hr9": 0.58,
-            "era": 2.9,
-            "whip": 1.19
-          },
-          "side": "home"
-        }
-      ]
-    },
     {
       "event_id": "401815368",
       "kickoff": "2026-05-16T18:15Z",
@@ -1582,88 +1536,6 @@
       ]
     },
     {
-      "event_id": "401815381",
-      "kickoff": "2026-05-17T17:40Z",
-      "league": "MLB",
-      "match": "Toronto Blue Jays at Detroit Tigers",
-      "home": "Detroit Tigers",
-      "away": "Toronto Blue Jays",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Detroit Tigers",
-          "pitcher": "Jack Flaherty",
-          "label": "Jack Flaherty plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.5756,
-          "fair_odds": 1.74,
-          "expected_strikeouts": 4.83,
-          "projected_ip": 4.13,
-          "inputs": {
-            "k9": 10.51,
-            "era": 5.73,
-            "whip": 1.73,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Detroit Tigers",
-          "pitcher": "Jack Flaherty",
-          "label": "Jack Flaherty ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.579,
-          "fair_odds": 1.73,
-          "expected_hr_allowed": 0.547,
-          "projected_ip": 4.13,
-          "inputs": {
-            "hr9": 1.19,
-            "era": 5.73,
-            "whip": 1.73
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Toronto Blue Jays",
-          "pitcher": "Kevin Gausman",
-          "label": "Kevin Gausman moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.5417,
-          "fair_odds": 1.85,
-          "expected_strikeouts": 5.31,
-          "projected_ip": 5.68,
-          "inputs": {
-            "k9": 8.42,
-            "era": 3.86,
-            "whip": 1.09,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Toronto Blue Jays",
-          "pitcher": "Kevin Gausman",
-          "label": "Kevin Gausman ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5156,
-          "fair_odds": 1.94,
-          "expected_hr_allowed": 0.662,
-          "projected_ip": 5.68,
-          "inputs": {
-            "hr9": 1.05,
-            "era": 3.86,
-            "whip": 1.09
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
       "event_id": "401815382",
       "kickoff": "2026-05-17T18:10Z",
       "league": "MLB",
@@ -2176,7 +2048,7 @@
       ]
     }
   ],
-  "props": 104,
+  "props": 98,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"

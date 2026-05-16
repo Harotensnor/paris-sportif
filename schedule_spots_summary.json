@@ -1,23 +1,23 @@
 {
-  "generated_at": "2026-05-16T01:42:27Z",
+  "generated_at": "2026-05-16T01:47:30Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 27,
+    "active_events": 26,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 42,
+      "lookahead": 40,
       "back_to_back_travel": 6,
       "schedule_congestion": 5
     },
     "by_decision": {
-      "abstain": 20,
+      "abstain": 19,
       "lean_home": 7
     },
     "lean_home": 7,
     "lean_away": 0,
-    "abstain": 20,
+    "abstain": 19,
     "monitor": 0
   },
   "active": [
@@ -92,58 +92,6 @@
       }
     },
     {
-      "event_id": "401815366",
-      "source_event_ids": [
-        "401815366"
-      ],
-      "kickoff": "2026-05-16T17:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Detroit Tigers",
-      "away": "Toronto Blue Jays",
-      "match": "Detroit Tigers - Toronto Blue Jays",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Detroit Tigers 0.15, Toronto Blue Jays 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
-        "home_fade": 0.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Toronto Blue Jays (-0.10)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401872119",
       "source_event_ids": [
         "401872119"
@@ -173,12 +121,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "home",
-        "home_score": 0.615,
+        "net_side": "away",
+        "home_score": -0.098,
         "away_score": -0.098,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Juve Stabia (+0.61)",
+        "reason": "Direction nette: Monza (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -191,12 +139,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.712
           }
         ]
       }
@@ -291,7 +233,7 @@
         "status": "abstain",
         "net_side": null,
         "home_score": -0.817,
-        "away_score": 0.452,
+        "away_score": -0.548,
         "home_fade": 1.15,
         "away_fade": 0.95,
         "reason": "Signaux opposes: Colorado Rockies fade 1.15, Arizona Diamondbacks fade 0.95 -> prudence",
@@ -318,12 +260,6 @@
             "side": "home",
             "type": "market_move",
             "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
             "strength": 1.0
           }
         ]
@@ -526,13 +462,13 @@
         "1 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.817,
-        "away_score": 0.452,
-        "home_fade": 1.15,
+        "status": "net",
+        "net_side": "home",
+        "home_score": 1.108,
+        "away_score": -0.898,
+        "home_fade": 0.15,
         "away_fade": 0.95,
-        "reason": "Signaux opposes: Cleveland Guardians fade 1.15, Cincinnati Reds fade 0.95 -> prudence",
+        "reason": "Direction nette: Cleveland Guardians (+1.11)",
         "detail": [
           {
             "side": "home",
@@ -555,14 +491,8 @@
           {
             "side": "home",
             "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
             "direction": "steam",
-            "strength": 1.0
+            "strength": 0.926
           }
         ]
       }
@@ -649,12 +579,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "away",
-        "home_score": -1.097,
-        "away_score": 1.252,
-        "home_fade": 1.15,
+        "net_side": "home",
+        "home_score": 0.843,
+        "away_score": -0.098,
+        "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Milwaukee Brewers (+1.25)",
+        "reason": "Direction nette: Minnesota Twins (+0.84)",
         "detail": [
           {
             "side": "home",
@@ -671,14 +601,8 @@
           {
             "side": "home",
             "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
             "direction": "steam",
-            "strength": 1.0
+            "strength": 0.94
           }
         ]
       }
@@ -881,12 +805,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
+        "net_side": "home",
+        "home_score": 0.425,
         "away_score": -0.098,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: San Diego Padres (-0.10)",
+        "reason": "Direction nette: Seattle Mariners (+0.43)",
         "detail": [
           {
             "side": "home",
@@ -899,6 +823,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.523
           }
         ]
       }
@@ -933,12 +863,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "home",
-        "home_score": -0.607,
-        "away_score": -1.147,
-        "home_fade": 1.15,
-        "away_fade": 1.55,
-        "reason": "Direction nette: Montreal Canadiens (-0.61)",
+        "net_side": "away",
+        "home_score": -0.098,
+        "away_score": -0.098,
+        "home_fade": 0.15,
+        "away_fade": 0.15,
+        "reason": "Direction nette: Buffalo Sabres (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -951,24 +881,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
           }
         ]
       }
@@ -1399,12 +1311,18 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.305,
+        "home_score": 0.828,
         "away_score": -0.872,
         "home_fade": 0.0,
         "away_fade": 0.872,
-        "reason": "Direction nette: Seattle Mariners (+0.31)",
+        "reason": "Direction nette: Seattle Mariners (+0.83)",
         "detail": [
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.523
+          },
           {
             "side": "away",
             "type": "back_to_back_travel",
