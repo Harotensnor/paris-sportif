@@ -5,6 +5,15 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 42 — Débloquer tennis/baseball/basket (P1 audit)
+
+- Audit terrain : 92 events football → 15 affichés / 7 prêts, mais **0 picks tennis (sur 5 events) et 0 baseball (sur 6 events)**. Cause identifiée : le moteur produisait soit un best sur un marché expert (`Jeux tennis` masqué standard), soit des edges légèrement négatifs sur les sports avec cotes serrées.
+- Fix moteur : `oddsBasedFallback` est maintenant appliqué quand `predictMatch` retourne un best sur un marché expert (hors `1n2`, `ou`, `btts`, `players`, `halftime`). Cela bascule automatiquement vers un pick Vainqueur cote-based simple pour ces sports.
+- Fix filtres : `safeAssessmentForRow` et `isDashboardDisplayCandidate` acceptent désormais les `limitedConfidence` picks tennis/baseball/basket/hockey/NFL/MMA/rugby/boxe avec un edge brut jusqu'à `-4pt`. Ces picks restent en statut `À surveiller` (jamais `Fiable`, jamais de bouton `Je mise` actif) — l'utilisateur voit la couverture sport sans être incité à parier à perte.
+- Fix renderer : `pickHasCoreData()` applique le même seuil `-4pt` aux picks `limitedConfidence` multi-sport pour qu'ils remontent dans `state.picks` et `state.allPicks`.
+- Résultat terrain : **25 picks dashboard répartis** (football 12, tennis 4, baseball 8, hockey 1) au lieu de 17 picks 100% foot. Le moteur génère désormais 144 picks (vs 171 avant, baisse normale car les Jeux tennis 8 sont écartés).
+- Validation : qa:engine (215 matchs, 144 picks, 25 paris simples dashboard), smoke desktop (14 timeline, 30 fiables, 12 priorités).
+
 ### Sprint 40 — Signaux enrichis sur les cartes pick + couverture nuit élargie
 
 - Section "Pourquoi" enrichie : `simpleWhyText()` mentionne maintenant le filet 2-0 Winamax estimé (≥35%), l'avantage modèle brut, les H2H récents (≥3), le sharp money aligné, les mouvements de cote favorables/défavorables (±5%), et la sévérité de l'arbitre (≥4.5 cartons/m). 4 signaux max par pick (vs 3 avant), avec déduplication. Le texte reste en vocabulaire utilisateur (`avantage modèle` au lieu de `edge`, conforme au filtre anti-jargon du smoke).

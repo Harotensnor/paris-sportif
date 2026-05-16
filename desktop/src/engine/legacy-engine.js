@@ -767,6 +767,18 @@ function createLegacyEngineService({ projectRoot }) {
     if (!isFutureStart(row)) return false;
     if (!(Number(row.odd || 0) > 1)) return false;
     if (isNightCoverageCandidate(row)) return true;
+    // Sprint 42 : pour les picks confiance limitée (fallback cote-based
+    // Winamax sur sports tennis/baseball/basket/hockey hors couverture
+    // nuit), on accepte un edge légèrement négatif jusqu'à -0.04. Le pick
+    // restera "À surveiller" sans bouton Je mise — l'utilisateur le voit
+    // pour information mais le filtre fiable empêche la mise impulsive.
+    if (row.limitedConfidence === true) {
+      const odd = Number(row?.odd || 0);
+      const edge = Number(row?.safeEdge ?? row?.edge ?? 0);
+      if (odd >= 1.30 && odd <= 4.50 && edge >= -0.04) {
+        return row.safeAssessment?.displayable !== false || edge >= -0.04;
+      }
+    }
     if (!(Number(row.safeEdge ?? row.edge ?? 0) >= 0.01)) return false;
     if (row.safeAssessment?.displayable === false) return false;
     return true;
@@ -1242,7 +1254,15 @@ function createLegacyEngineService({ projectRoot }) {
         const fallback = oddsBasedFallback(win, match, bankroll);
         let fallbackApplied = false;
         if (fallback) {
-          const shouldReplacePrimary = !best || !(best.edge > 0);
+          // Sprint 42 : si predictMatch produit un best mais que ce best
+          // est sur un marché expert (Jeux tennis, Score exact, Total
+          // basket, etc.) — donc invisible en mode standard — bascule
+          // vers le fallback cote-based Vainqueur (marché simple). Cela
+          // débloque les sports tennis/baseball/basket qui n'avaient
+          // jusqu'ici aucun pick standard alors que la cote 1n2 Winamax
+          // est exploitable.
+          const bestIsSimple = best && isSimpleMarketCandidate(best);
+          const shouldReplacePrimary = !best || !(best.edge > 0) || (best && !bestIsSimple);
           if (shouldReplacePrimary) {
             best = fallback.best;
             marketLabel = fallback.market;
@@ -1654,7 +1674,16 @@ function createLegacyEngineService({ projectRoot }) {
 
     if (row?.limitedConfidence) {
       const limitedHasTwoGoalSafety = Boolean(row?.winamaxTwoGoalRule?.eligible);
-      const limitedDisplayable = rawEdge >= 0.01 &&
+      // Sprint 42 : pour les sports hors foot (tennis/baseball/basket/
+      // hockey), les fallbacks cote-based peuvent avoir un edge brut
+      // légèrement négatif (jusqu'à -4pt) à cause des cotes serrées.
+      // On accepte ces picks en "À surveiller" sans bouton Je mise pour
+      // débloquer la couverture sport. Pour le foot, on garde le seuil
+      // strict +1pt.
+      const sportKey = String(row?.sport || '').toLowerCase();
+      const isMultiSportFallback = /tennis|baseball|basket|hockey|football américain|mma|rugby|boxe/.test(sportKey);
+      const minRawEdge = isMultiSportFallback ? -0.04 : 0.01;
+      const limitedDisplayable = rawEdge >= minRawEdge &&
         odd >= (limitedHasTwoGoalSafety ? 1.08 : 1.30) &&
         odd <= 6.00 &&
         confidence >= 0.30 &&

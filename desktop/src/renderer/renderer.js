@@ -4608,6 +4608,15 @@
   function pickHasCoreData(row) {
     if (!row || typeof row !== 'object') return false;
     const hasWinamax = Boolean(row.winamaxUrl || row.match?.winamax?.available === true || row.match?.winamax?.match_id);
+    // Sprint 42 : pour les fallbacks cote-based sur sports hors foot
+    // (tennis/baseball/basket/hockey/NFL/MMA), on accepte un edge
+    // brut jusqu'à -4pt. Le pick restera "À surveiller" sans bouton
+    // Je mise. Cela débloque la couverture sport là où le moteur
+    // produit des Vainqueurs basés cote Winamax sans signal positif net.
+    const sportKey = String(row.sport || row.match?.sport || '').toLowerCase();
+    const isMultiSportLimited = row.limitedConfidence === true
+      && /tennis|baseball|basket|hockey|football américain|mma|rugby|boxe/.test(sportKey);
+    const edgeFloor = isMultiSportLimited ? -0.04 : 0.01;
     return Boolean(
       row.title &&
       row.start &&
@@ -4616,7 +4625,7 @@
       hasWinamax &&
       Number(row.odd || 0) > 1 &&
       Number(row.probability || 0) > 0 &&
-      displayEdgeValue(row) >= 0.01
+      displayEdgeValue(row) >= edgeFloor
     );
   }
 
