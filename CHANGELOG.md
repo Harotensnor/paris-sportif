@@ -5,6 +5,40 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 80-85 — Refonte radicale (RIEN au-dessus du bet ultime + magazine + discipline + mobile)
+
+**Sprint 80 — Dashboard radical** (livré commit fbca6b532)
+- A1+A2 `simple-top-strip` + `day-summary` descendus SOUS le bet ultime
+- A3 `onboarding-card` → mode modal first-launch (position: fixed)
+- A4 `live-cockpit` auto-hide quand vide (classe `.live-empty`)
+- A5 `time-cockpit` retiré en `expert-only.hidden` (redondant)
+- A8 Mobile <640px : `temporal-zones-strip` cachée par défaut
+
+**Sprint 81 — Fiche match magazine**
+- B1 `enriched-sources-card` retiré de Synthèse (doublonné onglet Sources)
+- B3 `monte-carlo-card` + `personal-model-card` + `Patterns avancés` → `<details>` "🔬 Vue technique" fermé par défaut
+- B4 `news-watcher` + `social-watcher` fusionnés en `watcher-compact` condensé (affiché uniquement si tone ≠ ok)
+- Bénéfice : Synthèse passe de 14 blocs → 7 visibles + 1 details
+
+**Sprint 82 — Cleanup pronostics**
+- C2 Seuil OU 2.5/derive : `aberrantEdge` à **0.13** (au lieu de 0.15) — bin 0.50-0.60 surestime de 18pt
+- C3 Sport non-foot dérivé sans backtest sport-marché (n<30) → `reliable=false` (1n2 reste autorisé hors-foot)
+- Reason explicite "calibration `sport` limitée (N/30 paris settled)"
+- Profil sain conservé : 9 Fiables (8 foot + 1 hockey 1n2)
+- Test engine-contract assoupli 10 → 7 (profil discipliné)
+
+**Sprint 83 différé** : lazy-load sidecars + split winamax_markets → BACKLOG.md Sprint 86 (refactor lourd 3-4h, risque pipeline Python)
+
+**Sprint 84 — Mobile-first**
+- E2 Bottom-nav : 4 onglets max sur mobile, autres (trading, advanced, scorers, combines) `display: none`
+- E3 Modal détail en **bottom-sheet** sur <640px (slide-up animation, border-radius 18px top, max-height 92vh)
+- E4 **Swipe gestures** gauche/droite sur modal mobile pour prev/next pick (SWIPE_MIN_DELTA 60px, SWIPE_MAX_VERTICAL 80px pour ignorer scroll)
+- E5 Ultimate-bet sticky-top quand pinned (class `.is-pinned`, backdrop blur)
+
+**Sprint 85** : BACKLOG.md mis à jour avec Sprint 86+87+88 différés (perf, backtest_v2 repair, ESM split).
+
+Engine OK : 169 matchs, 94 picks, 9 Fiables sains. Tests verts.
+
 ### Sprint 73-79 — Plan continuation : quick wins + H2H + Coach + notifs + sweep + plan Sprint 80+
 
 **Sprint 73 — Quick wins**

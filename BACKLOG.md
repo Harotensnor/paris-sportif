@@ -1,5 +1,22 @@
 # Backlog — post v35.502
 
+## Desktop Sprint 86+ — Reste différé après Sprint 80-85
+
+### Sprint 86 — Performance critique (E1+E2+E3, différé Sprint 83)
+- **E1 Lazy-load sidecars** : `legacy-engine.js:3795-3845` charge 50 readers inconditionnellement. Wrapper via `Object.defineProperty(reports,'X',{get(){...}})` est risqué car les variables sont passées explicitement aux helpers downstream (refactor profond). Estimé M (3-4h).
+- **E2 JSDOM cache séparé** : invalidation granulaire vs fileKey global (50+ sidecars). Estimé M (3h).
+- **E3 Pre-computed picks JSON** : pipeline Python pré-calcule `desktop_dashboard.json`. Boot ~3s. Effort L (1j).
+- **D2 Split winamax_markets.json (40MB)** au cron en `winamax_markets/{match_id}.json` individuels. Frontend lit seulement les events affichés. Effort M (3h) côté Python.
+
+### Sprint 87 — Backtest_v2 réparation (C1 différé Sprint 82)
+Le rapport actuel a `n_events=1` alors que `picks_history.jsonl` a 1868 settled. La jointure `results_archive` ↔ `odds_history` est cassée. Options :
+- (a) Refactor `backtest_v2.py` pour consommer directement `picks_history.jsonl` (plus simple).
+- (b) Réparer la jointure existante (257 events sur 3826 ont des cotes matchées).
+- Effort M (3-4h).
+
+### Sprint 88 — ESM split (G1 toujours différé)
+Voir P0 ci-dessous (BACKLOG.md inchangé).
+
 ## Desktop Sprint 80+ — Suite après Sprints 73-79
 
 ### Sprint 80 — Compositions visuelles 11vs11 enrichies (D3)

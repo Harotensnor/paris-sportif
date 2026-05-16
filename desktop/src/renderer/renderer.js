@@ -12503,9 +12503,17 @@
             </div>
           </article>
         </div>
-        ${buildEnrichedSourcesHtml(row)}
-        ${buildNewsWatcherHtml(row)}
-        ${buildSocialWatcherHtml(row)}
+        <!-- Sprint 81 B1+B4 — enriched-sources retire (deja onglet Sources),
+             news+social fusionnes en watcher unique condense -->
+        ${(() => {
+          const news = (typeof newsForRow === 'function') ? newsForRow(row) : null;
+          if (!news || news.tone === 'ok') return '';
+          // Resume condense, le detail reste dans l'onglet Sources / news widget
+          return `<article class="detail-card wide watcher-compact watcher-${escapeHtml(news.tone)}">
+            <h4>📰 Veille externe</h4>
+            <p class="detail-text">${escapeHtml(news.headline || 'Actualités récentes détectées')} · ${escapeHtml(news.detail || 'Voir l\'onglet Sources pour détail')}</p>
+          </article>`;
+        })()}
         <article class="detail-card wide sheet-signals-card">
           <h4>Signaux clés</h4>
           <div class="sheet-signal-strip">
@@ -12531,15 +12539,9 @@
           </article>
           ${buildSportInsightHtml(row)}
           ${buildTwoGoalSafetyHtml(row)}
-          ${buildMonteCarloHtml(row)}
-          ${buildPersonalModelHtml(row)}
           <article class="detail-card">
             <h4>Contexte utile</h4>
             <div class="kv">${usefulContext.length ? usefulContext.map((signal) => `<span>${escapeHtml(signal.label)}</span><strong>${escapeHtml(signal.value)}</strong>`).join('') : '<span>Contexte</span><strong>Voir onglet Signaux</strong>'}</div>
-          </article>
-          <article class="detail-card">
-            <h4>Patterns avancés</h4>
-            <div class="kv">${advancedSignals.length ? advancedSignals.map((signal) => `<span>${escapeHtml(signal.label)}</span><strong>${escapeHtml(signal.detail)}</strong>`).join('') : '<span>Sport</span><strong>Aucun red flag avancé détecté</strong>'}</div>
           </article>
           ${limitedDataHtml}
           <article class="detail-card wide">
@@ -12552,6 +12554,19 @@
             `).join('')}</div>` : '<p class="detail-text">Tous les garde-fous locaux sont verts. La cote Winamax reste à vérifier au moment du clic.</p>'}
           </article>
         </div>
+        <!-- Sprint 81 B5+B7 — Modules expert reples dans <details>.
+             monte-carlo, personal-model, patterns avances disponibles ici mais fermes par defaut -->
+        <details class="advanced-section detail-expert-details">
+          <summary>🔬 Vue technique (modèles, monte-carlo, patterns)</summary>
+          <div class="modal-grid sheet-grid">
+            ${buildMonteCarloHtml(row)}
+            ${buildPersonalModelHtml(row)}
+            <article class="detail-card">
+              <h4>Patterns avancés</h4>
+              <div class="kv">${advancedSignals.length ? advancedSignals.map((signal) => `<span>${escapeHtml(signal.label)}</span><strong>${escapeHtml(signal.detail)}</strong>`).join('') : '<span>Sport</span><strong>Aucun red flag avancé détecté</strong>'}</div>
+            </article>
+          </div>
+        </details>
         <details class="advanced-section detail-audit">
           <summary>Audit technique</summary>
           <div class="kv">${quality.map(([k, v]) => `<span>${escapeHtml(k)}</span><strong>${escapeHtml(v)}</strong>`).join('')}</div>
@@ -16728,6 +16743,27 @@
       if (event.key === 'ArrowLeft') { event.preventDefault(); navigateModal('prev'); }
       else if (event.key === 'ArrowRight') { event.preventDefault(); navigateModal('next'); }
     });
+    // Sprint 84 E4 — Swipe gestures gauche/droite sur la modal mobile
+    let touchStartX = null;
+    let touchStartY = null;
+    const SWIPE_MIN_DELTA = 60;
+    const SWIPE_MAX_VERTICAL = 80;
+    $('#match-modal')?.addEventListener('touchstart', (event) => {
+      if (event.touches.length !== 1) return;
+      touchStartX = event.touches[0].clientX;
+      touchStartY = event.touches[0].clientY;
+    }, { passive: true });
+    $('#match-modal')?.addEventListener('touchend', (event) => {
+      if (touchStartX === null) return;
+      const touch = event.changedTouches[0];
+      const dx = touch.clientX - touchStartX;
+      const dy = touch.clientY - touchStartY;
+      touchStartX = null;
+      touchStartY = null;
+      if (Math.abs(dy) > SWIPE_MAX_VERTICAL) return; // user a scrolle, pas swipe horizontal
+      if (Math.abs(dx) < SWIPE_MIN_DELTA) return;
+      if (dx > 0) navigateModal('prev'); else navigateModal('next');
+    }, { passive: true });
     // Sprint 73 D10 — Hover preview au survol des lignes du tableau picks
     let hoverPreviewEl = null;
     let hoverPreviewTimer = null;

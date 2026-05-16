@@ -1706,14 +1706,26 @@ function createLegacyEngineService({ projectRoot }) {
     //   marche derive : aberrantEdge a 15pt (Poisson xG souvent surconfiant)
     //   marche derive sample>=5 et roi<0 : refuser Fiable (segment court mais perdant)
     //   sample=0 (data absente) : accepter Fiable avec warning (pas une preuve negative)
+    // Sprint 82 C2+C3 — Discipline modele renforcee :
+    //   OU foot : seuil aberrant 13pt (bin 0.50-0.60 surestime de 18pt)
+    //   Hors-foot sans backtest sport-marche (n<30) : reliable=false (watch only)
     const marketKey = String(row?.marketKey || row?.market || '').toLowerCase();
     const isOneN2 = marketKey === '1n2' || marketKey === 'matchwinner' || marketKey === 'winner' || marketKey === 'moneyline';
-    const aberrantThreshold = isOneN2 ? 0.22 : 0.15;
+    const isOuMarket = marketKey === 'ou' || marketKey === 'ou15' || marketKey === 'ou25' || marketKey === 'ou35' || marketKey === 'httotal' || marketKey === 'htou' || marketKey === 'hockeytotal' || marketKey === 'basketballtotal' || marketKey === 'baseballtotal' || marketKey === 'baskettotal';
+    const aberrantThreshold = isOneN2 ? 0.22 : isOuMarket ? 0.13 : 0.15;
     const aberrantEdge = rawEdge >= aberrantThreshold;
     const derivedShortNegative = !isOneN2 && sample >= 5 && sample < 15 && Number.isFinite(roi) && roi < 0;
+    // Sprint 82 C3 — Sport non-foot calibration aveugle ?
+    // Seul les marches DERIVES (OU/BTTS/scorer) sont bloques hors-foot.
+    // 1n2 reste autorise hors-foot car le modele 1n2 generaliste est universel.
+    const sportKey = String(row?.sport || row?.match?.sport || '').toLowerCase();
+    const isFootball = /football|soccer/.test(sportKey);
+    const sportMarketSample = Number(row?.calibration?.sportMarketSample ?? row?.segmentValidation?.sportMarketSample ?? 0);
+    const nonFootCalibrationBlind = !isFootball && !isOneN2 && sportMarketSample < 30;
     if (!(rawEdge >= 0.01)) reasons.push('edge < +1pt');
     if (aberrantEdge) reasons.push(`edge brut +${Math.round(rawEdge * 100)}pt aberrant (modele surconfiant)`);
     if (derivedShortNegative) reasons.push(`marche ${marketKey} segment court perdant (n=${sample}, ROI ${Math.round(roi * 100)}%)`);
+    if (nonFootCalibrationBlind) reasons.push(`calibration ${sportKey || 'sport'} limitee (${sportMarketSample}/30 paris settled)`);
     if (!reliableRule && edge < Math.min(edgeMin, sample < 5 ? 0.05 : sample < 15 ? 0.04 : edgeMin)) reasons.push('edge prudent insuffisant');
     if (odd < 1.30 || odd > (sample < 15 ? Math.min(5.00, oddMax) : oddMax)) reasons.push(`cote hors zone solo 1.30-${(sample < 15 ? Math.min(5.00, oddMax) : oddMax).toFixed(2)}`);
     if (!reliableRule && confidence < (sample < 5 ? 0.65 : sample < 15 ? 0.60 : confidenceMin)) reasons.push('confiance insuffisante');
@@ -1770,12 +1782,15 @@ function createLegacyEngineService({ projectRoot }) {
       };
     }
 
-    // Sprint 66 : Fiable durci. Refuser Fiable si edge aberrant (>22pt 1n2,
-    // >15pt derive) ou marche derive avec segment court perdant (sample 5-14, roi<0).
+    // Sprint 66+82 : Fiable durci.
+    // Refuse si edge aberrant (>22pt 1n2, >13pt OU, >15pt autre derive),
+    // ou marche derive avec segment court perdant (sample 5-14, roi<0),
+    // ou sport non-foot sans backtest sport-marche (n<30).
     const reliable = Boolean(reliableRule)
       && edge <= 0.20
       && !aberrantEdge
-      && !derivedShortNegative;
+      && !derivedShortNegative
+      && !nonFootCalibrationBlind;
     const displayable = rawEdge >= 0.01 && odd > 1.10 && odd <= 18 && confidence >= 0.30 && row?.decisionCenter?.status !== 'skip';
     return {
       status: reliable ? 'reliable' : displayable ? 'watch' : 'reject',

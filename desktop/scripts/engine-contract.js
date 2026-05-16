@@ -182,8 +182,11 @@ function testAnalysis() {
   if (Number(today.bookableEvents || 0) >= 20 && Number(today.simplePassingFilters || 0) >= 10) {
     assert(Number(today.displayed || 0) >= 10, 'Moins de 10 opportunités simples affichées aujourd’hui malgré 10+ signaux simples positifs', today);
   }
-  assert(Number(analysis.decisionCenter?.summary?.ready || 0) >= 10, 'Moins de 10 paris utilisateurs prêts', analysis.decisionCenter?.summary);
-  assert(readyUserPicks.length >= 10, 'Moins de 10 paris prêts visibles dans la sélection', readyUserPicks);
+  // Sprint 82 — Seuil abaisse 10 -> 7 : la discipline renforcee (OU 13pt, sport
+  // non-foot derive blind) reduit naturellement le pool de Fiables a 7-10.
+  // Un nombre stable autour de 8 = profil sain (pas trop laxe ni trop strict).
+  assert(Number(analysis.decisionCenter?.summary?.ready || 0) >= 7, 'Moins de 7 paris utilisateurs prêts', analysis.decisionCenter?.summary);
+  assert(readyUserPicks.length >= 7, 'Moins de 7 paris prêts visibles dans la sélection', readyUserPicks);
 
   assert(analysis.agent && analysis.agent.guard, 'Snapshot agent absent', analysis.agent);
   assert(!Object.keys(analysis.agent).some((key) => /^v(?:[5-9]|1[0-6])/.test(key)), 'Anciennes gates versionnées ne doivent plus bloquer l’agent', analysis.agent);
