@@ -1,0 +1,65 @@
+name: desktop-recalibrate
+
+# Sprint 72 (C9) — Recalibration weekly automatique du prob_calibration.json.
+# Tourne tous les lundis à 03:00 UTC (05:00 Paris) après le backtest quotidien
+# (04:00 UTC) qui peut avoir mis à jour picks_history.jsonl avec de nouveaux
+# settled bets.
+#
+# Output : prob_calibration.json avec bins per-market actualisés (Sprint 68).
+# Le runtime _calibrateProb utilise ces bins via les marketKey aliases.
+#
+# Pas de recalcul des _V45_LEAGUE_OFFSETS ici (ils sont dans legacy-app.js
+# et nécessitent un déploiement code, pas juste un JSON refresh). Voir
+# scripts/audit_v45_league_offsets.py pour la regénération manuelle.
+
+on:
+  schedule:
+    - cron: '0 3 * * 1'  # lundi 03:00 UTC
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/build_prob_calibration.py'
+      - 'picks_history.jsonl'
+
+permissions:
+  contents: write
+
+jobs:
+  recalibrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    concurrency:
+      group: desktop-recalibrate
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Build prob_calibration.json (per-market bins)
+        run: python3 scripts/build_prob_calibration.py
+
+      - name: Validate calibration (Sprint 70 contract)
+        run: node desktop/scripts/calibration-check.js
+
+      - name: Commit if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add prob_calibration.json
+          if git diff --cached --quiet; then
+            echo "prob_calibration unchanged — no commit needed."
+            exit 0
+          fi
+          git commit -m "recalibrate: weekly prob_calibration refresh $(date -u +'%Y-%m-%d UTC')"
+          git push

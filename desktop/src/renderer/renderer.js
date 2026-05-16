@@ -4129,6 +4129,66 @@
     return `Pourquoi : ${[...new Set(parts)].slice(0, 4).join(' · ')}.`;
   }
 
+  // Sprint 72 D9 — Checklist visuelle "Why this bet" : analyse contexte du pick
+  // pour donner ✅/⚠️/❌ par catégorie clé (forme, cote, modèle, météo, etc.)
+  function whyChecklistBullets(row) {
+    if (!row) return [];
+    const checks = [];
+    // Forme
+    const homeForm = String(row.match?.competitors?.[0]?.last5 || '').toLowerCase();
+    const awayForm = String(row.match?.competitors?.[1]?.last5 || '').toLowerCase();
+    const homeWins = (homeForm.match(/w/g) || []).length;
+    const awayWins = (awayForm.match(/w/g) || []).length;
+    if (homeForm || awayForm) {
+      const dominant = homeWins >= awayWins ? homeWins : awayWins;
+      const tone = dominant >= 3 ? 'ok' : dominant >= 2 ? 'warn' : 'bad';
+      checks.push({ tone, icon: '🔥', label: 'Forme récente', detail: `${homeWins}W home · ${awayWins}W away` });
+    }
+    // Edge modèle
+    const rawEdge = Number(row.edge || 0);
+    const edgeTone = rawEdge >= 0.05 ? 'ok' : rawEdge >= 0.02 ? 'warn' : 'bad';
+    checks.push({ tone: edgeTone, icon: '🧠', label: 'Avantage modèle', detail: `${rawEdge > 0 ? '+' : ''}${(rawEdge * 100).toFixed(1)}pt` });
+    // Confiance / segment
+    const conf = Number(row.safeAssessment?.confidence || row.probability || 0);
+    const sample = Number(row.segmentValidation?.sample || row.calibration?.sample || 0);
+    if (sample >= 15) {
+      const roi = Number(row.segmentValidation?.roi ?? row.calibration?.roi ?? 0);
+      const tone = roi > 0.05 ? 'ok' : roi >= -0.02 ? 'warn' : 'bad';
+      checks.push({ tone, icon: '📊', label: 'Segment historique', detail: `${sample} paris · ROI ${roi > 0 ? '+' : ''}${Math.round(roi * 100)}%` });
+    } else {
+      checks.push({ tone: 'warn', icon: '📊', label: 'Segment historique', detail: sample > 0 ? `${sample} paris (court)` : 'Aucune donnée' });
+    }
+    // Cote vérifiée Winamax
+    const isVerified = row.oddValidation?.status === 'verified' || (row.match?.winamax?.markets && row.match.winamax.markets['1n2']);
+    checks.push({
+      tone: isVerified ? 'ok' : 'warn',
+      icon: '✓',
+      label: 'Cote Winamax',
+      detail: isVerified ? 'Vérifiée à l\'instant' : 'À vérifier sur Winamax'
+    });
+    // Sharp money aligné
+    if (row.sharpMoney?.aligned === true) {
+      checks.push({ tone: 'ok', icon: '🦈', label: 'Sharp money', detail: 'Aligné avec le pick' });
+    } else if (row.sharpMoney?.aligned === false) {
+      checks.push({ tone: 'bad', icon: '🦈', label: 'Sharp money', detail: 'Contre le pick (⚠ reverse line movement)' });
+    }
+    // Météo (foot)
+    const weather = row.match?.weather || {};
+    const precip = Number(weather.precip || 0);
+    const wind = Number(weather.wind || 0);
+    if (precip > 5 || wind > 30) {
+      checks.push({ tone: 'warn', icon: '🌦️', label: 'Météo', detail: `${precip > 5 ? `Pluie ${precip}mm` : ''}${precip > 5 && wind > 30 ? ' · ' : ''}${wind > 30 ? `Vent ${wind}km/h` : ''}` });
+    }
+    // Compositions confirmées (foot)
+    const homeConf = row.match?.lineups?.home?.confirmed;
+    const awayConf = row.match?.lineups?.away?.confirmed;
+    if (homeConf || awayConf) {
+      const bothConf = homeConf && awayConf;
+      checks.push({ tone: bothConf ? 'ok' : 'warn', icon: '👥', label: 'Compositions', detail: bothConf ? 'Les 2 confirmées' : '1 confirmée seulement' });
+    }
+    return checks.slice(0, 7);
+  }
+
   // Sprint 62 : convertit simpleWhyText en bullets visuelles avec icone par
   // type de raison. Utilise pour la modal magazine layout.
   function keyReasonsBullets(row) {
@@ -5309,14 +5369,20 @@
     const row = aiSelectedUltimate(rows) || ultimateBetCandidate(rows);
     const aiReason = row && state.aiAssist?.ultimate?.selectedKey === userBetKey(row) ? state.aiAssist?.ultimate?.reason : null;
     if (!row) {
+      // Sprint 72 A7 — Empty state enrichi : suggérer J+1 / J+2 si dispo
+      const next = ultimateBetCandidate(rows.filter((r) => {
+        const ts = Date.parse(r?.start || '');
+        return Number.isFinite(ts) && ts > Date.now() + 24 * 60 * 60 * 1000;
+      }));
       const refusal = state.aiAssist?.ultimate?.accepted === false ? state.aiAssist.ultimate.reason : ultimateBetReason(null);
       wrap.innerHTML = `
         <div class="ultimate-copy">
-          <span class="eyebrow">Bet ultime du jour</span>
-          <h3>Aucun bet ultime validé</h3>
+          <span class="eyebrow">🎯 Bet du jour</span>
+          <h3>Aucun bet ultime validé aujourd'hui</h3>
           <p>${escapeHtml(refusal)}</p>
+          ${next ? `<p class="next-day-hint">⏭ Demain : <strong>${escapeHtml(next.title)}</strong> · ${escapeHtml(simpleMarketLabelForRow(next))} @${(Number(next.odd)||0).toFixed(2)}</p>` : ''}
         </div>
-        <div class="ultimate-side"><strong>Patience</strong><span>Les candidats restent classés par horaire.</span></div>
+        <div class="ultimate-side"><strong>Patience</strong><span>Mieux vaut zéro pari qu'un mauvais pari.</span></div>
       `;
       return;
     }
@@ -5325,10 +5391,19 @@
       .split(/(?<=\.)\s+/)
       .slice(0, 2)
       .join(' ');
+    // Sprint 72 A4 — Countdown pulse selon proximité
+    const ts = Date.parse(row.start || '');
+    const minutesUntil = Number.isFinite(ts) ? Math.max(0, Math.round((ts - Date.now()) / 60000)) : null;
+    let countdownClass = '';
+    if (minutesUntil !== null) {
+      if (minutesUntil <= 5) countdownClass = 'countdown-imminent';
+      else if (minutesUntil <= 30) countdownClass = 'countdown-soon';
+      else if (minutesUntil <= 120) countdownClass = 'countdown-warm';
+    }
     wrap.innerHTML = `
       <div class="ultimate-hero-media"><img src="${escapeHtml(visualSvgUrl(row.title, row, { wide: true }))}" alt=""></div>
       <div class="ultimate-copy">
-        <span class="eyebrow">Bet ultime du jour</span>
+        <span class="eyebrow">🎯 Bet du jour · #1 sur ${formatCount(rows.length)} paris analysés</span>
         <h3>${escapeHtml(row.title)}</h3>
         ${matchVisualHtml(row, 'match-visual hero')}
         ${actionPickHtml(row)}
@@ -5344,11 +5419,11 @@
         </div>
       </div>
       <div class="ultimate-side">
-        <strong>${escapeHtml(countdownLabel(row.start))}</strong>
+        <strong class="ultimate-countdown ${countdownClass}">${escapeHtml(countdownLabel(row.start))}</strong>
         <span>${escapeHtml(formatDateLabel(row.start))}</span>
-        <button type="button" class="ghost-btn focus-mode-btn" data-focus-pick-key="${escapeHtml(userBetKey(row))}">Mode focus</button>
-        ${winamaxOpenButtonHtml(row, 'Ouvrir Winamax')}
-        ${trackButtonHtml(row, `Je mise ${visibleStakeText(row)}`)}
+        <button type="button" class="ghost-btn focus-mode-btn" data-focus-pick-key="${escapeHtml(userBetKey(row))}">🎯 Mode focus</button>
+        ${winamaxOpenButtonHtml(row, '🚀 Ouvrir Winamax')}
+        ${trackButtonHtml(row, `✓ Je mise ${visibleStakeText(row)}`)}
       </div>
     `;
   }
@@ -11189,6 +11264,33 @@
     const modal = $('#match-modal');
     $('#modal-title').textContent = row.title;
     $('#modal-subtitle').textContent = `${row.sport} · ${row.league} · ${formatDateLabel(row.start)}`;
+    // Sprint 72 B3 — Breadcrumbs : Aujourd'hui > Sport > Ligue > Pari
+    const breadcrumbs = $('#modal-breadcrumbs');
+    if (breadcrumbs) {
+      const ts = Date.parse(row.start || '');
+      const dayLabel = (() => {
+        if (!Number.isFinite(ts)) return 'Toutes dates';
+        const now = new Date();
+        const target = new Date(ts);
+        const diff = Math.floor((target - now) / (24 * 60 * 60 * 1000));
+        if (diff < 1 && target.getDate() === now.getDate()) return "Aujourd'hui";
+        if (diff < 2) return 'Demain';
+        if (diff >= 2 && diff <= 6) return target.toLocaleDateString('fr-FR', { weekday: 'long' });
+        return target.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
+      })();
+      const sportLabel = String(row.sport || '').slice(0, 1).toUpperCase() + String(row.sport || '').slice(1);
+      const leagueLabel = String(row.league || '').slice(0, 40);
+      const betLabel = userBetLabel(row) || row.label || '';
+      breadcrumbs.innerHTML = [
+        dayLabel,
+        sportLabel,
+        leagueLabel,
+        `<span class="crumb-final">${escapeHtml(betLabel)}</span>`
+      ].filter(Boolean).map((s, i, arr) => {
+        const sep = i < arr.length - 1 ? '<span class="crumb-sep">›</span>' : '';
+        return s.startsWith('<span') ? `<span>${s}</span>${sep}` : `<span>${escapeHtml(s)}</span>${sep}`;
+      }).join('');
+    }
     $('#modal-content').innerHTML = buildDetailHtml(row);
     switchDetailTab('summary');
     applyExpertMode();
@@ -12064,6 +12166,21 @@
                 <ul class="key-reasons-list">
                   ${bullets.map((b) => `<li><span class="key-reason-icon">${escapeHtml(b.icon)}</span><span class="key-reason-text">${escapeHtml(b.text)}</span></li>`).join('')}
                 </ul>` : '';
+            })()}
+            ${(() => {
+              // Sprint 72 D9 — Checklist visuelle (8 dimensions max ✅⚠️❌)
+              const checks = whyChecklistBullets(row);
+              if (!checks.length) return '';
+              return `
+                <div class="why-checklist">
+                  <span class="why-checklist-title">Critères clés</span>
+                  <ul>
+                    ${checks.map((c) => {
+                      const sign = c.tone === 'ok' ? '✓' : c.tone === 'warn' ? '!' : '✗';
+                      return `<li class="why-check why-${escapeHtml(c.tone)}"><span class="why-sign">${sign}</span><span class="why-icon">${escapeHtml(c.icon)}</span><span class="why-label">${escapeHtml(c.label)}</span><span class="why-detail">${escapeHtml(c.detail)}</span></li>`;
+                    }).join('')}
+                  </ul>
+                </div>`;
             })()}
             <div class="ultimate-tags detail-priority-strip">
               ${priorityBadgeHtml(row)}
@@ -16201,6 +16318,28 @@
       if (event.key === 'ArrowLeft') { event.preventDefault(); navigateModal('prev'); }
       else if (event.key === 'ArrowRight') { event.preventDefault(); navigateModal('next'); }
     });
+    // Sprint 72 B4 — Sub-tabs Bilan (filter sections par focus)
+    const HISTORY_SUBTAB_KEY = 'parisSportif.historySubtab';
+    function applyHistorySubtab(name) {
+      const valid = ['overview', 'my-month', 'patterns', 'accounting'];
+      const target = valid.includes(name) ? name : 'overview';
+      $$('.history-subtab').forEach((btn) => {
+        btn.classList.toggle('active', btn.dataset.historySubtab === target);
+        btn.setAttribute('aria-selected', btn.dataset.historySubtab === target ? 'true' : 'false');
+      });
+      $$('.history-section').forEach((el) => {
+        el.classList.toggle('history-section-hidden', el.dataset.historySection !== target);
+      });
+      try { localStorage.setItem(HISTORY_SUBTAB_KEY, target); } catch { /* noop */ }
+    }
+    try {
+      const saved = localStorage.getItem(HISTORY_SUBTAB_KEY) || 'overview';
+      applyHistorySubtab(saved);
+    } catch { applyHistorySubtab('overview'); }
+    $$('.history-subtab').forEach((btn) => {
+      btn.addEventListener('click', () => applyHistorySubtab(btn.dataset.historySubtab));
+    });
+
     // Sprint 69 — Cmd-K palette : Cmd/Ctrl+K pour ouvrir
     document.addEventListener('keydown', (event) => {
       const isMeta = event.ctrlKey || event.metaKey;

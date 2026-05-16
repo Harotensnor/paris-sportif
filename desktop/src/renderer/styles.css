@@ -3099,6 +3099,235 @@ body.theme-light .pari-extras-chip {
   background: rgba(15, 23, 42, .08);
 }
 
+/* Sprint 72 A4 — Countdown pulse selon proximite kickoff */
+.ultimate-countdown {
+  display: inline-block;
+  transition: color .2s ease;
+}
+
+.ultimate-countdown.countdown-warm {
+  color: #fbbf24;
+}
+
+.ultimate-countdown.countdown-soon {
+  color: #f59e0b;
+  font-weight: 700;
+}
+
+.ultimate-countdown.countdown-imminent {
+  color: #ef4444;
+  font-weight: 700;
+  animation: countdown-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes countdown-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.05); opacity: .85; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ultimate-countdown.countdown-imminent { animation: none; }
+}
+
+body.theme-light .ultimate-countdown.countdown-warm { color: #c2410c; }
+body.theme-light .ultimate-countdown.countdown-soon { color: #b45309; }
+body.theme-light .ultimate-countdown.countdown-imminent { color: #b91c1c; }
+
+/* Sprint 72 A7 — Hint J+1 dans empty state */
+.next-day-hint {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(99, 102, 241, .08);
+  border-left: 3px solid var(--accent);
+  font-size: 13px;
+  color: var(--text);
+}
+
+body.theme-light .next-day-hint {
+  background: rgba(99, 102, 241, .05);
+}
+
+/* Sprint 72 B4 — Sub-tabs Bilan */
+.history-subtabs {
+  display: flex;
+  gap: 6px;
+  margin: 4px 0 18px;
+  padding: 4px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .03);
+  border: 1px solid var(--line);
+  overflow-x: auto;
+}
+
+.history-subtab {
+  flex: 1 0 auto;
+  min-width: 120px;
+  padding: 10px 14px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease, border-color .15s ease;
+  white-space: nowrap;
+}
+
+.history-subtab:hover {
+  background: rgba(99, 102, 241, .08);
+  color: var(--text);
+}
+
+.history-subtab.active {
+  background: linear-gradient(135deg, rgba(99, 102, 241, .15), rgba(99, 102, 241, .05));
+  color: var(--text);
+  border-color: rgba(99, 102, 241, .35);
+}
+
+.history-section-hidden {
+  display: none !important;
+}
+
+body.theme-light .history-subtabs {
+  background: rgba(15, 23, 42, .03);
+}
+
+body.theme-light .history-subtab.active {
+  background: linear-gradient(135deg, rgba(99, 102, 241, .12), rgba(99, 102, 241, .04));
+}
+
+/* Sprint 72 B3 — Breadcrumbs dans modal */
+.modal-breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--muted);
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+
+.modal-breadcrumbs span {
+  display: inline-flex;
+  align-items: center;
+}
+
+.modal-breadcrumbs .crumb-sep {
+  color: rgba(148, 163, 184, .5);
+  font-size: 10px;
+}
+
+.modal-breadcrumbs .crumb-final {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* Sprint 72 D9 — Why checklist visuelle */
+.why-checklist {
+  margin: 14px 0;
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, .025);
+  border: 1px solid var(--line);
+}
+
+.why-checklist-title {
+  display: block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.why-checklist ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 6px;
+}
+
+.why-check {
+  display: grid;
+  grid-template-columns: 18px 18px 1fr auto;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  font-size: 12px;
+  min-width: 0;
+}
+
+.why-check .why-sign {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.why-check .why-icon { font-size: 14px; }
+
+.why-check .why-label {
+  color: var(--text);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.why-check .why-detail {
+  color: var(--muted);
+  font-size: 11px;
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 130px;
+}
+
+.why-check.why-ok {
+  background: rgba(16, 185, 129, .08);
+  border: 1px solid rgba(16, 185, 129, .3);
+}
+
+.why-check.why-ok .why-sign {
+  background: #10b981;
+  color: white;
+}
+
+.why-check.why-warn {
+  background: rgba(245, 158, 11, .08);
+  border: 1px solid rgba(245, 158, 11, .35);
+}
+
+.why-check.why-warn .why-sign {
+  background: #f59e0b;
+  color: white;
+}
+
+.why-check.why-bad {
+  background: rgba(239, 68, 68, .08);
+  border: 1px solid rgba(239, 68, 68, .35);
+}
+
+.why-check.why-bad .why-sign {
+  background: #ef4444;
+  color: white;
+}
+
+body.theme-light .why-checklist {
+  background: rgba(15, 23, 42, .025);
+}
+
 .modal-head h3,
 .modal-head p {
   margin: 0;

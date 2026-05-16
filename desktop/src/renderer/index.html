@@ -545,34 +545,41 @@
             <button class="ghost-btn" id="export-user-bets-btn-history" type="button">⬇ Exporter mes paris</button>
           </div>
         </div>
-        <div class="model-performance-grid" id="model-performance-grid">
+        <!-- Sprint 72 B4 — Sub-tabs Bilan : filtre les sections par focus -->
+        <div class="history-subtabs" role="tablist" aria-label="Vues du bilan">
+          <button class="history-subtab active" data-history-subtab="overview" type="button">📈 Vue d'ensemble</button>
+          <button class="history-subtab" data-history-subtab="my-month" type="button">📅 Mon mois</button>
+          <button class="history-subtab" data-history-subtab="patterns" type="button">🎯 Patterns</button>
+          <button class="history-subtab" data-history-subtab="accounting" type="button">💰 Comptabilité</button>
+        </div>
+        <div class="model-performance-grid history-section" data-history-section="overview" id="model-performance-grid">
           <div class="empty">Chargement performance modèle...</div>
         </div>
-        <div id="my-month-card"></div>
-        <div id="my-month-insights"></div>
-        <div class="section-head compact">
+        <div class="history-section" data-history-section="my-month" id="my-month-card"></div>
+        <div class="history-section" data-history-section="my-month" id="my-month-insights"></div>
+        <div class="history-section section-head compact" data-history-section="accounting">
           <div>
             <h3>Comptabilité bankroll</h3>
             <p>ROI réel avec dépôts/retraits, séparé du ROI des paris suivis.</p>
           </div>
         </div>
-        <div class="model-performance-grid" id="bankroll-accounting-grid">
+        <div class="history-section model-performance-grid" data-history-section="accounting" id="bankroll-accounting-grid">
           <div class="empty">Comptabilité bankroll en attente.</div>
         </div>
-        <div class="tracked-bets-chart" id="bankroll-projection-chart"></div>
-        <div class="section-head compact">
+        <div class="history-section tracked-bets-chart" data-history-section="accounting" id="bankroll-projection-chart"></div>
+        <div class="history-section section-head compact" data-history-section="accounting">
           <div>
             <h3>Budget jour & simulation</h3>
             <p>Allocation des picks prioritaires et paper trading 30 jours.</p>
           </div>
         </div>
-        <div class="model-performance-grid" id="bankroll-allocation-grid">
+        <div class="history-section model-performance-grid" data-history-section="accounting" id="bankroll-allocation-grid">
           <div class="empty">Allocation bankroll en attente.</div>
         </div>
-        <div class="model-performance-grid" id="paper-simulation-grid">
+        <div class="history-section model-performance-grid" data-history-section="accounting" id="paper-simulation-grid">
           <div class="empty">Simulation 30 jours en attente.</div>
         </div>
-        <div class="model-performance-grid" id="model-vs-user-grid">
+        <div class="history-section model-performance-grid" data-history-section="overview" id="model-vs-user-grid">
           <div class="empty">Comparaison modèle/toi en attente.</div>
         </div>
         <div class="section-head compact">
@@ -1484,6 +1491,7 @@
       <header class="modal-head">
         <div>
           <div class="eyebrow">Détail match</div>
+          <div class="modal-breadcrumbs" id="modal-breadcrumbs" aria-label="Fil d'Ariane"></div>
           <h3 id="modal-title">Match</h3>
           <p id="modal-subtitle"></p>
         </div>
