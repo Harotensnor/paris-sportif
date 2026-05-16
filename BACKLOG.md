@@ -1,5 +1,34 @@
 # Backlog — post v35.502
 
+## P1 — Desktop Sprint 72 différés (plan UX/pronostics maximum)
+
+Items du plan d'amélioration "tout" mais non-faisables en une session :
+
+### Pronostics premium (nécessitent données externes)
+- **C2 — Calibration multi-sport per-market** (tennis jeux/sets, baseball NRFI/runline, hockey puckline, basket handicap/total) — exige `picks_history.jsonl` enrichi par sport (actuellement 96% football). Sample n>=30 par marché-sport nécessaire. **Effort L** (1-2j) ; **pré-requis** : étendre `snapshot_odds.py` à capturer cotes per-marché multi-sport.
+- **C4 — Sharp money tracking via TheOddsAPI** — TheOddsAPI free tier 500 calls/mois suffisant pour ~10 ligues quotidien. Nécessite secret `THE_ODDS_API_KEY` + fetcher `scripts/fetch_sharp_money.py` qui compare Winamax vs Pinnacle (proxy sharp). **Effort M** (3-4h) ; impact direct sur la confiance des picks.
+- **C5 — Multi-bookmaker comparison** — mêmes données TheOddsAPI, affichage "best odd: 2.10 chez Unibet vs 1.95 Winamax (+8%)". User reste Winamax-only mais voit le coût d'opportunité. **Effort M** (3h).
+- **C7 — Live picks <30min** — pipeline live continu (refresh ciblé toutes les 5 min sur matchs proches kickoff). Surface cote movement (↑↓ %) sur la card. **Effort M** (4-5h) ; **pré-requis** : fetcher live qui ne touche que les events < 30 min.
+
+### Fiches match
+- **D2 — H2H expanded** (10 derniers H2H avec scores cliquables, streak detection). Nécessite `h2h_extended.json` enrichi avec scores. **Effort M** (3h).
+- **D3 — Compositions visuelles 11vs11 enrichies** : terrain SVG avec positions, star players highlight. Sprint 60 a posé `buildPitchColumn`, à étendre. **Effort M** (3-4h).
+- **D4 — Player props inline** : "Mbappé buteur @2.10 · 47% modèle" sous le terrain. Nécessite cross-link `winamax_markets.scorer` ↔ lineups confirmées. **Effort M** (3h).
+- **D6 — Arbitre profile complet** (5 derniers matchs cartons/fautes/penaltys). Nécessite `referees_soccer.json` enrichi avec last_5_matches. Actuellement on a `yellowPerGame` global, à étendre. **Effort S** (2h).
+- **D7 — Historique cotes Winamax 72h** (courbe ouverture vs closing). Nécessite `odds_history.jsonl` ré-indexé par match_id avec timestamps. **Effort M** (3h).
+- **D8 — Mode tactique** (formation visuelle, heatmap zones force/faiblesse) — chantier original. **Effort L** (1j).
+- **D10 — Modal preview au hover** (mini-popover 3 KPIs sans ouvrir la modale). **Effort M** (3h).
+
+### Performance & robustesse
+- **E1 — Lazy-load winamax_markets.json post-boot** : dashboard avec data lite d'abord, hydrate markets après. Boot 38s → ~10s. **Effort M** (3-4h).
+- **E2 — JSDOM cache séparé** du analysisCache : invalidation granulaire au lieu de tout refaire. **Effort M** (3h).
+- **E3 — Pre-computed picks JSON** : pipeline Python pré-calcule `desktop_dashboard.json` qui contient tous les picks ranked. Electron lit juste ce JSON. Boot ~3s. **Effort L** (1j).
+
+### Personnalisation
+- **F3 — Notifications custom** ("Notifie-moi si PSG joue + edge >3pt") via règles user-defined. **Effort M** (3h).
+- **F5 — Sync multi-device** via Gist privé GitHub. **Effort L** (1j).
+- **F7 — Goals & achievements** badges progressifs ("10 paris suivis", "7 jours streak"). **Effort S** (2h).
+
 ## P0 — Desktop Sprint 71 différé (gros chantier 1-2 jours)
 
 **ESM split `desktop/src/engine/runtime/legacy-app.js`** (36 976 lignes, 1.93 MB)

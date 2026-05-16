@@ -1376,6 +1376,14 @@
               <button class="ghost-btn hidden" id="merge-profile-btn" type="button">Fusionner</button>
               <button class="ghost-btn hidden" id="replace-profile-btn" type="button">Remplacer</button>
             </div>
+            <!-- Sprint 72 G5 — Export logs erreurs pour debug -->
+            <hr class="profile-divider">
+            <p class="match-sub">Logs d'erreur JS capturés en local (max 50 dernières). Utile pour debug si un bug est reproductible.</p>
+            <div class="section-actions">
+              <button class="ghost-btn" id="export-error-logs-btn" type="button">📋 Exporter logs erreurs</button>
+              <button class="ghost-btn" id="clear-error-logs-btn" type="button">🗑 Vider les logs</button>
+            </div>
+            <p class="match-sub" id="error-logs-count">Aucun log d'erreur capturé.</p>
           </article>
         </div>
         <div class="section-head compact">

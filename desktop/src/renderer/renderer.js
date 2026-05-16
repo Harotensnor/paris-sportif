@@ -16196,6 +16196,41 @@
     });
     $('#export-profile-btn')?.addEventListener('click', exportProfile);
     $('#import-profile-btn')?.addEventListener('click', () => $('#profile-import-input')?.click());
+    // Sprint 72 G5 — Export / clear logs erreurs
+    const refreshErrorLogsCount = () => {
+      try {
+        const raw = localStorage.getItem('paris_sportif_js_errors_v1');
+        const arr = raw ? JSON.parse(raw) : [];
+        const n = Array.isArray(arr) ? arr.length : 0;
+        const node = $('#error-logs-count');
+        if (node) node.textContent = n === 0 ? 'Aucun log d\'erreur capturé.' : `${n} log(s) d'erreur capturé(s) localement.`;
+      } catch { /* noop */ }
+    };
+    refreshErrorLogsCount();
+    $('#export-error-logs-btn')?.addEventListener('click', () => {
+      try {
+        const raw = localStorage.getItem('paris_sportif_js_errors_v1') || '[]';
+        const blob = new Blob([raw], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `paris-sportif-errors-${new Date().toISOString().slice(0, 10)}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast('📋 Logs d\'erreur exportés', a.download, 'ok');
+      } catch (e) { setSideStatus('Export logs impossible', 'danger'); }
+    });
+    $('#clear-error-logs-btn')?.addEventListener('click', async () => {
+      const ok = typeof window._showConfirm === 'function'
+        ? await window._showConfirm({ title: 'Vider les logs ?', body: 'Cette action efface tous les logs d\'erreur stockés localement.', confirmLabel: 'Vider', cancelLabel: 'Annuler', danger: true })
+        : true;
+      if (!ok) return;
+      try { localStorage.removeItem('paris_sportif_js_errors_v1'); } catch { /* noop */ }
+      refreshErrorLogsCount();
+      showToast('🗑 Logs d\'erreur vidés', '', 'info');
+    });
     $('#profile-import-input')?.addEventListener('change', async (event) => {
       const file = event.target.files && event.target.files[0];
       if (!file) return;

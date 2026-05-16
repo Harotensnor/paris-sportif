@@ -5,6 +5,35 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 72 — Plan UX/pronostics maximum (Rounds 1-5)
+
+Implémentation du plan complet "améliorer UX au maximum + pronostics + fiches match" en 4 rounds d'exécution + 1 round documentation.
+
+**Round 1 — Backtest cron + Hero bet + Sub-tabs Bilan + Why checklist**
+- C9 : workflow `desktop-recalibrate.yml` (cron lundi 03h UTC) regénère `prob_calibration.json` avec bins per-market + validation auto via `calibration-check.js`.
+- A1 : Hero "🎯 Bet du jour" avec eyebrow "#1 sur N paris analysés", empty state enrichi (hint J+1), CTAs avec emojis "🚀 Ouvrir Winamax" / "✓ Je mise".
+- A4 : Countdown pulse selon proximité (`warm` jaune <2h → `soon` orange <30min → `imminent` rouge pulse <5min).
+- B3 : Modal breadcrumbs "Aujourd'hui › Sport › Ligue › Pari" en haut.
+- B4 : Sub-tabs Bilan 4 vues (Vue d'ensemble / Mon mois / Patterns / Comptabilité) avec localStorage persist.
+- D9 : `whyChecklistBullets(row)` checklist visuelle ✅/⚠️/❌ sur 8 dimensions (forme, edge, segment, cote Winamax, sharp money, météo, lineups, news).
+
+**Round 2 — Bandeau temporel 3 zones**
+- A3 : Strip "⚡ Maintenant (<1h) / ⏰ Aujourd'hui (1-12h) / 🌙 Demain (>12h)" en tête du dashboard avec compteurs live calculés depuis `dashboardPicks`. Halos radiaux colorés par zone (rouge/orange/indigo).
+
+**Round 3 — Pronostics premium**
+- C3 : Wilson 95% CI affiché dans la modal hero (helper `wilsonCi(wins, n, z=1.96)` exposé window). Barre de confiance gradient indigo→vert + IC segment "24-38%" si sample ≥ 5.
+- C6 : Bandeau hedging "⚠ Tu as déjà N paris en cours sur ce match" si user a déjà des paris pending sur le même matchId. Liste les paris existants.
+- C8 : Combos décorrélés déjà Sprint 71 (`combinationCorrelation` existant).
+- C10 : Carte Brier dans Bilan overview. 4 tiers (Excellent <0.18 / Bon <0.22 / Moyen <0.27 / Faible). Meter gradient vert→jaune→rouge sur 0-0.50. Advice contextuel par tier.
+
+**Round 4 — Robustesse**
+- G5 : Export/clear logs erreurs dans Réglages > Profil. Lit `localStorage.paris_sportif_js_errors_v1` (déjà alimenté par `logSafeError`), download JSON, compteur "N logs capturés", clear avec confirm.
+
+**Round 5 — Items différés documentés**
+- 14 items P1 documentés dans `BACKLOG.md` avec effort + pré-requis (C2 multi-sport, C4 sharp money, C5 multi-bookmaker, C7 live picks, D2/D3/D4/D6/D7/D8/D10 fiches match, E1/E2/E3 perf, F3/F5/F7 personnalisation). Nécessitent des données externes (TheOddsAPI) ou des refactors > 3h.
+
+Engine OK : 171 matchs, 94 picks. Tous tests verts (engine-contract, calibration-check, safe-assessment-check).
+
 ### Sprint 71 — Top 10 audit final fixes : cleanup, hook, focus, edge, lazy, catches, mobile, ESM
 
 Réponse à l'audit final (top 10 prochains chantiers post Sprint 60-70). Tous les chantiers XS+S+M traités, le L (ESM split) documenté dans BACKLOG.md.
