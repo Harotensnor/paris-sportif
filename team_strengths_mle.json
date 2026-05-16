@@ -1,39 +1,45 @@
 {
-  "generated_at": "2026-05-16T06:59:44Z",
+  "generated_at": "2026-05-16T07:08:02Z",
   "method": "Full Bivariate Poisson MLE Dixon-Coles. Coordinate-descent avec golden-section search 1D. Pure Python (pas de scipy).",
   "min_matches_per_league": 40,
   "min_matches_per_team": 5,
   "n_leagues_fit": 1,
   "leagues": {
     "jpn.1": {
-      "n_matches": 42,
-      "n_teams": 4,
-      "gamma": 0.3336,
-      "rho": -0.2793,
-      "log_lik": -112.87,
+      "n_matches": 43,
+      "n_teams": 5,
+      "gamma": 0.2529,
+      "rho": -0.2984,
+      "log_lik": -111.98,
       "iterations": 2,
       "teams": {
         "Cerezo Osaka": {
-          "alpha": -0.1898,
-          "beta": 0.1945,
+          "alpha": -0.0251,
+          "beta": -0.0831,
           "rank_off": 4,
           "rank_def": 3
         },
         "Mito Hollyhock": {
-          "alpha": -0.0807,
-          "beta": -0.6565,
+          "alpha": -0.0158,
+          "beta": -0.9133,
           "rank_off": 3,
           "rank_def": 1
         },
+        "Tokyo Verdy 1969": {
+          "alpha": -0.6113,
+          "beta": 1.0929,
+          "rank_off": 5,
+          "rank_def": 5
+        },
         "Urawa Red Diamonds": {
-          "alpha": 0.2142,
-          "beta": 0.6321,
+          "alpha": 0.3882,
+          "beta": 0.3453,
           "rank_off": 1,
           "rank_def": 4
         },
         "V-Varen Nagasaki": {
-          "alpha": 0.0563,
-          "beta": -0.1701,
+          "alpha": 0.264,
+          "beta": -0.4419,
           "rank_off": 2,
           "rank_def": 2
         }
