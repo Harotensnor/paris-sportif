@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-05-16T21:22:43Z",
+  "generated_at": "2026-05-16T21:29:33Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 67,
+    "active_events": 66,
     "actionable": 22,
     "watch": 4,
-    "risk": 41,
+    "risk": 40,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 20,
-      "market_move": 12,
-      "market_uncertain": 43,
+      "market_move": 11,
+      "market_uncertain": 41,
       "signal_conflict": 6,
       "back_to_back_travel": 6
     },
     "by_quality": {
       "actionable": 22,
       "watch": 4,
-      "risk": 41
+      "risk": 40
     }
   },
   "active_actionable": [
@@ -89,11 +89,11 @@
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
       "type": "market_move",
-      "direction": "drift",
+      "direction": "steam",
       "team": null,
-      "side": "away",
+      "side": "home",
       "strength": 1.0,
-      "context": "Cote away: 2.05 -> 2.80 (-36.6%)"
+      "context": "Cote home: 1.60 -> 1.30 (+18.8%)"
     },
     {
       "event_id": "401815375",
@@ -129,7 +129,7 @@
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 12.50 -> 17.00 (-36.0%)"
+      "context": "Cote home: 12.50 -> 15.00 (-20.0%)"
     },
     {
       "event_id": "401815379",
@@ -165,7 +165,7 @@
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 1.03 -> 1.78 (-72.8%)"
+      "context": "Cote home: 1.03 -> 1.80 (-74.8%)"
     },
     {
       "event_id": "401815387",
@@ -566,24 +566,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 12.2%"
-    },
-    {
-      "event_id": "175444",
-      "date": "2026-05-18T04:00Z",
-      "sport": "tennis",
-      "league_code": "bitpandahamburgopen",
-      "league_name": "Bitpanda Hamburg Open",
-      "home": "",
-      "away": "",
-      "match": "? - ?",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 12.0%"
     },
     {
       "event_id": "176115",
