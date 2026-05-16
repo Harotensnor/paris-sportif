@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-16T22:15:25Z",
+  "generated_at": "2026-05-16T22:18:43Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -15,17 +15,17 @@
           "market": "pitcher_strikeouts",
           "team": "Cleveland Guardians",
           "pitcher": "Joey Cantillo",
-          "label": "Joey Cantillo plus de 4,5 strikeouts",
+          "label": "Joey Cantillo moins de 4,5 strikeouts",
           "line": 4.5,
-          "pick": "over",
-          "probability": 0.5078,
-          "fair_odds": 1.97,
-          "expected_strikeouts": 4.53,
-          "projected_ip": 5.01,
+          "pick": "under",
+          "probability": 0.6002,
+          "fair_odds": 1.67,
+          "expected_strikeouts": 4.1,
+          "projected_ip": 4.6,
           "inputs": {
-            "k9": 8.14,
-            "era": 2.98,
-            "whip": 1.32,
+            "k9": 8.02,
+            "era": 2.93,
+            "whip": 1.33,
             "hand": "L"
           },
           "side": "home"
@@ -36,14 +36,14 @@
           "pitcher": "Joey Cantillo",
           "label": "Joey Cantillo ne concède pas de home run",
           "pick": "no",
-          "probability": 0.5762,
-          "fair_odds": 1.74,
-          "expected_hr_allowed": 0.551,
-          "projected_ip": 5.01,
+          "probability": 0.606,
+          "fair_odds": 1.65,
+          "expected_hr_allowed": 0.501,
+          "projected_ip": 4.6,
           "inputs": {
-            "hr9": 0.99,
-            "era": 2.98,
-            "whip": 1.32
+            "hr9": 0.98,
+            "era": 2.93,
+            "whip": 1.33
           },
           "side": "home"
         },
@@ -1414,6 +1414,42 @@
             "whip": 1.13
           },
           "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Texas Rangers",
+          "pitcher": "Nathan Eovaldi",
+          "label": "Nathan Eovaldi plus de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "over",
+          "probability": 0.5665,
+          "fair_odds": 1.77,
+          "expected_strikeouts": 5.81,
+          "projected_ip": 5.9,
+          "inputs": {
+            "k9": 8.87,
+            "era": 4.15,
+            "whip": 1.17,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Texas Rangers",
+          "pitcher": "Nathan Eovaldi",
+          "label": "Nathan Eovaldi concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.7103,
+          "fair_odds": 1.41,
+          "expected_hr_allowed": 1.239,
+          "projected_ip": 5.9,
+          "inputs": {
+            "hr9": 1.89,
+            "era": 4.15,
+            "whip": 1.17
+          },
+          "side": "away"
         }
       ]
     },
@@ -1756,7 +1792,7 @@
       ]
     }
   ],
-  "props": 84,
+  "props": 86,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
