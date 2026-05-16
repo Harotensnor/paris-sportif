@@ -1,23 +1,24 @@
 {
-  "generated_at": "2026-05-16T21:10:47Z",
+  "generated_at": "2026-05-16T21:15:02Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 64,
-    "actionable": 20,
-    "watch": 3,
+    "active_events": 67,
+    "actionable": 22,
+    "watch": 4,
     "risk": 41,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 20,
-      "back_to_back_travel": 8,
-      "market_uncertain": 41,
-      "signal_conflict": 3
+      "market_move": 12,
+      "market_uncertain": 42,
+      "signal_conflict": 5,
+      "back_to_back_travel": 6
     },
     "by_quality": {
-      "actionable": 20,
-      "watch": 3,
+      "actionable": 22,
+      "watch": 4,
       "risk": 41
     }
   },
@@ -41,6 +42,24 @@
       "context": "Absences severes 15-7"
     },
     {
+      "event_id": "401871409",
+      "date": "2026-05-17T00:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Montreal Canadiens",
+      "away": "Buffalo Sabres",
+      "match": "Montreal Canadiens - Buffalo Sabres",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 1.56 -> 1.90 (-22.1%)"
+    },
+    {
       "event_id": "401815372",
       "date": "2026-05-17T01:38Z",
       "sport": "baseball",
@@ -57,6 +76,24 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 7-13"
+    },
+    {
+      "event_id": "401815378",
+      "date": "2026-05-17T16:15Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Tampa Bay Rays",
+      "away": "Miami Marlins",
+      "match": "Tampa Bay Rays - Miami Marlins",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "away",
+      "strength": 1.0,
+      "context": "Cote away: 2.05 -> 2.90 (-41.5%)"
     },
     {
       "event_id": "401815375",
@@ -77,6 +114,24 @@
       "context": "Absences severes 8-13"
     },
     {
+      "event_id": "401815380",
+      "date": "2026-05-17T17:35Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Pittsburgh Pirates",
+      "away": "Philadelphia Phillies",
+      "match": "Pittsburgh Pirates - Philadelphia Phillies",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 12.50 -> 15.00 (-20.0%)"
+    },
+    {
       "event_id": "401815379",
       "date": "2026-05-17T17:40Z",
       "sport": "baseball",
@@ -93,6 +148,24 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 15-7"
+    },
+    {
+      "event_id": "401815383",
+      "date": "2026-05-17T18:15Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "St. Louis Cardinals",
+      "away": "Kansas City Royals",
+      "match": "St. Louis Cardinals - Kansas City Royals",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 1.03 -> 1.78 (-72.8%)"
     },
     {
       "event_id": "401815387",
@@ -145,48 +218,12 @@
       "direction": "fade",
       "team": "San Diego Padres",
       "side": "away",
-      "strength": 0.952,
-      "context": "2 match dans les 48h + 1711 km de voyage"
-    },
-    {
-      "event_id": "401815376",
-      "date": "2026-05-17T17:35Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Atlanta Braves",
-      "away": "Boston Red Sox",
-      "match": "Atlanta Braves - Boston Red Sox",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Boston Red Sox",
-      "side": "away",
-      "strength": 0.91,
-      "context": "2 match dans les 48h + 1498 km de voyage"
-    },
-    {
-      "event_id": "401815373",
-      "date": "2026-05-16T23:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Seattle Mariners",
-      "away": "San Diego Padres",
-      "match": "Seattle Mariners - San Diego Padres",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "San Diego Padres",
-      "side": "away",
       "strength": 0.872,
       "context": "1 match dans les 48h + 1711 km de voyage"
     },
     {
-      "event_id": "401815361",
-      "date": "2026-05-16T23:15Z",
+      "event_id": "401815376",
+      "date": "2026-05-17T17:35Z",
       "sport": "baseball",
       "league_code": "mlb",
       "league_name": "MLB",
@@ -255,24 +292,6 @@
       "side": null,
       "strength": 0.8,
       "context": "Absences severes 3-7"
-    },
-    {
-      "event_id": "401815383",
-      "date": "2026-05-17T18:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "St. Louis Cardinals",
-      "away": "Kansas City Royals",
-      "match": "St. Louis Cardinals - Kansas City Royals",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Kansas City Royals",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 2-6"
     },
     {
       "event_id": "401815386",
@@ -381,9 +400,45 @@
       "side": "away",
       "strength": 0.726,
       "context": "1 match dans les 48h + 979 km de voyage"
+    },
+    {
+      "event_id": "401815373",
+      "date": "2026-05-16T23:15Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Seattle Mariners",
+      "away": "San Diego Padres",
+      "match": "Seattle Mariners - San Diego Padres",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.66,
+      "context": "Cote away: 2.44 -> 2.15 (+11.9%)"
     }
   ],
   "active_watch": [
+    {
+      "event_id": "401872571",
+      "date": "2026-05-17T01:07Z",
+      "sport": "football",
+      "league_code": "ligamx",
+      "league_name": "Liga MX",
+      "home": "Guadalajara",
+      "away": "Cruz Azul",
+      "match": "Guadalajara - Cruz Azul",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.608,
+      "context": "Cote away: 3.20 -> 2.85 (+10.9%)"
+    },
     {
       "event_id": "401815370",
       "date": "2026-05-16T23:10Z",
@@ -403,24 +458,6 @@
       "context": "Absences severes 14-11"
     },
     {
-      "event_id": "401815378",
-      "date": "2026-05-17T16:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Tampa Bay Rays",
-      "away": "Miami Marlins",
-      "match": "Tampa Bay Rays - Miami Marlins",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Tampa Bay Rays",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 8-5"
-    },
-    {
       "event_id": "401815385",
       "date": "2026-05-17T18:10Z",
       "sport": "baseball",
@@ -437,6 +474,24 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 14-11"
+    },
+    {
+      "event_id": "401856915",
+      "date": "2026-05-17T17:30Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Atlanta Dream",
+      "away": "Las Vegas Aces",
+      "match": "Atlanta Dream - Las Vegas Aces",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.515,
+      "context": "Cote away: 1.94 -> 1.76 (+9.3%)"
     }
   ],
   "active_risk": [
