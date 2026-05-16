@@ -1,24 +1,25 @@
 {
-  "generated_at": "2026-05-16T02:04:53Z",
+  "generated_at": "2026-05-16T02:08:41Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 72,
-    "actionable": 20,
+    "active_events": 70,
+    "actionable": 19,
     "watch": 6,
-    "risk": 46,
+    "risk": 45,
     "expired_sample": 0,
     "by_type": {
-      "market_uncertain": 44,
+      "market_uncertain": 42,
       "injury_imbalance": 23,
+      "market_move": 7,
       "back_to_back_travel": 9,
-      "signal_conflict": 3
+      "signal_conflict": 6
     },
     "by_quality": {
-      "risk": 46,
+      "risk": 45,
       "watch": 6,
-      "actionable": 20
+      "actionable": 19
     }
   },
   "active_actionable": [
@@ -39,6 +40,24 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 8-13"
+    },
+    {
+      "event_id": "401815362",
+      "date": "2026-05-16T22:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Cleveland Guardians",
+      "away": "Cincinnati Reds",
+      "match": "Cleveland Guardians - Cincinnati Reds",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 10.00 -> 27.00 (-170.0%)"
     },
     {
       "event_id": "401815364",
@@ -95,6 +114,24 @@
       "context": "Absences severes 8-13"
     },
     {
+      "event_id": "401815377",
+      "date": "2026-05-17T17:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Cleveland Guardians",
+      "away": "Cincinnati Reds",
+      "match": "Cleveland Guardians - Cincinnati Reds",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 10.00 -> 27.00 (-170.0%)"
+    },
+    {
       "event_id": "401815379",
       "date": "2026-05-17T17:40Z",
       "sport": "baseball",
@@ -147,6 +184,42 @@
       "side": "away",
       "strength": 0.952,
       "context": "2 match dans les 48h + 1711 km de voyage"
+    },
+    {
+      "event_id": "401815371",
+      "date": "2026-05-16T19:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Colorado Rockies",
+      "away": "Arizona Diamondbacks",
+      "match": "Colorado Rockies - Arizona Diamondbacks",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 0.926,
+      "context": "Cote home: 15.00 -> 12.50 (+16.7%)"
+    },
+    {
+      "event_id": "401815386",
+      "date": "2026-05-17T19:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Colorado Rockies",
+      "away": "Arizona Diamondbacks",
+      "match": "Colorado Rockies - Arizona Diamondbacks",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 0.926,
+      "context": "Cote home: 15.00 -> 12.50 (+16.7%)"
     },
     {
       "event_id": "401815376",
@@ -203,42 +276,6 @@
       "context": "1 match dans les 48h + 1498 km de voyage"
     },
     {
-      "event_id": "401815371",
-      "date": "2026-05-16T19:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Colorado Rockies",
-      "away": "Arizona Diamondbacks",
-      "match": "Colorado Rockies - Arizona Diamondbacks",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Arizona Diamondbacks",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 8-12"
-    },
-    {
-      "event_id": "401815362",
-      "date": "2026-05-16T22:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Cleveland Guardians",
-      "away": "Cincinnati Reds",
-      "match": "Cleveland Guardians - Cincinnati Reds",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Cincinnati Reds",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 3-7"
-    },
-    {
       "event_id": "401815374",
       "date": "2026-05-17T01:40Z",
       "sport": "baseball",
@@ -257,42 +294,6 @@
       "context": "Absences severes 5-9"
     },
     {
-      "event_id": "401815377",
-      "date": "2026-05-17T17:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Cleveland Guardians",
-      "away": "Cincinnati Reds",
-      "match": "Cleveland Guardians - Cincinnati Reds",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Cincinnati Reds",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 3-7"
-    },
-    {
-      "event_id": "401815386",
-      "date": "2026-05-17T19:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Colorado Rockies",
-      "away": "Arizona Diamondbacks",
-      "match": "Colorado Rockies - Arizona Diamondbacks",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Arizona Diamondbacks",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 8-12"
-    },
-    {
       "event_id": "401815389",
       "date": "2026-05-17T20:05Z",
       "sport": "baseball",
@@ -309,24 +310,6 @@
       "side": null,
       "strength": 0.8,
       "context": "Absences severes 5-9"
-    },
-    {
-      "event_id": "401815440",
-      "date": "2026-05-22T01:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Arizona Diamondbacks",
-      "away": "Colorado Rockies",
-      "match": "Arizona Diamondbacks - Colorado Rockies",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Arizona Diamondbacks",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 12-8"
     },
     {
       "event_id": "401815452",
@@ -495,6 +478,24 @@
   ],
   "active_risk": [
     {
+      "event_id": "401815440",
+      "date": "2026-05-22T01:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Arizona Diamondbacks",
+      "away": "Colorado Rockies",
+      "match": "Arizona Diamondbacks - Colorado Rockies",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "signal_conflict",
+      "direction": "mixed",
+      "team": null,
+      "side": null,
+      "strength": 1.0,
+      "context": "Signaux mitigés: avantage net trop faible (Arizona Diamondbacks -1.39, Colorado Rockies +0.62)"
+    },
+    {
       "event_id": "401815454",
       "date": "2026-05-23T01:40Z",
       "sport": "baseball",
@@ -531,24 +532,6 @@
       "context": "Signaux opposes: Arizona Diamondbacks fade 1.40, Colorado Rockies fade 1.32 -> prudence"
     },
     {
-      "event_id": "401856913",
-      "date": "2026-05-16T02:00Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Phoenix Mercury",
-      "away": "Chicago Sky",
-      "match": "Phoenix Mercury - Chicago Sky",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 12.4%"
-    },
-    {
       "event_id": "401859392",
       "date": "2026-05-16T07:00Z",
       "sport": "football",
@@ -582,7 +565,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 15.5%"
+      "context": "marge bookmaker anormale 14.6%"
     },
     {
       "event_id": "401859395",
@@ -619,24 +602,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 19.1%"
-    },
-    {
-      "event_id": "401842721",
-      "date": "2026-05-17T12:00Z",
-      "sport": "football",
-      "league_code": "allsvenskan",
-      "league_name": "Allsvenskan",
-      "home": "Hammarby IF",
-      "away": "Malmö FF",
-      "match": "Hammarby IF - Malmö FF",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.1%"
     },
     {
       "event_id": "401842716",
