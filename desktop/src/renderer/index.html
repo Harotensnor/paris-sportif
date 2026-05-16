@@ -240,6 +240,28 @@
           <div class="empty">Sélection du bet ultime en cours...</div>
         </section>
 
+        <!-- Sprint 72 A3 — Bandeau temporel 3 zones : Maintenant / Aujourd'hui / Demain -->
+        <section class="temporal-zones-strip" id="temporal-zones-strip" aria-label="Vue par horizon">
+          <button class="zone-btn zone-now active" data-zone="now" type="button">
+            <span class="zone-icon">⚡</span>
+            <strong class="zone-count" id="zone-count-now">-</strong>
+            <span class="zone-label">Maintenant</span>
+            <span class="zone-detail">&lt; 1h</span>
+          </button>
+          <button class="zone-btn zone-today" data-zone="today" type="button">
+            <span class="zone-icon">⏰</span>
+            <strong class="zone-count" id="zone-count-today">-</strong>
+            <span class="zone-label">Aujourd'hui</span>
+            <span class="zone-detail">1-12h</span>
+          </button>
+          <button class="zone-btn zone-tomorrow" data-zone="tomorrow" type="button">
+            <span class="zone-icon">🌙</span>
+            <strong class="zone-count" id="zone-count-tomorrow">-</strong>
+            <span class="zone-label">Demain</span>
+            <span class="zone-detail">&gt; 12h</span>
+          </button>
+        </section>
+
         <section class="ready-picks-hero" id="ready-picks-hero" aria-label="Paris à miser maintenant">
           <div class="empty">Chargement des paris à miser...</div>
         </section>

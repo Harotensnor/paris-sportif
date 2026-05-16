@@ -5363,7 +5363,28 @@
     `;
   }
 
+  // Sprint 72 A3 — Remplir les compteurs des zones temporelles
+  function renderTemporalZonesStrip(rows) {
+    const arr = Array.isArray(rows) ? rows : [];
+    const now = Date.now();
+    let n_now = 0, n_today = 0, n_tomorrow = 0;
+    for (const r of arr) {
+      const ts = Date.parse(r?.start || '');
+      if (!Number.isFinite(ts) || ts < now) continue;
+      const diffH = (ts - now) / (60 * 60 * 1000);
+      if (diffH <= 1) n_now++;
+      else if (diffH <= 12) n_today++;
+      else if (diffH <= 36) n_tomorrow++;
+    }
+    const setText = (id, v) => { const el = $(id); if (el) el.textContent = String(v); };
+    setText('#zone-count-now', n_now);
+    setText('#zone-count-today', n_today);
+    setText('#zone-count-tomorrow', n_tomorrow);
+  }
+
   function renderUltimateBet(rows) {
+    // Sprint 72 A3 — Update temporal zones strip en meme temps
+    try { renderTemporalZonesStrip(rows); } catch { /* noop */ }
     const wrap = $('#ultimate-bet-card');
     if (!wrap) return;
     const row = aiSelectedUltimate(rows) || ultimateBetCandidate(rows);
