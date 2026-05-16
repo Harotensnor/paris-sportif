@@ -87,22 +87,9 @@
       <section class="today-funnel-alert hidden" id="today-funnel-alert"></section>
 
       <section class="tab-panel active" data-panel="dashboard">
-        <section class="simple-top-strip" id="simple-top-strip">
-          <span id="simple-now">Aujourd'hui</span>
-          <strong id="simple-bankroll">50 €</strong>
-          <em id="simple-pnl">Jour 0.00 €</em>
-          <small id="simple-freshness">Données en cours</small>
-        </section>
+        <!-- Sprint 80 — IMPERATIF : RIEN au-dessus du bet ultime sur l'accueil.
+             simple-top-strip et day-summary deplaces sous le bet ultime. -->
 
-        <!-- Sprint 59 (UX simplification) : résumé en une phrase pour
-             ne plus avoir d'écran "incompréhensible". -->
-        <section class="day-summary" id="day-summary" aria-label="Résumé du jour">
-          <div class="day-summary-content">
-            <span class="day-summary-eyebrow">Aujourd'hui sur Winamax</span>
-            <strong id="day-summary-headline">Calcul du résumé du jour...</strong>
-            <p id="day-summary-detail">Le logiciel agrège les paris et le contexte.</p>
-          </div>
-        </section>
 
         <section class="morning-brief expert-only hidden" id="morning-brief" aria-label="Brief du matin">
           <div class="morning-main">
@@ -236,11 +223,32 @@
           </div>
         </div>
 
+        <!-- Sprint 80 — ORDRE STRICT : bet ultime EN PREMIER -->
         <section class="ultimate-bet-card" id="ultimate-bet-card" aria-label="Bet ultime du jour">
           <div class="empty">Sélection du bet ultime en cours...</div>
         </section>
 
-        <!-- Sprint 72 A3 — Bandeau temporel 3 zones : Maintenant / Aujourd'hui / Demain -->
+        <section class="ready-picks-hero" id="ready-picks-hero" aria-label="Paris à miser maintenant">
+          <div class="empty">Chargement des paris à miser...</div>
+        </section>
+
+        <!-- Sprint 80 — simple-top-strip et day-summary descendus ici, en mode info passive -->
+        <section class="simple-top-strip dashboard-info-strip" id="simple-top-strip">
+          <span id="simple-now">Aujourd'hui</span>
+          <strong id="simple-bankroll">50 €</strong>
+          <em id="simple-pnl">Jour 0.00 €</em>
+          <small id="simple-freshness">Données en cours</small>
+        </section>
+
+        <section class="day-summary day-summary-compact" id="day-summary" aria-label="Résumé du jour">
+          <div class="day-summary-content">
+            <span class="day-summary-eyebrow">Aujourd'hui sur Winamax</span>
+            <strong id="day-summary-headline">Calcul du résumé du jour...</strong>
+            <p id="day-summary-detail">Le logiciel agrège les paris et le contexte.</p>
+          </div>
+        </section>
+
+        <!-- Sprint 80 A7 — Temporal zones strip avec less density (passe sous le hero) -->
         <section class="temporal-zones-strip" id="temporal-zones-strip" aria-label="Vue par horizon">
           <button class="zone-btn zone-now active" data-zone="now" type="button">
             <span class="zone-icon">⚡</span>
@@ -262,11 +270,8 @@
           </button>
         </section>
 
-        <section class="ready-picks-hero" id="ready-picks-hero" aria-label="Paris à miser maintenant">
-          <div class="empty">Chargement des paris à miser...</div>
-        </section>
-
-        <section class="live-cockpit" id="live-cockpit" aria-label="Matchs en direct">
+        <!-- Sprint 80 A4 — live-cockpit avec class auto-hide-if-empty (JS gere la classe) -->
+        <section class="live-cockpit auto-hide-if-empty" id="live-cockpit" aria-label="Matchs en direct">
           <div class="empty compact-empty">Aucun match live suivi pour le moment.</div>
         </section>
 
@@ -294,7 +299,9 @@
           <button type="button" data-picks-view-mode="sport">Sport</button>
         </section>
 
-        <section class="time-cockpit" id="time-cockpit" aria-label="Picks par horizon temporel">
+        <!-- Sprint 80 A5 — time-cockpit retire (redondant avec temporal-zones-strip).
+             Passe en expert-only pour ne pas casser les call sites renderTemporalCockpit. -->
+        <section class="time-cockpit expert-only hidden" id="time-cockpit" aria-label="Picks par horizon temporel">
           <div class="empty">Classement temporel des picks en cours...</div>
         </section>
 

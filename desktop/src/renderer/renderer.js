@@ -6053,9 +6053,12 @@
     if (!wrap) return;
     const rows = liveRows();
     if (!rows.length) {
+      // Sprint 80 A4 — auto-hide quand vide (au lieu d'empty state visible permanent)
       wrap.innerHTML = '<div class="empty compact-empty">Aucun match live suivi pour le moment.</div>';
+      wrap.classList.add('live-empty');
       return;
     }
+    wrap.classList.remove('live-empty');
     wrap.innerHTML = `
       <div class="section-head compact">
         <div>
@@ -9688,6 +9691,12 @@
     const card = $('#onboarding-card');
     if (!card) return;
     const seen = localStorage.getItem(USER_PREFS_SEEN_KEY) === '1';
+    // Sprint 80 A3 — first-launch : afficher en mode modal au lieu d'occuper le dashboard
+    if (!seen) {
+      card.classList.add('onboarding-modal-mode');
+    } else {
+      card.classList.remove('onboarding-modal-mode');
+    }
     card.classList.toggle('hidden', seen);
     if (!seen) {
       const bankroll = $('#onboarding-bankroll');

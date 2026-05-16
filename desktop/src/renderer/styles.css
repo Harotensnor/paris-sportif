@@ -1814,6 +1814,31 @@ a:hover {
   overflow: hidden;
 }
 
+/* Sprint 80 A3 — Onboarding card passe en modal first-launch
+   (au lieu d'occuper l'espace dashboard) */
+.onboarding-card.onboarding-modal-mode {
+  position: fixed;
+  top: 10vh;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 150;
+  max-width: 720px;
+  width: calc(100vw - 40px);
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, .55);
+  margin: 0;
+}
+
+.onboarding-card.onboarding-modal-mode::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, .55);
+  z-index: -1;
+  pointer-events: none;
+}
+
 .onboarding-card::before {
   content: '';
   position: absolute;
@@ -3873,6 +3898,69 @@ body.theme-light .h2h-row { background: rgba(15, 23, 42, .03); }
 body.theme-light .h2h-stat em { color: #047857; }
 body.theme-light .h2h-total.h2h-total-high { color: #c2410c; }
 body.theme-light .h2h-total.h2h-total-low { color: #4338ca; }
+
+/* Sprint 80 — Dashboard refonte radicale.
+   simple-top-strip + day-summary descendus sous le bet ultime, en mode info passive. */
+.dashboard-info-strip {
+  margin: 16px 0 12px;
+  opacity: .85;
+  font-size: 12px;
+}
+
+.day-summary-compact {
+  margin: 0 0 18px;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, .02);
+  border-left: 2px solid var(--accent);
+  border-radius: 6px;
+}
+
+.day-summary-compact .day-summary-eyebrow {
+  font-size: 10px;
+  letter-spacing: .06em;
+}
+
+.day-summary-compact #day-summary-headline {
+  font-size: 14px;
+  display: block;
+  margin: 2px 0;
+}
+
+.day-summary-compact #day-summary-detail {
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+body.theme-light .day-summary-compact {
+  background: rgba(15, 23, 42, .03);
+}
+
+/* Sprint 80 A4 — live-cockpit auto-hide quand vide */
+.live-cockpit.live-empty {
+  display: none;
+}
+
+/* Sprint 80 — Ultimate bet card en hero plein écran : padding et taille augmentés */
+.ultimate-bet-card {
+  margin-top: 0;
+  padding: 22px 24px;
+}
+
+@media (max-width: 640px) {
+  .ultimate-bet-card { padding: 18px 16px; }
+  /* Mobile : cacher temporal-zones par défaut (focus pur sur le bet) */
+  .temporal-zones-strip {
+    display: none;
+  }
+  .temporal-zones-strip.mobile-visible {
+    display: grid;
+  }
+  /* Cacher dashboard-info-strip sur très petit ecran */
+  .dashboard-info-strip {
+    font-size: 11px;
+  }
+}
 
 .modal-head h3,
 .modal-head p {
