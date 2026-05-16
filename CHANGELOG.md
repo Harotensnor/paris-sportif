@@ -5,6 +5,33 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 65 — Stats utilisateur : Mon mois + insights auto + battle banner
+
+**Mon mois card** (`myMonthStats`, `renderMyMonth`)
+- Nouvelle carte en tête du Bilan : agrège les 30 jours glissants des paris user.
+- 6 KPIs : P&L 30j (avec delta vs 30j précédents), Win rate, ROI, Meilleur jour, Pire jour, Top sport.
+- Sparkline cumulative P&L sur 30 jours (SVG).
+- KPI principal "P&L 30j" en grande taille avec couleur (vert profit, rouge perte) et delta vs 30j précédents (↗/↘/→).
+- Empty state si pas de pari réglé sur 30j.
+
+**Insights automatiques** (`myMonthInsights`, `renderMyMonthInsights`)
+- 4 insights max générés automatiquement à partir de 5 paris réglés :
+  - Best segment ROI (sport/marché avec ROI ≥+10%) → ✅ success
+  - Worst segment ROI (≤ -10% sur ≥5 paris) → ⚠️ warn "à éviter 7j"
+  - Best odd bucket (basse/moyenne/haute) → 🎯 tip
+  - Streak 3W consécutifs → 🔥 streak / 3L → 🛑 warn
+  - Volume daily avg : >3 paris/j → ⚠️ trop volume, <0.5 → 📈 plus régulier possible
+- Card sous le Mon mois, list-style avec icône + texte, tones colorées (success/warn/tip/streak/info).
+
+**Battle banner user vs modèle** (`renderModelVsUser` upgrade)
+- Si sample user ≥5 ET sample modèle ≥5 : compare les ROI.
+- 🏆 "Tu bats le modèle de Xpt" (vert) si user ROI - model ROI > 5pt
+- 🤖 "Le modèle te bat de Xpt — suis-le plus" (orange) si inverse
+- ⚖️ "Score serré" (indigo) si écart < 5pt
+- Banner full-width en tête de la grille model-vs-user, avec ROI user/modèle + sample en sous-titre.
+
+Engine contract OK : 181 matchs, 93 picks. Compat préservée (cards add-only, pas de breaking change).
+
 ### Sprint 64 — Badges live : compos confirmées + news fraîche dans la hero modal
 
 **Lineup status badge** (`lineupStatusForRow`, `lineupStatusBadgeHtml`)

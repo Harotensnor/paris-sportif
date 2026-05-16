@@ -9825,7 +9825,31 @@
       : report.unsafe.length
         ? 'Tu as suivi des picks hors zone fiable : privilégie les badges ✓ Fiable.'
         : 'Ton suivi reste cohérent avec les garde-fous.';
-    grid.innerHTML = [
+    // Sprint 65 — Highlight gagnant : compare ROI user vs ROI modèle (si sample suffisant)
+    const userRoi = Number(report.roi || 0);
+    const modelRoi = Number(report.model?.roi || 0);
+    const userSettled = (report.settled || []).length;
+    const modelSettled = (report.model?.settled || []).length;
+    let battleTone = 'neutral';
+    let battleLabel = '';
+    if (userSettled >= 5 && modelSettled >= 5) {
+      if (userRoi - modelRoi > 0.05) {
+        battleTone = 'user-wins';
+        battleLabel = `🏆 Tu bats le modèle de ${formatPct(userRoi - modelRoi, 0)}`;
+      } else if (modelRoi - userRoi > 0.05) {
+        battleTone = 'model-wins';
+        battleLabel = `🤖 Le modèle te bat de ${formatPct(modelRoi - userRoi, 0)} — suis-le plus`;
+      } else {
+        battleTone = 'tie';
+        battleLabel = '⚖️ Score serré — tu suis bien le modèle';
+      }
+    }
+    const battleBanner = battleLabel ? `
+      <article class="model-battle-banner battle-${escapeHtml(battleTone)}">
+        <strong>${escapeHtml(battleLabel)}</strong>
+        <span>User ROI ${formatPct(userRoi, 1)} · Modèle ROI ${formatPct(modelRoi, 1)} · sample ${formatCount(userSettled)}/${formatCount(modelSettled)}</span>
+      </article>` : '';
+    grid.innerHTML = battleBanner + [
       ['Si tu avais suivi le modèle', formatMoney(report.model.pnl), `${formatCount(report.model.settled.length)} picks simulés · ROI ${formatPct(report.model.roi, 1)}`],
       ['Toi sur 30 jours', formatMoney(report.pnl), `${formatCount(report.settled.length)} réglés · ROI ${formatPct(report.roi, 1)} · ${formatCount(report.won)}W/${formatCount(report.lost)}L`],
       ['Utilisation', utilizationText, report.realRows.length ? `${formatCount(report.realRows.length)} pari(s) suivis au total.` : 'Aucun pari réel suivi sur 30 jours.'],
@@ -10625,9 +10649,221 @@
     $('#demo-tour-modal')?.classList.add('hidden');
   }
 
+  // Sprint 65 — Mon mois : stats glissantes 30j de l'utilisateur
+  function myMonthStats() {
+    const bets = loadUserBets();
+    const now = Date.now();
+    const cutoff = now - 30 * 24 * 60 * 60 * 1000;
+    const prevCutoff = now - 60 * 24 * 60 * 60 * 1000;
+    const tsOf = (bet) => Date.parse(bet.settledAt || bet.day || bet.createdAt || '');
+    const inLast30 = bets.filter((bet) => {
+      const ts = tsOf(bet);
+      return Number.isFinite(ts) && ts >= cutoff && ts <= now && ['won', 'lost', 'void'].includes(String(bet.status || ''));
+    });
+    const prev30 = bets.filter((bet) => {
+      const ts = tsOf(bet);
+      return Number.isFinite(ts) && ts >= prevCutoff && ts < cutoff && ['won', 'lost', 'void'].includes(String(bet.status || ''));
+    });
+    const sumPnl = (rows) => rows.reduce((s, b) => s + (Number(b.pnl || 0) || 0), 0);
+    const sumStake = (rows) => rows.reduce((s, b) => s + (Number(b.stake || 0) || 0), 0);
+    const won = inLast30.filter((b) => b.status === 'won').length;
+    const lost = inLast30.filter((b) => b.status === 'lost').length;
+    const voided = inLast30.filter((b) => b.status === 'void').length;
+    const pnl = sumPnl(inLast30);
+    const stake = sumStake(inLast30);
+    const prevPnl = sumPnl(prev30);
+    const winRate = (won + lost) > 0 ? won / (won + lost) : 0;
+    const roi = stake > 0 ? pnl / stake : 0;
+    // Best/worst day
+    const byDay = new Map();
+    inLast30.forEach((bet) => {
+      const day = String(bet.day || new Date(tsOf(bet)).toISOString().slice(0, 10));
+      const bucket = byDay.get(day) || { day, count: 0, pnl: 0 };
+      bucket.count += 1;
+      bucket.pnl += Number(bet.pnl || 0) || 0;
+      byDay.set(day, bucket);
+    });
+    const dayArr = Array.from(byDay.values()).sort((a, b) => b.pnl - a.pnl);
+    const bestDay = dayArr[0] || null;
+    const worstDay = dayArr.length > 1 ? dayArr[dayArr.length - 1] : null;
+    // Top sport
+    const bySport = new Map();
+    inLast30.forEach((bet) => {
+      const k = bet.sport || 'Sport';
+      const b = bySport.get(k) || { key: k, count: 0, pnl: 0 };
+      b.count += 1; b.pnl += Number(bet.pnl || 0) || 0;
+      bySport.set(k, b);
+    });
+    const topSport = Array.from(bySport.values()).sort((a, b) => b.pnl - a.pnl)[0] || null;
+    // Cumulative sparkline 30d
+    const cumByDay = [];
+    const dayKeys = Array.from({ length: 30 }, (_, i) => {
+      const d = new Date(now - (29 - i) * 24 * 60 * 60 * 1000);
+      return d.toISOString().slice(0, 10);
+    });
+    let cum = 0;
+    dayKeys.forEach((key) => {
+      const b = byDay.get(key);
+      cum += b ? b.pnl : 0;
+      cumByDay.push({ day: key, pnl: cum });
+    });
+    return {
+      total: inLast30.length,
+      won, lost, void: voided,
+      winRate, pnl, stake, roi,
+      prevPnl,
+      delta: pnl - prevPnl,
+      bestDay, worstDay, topSport,
+      sparkline: cumByDay.map((d) => d.pnl)
+    };
+  }
+
+  // Sprint 65 — insights automatiques sur les 30j glissants
+  function myMonthInsights() {
+    const bets = loadUserBets();
+    const now = Date.now();
+    const cutoff = now - 30 * 24 * 60 * 60 * 1000;
+    const tsOf = (bet) => Date.parse(bet.settledAt || bet.day || bet.createdAt || '');
+    const inLast30 = bets.filter((bet) => {
+      const ts = tsOf(bet);
+      return Number.isFinite(ts) && ts >= cutoff && ts <= now && ['won', 'lost'].includes(String(bet.status || ''));
+    });
+    if (inLast30.length < 5) {
+      return [{ tone: 'info', icon: '🌱', text: `Reviens dans quelques jours : avec ${formatCount(inLast30.length)} pari(s) réglés sur 30j, les insights statistiques arrivent dès 5 paris.` }];
+    }
+    const insights = [];
+    // Insight 1 : Best segment ROI (sport ou marché)
+    const groupBy = (rows, keyFn) => {
+      const m = new Map();
+      rows.forEach((bet) => {
+        const k = keyFn(bet) || 'Inconnu';
+        const b = m.get(k) || { key: k, count: 0, won: 0, lost: 0, stake: 0, pnl: 0 };
+        b.count += 1;
+        if (bet.status === 'won') b.won += 1;
+        if (bet.status === 'lost') b.lost += 1;
+        b.stake += Number(bet.stake || 0) || 0;
+        b.pnl += Number(bet.pnl || 0) || 0;
+        m.set(k, b);
+      });
+      return Array.from(m.values()).map((b) => ({ ...b, winRate: (b.won + b.lost) > 0 ? b.won / (b.won + b.lost) : 0, roi: b.stake > 0 ? b.pnl / b.stake : 0 }));
+    };
+    const bySport = groupBy(inLast30, (b) => b.sport).filter((b) => b.count >= 3);
+    const byMarket = groupBy(inLast30, (b) => b.market).filter((b) => b.count >= 3);
+    const allSegments = [...bySport.map((b) => ({ ...b, type: 'sport' })), ...byMarket.map((b) => ({ ...b, type: 'marché' }))];
+    if (allSegments.length) {
+      const best = allSegments.slice().sort((a, b) => b.roi - a.roi)[0];
+      if (best && best.roi > 0.1) {
+        insights.push({ tone: 'success', icon: '✅', text: `Tu performes bien sur "${best.key}" (${best.type}) : ROI ${formatPct(best.roi, 0)} sur ${formatCount(best.count)} paris.` });
+      }
+      const worst = allSegments.slice().sort((a, b) => a.roi - b.roi)[0];
+      if (worst && worst.roi < -0.1 && worst.count >= 5) {
+        insights.push({ tone: 'warn', icon: '⚠️', text: `Tu perds sur "${worst.key}" (${worst.type}) : ROI ${formatPct(worst.roi, 0)} sur ${formatCount(worst.count)} paris. À éviter pendant 7j.` });
+      }
+    }
+    // Insight 2 : Cotes hautes vs basses
+    const byOddBucket = groupBy(inLast30, (b) => {
+      const odd = Number(b.odd || 0);
+      if (odd >= 3) return 'Cote haute (≥3)';
+      if (odd >= 2) return 'Cote moyenne (2-3)';
+      return 'Cote basse (<2)';
+    });
+    const bestOdd = byOddBucket.filter((b) => b.count >= 3).sort((a, b) => b.roi - a.roi)[0];
+    if (bestOdd && bestOdd.roi > 0.05) {
+      insights.push({ tone: 'tip', icon: '🎯', text: `Tu réussis le mieux sur ${bestOdd.key} : ROI ${formatPct(bestOdd.roi, 0)}.` });
+    }
+    // Insight 3 : Streak
+    const sorted = inLast30.slice().sort((a, b) => tsOf(b) - tsOf(a));
+    if (sorted.length >= 3) {
+      const last3 = sorted.slice(0, 3);
+      if (last3.every((b) => b.status === 'won')) {
+        insights.push({ tone: 'streak', icon: '🔥', text: '3 victoires de suite ! Reste discipliné, ne sur-mise pas.' });
+      } else if (last3.every((b) => b.status === 'lost')) {
+        insights.push({ tone: 'warn', icon: '🛑', text: '3 défaites de suite. Le coach recommande de réduire les mises ou faire une pause.' });
+      }
+    }
+    // Insight 4 : Volume
+    const dailyAvg = inLast30.length / 30;
+    if (dailyAvg > 3) {
+      insights.push({ tone: 'warn', icon: '🎰', text: `Tu places en moyenne ${dailyAvg.toFixed(1)} paris/jour. Au-delà de 3, la discipline se perd. Vise 1-3 paris/jour.` });
+    } else if (dailyAvg < 0.5 && inLast30.length >= 5) {
+      insights.push({ tone: 'info', icon: '📈', text: `Tu places en moyenne ${dailyAvg.toFixed(2)} paris/jour. Tu pourrais miser plus régulièrement si l'edge est là.` });
+    }
+    if (!insights.length) {
+      insights.push({ tone: 'info', icon: '✨', text: 'Tes 30 derniers jours sont stables : aucun pattern fort détecté. Continue ta routine.' });
+    }
+    return insights.slice(0, 4);
+  }
+
+  function renderMyMonthInsights() {
+    const node = $('#my-month-insights');
+    if (!node) return;
+    const insights = myMonthInsights();
+    if (!insights.length) {
+      node.innerHTML = '';
+      return;
+    }
+    node.innerHTML = `
+      <article class="my-month-insights">
+        <h4>💡 Insights de tes 30 derniers jours</h4>
+        <ul class="insights-list">
+          ${insights.map((ins) => `
+            <li class="insight-${escapeHtml(ins.tone)}">
+              <span class="insight-icon">${escapeHtml(ins.icon)}</span>
+              <span class="insight-text">${escapeHtml(ins.text)}</span>
+            </li>
+          `).join('')}
+        </ul>
+      </article>`;
+  }
+
+  function renderMyMonth() {
+    renderMyMonthInsights();
+    const node = $('#my-month-card');
+    if (!node) return;
+    const stats = myMonthStats();
+    if (!stats.total) {
+      node.innerHTML = `
+        <article class="my-month-card empty">
+          <h4>📅 Mon mois</h4>
+          <p class="detail-text">Pas encore de pari réglé sur 30 jours glissants. Tu verras ici ton P&L, ton ROI, ton meilleur jour et ton sport favori dès que tu auras suivi quelques paris.</p>
+        </article>`;
+      return;
+    }
+    const pnlClass = stats.pnl > 0 ? 'pos' : stats.pnl < 0 ? 'neg' : '';
+    const deltaClass = stats.delta > 0 ? 'pos' : stats.delta < 0 ? 'neg' : '';
+    const deltaSymbol = stats.delta > 0 ? '↗' : stats.delta < 0 ? '↘' : '→';
+    const sparkSvg = sparklineSvg(stats.sparkline);
+    const dayLabel = (d) => {
+      if (!d?.day) return '-';
+      try { return new Date(d.day).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' }); }
+      catch { return d.day; }
+    };
+    node.innerHTML = `
+      <article class="my-month-card ${pnlClass}">
+        <header>
+          <h4>📅 Mon mois</h4>
+          <span class="match-sub">30 jours glissants · ${formatCount(stats.total)} paris réglés</span>
+        </header>
+        <div class="my-month-grid">
+          <div class="my-month-kpi big ${pnlClass}">
+            <span>P&L 30j</span>
+            <strong>${formatMoney(stats.pnl)}</strong>
+            <em class="${deltaClass}">${deltaSymbol} ${formatMoney(stats.delta)} vs 30j précédents</em>
+          </div>
+          <div class="my-month-kpi"><span>Win rate</span><strong>${formatPct(stats.winRate, 1)}</strong><em>${formatCount(stats.won)} W · ${formatCount(stats.lost)} L</em></div>
+          <div class="my-month-kpi"><span>ROI</span><strong>${formatPct(stats.roi, 1)}</strong><em>${formatMoney(stats.stake)} misés</em></div>
+          <div class="my-month-kpi"><span>Meilleur jour</span><strong>${escapeHtml(dayLabel(stats.bestDay))}</strong><em>${stats.bestDay ? formatMoney(stats.bestDay.pnl) : '-'}</em></div>
+          <div class="my-month-kpi"><span>Pire jour</span><strong>${escapeHtml(dayLabel(stats.worstDay))}</strong><em>${stats.worstDay ? formatMoney(stats.worstDay.pnl) : '-'}</em></div>
+          <div class="my-month-kpi"><span>Top sport</span><strong>${escapeHtml(stats.topSport?.key || '-')}</strong><em>${stats.topSport ? `${formatMoney(stats.topSport.pnl)} sur ${formatCount(stats.topSport.count)}` : '-'}</em></div>
+        </div>
+        <div class="my-month-sparkline">${sparkSvg}</div>
+      </article>`;
+  }
+
   function renderHistory() {
     const history = state.history;
     renderModelPerformance();
+    renderMyMonth();
     renderTrackedBets();
     renderAutoSettlementAudit();
     renderModelSelfAudit();
