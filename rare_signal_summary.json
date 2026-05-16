@@ -1,64 +1,28 @@
 {
-  "generated_at": "2026-05-16T15:34:02Z",
+  "generated_at": "2026-05-16T15:37:27Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 72,
-    "actionable": 24,
-    "watch": 11,
+    "active_events": 64,
+    "actionable": 21,
+    "watch": 6,
     "risk": 37,
     "expired_sample": 0,
     "by_type": {
-      "market_move": 12,
-      "signal_conflict": 5,
+      "market_move": 4,
       "injury_imbalance": 24,
       "market_uncertain": 36,
-      "back_to_back_travel": 6
+      "back_to_back_travel": 6,
+      "signal_conflict": 3
     },
     "by_quality": {
-      "actionable": 24,
-      "watch": 11,
+      "actionable": 21,
+      "watch": 6,
       "risk": 37
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401866579",
-      "date": "2026-05-16T16:00Z",
-      "sport": "football",
-      "league_code": "superleaguegrece",
-      "league_name": "Super League Grèce",
-      "home": "Asteras Tripoli",
-      "away": "Kifisia",
-      "match": "Asteras Tripoli - Kifisia",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 1.0,
-      "context": "Cote away: 7.00 -> 5.10 (+27.1%)"
-    },
-    {
-      "event_id": "401866583",
-      "date": "2026-05-16T16:00Z",
-      "sport": "football",
-      "league_code": "superleaguegrece",
-      "league_name": "Super League Grèce",
-      "home": "Panserraikos FC",
-      "away": "Panetolikos",
-      "match": "Panserraikos FC - Panetolikos",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 1.0,
-      "context": "Cote away: 3.55 -> 2.80 (+21.1%)"
-    },
     {
       "event_id": "401815360",
       "date": "2026-05-16T20:05Z",
@@ -111,7 +75,7 @@
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 1.57 -> 1.94 (-23.5%)"
+      "context": "Cote home: 1.57 -> 1.90 (-20.9%)"
     },
     {
       "event_id": "401815372",
@@ -184,6 +148,24 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 7-13"
+    },
+    {
+      "event_id": "401866583",
+      "date": "2026-05-16T16:00Z",
+      "sport": "football",
+      "league_code": "superleaguegrece",
+      "league_name": "Super League Grèce",
+      "home": "Panserraikos FC",
+      "away": "Panetolikos",
+      "match": "Panserraikos FC - Panetolikos",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "away",
+      "strength": 0.893,
+      "context": "Cote away: 2.80 -> 3.25 (-16.1%)"
     },
     {
       "event_id": "401815388",
@@ -402,42 +384,6 @@
       "context": "Absences severes 9-5"
     },
     {
-      "event_id": "748960",
-      "date": "2026-05-16T16:30Z",
-      "sport": "football",
-      "league_code": "laliga2",
-      "league_name": "La Liga 2",
-      "home": "Racing Santander",
-      "away": "Real Valladolid",
-      "match": "Racing Santander - Real Valladolid",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.794,
-      "context": "Cote away: 7.00 -> 6.00 (+14.3%)"
-    },
-    {
-      "event_id": "401843349",
-      "date": "2026-05-16T18:00Z",
-      "sport": "football",
-      "league_code": "eliteserien",
-      "league_name": "Eliteserien",
-      "home": "Vålerenga",
-      "away": "Sarpsborg FK",
-      "match": "Vålerenga - Sarpsborg FK",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.728,
-      "context": "Cote away: 4.20 -> 3.65 (+13.1%)"
-    },
-    {
       "event_id": "401872904",
       "date": "2026-05-23T00:00Z",
       "sport": "hockey",
@@ -457,24 +403,6 @@
     }
   ],
   "active_watch": [
-    {
-      "event_id": "401872571",
-      "date": "2026-05-17T01:07Z",
-      "sport": "football",
-      "league_code": "ligamx",
-      "league_name": "Liga MX",
-      "home": "Guadalajara",
-      "away": "Cruz Azul",
-      "match": "Guadalajara - Cruz Azul",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.608,
-      "context": "Cote away: 3.20 -> 2.85 (+10.9%)"
-    },
     {
       "event_id": "401815368",
       "date": "2026-05-16T18:15Z",
@@ -582,78 +510,6 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 3-6"
-    },
-    {
-      "event_id": "750219",
-      "date": "2026-05-16T17:00Z",
-      "sport": "football",
-      "league_code": "superlig",
-      "league_name": "Süper Lig",
-      "home": "Samsunspor",
-      "away": "Goztepe",
-      "match": "Samsunspor - Goztepe",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "home",
-      "strength": 0.538,
-      "context": "Cote home: 3.10 -> 2.80 (+9.7%)"
-    },
-    {
-      "event_id": "401872119",
-      "date": "2026-05-16T18:00Z",
-      "sport": "football",
-      "league_code": "ita.2",
-      "league_name": "Serie B",
-      "home": "Juve Stabia",
-      "away": "Monza",
-      "match": "Juve Stabia - Monza",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "home",
-      "strength": 0.521,
-      "context": "Cote home: 3.20 -> 2.90 (+9.4%)"
-    },
-    {
-      "event_id": "748963",
-      "date": "2026-05-16T16:30Z",
-      "sport": "football",
-      "league_code": "laliga2",
-      "league_name": "La Liga 2",
-      "home": "Granada",
-      "away": "Burgos",
-      "match": "Granada - Burgos",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "home",
-      "strength": 0.498,
-      "context": "Cote home: 3.35 -> 3.05 (+9.0%)"
-    },
-    {
-      "event_id": "401866317",
-      "date": "2026-05-16T16:15Z",
-      "sport": "football",
-      "league_code": "proleague",
-      "league_name": "Pro League",
-      "home": "Standard Liege",
-      "away": "Racing Genk",
-      "match": "Standard Liege - Racing Genk",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.483,
-      "context": "Cote away: 2.30 -> 2.10 (+8.7%)"
     }
   ],
   "active_risk": [
@@ -979,7 +835,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.1%"
+      "context": "marge bookmaker anormale 18.2%"
     },
     {
       "event_id": "401843286",
