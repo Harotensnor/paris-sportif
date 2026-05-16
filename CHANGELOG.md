@@ -5,6 +5,13 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-16
 
+### Hotfix v2.1.3 — Raccourci Windows corrigé
+
+Cause trouvée après retour “toujours aucun changement” : le raccourci Windows `Paris Sportif Desktop` du menu Démarrer pointait vers une vieille installation temporaire `ParisSportifSprint22Install`, pas vers le lanceur local du projet.
+- Version passée en `v2.1.3`.
+- Marqueur visible en haut : `Accueil minimal v2.1.3 · Winamax-only`.
+- Le raccourci Windows doit pointer vers `wscript.exe LANCER-LOGICIEL.vbs`, donc la même app que le lanceur corrigé.
+
 ### Hotfix v2.1.2 — Accueil “À miser” vraiment allégé
 
 Correctif après retour utilisateur : la page “À miser” restait trop chargée malgré les catégories.
