@@ -196,11 +196,16 @@
         </section>
 
         <section class="onboarding-card hidden" id="onboarding-card" aria-label="Première configuration">
-          <div>
-            <span class="eyebrow">Première ouverture</span>
-            <h3>Configure ton cockpit en 30 secondes</h3>
-            <p>Bankroll, sports suivis et niveau de prudence servent à filtrer les picks sans toucher au modèle.</p>
+          <div class="onboarding-hero">
+            <span class="eyebrow">Bienvenue 👋</span>
+            <h3>Ton cockpit Winamax personnel</h3>
+            <p>Le logiciel filtre les paris Winamax du jour et te montre uniquement ceux sur lesquels miser. Tout est local, rien ne part sur internet.</p>
           </div>
+          <ul class="onboarding-checklist">
+            <li><span class="onboarding-step">1</span><div><strong>Définis ta bankroll</strong><small>Le logiciel calcule des mises adaptées en unités (1u = 1% de ta bankroll par défaut).</small></div></li>
+            <li><span class="onboarding-step">2</span><div><strong>Choisis ton niveau</strong><small>Débutant = filtres serrés, Expert = vue technique complète déverrouillée.</small></div></li>
+            <li><span class="onboarding-step">3</span><div><strong>Lance le tour démo (optionnel)</strong><small>3 minutes guidées : tu vois où sont les paris du jour, comment lire une fiche, et comment suivre tes paris en local.</small></div></li>
+          </ul>
           <div class="onboarding-actions">
             <input id="onboarding-bankroll" type="number" min="10" step="10" value="50" aria-label="Bankroll initiale">
             <select id="onboarding-level" aria-label="Niveau">
@@ -209,6 +214,7 @@
               <option value="expert">Expert</option>
             </select>
             <button class="primary-btn" id="onboarding-save-btn" type="button">Démarrer</button>
+            <button class="ghost-btn" id="onboarding-tour-btn" type="button">+ Tour démo</button>
           </div>
         </section>
 
@@ -1174,6 +1180,7 @@
             <label>Brief du soir heure<input id="pref-evening-hour" type="number" min="18" max="23" step="1"></label>
             <label class="check-line"><input id="pref-prematch-alerts" type="checkbox"> Alertes pré-match 30 min</label>
             <label class="check-line"><input id="pref-top-pick-alerts" type="checkbox"> Alerte si le #1 change</label>
+            <label class="check-line"><input id="pref-notify-quiet-off" type="checkbox"> Notifications même la nuit (23h-7h)</label>
             <label class="check-line"><input id="pref-bug-report-prompt" type="checkbox"> Proposer un rapport si l'app plante</label>
             <label>Webhook mobile
               <select id="pref-webhook-type">

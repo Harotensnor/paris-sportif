@@ -5,6 +5,29 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 63 — Onboarding + notifs + tour démo enrichis
+
+Triple amélioration UX pour les premières heures avec l'application.
+
+**Onboarding magazine** (`index.html` + CSS)
+- Card "Bienvenue 👋" enrichie : welcome message + value prop locale, checklist 3 étapes visuelles (1. bankroll / 2. niveau / 3. tour démo), grid 2-col responsive.
+- Halo radial indigo en arrière-plan pour ambiance premium.
+- Bouton "+ Tour démo" qui sauve les prefs puis lance directement le tour guidé.
+
+**Notifications natives mieux intégrées** (`notifyUser` + prefs)
+- `tag: match-${id}` → dédoublonne automatiquement les notifs sur un même match (plus de 5 popups empilés).
+- `renotify: false` → respect du tag.
+- Auto-close après 10s si l'utilisateur n'a pas cliqué.
+- **Quiet hours** : pas de notification locale 23h-7h Paris par défaut (webhook mobile reste envoyé). Toggle "Notifications même la nuit (23h-7h)" dans Réglages > Alertes (`pref-notify-quiet-off`, default OFF = quiet hours actives).
+- `notifyQuietHoursOff: false` ajouté à `DEFAULT_PREFERENCES`.
+
+**Tour démo enrichi** (5 → 7 étapes + CSS)
+- Étape 0 (welcome), 1 (bet ultime), 2 (mise démo), 3 (fiche enrichie), 4 (P&L), 5 (historique), 6 (personnalisation).
+- Chaque étape a un emoji `👋🎯💸📖📊📚⚙️` rendu en `<div.tour-step-emoji>` 48px avec animation bounce `cubic-bezier(.34,1.56,.64,1)`.
+- Progress bar gradient indigo→vert qui se remplit (`width: ${progress}%`).
+- Sous-titre dynamique selon étape ("3 min de visite guidée") + tip contextuel par step.
+- Card centrée, max-width 420px sur le paragraphe, gradient subtil indigo sur fond sombre.
+
 ### Sprint 62 — Fiche match magazine : bullets visuels "Pourquoi miser" + hero plus aéré
 
 Suite Sprint 61 (filtre Fiable durci), upgrade UX de la fiche match (modal détail) vers un layout magazine plus lisible :

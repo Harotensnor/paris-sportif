@@ -221,6 +221,7 @@
     eveningBriefHour: 22,
     prematchAlertsEnabled: true,
     topPickAlertsEnabled: true,
+    notifyQuietHoursOff: false, // Sprint 63 — opt-in pour notifs 23h-7h
     stakeMode: 'kelly',
     allocationStrategy: 'moderate',
     dailyBudgetPct: 5,
@@ -4814,18 +4815,40 @@
     }
   }
 
+  // Sprint 63 — quiet hours : pas de notif locale entre 23h-7h Paris sauf
+  // si user a explicitement opt-in. Webhook externe (mobile) reste OK.
+  function isQuietHour() {
+    try {
+      const prefs = loadPreferences();
+      if (prefs?.notifyQuietHoursOff === true) return false;
+      const h = new Date().getHours();
+      return h >= 23 || h < 7;
+    } catch { return false; }
+  }
+
   function notifyUser(title, body, row) {
     sendExternalAlert(title, body, row).catch((error) => {
       pushLog('warn', `Webhook mobile non envoyé: ${error.message}`);
     });
     if (!('Notification' in window)) return;
+    if (isQuietHour()) return; // Sprint 63 — respect quiet hours
     const show = () => {
       try {
-        const notification = new Notification(title, { body, silent: true });
+        // Sprint 63 — tag pour dedup notifs identiques (un seul popup par match)
+        const tag = row?.id ? `match-${row.id}` : `alert-${title.replace(/\s+/g, '-').toLowerCase()}`;
+        const notification = new Notification(title, {
+          body,
+          silent: true,
+          tag,
+          renotify: false
+        });
         notification.onclick = () => {
           window.focus();
           if (row?.id) openMatchDetail(row.id);
+          try { notification.close(); } catch { /* noop */ }
         };
+        // Sprint 63 — auto-close apres 10s si user n'a pas interagi
+        setTimeout(() => { try { notification.close(); } catch { /* noop */ } }, 10000);
       } catch {
         // Les notifications natives peuvent être bloquées par le système.
       }
@@ -9163,6 +9186,8 @@
     if (prematchAlerts) prematchAlerts.checked = prefs.prematchAlertsEnabled !== false;
     const topPickAlerts = $('#pref-top-pick-alerts');
     if (topPickAlerts) topPickAlerts.checked = prefs.topPickAlertsEnabled !== false;
+    const notifyQuietOff = $('#pref-notify-quiet-off');
+    if (notifyQuietOff) notifyQuietOff.checked = prefs.notifyQuietHoursOff === true;
     const bugReportPrompt = $('#pref-bug-report-prompt');
     if (bugReportPrompt) bugReportPrompt.checked = prefs.bugReportPrompt !== false;
     const tradingDesk = $('#pref-trading-desk');
@@ -9388,6 +9413,7 @@
       antiTiltStrict: $('#pref-anti-tilt-strict')?.checked !== false,
       prematchAlertsEnabled: $('#pref-prematch-alerts')?.checked !== false,
       topPickAlertsEnabled: $('#pref-top-pick-alerts')?.checked !== false,
+      notifyQuietHoursOff: Boolean($('#pref-notify-quiet-off')?.checked),
       bugReportPrompt: $('#pref-bug-report-prompt')?.checked !== false,
       dailyBetLimit: Math.max(1, Number($('#pref-daily-bet-limit')?.value || DEFAULT_PREFERENCES.dailyBetLimit) || DEFAULT_PREFERENCES.dailyBetLimit),
       dailyStakeCapPct: Math.max(1, Number($('#pref-daily-stake-cap')?.value || DEFAULT_PREFERENCES.dailyStakeCapPct) || DEFAULT_PREFERENCES.dailyStakeCapPct),
@@ -10434,26 +10460,42 @@
     $('#evening-brief-modal')?.classList.add('hidden');
   }
 
+  // Sprint 63 — tour démo enrichi : 7 étapes avec emoji et tips contextuels.
   const DEMO_TOUR_STEPS = [
     {
-      title: 'Voici ton bet ultime',
-      text: 'Le logiciel met le meilleur pari simple en haut. Tu dois pouvoir lire PARI, COTE et MISE sans chercher.'
+      title: '👋 Bienvenue dans ton cockpit',
+      text: 'Le logiciel scanne tous les matchs Winamax du jour et te montre uniquement ceux sur lesquels miser. Aucune donnée ne sort de ta machine — tout reste local.',
+      emoji: '👋'
     },
     {
-      title: 'Mise sur ton premier pick',
-      text: 'En mode démo, le bouton “Je mise” ajoute un pari virtuel séparé de ton vrai historique.'
+      title: '🎯 Voici ton bet ultime',
+      text: 'Le meilleur pari simple est en haut du tableau. Tu dois pouvoir lire PARI, COTE et MISE sans chercher. La cote affichée est celle vérifiée sur Winamax.',
+      emoji: '🎯'
     },
     {
-      title: 'Lis la fiche enrichie',
-      text: 'Clique une carte pour voir le texte rassurant, les compositions, les joueurs clés, la tactique, les H2H et le news watcher avant de confirmer.'
+      title: '💸 Mise sur ton premier pick',
+      text: 'En mode démo, le bouton "Je mise" ajoute un pari virtuel séparé de ton historique réel. Tu peux tester sans toucher à ta vraie bankroll.',
+      emoji: '💸'
     },
     {
-      title: 'Regarde ton P&L',
-      text: 'Après le suivi, Bilan montre la bankroll, le résultat des paris et la comparaison avec le modèle.'
+      title: '📖 Lis la fiche enrichie',
+      text: 'Clique une carte pour voir : le "Pourquoi miser" avec bullets visuelles, les compositions probables, joueurs clés, tactique, H2H et news pré-match.',
+      emoji: '📖'
     },
     {
-      title: 'Relis ton historique',
-      text: 'Tu peux filtrer, ajouter des notes privées, exporter et apprendre des paris perdus.'
+      title: '📊 Regarde ton P&L',
+      text: 'Bilan affiche ta bankroll, le résultat des paris suivis et la comparaison avec les recommandations du modèle. Le 30j te montre la tendance.',
+      emoji: '📊'
+    },
+    {
+      title: '📚 Relis ton historique',
+      text: 'Tu peux filtrer, ajouter des notes privées, exporter en CSV et apprendre des paris perdus. Les patterns gagnants apparaissent automatiquement.',
+      emoji: '📚'
+    },
+    {
+      title: '⚙️ Personnalise tes seuils',
+      text: 'Dans Réglages : bankroll, niveau (Débutant/Expert), seuils edge/cote/confiance, notifs nuit on/off, thème clair/sombre. Tout est local et privé.',
+      emoji: '⚙️'
     }
   ];
 
@@ -10466,12 +10508,24 @@
     const title = $('#demo-tour-title');
     const subtitle = $('#demo-tour-subtitle');
     if (title) title.textContent = item.title;
-    if (subtitle) subtitle.textContent = `Étape ${formatCount(step + 1)} / ${formatCount(DEMO_TOUR_STEPS.length)}`;
+    if (subtitle) subtitle.textContent = `Étape ${formatCount(step + 1)} / ${formatCount(DEMO_TOUR_STEPS.length)} · 3 min de visite guidée`;
+    const progressPct = Math.round(((step + 1) / DEMO_TOUR_STEPS.length) * 100);
+    const tipText = step === 0
+      ? 'Astuce : tu peux relancer ce tour à tout moment depuis Réglages.'
+      : step === 2
+        ? 'Astuce : le mode démo s\'active automatiquement pendant le tour.'
+        : step >= DEMO_TOUR_STEPS.length - 1
+          ? 'Bravo, tu connais tout l\'essentiel ! Tu peux refaire un tour si besoin.'
+          : 'Tu peux fermer à tout moment.';
     content.innerHTML = `
       <article class="tour-step-card">
+        <div class="tour-step-emoji" aria-hidden="true">${escapeHtml(item.emoji || '✨')}</div>
         <strong>${escapeHtml(item.title)}</strong>
         <p>${escapeHtml(item.text)}</p>
-        <span class="match-sub">${step === 1 ? 'Astuce : le mode démo est activé automatiquement pendant le tour.' : 'Tu peux fermer à tout moment.'}</span>
+        <div class="tour-progress-bar" role="progressbar" aria-valuenow="${progressPct}" aria-valuemin="0" aria-valuemax="100">
+          <span style="width: ${progressPct}%"></span>
+        </div>
+        <span class="match-sub">${escapeHtml(tipText)}</span>
       </article>
     `;
     const next = $('#demo-tour-next');
@@ -15748,6 +15802,17 @@
         bankroll: Math.max(10, Number($('#onboarding-bankroll')?.value || 50) || 50),
         level
       });
+    });
+    // Sprint 63 — bouton "+ Tour démo" dans l'onboarding card
+    $('#onboarding-tour-btn')?.addEventListener('click', () => {
+      const level = $('#onboarding-level')?.value || 'intermediate';
+      applyPreferences({
+        ...DEFAULT_PREFERENCES,
+        ...levelDefaults(level),
+        bankroll: Math.max(10, Number($('#onboarding-bankroll')?.value || 50) || 50),
+        level
+      });
+      startDemoTour({ force: true });
     });
   }
 
