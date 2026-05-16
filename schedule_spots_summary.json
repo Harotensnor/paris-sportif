@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-16T04:05:10Z",
+  "generated_at": "2026-05-16T04:11:40Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -805,12 +805,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "home",
-        "home_score": 0.043,
-        "away_score": -0.498,
+        "net_side": "away",
+        "home_score": -0.098,
+        "away_score": -0.098,
         "home_fade": 0.15,
-        "away_fade": 0.55,
-        "reason": "Direction nette: Montreal Canadiens (+0.04)",
+        "away_fade": 0.15,
+        "reason": "Direction nette: Buffalo Sabres (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -823,12 +823,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
           }
         ]
       }
@@ -1180,11 +1174,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.208,
-        "away_score": -0.97,
+        "home_score": 1.42,
+        "away_score": -1.575,
         "home_fade": 0.15,
-        "away_fade": 1.022,
-        "reason": "Direction nette: Seattle Mariners (+0.21)",
+        "away_fade": 1.627,
+        "reason": "Direction nette: Seattle Mariners (+1.42)",
         "detail": [
           {
             "side": "home",
@@ -1197,6 +1191,18 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 0.605
           },
           {
             "side": "away",
@@ -1363,12 +1369,24 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.333,
-        "away_score": -0.952,
+        "home_score": 1.545,
+        "away_score": -1.557,
         "home_fade": 0.0,
-        "away_fade": 0.952,
-        "reason": "Direction nette: Seattle Mariners (+0.33)",
+        "away_fade": 1.557,
+        "reason": "Direction nette: Seattle Mariners (+1.55)",
         "detail": [
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 0.605
+          },
           {
             "side": "away",
             "type": "back_to_back_travel",

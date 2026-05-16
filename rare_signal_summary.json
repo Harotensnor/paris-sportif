@@ -1,23 +1,24 @@
 {
-  "generated_at": "2026-05-16T04:05:10Z",
+  "generated_at": "2026-05-16T04:11:40Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 69,
-    "actionable": 21,
+    "active_events": 70,
+    "actionable": 22,
     "watch": 6,
     "risk": 42,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 24,
       "back_to_back_travel": 9,
+      "market_move": 5,
       "market_uncertain": 40,
       "signal_conflict": 3
     },
     "by_quality": {
       "watch": 6,
-      "actionable": 21,
+      "actionable": 22,
       "risk": 42
     }
   },
@@ -57,6 +58,24 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 15-7"
+    },
+    {
+      "event_id": "401815373",
+      "date": "2026-05-16T23:15Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Seattle Mariners",
+      "away": "San Diego Padres",
+      "match": "Seattle Mariners - San Diego Padres",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 29.00 -> 6.00 (+79.3%)"
     },
     {
       "event_id": "401815372",
@@ -131,6 +150,24 @@
       "context": "Absences severes 7-13"
     },
     {
+      "event_id": "401856917",
+      "date": "2026-05-17T23:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Los Angeles Sparks",
+      "away": "Toronto Tempo",
+      "match": "Los Angeles Sparks - Toronto Tempo",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "away",
+      "strength": 1.0,
+      "context": "Cote away: 7.50 -> 16.00 (-113.3%)"
+    },
+    {
       "event_id": "401815388",
       "date": "2026-05-17T23:20Z",
       "sport": "baseball",
@@ -141,12 +178,12 @@
       "match": "Seattle Mariners - San Diego Padres",
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "San Diego Padres",
-      "side": "away",
-      "strength": 0.952,
-      "context": "2 match dans les 48h + 1711 km de voyage"
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 29.00 -> 6.00 (+79.3%)"
     },
     {
       "event_id": "401815376",
@@ -165,24 +202,6 @@
       "side": "away",
       "strength": 0.91,
       "context": "2 match dans les 48h + 1498 km de voyage"
-    },
-    {
-      "event_id": "401815373",
-      "date": "2026-05-16T23:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Seattle Mariners",
-      "away": "San Diego Padres",
-      "match": "Seattle Mariners - San Diego Padres",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "San Diego Padres",
-      "side": "away",
-      "strength": 0.872,
-      "context": "1 match dans les 48h + 1711 km de voyage"
     },
     {
       "event_id": "401815361",
