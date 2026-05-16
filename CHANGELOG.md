@@ -5,6 +5,26 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 60 — 🚨 FIX CRITIQUE GÉNÉRALISÉ : cotes Winamax fausses (matchWinnerOptions)
+
+Audit post-Sprint 58 a découvert que **beaucoup de picks affichaient une cote inférieure à la vraie cote Winamax** :
+- IMT (foot) : **1.39 affiché** vs **4.00 vraie** (côté `away`, ou plutôt `Spartak Subotica` à `home`)
+- M. Navone (tennis) : **1.31 affiché** vs **2.75 vraie**
+- Texas Rangers (MLB) : **1.62** vs **2.10**
+- Yankees (MLB) : **1.68** vs **2.00**
+- Et 7 autres picks avec écart ≥ 0.05.
+
+Bug racine dans `matchWinnerOptions()` (legacy-engine.js) :
+1. Le code listait à la fois `markets.match_winner` (tableau brut all_markets) ET `markets['1n2']` (bloc résolu canonique). Quand les deux contenaient le même side, **il préférait la cote la PLUS BASSE** (`row.odd < seen.get(key).odd`). Or pour Winamax la cote canonique 1n2 est la VRAIE cote affichée sur la page match.
+2. Le tableau `match_winner` brut peut contenir des snapshots obsolètes, des marchés "Vainqueur tournoi" / "Vainqueur Bo3" / etc., avec des cotes complètement différentes.
+
+Fix
+- **Priorité au bloc `1n2` résolu** : si `1n2.home` et `1n2.away` sont > 1 (cote valide), on les utilise et on ignore `match_winner` brut.
+- Fallback sur `match_winner` uniquement si `1n2` est absent/incomplet.
+- Comparaison inversée : on garde la cote la **plus haute** en cas de doublon (meilleur pour le parieur, plus cohérent avec Winamax actuel).
+
+Validation manuelle terrain : **les 11 paris prêts affichent désormais des cotes qui matchent exactement** `markets['1n2'].home/away`. Test sur 11 picks de 5 sports (foot, tennis, baseball, hockey, basket) → 100% des cotes correctes.
+
 ### Sprint 59 — Simplification radicale accueil
 
 Feedback utilisateur : "accueil encore beaucoup trop de chose, accueil incompréhensible".

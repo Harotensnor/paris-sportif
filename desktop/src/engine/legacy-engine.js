@@ -958,15 +958,28 @@ function createLegacyEngineService({ projectRoot }) {
         source
       });
     };
-    const marketRows = Array.isArray(markets.match_winner) ? markets.match_winner : [];
-    for (const row of marketRows) push(row?.side, row?.odd, row?.label, row?.source || 'winamax_detail');
+    // Sprint 60 (fix cotes critique) : on utilise EN PRIORITÉ le bloc 1n2
+    // résolu (canonique) qui correspond à la cote affichée sur la page
+    // match Winamax. Le tableau `match_winner` brut peut contenir des
+    // snapshots obsolètes ou des marchés "Vainqueur" alternatifs (Vainqueur
+    // tournoi, Vainqueur Bo3, etc.) avec une cote complètement différente.
     const n12 = markets['1n2'] || {};
+    const hasResolved1n2 = Number(n12.home) > 1 && Number(n12.away) > 1;
     push('home', n12.home, n12.home_name || teams.home);
     push('away', n12.away, n12.away_name || teams.away);
+    if (!hasResolved1n2) {
+      // Fallback seulement si 1n2 résolu indisponible : on accepte match_winner.
+      const marketRows = Array.isArray(markets.match_winner) ? markets.match_winner : [];
+      for (const row of marketRows) push(row?.side, row?.odd, row?.label, row?.source || 'winamax_detail');
+    }
     const seen = new Map();
     for (const row of rows) {
       const key = row.side;
-      if (!seen.has(key) || Number(row.odd) < Number(seen.get(key).odd)) seen.set(key, row);
+      // Sprint 60 (fix cotes critique) : on PRÉFÈRE la cote la plus HAUTE
+      // (meilleure pour le parieur) en cas de doublon. Avant on prenait la
+      // plus basse, ce qui causait l'affichage de cotes obsolètes plus
+      // courtes que la vraie cote Winamax actuelle.
+      if (!seen.has(key) || Number(row.odd) > Number(seen.get(key).odd)) seen.set(key, row);
     }
     return Array.from(seen.values()).sort((a, b) => a.odd - b.odd);
   }
