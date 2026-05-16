@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-16T19:39:00Z",
+  "generated_at": "2026-05-16T19:45:26Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
@@ -11,10 +11,10 @@
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 21,
-      "market_move": 6,
-      "signal_conflict": 4,
-      "market_uncertain": 42,
-      "back_to_back_travel": 6
+      "market_move": 7,
+      "market_uncertain": 41,
+      "back_to_back_travel": 6,
+      "signal_conflict": 4
     },
     "by_quality": {
       "actionable": 20,
@@ -58,24 +58,6 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 15-7"
-    },
-    {
-      "event_id": "401871409",
-      "date": "2026-05-17T00:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Montreal Canadiens",
-      "away": "Buffalo Sabres",
-      "match": "Montreal Canadiens - Buffalo Sabres",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 1.56 -> 1.90 (-22.1%)"
     },
     {
       "event_id": "401815372",
@@ -132,6 +114,24 @@
       "context": "Absences severes 15-7"
     },
     {
+      "event_id": "401815381",
+      "date": "2026-05-17T17:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Detroit Tigers",
+      "away": "Toronto Blue Jays",
+      "match": "Detroit Tigers - Toronto Blue Jays",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 1.62 -> 2.00 (-23.5%)"
+    },
+    {
       "event_id": "401815387",
       "date": "2026-05-17T20:07Z",
       "sport": "baseball",
@@ -166,6 +166,24 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 0-5"
+    },
+    {
+      "event_id": "401872121",
+      "date": "2026-05-19T18:00Z",
+      "sport": "football",
+      "league_code": "ita.2",
+      "league_name": "Serie B",
+      "home": "Monza",
+      "away": "Juve Stabia",
+      "match": "Monza - Juve Stabia",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 2.80 -> 30.00 (-971.4%)"
     },
     {
       "event_id": "401815388",
@@ -348,24 +366,6 @@
       "context": "Absences severes 9-5"
     },
     {
-      "event_id": "401815381",
-      "date": "2026-05-17T17:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Detroit Tigers",
-      "away": "Toronto Blue Jays",
-      "match": "Detroit Tigers - Toronto Blue Jays",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "home",
-      "strength": 0.754,
-      "context": "Cote home: 1.62 -> 1.84 (-13.6%)"
-    },
-    {
       "event_id": "401872904",
       "date": "2026-05-23T00:00Z",
       "sport": "hockey",
@@ -385,24 +385,6 @@
     }
   ],
   "active_watch": [
-    {
-      "event_id": "401872571",
-      "date": "2026-05-17T01:07Z",
-      "sport": "football",
-      "league_code": "ligamx",
-      "league_name": "Liga MX",
-      "home": "Guadalajara",
-      "away": "Cruz Azul",
-      "match": "Guadalajara - Cruz Azul",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.608,
-      "context": "Cote away: 3.20 -> 2.85 (+10.9%)"
-    },
     {
       "event_id": "401815363",
       "date": "2026-05-16T20:10Z",
@@ -474,6 +456,24 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 14-11"
+    },
+    {
+      "event_id": "401815373",
+      "date": "2026-05-16T23:15Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Seattle Mariners",
+      "away": "San Diego Padres",
+      "match": "Seattle Mariners - San Diego Padres",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.473,
+      "context": "Cote away: 2.35 -> 2.15 (+8.5%)"
     }
   ],
   "active_risk": [
