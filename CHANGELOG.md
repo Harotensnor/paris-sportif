@@ -5,6 +5,65 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 55+56+57 — Cards picks + Bilan + Combinés + Light + Mobile + Animations (UX overhaul finale)
+
+Les 7 dernières pistes de refonte sont livrées.
+
+**Piste 1 — Cards picks repensées**
+- `.simple-timeline-card` / `.simple-inline-card` : radius 8→12, padding 12→14/16, transition complète (transform + border + shadow).
+- Liseré gradient indigo+bleu sur le côté gauche qui apparaît au hover.
+- Hover : translateY(-2px) + bordure indigo + box-shadow.
+- Eyebrow span : 11px uppercase letter-spacing 0.4, accent.
+- Strong : 14px font-weight 700 letter-spacing -0.1.
+- `.simple-fold-section` : radius 12, hover bordure indigo, summary avec chevron rotatif (⌄ → 180°), badge compteur en pill indigo 15% opacité.
+
+**Piste 2 — Bilan / KPI cards**
+- `.model-performance-grid` : auto-fit minmax(180px, 1fr) au lieu de 5 colonnes fixes.
+- `.performance-card` / `.segment-card` / `.calibration-bin` : radius 14, padding 18/20, liseré horizontal gradient en haut.
+- Hover : translateY(-2px), bordure indigo, box-shadow.
+- Eyebrow uppercase 11px font-weight 800, valeur strong 26px font-weight 800 letter-spacing -0.5.
+
+**Piste 3 — Combinés ticket**
+- `.combo-grid` : auto-fit minmax(380px, 1fr) (au lieu de 2 cols fixes).
+- `.combo-card` : radius 14, padding 20/22, liseré tricolore (jaune→indigo→bleu) en haut.
+- Hover : translateY(-3px), bordure jaune, shadow.
+- `.combo-head` : border-bottom subtile, h4 18px.
+- `.combo-stats` : carré encadré indigo avec stats (cote/retour/edge) centrées, 18px font-weight 800.
+
+**Piste 4 — Fiche match magazine**
+- `.detail-card` : radius 12, padding 18/20, hover bordure indigo + shadow.
+- `.detail-card h4` : border-bottom subtile + 13px font-weight 800 letter-spacing 0.08em.
+- `.sport-insight-grid` : minmax 240px (vs 220), gap 14 (vs 10), padding 14/16 par cellule.
+- Cellules hover : bordure indigo 35% + background indigo 4%.
+- Span uppercase 10px 900, strong 14px 700.
+
+**Piste 5 — Light theme**
+- Overrides spécifiques pour nav, simple-top-strip, ultimate-bet, preference-card, modal, combo-stats, scrollbars.
+- Couleurs accent indigo plus douces (109,93,252) en light.
+- Shadows réduites en light.
+
+**Piste 6 — Mobile-friendly**
+- `@media (max-width: 1023px)` : sidebar passe à 72px icônes-only.
+  * `.brand h1/p`, `.nav-group-label`, `.nav-label`, `.nav-badge` cachés.
+  * `.nav-btn` : centered, padding réduit, icon 22px.
+  * `.side-status` : font-size 0 (juste dot visible).
+  * `.main` : padding 20/18, `.topbar h2` 22px.
+- `@media (max-width: 640px)` : sidebar 56px, icon 18px, grids passent à 1 colonne.
+
+**Piste 7 — Animations subtiles**
+- Keyframes `fade-in-up` et `fade-in`.
+- Séquence au boot d'une vue :
+  * 0ms : simple-top-strip + alerts
+  * 60ms : morning-brief
+  * 80ms : ultimate-bet-card (cubic-bezier 420ms)
+  * 140ms : ready-picks-hero
+  * 200ms : live-cockpit
+  * 240ms : picks-view-switch + time-cockpit
+  * 320ms : simple-fold-section
+- `@media (prefers-reduced-motion: reduce)` : toutes les animations + transitions désactivées.
+
+Validation : smoke OK (1 ready, 14 timeline, 24 fiables, 10 priorités).
+
 ### Sprint 53+54 — Modal détail + boutons + scrollbars + cards (UX overhaul P3)
 
 Modal détail match
