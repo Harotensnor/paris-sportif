@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-16T13:04:17Z",
+  "generated_at": "2026-05-16T13:10:12Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
@@ -8,8 +8,9 @@
     "actionable": 21,
     "watch": 6,
     "risk": 39,
-    "expired_sample": 0,
+    "expired_sample": 1,
     "by_type": {
+      "market_move": 1,
       "injury_imbalance": 24,
       "back_to_back_travel": 9,
       "market_uncertain": 37,
@@ -1215,5 +1216,24 @@
       "context": "marge bookmaker anormale 18.7%"
     }
   ],
-  "expired_sample": []
+  "expired_sample": [
+    {
+      "event_id": "401842714",
+      "date": "2026-05-16T13:00Z",
+      "sport": "football",
+      "league_code": "allsvenskan",
+      "league_name": "Allsvenskan",
+      "home": "GAIS",
+      "away": "Degerfors IF",
+      "match": "GAIS - Degerfors IF",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.567,
+      "context": "Cote away: 4.90 -> 4.40 (+10.2%)"
+    }
+  ]
 }
