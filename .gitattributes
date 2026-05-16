@@ -5,6 +5,12 @@
 # entire class of bug.
 * text=auto eol=lf
 
+# Windows launchers must stay CRLF. cmd.exe can misread LF-only .bat files
+# and silently block when launched through wscript.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.vbs text eol=crlf
+
 # Binary lockdown : never normalize EOL on these
 *.png  binary
 *.jpg  binary

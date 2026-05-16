@@ -9,9 +9,13 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 Correctif ciblé après retour utilisateur : `LANCER-LOGICIEL.vbs` relançait parfois une ancienne fenêtre Electron déjà en mémoire, donc les changements semblaient absents.
 - `LANCER-LOGICIEL.bat` ferme uniquement l'ancienne instance Electron de ce projet avant de redémarrer.
+- Correction critique du lanceur Windows : le `.bat` est forcé en CRLF via `.gitattributes`. En LF, `cmd.exe` lisait `chcp/title/cd/set/if` sans première lettre et restait bloqué dans une fenêtre cachée.
+- Le lanceur démarre maintenant directement `desktop\node_modules\electron\dist\electron.exe` quand il est déjà installé, sans dépendre de `npm start`.
+- Les anciens lanceurs cachés du même projet sont nettoyés au démarrage.
 - Un second lancement recharge le renderer sans cache si l'app est déjà ouverte.
 - Version desktop passée en `v2.1.1` pour vérifier visuellement que la bonne build est lancée.
 - Validation terrain : accueil compact visible dans Electron, `Cockpit pronostics` en premier, 7 catégories, 3 cartes hero, anciens blocs denses cachés, 0 erreur console.
+- Validation lanceur réel : `wscript.exe LANCER-LOGICIEL.vbs` lance bien Electron, `/api/app-info` répond `200`, version `2.1.1`.
 
 ### Sprint pronostics — Accueil compact + Cockpit par catégories
 
