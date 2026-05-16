@@ -151,7 +151,10 @@ async function main() {
 
     await win.waitForSelector('[data-panel="dashboard"].active', { timeout: 60000 });
     await win.waitForFunction(() => document.querySelector('#metric-picks')?.textContent !== '-', null, { timeout: 90000 });
-    await win.waitForTimeout(1000);
+    await win.waitForFunction(() => (
+      document.querySelectorAll('#home-picks-table-body tr.clickable-row').length >= 6
+      || /Erreur au démarrage|Données trop anciennes/i.test(document.body.innerText || '')
+    ), null, { timeout: 45000 });
 
     await win.evaluate(() => {
       document.body.classList.add('expert-mode');
@@ -188,7 +191,9 @@ async function main() {
         readyHeroDisplay: getComputedStyle(document.querySelector('#ready-picks-hero')).display,
         homeShellDisplay: getComputedStyle(document.querySelector('#betting-home-v2')).display,
         homeTop3Count: document.querySelectorAll('#home-top3-grid .home-top-card').length,
+        homeTopMarkets: Array.from(document.querySelectorAll('#home-top3-grid .home-top-card')).map((node) => node.dataset.homeMarket || ''),
         homeTableRows: document.querySelectorAll('#home-picks-table-body tr.clickable-row').length,
+        homeTableMarkets: Array.from(document.querySelectorAll('#home-picks-table-body tr.clickable-row')).map((node) => node.dataset.homeMarket || ''),
         homeSortButtons: Array.from(document.querySelectorAll('[data-home-sort]')).map((node) => node.textContent.trim()),
         homeCategoryCount: document.querySelectorAll('[data-cockpit-category]').length,
         homeCategoryTexts: Array.from(document.querySelectorAll('[data-cockpit-category]')).map((node) => node.innerText || ''),
@@ -225,6 +230,9 @@ async function main() {
     assert(dom.nav.length <= 12, 'Terrain: navigation trop longue malgré les catégories', { nav: dom.nav });
     assert(dom.rows >= 15 && dom.rows <= 28 && dom.timeline >= 8, 'Terrain: cockpit réel insuffisant', dom);
     assert(dom.homeShellDisplay !== 'none' && dom.homeTop3Count >= Math.min(3, dom.homeTableRows) && dom.homeTableRows >= 6 && dom.homeSortButtons.length >= 4, 'Terrain: nouvel accueil Top 3 + tableau triable absent', dom);
+    const tableMarketCount = new Set(dom.homeTableMarkets.filter(Boolean)).size;
+    const topMarketCount = new Set(dom.homeTopMarkets.filter(Boolean)).size;
+    assert(tableMarketCount <= 1 || topMarketCount >= 2, 'Terrain: Top 3 trop monotone malgré plusieurs marchés disponibles', { top: dom.homeTopMarkets, table: dom.homeTableMarkets });
     assert(dom.homeCategoryCount >= 6, 'Terrain: catégories pronostics insuffisantes pour alléger l’accueil', dom);
     assert(!dom.homeCategoryTexts.some((text) => /\b0\s+ligne/i.test(text)), 'Terrain: catégorie vide visible sur l’accueil', dom.homeCategoryTexts);
     assert(!dom.cockpitOpen, 'Terrain: Cockpit détaillé ouvert par défaut, accueil trop chargé', dom);

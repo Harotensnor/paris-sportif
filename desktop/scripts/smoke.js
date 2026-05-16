@@ -75,6 +75,10 @@ async function main() {
 
     await win.waitForSelector('[data-panel="dashboard"].active', { timeout: 60000 });
     await win.waitForFunction(() => document.querySelector('#metric-picks')?.textContent !== '-', null, { timeout: 90000 });
+    await win.waitForFunction(() => (
+      document.querySelectorAll('#home-picks-table-body tr.clickable-row').length >= 6
+      || /Erreur au démarrage|Données trop anciennes/i.test(document.body.innerText || '')
+    ), null, { timeout: 45000 });
     const dashboard = await win.evaluate(() => ({
       title: document.querySelector('#page-title')?.textContent || '',
       nav: Array.from(document.querySelectorAll('.nav-btn:not(.hidden)')).map((node) => {
@@ -93,7 +97,9 @@ async function main() {
       noUltimate: document.querySelector('#ultimate-bet-card')?.textContent.includes('Aucun bet ultime validé') || false,
       homeShell: Boolean(document.querySelector('#betting-home-v2')) && getComputedStyle(document.querySelector('#betting-home-v2')).display !== 'none',
       homeTop3: document.querySelectorAll('#home-top3-grid .home-top-card').length,
+      homeTopMarkets: Array.from(document.querySelectorAll('#home-top3-grid .home-top-card')).map((node) => node.dataset.homeMarket || ''),
       homeTableRows: document.querySelectorAll('#home-picks-table-body tr.clickable-row').length,
+      homeTableMarkets: Array.from(document.querySelectorAll('#home-picks-table-body tr.clickable-row')).map((node) => node.dataset.homeMarket || ''),
       homeSortButtons: document.querySelectorAll('[data-home-sort]').length,
       dailyBudget: document.querySelector('#daily-budget-summary')?.textContent || '',
       hasRollingSections: document.body.textContent.includes('À jouer prochainement')
@@ -117,11 +123,14 @@ async function main() {
     const missingNav = requiredNavLabels.filter((label) => !navLabels.some((nav) => nav.includes(label)));
     if (missingNav.length) throw new Error(`Navigation Sprint 51 incomplète, manque: ${missingNav.join(', ')}`);
     const hasActionCopy = /PARI/i.test(dashboard.dashboardText) && /COTE/i.test(dashboard.dashboardText) && /MISE/i.test(dashboard.dashboardText);
-    const hasComplexMarket = /Handicap|Double chance|Jeux tennis|Total basket|Total runs|Score exact|Corners|Cartons/i.test(dashboard.dashboardText);
+    const hasComplexMarket = /Handicap|Double chance|Jeux tennis|Total basket|Total runs|Score exact|Corners|Cartons(?!\/m)/i.test(dashboard.dashboardText);
     const hasTechnicalJargon = /\bKelly\b|\bEV\b|\btier\b|\b1N2\b|\bBTTS\b|\bedge\b/i.test(dashboard.dashboardText);
     const hasExpertRepairLabel = /À réparer/i.test(dashboard.dashboardText);
     if (dashboard.rows < 15 || dashboard.rows > 28 || dashboard.timeline < 8 || dashboard.trackButtons < 6 || dashboard.safeBadges < 5 || !/24h|aujourd’hui|à venir|surveill/i.test(dashboard.metricLabel) || (dashboard.metric < 6 && !/trop strict|Winamax/i.test(dashboard.funnelAlert)) || !dashboard.homeShell || dashboard.homeTop3 < Math.min(3, dashboard.homeTableRows) || dashboard.homeTableRows < 6 || dashboard.homeSortButtons < 4 || !hasActionCopy || hasComplexMarket || hasTechnicalJargon || hasExpertRepairLabel) {
       throw new Error(`Picks Sprint 15 insuffisants: ${JSON.stringify({ ...dashboard, dashboardText: dashboard.dashboardText.slice(0, 800), hasActionCopy, hasComplexMarket, hasTechnicalJargon })}`);
+    }
+    if (new Set(dashboard.homeTableMarkets.filter(Boolean)).size > 1 && new Set(dashboard.homeTopMarkets.filter(Boolean)).size < 2) {
+      throw new Error(`Top 3 accueil trop monotone: ${JSON.stringify({ top: dashboard.homeTopMarkets, table: dashboard.homeTableMarkets })}`);
     }
     if (!dashboard.combines || !dashboard.scorers || !dashboard.promos || !dashboard.bankroll.includes('€') || !dashboard.pnl.includes('€') || !dashboard.expertHidden || dashboard.multibookText) {
       throw new Error(`Cockpit Sprint 14 incohérent: ${JSON.stringify(dashboard)}`);

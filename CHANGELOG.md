@@ -5,6 +5,15 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-16
 
+### Hotfix v2.1.6 — Top 3 diversifié + boot refresh robuste
+
+Mission autonome pronostics/UX après refonte accueil.
+- Le Top 3 24h ne peut plus empiler trois paris du même type si le tableau contient plusieurs marchés exploitables.
+- Les Vainqueurs reçoivent un bonus de priorité plus fort, surtout quand le filet 2-0 Winamax est disponible.
+- Les cartes Top 3 affichent maintenant le type de pari en chip pour comprendre immédiatement la variété.
+- Le refresh automatique au boot ne plante plus si certains boutons avancés sont absents de l’accueil compact.
+- `qa:terrain` et `smoke` attendent réellement les lignes calculées avant de juger la page, puis vérifient la diversité du Top 3.
+
 ### Hotfix v2.1.5 — Accueil refait Top 3 + tableau triable + catégories
 
 Refonte de la page “À miser” après captures utilisateur : l’écran d’entrée ne doit plus ressembler à un cockpit technique.

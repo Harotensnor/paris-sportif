@@ -5630,9 +5630,47 @@
     const odd = Number(row?.odd || 0);
     const oddBonus = odd > 1 ? Math.min(14, Math.max(0, (odd - 1) * 4)) : 0;
     const readyBonus = isReadyToStakeRow(row) ? 9 : 0;
-    const winnerBonus = isWinnerRow(row) ? 2 : 0;
-    const safetyBonus = row?.winamaxTwoGoalRule?.eligible ? Math.min(4, Number(row.winamaxTwoGoalRule.leadTwoProbability || 0) * 6) : 0;
+    const winnerBonus = isWinnerRow(row) ? 8 : 0;
+    const safetyBonus = row?.winamaxTwoGoalRule?.eligible ? Math.min(8, Number(row.winamaxTwoGoalRule.leadTwoProbability || 0) * 10) : 0;
     return confidence * 100 + oddBonus + readyBonus + winnerBonus + safetyBonus;
+  }
+
+  function diverseHomeTopRows(rows, limit = 3) {
+    const sorted = sortHomeRows(rows, 'confidence');
+    const selected = [];
+    const seen = new Set();
+    const marketCounts = new Map();
+    const sportCounts = new Map();
+    const add = (row) => {
+      const key = userBetKey(row) || row?.id || `${row?.title}:${row?.market}:${row?.label}`;
+      if (!row || seen.has(key) || selected.length >= limit) return false;
+      seen.add(key);
+      selected.push(row);
+      const market = rowMarketPreferenceKey(row) || 'other';
+      const sport = normalizeUiKey(row?.sport || 'sport');
+      marketCounts.set(market, (marketCounts.get(market) || 0) + 1);
+      sportCounts.set(sport, (sportCounts.get(sport) || 0) + 1);
+      return true;
+    };
+    const canAddWithDiversity = (row, { strict = true } = {}) => {
+      if (!row) return false;
+      const key = userBetKey(row) || row?.id || `${row?.title}:${row?.market}:${row?.label}`;
+      if (seen.has(key)) return false;
+      const market = rowMarketPreferenceKey(row) || 'other';
+      const sport = normalizeUiKey(row?.sport || 'sport');
+      const maxMarket = strict ? 1 : 2;
+      const maxSport = strict ? 2 : 3;
+      return (marketCounts.get(market) || 0) < maxMarket && (sportCounts.get(sport) || 0) < maxSport;
+    };
+    sorted.slice(0, 1).forEach(add);
+    if (selected.length < limit && !selected.some(isWinnerRow)) {
+      const bestWinner = sorted.find((row) => isWinnerRow(row) && canAddWithDiversity(row, { strict: false }));
+      if (bestWinner) add(bestWinner);
+    }
+    sorted.filter((row) => canAddWithDiversity(row, { strict: true })).forEach(add);
+    sorted.filter((row) => canAddWithDiversity(row, { strict: false })).forEach(add);
+    sorted.forEach(add);
+    return selected.slice(0, limit);
   }
 
   function sortHomeRows(rows, mode = homeSortMode()) {
@@ -5701,21 +5739,17 @@
     return rolling24hRows(rows, canDisplayPickCard);
   }
 
-  function homePickRows(rows) {
-    const source = homeSourceRows(rows);
-    const ready = source.filter(isReadyToStakeRow);
-    return ready.length >= 3 ? ready : source;
-  }
-
   function homeTopCardHtml(row, index) {
     const rank = index + 1;
     const confidence = Math.round(homeConfidenceValue(row) * 100);
-    const stake = visibleStakeText(row);
     const kickoff = `${formatDateLabel(row.start)} · ${countdownLabel(row.start)}`;
     const why = simpleWhyText(row);
     const canStake = isReadyToStakeRow(row);
+    const stake = canStake ? visibleStakeText(row) : 'À confirmer';
+    const marketKey = rowMarketPreferenceKey(row);
+    const sportKey = normalizeUiKey(row?.sport || 'sport');
     return `
-      <article class="home-top-card rank-${rank} clickable-row" data-match-id="${escapeHtml(row.id)}" tabindex="0" role="button" aria-label="Ouvrir ${escapeHtml(row.title || 'match')}">
+      <article class="home-top-card rank-${rank} clickable-row" data-match-id="${escapeHtml(row.id)}" data-home-market="${escapeHtml(marketKey)}" data-home-sport="${escapeHtml(sportKey)}" tabindex="0" role="button" aria-label="Ouvrir ${escapeHtml(row.title || 'match')}">
         <div class="home-top-rank">#${rank}</div>
         <div class="home-top-main">
           <div class="home-top-title">
@@ -5729,6 +5763,10 @@
           <div class="home-top-bet">
             <span>PARI</span>
             <strong>${escapeHtml(userBetLabel(row) || simpleMarketLabelForRow(row))}</strong>
+          </div>
+          <div class="home-top-tags">
+            <span>${escapeHtml(simpleMarketLabelForRow(row))}</span>
+            ${isWinnerRow(row) ? '<span>Vainqueur prioritaire</span>' : ''}
           </div>
           <p>${escapeHtml(why)}</p>
           <div class="home-top-kpis">
@@ -5752,8 +5790,10 @@
     const day = formatDayKey(row.start);
     const hour = new Date(row.start || '').toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
     const validHour = hour && hour !== 'Invalid Date' ? hour : '-';
+    const marketKey = rowMarketPreferenceKey(row);
+    const sportKey = normalizeUiKey(row?.sport || 'sport');
     return `
-      <tr class="clickable-row" data-match-id="${escapeHtml(row.id)}" tabindex="0" role="button" aria-label="Ouvrir ${escapeHtml(row.title || 'match')}">
+      <tr class="clickable-row" data-match-id="${escapeHtml(row.id)}" data-home-market="${escapeHtml(marketKey)}" data-home-sport="${escapeHtml(sportKey)}" tabindex="0" role="button" aria-label="Ouvrir ${escapeHtml(row.title || 'match')}">
         <td data-label="Date">${escapeHtml(day)}</td>
         <td data-label="Heure">${escapeHtml(validHour)}<div class="match-sub">${escapeHtml(countdownLabel(row.start))}</div></td>
         <td data-label="Match">
@@ -5788,9 +5828,8 @@
     if (title) title.textContent = meta.title;
     if (subtitle) subtitle.textContent = meta.subtitle;
     const source = homeSourceRows(rows);
-    const topSource = homePickRows(rows);
-    const sortedByConfidence = sortHomeRows(topSource, 'confidence');
-    const topRows = sortedByConfidence.slice(0, 3);
+    const topSource = source;
+    const topRows = diverseHomeTopRows(topSource, 3);
     const tableRows = sortHomeRows(source, sortMode).slice(0, 24);
     $$('.home-sort-actions [data-home-sort], .home-picks-table [data-home-sort]').forEach((button) => {
       button.classList.toggle('active', button.dataset.homeSort === sortMode);
@@ -15471,6 +15510,34 @@
     }
   }
 
+  const REFRESH_BUTTON_IDS = [
+    'refresh-btn',
+    'refresh-full-btn',
+    'refresh-signals-btn',
+    'refresh-prematch-btn',
+    'refresh-prematch-t60-btn',
+    'refresh-prematch-t30-btn',
+    'refresh-prematch-t10-btn',
+    'refresh-repair-context-btn',
+    'refresh-critical-btn',
+    'prepare-smart-btn',
+    'smart-prepare-run-btn',
+    'prematch-final-run-btn',
+    'prematch-t10-run-btn'
+  ];
+
+  function setRefreshControlsDisabled(disabled) {
+    REFRESH_BUTTON_IDS.forEach((id) => {
+      const node = $(`#${id}`);
+      if (node) node.disabled = disabled;
+    });
+  }
+
+  function setRefreshButtonText(id, text) {
+    const node = $(`#${id}`);
+    if (node) node.textContent = text;
+  }
+
   async function refreshLog() {
     const status = await fetchJson('/api/refresh/status');
     const lines = status.lines && status.lines.length ? status.lines : [];
@@ -15488,25 +15555,19 @@
     const isRepairContext = status.mode === 'repair_context';
     const sourceLabel = signalSourceLabel(status.source || 'all');
     const sourceSelect = $('#refresh-signal-source');
-    $('#refresh-btn').disabled = running;
-    if ($('#refresh-full-btn')) $('#refresh-full-btn').disabled = running;
-    $('#refresh-signals-btn').disabled = running;
-    $('#refresh-prematch-btn').disabled = running;
-    $('#refresh-prematch-t60-btn').disabled = running;
-    $('#refresh-prematch-t30-btn').disabled = running;
-    if ($('#refresh-prematch-t10-btn')) $('#refresh-prematch-t10-btn').disabled = running;
+    setRefreshControlsDisabled(running);
     updateFirstActionButton(running);
     if (sourceSelect) sourceSelect.disabled = running;
     $$('.quality-action-btn').forEach((button) => {
       button.disabled = running;
     });
-    $('#refresh-btn').textContent = running && !isSignals ? 'Refresh en cours' : 'Rafraîchir';
-    if ($('#refresh-full-btn')) $('#refresh-full-btn').textContent = running && status.mode === 'full' ? 'Complet en cours' : 'Refresh complet';
-    $('#refresh-signals-btn').textContent = running && isSignals ? `${sourceLabel} en cours` : 'Signaux lents';
-    $('#refresh-prematch-btn').textContent = running && isPrematch ? 'Pré-match en cours' : 'Pré-match final';
-    $('#refresh-prematch-t60-btn').textContent = running && isPrematchT60 ? 'T-60 en cours' : 'T-60';
-    $('#refresh-prematch-t30-btn').textContent = running && isPrematchT30 ? 'T-30 en cours' : 'T-30';
-    if ($('#refresh-prematch-t10-btn')) $('#refresh-prematch-t10-btn').textContent = running && isPrematchT10 ? 'T-10 en cours' : 'T-10';
+    setRefreshButtonText('refresh-btn', running && !isSignals ? 'Refresh en cours' : 'Rafraîchir');
+    setRefreshButtonText('refresh-full-btn', running && status.mode === 'full' ? 'Complet en cours' : 'Refresh complet');
+    setRefreshButtonText('refresh-signals-btn', running && isSignals ? `${sourceLabel} en cours` : 'Signaux lents');
+    setRefreshButtonText('refresh-prematch-btn', running && isPrematch ? 'Pré-match en cours' : 'Pré-match final');
+    setRefreshButtonText('refresh-prematch-t60-btn', running && isPrematchT60 ? 'T-60 en cours' : 'T-60');
+    setRefreshButtonText('refresh-prematch-t30-btn', running && isPrematchT30 ? 'T-30 en cours' : 'T-30');
+    setRefreshButtonText('refresh-prematch-t10-btn', running && isPrematchT10 ? 'T-10 en cours' : 'T-10');
     if (state.status) {
       state.status.refresh = status;
       renderRefreshSummary(state.status);
@@ -15535,19 +15596,7 @@
       lastByMode: state.status?.refresh?.lastByMode || {},
       history: state.status?.refresh?.history || []
     });
-    $('#refresh-btn').disabled = true;
-    if ($('#refresh-full-btn')) $('#refresh-full-btn').disabled = true;
-    $('#refresh-signals-btn').disabled = true;
-    $('#refresh-prematch-btn').disabled = true;
-    $('#refresh-prematch-t60-btn').disabled = true;
-    $('#refresh-prematch-t30-btn').disabled = true;
-    if ($('#refresh-prematch-t10-btn')) $('#refresh-prematch-t10-btn').disabled = true;
-    $('#refresh-repair-context-btn').disabled = true;
-    $('#refresh-critical-btn').disabled = true;
-    if ($('#prepare-smart-btn')) $('#prepare-smart-btn').disabled = true;
-    if ($('#smart-prepare-run-btn')) $('#smart-prepare-run-btn').disabled = true;
-    if ($('#prematch-final-run-btn')) $('#prematch-final-run-btn').disabled = true;
-    if ($('#prematch-t10-run-btn')) $('#prematch-t10-run-btn').disabled = true;
+    setRefreshControlsDisabled(true);
     updateFirstActionButton(true);
     const sourceSelect = $('#refresh-signal-source');
     if (sourceSelect) sourceSelect.disabled = true;
@@ -15557,13 +15606,13 @@
     $$('.quality-action-btn').forEach((button) => {
       button.disabled = true;
     });
-    $('#refresh-btn').textContent = mode === 'signals' ? 'Rafraîchir' : 'Refresh en cours';
-    if ($('#refresh-full-btn')) $('#refresh-full-btn').textContent = mode === 'full' ? 'Complet en cours' : 'Refresh complet';
-    $('#refresh-signals-btn').textContent = mode === 'signals' ? `${signalSourceLabel(source)} en cours` : 'Signaux lents';
-    $('#refresh-prematch-btn').textContent = mode === 'prematch' ? 'Pré-match en cours' : 'Pré-match final';
-    $('#refresh-prematch-t60-btn').textContent = mode === 'prematch_t60' ? 'T-60 en cours' : 'T-60';
-    $('#refresh-prematch-t30-btn').textContent = mode === 'prematch_t30' ? 'T-30 en cours' : 'T-30';
-    if ($('#refresh-prematch-t10-btn')) $('#refresh-prematch-t10-btn').textContent = mode === 'prematch_t10' ? 'T-10 en cours' : 'T-10';
+    setRefreshButtonText('refresh-btn', mode === 'signals' ? 'Rafraîchir' : 'Refresh en cours');
+    setRefreshButtonText('refresh-full-btn', mode === 'full' ? 'Complet en cours' : 'Refresh complet');
+    setRefreshButtonText('refresh-signals-btn', mode === 'signals' ? `${signalSourceLabel(source)} en cours` : 'Signaux lents');
+    setRefreshButtonText('refresh-prematch-btn', mode === 'prematch' ? 'Pré-match en cours' : 'Pré-match final');
+    setRefreshButtonText('refresh-prematch-t60-btn', mode === 'prematch_t60' ? 'T-60 en cours' : 'T-60');
+    setRefreshButtonText('refresh-prematch-t30-btn', mode === 'prematch_t30' ? 'T-30 en cours' : 'T-30');
+    setRefreshButtonText('refresh-prematch-t10-btn', mode === 'prematch_t10' ? 'T-10 en cours' : 'T-10');
     const params = new URLSearchParams({ mode });
     if (mode === 'signals') params.set('source', source);
     try {
@@ -15571,19 +15620,7 @@
       recordActionHistory(actionRecord);
     } catch (error) {
       renderRefreshEta(null);
-      $('#refresh-btn').disabled = false;
-      if ($('#refresh-full-btn')) $('#refresh-full-btn').disabled = false;
-      $('#refresh-signals-btn').disabled = false;
-      $('#refresh-prematch-btn').disabled = false;
-      $('#refresh-prematch-t60-btn').disabled = false;
-      $('#refresh-prematch-t30-btn').disabled = false;
-      if ($('#refresh-prematch-t10-btn')) $('#refresh-prematch-t10-btn').disabled = false;
-      $('#refresh-repair-context-btn').disabled = false;
-      $('#refresh-critical-btn').disabled = false;
-      if ($('#prepare-smart-btn')) $('#prepare-smart-btn').disabled = false;
-      if ($('#smart-prepare-run-btn')) $('#smart-prepare-run-btn').disabled = false;
-      if ($('#prematch-final-run-btn')) $('#prematch-final-run-btn').disabled = false;
-      if ($('#prematch-t10-run-btn')) $('#prematch-t10-run-btn').disabled = false;
+      setRefreshControlsDisabled(false);
       if (sourceSelect) sourceSelect.disabled = false;
       $$('.source-refresh-btn, .prematch-plan-btn').forEach((button) => {
         button.disabled = false;
@@ -15591,19 +15628,19 @@
       $$('.quality-action-btn').forEach((button) => {
         button.disabled = false;
       });
-      $('#refresh-btn').textContent = 'Rafraîchir';
-      if ($('#refresh-full-btn')) $('#refresh-full-btn').textContent = 'Refresh complet';
-      $('#refresh-signals-btn').textContent = 'Signaux lents';
-      $('#refresh-prematch-btn').textContent = 'Pré-match final';
-      $('#refresh-prematch-t60-btn').textContent = 'T-60';
-      $('#refresh-prematch-t30-btn').textContent = 'T-30';
-      if ($('#refresh-prematch-t10-btn')) $('#refresh-prematch-t10-btn').textContent = 'T-10';
-      $('#refresh-repair-context-btn').textContent = 'Réparer contexte';
-      $('#refresh-critical-btn').textContent = 'File critique';
-      if ($('#prepare-smart-btn')) $('#prepare-smart-btn').textContent = 'Préparer mes paris';
-      if ($('#smart-prepare-run-btn')) $('#smart-prepare-run-btn').textContent = smartPrepareAction().label || 'Préparer maintenant';
-      if ($('#prematch-final-run-btn')) $('#prematch-final-run-btn').textContent = 'Lancer pré-match final';
-      if ($('#prematch-t10-run-btn')) $('#prematch-t10-run-btn').textContent = 'Ticket T-10';
+      setRefreshButtonText('refresh-btn', 'Rafraîchir');
+      setRefreshButtonText('refresh-full-btn', 'Refresh complet');
+      setRefreshButtonText('refresh-signals-btn', 'Signaux lents');
+      setRefreshButtonText('refresh-prematch-btn', 'Pré-match final');
+      setRefreshButtonText('refresh-prematch-t60-btn', 'T-60');
+      setRefreshButtonText('refresh-prematch-t30-btn', 'T-30');
+      setRefreshButtonText('refresh-prematch-t10-btn', 'T-10');
+      setRefreshButtonText('refresh-repair-context-btn', 'Réparer contexte');
+      setRefreshButtonText('refresh-critical-btn', 'File critique');
+      setRefreshButtonText('prepare-smart-btn', 'Préparer mes paris');
+      setRefreshButtonText('smart-prepare-run-btn', smartPrepareAction().label || 'Préparer maintenant');
+      setRefreshButtonText('prematch-final-run-btn', 'Lancer pré-match final');
+      setRefreshButtonText('prematch-t10-run-btn', 'Ticket T-10');
       updateFirstActionButton(false);
       recordActionHistory({
         ...actionRecord,
