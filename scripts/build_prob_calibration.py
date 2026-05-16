@@ -106,6 +106,7 @@ def load_settled_records() -> list[dict]:
             "prob": prob,
             "outcome": 1 if result == "won" else 0,
             "sport": str(p.get("sport") or "unknown").lower(),
+            "market": str(p.get("market_key") or p.get("market") or "unknown").lower(),
         })
     if skipped_corrupt:
         print(
@@ -207,6 +208,23 @@ def build_bins_by_sport(records: list[dict]) -> dict[str, dict]:
     }
 
 
+# Sprint 68 — calibration per-market (1n2, ou, btts, teamTotal, dnb, etc.)
+# Pour chaque marche avec >= 30 picks settled, on construit un set de bins
+# isole. Le runtime helper _calibrateProb peut alors choisir le bon set selon
+# le marketKey du pick courant au lieu d'appliquer aveuglement les bins 1n2
+# aux marches derives (qui produisait l'edge fantome Juventus +18pt).
+def build_bins_by_market(records: list[dict], min_n: int = 30) -> dict[str, dict]:
+    grouped: dict[str, list[tuple[float, int]]] = {}
+    for row in records:
+        market = str(row.get("market") or "unknown").lower()
+        grouped.setdefault(market, []).append((row["prob"], row["outcome"]))
+    return {
+        market: build_group_report(rows)
+        for market, rows in sorted(grouped.items())
+        if len(rows) >= min_n
+    }
+
+
 def main() -> int:
     records = load_settled_records()
     rows = [(r["prob"], r["outcome"]) for r in records]
@@ -215,13 +233,16 @@ def main() -> int:
         return 1
     global_report = build_group_report(rows)
     by_sport = build_bins_by_sport(records)
+    # Sprint 68 — bins per-market (1n2, ou, btts, teamTotal, dnb, ...)
+    by_market = build_bins_by_market(records)
     payload = {
         "generated_at": _now_iso(),
-        "schema": "paris-sportif.prob_calibration.v2",
+        "schema": "paris-sportif.prob_calibration.v3",
         "n_settled": len(rows),
         "n_bins": N_BINS,
         "bins": global_report["bins"],
         "bins_by_sport": by_sport,
+        "bins_by_market": by_market,
         "brier_raw": global_report["brier_raw"],
         "brier_calibrated": global_report["brier_calibrated"],
         "brier_delta": global_report["brier_delta"],

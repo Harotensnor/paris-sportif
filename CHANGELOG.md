@@ -5,6 +5,37 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 68 — Calibration per-market + ligues refresh (audit P1)
+
+Suite Sprint 66-67 (discipline modèle), on s'attaque à la cause racine : la calibration `_calibrateProb` était globale (bins 1n2 foot only, n=1037) et s'appliquait aveuglément à OU 2.5/BTTS/scorer. Brier OU 0.247 vs 1n2 0.184 → marché OU **mal calibré de loin le plus**.
+
+**`build_prob_calibration.py`** étendu avec `bins_by_market`
+- Nouveau `build_bins_by_market(records, min_n=30)` qui group par `market_key` du `picks_history.jsonl`.
+- Schema bumpé `prob_calibration.v3`.
+- **5 marchés calibrés indépendamment** (n>=30 chacun, total 1817 picks settled) :
+  - **OU** : n=347, Brier 0.247 → 0.218 (gain **-2.9pt**, le plus gros)
+  - **TeamTotal** : n=513, gain -1.79pt
+  - **DNB** : n=126, gain -1.82pt
+  - **BTTS** : n=96, gain -1.55pt
+  - **1n2** : n=735, gain -1.25pt
+- exactScore (n=6) skip car < 30.
+
+**`_calibrateProb` runtime** (`legacy-app.js`)
+- Priorité hiérarchique : `bins_by_market[market]` > `bins_by_sport[sport]` > `bins` global.
+- Normalisation marketKey runtime → naming `picks_history` (`ou15/ou25/ou35/hockeyTotal/htOu` → `ou`, `matchwinner/winner/moneyline` → `1n2`, `goalscorer/buteur` → `scorer`).
+- Branchée dans `_v35AddCandidate` (`buildMarketCandidates`) pour calibrer la prob raw avant inclusion. `probRaw` conservé en parallèle pour debug.
+- Signature finale `_calibrateProb(p, sport, leagueCode, market)` alignée sur le call site historique.
+
+**`_V45_LEAGUE_OFFSETS` recalculés depuis picks_history.jsonl** (`legacy-app.js`)
+- Constat : le modèle est **systématiquement surconfiant** sur quasi toutes les ligues (avg_edge positif partout).
+- Half-correction (`offset = -avg_edge/2`) cappée à -6pt.
+- **3 nouvelles ligues ajoutées** : `esp.1` (-5.13pt, n=49), `eng.1` (-4.73pt, n=45), `ita.1` (-5.41pt, n=32) — les top 5 manquaient avant.
+- **6 ligues recalibrées** : `jpn.1` -1.35 → -4.45, `fra.2` -0.73 → -3.22, `conmebol.libertadores` +1.08 → **-5.07 (signe inversé !)**, `esp.2` +0.98 → **-3.84 (signe inversé !)**, `chn.1` -0.72 → -4.89.
+- **mlb/nba/nhl retirés** : avg_edge >40pt = artefact format cotes US (+200/-300 vs decimal), pas un vrai biais modèle.
+- Total : 17 ligues offsets (vs 9 avant), couverture beaucoup plus large.
+
+Engine contract OK : 181 matchs, 93 picks, 25 dashboard. 4 Fiables raisonnables conservés (Canadiens 1n2 +4.5pt, OU 2.5/3.5 entre +8.8 et +11pt). Pas de pick aberrant ressurgi.
+
 ### Sprint 66-67 — Audit top 10 fixes : discipline modèle, toast, perf, modal nav
 
 Réponse à l'audit "top 10 problèmes" identifiés (3 sous-agents : modèle, code engine, UX).

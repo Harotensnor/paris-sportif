@@ -3263,9 +3263,19 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
 
   function _v35AddCandidate(out, row, prob, market, key, label, extra) {
     const odd = Number(row?.odd);
-    const p = _v35Prob(prob);
-    if (!(odd > 1.01) || !(p > 0) || !(p < 1)) return;
+    const rawProb = _v35Prob(prob);
+    if (!(odd > 1.01) || !(rawProb > 0) || !(rawProb < 1)) return;
     const match = extra?.match || out?.__match || null;
+    // Sprint 68 — Calibration per-market sur la prob raw avant ajout.
+    // Les bins per-market (1n2/ou/btts/teamtotal/dnb) corrigent le biais
+    // systematique du Poisson xG (overconfident sur OU). Le marketKey est
+    // normalise dans _calibrateProb (ou15/ou25/ou35/hockeyTotal -> 'ou').
+    const sport = match && match.sport ? match.sport : null;
+    const leagueCode = match && match.league_code ? match.league_code : null;
+    const p = (typeof _calibrateProb === 'function')
+      ? _calibrateProb(rawProb, sport, leagueCode, market)
+      : rawProb;
+    if (!(p > 0) || !(p < 1)) return;
     const labelInfo = _v37FormatPickLabel(match, market, key, label || row?.label || key, row, extra || {});
     const rawLabel = label || row?.label || key;
     out.push({
@@ -3276,6 +3286,7 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
       line: row?.line ?? extra?.line ?? null,
       rel: p,
       prob: p,
+      probRaw: rawProb,
       odd,
       edge: p - 1 / odd,
       label: labelInfo.label,
@@ -8948,28 +8959,50 @@ findings: findings.slice(0, 3),
 try { window._v37PickSegmentTrust = _v37PickSegmentTrust; } catch(e) { swallowError(e); }
 // Runtime helper: map a raw model probability to its empirically-calibrated
 // counterpart using the histogram binning from build_prob_calibration.py.
-// Prefer sport-specific bins when sample size is usable, otherwise fall back
-// to the global map. Returns the input unchanged if the map isn't loaded yet.
-function _calibrateProb(p, sport) {
+//
+// Sprint 68 — Priorite des bins :
+//   1. bins_by_market[market]  (n>=30 picks reels sur ce marche)
+//   2. bins_by_sport[sport]    (n>=30 picks reels sur ce sport)
+//   3. bins                    (global fallback)
+//
+// Avant Sprint 68, _calibrateProb appliquait aveuglement les bins globaux
+// (calibres principalement sur 1n2) a TOUS les marches (OU, BTTS, scorer).
+// Ca produisait des edges fantomes comme Juventus Moins de 2.5 +18.3pt.
+// Maintenant chaque marche dispose de ses propres bins quand n>=30.
+// Signature alignee sur le call site historique : (p, sport, leagueCode, market)
+// leagueCode n'est PAS utilise ici (gere par _v45LeagueOffset en aval).
+function _calibrateProb(p, sport, leagueCode, market) {
 const num = Number(p);
 if (!Number.isFinite(num) || num <= 0 || num >= 1) return _capPublicProbValue(num);
 const rep = window.__probCalibration;
+if (!rep) return _capPublicProbValue(num);
+const marketKey = String(market || '').toLowerCase().replace(/[^a-z0-9]+/g, '');
+// Normalisation marketKey runtime -> picks_history.jsonl naming
+// ('matchwinner'/'winner'/'moneyline' -> '1n2', 'ou15'/'ou25'/'ou35' -> 'ou', etc.)
+let mkAlias = marketKey;
+if (marketKey === 'matchwinner' || marketKey === 'winner' || marketKey === 'moneyline') mkAlias = '1n2';
+else if (/^ou\d+/.test(marketKey) || marketKey === 'ou' || marketKey === 'hockeytotal' || marketKey === 'baseballtotal' || marketKey === 'basketballtotal' || marketKey === 'baskettotal' || marketKey === 'httotal' || marketKey === 'htou' || marketKey === 'halftimetotal') mkAlias = 'ou';
+else if (marketKey === 'goalscorer' || marketKey === 'buteur') mkAlias = 'scorer';
+// 1. Try per-market bins
+const marketRep = mkAlias && rep.bins_by_market && rep.bins_by_market[mkAlias];
+const marketBins = marketRep && Number(marketRep.n_settled || 0) >= 30 && Array.isArray(marketRep.bins)
+  ? marketRep.bins
+  : null;
+// 2. Try per-sport bins
 const sportKey = String(sport || '').toLowerCase();
-const sportRep = sportKey && rep && rep.bins_by_sport && rep.bins_by_sport[sportKey];
+const sportRep = sportKey && rep.bins_by_sport && rep.bins_by_sport[sportKey];
 const sportBins = sportRep && Number(sportRep.n_settled || 0) >= 30 && Array.isArray(sportRep.bins)
   ? sportRep.bins
   : null;
-const bins = sportBins || (rep && Array.isArray(rep.bins) ? rep.bins : null);
+// 3. Fallback global
+const bins = marketBins || sportBins || (Array.isArray(rep.bins) ? rep.bins : null);
 if (!bins || !bins.length) return _capPublicProbValue(num);
-// Find the bin containing num.
 const idx = Math.min(bins.length - 1, Math.max(0, Math.floor(num * bins.length)));
 const bin = bins[idx];
 if (!bin) return _capPublicProbValue(num);
-// If the bin has no observations, skip correction (factor defaults to ~1).
 const factor = Number(bin.calibration_factor);
 if (!Number.isFinite(factor) || factor <= 0) return _capPublicProbValue(num);
 const corrected = num * factor;
-// Clamp to a sane range so a noisy bin can't push the prob to 0 / 1.
 return _capPublicProbValue(corrected);
 }
 try { window._calibrateProb = _calibrateProb; } catch(e) { swallowError(e); }
@@ -9501,22 +9534,36 @@ function _v45PlattBoost(rel) {
   if (rel < 0.80) return Math.min(0.95, rel + 0.060);
   return rel;
 }
-// AUDIT 2026-05-09 v45.7 — Per-league calibration offsets.
-// Backtest_report_v2.by_league (n>=15 par ligue) montre des biais
-// systématiques de prediction par ligue. Half-correction appliquée
-// (offset = -avg_edge/200) pour garder safety net en cas de drift.
-// Ligues avec offset négatif : modèle SUR-confident → reduce rel.
-// Ligues avec offset positif : modèle SOUS-confident → boost rel.
+// Sprint 68 — Per-league calibration offsets recalcules depuis picks_history.jsonl
+// (n=735 picks 1n2 settled total). Half-correction (offset = -avg_edge/2) cappee a
+// -6pt pour eviter sur-correction. Constat : le modele est SYSTEMATIQUEMENT surconfiant
+// (avg_edge positif sur quasi toutes les ligues -> WR reel < prediction).
+//
+// Avant Sprint 68, les offsets v45.7 etaient calibres sur un corpus different
+// et boostaient certaines ligues (mlb +1.51pt, nba +2.22pt) qui sont en realite
+// fortement surconfiantes dans le nouveau corpus. mlb/nba ont des avg_edge absurdes
+// (>40pt) qui revelent un probleme de format de cotes US (+200/-300) -> skip.
 const _V45_LEAGUE_OFFSETS = {
-  'mlb': 0.0151,           // n=74 avg_edge -3.02% -> boost (model underconfident)
-  'nba': 0.0222,           // n=24 avg_edge -4.44% -> boost
-  'nhl': 0.0135,           // n=21 avg_edge -2.71% -> boost
-  'eng.3': 0.0088,         // n=27 avg_edge -1.76% -> boost
-  'esp.2': 0.0098,         // n=16 avg_edge -1.97% -> boost
-  'conmebol.libertadores': 0.0108, // n=16 avg_edge -2.16% -> boost
-  'jpn.1': -0.0135,        // n=24 avg_edge +2.70% -> reduce (overconfident)
-  'fra.2': -0.0073,        // n=18 avg_edge +1.47% -> reduce
-  'chn.1': -0.0072         // n=16 avg_edge +1.44% -> reduce
+  // Cap a -0.06 (max reduction 6pt) pour eviter sur-correction sur ligues
+  // avec sample court ou data bruitee.
+  'usa.1': -0.0367,                  // n=53 WR=30% avg_edge=+7.3pt
+  'jpn.1': -0.0445,                  // n=51 WR=28% avg_edge=+8.9pt
+  'esp.1': -0.0513,                  // n=49 WR=29% avg_edge=+10.3pt (nouvelle ligue Sprint 68)
+  'eng.1': -0.0473,                  // n=45 WR=16% avg_edge=+9.5pt (nouvelle ligue Sprint 68)
+  'arg.1': -0.0466,                  // n=37 WR=32% avg_edge=+9.3pt
+  'fra.2': -0.0322,                  // n=34 WR=27% avg_edge=+6.4pt
+  'fra.1': -0.0600,                  // n=32 WR=22% avg_edge=+12.4pt (cap -6pt)
+  'ita.1': -0.0541,                  // n=32 WR=19% avg_edge=+10.8pt (nouvelle ligue Sprint 68)
+  'mex.1': -0.0504,                  // n=32 WR=22% avg_edge=+10.1pt
+  'conmebol.libertadores': -0.0507,  // n=28 WR=21% avg_edge=+10.1pt (inverse vs v45.7)
+  'ger.1': -0.0469,                  // n=27 WR=11% avg_edge=+9.4pt
+  'conmebol.sudamericana': -0.0405,  // n=27 WR=11% avg_edge=+8.1pt
+  'tur.1': -0.0566,                  // n=25 WR=16% avg_edge=+11.3pt
+  'esp.2': -0.0384,                  // n=24 WR=17% avg_edge=+7.7pt (inverse vs v45.7)
+  'chn.1': -0.0489,                  // n=18 WR=39% avg_edge=+9.8pt
+  'gre.1': -0.0337,                  // n=18 WR=28% avg_edge=+6.8pt
+  'swe.1': -0.0419                   // n=16 WR=6% avg_edge=+8.4pt
+  // mlb/nba/nhl skipped : avg_edge >40pt = artefact format cotes US, pas reel
 };
 function _v45LeagueOffset(rel, leagueCode) {
   if (!Number.isFinite(rel) || rel <= 0 || rel >= 1) return rel;
