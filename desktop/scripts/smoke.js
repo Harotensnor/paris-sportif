@@ -75,7 +75,10 @@ async function main() {
     await win.waitForFunction(() => document.querySelector('#metric-picks')?.textContent !== '-', null, { timeout: 90000 });
     const dashboard = await win.evaluate(() => ({
       title: document.querySelector('#page-title')?.textContent || '',
-      nav: Array.from(document.querySelectorAll('.nav-btn:not(.hidden)')).map((node) => node.textContent.trim()),
+      nav: Array.from(document.querySelectorAll('.nav-btn:not(.hidden)')).map((node) => {
+        const label = node.querySelector('.nav-label');
+        return (label ? label.textContent : node.textContent).trim();
+      }),
       metric: Number(document.querySelector('#metric-picks')?.textContent || 0),
       metricLabel: document.querySelector('#metric-picks-label')?.textContent || '',
       funnelAlert: document.querySelector('#today-funnel-alert')?.innerText || '',
@@ -99,8 +102,14 @@ async function main() {
       multibookText: document.body.textContent.includes('Multi-' + 'bookmaker') || document.body.textContent.includes('Meilleure ' + 'cote'),
       dashboardText: document.querySelector('[data-panel="dashboard"]')?.innerText || ''
     }));
-    if (dashboard.title !== 'Picks') throw new Error(`Titre dashboard invalide: ${dashboard.title}`);
-    if (dashboard.nav.join('|') !== 'Picks|Bilan|Recherche|Réglages') throw new Error(`Navigation Sprint 22 invalide: ${dashboard.nav.join(', ')}`);
+    if (!/Picks|Paris/i.test(dashboard.title)) throw new Error(`Titre dashboard invalide: ${dashboard.title}`);
+    // Sprint 51 (refonte UX) : navigation enrichie avec groupes et labels.
+    // On vérifie que les labels clés sont présents au lieu d'exiger une
+    // séquence stricte qui contraint trop l'évolution de la nav.
+    const navLabels = dashboard.nav.map((l) => l.toLowerCase());
+    const requiredNavLabels = ['paris du jour', 'tous les matchs', 'buteurs', 'combinés', 'bilan', 'recherche', 'réglages'];
+    const missingNav = requiredNavLabels.filter((label) => !navLabels.some((nav) => nav.includes(label)));
+    if (missingNav.length) throw new Error(`Navigation Sprint 51 incomplète, manque: ${missingNav.join(', ')}`);
     const hasActionCopy = /PARI/i.test(dashboard.dashboardText) && /COTE/i.test(dashboard.dashboardText) && /MISE/i.test(dashboard.dashboardText);
     const hasComplexMarket = /Handicap|Double chance|Jeux tennis|Total basket|Total runs|Score exact|Corners|Cartons/i.test(dashboard.dashboardText);
     const hasTechnicalJargon = /\bKelly\b|\bEV\b|\btier\b|\b1N2\b|\bBTTS\b|\bedge\b/i.test(dashboard.dashboardText);

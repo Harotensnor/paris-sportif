@@ -5,6 +5,47 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 51 — Refonte navigation + nouvelles catégories
+
+**Feedback utilisateur : "revoie complétement l'affichage de chaque page, navigation, catégories supplémentaires"**
+
+Navigation principale refondue (sidebar)
+- 9 boutons au lieu de 5, organisés en 3 groupes thématiques :
+  * **À MISER** : 🎯 Paris du jour, ⚽ Tous les matchs, 👤 Buteurs, 🎲 Combinés
+  * **SUIVI** : 📊 Bilan & Stats, 📅 Calendrier, 🔍 Recherche
+  * **CONFIG** : ⚙️ Réglages, 🔧 Avancé (Mode expert)
+- Chaque bouton : icône emoji + label texte + badge compteur (paris prêts pour Picks).
+- Labels de groupe `À MISER / SUIVI / CONFIG` en petites caps lettrées 800.
+- Active state : gradient violet+bleu subtil + bordure 45% opacité + box-shadow.
+- Hover : translateX(2px) + bordure indigo 18% opacité.
+- Sidebar élargie de 228px à 248px pour accommoder les nouveaux labels.
+- Les vues `matches`, `scorers`, `combines`, `calendar` qui existaient déjà sans bouton nav sont maintenant directement accessibles.
+
+Titres de page mis à jour
+- "Picks" → "Paris du jour"
+- "Combinés" → "Combinés du jour"
+- "Buteurs" → "Buteurs & joueurs"
+- "Tous les matchs" → "Tous les matchs Winamax"
+- "Bilan" → "Bilan & Stats"
+
+Style global plus aéré
+- `.main` padding 22px → 28px/32px + overflow-y auto.
+- `.topbar` margin-bottom 18px → 24px + border-bottom subtile.
+- `.topbar h2` font-size 28px → 30px, letter-spacing -0.5px (plus moderne).
+- `.eyebrow` couleur ajustée pour meilleur contraste avec titre principal.
+- `.app-shell` passe en `height: 100vh` (au lieu de min-height) pour scroll fluide.
+
+i18n
+- `navPicks` `fr` → "Paris du jour", `en` → "Today's bets"
+- `navHistory` `fr` → "Bilan & Stats", `en` → "Stats"
+- I18N_MESSAGES inline + i18n/fr.json + i18n/en.json synchronisés.
+- `applyI18n()` cible désormais `.nav-label` pour ne plus écraser icône + badge.
+
+QA
+- smoke.js : extraction nav adaptée (`.nav-label`), assertion souple sur labels-clés au lieu de séquence stricte.
+- terrain-check.js et visual-capture.js alignés.
+- smoke OK : 1 paris ready, 14 timeline, 24 fiables, 10 priorités.
+
 ### Sprint 50 — Vue Buteurs assouplie + badge compteur nav Picks
 
 - `renderScorers()` : seuil `canTrackScorer` aligné sur le filtre moteur sprint 43 → `edge ≥ 0.005` et `qualityScore ≥ 35` (vs 0.01 et 50). La vue Buteurs ne rejette plus ce que le moteur a déjà validé comme buteur affichable.

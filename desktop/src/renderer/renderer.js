@@ -292,8 +292,8 @@
   };
   const I18N_MESSAGES = {
     fr: {
-      navPicks: 'Picks',
-      navHistory: 'Bilan',
+      navPicks: 'Paris du jour',
+      navHistory: 'Bilan & Stats',
       navSearch: 'Recherche',
       navSettings: 'Réglages',
       autoTracking: 'Auto-tracking supervisé',
@@ -309,8 +309,8 @@
       tacticalAnalysis: 'Analyse tactique'
     },
     en: {
-      navPicks: 'Picks',
-      navHistory: 'Results',
+      navPicks: "Today's bets",
+      navHistory: 'Stats',
       navSearch: 'Search',
       navSettings: 'Settings',
       autoTracking: 'Supervised auto-tracking',
@@ -352,10 +352,19 @@
       : (language === 'en' ? 'en' : 'fr');
     localStorage.setItem(I18N_LANGUAGE_KEY, language || 'fr');
     document.documentElement.lang = lang;
-    document.querySelector('[data-tab="dashboard"]') && (document.querySelector('[data-tab="dashboard"]').textContent = t('navPicks'));
-    document.querySelector('[data-tab="history"]') && (document.querySelector('[data-tab="history"]').textContent = t('navHistory'));
-    document.querySelector('[data-tab="search"]') && (document.querySelector('[data-tab="search"]').textContent = t('navSearch'));
-    document.querySelector('[data-tab="preferences"]') && (document.querySelector('[data-tab="preferences"]').textContent = t('navSettings'));
+    // Sprint 51 (refonte UX) : on cible la `.nav-label` enrichie au lieu
+    // d'écraser tout le bouton (qui contient maintenant icone + label + badge).
+    const setNavLabel = (selector, fallback) => {
+      const btn = document.querySelector(selector);
+      if (!btn) return;
+      const label = btn.querySelector('.nav-label');
+      if (label) label.textContent = fallback;
+      else btn.textContent = fallback;
+    };
+    setNavLabel('[data-tab="dashboard"]', t('navPicks'));
+    setNavLabel('[data-tab="history"]', t('navHistory'));
+    setNavLabel('[data-tab="search"]', t('navSearch'));
+    setNavLabel('[data-tab="preferences"]', t('navSettings'));
     const strategy = $('#saved-strategy-select option[value=""]');
     if (strategy) strategy.textContent = t('strategySelect');
     const saveStrategy = $('#save-current-strategy-btn');
@@ -14070,10 +14079,10 @@
     $$('.nav-btn').forEach((btn) => btn.classList.toggle('active', btn.dataset.tab === tab));
     $$('.tab-panel').forEach((panel) => panel.classList.toggle('active', panel.dataset.panel === tab));
     const titles = {
-      dashboard: t('navPicks'),
-      combines: 'Combinés',
-      scorers: 'Buteurs',
-      matches: 'Tous les matchs',
+      dashboard: 'Paris du jour',
+      combines: 'Combinés du jour',
+      scorers: 'Buteurs & joueurs',
+      matches: 'Tous les matchs Winamax',
       history: t('navHistory'),
       agent: 'Agent',
       data: 'Avancé',

@@ -48,7 +48,10 @@ async function main() {
     await safeScreenshot(win, path.join(captureDir, 'desktop-sprint33-ultra-picks-after.png'), { fullPage: true });
 
     const dashboard = await win.evaluate(() => ({
-      nav: Array.from(document.querySelectorAll('.nav-btn:not(.hidden)')).map((node) => node.textContent.trim()),
+      nav: Array.from(document.querySelectorAll('.nav-btn:not(.hidden)')).map((node) => {
+        const label = node.querySelector('.nav-label');
+        return (label ? label.textContent : node.textContent).trim();
+      }),
       metric: Number(document.querySelector('#metric-picks')?.textContent || 0),
       metricLabel: document.querySelector('#metric-picks-label')?.textContent || '',
       funnelAlert: document.querySelector('#today-funnel-alert')?.innerText || '',
@@ -220,7 +223,11 @@ async function main() {
       message.startsWith('error:') || message.startsWith('pageerror:')
     ) && !isIgnorableConsoleMessage(message));
     if (severe.length) throw new Error(`Erreurs console: ${severe.join(' | ')}`);
-    if (dashboard.nav.join('|') !== 'Picks|Bilan|Recherche|Réglages') throw new Error(`Navigation non simplifiée: ${dashboard.nav.join(', ')}`);
+    // Sprint 51 : vérification labels-clés au lieu de séquence stricte.
+    const visualNavLabels = dashboard.nav.map((l) => l.toLowerCase());
+    const visualRequired = ['paris du jour', 'bilan', 'recherche', 'réglages'];
+    const visualMissing = visualRequired.filter((label) => !visualNavLabels.some((nav) => nav.includes(label)));
+    if (visualMissing.length) throw new Error(`Navigation Sprint 51 incomplète, manque: ${visualMissing.join(', ')}`);
     const hasActionCopy = /PARI/i.test(dashboard.dashboardText) && /COTE/i.test(dashboard.dashboardText) && /MISE/i.test(dashboard.dashboardText);
     const hasComplexMarket = /Handicap|Double chance|Jeux tennis|Total basket|Total runs|Score exact|Corners|Cartons/i.test(dashboard.dashboardText);
     const hasTechnicalJargon = /\bKelly\b|\bEV\b|\btier\b|\b1N2\b|\bBTTS\b|\bedge\b/i.test(dashboard.dashboardText);

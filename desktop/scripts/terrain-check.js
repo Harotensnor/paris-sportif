@@ -169,11 +169,18 @@ async function main() {
         hasActionCopy: /PARI/i.test(text) && /COTE/i.test(text) && /MISE/i.test(text),
         hasStartedButton: trackButtons.some((label) => /déjà commencé/i.test(label)),
         hiddenAdvancedVisible: Boolean(document.querySelector('[data-tab="data"]:not(.hidden)')),
-        nav: Array.from(document.querySelectorAll('.nav-btn:not(.hidden)')).map((node) => node.textContent.trim())
+        nav: Array.from(document.querySelectorAll('.nav-btn:not(.hidden)')).map((node) => {
+          const label = node.querySelector('.nav-label');
+          return (label ? label.textContent : node.textContent).trim();
+        })
       };
     });
-    assert(dom.title === 'Picks', 'Terrain: la vue Picks ne s’ouvre pas par défaut', dom);
-    assert(dom.nav.join('|') === 'Picks|Bilan|Recherche|Réglages', 'Terrain: navigation standard non simplifiée', dom.nav);
+    assert(/Picks|Paris/i.test(dom.title), 'Terrain: la vue Picks ne s’ouvre pas par défaut', dom);
+    // Sprint 51 : on vérifie la présence des labels-clés, pas l'ordre exact.
+    const requiredNavLabels = ['paris du jour', 'bilan', 'recherche', 'réglages'];
+    const navLabels = dom.nav.map((l) => l.toLowerCase());
+    const missingNav = requiredNavLabels.filter((label) => !navLabels.some((nav) => nav.includes(label)));
+    assert(missingNav.length === 0, 'Terrain: navigation standard non simplifiée', { missingNav, nav: dom.nav });
     assert(dom.rows >= 15 && dom.rows <= 28 && dom.timeline >= 8, 'Terrain: cockpit réel insuffisant', dom);
     if (Number(todayFunnel.bookableEvents || 0) >= 30 && Number(todayFunnel.displayed || 0) < 10) {
       assert(/trop strict|modèle trop strict/i.test(dom.alertText), 'Terrain: le garde-fou trop strict n’est pas visible', { todayFunnel, alertText: dom.alertText });
