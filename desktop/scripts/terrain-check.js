@@ -166,9 +166,14 @@ async function main() {
         trackButtonCount: trackButtons.length,
         alertText: document.querySelector('#today-funnel-alert')?.innerText || '',
         readyHeroText: document.querySelector('#ready-picks-hero')?.innerText || '',
+        readyHeroDisplay: getComputedStyle(document.querySelector('#ready-picks-hero')).display,
         homeCategoryCount: document.querySelectorAll('[data-cockpit-category]').length,
+        homeCategoryTexts: Array.from(document.querySelectorAll('[data-cockpit-category]')).map((node) => node.innerText || ''),
         cockpitOpen: Boolean(document.querySelector('#cockpit-detail-section')?.open),
+        cockpitDisplay: getComputedStyle(document.querySelector('#cockpit-detail-section')).display,
         cockpitSummary: document.querySelector('#cockpit-detail-section > summary')?.innerText || '',
+        liveDisplay: getComputedStyle(document.querySelector('#live-cockpit')).display,
+        stakeScenarioDisplay: getComputedStyle(document.querySelector('.compact-advanced')).display,
         dashboardText: text,
         liveText: document.querySelector('#live-cockpit')?.innerText || '',
         sideStatus: document.querySelector('#side-status')?.innerText || '',
@@ -195,8 +200,10 @@ async function main() {
     assert(missingNav.length === 0, 'Terrain: navigation standard non simplifiée', { missingNav, nav: dom.nav });
     assert(dom.nav.length <= 5, 'Terrain: trop d’entrées visibles dans la navigation standard', { nav: dom.nav });
     assert(dom.rows >= 15 && dom.rows <= 28 && dom.timeline >= 8, 'Terrain: cockpit réel insuffisant', dom);
-    assert(dom.homeCategoryCount >= 6, 'Terrain: catégories pronostics absentes de l’accueil compact', dom);
+    assert(dom.homeCategoryCount >= 6, 'Terrain: catégories pronostics insuffisantes pour alléger l’accueil', dom);
+    assert(!dom.homeCategoryTexts.some((text) => /\b0\s+ligne/i.test(text)), 'Terrain: catégorie vide visible sur l’accueil', dom.homeCategoryTexts);
     assert(!dom.cockpitOpen, 'Terrain: Cockpit détaillé ouvert par défaut, accueil trop chargé', dom);
+    assert(dom.cockpitDisplay === 'none' && dom.readyHeroDisplay === 'none' && dom.liveDisplay === 'none' && dom.stakeScenarioDisplay === 'none', 'Terrain: accueil encore surchargé par des blocs secondaires', dom);
     assert(/Cockpit pronostics/i.test(dom.cockpitSummary), 'Terrain: catégorie Cockpit pronostics absente', dom);
     if (Number(todayFunnel.bookableEvents || 0) >= 30 && Number(todayFunnel.displayed || 0) < 10 && dom.trackButtonCount < 1) {
       assert(/trop strict|modèle trop strict/i.test(dom.alertText), 'Terrain: le garde-fou trop strict n’est pas visible', { todayFunnel, alertText: dom.alertText });

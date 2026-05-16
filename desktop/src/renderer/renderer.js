@@ -5469,12 +5469,19 @@
 
   function marketCategoryRows(rows, category) {
     const arr = rolling24hRows(rows, canDisplayPickCard);
+    if (category === 'ready') return arr.filter(isReadyToStakeRow);
     if (category === 'winner') return arr.filter(isWinnerRow);
     if (category === 'goals') return arr.filter((row) => ['goals', 'btts'].includes(rowMarketPreferenceKey(row)));
     if (category === 'scorer') return arr.filter((row) => rowMarketPreferenceKey(row) === 'scorer');
     if (category === 'halftime') return arr.filter((row) => rowMarketPreferenceKey(row) === 'halftime');
     if (category === 'watch') return arr.filter((row) => !isReadyToStakeRow(row));
     if (category === 'night') return nightPickRows(rows, canDisplayPickCard);
+    if (category === 'today') return arr.filter(isTodayPick);
+    if (category === 'tomorrow') {
+      const tomorrow = parisDayKey(new Date(Date.now() + 24 * 60 * 60 * 1000));
+      return arr.filter((row) => pickDayKey(row) === tomorrow);
+    }
+    if (category === 'live') return liveRows().map((item) => item.row).filter(canDisplayPickCard);
     return arr;
   }
 
@@ -5504,7 +5511,14 @@
         icon: '🎛',
         title: 'Cockpit pronostics',
         rows: cockpitRows,
-        detail: 'Tout classer par horaire, type ou sport'
+        detail: 'Tout ouvrir, filtrer, comparer'
+      },
+      {
+        key: 'ready',
+        icon: '✅',
+        title: 'À miser',
+        rows: marketCategoryRows(allRows, 'ready'),
+        detail: 'Uniquement les paris avec bouton'
       },
       {
         key: 'winner',
@@ -5518,14 +5532,28 @@
         icon: '🌙',
         title: 'Nuit',
         rows: marketCategoryRows(allRows, 'night'),
-        detail: 'Sports US / Asie sans encombrer l’accueil'
+        detail: 'Sports US / Asie'
+      },
+      {
+        key: 'today',
+        icon: '📅',
+        title: 'Aujourd’hui',
+        rows: marketCategoryRows(allRows, 'today'),
+        detail: 'Ce qui reste dans la journée'
+      },
+      {
+        key: 'tomorrow',
+        icon: '🌅',
+        title: 'Demain',
+        rows: marketCategoryRows(allRows, 'tomorrow'),
+        detail: 'Préparer sans charger l’accueil'
       },
       {
         key: 'goals',
         icon: '⚽',
         title: 'Buts',
         rows: marketCategoryRows(allRows, 'goals'),
-        detail: 'Plus/Moins + les deux équipes marquent'
+        detail: 'Plus/Moins + les deux marquent'
       },
       {
         key: 'scorer',
@@ -5542,6 +5570,13 @@
         detail: `${formatCount(sportCount)} sport${sportCount > 1 ? 's' : ''} couvert${sportCount > 1 ? 's' : ''}`
       },
       {
+        key: 'live',
+        icon: '🔴',
+        title: 'Live',
+        rows: marketCategoryRows(allRows, 'live'),
+        detail: 'Seulement si match en cours'
+      },
+      {
         key: 'watch',
         icon: '👁',
         title: 'À surveiller',
@@ -5551,7 +5586,7 @@
     ].map((card) => {
       const ready = card.rows.filter(isReadyToStakeRow).length;
       return { ...card, ready, total: card.rows.length };
-    });
+    }).filter((card) => card.key === 'cockpit' || card.total > 0);
     if (count) {
       count.textContent = `${formatCount(readyRows.length)} prêts · ${formatCount(cockpitRows.length)} lignes`;
     }
@@ -5562,21 +5597,29 @@
   function openCockpitCategory(category = 'cockpit') {
     const normalized = String(category || 'cockpit').toLowerCase();
     const modeByCategory = {
+      ready: 'time',
       winner: 'type',
       goals: 'type',
       scorer: 'type',
       halftime: 'type',
       sport: 'sport',
       night: 'time',
+      today: 'time',
+      tomorrow: 'time',
+      live: 'time',
       watch: 'time',
       cockpit: 'time'
     };
     const targetBucket = {
+      ready: 'next',
       winner: 'winner',
       goals: 'goals',
       scorer: 'scorer',
       halftime: 'halftime',
       night: 'tonight',
+      today: 'today',
+      tomorrow: 'tomorrow_am',
+      live: 'next',
       watch: 'next',
       cockpit: 'next'
     }[normalized] || 'next';
@@ -5600,12 +5643,16 @@
       }
     }, 40);
     const label = {
+      ready: 'Cockpit À miser',
       winner: 'Cockpit Vainqueurs',
       goals: 'Cockpit Buts',
       scorer: 'Cockpit Buteurs',
       halftime: 'Cockpit Mi-temps',
       sport: 'Cockpit par sport',
       night: 'Cockpit nuit',
+      today: 'Cockpit aujourd’hui',
+      tomorrow: 'Cockpit demain',
+      live: 'Cockpit live',
       watch: 'Cockpit à surveiller',
       cockpit: 'Cockpit complet'
     }[normalized] || 'Cockpit pronostics';

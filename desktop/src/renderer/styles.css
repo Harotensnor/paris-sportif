@@ -5414,18 +5414,16 @@ td.empty::before,
 .ultimate-bet-card {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 240px;
-  gap: 22px;
-  padding: 26px 28px;
-  margin: 20px 0 24px 0;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  padding: 16px 18px;
+  margin: 8px 0 12px 0;
   border: 1px solid rgba(16, 185, 129, .55);
-  border-radius: 20px;
+  border-radius: 14px;
   background:
-    linear-gradient(135deg, rgba(16, 185, 129, .22) 0%, rgba(99, 102, 241, .12) 100%),
+    linear-gradient(135deg, rgba(16, 185, 129, .18) 0%, rgba(99, 102, 241, .08) 100%),
     var(--surface);
-  box-shadow:
-    0 22px 60px rgba(2, 6, 23, .35),
-    inset 0 1px 0 rgba(255, 255, 255, .04);
+  box-shadow: 0 12px 34px rgba(2, 6, 23, .26);
   overflow: hidden;
   transition: transform 220ms ease-out, box-shadow 220ms ease-out;
 }
@@ -5470,8 +5468,8 @@ td.empty::before,
 }
 
 .ultimate-copy h3 {
-  margin: 6px 0 8px;
-  font-size: 28px;
+  margin: 4px 0 6px;
+  font-size: 21px;
   line-height: 1.1;
 }
 
@@ -5479,6 +5477,12 @@ td.empty::before,
   margin: 0;
   color: var(--muted);
   max-width: 880px;
+  font-size: 13px;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .match-visual {
@@ -6170,16 +6174,17 @@ body.theme-light .sidebar {
 
 .home-category-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 8px;
-  margin: 8px 0 12px;
+  grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+  gap: 7px;
+  margin: 6px 0 10px;
 }
 
 .home-category-card {
   display: grid;
-  gap: 5px;
+  gap: 3px;
   text-align: left;
-  padding: 10px;
+  min-height: 78px;
+  padding: 9px 10px;
   border: 1px solid var(--line);
   border-radius: 12px;
   background: rgba(15, 23, 42, .44);
@@ -6197,20 +6202,20 @@ body.theme-light .sidebar {
 }
 
 .home-category-card span {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 900;
   color: var(--text-dim);
 }
 
 .home-category-card strong {
-  font-size: 18px;
+  font-size: 17px;
   line-height: 1.1;
   color: var(--text);
   font-variant-numeric: tabular-nums;
 }
 
 .home-category-card em {
-  font-size: 11px;
+  font-size: 10.5px;
   line-height: 1.25;
   color: var(--muted);
   font-style: normal;
@@ -6257,6 +6262,40 @@ body.theme-light .sidebar {
 .cockpit-detail-section[open] {
   background: rgba(15, 23, 42, .56);
   border-color: rgba(99, 102, 241, .3);
+}
+
+/* Accueil vraiment léger : seulement Top Pick + catégories.
+   Le cockpit complet existe, mais uniquement après clic sur une catégorie. */
+.tab-panel[data-panel="dashboard"].active > .ready-picks-hero,
+.tab-panel[data-panel="dashboard"].active > .live-cockpit,
+.tab-panel[data-panel="dashboard"].active > .cockpit-detail-section:not([open]),
+.tab-panel[data-panel="dashboard"].active > .compact-advanced {
+  display: none !important;
+}
+
+.tab-panel[data-panel="dashboard"].active > .ultimate-bet-card .ultimate-hero-media,
+.tab-panel[data-panel="dashboard"].active > .ultimate-bet-card .ultimate-tags,
+.tab-panel[data-panel="dashboard"].active > .ultimate-bet-card .focus-mode-btn {
+  display: none;
+}
+
+.tab-panel[data-panel="dashboard"].active > .ultimate-bet-card .action-pick {
+  margin: 8px 0 0;
+  padding: 9px;
+  gap: 7px;
+}
+
+.tab-panel[data-panel="dashboard"].active > .ultimate-bet-card .ultimate-copy > p {
+  display: none;
+}
+
+.tab-panel[data-panel="dashboard"].active > .ultimate-bet-card .ultimate-side {
+  min-width: 150px;
+  gap: 7px;
+}
+
+.tab-panel[data-panel="dashboard"].active > .ultimate-bet-card .ultimate-side strong {
+  font-size: 18px;
 }
 
 .player-photo.player-photo-sm { width: 32px; height: 32px; }

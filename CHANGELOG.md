@@ -5,6 +5,17 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-16
 
+### Hotfix v2.1.2 — Accueil “À miser” vraiment allégé
+
+Correctif après retour utilisateur : la page “À miser” restait trop chargée malgré les catégories.
+- Accueil standard réduit à l’essentiel : Top Pick compact + catégories.
+- Les cartes secondaires “À miser maintenant”, le live vide et le panneau Cockpit fermé sont cachés par défaut.
+- Le Cockpit complet s’ouvre uniquement après clic sur une catégorie.
+- Catégories renforcées : `Cockpit pronostics`, `À miser`, `Vainqueurs`, `Nuit`, `Aujourd’hui`, `Demain`, `Buts`, `Buteurs`, `Par sport`, `Live`, `À surveiller`.
+- Les catégories vides sont masquées : plus de `Demain 0`, `Buteurs 0`, `Live 0` sur l’accueil.
+- Top Pick compact : moins de badges, image de fond cachée sur l’accueil, texte limité à une ligne.
+- `qa:terrain` vérifie maintenant que l’accueil n’affiche pas les blocs secondaires et ne montre pas de catégorie vide.
+
 ### Hotfix v2.1.1 — Changements visibles via le lanceur Windows
 
 Correctif ciblé après retour utilisateur : `LANCER-LOGICIEL.vbs` relançait parfois une ancienne fenêtre Electron déjà en mémoire, donc les changements semblaient absents.
