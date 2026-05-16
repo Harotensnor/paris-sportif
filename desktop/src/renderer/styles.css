@@ -346,8 +346,11 @@ a:hover {
 
 .ghost-btn,
 .primary-btn {
-  padding: 10px 14px;
-  font-weight: 800;
+  padding: 10px 16px;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.2px;
+  transition: background 160ms ease-out, transform 160ms ease-out, box-shadow 160ms ease-out, border-color 160ms ease-out;
 }
 
 .ghost-btn {
@@ -355,9 +358,22 @@ a:hover {
   border-color: var(--line);
 }
 
+.ghost-btn:hover:not([disabled]) {
+  background: var(--surface-2);
+  border-color: rgba(99, 102, 241, .35);
+  transform: translateY(-1px);
+}
+
 .primary-btn {
-  background: var(--accent);
+  background: linear-gradient(135deg, var(--accent) 0%, #14b884 100%);
   color: #05251b;
+  border-color: rgba(16, 185, 129, .55);
+  box-shadow: 0 2px 8px rgba(16, 185, 129, .25);
+}
+
+.primary-btn:hover:not([disabled]) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(16, 185, 129, .35);
 }
 
 .primary-btn[disabled],
@@ -603,8 +619,23 @@ a:hover {
 .preference-card,
 .onboarding-card {
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 12px;
   background: var(--surface);
+  padding: 16px 18px;
+  transition: border-color 200ms ease-out, box-shadow 200ms ease-out;
+}
+
+.preference-card:hover {
+  border-color: rgba(99, 102, 241, .25);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, .12);
+}
+
+.preference-card h4 {
+  margin: 0 0 12px 0;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.2px;
 }
 
 .market-chip {
@@ -2544,7 +2575,8 @@ tr:last-child td {
   display: grid;
   place-items: center;
   padding: 24px;
-  background: rgba(5, 8, 22, .78);
+  background: rgba(5, 8, 22, .82);
+  backdrop-filter: blur(8px);
 }
 
 .modal-backdrop.hidden {
@@ -2556,17 +2588,32 @@ body.modal-open {
 }
 
 .modal {
-  width: min(1180px, calc(100vw - 32px));
-  height: min(860px, calc(100vh - 32px));
+  width: min(1220px, calc(100vw - 32px));
+  height: min(880px, calc(100vh - 32px));
   overflow: hidden;
   display: grid;
   grid-template-rows: auto auto minmax(0, 1fr);
-  border: 1px solid var(--line);
-  border-radius: 8px;
+  border: 1px solid rgba(99, 102, 241, .35);
+  border-radius: 16px;
   background:
     linear-gradient(180deg, rgba(20, 28, 45, .98), rgba(10, 14, 24, .98)),
     var(--surface);
-  box-shadow: 0 28px 90px rgba(0, 0, 0, .46);
+  box-shadow:
+    0 40px 110px rgba(0, 0, 0, .55),
+    inset 0 1px 0 rgba(255, 255, 255, .04);
+  /* Sprint 53 (refonte UX) : entrée animée */
+  animation: modal-in 280ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .modal-head {
@@ -2574,9 +2621,10 @@ body.modal-open {
   justify-content: space-between;
   align-items: flex-start;
   gap: 18px;
-  padding: 18px;
+  padding: 22px 26px;
   border-bottom: 1px solid var(--line);
   min-width: 0;
+  background: linear-gradient(180deg, rgba(99, 102, 241, .08), transparent);
 }
 
 .modal-head > div {
@@ -2591,7 +2639,9 @@ body.modal-open {
 
 .modal-head h3 {
   margin-top: 4px;
-  font-size: 22px;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
 }
 
 .modal-head p {
@@ -2614,34 +2664,44 @@ body.modal-open {
 .modal-tabs {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  padding: 12px 18px;
+  gap: 6px;
+  padding: 14px 22px;
   border-bottom: 1px solid var(--line);
   overflow: visible;
   min-width: 0;
+  background: var(--surface);
 }
 
 .modal-tab {
-  border: 1px solid var(--line);
+  border: 1px solid transparent;
   border-radius: 8px;
-  background: var(--surface);
+  background: transparent;
   color: var(--muted);
   cursor: pointer;
-  padding: 9px 12px;
-  font-weight: 850;
+  padding: 8px 14px;
+  font-weight: 700;
+  font-size: 13px;
   white-space: nowrap;
-  min-height: 38px;
+  min-height: 36px;
+  transition: background 160ms ease-out, color 160ms ease-out, border-color 160ms ease-out;
+}
+
+.modal-tab:hover {
+  background: rgba(99, 102, 241, .08);
+  color: var(--text);
 }
 
 .modal-tab.active {
-  background: var(--surface-2);
+  background: linear-gradient(135deg, rgba(99, 102, 241, .22), rgba(14, 165, 233, .12));
   color: var(--text);
-  border-color: rgba(96, 165, 250, .38);
+  border-color: rgba(99, 102, 241, .45);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, .15);
 }
 
 .modal-content {
   min-width: 0;
   min-height: 320px;
+  padding: 4px 0;
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-color: rgba(148, 163, 184, .38) transparent;
@@ -3581,6 +3641,34 @@ td.empty::before,
   border: 1px solid rgba(148, 163, 184, .35);
   box-shadow: 0 4px 16px rgba(15, 23, 42, .35);
   flex-shrink: 0;
+}
+
+/* Sprint 54 (refonte UX) : scrollbars discrètes mais visibles */
+.main::-webkit-scrollbar,
+.nav::-webkit-scrollbar,
+.modal-content::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.main::-webkit-scrollbar-track,
+.nav::-webkit-scrollbar-track,
+.modal-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.main::-webkit-scrollbar-thumb,
+.nav::-webkit-scrollbar-thumb,
+.modal-content::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, .15);
+  border-radius: 999px;
+  transition: background 200ms;
+}
+
+.main::-webkit-scrollbar-thumb:hover,
+.nav::-webkit-scrollbar-thumb:hover,
+.modal-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, .45);
 }
 
 /* Sprint 52 (refonte UX) : en-têtes de page modernes + filtres */

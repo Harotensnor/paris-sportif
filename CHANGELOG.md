@@ -5,6 +5,33 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 53+54 — Modal détail + boutons + scrollbars + cards (UX overhaul P3)
+
+Modal détail match
+- Backdrop : opacité 78%→82% + backdrop-filter blur 8px.
+- `.modal` : largeur max 1180→1220px, hauteur 860→880px, radius 8→16px, bordure 1px indigo 35%, double box-shadow (deep 55% + inner top highlight).
+- Animation entrée : modal-in 280ms cubic-bezier avec scale 0.96→1 et translateY 20px→0.
+- `.modal-head` : padding 18→22/26px, h3 22→24px font-weight 800 letter-spacing -0.3px, gradient indigo subtil en haut.
+- `.modal-tabs` : gap 8→6px, padding 12/18→14/22px, fond surface.
+- `.modal-tab` : bordure transparente par défaut, fond transparent, hover indigo 8% opacity, active = gradient indigo+bleu + bordure 45% + box-shadow.
+
+Boutons globaux
+- `.ghost-btn` / `.primary-btn` : padding 10/14→10/16px, font-weight 800→700, font-size 13px + letter-spacing 0.2px.
+- Transitions complètes : background + transform + box-shadow + border-color en 160ms ease-out.
+- `.ghost-btn:hover` : surface-2 + bordure indigo 35% + translateY(-1px).
+- `.primary-btn` : gradient accent→14b884, border 55%, box-shadow vert 25%.
+- `.primary-btn:hover` : translateY(-1px) + shadow agrandie.
+
+Scrollbars discrètes
+- `.main` / `.nav` / `.modal-content` : webkit-scrollbar 10px, thumb violet 15% opacité, hover 45%.
+
+Cards Préférences
+- `.preference-card` : radius 8→12px, padding 16/18, transition border + shadow.
+- Hover : bordure indigo 25% + box-shadow douce.
+- `h4` : 15px font-weight 800 letter-spacing -0.2px.
+
+Validation : smoke OK (1 ready, 14 timeline, 24 fiables, 10 priorités).
+
 ### Sprint 52 — Refonte visuelle de chaque page (UX overhaul P2)
 
 Chaque tab-panel (Matchs / Buteurs / Combinés / Bilan / Recherche / Réglages / Calendrier) reçoit :
