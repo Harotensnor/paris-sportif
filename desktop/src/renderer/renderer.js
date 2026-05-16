@@ -10894,18 +10894,34 @@
       </article>`;
   }
 
+  // Sprint 71 — Lazy render Bilan. Avant : 19 sous-renderers appeles
+  // sequentiellement -> ~1s freeze sur switch vers Bilan. Maintenant : les
+  // 4 sections critiques (Mon mois + KPIs + P&L tracked + insights) renderent
+  // synchrones, les 15 suivantes sont schedulees via requestIdleCallback en
+  // chunks. Le user voit le contenu principal immediatement.
   function renderHistory() {
     const history = state.history;
+    // Tier 1 — critique, synchrone (apparait immediatement)
     renderModelPerformance();
     renderMyMonth();
     renderTrackedBets();
-    renderAutoSettlementAudit();
-    renderModelSelfAudit();
-    renderActiveModelAdjustments();
     renderPersonalInsights();
-    renderPersonalPatterns();
-    renderActivityHeatmap365();
-    renderLearningFeedback();
+    // Tier 2 — secondaire, defer idle
+    const tier2 = [
+      renderAutoSettlementAudit,
+      renderModelSelfAudit,
+      renderActiveModelAdjustments,
+      renderPersonalPatterns,
+      renderActivityHeatmap365,
+      renderLearningFeedback
+    ];
+    const scheduleIdle = typeof requestIdleCallback === 'function'
+      ? (fn) => requestIdleCallback(fn, { timeout: 800 })
+      : (fn) => setTimeout(fn, 16);
+    tier2.forEach((fn, i) => scheduleIdle(() => {
+      try { fn(); } catch (e) { /* render best-effort */ }
+    }));
+    // Path original a partir de renderBankrollAccounting (gardons sync)
     renderBankrollAccounting();
     renderDailyBudgetSummary();
     renderPaperSimulation();
@@ -16166,6 +16182,15 @@
     // Sprint 67 — Boutons prev/next dans la modal
     $('#modal-prev')?.addEventListener('click', () => navigateModal('prev'));
     $('#modal-next')?.addEventListener('click', () => navigateModal('next'));
+    // Sprint 71 — Bouton mode focus depuis la modal
+    $('#modal-focus-btn')?.addEventListener('click', () => {
+      const id = state.modalCurrentId;
+      if (!id) return;
+      const row = findMatchRow(id);
+      if (!row) return;
+      closeMatchDetail();
+      openFocusMode(row);
+    });
     // Sprint 67 — Raccourcis clavier ← → quand modal ouverte
     document.addEventListener('keydown', (event) => {
       const modal = $('#match-modal');

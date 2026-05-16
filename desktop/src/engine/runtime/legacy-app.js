@@ -2756,9 +2756,14 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     const edge = Number.isFinite(Number(c?.edge)) ? Number(c.edge) : (conf && odd ? conf - 1 / odd : 0);
     const ev = Number.isFinite(Number(c?.ev)) ? Number(c.ev) : (conf && odd ? conf * odd - 1 : -1);
     if (!(odd >= 1.30) || !(conf > 0) || !(edge > 0) || !(ev > 0)) return null;
-    if (odd < 1.50 && conf >= 0.65) return 'safe';
-    if (odd < 2.00 && conf >= 0.50) return 'solid';
-    if (odd < 3.00 && conf >= 0.35 && edge >= 0.01) return 'value';
+    // Sprint 71 — Edge minimum durci pour les tiers 'safe', 'solid', 'value' :
+    // edge >= 0.03 (3pt) au lieu de 0.01 (1pt). La zone 1-3pt est sous le bruit
+    // statistique du modele (Brier global 0.20, qui implique sigma ~30%) et
+    // produisait du bruit dans les recommandations. Les tiers 'big' et 'out'
+    // gardent leurs seuils plus eleves (3-5pt) car ils ciblent les outsiders.
+    if (odd < 1.50 && conf >= 0.65 && edge >= 0.03) return 'safe';
+    if (odd < 2.00 && conf >= 0.50 && edge >= 0.03) return 'solid';
+    if (odd < 3.00 && conf >= 0.35 && edge >= 0.03) return 'value';
     if (odd < 5.00 && conf >= 0.18 && edge >= 0.03) return 'big';
     if (conf >= 0.06 && edge >= 0.05) return 'out';
     return null;
@@ -4702,7 +4707,7 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     e.preventDefault();
     e.stopPropagation();
     let payload = [];
-    try { payload = JSON.parse(decodeURIComponent(btn.dataset.v45BulkTrack || '[]')); } catch (err) {}
+    try { payload = JSON.parse(decodeURIComponent(btn.dataset.v45BulkTrack || '[]')); } catch (err) { logSafeError('v45BulkTrack parse payload', err); }
     if (!Array.isArray(payload) || !payload.length) {
       if (typeof toast === 'function') toast('Aucun pick à tracker', 'warn');
       return;
@@ -4713,7 +4718,7 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
       const promptResult = await window._showStakePrompt('100', 'Ta bankroll initiale en € ? (1u = 1% de ce montant)');
       if (promptResult === null) return; // user cancelled
       const bk = Math.max(10, Math.min(10000, parseFloat(promptResult) || 100));
-      try { localStorage.setItem('userBankroll', String(bk)); } catch (er) {}
+      try { localStorage.setItem('userBankroll', String(bk)); } catch (er) { logSafeError('localStorage setItem userBankroll', er); }
       if (typeof window.toast === 'function') window.toast(`✓ Bankroll = ${bk}€ · 1u = ${Math.max(1, Math.round(bk*0.01))}€`, 'info', { duration: 2500 });
     }
     // v47.1 — Hedge protection : warn user si même match listé 2x dans payload
@@ -4748,7 +4753,7 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
         if (!item.matchId || !item.pickKey || !(Number(item.odd) > 1)) continue;
         window._addUserBet(item.matchId, item.market || '1n2', item.pickKey, item.label || '', Number(item.odd), Number(item.stake) || 1);
         added++;
-      } catch (err) {}
+      } catch (err) { logSafeError('v45BulkTrack _addUserBet item', err); }
     }
     if (typeof toast === 'function') toast(`📋 ${added} paris ajoutés au suivi · Voir le Bilan`, 'success', { duration: 3500 });
     btn.disabled = true;
@@ -4757,13 +4762,13 @@ const name = String(competitor.name || '').replace(/"/g, '&quot;');
     btn.style.cursor = 'default';
     // Re-render dashboard to update P&L chip
     setTimeout(() => {
-      try { if (typeof window.renderDashboardPage === 'function' && document.querySelector('main')) window.renderDashboardPage(document.querySelector('main')); } catch(err) {}
+      try { if (typeof window.renderDashboardPage === 'function' && document.querySelector('main')) window.renderDashboardPage(document.querySelector('main')); } catch(err) { logSafeError('post-bulk-track renderDashboardPage', err); }
     }, 600);
   }, true);
   // v45.3 — Auto-settle on data load (and dispatch event).
   if (typeof window._settleUserBets === 'function') {
     document.addEventListener('ps:app-shell-ready', () => {
-      try { window._settleUserBets(); } catch (err) {}
+      try { window._settleUserBets(); } catch (err) { logSafeError('ps:app-shell-ready _settleUserBets', err); }
     });
   }
   // v46.3 — Delegated handler pour data-v46-action (replace inline onclick
@@ -9575,6 +9580,15 @@ function _v45LeagueOffset(rel, leagueCode) {
 try { window._v45PlattBoost = _v45PlattBoost; } catch(e) {}
 try { window._v45LeagueOffset = _v45LeagueOffset; } catch(e) {}
 try { window._V45_LEAGUE_OFFSETS = _V45_LEAGUE_OFFSETS; } catch(e) {}
+// Sprint 71 — Documentation de scope :
+// _applyCalibration calibre UNIQUEMENT p.reliability qui represente la prob
+// du pick 1n2 head (predictMatch returns {pick: {key, prob}, reliability, ...}).
+// Les marches derives (OU 2.5, BTTS, scorer) sortent de poissonMarketsExtended
+// et sont calibres separement via _v35AddCandidate -> _calibrateProb(prob,
+// sport, league, marketKey) avec les bins_by_market Sprint 68. Donc le
+// Platt boost (+5/+6pt entre 0.60-0.80) qui est calibre sur n=639 ECE 1n2
+// ne fuit PAS sur les marches derives. p.reliability_raw est conserve pour
+// transparence/debug.
 function _applyCalibration(p, match) {
 if (!p || !isFinite(p.reliability) || p.calibrated) {
 return _capModelProbability(_markSuspectIfHugeEdge(p, match));

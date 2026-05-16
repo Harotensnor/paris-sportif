@@ -4827,16 +4827,55 @@ td.empty::before,
 }
 
 @media (max-width: 640px) {
+  /* Sprint 71 — Mobile bottom-nav : la sidebar verticale 56px qui mange l'ecran
+     est remplacee par une bottom-nav fixe avec 5 icones (À MISER, SUIVI, BUTEURS,
+     COMBINES, REGLAGES). Le contenu prend toute la largeur, scroll vertical normal. */
   .app-shell {
-    grid-template-columns: 56px minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: 1fr auto;
   }
 
-  .nav-btn .nav-icon {
-    font-size: 18px;
+  .sidebar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: auto;
+    width: 100%;
+    height: auto;
+    z-index: 50;
+    flex-direction: row;
+    padding: 6px 8px env(safe-area-inset-bottom) 8px;
+    border-right: none;
+    border-top: 1px solid var(--line);
+    background: rgba(15, 23, 42, .96);
+    backdrop-filter: blur(10px);
+    overflow-x: auto;
+    gap: 4px;
+  }
+
+  .sidebar .nav-group-label,
+  .sidebar .nav-label {
+    display: none;
+  }
+
+  .sidebar .nav-btn {
+    flex: 1 0 auto;
+    min-width: 56px;
+    height: 50px;
+    padding: 6px 4px;
+    flex-direction: column;
+    justify-content: center;
+    border-radius: 10px;
+  }
+
+  .sidebar .nav-btn .nav-icon {
+    font-size: 20px;
+    line-height: 1;
   }
 
   .main {
-    padding: 16px 12px;
+    padding: 16px 12px 80px;  /* padding-bottom pour eviter overlap bottom-nav */
   }
 
   .ready-hero-grid,
@@ -4844,6 +4883,10 @@ td.empty::before,
   .model-performance-grid {
     grid-template-columns: 1fr !important;
   }
+}
+
+body.theme-light .sidebar {
+  background: rgba(255, 255, 255, .96);
 }
 
 /* Sprint 55 (refonte UX) : overrides theme light pour les nouveaux éléments */

@@ -4,6 +4,14 @@ auto_refresh.log
 *.tmp
 .DS_Store
 data.json
+
+# Sprint 71 — Builds Electron-builder (jamais commités, 500-600 MB chacun).
+# 24 dossiers dist-sprint* à la racine desktop/ pesaient ~13.5 GB en untracked.
+# captures/ contient ~150 screenshots de QA visuels (jusqu'à 200 KB chacun)
+# qui sont régénérables à la demande.
+desktop/dist/
+desktop/dist-sprint*/
+captures/desktop-sprint*
 # Cache local des sources externes (footballdata, MLB pitchers, tennis CSV).
 # Re-téléchargeable, pas besoin de versionner.
 .cache/

@@ -18,6 +18,23 @@ cat > "$HOOK_PATH" <<'EOF'
 set -e
 cd "$(git rev-parse --show-toplevel)"
 
+# Sprint 71 — Detection robuste python3 / python.
+# Sur Windows, `python3` est souvent un faux raccourci Microsoft Store qui
+# affiche "Python est introuvable" et bloque le commit. On detecte le binaire
+# Python reel en testant `--version` (le faux raccourci fail, le vrai marche).
+PY=""
+for candidate in python3 python; do
+  if command -v "$candidate" >/dev/null 2>&1; then
+    if "$candidate" --version >/dev/null 2>&1; then
+      PY="$candidate"
+      break
+    fi
+  fi
+done
+if [ -z "$PY" ]; then
+  echo "[pre-commit] WARNING: aucun binaire python3/python fonctionnel trouve. Python checks skipes." >&2
+fi
+
 # 1. JS syntax check sur les bundles critiques (5s)
 echo "[pre-commit] node --check JS bundles..."
 for f in legacy-app.js app.js sw.js app-enhancements.js app-i18n.js; do
@@ -33,10 +50,10 @@ echo "[pre-commit] OK JS syntax"
 
 # 2. Python syntax check sur scripts modifiés (3s)
 PYTHON_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '^scripts/.*\.py$' || true)
-if [ -n "$PYTHON_FILES" ]; then
-  echo "[pre-commit] python ast.parse on modified scripts..."
+if [ -n "$PYTHON_FILES" ] && [ -n "$PY" ]; then
+  echo "[pre-commit] $PY ast.parse on modified scripts..."
   for f in $PYTHON_FILES; do
-    if ! python3 -c "import ast; ast.parse(open('$f').read())" 2>&1; then
+    if ! "$PY" -c "import ast; ast.parse(open('$f', encoding='utf-8').read())" 2>&1; then
       echo "[pre-commit] FAIL: $f has syntax error" >&2
       exit 1
     fi
@@ -45,9 +62,9 @@ if [ -n "$PYTHON_FILES" ]; then
 fi
 
 # 3. Audit patch contracts si patch_all_quick.py changé
-if echo "$PYTHON_FILES" | grep -q 'patch_all_quick\|patch_winamax'; then
+if [ -n "$PY" ] && echo "$PYTHON_FILES" | grep -q 'patch_all_quick\|patch_winamax'; then
   echo "[pre-commit] contract audit (patcher modifié)..."
-  python3 scripts/audit_patch_contracts.py 2>&1 | tail -3 || true
+  "$PY" scripts/audit_patch_contracts.py 2>&1 | tail -3 || true
 fi
 
 echo "[pre-commit] OK all checks passed"

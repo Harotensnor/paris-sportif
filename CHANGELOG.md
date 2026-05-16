@@ -5,6 +5,64 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 71 — Top 10 audit final fixes : cleanup, hook, focus, edge, lazy, catches, mobile, ESM
+
+Réponse à l'audit final (top 10 prochains chantiers post Sprint 60-70). Tous les chantiers XS+S+M traités, le L (ESM split) documenté dans BACKLOG.md.
+
+**#1 — `.gitignore` cleanup `dist-sprint*/` (-13.5 GB)**
+- Ajout `desktop/dist/`, `desktop/dist-sprint*/`, `captures/desktop-sprint*` au `.gitignore`.
+- `rm -rf desktop/dist-sprint*` (24 dossiers ×~560 MB).
+- git status untracked : **419 → 294** fichiers.
+
+**#10 — Pre-commit hook python3 → python fallback**
+- `scripts/install_pre_commit_hook.sh` détecte le binaire fonctionnel via boucle `python3` puis `python` avec test `--version`.
+- Évite le faux raccourci Microsoft Store sur Windows.
+- Skip gracieux des checks Python si aucun binaire valide.
+- Réinstallé localement, plus de `--no-verify` nécessaire pour modifier `scripts/*.py`.
+
+**#7 — Bouton 🎯 Mode focus dans la modal détail**
+- `#modal-focus-btn` ajouté dans `.modal-nav-buttons` à côté de prev/next/close.
+- Ferme la modal, ouvre l'overlay focus plein écran sur le même pick.
+- Adoption de la feature `openFocusMode` qui n'avait aucun entry point UI avant.
+
+**#5 — Edge threshold value 1pt → 3pt**
+- `_displayablePickTier` (`legacy-app.js:2761`) : les tiers `safe/solid/value` exigent désormais `edge >= 0.03` (3pt) au lieu de `0.01` (1pt).
+- La zone 1-3pt est sous le bruit statistique (Brier global 0.20 → σ ~30%). Élimine du bruit sans toucher aux outsiders (big/out gardent 3-5pt).
+
+**#6 — Lazy render Bilan (`renderHistory`)**
+- Tier 1 critique synchrone (4 renderers : Mon mois, Model perf, Tracked bets, Insights).
+- Tier 2 secondaire défer via `requestIdleCallback` (6 renderers : autoSettlement, modelSelfAudit, modelAdjustments, personalPatterns, heatmap365, learningFeedback).
+- Avant : ~1s freeze sur switch vers Bilan. Maintenant : contenu principal immédiat, le reste arrive en idle.
+
+**#3 — Sweep catch silencieux (5 cas critiques)**
+- 5 `} catch (err) {}` remplacés par `} catch (err) { logSafeError(ctx, err); }` dans `legacy-app.js` :
+  - `v45BulkTrack parse payload` (JSON.parse user input)
+  - `localStorage setItem userBankroll`
+  - `v45BulkTrack _addUserBet item`
+  - `post-bulk-track renderDashboardPage`
+  - `ps:app-shell-ready _settleUserBets`
+- Reste 33 catches silencieux (sweep complet = 2h, repoussé).
+
+**#4 — Platt boost scope explicite 1n2 only (commentaire)**
+- Déjà résolu par Sprint 68 (calibration per-market). Commentaire d'explication ajouté en tête de `_applyCalibration` pour prévenir régression future : "p.reliability représente la prob 1n2 head ; les marchés dérivés utilisent Poisson xG + bins_by_market Sprint 68 séparément".
+
+**#2 — Memoization `winamax_markets.json`**
+- Déjà couvert par Sprint 67 (`readJsonSidecarMemo` cache par mtime). Le refactor `analysisCache` séparé (3-4h) reporté.
+
+**#8 — Mobile bottom-nav <640px**
+- Sidebar verticale 56px (qui mange l'écran sur mobile) remplacée par **bottom-nav fixe** avec 5 icônes au breakpoint `max-width: 640px`.
+- Position `fixed bottom: 0`, flex-direction row, backdrop-filter blur, safe-area-inset-bottom pour iPhones.
+- `.nav-label` masquée, icônes seules 20px.
+- `.main { padding-bottom: 80px }` pour éviter overlap du contenu.
+- Theme-light parity (`rgba(255, 255, 255, .96)`).
+
+**#9 — ESM split legacy-app.js (1.93 MB, 36 976 lignes) — différé**
+- Documenté dans `BACKLOG.md` comme P0 desktop avec plan de découpe en 7 modules (core/markets/calibration/signals/ui-bridge/enrichment/misc).
+- Pré-requis : étendre suite de tests Sprint 70 avant le split.
+- Estimé 8-10h, à faire en sprint dédié.
+
+Engine OK : 172 matchs, 94 picks. Tests : engine-contract OK, calibration OK (5 marchés), safe-assessment OK (8 Fiables sains).
+
 ### Sprint 70 — Tests & CI : safe-assessment + calibration-check intégrés
 
 **`desktop/scripts/safe-assessment-check.js`** (nouveau)
