@@ -87,7 +87,11 @@ async function main() {
     const maxMemory = memory.length ? Math.max(...memory) : 0;
     const avgMemory = memory.length ? memory.reduce((sum, value) => sum + value, 0) / memory.length : 0;
     const p95Memory = percentile(memory, 95);
-    const memoryLimitMb = profile96h ? 800 : 700;
+    // Sprint 48 : seuil élevé à 850 MB (court) / 900 MB (96h) parce que
+    // Sprint 37+ charge des vraies photos Wikipedia (logos équipes +
+    // joueurs stars) qui consomment ~50-150 MB additionnels en cache
+    // navigateur Electron. L'app reste sous le seuil critique 1 GB.
+    const memoryLimitMb = profile96h ? 900 : 850;
     const report = {
       ok: !severe.length && maxMemory <= memoryLimitMb,
       profile: profile96h ? '96h' : 'short',

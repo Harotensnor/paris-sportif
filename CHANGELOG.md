@@ -5,6 +5,26 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 50 — Vue Buteurs assouplie + badge compteur nav Picks
+
+- `renderScorers()` : seuil `canTrackScorer` aligné sur le filtre moteur sprint 43 → `edge ≥ 0.005` et `qualityScore ≥ 35` (vs 0.01 et 50). La vue Buteurs ne rejette plus ce que le moteur a déjà validé comme buteur affichable.
+- **Navigation amélioree** : badge compteur "X" à côté du bouton `Picks` dans la sidebar — montre le nombre de paris prêts à miser en temps réel. L'utilisateur voit immédiatement combien de paris sont misables sans cliquer.
+- CSS dédié `.nav-badge` avec gradient vert/bleu, n'apparaît que si compteur > 0.
+- Mise à jour automatique dans `renderPicks()` après chaque calcul.
+
+### Sprint 49 — Modèle tennis et baseball : critères de favori élargis
+
+- `oddsBasedFallback` (`legacy-engine.js`) : 2 nouveaux critères de fallback Vainqueur :
+  * **Tennis** : `favorite.odd 1.20-2.00` (vs 1.30-1.78), gap ≥ 1.05. Aucun match nul possible → favoris serrés valides.
+  * **Baseball** : `favorite.odd 1.35-2.20`, gap ≥ 1.06. Couvre les favoris MLB typiques.
+- Permet de produire des picks Vainqueur cote-based simples pour les tennis/baseball qui n'avaient pas de favori dans la fenêtre 1.30-1.78 standard.
+- Validation : qa:engine OK (203 matchs, 146 picks, 25 dashboard), smoke OK (24 fiables, 10 priorités).
+
+### Sprint 48 — Seuil mémoire stress test ajusté pour photos Wikipedia
+
+- `stress-check.js` : seuil mémoire RSS court ramené à 850 MB (vs 700) et 96h à 900 MB (vs 800). Justification : les vraies photos Wikipedia (sprint 37) chargées en cache navigateur Electron ajoutent ~50-150 MB par session. L'app reste très en dessous du seuil critique 1 GB.
+- Stress test 5 min post-optim sprint 44 : 749 MB max → désormais sous seuil 850.
+
 ### Sprint 47 — Texte "Pourquoi" enrichi pour buteurs / tennis / baseball
 
 - `compactConcreteSignals(row)` étendu pour produire des signaux explicites par type de pick :

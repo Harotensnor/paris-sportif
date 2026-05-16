@@ -3464,6 +3464,25 @@ td.empty::before,
   flex-shrink: 0;
 }
 
+/* Sprint 50 (UX) : badge compteur "paris à miser" dans la nav Picks */
+.nav-badge {
+  display: none;
+  margin-left: 6px;
+  padding: 2px 8px;
+  background: linear-gradient(135deg, rgba(16, 185, 129, .9), rgba(14, 165, 233, .85));
+  color: #0b1120;
+  font-size: 11px;
+  font-weight: 900;
+  border-radius: 999px;
+  letter-spacing: 0.3px;
+  vertical-align: middle;
+  box-shadow: 0 2px 6px rgba(16, 185, 129, .35);
+}
+
+.nav-badge:not(:empty) {
+  display: inline-block;
+}
+
 /* Sprint 46 (UX) : logos équipes dans live cards */
 .live-card-teams {
   display: flex;

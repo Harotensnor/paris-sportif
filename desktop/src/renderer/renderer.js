@@ -6486,6 +6486,18 @@
     renderTradingDesk();
     renderUltimateBet(displayRows);
     renderReadyPicksHero(displayRows);
+    // Sprint 50 (UX) : badge compteur "paris prêts" dans la nav Picks.
+    try {
+      const readyCount = (displayRows || [])
+        .filter((row) => row?.decisionCenter?.canBet === true || row?.safeAssessment?.reliable === true)
+        .filter((row) => row?.limitedConfidence !== true)
+        .filter(canDisplayPickCard)
+        .length;
+      const badge = $('#nav-picks-badge');
+      if (badge) badge.textContent = readyCount > 0 ? String(readyCount) : '';
+    } catch {
+      // best-effort, non-bloquant
+    }
     renderTemporalCockpit(displayRows);
     renderDailyBudgetSummary();
     updateWebEnrichmentSummary();
@@ -7676,7 +7688,10 @@
       const qualityClass = quality.gate === 'strong' ? 'strong' : quality.gate === 'fragile' ? 'fragile' : 'watch';
       const reasonText = Array.isArray(quality.reasons) && quality.reasons.length ? quality.reasons.join(' · ') : 'Profil joueur';
       const realOdd = Number(scorer.odd || 0);
-      const canTrackScorer = realOdd > 1 && Number(scorer.edge || 0) >= 0.01 && Number(quality.score || 0) >= 50;
+      // Sprint 50 : aligné sur le filtre moteur sprint 43 (quality ≥ 35,
+      // edge ≥ 0.005). La vue Buteurs ne doit plus rejeter ce que le
+      // moteur a déjà validé comme buteur affichable.
+      const canTrackScorer = realOdd > 1 && Number(scorer.edge || 0) >= 0.005 && Number(quality.score || 0) >= 35;
       const winamaxUrl = safeExternalUrl(scorer.winamaxUrl, 'www.winamax.fr');
       return `
         <article class="scorer-card scorer-${qualityClass} clickable-row" data-match-id="${escapeHtml(scorer.matchId)}" tabindex="0" role="button" aria-label="Ouvrir ${escapeHtml(scorer.title)}">

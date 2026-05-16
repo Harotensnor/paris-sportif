@@ -1096,7 +1096,14 @@ function createLegacyEngineService({ projectRoot }) {
     const strongFavorite = favorite.odd >= 1.30 && favorite.odd <= 1.55;
     const clearMarketFavorite = challenger && favorite.odd <= 1.78 && gap >= 1.10;
     const widerMarketFavorite = challenger && favorite.odd <= 1.92 && gap >= 1.18 && (qualityScore >= 45 || majorNightSport);
-    if (!(strongFavorite || clearMarketFavorite || widerMarketFavorite || footballTwoGoalCandidate)) return null;
+    // Sprint 49 — Tennis : aucun match nul possible donc on accepte des
+    // favoris plus serrés (la cote 1.30-2.00 reste exploitable sans
+    // partage de probabilité avec un draw).
+    const tennisFavorite = /tennis/.test(sportKey) && favorite.odd >= 1.20 && favorite.odd <= 2.00 && (!challenger || gap >= 1.05);
+    // Sprint 49 — Baseball : favoris MLB raisonnables (cotes typiquement
+    // 1.40-2.20). Accepter ces fenêtres améliore la couverture nuit US.
+    const baseballFavorite = /baseball/.test(sportKey) && favorite.odd >= 1.35 && favorite.odd <= 2.20 && (!challenger || gap >= 1.06);
+    if (!(strongFavorite || clearMarketFavorite || widerMarketFavorite || footballTwoGoalCandidate || tennisFavorite || baseballFavorite)) return null;
     const implied = 1 / favorite.odd;
     const gapBonus = Math.min(0.030, Math.max(0, (gap - 1.10) * 0.024));
     const contextBonus = qualityScore >= 75 ? 0.012 : qualityScore >= 60 ? 0.006 : 0;
