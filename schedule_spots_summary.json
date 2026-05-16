@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-16T12:51:01Z",
+  "generated_at": "2026-05-16T12:53:37Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -163,10 +163,10 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.098,
-        "away_score": 0.458,
+        "away_score": -0.098,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Monza (+0.46)",
+        "reason": "Direction nette: Monza (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -179,12 +179,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.556
           }
         ]
       }
@@ -886,11 +880,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": -0.607,
-        "away_score": -1.147,
-        "home_fade": 1.15,
-        "away_fade": 1.55,
-        "reason": "Direction nette: Montreal Canadiens (-0.61)",
+        "home_score": 0.043,
+        "away_score": -0.498,
+        "home_fade": 0.15,
+        "away_fade": 0.55,
+        "reason": "Direction nette: Montreal Canadiens (+0.04)",
         "detail": [
           {
             "side": "home",
@@ -909,18 +903,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.4
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
           }
         ]
       }
