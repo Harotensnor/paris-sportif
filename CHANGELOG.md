@@ -5,6 +5,56 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 66-67 — Audit top 10 fixes : discipline modèle, toast, perf, modal nav
+
+Réponse à l'audit "top 10 problèmes" identifiés (3 sous-agents : modèle, code engine, UX).
+
+**Patch A+B — Discipline modèle sur marchés dérivés** (`legacy-engine.js:safeAssessmentForRow`)
+
+Root cause : Platt boost +5/+6pt et offsets ligues calibrés sur **n=639 bins 1n2** appliqués partout. `prob_calibration.json` ne contient que des bins **1n2 settled** (n=1037 foot only) mais `applies_at_runtime:true` les applique sur OU 2.5/BTTS/scorer. Backtest_strategies montre `safe_blend n=487 → -19% ROI / max_dd 88%`.
+
+Audit picks Fiables AVANT : 4 picks, dont 3 OU 2.5 avec **`segmentValidation.sample=0`** et **edge fantôme +18.3pt** (Juventus -2.5).
+
+Fix :
+```
+isOneN2 = marketKey ∈ {1n2, matchwinner, winner, moneyline}
+aberrantThreshold = isOneN2 ? 0.22 : 0.15
+derivedShortNegative = !isOneN2 && sample ∈ [5,15) && roi < 0
+reliable = ruleA && edge ≤ 0.20 && !aberrantEdge && !derivedShortNegative
+```
+
+Résultat AUDIT APRÈS : 4 Fiables raisonnables (Canadiens 1n2 +4.5pt, Real Oviedo -2.5 +11pt, Genoa -2.5 +9.5pt, Paris FC-PSG -3.5 +8.8pt). **Juventus +18pt viré**.
+
+**Patch C — showToast généralisé** (`renderer.js`)
+
+Avant : seul `setSideStatus('Pari ajouté…', 'ok')` qui peint un mini-dot bas-gauche sidebar. L'user croyait que rien ne se passait.
+
+Maintenant : `showToast(title, subtitle, tone)` réutilisable. Appelé depuis `trackUserBet` ("✅ {label} ajouté · @{cote} · mise X€"), `trackUserCombo` ("✅ Combiné N jambes ajouté · @{cote}"). Tones ok/warn/info avec borders/backgrounds gradients. Auto-close 4.5s.
+
+**Patch D + F — Memoization sidecars + logging JSON corrompus** (`legacy-engine.js`)
+
+Avant : chaque `getAnalysis` parsait `winamax_markets.json` (~90 MB) + `h2h_extended` + `lineups_soccer` + `sofascore_events` + `star_players` + autres en sync sans cache. Cache invalide à la moindre touche d'un sidecar.
+
+Maintenant : `readJsonSidecarMemo(filePath, transform, fallback)` cache par mtime. Ne reparse que si fichier modifié. Aussi : warn `[engine] Sidecar JSON corrompu {path}: {err}` au lieu de `catch {}` silencieux (Patch F intégré, surface les corruptions cron au lieu de retourner `{}` mute).
+
+Appliqué à : `readLineupsIndex`, `readSofascoreEventTimes`, `readStarPlayersIndex`, `readWinamaxMarketsIndex`, `readH2hIndex`, `readJsonSidecar` (router générique).
+
+**Patch E — structuredClone natif** (`legacy-engine.js:jsonClone`)
+
+Avant : `JSON.parse(JSON.stringify(value))` ~600 fois par run (1 par match), 30-120 MB de clones.
+
+Maintenant : `structuredClone(value)` natif Node 17+ (2-3x plus rapide, préserve Date/Map/Set). Fallback `JSON.parse(JSON.stringify)` si absent.
+
+**Patch G — Filtres + market-snapshot dans `<details>` persistant** (`index.html` + `renderer.js`)
+
+Charge cognitive dashboard réduite. `<details id="pick-toolbar-fold" open>` regroupe `.pick-toolbar` (10 inputs/selects) + `#market-snapshot`. Persiste state ouvert/fermé dans `localStorage.parisSportif.pickToolbarFoldOpen`. Ouvert par défaut pour ne pas casser le flow utilisateur, mais l'user peut le fermer en mode focus.
+
+**Patch H — Navigation prev/next dans modal détail** (`index.html` + `renderer.js` + `styles.css`)
+
+Boutons `‹ ›` ajoutés dans `.modal-head` à côté du `×`. Navigation ordonnée selon `state.dashboardPicks` (fallback `state.picks`). Raccourcis clavier `←` / `→` actifs quand modal ouverte (sauf si focus dans input/textarea). Boutons disabled aux extrémités, tooltip "Pari précédent (← idx/total)". Hover scale 1.05.
+
+Engine contract OK : 181 matchs, 93 picks, 25 paris simples dashboard. Smoke complet OK : 11 paris visibles, 14 timeline, 12 fiables, 10 priorités.
+
 ### Sprint 65 — Stats utilisateur : Mon mois + insights auto + battle banner
 
 **Mon mois card** (`myMonthStats`, `renderMyMonth`)

@@ -232,21 +232,44 @@ function createLegacyEngineService({ projectRoot }) {
     return modelUtils.normalizeTeamKey(value);
   }
 
-  function readLineupsIndex() {
-    if (!fs.existsSync(lineupsPath)) return {};
+  // Sprint 67 — Memoization sidecars JSON. Avant : chaque getAnalysis
+  // reparsait winamax_markets.json (~90 MB) + 5 autres > 10 MB.
+  // Maintenant : cache par mtime, ne reparse que si fichier modifie.
+  // Aussi : logger les JSON corrompus au lieu de catch {} silencieux (Patch F).
+  const _sidecarCache = new Map();
+  function readJsonSidecarMemo(filePath, transform, fallback) {
+    const fb = fallback === undefined ? {} : fallback;
+    if (!fs.existsSync(filePath)) return fb;
+    let stat;
+    try { stat = fs.statSync(filePath); }
+    catch (statErr) {
+      try { console.warn(`[engine] stat failed ${filePath}: ${statErr.message}`); } catch { /* noop */ }
+      return fb;
+    }
+    const cached = _sidecarCache.get(filePath);
+    if (cached && cached.mtime === stat.mtimeMs) return cached.value;
     try {
-      const parsed = JSON.parse(fs.readFileSync(lineupsPath, 'utf8'));
-      const events = parsed && parsed.events && typeof parsed.events === 'object' ? parsed.events : {};
-      return enrichLineupsWithSofaTimes(events);
-    } catch {
-      return {};
+      const parsed = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+      const transformed = typeof transform === 'function' ? transform(parsed) : parsed;
+      const value = transformed === undefined || transformed === null ? fb : transformed;
+      _sidecarCache.set(filePath, { mtime: stat.mtimeMs, value });
+      return value;
+    } catch (parseErr) {
+      try { console.warn(`[engine] Sidecar JSON corrompu ${filePath}: ${parseErr.message}`); } catch { /* noop */ }
+      _sidecarCache.set(filePath, { mtime: stat.mtimeMs, value: fb });
+      return fb;
     }
   }
 
+  function readLineupsIndex() {
+    return readJsonSidecarMemo(lineupsPath, (parsed) => {
+      const events = parsed && parsed.events && typeof parsed.events === 'object' ? parsed.events : {};
+      return enrichLineupsWithSofaTimes(events);
+    }, {});
+  }
+
   function readSofascoreEventTimes() {
-    if (!fs.existsSync(sofaEventsPath)) return new Map();
-    try {
-      const parsed = JSON.parse(fs.readFileSync(sofaEventsPath, 'utf8'));
+    return readJsonSidecarMemo(sofaEventsPath, (parsed) => {
       const groups = parsed && parsed.events && typeof parsed.events === 'object'
         ? Object.values(parsed.events)
         : [];
@@ -255,9 +278,7 @@ function createLegacyEngineService({ projectRoot }) {
         String(event?.id || '').replace(/^sofa_/, ''),
         { date: event?.date || null, name: event?.name || null }
       ]));
-    } catch {
-      return new Map();
-    }
+    }, new Map());
   }
 
   function enrichLineupsWithSofaTimes(events) {
@@ -271,23 +292,13 @@ function createLegacyEngineService({ projectRoot }) {
   }
 
   function readStarPlayersIndex() {
-    if (!fs.existsSync(starPlayersPath)) return {};
-    try {
-      const parsed = JSON.parse(fs.readFileSync(starPlayersPath, 'utf8'));
-      return parsed && parsed.teams && typeof parsed.teams === 'object' ? parsed.teams : {};
-    } catch {
-      return {};
-    }
+    return readJsonSidecarMemo(starPlayersPath, (parsed) =>
+      parsed && parsed.teams && typeof parsed.teams === 'object' ? parsed.teams : {}, {});
   }
 
   function readWinamaxMarketsIndex() {
-    if (!fs.existsSync(winamaxMarketsPath)) return {};
-    try {
-      const parsed = JSON.parse(fs.readFileSync(winamaxMarketsPath, 'utf8'));
-      return parsed && parsed.matches && typeof parsed.matches === 'object' ? parsed.matches : {};
-    } catch {
-      return {};
-    }
+    return readJsonSidecarMemo(winamaxMarketsPath, (parsed) =>
+      parsed && parsed.matches && typeof parsed.matches === 'object' ? parsed.matches : {}, {});
   }
 
   function winamaxMarketEntryForMatch(winamaxMarketsIndex, match) {
@@ -326,16 +337,17 @@ function createLegacyEngineService({ projectRoot }) {
   }
 
   function readH2hIndex() {
-    if (!fs.existsSync(h2hPath)) return {};
-    try {
-      const parsed = JSON.parse(fs.readFileSync(h2hPath, 'utf8'));
-      return parsed && parsed.events && typeof parsed.events === 'object' ? parsed.events : {};
-    } catch {
-      return {};
-    }
+    return readJsonSidecarMemo(h2hPath, (parsed) =>
+      parsed && parsed.events && typeof parsed.events === 'object' ? parsed.events : {}, {});
   }
 
   function readJsonSidecar(filePath, fallback = {}) {
+    // Sprint 67 — utilise memoization + log corrompus
+    return readJsonSidecarMemo(filePath, (parsed) =>
+      parsed && typeof parsed === 'object' ? parsed : fallback, fallback);
+  }
+  // Legacy path kept for safety (currently unreachable):
+  function _readJsonSidecarLegacy(filePath, fallback = {}) {
     if (!fs.existsSync(filePath)) return fallback;
     try {
       const parsed = JSON.parse(fs.readFileSync(filePath, 'utf8'));
@@ -1221,8 +1233,13 @@ function createLegacyEngineService({ projectRoot }) {
     return rows;
   }
 
+  // Sprint 67 — Utilise structuredClone natif (Node 17+) qui est ~2-3x plus
+  // rapide que JSON.parse(JSON.stringify(...)) et preserve les Date/Map/Set
+  // sans crash. Fallback sur l'ancien comportement si structuredClone absent.
   function jsonClone(value, fallback = null) {
+    if (value === undefined || value === null) return fallback;
     try {
+      if (typeof structuredClone === 'function') return structuredClone(value);
       return JSON.parse(JSON.stringify(value));
     } catch {
       return fallback;
@@ -1677,13 +1694,26 @@ function createLegacyEngineService({ projectRoot }) {
     const ruleC = baseZone && sample >= 5 && sample < 15 && edge >= 0.04 && odd <= 5.00 && confidence >= 0.60;
     const reliableRule = ruleA ? 'A' : ruleB ? 'B' : ruleC ? 'C' : null;
 
-    // Sprint 61 : declasser les picks avec edge brut aberrant (>= 22pt).
-    // Le modele est statistiquement surconfiant sur ces cotes — backtest
-    // montre que l'edge reel reste rarement > 15pt vs Winamax. On rejette
-    // donc la zone 22pt+ qui est un signal de calibration cassee.
-    const aberrantEdge = rawEdge >= 0.22;
+    // Sprint 66 — Discipline modele sur marches derives.
+    // Le Platt boost + offsets ligues + bins isotonic de prob_calibration
+    // sont calibres sur 1n2 uniquement (n=1037 bins foot only). Les marches
+    // OU/BTTS/scorer sortent du Poisson xG ou heuristiques sport-specific
+    // sans calibration propre. Backtest_strategies montre safe_blend
+    // (qui inclut OU 2.5) a -19% ROI sur n=487.
+    //
+    // Regles :
+    //   1n2 : aberrantEdge a 22pt (zone Platt OK)
+    //   marche derive : aberrantEdge a 15pt (Poisson xG souvent surconfiant)
+    //   marche derive sample>=5 et roi<0 : refuser Fiable (segment court mais perdant)
+    //   sample=0 (data absente) : accepter Fiable avec warning (pas une preuve negative)
+    const marketKey = String(row?.marketKey || row?.market || '').toLowerCase();
+    const isOneN2 = marketKey === '1n2' || marketKey === 'matchwinner' || marketKey === 'winner' || marketKey === 'moneyline';
+    const aberrantThreshold = isOneN2 ? 0.22 : 0.15;
+    const aberrantEdge = rawEdge >= aberrantThreshold;
+    const derivedShortNegative = !isOneN2 && sample >= 5 && sample < 15 && Number.isFinite(roi) && roi < 0;
     if (!(rawEdge >= 0.01)) reasons.push('edge < +1pt');
     if (aberrantEdge) reasons.push(`edge brut +${Math.round(rawEdge * 100)}pt aberrant (modele surconfiant)`);
+    if (derivedShortNegative) reasons.push(`marche ${marketKey} segment court perdant (n=${sample}, ROI ${Math.round(roi * 100)}%)`);
     if (!reliableRule && edge < Math.min(edgeMin, sample < 5 ? 0.05 : sample < 15 ? 0.04 : edgeMin)) reasons.push('edge prudent insuffisant');
     if (odd < 1.30 || odd > (sample < 15 ? Math.min(5.00, oddMax) : oddMax)) reasons.push(`cote hors zone solo 1.30-${(sample < 15 ? Math.min(5.00, oddMax) : oddMax).toFixed(2)}`);
     if (!reliableRule && confidence < (sample < 5 ? 0.65 : sample < 15 ? 0.60 : confidenceMin)) reasons.push('confiance insuffisante');
@@ -1740,9 +1770,12 @@ function createLegacyEngineService({ projectRoot }) {
       };
     }
 
-    // Sprint 61 : aberrantEdge declasse aussi le pick (sinon il garde "Fiable"
-    // avec son edge plafonne par conservativeEdge).
-    const reliable = Boolean(reliableRule) && edge <= 0.20 && !aberrantEdge;
+    // Sprint 66 : Fiable durci. Refuser Fiable si edge aberrant (>22pt 1n2,
+    // >15pt derive) ou marche derive avec segment court perdant (sample 5-14, roi<0).
+    const reliable = Boolean(reliableRule)
+      && edge <= 0.20
+      && !aberrantEdge
+      && !derivedShortNegative;
     const displayable = rawEdge >= 0.01 && odd > 1.10 && odd <= 18 && confidence >= 0.30 && row?.decisionCenter?.status !== 'skip';
     return {
       status: reliable ? 'reliable' : displayable ? 'watch' : 'reject',

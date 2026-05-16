@@ -337,35 +337,41 @@
             <p id="picks-caption">Chargement des meilleurs candidats proches...</p>
           </div>
         </div>
-        <div class="pick-toolbar" aria-label="Filtres rapides des picks">
-          <input id="pick-search" type="search" placeholder="Rechercher une équipe">
-          <select id="pick-sport-filter">
-            <option value="all">Tous sports</option>
-          </select>
-          <select id="pick-league-filter">
-            <option value="all">Toutes ligues</option>
-          </select>
-          <select id="pick-market-filter">
-            <option value="all">Tous marchés</option>
-          </select>
-          <select id="pick-sort">
-            <option value="priority">Priorité</option>
-            <option value="real_confidence">Fiabilité</option>
-            <option value="edge">Avantage</option>
-            <option value="confidence">Fiabilité brute</option>
-            <option value="kickoff">Départ</option>
-            <option value="odd">Cote</option>
-          </select>
-          <input id="pick-edge-min" type="number" min="0" max="100" step="1" placeholder="Avantage min %">
-          <input id="pick-odd-min" type="number" min="1" max="100" step="0.05" placeholder="Cote min">
-          <select id="saved-strategy-select" aria-label="Mes stratégies">
-            <option value="">Mes stratégies</option>
-          </select>
-          <button class="ghost-btn" id="save-current-strategy-btn" type="button">Sauver cette sélection</button>
-        </div>
-        <div class="market-snapshot" id="market-snapshot">
-          <div class="empty compact-empty">Chargement des marchés...</div>
-        </div>
+        <!-- Sprint 67 — Filtres + market-snapshot regroupes dans un <details>
+             ouvert par defaut. L'user peut fermer pour reduire la charge cognitive
+             une fois familier avec l'app. Persiste son choix dans localStorage. -->
+        <details class="simple-fold-section" id="pick-toolbar-fold" open>
+          <summary><span>🔍 Filtres et marchés</span><strong>Recherche, tri, market snapshot</strong></summary>
+          <div class="pick-toolbar" aria-label="Filtres rapides des picks">
+            <input id="pick-search" type="search" placeholder="Rechercher une équipe">
+            <select id="pick-sport-filter">
+              <option value="all">Tous sports</option>
+            </select>
+            <select id="pick-league-filter">
+              <option value="all">Toutes ligues</option>
+            </select>
+            <select id="pick-market-filter">
+              <option value="all">Tous marchés</option>
+            </select>
+            <select id="pick-sort">
+              <option value="priority">Priorité</option>
+              <option value="real_confidence">Fiabilité</option>
+              <option value="edge">Avantage</option>
+              <option value="confidence">Fiabilité brute</option>
+              <option value="kickoff">Départ</option>
+              <option value="odd">Cote</option>
+            </select>
+            <input id="pick-edge-min" type="number" min="0" max="100" step="1" placeholder="Avantage min %">
+            <input id="pick-odd-min" type="number" min="1" max="100" step="0.05" placeholder="Cote min">
+            <select id="saved-strategy-select" aria-label="Mes stratégies">
+              <option value="">Mes stratégies</option>
+            </select>
+            <button class="ghost-btn" id="save-current-strategy-btn" type="button">Sauver cette sélection</button>
+          </div>
+          <div class="market-snapshot" id="market-snapshot">
+            <div class="empty compact-empty">Chargement des marchés...</div>
+          </div>
+        </details>
         <div class="table-wrap">
           <table>
             <thead>
@@ -1469,7 +1475,11 @@
           <h3 id="modal-title">Match</h3>
           <p id="modal-subtitle"></p>
         </div>
-        <button class="icon-btn" id="modal-close" aria-label="Fermer">×</button>
+        <div class="modal-nav-buttons">
+          <button class="icon-btn modal-nav-btn" id="modal-prev" aria-label="Pari précédent" title="Pari précédent (←)" type="button">‹</button>
+          <button class="icon-btn modal-nav-btn" id="modal-next" aria-label="Pari suivant" title="Pari suivant (→)" type="button">›</button>
+          <button class="icon-btn" id="modal-close" aria-label="Fermer">×</button>
+        </div>
       </header>
       <div class="modal-tabs" id="modal-tabs">
         <button class="modal-tab active" data-detail-tab="summary">Synthèse</button>

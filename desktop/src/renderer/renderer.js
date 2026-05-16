@@ -2070,6 +2070,13 @@
     renderStakeScenarios();
     renderHistory();
     setSideStatus('Pari ajouté au suivi', 'ok');
+    // Sprint 66 — toast confirmation visible (feedback explicite après "Je mise")
+    try {
+      const label = userBetLabel(row) || 'Pari';
+      const odd = Number(row?.odd || 0);
+      const oddStr = odd > 1 ? `@${odd.toFixed(2)}` : '';
+      showToast(`✅ ${label} ajouté au suivi`, `${oddStr} · mise ${formatMoney(stake)}`, 'ok');
+    } catch { /* noop */ }
   }
 
   function autoTrackingStopped() {
@@ -2269,6 +2276,13 @@
     renderCombines();
     renderHistory();
     setSideStatus('Combiné ajouté au suivi', 'ok');
+    // Sprint 66 — toast feedback explicit
+    try {
+      const legs = (combo?.legs || combo?.picks || []).length;
+      const totalOdd = Number(combo?.totalOdd || combo?.combinedOdd || 0);
+      const oddStr = totalOdd > 1 ? `@${totalOdd.toFixed(2)}` : '';
+      showToast(`✅ Combiné ${legs} jambes ajouté`, `${oddStr}`, 'ok');
+    } catch { /* noop */ }
   }
 
   function formatOdd(value) {
@@ -11144,6 +11158,47 @@
     applyExpertMode();
     modal.classList.remove('hidden');
     document.body.classList.add('modal-open');
+    // Sprint 67 — Memoriser l'ID courant pour la navigation prev/next
+    state.modalCurrentId = String(id);
+    updateModalNavButtons();
+  }
+
+  // Sprint 67 — Navigation prev/next dans la modal entre les picks visibles
+  function modalNavOrderedIds() {
+    // Priorite : picks dashboard visibles, sinon table principale
+    const candidates = [];
+    if (Array.isArray(state.dashboardPicks) && state.dashboardPicks.length) {
+      state.dashboardPicks.forEach((p) => p?.id && candidates.push(String(p.id)));
+    }
+    if (!candidates.length && Array.isArray(state.picks)) {
+      state.picks.forEach((p) => p?.id && candidates.push(String(p.id)));
+    }
+    return [...new Set(candidates)];
+  }
+
+  function updateModalNavButtons() {
+    const prev = $('#modal-prev');
+    const next = $('#modal-next');
+    if (!prev || !next) return;
+    const ids = modalNavOrderedIds();
+    const idx = ids.indexOf(String(state.modalCurrentId || ''));
+    const hasPrev = idx > 0;
+    const hasNext = idx >= 0 && idx < ids.length - 1;
+    prev.disabled = !hasPrev;
+    next.disabled = !hasNext;
+    prev.style.opacity = hasPrev ? '1' : '0.35';
+    next.style.opacity = hasNext ? '1' : '0.35';
+    prev.title = hasPrev ? `Pari précédent (← ${idx}/${ids.length})` : 'Premier pari';
+    next.title = hasNext ? `Pari suivant (→ ${idx + 2}/${ids.length})` : 'Dernier pari';
+  }
+
+  function navigateModal(direction) {
+    const ids = modalNavOrderedIds();
+    const idx = ids.indexOf(String(state.modalCurrentId || ''));
+    if (idx === -1) return;
+    const targetIdx = idx + (direction === 'next' ? 1 : -1);
+    if (targetIdx < 0 || targetIdx >= ids.length) return;
+    openMatchDetail(ids[targetIdx]);
   }
 
   function openFocusMode(row) {
@@ -15048,17 +15103,24 @@
   }
 
   function showExportStatus(filename, type) {
+    showToast(`Export ${exportKindFromType(type)} généré`, filename, 'ok');
+  }
+
+  // Sprint 66 — toast générique réutilisable (export, track-bet, etc.)
+  function showToast(title, subtitle, tone = 'ok') {
     const toast = $('#export-toast');
     if (!toast) return;
     const now = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-    toast.innerHTML = `
-      <strong>Export ${escapeHtml(exportKindFromType(type))} généré</strong>
-      <span>${escapeHtml(filename)} · ${escapeHtml(now)}</span>
-    `;
+    const safeTitle = escapeHtml(String(title || ''));
+    const safeSub = escapeHtml(`${subtitle || ''}${subtitle ? ' · ' : ''}${now}`);
+    toast.innerHTML = `<strong>${safeTitle}</strong><span>${safeSub}</span>`;
     toast.classList.remove('hidden');
+    toast.classList.remove('toast-warn', 'toast-info', 'toast-ok');
+    toast.classList.add(`toast-${tone === 'warn' ? 'warn' : tone === 'info' ? 'info' : 'ok'}`);
     clearTimeout(state.exportTimer);
-    state.exportTimer = setTimeout(() => toast.classList.add('hidden'), 5000);
+    state.exportTimer = setTimeout(() => toast.classList.add('hidden'), 4500);
   }
+  try { window.showToast = showToast; } catch { /* noop */ }
 
   function agentExportRows() {
     const agent = state.agent || {};
@@ -15535,6 +15597,19 @@
         setSideStatus('Combinés du jour ouverts depuis le scanner', 'ok');
       }
     });
+    // Sprint 67 — Persistance etat ouvert/ferme du fold "Filtres et marches"
+    const pickToolbarFold = $('#pick-toolbar-fold');
+    if (pickToolbarFold) {
+      const STORAGE_KEY = 'parisSportif.pickToolbarFoldOpen';
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved === '0') pickToolbarFold.open = false;
+        else if (saved === '1') pickToolbarFold.open = true;
+      } catch { /* noop */ }
+      pickToolbarFold.addEventListener('toggle', () => {
+        try { localStorage.setItem(STORAGE_KEY, pickToolbarFold.open ? '1' : '0'); } catch { /* noop */ }
+      });
+    }
     ['scorer-search', 'scorer-league-filter', 'scorer-market-filter', 'scorer-odd-min', 'scorer-odd-max', 'scorer-sort'].forEach((id) => {
       const el = $(`#${id}`);
       if (!el) return;
@@ -15984,6 +16059,19 @@
       });
     });
     $('#modal-close').addEventListener('click', closeMatchDetail);
+    // Sprint 67 — Boutons prev/next dans la modal
+    $('#modal-prev')?.addEventListener('click', () => navigateModal('prev'));
+    $('#modal-next')?.addEventListener('click', () => navigateModal('next'));
+    // Sprint 67 — Raccourcis clavier ← → quand modal ouverte
+    document.addEventListener('keydown', (event) => {
+      const modal = $('#match-modal');
+      if (!modal || modal.classList.contains('hidden')) return;
+      // Ne pas intercepter dans inputs/textarea
+      const t = event.target;
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+      if (event.key === 'ArrowLeft') { event.preventDefault(); navigateModal('prev'); }
+      else if (event.key === 'ArrowRight') { event.preventDefault(); navigateModal('next'); }
+    });
     $('#modal-tabs').addEventListener('click', (event) => {
       const btn = event.target.closest('[data-detail-tab]');
       if (btn) switchDetailTab(btn.dataset.detailTab);
