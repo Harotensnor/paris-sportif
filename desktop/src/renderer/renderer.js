@@ -6720,7 +6720,27 @@
               </div>
             </div>
           </td>
-          <td data-label="Pari"><span class="pill">${escapeHtml(statusText)}</span> ${priorityBadgeHtml(pick)} <span class="pill">${escapeHtml(simpleMarketLabelForRow(pick))}</span>${safeBadgeHtml(pick)}${specialPatternBadgeHtml(pick)}${boostBadgeHtml(pick)}${enrichmentBadgeHtml(pick)}${actionPickHtml(pick, { compact: true })}</td>
+          <td data-label="Pari">
+            <div class="pari-cell">
+              <span class="pill pari-status">${escapeHtml(statusText)}</span>
+              <strong class="pari-bet-label">${escapeHtml(userBetLabel(pick) || simpleMarketLabelForRow(pick))}</strong>
+              ${(() => {
+                // Sprint 69 — Cellule Pari simplifiee : badges secondaires en tooltip.
+                // 3 chips max visible (status + safe + priority), le reste dans le title attribute.
+                const extras = [
+                  priorityBadgeHtml(pick) ? 'priorité' : '',
+                  safeBadgeHtml(pick) ? 'fiable' : '',
+                  specialPatternBadgeHtml(pick) ? 'pattern' : '',
+                  boostBadgeHtml(pick) ? 'boost' : '',
+                  enrichmentBadgeHtml(pick) ? 'enrichi' : ''
+                ].filter(Boolean);
+                return extras.length
+                  ? `<span class="pari-extras-chip" title="${escapeHtml(extras.join(' · '))}">+${extras.length}</span>`
+                  : '';
+              })()}
+              ${safeBadgeHtml(pick)}
+            </div>
+          </td>
           <td data-label="Cote">@${pick.odd.toFixed(2)}</td>
           <td data-label="Mise">${visibleStakeText(pick)}<div class="match-sub">${escapeHtml(allocationSummaryText(pick))}</div></td>
           <td data-label="Départ">${escapeHtml(startLabel)}</td>
@@ -11161,6 +11181,90 @@
     // Sprint 67 — Memoriser l'ID courant pour la navigation prev/next
     state.modalCurrentId = String(id);
     updateModalNavButtons();
+  }
+
+  // Sprint 69 — Cmd-K palette : recherche rapide matchs + actions + pages
+  function buildCmdKActions() {
+    const tabs = [
+      { id: 'tab:dashboard', icon: '🎯', title: 'Aller à À MISER', sub: 'Dashboard principal', tags: 'dashboard accueil home miser picks' },
+      { id: 'tab:history', icon: '📊', title: 'Aller à Bilan & Stats', sub: 'Performance + Mon mois', tags: 'bilan stats history performance pnl' },
+      { id: 'tab:scorers', icon: '👤', title: 'Aller à Buteurs', sub: 'Joueurs & buteurs', tags: 'buteur scorer joueur' },
+      { id: 'tab:combines', icon: '🎲', title: 'Aller à Combinés', sub: 'Multi-jambes du jour', tags: 'combine combo multi' },
+      { id: 'tab:preferences', icon: '⚙️', title: 'Aller à Réglages', sub: 'Bankroll, notifs, thème', tags: 'reglages preferences config' },
+      { id: 'action:demo-tour', icon: '🎬', title: 'Lancer le tour démo', sub: '7 étapes guidées', tags: 'tour demo onboarding aide' },
+      { id: 'action:toggle-expert', icon: '🧪', title: 'Toggle mode expert', sub: 'Affiche/cache sections avancées', tags: 'expert avance' },
+      { id: 'action:refresh', icon: '🔄', title: 'Refresh data', sub: 'Forcer une mise à jour', tags: 'refresh reload mettre a jour' }
+    ];
+    return tabs;
+  }
+
+  function cmdKMatchRows() {
+    const matches = state.dashboardPicks?.length ? state.dashboardPicks : (state.picks || []);
+    return matches.slice(0, 50).map((m) => ({
+      id: `match:${m.id}`,
+      icon: '⚽',
+      title: m.title || `${m.match?.home?.name || '?'} - ${m.match?.away?.name || '?'}`,
+      sub: `${m.sport || ''} · ${m.league || ''} · ${m.label || ''} @${(Number(m.odd) || 0).toFixed(2)}`,
+      tags: `${m.title || ''} ${m.sport || ''} ${m.league || ''}`.toLowerCase()
+    }));
+  }
+
+  function renderCmdKResults(query) {
+    const list = $('#cmd-k-results');
+    if (!list) return;
+    const q = String(query || '').trim().toLowerCase();
+    const all = [...buildCmdKActions(), ...cmdKMatchRows()];
+    const filtered = q
+      ? all.filter((item) => `${item.title} ${item.sub} ${item.tags || ''}`.toLowerCase().includes(q))
+      : all.slice(0, 12);
+    if (!filtered.length) {
+      list.innerHTML = '<li class="cmd-k-empty">Aucun résultat. Tape une équipe, un sport ou "tour démo".</li>';
+      return;
+    }
+    list.innerHTML = filtered.slice(0, 20).map((item, idx) => `
+      <li class="cmd-k-result ${idx === 0 ? 'active' : ''}" data-cmdk-id="${escapeHtml(item.id)}" role="option" tabindex="-1">
+        <span class="cmd-k-result-icon">${escapeHtml(item.icon)}</span>
+        <div class="cmd-k-result-meta">
+          <span class="cmd-k-result-title">${escapeHtml(item.title)}</span>
+          <span class="cmd-k-result-sub">${escapeHtml(item.sub)}</span>
+        </div>
+      </li>
+    `).join('');
+  }
+
+  function openCmdK() {
+    const bd = $('#cmd-k-backdrop');
+    const input = $('#cmd-k-input');
+    if (!bd || !input) return;
+    bd.classList.remove('hidden');
+    input.value = '';
+    renderCmdKResults('');
+    setTimeout(() => input.focus(), 50);
+  }
+
+  function closeCmdK() {
+    $('#cmd-k-backdrop')?.classList.add('hidden');
+  }
+
+  function executeCmdKAction(itemId) {
+    if (!itemId) return;
+    if (itemId.startsWith('match:')) {
+      const id = itemId.slice('match:'.length);
+      openMatchDetail(id);
+    } else if (itemId.startsWith('tab:')) {
+      const tab = itemId.slice('tab:'.length);
+      if (typeof switchTab === 'function') switchTab(tab);
+    } else if (itemId === 'action:demo-tour') {
+      if (typeof startDemoTour === 'function') startDemoTour({ force: true });
+    } else if (itemId === 'action:toggle-expert') {
+      try {
+        const prefs = loadPreferences();
+        applyPreferences({ ...prefs, expertMode: !prefs.expertMode });
+      } catch { /* noop */ }
+    } else if (itemId === 'action:refresh') {
+      if (typeof startRefresh === 'function') startRefresh('quick').catch(() => {});
+    }
+    closeCmdK();
   }
 
   // Sprint 67 — Navigation prev/next dans la modal entre les picks visibles
@@ -16071,6 +16175,49 @@
       if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
       if (event.key === 'ArrowLeft') { event.preventDefault(); navigateModal('prev'); }
       else if (event.key === 'ArrowRight') { event.preventDefault(); navigateModal('next'); }
+    });
+    // Sprint 69 — Cmd-K palette : Cmd/Ctrl+K pour ouvrir
+    document.addEventListener('keydown', (event) => {
+      const isMeta = event.ctrlKey || event.metaKey;
+      if (isMeta && event.key.toLowerCase() === 'k') {
+        event.preventDefault();
+        const bd = $('#cmd-k-backdrop');
+        if (bd?.classList.contains('hidden')) openCmdK();
+        else closeCmdK();
+        return;
+      }
+      const bd = $('#cmd-k-backdrop');
+      if (!bd || bd.classList.contains('hidden')) return;
+      if (event.key === 'Escape') { event.preventDefault(); closeCmdK(); return; }
+      const results = bd.querySelectorAll('.cmd-k-result');
+      if (!results.length) return;
+      const activeIdx = Array.from(results).findIndex((r) => r.classList.contains('active'));
+      if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        const next = Math.min(results.length - 1, activeIdx + 1);
+        results.forEach((r, i) => r.classList.toggle('active', i === next));
+        results[next].scrollIntoView({ block: 'nearest' });
+      } else if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        const prev = Math.max(0, activeIdx - 1);
+        results.forEach((r, i) => r.classList.toggle('active', i === prev));
+        results[prev].scrollIntoView({ block: 'nearest' });
+      } else if (event.key === 'Enter') {
+        event.preventDefault();
+        const active = results[activeIdx >= 0 ? activeIdx : 0];
+        if (active) executeCmdKAction(active.dataset.cmdkId);
+      }
+    });
+    $('#cmd-k-input')?.addEventListener('input', (event) => {
+      renderCmdKResults(event.target.value);
+    });
+    $('#cmd-k-results')?.addEventListener('click', (event) => {
+      const li = event.target.closest('.cmd-k-result');
+      if (!li) return;
+      executeCmdKAction(li.dataset.cmdkId);
+    });
+    $('#cmd-k-backdrop')?.addEventListener('click', (event) => {
+      if (event.target.id === 'cmd-k-backdrop') closeCmdK();
     });
     $('#modal-tabs').addEventListener('click', (event) => {
       const btn = event.target.closest('[data-detail-tab]');

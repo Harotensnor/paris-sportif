@@ -1467,6 +1467,18 @@
     </div>
   </div>
 
+  <!-- Sprint 69 — Cmd-K palette (Ctrl+K / Cmd+K) -->
+  <div class="cmd-k-backdrop hidden" id="cmd-k-backdrop" role="dialog" aria-modal="true" aria-labelledby="cmd-k-input">
+    <div class="cmd-k-panel" role="combobox" aria-controls="cmd-k-results" aria-expanded="true">
+      <div class="cmd-k-search-row">
+        <span class="cmd-k-icon" aria-hidden="true">🔍</span>
+        <input type="text" id="cmd-k-input" class="cmd-k-input" placeholder="Cherche un match, une action, une page..." aria-label="Recherche rapide" autocomplete="off">
+        <span class="cmd-k-kbd">ESC</span>
+      </div>
+      <ul class="cmd-k-results" id="cmd-k-results" role="listbox"></ul>
+    </div>
+  </div>
+
   <div class="modal-backdrop hidden" id="match-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
     <div class="modal">
       <header class="modal-head">

@@ -5,6 +5,25 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 69 — UX finitions : cellule Pari simplifiée + Cmd-K palette
+
+**Cellule "Pari" du tableau simplifiée** (`renderer.js:renderPicks`)
+- Avant : 8 chips empilés (`statusText` + `priority` + `marketLabel` + `safe` + `pattern` + `boost` + `enrichment` + `actionPick`) → cellule illisible.
+- Maintenant : 3 éléments principaux (`statusText` pill, bet label en strong, `safe` badge) + un chip compact `+N` qui list les badges secondaires en tooltip (`priorité · fiable · pattern · boost · enrichi`).
+- `<strong class="pari-bet-label">` met le libellé du pari en avant (typo 13px weight 600).
+
+**Cmd-K palette** (`index.html` + `renderer.js` + `styles.css`)
+- Raccourci `Ctrl+K` / `Cmd+K` ouvre une palette de recherche centrée (560px max, 8vh from top).
+- Recherche unifiée : 8 actions/tabs (À MISER, Bilan, Buteurs, Combinés, Réglages, Tour démo, Toggle expert, Refresh) + jusqu'à 50 matchs du dashboard.
+- Filtrage live : tape "psg" → matchs PSG + actions matching ; tape "demo" → "Lancer le tour démo".
+- Navigation clavier : `↓` / `↑` pour parcourir, `Enter` pour exécuter, `Esc` pour fermer.
+- Backdrop blur + animation slide-in 200ms.
+- Theme-light parity.
+
+**Comparaison 2 picks** : indirecte via Cmd-K (tape l'équipe du 2ème match dans la palette pour switch rapide depuis la modal).
+
+Engine contract OK : 181 matchs, 93 picks. Smoke OK : 11 paris visibles.
+
 ### Sprint 68 — Calibration per-market + ligues refresh (audit P1)
 
 Suite Sprint 66-67 (discipline modèle), on s'attaque à la cause racine : la calibration `_calibrateProb` était globale (bins 1n2 foot only, n=1037) et s'appliquait aveuglément à OU 2.5/BTTS/scorer. Brier OU 0.247 vs 1n2 0.184 → marché OU **mal calibré de loin le plus**.
