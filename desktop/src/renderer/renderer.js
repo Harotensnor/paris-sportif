@@ -3284,6 +3284,37 @@
     return row?.match?.lineups?.[side] || teamContext(row, side)?.lineup || competitor?.lineup || row?.match?.context?.availability?.[side]?.lineup || {};
   }
 
+  // Sprint 64 — status global lineup (confirmed/probable/missing) pour badge visible
+  // dans la hero modal et le simple-timeline-card.
+  function lineupStatusForRow(row) {
+    if (!row || row.sport !== 'football' && !/foot|soccer/i.test(row?.sport || '')) {
+      return { tone: 'none', label: '', count: 0 };
+    }
+    const home = lineupContext(row, 'home') || {};
+    const away = lineupContext(row, 'away') || {};
+    const homeStarters = Array.isArray(home.starters) ? home.starters.length : 0;
+    const awayStarters = Array.isArray(away.starters) ? away.starters.length : 0;
+    if (!homeStarters && !awayStarters) {
+      return { tone: 'missing', label: 'Compos à venir', count: 0 };
+    }
+    const bothConfirmed = home.confirmed === true && away.confirmed === true;
+    const someConfirmed = home.confirmed === true || away.confirmed === true;
+    if (bothConfirmed) {
+      return { tone: 'confirmed', label: '✅ Compos confirmées', count: homeStarters + awayStarters };
+    }
+    if (someConfirmed) {
+      return { tone: 'partial', label: '🟡 1 compo confirmée', count: homeStarters + awayStarters };
+    }
+    return { tone: 'projected', label: '🔵 Compos probables', count: homeStarters + awayStarters };
+  }
+
+  function lineupStatusBadgeHtml(row) {
+    const st = lineupStatusForRow(row);
+    if (!st.tone || st.tone === 'none') return '';
+    const cls = `lineup-status-badge lineup-${st.tone}`;
+    return `<span class="${cls}" title="${escapeHtml(st.count ? `${st.count} joueurs renseignés` : 'Compos en attente')}">${escapeHtml(st.label)}</span>`;
+  }
+
   function availabilityContext(row, side) {
     const sides = getSides(row?.match || {});
     const competitor = side === 'home' ? sides.home : sides.away;
@@ -5628,6 +5659,22 @@
     const store = state.newsWatcher || readStorageJson(NEWS_WATCHER_KEY, null);
     const key = rowEnrichmentKey(row);
     return store?.byKey?.[key] || store?.byKey?.[userBetKey(row)] || null;
+  }
+
+  // Sprint 64 — badge "news fraîche" pour la hero modal (impact / watch only).
+  function freshNewsBadgeHtml(row) {
+    const item = newsForRow(row);
+    if (!item) return '';
+    const tone = item.tone;
+    if (tone !== 'watch' && tone !== 'impact' && tone !== 'critical') return '';
+    const ts = Date.parse(item.checkedAt || item.updatedAt || '');
+    if (!Number.isFinite(ts)) return '';
+    const ageMin = Math.max(0, Math.round((Date.now() - ts) / 60000));
+    if (ageMin > 360) return ''; // > 6h ignored
+    const ageLabel = ageMin < 60 ? `il y a ${ageMin} min` : `il y a ${Math.floor(ageMin / 60)}h`;
+    const icon = tone === 'critical' ? '🚨' : tone === 'impact' ? '⚠️' : '📰';
+    const headline = String(item.headline || 'News pré-match').slice(0, 60);
+    return `<span class="news-fresh-badge news-fresh-${escapeHtml(tone)}" title="${escapeHtml(headline)} (${ageLabel})">${escapeHtml(icon)} ${escapeHtml(headline)}</span>`;
   }
 
   async function loadNewsWatcherState() {
@@ -11611,6 +11658,8 @@
               ${priorityBadgeHtml(row)}
               ${safeBadgeHtml(row)}
               ${twoGoalSafetyBadgeHtml(row)}
+              ${lineupStatusBadgeHtml(row)}
+              ${freshNewsBadgeHtml(row)}
               <span title="${escapeHtml(allocationLongText(row))}">${escapeHtml(allocationSummaryText(row))}</span>
             </div>
             <div class="decision-hero-grid">

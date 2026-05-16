@@ -3062,6 +3062,97 @@ body.modal-open {
   gap: 8px;
 }
 
+/* Sprint 64 — badge status lineup */
+.lineup-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .02em;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, .04);
+}
+
+.lineup-status-badge.lineup-confirmed {
+  border-color: rgba(16, 185, 129, .45);
+  background: rgba(16, 185, 129, .12);
+  color: #34d399;
+}
+
+.lineup-status-badge.lineup-partial {
+  border-color: rgba(245, 158, 11, .45);
+  background: rgba(245, 158, 11, .12);
+  color: #fbbf24;
+}
+
+.lineup-status-badge.lineup-projected {
+  border-color: rgba(99, 102, 241, .45);
+  background: rgba(99, 102, 241, .12);
+  color: #818cf8;
+}
+
+.lineup-status-badge.lineup-missing {
+  border-color: rgba(148, 163, 184, .35);
+  background: rgba(148, 163, 184, .08);
+  color: var(--muted);
+}
+
+body.theme-light .lineup-status-badge.lineup-confirmed { color: #047857; }
+body.theme-light .lineup-status-badge.lineup-partial { color: #c2410c; }
+body.theme-light .lineup-status-badge.lineup-projected { color: #4338ca; }
+
+/* Sprint 64 — badge news fraîche */
+.news-fresh-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .02em;
+  border: 1px solid var(--line);
+  max-width: 280px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.news-fresh-badge.news-fresh-watch {
+  border-color: rgba(99, 102, 241, .45);
+  background: rgba(99, 102, 241, .12);
+  color: #a5b4fc;
+}
+
+.news-fresh-badge.news-fresh-impact {
+  border-color: rgba(245, 158, 11, .5);
+  background: rgba(245, 158, 11, .14);
+  color: #fbbf24;
+}
+
+.news-fresh-badge.news-fresh-critical {
+  border-color: rgba(239, 68, 68, .5);
+  background: rgba(239, 68, 68, .14);
+  color: #f87171;
+  animation: pulse-news 2s ease-in-out infinite;
+}
+
+@keyframes pulse-news {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .news-fresh-badge.news-fresh-critical { animation: none; }
+}
+
+body.theme-light .news-fresh-badge.news-fresh-watch { color: #4338ca; }
+body.theme-light .news-fresh-badge.news-fresh-impact { color: #c2410c; }
+body.theme-light .news-fresh-badge.news-fresh-critical { color: #b91c1c; }
+
 /* Sprint 62 — bullets "Pourquoi miser" visuels dans la hero modal */
 .key-reasons-list {
   list-style: none;

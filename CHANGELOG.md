@@ -5,6 +5,25 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 64 — Badges live : compos confirmées + news fraîche dans la hero modal
+
+**Lineup status badge** (`lineupStatusForRow`, `lineupStatusBadgeHtml`)
+- Analyse `match.lineups.home/away.confirmed` + `.starters[]` pour produire un status global :
+  - `confirmed` → ✅ Compos confirmées (vert) si les 2 équipes ont publié
+  - `partial` → 🟡 1 compo confirmée (orange) si une seule
+  - `projected` → 🔵 Compos probables (indigo) si on a les noms mais pas la confirmation officielle
+  - `missing` → Compos à venir (gris) si rien
+- Badge inline dans la `detail-priority-strip` du hero modal foot uniquement. Tooltip avec compteur de joueurs renseignés.
+
+**News fraîche badge** (`freshNewsBadgeHtml`)
+- Lit `state.newsWatcher.byKey[matchKey]` (re-checks pré-match auto).
+- Affichage badge uniquement si tone ∈ {watch, impact, critical} ET age < 6h.
+- Couleurs : 📰 watch (indigo), ⚠️ impact (orange), 🚨 critical (rouge avec animation pulse 2s).
+- Headline tronquée à 60 chars, ellipsis si overflow.
+- Tooltip avec headline complète + âge ("il y a 12 min" / "il y a 3h").
+
+**Phase 4.3 cotes LIVE — skip** : `oddsMovementPct` n'est pas alimenté par l'engine actuel. Pas de données source fiables (winamax_markets.json est un snapshot ponctuel, pas un flux delta). Reportée à un sprint futur quand on aura un pipeline de fetch live continu.
+
 ### Sprint 63 — Onboarding + notifs + tour démo enrichis
 
 Triple amélioration UX pour les premières heures avec l'application.
