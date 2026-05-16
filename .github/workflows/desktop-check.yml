@@ -1,0 +1,66 @@
+name: desktop-check
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths:
+      - 'desktop/**'
+      - 'scripts/**'
+      - 'data.js'
+      - 'data_lite.js'
+      - 'data_today.json'
+      - 'data_manifest.json'
+      - 'health.json'
+      - 'package.json'
+
+permissions:
+  contents: read
+
+jobs:
+  desktop-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install desktop dependencies
+        run: npm --prefix desktop ci
+
+      - name: Syntax checks
+        run: |
+          node --check desktop/src/main.js
+          node --check desktop/src/renderer/renderer.js
+          node --check desktop/src/engine/model-utils.js
+          node --check desktop/src/engine/betting-utils.js
+          node --check desktop/src/engine/content-utils.js
+          node --check desktop/src/engine/history-utils.js
+          node --check desktop/src/engine/legacy-engine.js
+          node --check desktop/src/engine/runtime/legacy-app.js
+          node --check desktop/scripts/engine-contract.js
+          node --check desktop/scripts/safe-assessment-check.js
+          node --check desktop/scripts/calibration-check.js
+          node --check desktop/scripts/audit-ready-picks.js
+          node --check desktop/scripts/smoke.js
+          node --check desktop/scripts/visual-capture.js
+          python -m py_compile desktop/bin/refresh_once.py scripts/_data_io.py scripts/fetch_live.py scripts/fetch_injuries.py scripts/fetch_forebet.py scripts/fetch_lineups_soccer.py scripts/fetch_rus_odds.py scripts/fetch_team_form.py scripts/fetch_tennis_odds.py scripts/fetch_tips.py scripts/finalize_inline.py scripts/patch_odds.py scripts/patch_lineups_soccer.py scripts/patch_all_quick.py scripts/patch_winamax.py scripts/patch_winamax_markets.py
+
+      - name: Unit checks
+        run: npm run qa:unit
+
+      - name: Engine contract
+        run: npm run qa:engine
+
+      - name: Calibration check (Sprint 68)
+        run: npm run qa:calibration
+
+      - name: Safe assessment check (Sprint 66+70)
+        run: npm run qa:safe

@@ -5,6 +5,31 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 70 — Tests & CI : safe-assessment + calibration-check intégrés
+
+**`desktop/scripts/safe-assessment-check.js`** (nouveau)
+- Test 1 : aucun Fiable avec edge brut ≥ 22pt (1n2) ou ≥ 15pt (dérivé)
+- Test 2 : aucun Fiable dérivé avec segment court perdant (sample 5-14, ROI<0)
+- Test 3 : `oddsBasedFallback` (pickSource='winamax_odds_fallback') JAMAIS Fiable
+- Test 4 : profil sain (1-20 Fiables, ni trop strict ni trop laxe)
+- Verrouille les invariants Sprint 66-68 contre régression future.
+
+**`desktop/scripts/calibration-check.js`** (nouveau)
+- Test 1 : schema `prob_calibration.v3` (post Sprint 68)
+- Test 2 : `bins`, `bins_by_sport` présents
+- Test 3 : `bins_by_market` avec `1n2` ET `ou` (les 2 marchés clés), n>=30 chacun
+- Test 4 : `brier_calibrated < brier_raw` pour TOUS les marchés calibrés (pas de régression)
+- Test 5 : `applies_at_runtime === true`
+
+**`package.json`**
+- Nouveaux scripts : `npm run qa:safe`, `npm run qa:calibration`
+
+**`.github/workflows/desktop-check.yml`**
+- 2 nouveaux jobs : "Calibration check (Sprint 68)" + "Safe assessment check (Sprint 66+70)"
+- `node --check` étendu sur les 3 nouveaux scripts.
+
+Validation locale : qa:engine OK · qa:calibration OK (5 marchés, brier OU -2.9pt confirmé) · qa:safe OK (4 Fiables, 14 fallbacks watch, profil sain).
+
 ### Sprint 69 — UX finitions : cellule Pari simplifiée + Cmd-K palette
 
 **Cellule "Pari" du tableau simplifiée** (`renderer.js:renderPicks`)
