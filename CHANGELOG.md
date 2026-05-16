@@ -5,6 +5,21 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 47 — Texte "Pourquoi" enrichi pour buteurs / tennis / baseball
+
+- `compactConcreteSignals(row)` étendu pour produire des signaux explicites par type de pick :
+  * **Buteurs / scorers** : nom du joueur, qualité buteur (score/100), forme/titulaire/capitaine si dispo, proba modèle ≥40%.
+  * **Tennis** : surface, ranks ATP/WTA, H2H locaux, **+** spécialité de surface si win-rate surface > 50%.
+  * **Baseball** : matchup pitchers titulaires (home vs away), ERA équipes si dispo, forme récente W-L-D.
+  * **Foot/autres** : signal existant conservé (forme W-D-L, rythme but).
+- 3 signaux max par card avec dédup (le 4ème ajouté par `simpleWhyText` reste : filet 2-0, sharp money, mouvement cote, arbitre, etc.).
+- Validation : node --check OK, smoke OK (1 ready, 14 timeline, 22 fiables, 8 priorités).
+
+### Sprint 46 — Logos équipes dans live cards
+
+- `renderLiveCockpit()` : les cards de la section EN DIRECT affichent désormais les logos équipes Wikipedia (`matchVisualHtml(row, 'compact')`) à côté du titre du match et du score live. Cohérent avec le reste du cockpit qui montre déjà les logos.
+- CSS `.live-card-teams` pour l'alignement flex (logos + titre + score).
+
 ### Sprint 45 — Section hero "À MISER MAINTENANT" + photos buteurs/scorers
 
 **UX — "Voir direct sur quoi miser"**

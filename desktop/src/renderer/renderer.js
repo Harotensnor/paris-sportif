@@ -3958,8 +3958,23 @@
 
   function compactConcreteSignals(row) {
     const sport = String(row?.sport || row?.match?.sport || '').toLowerCase();
+    const marketKey = String(row?.marketKey || '').toLowerCase();
     const items = [];
-    if (sport.includes('football') || sport.includes('soccer')) {
+    // Sprint 47 — Buteurs : signaux spécifiques avant les signaux génériques
+    // par sport. Un pick "Mbappé marque" doit dire pourquoi : forme buteur,
+    // qualité joueur, position attaque, lineup statut.
+    if (marketKey === 'scorer' || /buteur/i.test(row?.market || '')) {
+      const playerName = row?.player || row?.label || '';
+      const quality = Number(row?.playerQuality?.score ?? row?.contextQuality?.score ?? 0);
+      const drivers = Array.isArray(row?.confidenceTrust?.drivers) ? row.confidenceTrust.drivers : [];
+      const reasonsArr = Array.isArray(row?.playerQuality?.reasons) ? row.playerQuality.reasons : drivers;
+      if (playerName) items.push(`${playerName}`);
+      if (quality >= 70) items.push(`qualité buteur ${Math.round(quality)}/100 (forte)`);
+      else if (quality >= 50) items.push(`qualité buteur ${Math.round(quality)}/100`);
+      const buteurSignal = reasonsArr.find((r) => /titulaire|forme|série|buteur récent|capitaine/i.test(r));
+      if (buteurSignal) items.push(buteurSignal);
+      if (Number(row?.probability || 0) >= 0.40) items.push(`proba modèle ${Math.round(Number(row.probability) * 100)}%`);
+    } else if (sport.includes('football') || sport.includes('soccer')) {
       const homeName = teamDisplayName(row, 'home');
       const awayName = teamDisplayName(row, 'away');
       const home = teamContext(row, 'home');
@@ -3980,6 +3995,27 @@
       if (ranks.length) items.push(ranks.join(' · '));
       const h2h = Array.isArray(match.h2h?.meetings) ? match.h2h.meetings.length : 0;
       if (h2h) items.push(`${formatCount(h2h)} H2H locaux`);
+      // Sprint 47 — Tennis : surface preferences si dispo
+      const homeSurfaceWR = Number(home?.surface_win_rate || home?.elo_surface || 0);
+      const awaySurfaceWR = Number(away?.surface_win_rate || away?.elo_surface || 0);
+      if (Number.isFinite(homeSurfaceWR) && homeSurfaceWR > 0.5) items.push(`${home.name} fort sur ${surface || 'cette surface'}`);
+      else if (Number.isFinite(awaySurfaceWR) && awaySurfaceWR > 0.5) items.push(`${away.name} fort sur ${surface || 'cette surface'}`);
+    } else if (sport.includes('baseball')) {
+      // Sprint 47 — Baseball : pitcher matchup + ERA si dispo
+      const match = row?.match || {};
+      const { home, away } = getSides(match);
+      const homePitcher = home?.starter_pitcher || home?.starting_pitcher || home?.starter || home?.advanced?.starter;
+      const awayPitcher = away?.starter_pitcher || away?.starting_pitcher || away?.starter || away?.advanced?.starter;
+      if (homePitcher || awayPitcher) {
+        items.push(`Pitchers ${homePitcher || '?'} vs ${awayPitcher || '?'}`);
+      }
+      const homeERA = Number(home?.advanced?.era || home?.team_ERA);
+      const awayERA = Number(away?.advanced?.era || away?.team_ERA);
+      if (Number.isFinite(homeERA) && Number.isFinite(awayERA)) {
+        items.push(`ERA équipes ${homeERA.toFixed(2)} vs ${awayERA.toFixed(2)}`);
+      }
+      const teamForm = [sideFormText(home), sideFormText(away)].filter((text) => text && !/non confirm/i.test(text)).join(' / ');
+      if (teamForm) items.push(`forme ${teamForm}`);
     } else {
       const match = row?.match || {};
       const { home, away } = getSides(match);
@@ -5750,7 +5786,7 @@
           return `
             <article class="live-card live-${escapeHtml(insight.tone)} clickable-row" data-match-id="${escapeHtml(row.id)}" tabindex="0" role="button">
               <span>${escapeHtml(live.status)} · ${escapeHtml(String(live.minute || '-'))} · <em class="live-insight-badge ${escapeHtml(insight.tone)}">${escapeHtml(insight.label)}</em></span>
-              <strong>${escapeHtml(row.title)} <em>${escapeHtml(live.score)}</em></strong>
+              <div class="live-card-teams">${matchVisualHtml(row, 'match-visual compact')}<strong>${escapeHtml(row.title)} <em>${escapeHtml(live.score)}</em></strong></div>
               <p>${escapeHtml(userBetLabel(row))} · ${escapeHtml(insight.detail)}</p>
               <div class="live-metric-grid">
                 <article><span>Proba live</span><strong>${escapeHtml(formatPct(insight.probability || 0, 0))}</strong><p>Score + temps restant</p></article>

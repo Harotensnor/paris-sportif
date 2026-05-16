@@ -3464,6 +3464,28 @@ td.empty::before,
   flex-shrink: 0;
 }
 
+/* Sprint 46 (UX) : logos équipes dans live cards */
+.live-card-teams {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 4px 0 8px 0;
+}
+
+.live-card-teams strong {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.live-card-teams strong em {
+  font-style: normal;
+  font-weight: 900;
+  color: var(--accent);
+  margin-left: 6px;
+}
+
 /* Sprint 45 (UX) : section hero "À MISER MAINTENANT" */
 .ready-picks-hero {
   margin: 16px 0 24px 0;
