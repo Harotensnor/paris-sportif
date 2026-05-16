@@ -186,6 +186,10 @@ async function main() {
         alertText: document.querySelector('#today-funnel-alert')?.innerText || '',
         readyHeroText: document.querySelector('#ready-picks-hero')?.innerText || '',
         readyHeroDisplay: getComputedStyle(document.querySelector('#ready-picks-hero')).display,
+        homeShellDisplay: getComputedStyle(document.querySelector('#betting-home-v2')).display,
+        homeTop3Count: document.querySelectorAll('#home-top3-grid .home-top-card').length,
+        homeTableRows: document.querySelectorAll('#home-picks-table-body tr.clickable-row').length,
+        homeSortButtons: Array.from(document.querySelectorAll('[data-home-sort]')).map((node) => node.textContent.trim()),
         homeCategoryCount: document.querySelectorAll('[data-cockpit-category]').length,
         homeCategoryTexts: Array.from(document.querySelectorAll('[data-cockpit-category]')).map((node) => node.innerText || ''),
         cockpitOpen: Boolean(document.querySelector('#cockpit-detail-section')?.open),
@@ -214,12 +218,13 @@ async function main() {
       readyHeroText: dom.readyHeroText.slice(0, 500)
     });
     // Sprint 51 : on vérifie la présence des labels-clés, pas l'ordre exact.
-    const requiredNavLabels = ['miser', 'bilan', 'recherche', 'réglages'];
+    const requiredNavLabels = ['miser', 'cockpit', 'vainqueurs', 'buts', 'nuit', 'buteurs', 'combinés', 'bilan', 'recherche', 'réglages'];
     const navLabels = dom.nav.map((l) => l.toLowerCase());
     const missingNav = requiredNavLabels.filter((label) => !navLabels.some((nav) => nav.includes(label)));
     assert(missingNav.length === 0, 'Terrain: navigation standard non simplifiée', { missingNav, nav: dom.nav });
-    assert(dom.nav.length <= 5, 'Terrain: trop d’entrées visibles dans la navigation standard', { nav: dom.nav });
+    assert(dom.nav.length <= 12, 'Terrain: navigation trop longue malgré les catégories', { nav: dom.nav });
     assert(dom.rows >= 15 && dom.rows <= 28 && dom.timeline >= 8, 'Terrain: cockpit réel insuffisant', dom);
+    assert(dom.homeShellDisplay !== 'none' && dom.homeTop3Count >= Math.min(3, dom.homeTableRows) && dom.homeTableRows >= 6 && dom.homeSortButtons.length >= 4, 'Terrain: nouvel accueil Top 3 + tableau triable absent', dom);
     assert(dom.homeCategoryCount >= 6, 'Terrain: catégories pronostics insuffisantes pour alléger l’accueil', dom);
     assert(!dom.homeCategoryTexts.some((text) => /\b0\s+ligne/i.test(text)), 'Terrain: catégorie vide visible sur l’accueil', dom.homeCategoryTexts);
     assert(!dom.cockpitOpen, 'Terrain: Cockpit détaillé ouvert par défaut, accueil trop chargé', dom);
@@ -248,6 +253,16 @@ async function main() {
       }));
       assert(categoryState.open && categoryState.mode === 'type' && categoryState.winnerVisible, 'Terrain: catégorie Vainqueurs n’ouvre pas le Cockpit dédié', categoryState);
     }
+
+    await win.locator('[data-tab="winners"]:visible').first().click();
+    await win.waitForFunction(() => Boolean(document.querySelector('#cockpit-detail-section')?.open), null, { timeout: 5000 });
+    const navCategoryState = await win.evaluate(() => ({
+      active: document.querySelector('.nav-btn.active')?.dataset.tab || '',
+      title: document.querySelector('#page-title')?.textContent || '',
+      mode: localStorage.getItem('parisSportifPicksViewMode'),
+      winnerVisible: Boolean(document.querySelector('[data-time-bucket="winner"]'))
+    }));
+    assert(navCategoryState.active === 'winners' && /Vainqueurs/i.test(navCategoryState.title) && navCategoryState.mode === 'type' && navCategoryState.winnerVisible, 'Terrain: navigation Vainqueurs dédiée cassée', navCategoryState);
 
     const firstMatchCard = win.locator('[data-match-id]:visible').first();
     if (await firstMatchCard.count()) {

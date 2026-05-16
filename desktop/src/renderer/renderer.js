@@ -102,6 +102,7 @@
     autoTrackingLastRunAt: 0,
     winamaxImportPreview: null,
     currentDashboardRows: [],
+    activeHomeCategory: null,
     bentoDragId: null
   };
 
@@ -153,6 +154,7 @@
   const I18N_LANGUAGE_KEY = 'parisSportifLanguage';
   const DASHBOARD_LAYOUT_KEY = 'parisSportifDashboardLayouts';
   const PICKS_VIEW_MODE_KEY = 'parisSportifPicksViewMode';
+  const HOME_SORT_KEY = 'parisSportifHomeSort';
   const DEFAULT_SHORTCUTS = {
     dashboard: 'Ctrl+1',
     history: 'Ctrl+2',
@@ -5594,6 +5596,221 @@
     wrap.innerHTML = cards.map(homeCategoryCardHtml).join('');
   }
 
+  function homeSortMode() {
+    try {
+      const value = localStorage.getItem(HOME_SORT_KEY) || 'confidence';
+      return ['confidence', 'kickoff', 'date', 'odd'].includes(value) ? value : 'confidence';
+    } catch {
+      return 'confidence';
+    }
+  }
+
+  function setHomeSort(mode) {
+    const next = ['confidence', 'kickoff', 'date', 'odd'].includes(mode) ? mode : 'confidence';
+    try {
+      localStorage.setItem(HOME_SORT_KEY, next);
+    } catch {
+      // Tri de confort seulement.
+    }
+    renderBettingHome(state.currentDashboardRows.length ? state.currentDashboardRows : state.picks);
+  }
+
+  function homeConfidenceValue(row) {
+    const values = [
+      safeConfidenceValue(row),
+      realConfidenceValue(row),
+      Number(row?.probability || 0),
+      Number(row?.pred?.probability || 0)
+    ].filter((value) => Number.isFinite(value) && value > 0);
+    return values.length ? Math.max(...values) : 0;
+  }
+
+  function homePickScore(row) {
+    const confidence = homeConfidenceValue(row);
+    const odd = Number(row?.odd || 0);
+    const oddBonus = odd > 1 ? Math.min(14, Math.max(0, (odd - 1) * 4)) : 0;
+    const readyBonus = isReadyToStakeRow(row) ? 9 : 0;
+    const winnerBonus = isWinnerRow(row) ? 2 : 0;
+    const safetyBonus = row?.winamaxTwoGoalRule?.eligible ? Math.min(4, Number(row.winamaxTwoGoalRule.leadTwoProbability || 0) * 6) : 0;
+    return confidence * 100 + oddBonus + readyBonus + winnerBonus + safetyBonus;
+  }
+
+  function sortHomeRows(rows, mode = homeSortMode()) {
+    const arr = (Array.isArray(rows) ? rows : []).slice();
+    const kickoff = (row) => rowKickoffTime(row);
+    const confidenceSort = (a, b) => (
+      homePickScore(b) - homePickScore(a)
+      || homeConfidenceValue(b) - homeConfidenceValue(a)
+      || Number(b?.odd || 0) - Number(a?.odd || 0)
+      || kickoff(a) - kickoff(b)
+    );
+    if (mode === 'kickoff' || mode === 'date') {
+      return arr.sort((a, b) => (
+        kickoff(a) - kickoff(b)
+        || confidenceSort(a, b)
+      ));
+    }
+    if (mode === 'odd') {
+      return arr.sort((a, b) => (
+        Number(b?.odd || 0) - Number(a?.odd || 0)
+        || homeConfidenceValue(b) - homeConfidenceValue(a)
+        || kickoff(a) - kickoff(b)
+      ));
+    }
+    return arr.sort(confidenceSort);
+  }
+
+  function homeCategoryMeta(category) {
+    const metas = {
+      cockpit: {
+        kicker: 'Cockpit 24h',
+        title: 'Tous les paris triables',
+        subtitle: 'Vue complète pour filtrer, comparer et ouvrir les sections détaillées.'
+      },
+      winner: {
+        kicker: 'Vainqueurs',
+        title: 'Les paris Vainqueur en priorité',
+        subtitle: 'Focus sur les matchs à résultat simple, avec filet 2-0 Winamax quand il est disponible.'
+      },
+      goals: {
+        kicker: 'Buts',
+        title: 'Plus / Moins et les deux marquent',
+        subtitle: 'Tous les paris buts sont regroupés ici pour ne pas charger l’accueil principal.'
+      },
+      night: {
+        kicker: 'Nuit',
+        title: 'Les paris de nuit',
+        subtitle: 'Sports US, Asie et matchs tardifs sur les prochaines 24h.'
+      },
+      watch: {
+        kicker: 'À surveiller',
+        title: 'Signaux utiles, sans mise directe',
+        subtitle: 'Ces lignes attendent un re-check, une cote ou un contexte plus propre avant d’être jouées.'
+      }
+    };
+    return metas[category] || {
+      kicker: 'Top 3 prochaines 24h',
+      title: 'Les 3 paris à regarder en premier',
+      subtitle: 'Classés par confiance de réussite, puis par cote Winamax. Le reste est dans le tableau triable.'
+    };
+  }
+
+  function homeSourceRows(rows) {
+    const category = state.activeHomeCategory || null;
+    if (category && category !== 'cockpit') return marketCategoryRows(rows, category);
+    return rolling24hRows(rows, canDisplayPickCard);
+  }
+
+  function homePickRows(rows) {
+    const source = homeSourceRows(rows);
+    const ready = source.filter(isReadyToStakeRow);
+    return ready.length >= 3 ? ready : source;
+  }
+
+  function homeTopCardHtml(row, index) {
+    const rank = index + 1;
+    const confidence = Math.round(homeConfidenceValue(row) * 100);
+    const stake = visibleStakeText(row);
+    const kickoff = `${formatDateLabel(row.start)} · ${countdownLabel(row.start)}`;
+    const why = simpleWhyText(row);
+    const canStake = isReadyToStakeRow(row);
+    return `
+      <article class="home-top-card rank-${rank} clickable-row" data-match-id="${escapeHtml(row.id)}" tabindex="0" role="button" aria-label="Ouvrir ${escapeHtml(row.title || 'match')}">
+        <div class="home-top-rank">#${rank}</div>
+        <div class="home-top-main">
+          <div class="home-top-title">
+            ${matchVisualHtml(row, 'match-visual compact')}
+            <div>
+              <span>${escapeHtml(kickoff)}</span>
+              <strong>${escapeHtml(row.title || 'Match')}</strong>
+              <em>${escapeHtml(`${row.sport || 'Sport'} · ${row.league || 'Winamax'}`)}</em>
+            </div>
+          </div>
+          <div class="home-top-bet">
+            <span>PARI</span>
+            <strong>${escapeHtml(userBetLabel(row) || simpleMarketLabelForRow(row))}</strong>
+          </div>
+          <p>${escapeHtml(why)}</p>
+          <div class="home-top-kpis">
+            <span><em>Confiance</em><strong>${escapeHtml(`${confidence}%`)}</strong></span>
+            <span><em>Cote</em><strong>${escapeHtml(formatOdd(row.odd))}</strong></span>
+            <span><em>Mise</em><strong>${escapeHtml(stake)}</strong></span>
+          </div>
+          ${row.winamaxTwoGoalRule?.eligible ? `<div class="home-safety-pill">Filet 2-0 Winamax ${Math.round(Number(row.winamaxTwoGoalRule.leadTwoProbability || 0) * 100)}%</div>` : ''}
+        </div>
+        <div class="home-top-actions">
+          ${winamaxOpenButtonHtml(row, 'Ouvrir Winamax')}
+          ${canStake ? trackButtonHtml(row, `Je mise ${stake}`) : '<span class="match-sub">À surveiller</span>'}
+        </div>
+      </article>
+    `;
+  }
+
+  function homeTableRowHtml(row) {
+    const confidence = Math.round(homeConfidenceValue(row) * 100);
+    const canStake = isReadyToStakeRow(row);
+    const day = formatDayKey(row.start);
+    const hour = new Date(row.start || '').toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+    const validHour = hour && hour !== 'Invalid Date' ? hour : '-';
+    return `
+      <tr class="clickable-row" data-match-id="${escapeHtml(row.id)}" tabindex="0" role="button" aria-label="Ouvrir ${escapeHtml(row.title || 'match')}">
+        <td data-label="Date">${escapeHtml(day)}</td>
+        <td data-label="Heure">${escapeHtml(validHour)}<div class="match-sub">${escapeHtml(countdownLabel(row.start))}</div></td>
+        <td data-label="Match">
+          <div class="home-table-match">
+            ${matchVisualHtml(row, 'match-visual compact')}
+            <div>
+              <strong>${escapeHtml(row.title || 'Match')}</strong>
+              <span>${escapeHtml(`${row.sport || 'Sport'} · ${row.league || 'Winamax'}`)}</span>
+            </div>
+          </div>
+        </td>
+        <td data-label="Pari"><strong>${escapeHtml(userBetLabel(row) || simpleMarketLabelForRow(row))}</strong><div class="match-sub">${escapeHtml(simpleMarketLabelForRow(row))}</div></td>
+        <td data-label="Confiance"><span class="home-confidence-pill">${escapeHtml(`${confidence}%`)}</span></td>
+        <td data-label="Cote"><strong>${escapeHtml(formatOdd(row.odd))}</strong></td>
+        <td data-label="Mise">${escapeHtml(visibleStakeText(row))}</td>
+        <td data-label="Action"><div class="home-table-action">${winamaxOpenButtonHtml(row, 'Winamax')}${canStake ? trackButtonHtml(row, 'Je mise') : '<span class="match-sub">Surveiller</span>'}</div></td>
+      </tr>
+    `;
+  }
+
+  function renderBettingHome(rows) {
+    const topWrap = $('#home-top3-grid');
+    const body = $('#home-picks-table-body');
+    const caption = $('#home-table-caption');
+    const sortMode = homeSortMode();
+    if (!topWrap && !body) return;
+    const meta = homeCategoryMeta(state.activeHomeCategory);
+    const kicker = $('#home-kicker');
+    const title = $('#home-title');
+    const subtitle = $('#home-subtitle');
+    if (kicker) kicker.textContent = meta.kicker;
+    if (title) title.textContent = meta.title;
+    if (subtitle) subtitle.textContent = meta.subtitle;
+    const source = homeSourceRows(rows);
+    const topSource = homePickRows(rows);
+    const sortedByConfidence = sortHomeRows(topSource, 'confidence');
+    const topRows = sortedByConfidence.slice(0, 3);
+    const tableRows = sortHomeRows(source, sortMode).slice(0, 24);
+    $$('.home-sort-actions [data-home-sort], .home-picks-table [data-home-sort]').forEach((button) => {
+      button.classList.toggle('active', button.dataset.homeSort === sortMode);
+    });
+    if (caption) {
+      const labels = { confidence: 'confiance puis cote', kickoff: 'heure de départ', date: 'date', odd: 'cote Winamax' };
+      caption.textContent = `${formatCount(tableRows.length)} paris sur 24h · tri ${labels[sortMode] || 'confiance'}`;
+    }
+    if (topWrap) {
+      topWrap.innerHTML = topRows.length
+        ? topRows.map(homeTopCardHtml).join('')
+        : '<div class="empty compact-empty">Aucun pari exploitable sur les prochaines 24h. Lance un refresh complet ou ouvre Cockpit pour le diagnostic.</div>';
+    }
+    if (body) {
+      body.innerHTML = tableRows.length
+        ? tableRows.map(homeTableRowHtml).join('')
+        : '<tr><td colspan="8" class="empty">Aucun pari dans le tableau 24h avec les filtres actuels.</td></tr>';
+    }
+  }
+
   function openCockpitCategory(category = 'cockpit') {
     const normalized = String(category || 'cockpit').toLowerCase();
     const modeByCategory = {
@@ -7054,6 +7271,7 @@
     renderDaySummary(displayRows);
     renderUltimateBet(displayRows);
     renderReadyPicksHero(displayRows);
+    renderBettingHome(displayRows);
     renderHomeCategories(displayRows);
     // Sprint 50 (UX) : badge compteur "paris prêts" dans la nav Picks.
     try {
@@ -15469,11 +15687,26 @@
 
   function switchTab(tab) {
     if (tab === 'data' && !loadPreferences().expertMode) tab = 'preferences';
+    const categoryTabs = {
+      cockpit: 'cockpit',
+      winners: 'winner',
+      goals: 'goals',
+      night: 'night',
+      watch: 'watch'
+    };
+    const cockpitCategory = categoryTabs[tab] || null;
+    const panelTab = cockpitCategory ? 'dashboard' : tab;
+    state.activeHomeCategory = panelTab === 'dashboard' ? cockpitCategory : null;
     recordUserAction('view', tab);
     $$('.nav-btn').forEach((btn) => btn.classList.toggle('active', btn.dataset.tab === tab));
-    $$('.tab-panel').forEach((panel) => panel.classList.toggle('active', panel.dataset.panel === tab));
+    $$('.tab-panel').forEach((panel) => panel.classList.toggle('active', panel.dataset.panel === panelTab));
     const titles = {
       dashboard: 'À miser maintenant',
+      cockpit: 'Cockpit pronostics',
+      winners: 'Vainqueurs',
+      goals: 'Buts',
+      night: 'Paris de nuit',
+      watch: 'À surveiller',
       combines: 'Combinés du jour',
       scorers: 'Buteurs & joueurs',
       matches: 'Tous les matchs Winamax',
@@ -15487,10 +15720,18 @@
       preferences: t('navSettings')
     };
     $('#page-title').textContent = titles[tab] || 'Paris-Sportif';
-    if (tab === 'calendar') renderCalendar();
-    if (tab === 'search') renderDeepSearch();
-    if (tab === 'pipeline') renderPipelinePanel(state.status);
-    if (tab === 'help') renderHelp();
+    if (panelTab === 'dashboard' && !cockpitCategory) {
+      const fold = $('#cockpit-detail-section');
+      if (fold) fold.open = false;
+      renderPicks();
+    }
+    if (cockpitCategory) {
+      setTimeout(() => openCockpitCategory(cockpitCategory), 20);
+    }
+    if (panelTab === 'calendar') renderCalendar();
+    if (panelTab === 'search') renderDeepSearch();
+    if (panelTab === 'pipeline') renderPipelinePanel(state.status);
+    if (panelTab === 'help') renderHelp();
   }
 
   function exportCsv() {
@@ -16617,6 +16858,12 @@
       renderTradingDesk();
     });
     document.addEventListener('click', (event) => {
+      const sortButton = event.target.closest('[data-home-sort]');
+      if (sortButton) {
+        event.preventDefault();
+        setHomeSort(sortButton.dataset.homeSort || 'confidence');
+        return;
+      }
       const tabButton = event.target.closest('[data-tab-target]');
       if (tabButton) switchTab(tabButton.dataset.tabTarget || 'dashboard');
       const cockpitCategory = event.target.closest('[data-cockpit-category]');
@@ -16918,7 +17165,7 @@
         $('#refresh-log').textContent = error.stack || error.message;
       });
     });
-    ['ultimate-bet-card', 'ready-picks-hero', 'live-cockpit', 'time-cockpit', 'simple-pick-timeline', 'favorite-picks-grid', 'simple-scorers-grid', 'bankroll-allocation-grid', 'picks-body', 'stake-scenario-body', 'watchlist-grid', 'prematch-final-grid', 'matches-body', 'combines-list', 'scorers-list', 'agent-positions-body', 'agent-blockers-body', 'deep-search-detail'].forEach((id) => {
+    ['home-top3-grid', 'home-picks-table-body', 'ultimate-bet-card', 'ready-picks-hero', 'live-cockpit', 'time-cockpit', 'simple-pick-timeline', 'favorite-picks-grid', 'simple-scorers-grid', 'bankroll-allocation-grid', 'picks-body', 'stake-scenario-body', 'watchlist-grid', 'prematch-final-grid', 'matches-body', 'combines-list', 'scorers-list', 'agent-positions-body', 'agent-blockers-body', 'deep-search-detail'].forEach((id) => {
       const node = $(`#${id}`);
       if (!node) return;
       node.addEventListener('click', openMatchFromEvent);

@@ -162,6 +162,18 @@ a:hover {
   filter: drop-shadow(0 1px 3px rgba(99, 102, 241, .5));
 }
 
+.nav-btn.nav-category {
+  min-height: 34px;
+  padding-top: 7px;
+  padding-bottom: 7px;
+  font-size: 13px;
+  color: rgba(226, 232, 240, .78);
+}
+
+.nav-btn.nav-category .nav-icon {
+  font-size: 16px;
+}
+
 .side-status {
   margin-top: auto;
   border: 1px solid var(--line);
@@ -6235,6 +6247,300 @@ body.theme-light .sidebar {
   opacity: .72;
 }
 
+.betting-home-v2 {
+  display: grid;
+  gap: 14px;
+  margin: 0 0 14px;
+}
+
+.betting-home-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 16px 18px;
+  border: 1px solid rgba(16, 185, 129, .22);
+  border-radius: 12px;
+  background:
+    linear-gradient(135deg, rgba(16, 185, 129, .12), rgba(56, 189, 248, .06)),
+    rgba(15, 23, 42, .48);
+}
+
+.betting-home-head h3 {
+  margin: 3px 0 4px;
+  font-size: 24px;
+  line-height: 1.05;
+  letter-spacing: 0;
+}
+
+.betting-home-head p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.home-sort-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.home-sort-actions button,
+.home-picks-table th button {
+  border: 1px solid rgba(148, 163, 184, .22);
+  border-radius: 8px;
+  background: rgba(15, 23, 42, .48);
+  color: var(--text-dim);
+  min-height: 32px;
+  padding: 0 10px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.home-sort-actions button.active,
+.home-picks-table th button.active {
+  color: var(--text);
+  border-color: rgba(16, 185, 129, .52);
+  background: rgba(16, 185, 129, .16);
+}
+
+.home-top3-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.home-top-card {
+  min-width: 0;
+  border: 1px solid rgba(148, 163, 184, .22);
+  border-radius: 12px;
+  background: rgba(15, 23, 42, .52);
+  padding: 14px;
+  display: grid;
+  gap: 10px;
+  cursor: pointer;
+  transition: transform 180ms ease-out, border-color 180ms ease-out, background 180ms ease-out;
+}
+
+.home-top-card:hover,
+.home-top-card:focus-visible {
+  transform: translateY(-2px);
+  border-color: rgba(16, 185, 129, .52);
+  background: rgba(15, 23, 42, .72);
+  outline: none;
+}
+
+.home-top-card.rank-1 {
+  border-color: rgba(16, 185, 129, .54);
+  box-shadow: inset 4px 0 0 rgba(16, 185, 129, .9);
+}
+
+.home-top-main {
+  display: grid;
+  gap: 10px;
+}
+
+.home-top-rank {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: rgba(16, 185, 129, .16);
+  color: var(--accent);
+  font-weight: 950;
+}
+
+.home-top-title {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 4px;
+}
+
+.home-top-title strong {
+  font-size: 15px;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.home-top-title span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.home-top-title em {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  font-style: normal;
+  margin-top: 2px;
+}
+
+.home-top-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.home-top-bet {
+  display: grid;
+  gap: 4px;
+  padding: 10px;
+  border-radius: 10px;
+  background: rgba(2, 6, 23, .42);
+}
+
+.home-top-bet span,
+.home-table-head span {
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  font-weight: 900;
+  letter-spacing: .02em;
+}
+
+.home-top-bet strong {
+  font-size: 16px;
+  line-height: 1.22;
+}
+
+.home-top-kpis {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.home-top-kpis span {
+  display: grid;
+  gap: 2px;
+  padding: 7px 8px;
+  border-radius: 8px;
+  background: rgba(15, 23, 42, .54);
+  color: var(--muted);
+  font-size: 10.5px;
+}
+
+.home-top-kpis strong {
+  color: var(--text);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.home-top-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.home-safety-pill {
+  justify-self: start;
+  border-radius: 999px;
+  padding: 6px 9px;
+  background: rgba(56, 189, 248, .12);
+  color: #7dd3fc;
+  border: 1px solid rgba(56, 189, 248, .24);
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.home-table-card {
+  border: 1px solid rgba(148, 163, 184, .2);
+  border-radius: 12px;
+  background: rgba(15, 23, 42, .42);
+  overflow: hidden;
+}
+
+.home-table-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(148, 163, 184, .16);
+}
+
+.home-table-wrap {
+  overflow-x: auto;
+}
+
+.home-picks-table {
+  width: 100%;
+  min-width: 980px;
+  border-collapse: collapse;
+}
+
+.home-picks-table th,
+.home-picks-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(148, 163, 184, .13);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.home-picks-table th {
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.home-picks-table th button {
+  min-height: 28px;
+  padding: 0 8px;
+  text-transform: uppercase;
+  font-size: 11px;
+}
+
+.home-picks-table tbody tr {
+  cursor: pointer;
+}
+
+.home-picks-table tbody tr:hover {
+  background: rgba(16, 185, 129, .06);
+}
+
+.home-table-match {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 220px;
+}
+
+.home-table-match strong,
+.home-table-bet strong {
+  display: block;
+  font-size: 13px;
+  line-height: 1.25;
+}
+
+.home-table-match span,
+.home-table-bet span,
+.home-table-small {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.home-table-action {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.home-confidence-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 9px;
+  border-radius: 999px;
+  background: rgba(16, 185, 129, .12);
+  color: var(--accent);
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+
 .cockpit-detail-section {
   margin: 10px 0 16px;
   border-color: rgba(148, 163, 184, .22);
@@ -6264,18 +6570,25 @@ body.theme-light .sidebar {
   border-color: rgba(99, 102, 241, .3);
 }
 
-/* Accueil vraiment léger : seulement Top Pick + catégories.
+/* Accueil vraiment léger : Top 3, tableau triable, catégories.
    Le cockpit complet existe, mais uniquement après clic sur une catégorie. */
 .tab-panel[data-panel="dashboard"].active > .morning-brief,
 .tab-panel[data-panel="dashboard"].active > .metrics-grid,
 .tab-panel[data-panel="dashboard"].active > .today-model-card,
 .tab-panel[data-panel="dashboard"].active > .decision-terminal,
 .tab-panel[data-panel="dashboard"].active > .ready-picks-hero,
+.tab-panel[data-panel="dashboard"].active > .simple-top-strip,
+.tab-panel[data-panel="dashboard"].active > .day-summary,
+.tab-panel[data-panel="dashboard"].active > .temporal-zones-strip,
 .tab-panel[data-panel="dashboard"].active > .live-cockpit,
 .tab-panel[data-panel="dashboard"].active > .cockpit-detail-section:not([open]),
 .tab-panel[data-panel="dashboard"].active > .compact-advanced,
 .tab-panel[data-panel="dashboard"].active > #market-scanner-section,
 .tab-panel[data-panel="dashboard"].active > #custom-dashboard {
+  display: none !important;
+}
+
+.tab-panel[data-panel="dashboard"].active > .ultimate-bet-card {
   display: none !important;
 }
 
@@ -6318,6 +6631,21 @@ body.theme-light .sidebar {
 
 .tab-panel[data-panel="dashboard"].active > .ultimate-bet-card .ultimate-side strong {
   font-size: 18px;
+}
+
+@media (max-width: 980px) {
+  .betting-home-head {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .home-sort-actions {
+    justify-content: flex-start;
+  }
+
+  .home-top3-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .player-photo.player-photo-sm { width: 32px; height: 32px; }

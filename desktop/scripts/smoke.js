@@ -91,6 +91,10 @@ async function main() {
       priorityBadges: document.querySelectorAll('.priority-badge').length,
       topPick: document.body.textContent.includes('TOP PICK'),
       noUltimate: document.querySelector('#ultimate-bet-card')?.textContent.includes('Aucun bet ultime validé') || false,
+      homeShell: Boolean(document.querySelector('#betting-home-v2')) && getComputedStyle(document.querySelector('#betting-home-v2')).display !== 'none',
+      homeTop3: document.querySelectorAll('#home-top3-grid .home-top-card').length,
+      homeTableRows: document.querySelectorAll('#home-picks-table-body tr.clickable-row').length,
+      homeSortButtons: document.querySelectorAll('[data-home-sort]').length,
       dailyBudget: document.querySelector('#daily-budget-summary')?.textContent || '',
       hasRollingSections: document.body.textContent.includes('À jouer prochainement')
         && ['Dans l’heure', 'Dans les 3 heures', 'Cette nuit', 'Demain matin', 'Demain après', 'Prochains jours'].some((label) => document.body.textContent.includes(label)),
@@ -109,14 +113,14 @@ async function main() {
     // On vérifie que les labels clés sont présents au lieu d'exiger une
     // séquence stricte qui contraint trop l'évolution de la nav.
     const navLabels = dashboard.nav.map((l) => l.toLowerCase());
-    const requiredNavLabels = ['miser', 'bilan', 'recherche', 'réglages'];
+    const requiredNavLabels = ['miser', 'cockpit', 'vainqueurs', 'buts', 'nuit', 'buteurs', 'combinés', 'bilan', 'recherche', 'réglages'];
     const missingNav = requiredNavLabels.filter((label) => !navLabels.some((nav) => nav.includes(label)));
     if (missingNav.length) throw new Error(`Navigation Sprint 51 incomplète, manque: ${missingNav.join(', ')}`);
     const hasActionCopy = /PARI/i.test(dashboard.dashboardText) && /COTE/i.test(dashboard.dashboardText) && /MISE/i.test(dashboard.dashboardText);
     const hasComplexMarket = /Handicap|Double chance|Jeux tennis|Total basket|Total runs|Score exact|Corners|Cartons/i.test(dashboard.dashboardText);
     const hasTechnicalJargon = /\bKelly\b|\bEV\b|\btier\b|\b1N2\b|\bBTTS\b|\bedge\b/i.test(dashboard.dashboardText);
     const hasExpertRepairLabel = /À réparer/i.test(dashboard.dashboardText);
-    if (dashboard.rows < 15 || dashboard.rows > 28 || dashboard.timeline < 8 || dashboard.trackButtons < 6 || dashboard.safeBadges < 5 || !/24h|aujourd’hui|à venir|surveill/i.test(dashboard.metricLabel) || (dashboard.metric < 6 && !/trop strict|Winamax/i.test(dashboard.funnelAlert)) || !(dashboard.topPick || dashboard.noUltimate) || !/jour/i.test(dashboard.dailyBudget) || !dashboard.hasRollingSections || !hasActionCopy || hasComplexMarket || hasTechnicalJargon || hasExpertRepairLabel) {
+    if (dashboard.rows < 15 || dashboard.rows > 28 || dashboard.timeline < 8 || dashboard.trackButtons < 6 || dashboard.safeBadges < 5 || !/24h|aujourd’hui|à venir|surveill/i.test(dashboard.metricLabel) || (dashboard.metric < 6 && !/trop strict|Winamax/i.test(dashboard.funnelAlert)) || !dashboard.homeShell || dashboard.homeTop3 < Math.min(3, dashboard.homeTableRows) || dashboard.homeTableRows < 6 || dashboard.homeSortButtons < 4 || !hasActionCopy || hasComplexMarket || hasTechnicalJargon || hasExpertRepairLabel) {
       throw new Error(`Picks Sprint 15 insuffisants: ${JSON.stringify({ ...dashboard, dashboardText: dashboard.dashboardText.slice(0, 800), hasActionCopy, hasComplexMarket, hasTechnicalJargon })}`);
     }
     if (!dashboard.combines || !dashboard.scorers || !dashboard.promos || !dashboard.bankroll.includes('€') || !dashboard.pnl.includes('€') || !dashboard.expertHidden || dashboard.multibookText) {
@@ -211,8 +215,9 @@ async function main() {
         const node = document.querySelector(selector);
         return node ? getComputedStyle(node).display !== 'none' && getComputedStyle(node).visibility !== 'hidden' : false;
       };
-      return visible('#ultimate-bet-card')
+      return visible('#betting-home-v2')
         && visible('#home-category-grid')
+        && !visible('#ultimate-bet-card')
         && !visible('.tab-panel[data-panel="dashboard"].active > .metrics-grid')
         && !visible('.tab-panel[data-panel="dashboard"].active > .today-model-card')
         && !visible('.tab-panel[data-panel="dashboard"].active > .decision-terminal')

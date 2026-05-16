@@ -22,9 +22,14 @@
         <div class="nav-group">
           <span class="nav-group-label">À MISER</span>
           <button class="nav-btn active" data-tab="dashboard"><span class="nav-icon">🎯</span><span class="nav-label">À miser</span><span class="nav-badge" id="nav-picks-badge" aria-hidden="true"></span></button>
+          <button class="nav-btn nav-category" data-tab="cockpit"><span class="nav-icon">🎛</span><span class="nav-label">Cockpit</span></button>
+          <button class="nav-btn nav-category" data-tab="winners"><span class="nav-icon">🏆</span><span class="nav-label">Vainqueurs</span></button>
+          <button class="nav-btn nav-category" data-tab="goals"><span class="nav-icon">⚽</span><span class="nav-label">Buts</span></button>
+          <button class="nav-btn nav-category" data-tab="night"><span class="nav-icon">🌙</span><span class="nav-label">Nuit</span></button>
+          <button class="nav-btn" data-tab="scorers"><span class="nav-icon">🎯</span><span class="nav-label">Buteurs</span></button>
+          <button class="nav-btn" data-tab="combines"><span class="nav-icon">🎲</span><span class="nav-label">Combinés</span></button>
+          <button class="nav-btn nav-category" data-tab="watch"><span class="nav-icon">👁</span><span class="nav-label">À surveiller</span></button>
           <button class="nav-btn nav-legacy hidden" data-tab="matches"><span class="nav-icon">⚽</span><span class="nav-label">Tous les matchs</span></button>
-          <button class="nav-btn nav-legacy hidden" data-tab="scorers"><span class="nav-icon">👤</span><span class="nav-label">Buteurs</span></button>
-          <button class="nav-btn nav-legacy hidden" data-tab="combines"><span class="nav-icon">🎲</span><span class="nav-label">Combinés</span></button>
         </div>
         <div class="nav-group">
           <span class="nav-group-label">SUIVI</span>
@@ -47,7 +52,7 @@
     <main class="main">
       <header class="topbar">
         <div>
-          <div class="eyebrow">Accueil minimal v2.1.4 · Winamax-only</div>
+          <div class="eyebrow">Accueil refait v2.1.5 · Winamax-only</div>
           <h2 id="page-title">À miser maintenant</h2>
         </div>
         <div class="actions decision-actions">
@@ -223,7 +228,51 @@
           </div>
         </div>
 
-        <!-- Sprint 80 — ORDRE STRICT : bet ultime EN PREMIER -->
+        <section class="betting-home-v2" id="betting-home-v2" aria-label="Accueil pronostics rapide">
+          <div class="betting-home-head">
+            <div>
+              <span class="eyebrow" id="home-kicker">Top 3 prochaines 24h</span>
+              <h3 id="home-title">Les 3 paris à regarder en premier</h3>
+              <p id="home-subtitle">Classés par confiance de réussite, puis par cote Winamax. Le reste est dans le tableau triable.</p>
+            </div>
+            <div class="home-sort-actions" aria-label="Tri accueil">
+              <button type="button" data-home-sort="confidence">Confiance</button>
+              <button type="button" data-home-sort="kickoff">Heure</button>
+              <button type="button" data-home-sort="date">Date</button>
+              <button type="button" data-home-sort="odd">Cote</button>
+            </div>
+          </div>
+          <div class="home-top3-grid" id="home-top3-grid">
+            <div class="empty compact-empty">Calcul du Top 3...</div>
+          </div>
+          <div class="home-table-card">
+            <div class="home-table-head">
+              <strong>Tableau des paris 24h</strong>
+              <span id="home-table-caption">Tri confiance · cotes Winamax</span>
+            </div>
+            <div class="home-table-wrap">
+              <table class="home-picks-table">
+                <thead>
+                  <tr>
+                    <th><button type="button" data-home-sort="date">Date</button></th>
+                    <th><button type="button" data-home-sort="kickoff">Heure</button></th>
+                    <th>Match</th>
+                    <th>Pari</th>
+                    <th><button type="button" data-home-sort="confidence">Confiance</button></th>
+                    <th><button type="button" data-home-sort="odd">Cote</button></th>
+                    <th>Mise</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="home-picks-table-body">
+                  <tr><td colspan="8" class="empty">Chargement du tableau...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- Compatibilité moteur : généré mais masqué sur l'accueil refait. -->
         <section class="ultimate-bet-card" id="ultimate-bet-card" aria-label="Bet ultime du jour">
           <div class="empty">Sélection du bet ultime en cours...</div>
         </section>
@@ -1370,7 +1419,7 @@
                 <option value="auto">Auto</option>
               </select>
             </label>
-            <p class="match-sub" id="app-version-label">Paris Sportif Desktop v2.1.4</p>
+            <p class="match-sub" id="app-version-label">Paris Sportif Desktop v2.1.5</p>
             <p class="match-sub" id="update-status">Aucune vérification de mise à jour lancée.</p>
             <div class="profile-preview" id="bug-report-list">Aucun rapport de bug local.</div>
           </article>

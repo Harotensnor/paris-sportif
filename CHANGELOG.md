@@ -5,6 +5,16 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-16
 
+### Hotfix v2.1.5 — Accueil refait Top 3 + tableau triable + catégories
+
+Refonte de la page “À miser” après captures utilisateur : l’écran d’entrée ne doit plus ressembler à un cockpit technique.
+- Accueil remplacé par un bloc clair : `Top 3 prochaines 24h` classé par confiance de réussite puis cote Winamax.
+- Nouveau tableau 24h triable par `Confiance`, `Heure`, `Date` ou `Cote`, avec PARI / COTE / MISE visibles sans jargon.
+- Navigation enrichie pour décharger l’accueil : `Cockpit`, `Vainqueurs`, `Buts`, `Nuit`, `Buteurs`, `Combinés`, `À surveiller`.
+- Les entrées de navigation catégories ouvrent directement le Cockpit au bon filtre, sans forcer l’utilisateur à fouiller l’accueil.
+- Les blocs passifs restants (`résumé jour`, bandeau temporel, anciens héros) sont masqués sur l’accueil rapide.
+- `qa:terrain` et `desktop/scripts/smoke.js` vérifient maintenant le Top 3, le tableau triable et la navigation dédiée.
+
 ### Hotfix v2.1.4 — Accueil et fiche match réellement épurés
 
 Correctif après captures utilisateur : le Mode expert réaffichait sur “À miser” les blocs diagnostic (`Modèle aujourd’hui`, `Conseils du jour`, `Décision finale locale`) avant le Top Pick.
