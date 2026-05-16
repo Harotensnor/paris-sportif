@@ -1,13 +1,13 @@
 {
-  "generated_at": "2026-05-16T19:20:12Z",
+  "generated_at": "2026-05-16T19:28:24Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
     "active_events": 25,
-    "expired_sample": 1,
+    "expired_sample": 0,
     "by_type": {
-      "lookahead": 40,
+      "lookahead": 38,
       "back_to_back_travel": 6,
       "schedule_congestion": 5
     },
@@ -108,13 +108,13 @@
         "1 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "home",
+        "status": "mixed",
+        "net_side": null,
         "home_score": 0.252,
-        "away_score": -1.097,
+        "away_score": -0.493,
         "home_fade": 0.15,
         "away_fade": 1.15,
-        "reason": "Direction nette: Washington Nationals (+0.25)",
+        "reason": "Signaux mitigés: avantage net trop faible (Washington Nationals +0.25, Baltimore Orioles -0.49)",
         "detail": [
           {
             "side": "home",
@@ -133,6 +133,12 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.604
           }
         ]
       }
@@ -660,11 +666,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.043,
-        "away_score": -0.498,
-        "home_fade": 0.15,
-        "away_fade": 0.55,
-        "reason": "Direction nette: Montreal Canadiens (+0.04)",
+        "home_score": -0.607,
+        "away_score": -1.147,
+        "home_fade": 1.15,
+        "away_fade": 1.55,
+        "reason": "Direction nette: Montreal Canadiens (-0.61)",
         "detail": [
           {
             "side": "home",
@@ -683,6 +689,18 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.4
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           }
         ]
       }
@@ -1401,64 +1419,5 @@
       }
     }
   ],
-  "expired_sample": [
-    {
-      "event_id": "401815371",
-      "source_event_ids": [
-        "401815371"
-      ],
-      "kickoff": "2026-05-16T19:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Colorado Rockies",
-      "away": "Arizona Diamondbacks",
-      "match": "Colorado Rockies - Arizona Diamondbacks",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Colorado Rockies 0.15, Arizona Diamondbacks 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.183,
-        "away_score": -0.898,
-        "home_fade": 0.15,
-        "away_fade": 0.95,
-        "reason": "Direction nette: Colorado Rockies (+0.18)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.8
-          }
-        ]
-      }
-    }
-  ]
+  "expired_sample": []
 }
