@@ -93,7 +93,8 @@ const refreshState = {
 let localServer = null;
 let mainWindow = null;
 let refreshChild = null;
-const gotSingleInstanceLock = app.requestSingleInstanceLock();
+const isolatedTestInstance = !app.isPackaged && process.env.PARIS_DESKTOP_TEST_ISOLATED === '1';
+const gotSingleInstanceLock = isolatedTestInstance || app.requestSingleInstanceLock();
 const engineService = createLegacyEngineService({ projectRoot: PROJECT_ROOT });
 const memoryState = {
   rssMb: null,

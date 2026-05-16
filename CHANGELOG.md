@@ -5,6 +5,29 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 34 — Validation v2.0.0 + push nuit + docs
+
+- Version desktop portée à `v2.0.1` après test terrain post-v2.0.0 sur pipeline réelle. Dernier refresh complet terminé le 16/05/2026 à 07:57 UTC : 256 events Winamax conservés, 70 events Winamax aujourd'hui dans le terrain app, 29 signaux simples positifs, 25 lignes cockpit, 17 opportunités 24h et 10 lignes affichées aujourd'hui sur le snapshot.
+- Validation des 7 features Ultra en pratique : la fiche ouvre bien `Simulation Monte Carlo` à 10 000 scénarios, `Modèle personnel` affiche un fallback explicite si le sample utilisateur est < 50, le watcher social/news lance `/api/news-watch/run` et vérifie des sources publiques, le brief audio déclenche la synthèse vocale locale, le dashboard custom est manipulable, le scanner inter-matchs remonte des patterns et les ajustements modèle 24h sont visibles avec bouton de reset.
+- Push nuit honnête : le cockpit expose désormais 8 lignes nocturnes 0h-6h Paris sur le snapshot terrain, dont 1 pari prêt strict et 7 lignes `À surveiller · nuit` non actionnables. Les lignes de couverture nuit n'ont jamais de mise forcée et expliquent qu'elles manquent de robustesse avant pari.
+- Bugs terrain corrigés :
+  1. Critique QA : les lancements Electron de test pouvaient être bloqués par une instance utilisateur déjà ouverte. Les scripts terrain/smoke/visual/a11y/multi-day/stress/Playwright utilisent maintenant un profil isolé et contournent le verrou mono-instance uniquement en dev/test.
+  2. Critique UI : le brief du matin lançait `ReferenceError: card is not defined` et bloquait le boot sur certains profils. La carte utilise à nouveau le libellé local correct.
+  3. Critique fiche : l'ouverture détail match lançait la même erreur dans la bande de forme récente. Les fiches s'ouvrent de nouveau et les captures Ultra passent.
+  4. Majeur UX : le dashboard custom affichait mais ne persistait pas un réordonnancement réel. Les widgets sont maintenant drag-and-drop, mémorisés par preset Matin/Soir/Live et réinitialisables.
+  5. Majeur action : le scanner inter-matchs n'avait pas de lien direct. Chaque pattern peut ouvrir les combinés du jour.
+  6. Mineur feedback : le brief audio affiche un pulse pendant la lecture.
+- Hit-rate/calibration : les rapports post-refresh conservent 1 853 décisions settled dans `decision_backtest_report`. Le bucket `bet` reste positif (`ROI +51,53%`) mais la calibration haute reste surveillée via Mode expert ; aucun assouplissement ne transforme les lignes nocturnes faibles en vrais tickets.
+- Documentation v2.0 mise à jour : README et guide utilisateur expliquent modèle personnel, Monte Carlo, watcher social, brief audio, dashboard custom, scanner, auto-optimisation et la différence entre pari prêt et ligne nocturne à surveiller.
+- Captures Sprint 34 : `captures/desktop-sprint34-dashboard-custom-drag.png` et `captures/desktop-sprint34-ultra-fiche.png` complètent les captures Sprint 33 des features Ultra.
+- Validation Sprint 34 : syntaxe Node OK, `npm test`, Playwright Electron, `qa:engine`, `qa:terrain`, `qa:desktop`, `qa:visual`, `qa:a11y`, `qa:multiday`, `qa:stress` et `qa:winamax-audit` passent après corrections terrain. `qa:terrain` mesure 70 events Winamax aujourd'hui, 29 signaux simples positifs, 10 affichés aujourd'hui, 25 lignes cockpit et 17 opportunités 24h. Stress court v2 : moyenne 335,2 MB, pic 671,8 MB sans erreur console. Build Windows généré : `desktop/dist-sprint34/Paris Sportif Desktop Setup 2.0.1.exe` (104,0 MB).
+
+### Version 2.0.0 — 2026-05-16
+
+- Release majeure desktop : cockpit 25 lignes, rotation sport/marché/ligue, visuels locaux, fiches enrichies, modèle personnel, Monte Carlo, watcher social, brief audio, dashboard custom, scanner inter-matchs et auto-optimisation.
+- Par rapport à v1.0.0 : l'app passe d'un cockpit simple fiable à un assistant expert complet, avec explications longues, données enrichies, suivi bankroll, audit modèle, alertes, recherche, live, et workflows avancés opt-in en Mode expert.
+- Le mode standard reste inchangé dans son principe : 100% Winamax, marchés simples par défaut, format `PARI / COTE / MISE / Pourquoi`, aucun match nul standard et aucune dépendance multi-bookmaker.
+
 ### Sprint 33 ULTRA — Volume + diversité + ML perso + Monte Carlo + Twitter + audio + dashboard + scanner
 
 - Version desktop portée à `v2.0.0` après audit terrain obligatoire sur pipeline réelle. Snapshot terrain : `health.json generated_at=2026-05-15T23:31:25Z`, 75 événements Winamax aujourd'hui, 60 prédictibles, 32 signaux simples positifs après recalibration, 25 lignes cockpit, 15 lignes sur 24h glissantes et 2 lignes nocturnes. La cible ambitieuse 8+ nuit n'est pas artificiellement remplie sur ce snapshot : le garde-fou reste honnête plutôt que d'inventer des paris faibles.

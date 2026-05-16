@@ -40,6 +40,9 @@ Ce guide donne une routine simple pour utiliser l'app sans se disperser.
 - Lis le rapport hebdo le lundi.
 - Active le `Mode Trading Desk` seulement si tu veux une vue dense pendant les lives.
 - Teste l'auto-tracking uniquement en `Dry-run` pendant quelques jours avant de l'activer réellement dans ton suivi local.
+- Si tu actives les modules v2.0, commence par le `Dashboard custom` en preset Matin, puis lis une seule fiche Monte Carlo par jour.
+- Ne joue pas une ligne `À surveiller · nuit` : utilise-la seulement pour prévoir un re-check plus proche du coup d'envoi.
+- Le `Modèle personnel` devient vraiment utile après environ 50 paris réglés. Avant ça, considère son score comme une indication, pas comme une règle.
 - Garde le Mode expert fermé sauf pour diagnostiquer un souci.
 - Si les données semblent anciennes, lance un refresh puis attends le bandeau de fin.
 

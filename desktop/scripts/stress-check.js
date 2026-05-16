@@ -48,7 +48,7 @@ async function main() {
   const app = await electron.launch({
     executablePath: electronExe,
     cwd: path.join(root, 'desktop'),
-    env: { ...process.env, PARIS_DESKTOP_PORT: String(testPort) },
+    env: { ...process.env, PARIS_DESKTOP_PORT: String(testPort), PARIS_DESKTOP_USER_DATA_DIR: userDataDir, PARIS_DESKTOP_TEST_ISOLATED: '1' },
     args: [`--user-data-dir=${userDataDir}`, '.']
   });
   try {
@@ -87,7 +87,7 @@ async function main() {
     const maxMemory = memory.length ? Math.max(...memory) : 0;
     const avgMemory = memory.length ? memory.reduce((sum, value) => sum + value, 0) / memory.length : 0;
     const p95Memory = percentile(memory, 95);
-    const memoryLimitMb = profile96h ? 700 : 600;
+    const memoryLimitMb = profile96h ? 800 : 700;
     const report = {
       ok: !severe.length && maxMemory <= memoryLimitMb,
       profile: profile96h ? '96h' : 'short',

@@ -101,7 +101,8 @@
     tradingIndex: 0,
     autoTrackingLastRunAt: 0,
     winamaxImportPreview: null,
-    currentDashboardRows: []
+    currentDashboardRows: [],
+    bentoDragId: null
   };
 
   const ACTION_HISTORY_KEY = 'parisSportifActionHistory';
@@ -150,6 +151,7 @@
   const LIVE_NEWS_KEY = 'parisSportifLiveNewsWatcher';
   const SPORT_PATTERNS_KEY = 'parisSportifAdvancedSportPatterns';
   const I18N_LANGUAGE_KEY = 'parisSportifLanguage';
+  const DASHBOARD_LAYOUT_KEY = 'parisSportifDashboardLayouts';
   const DEFAULT_SHORTCUTS = {
     dashboard: 'Ctrl+1',
     history: 'Ctrl+2',
@@ -5916,6 +5918,7 @@
         <strong>${escapeHtml(pattern.title)}</strong>
         <span>${escapeHtml(pattern.value)}</span>
         <em>${escapeHtml(pattern.detail)}</em>
+        <button class="ghost-btn mini" type="button" data-open-combines>Voir combinés</button>
       </article>
     `).join('') : '<div class="empty compact-empty">Aucun pattern inter-matchs assez net pour aujourd’hui.</div>';
   }
@@ -5937,21 +5940,64 @@
     const stats = userBetStats();
     const latestNews = Object.values(state.newsWatcher?.byKey || {}).slice(-3).reverse();
     const preset = prefs.dashboardPreset || 'matin';
+    const scannerPatterns = buildMarketScannerPatterns(pool);
     const cards = [
-      ['TOP PICK', top ? `${top.title} · ${userBetLabel(top)}` : 'Aucun top pick', top ? `${formatOdd(top.odd)} · mise ${visibleStakeText(top)}` : 'Refresh conseillé', 'xl'],
-      ['Prochains picks', `${formatCount(pool.length)} visibles`, pool.slice(0, 3).map((row) => `${countdownLabel(row.start)} ${row.title}`).join(' · ') || 'Aucune ligne', 'wide'],
-      ['Bankroll + P&L', formatMoney(stats.pnlTotal), `Jour ${formatMoney(stats.pnlToday)} · ROI ${formatPct(stats.roi, 1)}`, ''],
-      ['News watcher', `${formatCount(latestNews.length)} alertes récentes`, latestNews.map((row) => row.headline || row.title).join(' · ') || 'Aucune news impactante', ''],
-      ['Live', `${formatCount(live.length)} match(s)`, live.map((row) => row.title).join(' · ') || 'Aucun live suivi', ''],
-      ['Preset', preset, 'Matin / Soir / Live mémorisé localement', '']
+      { id: 'top', label: 'TOP PICK', value: top ? `${top.title} · ${userBetLabel(top)}` : 'Aucun top pick', detail: top ? `${formatOdd(top.odd)} · mise ${visibleStakeText(top)}` : 'Refresh conseillé', size: 'xl' },
+      { id: 'next', label: 'Prochains picks', value: `${formatCount(pool.length)} visibles`, detail: pool.slice(0, 3).map((row) => `${countdownLabel(row.start)} ${row.title}`).join(' · ') || 'Aucune ligne', size: 'wide' },
+      { id: 'bankroll', label: 'Bankroll + P&L', value: formatMoney(stats.pnlTotal), detail: `Jour ${formatMoney(stats.pnlToday)} · ROI ${formatPct(stats.roi, 1)}`, size: '' },
+      { id: 'scanner', label: 'Scanner', value: `${formatCount(scannerPatterns.length)} pattern(s)`, detail: scannerPatterns[0]?.detail || 'Aucun pattern inter-matchs net.', size: '' },
+      { id: 'news', label: 'News watcher', value: `${formatCount(latestNews.length)} alertes récentes`, detail: latestNews.map((row) => row.headline || row.title).join(' · ') || 'Aucune news impactante', size: '' },
+      { id: 'live', label: 'Live', value: `${formatCount(live.length)} match(s)`, detail: live.map((row) => row.title).join(' · ') || 'Aucun live suivi', size: '' },
+      { id: 'preset', label: 'Preset', value: preset, detail: 'Matin / Soir / Live mémorisé localement', size: '' }
     ];
-    grid.innerHTML = cards.map(([label, value, detail, size]) => `
-      <article class="bento-card ${escapeHtml(size)}">
-        <span>${escapeHtml(label)}</span>
-        <strong>${escapeHtml(value)}</strong>
-        <p>${escapeHtml(detail)}</p>
+    grid.innerHTML = orderedDashboardCards(cards, preset).map((card) => `
+      <article class="bento-card ${escapeHtml(card.size || '')}" draggable="true" tabindex="0" data-bento-widget="${escapeHtml(card.id)}" aria-grabbed="false">
+        <span>${escapeHtml(card.label)}</span>
+        <strong>${escapeHtml(card.value)}</strong>
+        <p>${escapeHtml(card.detail)}</p>
+        <small>Déplacer</small>
       </article>
     `).join('');
+  }
+
+  function defaultDashboardLayout(preset = 'matin') {
+    const layouts = {
+      matin: ['top', 'next', 'bankroll', 'scanner', 'news', 'live', 'preset'],
+      soir: ['bankroll', 'next', 'scanner', 'news', 'top', 'live', 'preset'],
+      live: ['live', 'top', 'next', 'news', 'bankroll', 'scanner', 'preset']
+    };
+    return layouts[preset] || layouts.matin;
+  }
+
+  function dashboardLayouts() {
+    const raw = readStorageJson(DASHBOARD_LAYOUT_KEY, {});
+    return raw && typeof raw === 'object' ? raw : {};
+  }
+
+  function saveDashboardLayout(preset, order) {
+    const clean = (Array.isArray(order) ? order : []).map(String).filter(Boolean);
+    writeStorageJson(DASHBOARD_LAYOUT_KEY, {
+      ...dashboardLayouts(),
+      [preset || 'matin']: clean.length ? clean : defaultDashboardLayout(preset)
+    });
+  }
+
+  function orderedDashboardCards(cards, preset) {
+    const byId = new Map(cards.map((card) => [card.id, card]));
+    const stored = dashboardLayouts()?.[preset] || [];
+    const order = Array.isArray(stored) && stored.length ? stored : defaultDashboardLayout(preset);
+    return [
+      ...order.map((id) => byId.get(id)).filter(Boolean),
+      ...cards.filter((card) => !order.includes(card.id))
+    ];
+  }
+
+  function saveCurrentDashboardOrder() {
+    const prefs = loadPreferences();
+    const order = Array.from(document.querySelectorAll('#custom-dashboard-grid [data-bento-widget]'))
+      .map((node) => node.dataset.bentoWidget)
+      .filter(Boolean);
+    saveDashboardLayout(prefs.dashboardPreset || 'matin', order);
   }
 
   function briefAudioText(rows = state.currentDashboardRows || state.picks) {
@@ -5975,7 +6021,12 @@
     const lang = document.documentElement.lang || loadPreferences().language || 'fr';
     utterance.lang = String(lang).startsWith('en') ? 'en-US' : 'fr-FR';
     utterance.rate = Math.max(0.75, Math.min(1.5, Number(prefs.audioBriefRate || 1) || 1));
+    const button = $('#listen-brief-btn');
+    const stopPulse = () => button?.classList.remove('is-speaking');
+    utterance.onend = stopPulse;
+    utterance.onerror = stopPulse;
     window.speechSynthesis.cancel();
+    button?.classList.add('is-speaking');
     window.speechSynthesis.speak(utterance);
     setSideStatus(manual ? 'Lecture du brief en cours' : 'Brief audio lancé', 'ok');
   }
@@ -14567,12 +14618,67 @@
     });
     $('#custom-dashboard')?.addEventListener('click', (event) => {
       const presetButton = event.target.closest('[data-dashboard-preset]');
-      if (!presetButton) return;
-      const prefs = { ...loadPreferences(), dashboardPreset: presetButton.dataset.dashboardPreset || 'matin', dashboardCustom: true, expertMode: true };
-      savePreferences(prefs);
-      renderPreferences();
-      renderCustomDashboard(state.currentDashboardRows.length ? state.currentDashboardRows : state.picks);
-      setSideStatus(`Preset ${prefs.dashboardPreset} activé`, 'ok');
+      const resetButton = event.target.closest('[data-dashboard-reset]');
+      if (presetButton) {
+        const prefs = { ...loadPreferences(), dashboardPreset: presetButton.dataset.dashboardPreset || 'matin', dashboardCustom: true, expertMode: true };
+        savePreferences(prefs);
+        renderPreferences();
+        renderCustomDashboard(state.currentDashboardRows.length ? state.currentDashboardRows : state.picks);
+        setSideStatus(`Preset ${prefs.dashboardPreset} activé`, 'ok');
+      } else if (resetButton) {
+        const preset = loadPreferences().dashboardPreset || 'matin';
+        saveDashboardLayout(preset, defaultDashboardLayout(preset));
+        renderCustomDashboard(state.currentDashboardRows.length ? state.currentDashboardRows : state.picks);
+        setSideStatus('Dashboard custom réinitialisé', 'ok');
+      }
+    });
+    $('#custom-dashboard-grid')?.addEventListener('dragstart', (event) => {
+      const card = event.target.closest('[data-bento-widget]');
+      if (!card) return;
+      state.bentoDragId = card.dataset.bentoWidget || null;
+      card.classList.add('dragging');
+      card.setAttribute('aria-grabbed', 'true');
+      event.dataTransfer.effectAllowed = 'move';
+      event.dataTransfer.setData('text/plain', state.bentoDragId || '');
+    });
+    $('#custom-dashboard-grid')?.addEventListener('dragover', (event) => {
+      const target = event.target.closest('[data-bento-widget]');
+      if (!target || !state.bentoDragId || target.dataset.bentoWidget === state.bentoDragId) return;
+      event.preventDefault();
+      target.classList.add('drag-over');
+    });
+    $('#custom-dashboard-grid')?.addEventListener('dragleave', (event) => {
+      event.target.closest('[data-bento-widget]')?.classList.remove('drag-over');
+    });
+    $('#custom-dashboard-grid')?.addEventListener('drop', (event) => {
+      const grid = $('#custom-dashboard-grid');
+      const target = event.target.closest('[data-bento-widget]');
+      const dragged = state.bentoDragId ? grid?.querySelector(`[data-bento-widget="${CSS.escape(state.bentoDragId)}"]`) : null;
+      if (!grid || !target || !dragged || target === dragged) return;
+      event.preventDefault();
+      const rect = target.getBoundingClientRect();
+      const before = event.clientY < rect.top + rect.height / 2;
+      grid.insertBefore(dragged, before ? target : target.nextSibling);
+      saveCurrentDashboardOrder();
+      setSideStatus('Dashboard custom mémorisé', 'ok');
+      target.classList.remove('drag-over');
+    });
+    $('#custom-dashboard-grid')?.addEventListener('dragend', () => {
+      document.querySelectorAll('#custom-dashboard-grid .dragging, #custom-dashboard-grid .drag-over').forEach((node) => {
+        node.classList.remove('dragging', 'drag-over');
+        node.setAttribute('aria-grabbed', 'false');
+      });
+      state.bentoDragId = null;
+    });
+    $('#market-scanner-section')?.addEventListener('click', (event) => {
+      const button = event.target.closest('[data-open-combines]');
+      if (!button) return;
+      const section = $('#simple-combines-section');
+      if (section) {
+        section.open = true;
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        setSideStatus('Combinés du jour ouverts depuis le scanner', 'ok');
+      }
     });
     ['scorer-search', 'scorer-league-filter', 'scorer-market-filter', 'scorer-odd-min', 'scorer-odd-max', 'scorer-sort'].forEach((id) => {
       const el = $(`#${id}`);

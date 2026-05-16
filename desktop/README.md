@@ -8,13 +8,13 @@ Paris Sportif Desktop est le logiciel PC local pour préparer tes paris Winamax.
 
 ### Version installateur Windows
 
-La version v2.0.0 se génère avec :
+La version v2.0.1 se génère avec :
 
 ```powershell
 npm --prefix desktop run dist
 ```
 
-Le fichier attendu est `Paris Sportif Desktop Setup 2.0.0.exe`. Le build packagé embarque les données, rapports modèle et scripts nécessaires au démarrage. Python reste recommandé si tu veux relancer une pipeline complète depuis la machine installée.
+Le fichier attendu est `Paris Sportif Desktop Setup 2.0.1.exe`. Le build packagé embarque les données, rapports modèle et scripts nécessaires au démarrage. Python reste recommandé si tu veux relancer une pipeline complète depuis la machine installée.
 
 ### Version développeur
 
@@ -54,6 +54,17 @@ L'app ne place pas de pari automatiquement. Elle prépare le ticket et suit ton 
 
 En Mode expert, l'auto-tracking supervisé peut suivre automatiquement certains tickets dans l'app selon tes règles. C'est uniquement un suivi interne : tu dois toujours ouvrir Winamax et confirmer toi-même le pari réel.
 
+## Nouveautés v2.0.1
+
+La v2.0.1 consolide la release majeure v2.0 :
+
+- validation terrain des 7 modules Ultra, pas seulement des tests automatisés ;
+- cockpit nuit renforcé : les matchs 0h-6h Paris remontent mieux, avec une séparation nette entre `pari prêt` et `à surveiller` ;
+- dashboard custom réellement déplaçable par glisser-déposer, avec ordre mémorisé par preset ;
+- scanner inter-matchs avec accès direct aux combinés ;
+- corrections des erreurs runtime qui pouvaient bloquer le brief du matin ou l'ouverture d'une fiche match ;
+- scripts de QA isolés pour ne plus être bloqués par une instance utilisateur déjà ouverte.
+
 ## Nouveautés v2.0
 
 La v2.0 garde le mode standard simple, mais ajoute une couche Ultra en Mode expert :
@@ -64,9 +75,12 @@ La v2.0 garde le mode standard simple, mais ajoute une couche Ultra en Mode expe
 - `Simulation Monte Carlo` dans la fiche match : 10 000 scénarios locaux pour visualiser la probabilité de gain et le risque ;
 - `Modèle personnel` : score de cohérence avec ton style gagnant si ton historique contient assez de paris réglés, sinon fallback explicite ;
 - `Scanner du jour` : patterns inter-matchs, repliés par défaut ;
-- `Dashboard custom` en Mode expert avec presets Matin / Soir / Live ;
+- `Dashboard custom` en Mode expert avec presets Matin / Soir / Live, glisser-déposer et reset ;
 - `Écouter le brief` : lecture audio locale du brief si tu l'actives ;
-- watcher Twitter/X public optionnel côté main process, avec cache et rate limit.
+- watcher Twitter/X public optionnel côté main process, avec cache et rate limit ;
+- `Ajustements 24h` : les segments sont durcis ou assouplis prudemment selon le backtest et ton historique local.
+
+Pour utiliser ces modules, active `Mode expert` dans `Réglages > Avancé`. Le mode standard reste volontairement aéré.
 
 Les objectifs de volume restent soumis aux données réelles Winamax du jour. Si la nuit ou un sport manque de matchs exploitables, l'app le dit au lieu de fabriquer des recommandations faibles.
 
@@ -280,3 +294,8 @@ npx electron-builder --win nsis --x64 --config.directories.output=dist-temp
 33. **Comment activer le news watcher ?** Il tourne automatiquement sur les picks proches. En Mode expert, la Pipeline montre les sources vérifiées, différées ou à relancer.
 34. **Que faire si Sofascore ou une source répond 403 ?** L'app garde les données locales, marque la source à relancer et ne déclasse pas un pick sans confirmation négative.
 35. **Comment lire une fiche enrichie ?** Commence par le ticket, puis le texte narratif, puis les joueurs clés, la tactique et les sources. Les détails techniques restent sous les sections avancées.
+36. **C'est quoi Monte Carlo ?** Une simulation locale de 10 000 scénarios du match pour visualiser si le pari gagne souvent, rarement ou dans des scénarios très serrés.
+37. **Comment fonctionne le modèle personnel ?** Il compare les picks à tes paris réglés. Avant 50 paris, il affiche un fallback prudent et indique que le sample est insuffisant.
+38. **Twitter/X watcher sert à quoi ?** Il surveille des sources publiques et sociales pour repérer blessure, compo, suspension ou news tardive avant le match.
+39. **Comment activer le brief audio ?** Active `Brief audio` en Mode expert, puis clique `Écouter le brief` dans le haut de la vue Picks.
+40. **Pourquoi une ligne de nuit peut être `À surveiller` ?** L'app préfère te montrer le match nocturne important sans bouton de mise plutôt que forcer un pari quand les signaux ne sont pas assez robustes.

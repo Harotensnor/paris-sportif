@@ -81,7 +81,7 @@ test('Sprint 23 desktop keeps clear Winamax picks with supervised workflows', as
   const app = await electron.launch({
     executablePath: electronExe,
     cwd: path.join(root, 'desktop'),
-    env: { ...process.env, PARIS_DESKTOP_PORT: String(testPort) },
+    env: { ...process.env, PARIS_DESKTOP_PORT: String(testPort), PARIS_DESKTOP_USER_DATA_DIR: userDataDir, PARIS_DESKTOP_TEST_ISOLATED: '1' },
     args: [`--user-data-dir=${userDataDir}`, '.']
   });
 
@@ -190,7 +190,7 @@ test('Sprint 23 desktop keeps clear Winamax picks with supervised workflows', as
     await expect(win.locator('#pref-auto-tracking-enabled')).toHaveCount(1);
     await expect(win.locator('#pref-live-news-watcher')).toBeVisible();
     await expect(win.locator('#pref-language')).toBeVisible();
-    await expect(win.locator('#app-version-label')).toContainText('v2.0.0');
+    await expect(win.locator('#app-version-label')).toContainText('v2.0.1');
     await win.selectOption('#pref-theme', 'light');
     await expect(win.locator('body')).toHaveClass(/theme-light/);
     await win.selectOption('#pref-theme', 'dark');

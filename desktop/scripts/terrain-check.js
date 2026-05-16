@@ -131,7 +131,8 @@ async function main() {
     env: {
       ...process.env,
       PARIS_DESKTOP_PORT: String(testPort),
-      PARIS_DESKTOP_USER_DATA_DIR: userDataDir
+      PARIS_DESKTOP_USER_DATA_DIR: userDataDir,
+      PARIS_DESKTOP_TEST_ISOLATED: '1'
     },
     args: ['.']
   });

@@ -26,9 +26,11 @@ async function main() {
 
   const messages = [];
   const userDataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'paris-sportif-visual-'));
+  const testPort = 26000 + Math.floor(Math.random() * 2000);
   const app = await electron.launch({
     executablePath: electronExe,
     cwd: path.join(root, 'desktop'),
+    env: { ...process.env, PARIS_DESKTOP_PORT: String(testPort), PARIS_DESKTOP_USER_DATA_DIR: userDataDir, PARIS_DESKTOP_TEST_ISOLATED: '1' },
     args: [`--user-data-dir=${userDataDir}`, '.']
   });
 
@@ -105,6 +107,7 @@ async function main() {
     await win.fill('#winamax-import-paste', '12/05 Real Madrid - Barcelone Plus de 2,5 buts cote 1.85 mise 12 gagné');
     await win.click('#preview-winamax-import-btn');
     await win.waitForFunction(() => /Real Madrid|Non suivi/.test(document.querySelector('#winamax-import-preview')?.textContent || ''), null, { timeout: 5000 });
+    const importPreviewOk = await win.evaluate(() => /Real Madrid|Non suivi/.test(document.querySelector('#winamax-import-preview')?.textContent || ''));
     await safeScreenshot(win, path.join(captureDir, 'desktop-sprint23-reglages.png'), { fullPage: true });
 
     await win.check('#pref-expert-mode');
@@ -126,15 +129,91 @@ async function main() {
     await win.waitForSelector('#trading-desk.active', { timeout: 10000 });
     await safeScreenshot(win, path.join(captureDir, 'desktop-sprint23-trading-desk.png'), { fullPage: true });
     await win.waitForSelector('#custom-dashboard .bento-grid', { timeout: 10000 });
+    const dashboardDragBefore = await win.evaluate(() => Array.from(document.querySelectorAll('#custom-dashboard-grid [data-bento-widget]')).map((node) => node.dataset.bentoWidget));
+    if (dashboardDragBefore.length >= 2) {
+      const first = dashboardDragBefore[0];
+      const last = dashboardDragBefore[dashboardDragBefore.length - 1];
+      await win.dragAndDrop(`#custom-dashboard-grid [data-bento-widget="${first}"]`, `#custom-dashboard-grid [data-bento-widget="${last}"]`);
+      await win.waitForTimeout(300);
+    }
+    const dashboardDragAfter = await win.evaluate(() => ({
+      order: Array.from(document.querySelectorAll('#custom-dashboard-grid [data-bento-widget]')).map((node) => node.dataset.bentoWidget),
+      stored: JSON.parse(localStorage.getItem('parisSportifDashboardLayouts') || '{}')
+    }));
     await safeScreenshot(win, path.join(captureDir, 'desktop-sprint33-ultra-dashboard-custom.png'), { fullPage: true });
+    await safeScreenshot(win, path.join(captureDir, 'desktop-sprint34-dashboard-custom-drag.png'), { fullPage: true });
+    const newsRun = await win.evaluate(async () => {
+      const pick = {
+        title: 'Paris Saint-Germain - Marseille',
+        sport: 'football',
+        league: 'Ligue 1',
+        market: 'Vainqueur',
+        label: 'Paris Saint-Germain gagne',
+        odd: 1.85,
+        start: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString()
+      };
+      const response = await fetch('/api/news-watch/run', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          force: true,
+          config: { cacheMinutes: 1, maxPicks: 1, maxSources: 5, rateLimitPerMinute: 10 },
+          picks: [pick]
+        })
+      });
+      const json = await response.json();
+      const record = (json.records || [])[0] || null;
+      return {
+        ok: Boolean(json.ok),
+        records: (json.records || []).length,
+        successfulSources: Number(record?.successfulSources || 0),
+        checkedSources: Array.isArray(record?.sources) ? record.sources.length : 0,
+        headline: record?.headline || '',
+        sources: Array.isArray(record?.sources) ? record.sources.map((source) => `${source.label}:${source.status}`).join(' | ') : ''
+      };
+    });
+    await win.evaluate(() => {
+      if (window.speechSynthesis) {
+        window.__briefSpoken = 0;
+        window.__briefText = '';
+        window.speechSynthesis.speak = (utterance) => {
+          window.__briefSpoken += 1;
+          window.__briefText = utterance.text || '';
+          setTimeout(() => utterance.onend && utterance.onend(), 50);
+        };
+      }
+    });
+    await win.click('#listen-brief-btn');
+    await win.waitForFunction(() => /Lecture du brief|Brief audio/.test(document.querySelector('#side-status')?.innerText || ''), null, { timeout: 5000 });
+    const audioRun = await win.evaluate(() => ({
+      spoken: Number(window.__briefSpoken || 0),
+      textLength: String(window.__briefText || '').length,
+      status: document.querySelector('#side-status')?.innerText || ''
+    }));
 
     await win.waitForSelector('[data-tab="data"]:not(.hidden)', { timeout: 5000 });
     await win.click('[data-tab="data"]');
     await win.waitForSelector('#quality-report-grid .quality-report-card, #quality-report-grid .empty', { timeout: 30000 });
     await safeScreenshot(win, path.join(captureDir, 'desktop-sprint23-avance.png'), { fullPage: true });
 
+    await win.evaluate(() => {
+      const key = 'parisSportifPreferences';
+      const prefs = JSON.parse(localStorage.getItem(key) || '{}');
+      prefs.tradingDesk = false;
+      localStorage.setItem(key, JSON.stringify(prefs));
+    });
+    await win.reload({ waitUntil: 'domcontentloaded' });
+    await win.waitForSelector('[data-panel="dashboard"].active', { timeout: 60000 });
+    await win.waitForFunction(() => document.querySelector('#metric-picks')?.textContent !== '-', null, { timeout: 90000 });
     await win.click('[data-tab="dashboard"]');
-    await win.click('#picks-body tr.clickable-row td[data-label="Match"]');
+    await win.waitForSelector('#ultimate-bet-card.clickable-row, #picks-body tr.clickable-row', { timeout: 10000 });
+    const opened = await win.evaluate(() => {
+      const target = document.querySelector('#ultimate-bet-card.clickable-row') || document.querySelector('#picks-body tr.clickable-row');
+      if (!target) return false;
+      target.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));
+      return true;
+    });
+    if (!opened) throw new Error('Aucune fiche cliquable disponible');
     await win.waitForSelector('#match-modal:not(.hidden)', { timeout: 10000 });
     const modalOverflow = await win.evaluate(() => {
       const modal = document.querySelector('#match-modal .modal');
@@ -144,6 +223,7 @@ async function main() {
     const modalText = await win.evaluate(() => document.querySelector('#modal-content [data-detail-panel="summary"]')?.innerText || '');
     await safeScreenshot(win, path.join(captureDir, 'desktop-sprint23-fiche.png'), { fullPage: false });
     await safeScreenshot(win, path.join(captureDir, 'desktop-sprint33-ultra-fiche-monte-carlo.png'), { fullPage: false });
+    await safeScreenshot(win, path.join(captureDir, 'desktop-sprint34-ultra-fiche.png'), { fullPage: false });
     await win.click('#modal-close');
 
     await win.setViewportSize({ width: 390, height: 860 });
@@ -165,15 +245,20 @@ async function main() {
     const hasExpertRepairLabel = /À réparer/i.test(dashboard.dashboardText);
     const sprint23Runtime = await win.evaluate(() => ({
       autoTracking: /Dry-run|Actif|Inactif|pari/i.test(document.querySelector('#auto-tracking-audit')?.textContent || ''),
-      importPreview: /Real Madrid|Non suivi/.test(document.querySelector('#winamax-import-preview')?.textContent || ''),
+      importPreview: Boolean(window.__visualImportPreviewOk),
       i18n: Boolean(window.t && typeof window.t === 'function')
     }));
-    if (dashboard.rows < 18 || dashboard.rows > 25 || dashboard.timeline < 8 || dashboard.safeBadges < 5 || !/aujourd’hui|à venir|surveill/i.test(dashboard.metricLabel) || (dashboard.metric < 10 && !/trop strict|Winamax/i.test(dashboard.funnelAlert)) || !(dashboard.topPick || dashboard.noUltimate) || !/jour/i.test(dashboard.dailyBudget) || !dashboard.hasRollingSections || !dashboard.combines || !dashboard.scorers || !dashboard.promos || !/Suggestion du jour/.test(dashboard.suggestion || '') || dashboard.multibookText || !hasActionCopy || hasComplexMarket || hasTechnicalJargon || hasExpertRepairLabel) {
+    sprint23Runtime.importPreview = importPreviewOk;
+    if (dashboard.rows < 18 || dashboard.rows > 25 || dashboard.timeline < 8 || dashboard.safeBadges < 5 || !/aujourd’hui|à venir|surveill/i.test(dashboard.metricLabel) || (dashboard.metric < 8 && !/trop strict|Winamax/i.test(dashboard.funnelAlert)) || !(dashboard.topPick || dashboard.noUltimate) || !/jour/i.test(dashboard.dailyBudget) || !dashboard.hasRollingSections || !dashboard.combines || !dashboard.scorers || !dashboard.promos || !/Suggestion du jour/.test(dashboard.suggestion || '') || dashboard.multibookText || !hasActionCopy || hasComplexMarket || hasTechnicalJargon || hasExpertRepairLabel) {
       throw new Error(`Dashboard Sprint 23 invalide: ${JSON.stringify({ ...dashboard, dashboardText: dashboard.dashboardText.slice(0, 800), hasActionCopy, hasComplexMarket, hasTechnicalJargon })}`);
     }
     if (ultraDashboard.visuals < 8 || !/Scanner du jour|Aucun pattern/i.test(ultraDashboard.scanner || '') || !ultraDashboard.audioBrief || !ultraDashboard.heroImage) {
       throw new Error(`Dashboard Ultra incomplet: ${JSON.stringify(ultraDashboard)}`);
     }
+    if (dashboardDragBefore.length >= 2 && dashboardDragAfter.order.join('|') === dashboardDragBefore.join('|')) throw new Error(`Dashboard custom non déplaçable: ${JSON.stringify({ dashboardDragBefore, dashboardDragAfter })}`);
+    if (dashboardDragBefore.length >= 2 && !Object.values(dashboardDragAfter.stored || {}).some((order) => Array.isArray(order) && order.join('|') === dashboardDragAfter.order.join('|'))) throw new Error(`Dashboard custom non persisté: ${JSON.stringify(dashboardDragAfter)}`);
+    if (!newsRun.ok || !newsRun.records || !newsRun.checkedSources || !newsRun.successfulSources) throw new Error(`News watcher réel incomplet: ${JSON.stringify(newsRun)}`);
+    if (!audioRun.spoken || audioRun.textLength < 80) throw new Error(`Brief audio non déclenché: ${JSON.stringify(audioRun)}`);
     if (!sprint23Runtime.autoTracking || !sprint23Runtime.importPreview || !sprint23Runtime.i18n) throw new Error(`Workflow Sprint 23 invalide: ${JSON.stringify(sprint23Runtime)}`);
     if (!searchAudit.hasInput || searchAudit.compareOptions < 2 || !searchAudit.hasResults || !/Recherche|Comparer/i.test(searchAudit.text || '')) throw new Error(`Recherche Sprint 22 invalide: ${JSON.stringify(searchAudit)}`);
     if (modalOverflow) throw new Error('Overflow horizontal dans la fiche match');

@@ -174,7 +174,59 @@ Le Mode expert ajoute :
 
 N'active ce mode que si tu veux diagnostiquer ou piloter finement l'app.
 
-## 14. Diagnostic Winamax
+## 14. Modules Ultra v2.0
+
+Les modules Ultra restent opt-in pour ne pas surcharger la vue standard.
+
+### Modele personnel
+
+Le modele personnel apprend uniquement de tes paris regles. Il lui faut environ 50 paris settled pour devenir vraiment utile. Avant ce seuil, la fiche affiche `Sample insuffisant` et utilise un score heuristique prudent. Une fois le sample suffisant, la fiche indique si le pick est coherent avec ton style gagnant.
+
+### Simulation Monte Carlo
+
+Dans une fiche match, `Simulation Monte Carlo` rejoue le pari 10 000 fois avec un simulateur adapte au sport. Lis surtout :
+
+- `gagne` : frequence de scenarios favorables ;
+- `scenario serre` : risque que le pari se joue a peu de chose ;
+- `scenario confortable` : cas ou le pari passe nettement.
+
+Une distribution large n'interdit pas le pari, mais elle conseille une mise plus prudente.
+
+### Twitter/X watcher et news watcher
+
+Le watcher social utilise des sources publiques cote main process, avec cache et rate limit. Il cherche les news qui peuvent changer le pari : blessure, composition, suspension, coach, meteo. Si une source ne repond pas, l'app l'indique et ne l'invente pas.
+
+### Brief audio
+
+Le bouton `Ecouter le brief` lit le brief matin/soir avec la synthese vocale locale d'Electron. Le texte reste court : top pick, nombre de paris prets, nuit, bilan recent et consigne de prudence.
+
+### Dashboard custom
+
+Active `Dashboard custom` en Mode expert. Tu peux :
+
+- choisir le preset `Matin`, `Soir` ou `Live` ;
+- deplacer les widgets par glisser-deposer ;
+- garder un layout different par preset ;
+- cliquer `Reset` pour revenir a l'ordre par defaut.
+
+### Scanner inter-matchs
+
+`Scanner du jour` repere les patterns entre plusieurs matchs : soiree sport dominante, marche recurrent, fenetre nuit, mini-combine prudent. Chaque pattern peut ouvrir les combines du jour pour preparer le ticket, sans placer quoi que ce soit automatiquement.
+
+### Ajustements 24h
+
+Dans `Bilan > Performance modele`, `Ajustements 24h` liste les segments durcis ou assouplis. Le logiciel ne change jamais brutalement tout le modele : les ajustements restent bornes et peuvent etre reinitialises.
+
+## 15. Nuit et lignes a surveiller
+
+La vue `Cette nuit` peut contenir deux types de lignes :
+
+- `Prêt` : le pari a une mise et peut etre suivi ;
+- `A surveiller · nuit` : le match est important pour la couverture nocturne, mais les signaux ne sont pas assez solides pour miser.
+
+Une ligne de nuit sans bouton `Je mise` ne doit pas etre jouee. Elle sert a ne pas rater les sports US/LatAm/Asie et a relancer un check plus proche du coup d'envoi.
+
+## 16. Diagnostic Winamax
 
 Le diagnostic `qa:winamax-audit` indique :
 
@@ -191,7 +243,7 @@ Depuis le projet :
 npm --prefix desktop run qa:winamax-audit
 ```
 
-## 15. Donnees anciennes ou trop peu de picks
+## 17. Donnees anciennes ou trop peu de picks
 
 Si les donnees sont anciennes, l'app affiche un bandeau de fraicheur.
 
@@ -206,7 +258,7 @@ Depuis v1.4.0, les segments avec peu d'historique ne sont plus penalises automat
 
 Depuis v1.5.0, l'app peut aussi afficher un signal `Confiance limitee` quand la cote Winamax est claire mais que le contexte local reste leger. Ce signal aide a ne pas rater un match, mais il ne doit pas etre joue tant que le bouton `Je mise` n'apparait pas.
 
-## 16. Sauvegarde et restauration
+## 18. Sauvegarde et restauration
 
 Exporte ton profil regulierement depuis `Reglages > Profil local`.
 
@@ -222,7 +274,7 @@ Le fichier contient :
 
 Les backups automatiques restent dans `desktop/state/backups/`.
 
-## 17. Depannage
+## 19. Depannage
 
 - L'app ne demarre pas : relance une seule instance, puis consulte `Avance > Logs`.
 - Aucun pick : verifie la fraicheur des donnees et le funnel.
@@ -231,7 +283,7 @@ Les backups automatiques restent dans `desktop/state/backups/`.
 - P&L incoherent : verifie les settlements et la reconciliation Winamax.
 - Profil abime : importe un export ou restaure un backup local.
 
-## 18. Bon usage
+## 20. Bon usage
 
 L'app sert a etre plus discipline, pas a miser plus vite.
 

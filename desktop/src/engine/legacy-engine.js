@@ -765,10 +765,28 @@ function createLegacyEngineService({ projectRoot }) {
     if (!row || row.status === 'skip') return false;
     if (!isSimpleUserMarket(row)) return false;
     if (!isFutureStart(row)) return false;
-    if (!(Number(row.safeEdge ?? row.edge ?? 0) >= 0.01)) return false;
     if (!(Number(row.odd || 0) > 1)) return false;
+    if (isNightCoverageCandidate(row)) return true;
+    if (!(Number(row.safeEdge ?? row.edge ?? 0) >= 0.01)) return false;
     if (row.safeAssessment?.displayable === false) return false;
     return true;
+  }
+
+  function isNightCoverageCandidate(row) {
+    const ts = startTimestamp(row);
+    if (!Number.isFinite(ts) || ts <= Date.now() || ts > Date.now() + 48 * 60 * 60 * 1000) return false;
+    const hour = parisHour(ts);
+    if (!(hour >= 0 && hour < 6)) return false;
+    if (isDrawSelection(row)) return false;
+    const sport = String(row?.sport || '').toLowerCase();
+    const market = simpleMarketGroup(row?.marketKey || row?.market);
+    if (!['baseball', 'basketball', 'hockey', 'football'].includes(sport)) return false;
+    if (!['winner', 'goals'].includes(market)) return false;
+    const edge = Number(row?.safeEdge ?? row?.edge ?? 0);
+    const probability = Number(row?.probability || 0);
+    const odd = Number(row?.odd || 0);
+    if (!(odd >= 1.30 && odd <= 4.00)) return false;
+    return edge >= -0.07 && probability >= 0.36 && row?.contextGate?.gate !== 'skip';
   }
 
   function isBookable(match) {
@@ -2884,6 +2902,32 @@ function createLegacyEngineService({ projectRoot }) {
       return Number.isFinite(ts) && ts > now && ts <= now + horizonMs;
     });
     const todayRows = sourcePicks.filter((pick) => dayKeyParis(pick.start) === todayKey);
+    const nightRows = sourcePicks.filter(isNightCoverageCandidate).map((row) => {
+      if (row?.decisionCenter?.status !== 'skip' && row?.status !== 'skip') return row;
+      return {
+        ...row,
+        status: row?.status === 'skip' ? 'watch' : row.status,
+        statusLabel: 'À surveiller · nuit',
+        safeAssessment: {
+          ...(row.safeAssessment || {}),
+          reliable: false,
+          displayable: true,
+          status: 'watch',
+          tone: 'watch',
+          label: 'À surveiller · couverture nuit'
+        },
+        decisionCenter: {
+          ...(row.decisionCenter || {}),
+          status: 'watch',
+          canBet: false,
+          stake: 0,
+          stakeDisplay: '0 €',
+          nextAction: 'Surveiller',
+          mainReason: 'Couverture nuit : ligne visible mais pas assez robuste pour miser',
+          riskTone: 'watch'
+        }
+      };
+    });
     const ordered = [];
     const seen = new Set();
     const matchCounts = new Map();
@@ -2936,6 +2980,7 @@ function createLegacyEngineService({ projectRoot }) {
     if (ordered.length < 5) addRows(sortRows(sourcePicks), { strict: false });
     const finalRows = [];
     const finalSeen = new Set();
+    const finalOutcomeSeen = new Set();
     const finalMatchCounts = new Map();
     const finalSportCounts = new Map();
     const finalMarketCounts = new Map();
@@ -2945,11 +2990,39 @@ function createLegacyEngineService({ projectRoot }) {
     const sportKey = (row) => String(row?.sport || 'sport').toLowerCase();
     const marketKey = (row) => canonicalMarketKey(row?.marketKey || row?.market || 'market');
     const leagueKey = (row) => compactKey(row?.match?.league_code || row?.league || row?.match?.league_name || 'league');
+    const teamTokens = (value) => String(value || '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .split(/[^a-z0-9]+/)
+      .filter((token) => token.length >= 4 && !['gagne', 'gagnent', 'vainqueur', 'match'].includes(token));
+    const sideOutcome = (row) => {
+      const label = String(row?.label || row?.pickLabel || row?.selection || row?.side || '');
+      const compactLabel = compactKey(label);
+      const titleParts = String(row?.title || '').split(/\s+-\s+/).map((part) => part.trim()).filter(Boolean);
+      const home = row?.match?.home || row?.home || titleParts[0] || '';
+      const away = row?.match?.away || row?.away || titleParts[1] || '';
+      const homeTokens = teamTokens(home);
+      const awayTokens = teamTokens(away);
+      const tokenScore = (tokens) => tokens.filter((token) => compactLabel.includes(token)).length;
+      const homeScore = tokenScore(homeTokens);
+      const awayScore = tokenScore(awayTokens);
+      if (homeScore > awayScore) return 'home';
+      if (awayScore > homeScore) return 'away';
+      const homeSpecific = homeTokens[homeTokens.length - 1] || '';
+      const awaySpecific = awayTokens[awayTokens.length - 1] || '';
+      if (awaySpecific && compactLabel.includes(awaySpecific)) return 'away';
+      if (homeSpecific && compactLabel.includes(homeSpecific)) return 'home';
+      return compactLabel;
+    };
+    const outcomeKey = (row) => `${matchKey(row)}:${simpleMarketGroup(row?.marketKey || row?.market)}:${sideOutcome(row)}`;
     const addFinalRows = (rowsToAdd, limit = maxDashboardRows, options = {}) => {
       for (const row of rowsToAdd) {
         if (finalRows.length >= limit) break;
         const key = `${row.id}:${row.market}:${row.label}`;
         if (finalSeen.has(key)) continue;
+        const ok = outcomeKey(row);
+        if (finalOutcomeSeen.has(ok)) continue;
         const mk = matchKey(row);
         const cap = Number(options.matchCap || 0) || (options.enforceMatchCap ? maxPerMatch : 0);
         if (cap && (finalMatchCounts.get(mk) || 0) >= cap) continue;
@@ -2962,6 +3035,7 @@ function createLegacyEngineService({ projectRoot }) {
           if (!options.relaxLeague && (finalLeagueCounts.get(lk) || 0) >= maxPerLeague) continue;
         }
         finalSeen.add(key);
+        finalOutcomeSeen.add(ok);
         finalMatchCounts.set(mk, (finalMatchCounts.get(mk) || 0) + 1);
         finalSportCounts.set(sportKey(row), (finalSportCounts.get(sportKey(row)) || 0) + 1);
         finalMarketCounts.set(marketKey(row), (finalMarketCounts.get(marketKey(row)) || 0) + 1);
@@ -2993,6 +3067,15 @@ function createLegacyEngineService({ projectRoot }) {
         todayCapRelaxed = true;
         addFinalRows(sortedTodayDisplayable, todayVisibleTarget, { matchCap: maxPerMatch + 1, relaxSport: true, relaxLeague: true });
       }
+    }
+    if (nightRows.length) {
+      const nightTarget = Math.min(8, nightRows.length);
+      addFinalRows(sortRows(nightRows), Math.min(maxDashboardRows, finalRows.length + nightTarget), {
+        matchCap: maxPerMatch,
+        relaxSport: true,
+        relaxLeague: true,
+        relaxMarket: true
+      });
     }
     addFinalRows(sortedRollingReady, Math.max(rollingReadyTarget, Math.min(target24, sortedRollingReady.length)));
     if (rollingWindowRows(finalRows, 24).length < rollingReadyTarget) {

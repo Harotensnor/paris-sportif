@@ -18,7 +18,7 @@ async function main() {
   const app = await electron.launch({
     executablePath: electronExe,
     cwd: path.join(root, 'desktop'),
-    env: { ...process.env, PARIS_DESKTOP_PORT: String(testPort) },
+    env: { ...process.env, PARIS_DESKTOP_PORT: String(testPort), PARIS_DESKTOP_USER_DATA_DIR: userDataDir, PARIS_DESKTOP_TEST_ISOLATED: '1' },
     args: [`--user-data-dir=${userDataDir}`, '.']
   });
 
