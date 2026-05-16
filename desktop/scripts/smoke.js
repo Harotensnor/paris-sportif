@@ -9,7 +9,9 @@ async function firstWindow(app) {
 }
 
 function isIgnorableConsoleMessage(message) {
-  return /Failed to load resource:\s*net::ERR_(EMPTY_RESPONSE|ABORTED)/i.test(String(message || ''));
+  // Sprint 65 — tolere ERR_NO_BUFFER_SPACE et ERR_NETWORK_CHANGED (transient Windows
+  // sur fetch images Wikipedia, sans impact engine).
+  return /Failed to load resource:\s*net::ERR_(EMPTY_RESPONSE|ABORTED|NO_BUFFER_SPACE|NETWORK_CHANGED|TIMED_OUT)/i.test(String(message || ''));
 }
 
 async function main() {
