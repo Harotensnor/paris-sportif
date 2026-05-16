@@ -5,6 +5,15 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 37 — Vraies photos joueurs + logos équipes (Wikipedia Commons)
+
+- Nouveau service `desktop/src/image-service.js` : résolution de vrais logos d'équipes et de photos de joueurs via l'API Wikipedia/Commons, côté main process uniquement. Cache disque local (`desktop/state/images/`) avec TTL 30 jours pour les logos et 7 jours pour les photos joueurs. Misses cachées 24h pour ne pas hammerer l'API.
+- Nouveaux endpoints locaux `/api/images/lookup` (single ou batch) et `/api/images/state`. Aucun fetch internet n'est jamais déclenché par le renderer ; tout passe par le main process avec rate limit 30 requêtes/minute + dédup des requêtes en cours.
+- Renderer enrichi : `rowVisual()` et nouvelle fonction `playerPhotoHtml()` interrogent le cache image et déclenchent un lookup en arrière-plan si nécessaire. Les avatars SVG initiales restent affichés instantanément en fallback ; dès qu'une vraie image arrive (PSG, Lakers, Mbappé, etc.), elle remplace la version SVG via `data-remote-image` + CSS classe `.remote-loaded`.
+- Cards "Joueurs clés" foot enrichies avec photos rondes 64px en haut à droite. Nouvelles classes utilitaires `.player-photo-sm/md/lg/xl` (32/48/64/80px) pour respecter la CSP `style-src 'self'` sans inline style.
+- CSP `img-src` étendue à `https://upload.wikimedia.org` (à la fois dans le header HTTP main process et le meta tag index.html) pour autoriser le rendu des images Wikipedia, sans ouvrir d'autres domaines.
+- Validation : tests Wikipedia OK pour PSG (`Paris_Saint-Germain_F.C..svg`), Los Angeles Lakers (`Los_Angeles_Lakers_logo.svg`), Kylian Mbappé. Miss cache pour les noms inconnus. `qa:engine`, smoke desktop (7 paris simples, 14 timeline, 42 fiables) et `qa:terrain` (133 events, 27 positifs simples → 15 affichés, cockpit 25) restent verts. `qa:a11y` rapporte 178 actions clavier et contrastes AA conservés.
+
 ### Sprint 36 — Refonte UX + Winamax 2-0 + compos visuelles + photos + plus de Vainqueur
 
 - Version desktop portée à `v2.1.0`. Le brief audio est retiré complètement : plus de bouton d’écoute, plus de préférence Speech Synthesis, plus de lecture automatique au boot et la documentation ne présente plus cette option.

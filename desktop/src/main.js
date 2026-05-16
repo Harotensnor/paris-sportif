@@ -8,6 +8,7 @@ const path = require('path');
 const { URL } = require('url');
 const { createLegacyEngineService } = require('./engine/legacy-engine');
 const qualityUtils = require('./engine/quality-utils');
+const imageService = require('./image-service');
 const desktopPackage = require('../package.json');
 
 const DESKTOP_ROOT = path.resolve(__dirname, '..');
@@ -34,6 +35,8 @@ const WEBHOOK_LOG_PATH = path.join(STATE_ROOT, 'webhook-log.jsonl');
 const UPDATE_STATUS_PATH = path.join(STATE_ROOT, 'update-status.json');
 const BUG_REPORT_ROOT = path.join(STATE_ROOT, 'bug-reports');
 const STRESS_REPORT_PATH = path.join(STATE_ROOT, 'stress-report.json');
+const IMAGE_CACHE_ROOT = path.join(STATE_ROOT, 'images');
+imageService.init({ cacheDir: IMAGE_CACHE_ROOT });
 const SIGNAL_SOURCES = new Set(['all', 'weather', 'referees', 'injuries', 'lineups', 'team_form', 'team_stats', 'h2h', 'context']);
 const REFRESH_MODES = new Set([
   'quick',
@@ -68,7 +71,7 @@ const HTML_CSP = [
   "default-src 'self'",
   "script-src 'self'",
   "style-src 'self'",
-  "img-src 'self' data:",
+  "img-src 'self' data: https://upload.wikimedia.org",
   "connect-src 'self'",
   "frame-src 'none'",
   "object-src 'none'",
@@ -1876,6 +1879,33 @@ async function handleApi(req, res, url) {
   }
   if (url.pathname === '/api/ai/enrichment-state') {
     jsonResponse(res, 200, enrichmentStore());
+    return;
+  }
+  if (url.pathname === '/api/images/lookup') {
+    if (req.method !== 'POST') {
+      jsonResponse(res, 405, { ok: false, error: 'POST required' });
+      return;
+    }
+    try {
+      const payload = await readJsonBody(req, 64 * 1024);
+      const items = Array.isArray(payload?.items) ? payload.items : null;
+      if (items) {
+        const results = await imageService.lookupBatch(items);
+        jsonResponse(res, 200, { ok: true, results });
+        return;
+      }
+      const kind = String(payload?.kind || 'team');
+      const name = String(payload?.name || '');
+      const hints = payload?.hints && typeof payload.hints === 'object' ? payload.hints : {};
+      const result = await imageService.lookupImage(kind, name, hints);
+      jsonResponse(res, 200, { ok: true, ...result });
+    } catch (error) {
+      jsonResponse(res, 200, { ok: false, url: null, miss: true, error: error.message });
+    }
+    return;
+  }
+  if (url.pathname === '/api/images/state') {
+    jsonResponse(res, 200, { ok: true, stats: imageService.statsSnapshot() });
     return;
   }
   if (url.pathname === '/api/ai/enrich') {

@@ -3438,6 +3438,82 @@ td.empty::before,
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: opacity 220ms ease-out, transform 220ms ease-out;
+}
+
+.team-avatar img.remote-loaded {
+  object-fit: contain;
+  background: rgba(15, 23, 42, .35);
+  padding: 4px;
+}
+
+.team-avatar img.remote-loaded + span {
+  opacity: 0;
+}
+
+.player-photo {
+  display: inline-block;
+  position: relative;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: linear-gradient(135deg, rgba(99, 102, 241, .45), rgba(14, 165, 233, .35));
+  border: 1px solid rgba(148, 163, 184, .35);
+  box-shadow: 0 4px 16px rgba(15, 23, 42, .35);
+  flex-shrink: 0;
+}
+
+.player-photo.player-photo-sm { width: 32px; height: 32px; }
+.player-photo.player-photo-md { width: 48px; height: 48px; }
+.player-photo.player-photo-lg { width: 64px; height: 64px; }
+.player-photo.player-photo-xl { width: 80px; height: 80px; }
+
+.player-photo img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 220ms ease-out;
+}
+
+.player-photo img.remote-loaded {
+  opacity: 1;
+}
+
+.player-photo-initials {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  color: rgba(248, 250, 252, .95);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, .45);
+  pointer-events: none;
+}
+
+.player-photo.player-photo-sm .player-photo-initials { font-size: 13px; }
+.player-photo.player-photo-md .player-photo-initials { font-size: 20px; }
+.player-photo.player-photo-lg .player-photo-initials { font-size: 26px; }
+.player-photo.player-photo-xl .player-photo-initials { font-size: 32px; }
+
+.player-photo:has(img.remote-loaded) .player-photo-initials {
+  opacity: 0;
+}
+
+.key-player-card.has-photo {
+  position: relative;
+  padding-top: 76px;
+}
+
+.key-player-card .key-player-photo-wrap {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  z-index: 1;
 }
 
 .team-color-0 { border-color: rgba(14, 165, 233, .55); background: rgba(14, 165, 233, .18); }

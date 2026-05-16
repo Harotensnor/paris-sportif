@@ -3008,23 +3008,91 @@
     return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
   }
 
+  // Cache of remote team/player logos resolved via the local /api/images
+  // endpoint. Keys are normalized "kind:name:sport" strings and values are
+  // either a URL or null (miss). Misses are remembered to avoid hammering
+  // the resolver.
+  const REMOTE_IMAGE_CACHE = new Map();
+  const REMOTE_IMAGE_PENDING = new Map();
+
+  function remoteImageKey(kind, name, sport) {
+    return `${kind}|${String(name || '').trim().toLowerCase()}|${String(sport || '').trim().toLowerCase()}`;
+  }
+
+  function queueRemoteImage(kind, name, sport) {
+    const key = remoteImageKey(kind, name, sport);
+    if (REMOTE_IMAGE_CACHE.has(key) || REMOTE_IMAGE_PENDING.has(key)) return;
+    if (!name || String(name).trim() === '') {
+      REMOTE_IMAGE_CACHE.set(key, null);
+      return;
+    }
+    const promise = fetch('/api/images/lookup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ kind, name, hints: { sport: sport || '' } })
+    })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((payload) => {
+        const url = payload && payload.ok && payload.url ? String(payload.url) : null;
+        REMOTE_IMAGE_CACHE.set(key, url);
+        REMOTE_IMAGE_PENDING.delete(key);
+        if (url) {
+          document.querySelectorAll(`img[data-remote-image="${key}"]`).forEach((img) => {
+            img.setAttribute('src', url);
+            img.classList.add('remote-loaded');
+          });
+        }
+      })
+      .catch(() => {
+        REMOTE_IMAGE_CACHE.set(key, null);
+        REMOTE_IMAGE_PENDING.delete(key);
+      });
+    REMOTE_IMAGE_PENDING.set(key, promise);
+  }
+
   function rowVisual(row, side = 'home') {
     const names = getTeamNames(row?.match || {});
     const label = side === 'away' ? names.away : names.home;
-    const colorIndex = stringHash(`${label}:${row?.sport || row?.match?.sport || ''}`) % 8;
+    const sport = row?.sport || row?.match?.sport || '';
+    const colorIndex = stringHash(`${label}:${sport}`) % 8;
+    const remoteKey = remoteImageKey('team', label, sport);
+    const remoteUrl = REMOTE_IMAGE_CACHE.has(remoteKey) ? REMOTE_IMAGE_CACHE.get(remoteKey) : undefined;
+    if (remoteUrl === undefined && label) {
+      queueRemoteImage('team', label, sport);
+    }
     return {
       label,
       initials: initialsForLabel(label),
       icon: sportIconForRow(row),
-      color: visualColorForLabel(label, row?.sport || row?.match?.sport || '')[0],
+      color: visualColorForLabel(label, sport)[0],
       colorIndex,
-      url: visualSvgUrl(label, row)
+      url: remoteUrl || visualSvgUrl(label, row),
+      remoteKey,
+      remoteAvailable: Boolean(remoteUrl)
     };
   }
 
   function avatarHtml(row, side = 'home', className = 'team-avatar') {
     const visual = rowVisual(row, side);
-    return `<span class="${escapeHtml(className)} team-color-${visual.colorIndex}" aria-label="${escapeHtml(visual.label)}"><img src="${escapeHtml(visual.url)}" alt=""><span>${escapeHtml(visual.initials)}</span></span>`;
+    const remoteAttr = visual.remoteKey ? ` data-remote-image="${escapeHtml(visual.remoteKey)}"` : '';
+    const remoteClass = visual.remoteAvailable ? ' remote-loaded' : '';
+    return `<span class="${escapeHtml(className)} team-color-${visual.colorIndex}" aria-label="${escapeHtml(visual.label)}"><img src="${escapeHtml(visual.url)}" alt=""${remoteAttr} class="${remoteClass.trim()}"><span>${escapeHtml(visual.initials)}</span></span>`;
+  }
+
+  function playerPhotoHtml(name, hints = {}, { size = 48, className = 'player-photo' } = {}) {
+    const safeName = String(name || '').trim();
+    const initials = initialsForLabel(safeName || '?');
+    const sport = hints.sport || '';
+    const key = remoteImageKey('player', safeName, sport);
+    if (safeName && !REMOTE_IMAGE_CACHE.has(key) && !REMOTE_IMAGE_PENDING.has(key)) {
+      queueRemoteImage('player', safeName, sport);
+    }
+    const cachedUrl = REMOTE_IMAGE_CACHE.get(key);
+    const hasRemote = Boolean(cachedUrl);
+    const remoteAttr = safeName ? ` data-remote-image="${escapeHtml(key)}"` : '';
+    const remoteClass = hasRemote ? ' remote-loaded' : '';
+    const sizeClass = size >= 80 ? 'player-photo-xl' : size >= 60 ? 'player-photo-lg' : size >= 40 ? 'player-photo-md' : 'player-photo-sm';
+    return `<span class="${escapeHtml(className)} ${sizeClass}" aria-label="${escapeHtml(safeName || 'Joueur')}">${hasRemote ? `<img src="${escapeHtml(cachedUrl)}" alt=""${remoteAttr} class="${remoteClass.trim()}">` : `<img alt=""${remoteAttr} class="${remoteClass.trim()}">`}<span class="player-photo-initials">${escapeHtml(initials)}</span></span>`;
   }
 
   function matchVisualHtml(row, className = 'match-visual') {
@@ -3308,9 +3376,12 @@
           <h5>${escapeHtml(teamDisplayName(row, side))}</h5>
           ${rows.length ? rows.map(({ player, star, stats }) => {
             const form = stats.formScore >= 6 ? 'En forme' : stats.formScore > 0 && stats.formScore < 4 ? 'En méforme' : 'À confirmer';
+            const playerName = player.name || star.name || 'Joueur clé';
+            const sportHint = row?.sport || row?.match?.sport || '';
             return `
-              <article class="key-player-card">
-                <strong>${escapeHtml(player.name || star.name || 'Joueur clé')}</strong>
+              <article class="key-player-card has-photo">
+                <div class="key-player-photo-wrap">${playerPhotoHtml(playerName, { sport: sportHint }, { size: 64 })}</div>
+                <strong>${escapeHtml(playerName)}</strong>
                 <em>${escapeHtml(`${player.pos || star.position || 'poste ?'} · ${form}`)}</em>
                 <div class="stat-chip-row">
                   ${statChip('xG saison', stats.xgSeason, '', 1)}
