@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-16T11:45:54Z",
+  "generated_at": "2026-05-16T11:50:18Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -160,13 +160,13 @@
         "1 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
+        "status": "mixed",
+        "net_side": null,
+        "home_score": 0.415,
+        "away_score": 0.365,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Monza (-0.10)",
+        "reason": "Signaux mitigés: avantage net trop faible (Juve Stabia +0.42, Monza +0.37)",
         "detail": [
           {
             "side": "home",
@@ -179,6 +179,18 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.513
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.463
           }
         ]
       }
@@ -880,11 +892,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.043,
-        "away_score": -0.498,
-        "home_fade": 0.15,
-        "away_fade": 0.55,
-        "reason": "Direction nette: Montreal Canadiens (+0.04)",
+        "home_score": -0.607,
+        "away_score": -1.147,
+        "home_fade": 1.15,
+        "away_fade": 1.55,
+        "reason": "Direction nette: Montreal Canadiens (-0.61)",
         "detail": [
           {
             "side": "home",
@@ -903,6 +915,18 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.4
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           }
         ]
       }
@@ -1105,12 +1129,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
+        "net_side": "home",
+        "home_score": 0.141,
+        "away_score": -0.78,
         "home_fade": 0.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Vegas Golden Knights (-0.10)",
+        "away_fade": 0.832,
+        "reason": "Direction nette: Colorado Avalanche (+0.14)",
         "detail": [
           {
             "side": "home",
@@ -1123,6 +1147,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 0.682
           }
         ]
       }
@@ -1503,12 +1533,18 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.254,
-        "away_score": -0.726,
+        "home_score": 0.493,
+        "away_score": -1.408,
         "home_fade": 0.0,
-        "away_fade": 0.726,
-        "reason": "Direction nette: Colorado Avalanche (+0.25)",
+        "away_fade": 1.408,
+        "reason": "Direction nette: Colorado Avalanche (+0.49)",
         "detail": [
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 0.682
+          },
           {
             "side": "away",
             "type": "back_to_back_travel",
