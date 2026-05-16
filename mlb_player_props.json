@@ -1,254 +1,8 @@
 {
-  "generated_at": "2026-05-16T23:11:47Z",
+  "generated_at": "2026-05-16T23:20:27Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815367",
-      "kickoff": "2026-05-16T23:10Z",
-      "league": "MLB",
-      "match": "Chicago Cubs at Chicago White Sox",
-      "home": "Chicago White Sox",
-      "away": "Chicago Cubs",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Chicago White Sox",
-          "pitcher": "Davis Martin",
-          "label": "Davis Martin plus de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "over",
-          "probability": 0.5,
-          "fair_odds": 2.0,
-          "expected_strikeouts": 6.5,
-          "projected_ip": 6.25,
-          "inputs": {
-            "k9": 9.36,
-            "era": 1.62,
-            "whip": 1.0,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Chicago White Sox",
-          "pitcher": "Davis Martin",
-          "label": "Davis Martin ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.7788,
-          "fair_odds": 1.28,
-          "expected_hr_allowed": 0.25,
-          "projected_ip": 6.25,
-          "inputs": {
-            "hr9": 0.36,
-            "era": 1.62,
-            "whip": 1.0
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Chicago Cubs",
-          "pitcher": "Jameson Taillon",
-          "label": "Jameson Taillon plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.6016,
-          "fair_odds": 1.66,
-          "expected_strikeouts": 4.95,
-          "projected_ip": 5.65,
-          "inputs": {
-            "k9": 7.88,
-            "era": 3.94,
-            "whip": 1.14,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Chicago Cubs",
-          "pitcher": "Jameson Taillon",
-          "label": "Jameson Taillon concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.7439,
-          "fair_odds": 1.34,
-          "expected_hr_allowed": 1.362,
-          "projected_ip": 5.65,
-          "inputs": {
-            "hr9": 2.17,
-            "era": 3.94,
-            "whip": 1.14
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401815369",
-      "kickoff": "2026-05-16T23:10Z",
-      "league": "MLB",
-      "match": "Milwaukee Brewers at Minnesota Twins",
-      "home": "Minnesota Twins",
-      "away": "Milwaukee Brewers",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Minnesota Twins",
-          "pitcher": "Connor Prielipp",
-          "label": "Connor Prielipp moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.5553,
-          "fair_odds": 1.8,
-          "expected_strikeouts": 5.25,
-          "projected_ip": 4.75,
-          "inputs": {
-            "k9": 9.95,
-            "era": 3.32,
-            "whip": 1.0,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Minnesota Twins",
-          "pitcher": "Connor Prielipp",
-          "label": "Connor Prielipp concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5274,
-          "fair_odds": 1.9,
-          "expected_hr_allowed": 0.749,
-          "projected_ip": 4.75,
-          "inputs": {
-            "hr9": 1.42,
-            "era": 3.32,
-            "whip": 1.0
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Milwaukee Brewers",
-          "pitcher": "Logan Henderson",
-          "label": "Logan Henderson moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.5365,
-          "fair_odds": 1.86,
-          "expected_strikeouts": 5.33,
-          "projected_ip": 4.33,
-          "inputs": {
-            "k9": 11.08,
-            "era": 4.15,
-            "whip": 0.92,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Milwaukee Brewers",
-          "pitcher": "Logan Henderson",
-          "label": "Logan Henderson ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.7173,
-          "fair_odds": 1.39,
-          "expected_hr_allowed": 0.332,
-          "projected_ip": 4.33,
-          "inputs": {
-            "hr9": 0.69,
-            "era": 4.15,
-            "whip": 0.92
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401815370",
-      "kickoff": "2026-05-16T23:10Z",
-      "league": "MLB",
-      "match": "Texas Rangers at Houston Astros",
-      "home": "Houston Astros",
-      "away": "Texas Rangers",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Houston Astros",
-          "pitcher": "Kai-Wei Teng",
-          "label": "Kai-Wei Teng plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.571,
-          "fair_odds": 1.75,
-          "expected_strikeouts": 5.84,
-          "projected_ip": 6.6,
-          "inputs": {
-            "k9": 7.96,
-            "era": 3.12,
-            "whip": 1.08,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Houston Astros",
-          "pitcher": "Kai-Wei Teng",
-          "label": "Kai-Wei Teng concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5336,
-          "fair_odds": 1.87,
-          "expected_hr_allowed": 0.763,
-          "projected_ip": 6.6,
-          "inputs": {
-            "hr9": 1.04,
-            "era": 3.12,
-            "whip": 1.08
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Texas Rangers",
-          "pitcher": "Jacob deGrom",
-          "label": "Jacob deGrom moins de 7,5 strikeouts",
-          "line": 7.5,
-          "pick": "under",
-          "probability": 0.5853,
-          "fair_odds": 1.71,
-          "expected_strikeouts": 7.05,
-          "projected_ip": 5.53,
-          "inputs": {
-            "k9": 11.49,
-            "era": 2.62,
-            "whip": 0.92,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Texas Rangers",
-          "pitcher": "Jacob deGrom",
-          "label": "Jacob deGrom concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5242,
-          "fair_odds": 1.91,
-          "expected_hr_allowed": 0.743,
-          "projected_ip": 5.53,
-          "inputs": {
-            "hr9": 1.21,
-            "era": 2.62,
-            "whip": 0.92
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815361",
       "kickoff": "2026-05-16T23:15Z",
@@ -261,17 +15,17 @@
           "market": "pitcher_strikeouts",
           "team": "Atlanta Braves",
           "pitcher": "Bryce Elder",
-          "label": "Bryce Elder plus de 5,5 strikeouts",
+          "label": "Bryce Elder moins de 5,5 strikeouts",
           "line": 5.5,
-          "pick": "over",
-          "probability": 0.5719,
-          "fair_odds": 1.75,
-          "expected_strikeouts": 5.84,
-          "projected_ip": 6.02,
+          "pick": "under",
+          "probability": 0.5447,
+          "fair_odds": 1.84,
+          "expected_strikeouts": 5.3,
+          "projected_ip": 5.5,
           "inputs": {
-            "k9": 8.73,
-            "era": 1.81,
-            "whip": 1.01,
+            "k9": 8.67,
+            "era": 1.8,
+            "whip": 1.02,
             "hand": "R"
           },
           "side": "home"
@@ -282,14 +36,14 @@
           "pitcher": "Bryce Elder",
           "label": "Bryce Elder ne concède pas de home run",
           "pick": "no",
-          "probability": 0.7205,
-          "fair_odds": 1.39,
-          "expected_hr_allowed": 0.328,
-          "projected_ip": 6.02,
+          "probability": 0.7412,
+          "fair_odds": 1.35,
+          "expected_hr_allowed": 0.299,
+          "projected_ip": 5.5,
           "inputs": {
             "hr9": 0.49,
-            "era": 1.81,
-            "whip": 1.01
+            "era": 1.8,
+            "whip": 1.02
           },
           "side": "home"
         },
@@ -346,14 +100,14 @@
           "label": "Huascar Brazobán moins de 5,5 strikeouts",
           "line": 5.5,
           "pick": "under",
-          "probability": 0.6058,
-          "fair_odds": 1.65,
-          "expected_strikeouts": 5.03,
+          "probability": 0.5721,
+          "fair_odds": 1.75,
+          "expected_strikeouts": 5.18,
           "projected_ip": 6.6,
           "inputs": {
-            "k9": 6.86,
-            "era": 2.14,
-            "whip": 0.95,
+            "k9": 7.06,
+            "era": 2.08,
+            "whip": 0.92,
             "hand": "R"
           },
           "side": "home"
@@ -364,14 +118,14 @@
           "pitcher": "Huascar Brazobán",
           "label": "Huascar Brazobán ne concède pas de home run",
           "pick": "no",
-          "probability": 0.7295,
-          "fair_odds": 1.37,
-          "expected_hr_allowed": 0.315,
+          "probability": 0.7349,
+          "fair_odds": 1.36,
+          "expected_hr_allowed": 0.308,
           "projected_ip": 6.6,
           "inputs": {
-            "hr9": 0.43,
-            "era": 2.14,
-            "whip": 0.95
+            "hr9": 0.42,
+            "era": 2.08,
+            "whip": 0.92
           },
           "side": "home"
         },
@@ -425,17 +179,17 @@
           "market": "pitcher_strikeouts",
           "team": "Seattle Mariners",
           "pitcher": "Logan Gilbert",
-          "label": "Logan Gilbert plus de 5,5 strikeouts",
+          "label": "Logan Gilbert moins de 5,5 strikeouts",
           "line": 5.5,
-          "pick": "over",
-          "probability": 0.5589,
-          "fair_odds": 1.79,
-          "expected_strikeouts": 5.78,
-          "projected_ip": 5.56,
+          "pick": "under",
+          "probability": 0.5559,
+          "fair_odds": 1.8,
+          "expected_strikeouts": 5.25,
+          "projected_ip": 5.02,
           "inputs": {
-            "k9": 9.36,
-            "era": 3.78,
-            "whip": 1.16,
+            "k9": 9.41,
+            "era": 3.73,
+            "whip": 1.14,
             "hand": "R"
           },
           "side": "home"
@@ -446,14 +200,14 @@
           "pitcher": "Logan Gilbert",
           "label": "Logan Gilbert concède au moins 1 home run",
           "pick": "yes",
-          "probability": 0.5889,
-          "fair_odds": 1.7,
-          "expected_hr_allowed": 0.889,
-          "projected_ip": 5.56,
+          "probability": 0.5471,
+          "fair_odds": 1.83,
+          "expected_hr_allowed": 0.792,
+          "projected_ip": 5.02,
           "inputs": {
-            "hr9": 1.44,
-            "era": 3.78,
-            "whip": 1.16
+            "hr9": 1.42,
+            "era": 3.73,
+            "whip": 1.14
           },
           "side": "home"
         },
@@ -1710,7 +1464,7 @@
       ]
     }
   ],
-  "props": 82,
+  "props": 70,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
