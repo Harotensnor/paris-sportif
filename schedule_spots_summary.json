@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-16T02:45:45Z",
+  "generated_at": "2026-05-16T02:48:16Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -109,12 +109,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
+        "net_side": "home",
+        "home_score": 0.615,
         "away_score": -0.098,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Monza (-0.10)",
+        "reason": "Direction nette: Juve Stabia (+0.61)",
         "detail": [
           {
             "side": "home",
@@ -127,6 +127,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.712
           }
         ]
       }
@@ -826,13 +832,13 @@
         "1 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.043,
-        "away_score": -0.498,
-        "home_fade": 0.15,
-        "away_fade": 0.55,
-        "reason": "Direction nette: Montreal Canadiens (+0.04)",
+        "status": "abstain",
+        "net_side": null,
+        "home_score": -0.747,
+        "away_score": -0.747,
+        "home_fade": 1.15,
+        "away_fade": 1.15,
+        "reason": "Signaux opposes: Montreal Canadiens fade 1.15, Buffalo Sabres fade 1.15 -> prudence",
         "detail": [
           {
             "side": "home",
@@ -847,10 +853,16 @@
             "strength": 0.15
           },
           {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
+          },
+          {
             "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           }
         ]
       }
@@ -1257,23 +1269,23 @@
       "global_resolution": {
         "status": "abstain",
         "net_side": null,
-        "home_score": -0.621,
-        "away_score": 0.189,
-        "home_fade": 0.926,
+        "home_score": -0.695,
+        "away_score": 0.478,
+        "home_fade": 1.0,
         "away_fade": 0.872,
-        "reason": "Signaux opposes: Seattle Mariners fade 0.93, San Diego Padres fade 0.87 -> prudence",
+        "reason": "Signaux opposes: Seattle Mariners fade 1.00, San Diego Padres fade 0.87 -> prudence",
         "detail": [
           {
             "side": "home",
             "type": "market_move",
             "direction": "drift",
-            "strength": 0.926
+            "strength": 1.0
           },
           {
             "side": "away",
             "type": "market_move",
             "direction": "steam",
-            "strength": 0.737
+            "strength": 1.0
           },
           {
             "side": "away",
