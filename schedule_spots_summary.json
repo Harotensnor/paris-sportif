@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-16T16:20:29Z",
+  "generated_at": "2026-05-16T16:24:13Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -160,13 +160,13 @@
         "1 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "mixed",
-        "net_side": null,
-        "home_score": 0.44,
-        "away_score": 0.447,
+        "status": "net",
+        "net_side": "away",
+        "home_score": -0.098,
+        "away_score": -0.098,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Signaux mitigés: avantage net trop faible (Juve Stabia +0.44, Monza +0.45)",
+        "reason": "Direction nette: Monza (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -179,18 +179,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.538
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.545
           }
         ]
       }
@@ -892,11 +880,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": -0.607,
-        "away_score": -1.147,
-        "home_fade": 1.15,
-        "away_fade": 1.55,
-        "reason": "Direction nette: Montreal Canadiens (-0.61)",
+        "home_score": 0.043,
+        "away_score": -0.498,
+        "home_fade": 0.15,
+        "away_fade": 0.55,
+        "reason": "Direction nette: Montreal Canadiens (+0.04)",
         "detail": [
           {
             "side": "home",
@@ -915,18 +903,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.4
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
           }
         ]
       }
