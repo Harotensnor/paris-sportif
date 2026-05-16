@@ -4083,6 +4083,36 @@
     return `Pourquoi : ${[...new Set(parts)].slice(0, 4).join(' · ')}.`;
   }
 
+  // Sprint 62 : convertit simpleWhyText en bullets visuelles avec icone par
+  // type de raison. Utilise pour la modal magazine layout.
+  function keyReasonsBullets(row) {
+    const raw = simpleWhyText(row) || '';
+    const trimmed = raw.replace(/^Pourquoi\s*:\s*/i, '').replace(/\.$/, '');
+    if (!trimmed) return [];
+    const parts = trimmed.split(/\s+·\s+/).map((s) => s.trim()).filter(Boolean);
+    const iconFor = (text) => {
+      const t = String(text || '').toLowerCase();
+      if (/cote\s*bo[oô]st|boost[ée]/.test(t)) return '⚡';
+      if (/sharp\s*money|cote\s+en\s+(hausse|baisse)/.test(t)) return '📈';
+      if (/filet\s*2-0|s[éeè]curit[éeè]\s*2-0/.test(t)) return '🛡️';
+      if (/profil\s*fiable|fiable|priorit[éeè]\s*haute/.test(t)) return '✅';
+      if (/arbitre|carton|disciplin/.test(t)) return '🟨';
+      if (/m[ée]t[ée]o|pluie|vent|temp[ée]rature/.test(t)) return '🌦️';
+      if (/forme|s[éeè]rie|tendance/.test(t)) return '🔥';
+      if (/qualit[éeè]\s*buteur|buteur/.test(t)) return '🎯';
+      if (/avantage\s*mod[èeé]le|edge|proba\s*mod[èeé]le|mod[èeé]le/.test(t)) return '🧠';
+      if (/h2h|confront/.test(t)) return '🤝';
+      if (/sure\s*pick|s[ûuü]r\s*pick/.test(t)) return '⭐';
+      if (/surface|terrain/.test(t)) return '🎾';
+      if (/contexte\s*solide/.test(t)) return '🏟️';
+      if (/cote\s*haute|outsider/.test(t)) return '💎';
+      if (/rythme|stat|era|pace|points/.test(t)) return '📊';
+      if (/pitcher|starter/.test(t)) return '⚾';
+      return '•';
+    };
+    return parts.slice(0, 5).map((text) => ({ icon: iconFor(text), text }));
+  }
+
   function actionPickHtml(row, { compact = false } = {}) {
     const stake = visibleStakeText(row);
     return `
@@ -11516,6 +11546,13 @@
             <strong>${escapeHtml(stakeAllowed ? 'Je peux miser' : 'Ne pas miser maintenant')}</strong>
             ${actionPickHtml(row, { compact: true })}
             <p>${escapeHtml(simpleWhyText(row))}</p>
+            ${(() => {
+              const bullets = keyReasonsBullets(row);
+              return bullets.length ? `
+                <ul class="key-reasons-list">
+                  ${bullets.map((b) => `<li><span class="key-reason-icon">${escapeHtml(b.icon)}</span><span class="key-reason-text">${escapeHtml(b.text)}</span></li>`).join('')}
+                </ul>` : '';
+            })()}
             <div class="ultimate-tags detail-priority-strip">
               ${priorityBadgeHtml(row)}
               ${safeBadgeHtml(row)}

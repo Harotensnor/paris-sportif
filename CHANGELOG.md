@@ -5,6 +5,28 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 62 — Fiche match magazine : bullets visuels "Pourquoi miser" + hero plus aéré
+
+Suite Sprint 61 (filtre Fiable durci), upgrade UX de la fiche match (modal détail) vers un layout magazine plus lisible :
+
+**Bullets "Pourquoi miser"**
+- Nouveau helper `keyReasonsBullets(row)` (renderer.js) qui parse `simpleWhyText` et map chaque raison vers un picto emoji (⚡ boost, 🛡️ filet 2-0, ✅ fiable, 🔥 forme, 🎯 buteur, 🧠 modèle, 🤝 H2H, 🌦️ météo, 🟨 arbitre, etc.)
+- Rendu dans la hero modal au-dessus des badges priorité — grid auto-fit minmax(180px, 1fr) gap 6px, hover translateY(-1px) + border indigo
+- L'utilisateur voit en un coup d'œil les 3-5 raisons clés au lieu de devoir lire un mur de texte concaténé `"Pourquoi : A · B · C · D."`
+
+**Hero plus magazine**
+- Padding 22px (vs 18px), border-radius 10px (vs 8px) pour respiration
+- Titre 32px letter-spacing -.02em (vs 28px) — plus de hiérarchie typo
+- Halo radial subtil indigo/warn/danger selon decisionTone (top-right -40px) → ambiance magazine
+- z-index sur titre+p pour passer au-dessus du halo
+
+**Theme-light parity**
+- Bullets `.key-reasons-list` ont leurs surcharges light mode (background, hover) pour cohérence cross-theme
+
+Compat préservée :
+- `simpleWhyText` inchangé (le mur de texte reste affiché en `<p>` au-dessus des bullets)
+- Smoke test : "PARI/COTE/MISE/Pourquoi ce pari" toujours présents, vocabulaire user respecté (pas de "edge"/"Kelly"/"1N2")
+
 ### Sprint 61 — Durcissement filtre Fiable : declassement des edges aberrants ≥ 22pt
 
 Suite Sprint 60 (cotes Winamax désormais correctes), audit qualité picks prêts révèle que **certains picks gardent le label "Fiable" malgré un edge brut aberrant** (29.2pt sur Wolverhampton Moins de 1,5 par exemple). Le filtre `safeAssessmentForRow` plafonnait l'edge avec `conservativeEdge` (ramène 29pt à ~0.19), mais ce plafonnement ne déclassait pas le pick — le gate `edge <= 0.20` était satisfait sur l'edge plafonné.

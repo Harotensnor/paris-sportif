@@ -2840,23 +2840,47 @@ body.modal-open {
 .match-decision-hero,
 .match-ticket-card {
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 10px;
   background: linear-gradient(180deg, rgba(17, 24, 39, .94), rgba(11, 15, 24, .96));
-  padding: 18px;
+  padding: 22px;
   min-width: 0;
 }
 
 .match-decision-hero {
   border-left: 4px solid var(--accent);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Sprint 62 — halo subtil pour ambiance magazine */
+.match-decision-hero::after {
+  content: '';
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(99, 102, 241, .12), transparent 70%);
+  pointer-events: none;
 }
 
 .match-decision-hero.decision-watch {
   border-left-color: var(--warn);
 }
 
+.match-decision-hero.decision-watch::after {
+  background: radial-gradient(circle, rgba(245, 158, 11, .12), transparent 70%);
+}
+
 .match-decision-hero.decision-warn,
 .match-decision-hero.decision-danger {
   border-left-color: var(--danger);
+}
+
+.match-decision-hero.decision-warn::after,
+.match-decision-hero.decision-danger::after {
+  background: radial-gradient(circle, rgba(239, 68, 68, .14), transparent 70%);
 }
 
 .limited-data-card {
@@ -2876,21 +2900,81 @@ body.modal-open {
 
 .match-decision-hero > strong {
   display: block;
-  font-size: 28px;
+  font-size: 32px;
   line-height: 1.05;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
+  letter-spacing: -.02em;
+  position: relative;
+  z-index: 1;
 }
 
 .match-decision-hero p {
   color: var(--muted);
   margin: 0 0 16px;
-  line-height: 1.45;
+  line-height: 1.5;
+  font-size: 14px;
+  position: relative;
+  z-index: 1;
 }
 
 .decision-hero-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
+}
+
+/* Sprint 62 — bullets "Pourquoi miser" visuels dans la hero modal */
+.key-reasons-list {
+  list-style: none;
+  margin: 12px 0 14px;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 6px;
+}
+
+.key-reasons-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .035);
+  min-width: 0;
+  transition: transform .15s ease, border-color .15s ease, background .15s ease;
+}
+
+.key-reasons-list li:hover {
+  transform: translateY(-1px);
+  border-color: rgba(99, 102, 241, .45);
+  background: rgba(99, 102, 241, .08);
+}
+
+.key-reason-icon {
+  font-size: 16px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.key-reason-text {
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .key-reasons-list li { transition: none; }
+  .key-reasons-list li:hover { transform: none; }
+}
+
+body.theme-light .key-reasons-list li {
+  background: rgba(15, 23, 42, .04);
+}
+
+body.theme-light .key-reasons-list li:hover {
+  background: rgba(99, 102, 241, .1);
 }
 
 .decision-hero-grid div,
