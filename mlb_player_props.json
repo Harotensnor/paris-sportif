@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-16T03:44:35Z",
+  "generated_at": "2026-05-16T03:48:36Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -913,6 +913,42 @@
       "home": "New York Mets",
       "away": "New York Yankees",
       "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "New York Mets",
+          "pitcher": "Huascar Brazobán",
+          "label": "Huascar Brazobán moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.6058,
+          "fair_odds": 1.65,
+          "expected_strikeouts": 5.03,
+          "projected_ip": 6.6,
+          "inputs": {
+            "k9": 6.86,
+            "era": 2.14,
+            "whip": 0.95,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "New York Mets",
+          "pitcher": "Huascar Brazobán",
+          "label": "Huascar Brazobán ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.7295,
+          "fair_odds": 1.37,
+          "expected_hr_allowed": 0.315,
+          "projected_ip": 6.6,
+          "inputs": {
+            "hr9": 0.43,
+            "era": 2.14,
+            "whip": 0.95
+          },
+          "side": "home"
+        },
         {
           "market": "pitcher_strikeouts",
           "team": "New York Yankees",
@@ -2212,7 +2248,7 @@
       ]
     }
   ],
-  "props": 106,
+  "props": 108,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
