@@ -5,6 +5,23 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-16
 
+### Sprint pronostics — Accueil compact + Cockpit par catégories
+
+Focus demandé sur les pronostics : l'accueil devient une page de décision rapide, le détail passe dans un Cockpit dédié.
+- Accueil allégé : seuls le top pick, les meilleurs paris immédiats, le résumé Winamax et les catégories restent visibles.
+- Le hero "À miser maintenant" est limité au Top 4 pour éviter l'effet mur de cartes.
+- Nouveau bloc catégories : `Vainqueurs`, `Nuit`, `Buts`, `Buteurs`, `Par sport`, `À surveiller`, `Cockpit complet`.
+- Nouveau panneau `Cockpit pronostics` fermé par défaut : exploration complète par horaire, type, sport, favoris, combinés, buteurs, filtres et tableau.
+- Clic sur une catégorie ouvre directement le cockpit au bon endroit, par exemple `Vainqueurs` ouvre la vue par type sur les paris Vainqueur.
+- Les filtres ne sont plus ouverts par défaut dans l'accueil, pour garder l'écran principal petit et actionnable.
+- `qa:terrain:quick` vérifie maintenant que les catégories existent, que le Cockpit n'est pas ouvert par défaut et que la catégorie `Vainqueurs` ouvre bien le cockpit.
+
+Validation :
+- Syntaxe renderer/main : OK.
+- `npm run qa:terrain` : OK avec pipeline complète, `health.json` généré à `2026-05-16T21:20:45Z`.
+- `npm run qa:terrain:quick`, `npm test`, `npm run qa:engine`, `npm run qa:safe`, `npm run qa:a11y`, `node desktop/scripts/visual-capture.js` : OK.
+- `npm run dist` : OK, installeur `Paris Sportif Desktop Setup 2.1.0.exe` généré.
+
 ### Sprint terrain — Audit utilisateur réel + corrections cockpit
 
 Audit terrain lancé avec pipeline complète réelle puis app Electron pilotée comme un utilisateur qui veut miser vite :

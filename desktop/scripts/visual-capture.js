@@ -73,7 +73,7 @@ async function main() {
     }));
     const ultraDashboard = await win.evaluate(() => ({
       visuals: document.querySelectorAll('.match-visual').length,
-      scanner: document.querySelector('#market-scanner-section')?.innerText || '',
+      scanner: document.querySelector('#market-scanner-section')?.textContent || '',
       voiceBriefRemoved: !document.querySelector('#listen-brief-btn') && !/lecture vocale/i.test(document.body.innerText || ''),
       heroImage: Boolean(document.querySelector('.ultimate-hero-media img'))
     }));
@@ -131,12 +131,24 @@ async function main() {
     await win.click('[data-tab="dashboard"]');
     await win.waitForSelector('#trading-desk.active', { timeout: 10000 });
     await safeScreenshot(win, path.join(captureDir, 'desktop-sprint23-trading-desk.png'), { fullPage: true });
-    await win.waitForSelector('#custom-dashboard .bento-grid', { timeout: 10000 });
+    await win.click('[data-cockpit-category="cockpit"]');
+    await win.waitForFunction(() => Boolean(document.querySelector('#cockpit-detail-section')?.open), null, { timeout: 5000 });
+    await win.waitForSelector('#custom-dashboard-grid:visible', { timeout: 10000 });
     const dashboardDragBefore = await win.evaluate(() => Array.from(document.querySelectorAll('#custom-dashboard-grid [data-bento-widget]')).map((node) => node.dataset.bentoWidget));
     if (dashboardDragBefore.length >= 2) {
       const first = dashboardDragBefore[0];
       const last = dashboardDragBefore[dashboardDragBefore.length - 1];
-      await win.dragAndDrop(`#custom-dashboard-grid [data-bento-widget="${first}"]`, `#custom-dashboard-grid [data-bento-widget="${last}"]`);
+      await win.evaluate(({ first, last }) => {
+        const source = document.querySelector(`#custom-dashboard-grid [data-bento-widget="${CSS.escape(first)}"]`);
+        const target = document.querySelector(`#custom-dashboard-grid [data-bento-widget="${CSS.escape(last)}"]`);
+        if (!source || !target) return;
+        const dataTransfer = new DataTransfer();
+        source.dispatchEvent(new DragEvent('dragstart', { bubbles: true, cancelable: true, dataTransfer }));
+        const rect = target.getBoundingClientRect();
+        target.dispatchEvent(new DragEvent('dragover', { bubbles: true, cancelable: true, dataTransfer, clientY: rect.bottom + 4 }));
+        target.dispatchEvent(new DragEvent('drop', { bubbles: true, cancelable: true, dataTransfer, clientY: rect.bottom + 4 }));
+        source.dispatchEvent(new DragEvent('dragend', { bubbles: true, cancelable: true, dataTransfer }));
+      }, { first, last });
       await win.waitForTimeout(300);
     }
     const dashboardDragAfter = await win.evaluate(() => ({
@@ -191,9 +203,10 @@ async function main() {
     await win.waitForSelector('[data-panel="dashboard"].active', { timeout: 60000 });
     await win.waitForFunction(() => document.querySelector('#metric-picks')?.textContent !== '-', null, { timeout: 90000 });
     await win.click('[data-tab="dashboard"]');
-    await win.waitForSelector('#ultimate-bet-card.clickable-row, #picks-body tr.clickable-row', { timeout: 10000 });
+    await win.waitForSelector('#ready-picks-hero .clickable-row[data-match-id], #picks-body tr.clickable-row', { timeout: 10000 });
     const opened = await win.evaluate(() => {
-      const target = document.querySelector('#ultimate-bet-card.clickable-row') || document.querySelector('#picks-body tr.clickable-row');
+      const target = document.querySelector('#ready-picks-hero .clickable-row[data-match-id]')
+        || document.querySelector('#picks-body tr.clickable-row');
       if (!target) return false;
       target.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));
       return true;

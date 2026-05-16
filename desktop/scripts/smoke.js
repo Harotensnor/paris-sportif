@@ -123,6 +123,13 @@ async function main() {
       throw new Error(`Cockpit Sprint 14 incohérent: ${JSON.stringify(dashboard)}`);
     }
 
+    await win.click('[data-cockpit-category="cockpit"]');
+    await win.waitForFunction(() => Boolean(document.querySelector('#cockpit-detail-section')?.open), null, { timeout: 5000 });
+    await win.evaluate(() => {
+      const filters = document.querySelector('#pick-toolbar-fold');
+      if (filters) filters.open = true;
+    });
+    await win.waitForSelector('#save-current-strategy-btn:visible', { timeout: 5000 });
     await win.click('#save-current-strategy-btn');
     await win.waitForFunction(() => /Stratégie Winamax/.test(document.querySelector('#saved-strategy-select')?.textContent || ''), null, { timeout: 5000 });
 

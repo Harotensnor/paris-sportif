@@ -6168,6 +6168,89 @@ body.theme-light .sidebar {
   font-weight: 800;
 }
 
+.home-category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px;
+  margin: 10px 0 16px;
+}
+
+.home-category-card {
+  display: grid;
+  gap: 5px;
+  text-align: left;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(15, 23, 42, .44);
+  color: var(--text);
+  cursor: pointer;
+  transition: transform 180ms ease-out, border-color 180ms ease-out, background 180ms ease-out;
+}
+
+.home-category-card:hover,
+.home-category-card:focus-visible {
+  transform: translateY(-2px);
+  border-color: rgba(16, 185, 129, .5);
+  background: rgba(15, 23, 42, .66);
+  outline: none;
+}
+
+.home-category-card span {
+  font-size: 12px;
+  font-weight: 900;
+  color: var(--text-dim);
+}
+
+.home-category-card strong {
+  font-size: 20px;
+  line-height: 1.1;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.home-category-card em {
+  font-size: 11px;
+  line-height: 1.25;
+  color: var(--muted);
+  font-style: normal;
+}
+
+.home-category-card.ok {
+  border-color: rgba(16, 185, 129, .38);
+  box-shadow: inset 3px 0 0 rgba(16, 185, 129, .9);
+}
+
+.home-category-card.watch {
+  border-color: rgba(245, 158, 11, .34);
+  box-shadow: inset 3px 0 0 rgba(245, 158, 11, .9);
+}
+
+.home-category-card.quiet {
+  opacity: .72;
+}
+
+.cockpit-detail-section {
+  margin: 12px 0 18px;
+  border-color: rgba(148, 163, 184, .22);
+  background: rgba(15, 23, 42, .34);
+}
+
+.cockpit-detail-section > summary {
+  grid-template-columns: minmax(0, 1fr) auto auto;
+}
+
+.cockpit-detail-section > summary em {
+  color: var(--muted);
+  font-size: 12px;
+  font-style: normal;
+}
+
+.cockpit-detail-section[open] {
+  background: rgba(15, 23, 42, .56);
+  border-color: rgba(99, 102, 241, .3);
+}
+
 .player-photo.player-photo-sm { width: 32px; height: 32px; }
 .player-photo.player-photo-md { width: 48px; height: 48px; }
 .player-photo.player-photo-lg { width: 64px; height: 64px; }

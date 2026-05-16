@@ -5425,7 +5425,7 @@
   function renderReadyPicksHero(rows) {
     const wrap = $('#ready-picks-hero');
     if (!wrap) return;
-    const readyRows = balancedReadySelection(rollingReadyRows(rows), 8);
+    const readyRows = balancedReadySelection(rollingReadyRows(rows), 4);
     if (!readyRows.length) {
       wrap.innerHTML = `
         <div class="ready-hero-empty">
@@ -5438,7 +5438,7 @@
     wrap.innerHTML = `
       <div class="ready-hero-head">
         <h3>🎯 À MISER MAINTENANT</h3>
-        <p>${formatCount(readyRows.length)} pari(s) prêt(s) sur 24h · Mise totale suggérée ${escapeHtml(formatMoney(readyRows.reduce((sum, row) => sum + displayStakeAmount(row), 0)))}</p>
+        <p>Top ${formatCount(readyRows.length)} lisible · Mise totale suggérée ${escapeHtml(formatMoney(readyRows.reduce((sum, row) => sum + displayStakeAmount(row), 0)))}</p>
       </div>
       <div class="ready-hero-grid">
         ${readyRows.map((row, index) => `
@@ -5465,6 +5465,151 @@
         `).join('')}
       </div>
     `;
+  }
+
+  function marketCategoryRows(rows, category) {
+    const arr = rolling24hRows(rows, canDisplayPickCard);
+    if (category === 'winner') return arr.filter(isWinnerRow);
+    if (category === 'goals') return arr.filter((row) => ['goals', 'btts'].includes(rowMarketPreferenceKey(row)));
+    if (category === 'scorer') return arr.filter((row) => rowMarketPreferenceKey(row) === 'scorer');
+    if (category === 'halftime') return arr.filter((row) => rowMarketPreferenceKey(row) === 'halftime');
+    if (category === 'watch') return arr.filter((row) => !isReadyToStakeRow(row));
+    if (category === 'night') return nightPickRows(rows, canDisplayPickCard);
+    return arr;
+  }
+
+  function homeCategoryCardHtml(card) {
+    const tone = card.ready > 0 ? 'ok' : card.total > 0 ? 'watch' : 'quiet';
+    const value = card.ready > 0 ? `${formatCount(card.ready)} prêt${card.ready > 1 ? 's' : ''}` : `${formatCount(card.total)} ligne${card.total > 1 ? 's' : ''}`;
+    return `
+      <button class="home-category-card ${tone}" type="button" data-cockpit-category="${escapeHtml(card.key)}" aria-label="${escapeHtml(card.title)}">
+        <span>${escapeHtml(card.icon)} ${escapeHtml(card.title)}</span>
+        <strong>${escapeHtml(value)}</strong>
+        <em>${escapeHtml(card.detail)}</em>
+      </button>
+    `;
+  }
+
+  function renderHomeCategories(rows) {
+    const wrap = $('#home-category-grid');
+    const count = $('#cockpit-detail-count');
+    if (!wrap && !count) return;
+    const allRows = Array.isArray(rows) ? rows : [];
+    const cockpitRows = rolling24hRows(allRows, canDisplayPickCard);
+    const readyRows = cockpitRows.filter(isReadyToStakeRow);
+    const sportCount = uniqueCleanLabels(cockpitRows.map((row) => row.sport)).length;
+    const cards = [
+      {
+        key: 'winner',
+        icon: '🏆',
+        title: 'Vainqueurs',
+        rows: marketCategoryRows(allRows, 'winner'),
+        detail: 'Paris simples, filet 2-0 Winamax quand dispo'
+      },
+      {
+        key: 'night',
+        icon: '🌙',
+        title: 'Nuit',
+        rows: marketCategoryRows(allRows, 'night'),
+        detail: 'Sports US / Asie sans encombrer l’accueil'
+      },
+      {
+        key: 'goals',
+        icon: '⚽',
+        title: 'Buts',
+        rows: marketCategoryRows(allRows, 'goals'),
+        detail: 'Plus/Moins + les deux équipes marquent'
+      },
+      {
+        key: 'scorer',
+        icon: '🎯',
+        title: 'Buteurs',
+        rows: marketCategoryRows(allRows, 'scorer'),
+        detail: 'Joueurs qui peuvent marquer'
+      },
+      {
+        key: 'sport',
+        icon: '🏀',
+        title: 'Par sport',
+        rows: cockpitRows,
+        detail: `${formatCount(sportCount)} sport${sportCount > 1 ? 's' : ''} couvert${sportCount > 1 ? 's' : ''}`
+      },
+      {
+        key: 'watch',
+        icon: '👁',
+        title: 'À surveiller',
+        rows: marketCategoryRows(allRows, 'watch'),
+        detail: 'Signaux utiles, sans bouton de mise'
+      },
+      {
+        key: 'cockpit',
+        icon: '🎛',
+        title: 'Cockpit complet',
+        rows: cockpitRows,
+        detail: 'Horaire, type, sport, filtres et tableau'
+      }
+    ].map((card) => {
+      const ready = card.rows.filter(isReadyToStakeRow).length;
+      return { ...card, ready, total: card.rows.length };
+    });
+    if (count) {
+      count.textContent = `${formatCount(readyRows.length)} prêts · ${formatCount(cockpitRows.length)} lignes`;
+    }
+    if (!wrap) return;
+    wrap.innerHTML = cards.map(homeCategoryCardHtml).join('');
+  }
+
+  function openCockpitCategory(category = 'cockpit') {
+    const normalized = String(category || 'cockpit').toLowerCase();
+    const modeByCategory = {
+      winner: 'type',
+      goals: 'type',
+      scorer: 'type',
+      halftime: 'type',
+      sport: 'sport',
+      night: 'time',
+      watch: 'time',
+      cockpit: 'time'
+    };
+    const targetBucket = {
+      winner: 'winner',
+      goals: 'goals',
+      scorer: 'scorer',
+      halftime: 'halftime',
+      night: 'tonight',
+      watch: 'next',
+      cockpit: 'next'
+    }[normalized] || 'next';
+    try {
+      localStorage.setItem(PICKS_VIEW_MODE_KEY, modeByCategory[normalized] || 'time');
+    } catch {
+      // Confort seulement : si le profil refuse localStorage, on ouvre quand même le cockpit.
+    }
+    const fold = $('#cockpit-detail-section');
+    if (fold) fold.open = true;
+    renderPicks();
+    setTimeout(() => {
+      const refreshedFold = $('#cockpit-detail-section');
+      if (refreshedFold) refreshedFold.open = true;
+      const target = $(`[data-time-bucket="${targetBucket}"]`);
+      if (target) {
+        target.open = true;
+        target.scrollIntoView({ block: 'start', behavior: 'smooth' });
+      } else {
+        refreshedFold?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+      }
+    }, 40);
+    const label = {
+      winner: 'Cockpit Vainqueurs',
+      goals: 'Cockpit Buts',
+      scorer: 'Cockpit Buteurs',
+      halftime: 'Cockpit Mi-temps',
+      sport: 'Cockpit par sport',
+      night: 'Cockpit nuit',
+      watch: 'Cockpit à surveiller',
+      cockpit: 'Cockpit complet'
+    }[normalized] || 'Cockpit pronostics';
+    setSideStatus(label, 'ok');
   }
 
   // Sprint 72 A3 — Remplir les compteurs des zones temporelles
@@ -6862,6 +7007,7 @@
     renderDaySummary(displayRows);
     renderUltimateBet(displayRows);
     renderReadyPicksHero(displayRows);
+    renderHomeCategories(displayRows);
     // Sprint 50 (UX) : badge compteur "paris prêts" dans la nav Picks.
     try {
       const readyCount = (displayRows || [])
@@ -16423,6 +16569,12 @@
     document.addEventListener('click', (event) => {
       const tabButton = event.target.closest('[data-tab-target]');
       if (tabButton) switchTab(tabButton.dataset.tabTarget || 'dashboard');
+      const cockpitCategory = event.target.closest('[data-cockpit-category]');
+      if (cockpitCategory) {
+        event.preventDefault();
+        openCockpitCategory(cockpitCategory.dataset.cockpitCategory || 'cockpit');
+        return;
+      }
       const picksModeButton = event.target.closest('[data-picks-view-mode]');
       if (picksModeButton) {
         try {
@@ -16716,7 +16868,7 @@
         $('#refresh-log').textContent = error.stack || error.message;
       });
     });
-    ['ultimate-bet-card', 'live-cockpit', 'time-cockpit', 'simple-pick-timeline', 'favorite-picks-grid', 'simple-scorers-grid', 'bankroll-allocation-grid', 'picks-body', 'stake-scenario-body', 'watchlist-grid', 'prematch-final-grid', 'matches-body', 'combines-list', 'scorers-list', 'agent-positions-body', 'agent-blockers-body', 'deep-search-detail'].forEach((id) => {
+    ['ultimate-bet-card', 'ready-picks-hero', 'live-cockpit', 'time-cockpit', 'simple-pick-timeline', 'favorite-picks-grid', 'simple-scorers-grid', 'bankroll-allocation-grid', 'picks-body', 'stake-scenario-body', 'watchlist-grid', 'prematch-final-grid', 'matches-body', 'combines-list', 'scorers-list', 'agent-positions-body', 'agent-blockers-body', 'deep-search-detail'].forEach((id) => {
       const node = $(`#${id}`);
       if (!node) return;
       node.addEventListener('click', openMatchFromEvent);

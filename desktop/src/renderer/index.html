@@ -232,6 +232,10 @@
           <div class="empty">Chargement des paris à miser...</div>
         </section>
 
+        <section class="home-category-grid" id="home-category-grid" aria-label="Catégories pronostics">
+          <div class="empty compact-empty">Chargement des catégories...</div>
+        </section>
+
         <!-- Sprint 80 — simple-top-strip et day-summary descendus ici, en mode info passive -->
         <section class="simple-top-strip dashboard-info-strip" id="simple-top-strip">
           <span id="simple-now">Aujourd'hui</span>
@@ -290,23 +294,30 @@
           </div>
         </section>
 
-        <section class="picks-view-switch" id="picks-view-switch" aria-label="Organisation des picks">
-          <span>Voir par</span>
-          <button type="button" data-picks-view-mode="time">Horaire</button>
-          <button type="button" data-picks-view-mode="type">Type</button>
-          <button type="button" data-picks-view-mode="sport">Sport</button>
-        </section>
+        <details class="simple-fold-section cockpit-detail-section" id="cockpit-detail-section">
+          <summary>
+            <span>🎛 Cockpit pronostics</span>
+            <strong id="cockpit-detail-count">0</strong>
+            <em>Tout explorer par horaire, type ou sport</em>
+          </summary>
 
-        <section class="time-cockpit" id="time-cockpit" aria-label="Picks par horizon temporel">
-          <div class="empty">Classement temporel des picks en cours...</div>
-        </section>
+          <section class="picks-view-switch" id="picks-view-switch" aria-label="Organisation des picks">
+            <span>Voir par</span>
+            <button type="button" data-picks-view-mode="time">Horaire</button>
+            <button type="button" data-picks-view-mode="type">Type</button>
+            <button type="button" data-picks-view-mode="sport">Sport</button>
+          </section>
 
-        <details class="simple-fold-section" id="simple-timeline-section">
-          <summary><span>Voir tous les paris (24h)</span><strong>24h</strong></summary>
-          <div class="simple-pick-timeline" id="simple-pick-timeline">
-            <div class="empty compact-empty">Chargement de la timeline...</div>
-          </div>
-        </details>
+          <section class="time-cockpit" id="time-cockpit" aria-label="Picks par horizon temporel">
+            <div class="empty">Classement temporel des picks en cours...</div>
+          </section>
+
+          <details class="simple-fold-section" id="simple-timeline-section">
+            <summary><span>Voir tous les paris (24h)</span><strong>24h</strong></summary>
+            <div class="simple-pick-timeline" id="simple-pick-timeline">
+              <div class="empty compact-empty">Chargement de la timeline...</div>
+            </div>
+          </details>
 
         <details class="simple-fold-section hidden" id="favorite-picks-section">
           <summary><span>⭐ Tes favoris</span><strong id="favorite-picks-count">0</strong></summary>
@@ -356,16 +367,15 @@
           </div>
         </section>
 
-        <div class="section-head compact">
-          <div>
-            <h3 id="picks-section-title">Sélection du jour</h3>
-            <p id="picks-caption">Chargement des meilleurs candidats proches...</p>
+          <div class="section-head compact">
+            <div>
+              <h3 id="picks-section-title">Sélection du jour</h3>
+              <p id="picks-caption">Chargement des meilleurs candidats proches...</p>
+            </div>
           </div>
-        </div>
-        <!-- Sprint 67 — Filtres + market-snapshot regroupes dans un <details>
-             ouvert par defaut. L'user peut fermer pour reduire la charge cognitive
-             une fois familier avec l'app. Persiste son choix dans localStorage. -->
-        <details class="simple-fold-section" id="pick-toolbar-fold" open>
+        <!-- Sprint pronostics — Filtres + market-snapshot restent dans le Cockpit,
+             fermés par défaut pour garder l'accueil court et orienté décision. -->
+          <details class="simple-fold-section" id="pick-toolbar-fold">
           <summary><span>🔍 Filtres et marchés</span><strong>Recherche, tri, market snapshot</strong></summary>
           <div class="pick-toolbar" aria-label="Filtres rapides des picks">
             <input id="pick-search" type="search" placeholder="Rechercher une équipe">
@@ -397,24 +407,25 @@
             <div class="empty compact-empty">Chargement des marchés...</div>
           </div>
         </details>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Match</th>
-                <th>Pari</th>
-                <th>Cote</th>
-                <th>Mise</th>
-                <th>Départ</th>
-                <th>Pourquoi</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody id="picks-body">
-              <tr><td colspan="7" class="empty">Chargement des paris...</td></tr>
-            </tbody>
-          </table>
-        </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Match</th>
+                  <th>Pari</th>
+                  <th>Cote</th>
+                  <th>Mise</th>
+                  <th>Départ</th>
+                  <th>Pourquoi</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="picks-body">
+                <tr><td colspan="7" class="empty">Chargement des paris...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
 
         <details class="advanced-section compact-advanced">
           <summary>Scénarios de mise</summary>

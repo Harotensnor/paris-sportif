@@ -166,6 +166,9 @@ async function main() {
         trackButtonCount: trackButtons.length,
         alertText: document.querySelector('#today-funnel-alert')?.innerText || '',
         readyHeroText: document.querySelector('#ready-picks-hero')?.innerText || '',
+        homeCategoryCount: document.querySelectorAll('[data-cockpit-category]').length,
+        cockpitOpen: Boolean(document.querySelector('#cockpit-detail-section')?.open),
+        cockpitSummary: document.querySelector('#cockpit-detail-section > summary')?.innerText || '',
         dashboardText: text,
         liveText: document.querySelector('#live-cockpit')?.innerText || '',
         sideStatus: document.querySelector('#side-status')?.innerText || '',
@@ -192,6 +195,9 @@ async function main() {
     assert(missingNav.length === 0, 'Terrain: navigation standard non simplifiée', { missingNav, nav: dom.nav });
     assert(dom.nav.length <= 5, 'Terrain: trop d’entrées visibles dans la navigation standard', { nav: dom.nav });
     assert(dom.rows >= 15 && dom.rows <= 28 && dom.timeline >= 8, 'Terrain: cockpit réel insuffisant', dom);
+    assert(dom.homeCategoryCount >= 6, 'Terrain: catégories pronostics absentes de l’accueil compact', dom);
+    assert(!dom.cockpitOpen, 'Terrain: Cockpit détaillé ouvert par défaut, accueil trop chargé', dom);
+    assert(/Cockpit pronostics/i.test(dom.cockpitSummary), 'Terrain: catégorie Cockpit pronostics absente', dom);
     if (Number(todayFunnel.bookableEvents || 0) >= 30 && Number(todayFunnel.displayed || 0) < 10 && dom.trackButtonCount < 1) {
       assert(/trop strict|modèle trop strict/i.test(dom.alertText), 'Terrain: le garde-fou trop strict n’est pas visible', { todayFunnel, alertText: dom.alertText });
     }
@@ -201,6 +207,18 @@ async function main() {
     assert(!/STATUS_SCHEDULED|LIVE estimé|live estimé/i.test(dom.liveText), 'Terrain: faux live détecté sur statut programmé', dom.liveText);
     assert(!dom.hasStartedButton, 'Terrain: bouton actionnable pour match déjà commencé', dom);
     assert(!dom.hiddenAdvancedVisible, 'Terrain: Avancé visible sans Mode expert', dom);
+
+    const winnerCategory = win.locator('[data-cockpit-category="winner"]:visible');
+    if (await winnerCategory.count()) {
+      await winnerCategory.first().click();
+      await win.waitForFunction(() => Boolean(document.querySelector('#cockpit-detail-section')?.open), null, { timeout: 5000 });
+      const categoryState = await win.evaluate(() => ({
+        open: Boolean(document.querySelector('#cockpit-detail-section')?.open),
+        mode: localStorage.getItem('parisSportifPicksViewMode'),
+        winnerVisible: Boolean(document.querySelector('[data-time-bucket="winner"]'))
+      }));
+      assert(categoryState.open && categoryState.mode === 'type' && categoryState.winnerVisible, 'Terrain: catégorie Vainqueurs n’ouvre pas le Cockpit dédié', categoryState);
+    }
 
     const visibleTrackButtons = win.locator('[data-track-bet-key]:visible');
     if (await visibleTrackButtons.count()) {
