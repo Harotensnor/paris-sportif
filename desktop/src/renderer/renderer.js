@@ -11835,6 +11835,7 @@
     $('#modal-content').innerHTML = buildDetailHtml(row);
     switchDetailTab('summary');
     applyExpertMode();
+    modal.classList.add('quick-bet-mode');
     modal.classList.remove('hidden');
     document.body.classList.add('modal-open');
     // Sprint 67 — Memoriser l'ID courant pour la navigation prev/next
@@ -12002,7 +12003,9 @@
   }
 
   function closeMatchDetail() {
-    $('#match-modal').classList.add('hidden');
+    const modal = $('#match-modal');
+    modal?.classList.add('hidden');
+    modal?.classList.remove('quick-bet-mode');
     document.body.classList.remove('modal-open');
   }
 

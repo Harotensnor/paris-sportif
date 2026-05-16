@@ -5,6 +5,15 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-16
 
+### Hotfix v2.1.4 — Accueil et fiche match réellement épurés
+
+Correctif après captures utilisateur : le Mode expert réaffichait sur “À miser” les blocs diagnostic (`Modèle aujourd’hui`, `Conseils du jour`, `Décision finale locale`) avant le Top Pick.
+- L’accueil “À miser” reste minimal même si le Mode expert est activé : Top Pick + catégories uniquement.
+- Les blocs diagnostic, métriques, scanner, dashboard custom, live et scénarios restent hors de l’accueil rapide.
+- La fiche match desktop passe en mode rapide : seulement `Synthèse`, `Contexte`, `Équipes`; les onglets techniques ne polluent plus le parcours de mise.
+- L’ancien détail match runtime est verrouillé sur `Synthèse` / `Pourquoi ce pari` par défaut, avec les marchés alternatifs cachés derrière le bouton de détails.
+- `qa:terrain` simule maintenant le Mode expert actif pour éviter que cette régression revienne.
+
 ### Hotfix v2.1.3 — Raccourci Windows corrigé
 
 Cause trouvée après retour “toujours aucun changement” : le raccourci Windows `Paris Sportif Desktop` du menu Démarrer pointait vers une vieille installation temporaire `ParisSportifSprint22Install`, pas vers le lanceur local du projet.

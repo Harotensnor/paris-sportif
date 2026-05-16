@@ -153,10 +153,29 @@ async function main() {
     await win.waitForFunction(() => document.querySelector('#metric-picks')?.textContent !== '-', null, { timeout: 90000 });
     await win.waitForTimeout(1000);
 
+    await win.evaluate(() => {
+      document.body.classList.add('expert-mode');
+      document.querySelectorAll('[data-panel="dashboard"] > .expert-only, [data-panel="dashboard"] > .decision-terminal, [data-panel="dashboard"] > .metrics-grid, [data-panel="dashboard"] > .today-model-card').forEach((node) => {
+        node.classList.remove('hidden');
+      });
+    });
+
     const dom = await win.evaluate(() => {
       const text = document.querySelector('[data-panel="dashboard"]')?.innerText || '';
       const rows = Array.from(document.querySelectorAll('#picks-body tr.clickable-row')).map((row) => row.innerText);
       const trackButtons = Array.from(document.querySelectorAll('[data-track-bet-key]')).map((btn) => btn.textContent.trim());
+      const visible = (selector) => {
+        const node = document.querySelector(selector);
+        return node ? getComputedStyle(node).display !== 'none' && getComputedStyle(node).visibility !== 'hidden' : false;
+      };
+      const expertLeakSelectors = [
+        '.tab-panel[data-panel="dashboard"].active > .morning-brief',
+        '.tab-panel[data-panel="dashboard"].active > .metrics-grid',
+        '.tab-panel[data-panel="dashboard"].active > .today-model-card',
+        '.tab-panel[data-panel="dashboard"].active > .decision-terminal',
+        '.tab-panel[data-panel="dashboard"].active > #market-scanner-section',
+        '.tab-panel[data-panel="dashboard"].active > #custom-dashboard'
+      ];
       return {
         title: document.querySelector('#page-title')?.textContent || '',
         metric: Number(document.querySelector('#metric-picks')?.textContent || 0),
@@ -174,6 +193,7 @@ async function main() {
         cockpitSummary: document.querySelector('#cockpit-detail-section > summary')?.innerText || '',
         liveDisplay: getComputedStyle(document.querySelector('#live-cockpit')).display,
         stakeScenarioDisplay: getComputedStyle(document.querySelector('.compact-advanced')).display,
+        expertHomeLeaks: expertLeakSelectors.filter((selector) => visible(selector)),
         dashboardText: text,
         liveText: document.querySelector('#live-cockpit')?.innerText || '',
         sideStatus: document.querySelector('#side-status')?.innerText || '',
@@ -204,6 +224,8 @@ async function main() {
     assert(!dom.homeCategoryTexts.some((text) => /\b0\s+ligne/i.test(text)), 'Terrain: catégorie vide visible sur l’accueil', dom.homeCategoryTexts);
     assert(!dom.cockpitOpen, 'Terrain: Cockpit détaillé ouvert par défaut, accueil trop chargé', dom);
     assert(dom.cockpitDisplay === 'none' && dom.readyHeroDisplay === 'none' && dom.liveDisplay === 'none' && dom.stakeScenarioDisplay === 'none', 'Terrain: accueil encore surchargé par des blocs secondaires', dom);
+    assert(dom.expertHomeLeaks.length === 0, 'Terrain: le Mode expert pollue encore l’accueil À miser', dom.expertHomeLeaks);
+    assert(!/Modèle aujourd'hui|Conseils du jour|Décision finale locale/i.test(dom.dashboardText), 'Terrain: blocs diagnostic visibles sur l’accueil rapide', dom.dashboardText.slice(0, 1800));
     assert(/Cockpit pronostics/i.test(dom.cockpitSummary), 'Terrain: catégorie Cockpit pronostics absente', dom);
     if (Number(todayFunnel.bookableEvents || 0) >= 30 && Number(todayFunnel.displayed || 0) < 10 && dom.trackButtonCount < 1) {
       assert(/trop strict|modèle trop strict/i.test(dom.alertText), 'Terrain: le garde-fou trop strict n’est pas visible', { todayFunnel, alertText: dom.alertText });
@@ -225,6 +247,23 @@ async function main() {
         winnerVisible: Boolean(document.querySelector('[data-time-bucket="winner"]'))
       }));
       assert(categoryState.open && categoryState.mode === 'type' && categoryState.winnerVisible, 'Terrain: catégorie Vainqueurs n’ouvre pas le Cockpit dédié', categoryState);
+    }
+
+    const firstMatchCard = win.locator('[data-match-id]:visible').first();
+    if (await firstMatchCard.count()) {
+      await firstMatchCard.click();
+      await win.waitForSelector('#match-modal:not(.hidden)', { timeout: 5000 });
+      const modalState = await win.evaluate(() => ({
+        visibleTabs: Array.from(document.querySelectorAll('#match-modal .modal-tab')).filter((node) => getComputedStyle(node).display !== 'none').map((node) => node.textContent.trim()),
+        text: document.querySelector('#match-modal')?.innerText || '',
+        advancedDetailsVisible: Boolean(Array.from(document.querySelectorAll('#match-modal .detail-expert-details, #match-modal .detail-audit')).find((node) => getComputedStyle(node).display !== 'none'))
+      }));
+      assert(modalState.visibleTabs.length <= 3, 'Terrain: fiche match encore trop chargée en onglets', modalState.visibleTabs);
+      assert(!modalState.visibleTabs.some((label) => /cotes avanc|signaux|timeline|sources|modèle|h2h|face-à-face/i.test(label)), 'Terrain: onglets techniques visibles dans la fiche rapide', modalState.visibleTabs);
+      assert(!modalState.advancedDetailsVisible, 'Terrain: détails techniques visibles dans la fiche rapide', modalState);
+      assert(!/\bKelly\b|Marchés détaillés|Audit technique|Vue technique/i.test(modalState.text), 'Terrain: jargon technique visible dans la fiche rapide', modalState.text.slice(0, 1800));
+      await win.locator('#modal-close').click();
+      await win.waitForFunction(() => document.querySelector('#match-modal')?.classList.contains('hidden'), null, { timeout: 5000 });
     }
 
     const visibleTrackButtons = win.locator('[data-track-bet-key]:visible');

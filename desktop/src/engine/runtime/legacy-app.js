@@ -13639,7 +13639,7 @@ const whyHtml = `
           <div>
             <h3 id="why-bet-title">${esc(whyLabel)} ${whyOdd ? `<span>@${whyOdd.toFixed(2)}</span>` : ''}</h3>
             <div class="why-bet__match">${esc(home?.name || 'Domicile')} vs ${esc(away?.name || 'Extérieur')} · ${esc(fmtTime(match.date))}${match.league ? ` · ${esc(match.league)}` : ''}</div>
-            <p>${whyEdge > 0 ? `+${(whyEdge * 100).toFixed(1)}% mieux que le marché` : 'Pas assez de value claire'} · ${whyEv >= 0 ? '+' : ''}${Math.round(whyEv * 100)}% attendu par euro misé.</p>
+            <p>${whyActionable ? 'Le logiciel garde ce pari car les signaux utiles vont dans le même sens et la cote reste jouable.' : 'Le logiciel garde ce match en observation : il manque encore un feu vert clair avant de miser.'}</p>
           </div>
           <div class="why-bet__stake">
             <span>${whyActionable ? 'Mise suggérée' : 'Mise bloquée'}</span>
@@ -15891,13 +15891,15 @@ ${match.surface ? `<div class="kv"><div class="k">Surface</div><div class="v">${
       if (whyBlock) whyBlock.setAttribute('data-mtab-always', 'true');
       const header = body.querySelector('.teams-big');
       if (header) header.setAttribute('data-mtab-always', 'true');
+      const simpleDetailTabs = new Set(['synthese', 'pourquoi']);
+      const essentialTabs = [];
       // v48 fix — Audit point #13 : l'onglet H2H disparaissait sur les matchs
       // sans h2h scrapé (TennisExplorer absent, derbies obscurs, etc.) →
       // l'utilisateur pensait que l'onglet buggait. Maintenant : injecter une
       // section placeholder "Pas de H2H disponible" pour que l'onglet reste
       // toujours visible et que l'utilisateur sache que cette donnée existe
       // (juste pas pour ce match). Idem pour les autres tabs essentiels.
-      ['h2h', 'cotes', 'risques'].forEach(essentialKey => {
+      essentialTabs.forEach(essentialKey => {
         if (!tabSections[essentialKey].length) {
           const placeholder = document.createElement('section');
           placeholder.setAttribute('data-mtab', essentialKey);
@@ -15914,11 +15916,11 @@ ${match.surface ? `<div class="kv"><div class="k">Surface</div><div class="v">${
         }
       });
       // Ne montrer les chips que pour les catégories non vides
-      const visibleTabs = tabsOrder.filter(([k]) => tabSections[k].length > 0);
+      const visibleTabs = tabsOrder.filter(([k]) => simpleDetailTabs.has(k) && tabSections[k].length > 0);
       if (visibleTabs.length < 2) return;  // 1 seul onglet utile = pas la peine
       // Détecter le tab initial depuis le hash : #match/123/cotes
       const hashMatch = (location.hash || '').match(/^#match\/[^/]+\/(\w+)$/);
-      const initialTab = (hashMatch && tabSections[hashMatch[1]]?.length) ? hashMatch[1] : 'synthese';
+      const initialTab = (hashMatch && simpleDetailTabs.has(hashMatch[1]) && tabSections[hashMatch[1]]?.length) ? hashMatch[1] : 'synthese';
       const chipsHtml = visibleTabs
         .map(([k, label]) =>
           `<button type="button" class="md-tab v38-detail-tab" data-mtab-toggle="${k}" data-v38-detail-tab="${k}" role="tab" aria-selected="${k === initialTab}" tabindex="${k === initialTab ? '0' : '-1'}">${label}</button>`

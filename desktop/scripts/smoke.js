@@ -206,7 +206,20 @@ async function main() {
     }
 
     await win.click('[data-tab="dashboard"]');
-    await win.waitForSelector('#trading-desk.active', { timeout: 10_000 });
+    await win.waitForFunction(() => {
+      const visible = (selector) => {
+        const node = document.querySelector(selector);
+        return node ? getComputedStyle(node).display !== 'none' && getComputedStyle(node).visibility !== 'hidden' : false;
+      };
+      return visible('#ultimate-bet-card')
+        && visible('#home-category-grid')
+        && !visible('.tab-panel[data-panel="dashboard"].active > .metrics-grid')
+        && !visible('.tab-panel[data-panel="dashboard"].active > .today-model-card')
+        && !visible('.tab-panel[data-panel="dashboard"].active > .decision-terminal')
+        && !visible('#trading-desk');
+    }, null, { timeout: 10_000 });
+    await win.click('[data-cockpit-category="cockpit"]');
+    await win.waitForFunction(() => Boolean(document.querySelector('#cockpit-detail-section')?.open), null, { timeout: 5000 });
     await win.click('#picks-body tr.clickable-row td[data-label="Match"]');
     await win.waitForSelector('#match-modal:not(.hidden)', { timeout: 10000 });
     const modal = await win.evaluate(() => {

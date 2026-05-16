@@ -6266,10 +6266,32 @@ body.theme-light .sidebar {
 
 /* Accueil vraiment léger : seulement Top Pick + catégories.
    Le cockpit complet existe, mais uniquement après clic sur une catégorie. */
+.tab-panel[data-panel="dashboard"].active > .morning-brief,
+.tab-panel[data-panel="dashboard"].active > .metrics-grid,
+.tab-panel[data-panel="dashboard"].active > .today-model-card,
+.tab-panel[data-panel="dashboard"].active > .decision-terminal,
 .tab-panel[data-panel="dashboard"].active > .ready-picks-hero,
 .tab-panel[data-panel="dashboard"].active > .live-cockpit,
 .tab-panel[data-panel="dashboard"].active > .cockpit-detail-section:not([open]),
-.tab-panel[data-panel="dashboard"].active > .compact-advanced {
+.tab-panel[data-panel="dashboard"].active > .compact-advanced,
+.tab-panel[data-panel="dashboard"].active > #market-scanner-section,
+.tab-panel[data-panel="dashboard"].active > #custom-dashboard {
+  display: none !important;
+}
+
+/* Le Mode expert ne doit plus polluer le parcours rapide "je mise".
+   Les analyses restent dans Avancé / Cockpit, pas sur la page d'accueil. */
+.tab-panel[data-panel="dashboard"].active > .expert-only {
+  display: none !important;
+}
+
+/* Fiche match rapide : trois onglets lisibles, le reste reste hors parcours mise. */
+#match-modal.quick-bet-mode .modal-tab:not([data-detail-tab="summary"]):not([data-detail-tab="context"]):not([data-detail-tab="teams"]) {
+  display: none !important;
+}
+
+#match-modal.quick-bet-mode .detail-expert-details,
+#match-modal.quick-bet-mode .detail-audit {
   display: none !important;
 }
 
