@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-05-16T16:36:07Z",
+  "generated_at": "2026-05-16T16:39:22Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 64,
-    "actionable": 23,
-    "watch": 5,
+    "active_events": 68,
+    "actionable": 24,
+    "watch": 8,
     "risk": 36,
     "expired_sample": 0,
     "by_type": {
+      "market_move": 12,
+      "signal_conflict": 4,
       "injury_imbalance": 24,
       "market_uncertain": 37,
-      "market_move": 7,
-      "back_to_back_travel": 6,
-      "signal_conflict": 3
+      "back_to_back_travel": 6
     },
     "by_quality": {
-      "actionable": 23,
-      "watch": 5,
+      "watch": 8,
+      "actionable": 24,
       "risk": 36
     }
   },
@@ -436,9 +436,45 @@
       "side": "away",
       "strength": 0.726,
       "context": "1 match dans les 48h + 979 km de voyage"
+    },
+    {
+      "event_id": "401843349",
+      "date": "2026-05-16T18:00Z",
+      "sport": "football",
+      "league_code": "eliteserien",
+      "league_name": "Eliteserien",
+      "home": "Vålerenga",
+      "away": "Sarpsborg FK",
+      "match": "Vålerenga - Sarpsborg FK",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.661,
+      "context": "Cote away: 4.20 -> 3.70 (+11.9%)"
     }
   ],
   "active_watch": [
+    {
+      "event_id": "401872571",
+      "date": "2026-05-17T01:07Z",
+      "sport": "football",
+      "league_code": "ligamx",
+      "league_name": "Liga MX",
+      "home": "Guadalajara",
+      "away": "Cruz Azul",
+      "match": "Guadalajara - Cruz Azul",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.608,
+      "context": "Cote away: 3.20 -> 2.85 (+10.9%)"
+    },
     {
       "event_id": "401815363",
       "date": "2026-05-16T20:10Z",
@@ -512,6 +548,24 @@
       "context": "Absences severes 14-11"
     },
     {
+      "event_id": "401872119",
+      "date": "2026-05-16T18:00Z",
+      "sport": "football",
+      "league_code": "ita.2",
+      "league_name": "Serie B",
+      "home": "Juve Stabia",
+      "away": "Monza",
+      "match": "Juve Stabia - Monza",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.545,
+      "context": "Cote away: 2.55 -> 2.30 (+9.8%)"
+    },
+    {
       "event_id": "401866585",
       "date": "2026-05-21T16:00Z",
       "sport": "football",
@@ -528,6 +582,24 @@
       "side": "away",
       "strength": 0.524,
       "context": "Cote away: 2.65 -> 2.90 (-9.4%)"
+    },
+    {
+      "event_id": "750223",
+      "date": "2026-05-16T17:00Z",
+      "sport": "football",
+      "league_code": "superlig",
+      "league_name": "Süper Lig",
+      "home": "Gaziantep FK",
+      "away": "Istanbul Basaksehir",
+      "match": "Gaziantep FK - Istanbul Basaksehir",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 0.463,
+      "context": "Cote home: 3.60 -> 3.30 (+8.3%)"
     }
   ],
   "active_risk": [
