@@ -1,23 +1,24 @@
 {
-  "generated_at": "2026-05-16T23:07:56Z",
+  "generated_at": "2026-05-16T23:11:53Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 61,
-    "actionable": 19,
+    "active_events": 62,
+    "actionable": 20,
     "watch": 3,
     "risk": 39,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 19,
-      "back_to_back_travel": 8,
-      "market_uncertain": 39,
+      "market_move": 6,
+      "market_uncertain": 40,
+      "back_to_back_travel": 6,
       "signal_conflict": 3
     },
     "by_quality": {
       "watch": 3,
-      "actionable": 19,
+      "actionable": 20,
       "risk": 39
     }
   },
@@ -41,6 +42,24 @@
       "context": "Absences severes 15-7"
     },
     {
+      "event_id": "401871409",
+      "date": "2026-05-17T00:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Montreal Canadiens",
+      "away": "Buffalo Sabres",
+      "match": "Montreal Canadiens - Buffalo Sabres",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 1.56 -> 1.90 (-22.1%)"
+    },
+    {
       "event_id": "401815372",
       "date": "2026-05-17T01:38Z",
       "sport": "baseball",
@@ -59,22 +78,22 @@
       "context": "Absences severes 7-13"
     },
     {
-      "event_id": "401815374",
-      "date": "2026-05-17T01:40Z",
+      "event_id": "401815378",
+      "date": "2026-05-17T16:15Z",
       "sport": "baseball",
       "league_code": "mlb",
       "league_name": "MLB",
-      "home": "Athletics",
-      "away": "San Francisco Giants",
-      "match": "Athletics - San Francisco Giants",
+      "home": "Tampa Bay Rays",
+      "away": "Miami Marlins",
+      "match": "Tampa Bay Rays - Miami Marlins",
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "San Francisco Giants",
-      "side": null,
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
       "strength": 1.0,
-      "context": "Absences severes 5-10"
+      "context": "Cote home: 1.64 -> 32.00 (-1850.0%)"
     },
     {
       "event_id": "401815375",
@@ -111,24 +130,6 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 15-7"
-    },
-    {
-      "event_id": "401815389",
-      "date": "2026-05-17T20:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Athletics",
-      "away": "San Francisco Giants",
-      "match": "Athletics - San Francisco Giants",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "San Francisco Giants",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 5-10"
     },
     {
       "event_id": "401815387",
@@ -181,8 +182,8 @@
       "direction": "fade",
       "team": "San Diego Padres",
       "side": "away",
-      "strength": 0.952,
-      "context": "2 match dans les 48h + 1711 km de voyage"
+      "strength": 0.872,
+      "context": "1 match dans les 48h + 1711 km de voyage"
     },
     {
       "event_id": "401815376",
@@ -199,44 +200,26 @@
       "direction": "fade",
       "team": "Boston Red Sox",
       "side": "away",
-      "strength": 0.91,
-      "context": "2 match dans les 48h + 1498 km de voyage"
-    },
-    {
-      "event_id": "401815373",
-      "date": "2026-05-16T23:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Seattle Mariners",
-      "away": "San Diego Padres",
-      "match": "Seattle Mariners - San Diego Padres",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "San Diego Padres",
-      "side": "away",
-      "strength": 0.872,
-      "context": "1 match dans les 48h + 1711 km de voyage"
-    },
-    {
-      "event_id": "401815361",
-      "date": "2026-05-16T23:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Atlanta Braves",
-      "away": "Boston Red Sox",
-      "match": "Atlanta Braves - Boston Red Sox",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Boston Red Sox",
-      "side": "away",
       "strength": 0.83,
       "context": "1 match dans les 48h + 1498 km de voyage"
+    },
+    {
+      "event_id": "401815374",
+      "date": "2026-05-17T01:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Athletics",
+      "away": "San Francisco Giants",
+      "match": "Athletics - San Francisco Giants",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "San Francisco Giants",
+      "side": null,
+      "strength": 0.8,
+      "context": "Absences severes 5-9"
     },
     {
       "event_id": "401815377",
@@ -291,6 +274,24 @@
       "side": null,
       "strength": 0.8,
       "context": "Absences severes 8-12"
+    },
+    {
+      "event_id": "401815389",
+      "date": "2026-05-17T20:05Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Athletics",
+      "away": "San Francisco Giants",
+      "match": "Athletics - San Francisco Giants",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "San Francisco Giants",
+      "side": null,
+      "strength": 0.8,
+      "context": "Absences severes 5-9"
     },
     {
       "event_id": "401815440",
@@ -363,6 +364,24 @@
       "side": "away",
       "strength": 0.726,
       "context": "1 match dans les 48h + 979 km de voyage"
+    },
+    {
+      "event_id": "401815373",
+      "date": "2026-05-16T23:15Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Seattle Mariners",
+      "away": "San Diego Padres",
+      "match": "Seattle Mariners - San Diego Padres",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.66,
+      "context": "Cote away: 2.44 -> 2.15 (+11.9%)"
     }
   ],
   "active_watch": [
@@ -385,24 +404,6 @@
       "context": "Absences severes 14-11"
     },
     {
-      "event_id": "401815378",
-      "date": "2026-05-17T16:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Tampa Bay Rays",
-      "away": "Miami Marlins",
-      "match": "Tampa Bay Rays - Miami Marlins",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Tampa Bay Rays",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 8-5"
-    },
-    {
       "event_id": "401815385",
       "date": "2026-05-17T18:10Z",
       "sport": "baseball",
@@ -419,6 +420,24 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 14-11"
+    },
+    {
+      "event_id": "401866584",
+      "date": "2026-05-21T16:00Z",
+      "sport": "football",
+      "league_code": "superleaguegrece",
+      "league_name": "Super League Grèce",
+      "home": "Atromitos",
+      "away": "Panserraikos FC",
+      "match": "Atromitos - Panserraikos FC",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.505,
+      "context": "Cote away: 4.40 -> 4.00 (+9.1%)"
     }
   ],
   "active_risk": [
