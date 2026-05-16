@@ -5,6 +5,19 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-14
 
+### Sprint 61 — Durcissement filtre Fiable : declassement des edges aberrants ≥ 22pt
+
+Suite Sprint 60 (cotes Winamax désormais correctes), audit qualité picks prêts révèle que **certains picks gardent le label "Fiable" malgré un edge brut aberrant** (29.2pt sur Wolverhampton Moins de 1,5 par exemple). Le filtre `safeAssessmentForRow` plafonnait l'edge avec `conservativeEdge` (ramène 29pt à ~0.19), mais ce plafonnement ne déclassait pas le pick — le gate `edge <= 0.20` était satisfait sur l'edge plafonné.
+
+Fix
+- Ajout flag `aberrantEdge = rawEdge >= 0.22` dans `safeAssessmentForRow`.
+- Si `aberrantEdge`, ajout d'une `reason` explicite ("edge brut +29pt aberrant (modèle surconfiant)") pour transparence UI.
+- Gate `reliable = Boolean(reliableRule) && edge <= 0.20 && !aberrantEdge` : le pick passe en "À surveiller" au lieu de "Fiable".
+
+Raison du seuil : le backtest historique du modèle montre que **les edges réels vs Winamax dépassent rarement 15pt**. Au-delà de 22pt, c'est statistiquement plus probablement une calibration cassée qu'un vrai value bet — typiquement le modèle ignore un signal (blessure clef, retour de pause longue, etc.) que Winamax intègre.
+
+Outil d'audit ajouté : `desktop/scripts/audit-ready-picks.js` (liste picks Fiables + picks edge ≥ 22pt avec leur statut). Vérification terrain : 4/4 picks Fiables ont désormais un edge brut ≤ 18.3pt. Aucun pick aberrant ne traverse plus le filtre.
+
 ### Sprint 60 — 🚨 FIX CRITIQUE GÉNÉRALISÉ : cotes Winamax fausses (matchWinnerOptions)
 
 Audit post-Sprint 58 a découvert que **beaucoup de picks affichaient une cote inférieure à la vraie cote Winamax** :

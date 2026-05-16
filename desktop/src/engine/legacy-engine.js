@@ -1677,7 +1677,13 @@ function createLegacyEngineService({ projectRoot }) {
     const ruleC = baseZone && sample >= 5 && sample < 15 && edge >= 0.04 && odd <= 5.00 && confidence >= 0.60;
     const reliableRule = ruleA ? 'A' : ruleB ? 'B' : ruleC ? 'C' : null;
 
+    // Sprint 61 : declasser les picks avec edge brut aberrant (>= 22pt).
+    // Le modele est statistiquement surconfiant sur ces cotes — backtest
+    // montre que l'edge reel reste rarement > 15pt vs Winamax. On rejette
+    // donc la zone 22pt+ qui est un signal de calibration cassee.
+    const aberrantEdge = rawEdge >= 0.22;
     if (!(rawEdge >= 0.01)) reasons.push('edge < +1pt');
+    if (aberrantEdge) reasons.push(`edge brut +${Math.round(rawEdge * 100)}pt aberrant (modele surconfiant)`);
     if (!reliableRule && edge < Math.min(edgeMin, sample < 5 ? 0.05 : sample < 15 ? 0.04 : edgeMin)) reasons.push('edge prudent insuffisant');
     if (odd < 1.30 || odd > (sample < 15 ? Math.min(5.00, oddMax) : oddMax)) reasons.push(`cote hors zone solo 1.30-${(sample < 15 ? Math.min(5.00, oddMax) : oddMax).toFixed(2)}`);
     if (!reliableRule && confidence < (sample < 5 ? 0.65 : sample < 15 ? 0.60 : confidenceMin)) reasons.push('confiance insuffisante');
@@ -1734,7 +1740,9 @@ function createLegacyEngineService({ projectRoot }) {
       };
     }
 
-    const reliable = Boolean(reliableRule) && edge <= 0.20;
+    // Sprint 61 : aberrantEdge declasse aussi le pick (sinon il garde "Fiable"
+    // avec son edge plafonne par conservativeEdge).
+    const reliable = Boolean(reliableRule) && edge <= 0.20 && !aberrantEdge;
     const displayable = rawEdge >= 0.01 && odd > 1.10 && odd <= 18 && confidence >= 0.30 && row?.decisionCenter?.status !== 'skip';
     return {
       status: reliable ? 'reliable' : displayable ? 'watch' : 'reject',
