@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-05-16T20:47:50Z",
+  "generated_at": "2026-05-16T20:53:41Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 63,
-    "actionable": 19,
-    "watch": 3,
+    "active_events": 66,
+    "actionable": 21,
+    "watch": 4,
     "risk": 41,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 20,
-      "market_uncertain": 40,
+      "market_move": 9,
+      "market_uncertain": 42,
       "back_to_back_travel": 6,
-      "market_move": 4,
       "signal_conflict": 3
     },
     "by_quality": {
-      "actionable": 19,
-      "watch": 3,
+      "actionable": 21,
+      "watch": 4,
       "risk": 41
     }
   },
@@ -40,6 +40,24 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 15-7"
+    },
+    {
+      "event_id": "401871409",
+      "date": "2026-05-17T00:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Montreal Canadiens",
+      "away": "Buffalo Sabres",
+      "match": "Montreal Canadiens - Buffalo Sabres",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 1.56 -> 1.90 (-22.1%)"
     },
     {
       "event_id": "401815372",
@@ -93,7 +111,7 @@
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 2.35 -> 10.50 (-346.8%)"
+      "context": "Cote home: 2.35 -> 12.50 (-431.9%)"
     },
     {
       "event_id": "401815379",
@@ -129,7 +147,7 @@
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 1.34 -> 1.09 (+18.7%)"
+      "context": "Cote home: 1.34 -> 1.03 (+23.1%)"
     },
     {
       "event_id": "401815387",
@@ -364,9 +382,45 @@
       "side": "away",
       "strength": 0.726,
       "context": "1 match dans les 48h + 979 km de voyage"
+    },
+    {
+      "event_id": "401815373",
+      "date": "2026-05-16T23:15Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Seattle Mariners",
+      "away": "San Diego Padres",
+      "match": "Seattle Mariners - San Diego Padres",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.66,
+      "context": "Cote away: 2.44 -> 2.15 (+11.9%)"
     }
   ],
   "active_watch": [
+    {
+      "event_id": "401872571",
+      "date": "2026-05-17T01:07Z",
+      "sport": "football",
+      "league_code": "ligamx",
+      "league_name": "Liga MX",
+      "home": "Guadalajara",
+      "away": "Cruz Azul",
+      "match": "Guadalajara - Cruz Azul",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.608,
+      "context": "Cote away: 3.20 -> 2.85 (+10.9%)"
+    },
     {
       "event_id": "401815370",
       "date": "2026-05-16T23:10Z",
