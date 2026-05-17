@@ -5,6 +5,14 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-17
 
+### Version v4.1.3 — Forme récente lisible
+
+Correctif UX fiche match : les dynamiques d'équipes sortaient encore comme des codes bruts (`WWDND`, `VDVVV`, `DDDDD`), peu lisibles et peu professionnels.
+- Ajout d'un formateur central pour convertir les séries en `victoires / nuls / défaites`.
+- Nettoyage automatique des anciennes raisons modèle contenant des codes de forme.
+- Ajout de pastilles visuelles `V Victoire`, `N Nul`, `D Défaite` dans les zones qui listent les derniers résultats.
+- Espacement corrigé dans les blocs `Équipes` pour éviter les libellés collés aux valeurs.
+
 ### Version v4.1.2 — Terrain de composition propre
 
 Correctif UX ciblé fiche match : le terrain de composition pouvait sembler bizarre parce qu'il utilisait parfois les joueurs clés comme fausse composition quand la source lineup était trop partielle.

@@ -2949,7 +2949,7 @@
     if (row?.marketTiming?.tone === 'cold') reasons.push('marché à surveiller');
     if (row?.marketTiming?.tone === 'warm') reasons.push('CLV favorable');
     if (row?.stakeAdjustment?.applied) reasons.push(`mise réduite x${Number(row.stakeAdjustment.factor || 1).toFixed(2)}`);
-    return reasons.length ? `Pourquoi : ${reasons.slice(0, 4).join(' · ')}` : 'Pourquoi : lecture modèle disponible dans la fiche.';
+    return reasons.length ? prettifyFormCodesInText(`Pourquoi : ${reasons.slice(0, 4).join(' · ')}`) : 'Pourquoi : lecture modèle disponible dans la fiche.';
   }
 
   function calibrationRiskClass(level) {
@@ -3252,30 +3252,104 @@
 
   function cleanExplanation(value) {
     if (!value) return 'Le moteur ne fournit pas encore de texte détaillé pour ce match.';
-    if (typeof value === 'string') return value;
-    if (Array.isArray(value)) return value.map((item) => cleanLabel(item, '')).filter(Boolean).join(' · ') || 'Lecture structurée disponible.';
+    if (typeof value === 'string') return prettifyFormCodesInText(value);
+    if (Array.isArray(value)) return prettifyFormCodesInText(value.map((item) => cleanLabel(item, '')).filter(Boolean).join(' · ')) || 'Lecture structurée disponible.';
     if (typeof value === 'object') {
       const parts = Object.entries(value)
         .slice(0, 5)
         .map(([key, val]) => `${key}: ${cleanLabel(val, '')}`)
         .filter((part) => !part.endsWith(': '));
-      return parts.join(' · ') || 'Lecture structurée disponible.';
+      return prettifyFormCodesInText(parts.join(' · ')) || 'Lecture structurée disponible.';
     }
     return String(value);
   }
 
   function formLetters(side) {
     const last = Array.isArray(side?.last5) ? side.last5 : [];
+    const normalize = (value, frenchMode = false) => {
+      const token = String(value || '').trim().slice(0, 1).toUpperCase();
+      if (token === 'W' || token === 'V') return 'W';
+      if (token === 'L' || token === 'P') return 'L';
+      if (token === 'N' || token === 'X') return 'D';
+      if (token === 'D') return frenchMode ? 'L' : 'D';
+      return '';
+    };
     if (last.length) {
       return last.map((row) => {
-        if (typeof row?.result === 'string') return row.result.slice(0, 1).toUpperCase();
+        if (typeof row?.result === 'string') return normalize(row.result);
         if (row?.won === true) return 'W';
         if (row?.won === false && Number(row?.score_for) === Number(row?.score_against)) return 'D';
         if (row?.won === false) return 'L';
         return '';
       }).filter(Boolean).slice(-5);
     }
-    return String(side?.team_form_l5 || side?.form || '').slice(0, 5).split('').filter(Boolean);
+    const raw = String(side?.team_form_l5 || side?.form || '').slice(0, 5);
+    const frenchMode = /[VN]/i.test(raw);
+    return raw.split('').map((letter) => normalize(letter, frenchMode)).filter(Boolean);
+  }
+
+  function formOutcomeLabel(letter) {
+    if (letter === 'W') return 'Victoire';
+    if (letter === 'D') return 'Nul';
+    if (letter === 'L') return 'Défaite';
+    return 'Résultat';
+  }
+
+  function formOutcomeShort(letter) {
+    if (letter === 'W') return 'V';
+    if (letter === 'D') return 'N';
+    if (letter === 'L') return 'D';
+    return '-';
+  }
+
+  function formBadgeHtml(letter) {
+    const normalized = letter === 'W' || letter === 'D' || letter === 'L' ? letter : '';
+    if (!normalized) return '';
+    const label = formOutcomeLabel(normalized);
+    return `<span class="form-result-chip form-${escapeHtml(normalized.toLowerCase())}" title="${escapeHtml(label)}" aria-label="${escapeHtml(label)}"><strong>${escapeHtml(formOutcomeShort(normalized))}</strong><em>${escapeHtml(label)}</em></span>`;
+  }
+
+  function formSummaryFromLetters(letters, { compact = false } = {}) {
+    const list = (Array.isArray(letters) ? letters : []).filter((letter) => ['W', 'D', 'L'].includes(letter));
+    if (!list.length) return 'forme non confirmée';
+    const counts = {
+      W: list.filter((letter) => letter === 'W').length,
+      D: list.filter((letter) => letter === 'D').length,
+      L: list.filter((letter) => letter === 'L').length
+    };
+    const parts = [];
+    const push = (count, singular, plural) => {
+      if (count) parts.push(`${formatCount(count)} ${count > 1 ? plural : singular}`);
+    };
+    push(counts.W, 'victoire', 'victoires');
+    push(counts.D, 'nul', 'nuls');
+    push(counts.L, 'défaite', 'défaites');
+    return parts.join(compact ? ' · ' : ', ') || 'forme non confirmée';
+  }
+
+  function formSummaryFromCodeSequence(value) {
+    const raw = String(value || '').trim().toUpperCase().replace(/[^WVNDL]/g, '').slice(0, 5);
+    if (!raw) return '';
+    const frenchMode = /[VN]/.test(raw);
+    const mapped = raw.split('').map((letter) => {
+      if (letter === 'W' || letter === 'V') return 'W';
+      if (letter === 'L') return 'L';
+      if (letter === 'N') return 'D';
+      if (letter === 'D') return frenchMode || !/[WL]/.test(raw) ? 'L' : 'D';
+      return '';
+    }).filter(Boolean);
+    return formSummaryFromLetters(mapped);
+  }
+
+  function prettifyFormCodesInText(value) {
+    let text = String(value || '');
+    text = text.replace(/\bforme\s+([WVNDL]{3,5})\s*\/\s*([WVNDL]{3,5})\b/gi, (_match, home, away) => {
+      const homeText = formSummaryFromCodeSequence(home);
+      const awayText = formSummaryFromCodeSequence(away);
+      return `forme : domicile ${homeText} · extérieur ${awayText}`;
+    });
+    text = text.replace(/\b([WVNDL]{4,5})\b/g, (match) => formSummaryFromCodeSequence(match) || match);
+    return text;
   }
 
   function formStripHtml(match) {
@@ -3283,7 +3357,10 @@
     const render = (label, letters) => `
       <div class="form-strip-row">
         <span>${escapeHtml(label)}</span>
-        <div>${letters.map((letter) => `<strong class="form-${escapeHtml(letter.toLowerCase())}">${escapeHtml(letter === 'W' ? 'V' : letter === 'D' ? 'N' : letter === 'L' ? 'D' : letter)}</strong>`).join('') || '<em>Forme indisponible</em>'}</div>
+        <div>
+          <div class="form-strip-results">${letters.map(formBadgeHtml).join('') || '<em>Forme indisponible</em>'}</div>
+          ${letters.length ? `<small>${escapeHtml(formSummaryFromLetters(letters, { compact: true }))}</small>` : ''}
+        </div>
       </div>
     `;
     return `<div class="form-strip">${render(home.name || 'Domicile', formLetters(home))}${render(away.name || 'Extérieur', formLetters(away))}</div>`;
@@ -3410,12 +3487,18 @@
 
   function sideFormText(side) {
     const letters = formLetters(side || {});
-    if (letters.length) return letters.map((letter) => letter === 'W' ? 'V' : letter === 'D' ? 'N' : letter === 'L' ? 'D' : letter).join('');
+    if (letters.length) return formSummaryFromLetters(letters);
     const direct = String(side?.form5 || side?.team_form_l5 || side?.form || side?.history?.latest_form || '').trim();
-    if (direct) return direct.slice(0, 5).replace(/W/g, 'V').replace(/L/g, 'D');
+    if (direct) return formSummaryFromCodeSequence(direct) || prettifyFormCodesInText(direct);
     const wdl = side?.form5_wdl || {};
     const sample = Number(wdl.sample || 0);
-    if (sample) return `${formatCount(wdl.wins || 0)}V-${formatCount(wdl.draws || 0)}N-${formatCount(wdl.losses || 0)}D`;
+    if (sample) {
+      return formSummaryFromLetters([
+        ...Array(Number(wdl.wins || 0)).fill('W'),
+        ...Array(Number(wdl.draws || 0)).fill('D'),
+        ...Array(Number(wdl.losses || 0)).fill('L')
+      ]);
+    }
     return 'forme non confirmée';
   }
 
@@ -4272,7 +4355,7 @@
     if (Number(row.contextQuality?.score || row.match?.context?.quality?.score || 0) >= 65) parts.push('contexte solide');
     if (!parts.length && row.priority?.reason) parts.push('bon signal modèle');
     if (!parts.length) parts.push('cote Winamax intéressante');
-    return `Pourquoi : ${[...new Set(parts)].slice(0, 4).join(' · ')}.`;
+    return prettifyFormCodesInText(`Pourquoi : ${[...new Set(parts)].slice(0, 4).join(' · ')}.`);
   }
 
   // Sprint 72 C6 — Detection hedging : compte combien de paris user actifs
@@ -11330,10 +11413,10 @@
       .sort((a, b) => Date.parse(a.start || a.match?.date || '') - Date.parse(b.start || b.match?.date || ''))
       .slice(0, 6);
     const formRows = rows.map((row) => row.match || row).filter(Boolean).slice(0, 10);
-    const form = formRows.map((row) => {
+    const formLettersForEntity = formRows.map((row) => {
       const side = (row.competitors || []).find((team) => normalizeUiKey(team.name || team.short) === normalizeUiKey(entity.label));
       return side?.winner === true ? 'W' : side?.winner === false ? 'L' : 'D';
-    }).filter(Boolean).slice(0, 10).join('') || 'Forme non disponible';
+    }).filter(Boolean).slice(0, 10);
     const injuries = rows
       .flatMap((row) => (row.match?.competitors || row.competitors || []).flatMap((team) => team.injuries || []))
       .filter((injury) => injury?.name)
@@ -11350,7 +11433,11 @@
         ${entityPerformanceRows(historyRows).map(([label, value, text]) => `
           <article><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong><p>${escapeHtml(text)}</p></article>
         `).join('')}
-        <article><span>Forme récente</span><strong>${escapeHtml(form)}</strong><p>Lecture W/D/L locale quand disponible.</p></article>
+        <article>
+          <span>Forme récente</span>
+          <strong>${escapeHtml(formLettersForEntity.length ? formSummaryFromLetters(formLettersForEntity, { compact: true }) : 'Forme non disponible')}</strong>
+          <p>${formLettersForEntity.length ? formLettersForEntity.map(formBadgeHtml).join('') : 'Aucun résultat récent exploitable.'}</p>
+        </article>
       </div>
       <div class="deep-analytics-layout">
         <div class="deep-analytics-panel">
@@ -12687,8 +12774,8 @@
     const xg = side?.xg || {};
     const elo = side?.elo || {};
     const rows = [
-      ['Forme L5', side?.form5 || '-'],
-      ['Forme L10', side?.form10 || '-'],
+      ['Forme récente', sideFormText(side)],
+      ['Dynamique longue', side?.form10 ? (formSummaryFromCodeSequence(side.form10) || prettifyFormCodesInText(side.form10)) : 'Non disponible'],
       ['xG pour/contre', xg.present && (hasMeaningfulMetric(xg.for_avg) || hasMeaningfulMetric(xg.against_avg)) ? `${numericText(xg.for_avg, '', 2)} / ${numericText(xg.against_avg, '', 2)}` : 'Non disponible'],
       ['Elo', elo.value != null ? `${Math.round(Number(elo.value))}` : history.elo != null ? `${Math.round(Number(history.elo))}` : 'Non disponible'],
       ['Historique local', history.events_seen ? `${formatCount(history.events_seen)} observations` : 'Non disponible'],
@@ -13973,7 +14060,7 @@
     const rows = Array.isArray(team?.last5) ? team.last5 : [];
     if (!rows.length) return '<div class="empty compact-empty">Forme récente absente.</div>';
     return `<div class="form-list">${rows.slice(0, 5).map((item) => `
-      <div><span>${escapeHtml(item.date || '-')}</span><strong>${escapeHtml(item.result || '-')}</strong><em>${escapeHtml(`${item.gf ?? '?'}-${item.ga ?? '?'}`)} vs ${escapeHtml(item.opp || '')}</em></div>
+      <div><span>${escapeHtml(item.date || '-')}</span><div class="form-list-result">${formBadgeHtml(formLetters({ last5: [item] })[0]) || escapeHtml(formSummaryFromCodeSequence(item.result) || 'Résultat')}</div><em>${escapeHtml(`${item.gf ?? '?'}-${item.ga ?? '?'}`)} vs ${escapeHtml(item.opp || '')}</em></div>
     `).join('')}</div>`;
   }
 
@@ -14048,7 +14135,7 @@
           ${stats.lastNHomeForm.length ? `
             <div class="h2h-form-sequence">
               <span>Forme home sur les ${stats.lastNHomeForm.length} derniers :</span>
-              ${stats.lastNHomeForm.map((r) => `<span class="form-pill form-${r === 'W' ? 'w' : r === 'D' ? 'd' : 'l'}">${r}</span>`).join('')}
+              ${stats.lastNHomeForm.map(formBadgeHtml).join('')}
             </div>
           ` : ''}
         </article>
