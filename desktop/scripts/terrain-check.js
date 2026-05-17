@@ -228,8 +228,8 @@ async function main() {
     const missingNav = requiredNavLabels.filter((label) => !navLabels.some((nav) => nav.includes(label)));
     assert(missingNav.length === 0, 'Terrain: navigation standard non simplifiée', { missingNav, nav: dom.nav });
     assert(dom.nav.length <= 12, 'Terrain: navigation trop longue malgré les catégories', { nav: dom.nav });
-    assert(dom.rows >= 15 && dom.rows <= 28 && dom.timeline >= 8, 'Terrain: cockpit réel insuffisant', dom);
-    assert(dom.homeShellDisplay !== 'none' && dom.homeTop3Count >= Math.min(3, dom.homeTableRows) && dom.homeTableRows >= 6 && dom.homeSortButtons.length >= 4, 'Terrain: nouvel accueil Top 3 + tableau triable absent', dom);
+    assert(dom.rows >= 15 && dom.rows <= 32 && dom.timeline >= 8, 'Terrain: cockpit réel insuffisant', dom);
+    assert(dom.homeShellDisplay !== 'none' && dom.homeTop3Count >= Math.min(3, dom.homeTableRows) && dom.homeTableRows >= 6 && dom.homeTableRows <= 12 && dom.homeSortButtons.length >= 4, 'Terrain: nouvel accueil Top 3 + tableau triable absent ou trop long', dom);
     const tableMarketCount = new Set(dom.homeTableMarkets.filter(Boolean)).size;
     const topMarketCount = new Set(dom.homeTopMarkets.filter(Boolean)).size;
     assert(tableMarketCount <= 1 || topMarketCount >= 2, 'Terrain: Top 3 trop monotone malgré plusieurs marchés disponibles', { top: dom.homeTopMarkets, table: dom.homeTableMarkets });
@@ -239,6 +239,7 @@ async function main() {
     assert(dom.cockpitDisplay === 'none' && dom.readyHeroDisplay === 'none' && dom.liveDisplay === 'none' && dom.stakeScenarioDisplay === 'none', 'Terrain: accueil encore surchargé par des blocs secondaires', dom);
     assert(dom.expertHomeLeaks.length === 0, 'Terrain: le Mode expert pollue encore l’accueil À miser', dom.expertHomeLeaks);
     assert(!/Modèle aujourd'hui|Conseils du jour|Décision finale locale/i.test(dom.dashboardText), 'Terrain: blocs diagnostic visibles sur l’accueil rapide', dom.dashboardText.slice(0, 1800));
+    assert(!/Écouter le brief|brief audio|SpeechSynthesis|TTS/i.test(dom.dashboardText), 'Terrain: brief audio revenu dans le parcours standard', dom.dashboardText.slice(0, 1800));
     assert(/Cockpit pronostics/i.test(dom.cockpitSummary), 'Terrain: catégorie Cockpit pronostics absente', dom);
     if (Number(todayFunnel.bookableEvents || 0) >= 30 && Number(todayFunnel.displayed || 0) < 10 && dom.trackButtonCount < 1) {
       assert(/trop strict|modèle trop strict/i.test(dom.alertText), 'Terrain: le garde-fou trop strict n’est pas visible', { todayFunnel, alertText: dom.alertText });

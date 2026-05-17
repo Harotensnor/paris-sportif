@@ -5,6 +5,16 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-16
 
+### Hotfix v2.1.8 — Plan 30 chantiers pronostics + accueil compact
+
+Livraison autonome des priorités pronostics/UX demandées.
+- Moteur cockpit élargi de 25 à 30 lignes maximum, avec cible 24h portée jusqu’à 30 quand le catalogue Winamax le permet, sans changer les garde-fous de mise.
+- Quota `Vainqueur` renforcé : cible minimale 10 lignes et environ 50% du cockpit quand les signaux existent, pour éviter une page dominée par les Plus/Moins.
+- Accueil encore réduit : le tableau rapide affiche 12 lignes maximum, le reste part dans les catégories et le Cockpit.
+- Nouvelles catégories de désengorgement : `Strict` pour les lignes fiables avec contexte propre, `Gros gain` pour les cotes 2+ filtrées, en plus de Vainqueurs, Buts, Nuit, Buteurs, Combinés et À surveiller.
+- Les tests terrain et smoke vérifient désormais que l’accueil reste court, que le brief audio ne revient pas, et que le cockpit peut monter à 30 lignes.
+- Libellé `Résultat + BTTS` remplacé par `Résultat + les deux marquent` côté interface standard.
+
 ### Hotfix v2.1.7 — Audit profond terrain + combinés propres
 
 Audit utilisateur réel après la refonte “À miser”.

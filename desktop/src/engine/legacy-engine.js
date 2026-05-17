@@ -3160,7 +3160,7 @@ function createLegacyEngineService({ projectRoot }) {
     const todayKey = dayKeyParis(new Date());
     const maxPerMatch = 2;
     const maxPerHourSlot = 4;
-    const maxDashboardRows = 25;
+    const maxDashboardRows = 30;
     const maxPerSport = Math.max(3, Math.ceil(maxDashboardRows * 0.30));
     const maxPerMarket = Math.max(5, Math.ceil(maxDashboardRows * 0.35));
     const maxPerLeague = Math.max(2, Math.ceil(maxDashboardRows * 0.20));
@@ -3169,7 +3169,7 @@ function createLegacyEngineService({ projectRoot }) {
       .filter((row) => row?.contextGate?.gate !== 'skip');
     const sourcePicks = simplePicks.length ? simplePicks : [];
     const rolling24 = rollingWindowRows(sourcePicks, 24);
-    const target24 = rolling24.length >= 25 ? 25 : rolling24.length >= 18 ? 18 : rolling24.length >= 12 ? 12 : Math.min(8, rolling24.length);
+    const target24 = rolling24.length >= 30 ? 30 : rolling24.length >= 25 ? 25 : rolling24.length >= 18 ? 18 : rolling24.length >= 12 ? 12 : Math.min(8, rolling24.length);
     const rank = (pick) => [
       pick?.decisionCenter?.canBet ? 1 : 0,
       pick?.safeAssessment?.reliable ? 1 : 0,
@@ -3353,7 +3353,7 @@ function createLegacyEngineService({ projectRoot }) {
     }));
     const rollingReadyTarget = Math.min(maxDashboardRows, rollingReadyPool.length, Math.max(target24, 10));
     const todayReadyTarget = Math.min(8, sortedTodayReady.length);
-    const todayVisibleTarget = Math.min(20, sortedTodayDisplayable.length);
+    const todayVisibleTarget = Math.min(24, sortedTodayDisplayable.length);
     if (todayReadyTarget > 0) {
       addFinalRows(sortedTodayReady, todayReadyTarget, { enforceMatchCap: true });
       if (finalRows.length < todayReadyTarget) {
@@ -3365,7 +3365,7 @@ function createLegacyEngineService({ projectRoot }) {
       addFinalRows(sortedTodayDisplayable, todayVisibleTarget, { enforceMatchCap: true });
       if (finalRows.filter((row) => dayKeyParis(row.start) === todayKey).length < todayVisibleTarget) {
         todayCapRelaxed = true;
-        addFinalRows(sortedTodayDisplayable, todayVisibleTarget, { matchCap: maxPerMatch + 1, relaxSport: true, relaxLeague: true });
+        addFinalRows(sortedTodayDisplayable, todayVisibleTarget, { matchCap: maxPerMatch, relaxSport: true, relaxLeague: true });
       }
     }
     if (nightRows.length) {
@@ -3393,7 +3393,7 @@ function createLegacyEngineService({ projectRoot }) {
       // Quota Vainqueurs renforcé : cible 50% du cockpit standard pour
       // ne plus avoir l'impression de "ne miser que sur des nombres de buts".
       // L'utilisateur a explicitement demandé plus de Vainqueurs.
-      const winnerTarget = Math.min(winnerRows.length, Math.max(8, Math.ceil(maxDashboardRows * 0.50)));
+      const winnerTarget = Math.min(winnerRows.length, Math.max(10, Math.ceil(maxDashboardRows * 0.50)));
       const currentWinners = () => finalRows.filter((row) => simpleMarketGroup(row?.marketKey || row?.market) === 'winner').length;
       if (currentWinners() < Math.min(winnerTarget, maxDashboardRows)) {
         addFinalRows(winnerRows, Math.min(maxDashboardRows, finalRows.length + Math.max(0, winnerTarget - currentWinners())), {
@@ -3412,7 +3412,7 @@ function createLegacyEngineService({ projectRoot }) {
       const currentScorers = () => finalRows.filter((row) => simpleMarketGroup(row?.marketKey || row?.market) === 'scorer').length;
       if (currentScorers() < scorerTarget) {
         addFinalRows(scorerRows, Math.min(maxDashboardRows, finalRows.length + Math.max(0, scorerTarget - currentScorers())), {
-          matchCap: maxPerMatch + 1,
+          matchCap: maxPerMatch,
           relaxSport: true,
           relaxLeague: true,
           relaxMarket: true
@@ -3423,11 +3423,11 @@ function createLegacyEngineService({ projectRoot }) {
     if (rollingWindowRows(finalRows, 24).length < rollingReadyTarget) {
       addFinalRows(rollingReadyPool, rollingReadyTarget, { enforceMatchCap: true });
     }
-    addFinalRows(sortedOrdered, maxDashboardRows, { matchCap: todayCapRelaxed ? maxPerMatch + 1 : maxPerMatch });
+    addFinalRows(sortedOrdered, maxDashboardRows, { matchCap: maxPerMatch });
     if (finalRows.length < Math.min(maxDashboardRows, sourcePicks.length)) {
       diversityCapRelaxed = true;
-      addFinalRows(sortedOrdered, maxDashboardRows, { matchCap: maxPerMatch + 1, relaxSport: true, relaxLeague: true });
-      addFinalRows(sortRows(sourcePicks), maxDashboardRows, { matchCap: maxPerMatch + 1, relaxSport: true, relaxLeague: true });
+      addFinalRows(sortedOrdered, maxDashboardRows, { matchCap: maxPerMatch, relaxSport: true, relaxLeague: true });
+      addFinalRows(sortRows(sourcePicks), maxDashboardRows, { matchCap: maxPerMatch, relaxSport: true, relaxLeague: true });
     }
     const rows = finalRows.slice(0, maxDashboardRows)
       .map((row, index) => ({

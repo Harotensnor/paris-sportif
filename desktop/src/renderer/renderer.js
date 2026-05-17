@@ -4351,7 +4351,7 @@
       'halftimetotal': 'Total mi-temps',
       'ht1n2': 'Mi-temps vainqueur',
       'btts': 'Les deux équipes marquent',
-      'resultbtts': 'Résultat + BTTS',
+      'resultbtts': 'Résultat + les deux marquent',
       'doublechance': 'Double chance',
       'handicap': 'Handicap',
       'dnb': 'Remboursé si nul',
@@ -5472,6 +5472,8 @@
   function marketCategoryRows(rows, category) {
     const arr = rolling24hRows(rows, canDisplayPickCard);
     if (category === 'ready') return arr.filter(isReadyToStakeRow);
+    if (category === 'strict') return arr.filter((row) => isReadyToStakeRow(row) && Boolean(row?.safeAssessment?.reliable) && Number(row?.contextQuality?.score ?? row?.match?.context?.quality?.score ?? 0) >= 55);
+    if (category === 'value') return arr.filter((row) => Number(row?.odd || 0) >= 2 && (isReadyToStakeRow(row) || Number(displayEdgeValue(row) || 0) >= 0.03));
     if (category === 'winner') return arr.filter(isWinnerRow);
     if (category === 'goals') return arr.filter((row) => ['goals', 'btts'].includes(rowMarketPreferenceKey(row)));
     if (category === 'scorer') return arr.filter((row) => rowMarketPreferenceKey(row) === 'scorer');
@@ -5528,6 +5530,20 @@
         title: 'Vainqueurs',
         rows: marketCategoryRows(allRows, 'winner'),
         detail: 'Paris simples, filet 2-0 Winamax quand dispo'
+      },
+      {
+        key: 'strict',
+        icon: '🛡',
+        title: 'Strict',
+        rows: marketCategoryRows(allRows, 'strict'),
+        detail: 'Contexte propre + profil fiable'
+      },
+      {
+        key: 'value',
+        icon: '💎',
+        title: 'Gros gain',
+        rows: marketCategoryRows(allRows, 'value'),
+        detail: 'Cotes 2+ avec garde-fous'
       },
       {
         key: 'night',
@@ -5726,6 +5742,16 @@
         title: 'Les paris de nuit',
         subtitle: 'Sports US, Asie et matchs tardifs sur les prochaines 24h.'
       },
+      strict: {
+        kicker: 'Mode strict',
+        title: 'Les paris les plus propres',
+        subtitle: 'Seulement les lignes avec contexte correct, badge fiable et mise autorisée.'
+      },
+      value: {
+        kicker: 'Gros gain',
+        title: 'Cotes plus hautes, toujours filtrées',
+        subtitle: 'Cotes 2+ avec avantage positif ou pari prêt, pour chercher du rendement sans ouvrir les marchés complexes.'
+      },
       watch: {
         kicker: 'À surveiller',
         title: 'Signaux utiles, sans mise directe',
@@ -5835,13 +5861,13 @@
     if (subtitle) subtitle.textContent = meta.subtitle;
     const source = homeSourceRows(rows);
     const topRows = homeTopRows(source, 3);
-    const tableRows = sortHomeRows(source, sortMode).slice(0, 24);
+    const tableRows = sortHomeRows(source, sortMode).slice(0, 12);
     $$('.home-sort-actions [data-home-sort], .home-picks-table [data-home-sort]').forEach((button) => {
       button.classList.toggle('active', button.dataset.homeSort === sortMode);
     });
     if (caption) {
       const labels = { confidence: 'confiance puis cote', kickoff: 'heure de départ', date: 'date', odd: 'cote Winamax' };
-      caption.textContent = `${formatCount(tableRows.length)} paris sur 24h · tri ${labels[sortMode] || 'confiance'}`;
+      caption.textContent = `${formatCount(tableRows.length)} affichés ici · 12 max · tri ${labels[sortMode] || 'confiance'}`;
     }
     if (topWrap) {
       topWrap.innerHTML = topRows.length
@@ -5865,6 +5891,8 @@
       halftime: 'type',
       sport: 'sport',
       night: 'time',
+      strict: 'time',
+      value: 'time',
       today: 'time',
       tomorrow: 'time',
       live: 'time',
@@ -5878,6 +5906,8 @@
       scorer: 'scorer',
       halftime: 'halftime',
       night: 'tonight',
+      strict: 'next',
+      value: 'next',
       today: 'today',
       tomorrow: 'tomorrow_am',
       live: 'next',
@@ -5911,6 +5941,8 @@
       halftime: 'Cockpit Mi-temps',
       sport: 'Cockpit par sport',
       night: 'Cockpit nuit',
+      strict: 'Cockpit strict',
+      value: 'Cockpit gros gain',
       today: 'Cockpit aujourd’hui',
       tomorrow: 'Cockpit demain',
       live: 'Cockpit live',
