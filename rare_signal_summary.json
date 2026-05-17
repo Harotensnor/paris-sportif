@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-05-17T00:48:44Z",
+  "generated_at": "2026-05-17T00:51:35Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 61,
-    "actionable": 17,
-    "watch": 3,
+    "actionable": 19,
+    "watch": 1,
     "risk": 41,
     "expired_sample": 0,
     "by_type": {
       "market_uncertain": 39,
       "injury_imbalance": 17,
-      "market_move": 4,
       "back_to_back_travel": 8,
+      "market_move": 6,
       "signal_conflict": 4
     },
     "by_quality": {
       "risk": 41,
-      "watch": 3,
-      "actionable": 17
+      "watch": 1,
+      "actionable": 19
     }
   },
   "active_actionable": [
@@ -40,24 +40,6 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 8-13"
-    },
-    {
-      "event_id": "401815376",
-      "date": "2026-05-17T17:35Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Atlanta Braves",
-      "away": "Boston Red Sox",
-      "match": "Atlanta Braves - Boston Red Sox",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "away",
-      "strength": 1.0,
-      "context": "Cote away: 3.45 -> 4.70 (-36.2%)"
     },
     {
       "event_id": "401815379",
@@ -93,7 +75,43 @@
       "team": null,
       "side": "away",
       "strength": 1.0,
-      "context": "Cote away: 36.00 -> 28.00 (+22.2%)"
+      "context": "Cote away: 36.00 -> 19.00 (+47.2%)"
+    },
+    {
+      "event_id": "401815384",
+      "date": "2026-05-17T18:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Minnesota Twins",
+      "away": "Milwaukee Brewers",
+      "match": "Minnesota Twins - Milwaukee Brewers",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 2.60 -> 3.45 (-32.7%)"
+    },
+    {
+      "event_id": "401815385",
+      "date": "2026-05-17T18:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Houston Astros",
+      "away": "Texas Rangers",
+      "match": "Houston Astros - Texas Rangers",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 1.0,
+      "context": "Cote away: 14.50 -> 11.50 (+20.7%)"
     },
     {
       "event_id": "401815387",
@@ -148,6 +166,24 @@
       "side": "away",
       "strength": 0.872,
       "context": "1 match dans les 48h + 1711 km de voyage"
+    },
+    {
+      "event_id": "401815376",
+      "date": "2026-05-17T17:35Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Atlanta Braves",
+      "away": "Boston Red Sox",
+      "match": "Atlanta Braves - Boston Red Sox",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Boston Red Sox",
+      "side": "away",
+      "strength": 0.83,
+      "context": "1 match dans les 48h + 1498 km de voyage"
     },
     {
       "event_id": "401815377",
@@ -332,24 +368,6 @@
   ],
   "active_watch": [
     {
-      "event_id": "401815384",
-      "date": "2026-05-17T18:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Minnesota Twins",
-      "away": "Milwaukee Brewers",
-      "match": "Minnesota Twins - Milwaukee Brewers",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "home",
-      "strength": 0.641,
-      "context": "Cote home: 2.60 -> 2.90 (-11.5%)"
-    },
-    {
       "event_id": "401815378",
       "date": "2026-05-17T16:15Z",
       "sport": "baseball",
@@ -366,24 +384,6 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 8-5"
-    },
-    {
-      "event_id": "401815385",
-      "date": "2026-05-17T18:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Houston Astros",
-      "away": "Texas Rangers",
-      "match": "Houston Astros - Texas Rangers",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Houston Astros",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 14-11"
     }
   ],
   "active_risk": [
