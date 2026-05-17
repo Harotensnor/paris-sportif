@@ -1,24 +1,23 @@
 {
-  "generated_at": "2026-05-17T18:12:40Z",
+  "generated_at": "2026-05-17T19:09:27Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 52,
-    "actionable": 12,
-    "watch": 1,
-    "risk": 39,
+    "active_events": 49,
+    "actionable": 11,
+    "watch": 0,
+    "risk": 38,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 13,
+      "injury_imbalance": 11,
       "back_to_back_travel": 7,
-      "market_uncertain": 37,
+      "market_uncertain": 36,
       "signal_conflict": 5
     },
     "by_quality": {
-      "watch": 1,
-      "actionable": 12,
-      "risk": 39
+      "actionable": 11,
+      "risk": 38
     }
   },
   "active_actionable": [
@@ -38,7 +37,7 @@
       "team": "Los Angeles Dodgers",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 6-13"
+      "context": "Absences severes 6-14"
     },
     {
       "event_id": "401856916",
@@ -75,24 +74,6 @@
       "side": "away",
       "strength": 0.952,
       "context": "2 match dans les 48h + 1711 km de voyage"
-    },
-    {
-      "event_id": "401815383",
-      "date": "2026-05-17T18:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "St. Louis Cardinals",
-      "away": "Kansas City Royals",
-      "match": "St. Louis Cardinals - Kansas City Royals",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Kansas City Royals",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 2-6"
     },
     {
       "event_id": "401815386",
@@ -239,26 +220,7 @@
       "context": "1 match dans les 48h + 979 km de voyage"
     }
   ],
-  "active_watch": [
-    {
-      "event_id": "401815385",
-      "date": "2026-05-17T18:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Houston Astros",
-      "away": "Texas Rangers",
-      "match": "Houston Astros - Texas Rangers",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Houston Astros",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 14-11"
-    }
-  ],
+  "active_watch": [],
   "active_risk": [
     {
       "event_id": "401815454",
@@ -313,24 +275,6 @@
       "side": null,
       "strength": 0.91,
       "context": "Signaux opposes: Arizona Diamondbacks fade 1.40, Colorado Rockies fade 1.40 -> prudence"
-    },
-    {
-      "event_id": "178365",
-      "date": "2026-05-18T11:00Z",
-      "sport": "tennis",
-      "league_code": "rolandgarros",
-      "league_name": "Roland Garros",
-      "home": "",
-      "away": "",
-      "match": "? - ?",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 12.3%"
     },
     {
       "event_id": "175457",
@@ -726,7 +670,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.8%"
+      "context": "marge bookmaker anormale 18.9%"
     },
     {
       "event_id": "401842724",
@@ -780,7 +724,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.8%"
+      "context": "marge bookmaker anormale 19.3%"
     },
     {
       "event_id": "740967",
@@ -835,24 +779,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.8%"
-    },
-    {
-      "event_id": "401866332",
-      "date": "2026-05-24T16:30Z",
-      "sport": "football",
-      "league_code": "proleague",
-      "league_name": "Pro League",
-      "home": "Union St.-Gilloise",
-      "away": "Anderlecht",
-      "match": "Union St.-Gilloise - Anderlecht",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.3%"
     },
     {
       "event_id": "748971",
@@ -924,7 +850,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.9%"
+      "context": "marge bookmaker anormale 19.0%"
     },
     {
       "event_id": "748969",
@@ -943,6 +869,24 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 19.7%"
+    },
+    {
+      "event_id": "401866332",
+      "date": "2026-05-24T16:30Z",
+      "sport": "football",
+      "league_code": "proleague",
+      "league_name": "Pro League",
+      "home": "Union St.-Gilloise",
+      "away": "Anderlecht",
+      "match": "Union St.-Gilloise - Anderlecht",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.3%"
     },
     {
       "event_id": "401873200",

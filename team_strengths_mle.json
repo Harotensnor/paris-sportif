@@ -1,10 +1,98 @@
 {
-  "generated_at": "2026-05-17T18:13:07Z",
+  "generated_at": "2026-05-17T19:09:58Z",
   "method": "Full Bivariate Poisson MLE Dixon-Coles. Coordinate-descent avec golden-section search 1D. Pure Python (pas de scipy).",
   "min_matches_per_league": 40,
   "min_matches_per_team": 5,
-  "n_leagues_fit": 1,
+  "n_leagues_fit": 2,
   "leagues": {
+    "esp.1": {
+      "n_matches": 47,
+      "n_teams": 13,
+      "gamma": 0.2819,
+      "rho": -0.0872,
+      "log_lik": -121.4,
+      "iterations": 2,
+      "teams": {
+        "Alavés": {
+          "alpha": 0.133,
+          "beta": -0.2615,
+          "rank_off": 8,
+          "rank_def": 4
+        },
+        "Celta Vigo": {
+          "alpha": 0.2794,
+          "beta": 0.146,
+          "rank_off": 4,
+          "rank_def": 8
+        },
+        "Elche": {
+          "alpha": -0.0248,
+          "beta": -0.2917,
+          "rank_off": 9,
+          "rank_def": 3
+        },
+        "Espanyol": {
+          "alpha": -0.1131,
+          "beta": 0.3527,
+          "rank_off": 10,
+          "rank_def": 12
+        },
+        "Getafe": {
+          "alpha": -0.6993,
+          "beta": -0.1883,
+          "rank_off": 12,
+          "rank_def": 5
+        },
+        "Levante": {
+          "alpha": 0.4918,
+          "beta": -0.1826,
+          "rank_off": 2,
+          "rank_def": 6
+        },
+        "Mallorca": {
+          "alpha": -0.286,
+          "beta": 0.1611,
+          "rank_off": 11,
+          "rank_def": 9
+        },
+        "Osasuna": {
+          "alpha": 0.2062,
+          "beta": -0.4287,
+          "rank_off": 6,
+          "rank_def": 1
+        },
+        "Rayo Vallecano": {
+          "alpha": 0.4129,
+          "beta": 0.1855,
+          "rank_off": 3,
+          "rank_def": 10
+        },
+        "Real Madrid": {
+          "alpha": 0.1517,
+          "beta": 0.7172,
+          "rank_off": 7,
+          "rank_def": 13
+        },
+        "Real Oviedo": {
+          "alpha": -1.4412,
+          "beta": -0.3555,
+          "rank_off": 13,
+          "rank_def": 2
+        },
+        "Sevilla": {
+          "alpha": 0.2608,
+          "beta": 0.2157,
+          "rank_off": 5,
+          "rank_def": 11
+        },
+        "Villarreal": {
+          "alpha": 0.6288,
+          "beta": -0.0699,
+          "rank_off": 1,
+          "rank_def": 7
+        }
+      }
+    },
     "jpn.1": {
       "n_matches": 51,
       "n_teams": 18,

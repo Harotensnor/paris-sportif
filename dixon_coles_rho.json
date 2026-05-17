@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-05-17T18:13:06Z",
+  "generated_at": "2026-05-17T19:09:58Z",
   "method": "Dixon-Coles MLE grid search (ρ ∈ [-0.30, 0.10] step 0.005), λ_h, λ_a fixés à moyenne empirique par ligue. CI 95% via LR test.",
   "min_matches": 40,
   "default_rho": -0.13,
-  "n_leagues": 134,
+  "n_leagues": 136,
   "n_measured": 0,
   "leagues": {
     "1lig": {
@@ -319,17 +319,17 @@
       "reason": "n=3 < 40"
     },
     "eng.1": {
-      "n": 41,
-      "rho_measured": 0.035,
+      "n": 42,
+      "rho_measured": 0.04,
       "rho_literature": -0.07,
       "rho_used": -0.07,
       "source": "literature_fallback",
       "reason": "CI trop large (0.400) ou fit nul",
-      "log_lik": -121.74,
+      "log_lik": -124.56,
       "ci_lo": -0.3,
       "ci_hi": 0.1,
-      "lambda_h": 1.829,
-      "lambda_a": 1.268
+      "lambda_h": 1.857,
+      "lambda_a": 1.262
     },
     "eng.2": {
       "n": 27,
@@ -372,17 +372,17 @@
       "reason": "n=2 < 40"
     },
     "esp.1": {
-      "n": 40,
-      "rho_measured": -0.12,
+      "n": 47,
+      "rho_measured": 0.01,
       "rho_literature": -0.1,
       "rho_used": -0.1,
       "source": "literature_fallback",
       "reason": "CI trop large (0.400) ou fit nul",
-      "log_lik": -114.15,
+      "log_lik": -131.55,
       "ci_lo": -0.3,
       "ci_hi": 0.1,
-      "lambda_h": 1.5,
-      "lambda_a": 1.275
+      "lambda_h": 1.426,
+      "lambda_a": 1.191
     },
     "esp.2": {
       "n": 35,
@@ -805,6 +805,14 @@
       "source": "literature_fallback",
       "reason": "n=1 < 40"
     },
+    "proleague": {
+      "n": 1,
+      "rho_measured": null,
+      "rho_literature": -0.13,
+      "rho_used": -0.13,
+      "source": "literature_fallback",
+      "reason": "n=1 < 40"
+    },
     "proleaguerelegationr": {
       "n": 1,
       "rho_measured": null,
@@ -901,13 +909,21 @@
       "source": "literature_fallback",
       "reason": "n=2 < 40"
     },
-    "superlig": {
+    "superleaguegrece": {
       "n": 1,
       "rho_measured": null,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
       "reason": "n=1 < 40"
+    },
+    "superlig": {
+      "n": 5,
+      "rho_measured": null,
+      "rho_literature": -0.13,
+      "rho_used": -0.13,
+      "source": "literature_fallback",
+      "reason": "n=5 < 40"
     },
     "superligachampionshi": {
       "n": 1,
