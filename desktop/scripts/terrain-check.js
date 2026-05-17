@@ -250,6 +250,20 @@ async function main() {
     assert(!dom.hasStartedButton, 'Terrain: bouton actionnable pour match déjà commencé', dom);
     assert(!dom.hiddenAdvancedVisible, 'Terrain: Avancé visible sans Mode expert', dom);
 
+    await win.locator('[data-tab="combines"]:visible').first().click();
+    await win.waitForSelector('#combines-list', { timeout: 10_000 });
+    const combinesAudit = await win.evaluate(() => {
+      const text = document.querySelector('[data-panel="combines"]')?.innerText || '';
+      return {
+        cards: document.querySelectorAll('#combines-list .combo-card').length,
+        text,
+        hasAdvanced: /Handicap|Remboursé|Double chance|Score exact|HT\/FT|\b1N2\b|\bDNB\b|\bBTTS\b|Same-game|Best Edge|Kelly|edge/i.test(text)
+      };
+    });
+    assert(!(combinesAudit.cards && combinesAudit.hasAdvanced), 'Terrain: Combinés standard trop techniques', combinesAudit.text.slice(0, 1400));
+    await win.locator('[data-tab="dashboard"]:visible').first().click();
+    await win.waitForSelector('[data-panel="dashboard"].active', { timeout: 10_000 });
+
     const winnerCategory = win.locator('[data-cockpit-category="winner"]:visible');
     if (await winnerCategory.count()) {
       await winnerCategory.first().click();

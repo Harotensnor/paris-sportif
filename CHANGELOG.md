@@ -5,6 +5,17 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-16
 
+### Hotfix v2.1.7 — Audit profond terrain + combinés propres
+
+Audit utilisateur réel après la refonte “À miser”.
+- Terrain actuel mesuré : 161 events Winamax aujourd’hui, 130 analysables, 58 signaux simples positifs, 20 affichés, 7 paris réellement prêts, 25 lignes cockpit sur 24h. Le logiciel reste honnête : il affiche les lignes à surveiller sans les transformer en faux paris.
+- Le Top 3 de l’accueil privilégie les paris jouables, mais force aussi une vraie diversité de marchés quand le tableau contient plusieurs types de pronostics.
+- Les raisons techniques visibles ont été réécrites en français clair : `Edge non positif` devient `Avantage insuffisant`, `Kelly nul` devient `Mise non recommandée`, `Contexte exploitable` devient `Contexte à rechecker`.
+- La page `Combinés` ne montre plus en mode standard les tickets avec handicap, score exact, double chance, DNB, nul, HT/FT ou libellés techniques. Les tickets trop corrélés et les répétitions du même match sont masqués.
+- Les combinés standard utilisent des libellés utilisateur (`Même match`, `Plusieurs matchs`, `Vainqueur`, `Les deux marquent`) et ne montrent plus les métriques `edge`/corrélation hors Mode expert.
+- Le Bilan masque les ROI extrêmes non crédibles côté utilisateur (`MLB 1169%`, `NBA 564%`) derrière une carte `Segments extrêmes masqués`, pour éviter de donner un faux signal de confiance.
+- `smoke` et `qa:terrain` ouvrent désormais aussi la page Combinés et échouent si du jargon ou un marché avancé réapparaît en mode standard.
+
 ### Hotfix v2.1.6 — Top 3 diversifié + boot refresh robuste
 
 Mission autonome pronostics/UX après refonte accueil.

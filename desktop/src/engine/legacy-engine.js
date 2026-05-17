@@ -2889,13 +2889,17 @@ function createLegacyEngineService({ projectRoot }) {
     const contextRelease = proxyContextRelease || softAvailabilityRelease;
     const sourceRepairNeeded = (hasCriticalSignals && !contextRelease) || (Number.isFinite(qualityScore) && qualityScore < 45);
     if (!(Number(row.odd || 0) > 1)) blockingGates.push({ key: 'odds', label: 'Cote Winamax invalide', tone: 'danger' });
-    if (!(Number(row.edge || 0) > 0)) blockingGates.push({ key: 'edge', label: 'Edge non positif', tone: 'danger' });
-    if (!(modelStake > 0 || currentStake > 0)) blockingGates.push({ key: 'kelly', label: 'Kelly nul', tone: 'warn' });
+    if (!(Number(row.edge || 0) > 0)) blockingGates.push({ key: 'edge', label: 'Avantage insuffisant', tone: 'danger' });
+    if (!(modelStake > 0 || currentStake > 0)) blockingGates.push({ key: 'kelly', label: 'Mise non recommandée', tone: 'warn' });
     if (row.status === 'skip') blockingGates.push({ key: 'model', label: row.statusLabel || 'Skip modèle', tone: 'danger' });
     if ((row.contextGate?.agentEligible === false || hasCriticalSignals) && !contextRelease) {
+      const rawContextLabel = row.contextGate?.label || (hardCriticalSignals.length ? 'Signal critique manquant' : 'Contexte insuffisant');
+      const contextLabel = /contexte exploitable/i.test(String(rawContextLabel))
+        ? 'Contexte à rechecker'
+        : rawContextLabel;
       blockingGates.push({
         key: 'context',
-        label: row.contextGate?.label || (hardCriticalSignals.length ? 'Signal critique manquant' : 'Contexte insuffisant'),
+        label: contextLabel,
         tone: hardCriticalSignals.length ? 'danger' : 'warn'
       });
     }
@@ -3629,7 +3633,7 @@ function createLegacyEngineService({ projectRoot }) {
       return { key: 'status_watch', label };
     }
     if (!(kelly > 0)) {
-      return { key: 'kelly_zero', label: 'Kelly nul ou edge insuffisant' };
+      return { key: 'kelly_zero', label: 'Mise non recommandée' };
     }
     if (Number(row.confidenceTrust?.score || 100) < 45) {
       return { key: 'trust_low', label: 'Confiance trop fragile' };

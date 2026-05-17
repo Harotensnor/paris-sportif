@@ -215,6 +215,15 @@ def aggregate(matches: list[dict]) -> dict:
     }
 
 
+def write_team_stats(payload: dict) -> None:
+    tmp = OUT.with_name(f'{OUT.name}.tmp')
+    tmp.write_text(
+        json.dumps(payload, ensure_ascii=False, separators=(',', ':')),
+        encoding='utf-8',
+    )
+    tmp.replace(OUT)
+
+
 def main() -> int:
     t0 = time.time()
     # AUDIT-2026-04-27 (Sprint 32 #36) — Adoption logger structuré.
@@ -263,12 +272,12 @@ def main() -> int:
     # AUDIT-2026-04-27 (P1) — schema_version=2 : clé composite `lc:tid`.
     # Le patcher gère le legacy v1 (clé `tid` seul) en fallback safe le
     # temps que le cron rebuilde la cache.
-    OUT.write_text(json.dumps({
+    write_team_stats({
         'generated_at': datetime.now(timezone.utc).isoformat(),
         'schema_version': 2,
         'key_format': 'league_code:team_id',
         'teams': out,
-    }, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+    })
     print(f'[{datetime.now():%H:%M:%S}] Done in {elapsed:.1f}s · '
           f'{len(out)}/{len(teams)} teams enriched · {errs} errors · '
           f'wrote {OUT.name} ({OUT.stat().st_size/1024:.1f}KB)', flush=True)

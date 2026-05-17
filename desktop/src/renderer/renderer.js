@@ -2275,7 +2275,7 @@
     }
     const now = new Date();
     const stake = 10;
-    const coach = coachDecisionForBet({ ...combo, id: key, market: 'Combiné', label: combo.title, odd: combo.totalOdd, edge: combo.edge, sport: 'multi', league: combo.sameGame ? 'Same-game' : 'Multi-match' }, stake);
+    const coach = coachDecisionForBet({ ...combo, id: key, market: 'Combiné', label: readableComboTitle(combo), odd: combo.totalOdd, edge: combo.edge, sport: 'multi', league: combo.sameGame ? 'Même match' : 'Plusieurs matchs' }, stake);
     if (!coach.allow) {
       setSideStatus(coach.label, coach.tone === 'danger' ? 'danger' : 'warn');
       notifyUser(coach.label, coach.detail);
@@ -2285,12 +2285,12 @@
       id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
       key,
       matchId: key,
-      title: combo.title || 'Combiné',
+      title: readableComboTitle(combo) || 'Combiné',
       sport: 'multi',
-      league: combo.sameGame ? 'Same-game' : 'Multi-match',
+      league: combo.sameGame ? 'Même match' : 'Plusieurs matchs',
       start: combo.legs[0]?.start || '',
       market: 'Combiné',
-      label: combo.legs.map((leg) => leg.label).join(' + '),
+      label: combo.legs.map(readableComboLegLabel).join(' + '),
       odd: Number(combo.totalOdd || 0),
       probability: Number(combo.combinedProb || combo.avgProb || 0),
       edge: Number(combo.edge || 0),
@@ -5677,7 +5677,8 @@
     const arr = (Array.isArray(rows) ? rows : []).slice();
     const kickoff = (row) => rowKickoffTime(row);
     const confidenceSort = (a, b) => (
-      homePickScore(b) - homePickScore(a)
+      Number(isReadyToStakeRow(b)) - Number(isReadyToStakeRow(a))
+      || homePickScore(b) - homePickScore(a)
       || homeConfidenceValue(b) - homeConfidenceValue(a)
       || Number(b?.odd || 0) - Number(a?.odd || 0)
       || kickoff(a) - kickoff(b)
@@ -5696,6 +5697,11 @@
       ));
     }
     return arr.sort(confidenceSort);
+  }
+
+  function homeTopRows(rows, limit = 3) {
+    const source = Array.isArray(rows) ? rows : [];
+    return diverseHomeTopRows(source, limit);
   }
 
   function homeCategoryMeta(category) {
@@ -5828,8 +5834,7 @@
     if (title) title.textContent = meta.title;
     if (subtitle) subtitle.textContent = meta.subtitle;
     const source = homeSourceRows(rows);
-    const topSource = source;
-    const topRows = diverseHomeTopRows(topSource, 3);
+    const topRows = homeTopRows(source, 3);
     const tableRows = sortHomeRows(source, sortMode).slice(0, 24);
     $$('.home-sort-actions [data-home-sort], .home-picks-table [data-home-sort]').forEach((button) => {
       button.classList.toggle('active', button.dataset.homeSort === sortMode);
@@ -6105,7 +6110,7 @@
   function renderTypeCockpit(baseRows) {
     const definitions = [
       { key: 'winner', title: 'Vainqueurs du jour', detail: 'priorité diversité', open: true, limit: 12, match: (row) => rowMarketPreferenceKey(row) === 'winner' },
-      { key: 'goals', title: 'Buts', detail: 'Plus/Moins + BTTS', open: false, limit: 12, match: (row) => ['goals', 'btts'].includes(rowMarketPreferenceKey(row)) },
+      { key: 'goals', title: 'Buts', detail: 'Plus/Moins + les deux marquent', open: false, limit: 12, match: (row) => ['goals', 'btts'].includes(rowMarketPreferenceKey(row)) },
       { key: 'scorer', title: 'Buteurs', detail: 'joueurs décisifs', open: false, limit: 10, match: (row) => rowMarketPreferenceKey(row) === 'scorer' },
       { key: 'halftime', title: 'Mi-temps', detail: 'lecture simple', open: false, limit: 8, match: (row) => rowMarketPreferenceKey(row) === 'halftime' },
       { key: 'other', title: 'Autres paris simples', detail: 'à vérifier', open: false, limit: 8, match: () => true }
@@ -7001,15 +7006,94 @@
     `).join('');
   }
 
+  function comboLegGroup(leg) {
+    return marketGroupFromKey(marketKeyFromRow({
+      marketKey: leg?.marketKey || leg?.key || leg?.market,
+      market: leg?.market
+    }));
+  }
+
+  function comboLegText(leg) {
+    return `${leg?.market || ''} ${leg?.label || ''} ${leg?.pick || ''} ${leg?.title || ''}`.toLowerCase();
+  }
+
+  function comboLegIsDraw(leg) {
+    const text = comboLegText(leg);
+    return /\b(match\s*)?nul\b|\bdraw\b|\b1x\b|\bx2\b|\bx\/x\b|\bht\/ft\s*x/i.test(text);
+  }
+
+  function comboLegIsSimpleStandard(leg) {
+    const group = comboLegGroup(leg);
+    if (!['winner', 'goals', 'btts', 'scorer', 'halftime'].includes(group)) return false;
+    if (comboLegIsDraw(leg)) return false;
+    return !/handicap|rembours|dnb|double chance|score exact|ht\/ft|mi-temps\s*\/\s*fin|corners?|cartons?|penalty|p[eé]nalty|clean sheet|derni[eè]re [eé]quipe|premi[eè]re [eé]quipe|total [eé]quipe/i.test(comboLegText(leg));
+  }
+
+  function readableComboLegMarket(leg) {
+    const group = comboLegGroup(leg);
+    const labels = {
+      winner: 'Vainqueur',
+      goals: 'Plus / Moins',
+      btts: 'Les deux marquent',
+      scorer: 'Buteur',
+      halftime: 'Mi-temps'
+    };
+    return labels[group] || formatMarketName(leg?.market || leg?.marketKey || 'Marché');
+  }
+
+  function readableComboLegLabel(leg) {
+    return String(leg?.label || leg?.pick || 'Pari').replace(/\bBTTS\b/gi, 'Les deux marquent').replace(/\b1N2\b/gi, 'Vainqueur');
+  }
+
+  function readableComboTitle(combo) {
+    const raw = cleanLabel(combo?.title || combo?.name || 'Combiné simple', 'Combiné simple');
+    return raw
+      .replace(/best\s*edge/ig, 'Meilleur ticket')
+      .replace(/lock\s*combo/ig, 'Ticket prudent')
+      .replace(/same-game\s*value/ig, 'Même match simple')
+      .replace(/\bBTTS\b/ig, 'Les deux marquent')
+      .replace(/\b1N2\b/ig, 'Vainqueur');
+  }
+
+  function comboAnchor(combo) {
+    const legs = Array.isArray(combo?.legs) ? combo.legs : [];
+    return cleanLabel(legs[0]?.title || combo?.title || comboKey(combo), 'combo');
+  }
+
+  function displayCombinesForUser(combines, { limit = 12 } = {}) {
+    const expert = Boolean(loadPreferences().expertMode);
+    const source = Array.isArray(combines) ? combines : [];
+    if (expert) return source.slice(0, limit);
+    const byAnchor = new Map();
+    const seenSignature = new Set();
+    const safe = source.filter((combo) => {
+      const legs = Array.isArray(combo?.legs) ? combo.legs : [];
+      if (legs.length < 2 || legs.length > 4) return false;
+      if (!legs.every(comboLegIsSimpleStandard)) return false;
+      const totalOdd = Number(combo.totalOdd || combo.odd || 0);
+      if (!(totalOdd > 1.2) || totalOdd > 14) return false;
+      const anchor = comboAnchor(combo);
+      const anchorCount = byAnchor.get(anchor) || 0;
+      if (combo.sameGame && anchorCount >= 1) return false;
+      if (anchorCount >= 2) return false;
+      const signature = legs.map((leg) => `${comboAnchor({ legs: [leg] })}:${comboLegGroup(leg)}:${readableComboLegLabel(leg)}`).sort().join('|');
+      if (seenSignature.has(signature)) return false;
+      byAnchor.set(anchor, anchorCount + 1);
+      seenSignature.add(signature);
+      return true;
+    });
+    return safe.slice(0, limit);
+  }
+
   function renderSimpleInlineSections() {
-    const combines = Array.isArray(state.combines) ? state.combines.slice(0, 4) : [];
+    const combines = displayCombinesForUser(state.combines, { limit: 4 });
     const realScorers = (Array.isArray(state.scorers) ? state.scorers : [])
       .filter((scorer) => Number(scorer?.odd || 0) > 1 && Number(scorer?.edge || 0) >= 0.01 && Number(scorer?.playerQuality?.score || 0) >= 50)
       .sort((a, b) => (Number(b.edge || 0) - Number(a.edge || 0)) || (Number(b.probability || 0) - Number(a.probability || 0)));
     const scorers = realScorers.slice(0, 6);
     const combineCount = $('#simple-combines-count');
     const scorerCount = $('#simple-scorers-count');
-    if (combineCount) combineCount.textContent = formatCount(state.combines?.length || 0);
+    if (combineCount) combineCount.textContent = formatCount(combines.length);
     if (scorerCount) scorerCount.textContent = formatCount(realScorers.length || 0);
     const combineGrid = $('#simple-combines-grid');
     if (combineGrid) {
@@ -8346,12 +8430,15 @@
   function renderCombines() {
     const wrap = $('#combines-list');
     if (!wrap) return;
-    if (!state.combines.length) {
-      wrap.innerHTML = '<div class="empty">Aucun combiné exploitable avec les règles actuelles.</div>';
+    const displayCombines = displayCombinesForUser(state.combines, { limit: 14 });
+    if (!displayCombines.length) {
+      const hidden = Array.isArray(state.combines) ? state.combines.length : 0;
+      wrap.innerHTML = `<div class="empty">Aucun combiné simple exploitable maintenant.${hidden ? ' Les tickets trop techniques ou trop corrélés restent masqués en mode standard.' : ''}</div>`;
       return;
     }
+    const expert = Boolean(loadPreferences().expertMode);
     const tracked = new Set(loadUserBets().filter((bet) => bet.status === 'pending').map((bet) => bet.key));
-    const sortedCombines = state.combines.slice().sort((a, b) => {
+    const sortedCombines = displayCombines.slice().sort((a, b) => {
       const edgeA = (Array.isArray(a.legs) ? a.legs : []).reduce((sum, leg) => sum + Number(leg.edge || 0), 0) / Math.max(1, (a.legs || []).length);
       const edgeB = (Array.isArray(b.legs) ? b.legs : []).reduce((sum, leg) => sum + Number(leg.edge || 0), 0) / Math.max(1, (b.legs || []).length);
       return edgeB - edgeA || Number(b.totalOdd || 0) - Number(a.totalOdd || 0);
@@ -8371,23 +8458,23 @@
           ? 'Buts'
           : totalOdd >= 5
             ? 'Outsider'
-            : 'Best Edge';
+            : 'Meilleur ticket';
       return `
         <article class="combo-card">
           <div class="combo-head">
             <div>
-              <h4>${escapeHtml(combo.title)}</h4>
-              <p class="match-sub">${escapeHtml(combo.desc || 'Ticket multi-marché')}</p>
+              <h4>${escapeHtml(readableComboTitle(combo))}</h4>
+              <p class="match-sub">${escapeHtml((combo.desc || 'Ticket combiné').replace(/\bBTTS\b/ig, 'les deux marquent').replace(/\b1N2\b/ig, 'vainqueur').replace(/Best Edge/ig, 'meilleur ticket').replace(/Same-game/ig, 'même match'))}</p>
             </div>
             <span class="pill">${escapeHtml(variant)}</span>
-            <span class="pill">${combo.sameGame ? 'Same-game' : 'Multi-match'}</span>
+            <span class="pill">${combo.sameGame ? 'Même match' : 'Plusieurs matchs'}</span>
           </div>
           <div class="combo-stats">
             <div class="mini-stat"><span>Cote</span><strong>${formatOdd(combo.totalOdd).replace('@', '')}</strong></div>
             <div class="mini-stat"><span>Proba</span><strong>${combo.combinedProb > 0 ? formatPct(combo.combinedProb, 1) : formatPct(combo.avgProb, 1)}</strong></div>
             <div class="mini-stat"><span>Retour 10€</span><strong>${returnForTen > 0 ? formatMoney(returnForTen) : '-'}</strong></div>
-            <div class="mini-stat"><span>Corrélation</span><strong>${formatPct(correlation, 0)}</strong></div>
-            <div class="mini-stat"><span>Edge moyen</span><strong>${formatPct(edgeCompound, 1)}</strong></div>
+            ${expert ? `<div class="mini-stat"><span>Dépendance</span><strong>${formatPct(correlation, 0)}</strong></div>` : ''}
+            ${expert ? `<div class="mini-stat"><span>Avantage moyen</span><strong>${formatPct(edgeCompound, 1)}</strong></div>` : ''}
             <div class="mini-stat"><span>Jambes</span><strong>${legs.length}</strong></div>
           </div>
           <div class="leg-list">
@@ -8395,7 +8482,7 @@
               <div class="leg-row clickable-row" data-match-id="${escapeHtml(leg.id)}" tabindex="0" role="button" aria-label="Ouvrir ${escapeHtml(leg.title)}">
                 <div>
                   <div class="match-title">${escapeHtml(leg.title)}</div>
-                  <div class="match-sub">${escapeHtml(leg.market)} · ${escapeHtml(leg.label)}</div>
+                  <div class="match-sub">${escapeHtml(readableComboLegMarket(leg))} · ${escapeHtml(readableComboLegLabel(leg))}</div>
                 </div>
                 <strong>${formatOdd(leg.odd)}</strong>
               </div>
@@ -8776,6 +8863,17 @@
     return 'sample';
   }
 
+  function isExtremeModelRoi(row) {
+    const roi = Math.abs(Number(row?.roi || 0));
+    const brier = Number(row?.brier || 0);
+    const count = Number(row?.count || 0);
+    return roi > 3 || (roi > 1.5 && (count < 50 || brier > 0.4));
+  }
+
+  function userFacingRoi(row, digits = 0) {
+    return isExtremeModelRoi(row) ? 'Sample anormal' : formatPct(row?.roi || 0, digits);
+  }
+
   function renderModelPerformance() {
     const grid = $('#model-performance-grid');
     const segmentGrid = $('#model-segment-grid');
@@ -8817,15 +8915,20 @@
       const realityTop = Array.isArray(state.modelRealityAudit?.topSegments) ? state.modelRealityAudit.topSegments.slice(0, 4) : [];
       const markets = realityTop.length ? realityTop : (Array.isArray(report.by_market) ? report.by_market : []).slice(0, 4);
       const leagues = (Array.isArray(report.by_league) ? report.by_league : []).filter((row) => Number(row.roi || 0) > 0).slice(0, 4);
-      const rows = [...markets, ...leagues].slice(0, 8);
+      const rawRows = [...markets, ...leagues].slice(0, 10);
+      const hiddenExtreme = rawRows.filter(isExtremeModelRoi).length;
+      const rows = rawRows.filter((row) => !isExtremeModelRoi(row)).slice(0, 8);
+      const hiddenHtml = hiddenExtreme
+        ? `<article class="segment-card sample"><span>Segments extrêmes masqués</span><strong>${formatCount(hiddenExtreme)}</strong><p>ROI trop haut pour être fiable côté utilisateur. Détail disponible en export expert.</p><em>anti-signal trompeur</em></article>`
+        : '';
       segmentGrid.innerHTML = rows.length ? rows.map((row) => `
         <article class="segment-card ${segmentTone(row)}" data-market-chip="${escapeHtml(normalizeUiKey(row.key || ''))}">
           <span>${escapeHtml(formatMarketName(row.key || row.market || row.league || 'Segment'))}</span>
-          <strong>${escapeHtml(formatPct(row.roi || 0, 0))}</strong>
+          <strong>${escapeHtml(userFacingRoi(row, 0))}</strong>
           <p>${escapeHtml(`${formatCount(row.count || 0)} réglés · WR ${formatPct(row.hit_rate || row.win_rate || row.winRate || 0, 0)} · Brier ${Number(row.brier || 0).toFixed(3)}`)}</p>
           <em>${escapeHtml(row.sample_level || 'sample')}</em>
         </article>
-      `).join('') : '<div class="empty">Aucun segment robuste à afficher.</div>';
+      `).join('') + hiddenHtml : (hiddenHtml || '<div class="empty">Aucun segment robuste à afficher.</div>');
     }
     if (plot) {
       const buckets = Array.isArray(state.probabilityCalibration?.buckets) ? state.probabilityCalibration.buckets : [];

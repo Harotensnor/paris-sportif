@@ -168,19 +168,29 @@ function confidenceTrust(row, backtestReport = null) {
 }
 
 function applyContextGate(row) {
-  const details = contextQuality(row?.match);
+  const existingQuality = row?.contextQuality && typeof row.contextQuality === 'object' ? row.contextQuality : null;
+  const details = existingQuality ? { quality: existingQuality } : contextQuality(row?.match);
   const quality = details.quality;
   if (!quality) {
+    const fallbackQuality = {
+      score: 35,
+      tier: 'manquant',
+      gate: 'watch',
+      agent_eligible: false,
+      critical_missing: ['context_missing'],
+      missing: ['context'],
+      stale: []
+    };
     return {
       ...row,
-      contextQuality: null,
+      contextQuality: fallbackQuality,
       contextGate: {
         gate: 'watch',
         agentEligible: false,
         label: 'Contexte non généré',
         warnings: ['context_missing']
       },
-      confidenceTrust: confidenceTrust(row),
+      confidenceTrust: confidenceTrust({ ...row, contextQuality: fallbackQuality }),
       status: row.status === 'bet' ? 'watch' : row.status,
       statusLabel: row.status === 'bet' ? 'À surveiller · contexte non généré' : row.statusLabel
     };

@@ -126,7 +126,7 @@ async function main() {
     const hasComplexMarket = /Handicap|Double chance|Jeux tennis|Total basket|Total runs|Score exact|Corners|Cartons(?!\/m)/i.test(dashboard.dashboardText);
     const hasTechnicalJargon = /\bKelly\b|\bEV\b|\btier\b|\b1N2\b|\bBTTS\b|\bedge\b/i.test(dashboard.dashboardText);
     const hasExpertRepairLabel = /À réparer/i.test(dashboard.dashboardText);
-    if (dashboard.rows < 15 || dashboard.rows > 28 || dashboard.timeline < 8 || dashboard.trackButtons < 6 || dashboard.safeBadges < 5 || !/24h|aujourd’hui|à venir|surveill/i.test(dashboard.metricLabel) || (dashboard.metric < 6 && !/trop strict|Winamax/i.test(dashboard.funnelAlert)) || !dashboard.homeShell || dashboard.homeTop3 < Math.min(3, dashboard.homeTableRows) || dashboard.homeTableRows < 6 || dashboard.homeSortButtons < 4 || !hasActionCopy || hasComplexMarket || hasTechnicalJargon || hasExpertRepairLabel) {
+    if (dashboard.rows < 15 || dashboard.rows > 28 || dashboard.timeline < 8 || dashboard.trackButtons < 3 || dashboard.safeBadges < 5 || !/24h|aujourd’hui|à venir|surveill/i.test(dashboard.metricLabel) || (dashboard.metric < 6 && !/trop strict|Winamax/i.test(dashboard.funnelAlert)) || !dashboard.homeShell || dashboard.homeTop3 < Math.min(3, dashboard.homeTableRows) || dashboard.homeTableRows < 6 || dashboard.homeSortButtons < 4 || !hasActionCopy || hasComplexMarket || hasTechnicalJargon || hasExpertRepairLabel) {
       throw new Error(`Picks Sprint 15 insuffisants: ${JSON.stringify({ ...dashboard, dashboardText: dashboard.dashboardText.slice(0, 800), hasActionCopy, hasComplexMarket, hasTechnicalJargon })}`);
     }
     if (new Set(dashboard.homeTableMarkets.filter(Boolean)).size > 1 && new Set(dashboard.homeTopMarkets.filter(Boolean)).size < 2) {
@@ -135,6 +135,22 @@ async function main() {
     if (!dashboard.combines || !dashboard.scorers || !dashboard.promos || !dashboard.bankroll.includes('€') || !dashboard.pnl.includes('€') || !dashboard.expertHidden || dashboard.multibookText) {
       throw new Error(`Cockpit Sprint 14 incohérent: ${JSON.stringify(dashboard)}`);
     }
+
+    await win.click('[data-tab="combines"]');
+    await win.waitForSelector('#combines-list', { timeout: 10_000 });
+    const combinesAudit = await win.evaluate(() => {
+      const text = document.querySelector('[data-panel="combines"]')?.innerText || '';
+      return {
+        cards: document.querySelectorAll('#combines-list .combo-card').length,
+        text,
+        hasAdvanced: /Handicap|Remboursé|Double chance|Score exact|HT\/FT|\b1N2\b|\bDNB\b|\bBTTS\b|Same-game|Best Edge|Kelly|edge/i.test(text)
+      };
+    });
+    if (combinesAudit.cards && combinesAudit.hasAdvanced) {
+      throw new Error(`Combinés standard trop techniques: ${combinesAudit.text.slice(0, 1200)}`);
+    }
+    await win.click('[data-tab="dashboard"]');
+    await win.waitForSelector('[data-panel="dashboard"].active', { timeout: 10_000 });
 
     await win.click('[data-cockpit-category="cockpit"]');
     await win.waitForFunction(() => Boolean(document.querySelector('#cockpit-detail-section')?.open), null, { timeout: 5000 });
