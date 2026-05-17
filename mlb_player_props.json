@@ -1,56 +1,9 @@
 {
-  "generated_at": "2026-05-17T23:18:00Z",
+  "generated_at": "2026-05-17T23:33:06Z",
   "source": "derived from mlb_pitchers already patched into data.js",
-  "status": "ok",
-  "events": [
-    {
-      "event_id": "401815388",
-      "kickoff": "2026-05-17T23:20Z",
-      "league": "MLB",
-      "match": "San Diego Padres at Seattle Mariners",
-      "home": "Seattle Mariners",
-      "away": "San Diego Padres",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Seattle Mariners",
-          "pitcher": "George Kirby",
-          "label": "George Kirby moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.5878,
-          "fair_odds": 1.7,
-          "expected_strikeouts": 5.11,
-          "projected_ip": 6.33,
-          "inputs": {
-            "k9": 7.26,
-            "era": 2.84,
-            "whip": 1.16,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Seattle Mariners",
-          "pitcher": "George Kirby",
-          "label": "George Kirby ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6419,
-          "fair_odds": 1.56,
-          "expected_hr_allowed": 0.443,
-          "projected_ip": 6.33,
-          "inputs": {
-            "hr9": 0.63,
-            "era": 2.84,
-            "whip": 1.16
-          },
-          "side": "home"
-        }
-      ]
-    }
-  ],
-  "props": 2,
+  "status": "empty",
+  "events": [],
+  "props": 0,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
