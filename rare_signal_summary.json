@@ -1,26 +1,25 @@
 {
-  "generated_at": "2026-05-17T13:59:47Z",
+  "generated_at": "2026-05-17T14:05:08Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 43,
+    "active_events": 46,
     "actionable": 17,
     "watch": 2,
-    "risk": 24,
+    "risk": 27,
     "expired_sample": 0,
     "by_type": {
       "weather_extreme": 1,
       "injury_imbalance": 17,
       "back_to_back_travel": 8,
-      "market_uncertain": 20,
-      "signal_conflict": 4,
-      "market_move": 1
+      "market_uncertain": 23,
+      "signal_conflict": 5
     },
     "by_quality": {
       "watch": 2,
       "actionable": 17,
-      "risk": 24
+      "risk": 27
     }
   },
   "active_actionable": [
@@ -111,8 +110,8 @@
       "direction": "fade",
       "team": "San Diego Padres",
       "side": "away",
-      "strength": 0.872,
-      "context": "1 match dans les 48h + 1711 km de voyage"
+      "strength": 0.952,
+      "context": "2 match dans les 48h + 1711 km de voyage"
     },
     {
       "event_id": "401815376",
@@ -129,8 +128,8 @@
       "direction": "fade",
       "team": "Boston Red Sox",
       "side": "away",
-      "strength": 0.83,
-      "context": "1 match dans les 48h + 1498 km de voyage"
+      "strength": 0.91,
+      "context": "2 match dans les 48h + 1498 km de voyage"
     },
     {
       "event_id": "401815378",
@@ -515,6 +514,24 @@
       "context": "marge bookmaker anormale 18.0%"
     },
     {
+      "event_id": "401866584",
+      "date": "2026-05-21T16:00Z",
+      "sport": "football",
+      "league_code": "superleaguegrece",
+      "league_name": "Super League Grèce",
+      "home": "Atromitos",
+      "away": "Panserraikos FC",
+      "match": "Atromitos - Panserraikos FC",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.0%"
+    },
+    {
       "event_id": "401866585",
       "date": "2026-05-21T16:00Z",
       "sport": "football",
@@ -765,6 +782,42 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 19.4%"
+    },
+    {
+      "event_id": "401842728",
+      "date": "2026-05-24T12:00Z",
+      "sport": "football",
+      "league_code": "allsvenskan",
+      "league_name": "Allsvenskan",
+      "home": "Hammarby IF",
+      "away": "AIK",
+      "match": "Hammarby IF - AIK",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.9%"
+    },
+    {
+      "event_id": "401842724",
+      "date": "2026-05-24T12:00Z",
+      "sport": "football",
+      "league_code": "allsvenskan",
+      "league_name": "Allsvenskan",
+      "home": "IK Sirius",
+      "away": "GAIS",
+      "match": "IK Sirius - GAIS",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.8%"
     },
     {
       "event_id": "401843351",
