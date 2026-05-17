@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-17T19:19:24Z",
+  "generated_at": "2026-05-17T19:21:28Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815386",
-      "kickoff": "2026-05-17T19:10Z",
-      "league": "MLB",
-      "match": "Arizona Diamondbacks at Colorado Rockies",
-      "home": "Colorado Rockies",
-      "away": "Arizona Diamondbacks",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Colorado Rockies",
-          "pitcher": "Michael Lorenzen",
-          "label": "Michael Lorenzen moins de 3,5 strikeouts",
-          "line": 3.5,
-          "pick": "under",
-          "probability": 0.5154,
-          "fair_odds": 1.94,
-          "expected_strikeouts": 3.44,
-          "projected_ip": 4.89,
-          "inputs": {
-            "k9": 6.34,
-            "era": 6.55,
-            "whip": 1.84,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Colorado Rockies",
-          "pitcher": "Michael Lorenzen",
-          "label": "Michael Lorenzen concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5401,
-          "fair_odds": 1.85,
-          "expected_hr_allowed": 0.777,
-          "projected_ip": 4.89,
-          "inputs": {
-            "hr9": 1.43,
-            "era": 6.55,
-            "whip": 1.84
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Arizona Diamondbacks",
-          "pitcher": "Michael Soroka",
-          "label": "Michael Soroka plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.5721,
-          "fair_odds": 1.75,
-          "expected_strikeouts": 5.84,
-          "projected_ip": 5.39,
-          "inputs": {
-            "k9": 9.76,
-            "era": 3.53,
-            "whip": 1.32,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Arizona Diamondbacks",
-          "pitcher": "Michael Soroka",
-          "label": "Michael Soroka ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6084,
-          "fair_odds": 1.64,
-          "expected_hr_allowed": 0.497,
-          "projected_ip": 5.39,
-          "inputs": {
-            "hr9": 0.83,
-            "era": 3.53,
-            "whip": 1.32
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815389",
       "kickoff": "2026-05-17T20:05Z",
@@ -260,7 +178,7 @@
       ]
     }
   ],
-  "props": 12,
+  "props": 8,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
