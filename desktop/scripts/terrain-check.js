@@ -87,10 +87,15 @@ async function main() {
   assert(analysis.terrainReportV3?.schema === 'paris-sportif.terrain_report.v3', 'Terrain: rapport v3 absent', analysis.terrainReportV3);
   assert(analysis.sourceHealthV6?.schema === 'paris-sportif.source_health.v6', 'Terrain: santé sources v6 absente', analysis.sourceHealthV6);
   assert(analysis.modelBacktestV4?.schema === 'paris-sportif.model_backtest.v4', 'Terrain: backtest modèle v4 absent', analysis.modelBacktestV4);
+  assert(analysis.terrainReportV4?.schema === 'paris-sportif.terrain_report.v4', 'Terrain: rapport v4 absent', analysis.terrainReportV4);
+  assert(analysis.sourceHealthV7?.schema === 'paris-sportif.source_health.v7', 'Terrain: santé sources v7 absente', analysis.sourceHealthV7);
+  assert(analysis.modelBacktestV5?.schema === 'paris-sportif.model_backtest.v5', 'Terrain: backtest modèle v5 absent', analysis.modelBacktestV5);
   assert(analysis.marketCoverageV2?.schema === 'paris-sportif.market_coverage.v2', 'Terrain: couverture marchés v2 absente', analysis.marketCoverageV2);
   assert(dashboard.every((pick) => pick?.pickDecisionV3?.schema === 'paris-sportif.pick_decision.v3' && pick?.matchSheetV3?.schema === 'paris-sportif.match_sheet.v3'), 'Terrain: le cockpit contient une ligne sans contrat v3', dashboard.slice(0, 3));
   assert(dashboard.every((pick) => pick?.pickDecisionV4?.schema === 'paris-sportif.pick_decision.v4' && pick?.matchSheetV4?.schema === 'paris-sportif.match_sheet.v4'), 'Terrain: le cockpit contient une ligne sans contrat v4', dashboard.slice(0, 3));
+  assert(dashboard.every((pick) => pick?.pickDecisionV5?.schema === 'paris-sportif.pick_decision.v5' && pick?.matchSheetV5?.schema === 'paris-sportif.match_sheet.v5'), 'Terrain: le cockpit contient une ligne sans contrat v5', dashboard.slice(0, 3));
   assert(analysis.terrainReportV3.uxChecks?.hideEmptySections === true, 'Terrain: rapport v3 ne garantit pas le masquage des sections vides', analysis.terrainReportV3.uxChecks);
+  assert(analysis.terrainReportV4.quickBetSummary && Array.isArray(analysis.terrainReportV4.userVisibleBugs), 'Terrain: rapport v4 incomplet', analysis.terrainReportV4);
   if (Number(coverage.nightPositive || 0) >= 6) {
     assert(Number(coverage.nightDisplayed || 0) >= Math.min(6, Number(coverage.nightPositive || 0)), 'Terrain: couverture nuit v3 insuffisante', coverage);
   }

@@ -37,8 +37,13 @@ async function captureFingerprint() {
   try {
     const win = app.windows()[0] || await app.waitForEvent('window', { timeout: 60000 });
     await win.waitForSelector('[data-panel="dashboard"].active', { timeout: 60000 });
-    await win.waitForFunction(() => document.querySelector('#metric-picks')?.textContent !== '-',
-      null, { timeout: 90000 });
+    await win.waitForFunction(() => {
+      const panel = document.querySelector('[data-panel="dashboard"]');
+      const metricReady = document.querySelector('#metric-picks')?.textContent !== '-';
+      const rows = document.querySelectorAll('#picks-body tr.clickable-row').length;
+      const text = panel?.innerText || '';
+      return metricReady && (rows > 0 || /Aucun pari|Mod[eè]le trop strict|Donn[eé]es indisponibles/i.test(text));
+    }, null, { timeout: 90000 });
 
     const fp = await win.evaluate(() => ({
       dashboardRows: document.querySelectorAll('#picks-body tr.clickable-row').length,

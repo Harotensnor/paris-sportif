@@ -8,13 +8,13 @@ Paris Sportif Desktop est le logiciel PC local pour préparer tes paris Winamax.
 
 ### Version installateur Windows
 
-La version v3.1.0 se génère avec :
+La version v3.2.0 se génère avec :
 
 ```powershell
 npm --prefix desktop run dist
 ```
 
-Le fichier attendu est `Paris Sportif Desktop Setup 3.1.0.exe`. Le build packagé embarque les données, rapports modèle et scripts nécessaires au démarrage. Python reste recommandé si tu veux relancer une pipeline complète depuis la machine installée.
+Le fichier attendu est `Paris Sportif Desktop Setup 3.2.0.exe`. Le build packagé embarque les données, rapports modèle et scripts nécessaires au démarrage. Python reste recommandé si tu veux relancer une pipeline complète depuis la machine installée.
 
 ### Version développeur
 
@@ -53,6 +53,16 @@ Depuis v1.5.0, certains matchs avec peu de contexte secondaire peuvent apparaît
 L'app ne place pas de pari automatiquement. Elle prépare le ticket et suit ton résultat.
 
 En Mode expert, l'auto-tracking supervisé peut suivre automatiquement certains tickets dans l'app selon tes règles. C'est uniquement un suivi interne : tu dois toujours ouvrir Winamax et confirmer toi-même le pari réel.
+
+## Nouveautés v3.2.0
+
+La v3.2.0 pousse le plan `Pronostics Plus Fiables, Plus Nombreux, Plus Propres` avec des diagnostics terrain encore plus précis :
+
+- chaque ligne cockpit porte maintenant `PickDecision v5` : score modèle, score pari rapide, blocages de sources, statut quota/nuit, politique de mise, éléments manquants pour miser et phrase utilisateur ;
+- chaque fiche expose `MatchSheet v5` : sections obligatoires/facultatives, qualité par section, preuves affichées, état de relance enrichissement et manques critiques ;
+- la santé sources passe en `SourceHealth v7`, avec couverture actuelle/cible, delta à réparer, auto-réparation autorisée, politique de retry et gain estimé en picks ;
+- le terrain passe en `TerrainReport v4` : résumé pari rapide, résumé nuit, bugs visibles, sections vides et prochaines réparations actionnables ;
+- le laboratoire modèle expose `ModelBacktest v5`, avec lecture par qualité source, statut de décision et règles Winamax pour éviter de promouvoir artificiellement des picks faibles.
 
 ## Nouveautés v3.1.0
 

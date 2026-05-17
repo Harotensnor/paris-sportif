@@ -57,10 +57,13 @@
     policyCandidates: null,
     sourceHealth: null,
     sourceHealthV6: null,
+    sourceHealthV7: null,
     marketCoverageV2: null,
     terrainReportV2: null,
     terrainReportV3: null,
+    terrainReportV4: null,
     modelBacktestV4: null,
+    modelBacktestV5: null,
     decisionCenter: null,
     agentBlockers: null,
     clvSummary: null,
@@ -4697,12 +4700,15 @@
     state.modelRealityAudit = analysis.modelRealityAudit || null;
     state.probabilityCalibration = analysis.probabilityCalibration || null;
     state.policyCandidates = analysis.policyCandidates || null;
-    state.sourceHealth = analysis.sourceHealthV6 || analysis.sourceHealthV5 || analysis.sourceHealth || null;
+    state.sourceHealth = analysis.sourceHealthV7 || analysis.sourceHealthV6 || analysis.sourceHealthV5 || analysis.sourceHealth || null;
     state.sourceHealthV6 = analysis.sourceHealthV6 || null;
+    state.sourceHealthV7 = analysis.sourceHealthV7 || null;
     state.marketCoverageV2 = analysis.marketCoverageV2 || null;
     state.terrainReportV2 = analysis.terrainReportV2 || null;
     state.terrainReportV3 = analysis.terrainReportV3 || null;
+    state.terrainReportV4 = analysis.terrainReportV4 || null;
     state.modelBacktestV4 = analysis.modelBacktestV4 || null;
+    state.modelBacktestV5 = analysis.modelBacktestV5 || null;
     state.decisionCenter = analysis.decisionCenter || null;
     state.agentBlockers = analysis.agentBlockers || null;
     state.clvSummary = analysis.clvSummary || null;
@@ -13163,8 +13169,8 @@
   }
 
   function buildV3SheetSnapshotHtml(row) {
-    const sheet = row?.matchSheetV4 || row?.matchSheetV3 || null;
-    const decision = row?.pickDecisionV4 || row?.pickDecisionV3 || null;
+    const sheet = row?.matchSheetV5 || row?.matchSheetV4 || row?.matchSheetV3 || null;
+    const decision = row?.pickDecisionV5 || row?.pickDecisionV4 || row?.pickDecisionV3 || null;
     if (!sheet || !decision) return '';
     const quality = sheet.summary?.sourceQuality || decision.sourceQuality || {};
     const missing = Array.isArray(sheet.missingData) ? sheet.missingData : [];
@@ -13185,7 +13191,7 @@
       : 'Observation sans bouton de mise';
     return `
       <article class="detail-card wide v3-sheet-card">
-        <h4>Dossier pronostic ${sheet.schema?.includes('v4') ? 'v4' : 'v3'}</h4>
+        <h4>Dossier pronostic ${sheet.schema?.includes('v5') ? 'v5' : sheet.schema?.includes('v4') ? 'v4' : 'v3'}</h4>
         <div class="match-context-band">
           <span>${escapeHtml(decision.marketFamily || simpleMarketLabelForRow(row))}</span>
           <strong>${escapeHtml(canBetText)}</strong>
@@ -13206,6 +13212,11 @@
             <span>Masqué car vide</span>
             <strong>${escapeHtml(hidden.slice(0, 4).map((item) => item.section).join(' · '))}</strong>
             <em>${escapeHtml('Ces blocs ne polluent plus la fiche tant que la donnée fiable manque.')}</em>
+          </div>` : ''}
+          ${decision.repairable ? `<div class="missing">
+            <span>Réparable</span>
+            <strong>${escapeHtml(decision.repairHint || 'Relancer enrichissement contexte')}</strong>
+            <em>${escapeHtml((decision.missingForBet || []).slice(0, 3).join(' · ') || 'La ligne reste en observation tant que le contexte manque.')}</em>
           </div>` : ''}
         </div>
       </article>
@@ -14564,7 +14575,7 @@
     const grid = $('#model-lab-grid');
     if (!grid) return;
     const model = state.modelLab || {};
-    const backtest = state.modelBacktestV4 || {};
+    const backtest = state.modelBacktestV5 || state.modelBacktestV4 || {};
     const prob = state.probabilityCalibration || {};
     const policies = Array.isArray(state.policyCandidates?.policies) ? state.policyCandidates.policies : [];
     const summary = model.summary || {};
@@ -14628,6 +14639,7 @@
     }
     const scoreFor = (row) => {
       if (Number.isFinite(Number(row.score))) return Number(row.score);
+      if (Number.isFinite(Number(row.currentCoverage))) return Math.round(Math.max(0, Math.min(100, Number(row.currentCoverage) > 1 ? Number(row.currentCoverage) : Number(row.currentCoverage) * 100)));
       if (row.status === 'ok' || row.status === 'preserved') return 100;
       if (row.status === 'degraded') return 55;
       if (row.status === 'warning') return 65;
@@ -14641,18 +14653,20 @@
         : 0;
     const cards = [
       {
-        tone: Number(summary.critical || 0) ? 'danger' : Number(summary.warning || 0) ? 'warn' : 'ok',
+        tone: Number(summary.critical || 0) ? 'danger' : Number(summary.degraded || summary.warning || 0) ? 'warn' : 'ok',
         label: 'Score sources',
         value: `${avgScore.toFixed(0)}/100`,
-        detail: `${formatCount(summary.sources || rows.length)} sources · ${formatCount(summary.degraded || 0)} dégradée(s) · ${formatCount(summary.preserved || summary.preservedSnapshots || 0)} snapshot(s) préservé(s) · gain estimé ${formatCount(summary.estimatedPickGain || 0)}.`
+        detail: `${formatCount(summary.sources || rows.length)} sources · ${formatCount(summary.degraded || 0)} dégradée(s) · ${formatCount(summary.autoRepairable || 0)} réparable(s) · gain estimé ${formatCount(summary.estimatedPickGain || 0)}.`
       },
       ...rows.slice(0, 7).map((row) => {
         const ageValue = row.age_min ?? row.age;
+        const coverage = row.currentCoverage ?? row.coverage ?? row.score;
+        const target = row.targetCoverage != null ? ` / cible ${Math.round(Number(row.targetCoverage) * 100)}%` : '';
         return {
           tone: scoreFor(row) < 50 ? 'danger' : scoreFor(row) < 80 ? 'warn' : 'ok',
           label: row.status || row.kind || 'source',
-          value: `${row.source || '-'} · ${formatCount(row.score ?? row.coverage ?? scoreFor(row))}`,
-          detail: `${row.repairCommand ? `Réparer: ${row.repairCommand}` : row.action || row.note || '-'} · âge ${ageValue != null ? formatAge(Math.round(Number(ageValue))) : 'inconnu'} · TTL ${row.ttl_min ?? row.ttl ?? '-'} min`
+          value: `${row.source || '-'} · ${Number.isFinite(Number(coverage)) ? `${Math.round((Number(coverage) > 1 ? Number(coverage) : Number(coverage) * 100))}%${target}` : formatCount(scoreFor(row))}`,
+          detail: `${row.repairCommand ? `Réparer: ${row.repairCommand}` : row.action || row.note || '-'} · âge ${ageValue != null ? formatAge(Math.round(Number(ageValue))) : 'inconnu'} · TTL ${row.ttl_min ?? row.ttl ?? row.retryPolicy?.ttlMinutes ?? '-'} min`
         };
       })
     ];

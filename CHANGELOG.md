@@ -5,6 +5,17 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-17
 
+### Version v3.2.0 — Pronostics plus fiables : contrats v5 + terrain v4 + sources v7
+
+Suite du plan `Pronostics Plus Fiables, Plus Nombreux, Plus Propres`, avec priorité donnée aux vrais blocages terrain plutôt qu'au remplissage artificiel des boutons `Je mise`.
+- Ajout de `PickDecision v5` sur chaque ligne cockpit : score modèle, score pari rapide, blocages de sources, statut quota/nuit, confiance marché, politique de mise, preuves de décision et manques à réparer avant pari.
+- Ajout de `MatchSheet v5` : sections obligatoires/facultatives, qualité par section, fraîcheur d'enrichissement, preuves affichables et état de relance manuelle.
+- Ajout de `SourceHealth v7` : couverture actuelle/cible, delta à combler, auto-réparation autorisée, politique de retry, âge du dernier snapshot sain et gain estimé en picks.
+- Ajout de `TerrainReport v4` : résumé “pari vite”, résumé nuit, bugs visibles côté utilisateur, sections vides et prochaines réparations actionnables.
+- Ajout de `ModelBacktest v5` : lecture par qualité source, statut de décision, tranche horaire et règles Winamax pour contrôler les promotions.
+- Interface : les fiches indiquent maintenant quand un pick est réparable et ce qui manque concrètement avant de pouvoir cliquer `Je mise`.
+- Tests : `qa:engine` et `qa:terrain` vérifient les contrats v5/v7/v4/v5 sur les vraies lignes cockpit issues de la pipeline terrain.
+
 ### Version v3.1.0 — Contrats v4 + terrain v3 + santé sources v6
 
 Suite du chantier `Pronostics Pro Winamax`, centrée sur la qualité réelle des pronostics plutôt que sur l'ajout cosmétique.
