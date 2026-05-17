@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-17T16:24:02Z",
+  "generated_at": "2026-05-17T16:27:24Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815378",
-      "kickoff": "2026-05-17T16:15Z",
-      "league": "MLB",
-      "match": "Miami Marlins at Tampa Bay Rays",
-      "home": "Tampa Bay Rays",
-      "away": "Miami Marlins",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Tampa Bay Rays",
-          "pitcher": "Drew Rasmussen",
-          "label": "Drew Rasmussen plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.5588,
-          "fair_odds": 1.79,
-          "expected_strikeouts": 4.75,
-          "projected_ip": 4.79,
-          "inputs": {
-            "k9": 8.93,
-            "era": 3.12,
-            "whip": 0.9,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Tampa Bay Rays",
-          "pitcher": "Drew Rasmussen",
-          "label": "Drew Rasmussen concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5377,
-          "fair_odds": 1.86,
-          "expected_hr_allowed": 0.772,
-          "projected_ip": 4.79,
-          "inputs": {
-            "hr9": 1.45,
-            "era": 3.12,
-            "whip": 0.9
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Miami Marlins",
-          "pitcher": "Eury Pérez",
-          "label": "Eury Pérez plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.5759,
-          "fair_odds": 1.74,
-          "expected_strikeouts": 5.86,
-          "projected_ip": 5.23,
-          "inputs": {
-            "k9": 10.08,
-            "era": 4.94,
-            "whip": 1.37,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Miami Marlins",
-          "pitcher": "Eury Pérez",
-          "label": "Eury Pérez concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5868,
-          "fair_odds": 1.7,
-          "expected_hr_allowed": 0.884,
-          "projected_ip": 5.23,
-          "inputs": {
-            "hr9": 1.52,
-            "era": 4.94,
-            "whip": 1.37
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815375",
       "kickoff": "2026-05-17T17:35Z",
@@ -1126,7 +1044,7 @@
       ]
     }
   ],
-  "props": 54,
+  "props": 50,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
