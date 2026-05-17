@@ -62,6 +62,17 @@ function commonDecisionOutputs(stages, label) {
     'build_smart_prepare_plan.py',
     'build_source_registry.py',
     'build_optional_sources_plan.py',
+    'build_v6_decision_terminal.py',
+    'build_v7_actionability.py',
+    'build_v8_decision_cockpit.py',
+    'build_v9_operational_readiness.py',
+    'build_v10_finalizer.py',
+    'build_v11_finalizer.py',
+    'build_v12_price_watch.py',
+    'build_v13_price_alerts.py',
+    'build_v14_quality_audit.py',
+    'build_v15_operational_cleanup.py',
+    'build_v16_final_decision.py',
     'build_v4_audit_reports.py',
     'build_decision_exports.py',
     'build_health.py',
@@ -71,6 +82,9 @@ function commonDecisionOutputs(stages, label) {
   }
   before(stages, 'build_match_context.py', 'build_prebet_checklist.py', `${label} contexte avant checklist`);
   before(stages, 'build_prebet_checklist.py', 'build_prebet_checklist_backtest.py', `${label} checklist avant backtest`);
+  before(stages, 'build_optional_sources_plan.py', 'build_v6_decision_terminal.py', `${label} plan sources avant pile décision`);
+  before(stages, 'build_v6_decision_terminal.py', 'build_v16_final_decision.py', `${label} pile décision ordonnée`);
+  before(stages, 'build_v16_final_decision.py', 'build_v4_audit_reports.py', `${label} décision finale avant audit v4`);
   before(stages, 'build_v4_audit_reports.py', 'build_decision_exports.py', `${label} audit avant exports`);
   before(stages, 'build_decision_exports.py', 'build_health.py', `${label} exports avant santé`);
   before(stages, 'build_health.py', 'finalize_inline.py', `${label} santé avant inline`);

@@ -5,6 +5,16 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-17
 
+### Version v4.1.1 — Pile décision fraîche + anti-match expiré
+
+Correctif opérationnel orienté pronostics : les rapports avancés `V8 → V16` pouvaient rester datés alors que les données Winamax étaient fraîches, ce qui réaffichait des matchs passés comme candidats T-10.
+- La pipeline desktop relance désormais toute la pile décision `V6` à `V16` à chaque refresh quick, signal, pré-match, T-60, T-30, T-10 et réparation contexte.
+- `V8` classe les matchs déjà commencés en `skip`/`expired` au lieu de les compter dans `now`.
+- `V9`, `V10`, `V11` et `V12` propagent le statut expiré sans le transformer en faux `wait_t10`.
+- `V14` retire les matchs expirés du cockpit prix/action ; `V15` et `V16` ne gardent plus que les candidats actuels.
+- `qa:engine` vérifie maintenant qu’aucun match expiré ne peut revenir dans les statuts `ready_now`, `wait_t10` ou `wait_price`.
+- Après réparation contexte réelle, le cockpit opérationnel affiche `12` candidats à finaliser T-10, `7` prix à surveiller et `15` rejetés actuels, au lieu de mélanger ces chiffres avec des vieux matchs.
+
 ### Version v4.1.0 — Réparation contexte par sport + tennis source pipeline
 
 Correctif profond après test terrain v4.0.0 : les dossiers tennis et sports non-foot étaient trop souvent pénalisés par des sources football-only, ce qui gonflait artificiellement les blocages contexte.

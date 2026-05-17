@@ -145,6 +145,21 @@ function testAnalysis() {
     });
     assert(polluted.length === 0, 'Les dossiers tennis ne doivent pas être bloqués par des sources foot', polluted.slice(0, 5));
   }
+  const readJson = (name) => JSON.parse(fs.readFileSync(path.join(process.cwd(), name), 'utf8'));
+  const parseTime = (value) => {
+    const date = new Date(String(value || '').replace('Z', '+00:00'));
+    return Number.isFinite(date.getTime()) ? date.getTime() : 0;
+  };
+  const v10 = readJson('v10_decision_feed.json');
+  const v15 = readJson('v15_action_cockpit_report.json');
+  const v16 = readJson('v16_final_ticket.json');
+  const staleV10 = (v10.decisions || []).filter((row) => row.time_bucket === 'expired' && row.v10_status === 'wait_t10');
+  assert(staleV10.length === 0, 'V10 ne doit pas demander T-10 sur un match expiré', staleV10.slice(0, 5));
+  const v15Generated = parseTime(v15.generated_at);
+  const staleV15 = (v15.rows || []).filter((row) => parseTime(row.kickoff) <= v15Generated && ['ready_now', 'needs_t10', 'one_tick_price', 'price_watch'].includes(row.v15_status));
+  assert(staleV15.length === 0, 'V15 ne doit pas proposer action/prix sur un match expiré', staleV15.slice(0, 5));
+  const staleV16 = (v16.rows || []).filter((row) => parseTime(row.kickoff) <= parseTime(v16.generated_at) && ['ready_now', 'wait_t10', 'wait_price'].includes(row.v16_status));
+  assert(staleV16.length === 0, 'V16 ne doit pas garder un match expiré dans le ticket actif', staleV16.slice(0, 5));
   assert(Number(analysis.winamaxMarketAudit.summary?.availableFamilies || 0) >= 8, 'Pas assez de familles de marchés Winamax détectées', analysis.winamaxMarketAudit.summary);
   const availableFamilies = Number(analysis.winamaxMarketAudit.summary?.availableFamilies || 0);
   const exploitedFamilies = Number(analysis.winamaxMarketAudit.summary?.exploitedFamilies || 0);

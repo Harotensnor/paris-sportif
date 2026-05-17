@@ -39,6 +39,21 @@ class Stage:
     required: bool = False
 
 
+DECISION_STACK_STAGES = [
+    Stage("build_v6_decision_terminal.py", 30),
+    Stage("build_v7_actionability.py", 30),
+    Stage("build_v8_decision_cockpit.py", 30),
+    Stage("build_v9_operational_readiness.py", 30),
+    Stage("build_v10_finalizer.py", 30),
+    Stage("build_v11_finalizer.py", 30),
+    Stage("build_v12_price_watch.py", 30),
+    Stage("build_v13_price_alerts.py", 30),
+    Stage("build_v14_quality_audit.py", 45),
+    Stage("build_v15_operational_cleanup.py", 30),
+    Stage("build_v16_final_decision.py", 30),
+]
+
+
 QUICK_STAGES = [
     Stage("fetch_live.py", 60),
     Stage("fetch_sofascore_events.py", 90),
@@ -104,8 +119,9 @@ QUICK_STAGES = [
     Stage("build_smart_prepare_plan.py", 30),
     Stage("build_source_registry.py", 30),
     Stage("build_optional_sources_plan.py", 30),
+    *DECISION_STACK_STAGES,
     Stage("build_v4_audit_reports.py", 30),
-        Stage("build_decision_exports.py", 30),
+    Stage("build_decision_exports.py", 30),
     Stage("build_health.py", 30),
     Stage("build_daily_insights.py", 30),
     Stage("finalize_inline.py", 45, required=True),
@@ -207,6 +223,7 @@ PREMATCH_STAGES = [
     Stage("build_smart_prepare_plan.py", 30),
     Stage("build_source_registry.py", 30),
     Stage("build_optional_sources_plan.py", 30),
+    *DECISION_STACK_STAGES,
     Stage("build_v4_audit_reports.py", 30),
     Stage("build_decision_exports.py", 30),
     Stage("build_health.py", 30),
@@ -247,6 +264,7 @@ PREMATCH_T60_STAGES = [
     Stage("build_smart_prepare_plan.py", 30),
     Stage("build_source_registry.py", 30),
     Stage("build_optional_sources_plan.py", 30),
+    *DECISION_STACK_STAGES,
     Stage("build_v4_audit_reports.py", 30),
     Stage("build_decision_exports.py", 30),
     Stage("build_health.py", 30),
@@ -304,6 +322,7 @@ PREMATCH_T30_STAGES = [
     Stage("build_smart_prepare_plan.py", 30),
     Stage("build_source_registry.py", 30),
     Stage("build_optional_sources_plan.py", 30),
+    *DECISION_STACK_STAGES,
     Stage("build_v4_audit_reports.py", 30),
     Stage("build_decision_exports.py", 30),
     Stage("build_health.py", 30),
@@ -358,6 +377,7 @@ PREMATCH_T10_STAGES = [
     Stage("build_smart_prepare_plan.py", 30),
     Stage("build_source_registry.py", 30),
     Stage("build_optional_sources_plan.py", 30),
+    *DECISION_STACK_STAGES,
     Stage("build_v4_audit_reports.py", 30),
     Stage("build_decision_exports.py", 30),
     Stage("build_health.py", 30),
@@ -406,6 +426,7 @@ SIGNAL_PATCH_STAGES = [
     Stage("build_smart_prepare_plan.py", 30),
     Stage("build_source_registry.py", 30),
     Stage("build_optional_sources_plan.py", 30),
+    *DECISION_STACK_STAGES,
     Stage("build_v4_audit_reports.py", 30),
     Stage("build_decision_exports.py", 30),
     Stage("build_health.py", 30),
