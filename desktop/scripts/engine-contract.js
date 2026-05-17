@@ -36,6 +36,16 @@ function isDrawDashboardPick(pick) {
     || ['x', 'n', 'nul', 'draw', 'matchnul', 'egalite'].includes(compact);
 }
 
+function dashboardMarketGroup(pick) {
+  const key = compactMarketKey(pick?.marketKey || pick?.market);
+  if (/^(1n2|matchwinner|winner|moneyline)$/.test(key)) return 'winner';
+  if (/^(scorer|buteur|goalscorer)$/.test(key)) return 'scorer';
+  if (/btts/.test(key)) return 'btts';
+  if (/^(ht1n2|halftime1n2)$/.test(key)) return 'halftime';
+  if (/^(ou|ou15|ou25|ou35|httotal|htou|halftimetotal)$/.test(key)) return 'goals';
+  return 'other';
+}
+
 function isFuturePick(pick) {
   const ts = Date.parse(pick?.start || pick?.date || pick?.kickoff || '');
   return Number.isFinite(ts) && ts > Date.now();
@@ -114,7 +124,13 @@ function testAnalysis() {
     assert(Number(pick.safeEdge || pick.edge || 0) >= 0.01, 'Pick sans edge prudent positif', pick);
     const safeSample = Number(pick.safeAssessment?.sample ?? pick.segmentValidation?.sample ?? 0) || 0;
     const safeRoi = Number(pick.safeAssessment?.roi ?? pick.segmentValidation?.roi ?? 0);
-    assert(!(pick.safeAssessment?.reliable && safeSample >= 15 && Number.isFinite(safeRoi) && safeRoi < 0), 'Pick fiable malgré segment historique négatif', {
+    const twoGoalSafetyOverride = pick.safeAssessment?.reliableRule === '2-0'
+      && pick.winamaxTwoGoalRule?.eligible
+      && Number(pick.winamaxTwoGoalRule?.leadTwoProbability || 0) >= 0.55
+      && safeSample >= 15
+      && Number.isFinite(safeRoi)
+      && safeRoi > -0.08;
+    assert(!(pick.safeAssessment?.reliable && safeSample >= 15 && Number.isFinite(safeRoi) && safeRoi < 0 && !twoGoalSafetyOverride), 'Pick fiable malgré segment historique négatif', {
       id: pick.id,
       label: pick.label,
       market: pick.market,
@@ -190,6 +206,16 @@ function testAnalysis() {
   assert(topRanks.length >= 5, 'Top 5 prioritaire absent du cockpit', topRanks);
   assert(Number(analysis.dashboardPicks?.[0]?.priorityRank || 0) === 1, 'Le premier pick dashboard doit être le #1 prioritaire', analysis.dashboardPicks?.[0]);
   assert(String(analysis.dashboardPicks?.[0]?.priorityLabel || '').includes('TOP'), 'Le #1 doit porter le badge TOP PICK', analysis.dashboardPicks?.[0]);
+  const sourceWinnerPicks = (analysis.picks || []).filter((pick) => dashboardMarketGroup(pick) === 'winner' && isSimpleDashboardMarket(pick) && isFuturePick(pick));
+  const dashboardWinners = (analysis.dashboardPicks || []).filter((pick) => dashboardMarketGroup(pick) === 'winner');
+  if (sourceWinnerPicks.length >= 8) {
+    assert(dashboardWinners.length >= Math.min(12, Math.ceil(analysis.dashboardPicks.length * 0.35)), 'Pas assez de Vainqueurs dans le cockpit malgré le stock disponible', {
+      available: sourceWinnerPicks.length,
+      dashboardWinners: dashboardWinners.length,
+      total: analysis.dashboardPicks.length,
+      marketCounts: analysis.dashboardMeta?.qualityPolicy?.marketCounts
+    });
+  }
   const relaxedTodayCoverage = Boolean(analysis.dashboardMeta?.qualityPolicy?.todayCapRelaxed);
   assert(Array.from(perMatch.values()).every((count) => count <= (relaxedTodayCoverage ? 3 : 2)), 'Dashboard expose trop de picks sur un même match', Array.from(perMatch.entries()).filter(([, count]) => count > (relaxedTodayCoverage ? 3 : 2)));
   const today = analysis.todayFunnel?.today || {};

@@ -1751,14 +1751,15 @@ function createLegacyEngineService({ projectRoot }) {
     if (row?.limitedConfidence) {
       const limitedHasTwoGoalSafety = Boolean(row?.winamaxTwoGoalRule?.eligible);
       const twoGoalPct = Number(row?.winamaxTwoGoalRule?.leadTwoProbability || 0);
+      const severeTwoGoalSegmentLoss = sample >= 30 && Number.isFinite(roi) && roi < -0.08;
       const twoGoalWinnerReliable = limitedHasTwoGoalSafety
         && rawEdge >= 0.01
         && edge >= 0.01
         && odd >= 1.25
         && odd <= 4.00
-        && confidence >= 0.68
+        && confidence >= 0.66
         && twoGoalPct >= 0.55
-        && !segmentNegative
+        && !severeTwoGoalSegmentLoss
         && !row?.signalConflict?.active
         && !row?.oddsGuardrail?.applied
         && !hardCriticalMissing.length;
@@ -3369,13 +3370,6 @@ function createLegacyEngineService({ projectRoot }) {
         addFinalRows(sortedTodayReady, todayReadyTarget, { enforceMatchCap: false, relaxSport: true, relaxLeague: true });
       }
     }
-    if (todayVisibleTarget > 0 && finalRows.filter((row) => dayKeyParis(row.start) === todayKey).length < todayVisibleTarget) {
-      addFinalRows(sortedTodayDisplayable, todayVisibleTarget, { enforceMatchCap: true });
-      if (finalRows.filter((row) => dayKeyParis(row.start) === todayKey).length < todayVisibleTarget) {
-        todayCapRelaxed = true;
-        addFinalRows(sortedTodayDisplayable, todayVisibleTarget, { matchCap: maxPerMatch, relaxSport: true, relaxLeague: true });
-      }
-    }
     if (nightRows.length) {
       const nightTarget = Math.min(8, nightRows.length);
       addFinalRows(sortRows(nightRows), Math.min(maxDashboardRows, finalRows.length + nightTarget), {
@@ -3425,6 +3419,17 @@ function createLegacyEngineService({ projectRoot }) {
           relaxLeague: true,
           relaxMarket: true
         });
+      }
+    }
+    if (todayVisibleTarget > 0 && finalRows.filter((row) => dayKeyParis(row.start) === todayKey).length < todayVisibleTarget) {
+      // Sprint 86 : les lignes "Vainqueur" et "Buteur" doivent passer
+      // avant le remplissage général du jour. Sinon les Plus/Moins occupent
+      // les 24 premières places et l'accueil donne une fausse impression de
+      // monotonie.
+      addFinalRows(sortedTodayDisplayable, todayVisibleTarget, { enforceMatchCap: true });
+      if (finalRows.filter((row) => dayKeyParis(row.start) === todayKey).length < todayVisibleTarget) {
+        todayCapRelaxed = true;
+        addFinalRows(sortedTodayDisplayable, todayVisibleTarget, { matchCap: maxPerMatch, relaxSport: true, relaxLeague: true });
       }
     }
     addFinalRows(sortedRollingReady, Math.max(rollingReadyTarget, Math.min(target24, sortedRollingReady.length)));

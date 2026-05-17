@@ -131,6 +131,12 @@ async function main() {
     await win.click('[data-tab="dashboard"]');
     await win.waitForSelector('#trading-desk.active', { timeout: 10000 });
     await safeScreenshot(win, path.join(captureDir, 'desktop-sprint23-trading-desk.png'), { fullPage: true });
+    await win.click('[data-tab="preferences"]');
+    await win.waitForSelector('#pref-trading-desk', { timeout: 10000 });
+    await win.uncheck('#pref-trading-desk');
+    await win.click('#save-preferences-btn');
+    await win.click('[data-tab="dashboard"]');
+    await win.waitForSelector('[data-cockpit-category="cockpit"]:visible', { timeout: 10000 });
     await win.click('[data-cockpit-category="cockpit"]');
     await win.waitForFunction(() => Boolean(document.querySelector('#cockpit-detail-section')?.open), null, { timeout: 5000 });
     await win.waitForSelector('#custom-dashboard-grid:visible', { timeout: 10000 });
@@ -203,9 +209,11 @@ async function main() {
     await win.waitForSelector('[data-panel="dashboard"].active', { timeout: 60000 });
     await win.waitForFunction(() => document.querySelector('#metric-picks')?.textContent !== '-', null, { timeout: 90000 });
     await win.click('[data-tab="dashboard"]');
-    await win.waitForSelector('#ready-picks-hero .clickable-row[data-match-id], #picks-body tr.clickable-row', { timeout: 10000 });
+    await win.waitForSelector('#home-top3-grid .clickable-row[data-match-id], #home-picks-table-body tr.clickable-row, #ready-picks-hero .clickable-row[data-match-id], #picks-body tr.clickable-row', { timeout: 10000 });
     const opened = await win.evaluate(() => {
-      const target = document.querySelector('#ready-picks-hero .clickable-row[data-match-id]')
+      const target = document.querySelector('#home-top3-grid .clickable-row[data-match-id]')
+        || document.querySelector('#home-picks-table-body tr.clickable-row')
+        || document.querySelector('#ready-picks-hero .clickable-row[data-match-id]')
         || document.querySelector('#picks-body tr.clickable-row');
       if (!target) return false;
       target.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));

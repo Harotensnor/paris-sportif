@@ -5,6 +5,19 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-17
 
+### Version v2.2.0 — Pronostics focus + accueil compact par catégories
+
+Refonte ciblée après audit terrain de la page “À miser”.
+- Pipeline réelle relancée : `generated_at=2026-05-17T09:11:14Z`, 159 événements Winamax aujourd’hui, 147 signaux simples positifs, 18 lignes affichées aujourd’hui et 26 sur 24h.
+- Le cockpit standard garde 30 lignes maximum mais remonte désormais 15 Vainqueurs sur 30 quand le stock existe, au lieu de laisser les Plus/Moins remplir le haut de page.
+- La règle Winamax “filet 2-0” peut promouvoir un Vainqueur en pari jouable si le signal est fort, le risque segment n’est pas sévère et la probabilité 2-0 est élevée. Exemple terrain : AS Roma - Lazio devient #1, Vainqueur, cote 1.50, confiance 79%, filet 2-0 71%.
+- Accueil “À miser” réduit au strict utile : Top 3 des prochaines 24h, tableau triable limité à 8 lignes, puis catégories compactes.
+- Catégories d’allègement ajoutées sur l’accueil : Strict, Gros gain, Mi-temps, Combinés et entrées directes par sport, sans rallonger la barre latérale.
+- La navigation latérale reste courte : À miser, Cockpit, Vainqueurs, Buts, Nuit, Buteurs, Combinés, À surveiller, Bilan, Recherche, Réglages.
+- Le Mode Trading Desk redevient visible quand il est activé en Mode expert, sans polluer l’accueil standard.
+- Tests terrain renforcés : `qa:engine`, `qa:terrain:quick`, `qa:desktop`, `qa:safe`, `qa:winamax-audit`, `qa:a11y` et capture visuelle validés.
+- Capture terrain : `captures/desktop-home-focus-v220.png` avec 3 cartes Top Pick, 8 lignes de tableau et 16 catégories compactes.
+
 ### Hotfix v2.1.9 — Vérité data terrain + garde-fou zéro Winamax
 
 Correction profonde du faux vert terrain détecté pendant l’audit pronostics.

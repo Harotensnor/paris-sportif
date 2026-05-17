@@ -5480,6 +5480,10 @@
     if (category === 'halftime') return arr.filter((row) => rowMarketPreferenceKey(row) === 'halftime');
     if (category === 'watch') return arr.filter((row) => !isReadyToStakeRow(row));
     if (category === 'night') return nightPickRows(rows, canDisplayPickCard);
+    if (String(category || '').startsWith('sport:')) {
+      const wanted = normalizeUiKey(String(category).slice(6));
+      return arr.filter((row) => normalizeUiKey(row?.sport || 'sport') === wanted);
+    }
     if (category === 'today') return arr.filter(isTodayPick);
     if (category === 'tomorrow') {
       const tomorrow = parisDayKey(new Date(Date.now() + 24 * 60 * 60 * 1000));
@@ -5509,7 +5513,7 @@
     const cockpitRows = rolling24hRows(allRows, canDisplayPickCard);
     const readyRows = cockpitRows.filter(isReadyToStakeRow);
     const sportCount = uniqueCleanLabels(cockpitRows.map((row) => row.sport)).length;
-    const cards = [
+    const baseCards = [
       {
         key: 'cockpit',
         icon: '🎛',
@@ -5544,6 +5548,13 @@
         title: 'Gros gain',
         rows: marketCategoryRows(allRows, 'value'),
         detail: 'Cotes 2+ avec garde-fous'
+      },
+      {
+        key: 'halftime',
+        icon: '⏱',
+        title: 'Mi-temps',
+        rows: marketCategoryRows(allRows, 'halftime'),
+        detail: 'Paris simples avant la pause'
       },
       {
         key: 'night',
@@ -5581,6 +5592,13 @@
         detail: 'Joueurs qui peuvent marquer'
       },
       {
+        key: 'combines',
+        icon: '🎲',
+        title: 'Combinés',
+        rows: Array.isArray(state.combines) ? state.combines : [],
+        detail: 'Tickets construits à part'
+      },
+      {
         key: 'sport',
         icon: '🏀',
         title: 'Par sport',
@@ -5601,7 +5619,27 @@
         rows: marketCategoryRows(allRows, 'watch'),
         detail: 'Signaux utiles, sans bouton de mise'
       }
-    ].map((card) => {
+    ];
+    const sportCards = ['football', 'tennis', 'basketball', 'hockey', 'baseball']
+      .map((sport) => {
+        const rowsForSport = marketCategoryRows(allRows, `sport:${sport}`);
+        const labels = {
+          football: ['⚽', 'Football'],
+          tennis: ['🎾', 'Tennis'],
+          basketball: ['🏀', 'Basket'],
+          hockey: ['🏒', 'Hockey'],
+          baseball: ['⚾', 'Baseball']
+        };
+        return {
+          key: `sport:${sport}`,
+          icon: labels[sport][0],
+          title: labels[sport][1],
+          rows: rowsForSport,
+          detail: 'Entrée directe par sport'
+        };
+      })
+      .filter((card) => card.rows.length > 0);
+    const cards = baseCards.concat(sportCards).map((card) => {
       const ready = card.rows.filter(isReadyToStakeRow).length;
       return { ...card, ready, total: card.rows.length };
     }).filter((card) => card.key === 'cockpit' || card.total > 0);
@@ -5861,13 +5899,13 @@
     if (subtitle) subtitle.textContent = meta.subtitle;
     const source = homeSourceRows(rows);
     const topRows = homeTopRows(source, 3);
-    const tableRows = sortHomeRows(source, sortMode).slice(0, 12);
+    const tableRows = sortHomeRows(source, sortMode).slice(0, 8);
     $$('.home-sort-actions [data-home-sort], .home-picks-table [data-home-sort]').forEach((button) => {
       button.classList.toggle('active', button.dataset.homeSort === sortMode);
     });
     if (caption) {
       const labels = { confidence: 'confiance puis cote', kickoff: 'heure de départ', date: 'date', odd: 'cote Winamax' };
-      caption.textContent = `${formatCount(tableRows.length)} affichés ici · 12 max · tri ${labels[sortMode] || 'confiance'}`;
+      caption.textContent = `${formatCount(tableRows.length)} affichés ici · 8 max · tri ${labels[sortMode] || 'confiance'}`;
     }
     if (topWrap) {
       topWrap.innerHTML = topRows.length
@@ -5889,6 +5927,7 @@
       goals: 'type',
       scorer: 'type',
       halftime: 'type',
+      combines: 'type',
       sport: 'sport',
       night: 'time',
       strict: 'time',
@@ -5905,6 +5944,7 @@
       goals: 'goals',
       scorer: 'scorer',
       halftime: 'halftime',
+      combines: 'combines',
       night: 'tonight',
       strict: 'next',
       value: 'next',
@@ -5914,6 +5954,30 @@
       watch: 'next',
       cockpit: 'next'
     }[normalized] || 'next';
+    if (normalized === 'combines') {
+      switchTab('combines');
+      return;
+    }
+    if (normalized.startsWith('sport:')) {
+      try {
+        localStorage.setItem(PICKS_VIEW_MODE_KEY, 'sport');
+      } catch {
+        // Confort seulement.
+      }
+      const sport = normalized.slice(6);
+      renderPicks();
+      setTimeout(() => {
+        const target = $(`[data-sport-bucket="${sport}"]`);
+        if (target) {
+          target.open = true;
+          target.scrollIntoView({ block: 'start', behavior: 'smooth' });
+        } else {
+          $('#cockpit-detail-section')?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+        }
+      }, 40);
+      setSideStatus(`Cockpit ${sport}`, 'ok');
+      return;
+    }
     try {
       localStorage.setItem(PICKS_VIEW_MODE_KEY, modeByCategory[normalized] || 'time');
     } catch {
@@ -15871,6 +15935,9 @@
       cockpit: 'cockpit',
       winners: 'winner',
       goals: 'goals',
+      strict: 'strict',
+      value: 'value',
+      halftime: 'halftime',
       night: 'night',
       watch: 'watch'
     };
@@ -15885,6 +15952,9 @@
       cockpit: 'Cockpit pronostics',
       winners: 'Vainqueurs',
       goals: 'Buts',
+      strict: 'Strict',
+      value: 'Gros gain',
+      halftime: 'Mi-temps',
       night: 'Paris de nuit',
       watch: 'À surveiller',
       combines: 'Combinés du jour',
