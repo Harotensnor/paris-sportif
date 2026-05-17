@@ -126,7 +126,8 @@ const refreshState = {
 let localServer = null;
 let mainWindow = null;
 let refreshChild = null;
-const isolatedTestInstance = !app.isPackaged && process.env.PARIS_DESKTOP_TEST_ISOLATED === '1';
+const testMode = process.env.PARIS_DESKTOP_TEST_ISOLATED === '1';
+const isolatedTestInstance = !app.isPackaged && testMode;
 const gotSingleInstanceLock = isolatedTestInstance || app.requestSingleInstanceLock();
 const engineService = createLegacyEngineService({ projectRoot: PROJECT_ROOT });
 const memoryState = {
@@ -1799,6 +1800,7 @@ async function handleApi(req, res, url) {
       projectRoot: PROJECT_ROOT,
       desktopRoot: DESKTOP_ROOT,
       calculationMode: 'desktop-jsdom',
+      testMode,
       memory: sampleMemoryUsage()
     });
     return;

@@ -3,6 +3,21 @@
 Auto-généré depuis les messages de commit par `scripts/build_changelog.py`.
 Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
+## Desktop — 2026-05-17
+
+### Hotfix v2.1.9 — Vérité data terrain + garde-fou zéro Winamax
+
+Correction profonde du faux vert terrain détecté pendant l’audit pronostics.
+- Nouvelle source de vérité runtime pour le moteur desktop : `data.js`, `data_lite.js`, `data_today.json` et `data_manifest.json` sont comparés avant analyse.
+- Si `data.js` perd les événements Winamax du jour alors qu’un snapshot léger en contient, le moteur peut réparer la journée en mémoire au lieu d’afficher 0 pick.
+- Le refresh desktop écrit maintenant un verrou `refresh-running.json`; les audits attendent un refresh vivant mais ne restent plus bloqués sur un verrou fantôme si le process est mort.
+- Les smoke tests isolés ne déclenchent plus les auto-refresh pré-match/critique, pour éviter de fermer Electron pendant que `fetch_live.py` a écrit un snapshot intermédiaire.
+- `qa:engine` et `qa:terrain` échouent désormais explicitement si `data.js` retombe à 0 Winamax aujourd’hui pendant que les snapshots légers prouvent le contraire.
+- `qa:winamax-audit` lit la même donnée réparée que le moteur, avec un champ `dataTruth` pour voir les écarts entre full/lite/today.
+- Validation terrain après pipeline complète : 159 événements Winamax aujourd’hui, 145 signaux simples positifs, 24 affichés, 7 paris prêts, 30 lignes cockpit.
+- Build Windows validé : `Paris Sportif Desktop Setup 2.1.9.exe`, version visible dans l’app packagée, 12 lignes rapides sur l’accueil.
+- Problèmes réels conservés comme alertes qualité : enrichissement incomplet sur certaines sources sportives et checklist pré-match encore bloquante sur les dossiers à contexte fragile.
+
 ## Desktop — 2026-05-16
 
 ### Hotfix v2.1.8 — Plan 30 chantiers pronostics + accueil compact

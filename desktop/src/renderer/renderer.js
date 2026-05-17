@@ -7830,6 +7830,10 @@
     return localStorage.getItem('autoPrematchEnabled') !== 'off';
   }
 
+  function automationRefreshDisabled() {
+    return Boolean(state.appInfo?.testMode || navigator.webdriver);
+  }
+
   function readAutoPrematchLast() {
     try {
       const raw = localStorage.getItem('autoPrematchLast');
@@ -7958,7 +7962,7 @@
 
   function maybeAutoCriticalRefresh() {
     if (!autoCriticalEnabled()) return;
-    if (navigator.webdriver) return;
+    if (automationRefreshDisabled()) return;
     if (state.status?.refresh?.running) return;
     const summary = state.prebetChecklist?.summary || {};
     const blockers = Number(summary.blockers || 0);
@@ -8175,7 +8179,7 @@
 
   function maybeAutoPrematchRefresh() {
     if (!autoPrematchEnabled()) return;
-    if (navigator.webdriver) return;
+    if (automationRefreshDisabled()) return;
     if (state.status?.refresh?.running) return;
     const dueRows = (Array.isArray(state.watchlist) ? state.watchlist : []).filter((row) => row.autoRefreshDue);
     if (!dueRows.length) return;
@@ -15712,6 +15716,10 @@
   }
 
   async function startRefresh(mode = 'quick', requestedSource = null) {
+    if (automationRefreshDisabled()) {
+      pushLog('info', `Refresh ${mode} ignoré en profil de test isolé.`);
+      return { ok: true, started: false, skipped: true };
+    }
     const source = mode === 'signals' ? (requestedSource || $('#refresh-signal-source')?.value || 'all') : 'all';
     recordUserAction('refresh', `${mode}:${source}`);
     const actionId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
@@ -17738,6 +17746,7 @@
   }
 
   function scheduleBackgroundRefresh() {
+    if (automationRefreshDisabled()) return;
     if (state.backgroundRefreshTimer) clearTimeout(state.backgroundRefreshTimer);
     const plan = nextRefreshPlan();
     if (!plan.delayMs) {
@@ -17786,7 +17795,7 @@
     renderPreferences();
     const statusPromise = refreshStatus();
     const logPromise = refreshLog().catch(() => null);
-    fetchJson('/api/app-info').then((info) => {
+    await fetchJson('/api/app-info').then((info) => {
       state.appInfo = info || null;
       renderPreferences();
     }).catch((error) => pushLog('warn', `Info application indisponible: ${error.message}`));

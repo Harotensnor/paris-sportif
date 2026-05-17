@@ -2,6 +2,7 @@
 const fs = require('fs');
 const path = require('path');
 const { createLegacyEngineService } = require('../src/engine/legacy-engine');
+const dataSource = require('../src/engine/data-source');
 
 const root = path.resolve(__dirname, '..', '..');
 
@@ -11,31 +12,6 @@ function readJson(file, fallback = null) {
   } catch {
     return fallback;
   }
-}
-
-function loadDataJs() {
-  const text = fs.readFileSync(path.join(root, 'data.js'), 'utf8');
-  const match = text.match(/window\.PRONOSTICS_DATA\s*=\s*(\{[\s\S]*\})\s*;?\s*$/);
-  if (!match) throw new Error('data.js ne contient pas window.PRONOSTICS_DATA');
-  return Function(`"use strict"; return (${match[1]});`)();
-}
-
-function parisDay(value = new Date()) {
-  return new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'Europe/Paris',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit'
-  }).format(new Date(value));
-}
-
-function eventListFromDays(days) {
-  const rows = [];
-  Object.entries(days || {}).forEach(([dayKey, value]) => {
-    const events = Array.isArray(value) ? value : Array.isArray(value?.events) ? value.events : [];
-    events.forEach((event) => rows.push({ ...event, __dayKey: dayKey }));
-  });
-  return rows;
 }
 
 function compact(value) {
@@ -90,14 +66,15 @@ function mapRows(map, mapper = (key, count) => ({ key, count })) {
 }
 
 function main() {
-  const data = loadDataJs();
+  const runtimeData = dataSource.loadRuntimeDataStable(root);
+  const data = runtimeData.data;
   const catalog = readJson('winamax_catalog.json', {});
   const markets = readJson('winamax_markets.json', {});
   const analysis = createLegacyEngineService({ projectRoot: root }).getAnalysis({ bankroll: 50, force: true });
-  const today = parisDay();
+  const today = dataSource.parisDay();
   const now = Date.now();
-  const events = eventListFromDays(data.days || {});
-  const todayEvents = events.filter((event) => parisDay(event.date || event.startDate || event.kickoff || event.__dayKey) === today);
+  const events = dataSource.eventListFromDays(data.days || {});
+  const todayEvents = events.filter((event) => dataSource.parisDay(event.date || event.startDate || event.kickoff || event.__dayKey) === today);
   const todayBookable = todayEvents.filter((event) => event?.winamax?.available === true);
   const futureTodayBookable = todayBookable.filter((event) => {
     const ts = Date.parse(event.date || event.startDate || event.kickoff || '');
@@ -137,11 +114,11 @@ function main() {
   const sportsReady = new Map();
   futureTodayBookable.forEach((event) => bump(sportsToday, String(event.sport || event.sport_name || 'sport').toLowerCase()));
   (analysis.matches || []).forEach((row) => {
-    if (parisDay(row.start || row.date) !== today) return;
+    if (dataSource.parisDay(row.start || row.date) !== today) return;
     bump(sportsPredictable, String(row.sport || 'sport').toLowerCase());
   });
   (analysis.dashboardPicks || []).forEach((row) => {
-    if (parisDay(row.start || row.date) !== today) return;
+    if (dataSource.parisDay(row.start || row.date) !== today) return;
     bump(sportsDisplayed, String(row.sport || 'sport').toLowerCase());
     if (row.decisionCenter?.canBet) bump(sportsReady, String(row.sport || 'sport').toLowerCase());
   });
@@ -170,6 +147,7 @@ function main() {
     schema: 'paris-sportif.winamax_audit_sprint29.v1',
     generatedAt: new Date().toISOString(),
     dataGeneratedAt: data.generated_at || null,
+    dataTruth: runtimeData.truth,
     today,
     summary: {
       catalogSports: catalogSports.size,

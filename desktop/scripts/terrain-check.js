@@ -5,6 +5,7 @@ const path = require('path');
 const { spawn } = require('child_process');
 const { _electron: electron } = require('playwright');
 const { createLegacyEngineService } = require('../src/engine/legacy-engine');
+const dataSource = require('../src/engine/data-source');
 
 function fail(message, details) {
   const suffix = details ? ` ${JSON.stringify(details).slice(0, 2000)}` : '';
@@ -13,33 +14,6 @@ function fail(message, details) {
 
 function assert(condition, message, details) {
   if (!condition) fail(message, details);
-}
-
-function parisDay(value = new Date()) {
-  return new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'Europe/Paris',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit'
-  }).format(new Date(value));
-}
-
-function eventListFromDays(days) {
-  const events = [];
-  if (!days || typeof days !== 'object') return events;
-  Object.entries(days).forEach(([dayKey, value]) => {
-    const rows = Array.isArray(value) ? value : Array.isArray(value?.events) ? value.events : [];
-    rows.forEach((event) => events.push({ ...event, __dayKey: dayKey }));
-  });
-  return events;
-}
-
-function loadDataJs(root) {
-  const file = path.join(root, 'data.js');
-  const text = fs.readFileSync(file, 'utf8');
-  const match = text.match(/window\.PRONOSTICS_DATA\s*=\s*(\{[\s\S]*\})\s*;?\s*$/);
-  if (!match) fail('data.js ne contient pas window.PRONOSTICS_DATA');
-  return Function(`"use strict"; return (${match[1]});`)();
 }
 
 function run(command, args, options = {}) {
@@ -83,11 +57,21 @@ async function main() {
     await run(process.platform === 'win32' ? 'python' : 'python3', ['desktop/bin/refresh_once.py', '--full'], { cwd: root });
   }
 
-  const data = loadDataJs(root);
-  const today = parisDay();
-  const events = eventListFromDays(data.days || {});
-  const todayEvents = events.filter((event) => parisDay(event.date || event.startDate || event.kickoff || event.__dayKey) === today);
+  const runtimeData = dataSource.loadRuntimeDataStable(root);
+  const data = runtimeData.data;
+  const today = dataSource.parisDay();
+  const events = dataSource.eventListFromDays(data.days || {});
+  const todayEvents = events.filter((event) => dataSource.parisDay(event.date || event.startDate || event.kickoff || event.__dayKey) === today);
   const todayBookable = todayEvents.filter((event) => event?.winamax?.available === true);
+  assert(
+    !dataSource.hasPrimaryTodayWinamaxLoss(runtimeData.truth),
+    'Terrain: data.js a perdu les events Winamax du jour alors que les snapshots légers en ont',
+    {
+      truth: runtimeData.truth,
+      refreshRunning: runtimeData.refreshRunning,
+      waitedMs: runtimeData.waitedMs
+    }
+  );
   const health = JSON.parse(fs.readFileSync(path.join(root, 'health.json'), 'utf8'));
   const generatedAt = Date.parse(health.generated_at || data.generated_at || '');
   assert(Number.isFinite(generatedAt), 'health.json/data.js sans generated_at exploitable');

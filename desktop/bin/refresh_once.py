@@ -24,6 +24,7 @@ PROJECT = Path(__file__).resolve().parents[2]
 SCRIPTS = PROJECT / "scripts"
 STATE_ROOT = PROJECT / "desktop" / "state"
 REFRESH_HISTORY_PATH = STATE_ROOT / "refresh-history.json"
+REFRESH_RUNNING_PATH = STATE_ROOT / "refresh-running.json"
 CONTEXT_REPAIR_PLAN = PROJECT / "context_repair_plan.json"
 SOURCE_RUNS_PATH = PROJECT / "source_runs.jsonl"
 WEATHER_TIMEOUT_SEC = 180
@@ -564,6 +565,31 @@ def persist_refresh_summary(summary: dict) -> None:
         print(f"[desktop-refresh] historique refresh non ecrit: {exc}", flush=True)
 
 
+def write_refresh_running(mode: str, source: str | None, stage_count: int, started_at: str) -> None:
+    try:
+        STATE_ROOT.mkdir(parents=True, exist_ok=True)
+        payload = {
+            "schema": "paris-sportif.refresh_running.v1",
+            "pid": os.getpid(),
+            "mode": mode,
+            "source": source,
+            "startedAt": started_at,
+            "stageCount": stage_count,
+        }
+        tmp = REFRESH_RUNNING_PATH.with_suffix(f".json.{os.getpid()}.tmp")
+        tmp.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+        tmp.replace(REFRESH_RUNNING_PATH)
+    except Exception as exc:
+        print(f"[desktop-refresh] verrou refresh non ecrit: {exc}", flush=True)
+
+
+def clear_refresh_running() -> None:
+    try:
+        REFRESH_RUNNING_PATH.unlink(missing_ok=True)
+    except Exception as exc:
+        print(f"[desktop-refresh] verrou refresh non efface: {exc}", flush=True)
+
+
 def stage_result(stage: Stage, started_at: str, elapsed: float, status: str, code: int | None, output: list[str] | None = None) -> dict:
     return {
         "script": stage.script,
@@ -725,13 +751,17 @@ def main() -> int:
         return 0
     failed = 0
     results = []
-    for stage in stages:
-        rc, result = run_stage(stage)
-        results.append(result)
-        if rc != 0:
-            failed = rc
-            print(f"[desktop-refresh] arret sur etape requise: {stage.script}", flush=True)
-            break
+    write_refresh_running(mode, source if mode in {"signals", "repair_context"} else None, len(stages), run_started)
+    try:
+        for stage in stages:
+            rc, result = run_stage(stage)
+            results.append(result)
+            if rc != 0:
+                failed = rc
+                print(f"[desktop-refresh] arret sur etape requise: {stage.script}", flush=True)
+                break
+    finally:
+        clear_refresh_running()
 
     if failed == 0:
         print("[desktop-refresh] termine", flush=True)

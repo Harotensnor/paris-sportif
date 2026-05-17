@@ -7,6 +7,7 @@ const historyUtils = require('../src/engine/history-utils');
 const qualityUtils = require('../src/engine/quality-utils');
 const calibrationUtils = require('../src/engine/calibration-utils');
 const contextUtils = require('../src/engine/context-utils');
+const dataSource = require('../src/engine/data-source');
 
 function fail(message, details) {
   const suffix = details ? ` ${JSON.stringify(details).slice(0, 2000)}` : '';
@@ -56,6 +57,19 @@ function testUtils() {
 }
 
 function testAnalysis() {
+  const runtimeData = dataSource.loadRuntimeDataStable(process.cwd(), { allowFallback: false });
+  const fallbackTodayWinamax = dataSource.fallbackTodayWinamax(runtimeData.truth);
+  assert(
+    !dataSource.hasPrimaryTodayWinamaxLoss(runtimeData.truth),
+    'data.js a perdu les événements Winamax du jour alors que les snapshots légers en ont',
+    {
+      truth: runtimeData.truth,
+      refreshRunning: runtimeData.refreshRunning,
+      waitedMs: runtimeData.waitedMs,
+      fallbackTodayWinamax
+    }
+  );
+
   const engine = createLegacyEngineService({ projectRoot: process.cwd() });
   const analysis = engine.getAnalysis({ bankroll: 50 });
   assert(analysis && analysis.ok, 'Analyse moteur absente');
