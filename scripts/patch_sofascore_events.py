@@ -30,6 +30,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 DATA_PATH = ROOT / 'data.js'
 SOFA_PATH = ROOT / 'sofascore_events.json'
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from _data_io import save_data_js
 
 
 def _normalize(name: str) -> str:
@@ -141,10 +143,7 @@ def main() -> int:
     from datetime import datetime as _dt, timezone as _tz
     data['generated_at'] = _dt.now(_tz.utc).isoformat().replace('+00:00', 'Z')
 
-    # Rewrite data.js (preserve original surrounding text + minified inside)
-    new_json = json.dumps(data, ensure_ascii=False, separators=(',', ':'))
-    new_text = text[:m.start(1)] + new_json + text[m.end(1):]
-    DATA_PATH.write_text(new_text, encoding='utf-8')
+    save_data_js(data, DATA_PATH)
     print(f'  data.js updated ({DATA_PATH.stat().st_size/1024:.0f}KB) — generated_at bumped', flush=True)
     return 0
 

@@ -45,6 +45,11 @@ try:
 except Exception:
     _clubelo_lookup = None
 
+try:
+    from _data_io import save_data_js
+except Exception:
+    save_data_js = None
+
 ROOT = Path(__file__).resolve().parent.parent
 DATA_JS = ROOT / 'data.js'
 
@@ -213,6 +218,25 @@ def _norm(name: str) -> str:
     return ''.join(c for c in n.lower() if c.isalnum())
 
 
+def _parse_ts(value: object) -> float | None:
+    if value is None or value == '':
+        return None
+    if isinstance(value, (int, float)):
+        return float(value if value > 10_000_000_000 else value * 1000)
+    try:
+        return datetime.fromisoformat(str(value).replace('Z', '+00:00')).timestamp() * 1000
+    except Exception:
+        return None
+
+
+def _time_compatible(entry: dict, event_date: str, max_minutes: int = 240) -> bool:
+    entry_ts = _parse_ts(entry.get('date') or entry.get('start') or entry.get('startDate') or entry.get('startTimestamp'))
+    event_ts = _parse_ts(event_date)
+    if entry_ts is None or event_ts is None:
+        return True
+    return abs(entry_ts - event_ts) <= max_minutes * 60_000
+
+
 def _name_tokens(name: str) -> set[str]:
     toks = {_norm(name)}
     for part in re.split(r'[\s\-.&]+', name or ''):
@@ -285,20 +309,23 @@ def _find_soccer_pair_entry(
     league_code: str,
     home_name: str,
     away_name: str,
+    event_date: str = '',
 ) -> dict | None:
     key = f'{_norm(home_name)}|{_norm(away_name)}'
     direct = events_idx.get(key)
-    if direct:
+    if direct and _time_compatible(direct, event_date):
         return direct
 
     alias_key = f'{TEAM_ALIAS.get(_norm(home_name), _norm(home_name))}|{TEAM_ALIAS.get(_norm(away_name), _norm(away_name))}'
     direct = events_idx.get(alias_key)
-    if direct:
+    if direct and _time_compatible(direct, event_date):
         return direct
 
     for idx_key, candidate in events_idx.items():
         cand_league = candidate.get('league_code') or ''
         if cand_league and league_code and cand_league != league_code:
+            continue
+        if not _time_compatible(candidate, event_date):
             continue
         key_home, key_away = _split_pair_key(idx_key)
         cand_home = (candidate.get('home') or {}).get('team') or key_home
@@ -379,6 +406,8 @@ def _load_data() -> dict | None:
 
 def _save_data(data: dict) -> int:
     """Returns size in bytes."""
+    if save_data_js:
+        return save_data_js(data, DATA_JS)
     payload = json.dumps(data, ensure_ascii=False, separators=(',', ':'))
     text = f'window.PRONOSTICS_DATA = {payload};\n'
     DATA_JS.write_text(text, encoding='utf-8')
@@ -461,6 +490,7 @@ def patch_referees(data: dict) -> int:
                 league_code,
                 home_name,
                 away_name,
+                ev.get('date') or '',
             )
             if not entry:
                 prior = league_priors.get(league_code)
@@ -508,6 +538,7 @@ def patch_lineups(data: dict) -> int:
                 ev.get('league_code') or '',
                 home_name,
                 away_name,
+                ev.get('date') or '',
             )
             if not entry:
                 continue
@@ -518,6 +549,7 @@ def patch_lineups(data: dict) -> int:
                 'away': away_lineup,
                 'league_code': entry.get('league_code') or ev.get('league_code') or '',
                 'sofa_event_id': entry.get('sofa_event_id') or '',
+                'date': entry.get('date') or '',
                 'source': 'sofascore',
             }
             for c in ev.get('competitors') or []:

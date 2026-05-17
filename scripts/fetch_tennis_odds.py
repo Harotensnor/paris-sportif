@@ -17,6 +17,8 @@ from datetime import datetime, date
 DATA_JS = Path(__file__).resolve().parent.parent / 'data.js'
 HTML = Path(__file__).resolve().parent.parent / 'pronostics.html'
 
+from _data_io import save_data_js, update_inline_blob_in_html
+
 UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15'
 CTX = ssl.create_default_context()
 CTX.check_hostname = False
@@ -271,14 +273,8 @@ def main():
 
     print(f'  attached to {total_filled} tennis events')
 
-    payload = json.dumps(data, ensure_ascii=False, separators=(',', ':'))
-    DATA_JS.write_text(f'window.PRONOSTICS_DATA = {payload};\n', encoding='utf-8')
-
-    html_text = HTML.read_text(encoding='utf-8')
-    new_block = f'<script>\nwindow.PRONOSTICS_DATA = {payload};\n</script>'
-    html_text = re.sub(r'<script>\s*window\.PRONOSTICS_DATA\s*=.*?;?\s*</script>',
-                       new_block, html_text, count=1, flags=re.DOTALL)
-    HTML.write_text(html_text, encoding='utf-8')
+    save_data_js(data, DATA_JS)
+    update_inline_blob_in_html(data, HTML)
 
     elapsed = time.time() - t0
     print(f'[{datetime.now():%H:%M:%S}] Done in {elapsed:.1f}s')

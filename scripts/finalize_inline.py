@@ -28,6 +28,7 @@ import re
 import hashlib
 from pathlib import Path
 from datetime import datetime, timedelta, timezone
+from _data_io import save_data_js, write_text_atomic
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA_JS = ROOT / 'data.js'
@@ -35,15 +36,15 @@ HTML = ROOT / 'pronostics.html'
 DATA_TODAY = ROOT / 'data_today.json'
 DATA_MANIFEST = ROOT / 'data_manifest.json'
 DATA_LITE_JS = ROOT / 'data_lite.js'
-# Sprint 61 (v31.7.150 — audit ChatGPT 2026-04-28 P0) — Payload LITE 72h.
-# Avant : LITE blob inline avait UNIQUEMENT today → premier paint montrait
-# 0 match pour demain (PSG-Bayern caché jusqu'au _ensureFullData()).
-# Après : LITE blob = today + J+1 + J+2, tooltips/Calendrier/Top Demain
-# instantanés. Coût : ~600 KB inline au lieu de 200 KB (acceptable, le
-# data.js full reste asynchrone pour l'archive complète 14j+).
 DATA_LITE_72H = ROOT / 'data_lite_72h.json'
-LITE_HORIZON_DAYS = 3  # today + tomorrow + J+2
-BOOT_EVENT_CAP = 5
+# v55.2 — Boot autonome 7j + historique 7j.
+# Le dashboard ne doit plus démarrer sur 5 matchs du jour puis attendre le
+# chargement async pour afficher demain / la semaine. Le blob lite couvre une
+# fenêtre utile (J-7 → J+7) avec cap par jour, ce qui garde le premier écran
+# cohérent même si data.js full arrive quelques secondes après.
+LITE_PAST_DAYS = 7
+LITE_FUTURE_DAYS = 7
+BOOT_EVENT_CAP = 50
 
 
 ALLOWED_SPORTS = {'football', 'tennis', 'basketball', 'hockey', 'baseball', 'football-american'}
@@ -86,35 +87,25 @@ def main():
     # Réécriture data.js avec generated_at frais (+ events filtrés si besoin).
     # Sans ça, health.json pouvait annoncer data 0min tandis que le frontend
     # gardait un top-level generated_at stale et affichait un faux stale state.
-    new_text = re.sub(
-        r'=\s*\{.*\}\s*;?\s*$',
-        '= ' + json.dumps(data, ensure_ascii=False, separators=(',', ':')) + ';\n',
-        txt,
-        count=1,
-        flags=re.DOTALL,
-    )
-    DATA_JS.write_text(new_text, encoding='utf-8')
+    save_data_js(data, DATA_JS)
 
     today = data.get('today') or datetime.utcnow().strftime('%Y-%m-%d')
     days = data.get('days') or {}
     today_events = days.get(today, [])
 
-    # Sprint 61 — Calcul du scope LITE 72h (today + tomorrow + J+2).
+    # v55.2 — Calcul du scope LITE rolling (J-7 → J+7).
     try:
         today_dt = datetime.fromisoformat(today)
     except (TypeError, ValueError):
         today_dt = datetime.utcnow()
-    scope_72h_keys = [
+    scope_lite_keys = [
         (today_dt + timedelta(days=i)).strftime('%Y-%m-%d')
-        for i in range(LITE_HORIZON_DAYS)
+        for i in range(-LITE_PAST_DAYS, LITE_FUTURE_DAYS + 1)
     ]
-    lite_72h_days = {k: days.get(k, []) for k in scope_72h_keys if k in days}
+    lite_scope_days = {k: days.get(k, []) for k in scope_lite_keys if k in days}
 
     # 1. data_today.json — just today's events array (~200-300 KB)
-    DATA_TODAY.write_text(
-        json.dumps(today_events, ensure_ascii=False, separators=(',', ':')),
-        encoding='utf-8',
-    )
+    write_text_atomic(DATA_TODAY, json.dumps(today_events, ensure_ascii=False, separators=(',', ':')))
 
     # AUDIT 2026-05-08 (P1.6) — data_lite_72h.json supprimé. Le sidecar
     # 1.9 MB était généré à chaque cron tick mais JAMAIS lu par le
@@ -134,23 +125,26 @@ def main():
         'today': today,
         'days': sorted(days.keys()),
         'event_counts': {d: len(evs) for d, evs in days.items()},
-        # Sprint 61 — Métadonnées du scope LITE pour traçabilité côté client.
-        'lite_scope': scope_72h_keys,
-        'event_counts_lite_72h': {k: len(days.get(k, [])) for k in scope_72h_keys},
+        # Métadonnées du scope LITE pour traçabilité côté client.
+        'lite_scope': scope_lite_keys,
+        'event_counts_lite_72h': {k: len(days.get(k, [])) for k in scope_lite_keys},
+        'event_counts_lite': {k: len(days.get(k, [])) for k in scope_lite_keys},
         'boot_event_cap': BOOT_EVENT_CAP,
     }
-    DATA_MANIFEST.write_text(
-        json.dumps(manifest, ensure_ascii=False, separators=(',', ':')),
-        encoding='utf-8',
-    )
+    write_text_atomic(DATA_MANIFEST, json.dumps(manifest, ensure_ascii=False, separators=(',', ':')))
 
-    # 3. LITE boot blob — v35.112 : today only.
-    # Le premier chargement doit éviter le poids J+1/J+2 pour remonter Lighthouse.
-    boot_events = sorted(
-        today_events,
-        key=lambda m: (not ((m.get('winamax') or {}).get('available')), m.get('date') or ''),
-    )[:BOOT_EVENT_CAP]
-    lite_days = {today: boot_events}
+    # 3. LITE boot blob — J-7 → J+7, cap par jour.
+    # Priorité aux matchs Winamax et à l'ordre chronologique pour que le
+    # calendrier, l'historique récent et le tableau ne démarrent plus vides.
+    lite_days = {}
+    for key in scope_lite_keys:
+        bucket = days.get(key, [])
+        if not bucket:
+            continue
+        lite_days[key] = sorted(
+            bucket,
+            key=lambda m: (not ((m.get('winamax') or {}).get('available')), m.get('date') or ''),
+        )[:BOOT_EVENT_CAP]
 
     lite = {
         'generated_at': manifest['generated_at'],
@@ -165,10 +159,7 @@ def main():
         'standings': data.get('standings') or [],
     }
     payload = json.dumps(lite, ensure_ascii=False, separators=(',', ':'))
-    DATA_LITE_JS.write_text(
-        'window.PRONOSTICS_DATA = ' + payload + ';\n',
-        encoding='utf-8',
-    )
+    write_text_atomic(DATA_LITE_JS, 'window.PRONOSTICS_DATA = ' + payload + ';\n')
 
     if HTML.exists():
         html_text = HTML.read_text(encoding='utf-8')
@@ -182,17 +173,17 @@ def main():
             flags=re.DOTALL,
         )
         if n:
-            HTML.write_text(new_html, encoding='utf-8')
+            write_text_atomic(HTML, new_html)
 
     full_size_kb = DATA_JS.stat().st_size / 1024
     today_size_kb = DATA_TODAY.stat().st_size / 1024
     lite_js_kb = DATA_LITE_JS.stat().st_size / 1024
     n_boot_events = sum(len(v) for v in lite_days.values())
-    n_lite_72h_events = sum(len(v) for v in lite_72h_days.values())
+    n_lite_scope_events = sum(len(v) for v in lite_scope_days.values())
     print(
-        f'[finalize_inline] today={today} scope={scope_72h_keys[0]}..{scope_72h_keys[-1]} '
+        f'[finalize_inline] today={today} scope={scope_lite_keys[0]}..{scope_lite_keys[-1]} '
         f'| full={full_size_kb:.0f} KB | today.json={today_size_kb:.0f} KB '
-        f'| 72h scope={n_lite_72h_events} events (sidecar retiré audit P1.6) '
+        f'| lite scope={n_lite_scope_events} events '
         f'| data_lite.js={lite_js_kb:.0f} KB ({n_boot_events} boot events) '
         f'| total days={len(manifest["days"])}',
         flush=True,

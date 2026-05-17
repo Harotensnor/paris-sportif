@@ -66,9 +66,9 @@ def main() -> int:
     py = sys.executable
     steps = [
         run_step("unit helpers", [node, "scripts/qa_unit_runner.js"]),
-        run_step("mutation smoke", [node, "scripts/qa_mutation_smoke.js"]),
-        run_step("snapshots", [node, "scripts/qa_snapshot_runner.js"]),
-        run_step("load 1000 picks", [node, "scripts/qa_load_test.js"]),
+        run_step("mutation smoke", [node, "scripts/legacy_site/qa/qa_mutation_smoke.js"]),
+        run_step("snapshots", [node, "scripts/legacy_site/qa/qa_snapshot_runner.js"]),
+        run_step("load 1000 picks", [node, "scripts/legacy_site/qa/qa_load_test.js"]),
         run_step("data contracts", [py, "scripts/qa_contract_tests.py"]),
         run_step("data integrity", [py, "scripts/check_data_integrity.py"]),
         run_step("pipeline drift", [py, "scripts/check_pipeline_drift.py"]),

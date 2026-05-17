@@ -40,7 +40,12 @@ def now_utc() -> datetime:
 
 
 def paris_tz():
-    return ZoneInfo("Europe/Paris") if ZoneInfo else timezone.utc
+    if ZoneInfo:
+        try:
+            return ZoneInfo("Europe/Paris")
+        except Exception:
+            pass
+    return datetime.now().astimezone().tzinfo or timezone.utc
 
 
 def load_json(path: Path) -> dict[str, Any]:

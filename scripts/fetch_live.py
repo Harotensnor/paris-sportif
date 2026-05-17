@@ -16,6 +16,8 @@ HERE = Path(__file__).resolve().parent
 DATA_JS = Path(__file__).resolve().parent.parent / 'data.js'
 HTML = Path(__file__).resolve().parent.parent / 'pronostics.html'
 ODDS_HISTORY = Path(__file__).resolve().parent.parent / 'odds_history.jsonl'
+sys.path.insert(0, str(HERE))
+from _data_io import save_data_js, write_text_atomic
 
 # Import fetch_v3 as a module to reuse fetchers
 spec = importlib.util.spec_from_file_location('v3', HERE / 'fetch_v3.py')
@@ -144,8 +146,7 @@ def rotate_odds_history(keep_days: int = 180, soft_cap: int = 20000):
         if len(lines) <= soft_cap:
             return
         # Over soft_cap: keep the last soft_cap lines.
-        with ODDS_HISTORY.open('w', encoding='utf-8') as f:
-            f.writelines(lines[-soft_cap:])
+        write_text_atomic(ODDS_HISTORY, ''.join(lines[-soft_cap:]))
         print(f'  rotated odds_history: trimmed to last {soft_cap} rows', flush=True)
         return
     cutoff = datetime.utcnow() - timedelta(days=keep_days)
@@ -173,8 +174,7 @@ def rotate_odds_history(keep_days: int = 180, soft_cap: int = 20000):
             kept.append(line)
     if len(kept) > soft_cap:
         kept = kept[-soft_cap:]
-    with ODDS_HISTORY.open('w', encoding='utf-8') as f:
-        f.writelines(kept)
+    write_text_atomic(ODDS_HISTORY, ''.join(kept))
     print(f'  rotated odds_history: dropped {dropped}, kept {len(kept)}', flush=True)
 
 
@@ -251,17 +251,17 @@ def main():
 
     # Save
     payload = json.dumps(data, ensure_ascii=False, separators=(',', ':'))
-    DATA_JS.write_text(f'window.PRONOSTICS_DATA = {payload};\n', encoding='utf-8')
+    save_data_js(data, DATA_JS)
 
-    # Re-inline into html (so file:// still works)
-    try:
-        html_text = HTML.read_text(encoding='utf-8')
-        new_block = f'<script>\nwindow.PRONOSTICS_DATA = {payload};\n</script>'
-        html_text = re.sub(r'<script>\s*window\.PRONOSTICS_DATA\s*=.*?;?\s*</script>',
-                           new_block, html_text, count=1, flags=re.DOTALL)
-        HTML.write_text(html_text, encoding='utf-8')
-    except Exception as e:
-        print(f'  WARN re-inline pronostics.html failed: {e}', flush=True)
+    if HTML.exists():
+        try:
+            html_text = HTML.read_text(encoding='utf-8')
+            new_block = f'<script>\nwindow.PRONOSTICS_DATA = {payload};\n</script>'
+            html_text = re.sub(r'<script>\s*window\.PRONOSTICS_DATA\s*=.*?;?\s*</script>',
+                               new_block, html_text, count=1, flags=re.DOTALL)
+            HTML.write_text(html_text, encoding='utf-8')
+        except Exception as e:
+            print(f'  WARN re-inline pronostics.html failed: {e}', flush=True)
 
     elapsed = time.time() - t0
     status = 'OK' if not fetch_errors else f'PARTIAL ({len(fetch_errors)} fetcher fails)' if events else 'KEPT-PREVIOUS'

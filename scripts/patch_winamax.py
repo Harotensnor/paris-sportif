@@ -12,6 +12,7 @@ from datetime import datetime, timezone, timedelta
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 from winamax_map import lookup
+from _data_io import save_data_js
 
 DATA_JS = Path(__file__).resolve().parent.parent / 'data.js'
 HTML = Path(__file__).resolve().parent.parent / 'pronostics.html'
@@ -86,8 +87,7 @@ def main():
         new_days[d].sort(key=lambda e: e.get('date') or '')
     data['days'] = new_days
 
-    payload = json.dumps(data, ensure_ascii=False, separators=(',', ':'))
-    DATA_JS.write_text(f'window.PRONOSTICS_DATA = {payload};\n', encoding='utf-8')
+    save_data_js(data, DATA_JS)
 
     # Also inline into pronostics.html
     # v33.28 — HTML rewrite déplacé dans scripts/inject_data_in_html.py

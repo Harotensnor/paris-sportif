@@ -20,6 +20,7 @@ SCRIPTS = ROOT / "scripts"
 sys.path.insert(0, str(SCRIPTS))
 
 from fetch_sofascore_events import _league_code  # noqa: E402
+from _data_io import save_data_js  # noqa: E402
 
 
 def load_data() -> tuple[str, re.Match[str], dict]:
@@ -65,8 +66,7 @@ def main() -> int:
         return 0
 
     data["generated_at"] = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
-    new_json = json.dumps(data, ensure_ascii=False, separators=(",", ":"))
-    DATA_PATH.write_text(text[: match.start(1)] + new_json + text[match.end(1) :], encoding="utf-8")
+    save_data_js(data, DATA_PATH)
     top = ", ".join(f"{k}:{v}" for k, v in sorted(categories.items(), key=lambda item: -item[1])[:8])
     print(f"sofascore league codes: updated={changed} checked={touched} top={top}")
     return 0

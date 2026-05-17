@@ -22,6 +22,8 @@ DATA_JS = Path(__file__).resolve().parent.parent / 'data.js'
 HTML = Path(__file__).resolve().parent.parent / 'pronostics.html'
 INJ_OUT = Path(__file__).resolve().parent.parent / 'injuries_multisport.json'
 
+from _data_io import save_data_js, update_inline_blob_in_html
+
 UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)'
 CTX = ssl.create_default_context()
 CTX.check_hostname = False
@@ -192,13 +194,8 @@ def main():
         print(f'[{datetime.now():%H:%M:%S}] sidecar only · wrote {INJ_OUT.name}')
         return
 
-    payload = json.dumps(data, ensure_ascii=False, separators=(',', ':'))
-    DATA_JS.write_text(f'window.PRONOSTICS_DATA = {payload};\n', encoding='utf-8')
-    html_text = HTML.read_text(encoding='utf-8')
-    new_block = f'<script>\nwindow.PRONOSTICS_DATA = {payload};\n</script>'
-    html_text = re.sub(r'<script>\s*window\.PRONOSTICS_DATA\s*=.*?;?\s*</script>',
-                       new_block, html_text, count=1, flags=re.DOTALL)
-    HTML.write_text(html_text, encoding='utf-8')
+    save_data_js(data, DATA_JS)
+    update_inline_blob_in_html(data, HTML)
 
     print(f'[{datetime.now():%H:%M:%S}] done in {time.time()-t0:.1f}s · {total_touched} events tagged with injuries')
 

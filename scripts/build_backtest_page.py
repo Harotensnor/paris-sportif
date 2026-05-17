@@ -91,7 +91,7 @@ def render_overall_kpis(o: dict) -> str:
     return f'''
     <div class="kpi-strip">
       <div class="kpi-card">
-        <div class="kpi-label">Picks réglés</div>
+        <div class="kpi-label">Paris réglés</div>
         <div class="kpi-value">{n}</div>
         <div class="kpi-sub">{o.get('wins', 0)} gagnés · {o.get('losses', 0)} perdus</div>
       </div>
@@ -103,7 +103,7 @@ def render_overall_kpis(o: dict) -> str:
       <div class="kpi-card">
         <div class="kpi-label">ROI flat</div>
         <div class="kpi-value {color_class(roi)}">{fmt_signed(roi, 1, '%')}</div>
-        <div class="kpi-sub">P&amp;L {fmt_signed(o.get('flat_pnl'), 2, 'u')} · mise plate 1u/pick</div>
+        <div class="kpi-sub">P&amp;L {fmt_signed(o.get('flat_pnl'), 2, 'u')} · mise plate 1u/pari</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-label">Kelly 0.25× (cap 10%)</div>
@@ -137,7 +137,7 @@ def render_by_tier(by_tier: dict) -> str:
     """v31.7.62 — Ajout colonne CLV moyen par tier (audit suite).
     CLV = (notre cote / closing cote - 1) × 100. Indicateur d'edge."""
     rows = []
-    tier_label = {'lock': '🔒 Lock', 'standard': '✅ Standard', 'lowconf': '⚠️ Low conf', 'skip': '🚫 Skip'}
+    tier_label = {'lock': '🔒 Sûr', 'standard': '✅ Standard', 'lowconf': '⚠️ Confiance basse', 'skip': '🚫 Refusé'}
     tier_order = ['lock', 'standard', 'lowconf', 'skip']
     for tier in tier_order:
         d = by_tier.get(tier)
@@ -279,7 +279,7 @@ def _sparkline_svg(picks: list, kind: str = 'best') -> str:
     return f'''
     <div style="margin:0 0 14px;padding:8px 12px;background:rgba(255,255,255,.02);border:1px solid var(--border, rgba(255,255,255,.08));border-radius:8px;display:flex;align-items:center;gap:12px;">
       <span style="font-size:10.5px;color:#a3a3aa;text-transform:uppercase;letter-spacing:.5px;font-weight:700;">Cumul</span>
-      <svg viewBox="0 0 {w} {h}" style="flex:1;height:{h}px;display:block;" xmlns="http://www.w3.org/2000/svg" aria-label="Cumul P&amp;L flat sur les {n} picks">
+      <svg viewBox="0 0 {w} {h}" style="flex:1;height:{h}px;display:block;" xmlns="http://www.w3.org/2000/svg" aria-label="Cumul P&amp;L flat sur {n} pari(s)">
         <path d="{area}" fill="#{fill}" stroke="none"/>
         <polyline points="{poly}" fill="none" stroke="{color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
       </svg>
@@ -292,7 +292,7 @@ def render_worst_picks(worst_picks: list) -> str:
     Affiche en transparence pour montrer ou le modele se trompe le plus.
     Critère : prob >= 65% mais résultat lost. Trié par pick_prob desc."""
     if not worst_picks:
-        return '<p style="color:#a3a3aa;font-size:13px;">Pas de pires picks à afficher (aucune perte avec confiance ≥65%).</p>'
+        return '<p style="color:#a3a3aa;font-size:13px;">Pas de pires paris à afficher (aucune perte avec confiance ≥65%).</p>'
 
     sport_emoji = {
         'football': '⚽', 'tennis': '🎾', 'basketball': '🏀',
@@ -313,10 +313,10 @@ def render_worst_picks(worst_picks: list) -> str:
         # systématiquement parce que best_picks contient surtout des
         # 'skip'/'lowconf' (outsiders qui gagnent). Mapping complet maintenant.
         tier_lbl = {
-            'lock': '🔒 Lock',
+            'lock': '🔒 Sûr',
             'standard': '📋 Standard',
-            'lowconf': '⚠️ Low conf.',
-            'skip': '🤔 Skip',
+            'lowconf': '⚠️ Confiance basse',
+            'skip': '🤔 Refusé',
         }.get(p.get('tier'), '—')
         rows.append(f'''<tr>
       <td><span style="font-size:14px;">{em}</span> <b>{escape(name)}</b></td>
@@ -377,10 +377,10 @@ def render_best_picks(best_picks: list) -> str:
         # systématiquement parce que best_picks contient surtout des
         # 'skip'/'lowconf' (outsiders qui gagnent). Mapping complet maintenant.
         tier_lbl = {
-            'lock': '🔒 Lock',
+            'lock': '🔒 Sûr',
             'standard': '📋 Standard',
-            'lowconf': '⚠️ Low conf.',
-            'skip': '🤔 Skip',
+            'lowconf': '⚠️ Confiance basse',
+            'skip': '🤔 Refusé',
         }.get(p.get('tier'), '—')
         rows.append(f'''<tr>
       <td><span style="font-size:14px;">{em}</span> <b>{escape(name)}</b></td>
@@ -463,6 +463,7 @@ def render_streaks(streaks: dict) -> str:
             n = r["len"]
             items.append(f'<li><b>{n}</b> {_word_fr(n, "lose")} ({ds} → {de})</li>')
         top_lose_html = f'<div><h4 style="margin:12px 0 6px;font-size:13px;color:#f87171;">❄️ Top 3 séries perdantes</h4><ol style="font-size:13px;padding-left:18px;color:#d4d4d8;">{"".join(items)}</ol></div>'
+    runs_html = '\n      '.join(x for x in (top_win_html, top_lose_html) if x)
 
     return f'''<p style="font-size:13px;color:#a3a3aa;margin:0 0 12px;">
       Les paris sportifs sont <b>variance-driven</b> : un modèle profitable a quand même des "froids"
@@ -484,8 +485,7 @@ def render_streaks(streaks: dict) -> str:
       </div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
-      {top_win_html}
-      {top_lose_html}
+      {runs_html}
     </div>
     <p style="font-size:12px;color:#a3a3aa;margin-top:12px;">
       Source : <code>backtest_report_v2.json#streaks</code> (cron hebdo).
@@ -517,7 +517,7 @@ def render_benchmarks(overall: dict, baselines: dict) -> str:
     delta_self = 0
     delta_str = '<span style="color:#a3a3aa;">référence</span>'
     rows.append(f'''<tr style="background:rgba(167,139,250,.08);">
-      <td><b>🤖 Modèle predictMatch</b><br><span style="font-size:11px;color:#a3a3aa;">{model_n} picks réglés</span></td>
+      <td><b>🤖 Modèle predictMatch</b><br><span style="font-size:11px;color:#a3a3aa;">{model_n} pari(s) réglé(s)</span></td>
       <td style="text-align:right;">{model_n}</td>
       <td style="text-align:right;">{fmt_pct(overall.get("win_rate"), 1)}</td>
       <td style="text-align:right;color:{"#34d399" if model_roi > 0 else "#f87171" if model_roi < 0 else "#a3a3aa"};font-weight:700;">{fmt_signed(model_roi, 1, "%")}</td>
@@ -582,19 +582,19 @@ PAGE_TEMPLATE = '''<!DOCTYPE html>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Backtest — Performance vérifiable du modèle Paris-Sportif</title>
-<meta name="description" content="Performance réelle du modèle Paris-Sportif sur {n} picks réglés : WR {wr_str}, ROI flat {roi_str}, Brier {brier_str}, Kelly {kelly_str}. Backtest hebdo via vrai predictMatch(). Tableaux par tier, sport, ligue, cote, calibration.">
+<meta name="description" content="Performance réelle du modèle Paris-Sportif sur {n} pari(s) réglé(s) : WR {wr_str}, ROI flat {roi_str}, Brier {brier_str}, Kelly {kelly_str}. Backtest hebdo via vrai predictMatch(). Tableaux par tier, sport, ligue, cote, calibration.">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://harotensnor.github.io/paris-sportif/backtest.html">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Backtest — Performance vérifiable du modèle Paris-Sportif">
-<meta property="og:description" content="WR {wr_str} · ROI flat {roi_str} · Brier {brier_str} · {n} picks · backtest hebdo">
+<meta property="og:description" content="WR {wr_str} · ROI flat {roi_str} · Brier {brier_str} · {n} pari(s) · backtest hebdo">
 <meta property="og:url" content="https://harotensnor.github.io/paris-sportif/backtest.html">
 <meta property="og:image" content="https://harotensnor.github.io/paris-sportif/og-backtest.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Backtest — Paris-Sportif">
-<meta name="twitter:description" content="Performance vérifiable du modèle : ROI, Win Rate, Brier, calibration sur 600+ picks réglés. Indexable et reproductible.">
+<meta name="twitter:description" content="Performance vérifiable du modèle : ROI, Win Rate, Brier, calibration sur 600+ paris réglés. Indexable et reproductible.">
 <meta name="twitter:image" content="https://harotensnor.github.io/paris-sportif/og-backtest.png">
 <meta name="theme-color" content="#08080a">
 
@@ -613,7 +613,7 @@ PAGE_TEMPLATE = '''<!DOCTYPE html>
     {{
       "@type": "Dataset",
       "name": "Paris-Sportif backtest model performance",
-      "description": "Performance vérifiée du modèle predictMatch sur {n} picks réglés ({date_start} → {date_end}). WR {wr_str}, ROI flat {roi_str}, Brier {brier_str}.",
+      "description": "Performance vérifiée du modèle predictMatch sur {n} pari(s) réglé(s) ({date_start} → {date_end}). WR {wr_str}, ROI flat {roi_str}, Brier {brier_str}.",
       "url": "https://harotensnor.github.io/paris-sportif/backtest.html",
       "creator": {{ "@id": "https://harotensnor.github.io/paris-sportif/#org" }},
       "datePublished": "{generated_iso}",
@@ -717,7 +717,64 @@ PAGE_TEMPLATE = '''<!DOCTYPE html>
     border-bottom: 1px solid rgba(255,255,255,.08);
     z-index: 1;
   }}
-</b> → <b>{date_end}</b><br>
+  tbody td {{ padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,.04); color: #c5c5cc; }}
+  tbody tr:last-child td {{ border-bottom: none; }}
+  tbody td:nth-child(n+2) {{ text-align: right; }}
+  .meta-box {{
+    margin: 0 0 26px;
+    padding: 14px 16px;
+    background: rgba(255,255,255,.035);
+    border: 1px solid rgba(255,255,255,.08);
+    border-left: 4px solid #34d399;
+    border-radius: 10px;
+    color: #c5c5cc;
+    font-size: 13px;
+  }}
+  .danger-banner {{
+    margin: 28px 0 18px;
+    padding: 14px 16px;
+    background: rgba(251,191,36,.08);
+    border: 1px solid rgba(251,191,36,.18);
+    border-left: 4px solid #fbbf24;
+    border-radius: 10px;
+    color: #e6ebf2;
+    font-size: 13px;
+  }}
+  .contrib-prompt {{ color: #a3a3aa; font-size: 13px; margin-top: 22px; }}
+  footer.site-footer {{ border-top: 1px solid rgba(255,255,255,.06); margin-top: 40px; padding: 24px 20px; text-align: center; font-size: 12.5px; color: #c5c5cc; }}
+  footer.site-footer nav a {{ margin: 0 10px; color: #d4d4dc; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 2px; }}
+  @media (max-width: 720px) {{
+    header.topbar {{ align-items: flex-start; gap: 10px; flex-direction: column; }}
+    .topbar nav {{ display: flex; gap: 8px; overflow-x: auto; width: 100%; padding-bottom: 2px; }}
+    .topbar nav a {{ margin-left: 0; white-space: nowrap; }}
+    main {{ padding-inline: 14px; }}
+    h1 {{ font-size: 30px; }}
+    table {{ display: block; overflow-x: auto; white-space: nowrap; }}
+  }}
+</style>
+</head>
+<body>
+<header class="topbar" role="banner">
+  <a href="./" class="brand" aria-label="Retour à l'accueil Paris-Sportif">
+    <span class="brand-logo">📈</span>
+    <span class="brand-text">Paris-Sportif</span>
+  </a>
+  <nav aria-label="Navigation principale">
+    <a href="./">Accueil</a>
+    <a href="stats.html">Stats</a>
+    <a href="credibilite.html">Crédibilité</a>
+    <a href="methodologie.html">Méthodologie</a>
+  </nav>
+</header>
+
+<main>
+  <div class="breadcrumb"><a href="./">Accueil</a> › Backtest</div>
+  <span class="uppercase-pill">Backtest vérifiable</span>
+  <h1>Backtest du modèle</h1>
+  <p class="lead">Historique des paris réglés, par fiabilité, sport, bucket de cote et calibration. Les chiffres sont utiles pour diagnostiquer le modèle, pas pour promettre un résultat futur.</p>
+
+  <div class="meta-box">
+    📅 Fenêtre : <b>{date_start}</b> → <b>{date_end}</b><br>
     🔄 Régénéré : <b>{generated_human}</b><br>
     📦 Sources brutes : <a href="backtest_report_v2.json">backtest_report_v2.json</a> · <a href="backtest_report_v2.md">.md</a> · <a href="results_archive.jsonl">results_archive.jsonl</a>
   </div>
@@ -743,7 +800,7 @@ PAGE_TEMPLATE = '''<!DOCTYPE html>
   <h2 id="best">🏆 Plus beaux gains <span class="subtle">— les 10 succès les mieux payés</span></h2>
   {table_best_picks}
 
-  <h2 id="worst">😬 Pires picks <span class="subtle">— transparence sur les erreurs du modèle</span></h2>
+  <h2 id="worst">😬 Pires paris <span class="subtle">— transparence sur les erreurs du modèle</span></h2>
   {table_worst_picks}
 
   <h2 id="calibration">📊 Calibration probabiliste <span class="subtle">— quand on dit 70%, on gagne 70% ?</span></h2>
@@ -755,7 +812,7 @@ PAGE_TEMPLATE = '''<!DOCTYPE html>
   {table_leagues}
 
   <div class="danger-banner">
-    <strong>⚠️ Petite n.</strong> {n} picks restent insuffisants pour conclure définitivement
+    <strong>⚠️ Petite n.</strong> {n} pari(s) restent insuffisants pour conclure définitivement
     sur les sous-segments (sport, ligue, bucket de cote). Il faut typiquement <b>≥150 paris</b> par
     catégorie pour qu'un ROI ait du sens. Avant ça, c'est de la variance. Voir <a href="methodologie.html#biais">méthodologie · biais &amp; limites</a>.
   </div>

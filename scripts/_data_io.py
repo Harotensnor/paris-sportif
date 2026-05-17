@@ -29,6 +29,7 @@ import json
 import os
 import re
 import tempfile
+import time
 from pathlib import Path
 from typing import Any
 
@@ -42,6 +43,46 @@ DATA_RE = re.compile(r'window\.PRONOSTICS_DATA\s*=\s*(\{.*\})\s*;?\s*$', re.DOTA
 
 class DataIOError(Exception):
     """Raised when data.js cannot be parsed or saved."""
+
+
+def _replace_with_retry(tmp_path: str, target: Path, attempts: int = 18) -> None:
+    """Replace target atomically, with Windows retry on transient locks."""
+    last_error: Exception | None = None
+    for attempt in range(attempts):
+        try:
+            os.replace(tmp_path, str(target))
+            return
+        except OSError as exc:
+            last_error = exc
+            errno = getattr(exc, 'errno', None)
+            winerror = getattr(exc, 'winerror', None)
+            # Windows can briefly deny os.replace while Defender, OneDrive, or
+            # Electron readers scan a JSON report. Treat those as transient.
+            if errno not in (13, 22, 32) and winerror not in (5, 32, 33):
+                break
+            time.sleep(min(0.15 * (attempt + 1), 1.5))
+    if last_error is not None:
+        raise last_error
+
+
+def write_text_atomic(path: Path, text: str, encoding: str = 'utf-8') -> None:
+    """Write text via temp file + atomic replace.
+
+    Useful for desktop refresh on Windows where a reader can briefly hold a
+    JSON/JSONL file while another stage rewrites it.
+    """
+    p = Path(path)
+    fd, tmp_path = tempfile.mkstemp(prefix=f'.{p.name}.', suffix='.tmp', dir=str(p.parent))
+    try:
+        with os.fdopen(fd, 'w', encoding=encoding) as f:
+            f.write(text)
+        _replace_with_retry(tmp_path, p)
+    except Exception:
+        try:
+            os.unlink(tmp_path)
+        except OSError:
+            pass
+        raise
 
 
 def load_data_js(path: Path | None = None) -> dict:
@@ -79,7 +120,7 @@ def save_data_js(data: dict, path: Path | None = None) -> int:
     try:
         with os.fdopen(fd, 'w', encoding='utf-8') as f:
             f.write(out)
-        os.replace(tmp_path, str(p))
+        _replace_with_retry(tmp_path, p)
     except Exception:
         try:
             os.unlink(tmp_path)

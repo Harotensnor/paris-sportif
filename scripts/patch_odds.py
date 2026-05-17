@@ -9,6 +9,8 @@ from pathlib import Path
 
 DATA_JS = Path(__file__).resolve().parent.parent / 'data.js'
 HTML = Path(__file__).resolve().parent.parent / 'pronostics.html'
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from _data_io import save_data_js
 
 def slug(s):
     if not s: return ''
@@ -105,14 +107,16 @@ def main():
                 total_events_fixed += 1
     print(f'Filled ML on {total_fixed} odds rows across {total_events_fixed} events')
 
-    payload = json.dumps(data, ensure_ascii=False, separators=(',',':'))
-    DATA_JS.write_text(f'window.PRONOSTICS_DATA = {payload};\n', encoding='utf-8')
+    save_data_js(data, DATA_JS)
     print(f'data.js size: {DATA_JS.stat().st_size/1024:.1f} KB')
 
     # Re-inline into HTML
     # v33.28 — HTML rewrite déplacé dans scripts/inject_data_in_html.py
     # (1 seul appel à la fin du pipeline plutôt que 12 regex sur ~13500 lignes)
-    print(f'pronostics.html size: {HTML.stat().st_size/1024:.1f} KB')
+    if HTML.exists():
+        print(f'pronostics.html size: {HTML.stat().st_size/1024:.1f} KB')
+    else:
+        print('mode logiciel: pas de HTML site à mettre à jour')
 
 if __name__ == '__main__':
     main()

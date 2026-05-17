@@ -11,6 +11,8 @@ HTML_PATH = Path(__file__).resolve().parent.parent / 'pronostics.html'
 URL = 'https://www.forebet.com/en/football-tips-and-predictions-for-today'
 H = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/122.0.0.0 Safari/537.36'}
 
+from _data_io import save_data_js, update_inline_blob_in_html
+
 
 def fetch(url):
     req = urllib.request.Request(url, headers=H)
@@ -210,18 +212,12 @@ def main():
         odds_added += 1
     print(f'Added forebet odds to {odds_added} events')
 
-    # Save back
-    payload = json.dumps(data, ensure_ascii=False, separators=(',',':'))
-    DATA_JS.write_text(f'window.PRONOSTICS_DATA = {payload};\n', encoding='utf-8')
-    html_text = HTML_PATH.read_text(encoding='utf-8')
-    new_block = f'<script>\nwindow.PRONOSTICS_DATA = {payload};\n</script>'
-    if '<script src="data.js"></script>' in html_text:
-        html_text = html_text.replace('<script src="data.js"></script>', new_block, 1)
-    else:
-        html_text = re.sub(r'<script>\s*window\.PRONOSTICS_DATA\s*=.*?;?\s*</script>',
-                           new_block, html_text, count=1, flags=re.DOTALL)
-    HTML_PATH.write_text(html_text, encoding='utf-8')
-    print(f'data.js: {DATA_JS.stat().st_size/1024:.1f} KB, html: {HTML_PATH.stat().st_size/1024:.1f} KB')
+    # Save back. The desktop build no longer ships pronostics.html; update it
+    # only when a legacy static checkout still has the file.
+    save_data_js(data, DATA_JS)
+    html_updated = update_inline_blob_in_html(data, HTML_PATH)
+    html_info = f', html: {HTML_PATH.stat().st_size/1024:.1f} KB' if html_updated else ', html: absent'
+    print(f'data.js: {DATA_JS.stat().st_size/1024:.1f} KB{html_info}')
 
 
 if __name__ == '__main__':

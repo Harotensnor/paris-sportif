@@ -47,8 +47,11 @@ Ce fetcher est SAFE en cas d'échec : retourne {} si Sofascore ban.
 """
 from __future__ import annotations
 import json
+import os
 import sys
 import argparse
+import tempfile
+import time
 import unicodedata
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
@@ -318,6 +321,32 @@ def _previous_total() -> int:
     return 0
 
 
+def _write_json_atomic(path: Path, payload: dict) -> None:
+    """Write JSON through a same-folder temp file, then atomically replace."""
+    text = json.dumps(payload, ensure_ascii=False, separators=(',', ':'))
+    fd, tmp_path = tempfile.mkstemp(prefix=f'.{path.name}.', suffix='.tmp', dir=str(path.parent))
+    try:
+        with os.fdopen(fd, 'w', encoding='utf-8') as fh:
+            fh.write(text)
+        last_error: Exception | None = None
+        for attempt in range(8):
+            try:
+                os.replace(tmp_path, path)
+                last_error = None
+                break
+            except (PermissionError, OSError) as exc:
+                last_error = exc
+                time.sleep(0.08 * (attempt + 1))
+        if last_error is not None:
+            raise last_error
+    except Exception:
+        try:
+            os.unlink(tmp_path)
+        except OSError:
+            pass
+        raise
+
+
 def fetch_sport(sport: str, today: str) -> list[dict]:
     """Fetch les events scheduled pour un sport et un jour."""
     url = f'{API}/sport/{sport}/scheduled-events/{today}'
@@ -380,7 +409,7 @@ def main() -> int:
             flush=True,
         )
         return 1
-    OUT.write_text(json.dumps(out, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+    _write_json_atomic(OUT, out)
     print(f'  wrote {OUT.name} : {total} events ({OUT.stat().st_size/1024:.1f}KB)', flush=True)
     return 0
 

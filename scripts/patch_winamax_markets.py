@@ -21,6 +21,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 from winamax_map import _name_tokens
+from _data_io import save_data_js
 
 ROOT     = Path(__file__).resolve().parent.parent
 DATA_JS  = ROOT / 'data.js'
@@ -254,8 +255,7 @@ def main() -> int:
             ev['winamax'] = wx
             stats['matched'] += 1
 
-    payload = json.dumps(data, ensure_ascii=False, separators=(',', ':'))
-    DATA_JS.write_text(f'window.PRONOSTICS_DATA = {payload};\n', encoding='utf-8')
+    save_data_js(data, DATA_JS)
 
     # Also inline into pronostics.html (same pattern as patch_winamax.py)
     # v33.28 — HTML rewrite déplacé dans scripts/inject_data_in_html.py

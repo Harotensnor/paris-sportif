@@ -190,6 +190,403 @@ def _count_match_previews(d):
         'local_fallbacks': d.get('local_fallbacks') or 0,
     }
 
+def _count_match_context(d):
+    if not isinstance(d, dict):
+        return None
+    quality = d.get('quality') or {}
+    sources = d.get('sources') or {}
+    return {
+        'matches': d.get('matches') or len(d.get('matches_by_id') or {}),
+        'strong': quality.get('fort') or 0,
+        'correct': quality.get('correct') or 0,
+        'weak': quality.get('faible') or 0,
+        'insufficient': quality.get('insuffisant') or 0,
+        'sources': len(sources),
+    }
+
+def _count_signal_gap_report(d):
+    if not isinstance(d, dict):
+        return None
+    summary = d.get('summary') or {}
+    return {
+        'matches': summary.get('matches') or 0,
+        'gaps': summary.get('gaps') or len(d.get('gaps') or []),
+        'low_context_matches': summary.get('low_context_matches') or 0,
+        'sources': len(summary.get('by_source') or {}),
+    }
+
+def _count_context_backtest(d):
+    if not isinstance(d, dict):
+        return None
+    return {
+        'settled': d.get('settled_used') or 0,
+        'markets': len(d.get('by_market') or []),
+        'tiers': len(d.get('by_context_tier') or []),
+        'rows_skipped': d.get('rows_skipped') or 0,
+    }
+
+def _count_decision_backtest(d):
+    if not isinstance(d, dict):
+        return None
+    return {
+        'settled': d.get('settled_used') or 0,
+        'decisions': len(d.get('by_decision') or []),
+        'reasons': len(d.get('by_reason') or []),
+        'markets': len(d.get('by_decision_market') or []),
+        'rows_skipped': d.get('rows_skipped') or 0,
+    }
+
+def _count_decision_tuning(d):
+    if not isinstance(d, dict):
+        return None
+    policy = d.get('policy') or {}
+    summary = d.get('summary') or {}
+    return {
+        'settled': d.get('settled_used') or 0,
+        'recommendations': summary.get('recommendations') or len(d.get('recommendations') or []),
+        'degrade_markets': len(policy.get('degrade_markets') or []),
+        'watch_markets': len(policy.get('keep_watch_markets') or []),
+        'suggested_min_trust': policy.get('suggested_min_trust') or 0,
+    }
+
+def _count_decision_shadow(d):
+    if not isinstance(d, dict):
+        return None
+    summary = d.get('summary') or {}
+    return {
+        'matches': summary.get('current_matches') or 0,
+        'affected': summary.get('affected') or 0,
+        'would_watch': summary.get('would_watch') or 0,
+        'would_skip': summary.get('would_skip') or 0,
+        'affected_rate_pct': round(float(summary.get('affected_rate') or 0) * 100, 1),
+    }
+
+def _count_odds_guardrails(d):
+    if not isinstance(d, dict):
+        return None
+    summary = d.get('summary') or {}
+    policy = d.get('policy') or {}
+    return {
+        'settled': d.get('settled_used') or 0,
+        'buckets': summary.get('buckets') or 0,
+        'risky_buckets': summary.get('risky_buckets') or 0,
+        'current_high_odd_matches': summary.get('current_high_odd_matches') or 0,
+        'max_agent_odd': policy.get('max_agent_odd') or summary.get('max_agent_odd') or 0,
+    }
+
+def _count_agent_blocker_backtest(d):
+    if not isinstance(d, dict):
+        return None
+    summary = d.get('summary') or {}
+    return {
+        'settled': d.get('settled_used') or 0,
+        'active_like': summary.get('active_like_count') or 0,
+        'blocked_like': summary.get('blocked_like_count') or 0,
+        'outlier_like': summary.get('outlier_like_count') or 0,
+        'active_roi_pct': round(float(summary.get('active_like_roi') or 0) * 100, 1),
+        'blocked_roi_pct': round(float(summary.get('blocked_like_roi') or 0) * 100, 1),
+        'roi_gap_pct': round(float(summary.get('roi_gap') or 0) * 100, 1),
+    }
+
+def _count_agent_guardrail_recommendations(d):
+    if not isinstance(d, dict):
+        return None
+    summary = d.get('summary') or {}
+    return {
+        'recommendations': summary.get('recommendations') or 0,
+        'critical': summary.get('critical') or 0,
+        'high': summary.get('high') or 0,
+        'medium': summary.get('medium') or 0,
+        'low': summary.get('low') or 0,
+    }
+
+def _count_scorer_quality(d):
+    if not isinstance(d, dict):
+        return None
+    summary = d.get('summary') or {}
+    return {
+        'football_bookable': summary.get('football_bookable') or 0,
+        'ready': summary.get('ready') or 0,
+        'watch': summary.get('watch') or 0,
+        'fragile': summary.get('fragile') or 0,
+        'ready_rate_pct': round(float(summary.get('ready_rate') or 0) * 100, 1),
+    }
+
+def _count_scorer_candidates(d):
+    if not isinstance(d, dict):
+        return None
+    return {
+        'history_rows': d.get('history_rows') or 0,
+        'added_rows': d.get('added_rows') or 0,
+        'matches': d.get('matches_with_candidates') or 0,
+        'pending': d.get('pending_rows') or 0,
+    }
+
+def _count_scorer_settlement(d):
+    if not isinstance(d, dict):
+        return None
+    return {
+        'history_rows': d.get('history_rows') or 0,
+        'settled_total': d.get('settled_total') or 0,
+        'won': d.get('won') or 0,
+        'lost': d.get('lost') or 0,
+        'pending': d.get('pending') or 0,
+        'hit_rate_pct': round(float(d.get('hit_rate') or 0) * 100, 1),
+    }
+
+def _count_scorer_pending_audit(d):
+    if not isinstance(d, dict):
+        return None
+    summary = d.get('summary') or {}
+    return {
+        'history_rows': summary.get('history_rows') or 0,
+        'pending': summary.get('pending') or 0,
+        'pending_matches': summary.get('pending_matches') or 0,
+        'settled_total': summary.get('settled_total') or 0,
+        'actions': summary.get('actions') or 0,
+    }
+
+def _count_prematch_focus(d):
+    if not isinstance(d, dict):
+        return None
+    summary = d.get('summary') or {}
+    return {
+        'matches': summary.get('matches') or 0,
+        'critical': summary.get('critical') or 0,
+        'high': summary.get('high') or 0,
+        'medium': summary.get('medium') or 0,
+        'source_total': summary.get('source_total') or 0,
+    }
+
+def _count_prematch_execution(d):
+    if not isinstance(d, dict):
+        return None
+    summary = d.get('summary') or {}
+    return {
+        'focus_matches': summary.get('focus_matches') or 0,
+        'steps': summary.get('steps') or 0,
+        'blocking_steps': summary.get('blocking_steps') or 0,
+        'critical': summary.get('critical') or 0,
+        'high': summary.get('high') or 0,
+        'estimated_total_min': summary.get('estimated_total_min') or 0,
+        'final_gate': summary.get('final_gate') or 'unknown',
+    }
+
+def _count_signal_coverage_trend(d):
+    if not isinstance(d, dict):
+        return None
+    latest = d.get('latest') or {}
+    delta = d.get('delta_last') or {}
+    return {
+        'history_rows': d.get('history_rows') or 0,
+        'matches': latest.get('matches') or 0,
+        'usable_rate_pct': round(float(latest.get('usable_rate') or 0) * 100, 1),
+        'strong_rate_pct': round(float(latest.get('strong_rate') or 0) * 100, 1),
+        'delta_usable_rate_pct': delta.get('usable_rate_pct') if delta.get('available') else 0,
+    }
+
+def _count_next_actions(d):
+    if not isinstance(d, dict):
+        return None
+    summary = d.get('summary') or {}
+    return {
+        'actions': summary.get('actions') or 0,
+        'critical': summary.get('critical') or 0,
+        'high': summary.get('high') or 0,
+        'medium': summary.get('medium') or 0,
+        'low': summary.get('low') or 0,
+    }
+
+def _count_source_freshness_plan(d):
+    if not isinstance(d, dict):
+        return None
+    summary = d.get('summary') or {}
+    return {
+        'sources': summary.get('sources') or 0,
+        'due': summary.get('due') or 0,
+        'critical': summary.get('critical') or 0,
+        'high': summary.get('high') or 0,
+    }
+
+def _count_refresh_priority_plan(d):
+    if not isinstance(d, dict):
+        return None
+    summary = d.get('summary') or {}
+    return {
+        'items': summary.get('items') or 0,
+        'critical': summary.get('critical') or 0,
+        'high': summary.get('high') or 0,
+        'medium': summary.get('medium') or 0,
+        'estimated_total_sec': summary.get('estimated_total_sec') or 0,
+    }
+
+def _count_prebet_checklist(d):
+    if not isinstance(d, dict):
+        return None
+    summary = d.get('summary') or {}
+    return {
+        'status': summary.get('status') or 'unknown',
+        'ready_to_bet': bool(summary.get('ready_to_bet')),
+        'items': summary.get('items') or 0,
+        'blockers': summary.get('blockers') or 0,
+        'critical': summary.get('critical') or 0,
+        'high': summary.get('high') or 0,
+    }
+
+def _count_prebet_checklist_backtest(d):
+    if not isinstance(d, dict):
+        return None
+    summary = d.get('summary') or {}
+    return {
+        'settled_used': summary.get('settled_used') or 0,
+        'red_count': summary.get('red_count') or 0,
+        'red_roi': summary.get('red_roi') or 0,
+        'green_count': summary.get('green_count') or 0,
+        'green_roi': summary.get('green_roi') or 0,
+        'policy': summary.get('policy') or 'unknown',
+    }
+
+def _count_context_repair_plan(d):
+    if not isinstance(d, dict):
+        return None
+    summary = d.get('summary') or {}
+    return {
+        'weak_matches': summary.get('weak_matches') or 0,
+        'insufficient_matches': summary.get('insufficient_matches') or 0,
+        'repair_actions': summary.get('repair_actions') or 0,
+        'critical': summary.get('critical') or 0,
+        'high': summary.get('high') or 0,
+    }
+
+def _count_stake_reduction_backtest(d):
+    if not isinstance(d, dict):
+        return None
+    summary = d.get('summary') or {}
+    return {
+        'recommendations': summary.get('recommendations') or 0,
+        'league_market_recommendations': summary.get('league_market_recommendations') or 0,
+        'high': summary.get('high') or 0,
+        'medium': summary.get('medium') or 0,
+        'settled_used': summary.get('settled_used') or 0,
+        'loss_saved_units': summary.get('loss_saved_units') or 0,
+    }
+
+def _count_signal_conflict_backtest(d):
+    if not isinstance(d, dict):
+        return None
+    summary = d.get('summary') or {}
+    policy = d.get('policy') or {}
+    return {
+        'count': summary.get('count') or 0,
+        'roi': summary.get('roi') or 0,
+        'current_conflicts': summary.get('current_conflicts') or 0,
+        'policy_action': policy.get('action') or summary.get('policy_action') or 'unknown',
+    }
+
+def _count_source_registry(d):
+    if not isinstance(d, dict):
+        return None
+    summary = d.get('summary') or {}
+    return {
+        'sources': summary.get('sources') or len(d.get('sources') or []),
+        'free_or_optional': summary.get('free_or_optional') or 0,
+        'quarantine': summary.get('quarantine') or 0,
+        'runs_tail': summary.get('runs_tail') or 0,
+    }
+
+def _count_source_quarantine(d):
+    if not isinstance(d, dict):
+        return None
+    summary = d.get('summary') or {}
+    return {
+        'items': summary.get('items') or len(d.get('items') or []),
+        'critical': summary.get('critical') or 0,
+    }
+
+def _count_decision_exports(d):
+    if isinstance(d, dict):
+        summary = d.get('summary') or {}
+        return {
+            'files': summary.get('files') or len(d.get('files') or []),
+            'signal_conflicts': summary.get('signal_conflicts') or 0,
+            'repairable_contexts': summary.get('repairable_contexts') or 0,
+            'prebet_final': summary.get('prebet_final') or 0,
+        }
+    exports = ROOT / 'exports'
+    return {
+        'files': sum(1 for p in exports.glob('*.csv')) if exports.exists() else 0,
+        'signal_conflicts': (exports / 'signal_conflicts.csv').exists(),
+        'repairable_contexts': (exports / 'repairable_contexts.csv').exists(),
+        'prebet_final': (exports / 'prebet_final.csv').exists(),
+    }
+
+def _count_team_identity_graph(d):
+    if not isinstance(d, dict):
+        return None
+    summary = d.get('summary') or {}
+    return {
+        'teams': summary.get('teams') or len(d.get('teams') or {}),
+        'matches': summary.get('matches') or len(d.get('matches') or []),
+        'strict': summary.get('strict') or 0,
+        'usable': summary.get('usable') or 0,
+        'uncertain': summary.get('uncertain') or len(d.get('unmatched') or []),
+    }
+
+def _count_match_decision_timeline(d):
+    if not isinstance(d, dict):
+        return None
+    summary = d.get('summary') or {}
+    return {
+        'matches': summary.get('matches') or len(d.get('matches') or {}),
+        'weak_context': summary.get('weak_context') or 0,
+        'checklist_blocked_matches': summary.get('checklist_blocked_matches') or 0,
+        'signal_conflicts': summary.get('signal_conflicts') or 0,
+    }
+
+def _count_agent_bankroll_simulation(d):
+    if not isinstance(d, dict):
+        return None
+    summary = d.get('summary') or {}
+    return {
+        'settled_rows': summary.get('settled_rows') or 0,
+        'strategies': summary.get('strategies') or len(d.get('strategies') or []),
+        'current_policy_nav': summary.get('current_policy_nav') or 0,
+        'league_market_factors': summary.get('league_market_factors') or 0,
+    }
+
+def _count_smart_prepare_plan(d):
+    if not isinstance(d, dict):
+        return None
+    summary = d.get('summary') or {}
+    return {
+        'actions': summary.get('actions') or len(d.get('queue') or []),
+        'mode': summary.get('mode') or 'unknown',
+        'priority': summary.get('priority') or 'unknown',
+    }
+
+def _count_optional_sources_plan(d):
+    if not isinstance(d, dict):
+        return None
+    summary = d.get('summary') or {}
+    return {
+        'sources': summary.get('sources') or len(d.get('sources') or []),
+        'configured': summary.get('configured') or 0,
+        'token_missing': summary.get('token_missing') or 0,
+        'offline_ready': summary.get('offline_ready') or 0,
+    }
+
+def _count_clv_summary(d):
+    if not isinstance(d, dict):
+        return None
+    summary = d.get('summary') or {}
+    pick = (d.get('pick_level') or {}).get('summary') or {}
+    return {
+        'observations': summary.get('n') or summary.get('n_clv_observations') or 0,
+        'pick_observations': pick.get('n') or summary.get('n_pick_clv_observations') or 0,
+        'pick_mean_clv_pct': pick.get('mean_clv_pct') or summary.get('pick_mean_clv_pct') or 0,
+        'positive_clv_rate': pick.get('positive_clv_rate') or summary.get('positive_clv_rate') or 0,
+    }
+
 def _count_league_bias_audit(d):
     if not isinstance(d, dict):
         return None
@@ -239,6 +636,48 @@ SOURCES = [
     ('lineups_multisport', 'lineups_multisport.json', _count_lineups_multisport),
     ('xg_coverage', 'xg_coverage.json', _count_xg_coverage),
     ('match_previews', 'match_previews.json', _count_match_previews),
+    ('match_context', 'match_context.json', _count_match_context),
+    ('team_history_extended', 'team_history_extended.json', lambda d: {
+        'teams': (d.get('team_count') or len(d.get('teams') or {})) if isinstance(d, dict) else 0,
+    }),
+    ('roster_context', 'roster_context.json', lambda d: {
+        'matches': (d.get('match_count') or len(d.get('matches') or {})) if isinstance(d, dict) else 0,
+    }),
+    ('signal_gap_report', 'signal_gap_report.json', _count_signal_gap_report),
+    ('team_identity_report', 'team_identity_report.json', lambda d: {
+        'teams': (d.get('team_count') or len(d.get('teams') or {})) if isinstance(d, dict) else 0,
+    }),
+    ('team_identity_graph', 'team_identity_graph.json', _count_team_identity_graph),
+    ('context_backtest', 'context_backtest_report.json', _count_context_backtest),
+    ('decision_backtest', 'decision_backtest_report.json', _count_decision_backtest),
+    ('decision_tuning', 'decision_tuning_report.json', _count_decision_tuning),
+    ('decision_shadow', 'decision_shadow_report.json', _count_decision_shadow),
+    ('odds_guardrails', 'odds_guardrails_report.json', _count_odds_guardrails),
+    ('agent_blocker_backtest', 'agent_blocker_backtest.json', _count_agent_blocker_backtest),
+    ('agent_guardrail_recommendations', 'agent_guardrail_recommendations.json', _count_agent_guardrail_recommendations),
+    ('stake_reduction_backtest', 'stake_reduction_backtest.json', _count_stake_reduction_backtest),
+    ('signal_conflict_backtest', 'signal_conflict_backtest.json', _count_signal_conflict_backtest),
+    ('scorer_quality', 'scorer_quality_report.json', _count_scorer_quality),
+    ('scorer_candidates', 'scorer_candidates_summary.json', _count_scorer_candidates),
+    ('scorer_settlement', 'scorer_candidates_settlement.json', _count_scorer_settlement),
+    ('scorer_pending_audit', 'scorer_pending_audit.json', _count_scorer_pending_audit),
+    ('prematch_focus', 'prematch_focus_report.json', _count_prematch_focus),
+    ('prematch_execution', 'prematch_execution_plan.json', _count_prematch_execution),
+    ('signal_coverage_trend', 'signal_coverage_trend.json', _count_signal_coverage_trend),
+    ('next_actions', 'next_actions_report.json', _count_next_actions),
+    ('source_freshness_plan', 'source_freshness_plan.json', _count_source_freshness_plan),
+    ('context_repair_plan', 'context_repair_plan.json', _count_context_repair_plan),
+    ('refresh_priority_plan', 'refresh_priority_plan.json', _count_refresh_priority_plan),
+    ('prebet_checklist', 'prebet_checklist_report.json', _count_prebet_checklist),
+    ('prebet_checklist_backtest', 'prebet_checklist_backtest.json', _count_prebet_checklist_backtest),
+    ('agent_bankroll_simulation', 'agent_bankroll_simulation.json', _count_agent_bankroll_simulation),
+    ('match_decision_timeline', 'match_decision_timeline.json', _count_match_decision_timeline),
+    ('smart_prepare_plan', 'smart_prepare_plan.json', _count_smart_prepare_plan),
+    ('decision_exports', 'exports/decision_exports_manifest.json', _count_decision_exports),
+    ('source_registry', 'source_registry.json', _count_source_registry),
+    ('source_quarantine', 'source_quarantine.json', _count_source_quarantine),
+    ('optional_sources_plan', 'optional_sources_plan.json', _count_optional_sources_plan),
+    ('clv_summary', 'clv_summary.json', _count_clv_summary),
     ('league_bias_audit', 'league_bias_audit.json', _count_league_bias_audit),
     ('league_inefficiencies', 'league_inefficiencies.json', lambda d: {
         'leagues': ((d.get('summary') or {}).get('leagues') or len(d.get('leagues') or [])) if isinstance(d, dict) else 0,
@@ -496,6 +935,42 @@ STALE_AFTER_MIN = {
     'lineups_multisport': 60,   # starter context built from patched data.js
     'xg_coverage': 60,          # product coverage of patched xG fields
     'match_previews': 60,       # top upcoming match explanations
+    'match_context': 60,        # local dossier per bookable match
+    'team_history_extended': 60, # derived local team history context
+    'roster_context': 60,       # derived lineups/injuries/stars context
+    'signal_gap_report': 60,    # missing signal worklist
+    'team_identity_report': 60, # team alias/matching report
+    'team_identity_graph': 60,  # strict team identity graph and failed matching
+    'context_backtest': 60,     # settled ROI/Brier by context tier
+    'decision_backtest': 60,    # settled ROI/Brier by bet/watch/skip decision
+    'decision_tuning': 60,      # conservative decision thresholds from settled history
+    'decision_shadow': 60,      # current-match projection of conservative thresholds
+    'odds_guardrails': 60,      # high-odd and calibration guardrails
+    'agent_blocker_backtest': 60, # flat ROI by active-like vs blocked-like agent guardrails
+    'agent_guardrail_recommendations': 60, # cautious next guardrail actions
+    'stake_reduction_backtest': 60, # reduced-stake policy diagnostic
+    'signal_conflict_backtest': 60, # strong-context/cold-market guardrail diagnostic
+    'scorer_quality': 60,       # current scorer readiness guardrail
+    'scorer_candidates': 60,    # local scorer candidate archive summary
+    'scorer_settlement': 60,    # candidate scorer settlement when post-match scorers exist
+    'scorer_pending_audit': 60, # pending player-prop audit
+    'prematch_focus': 60,       # T-60 source priority worklist
+    'prematch_execution': 60,   # executable source plan derived from T-60 focus
+    'signal_coverage_trend': 60, # local trend of signal coverage quality
+    'next_actions': 60,         # compact local queue for the next useful action
+    'source_freshness_plan': 60, # source-specific freshness worklist
+    'context_repair_plan': 60, # weak context dossier repair queue
+    'refresh_priority_plan': 60, # deduplicated local refresh queue
+    'prebet_checklist': 60,     # pre-bet local go/no-go checklist
+    'prebet_checklist_backtest': 60, # red/watch/green checklist diagnostic
+    'agent_bankroll_simulation': 60, # simulated agent bankroll strategies
+    'match_decision_timeline': 60, # per-match decision timeline for detail sheet
+    'smart_prepare_plan': 60,   # one-click local refresh recommendation
+    'decision_exports': 60,     # durable local CSV decision exports
+    'source_registry': 24*60,   # local free-source registry
+    'source_quarantine': 60,    # degraded/missing source quarantine
+    'optional_sources_plan': 24*60, # optional free/free-tier source roadmap
+    'clv_summary': 24*60,       # CLV/odds movement historical summary
     'league_bias_audit': 60,    # model league reliability guardrail
     'rugby_markets':   6*60,    # derived only when rugby appears in data.js
     'niche_markets':   6*60,    # darts/snooker derived sidecar
@@ -536,6 +1011,42 @@ SOURCE_SCRIPT = {
     'lineups_multisport': 'scripts/build_lineups_multisport.py',
     'xg_coverage': 'scripts/build_xg_coverage.py',
     'match_previews': 'scripts/fetch_match_previews.py',
+    'match_context': 'scripts/build_match_context.py',
+    'team_history_extended': 'scripts/build_match_context.py',
+    'roster_context': 'scripts/build_match_context.py',
+    'signal_gap_report': 'scripts/build_match_context.py',
+    'team_identity_report': 'scripts/build_team_identity_graph.py',
+    'team_identity_graph': 'scripts/build_team_identity_graph.py',
+    'context_backtest': 'scripts/build_context_backtest.py',
+    'decision_backtest': 'scripts/build_decision_backtest.py',
+    'decision_tuning': 'scripts/build_decision_tuning.py',
+    'decision_shadow': 'scripts/build_decision_shadow.py',
+    'odds_guardrails': 'scripts/build_odds_guardrails.py',
+    'agent_blocker_backtest': 'scripts/build_agent_blocker_backtest.py',
+    'agent_guardrail_recommendations': 'scripts/build_agent_guardrail_recommendations.py',
+    'stake_reduction_backtest': 'scripts/build_stake_reduction_backtest.py',
+    'signal_conflict_backtest': 'scripts/build_signal_conflict_backtest.py',
+    'scorer_quality': 'scripts/build_scorer_quality.py',
+    'scorer_candidates': 'scripts/archive_scorer_candidates.py',
+    'scorer_settlement': 'scripts/settle_scorer_candidates.py',
+    'scorer_pending_audit': 'scripts/build_scorer_pending_audit.py',
+    'prematch_focus': 'scripts/build_prematch_focus.py',
+    'prematch_execution': 'scripts/build_prematch_execution_plan.py',
+    'signal_coverage_trend': 'scripts/build_signal_coverage_trend.py',
+    'next_actions': 'scripts/build_next_actions.py',
+    'source_freshness_plan': 'scripts/build_source_freshness_plan.py',
+    'context_repair_plan': 'scripts/build_context_repair_plan.py',
+    'refresh_priority_plan': 'scripts/build_refresh_priority_plan.py',
+    'prebet_checklist': 'scripts/build_prebet_checklist.py',
+    'prebet_checklist_backtest': 'scripts/build_prebet_checklist_backtest.py',
+    'agent_bankroll_simulation': 'scripts/build_agent_bankroll_simulation.py',
+    'match_decision_timeline': 'scripts/build_match_decision_timeline.py',
+    'smart_prepare_plan': 'scripts/build_smart_prepare_plan.py',
+    'decision_exports': 'scripts/build_decision_exports.py',
+    'source_registry': 'scripts/build_source_registry.py',
+    'source_quarantine': 'scripts/build_source_registry.py',
+    'optional_sources_plan': 'scripts/build_optional_sources_plan.py',
+    'clv_summary': 'scripts/compute_clv.py',
     'league_bias_audit': 'scripts/build_league_bias_audit.py',
     'rugby_markets': 'scripts/build_rugby_markets.py',
     'niche_markets': 'scripts/build_niche_markets.py',

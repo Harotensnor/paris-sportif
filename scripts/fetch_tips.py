@@ -14,6 +14,8 @@ TIPS_JS = Path(__file__).resolve().parent.parent / 'tips.js'
 
 HEADERS = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'}
 
+from _data_io import save_data_js as _save_data_js, update_inline_blob_in_html
+
 
 def fetch(url):
     req = urllib.request.Request(url, headers=HEADERS)
@@ -111,27 +113,10 @@ def load_data_js():
 
 
 def save_data_js(data):
-    payload = json.dumps(data, ensure_ascii=False, separators=(',', ':'))
-    DATA_JS.write_text(f'window.PRONOSTICS_DATA = {payload};\n', encoding='utf-8')
-    # Also re-inline into pronostics.html so the file stays self-contained.
+    _save_data_js(data, DATA_JS)
+    # Legacy static checkout only: the desktop app no longer ships pronostics.html.
     html_path = Path(__file__).resolve().parent.parent / 'pronostics.html'
-    if html_path.exists():
-        html = html_path.read_text(encoding='utf-8')
-        # Replace any inline window.PRONOSTICS_DATA block OR external src
-        new_block = f'<script>\nwindow.PRONOSTICS_DATA = {payload};\n</script>'
-        # Pattern 1: external <script src="data.js"></script>
-        if '<script src="data.js"></script>' in html:
-            html = html.replace('<script src="data.js"></script>', new_block, 1)
-        else:
-            # Pattern 2: replace existing inline block
-            html = re.sub(
-                r'<script>\s*window\.PRONOSTICS_DATA\s*=.*?;?\s*</script>',
-                new_block,
-                html,
-                count=1,
-                flags=re.DOTALL,
-            )
-        html_path.write_text(html, encoding='utf-8')
+    if update_inline_blob_in_html(data, html_path):
         print(f'Re-inlined into pronostics.html ({html_path.stat().st_size/1024:.1f} KB)')
 
 

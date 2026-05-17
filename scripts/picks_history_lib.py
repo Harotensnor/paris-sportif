@@ -10,17 +10,17 @@ from __future__ import annotations
 
 import json
 import math
-import tempfile
 from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from _data_io import DATA_RE, load_data_js, iter_events
+from _data_io import DATA_RE, load_data_js, iter_events, write_text_atomic
 
 ROOT = Path(__file__).resolve().parent.parent
 HISTORY_PATH = ROOT / "picks_history.jsonl"
 SUMMARY_PATH = ROOT / "picks_history_summary.json"
+MATCH_CONTEXT_PATH = ROOT / "match_context.json"
 MIN_MODEL_PROB = 0.001
 MAX_MODEL_PROB = 0.95
 
@@ -117,6 +117,121 @@ def market_key(raw: str) -> str:
         "ht_1n2": "ht_1n2",
     }
     return aliases.get(text, text or "1n2")
+
+
+def read_context_index(path: Path = MATCH_CONTEXT_PATH) -> dict[str, Any]:
+    if not path.exists():
+        return {}
+    try:
+        parsed = json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+    if not isinstance(parsed, dict):
+        return {}
+    matches = parsed.get("matches_by_id") or {}
+    return matches if isinstance(matches, dict) else {}
+
+
+def context_for_event(event: dict, context_index: dict[str, Any] | None) -> dict[str, Any] | None:
+    if not context_index:
+        return None
+    wx = event.get("winamax") or {}
+    candidates = [
+        wx.get("match_id"),
+        event.get("id"),
+        event.get("event_id"),
+        event.get("uid"),
+    ]
+    for raw in list(candidates):
+        if raw:
+            text = str(raw)
+            candidates.append(text.replace("espn_", "", 1))
+            candidates.append(text.replace("sofa_", "", 1))
+    for raw in candidates:
+        if raw is None:
+            continue
+        ctx = context_index.get(str(raw))
+        if isinstance(ctx, dict):
+            return ctx
+    return None
+
+
+def trust_level(score: float | None) -> str:
+    if score is None:
+        return "unknown"
+    if score >= 80:
+        return "strong"
+    if score >= 65:
+        return "stable"
+    if score >= 50:
+        return "watch"
+    return "fragile"
+
+
+def context_tier_for(score: float | None) -> str:
+    if score is None:
+        return "unknown"
+    if score >= 75:
+        return "fort"
+    if score >= 55:
+        return "correct"
+    if score >= 42:
+        return "faible"
+    return "insuffisant"
+
+
+def context_snapshot_fields(
+    event: dict,
+    context_index: dict[str, Any] | None,
+    *,
+    odd: float | None = None,
+    edge: float | None = None,
+    signals: list[str] | None = None,
+) -> dict[str, Any]:
+    ctx = context_for_event(event, context_index)
+    quality = (ctx or {}).get("quality") if isinstance(ctx, dict) else None
+    if not isinstance(quality, dict):
+        return {}
+    score = safe_float(quality.get("score"), None)
+    if score is None:
+        return {}
+    gate = str(quality.get("gate") or "watch")
+    tier = str(quality.get("tier") or context_tier_for(score))
+    missing = [str(x) for x in (quality.get("missing") or []) if x]
+    critical = [str(x) for x in (quality.get("critical_missing") or []) if x]
+    stale = [str(x) for x in (quality.get("stale") or []) if x]
+    present = [str(x) for x in (quality.get("present") or []) if x]
+    trust = 25 + score * 0.55
+    if gate == "watch":
+        trust -= 8
+    elif gate == "skip":
+        trust -= 35
+    if critical:
+        trust -= min(18, 8 + len(critical) * 4)
+    if stale:
+        trust -= min(12, len(stale) * 4)
+    if missing:
+        trust -= min(10, len(missing) * 1.2)
+    if signals:
+        trust += min(8, len(set(signals)) * 1.2)
+    if edge is not None and edge > 0.20 and score < 55:
+        trust -= 8
+    if odd is not None and odd >= 8:
+        trust -= 5
+    trust = int(round(clamp(trust, 0, 100)))
+    return {
+        "context_score": int(round(score)),
+        "context_tier": tier,
+        "context_gate": gate,
+        "context_agent_eligible": quality.get("agent_eligible") is not False and gate == "bet",
+        "context_missing": missing,
+        "context_critical_missing": critical,
+        "context_stale": stale,
+        "context_present": present,
+        "context_minutes_to_kickoff": safe_float(quality.get("minutes_to_kickoff"), None),
+        "trust_score": trust,
+        "trust_level": trust_level(trust),
+    }
 
 
 def tier_for(odd: float, prob: float, edge: float) -> str | None:
@@ -252,7 +367,17 @@ def implied_fallback(odd: float, siblings: list[dict], row: dict) -> float:
     return clamp(inv * 0.96, 0.01, 0.99)
 
 
-def add_candidate(out: list[dict], event: dict, row: dict, siblings: list[dict], model_prob: float | None, mk: str, selection: str, label: str) -> None:
+def add_candidate(
+    out: list[dict],
+    event: dict,
+    row: dict,
+    siblings: list[dict],
+    model_prob: float | None,
+    mk: str,
+    selection: str,
+    label: str,
+    context_index: dict[str, Any] | None = None,
+) -> None:
     odd = safe_float(row.get("odd"), None)
     if odd is None or odd < 1.01 or odd > 50:
         return
@@ -264,6 +389,7 @@ def add_candidate(out: list[dict], event: dict, row: dict, siblings: list[dict],
     if not tier:
         return
     sig = active_signals(event)
+    context_fields = context_snapshot_fields(event, context_index, odd=odd, edge=edge, signals=sig)
     out.append({
         "market_key": mk,
         "selection": selection,
@@ -276,10 +402,16 @@ def add_candidate(out: list[dict], event: dict, row: dict, siblings: list[dict],
         "tier": tier,
         "score_quality": quality_score(event, odd, prob, edge, sig),
         "signals_active": sig,
+        **context_fields,
     })
 
 
-def generate_event_picks(event: dict, ts_generated: str | None = None, max_per_match: int = 24) -> list[dict]:
+def generate_event_picks(
+    event: dict,
+    ts_generated: str | None = None,
+    max_per_match: int = 24,
+    context_index: dict[str, Any] | None = None,
+) -> list[dict]:
     wx = event.get("winamax") or {}
     markets = wx.get("markets") or {}
     if not wx.get("available") or not markets:
@@ -314,19 +446,19 @@ def generate_event_picks(event: dict, ts_generated: str | None = None, max_per_m
         side = row.get("side")
         key = "1" if side == "home" else "2" if side == "away" else "X"
         label = base["home"] if key == "1" else base["away"] if key == "2" else "Match nul"
-        add_candidate(rows, event, row, winner_rows, model.get(key), "1n2", key, label)
+        add_candidate(rows, event, row, winner_rows, model.get(key), "1n2", key, label, context_index)
     for row in markets.get("ou") or []:
         line = safe_float(row.get("line"), None)
         side = row.get("side")
         if line is None or side not in ("over", "under"):
             continue
         sel = ("O" if side == "over" else "U") + str(line)
-        add_candidate(rows, event, row, markets.get("ou") or [], model.get(sel), "ou", sel, row.get("label") or sel)
+        add_candidate(rows, event, row, markets.get("ou") or [], model.get(sel), "ou", sel, row.get("label") or sel, context_index)
     btts_rows = markets.get("btts_rows") or []
     for row in btts_rows:
         side = row.get("side")
         sel = "BTTS_Y" if side == "yes" else "BTTS_N"
-        add_candidate(rows, event, row, btts_rows, model.get(sel), "btts", sel, row.get("label") or sel)
+        add_candidate(rows, event, row, btts_rows, model.get(sel), "btts", sel, row.get("label") or sel, context_index)
     for row in markets.get("team_total") or []:
         line = safe_float(row.get("line"), None)
         side = row.get("side")
@@ -335,25 +467,25 @@ def generate_event_picks(event: dict, ts_generated: str | None = None, max_per_m
             continue
         prefix = "HOME" if team == "home" else "AWAY"
         sel = f"{prefix}_{'O' if side == 'over' else 'U'}{line}"
-        add_candidate(rows, event, row, markets.get("team_total") or [], model.get(sel), "teamTotal", sel, row.get("label") or sel)
+        add_candidate(rows, event, row, markets.get("team_total") or [], model.get(sel), "teamTotal", sel, row.get("label") or sel, context_index)
     for row in markets.get("dnb_rows") or []:
         side = row.get("side")
         sel = "DNB_1" if side == "home" else "DNB_2" if side == "away" else ""
         if sel:
             label = f"{base['home']} nul remboursé" if sel == "DNB_1" else f"{base['away']} nul remboursé"
-            add_candidate(rows, event, row, markets.get("dnb_rows") or [], model.get(sel), "dnb", sel, label)
+            add_candidate(rows, event, row, markets.get("dnb_rows") or [], model.get(sel), "dnb", sel, label, context_index)
     for row in markets.get("ht_ou") or []:
         line = safe_float(row.get("line"), None)
         side = row.get("side")
         if line is None or side not in ("over", "under"):
             continue
         sel = f"HT_{'O' if side == 'over' else 'U'}{line}"
-        add_candidate(rows, event, row, markets.get("ht_ou") or [], model.get(sel), "htTotal", sel, row.get("label") or sel)
+        add_candidate(rows, event, row, markets.get("ht_ou") or [], model.get(sel), "htTotal", sel, row.get("label") or sel, context_index)
     for row in markets.get("exact_score_rows") or []:
         score = str(row.get("score") or row.get("side") or "")
         if not score:
             continue
-        add_candidate(rows, event, row, markets.get("exact_score_rows") or [], model.get(f"CS_{score}"), "exactScore", score, row.get("label") or score)
+        add_candidate(rows, event, row, markets.get("exact_score_rows") or [], model.get(f"CS_{score}"), "exactScore", score, row.get("label") or score, context_index)
     # Keep market variety inside each match.
     rows.sort(key=lambda r: (r["score_quality"], r["edge"], r["prob_model"]), reverse=True)
     kept = []
@@ -441,11 +573,8 @@ def read_history(path: Path = HISTORY_PATH) -> dict[str, dict]:
 
 def write_history(entries: dict[str, dict], path: Path = HISTORY_PATH) -> None:
     ordered = sorted(entries.values(), key=lambda e: (e.get("kickoff_utc") or "", e.get("match_id") or "", e.get("market_key") or "", e.get("selection") or ""))
-    fd, tmp = tempfile.mkstemp(prefix=".picks_history.", suffix=".tmp", dir=str(path.parent))
-    with open(fd, "w", encoding="utf-8") as f:
-        for entry in ordered:
-            f.write(json.dumps(entry, ensure_ascii=False, separators=(",", ":")) + "\n")
-    Path(tmp).replace(path)
+    text = "".join(json.dumps(entry, ensure_ascii=False, separators=(",", ":")) + "\n" for entry in ordered)
+    write_text_atomic(path, text)
 
 
 def build_summary(entries: dict[str, dict], path: Path = SUMMARY_PATH) -> dict:
@@ -501,7 +630,7 @@ def build_summary(entries: dict[str, dict], path: Path = SUMMARY_PATH) -> dict:
         "by_market": dict(by_market.most_common()),
         "recent_picks": sorted(rows, key=lambda r: r.get("kickoff_utc") or "", reverse=True)[:500],
     }
-    path.write_text(json.dumps(summary, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+    write_text_atomic(path, json.dumps(summary, ensure_ascii=False, separators=(",", ":")))
     return summary
 
 
@@ -516,7 +645,41 @@ def event_index(data: dict) -> dict[str, dict]:
     return idx
 
 
-def merge_data_into_entries(data: dict, entries: dict[str, dict], generate_new: bool = True, settle_existing: bool = True, ts_generated: str | None = None) -> tuple[int, int]:
+CONTEXT_ENTRY_FIELDS = {
+    "context_score",
+    "context_tier",
+    "context_gate",
+    "context_agent_eligible",
+    "context_missing",
+    "context_critical_missing",
+    "context_stale",
+    "context_present",
+    "context_minutes_to_kickoff",
+    "trust_score",
+    "trust_level",
+}
+
+
+def merge_context_into_entry(entry: dict, fresh_pick: dict) -> tuple[dict, bool]:
+    next_entry = dict(entry)
+    changed = False
+    for field in CONTEXT_ENTRY_FIELDS:
+        if field not in fresh_pick:
+            continue
+        if next_entry.get(field) != fresh_pick.get(field):
+            next_entry[field] = fresh_pick.get(field)
+            changed = True
+    return next_entry, changed
+
+
+def merge_data_into_entries(
+    data: dict,
+    entries: dict[str, dict],
+    generate_new: bool = True,
+    settle_existing: bool = True,
+    ts_generated: str | None = None,
+    context_index: dict[str, Any] | None = None,
+) -> tuple[int, int]:
     idx = event_index(data)
     added = updated = 0
     ts = ts_generated or utc_now_iso()
@@ -524,9 +687,16 @@ def merge_data_into_entries(data: dict, entries: dict[str, dict], generate_new: 
         for _day, ev in iter_events(data):
             if not isinstance(ev, dict):
                 continue
-            for pick in generate_event_picks(ev, ts_generated=ts):
+            for pick in generate_event_picks(ev, ts_generated=ts, context_index=context_index):
                 key = pick_key(pick)
-                if not key or key in entries:
+                if not key:
+                    continue
+                if key in entries:
+                    if entries[key].get("result") == "pending":
+                        merged, changed = merge_context_into_entry(entries[key], pick)
+                        if changed:
+                            entries[key] = merged
+                            updated += 1
                     continue
                 entries[key] = settle_entry(pick, ev)
                 added += 1
@@ -555,7 +725,14 @@ def parse_data_js_text(text: str) -> dict | None:
 def refresh_history(generate_new: bool = True, settle_existing: bool = True) -> dict:
     data = load_data_js()
     entries = read_history()
-    added, updated = merge_data_into_entries(data, entries, generate_new=generate_new, settle_existing=settle_existing)
+    context_index = read_context_index()
+    added, updated = merge_data_into_entries(
+        data,
+        entries,
+        generate_new=generate_new,
+        settle_existing=settle_existing,
+        context_index=context_index,
+    )
     write_history(entries)
     summary = build_summary(entries)
     return {"added": added, "updated": updated, "total": len(entries), "summary_total": summary["total"]}

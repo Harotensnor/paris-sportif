@@ -8,8 +8,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 WORKFLOW = ROOT / ".github" / "workflows" / "smoke.yml"
-SMOKE = ROOT / "scripts" / "smoke_e2e.js"
-RUN_RE = re.compile(r"run:\s*node\s+(scripts/[A-Za-z0-9_.-]+\.js)")
+SMOKE = ROOT / "scripts" / "legacy_site" / "qa" / "smoke_e2e.js"
+RUN_RE = re.compile(r"run:\s*node\s+(scripts/[A-Za-z0-9_./-]+\.js)")
 
 
 def section(text: str, start: str, end: str) -> str:
@@ -35,7 +35,7 @@ def main() -> int:
 
     smoke_text = SMOKE.read_text(encoding="utf-8")
     if "nav button not found" in smoke_text or "[skip]" in smoke_text and "data-dependent" not in smoke_text:
-        findings.append("scripts/smoke_e2e.js: contains a generic skip path")
+        findings.append("scripts/legacy_site/qa/smoke_e2e.js: contains a generic skip path")
 
     if findings:
         print("[smoke-workflow-triggers] FAIL")

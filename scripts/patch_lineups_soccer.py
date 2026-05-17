@@ -31,6 +31,7 @@ from __future__ import annotations
 import json
 import re
 import sys
+from datetime import datetime
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -79,15 +80,35 @@ def _lineup_payload(side: dict | None) -> dict:
     }
 
 
+def _parse_ts(value: object) -> float | None:
+    if value is None or value == '':
+        return None
+    if isinstance(value, (int, float)):
+        return float(value if value > 10_000_000_000 else value * 1000)
+    try:
+        return datetime.fromisoformat(str(value).replace('Z', '+00:00')).timestamp() * 1000
+    except Exception:
+        return None
+
+
+def _time_compatible(entry: dict, event_date: str, max_minutes: int = 240) -> bool:
+    entry_ts = _parse_ts(entry.get('date') or entry.get('start') or entry.get('startDate') or entry.get('startTimestamp'))
+    event_ts = _parse_ts(event_date)
+    if entry_ts is None or event_ts is None:
+        return True
+    return abs(entry_ts - event_ts) <= max_minutes * 60_000
+
+
 def _find_entry(
     events_idx: dict[str, dict],
     league_code: str,
     home_name: str,
     away_name: str,
+    event_date: str = '',
 ) -> dict | None:
     key = f'{_norm(home_name)}|{_norm(away_name)}'
     entry = events_idx.get(key)
-    if entry:
+    if entry and _time_compatible(entry, event_date):
         return entry
 
     home_tokens = _name_tokens(home_name)
@@ -97,6 +118,8 @@ def _find_entry(
 
     for idx_key, candidate in events_idx.items():
         if candidate.get('league_code') and candidate.get('league_code') != league_code:
+            continue
+        if not _time_compatible(candidate, event_date):
             continue
         h_name = (candidate.get('home') or {}).get('team') or idx_key.split('|', 1)[0]
         a_name = (candidate.get('away') or {}).get('team') or idx_key.split('|', 1)[-1]
@@ -145,7 +168,7 @@ def main() -> int:
             if not (home_name and away_name):
                 continue
             scanned += 1
-            entry = _find_entry(events_idx, ev.get('league_code') or '', home_name, away_name)
+            entry = _find_entry(events_idx, ev.get('league_code') or '', home_name, away_name, ev.get('date') or '')
             if not entry:
                 continue
             home_lineup = _lineup_payload(entry.get('home'))
@@ -155,6 +178,7 @@ def main() -> int:
                 'away': away_lineup,
                 'league_code': entry.get('league_code') or ev.get('league_code') or '',
                 'sofa_event_id': entry.get('sofa_event_id') or '',
+                'date': entry.get('date') or '',
                 'source': 'sofascore',
             }
             event_level_patched += 1

@@ -281,6 +281,10 @@ def collect(selected_leagues: set[str] | None = None, pages: int = 3,
             away_name = (ev.get('awayTeam') or {}).get('name') or ''
             if not (eid and home_name and away_name):
                 continue
+            start_ts = ev.get('startTimestamp')
+            date_iso = ''
+            if isinstance(start_ts, (int, float)) and start_ts > 0:
+                date_iso = datetime.fromtimestamp(start_ts, tz=timezone.utc).strftime('%Y-%m-%dT%H:%MZ')
             lu = lineup_for_event(eid)
             if not lu:
                 totals['misses'] += 1
@@ -297,6 +301,7 @@ def collect(selected_leagues: set[str] | None = None, pages: int = 3,
                 **lu,
                 'league_code': code,
                 'sofa_event_id': eid,
+                'date': date_iso,
             }
             totals['with_lineup'] += 1
             # v31.7.208 — sleep réduit 0.3s → 0.15s. Sofascore tolère bien
