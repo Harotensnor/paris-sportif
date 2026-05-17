@@ -230,8 +230,10 @@ jobs:
           # v52.5 — Inject NBA/MLB/NHL advanced team stats sur competitor.{nba,mlb,nhl}_advanced
           python3 patch_advanced_stats.py || true
           python3 patch_smart_money.py || true
-          python3 build_public_team_stats.py || true
+            python3 build_public_team_stats.py || true
             python3 build_lineups_multisport.py || true
+            PUBLIC_SOURCE_MIN_INTERVAL=0.18 python3 fetch_public_match_signals.py --limit 120 --include-past-minutes 1440 --player-limit 180 || true
+            python3 patch_public_match_signals.py || true
             python3 build_xg_coverage.py || true
             python3 build_public_profiles.py || true
             python3 fetch_match_previews.py --limit 12 || true

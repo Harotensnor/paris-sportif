@@ -15,6 +15,7 @@ import json
 import os
 import re
 import time
+import unicodedata
 import urllib.parse
 import urllib.request
 from datetime import datetime, timedelta, timezone
@@ -32,9 +33,12 @@ OUT_PATH = ROOT / "public_match_signals.json"
 CACHE_PATH = ROOT / "public_match_signals_cache.json"
 USER_AGENT = "ParisSportifDesktop/4.1 public-signals (local Winamax assistant)"
 TEAM_TTL_SECONDS = 7 * 24 * 3600
+PLAYER_TTL_SECONDS = 7 * 24 * 3600
 EVENT_TTL_SECONDS = 4 * 3600
 MISSING_TTL_SECONDS = 3600
 SOURCE_BACKOFF_UNTIL: dict[str, float] = {}
+SOURCE_LAST_REQUEST_AT: dict[str, float] = {}
+SOURCE_MIN_INTERVAL_SECONDS = float(os.environ.get("PUBLIC_SOURCE_MIN_INTERVAL", "0.16"))
 RIVALRY_KEYWORDS = (
     "rivalry",
     "rivalries",
@@ -109,7 +113,8 @@ def parse_dt(value: Any) -> datetime | None:
 
 
 def norm(value: Any) -> str:
-    text = str(value or "").lower()
+    text = unicodedata.normalize("NFKD", str(value or "").lower())
+    text = "".join(ch for ch in text if not unicodedata.combining(ch))
     text = re.sub(r"[\u2019']", "", text)
     text = re.sub(r"[^a-z0-9]+", " ", text)
     text = re.sub(r"\b(fc|afc|cf|sc|club|the|women|wfc)\b", " ", text)
@@ -164,17 +169,18 @@ def event_rows(data: dict[str, Any], horizon_days: int, include_past_minutes: in
 
 def load_cache() -> dict[str, Any]:
     if not CACHE_PATH.exists():
-        return {"version": 1, "teams": {}, "rivalries": {}}
+        return {"version": 2, "teams": {}, "players": {}, "rivalries": {}}
     try:
         cache = json.loads(CACHE_PATH.read_text(encoding="utf-8"))
         if not isinstance(cache, dict):
-            return {"version": 1, "teams": {}, "rivalries": {}}
-        cache.setdefault("version", 1)
+            return {"version": 2, "teams": {}, "players": {}, "rivalries": {}}
+        cache.setdefault("version", 2)
         cache.setdefault("teams", {})
+        cache.setdefault("players", {})
         cache.setdefault("rivalries", {})
         return cache
     except Exception:
-        return {"version": 1, "teams": {}, "rivalries": {}}
+        return {"version": 2, "teams": {}, "players": {}, "rivalries": {}}
 
 
 def save_cache(cache: dict[str, Any]) -> None:
@@ -198,6 +204,23 @@ def set_cached_team(cache: dict[str, Any], key: str, record: dict[str, Any]) -> 
     cache.setdefault("teams", {})[key] = {"fetched_at": iso_now(), "record": record}
 
 
+def cached_player(cache: dict[str, Any], key: str) -> dict[str, Any] | None:
+    item = (cache.get("players") or {}).get(key)
+    if not isinstance(item, dict):
+        return None
+    fetched_at = parse_dt(item.get("fetched_at"))
+    record = item.get("record") if isinstance(item.get("record"), dict) else {}
+    status = record.get("status")
+    ttl = MISSING_TTL_SECONDS if status in {"missing", "queued", "partial"} else PLAYER_TTL_SECONDS
+    if fetched_at and (utc_now() - fetched_at).total_seconds() < ttl:
+        return record if isinstance(record, dict) else None
+    return None
+
+
+def set_cached_player(cache: dict[str, Any], key: str, record: dict[str, Any]) -> None:
+    cache.setdefault("players", {})[key] = {"fetched_at": iso_now(), "record": record}
+
+
 def cached_rivalry(cache: dict[str, Any], key: str) -> dict[str, Any] | None:
     item = (cache.get("rivalries") or {}).get(key)
     if not isinstance(item, dict):
@@ -217,6 +240,11 @@ def http_json(url: str, timeout: int = 12) -> dict[str, Any] | None:
     host = urllib.parse.urlparse(url).netloc
     if SOURCE_BACKOFF_UNTIL.get(host, 0) > time.time():
         return None
+    if host.endswith(("wikidata.org", "wikipedia.org")) and SOURCE_MIN_INTERVAL_SECONDS > 0:
+        elapsed = time.time() - SOURCE_LAST_REQUEST_AT.get(host, 0)
+        if elapsed < SOURCE_MIN_INTERVAL_SECONDS:
+            time.sleep(SOURCE_MIN_INTERVAL_SECONDS - elapsed)
+        SOURCE_LAST_REQUEST_AT[host] = time.time()
     request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT, "Accept": "application/json"})
     try:
         with urllib.request.urlopen(request, timeout=timeout) as response:
@@ -908,6 +936,438 @@ def source_record(label: str, url: str, status: str = "ok", detail: str = "") ->
     return {"label": label, "url": url, "status": status, "detail": detail, "checkedAt": iso_now()}
 
 
+def player_search_queries(name: str, sport: str, team: str = "") -> list[str]:
+    clean_name = str(name or "").strip()
+    sport_key = str(sport or "").lower()
+    clean_team = str(team or "").strip()
+    if not clean_name:
+        return []
+    queries = [clean_name]
+    if clean_team:
+        queries.append(f"{clean_name} {clean_team}")
+    if "football" in sport_key or "soccer" in sport_key:
+        queries.extend([
+            f"{clean_name} footballer",
+            f"{clean_name} association football player",
+            f"{clean_name} soccer player",
+        ])
+    elif "tennis" in sport_key:
+        queries.append(f"{clean_name} tennis player")
+    elif "basket" in sport_key:
+        queries.append(f"{clean_name} basketball player")
+    elif "baseball" in sport_key:
+        queries.append(f"{clean_name} baseball player")
+    elif "hockey" in sport_key:
+        queries.append(f"{clean_name} ice hockey player")
+    elif "nfl" in sport_key or "american" in sport_key:
+        queries.append(f"{clean_name} American football player")
+    else:
+        queries.append(f"{clean_name} athlete")
+    return list(dict.fromkeys(query for query in queries if query))
+
+
+def wikidata_search_player(name: str, sport: str, team: str = "") -> dict[str, Any] | None:
+    target = norm(name)
+    target_tokens = target.split()
+    if not target:
+        return None
+    sport_key = str(sport or "").lower()
+    player_words = (
+        "player",
+        "footballer",
+        "soccer player",
+        "association football player",
+        "tennis player",
+        "basketball player",
+        "baseball player",
+        "ice hockey player",
+        "american football player",
+        "athlete",
+        "boxer",
+        "fighter",
+    )
+    bad_words = ("club", "team", "stadium", "league", "season", "match")
+    best: tuple[float, dict[str, Any]] | None = None
+    for query in player_search_queries(name, sport, team):
+        params = urllib.parse.urlencode(
+            {
+                "action": "wbsearchentities",
+                "search": query,
+                "language": "en",
+                "uselang": "en",
+                "format": "json",
+                "limit": "8",
+            }
+        )
+        data = http_json(f"https://www.wikidata.org/w/api.php?{params}")
+        results = data.get("search") if isinstance(data, dict) else None
+        if not isinstance(results, list):
+            continue
+        for result in results:
+            label = result.get("label") or ""
+            aliases = result.get("aliases") or []
+            description = str(result.get("description") or "").lower()
+            label_norm = norm(label)
+            if any(word in description for word in bad_words) and not any(word in description for word in player_words):
+                continue
+            if ("football" in sport_key or "soccer" in sport_key) and any(bad in description for bad in ASSOCIATION_FOOTBALL_BAD_HINTS):
+                continue
+            candidate_names = [label, *aliases]
+            exact = any(norm(candidate) == target for candidate in candidate_names)
+            partial = target and any(target in norm(candidate) or norm(candidate) in target for candidate in candidate_names)
+            if not exact and not partial and len(target_tokens) <= 2:
+                continue
+            name_score = 0.74 if exact else 0.54 if partial else 0.30
+            hint_score = 0.22 if any(word in description for word in player_words) else 0.0
+            team_score = 0.08 if team and norm(team).split() and any(token in description for token in norm(team).split()[:2]) else 0.0
+            score = name_score + hint_score + team_score
+            if label_norm == target and "human" in description:
+                score += 0.04
+            if not best or score > best[0]:
+                best = (score, result)
+    if not best or best[0] < 0.56:
+        return None
+    out = dict(best[1])
+    out["confidence"] = round(best[0], 2)
+    return out
+
+
+def claim_quantity(entity: dict[str, Any] | None, prop: str) -> float | None:
+    claims = ((entity or {}).get("claims") or {}).get(prop) or []
+    if not isinstance(claims, list):
+        return None
+    for claim in claims[:2]:
+        if not isinstance(claim, dict):
+            continue
+        try:
+            value = claim["mainsnak"]["datavalue"]["value"]
+            if isinstance(value, dict) and value.get("amount") is not None:
+                return float(value["amount"])
+        except Exception:
+            continue
+    return None
+
+
+def claim_entity_ids(entity: dict[str, Any] | None, prop: str, limit: int = 8) -> list[str]:
+    claims = ((entity or {}).get("claims") or {}).get(prop) or []
+    if not isinstance(claims, list):
+        return []
+    out: list[str] = []
+    for claim in claims[:limit]:
+        if not isinstance(claim, dict):
+            continue
+        qid = claim_value_id(claim)
+        if qid:
+            out.append(qid)
+    return out
+
+
+def sport_player_keywords(sport: str) -> tuple[str, ...]:
+    sport_key = str(sport or "").lower()
+    if "football" in sport_key or "soccer" in sport_key:
+        return ("footballer", "footballeur", "football player", "association football", "soccer player", "football")
+    if "tennis" in sport_key:
+        return ("tennis player", "joueur de tennis", "tennis")
+    if "basket" in sport_key:
+        return ("basketball player", "basketball")
+    if "baseball" in sport_key:
+        return ("baseball player", "baseball")
+    if "hockey" in sport_key:
+        return ("ice hockey player", "hockey player", "ice hockey")
+    if "nfl" in sport_key or "american" in sport_key:
+        return ("american football player", "american football")
+    if "mma" in sport_key or "ufc" in sport_key:
+        return ("mixed martial artist", "martial artist", "fighter")
+    if "box" in sport_key:
+        return ("boxer", "boxing")
+    return ("athlete", "player", "sportsperson")
+
+
+def valid_public_player_entity(entity: dict[str, Any] | None, sport: str) -> bool:
+    if not entity:
+        return False
+    is_human = "Q5" in claim_entity_ids(entity, "P31", 6)
+    if not is_human:
+        return False
+    labels: list[str] = [description_for_entity(entity)]
+    for prop in ("P106", "P641"):
+        for qid in claim_entity_ids(entity, prop, 8):
+            label = label_for_entity(entity_json(qid))
+            if label:
+                labels.append(label)
+    text = " ".join(labels).lower()
+    generic_ok = any(word in text for word in ("player", "joueur", "athlete", "athlète", "sportif", "sportsperson", "footballer", "footballeur", "boxer", "boxeur", "fighter"))
+    sport_ok = any(word in text for word in sport_player_keywords(sport))
+    return generic_ok and sport_ok
+
+
+def wiki_extract_mentions_player(wiki: dict[str, Any] | None, sport: str) -> bool:
+    text = f"{(wiki or {}).get('title') or ''} {(wiki or {}).get('extract') or ''}".lower()
+    if not text:
+        return False
+    return any(word in text for word in sport_player_keywords(sport)) or any(word in text for word in ("player", "joueur", "athlete", "athlète", "sportif", "footballer", "footballeur"))
+
+
+def public_player_stats(entity: dict[str, Any] | None, player: dict[str, Any], team: str) -> dict[str, Any]:
+    birth_year = year_from_wikidata_time(claim_time(entity, "P569"))
+    age_years = utc_now().year - birth_year if birth_year else None
+    height_raw = claim_quantity(entity, "P2048")
+    height_cm = None
+    if height_raw:
+        height_cm = round(height_raw * 100) if height_raw < 3 else round(height_raw)
+    stats = {
+        "position": claim_entity_label(entity, "P413") or player.get("pos") or player.get("position") or "",
+        "country": claim_entity_label(entity, "P27"),
+        "currentTeam": claim_entity_label(entity, "P54") or team,
+        "birthYear": birth_year,
+        "ageYears": age_years,
+        "heightCm": height_cm,
+        "shirt": player.get("shirt") or player.get("number"),
+        "lineupPosition": player.get("pos") or player.get("position") or "",
+        "lineupRating": player.get("rating") if player.get("rating") is not None else None,
+        "captain": bool(player.get("captain")),
+        "pid": player.get("pid") or player.get("id") or "",
+        "sources": ["Wikidata", "lineup_snapshot"],
+    }
+    return {key: value for key, value in stats.items() if value not in ("", None, [])}
+
+
+def espn_headshot_url(pid: Any, sport: str) -> str:
+    player_id = str(pid or "").strip()
+    if not player_id:
+        return ""
+    sport_key = str(sport or "").lower()
+    if "basket" in sport_key or "nba" in sport_key:
+        league = "nba"
+    elif "baseball" in sport_key or "mlb" in sport_key:
+        league = "mlb"
+    elif "hockey" in sport_key or "nhl" in sport_key:
+        league = "nhl"
+    elif "nfl" in sport_key or "american" in sport_key:
+        league = "nfl"
+    elif "tennis" in sport_key:
+        league = "tennis"
+    else:
+        league = "soccer"
+    return f"https://a.espncdn.com/i/headshots/{league}/players/full/{urllib.parse.quote(player_id)}.png"
+
+
+def espn_athlete_url(pid: Any, sport: str) -> str:
+    player_id = str(pid or "").strip()
+    if not player_id:
+        return ""
+    sport_key = str(sport or "").lower()
+    if "basket" in sport_key or "nba" in sport_key:
+        return f"https://www.espn.com/nba/player/_/id/{urllib.parse.quote(player_id)}"
+    if "baseball" in sport_key or "mlb" in sport_key:
+        return f"https://www.espn.com/mlb/player/_/id/{urllib.parse.quote(player_id)}"
+    if "hockey" in sport_key or "nhl" in sport_key:
+        return f"https://www.espn.com/nhl/player/_/id/{urllib.parse.quote(player_id)}"
+    if "nfl" in sport_key or "american" in sport_key:
+        return f"https://www.espn.com/nfl/player/_/id/{urllib.parse.quote(player_id)}"
+    return f"https://www.espn.com/soccer/player/_/id/{urllib.parse.quote(player_id)}"
+
+
+def player_fallback_profile(name: str, sport: str, player: dict[str, Any], team: str) -> dict[str, Any]:
+    pid = player.get("pid") or player.get("id") or ""
+    local_stats = {
+        "position": player.get("pos") or player.get("position") or "",
+        "shirt": player.get("shirt") or player.get("number"),
+        "lineupRating": player.get("rating") if player.get("rating") is not None else None,
+        "captain": bool(player.get("captain")),
+        "pid": pid,
+        "currentTeam": team,
+        "sources": ["lineup_snapshot"],
+    }
+    local_stats = {key: value for key, value in local_stats.items() if value not in ("", None, [])}
+    headshot = espn_headshot_url(pid, sport)
+    athlete_url = espn_athlete_url(pid, sport)
+    detail_bits = [
+        local_stats.get("position") and f"poste {local_stats.get('position')}",
+        local_stats.get("shirt") and f"n°{local_stats.get('shirt')}",
+        team and f"équipe {team}",
+    ]
+    sources = [source_record("Lineup snapshot", "", "partial", "identité joueur issue de la composition locale")] if local_stats else []
+    if headshot:
+        sources.append(source_record("ESPN headshot", athlete_url, "partial", "photo publique via identifiant joueur ESPN"))
+    return {
+        "name": name,
+        "status": "partial" if local_stats else "missing",
+        "label": name,
+        "team": team,
+        "profile": {
+            "title": name,
+            "url": athlete_url,
+            "extract": f"Profil joueur partiel rattaché à la composition locale de {team}." if team else "Profil joueur partiel rattaché à la composition locale.",
+            "thumbnail": headshot,
+            "source": "espncdn.com" if headshot else "",
+        } if headshot else {},
+        "publicStats": local_stats,
+        "history": {"status": "missing"},
+        "signals": [
+            *( [f"Lineup source: {', '.join(str(bit) for bit in detail_bits if bit)}"] if detail_bits else [] ),
+            *( ["Photo joueur publique reliée via ESPN"] if headshot else [] ),
+        ],
+        "sources": sources,
+        "quality": (38 if headshot else 28) if local_stats else 0,
+        "fetchedAt": iso_now(),
+    }
+
+
+def enrich_player_entity(
+    name: str,
+    sport: str,
+    cache: dict[str, Any],
+    sleep_sec: float,
+    player: dict[str, Any],
+    team: str = "",
+    budget: dict[str, int] | None = None,
+) -> dict[str, Any]:
+    key = f"{sport.lower()}::player_v8::{norm(team)}::{norm(name)}"
+    cached = cached_player(cache, key)
+    if cached:
+        return cached
+    if budget is not None and int(budget.get("remaining", 0)) <= 0:
+        record = player_fallback_profile(name, sport, player, team)
+        record["status"] = "queued" if record.get("status") != "missing" else "missing"
+        record["queuedReason"] = "budget réseau joueurs atteint"
+        return record
+    if budget is not None:
+        budget["remaining"] = max(0, int(budget.get("remaining", 0)) - 1)
+    search = wikidata_search_player(name, sport, team)
+    time.sleep(sleep_sec)
+    if not search:
+        title, lang, confidence = wikipedia_search_title(f"{name} {sport} player", sport)
+        time.sleep(sleep_sec)
+        wiki = wikipedia_extract(title, lang) if title else None
+        if wiki and wiki_extract_mentions_player(wiki, sport):
+            record = player_fallback_profile(name, sport, player, team)
+            record.update({
+                "status": "ok",
+                "label": wiki.get("title") or name,
+                "profile": {
+                    "title": wiki.get("title") or name,
+                    "url": wiki.get("url") or "",
+                    "extract": compact_text(wiki.get("extract"), 320),
+                    "thumbnail": wiki.get("thumbnail") or "",
+                    "source": wiki.get("source") or "wikipedia.org",
+                },
+                "history": historical_profile_from_wiki(name, sport, wiki, None),
+                "sources": [
+                    *record.get("sources", []),
+                    source_record("Wikipedia joueur", wiki.get("url") or "", "ok", f"profil joueur public · confiance {confidence}"),
+                ],
+                "signals": [
+                    f"Profil joueur public confirmé: {wiki.get('title') or name}",
+                    *record.get("signals", []),
+                ],
+                "quality": max(int(record.get("quality") or 0), 62),
+            })
+            set_cached_player(cache, key, record)
+            return record
+        record = player_fallback_profile(name, sport, player, team)
+        set_cached_player(cache, key, record)
+        return record
+    qid = str(search.get("id") or "")
+    entity = entity_json(qid)
+    time.sleep(sleep_sec)
+    if not valid_public_player_entity(entity, sport):
+        title, lang, confidence = wikipedia_search_title(f"{name} {sport} player", sport)
+        time.sleep(sleep_sec)
+        wiki = wikipedia_extract(title, lang) if title else None
+        if wiki and wiki_extract_mentions_player(wiki, sport):
+            record = player_fallback_profile(name, sport, player, team)
+            record.update({
+                "status": "ok",
+                "label": wiki.get("title") or name,
+                "profile": {
+                    "title": wiki.get("title") or name,
+                    "url": wiki.get("url") or "",
+                    "extract": compact_text(wiki.get("extract"), 320),
+                    "thumbnail": wiki.get("thumbnail") or "",
+                    "source": wiki.get("source") or "wikipedia.org",
+                },
+                "history": historical_profile_from_wiki(name, sport, wiki, None),
+                "sources": [
+                    *record.get("sources", []),
+                    source_record("Wikipedia joueur", wiki.get("url") or "", "ok", f"profil joueur public · confiance {confidence}"),
+                ],
+                "signals": [
+                    f"Profil joueur public confirmé: {wiki.get('title') or name}",
+                    *record.get("signals", []),
+                ],
+                "quality": max(int(record.get("quality") or 0), 62),
+            })
+            set_cached_player(cache, key, record)
+            return record
+        record = player_fallback_profile(name, sport, player, team)
+        record["status"] = "partial" if record.get("publicStats") else "missing"
+        record["rejectedPublicProfile"] = qid or str(search.get("label") or "")
+        set_cached_player(cache, key, record)
+        return record
+    title, lang = wiki_title_from_entity(entity)
+    wiki = wikipedia_extract(title, lang) if title else None
+    if title:
+        time.sleep(sleep_sec)
+    label = label_for_entity(entity) or str(search.get("label") or name)
+    description = description_for_entity(entity) or str(search.get("description") or "")
+    extract = (wiki or {}).get("extract") or description
+    history = historical_profile_from_entity(entity, wiki, sport, name, None)
+    stats = public_player_stats(entity, player, team)
+    quality = 44 + (20 if wiki else 0) + (14 if stats.get("position") or stats.get("country") else 0) + (8 if (wiki or {}).get("thumbnail") else 0)
+    record = {
+        "name": name,
+        "status": "ok",
+        "entityId": qid,
+        "label": label,
+        "team": team,
+        "description": compact_text(description, 220),
+        "profile": {
+            "title": (wiki or {}).get("title") or title or label,
+            "url": (wiki or {}).get("url") or f"https://www.wikidata.org/wiki/{qid}",
+            "extract": compact_text(extract, 320),
+            "thumbnail": (wiki or {}).get("thumbnail") or "",
+            "source": (wiki or {}).get("source") or "wikidata.org",
+        },
+        "publicStats": stats,
+        "history": history,
+        "signals": [
+            f"Profil joueur public confirmé: {label}",
+            *( [f"Poste public: {stats.get('position')}"] if stats.get("position") else [] ),
+            *( [f"Historique joueur: {history['summary']}"] if history.get("summary") else [] ),
+        ],
+        "sources": [
+            source_record("Wikidata joueur", f"https://www.wikidata.org/wiki/{qid}", "ok", f"identité joueur · confiance {search.get('confidence')}"),
+            *( [source_record("Wikipedia joueur", (wiki or {}).get("url") or "", "ok", "photo/résumé joueur public")] if wiki else [] ),
+            source_record("Lineup snapshot", "", "partial", "numéro/poste issus de la composition locale"),
+        ],
+        "quality": min(100, int(quality)),
+        "fetchedAt": iso_now(),
+    }
+    set_cached_player(cache, key, record)
+    return record
+
+
+def lineup_players(event: dict[str, Any], side: str) -> tuple[str, list[dict[str, Any]]]:
+    competitors = [c for c in (event.get("competitors") or []) if isinstance(c, dict)]
+    competitor = next((c for c in competitors if c.get("home_away") == side), None)
+    if competitor is None:
+        competitor = competitors[0] if side == "home" and competitors else competitors[1] if side == "away" and len(competitors) > 1 else {}
+    lineup = ((event.get("lineups") or {}).get(side) if isinstance(event.get("lineups"), dict) else None) or competitor.get("lineup") or {}
+    team = str(lineup.get("team") or competitor.get("name") or ("Domicile" if side == "home" else "Extérieur")).strip()
+    starters = lineup.get("starters") if isinstance(lineup.get("starters"), list) else []
+    subs = lineup.get("subs") if isinstance(lineup.get("subs"), list) else []
+    players = []
+    for source, items in (("starter", starters), ("substitute", subs[:5])):
+        for item in items:
+            if not isinstance(item, dict) or not item.get("name"):
+                continue
+            row = dict(item)
+            row["lineupRole"] = source
+            players.append(row)
+    return team, players
+
+
 def espn_public_fallback(name: str, sport: str, competitor: dict[str, Any] | None) -> dict[str, Any] | None:
     competitor = competitor or {}
     if not competitor.get("id") and not competitor.get("logo") and not competitor.get("records"):
@@ -1081,9 +1541,10 @@ def event_key(event: dict[str, Any]) -> str:
     )
 
 
-def build_match_record(event: dict[str, Any], cache: dict[str, Any], sleep_sec: float) -> dict[str, Any]:
+def build_match_record(event: dict[str, Any], cache: dict[str, Any], sleep_sec: float, player_budget: dict[str, int] | None = None) -> dict[str, Any]:
     sport = str(event.get("sport") or "").lower() or "sport"
     teams: dict[str, Any] = {}
+    players: dict[str, list[dict[str, Any]]] = {"home": [], "away": []}
     sources: list[dict[str, Any]] = []
     signals: list[str] = []
     for competitor in event.get("competitors") or []:
@@ -1097,6 +1558,19 @@ def build_match_record(event: dict[str, Any], cache: dict[str, Any], sleep_sec: 
         teams[str(side)] = enriched
         sources.extend(enriched.get("sources") or [])
         signals.extend(enriched.get("signals") or [])
+    for side in ("home", "away"):
+        team_name, lineup = lineup_players(event, side)
+        for player in lineup[:16]:
+            name = str(player.get("name") or "").strip()
+            if not name:
+                continue
+            enriched_player = enrich_player_entity(name, sport, cache, sleep_sec, player, team_name, player_budget)
+            enriched_player["side"] = side
+            enriched_player["team"] = enriched_player.get("team") or team_name
+            enriched_player["lineupRole"] = player.get("lineupRole") or "starter"
+            players[side].append(enriched_player)
+            sources.extend(enriched_player.get("sources") or [])
+            signals.extend(enriched_player.get("signals") or [])
     rivalry = detect_match_rivalry(event, teams, cache, sleep_sec)
     if rivalry.get("status") == "confirmed":
         sources.extend(rivalry.get("sources") or [])
@@ -1105,7 +1579,10 @@ def build_match_record(event: dict[str, Any], cache: dict[str, Any], sleep_sec: 
     coach_count = len([team for team in teams.values() if team.get("coach")])
     rivalry_count = 1 if rivalry.get("status") == "confirmed" else 0
     history_count = len([team for team in teams.values() if (team.get("history") or {}).get("status") in {"ok", "partial"}])
-    quality = min(100, source_count * 16 + coach_count * 16 + rivalry_count * 8 + history_count * 6)
+    player_profile_count = len([player for side_players in players.values() for player in side_players if player.get("status") == "ok"])
+    player_photo_count = len([player for side_players in players.values() for player in side_players if (player.get("profile") or {}).get("thumbnail")])
+    player_stats_count = len([player for side_players in players.values() for player in side_players if player.get("publicStats")])
+    quality = min(100, source_count * 10 + coach_count * 12 + rivalry_count * 8 + history_count * 5 + min(12, player_profile_count))
     return {
         "version": 1,
         "eventId": event_key(event),
@@ -1118,15 +1595,19 @@ def build_match_record(event: dict[str, Any], cache: dict[str, Any], sleep_sec: 
         "status": "ok" if source_count else "missing",
         "quality": quality,
         "teams": teams,
+        "players": players,
         "rivalry": rivalry,
         "signals": list(dict.fromkeys(signals))[:10],
-        "sources": sources[:12],
+        "sources": sources[:18],
         "summary": {
             "sourceCount": source_count,
             "teamProfiles": len([team for team in teams.values() if team.get("status") == "ok"]),
             "coaches": coach_count,
             "rivalries": rivalry_count,
             "histories": history_count,
+            "playerProfiles": player_profile_count,
+            "playerPhotos": player_photo_count,
+            "playerStats": player_stats_count,
             "tacticalReads": len([team for team in teams.values() if (team.get("tactical") or {}).get("tags")]),
         },
     }
@@ -1138,6 +1619,7 @@ def main() -> int:
     parser.add_argument("--horizon-days", type=int, default=int(os.environ.get("PUBLIC_SIGNALS_HORIZON_DAYS", "7")))
     parser.add_argument("--include-past-minutes", type=int, default=30)
     parser.add_argument("--sleep", type=float, default=float(os.environ.get("PUBLIC_SIGNALS_SLEEP", "0.10")))
+    parser.add_argument("--player-limit", type=int, default=int(os.environ.get("PUBLIC_PLAYER_SIGNALS_LIMIT", "120")))
     args = parser.parse_args()
 
     data = load_data_js()
@@ -1145,7 +1627,8 @@ def main() -> int:
     rows = event_rows(data, args.horizon_days, args.include_past_minutes)
     if args.limit > 0:
         rows = rows[: args.limit]
-    matches = [build_match_record(event, cache, max(0.0, args.sleep)) for event in rows]
+    player_budget = {"remaining": max(0, int(args.player_limit or 0))}
+    matches = [build_match_record(event, cache, max(0.0, args.sleep), player_budget) for event in rows]
     save_cache(cache)
     payload = {
         "version": 1,
@@ -1160,6 +1643,9 @@ def main() -> int:
             "coaches": sum(int((m.get("summary") or {}).get("coaches") or 0) for m in matches),
             "rivalries": sum(int((m.get("summary") or {}).get("rivalries") or 0) for m in matches),
             "histories": sum(int((m.get("summary") or {}).get("histories") or 0) for m in matches),
+            "playerProfiles": sum(int((m.get("summary") or {}).get("playerProfiles") or 0) for m in matches),
+            "playerPhotos": sum(int((m.get("summary") or {}).get("playerPhotos") or 0) for m in matches),
+            "playerStats": sum(int((m.get("summary") or {}).get("playerStats") or 0) for m in matches),
             "sources": sum(int((m.get("summary") or {}).get("sourceCount") or 0) for m in matches),
         },
         "matches": matches,
@@ -1170,6 +1656,7 @@ def main() -> int:
         f"matches={payload['summary']['matches']} ok={payload['summary']['ok']} "
         f"profiles={payload['summary']['teamProfiles']} coaches={payload['summary']['coaches']} "
         f"rivalries={payload['summary']['rivalries']} histories={payload['summary']['histories']} "
+        f"playerProfiles={payload['summary']['playerProfiles']} playerPhotos={payload['summary']['playerPhotos']} "
         f"sources={payload['summary']['sources']}"
     )
     return 0

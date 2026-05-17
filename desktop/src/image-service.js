@@ -63,6 +63,22 @@ function isLocalImageUrl(url) {
   return !url || String(url).startsWith('/api/images/cache/');
 }
 
+function trustedRemoteImageUrl(url) {
+  if (!url) return null;
+  try {
+    const parsed = new URL(String(url));
+    if (!['https:', 'http:'].includes(parsed.protocol)) return null;
+    const host = parsed.hostname.toLowerCase();
+    const allowed = host.endsWith('wikimedia.org')
+      || host.endsWith('wikipedia.org')
+      || host.endsWith('espncdn.com')
+      || host.endsWith('espn.com');
+    return allowed ? parsed.toString() : null;
+  } catch {
+    return null;
+  }
+}
+
 function readDiskCache(key) {
   const fp = diskPathFor(key);
   if (!fp) return null;
@@ -345,6 +361,8 @@ function buildCoachQueries(name, hints = {}) {
 }
 
 async function resolveImage(kind, name, hints = {}, { pixelSize, ttlMs }) {
+  const hinted = trustedRemoteImageUrl(hints.thumbnail || hints.image || hints.photo);
+  if (hinted) return hinted;
   const queries = kind === 'team'
     ? buildTeamQueries(name, hints)
     : kind === 'coach'

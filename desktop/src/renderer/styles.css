@@ -4065,7 +4065,7 @@ body.theme-light .day-summary-compact {
     display: none;
   }
   /* Si plus de 4 nav buttons, garder les 4 premiers visibles */
-  .sidebar .nav-btn:nth-of-type(n+5):not([data-tab="preferences"]) {
+  .sidebar .nav-btn:nth-of-type(n+5):not([data-tab="preferences"]):not(.expert-nav) {
     display: none;
   }
 }
@@ -7082,6 +7082,10 @@ body.trading-desk-on .tab-panel[data-panel="dashboard"].active > #cockpit-detail
   background: rgba(16, 185, 129, .12);
 }
 
+.pitch-player-token.sourced {
+  box-shadow: 0 0 0 1px rgba(96, 165, 250, .18), 0 8px 18px rgba(0,0,0,.18);
+}
+
 .pitch-player-token .pitch-player-photo {
   display: inline-flex;
   align-items: center;
@@ -7331,6 +7335,12 @@ body.trading-desk-on .tab-panel[data-panel="dashboard"].active > #cockpit-detail
   color: var(--muted);
   font-style: normal;
   font-size: 12px;
+}
+
+.player-source-line {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.35;
 }
 
 .stat-chip-row {

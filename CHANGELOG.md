@@ -5,6 +5,16 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-17
 
+### Version v4.2.0 — Joueurs publics sourcés + photos/stats fiables
+
+Rattachement réel des joueurs aux sources publiques sans inventer de donnée.
+- `fetch_public_match_signals.py` enrichit maintenant les joueurs individuellement avec cache dédié, normalisation correcte des accents, validation anti-homonyme sportif et cadence réseau pour Wikidata/Wikipedia.
+- Quand Wikidata/Wikipedia limitent ou ne confirment pas un joueur, la pipeline rattache un fallback partiel sourcé via l’identifiant ESPN de la composition : photo publique ESPN/CDN + poste/numéro/équipe, sans transformer ce fallback en preuve complète.
+- `patch_public_match_signals.py` injecte ces profils dans les titulaires/remplaçants (`public_profile`, `public_stats`, `public_sources`, `public_signals`) et conserve les sources en fiche.
+- Les fiches match affichent pays, poste public, âge, taille, source et photos joueur quand disponibles ; le terrain des compositions utilise aussi ces photos.
+- Le service image accepte les miniatures publiques déjà sourcées (Wikipedia/Wikimedia/ESPN) et les met en cache localement, toujours côté main process.
+- La pipeline desktop et GitHub Pages exécutent désormais l’enrichissement public avec une fenêtre “jour en cours + passé récent” pour couvrir les compositions publiées après coup. Validation terrain : 162 matchs patchés, 528 lignes joueurs touchées, 264 photos et 264 blocs stats joueurs injectés.
+
 ### Version v4.1.8 — Audit terrain QA + marchés standard nettoyés
 
 Correctif qualité après refresh réel : les garde-fous mélangeaient des signaux simples observables avec de vrais signaux positifs, ce qui créait une fausse alerte moteur.

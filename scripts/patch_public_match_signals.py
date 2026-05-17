@@ -8,6 +8,7 @@ prices remain Winamax-only.
 from __future__ import annotations
 
 import json
+import unicodedata
 from pathlib import Path
 from typing import Any
 
@@ -109,9 +110,72 @@ def compact_team(team: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def compact_player(player: dict[str, Any]) -> dict[str, Any]:
+    profile = player.get("profile") or {}
+    history = player.get("history") or {}
+    stats = player.get("publicStats") or {}
+    return {
+        "name": player.get("name") or player.get("label") or "",
+        "label": player.get("label") or player.get("name") or "",
+        "team": player.get("team") or "",
+        "side": player.get("side") or "",
+        "lineupRole": player.get("lineupRole") or "",
+        "status": player.get("status") or "missing",
+        "quality": player.get("quality") or 0,
+        "entityId": player.get("entityId") or "",
+        "profile": {
+            "title": profile.get("title") or "",
+            "url": profile.get("url") or "",
+            "extract": compact_text(profile.get("extract"), 260),
+            "thumbnail": profile.get("thumbnail") or "",
+            "source": profile.get("source") or "",
+        },
+        "publicStats": {
+            "position": stats.get("position") or "",
+            "country": stats.get("country") or "",
+            "currentTeam": stats.get("currentTeam") or "",
+            "birthYear": stats.get("birthYear") if stats.get("birthYear") is not None else None,
+            "ageYears": stats.get("ageYears") if stats.get("ageYears") is not None else None,
+            "heightCm": stats.get("heightCm") if stats.get("heightCm") is not None else None,
+            "shirt": stats.get("shirt") if stats.get("shirt") is not None else None,
+            "lineupPosition": stats.get("lineupPosition") or "",
+            "lineupRating": stats.get("lineupRating") if stats.get("lineupRating") is not None else None,
+            "captain": bool(stats.get("captain")),
+            "pid": stats.get("pid") or "",
+            "sources": [str(source) for source in (stats.get("sources") or [])[:4]],
+        },
+        "history": {
+            "status": history.get("status") or "",
+            "type": history.get("type") or "player",
+            "summary": compact_text(history.get("summary"), 240),
+            "statureScore": int(history.get("statureScore") or 0),
+            "ageYears": history.get("ageYears") if history.get("ageYears") is not None else None,
+            "birthYear": history.get("birthYear") if history.get("birthYear") is not None else None,
+            "country": history.get("country") or "",
+            "position": history.get("position") or "",
+            "currentTeam": history.get("currentTeam") or "",
+            "tags": [compact_text(tag, 40) for tag in (history.get("tags") or [])[:5]],
+            "source": history.get("source") or "",
+        } if isinstance(history, dict) and history.get("status") in {"ok", "partial"} else {},
+        "signals": [compact_text(signal, 140) for signal in (player.get("signals") or [])[:4]],
+        "sources": [
+            {
+                "label": source.get("label") or "Source joueur",
+                "url": source.get("url") or "",
+                "status": source.get("status") or "",
+                "detail": compact_text(source.get("detail"), 140),
+                "checkedAt": source.get("checkedAt") or "",
+            }
+            for source in (player.get("sources") or [])[:4]
+            if isinstance(source, dict)
+        ],
+    }
+
+
 def compact_match(match: dict[str, Any]) -> dict[str, Any]:
     teams = match.get("teams") or {}
     rivalry = match.get("rivalry") or {}
+    players = match.get("players") or {}
     return {
         "version": 1,
         "status": match.get("status") or "missing",
@@ -124,6 +188,10 @@ def compact_match(match: dict[str, Any]) -> dict[str, Any]:
         "teams": {
             "home": compact_team(teams.get("home") or {}),
             "away": compact_team(teams.get("away") or {}),
+        },
+        "players": {
+            "home": [compact_player(player) for player in (players.get("home") or [])[:16] if isinstance(player, dict)],
+            "away": [compact_player(player) for player in (players.get("away") or [])[:16] if isinstance(player, dict)],
         },
         "rivalry": {
             "status": rivalry.get("status") or "none",
@@ -208,6 +276,58 @@ def merge_competitor(event: dict[str, Any], side: str, team: dict[str, Any]) -> 
     return True
 
 
+def norm_name(value: Any) -> str:
+    text = unicodedata.normalize("NFKD", str(value or "").lower())
+    text = "".join(ch for ch in text if not unicodedata.combining(ch))
+    return "".join(ch for ch in text if ch.isalnum())
+
+
+def merge_lineup_players(event: dict[str, Any], side: str, players: list[dict[str, Any]]) -> int:
+    if not players:
+        return 0
+    by_name = {norm_name(player.get("name")): player for player in players if player.get("name")}
+    if not by_name:
+        return 0
+    patched = 0
+    targets: list[dict[str, Any]] = []
+    lineup = (event.get("lineups") or {}).get(side) if isinstance(event.get("lineups"), dict) else None
+    if isinstance(lineup, dict):
+        targets.append(lineup)
+    competitors = event.get("competitors") or []
+    for competitor in competitors:
+        if isinstance(competitor, dict) and str(competitor.get("home_away") or "") == side and isinstance(competitor.get("lineup"), dict):
+            targets.append(competitor["lineup"])
+    seen_target_ids = set()
+    for target in targets:
+        marker = id(target)
+        if marker in seen_target_ids:
+            continue
+        seen_target_ids.add(marker)
+        for list_key in ("starters", "subs"):
+            rows = target.get(list_key)
+            if not isinstance(rows, list):
+                continue
+            for row in rows:
+                if not isinstance(row, dict):
+                    continue
+                source = by_name.get(norm_name(row.get("name")))
+                if not source:
+                    continue
+                row["public_profile"] = source.get("profile") or {}
+                row["public_stats"] = source.get("publicStats") or {}
+                row["public_sources"] = source.get("sources") or []
+                row["public_signals"] = {
+                    "quality": source.get("quality") or 0,
+                    "signals": source.get("signals") or [],
+                    "status": source.get("status") or "missing",
+                }
+                history = source.get("history") or {}
+                if history.get("status") in {"ok", "partial"}:
+                    row["history_public"] = history
+                patched += 1
+    return patched
+
+
 def main() -> int:
     signals = load_signals()
     matches = signals.get("matches") or []
@@ -226,6 +346,9 @@ def main() -> int:
     competitor_patches = 0
     coach_patches = 0
     history_patches = 0
+    player_patches = 0
+    player_photo_patches = 0
+    player_stat_patches = 0
     source_patches = 0
     for day in (data.get("days") or {}).values():
         events = day if isinstance(day, list) else day.get("events", []) if isinstance(day, dict) else []
@@ -253,6 +376,11 @@ def main() -> int:
                     coach_patches += 1
                 if (team.get("history") or {}).get("status") in {"ok", "partial"}:
                     history_patches += 1
+            for side, players in (compact.get("players") or {}).items():
+                if isinstance(players, list):
+                    player_patches += merge_lineup_players(event, side, players)
+                    player_photo_patches += len([player for player in players if (player.get("profile") or {}).get("thumbnail")])
+                    player_stat_patches += len([player for player in players if player.get("publicStats")])
             patched += 1
 
     size = save_data_js(data)
@@ -263,6 +391,9 @@ def main() -> int:
         "patched_competitors": competitor_patches,
         "coach_signals": coach_patches,
         "history_signals": history_patches,
+        "player_profile_patches": player_patches,
+        "player_photo_signals": player_photo_patches,
+        "player_stat_signals": player_stat_patches,
         "source_rows": source_patches,
         "data_js_bytes": size,
         "policy": "context_only_winamax_odds_only",
@@ -271,7 +402,7 @@ def main() -> int:
     print(
         "[public-signals-patch] "
         f"matches={patched} competitors={competitor_patches} coaches={coach_patches} "
-        f"histories={history_patches} bytes={size}"
+        f"histories={history_patches} players={player_patches} photos={player_photo_patches} bytes={size}"
     )
     return 0
 

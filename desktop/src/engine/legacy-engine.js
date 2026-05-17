@@ -4665,10 +4665,16 @@ function createLegacyEngineService({ projectRoot }) {
       coach: lineup.coach || competitor?.coach || null,
       starters: starters.slice(0, 11).map((player) => ({
         name: cleanLabel(player?.name, ''),
+        pid: player?.pid || player?.id || null,
         number: player?.shirt ?? player?.number ?? null,
         position: player?.pos || player?.position || null,
         rating: Number.isFinite(Number(player?.rating)) ? Number(player.rating) : null,
-        captain: Boolean(player?.captain)
+        captain: Boolean(player?.captain),
+        public_profile: player?.public_profile || player?.publicProfile || {},
+        public_stats: player?.public_stats || player?.publicStats || {},
+        public_sources: Array.isArray(player?.public_sources) ? player.public_sources.slice(0, 6) : [],
+        public_signals: player?.public_signals || player?.publicSignals || {},
+        history_public: player?.history_public || player?.historyPublic || {}
       })).filter((player) => player.name),
       substitutes: Array.isArray(lineup.subs) ? lineup.subs.slice(0, 9).map((player) => cleanLabel(player?.name, '')).filter(Boolean) : [],
       injuries: {

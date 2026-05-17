@@ -53,7 +53,12 @@ DECISION_STACK_STAGES = [
     Stage("build_v16_final_decision.py", 30),
 ]
 
-PUBLIC_CONTEXT_FETCH_STAGE = Stage("fetch_public_match_signals.py", 120)
+PUBLIC_CONTEXT_FETCH_STAGE = Stage(
+    "fetch_public_match_signals.py",
+    180,
+    ["--limit", "120", "--include-past-minutes", "1440", "--player-limit", "180"],
+    {"PUBLIC_SOURCE_MIN_INTERVAL": "0.18"},
+)
 PUBLIC_CONTEXT_PATCH_STAGE = Stage("patch_public_match_signals.py", 45)
 PUBLIC_CONTEXT_STAGES = [
     PUBLIC_CONTEXT_FETCH_STAGE,

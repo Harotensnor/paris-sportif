@@ -3767,6 +3767,7 @@
   }
 
   function playerStatLine(player, star) {
+    const publicStats = publicPlayerStats(player, star);
     const rawScore = star?.star_score ?? (player?.rating != null ? player.rating : undefined);
     const score = Number(rawScore);
     const scoreText = Number.isFinite(score) ? `forme ${Math.max(0, Math.min(10, score)).toFixed(1)}/10` : 'forme 5 derniers à enrichir';
@@ -3781,10 +3782,56 @@
     if (Number.isFinite(xa)) parts.push(`${xa.toFixed(2)} xA/m`);
     if (Number.isFinite(shots)) parts.push(`${shots.toFixed(1)} tir cadré/m`);
     if (Number.isFinite(keyPasses)) parts.push(`${keyPasses.toFixed(1)} passe clé/m`);
+    if (!looksLikePlaceholderValue(publicStats.country)) parts.push(String(publicStats.country));
+    if (Number.isFinite(Number(publicStats.ageYears))) parts.push(`${Number(publicStats.ageYears)} ans`);
+    if (Number.isFinite(Number(publicStats.heightCm))) parts.push(`${Number(publicStats.heightCm)} cm`);
     return parts.join(' · ');
   }
 
+  function publicPlayerProfile(player, star = {}) {
+    const direct = player?.public_profile || player?.publicProfile || star?.public_profile || star?.publicProfile || {};
+    return direct && typeof direct === 'object' ? direct : {};
+  }
+
+  function publicPlayerStats(player, star = {}) {
+    const direct = player?.public_stats || player?.publicStats || star?.public_stats || star?.publicStats || {};
+    return direct && typeof direct === 'object' ? direct : {};
+  }
+
+  function publicPlayerSources(player, star = {}) {
+    const fromPlayer = Array.isArray(player?.public_sources) ? player.public_sources : Array.isArray(player?.publicSources) ? player.publicSources : [];
+    const signalSources = Array.isArray(player?.public_signals?.sources) ? player.public_signals.sources : [];
+    const fromStar = Array.isArray(star?.public_sources) ? star.public_sources : [];
+    return [...fromPlayer, ...signalSources, ...fromStar].filter(Boolean);
+  }
+
+  function publicPlayerSourceLine(player, star = {}) {
+    const profile = publicPlayerProfile(player, star);
+    const sources = publicPlayerSources(player, star)
+      .map((source) => source?.label || source?.source || source?.url || '')
+      .filter((value) => !looksLikePlaceholderValue(value));
+    const labels = [
+      profile.source,
+      ...sources
+    ]
+      .map((value) => String(value || '').replace(/^https?:\/\/(www\.)?/i, '').replace(/\/$/, ''))
+      .filter((value) => !looksLikePlaceholderValue(value));
+    const unique = [...new Set(labels)].slice(0, 2);
+    return unique.length ? `Source : ${unique.join(' + ')}` : '';
+  }
+
+  function playerPhotoHints(row, side, player = {}, star = {}) {
+    const profile = publicPlayerProfile(player, star);
+    return {
+      sport: row?.sport || row?.match?.sport || '',
+      team: teamDisplayName(row, side),
+      title: profile.title || '',
+      thumbnail: profile.thumbnail || ''
+    };
+  }
+
   function playerAdvancedStats(player, star = {}) {
+    const publicStats = publicPlayerStats(player, star);
     const merged = { ...(star || {}), ...(player || {}) };
     const goals = Number(merged.goals_season ?? merged.goals ?? merged.season_goals);
     const assists = Number(merged.assists_season ?? merged.assists ?? merged.season_assists);
@@ -3807,7 +3854,13 @@
       minutes,
       goals,
       assists,
-      formScore: Number(merged.star_score ?? merged.rating ?? 0)
+      formScore: Number(merged.star_score ?? merged.rating ?? 0),
+      ageYears: Number(publicStats.ageYears),
+      heightCm: Number(publicStats.heightCm),
+      country: publicStats.country || '',
+      publicPosition: publicStats.position || publicStats.lineupPosition || '',
+      currentTeam: publicStats.currentTeam || '',
+      sourceCount: Array.isArray(publicStats.sources) ? publicStats.sources.length : publicPlayerSources(player, star).length
     };
   }
 
@@ -3855,6 +3908,11 @@
     return `<span title="${escapeHtml(label)}">${escapeHtml(label)} <strong>${escapeHtml(text)}</strong></span>`;
   }
 
+  function textStatChip(label, value) {
+    if (looksLikePlaceholderValue(value)) return '';
+    return `<span title="${escapeHtml(label)}">${escapeHtml(label)} <strong>${escapeHtml(String(value))}</strong></span>`;
+  }
+
   function keyPlayersForSide(row, side) {
     const players = lineupPlayers(row, side);
     const stars = starIndex(row, side);
@@ -3900,8 +3958,13 @@
           ${rows.map(({ player, star, stats }) => {
             const form = stats.formScore >= 6 ? 'En forme' : stats.formScore > 0 && stats.formScore < 4 ? 'En méforme' : 'À confirmer';
             const playerName = player.name || star.name || 'Joueur clé';
-            const sportHint = row?.sport || row?.match?.sport || '';
+            const photoHints = playerPhotoHints(row, side, player, star);
+            const sourceLine = publicPlayerSourceLine(player, star);
             const chips = [
+              textStatChip('Pays', stats.country),
+              textStatChip('Poste public', stats.publicPosition),
+              statChip('Âge', stats.ageYears, ' ans', 0),
+              statChip('Taille', stats.heightCm, ' cm', 0),
               statChip('xG saison', stats.xgSeason, '', 1),
               statChip('xA saison', stats.xaSeason, '', 1),
               statChip('Tirs cadrés/m', stats.shots, '', 1),
@@ -3913,10 +3976,11 @@
             ].filter(Boolean);
             return `
               <article class="key-player-card has-photo">
-                <div class="key-player-photo-wrap">${playerPhotoHtml(playerName, { sport: sportHint }, { size: 64 })}</div>
+                <div class="key-player-photo-wrap">${playerPhotoHtml(playerName, photoHints, { size: 64 })}</div>
                 <strong>${escapeHtml(playerName)}</strong>
                 <em>${escapeHtml(`${player.pos || star.position || 'poste ?'} · ${form}`)}</em>
                 ${chips.length ? `<div class="stat-chip-row">${chips.join('')}</div>` : ''}
+                ${sourceLine ? `<small class="player-source-line">${escapeHtml(sourceLine)}</small>` : ''}
               </article>
             `;
           }).join('')}
@@ -3950,9 +4014,14 @@
     const sportHint = row?.sport || row?.match?.sport || 'football';
     const duelPlayerHtml = (item, sideLabel) => {
       const name = item?.player?.name || item?.star?.name || sideLabel;
+      const hints = {
+        sport: sportHint,
+        team: item?.player?.team || '',
+        thumbnail: publicPlayerProfile(item?.player || {}, item?.star || {}).thumbnail || ''
+      };
       return `
         <span class="tactical-player">
-          ${playerPhotoHtml(name, { sport: sportHint }, { size: 40 })}
+          ${playerPhotoHtml(name, hints, { size: 40 })}
           <span>
             <strong>${escapeHtml(name)}</strong>
             <em>${escapeHtml(playerStatLine(item?.player || {}, item?.star || {}))}</em>
@@ -4101,10 +4170,11 @@
       const playerName = player.name || star?.name || '';
       // Trigger remote photo lookup as a side-effect; result swaps in
       // automatically via data-remote-image attribute.
-      const photoHtml = playerName ? playerPhotoHtml(playerName, { sport: sportHint }, { size: 32 }) : '';
+      const photoHtml = playerName ? playerPhotoHtml(playerName, playerPhotoHints(row, side, player, star), { size: 32 }) : '';
       const numberOrPos = player.shirt != null && player.shirt !== '' ? String(player.shirt) : (player.number || player.pos || star?.position || '-');
+      const sourceLine = publicPlayerSourceLine(player, star);
       return `
-        <div class="pitch-player-token ${hot ? 'hot' : ''} ${lineCount >= 4 ? 'compact' : ''}" title="${escapeHtml(playerStatLine(player, star))}">
+        <div class="pitch-player-token ${hot ? 'hot' : ''} ${sourceLine ? 'sourced' : ''} ${lineCount >= 4 ? 'compact' : ''}" title="${escapeHtml([playerStatLine(player, star), sourceLine].filter(Boolean).join(' · '))}">
           ${photoHtml ? `<span class="pitch-player-photo">${photoHtml}</span>` : ''}
           <span class="pitch-player-num">${escapeHtml(numberOrPos)}</span>
           <strong>${escapeHtml(playerName || 'À confirmer')}</strong>

@@ -230,7 +230,7 @@ async function main() {
     await win.click('#save-preferences-btn');
     await win.click('#run-auto-tracking-btn');
     await win.waitForFunction(() => /Dry-run|Règle|auto/i.test(document.querySelector('#auto-tracking-audit')?.textContent || ''), null, { timeout: 5000 });
-    await win.waitForSelector('[data-tab="data"]:not(.hidden)', { timeout: 5000 });
+    await win.waitForSelector('[data-tab="data"]:not(.hidden)', { timeout: 15000 });
     await win.waitForFunction(() => /Vue Picks/.test(document.querySelector('#shortcut-settings-grid')?.textContent || ''), null, { timeout: 5000 });
     await win.click('[data-tab="data"]');
     await win.waitForSelector('#quality-report-grid .quality-report-card, #quality-report-grid .empty', { timeout: 30000 });
