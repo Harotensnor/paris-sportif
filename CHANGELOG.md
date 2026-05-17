@@ -5,6 +5,16 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-17
 
+### Version v4.1.0 — Réparation contexte par sport + tennis source pipeline
+
+Correctif profond après test terrain v4.0.0 : les dossiers tennis et sports non-foot étaient trop souvent pénalisés par des sources football-only, ce qui gonflait artificiellement les blocages contexte.
+- Le calcul `MatchSheet`/contexte applique désormais des poids par sport : football garde compositions/blessures/arbitre/xG/météo, tennis se concentre sur Elo surface/H2H/formes, sports US sur leurs stats starters.
+- Ajout de `tennis_features` et `sport_stats` dans la santé sources, les plans de réparation et les audits v4 pour expliquer les vrais manques au lieu de lister des sources hors sujet.
+- Pipeline renforcée : `fetch_tennis_sackmann.py` et `patch_tennis_features.py` sont inclus dans les refresh signaux/pré-match/T-60/T-30/T-10 pertinents.
+- Bug Windows corrigé dans `fetch_tennis_sackmann.py` : plus de warning Unicode sur la console pendant le refresh terrain.
+- Tests renforcés : `qa:refresh` exige la réparation tennis dans les chemins critiques, et `qa:engine` bloque toute régression où un match tennis redevient “faible” à cause de compositions/blessures/arbitres/xG/météo.
+- Résultat terrain mesuré : après refresh ciblé tennis, `match_context` passe à `176` dossiers forts, `9` corrects et `0` faibles, avec `0` faux blocage tennis football-only ; le plan de réparation tombe de `38` à `7` dossiers réparables.
+
 ### Version v4.0.0 — Pronostics Winamax Pro : readiness v6 + sources v8 + terrain v5
 
 Passage majeur du plan v4 : l’app ne cherche pas à fabriquer plus de boutons `Je mise`, elle explique et répare les vrais blocages qui empêchent les picks de devenir actionnables.

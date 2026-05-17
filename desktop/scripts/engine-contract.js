@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 const { createLegacyEngineService } = require('../src/engine/legacy-engine');
+const fs = require('fs');
+const path = require('path');
 const modelUtils = require('../src/engine/model-utils');
 const bettingUtils = require('../src/engine/betting-utils');
 const contentUtils = require('../src/engine/content-utils');
@@ -129,6 +131,20 @@ function testAnalysis() {
   assert(analysis.terrainReportV4.quickBetSummary && Array.isArray(analysis.terrainReportV4.actionableNextRepairs), 'TerrainReport v4 incomplet', analysis.terrainReportV4);
   assert(analysis.terrainReportV5.quickBetSummary && analysis.terrainReportV5.nightAudit && analysis.terrainReportV5.varietyAudit, 'TerrainReport v5 incomplet', analysis.terrainReportV5);
   assert(analysis.modelBacktestV6.dimensions && analysis.modelBacktestV6.dimensions.byDecisionStatus, 'ModelBacktest v6 sans dimensions', analysis.modelBacktestV6);
+  const matchContext = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'match_context.json'), 'utf8'));
+  const contextRows = matchContext.matches_by_id && typeof matchContext.matches_by_id === 'object'
+    ? Object.values(matchContext.matches_by_id)
+    : Array.isArray(matchContext.matches) ? matchContext.matches : [];
+  const tennisContextRows = contextRows.filter((row) => String(row?.sport || '').toLowerCase() === 'tennis');
+  if (tennisContextRows.length) {
+    const footOnlySources = new Set(['lineups', 'injuries', 'referees', 'weather', 'xg', 'roster']);
+    const polluted = tennisContextRows.filter((row) => {
+      const quality = row.quality || {};
+      const missing = [...(quality.missing || []), ...(quality.stale || []), ...(quality.critical_missing || [])].map(String);
+      return missing.some((source) => footOnlySources.has(source) || /lineup|injur|referee|weather|xg|roster/i.test(source));
+    });
+    assert(polluted.length === 0, 'Les dossiers tennis ne doivent pas être bloqués par des sources foot', polluted.slice(0, 5));
+  }
   assert(Number(analysis.winamaxMarketAudit.summary?.availableFamilies || 0) >= 8, 'Pas assez de familles de marchés Winamax détectées', analysis.winamaxMarketAudit.summary);
   const availableFamilies = Number(analysis.winamaxMarketAudit.summary?.availableFamilies || 0);
   const exploitedFamilies = Number(analysis.winamaxMarketAudit.summary?.exploitedFamilies || 0);

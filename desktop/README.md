@@ -8,13 +8,13 @@ Paris Sportif Desktop est le logiciel PC local pour préparer tes paris Winamax.
 
 ### Version installateur Windows
 
-La version v4.0.0 se génère avec :
+La version v4.1.0 se génère avec :
 
 ```powershell
 npm --prefix desktop run dist
 ```
 
-Le fichier attendu est `Paris Sportif Desktop Setup 4.0.0.exe`. Le build packagé embarque les données, rapports modèle et scripts nécessaires au démarrage. Python reste recommandé si tu veux relancer une pipeline complète depuis la machine installée.
+Le fichier attendu est `Paris Sportif Desktop Setup 4.1.0.exe`. Le build packagé embarque les données, rapports modèle et scripts nécessaires au démarrage. Python reste recommandé si tu veux relancer une pipeline complète depuis la machine installée.
 
 ### Version développeur
 
@@ -53,6 +53,16 @@ Depuis v1.5.0, certains matchs avec peu de contexte secondaire peuvent apparaît
 L'app ne place pas de pari automatiquement. Elle prépare le ticket et suit ton résultat.
 
 En Mode expert, l'auto-tracking supervisé peut suivre automatiquement certains tickets dans l'app selon tes règles. C'est uniquement un suivi interne : tu dois toujours ouvrir Winamax et confirmer toi-même le pari réel.
+
+## Nouveautés v4.1.0
+
+La v4.1.0 répare le contexte par sport au lieu de pénaliser tous les matchs avec les mêmes sources :
+
+- les matchs tennis ne sont plus bloqués par des sources football inutiles comme compositions, arbitres, météo ou xG ;
+- la pipeline lance désormais le fetch Sackmann + patch tennis dans les refresh rapides, pré-match et réparations source ciblées ;
+- les rapports de contexte distinguent les signaux `tennis_features` et `sport_stats`, avec des priorités de réparation plus justes ;
+- le bug Windows du fetch tennis lié aux caractères non ASCII dans la console est corrigé ;
+- les tests terrain vérifient qu’un dossier tennis ne retombe plus dans les faux blocages football-only.
 
 ## Nouveautés v4.0.0
 

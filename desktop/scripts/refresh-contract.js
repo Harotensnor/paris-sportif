@@ -88,6 +88,7 @@ function testQuick() {
     'patch_winamax.py',
     'fetch_winamax_match_details.py',
     'patch_all_quick.py',
+    'patch_tennis_features.py',
     'compute_clv.py',
     'build_decision_tuning.py',
     'build_signal_conflict_backtest.py',
@@ -110,7 +111,7 @@ function testQuick() {
 
 function testFull() {
   const { stages } = runDry(['--full']);
-  for (const stage of ['fetch_v3.py', 'fetch_clubelo.py', 'fetch_weather.py', 'fetch_team_stats.py', 'fetch_h2h.py']) {
+  for (const stage of ['fetch_v3.py', 'fetch_clubelo.py', 'fetch_weather.py', 'fetch_team_stats.py', 'fetch_tennis_sackmann.py', 'fetch_h2h.py']) {
     includes(stages, stage, `full ${stage}`);
   }
   commonDecisionOutputs(stages, 'full');
@@ -131,6 +132,7 @@ function testPrematch() {
     'fetch_lineups_soccer.py',
     'fetch_h2h.py',
     'patch_all_quick.py',
+    'patch_tennis_features.py',
     'build_match_context.py',
     'compute_clv.py',
     'build_prematch_execution_plan.py'
@@ -145,7 +147,7 @@ function testPrematch() {
 
 function testPrematchT60() {
   const { stages } = runDry(['--prematch-t60']);
-  for (const stage of ['fetch_weather.py', 'fetch_injuries_soccer.py', 'fetch_lineups_soccer.py', 'fetch_h2h.py', 'patch_all_quick.py', 'build_match_context.py', 'build_prematch_execution_plan.py']) {
+  for (const stage of ['fetch_weather.py', 'fetch_injuries_soccer.py', 'fetch_lineups_soccer.py', 'fetch_h2h.py', 'patch_all_quick.py', 'patch_tennis_features.py', 'build_match_context.py', 'build_prematch_execution_plan.py']) {
     includes(stages, stage, `prematch T-60 ${stage}`);
   }
   commonDecisionOutputs(stages, 'prematch T-60');
@@ -155,7 +157,7 @@ function testPrematchT60() {
 
 function testPrematchT30() {
   const { stages } = runDry(['--prematch-t30']);
-  for (const stage of ['fetch_live.py', 'fetch_winamax_catalog.py', 'fetch_winamax_match_details.py', 'snapshot_odds.py', 'fetch_injuries_soccer.py', 'fetch_lineups_soccer.py', 'patch_all_quick.py', 'build_match_context.py', 'compute_clv.py']) {
+  for (const stage of ['fetch_live.py', 'fetch_winamax_catalog.py', 'fetch_winamax_match_details.py', 'snapshot_odds.py', 'fetch_injuries_soccer.py', 'fetch_lineups_soccer.py', 'patch_all_quick.py', 'patch_tennis_features.py', 'build_match_context.py', 'compute_clv.py']) {
     includes(stages, stage, `prematch T-30 ${stage}`);
   }
   commonDecisionOutputs(stages, 'prematch T-30');
@@ -164,7 +166,7 @@ function testPrematchT30() {
 
 function testPrematchT10() {
   const { stages } = runDry(['--prematch-t10']);
-  for (const stage of ['fetch_live.py', 'fetch_winamax_catalog.py', 'fetch_winamax_match_details.py', 'snapshot_odds.py', 'fetch_injuries_soccer.py', 'fetch_lineups_soccer.py', 'patch_all_quick.py', 'build_match_context.py', 'compute_clv.py']) {
+  for (const stage of ['fetch_live.py', 'fetch_winamax_catalog.py', 'fetch_winamax_match_details.py', 'snapshot_odds.py', 'fetch_injuries_soccer.py', 'fetch_lineups_soccer.py', 'patch_all_quick.py', 'patch_tennis_features.py', 'build_match_context.py', 'compute_clv.py']) {
     includes(stages, stage, `prematch T-10 ${stage}`);
   }
   commonDecisionOutputs(stages, 'prematch T-10');
@@ -173,7 +175,7 @@ function testPrematchT10() {
 
 function testCritical() {
   const { stages } = runDry(['--critical']);
-  for (const stage of ['fetch_live.py', 'fetch_winamax_match_details.py', 'fetch_injuries_soccer.py', 'fetch_lineups_soccer.py', 'patch_all_quick.py', 'build_match_context.py', 'build_refresh_priority_plan.py', 'build_prebet_checklist.py']) {
+  for (const stage of ['fetch_live.py', 'fetch_winamax_match_details.py', 'fetch_injuries_soccer.py', 'fetch_lineups_soccer.py', 'patch_all_quick.py', 'patch_tennis_features.py', 'build_match_context.py', 'build_refresh_priority_plan.py', 'build_prebet_checklist.py']) {
     includes(stages, stage, `critical ${stage}`);
   }
   commonDecisionOutputs(stages, 'critical');
@@ -183,6 +185,7 @@ function testCritical() {
 function testRepairContext() {
   const { stages } = runDry(['--repair-context']);
   includes(stages, 'patch_all_quick.py', 'repair-context patch');
+  includes(stages, 'patch_tennis_features.py', 'repair-context tennis patch');
   includes(stages, 'build_match_context.py', 'repair-context contexte');
   includes(stages, 'build_context_repair_plan.py', 'repair-context plan');
   includes(stages, 'build_refresh_priority_plan.py', 'repair-context file');
@@ -201,6 +204,11 @@ function testSignals() {
   includes(teamStats, 'fetch_understat_xg.py', 'signals team_stats xG');
   includes(teamStats, 'fetch_team_stats.py', 'signals team_stats');
   commonDecisionOutputs(teamStats, 'signals team_stats');
+
+  const tennis = runDry(['--signals', '--signal-source', 'tennis']).stages;
+  includes(tennis, 'fetch_tennis_sackmann.py', 'signals tennis ratings');
+  includes(tennis, 'patch_tennis_features.py', 'signals tennis patch');
+  commonDecisionOutputs(tennis, 'signals tennis');
 }
 
 testQuick();

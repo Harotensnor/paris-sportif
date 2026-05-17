@@ -4292,6 +4292,8 @@ function createLegacyEngineService({ projectRoot }) {
     if (/referee|arbit/.test(text)) return 'referees';
     if (/weather|météo|meteo|wind|rain/.test(text)) return 'weather';
     if (/h2h|face/.test(text)) return 'h2h';
+    if (/tennis|surface|elo/.test(text)) return 'tennis';
+    if (/baseball|hockey|nba|nfl|pitcher|goalie|starter|sport/.test(text)) return 'team_stats';
     if (/xg|team|strength|force/.test(text)) return 'team_stats';
     if (/odds|cote|winamax/.test(text)) return 'winamax';
     return 'context';

@@ -355,10 +355,10 @@ def main() -> int:
         'players': ratings,
         'h2h': h2h,
     }
-    # AUDIT 2026-05-08 v40 — gzip (~1.1 MB → ~0.3 MB).
+    # AUDIT 2026-05-08 v40 - gzip (~1.1 MB -> ~0.3 MB).
     written = _write_json_gz(OUTPUT, payload)
-    print(f'[{now:%H:%M:%S}] tennis_sackmann: {len(ratings)} players · '
-          f'{len(h2h)} h2h pairs → {written.name} '
+    print(f'[{now:%H:%M:%S}] tennis_sackmann: {len(ratings)} players - '
+          f'{len(h2h)} h2h pairs -> {written.name} '
           f'({written.stat().st_size // 1024} KB)', flush=True)
     return 0
 
