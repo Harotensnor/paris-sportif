@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-05-17T01:58:41Z",
+  "generated_at": "2026-05-17T02:04:47Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 59,
-    "actionable": 17,
+    "active_events": 58,
+    "actionable": 16,
     "watch": 1,
     "risk": 41,
     "expired_sample": 0,
@@ -13,12 +13,11 @@
       "market_uncertain": 38,
       "injury_imbalance": 17,
       "back_to_back_travel": 7,
-      "market_move": 3,
-      "signal_conflict": 4
+      "signal_conflict": 5
     },
     "by_quality": {
       "risk": 41,
-      "actionable": 17,
+      "actionable": 16,
       "watch": 1
     }
   },
@@ -96,24 +95,6 @@
       "context": "Absences severes 0-6"
     },
     {
-      "event_id": "401871410",
-      "date": "2026-05-18T23:30Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Buffalo Sabres",
-      "away": "Montreal Canadiens",
-      "match": "Buffalo Sabres - Montreal Canadiens",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 4.90 -> 2.95 (+39.8%)"
-    },
-    {
       "event_id": "401815388",
       "date": "2026-05-17T23:20Z",
       "sport": "baseball",
@@ -128,8 +109,8 @@
       "direction": "fade",
       "team": "San Diego Padres",
       "side": "away",
-      "strength": 0.872,
-      "context": "1 match dans les 48h + 1711 km de voyage"
+      "strength": 0.952,
+      "context": "2 match dans les 48h + 1711 km de voyage"
     },
     {
       "event_id": "401815378",
@@ -496,24 +477,6 @@
       "context": "marge bookmaker anormale 18.2%"
     },
     {
-      "event_id": "401865537",
-      "date": "2026-05-19T22:00Z",
-      "sport": "football",
-      "league_code": "conmebol.libertadores",
-      "league_name": "Copa Libertadores",
-      "home": "Coquimbo Unido",
-      "away": "Deportes Tolima",
-      "match": "Coquimbo Unido - Deportes Tolima",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.8%"
-    },
-    {
       "event_id": "401865438",
       "date": "2026-05-19T22:00Z",
       "sport": "football",
@@ -548,6 +511,24 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.5%"
+    },
+    {
+      "event_id": "401865537",
+      "date": "2026-05-19T22:00Z",
+      "sport": "football",
+      "league_code": "conmebol.libertadores",
+      "league_name": "Copa Libertadores",
+      "home": "Coquimbo Unido",
+      "away": "Deportes Tolima",
+      "match": "Coquimbo Unido - Deportes Tolima",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.8%"
     },
     {
       "event_id": "401865539",
@@ -586,24 +567,6 @@
       "context": "marge bookmaker anormale 18.3%"
     },
     {
-      "event_id": "401865538",
-      "date": "2026-05-20T00:30Z",
-      "sport": "football",
-      "league_code": "conmebol.libertadores",
-      "league_name": "Copa Libertadores",
-      "home": "Boca Juniors",
-      "away": "Cruzeiro",
-      "match": "Boca Juniors - Cruzeiro",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.4%"
-    },
-    {
       "event_id": "401865443",
       "date": "2026-05-20T00:30Z",
       "sport": "football",
@@ -620,6 +583,24 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.7%"
+    },
+    {
+      "event_id": "401865538",
+      "date": "2026-05-20T00:30Z",
+      "sport": "football",
+      "league_code": "conmebol.libertadores",
+      "league_name": "Copa Libertadores",
+      "home": "Boca Juniors",
+      "away": "Cruzeiro",
+      "match": "Boca Juniors - Cruzeiro",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.4%"
     },
     {
       "event_id": "401865435",
@@ -712,6 +693,24 @@
       "context": "marge bookmaker anormale 18.2%"
     },
     {
+      "event_id": "401865545",
+      "date": "2026-05-20T22:00Z",
+      "sport": "football",
+      "league_code": "conmebol.libertadores",
+      "league_name": "Copa Libertadores",
+      "home": "Nacional",
+      "away": "Universitario",
+      "match": "Nacional - Universitario",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.7%"
+    },
+    {
       "event_id": "401865436",
       "date": "2026-05-20T22:00Z",
       "sport": "football",
@@ -766,24 +765,6 @@
       "context": "marge bookmaker anormale 18.1%"
     },
     {
-      "event_id": "401865545",
-      "date": "2026-05-20T22:00Z",
-      "sport": "football",
-      "league_code": "conmebol.libertadores",
-      "league_name": "Copa Libertadores",
-      "home": "Nacional",
-      "away": "Universitario",
-      "match": "Nacional - Universitario",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.7%"
-    },
-    {
       "event_id": "401865450",
       "date": "2026-05-21T00:00Z",
       "sport": "football",
@@ -800,24 +781,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.7%"
-    },
-    {
-      "event_id": "401865445",
-      "date": "2026-05-21T00:30Z",
-      "sport": "football",
-      "league_code": "conmebol.sudamericana",
-      "league_name": "Copa Sudamericana",
-      "home": "River Plate",
-      "away": "Red Bull Bragantino",
-      "match": "River Plate - Red Bull Bragantino",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.6%"
     },
     {
       "event_id": "401865546",
@@ -854,6 +817,24 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.0%"
+    },
+    {
+      "event_id": "401865445",
+      "date": "2026-05-21T00:30Z",
+      "sport": "football",
+      "league_code": "conmebol.sudamericana",
+      "league_name": "Copa Sudamericana",
+      "home": "River Plate",
+      "away": "Red Bull Bragantino",
+      "match": "River Plate - Red Bull Bragantino",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.6%"
     },
     {
       "event_id": "401865547",
