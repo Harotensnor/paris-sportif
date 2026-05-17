@@ -2192,7 +2192,14 @@ function createLegacyEngineService({ projectRoot }) {
     let nextStake = row.stake;
     let status = row.status;
     let statusLabel = row.statusLabel;
-    if (assessment.status === 'reliable' && !nextDecision.canBet && Number(row?.modelStake ?? row?.stake ?? 0) > 0 && row?.status !== 'skip') {
+    const profitGuardReasons = [
+      row?.marketTiming?.guardApplied ? (row.marketTiming.warnings || [])[0] || 'Marché froid au backtest' : null,
+      row?.signalConflict?.guardApplied ? row.signalConflict.label || 'Conflit signaux marché/contexte' : null,
+      row?.oddsGuardrail?.applied ? row.oddsGuardrail.label || 'Cote haute non confirmée' : null,
+      row?.contextGate?.agentEligible === false ? row.contextGate.label || 'Contexte non éligible agent' : null
+    ].filter(Boolean);
+    const profitGuardBlocked = profitGuardReasons.length > 0;
+    if (assessment.status === 'reliable' && !profitGuardBlocked && !nextDecision.canBet && Number(row?.modelStake ?? row?.stake ?? 0) > 0 && row?.status !== 'skip') {
       const promotedStake = Number(row?.modelStake ?? row?.stake ?? 0) || 0;
       nextDecision = {
         ...nextDecision,
@@ -2208,6 +2215,27 @@ function createLegacyEngineService({ projectRoot }) {
         riskTone: Array.isArray(nextDecision.globalGates) && nextDecision.globalGates.length ? 'watch' : 'ok'
       };
       nextStake = promotedStake;
+    }
+    if (assessment.status === 'reliable' && profitGuardBlocked) {
+      nextDecision = {
+        ...nextDecision,
+        status: 'watch',
+        canBet: false,
+        stake: 0,
+        stakeDisplay: '0 €',
+        mainReason: profitGuardReasons[0] || nextDecision.mainReason || 'Garde-fou profit réel',
+        nextAction: 'Surveiller',
+        blockingGates: [
+          ...(nextDecision.blockingGates || []),
+          { key: 'profit_guard_v5', label: profitGuardReasons[0] || 'Garde-fou profit réel', tone: 'warn' }
+        ],
+        riskTone: 'watch'
+      };
+      nextStake = 0;
+      if (status !== 'skip') {
+        status = 'watch';
+        statusLabel = 'À surveiller · profit réel';
+      }
     }
     if (assessment.status === 'reliable' && nextDecision.canBet) {
       nextStake = Math.max(0, Number(nextDecision.stake ?? nextStake ?? 0) || 0);
@@ -2256,6 +2284,11 @@ function createLegacyEngineService({ projectRoot }) {
       statusLabel,
       decisionCenter: nextDecision,
       safeAssessment: assessment,
+      profitGuardV5: {
+        blocked: profitGuardBlocked,
+        reasons: profitGuardReasons,
+        policy: 'Ne jamais transformer un segment froid ou un contexte bloqué en bouton Je mise, même si le filtre safe voit un signal.'
+      },
       safeEdge: assessment.conservativeEdge,
       safeConfidence: assessment.confidence
     };
@@ -4402,6 +4435,7 @@ function createLegacyEngineService({ projectRoot }) {
     if (row?.safeAssessment?.status === 'reject') codes.push('safe_reject');
     if (row?.signalConflict?.active) codes.push('signal_conflict');
     if (row?.oddsGuardrail?.applied) codes.push('odds_guardrail');
+    if (row?.profitGuardV5?.blocked) codes.push('profit_guard_v5');
     if (row?.winamaxTwoGoalRule?.eligible) codes.push('winamax_2_goal_early_payout');
     if (row?.limitedConfidence) codes.push('limited_confidence');
     if (!isFutureStart(row)) codes.push('started_or_finished');
@@ -4576,8 +4610,10 @@ function createLegacyEngineService({ projectRoot }) {
     const missingPenalty = missingCriticalSignals.length * 12 + missingOptionalSignals.length * 4;
     const sourcePenalty = v5.sourceBlocksBet ? 18 : 0;
     const stakeAllowed = Boolean(v5.stakePolicy?.allowed && Number(v5.stakePolicy?.stake || 0) > 0);
+    const profitGuard = row?.profitGuardV5 || {};
+    const profitGuardBlocked = Boolean(profitGuard.blocked);
     const betReadinessScore = Math.round(Math.max(0, Math.min(100,
-      Number(v5.userFastBetScore || v5.modelScore || 0) + (stakeAllowed ? 10 : -8) - missingPenalty - sourcePenalty
+      Number(v5.userFastBetScore || v5.modelScore || 0) + (stakeAllowed ? 10 : -8) - missingPenalty - sourcePenalty - (profitGuardBlocked ? 18 : 0)
     )));
     const twoGoalProbability = Number(row?.winamaxTwoGoalRule?.leadTwoProbability ?? v5.winamaxRuleFlags?.twoGoalLeadProbability ?? 0) || 0;
     const isNight = Boolean(v5.nightStatus?.isNight);
@@ -4609,6 +4645,11 @@ function createLegacyEngineService({ projectRoot }) {
         adjustedEdge: Number(row?.winamaxTwoGoalRule?.afterEdge ?? v5.winamaxRuleFlags?.earlyPayoutAdjustedEdge ?? 0) || 0,
         label: twoGoalProbability > 0 ? `Filet 2-0 Winamax ${Math.round(twoGoalProbability * 100)}%` : null
       },
+      profitGuardTrace: {
+        blocked: profitGuardBlocked,
+        reasons: Array.isArray(profitGuard.reasons) ? profitGuard.reasons.slice(0, 5) : [],
+        policy: profitGuard.policy || null
+      },
       nightUnlockReason: isNight
         ? stakeAllowed
           ? 'Nuit prête : edge positif, cote Winamax et sources suffisantes'
@@ -4626,6 +4667,7 @@ function createLegacyEngineService({ projectRoot }) {
         missingCritical: missingCriticalSignals.length,
         missingOptional: missingOptionalSignals.length,
         sourceBlocksBet: Boolean(v5.sourceBlocksBet),
+        profitGuardBlocked,
         riskReasons: Array.isArray(v5.riskReasons) ? v5.riskReasons.slice(0, 6) : []
       },
       userFastCopy: stakeAllowed

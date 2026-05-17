@@ -14216,6 +14216,10 @@
       const warnings = Array.isArray(row.marketTiming.warnings) ? row.marketTiming.warnings.join(' · ') : '';
       reasons.push({ label: 'Marché', detail: warnings || row.marketTiming.label || 'Marché freiné', tone: 'warn' });
     }
+    if (row?.profitGuardV5?.blocked) {
+      const details = Array.isArray(row.profitGuardV5.reasons) ? row.profitGuardV5.reasons.slice(0, 3).join(' · ') : '';
+      reasons.push({ label: 'Profit réel', detail: details || 'Segment gardé en observation malgré un signal positif', tone: 'warn' });
+    }
     if (row?.signalConflict?.active) {
       reasons.push({
         label: 'Conflit signaux',

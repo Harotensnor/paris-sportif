@@ -184,6 +184,11 @@ function testAnalysis() {
     assert(Number.isFinite(Number(pick.pickDecisionV5.modelScore)) && typeof pick.pickDecisionV5.sourceBlocksBet === 'boolean', 'PickDecision v5 incomplet', pick.pickDecisionV5);
     assert(pick.pickDecisionV6 && pick.pickDecisionV6.schema === 'paris-sportif.pick_decision.v6', 'PickDecision v6 absent', pick);
     assert(Number.isFinite(Number(pick.pickDecisionV6.betReadinessScore)) && Array.isArray(pick.pickDecisionV6.sourceRepairPlan), 'PickDecision v6 incomplet', pick.pickDecisionV6);
+    if (pick.profitGuardV5?.blocked) {
+      assert(pick.decisionCenter?.canBet !== true && Number(pick.stake || 0) === 0, 'Garde-fou profit réel contourné par un bouton Je mise', pick);
+      assert(pick.pickDecisionV6.profitGuardTrace?.blocked === true, 'PickDecision v6 ne trace pas le garde-fou profit réel', pick.pickDecisionV6);
+      assert((pick.pickDecisionV4.decisionReasonCodes || []).includes('profit_guard_v5'), 'Code décision profit_guard_v5 absent', pick.pickDecisionV4);
+    }
     assert(pick.matchSheetV3 && pick.matchSheetV3.schema === 'paris-sportif.match_sheet.v3', 'MatchSheet v3 absente', pick);
     assert(pick.matchSheetV3.summary && Array.isArray(pick.matchSheetV3.missingData), 'MatchSheet v3 incomplète', pick.matchSheetV3);
     assert(pick.matchSheetV4 && pick.matchSheetV4.schema === 'paris-sportif.match_sheet.v4', 'MatchSheet v4 absente', pick);

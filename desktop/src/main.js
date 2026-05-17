@@ -16,7 +16,8 @@ const PROJECT_ROOT = app.isPackaged ? process.resourcesPath : path.resolve(DESKT
 const HOST = '127.0.0.1';
 const DEFAULT_LOCAL_PORT = 17654;
 const LOCAL_PORT = Number(process.env.PARIS_DESKTOP_PORT || DEFAULT_LOCAL_PORT);
-if (process.env.PARIS_DESKTOP_USER_DATA_DIR && !app.isPackaged) {
+const TEST_MODE = process.env.PARIS_DESKTOP_TEST_ISOLATED === '1';
+if (process.env.PARIS_DESKTOP_USER_DATA_DIR && (!app.isPackaged || TEST_MODE)) {
   const isolatedUserData = path.resolve(process.env.PARIS_DESKTOP_USER_DATA_DIR);
   fs.mkdirSync(isolatedUserData, { recursive: true });
   app.setPath('userData', isolatedUserData);
@@ -127,8 +128,8 @@ const refreshState = {
 let localServer = null;
 let mainWindow = null;
 let refreshChild = null;
-const testMode = process.env.PARIS_DESKTOP_TEST_ISOLATED === '1';
-const isolatedTestInstance = !app.isPackaged && testMode;
+const testMode = TEST_MODE;
+const isolatedTestInstance = testMode && Boolean(process.env.PARIS_DESKTOP_USER_DATA_DIR);
 const gotSingleInstanceLock = isolatedTestInstance || app.requestSingleInstanceLock();
 const engineService = createLegacyEngineService({ projectRoot: PROJECT_ROOT });
 const memoryState = {

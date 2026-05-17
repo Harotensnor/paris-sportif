@@ -5,6 +5,17 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-17
 
+### Version v5.0.0 — Pronostics profit-first
+
+Release majeure orientée qualité des paris : l’app privilégie désormais le profit réel et la protection utilisateur avant le volume brut.
+- Nouveau garde-fou `profitGuardV5` : un segment historiquement froid, une CLV défavorable, un conflit de signaux ou un contexte bloquant ne peut plus redevenir un bouton `Je mise` via le filtre safe.
+- `PickDecision v6` trace maintenant ce garde-fou dans `profitGuardTrace`, pénalise le score de readiness et expose le code `profit_guard_v5` pour les audits terrain.
+- Les fiches match affichent une raison lisible `Profit réel` dans les blocages, au lieu de cacher la prudence derrière un statut technique.
+- `compute_clv.py` écrit `clv_history.json` et `clv_summary.json` de façon atomique avec retry Windows, pour éviter les refresh partiellement échoués quand l’app lit les fichiers.
+- Le mode test packagé peut maintenant utiliser un profil isolé et contourner le verrou d’instance unique, ce qui permet de valider l’exécutable sans fermer l’app ouverte par l’utilisateur.
+- `qa:engine` vérifie qu’un pick bloqué par `profitGuardV5` n’a jamais de mise positive ni de bouton `Je mise`.
+- Validation terrain v5 : pipeline complète fraîche, CLV recalculée, `qa:unit`, `qa:engine`, `qa:safe`, `qa:terrain`, `qa:winamax-audit` et `qa:calibration` validés. Le snapshot du soir n’a plus d’événement Winamax futur aujourd’hui : l’app reste honnête et ne fabrique pas de pari.
+
 ### Version v4.2.1 — Fiches plus lisibles
 
 Correctif visuel ciblé après retour utilisateur sur les fiches match.
