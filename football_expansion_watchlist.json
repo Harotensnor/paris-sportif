@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-17T05:57:17Z",
+  "generated_at": "2026-05-17T06:04:09Z",
   "source": "data.js bookable feed + sofascore_events source feed",
   "status": "ok",
   "categories": {
@@ -77,9 +77,25 @@
     },
     "J5_football_tier2": {
       "label": "Ligues tier 2",
-      "bookable": 0,
+      "bookable": 2,
       "source": 20,
       "samples": [
+        {
+          "event_id": "401872119",
+          "source": "winamax_exact",
+          "kickoff": "2026-05-16T18:00Z",
+          "match": "Monza at Juve Stabia",
+          "league": "Serie B",
+          "code": "ita.2"
+        },
+        {
+          "event_id": "401872121",
+          "source": "winamax_exact",
+          "kickoff": "2026-05-19T18:00Z",
+          "match": "Juve Stabia at Monza",
+          "league": "Serie B",
+          "code": "ita.2"
+        },
         {
           "event_id": "sofa_15345973",
           "source": "sofascore_watch",
@@ -127,47 +143,15 @@
           "match": "Fujieda MYFC vs Fukushima United FC",
           "league": "J2/J3 League, East B",
           "code": "jpn.2"
-        },
-        {
-          "event_id": "sofa_15346049",
-          "source": "sofascore_watch",
-          "kickoff": "2026-05-06T05:00Z",
-          "match": "Hokkaido Consadole Sapporo vs AC Nagano Parceiro",
-          "league": "J2/J3 League, East B",
-          "code": "jpn.2"
-        },
-        {
-          "event_id": "sofa_15346051",
-          "source": "sofascore_watch",
-          "kickoff": "2026-05-06T05:00Z",
-          "match": "RB Omiya Ardija vs Iwaki FC",
-          "league": "J2/J3 League, East B",
-          "code": "jpn.2"
         }
       ],
-      "status": "watch"
+      "status": "ok"
     },
     "J6_coupes": {
       "label": "Coupes",
       "bookable": 31,
       "source": 43,
       "samples": [
-        {
-          "event_id": "401865537",
-          "source": "winamax_exact",
-          "kickoff": "2026-05-19T22:00Z",
-          "match": "Deportes Tolima at Coquimbo Unido",
-          "league": "Copa Libertadores",
-          "code": "conmebol.libertadores"
-        },
-        {
-          "event_id": "401865533",
-          "source": "winamax_exact",
-          "kickoff": "2026-05-19T22:00Z",
-          "match": "Bolívar at Fluminense",
-          "league": "Copa Libertadores",
-          "code": "conmebol.libertadores"
-        },
         {
           "event_id": "401865438",
           "source": "winamax_exact",
@@ -183,6 +167,22 @@
           "match": "Deportivo Riestra at Montevideo City Torque",
           "league": "Copa Sudamericana",
           "code": "conmebol.sudamericana"
+        },
+        {
+          "event_id": "401865537",
+          "source": "winamax_exact",
+          "kickoff": "2026-05-19T22:00Z",
+          "match": "Deportes Tolima at Coquimbo Unido",
+          "league": "Copa Libertadores",
+          "code": "conmebol.libertadores"
+        },
+        {
+          "event_id": "401865533",
+          "source": "winamax_exact",
+          "kickoff": "2026-05-19T22:00Z",
+          "match": "Bolívar at Fluminense",
+          "league": "Copa Libertadores",
+          "code": "conmebol.libertadores"
         },
         {
           "event_id": "401865539",
@@ -201,20 +201,20 @@
           "code": "conmebol.libertadores"
         },
         {
-          "event_id": "401865538",
-          "source": "winamax_exact",
-          "kickoff": "2026-05-20T00:30Z",
-          "match": "Cruzeiro at Boca Juniors",
-          "league": "Copa Libertadores",
-          "code": "conmebol.libertadores"
-        },
-        {
           "event_id": "401865443",
           "source": "winamax_exact",
           "kickoff": "2026-05-20T00:30Z",
           "match": "Millonarios at São Paulo",
           "league": "Copa Sudamericana",
           "code": "conmebol.sudamericana"
+        },
+        {
+          "event_id": "401865538",
+          "source": "winamax_exact",
+          "kickoff": "2026-05-20T00:30Z",
+          "match": "Cruzeiro at Boca Juniors",
+          "league": "Copa Libertadores",
+          "code": "conmebol.libertadores"
         }
       ],
       "status": "ok"
@@ -265,36 +265,36 @@
           "code": "chn.1"
         },
         {
-          "event_id": "401865537",
-          "source": "winamax_exact",
-          "kickoff": "2026-05-19T22:00Z",
-          "match": "Deportes Tolima at Coquimbo Unido",
-          "league": "Copa Libertadores",
-          "code": "conmebol.libertadores"
-        },
-        {
-          "event_id": "401865533",
-          "source": "winamax_exact",
-          "kickoff": "2026-05-19T22:00Z",
-          "match": "Bolívar at Fluminense",
-          "league": "Copa Libertadores",
-          "code": "conmebol.libertadores"
-        },
-        {
           "event_id": "401865438",
           "source": "winamax_exact",
           "kickoff": "2026-05-19T22:00Z",
           "match": "Barracas Central at Audax Italiano",
           "league": "Copa Sudamericana",
           "code": "conmebol.sudamericana"
+        },
+        {
+          "event_id": "401865448",
+          "source": "winamax_exact",
+          "kickoff": "2026-05-19T22:00Z",
+          "match": "Deportivo Riestra at Montevideo City Torque",
+          "league": "Copa Sudamericana",
+          "code": "conmebol.sudamericana"
+        },
+        {
+          "event_id": "401865537",
+          "source": "winamax_exact",
+          "kickoff": "2026-05-19T22:00Z",
+          "match": "Deportes Tolima at Coquimbo Unido",
+          "league": "Copa Libertadores",
+          "code": "conmebol.libertadores"
         }
       ],
       "status": "ok"
     }
   },
   "summary": {
-    "bookable_total": 71,
+    "bookable_total": 73,
     "source_total": 141,
-    "ok_categories": 2
+    "ok_categories": 3
   }
 }
