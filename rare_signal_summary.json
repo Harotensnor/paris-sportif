@@ -1,23 +1,25 @@
 {
-  "generated_at": "2026-05-17T19:13:28Z",
+  "generated_at": "2026-05-17T19:19:31Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 49,
+    "active_events": 54,
     "actionable": 11,
-    "watch": 0,
-    "risk": 38,
+    "watch": 4,
+    "risk": 39,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 11,
       "back_to_back_travel": 7,
-      "market_uncertain": 36,
-      "signal_conflict": 5
+      "market_move": 5,
+      "signal_conflict": 5,
+      "market_uncertain": 37
     },
     "by_quality": {
       "actionable": 11,
-      "risk": 38
+      "watch": 4,
+      "risk": 39
     }
   },
   "active_actionable": [
@@ -72,8 +74,8 @@
       "direction": "fade",
       "team": "San Diego Padres",
       "side": "away",
-      "strength": 0.952,
-      "context": "2 match dans les 48h + 1711 km de voyage"
+      "strength": 0.872,
+      "context": "1 match dans les 48h + 1711 km de voyage"
     },
     {
       "event_id": "401815386",
@@ -220,7 +222,80 @@
       "context": "1 match dans les 48h + 979 km de voyage"
     }
   ],
-  "active_watch": [],
+  "active_watch": [
+    {
+      "event_id": "748962",
+      "date": "2026-05-17T19:15Z",
+      "sport": "football",
+      "league_code": "laliga2",
+      "league_name": "La Liga 2",
+      "home": "Real Zaragoza",
+      "away": "Sporting Gijón",
+      "match": "Real Zaragoza - Sporting Gijón",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.581,
+      "context": "Cote away: 4.30 -> 3.85 (+10.5%)"
+    },
+    {
+      "event_id": "178339",
+      "date": "2026-05-18T08:00Z",
+      "sport": "tennis",
+      "league_code": "rolandgarros",
+      "league_name": "Roland Garros",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "away",
+      "strength": 0.534,
+      "context": "Cote away: 2.60 -> 2.85 (-9.6%)"
+    },
+    {
+      "event_id": "401856914",
+      "date": "2026-05-17T23:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Minnesota Lynx",
+      "away": "Chicago Sky",
+      "match": "Minnesota Lynx - Chicago Sky",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.496,
+      "context": "Cote away: 2.80 -> 2.55 (+8.9%)"
+    },
+    {
+      "event_id": "401872573",
+      "date": "2026-05-18T01:00Z",
+      "sport": "football",
+      "league_code": "ligamx",
+      "league_name": "Liga MX",
+      "home": "Pumas UNAM",
+      "away": "Pachuca",
+      "match": "Pumas UNAM - Pachuca",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.471,
+      "context": "Cote away: 2.95 -> 2.70 (+8.5%)"
+    }
+  ],
   "active_risk": [
     {
       "event_id": "401815454",
@@ -293,6 +368,24 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 12.1%"
+    },
+    {
+      "event_id": "176120",
+      "date": "2026-05-19T04:00Z",
+      "sport": "tennis",
+      "league_code": "internationauxdestra",
+      "league_name": "Internationaux de Strasbourg presented by Mammotion",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 12.0%"
     },
     {
       "event_id": "178349",
