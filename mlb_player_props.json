@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-17T01:25:03Z",
+  "generated_at": "2026-05-17T01:27:42Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -164,52 +164,6 @@
             "whip": 1.38
           },
           "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401815376",
-      "kickoff": "2026-05-17T17:35Z",
-      "league": "MLB",
-      "match": "Boston Red Sox at Atlanta Braves",
-      "home": "Atlanta Braves",
-      "away": "Boston Red Sox",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Atlanta Braves",
-          "pitcher": "Grant Holmes",
-          "label": "Grant Holmes moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.5683,
-          "fair_odds": 1.76,
-          "expected_strikeouts": 4.22,
-          "projected_ip": 5.14,
-          "inputs": {
-            "k9": 7.4,
-            "era": 4.35,
-            "whip": 1.31,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Atlanta Braves",
-          "pitcher": "Grant Holmes",
-          "label": "Grant Holmes concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5801,
-          "fair_odds": 1.72,
-          "expected_hr_allowed": 0.868,
-          "projected_ip": 5.14,
-          "inputs": {
-            "hr9": 1.52,
-            "era": 4.35,
-            "whip": 1.31
-          },
-          "side": "home"
         }
       ]
     },
@@ -1090,7 +1044,7 @@
       ]
     }
   ],
-  "props": 52,
+  "props": 50,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
