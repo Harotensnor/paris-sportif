@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-17T14:44:39Z",
+  "generated_at": "2026-05-17T14:50:00Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -96,36 +96,36 @@
         {
           "market": "pitcher_strikeouts",
           "team": "Washington Nationals",
-          "pitcher": "Miles Mikolas",
-          "label": "Miles Mikolas moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.6257,
-          "fair_odds": 1.6,
-          "expected_strikeouts": 4.0,
-          "projected_ip": 6.0,
+          "pitcher": "Richard Lovelady",
+          "label": "Richard Lovelady plus de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "over",
+          "probability": 0.6084,
+          "fair_odds": 1.64,
+          "expected_strikeouts": 3.93,
+          "projected_ip": 4.8,
           "inputs": {
-            "k9": 6.0,
-            "era": 7.0,
-            "whip": 1.53,
-            "hand": "R"
+            "k9": 7.36,
+            "era": 3.68,
+            "whip": 1.64,
+            "hand": "L"
           },
           "side": "home"
         },
         {
           "market": "pitcher_home_run_allowed",
           "team": "Washington Nationals",
-          "pitcher": "Miles Mikolas",
-          "label": "Miles Mikolas concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.7769,
-          "fair_odds": 1.29,
-          "expected_hr_allowed": 1.5,
-          "projected_ip": 6.0,
+          "pitcher": "Richard Lovelady",
+          "label": "Richard Lovelady ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5189,
+          "fair_odds": 1.93,
+          "expected_hr_allowed": 0.656,
+          "projected_ip": 4.8,
           "inputs": {
-            "hr9": 2.25,
-            "era": 7.0,
-            "whip": 1.53
+            "hr9": 1.23,
+            "era": 3.68,
+            "whip": 1.64
           },
           "side": "home"
         },
