@@ -208,6 +208,7 @@ function testAnalysis() {
   assert(String(analysis.dashboardPicks?.[0]?.priorityLabel || '').includes('TOP'), 'Le #1 doit porter le badge TOP PICK', analysis.dashboardPicks?.[0]);
   const sourceWinnerPicks = (analysis.picks || []).filter((pick) => dashboardMarketGroup(pick) === 'winner' && isSimpleDashboardMarket(pick) && isFuturePick(pick));
   const dashboardWinners = (analysis.dashboardPicks || []).filter((pick) => dashboardMarketGroup(pick) === 'winner');
+  const readyDashboardWinners = dashboardWinners.filter((pick) => pick.decisionCenter?.canBet === true);
   if (sourceWinnerPicks.length >= 8) {
     assert(dashboardWinners.length >= Math.min(12, Math.ceil(analysis.dashboardPicks.length * 0.35)), 'Pas assez de Vainqueurs dans le cockpit malgré le stock disponible', {
       available: sourceWinnerPicks.length,
@@ -215,7 +216,13 @@ function testAnalysis() {
       total: analysis.dashboardPicks.length,
       marketCounts: analysis.dashboardMeta?.qualityPolicy?.marketCounts
     });
+    assert(readyDashboardWinners.length >= 2, 'Pas assez de Vainqueurs vraiment misables malgré le stock disponible', {
+      available: sourceWinnerPicks.length,
+      readyDashboardWinners: readyDashboardWinners.length,
+      readyMarkets: (analysis.dashboardPicks || []).filter((pick) => pick.decisionCenter?.canBet === true).map((pick) => dashboardMarketGroup(pick))
+    });
   }
+  assert(!(analysis.dashboardPicks || []).some((pick) => pick.status === 'bet' && pick.decisionCenter?.canBet !== true), 'Pick non misable encore marqué bet', (analysis.dashboardPicks || []).filter((pick) => pick.status === 'bet' && pick.decisionCenter?.canBet !== true).slice(0, 5));
   const relaxedTodayCoverage = Boolean(analysis.dashboardMeta?.qualityPolicy?.todayCapRelaxed);
   assert(Array.from(perMatch.values()).every((count) => count <= (relaxedTodayCoverage ? 3 : 2)), 'Dashboard expose trop de picks sur un même match', Array.from(perMatch.entries()).filter(([, count]) => count > (relaxedTodayCoverage ? 3 : 2)));
   const today = analysis.todayFunnel?.today || {};

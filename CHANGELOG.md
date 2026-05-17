@@ -5,6 +5,19 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-17
 
+### Version v2.3.0 — Pronostics recentrés + accueil “À miser” compact
+
+Correctifs terrain après usage réel de la page “À miser”.
+- Pipeline réelle relancée : `153` événements Winamax aujourd'hui, test terrain Electron OK, fenêtre ouverte en `9.2s`, `30` lignes cockpit et `21` opportunités 24h contrôlées par `qa:terrain`.
+- Moteur fiabilité corrigé : une ligne écartée par contexte ne peut plus ressortir comme pari jouable, et une ligne `À surveiller` ne garde plus de mise positive ou de faux statut `bet`.
+- Vainqueurs renforcés sans tricher : `8` lignes fiables au moteur, dont `6` Vainqueurs et `2` Plus/Moins, avec promotion uniquement si filet 2-0 Winamax ou historique multi-sport robuste.
+- Règle Winamax “2 buts d’écart” mieux prise en compte : le bonus reste plafonné mais pèse enfin assez pour différencier un Vainqueur foot avec vrai filet de sécurité.
+- Accueil refait plus petit : suppression des tuiles modèle/conseils/décision lourdes, Top 3 des prochaines 24h, tableau triable limité à `6` lignes par défaut, puis catégories compactes.
+- Catégories allégées : la barre latérale garde Cockpit, Vainqueurs, Buts, Nuit, Buteurs, Combinés et À surveiller ; l’accueil ne rajoute plus les cartes redondantes `Strict`, `Gros gain`, `Mi-temps`, `Aujourd’hui`, `Demain` et `Live`.
+- Garde-fous renforcés : `qa:engine` vérifie maintenant qu’un pick non misable n’est jamais marqué `bet`, et `qa:safe` accepte seulement les fallbacks promus par filet 2-0 ou Vainqueur prudent très encadré.
+- Limite honnête du snapshot : aucun pari nuit n’est promu en “Je mise” quand les signaux nocturnes restent insuffisants ; ils restent visibles en observation au lieu d’être gonflés artificiellement.
+- Validation : `qa:engine`, `qa:safe`, `qa:desktop`, `qa:winamax-audit`, `qa:a11y`, `qa:terrain -- --skip-refresh`, `npx playwright test` et capture visuelle Electron `captures/desktop-sprint23-picks.png` repassés sur données terrain.
+
 ### Hotfix v2.2.2 — Pronostics honnêtes + accueil plus léger
 
 Corrections terrain après audit “je veux parier vite, sans faux fiable”.

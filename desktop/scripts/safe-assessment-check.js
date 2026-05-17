@@ -56,18 +56,27 @@ function assert(condition, msg, ctx) {
   }
   console.log(`[safe-assessment] OK : aucun derive avec segment court perdant`);
 
-  // Test 3 : oddsBasedFallback retourne 'watch' (limitedConfidence)
-  // Ces picks ne doivent JAMAIS etre Fiable.
+  // Test 3 : oddsBasedFallback retourne 'watch' (limitedConfidence),
+  // sauf filet 2-0 Winamax ou vainqueur prudent avec historique robuste.
   const fallbacks = all.filter((p) => p?.pickSource === 'winamax_odds_fallback');
   for (const pick of fallbacks) {
     const isTwoGoalWinamaxPromotion = pick.safeAssessment?.reliableRule === '2-0'
       && pick.winamaxTwoGoalRule?.eligible
       && Number(pick.winamaxTwoGoalRule?.leadTwoProbability || 0) >= 0.55;
-    assert(isTwoGoalWinamaxPromotion || !pick.safeAssessment?.reliable, `Sprint 66: oddsBasedFallback Fiable interdit hors filet 2-0`, {
-      title: pick.title, pickSource: pick.pickSource, safeAssessment: pick.safeAssessment, twoGoal: pick.winamaxTwoGoalRule
+    const marketKey = String(pick.marketKey || pick.market || '').toLowerCase();
+    const isWinnerMarket = ['1n2', 'winner', 'matchwinner', 'moneyline'].includes(marketKey);
+    const isPrudentWinnerPromotion = pick.safeAssessment?.reliableRule === 'vainqueur-prudent'
+      && isWinnerMarket
+      && Number(pick.safeAssessment?.rawEdge ?? pick.edge ?? 0) >= 0.003
+      && Number(pick.safeAssessment?.confidence || 0) >= 0.72
+      && Number(pick.safeAssessment?.sample || 0) >= 40
+      && Number(pick.safeAssessment?.roi || 0) >= 0.10
+      && Number(pick.contextQuality?.score ?? pick.match?.context?.quality?.score ?? 0) >= 80;
+    assert(isTwoGoalWinamaxPromotion || isPrudentWinnerPromotion || !pick.safeAssessment?.reliable, `Sprint 66: oddsBasedFallback Fiable interdit hors filet 2-0 ou vainqueur prudent`, {
+      title: pick.title, pickSource: pick.pickSource, marketKey, safeAssessment: pick.safeAssessment, twoGoal: pick.winamaxTwoGoalRule
     });
   }
-  console.log(`[safe-assessment] OK : ${fallbacks.length} fallback non-reliable ou promu par filet 2-0`);
+  console.log(`[safe-assessment] OK : ${fallbacks.length} fallback non-reliable ou promu par filet 2-0/vainqueur prudent`);
 
   // Test 4 : engine sane (au moins 1 Fiable, < 20 Fiables)
   assert(reliable.length >= 1, `Engine trop strict (0 Fiable)`, { total: all.length });

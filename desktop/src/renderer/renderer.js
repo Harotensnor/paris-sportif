@@ -5621,46 +5621,11 @@
         detail: 'Paris simples, filet 2-0 Winamax quand dispo'
       },
       {
-        key: 'strict',
-        icon: '🛡',
-        title: 'Strict',
-        rows: marketCategoryRows(allRows, 'strict'),
-        detail: 'Contexte propre + profil fiable'
-      },
-      {
-        key: 'value',
-        icon: '💎',
-        title: 'Gros gain',
-        rows: marketCategoryRows(allRows, 'value'),
-        detail: 'Cotes 2+ avec garde-fous'
-      },
-      {
-        key: 'halftime',
-        icon: '⏱',
-        title: 'Mi-temps',
-        rows: marketCategoryRows(allRows, 'halftime'),
-        detail: 'Paris simples avant la pause'
-      },
-      {
         key: 'night',
         icon: '🌙',
         title: 'Nuit',
         rows: marketCategoryRows(allRows, 'night'),
         detail: 'Sports US / Asie'
-      },
-      {
-        key: 'today',
-        icon: '📅',
-        title: 'Aujourd’hui',
-        rows: marketCategoryRows(allRows, 'today'),
-        detail: 'Ce qui reste dans la journée'
-      },
-      {
-        key: 'tomorrow',
-        icon: '🌅',
-        title: 'Demain',
-        rows: marketCategoryRows(allRows, 'tomorrow'),
-        detail: 'Préparer sans charger l’accueil'
       },
       {
         key: 'goals',
@@ -5691,13 +5656,6 @@
         detail: `${formatCount(sportCount)} sport${sportCount > 1 ? 's' : ''} couvert${sportCount > 1 ? 's' : ''}`
       },
       {
-        key: 'live',
-        icon: '🔴',
-        title: 'Live',
-        rows: marketCategoryRows(allRows, 'live'),
-        detail: 'Seulement si match en cours'
-      },
-      {
         key: 'watch',
         icon: '👁',
         title: 'À surveiller',
@@ -5724,10 +5682,10 @@
         };
       })
       .filter((card) => card.rows.length > 0);
-    const cards = baseCards.concat(sportCards).map((card) => {
+    const cards = baseCards.concat(sportCards.slice(0, 3)).map((card) => {
       const ready = card.rows.filter(isReadyToStakeRow).length;
       return { ...card, ready, total: card.rows.length };
-    }).filter((card) => card.key === 'cockpit' || card.total > 0);
+    }).filter((card) => card.key === 'cockpit' || card.total > 0).slice(0, 10);
     if (count) {
       count.textContent = `${formatCount(readyRows.length)} prêts · ${formatCount(cockpitRows.length)} lignes`;
     }
@@ -5903,7 +5861,17 @@
   function homeSourceRows(rows) {
     const category = state.activeHomeCategory || null;
     if (category && category !== 'cockpit') return marketCategoryRows(rows, category);
-    return rolling24hRows(rows, canDisplayPickCard);
+    const ready = rolling24hRows(rows, isReadyToStakeRow);
+    if (ready.length >= 6) return ready;
+    const seen = new Set(ready.map((row) => userBetKey(row) || `${row.id}:${row.market}:${row.label}`));
+    const watch = rolling24hRows(rows, canDisplayPickCard)
+      .filter((row) => {
+        const key = userBetKey(row) || `${row.id}:${row.market}:${row.label}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+    return ready.concat(watch);
   }
 
   function homeTopCardHtml(row, index) {
@@ -5996,13 +5964,14 @@
     if (subtitle) subtitle.textContent = meta.subtitle;
     const source = homeSourceRows(rows);
     const topRows = homeTopRows(source, 3);
-    const tableRows = sortHomeRows(source, sortMode).slice(0, 8);
+    const tableLimit = state.activeHomeCategory ? 10 : 6;
+    const tableRows = sortHomeRows(source, sortMode).slice(0, tableLimit);
     $$('.home-sort-actions [data-home-sort], .home-picks-table [data-home-sort]').forEach((button) => {
       button.classList.toggle('active', button.dataset.homeSort === sortMode);
     });
     if (caption) {
       const labels = { confidence: 'confiance puis cote', kickoff: 'heure de départ', date: 'date', odd: 'cote Winamax' };
-      caption.textContent = `${formatCount(tableRows.length)} affichés ici · 8 max · tri ${labels[sortMode] || 'confiance'}`;
+      caption.textContent = `${formatCount(tableRows.length)} affichés ici · ${formatCount(tableLimit)} max · tri ${labels[sortMode] || 'confiance'}`;
     }
     if (topWrap) {
       topWrap.innerHTML = topRows.length

@@ -1068,7 +1068,11 @@ function createLegacyEngineService({ projectRoot }) {
       margin2Plus,
       Math.min(0.92, margin2Plus * 1.18 + baseWinProb * 0.06 + homeBonus)
     );
-    const boost = Math.min(0.045, leadTwoProbability * (side === 'home' ? 0.070 : 0.055));
+    // La garantie Winamax "2 buts d'écart" transforme le marché Vainqueur :
+    // une avance de deux buts peut payer le pari avant le score final. Le
+    // boost doit donc peser plus qu'un simple bonus cosmétique, tout en
+    // restant plafonné pour éviter de rendre tous les favoris jouables.
+    const boost = Math.min(0.075, leadTwoProbability * (side === 'home' ? 0.110 : 0.085));
     return {
       eligible: true,
       side,
@@ -1698,6 +1702,24 @@ function createLegacyEngineService({ projectRoot }) {
     const softAvailabilityMissing = criticalMissing.length > 0 && hardCriticalMissing.length === 0;
     const reasons = [];
     const warnings = [];
+    if (row?.contextGate?.gate === 'skip') {
+      return {
+        status: 'reject',
+        label: 'Écarté',
+        reliable: false,
+        displayable: false,
+        conservativeEdge: 0,
+        rawEdge,
+        edgeCapped: edgeInfo.capped,
+        confidence,
+        sample,
+        roi: Number.isFinite(roi) ? roi : null,
+        policy: null,
+        reliableRule: null,
+        reasons: [row.contextGate.label || 'Contexte insuffisant'],
+        warnings
+      };
+    }
 
     const calibrationContextSample = Number(row?.calibration?.context?.sample ?? 0) || 0;
     const calibrationContextRoi = Number(row?.calibration?.context?.roi ?? 0);
@@ -1708,10 +1730,17 @@ function createLegacyEngineService({ projectRoot }) {
     const edgeBucketCold = calibrationEdgeSample >= 80 && Number.isFinite(calibrationEdgeRoi) && calibrationEdgeRoi < -0.12;
     const contextBucketPositive = calibrationContextSample >= 40 && Number.isFinite(calibrationContextRoi) && calibrationContextRoi > 0.02;
     const contextScore = Number(quality?.score ?? row?.contextQuality?.score ?? 0);
-    const coldMarketOverride = contextBucketPositive && contextScore >= 90 && (
+    const strongContextDerivedOverride = ['goals', 'btts'].includes(marketGroup)
+      && contextScore >= 90
+      && rawEdge >= 0.08
+      && confidence >= 0.70
+      && odd >= 1.30
+      && odd <= 2.10
+      && (!Number.isFinite(calibrationEdgeRoi) || calibrationEdgeRoi > -0.16);
+    const coldMarketOverride = (contextBucketPositive && contextScore >= 90 && (
       (rawEdge >= 0.06 && confidence >= 0.65) ||
       (rawEdge >= 0.03 && confidence >= 0.72 && odd <= 1.75)
-    );
+    )) || strongContextDerivedOverride;
     const robustMarketBlock = robustMarketCold && !coldMarketOverride;
     const edgeProfileBlock = edgeBucketCold && !coldMarketOverride;
     const segmentNegative = sample >= 15 && Number.isFinite(roi) && roi < 0;
@@ -1775,8 +1804,8 @@ function createLegacyEngineService({ projectRoot }) {
       const twoGoalPct = Number(row?.winamaxTwoGoalRule?.leadTwoProbability || 0);
       const severeTwoGoalSegmentLoss = sample >= 30 && Number.isFinite(roi) && roi < -0.08;
       const twoGoalWinnerReliable = limitedHasTwoGoalSafety
-        && rawEdge >= 0.01
-        && edge >= 0.01
+        && rawEdge >= 0.003
+        && edge >= 0.003
         && odd >= 1.25
         && odd <= 4.00
         && confidence >= 0.66
@@ -1808,6 +1837,85 @@ function createLegacyEngineService({ projectRoot }) {
           reliableRule: '2-0',
           reasons: [],
           warnings: [`Filet 2-0 Winamax ${Math.round(twoGoalPct * 100)}%`, ...warnings].slice(0, 4)
+        };
+      }
+      const twoGoalWinnerSoftReliable = limitedHasTwoGoalSafety
+        && isOneN2
+        && isFootball
+        && rawEdge >= 0.012
+        && edge >= 0.012
+        && odd >= 1.25
+        && odd <= 1.70
+        && confidence >= 0.70
+        && twoGoalPct >= 0.42
+        && contextScore >= 60
+        && !severeTwoGoalSegmentLoss
+        && (!Number.isFinite(roi) || sample < 15 || roi >= -0.03)
+        && !row?.signalConflict?.active
+        && !row?.oddsGuardrail?.applied
+        && !hardCriticalMissing.length;
+      if (twoGoalWinnerSoftReliable) {
+        return {
+          status: 'reliable',
+          label: 'Fiable',
+          reliable: true,
+          displayable: true,
+          conservativeEdge: edge,
+          rawEdge,
+          edgeCapped: edgeInfo.capped,
+          confidence,
+          sample,
+          roi: Number.isFinite(roi) ? roi : null,
+          policy: policy ? {
+            key: policy.key,
+            direction: policy.direction,
+            edgeMin,
+            oddMax,
+            confidenceMin,
+            reason: policy.reason
+          } : null,
+          reliableRule: '2-0-prudent',
+          reasons: [],
+          warnings: [`Filet 2-0 Winamax ${Math.round(twoGoalPct * 100)}%`, 'Mise prudente : avantage court mais contexte fort', ...warnings].slice(0, 4)
+        };
+      }
+      const nonFootWinnerReliable = isOneN2
+        && !isFootball
+        && rawEdge >= 0.003
+        && edge >= 0.003
+        && odd >= 1.30
+        && odd <= 2.10
+        && confidence >= 0.72
+        && contextScore >= 80
+        && sample >= 40
+        && Number.isFinite(roi)
+        && roi >= 0.10
+        && !row?.signalConflict?.active
+        && !row?.oddsGuardrail?.applied
+        && !hardCriticalMissing.length;
+      if (nonFootWinnerReliable) {
+        return {
+          status: 'reliable',
+          label: 'Fiable',
+          reliable: true,
+          displayable: true,
+          conservativeEdge: edge,
+          rawEdge,
+          edgeCapped: edgeInfo.capped,
+          confidence,
+          sample,
+          roi,
+          policy: policy ? {
+            key: policy.key,
+            direction: policy.direction,
+            edgeMin,
+            oddMax,
+            confidenceMin,
+            reason: policy.reason
+          } : null,
+          reliableRule: 'vainqueur-prudent',
+          reasons: [],
+          warnings: ['Vainqueur multi-sport validé par historique positif', ...warnings].slice(0, 4)
         };
       }
       // Sprint 42 : pour les sports hors foot (tennis/baseball/basket/
@@ -1932,9 +2040,25 @@ function createLegacyEngineService({ projectRoot }) {
       status = assessment.status === 'watch' ? 'watch' : 'skip';
       statusLabel = assessment.status === 'watch' ? 'À surveiller · filtre safe' : 'Écarté par filtre safe';
     }
+    if (assessment.status !== 'reliable' && !nextDecision.canBet && (status === 'bet' || Number(nextStake || 0) > 0 || Number(row?.modelStake || 0) > 0)) {
+      nextDecision = {
+        ...nextDecision,
+        status: assessment.status === 'watch' ? 'watch' : 'skip',
+        canBet: false,
+        stake: 0,
+        stakeDisplay: '0 €',
+        mainReason: nextDecision.mainReason || assessment.reasons[0] || (assessment.status === 'watch' ? 'À surveiller par prudence' : 'Pick écarté par filtre safe'),
+        nextAction: assessment.status === 'watch' ? 'Surveiller' : 'Écarter',
+        riskTone: assessment.status === 'watch' ? 'watch' : 'warn'
+      };
+      nextStake = 0;
+      status = assessment.status === 'watch' ? 'watch' : 'skip';
+      statusLabel = assessment.status === 'watch' ? 'À surveiller · filtre safe' : 'Écarté par filtre safe';
+    }
     return {
       ...row,
       stake: nextStake,
+      modelStake: assessment.status === 'reliable' ? row.modelStake : 0,
       status,
       statusLabel,
       decisionCenter: nextDecision,

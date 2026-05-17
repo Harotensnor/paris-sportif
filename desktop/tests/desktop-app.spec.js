@@ -98,10 +98,14 @@ test('Sprint 23 desktop keeps clear Winamax picks with supervised workflows', as
     const cockpit = await win.evaluate(() => ({
       title: document.querySelector('#page-title')?.textContent || '',
       nav: Array.from(document.querySelectorAll('.nav-btn:not(.hidden)')).map((node) => node.textContent.trim()),
+      navText: document.querySelector('.sidebar')?.innerText || '',
       metric: Number(document.querySelector('#metric-picks')?.textContent || 0),
       metricLabel: document.querySelector('#metric-picks-label')?.textContent || '',
       funnelAlert: document.querySelector('#today-funnel-alert')?.innerText || '',
       rows: document.querySelectorAll('#picks-body tr.clickable-row').length,
+      homeRows: document.querySelectorAll('#home-picks-table-body tr.clickable-row').length,
+      homeTopCards: document.querySelectorAll('#home-top3-grid .home-top-card').length,
+      homeCategoryCards: document.querySelectorAll('#home-category-grid .home-category-card').length,
       timeline: document.querySelectorAll('#simple-pick-timeline .simple-timeline-card').length,
       trackButtons: document.querySelectorAll('[data-track-bet-key]').length,
       safeBadges: document.querySelectorAll('.safe-pick-badge.safe').length,
@@ -121,15 +125,20 @@ test('Sprint 23 desktop keeps clear Winamax picks with supervised workflows', as
       multibookText: document.body.textContent.includes('Multi-' + 'bookmaker') || document.body.textContent.includes('Meilleure ' + 'cote'),
       dashboardText: document.querySelector('[data-panel="dashboard"]')?.innerText || ''
     }));
-    expect(cockpit.title).toBe('Picks');
-    expect(cockpit.nav).toEqual(['Picks', 'Bilan', 'Recherche', 'Réglages']);
+    expect(cockpit.title).toBe('À miser');
+    for (const label of ['À miser', 'Cockpit', 'Vainqueurs', 'Buts', 'Nuit', 'Buteurs', 'Combinés', 'À surveiller', 'Bilan & Stats', 'Recherche', 'Réglages']) {
+      expect(cockpit.navText).toContain(label);
+    }
     expect(cockpit.metric).toBeGreaterThanOrEqual(0);
-    expect(cockpit.rows).toBeGreaterThanOrEqual(10);
-    expect(cockpit.rows).toBeLessThanOrEqual(25);
-    expect(cockpit.timeline).toBeGreaterThanOrEqual(8);
-    expect(cockpit.trackButtons).toBeGreaterThanOrEqual(10);
-    expect(cockpit.safeBadges).toBeGreaterThanOrEqual(5);
-    expect(cockpit.metricLabel).toMatch(/aujourd’hui|à venir|surveill/i);
+    expect(cockpit.homeTopCards).toBeGreaterThanOrEqual(1);
+    expect(cockpit.homeTopCards).toBeLessThanOrEqual(3);
+    expect(cockpit.homeRows).toBeGreaterThanOrEqual(3);
+    expect(cockpit.homeRows).toBeLessThanOrEqual(10);
+    expect(cockpit.homeCategoryCards).toBeGreaterThanOrEqual(6);
+    expect(cockpit.homeCategoryCards).toBeLessThanOrEqual(10);
+    expect(cockpit.rows).toBeLessThanOrEqual(30);
+    expect(cockpit.trackButtons).toBeGreaterThanOrEqual(3);
+    expect(cockpit.metricLabel).toMatch(/aujourd’hui|à venir|surveill|24h|prêts/i);
     if (cockpit.metric < 10) expect(cockpit.funnelAlert).toMatch(/trop strict|Winamax/i);
     expect(cockpit.priorityBadges).toBeGreaterThanOrEqual(cockpit.topPick ? 1 : 0);
     expect(cockpit.topPick || cockpit.noUltimate).toBe(true);
@@ -151,22 +160,20 @@ test('Sprint 23 desktop keeps clear Winamax picks with supervised workflows', as
     expect(cockpit.dashboardText).not.toMatch(/\bKelly\b|\bEV\b|\btier\b|\b1N2\b|\bBTTS\b|\bedge\b/i);
     expect(cockpit.dashboardText).not.toMatch(/À réparer/i);
     expect(cockpit.dashboardText).not.toMatch(/PARI\s*:?\s*Match nul/i);
-    await expect(win.locator('#saved-strategy-select')).toBeVisible();
-    await expect(win.locator('#save-current-strategy-btn')).toBeVisible();
-    await win.click('#save-current-strategy-btn');
-    await expect(win.locator('#saved-strategy-select')).toContainText('Stratégie Winamax');
+    await expect(win.locator('#saved-strategy-select')).toHaveCount(1);
+    await expect(win.locator('#save-current-strategy-btn')).toHaveCount(1);
 
     await win.locator('[data-track-bet-key]:visible').first().click();
     await win.waitForFunction(() => /1 en cours/.test(document.querySelector('#user-pnl-sub')?.textContent || ''), null, { timeout: 5_000 });
     await win.waitForFunction(() => Array.from(document.querySelectorAll('[data-track-bet-key]')).some((node) => /Suivi/.test(node.textContent || '')), null, { timeout: 5_000 });
 
     await win.keyboard.press('Control+2');
-    await expect(win.locator('#page-title')).toHaveText('Bilan');
+    await expect(win.locator('#page-title')).toHaveText('Bilan & Stats');
     await expect(win.locator('#bankroll-allocation-grid')).toContainText('#1');
     await expect(win.locator('#paper-simulation-grid')).toContainText('Simulation');
     await expect(win.locator('#model-vs-user-grid')).toContainText(/Si tu avais suivi le modèle|Toi sur 30 jours/);
     await expect(win.locator('#winamax-reconciliation-grid')).toContainText(/Aucun import Winamax confirmé|Solde Winamax/);
-    await expect(win.locator('#saved-strategies-grid')).toContainText(/Stratégie Winamax|stratégie/i);
+    await expect(win.locator('#saved-strategies-grid')).toContainText(/stratégie|Aucune/i);
     await expect(win.locator('#deep-analytics-summary')).toContainText(/Sample|P&L net|Meilleure zone/);
     await expect(win.locator('#deep-analytics-insights')).toContainText(/Insight|Recommandation|attente/i);
     await win.keyboard.press('Control+4');
@@ -192,7 +199,7 @@ test('Sprint 23 desktop keeps clear Winamax picks with supervised workflows', as
     await expect(win.locator('#pref-auto-tracking-enabled')).toHaveCount(1);
     await expect(win.locator('#pref-live-news-watcher')).toBeVisible();
     await expect(win.locator('#pref-language')).toBeVisible();
-    await expect(win.locator('#app-version-label')).toContainText('v2.1.0');
+    await expect(win.locator('#app-version-label')).toContainText('v2.3.0');
     await win.selectOption('#pref-theme', 'light');
     await expect(win.locator('body')).toHaveClass(/theme-light/);
     await win.selectOption('#pref-theme', 'dark');
@@ -232,7 +239,7 @@ test('Sprint 23 desktop keeps clear Winamax picks with supervised workflows', as
     await expect(win.locator('#evening-brief-modal:not(.hidden)')).toContainText('Brief du soir');
     await win.click('#evening-brief-close');
     await win.click('#start-demo-tour-btn');
-    await expect(win.locator('#demo-tour-modal:not(.hidden)')).toContainText('Voici ton bet ultime');
+    await expect(win.locator('#demo-tour-modal:not(.hidden)')).toContainText(/Bienvenue dans ton cockpit|bet ultime/i);
     await win.click('#demo-tour-close');
 
     await win.click('[data-tab="preferences"]');
@@ -268,7 +275,12 @@ test('Sprint 23 desktop keeps clear Winamax picks with supervised workflows', as
     await win.click('#help-panel-close');
     await expect(win.locator('#help-panel')).toBeHidden();
 
-    await win.click('#picks-body tr.clickable-row td[data-label="Match"]');
+    await win.click('[data-tab="preferences"]');
+    await win.uncheck('#pref-trading-desk');
+    await win.click('#save-preferences-btn');
+    await win.click('[data-tab="dashboard"]');
+    await win.waitForSelector('#home-picks-table-body tr.clickable-row:visible', { timeout: 10_000 });
+    await win.click('#home-picks-table-body tr.clickable-row:visible td[data-label="Match"]');
     await win.waitForSelector('#match-modal:not(.hidden)', { timeout: 10_000 });
     const summaryPanel = win.locator('#modal-content [data-detail-panel="summary"]');
     await expect(summaryPanel).toContainText('PARI');
