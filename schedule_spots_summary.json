@@ -1,100 +1,27 @@
 {
-  "generated_at": "2026-05-17T19:41:52Z",
+  "generated_at": "2026-05-17T19:47:08Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 15,
+    "active_events": 11,
     "expired_sample": 0,
     "by_type": {
-      "back_to_back_travel": 6,
-      "lookahead": 20,
-      "schedule_congestion": 11
+      "back_to_back_travel": 3,
+      "lookahead": 14,
+      "schedule_congestion": 3
     },
     "by_decision": {
-      "abstain": 8,
-      "lean_home": 6,
+      "abstain": 7,
+      "lean_home": 3,
       "lean_away": 1
     },
-    "lean_home": 6,
+    "lean_home": 3,
     "lean_away": 1,
-    "abstain": 8,
+    "abstain": 7,
     "monitor": 0
   },
   "active": [
-    {
-      "event_id": "401815440",
-      "source_event_ids": [
-        "401815440"
-      ],
-      "kickoff": "2026-05-22T01:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Arizona Diamondbacks",
-      "away": "Colorado Rockies",
-      "match": "Arizona Diamondbacks - Colorado Rockies",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Arizona Diamondbacks 0.96, Colorado Rockies 0.96",
-      "pressure_score": 2.8,
-      "home_fade": 0.96,
-      "away_fade": 0.96,
-      "travel_score": 0,
-      "lookahead_score": 1.6,
-      "congestion_score": 1.2,
-      "types": {
-        "schedule_congestion": 2,
-        "lookahead": 2
-      },
-      "contexts": [
-        "3 matchs sur les 7 derniers jours",
-        "3 match important/proche dans les 3 jours",
-        "3 matchs sur les 7 derniers jours",
-        "3 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -1.424,
-        "away_score": -0.344,
-        "home_fade": 1.76,
-        "away_fade": 0.96,
-        "reason": "Direction nette: Colorado Rockies (-0.34)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.36
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.36
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.8
-          }
-        ]
-      }
-    },
     {
       "event_id": "401815452",
       "source_event_ids": [
@@ -467,232 +394,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.8
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815454",
-      "source_event_ids": [
-        "401815454"
-      ],
-      "kickoff": "2026-05-23T01:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Arizona Diamondbacks",
-      "away": "Colorado Rockies",
-      "match": "Arizona Diamondbacks - Colorado Rockies",
-      "decision": "lean_home",
-      "net_team": "Arizona Diamondbacks",
-      "reason": "Colorado Rockies plus penalise par calendrier/voyage (1.62 vs 0.90)",
-      "pressure_score": 3.252,
-      "home_fade": 0.9,
-      "away_fade": 1.619,
-      "travel_score": 0.719,
-      "lookahead_score": 1.333,
-      "congestion_score": 1.2,
-      "types": {
-        "schedule_congestion": 2,
-        "lookahead": 2,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "3 matchs sur les 7 derniers jours",
-        "2 match important/proche dans les 3 jours",
-        "3 matchs sur les 7 derniers jours",
-        "2 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -1.133,
-        "away_score": -1.024,
-        "home_fade": 1.7,
-        "away_fade": 1.619,
-        "reason": "Signaux opposes: Arizona Diamondbacks fade 1.70, Colorado Rockies fade 1.62 -> prudence",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.8
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.719
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815469",
-      "source_event_ids": [
-        "401815469"
-      ],
-      "kickoff": "2026-05-24T02:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Arizona Diamondbacks",
-      "away": "Colorado Rockies",
-      "match": "Arizona Diamondbacks - Colorado Rockies",
-      "decision": "lean_home",
-      "net_team": "Arizona Diamondbacks",
-      "reason": "Colorado Rockies plus penalise par calendrier/voyage (1.47 vs 0.75)",
-      "pressure_score": 2.585,
-      "home_fade": 0.75,
-      "away_fade": 1.469,
-      "travel_score": 0.719,
-      "lookahead_score": 0.667,
-      "congestion_score": 1.2,
-      "types": {
-        "schedule_congestion": 2,
-        "lookahead": 2,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "3 matchs sur les 7 derniers jours",
-        "1 match important/proche dans les 3 jours",
-        "3 matchs sur les 7 derniers jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -1.036,
-        "away_score": -0.926,
-        "home_fade": 1.55,
-        "away_fade": 1.469,
-        "reason": "Signaux opposes: Arizona Diamondbacks fade 1.55, Colorado Rockies fade 1.47 -> prudence",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.8
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.719
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815484",
-      "source_event_ids": [
-        "401815484"
-      ],
-      "kickoff": "2026-05-24T20:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Arizona Diamondbacks",
-      "away": "Colorado Rockies",
-      "match": "Arizona Diamondbacks - Colorado Rockies",
-      "decision": "lean_home",
-      "net_team": "Arizona Diamondbacks",
-      "reason": "Colorado Rockies plus penalise par calendrier/voyage (1.40 vs 0.60)",
-      "pressure_score": 1.999,
-      "home_fade": 0.6,
-      "away_fade": 1.399,
-      "travel_score": 0.799,
-      "lookahead_score": 0,
-      "congestion_score": 1.2,
-      "types": {
-        "schedule_congestion": 2,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "3 matchs sur les 7 derniers jours",
-        "3 matchs sur les 7 derniers jours",
-        "2 match dans les 48h + 943 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.91,
-        "away_score": -0.909,
-        "home_fade": 1.4,
-        "away_fade": 1.399,
-        "reason": "Signaux opposes: Arizona Diamondbacks fade 1.40, Colorado Rockies fade 1.40 -> prudence",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.8
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.799
           }
         ]
       }
