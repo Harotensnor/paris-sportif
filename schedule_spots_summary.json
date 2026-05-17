@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-05-17T02:57:19Z",
+  "generated_at": "2026-05-17T03:06:12Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 16,
+    "active_events": 17,
     "expired_sample": 0,
     "by_type": {
-      "back_to_back_travel": 7,
+      "back_to_back_travel": 8,
       "lookahead": 20,
-      "schedule_congestion": 11
+      "schedule_congestion": 14
     },
     "by_decision": {
-      "abstain": 8,
-      "lean_home": 7,
+      "abstain": 7,
+      "lean_home": 9,
       "lean_away": 1
     },
-    "lean_home": 7,
+    "lean_home": 9,
     "lean_away": 1,
-    "abstain": 8,
+    "abstain": 7,
     "monitor": 0
   },
   "active": [
@@ -109,34 +109,49 @@
       "match": "San Diego Padres - Athletics",
       "decision": "abstain",
       "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: San Diego Padres 0.30, Athletics 0.30",
-      "pressure_score": 1.333,
-      "home_fade": 0.3,
-      "away_fade": 0.3,
+      "reason": "Fatigue/agenda des deux cotes: San Diego Padres 0.90, Athletics 0.90",
+      "pressure_score": 2.533,
+      "home_fade": 0.9,
+      "away_fade": 0.9,
       "travel_score": 0,
       "lookahead_score": 1.333,
-      "congestion_score": 0,
+      "congestion_score": 1.2,
       "types": {
+        "schedule_congestion": 2,
         "lookahead": 2
       },
       "contexts": [
+        "3 matchs sur les 7 derniers jours",
         "2 match important/proche dans les 3 jours",
+        "3 matchs sur les 7 derniers jours",
         "2 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.995,
-        "away_score": 0.085,
-        "home_fade": 1.1,
-        "away_fade": 0.3,
-        "reason": "Direction nette: Athletics (+0.09)",
+        "home_score": -1.385,
+        "away_score": -0.305,
+        "home_fade": 1.7,
+        "away_fade": 0.9,
+        "reason": "Direction nette: Athletics (-0.30)",
         "detail": [
+          {
+            "side": "home",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          },
           {
             "side": "home",
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.3
+          },
+          {
+            "side": "away",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
           },
           {
             "side": "away",
@@ -409,64 +424,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815467",
-      "source_event_ids": [
-        "401815467"
-      ],
-      "kickoff": "2026-05-24T01:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Diego Padres",
-      "away": "Athletics",
-      "match": "San Diego Padres - Athletics",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: San Diego Padres 0.15, Athletics 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.898,
-        "away_score": 0.183,
-        "home_fade": 0.95,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Athletics (+0.18)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.8
           }
         ]
       }
@@ -758,6 +715,72 @@
       }
     },
     {
+      "event_id": "401815467",
+      "source_event_ids": [
+        "401815467"
+      ],
+      "kickoff": "2026-05-24T01:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "San Diego Padres",
+      "away": "Athletics",
+      "match": "San Diego Padres - Athletics",
+      "decision": "lean_home",
+      "net_team": "San Diego Padres",
+      "reason": "Athletics plus penalise par calendrier/voyage (0.75 vs 0.15)",
+      "pressure_score": 1.267,
+      "home_fade": 0.15,
+      "away_fade": 0.75,
+      "travel_score": 0,
+      "lookahead_score": 0.667,
+      "congestion_score": 0.6,
+      "types": {
+        "lookahead": 2,
+        "schedule_congestion": 1
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours",
+        "3 matchs sur les 7 derniers jours",
+        "1 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "abstain",
+        "net_side": null,
+        "home_score": -0.688,
+        "away_score": -0.417,
+        "home_fade": 0.95,
+        "away_fade": 0.75,
+        "reason": "Signaux opposes: San Diego Padres fade 0.95, Athletics fade 0.75 -> prudence",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.8
+          }
+        ]
+      }
+    },
+    {
       "event_id": "401815388",
       "source_event_ids": [
         "401815388"
@@ -771,33 +794,78 @@
       "match": "Seattle Mariners - San Diego Padres",
       "decision": "lean_home",
       "net_team": "Seattle Mariners",
-      "reason": "San Diego Padres plus penalise par calendrier/voyage (0.87 vs 0.00)",
-      "pressure_score": 0.872,
+      "reason": "San Diego Padres plus penalise par calendrier/voyage (0.95 vs 0.00)",
+      "pressure_score": 0.952,
       "home_fade": 0.0,
-      "away_fade": 0.872,
-      "travel_score": 0.872,
+      "away_fade": 0.952,
+      "travel_score": 0.952,
       "lookahead_score": 0,
       "congestion_score": 0,
       "types": {
         "back_to_back_travel": 1
       },
       "contexts": [
-        "1 match dans les 48h + 1711 km de voyage"
+        "2 match dans les 48h + 1711 km de voyage"
       ],
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.305,
-        "away_score": -0.872,
+        "home_score": 0.333,
+        "away_score": -0.952,
         "home_fade": 0.0,
-        "away_fade": 0.872,
-        "reason": "Direction nette: Seattle Mariners (+0.31)",
+        "away_fade": 0.952,
+        "reason": "Direction nette: Seattle Mariners (+0.33)",
         "detail": [
           {
             "side": "away",
             "type": "back_to_back_travel",
             "direction": "fade",
-            "strength": 0.872
+            "strength": 0.952
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815376",
+      "source_event_ids": [
+        "401815376"
+      ],
+      "kickoff": "2026-05-17T17:35Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Atlanta Braves",
+      "away": "Boston Red Sox",
+      "match": "Atlanta Braves - Boston Red Sox",
+      "decision": "lean_home",
+      "net_team": "Atlanta Braves",
+      "reason": "Boston Red Sox plus penalise par calendrier/voyage (0.91 vs 0.00)",
+      "pressure_score": 0.91,
+      "home_fade": 0.0,
+      "away_fade": 0.91,
+      "travel_score": 0.91,
+      "lookahead_score": 0,
+      "congestion_score": 0,
+      "types": {
+        "back_to_back_travel": 1
+      },
+      "contexts": [
+        "2 match dans les 48h + 1498 km de voyage"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": 0.318,
+        "away_score": -0.91,
+        "home_fade": 0.0,
+        "away_fade": 0.91,
+        "reason": "Direction nette: Atlanta Braves (+0.32)",
+        "detail": [
+          {
+            "side": "away",
+            "type": "back_to_back_travel",
+            "direction": "fade",
+            "strength": 0.91
           }
         ]
       }
