@@ -1,8 +1,61 @@
 {
-  "generated_at": "2026-05-17T03:58:54Z",
+  "generated_at": "2026-05-17T04:04:26Z",
   "source": "derived from nhl_stats already patched into data.js",
   "status": "ok",
   "events": [
+    {
+      "event_id": "401871410",
+      "kickoff": "2026-05-18T23:30Z",
+      "league": "NHL",
+      "match": "Montreal Canadiens at Buffalo Sabres",
+      "home": "Buffalo Sabres",
+      "away": "Montreal Canadiens",
+      "projection": {
+        "home_goals": 3.4,
+        "away_goals": 3.11,
+        "total_goals": 6.5,
+        "home_goalie": "Alex Lyon",
+        "away_goalie": "Jakub Dobes"
+      },
+      "markets": {
+        "winner": {
+          "pick": "home",
+          "probability": 0.5948,
+          "fair_odds": 1.68
+        },
+        "totals": [
+          {
+            "line": 4.5,
+            "pick": "over",
+            "probability": 0.8762,
+            "fair_odds": 1.14
+          },
+          {
+            "line": 5.5,
+            "pick": "over",
+            "probability": 0.7188,
+            "fair_odds": 1.39
+          },
+          {
+            "line": 6.5,
+            "pick": "over",
+            "probability": 0.5011,
+            "fair_odds": 2.0
+          },
+          {
+            "line": 7.5,
+            "pick": "under",
+            "probability": 0.717,
+            "fair_odds": 1.39
+          }
+        ],
+        "first_period_total_1_5": {
+          "pick": "over",
+          "probability": 0.7176,
+          "fair_odds": 1.39
+        }
+      }
+    },
     {
       "event_id": "401872903",
       "kickoff": "2026-05-21T00:00Z",
@@ -163,5 +216,5 @@
       }
     }
   ],
-  "markets": 18
+  "markets": 24
 }
