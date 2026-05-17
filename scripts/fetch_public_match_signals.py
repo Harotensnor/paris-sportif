@@ -35,6 +35,20 @@ TEAM_TTL_SECONDS = 7 * 24 * 3600
 EVENT_TTL_SECONDS = 4 * 3600
 MISSING_TTL_SECONDS = 3600
 SOURCE_BACKOFF_UNTIL: dict[str, float] = {}
+RIVALRY_KEYWORDS = (
+    "rivalry",
+    "rivalries",
+    "rival",
+    "derby",
+    "derbi",
+    "clásico",
+    "clasico",
+    "classico",
+    "classique",
+    "klassiker",
+    "old firm",
+    "der Klassiker".lower(),
+)
 SPORT_HINTS = {
     "football": ("football club", "association football", "soccer", "football team", "sports club"),
     "soccer": ("football club", "association football", "soccer", "football team", "sports club"),
@@ -121,16 +135,17 @@ def event_rows(data: dict[str, Any], horizon_days: int, include_past_minutes: in
 
 def load_cache() -> dict[str, Any]:
     if not CACHE_PATH.exists():
-        return {"version": 1, "teams": {}}
+        return {"version": 1, "teams": {}, "rivalries": {}}
     try:
         cache = json.loads(CACHE_PATH.read_text(encoding="utf-8"))
         if not isinstance(cache, dict):
-            return {"version": 1, "teams": {}}
+            return {"version": 1, "teams": {}, "rivalries": {}}
         cache.setdefault("version", 1)
         cache.setdefault("teams", {})
+        cache.setdefault("rivalries", {})
         return cache
     except Exception:
-        return {"version": 1, "teams": {}}
+        return {"version": 1, "teams": {}, "rivalries": {}}
 
 
 def save_cache(cache: dict[str, Any]) -> None:
@@ -152,6 +167,21 @@ def cached_team(cache: dict[str, Any], key: str) -> dict[str, Any] | None:
 
 def set_cached_team(cache: dict[str, Any], key: str, record: dict[str, Any]) -> None:
     cache.setdefault("teams", {})[key] = {"fetched_at": iso_now(), "record": record}
+
+
+def cached_rivalry(cache: dict[str, Any], key: str) -> dict[str, Any] | None:
+    item = (cache.get("rivalries") or {}).get(key)
+    if not isinstance(item, dict):
+        return None
+    fetched_at = parse_dt(item.get("fetched_at"))
+    record = item.get("record")
+    if fetched_at and (utc_now() - fetched_at).total_seconds() < EVENT_TTL_SECONDS and isinstance(record, dict):
+        return record
+    return None
+
+
+def set_cached_rivalry(cache: dict[str, Any], key: str, record: dict[str, Any]) -> None:
+    cache.setdefault("rivalries", {})[key] = {"fetched_at": iso_now(), "record": record}
 
 
 def http_json(url: str, timeout: int = 12) -> dict[str, Any] | None:
@@ -370,6 +400,197 @@ def wikipedia_search_title(name: str, sport: str) -> tuple[str, str, float]:
     return best[1], "en", round(best[0], 2)
 
 
+def important_tokens(name: str) -> list[str]:
+    stop = {
+        "fc",
+        "afc",
+        "cf",
+        "sc",
+        "club",
+        "city",
+        "united",
+        "athletic",
+        "sporting",
+        "real",
+        "de",
+        "la",
+        "le",
+        "les",
+        "st",
+        "saint",
+        "team",
+    }
+    return [token for token in norm(name).split() if len(token) >= 4 and token not in stop][:4]
+
+
+def token_hit(text: str, name: str) -> bool:
+    tokens = important_tokens(name)
+    haystack = norm(text)
+    return bool(tokens and any(token in haystack for token in tokens))
+
+
+def has_rivalry_keyword(text: str) -> bool:
+    lower = str(text or "").lower()
+    return any(keyword in lower for keyword in RIVALRY_KEYWORDS)
+
+
+def rivalry_search(home_name: str, away_name: str, sport: str) -> dict[str, Any] | None:
+    host = "en.wikipedia.org"
+    search_text = f"{home_name} {away_name} rivalry derby {sport}".strip()
+    params = urllib.parse.urlencode(
+        {
+            "action": "query",
+            "list": "search",
+            "srsearch": search_text,
+            "srwhat": "text",
+            "srlimit": "8",
+            "format": "json",
+        }
+    )
+    data = http_json(f"https://{host}/w/api.php?{params}")
+    results = (((data or {}).get("query") or {}).get("search") or [])
+    if not isinstance(results, list):
+        return None
+    best: tuple[float, dict[str, Any]] | None = None
+    for result in results:
+        title = str(result.get("title") or "")
+        snippet = re.sub(r"<.*?>", " ", str(result.get("snippet") or ""))
+        text = f"{title} {snippet}"
+        keyword = has_rivalry_keyword(text)
+        home_hit = token_hit(text, home_name)
+        away_hit = token_hit(text, away_name)
+        score = 0.0
+        if keyword:
+            score += 0.35
+        if home_hit:
+            score += 0.25
+        if away_hit:
+            score += 0.25
+        if re.search(r"\b(vs\.?|v|–|-)\b", title, re.I):
+            score += 0.08
+        if "rivalry" in title.lower() or "derby" in title.lower():
+            score += 0.12
+        if not best or score > best[0]:
+            best = (score, result)
+    if not best or best[0] < 0.65:
+        return None
+    title = str(best[1].get("title") or "")
+    wiki = wikipedia_extract(title, "en")
+    detail = compact_text((wiki or {}).get("extract") or re.sub(r"<.*?>", " ", str(best[1].get("snippet") or "")), 260)
+    validation_text = f"{title} {detail}"
+    title_lower = title.lower()
+    if not (token_hit(validation_text, home_name) and token_hit(validation_text, away_name) and has_rivalry_keyword(validation_text)):
+        return None
+    if "schedule" in title_lower or "list of" in title_lower:
+        return None
+    intensity = 85 if re.search(r"rivalry|derby|cl[aá]sico|classique", title, re.I) else 70
+    return {
+        "status": "confirmed",
+        "label": title or f"{home_name} - {away_name}",
+        "intensity": intensity,
+        "confidence": round(min(0.95, best[0]), 2),
+        "summary": detail or "Rivalité publique détectée, à croiser avec les signaux du match.",
+        "source": {
+            "label": "Wikipedia rivalry",
+            "url": (wiki or {}).get("url") or f"https://{host}/wiki/{urllib.parse.quote(title.replace(' ', '_'))}",
+            "status": "ok",
+            "detail": "rivalité/derby détecté par recherche publique",
+            "checkedAt": iso_now(),
+        },
+        "signals": [
+            f"Rivalité détectée: {title}",
+            "Match à tension supérieure : prudence sur Vainqueur, attention rythme/cartons.",
+        ],
+    }
+
+
+def profile_rivalry_signal(home_name: str, away_name: str, teams: dict[str, Any]) -> dict[str, Any] | None:
+    home_text = " ".join(
+        str((teams.get("home") or {}).get(path) or "")
+        for path in ("description",)
+    )
+    away_text = " ".join(
+        str((teams.get("away") or {}).get(path) or "")
+        for path in ("description",)
+    )
+    home_profile = ((teams.get("home") or {}).get("profile") or {}).get("extract") or ""
+    away_profile = ((teams.get("away") or {}).get("profile") or {}).get("extract") or ""
+    combined_home = f"{home_text} {home_profile}"
+    combined_away = f"{away_text} {away_profile}"
+    home_mentions_away = has_rivalry_keyword(combined_home) and token_hit(combined_home, away_name)
+    away_mentions_home = has_rivalry_keyword(combined_away) and token_hit(combined_away, home_name)
+    if not (home_mentions_away or away_mentions_home):
+        return None
+    return {
+        "status": "confirmed",
+        "label": f"{home_name} - {away_name}",
+        "intensity": 68 if home_mentions_away ^ away_mentions_home else 78,
+        "confidence": 0.72 if home_mentions_away ^ away_mentions_home else 0.82,
+        "summary": "Une source publique d’équipe mentionne une rivalité avec l’adversaire.",
+        "source": source_record("Profil public rivalité", "", "ok", "rivalité détectée dans un profil public"),
+        "signals": [
+            f"Rivalité publique détectée entre {home_name} et {away_name}",
+            "À intégrer comme facteur de pression et de prudence.",
+        ],
+    }
+
+
+def rivalry_key(home_name: str, away_name: str, sport: str) -> str:
+    pair = sorted([norm(home_name), norm(away_name)])
+    return f"rivalry_v2::{sport.lower()}::{'::'.join(pair)}"
+
+
+def detect_match_rivalry(event: dict[str, Any], teams: dict[str, Any], cache: dict[str, Any], sleep_sec: float) -> dict[str, Any]:
+    sport = str(event.get("sport") or "").lower()
+    if re.search(r"tennis|mma|boxe|boxing", sport):
+        return {"status": "none", "intensity": 0, "signals": [], "sources": []}
+    competitors = event.get("competitors") or []
+    home_name = str(((teams.get("home") or {}).get("name")) or (competitors[0] or {}).get("name") or "").strip()
+    away_name = str(((teams.get("away") or {}).get("name")) or ((competitors[1] or {}) if len(competitors) > 1 else {}).get("name") or "").strip()
+    if not home_name or not away_name:
+        return {"status": "missing", "intensity": 0, "signals": [], "sources": []}
+    key = rivalry_key(home_name, away_name, sport)
+    cached = cached_rivalry(cache, key)
+    if cached:
+        return cached
+
+    profile_hit = profile_rivalry_signal(home_name, away_name, teams)
+    if profile_hit:
+        record = {
+            **profile_hit,
+            "sourceType": "profile_extract",
+            "sources": [profile_hit.get("source")],
+            "fetchedAt": iso_now(),
+        }
+        set_cached_rivalry(cache, key, record)
+        return record
+
+    search_hit = rivalry_search(home_name, away_name, sport)
+    time.sleep(sleep_sec)
+    if search_hit:
+        record = {
+            **search_hit,
+            "sourceType": "wikipedia_search",
+            "sources": [search_hit.get("source")],
+            "fetchedAt": iso_now(),
+        }
+        set_cached_rivalry(cache, key, record)
+        return record
+
+    record = {
+        "status": "none",
+        "label": f"{home_name} - {away_name}",
+        "intensity": 0,
+        "confidence": 0,
+        "summary": "",
+        "signals": [],
+        "sources": [],
+        "fetchedAt": iso_now(),
+    }
+    set_cached_rivalry(cache, key, record)
+    return record
+
+
 def tactical_from_text(text: str, sport: str) -> dict[str, Any]:
     lower = text.lower()
     tags: list[str] = []
@@ -582,9 +803,14 @@ def build_match_record(event: dict[str, Any], cache: dict[str, Any], sleep_sec: 
         teams[str(side)] = enriched
         sources.extend(enriched.get("sources") or [])
         signals.extend(enriched.get("signals") or [])
+    rivalry = detect_match_rivalry(event, teams, cache, sleep_sec)
+    if rivalry.get("status") == "confirmed":
+        sources.extend(rivalry.get("sources") or [])
+        signals.extend(rivalry.get("signals") or [])
     source_count = len([source for source in sources if source.get("status") == "ok"])
     coach_count = len([team for team in teams.values() if team.get("coach")])
-    quality = min(100, source_count * 16 + coach_count * 16)
+    rivalry_count = 1 if rivalry.get("status") == "confirmed" else 0
+    quality = min(100, source_count * 16 + coach_count * 16 + rivalry_count * 8)
     return {
         "version": 1,
         "eventId": event_key(event),
@@ -597,12 +823,14 @@ def build_match_record(event: dict[str, Any], cache: dict[str, Any], sleep_sec: 
         "status": "ok" if source_count else "missing",
         "quality": quality,
         "teams": teams,
+        "rivalry": rivalry,
         "signals": list(dict.fromkeys(signals))[:10],
         "sources": sources[:12],
         "summary": {
             "sourceCount": source_count,
             "teamProfiles": len([team for team in teams.values() if team.get("status") == "ok"]),
             "coaches": coach_count,
+            "rivalries": rivalry_count,
             "tacticalReads": len([team for team in teams.values() if (team.get("tactical") or {}).get("tags")]),
         },
     }
@@ -634,6 +862,7 @@ def main() -> int:
             "ok": len([m for m in matches if m.get("status") == "ok"]),
             "teamProfiles": sum(int((m.get("summary") or {}).get("teamProfiles") or 0) for m in matches),
             "coaches": sum(int((m.get("summary") or {}).get("coaches") or 0) for m in matches),
+            "rivalries": sum(int((m.get("summary") or {}).get("rivalries") or 0) for m in matches),
             "sources": sum(int((m.get("summary") or {}).get("sourceCount") or 0) for m in matches),
         },
         "matches": matches,
@@ -643,7 +872,7 @@ def main() -> int:
         "[public-signals] "
         f"matches={payload['summary']['matches']} ok={payload['summary']['ok']} "
         f"profiles={payload['summary']['teamProfiles']} coaches={payload['summary']['coaches']} "
-        f"sources={payload['summary']['sources']}"
+        f"rivalries={payload['summary']['rivalries']} sources={payload['summary']['sources']}"
     )
     return 0
 

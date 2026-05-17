@@ -67,7 +67,7 @@ function rotateSprintReports() {
 }
 rotateSprintReports();
 setInterval(rotateSprintReports, 24 * 60 * 60 * 1000); // tourne tous les jours
-const SIGNAL_SOURCES = new Set(['all', 'weather', 'referees', 'injuries', 'lineups', 'team_form', 'team_stats', 'h2h', 'context']);
+const SIGNAL_SOURCES = new Set(['all', 'weather', 'referees', 'injuries', 'lineups', 'team_form', 'team_stats', 'h2h', 'context', 'public', 'public_web', 'web', 'wikipedia', 'wikidata']);
 const REFRESH_MODES = new Set([
   'quick',
   'full',
@@ -102,7 +102,7 @@ const HTML_CSP = [
   "default-src 'self'",
   "script-src 'self'",
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: https://upload.wikimedia.org",
+  "img-src 'self' data: https://upload.wikimedia.org https://a.espncdn.com https://a1.espncdn.com https://a2.espncdn.com https://a3.espncdn.com https://a4.espncdn.com",
   "connect-src 'self'",
   "frame-src 'none'",
   "object-src 'none'",

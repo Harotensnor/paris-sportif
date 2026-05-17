@@ -2949,6 +2949,8 @@
     if (row?.marketTiming?.tone === 'cold') reasons.push('marché à surveiller');
     if (row?.marketTiming?.tone === 'warm') reasons.push('CLV favorable');
     if (row?.stakeAdjustment?.applied) reasons.push(`mise réduite x${Number(row.stakeAdjustment.factor || 1).toFixed(2)}`);
+    const rivalry = rivalryForRow(row);
+    if (rivalry) reasons.push(`rivalité ${Math.round(rivalry.intensity)}/100`);
     return reasons.length ? prettifyFormCodesInText(`Pourquoi : ${reasons.slice(0, 4).join(' · ')}`) : 'Pourquoi : lecture modèle disponible dans la fiche.';
   }
 
@@ -3492,6 +3494,20 @@
       || row?.match?.context?.public_signals
       || row?.public_signals
       || {};
+  }
+
+  function rivalryForRow(row) {
+    const rivalry = row?.rivalryContext
+      || row?.match?.rivalry
+      || row?.match?.context?.rivalry
+      || publicSignalsForRow(row)?.rivalry
+      || {};
+    if (rivalry?.status !== 'confirmed') return null;
+    return {
+      ...rivalry,
+      intensity: Math.max(0, Math.min(100, Number(rivalry.intensity || 0) || 0)),
+      label: rivalry.label || 'Rivalité détectée'
+    };
   }
 
   function publicTeamSignal(row, side) {
@@ -4549,6 +4565,8 @@
       .find(Boolean);
     if (publicCoach) items.push(`coach confirmé: ${publicCoach}`);
     else if (publicTeamSignals.length) items.push(publicTeamSignals[0]);
+    const rivalry = rivalryForRow(row);
+    if (rivalry) items.push(`rivalité/derby ${Math.round(rivalry.intensity)}/100`);
     return items.filter(Boolean).slice(0, 3);
   }
 
@@ -4568,6 +4586,10 @@
     const twoGoalRule = row?.winamaxTwoGoalRule;
     if (twoGoalRule?.eligible && Number(twoGoalRule.leadTwoProbability || 0) >= 0.35) {
       parts.push(`filet 2-0 ~${Math.round(Number(twoGoalRule.leadTwoProbability || 0) * 100)}%`);
+    }
+    const rivalry = rivalryForRow(row);
+    if (rivalry) {
+      parts.push(`rivalité ${Math.round(rivalry.intensity)}/100`);
     }
     // Avantage modèle fort (raw, pas le clamped)
     const rawEdge = Number(row?.edgeRaw ?? row?.edge ?? 0);
@@ -4642,6 +4664,10 @@
     // Confiance / segment
     const conf = Number(row.safeAssessment?.confidence || row.probability || 0);
     const sample = Number(row.segmentValidation?.sample || row.calibration?.sample || 0);
+    const rivalry = rivalryForRow(row);
+    if (rivalry) {
+      checks.push({ tone: rivalry.intensity >= 80 ? 'warn' : 'ok', icon: '⚔️', label: 'Rivalité', detail: `${rivalry.label} · tension ${Math.round(rivalry.intensity)}/100` });
+    }
     if (sample >= 15) {
       const roi = Number(row.segmentValidation?.roi ?? row.calibration?.roi ?? 0);
       const tone = roi > 0.05 ? 'ok' : roi >= -0.02 ? 'warn' : 'bad';
@@ -13138,6 +13164,7 @@
     const teams = publicSignals?.teams || {};
     const sources = Array.isArray(publicSignals?.sources) ? publicSignals.sources : [];
     const matchSignals = Array.isArray(publicSignals?.signals) ? publicSignals.signals : [];
+    const rivalry = rivalryForRow(row);
     const teamCards = ['home', 'away'].map((side) => {
       const team = teams?.[side] || {};
       const profile = team.profile || {};
@@ -13166,7 +13193,7 @@
           ${sourceUrl ? `<a class="inline-source-link" href="${escapeHtml(sourceUrl)}" target="_blank" rel="noreferrer">ouvrir la source</a>` : ''}
         </article>`;
     }).join('');
-    if (!teamCards && !sources.length && !matchSignals.length) {
+    if (!teamCards && !sources.length && !matchSignals.length && !rivalry) {
       return `
         <article class="detail-card wide public-signals-card">
           <h4>Signaux web vérifiés</h4>
@@ -13177,6 +13204,12 @@
       <article class="detail-card wide public-signals-card">
         <h4>Signaux web vérifiés</h4>
         <p class="detail-text">${escapeHtml(`Contexte public uniquement. Les cotes et la décision restent 100% Winamax. Qualité source ${Math.round(Number(publicSignals.quality || 0))}/100.`)}</p>
+        ${rivalry ? `<div class="rivalry-signal-card">
+          <span>Rivalité / derby</span>
+          <strong>${escapeHtml(rivalry.label)}</strong>
+          <p>${escapeHtml(rivalry.summary || `Tension estimée ${Math.round(rivalry.intensity)}/100 : le modèle réduit la confiance sur les Vainqueurs trop marginaux et garde ce signal visible avant mise.`)}</p>
+          <em>${escapeHtml(`Impact modèle : ${row?.rivalryContext?.modelImpact || 'pression supérieure prise en compte'}`)}</em>
+        </div>` : ''}
         ${matchSignals.length ? `<div class="sheet-signal-strip">${matchSignals.slice(0, 4).map((signal) => `<div class="ok"><span>Signal public</span><strong>${escapeHtml(signal)}</strong><em>Wikidata / Wikipedia</em></div>`).join('')}</div>` : ''}
         <div class="signal-grid">${teamCards || '<article class="signal-card signal-missing"><span>Profil</span><strong>Non confirmé</strong><small>Pas assez fiable pour affichage.</small></article>'}</div>
         ${sources.length ? `<div class="market-list">${sources.slice(0, 6).map((source) => {

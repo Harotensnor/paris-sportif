@@ -1124,6 +1124,67 @@ function createLegacyEngineService({ projectRoot }) {
     };
   }
 
+  function rivalryContextForRow(row) {
+    const rivalry = row?.match?.rivalry
+      || row?.match?.context?.rivalry
+      || row?.match?.public_signals?.rivalry
+      || row?.match?.context?.public_signals?.rivalry
+      || null;
+    if (!rivalry || rivalry.status !== 'confirmed') return null;
+    const intensity = Math.max(0, Math.min(100, Number(rivalry.intensity || 0) || 0));
+    return {
+      ...rivalry,
+      intensity,
+      label: rivalry.label || 'Rivalité détectée',
+      caution: intensity >= 65,
+      severe: intensity >= 80
+    };
+  }
+
+  function applyRivalryContext(row) {
+    const rivalry = rivalryContextForRow(row);
+    if (!rivalry) return row;
+    const marketGroup = simpleMarketGroup(row?.marketKey || row?.market);
+    const isWinner = marketGroup === 'winner';
+    const odd = Number(row?.odd || 0);
+    const beforeProbability = Number(row?.probability || 0) || 0;
+    const pressurePenalty = isWinner
+      ? (rivalry.severe ? 0.030 : rivalry.caution ? 0.018 : 0.010)
+      : (rivalry.severe ? 0.008 : 0.004);
+    const probability = beforeProbability > 0
+      ? Math.max(0.05, Math.min(0.95, beforeProbability - pressurePenalty))
+      : beforeProbability;
+    const edge = odd > 1 && probability > 0 ? probability - (1 / odd) : Number(row?.edge || 0);
+    const stakeFactor = isWinner ? (rivalry.severe ? 0.82 : 0.90) : (rivalry.severe ? 0.92 : 0.96);
+    const driver = `rivalité ${Math.round(rivalry.intensity)}/100`;
+    return {
+      ...row,
+      rivalryContext: {
+        ...rivalry,
+        modelImpact: isWinner
+          ? 'prudence vainqueur : probabilité et mise réduites'
+          : 'pression match : signal affiché, impact léger'
+      },
+      probability,
+      edge,
+      stake: Math.max(0, Number(row?.stake || 0) * stakeFactor),
+      modelStake: Math.max(0, Number(row?.modelStake || 0) * stakeFactor),
+      confidenceTrust: row?.confidenceTrust ? {
+        ...row.confidenceTrust,
+        score: Math.max(0, Number(row.confidenceTrust.score || 0) - (isWinner ? (rivalry.severe ? 5 : 3) : 1)),
+        drivers: [...(row.confidenceTrust.drivers || []), driver]
+      } : row?.confidenceTrust,
+      contextGate: row?.contextGate ? {
+        ...row.contextGate,
+        warnings: [...new Set([...(row.contextGate.warnings || []), 'rivalry_pressure'])]
+      } : row?.contextGate,
+      reason: [
+        row?.reason,
+        `Rivalité détectée (${Math.round(rivalry.intensity)}/100) : pression plus forte, mise ${isWinner ? 'réduite' : 'surveillée'}.`
+      ].filter(Boolean).join(' ')
+    };
+  }
+
   function oddsBasedFallback(win, match, bankroll) {
     const options = matchWinnerOptions(match);
     if (options.length < 1) return null;
@@ -1787,12 +1848,20 @@ function createLegacyEngineService({ projectRoot }) {
     const isFootball = /football|soccer/.test(sportKey);
     const sportMarketSample = Number(row?.calibration?.sportMarketSample ?? row?.segmentValidation?.sportMarketSample ?? 0);
     const nonFootCalibrationBlind = !isFootball && !isOneN2 && sportMarketSample < 30;
+    const rivalry = rivalryContextForRow(row);
+    const rivalryMarginalWinnerBlock = Boolean(rivalry?.caution)
+      && isOneN2
+      && isFootball
+      && !(Number(row?.winamaxTwoGoalRule?.leadTwoProbability || 0) >= 0.42)
+      && confidence < (rivalry.severe ? 0.72 : 0.68)
+      && edge < (rivalry.severe ? 0.055 : 0.045);
     if (!(rawEdge >= 0.01)) reasons.push('edge < +1pt');
     if (aberrantEdge) reasons.push(`edge brut +${Math.round(rawEdge * 100)}pt aberrant (modele surconfiant)`);
     if (robustMarketBlock) reasons.push(`marché froid robuste (ROI ${Math.round(calibrationRoi * 100)}% sur ${calibrationSample} paris)`);
     if (edgeProfileBlock) reasons.push(`profil d'avantage froid (ROI ${Math.round(calibrationEdgeRoi * 100)}% sur ${calibrationEdgeSample} paris)`);
     if (derivedShortNegative) reasons.push(`marche ${marketKey} segment court perdant (n=${sample}, ROI ${Math.round(roi * 100)}%)`);
     if (nonFootCalibrationBlind) reasons.push(`calibration ${sportKey || 'sport'} limitee (${sportMarketSample}/30 paris settled)`);
+    if (rivalryMarginalWinnerBlock) reasons.push(`rivalité/derby : Vainqueur trop marginal (${Math.round(rivalry.intensity)}% tension)`);
     if (!reliableRule && edge < Math.min(edgeMin, sample < 5 ? 0.05 : sample < 15 ? 0.04 : edgeMin)) reasons.push('edge prudent insuffisant');
     if (odd < 1.30 || odd > (sample < 15 ? Math.min(5.00, oddMax) : oddMax)) reasons.push(`cote hors zone solo 1.30-${(sample < 15 ? Math.min(5.00, oddMax) : oddMax).toFixed(2)}`);
     if (!reliableRule && confidence < (sample < 5 ? 0.65 : sample < 15 ? 0.60 : confidenceMin)) reasons.push('confiance insuffisante');
@@ -1805,6 +1874,7 @@ function createLegacyEngineService({ projectRoot }) {
     if (sample > 0 && sample < 15) warnings.push(`sample court ${sample}/15`);
     if (!sample) warnings.push('historique segment absent');
     if (coldMarketOverride) warnings.push('marché froid compensé par contexte fort');
+    if (rivalry?.caution) warnings.push(`rivalité/derby ${Math.round(rivalry.intensity)}% : variance plus élevée`);
     if (policy?.direction === 'boost') warnings.push(`segment gagnant : filtre assoupli (${policy.reason})`);
     if (policy?.direction === 'harden') warnings.push(`segment froid : filtre durci (${policy.reason})`);
 
@@ -1989,7 +2059,8 @@ function createLegacyEngineService({ projectRoot }) {
       && edge <= 0.20
       && !aberrantEdge
       && !derivedShortNegative
-      && !nonFootCalibrationBlind;
+      && !nonFootCalibrationBlind
+      && !rivalryMarginalWinnerBlock;
     const displayable = rawEdge >= 0.01 && odd > 1.10 && odd <= 18 && confidence >= 0.30 && row?.decisionCenter?.status !== 'skip';
     return {
       status: reliable ? 'reliable' : displayable ? 'watch' : 'reject',
@@ -5627,6 +5698,7 @@ function createLegacyEngineService({ projectRoot }) {
       .map((row) => applyModelReality(row, modelRealityAudit))
       .map((row) => applyProbabilityRealityCalibration(row, probabilityCalibrationReport, win, safeBankroll))
       .map((row) => applyWinamaxTwoGoalRule(row, win, safeBankroll))
+      .map((row) => applyRivalryContext(row))
       .map((row) => applyDecisionAndMarketTiming(row, clvSummaryReport, decisionTuningReport))
       .map((row) => applyOddsGuardrails(row, oddsGuardrailsReport))
       .map((row) => applyStakePrudence(row, agentGuardrailRecommendationsReport, stakeReductionBacktestReport))

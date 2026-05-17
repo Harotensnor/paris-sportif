@@ -94,6 +94,7 @@ def compact_team(team: dict[str, Any]) -> dict[str, Any]:
 
 def compact_match(match: dict[str, Any]) -> dict[str, Any]:
     teams = match.get("teams") or {}
+    rivalry = match.get("rivalry") or {}
     return {
         "version": 1,
         "status": match.get("status") or "missing",
@@ -106,6 +107,26 @@ def compact_match(match: dict[str, Any]) -> dict[str, Any]:
         "teams": {
             "home": compact_team(teams.get("home") or {}),
             "away": compact_team(teams.get("away") or {}),
+        },
+        "rivalry": {
+            "status": rivalry.get("status") or "none",
+            "label": rivalry.get("label") or "",
+            "intensity": int(rivalry.get("intensity") or 0),
+            "confidence": rivalry.get("confidence") or 0,
+            "summary": compact_text(rivalry.get("summary"), 260),
+            "sourceType": rivalry.get("sourceType") or "",
+            "signals": [compact_text(signal, 180) for signal in (rivalry.get("signals") or [])[:4]],
+            "sources": [
+                {
+                    "label": source.get("label") or "Source rivalité",
+                    "url": source.get("url") or "",
+                    "status": source.get("status") or "",
+                    "detail": compact_text(source.get("detail"), 180),
+                    "checkedAt": source.get("checkedAt") or "",
+                }
+                for source in (rivalry.get("sources") or [])[:3]
+                if isinstance(source, dict)
+            ],
         },
         "sources": [
             {
@@ -197,6 +218,11 @@ def main() -> int:
             event["public_signals"] = compact
             context = event.setdefault("context", {})
             context["public_signals"] = compact
+            event.pop("rivalry", None)
+            context.pop("rivalry", None)
+            if (compact.get("rivalry") or {}).get("status") == "confirmed":
+                context["rivalry"] = compact["rivalry"]
+                event["rivalry"] = compact["rivalry"]
             merge_context_sources(event, compact)
             source_patches += 1
             for side, team in (compact.get("teams") or {}).items():

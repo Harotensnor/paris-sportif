@@ -4987,6 +4987,40 @@ body.theme-light .key-reasons-list li:hover {
   letter-spacing: 0;
 }
 
+.rivalry-signal-card {
+  background:
+    linear-gradient(135deg, rgba(245, 158, 11, .16), rgba(16, 185, 129, .08)),
+    rgba(255, 255, 255, .04);
+  border: 1px solid rgba(245, 158, 11, .34);
+  border-radius: 14px;
+  margin-top: 12px;
+  padding: 12px;
+}
+
+.rivalry-signal-card span {
+  color: var(--warn);
+  display: block;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+}
+
+.rivalry-signal-card strong {
+  display: block;
+  font-size: 16px;
+  margin-top: 4px;
+}
+
+.rivalry-signal-card p,
+.rivalry-signal-card em {
+  color: var(--text-dim);
+  display: block;
+  font-size: 12px;
+  line-height: 1.45;
+  margin-top: 6px;
+}
+
 .signal-ok {
   border-color: rgba(16, 185, 129, .45);
 }

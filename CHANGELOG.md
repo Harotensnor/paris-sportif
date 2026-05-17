@@ -5,6 +5,15 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-17
 
+### Version v4.1.6 — Rivalités d’équipes prises en compte
+
+Ajout d’un vrai signal `rivalité/derby` dans les pronostics, avec prudence modèle plutôt qu’un simple badge décoratif.
+- La source publique cherche les rivalités avec validation stricte : deux équipes reconnues + vocabulaire derby/rivalité + rejet des pages génériques.
+- Les rivalités confirmées sont injectées dans `data.js`/fiches match avec intensité, résumé, source et signaux.
+- Le moteur réduit la probabilité, la confiance et la mise sur les Vainqueurs trop marginaux quand la rivalité augmente la variance du match.
+- Les fiches affichent une carte `Rivalité / derby`, et les raisons/checklists reprennent ce signal avant mise.
+- La CSP desktop autorise les logos ESPN publics déjà présents dans les données, uniquement comme images.
+
 ### Version v4.1.5 — Signaux web sourcés
 
 Enrichissement réel des pronostics et fiches match avec une nouvelle source publique côté pipeline, sans toucher à la règle Winamax-only pour les cotes.
