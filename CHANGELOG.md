@@ -5,6 +5,15 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-17
 
+### Version v4.1.2 — Terrain de composition propre
+
+Correctif UX ciblé fiche match : le terrain de composition pouvait sembler bizarre parce qu'il utilisait parfois les joueurs clés comme fausse composition quand la source lineup était trop partielle.
+- Le terrain foot n'apparaît plus avec des joueurs stars placés artificiellement.
+- Les compositions sont affichées uniquement avec une base de titulaires suffisamment complète.
+- Les joueurs sont alignés en grille stable par ligne de jeu, avec noms tronqués proprement.
+- Le dessin du terrain a été remis dans le bon sens, avec ligne centrale horizontale et zones de surface.
+- Une fiche sans compo fiable affiche désormais un état clair au lieu d'un terrain trompeur.
+
 ### Version v4.1.1 — Pile décision fraîche + anti-match expiré
 
 Correctif opérationnel orienté pronostics : les rapports avancés `V8 → V16` pouvaient rester datés alors que les données Winamax étaient fraîches, ce qui réaffichait des matchs passés comme candidats T-10.

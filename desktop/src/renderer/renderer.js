@@ -3727,9 +3727,16 @@
   function lineupPlayers(row, side) {
     const lineup = lineupContext(row, side);
     const starters = Array.isArray(lineup?.starters) ? lineup.starters : [];
-    if (starters.length) return starters.slice(0, 11);
-    const stars = Array.isArray(availabilityContext(row, side)?.stars) ? availabilityContext(row, side).stars : [];
-    return stars.slice(0, 8).map((star) => ({ name: star.name, pos: star.position, shirt: '', star }));
+    const cleaned = starters
+      .slice(0, 11)
+      .map((player) => ({
+        ...player,
+        name: cleanLabel(player?.name, ''),
+        pos: player?.pos || player?.position || '',
+        shirt: player?.shirt ?? player?.number ?? ''
+      }))
+      .filter((player) => player.name);
+    return cleaned.length >= 8 ? cleaned : [];
   }
 
   function starIndex(row, side) {
@@ -3778,16 +3785,16 @@
     const source = lineup.confirmed ? 'composition confirmée' : lineup.projected || lineup.present ? 'composition probable' : 'composition à confirmer';
     const pitchLines = pitchRowsForPlayers(players, lineup.formation);
     const sportHint = row?.sport || row?.match?.sport || 'football';
-    const renderPlayer = (player) => {
+    const renderPlayer = (player, lineCount) => {
       const star = player.star || stars.get(normalizeUiKey(player.name || ''));
       const hot = Number(star?.star_score || player?.rating || 0) >= 6;
       const playerName = player.name || star?.name || '';
       // Trigger remote photo lookup as a side-effect; result swaps in
       // automatically via data-remote-image attribute.
       const photoHtml = playerName ? playerPhotoHtml(playerName, { sport: sportHint }, { size: 32 }) : '';
-      const numberOrPos = player.shirt != null && player.shirt !== '' ? String(player.shirt) : (player.pos || star?.position || '-');
+      const numberOrPos = player.shirt != null && player.shirt !== '' ? String(player.shirt) : (player.number || player.pos || star?.position || '-');
       return `
-        <div class="pitch-player-token ${hot ? 'hot' : ''}" title="${escapeHtml(playerStatLine(player, star))}">
+        <div class="pitch-player-token ${hot ? 'hot' : ''} ${lineCount >= 4 ? 'compact' : ''}" title="${escapeHtml(playerStatLine(player, star))}">
           ${photoHtml ? `<span class="pitch-player-photo">${photoHtml}</span>` : ''}
           <span class="pitch-player-num">${escapeHtml(numberOrPos)}</span>
           <strong>${escapeHtml(playerName || 'À confirmer')}</strong>
@@ -3801,13 +3808,26 @@
         <small>${escapeHtml(source)}</small>
         <div class="pitch-players">
           ${pitchLines.map((line) => `
-            <div class="pitch-line" data-line="${escapeHtml(line.label)}">
-              ${line.players.map(renderPlayer).join('')}
+            <div class="pitch-line" data-line="${escapeHtml(line.label)}" style="--line-count:${Math.max(1, line.players.length)}">
+              ${line.players.map((player) => renderPlayer(player, line.players.length)).join('')}
             </div>
           `).join('')}
         </div>
       </div>
     `;
+  }
+
+  function buildLineupPitch(row) {
+    const columns = [buildPitchColumn(row, 'home'), buildPitchColumn(row, 'away')].filter(Boolean);
+    if (!columns.length) {
+      return `
+        <div class="pitch-empty">
+          <strong>Compositions pas encore fiables</strong>
+          <span>Source compo absente ou trop partielle pour afficher un terrain propre.</span>
+        </div>
+      `;
+    }
+    return `<div class="lineup-pitch" aria-label="Feuille de match probable">${columns.join('')}</div>`;
   }
 
   function buildFootballInsightHtml(row) {
@@ -3835,10 +3855,7 @@
           <strong>${escapeHtml(seasonStakeText(row))}</strong>
           ${previousChampion ? `<em>${escapeHtml(`Champion passé : ${previousChampion}`)}</em>` : ''}
         </div>
-        <div class="lineup-pitch" aria-label="Feuille de match probable">
-          ${buildPitchColumn(row, 'home')}
-          ${buildPitchColumn(row, 'away')}
-        </div>
+        ${buildLineupPitch(row)}
         <div class="sport-insight-grid">
           <div>
             <span>Forme récente</span>
@@ -12691,10 +12708,7 @@
     const footballPitch = sport.includes('football') || sport.includes('soccer') ? `
       <article class="detail-card wide">
         <h4>Terrain & compositions</h4>
-        <div class="lineup-pitch" aria-label="Feuille de match probable">
-          ${buildPitchColumn(row, 'home')}
-          ${buildPitchColumn(row, 'away')}
-        </div>
+        ${buildLineupPitch(row)}
       </article>
     ` : '';
     return `

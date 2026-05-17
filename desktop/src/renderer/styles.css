@@ -6804,17 +6804,19 @@ body.trading-desk-on .tab-panel[data-panel="dashboard"].active > #cockpit-detail
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
   margin-top: 10px;
+  align-items: stretch;
 }
 
 .pitch-column {
   min-width: 0;
   border: 1px solid rgba(16, 185, 129, .22);
-  border-radius: 14px;
-  padding: 12px;
+  border-radius: 12px;
+  padding: 10px;
   background:
     linear-gradient(0deg, rgba(16, 185, 129, .08), rgba(16, 185, 129, .08)),
     repeating-linear-gradient(90deg, rgba(255,255,255,.025), rgba(255,255,255,.025) 1px, transparent 1px, transparent 18px),
     var(--surface);
+  overflow: hidden;
 }
 
 .pitch-column h5 {
@@ -6832,37 +6834,75 @@ body.trading-desk-on .tab-panel[data-panel="dashboard"].active > #cockpit-detail
 .pitch-players {
   position: relative;
   display: grid;
-  grid-template-rows: repeat(4, minmax(58px, auto));
-  gap: 10px;
-  min-height: 310px;
-  padding: 14px 10px;
+  grid-template-rows: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  min-height: 330px;
+  padding: 16px 10px;
   border: 1px solid rgba(255,255,255,.08);
   border-radius: 16px;
+  overflow: hidden;
   background:
-    linear-gradient(90deg, transparent 49.5%, rgba(255,255,255,.16) 49.5%, rgba(255,255,255,.16) 50.5%, transparent 50.5%),
+    linear-gradient(0deg, transparent 49.5%, rgba(255,255,255,.16) 49.5%, rgba(255,255,255,.16) 50.5%, transparent 50.5%),
     radial-gradient(circle at 50% 50%, transparent 0 38px, rgba(255,255,255,.14) 39px 40px, transparent 41px),
     repeating-linear-gradient(0deg, rgba(16,185,129,.10), rgba(16,185,129,.10) 38px, rgba(5,150,105,.10) 38px, rgba(5,150,105,.10) 76px);
 }
 
+.pitch-players::before,
+.pitch-players::after {
+  content: "";
+  position: absolute;
+  left: 28%;
+  width: 44%;
+  height: 44px;
+  border: 1px solid rgba(255,255,255,.12);
+  pointer-events: none;
+}
+
+.pitch-players::before {
+  top: -1px;
+  border-top: 0;
+  border-radius: 0 0 12px 12px;
+}
+
+.pitch-players::after {
+  bottom: -1px;
+  border-bottom: 0;
+  border-radius: 12px 12px 0 0;
+}
+
 .pitch-line {
-  display: flex;
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(var(--line-count, 3), minmax(0, 1fr));
   align-items: center;
-  justify-content: center;
-  gap: 7px;
-  flex-wrap: wrap;
+  justify-items: center;
+  gap: 6px;
+  min-width: 0;
 }
 
 .pitch-player-token {
   display: grid;
-  grid-template-columns: 32px 22px minmax(0, 1fr);
-  gap: 5px;
+  grid-template-columns: 28px minmax(18px, auto) minmax(0, 1fr);
+  gap: 4px;
   align-items: center;
-  max-width: 144px;
-  padding: 6px 7px;
+  width: 100%;
+  max-width: 132px;
+  min-width: 0;
+  padding: 5px 6px;
   border: 1px solid rgba(255,255,255,.16);
-  border-radius: 18px;
+  border-radius: 12px;
   background: rgba(2, 6, 23, .56);
   box-shadow: 0 8px 18px rgba(0,0,0,.18);
+}
+
+.pitch-player-token.compact {
+  grid-template-columns: minmax(18px, auto) minmax(0, 1fr);
+  padding: 5px;
+}
+
+.pitch-player-token.compact .pitch-player-photo {
+  display: none;
 }
 
 .pitch-player-token.hot {
@@ -6877,13 +6917,13 @@ body.trading-desk-on .tab-panel[data-panel="dashboard"].active > #cockpit-detail
 }
 
 .pitch-player-token .pitch-player-photo .player-photo {
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
 }
 
 .pitch-player-token .pitch-player-num {
   color: var(--accent);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 900;
   text-align: center;
 }
@@ -6894,7 +6934,22 @@ body.trading-desk-on .tab-panel[data-panel="dashboard"].active > #cockpit-detail
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 12px;
+  font-size: 11px;
+}
+
+.pitch-empty {
+  margin-top: 10px;
+  padding: 14px;
+  border: 1px dashed rgba(148, 163, 184, .32);
+  border-radius: 12px;
+  background: var(--surface-2);
+  color: var(--muted);
+}
+
+.pitch-empty strong {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--text);
 }
 
 .sport-insight-grid {
