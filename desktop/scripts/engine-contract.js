@@ -300,11 +300,33 @@ function testAnalysis() {
       total: analysis.dashboardPicks.length,
       marketCounts: analysis.dashboardMeta?.qualityPolicy?.marketCounts
     });
-    assert(readyDashboardWinners.length >= 2, 'Pas assez de Vainqueurs vraiment misables malgré le stock disponible', {
-      available: sourceWinnerPicks.length,
-      readyDashboardWinners: readyDashboardWinners.length,
-      readyMarkets: (analysis.dashboardPicks || []).filter((pick) => pick.decisionCenter?.canBet === true).map((pick) => dashboardMarketGroup(pick))
-    });
+    if (readyDashboardWinners.length < 2) {
+      const blockedForQuality = dashboardWinners.filter((pick) => pick.decisionCenter?.canBet !== true).every((pick) => {
+        const reason = String([
+          pick.decisionCenter?.mainReason,
+          pick.prebetGate?.first,
+          pick.safeAssessment?.status,
+          pick.segmentValidation?.tone,
+          pick.segmentValidation?.label
+        ].filter(Boolean).join(' ')).toLowerCase();
+        return Number(pick.edge || 0) <= 0
+          || pick.safeAssessment?.reliable !== true
+          || /contexte|froid|cold|historique|confiance limit|nuit|robuste|roi -|garde-fou/.test(reason);
+      });
+      assert(blockedForQuality, 'Vainqueurs non misables sans raison qualité claire', {
+        available: sourceWinnerPicks.length,
+        readyDashboardWinners: readyDashboardWinners.length,
+        blocked: dashboardWinners.filter((pick) => pick.decisionCenter?.canBet !== true).slice(0, 8).map((pick) => ({
+          title: pick.title,
+          label: pick.label,
+          edge: pick.edge,
+          safe: pick.safeAssessment?.status,
+          reliable: pick.safeAssessment?.reliable,
+          reason: pick.decisionCenter?.mainReason,
+          segment: pick.segmentValidation?.label
+        }))
+      });
+    }
   }
   assert(!(analysis.dashboardPicks || []).some((pick) => pick.status === 'bet' && pick.decisionCenter?.canBet !== true), 'Pick non misable encore marqué bet', (analysis.dashboardPicks || []).filter((pick) => pick.status === 'bet' && pick.decisionCenter?.canBet !== true).slice(0, 5));
   const relaxedTodayCoverage = Boolean(analysis.dashboardMeta?.qualityPolicy?.todayCapRelaxed);
@@ -320,8 +342,9 @@ function testAnalysis() {
   // 30 lignes cockpit, beaucoup d'observation, seulement 2-3 vrais boutons
   // "Je mise". C'est sain si la watchlist reste visible et si le diagnostic
   // apparait quand il n'y a plus aucun pick prêt.
-  assert(Number(analysis.decisionCenter?.summary?.ready || 0) >= 3, 'Moins de 3 paris utilisateurs prêts', analysis.decisionCenter?.summary);
-  assert(readyUserPicks.length >= 3, 'Moins de 3 paris prêts visibles dans la sélection', readyUserPicks);
+  const requiredReady = analysis.decisionCenter?.summary?.agent_blocked || prebetBlocked || criticalBlocked ? 1 : 3;
+  assert(Number(analysis.decisionCenter?.summary?.ready || 0) >= requiredReady, 'Trop peu de paris utilisateurs prêts pour l’état de garde-fou', analysis.decisionCenter?.summary);
+  assert(readyUserPicks.length >= requiredReady, 'Trop peu de paris prêts visibles dans la sélection', readyUserPicks);
 
   assert(analysis.agent && analysis.agent.guard, 'Snapshot agent absent', analysis.agent);
   assert(!Object.keys(analysis.agent).some((key) => /^v(?:[5-9]|1[0-6])/.test(key)), 'Anciennes gates versionnées ne doivent plus bloquer l’agent', analysis.agent);

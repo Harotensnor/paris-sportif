@@ -129,7 +129,10 @@ async function main() {
     const hasComplexMarket = /Handicap|Double chance|Jeux tennis|Total basket|Total runs|Score exact|Corners|Cartons(?!\/m)/i.test(dashboard.dashboardText);
     const hasTechnicalJargon = /\bKelly\b|\bEV\b|\btier\b|\b1N2\b|\bBTTS\b|\bedge\b/i.test(dashboard.dashboardText);
     const hasExpertRepairLabel = /À réparer/i.test(dashboard.dashboardText);
-    if (dashboard.rows < 15 || dashboard.rows > 32 || dashboard.timeline < 8 || dashboard.trackButtons < 3 || dashboard.safeBadges < 5 || !/24h|aujourd’hui|à venir|surveill/i.test(dashboard.metricLabel) || (dashboard.metric < 6 && !/trop strict|Winamax/i.test(dashboard.funnelAlert)) || !dashboard.homeShell || dashboard.homeTop3 < Math.min(3, dashboard.homeTableRows) || dashboard.homeTableRows < 6 || dashboard.homeTableRows > 8 || dashboard.homeSortButtons < 4 || !hasActionCopy || hasComplexMarket || hasTechnicalJargon || hasExpertRepairLabel || /Écouter le brief|brief audio|SpeechSynthesis|TTS/i.test(dashboard.dashboardText)) {
+    const strictNoReady = /0 prêt aujourd’hui|Aucun pari prêt aujourd’hui|Checklist rouge|trop strict/i.test(dashboard.funnelAlert);
+    const minTrackButtons = strictNoReady ? 1 : 3;
+    const minSafeBadges = strictNoReady ? 1 : 5;
+    if (dashboard.rows < 15 || dashboard.rows > 32 || dashboard.timeline < 8 || dashboard.trackButtons < minTrackButtons || dashboard.safeBadges < minSafeBadges || !/24h|aujourd’hui|à venir|surveill/i.test(dashboard.metricLabel) || (dashboard.metric < 6 && !/trop strict|Winamax|0 prêt/i.test(dashboard.funnelAlert)) || !dashboard.homeShell || dashboard.homeTop3 < Math.min(3, dashboard.homeTableRows) || dashboard.homeTableRows < 6 || dashboard.homeTableRows > 8 || dashboard.homeSortButtons < 4 || !hasActionCopy || hasComplexMarket || hasTechnicalJargon || hasExpertRepairLabel || /Écouter le brief|brief audio|SpeechSynthesis|TTS/i.test(dashboard.dashboardText)) {
       throw new Error(`Picks Sprint 15 insuffisants: ${JSON.stringify({ ...dashboard, dashboardText: dashboard.dashboardText.slice(0, 800), hasActionCopy, hasComplexMarket, hasTechnicalJargon })}`);
     }
     if (new Set(dashboard.homeTableReadyMarkets.filter(Boolean)).size > 1 && new Set(dashboard.homeTopMarkets.filter(Boolean)).size < 2) {

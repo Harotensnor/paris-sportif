@@ -4947,6 +4947,46 @@ body.theme-light .key-reasons-list li:hover {
   line-height: 1.45;
 }
 
+.inline-source-link {
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.public-signals-card .signal-grid {
+  padding: 10px 0 0;
+}
+
+.public-signals-card .sheet-signal-strip {
+  margin-top: 12px;
+}
+
+.public-source-head {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+}
+
+.public-source-head img,
+.public-source-head b {
+  align-items: center;
+  background: rgba(255, 255, 255, .06);
+  border: 1px solid rgba(255, 255, 255, .14);
+  border-radius: 14px;
+  display: inline-flex;
+  height: 44px;
+  justify-content: center;
+  object-fit: cover;
+  width: 44px;
+}
+
+.public-source-head b {
+  color: var(--accent);
+  font-size: 13px;
+  letter-spacing: 0;
+}
+
 .signal-ok {
   border-color: rgba(16, 185, 129, .45);
 }

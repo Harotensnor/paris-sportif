@@ -3487,11 +3487,31 @@
     return Number.isFinite(n) && Math.abs(n) >= min;
   }
 
+  function publicSignalsForRow(row) {
+    return row?.match?.public_signals
+      || row?.match?.context?.public_signals
+      || row?.public_signals
+      || {};
+  }
+
+  function publicTeamSignal(row, side) {
+    const signals = publicSignalsForRow(row);
+    return signals?.teams?.[side] || {};
+  }
+
   function teamContext(row, side) {
     const contextTeam = row?.match?.context?.teams?.[side] || {};
     const sides = getSides(row?.match || {});
     const competitor = side === 'home' ? sides.home : sides.away;
-    return { ...(competitor || {}), ...contextTeam };
+    const publicTeam = publicTeamSignal(row, side);
+    return {
+      ...(competitor || {}),
+      ...(publicTeam?.profile ? { public_profile: publicTeam.profile } : {}),
+      ...(publicTeam?.coach ? { coach_public: publicTeam.coach } : {}),
+      ...(publicTeam?.tactical ? { tactical_public: publicTeam.tactical } : {}),
+      ...(publicTeam?.signals ? { public_signal_items: publicTeam.signals } : {}),
+      ...contextTeam
+    };
   }
 
   function lineupContext(row, side) {
@@ -3601,21 +3621,25 @@
     const team = teamContext(row, side) || {};
     const availability = availabilityContext(row, side) || {};
     const coaches = row?.match?.context?.coaches || row?.match?.coaches || {};
-    const raw = lineup.coach || team.coach || availability.coach || coaches?.[side]?.name || coaches?.[side];
+    const publicTeam = publicTeamSignal(row, side);
+    const raw = lineup.coach || team.coach || availability.coach || coaches?.[side]?.name || coaches?.[side] || publicTeam?.coach?.name || team?.coach_public?.name;
     const text = cleanLabel(raw, '').trim();
     return looksLikePlaceholderValue(text) ? '' : text;
   }
 
   function tacticalReadForSide(row, side) {
     const team = teamContext(row, side);
+    const publicTeam = publicTeamSignal(row, side);
+    const publicTactical = publicTeam?.tactical || team?.tactical_public || {};
     const lineup = lineupContext(row, side) || {};
     const formation = cleanLabel(lineup.formation || team?.formation || '', '');
-    const style = inferFootballStyle(team);
+    const hasPublicTacticalTags = Array.isArray(publicTactical.tags) && publicTactical.tags.length > 0;
+    const style = (hasPublicTacticalTags ? cleanLabel(publicTactical.style || '', '') : '') || inferFootballStyle(team);
     const xgFor = Number(team?.xg_for_avg ?? team?.xg_per90 ?? team?.history?.xg?.for_avg);
     const xgAgainst = Number(team?.xg_against_avg ?? team?.xga_per90 ?? team?.history?.xg?.against_avg);
     const ppda = Number(team?.ppda ?? team?.history?.ppda);
     const over25 = Number(team?.history?.football_data?.over25_rate);
-    let read = 'Lecture prudente : le style est estimé avec les signaux d’équipe et la formation probable.';
+    let read = (hasPublicTacticalTags ? cleanLabel(publicTactical.read || '', '') : '') || 'Lecture prudente : le style est estimé avec les signaux d’équipe et la formation probable.';
     if (Number.isFinite(ppda) && ppda <= 10.5) {
       read = 'Pressing haut : l’équipe cherche à récupérer vite, ce qui augmente le rythme et les erreurs adverses.';
     } else if (hasMeaningfulMetric(xgFor, 0.25) && xgFor >= 1.65) {
@@ -3638,6 +3662,7 @@
       const teamName = teamDisplayName(row, side);
       const coachName = coachNameForSide(row, side);
       const tactical = tacticalReadForSide(row, side);
+      const publicCoach = publicTeamSignal(row, side)?.coach;
       const coachKey = coachLookupKey(teamName, sportHint);
       if (!coachName) queueCoachLookup(teamName, { sport: sportHint, team: teamName });
       const visual = coachName
@@ -3650,7 +3675,7 @@
             <div>
               <span>${escapeHtml(teamName)}</span>
               <strong data-coach-name-key="${escapeHtml(coachKey)}">${escapeHtml(coachName || 'Recherche coach en cours')}</strong>
-              <em data-coach-source-key="${escapeHtml(coachKey)}">${escapeHtml(coachName ? 'photo et source mises en cache si disponibles' : 'si la source ouverte ne confirme pas le nom, la fiche garde la tactique estimée')}</em>
+              <em data-coach-source-key="${escapeHtml(coachKey)}">${escapeHtml(publicCoach?.source ? 'coach confirmé par source publique' : coachName ? 'photo et source mises en cache si disponibles' : 'si la source ouverte ne confirme pas le nom, la fiche garde la tactique estimée')}</em>
             </div>
           </div>
           <div class="coach-tactic-body">
@@ -4515,6 +4540,15 @@
     }
     if (row?.safeAssessment?.reliable) items.push('profil fiable');
     if (row?.winamaxBoost) items.push('cote boostée Winamax');
+    const publicSignals = publicSignalsForRow(row);
+    const publicTeamSignals = ['home', 'away']
+      .flatMap((side) => publicSignals?.teams?.[side]?.signals || [])
+      .filter(Boolean);
+    const publicCoach = ['home', 'away']
+      .map((side) => publicSignals?.teams?.[side]?.coach?.name)
+      .find(Boolean);
+    if (publicCoach) items.push(`coach confirmé: ${publicCoach}`);
+    else if (publicTeamSignals.length) items.push(publicTeamSignals[0]);
     return items.filter(Boolean).slice(0, 3);
   }
 
@@ -6135,7 +6169,14 @@
       }
       return selected;
     }
-    return diverseHomeTopRows(ready, limit);
+    const readyKeys = new Set(ready.map((row) => userBetKey(row) || `${row.id}:${row.market}:${row.label}`));
+    const watch = source
+      .filter(canDisplayPickCard)
+      .filter((row) => {
+        const key = userBetKey(row) || `${row.id}:${row.market}:${row.label}`;
+        return !readyKeys.has(key);
+      });
+    return diverseHomeTopRows(ready.concat(watch), limit);
   }
 
   function homeCategoryMeta(category) {
@@ -7422,14 +7463,19 @@
       const simpleReady = Number(today.simpleReady || ready || 0);
       const advancedReady = Number(today.advancedReady || 0);
       const bookable = Number(today.bookableEvents || today.bookable || 0);
+      const visibleReadyRows = (state.currentDashboardRows?.length ? state.currentDashboardRows : state.picks).filter(isReadyToStakeRow);
+      const futureReadyOutsideToday = visibleReadyRows.filter((row) => !isTodayPick(row)).length;
       const tooStrictForDailyTarget = bookable >= 30 && simpleReady < 5;
       const noReadyToday = bookable >= 10 && simpleReady < 1;
       const lowReadyToday = bookable >= 30 && simpleReady > 0 && simpleReady < 5;
       if ((bookable > 0 && displayed < 5) || tooStrictForDailyTarget || noReadyToday || lowReadyToday) {
         node.className = 'today-funnel-alert danger';
+        const noReadyTitle = futureReadyOutsideToday
+          ? `0 prêt aujourd’hui · ${formatCount(futureReadyOutsideToday)} à venir`
+          : 'Aucun pari prêt aujourd’hui';
         node.innerHTML = `
-          <strong>${noReadyToday ? 'Aucun pari prêt aujourd’hui' : lowReadyToday ? 'Volume prêt limité aujourd’hui' : tooStrictForDailyTarget ? 'Modèle trop strict aujourd’hui' : displayed ? `${formatCount(displayed)} pari(s) aujourd'hui seulement` : 'Aucun pari simple aujourd’hui visible'}</strong>
-          <span>Aujourd’hui : ${formatCount(today.totalEvents || today.events || 0)} matchs → ${formatCount(bookable)} Winamax → ${formatCount(today.predictableMatches || today.predictable || 0)} analysables → ${formatCount(today.positiveSimplePassingFilters ?? today.simplePassingFilters ?? 0)} signaux simples positifs → ${formatCount(simpleReady)} simples prêts. ${advancedReady ? `${formatCount(advancedReady)} prêts avancés restent cachés en mode standard.` : ''}</span>
+          <strong>${noReadyToday ? noReadyTitle : lowReadyToday ? 'Volume prêt limité aujourd’hui' : tooStrictForDailyTarget ? 'Modèle trop strict aujourd’hui' : displayed ? `${formatCount(displayed)} pari(s) aujourd'hui seulement` : 'Aucun pari simple aujourd’hui visible'}</strong>
+          <span>Aujourd’hui : ${formatCount(today.totalEvents || today.events || 0)} matchs → ${formatCount(bookable)} Winamax → ${formatCount(today.predictableMatches || today.predictable || 0)} analysables → ${formatCount(today.positiveSimplePassingFilters ?? today.simplePassingFilters ?? 0)} signaux simples positifs → ${formatCount(simpleReady)} simples prêts.${futureReadyOutsideToday ? ` ${formatCount(futureReadyOutsideToday)} pari(s) prêts existent plus tard dans le cockpit.` : ''} ${advancedReady ? `${formatCount(advancedReady)} prêts avancés restent cachés en mode standard.` : ''}</span>
           <button class="ghost-btn" type="button" data-tab-target="data">Diagnostic auto</button>
         `;
         return;
@@ -13087,12 +13133,70 @@
       </article>`;
   }
 
+  function buildPublicSignalsHtml(row) {
+    const publicSignals = publicSignalsForRow(row);
+    const teams = publicSignals?.teams || {};
+    const sources = Array.isArray(publicSignals?.sources) ? publicSignals.sources : [];
+    const matchSignals = Array.isArray(publicSignals?.signals) ? publicSignals.signals : [];
+    const teamCards = ['home', 'away'].map((side) => {
+      const team = teams?.[side] || {};
+      const profile = team.profile || {};
+      const coach = team.coach || {};
+      const tactical = team.tactical || {};
+      const sideSignals = Array.isArray(team.signals) ? team.signals : [];
+      const hasContent = team.status === 'ok' || profile.url || coach.name || sideSignals.length;
+      if (!hasContent) return '';
+      const title = profile.title || team.label || team.name || teamDisplayName(row, side);
+      const sourceUrl = safeExternalUrl(profile.url || coach.source || '', '');
+      const thumbnail = safeExternalUrl(profile.thumbnail || '', '');
+      return `
+        <article class="signal-card signal-ok">
+          <div class="public-source-head">
+            ${thumbnail ? `<img src="${escapeHtml(thumbnail)}" alt="" loading="lazy">` : `<b>${escapeHtml((title || '?').slice(0, 2).toUpperCase())}</b>`}
+            <div>
+              <span>${escapeHtml(side === 'home' ? 'Source domicile' : 'Source extérieur')}</span>
+              <strong>${escapeHtml(title)}</strong>
+            </div>
+          </div>
+          <small>${escapeHtml([
+            coach.name ? `Coach: ${coach.name}` : '',
+            tactical.style ? `Style: ${tactical.style}` : '',
+            sideSignals[0] || ''
+          ].filter(Boolean).join(' · ') || 'Profil public vérifié')}</small>
+          ${sourceUrl ? `<a class="inline-source-link" href="${escapeHtml(sourceUrl)}" target="_blank" rel="noreferrer">ouvrir la source</a>` : ''}
+        </article>`;
+    }).join('');
+    if (!teamCards && !sources.length && !matchSignals.length) {
+      return `
+        <article class="detail-card wide public-signals-card">
+          <h4>Signaux web vérifiés</h4>
+          <p class="detail-text">Aucune source publique solide n’a encore été attachée à ce match. La fiche garde uniquement les signaux locaux.</p>
+        </article>`;
+    }
+    return `
+      <article class="detail-card wide public-signals-card">
+        <h4>Signaux web vérifiés</h4>
+        <p class="detail-text">${escapeHtml(`Contexte public uniquement. Les cotes et la décision restent 100% Winamax. Qualité source ${Math.round(Number(publicSignals.quality || 0))}/100.`)}</p>
+        ${matchSignals.length ? `<div class="sheet-signal-strip">${matchSignals.slice(0, 4).map((signal) => `<div class="ok"><span>Signal public</span><strong>${escapeHtml(signal)}</strong><em>Wikidata / Wikipedia</em></div>`).join('')}</div>` : ''}
+        <div class="signal-grid">${teamCards || '<article class="signal-card signal-missing"><span>Profil</span><strong>Non confirmé</strong><small>Pas assez fiable pour affichage.</small></article>'}</div>
+        ${sources.length ? `<div class="market-list">${sources.slice(0, 6).map((source) => {
+          const url = safeExternalUrl(source.url || '', '');
+          return `<div class="market-row">
+            <span>${escapeHtml(source.label || 'Source publique')}</span>
+            <strong>${escapeHtml(source.status === 'ok' ? 'validée' : 'à confirmer')}</strong>
+            <em>${url ? `<a href="${escapeHtml(url)}" target="_blank" rel="noreferrer">${escapeHtml(source.detail || url)}</a>` : escapeHtml(source.detail || '-')}</em>
+          </div>`;
+        }).join('')}</div>` : ''}
+      </article>`;
+  }
+
   function buildSourcesHtml(row) {
     const sources = Array.isArray(row.match?.context?.sources) ? row.match.context.sources : [];
     return `
       <section class="detail-tab-panel" data-detail-panel="sources">
         <div class="modal-grid">
           ${buildIdentityDetailHtml(row)}
+          ${buildPublicSignalsHtml(row)}
           ${buildEnrichedSourcesHtml(row)}
         </div>
         <article class="detail-card wide">
@@ -13770,6 +13874,7 @@
               <span>${escapeHtml(sourceLine)}</span>
             </div>
           </article>
+          ${buildPublicSignalsHtml(row)}
           ${buildSportInsightHtml(row)}
           ${buildTwoGoalSafetyHtml(row)}
           <article class="detail-card">

@@ -53,6 +53,13 @@ DECISION_STACK_STAGES = [
     Stage("build_v16_final_decision.py", 30),
 ]
 
+PUBLIC_CONTEXT_FETCH_STAGE = Stage("fetch_public_match_signals.py", 120)
+PUBLIC_CONTEXT_PATCH_STAGE = Stage("patch_public_match_signals.py", 45)
+PUBLIC_CONTEXT_STAGES = [
+    PUBLIC_CONTEXT_FETCH_STAGE,
+    PUBLIC_CONTEXT_PATCH_STAGE,
+]
+
 
 QUICK_STAGES = [
     Stage("fetch_live.py", 60),
@@ -80,6 +87,7 @@ QUICK_STAGES = [
     Stage("patch_all_quick.py", 60),
     Stage("patch_tennis_features.py", 60),
     Stage("patch_smart_money.py", 30),
+    *PUBLIC_CONTEXT_STAGES,
     Stage("build_lineups_multisport.py", 45),
     Stage("build_xg_coverage.py", 30),
     Stage("fetch_match_previews.py", 60),
@@ -153,6 +161,7 @@ SIGNAL_FETCH_STAGES = [
     Stage("fetch_team_stats.py", 360),
     Stage("fetch_tennis_sackmann.py", 180),
     Stage("fetch_h2h.py", 300),
+    PUBLIC_CONTEXT_FETCH_STAGE,
 ]
 
 PREMATCH_STAGES = [
@@ -185,6 +194,7 @@ PREMATCH_STAGES = [
     Stage("patch_winamax_markets.py", 60),
     Stage("patch_all_quick.py", 60),
     Stage("patch_tennis_features.py", 60),
+    *PUBLIC_CONTEXT_STAGES,
     Stage("build_lineups_multisport.py", 45),
     Stage("build_xg_coverage.py", 30),
     Stage("fetch_match_previews.py", 60),
@@ -239,6 +249,7 @@ PREMATCH_T60_STAGES = [
     Stage("fetch_h2h.py", 300),
     Stage("patch_all_quick.py", 60),
     Stage("patch_tennis_features.py", 60),
+    *PUBLIC_CONTEXT_STAGES,
     Stage("build_lineups_multisport.py", 45),
     Stage("build_xg_coverage.py", 30),
     Stage("fetch_match_previews.py", 60),
@@ -296,6 +307,7 @@ PREMATCH_T30_STAGES = [
     Stage("patch_winamax_markets.py", 60),
     Stage("patch_all_quick.py", 60),
     Stage("patch_tennis_features.py", 60),
+    *PUBLIC_CONTEXT_STAGES,
     Stage("build_lineups_multisport.py", 45),
     Stage("build_xg_coverage.py", 30),
     Stage("build_match_context.py", 60),
@@ -354,6 +366,7 @@ PREMATCH_T10_STAGES = [
     Stage("patch_winamax_markets.py", 60),
     Stage("patch_all_quick.py", 60),
     Stage("patch_tennis_features.py", 60),
+    *PUBLIC_CONTEXT_STAGES,
     Stage("build_lineups_multisport.py", 45),
     Stage("build_xg_coverage.py", 30),
     Stage("build_match_context.py", 60),
@@ -388,6 +401,7 @@ PREMATCH_T10_STAGES = [
 SIGNAL_PATCH_STAGES = [
     Stage("patch_all_quick.py", 60),
     Stage("patch_tennis_features.py", 60),
+    PUBLIC_CONTEXT_PATCH_STAGE,
     Stage("build_lineups_multisport.py", 45),
     Stage("build_xg_coverage.py", 30),
     Stage("fetch_match_previews.py", 60),
@@ -455,6 +469,11 @@ SIGNAL_SOURCE_ALIASES = {
     "h2h": "h2h",
     "tennis": "tennis",
     "tennis_features": "tennis",
+    "public": "public",
+    "public_web": "public",
+    "web": "public",
+    "wikipedia": "public",
+    "wikidata": "public",
     "context": "context",
     "match_context": "context",
 }
@@ -470,6 +489,7 @@ SIGNAL_FETCH_BY_SOURCE = {
     "tennis": [Stage("fetch_tennis_sackmann.py", 180), Stage("fetch_tennis_odds.py", 90)],
     "clubelo": [Stage("fetch_clubelo.py", 90)],
     "h2h": [Stage("fetch_h2h.py", 300)],
+    "public": [PUBLIC_CONTEXT_FETCH_STAGE],
     "context": [],
 }
 

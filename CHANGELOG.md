@@ -5,6 +5,15 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-17
 
+### Version v4.1.5 — Signaux web sourcés
+
+Enrichissement réel des pronostics et fiches match avec une nouvelle source publique côté pipeline, sans toucher à la règle Winamax-only pour les cotes.
+- Nouveau fetch `public_match_signals` : profils publics, preuves Wikidata/Wikipedia quand disponibles, fallback ESPN public avec cache et rate-limit si une source limite les requêtes.
+- Nouveau patch `public_signals` dans `data.js` : chaque match enrichi garde ses sources, son niveau de qualité, ses signaux lisibles et ses profils équipe/joueur.
+- Les fiches match affichent `Signaux web vérifiés` avec liens de source, coach public confirmé quand disponible et lecture tactique prudente.
+- Les cartes et narratifs peuvent réutiliser les signaux publics, mais aucune cote externe n'est utilisée pour la décision.
+- La pipeline desktop sait rafraîchir `public_web` en full/quick/signaux/pré-match, et le registre des sources expose cette nouvelle source.
+
 ### Version v4.1.4 — Photos joueurs + coach tactique
 
 Correctif fiche match orienté lisibilité : les joueurs et entraîneurs manquaient encore de présence visuelle, et la tactique coach était trop compressée pour aider à décider vite.
