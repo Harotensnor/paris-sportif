@@ -5,6 +5,13 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-17
 
+### Version v4.2.1 — Fiches plus lisibles
+
+Correctif visuel ciblé après retour utilisateur sur les fiches match.
+- Lisibilité fiche : la forme récente n’apparaît plus en codes bruts type `WWDND` ; elle est convertie en pastilles Victoire/Nul/Défaite, avec correction de l’interprétation des séquences mixtes FR/EN.
+- Terrain de composition allégé : rendu plus compact, lignes Attaque/Milieu/Défense/Gardien visibles et joueurs en jetons arrondis avec photos sourcées quand disponibles.
+- Version visible et cache bumpés pour forcer le logiciel à charger cette révision.
+
 ### Version v4.2.0 — Joueurs publics sourcés + photos/stats fiables
 
 Rattachement réel des joueurs aux sources publiques sans inventer de donnée.
@@ -14,8 +21,6 @@ Rattachement réel des joueurs aux sources publiques sans inventer de donnée.
 - Les fiches match affichent pays, poste public, âge, taille, source et photos joueur quand disponibles ; le terrain des compositions utilise aussi ces photos.
 - Le service image accepte les miniatures publiques déjà sourcées (Wikipedia/Wikimedia/ESPN) et les met en cache localement, toujours côté main process.
 - La pipeline desktop et GitHub Pages exécutent désormais l’enrichissement public avec une fenêtre “jour en cours + passé récent” pour couvrir les compositions publiées après coup. Validation terrain : 162 matchs patchés, 528 lignes joueurs touchées, 264 photos et 264 blocs stats joueurs injectés.
-- Lisibilité fiche : la forme récente n’apparaît plus en codes bruts type `WWDND` ; elle est convertie en pastilles Victoire/Nul/Défaite, avec correction de l’interprétation des séquences mixtes FR/EN.
-- Terrain de composition allégé : rendu plus compact, lignes Attaque/Milieu/Défense/Gardien visibles et joueurs en jetons arrondis avec photos sourcées quand disponibles.
 
 ### Version v4.1.8 — Audit terrain QA + marchés standard nettoyés
 
