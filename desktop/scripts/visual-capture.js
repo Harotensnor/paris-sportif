@@ -79,7 +79,7 @@ async function main() {
       visuals: document.querySelectorAll('.match-visual').length,
       scanner: document.querySelector('#market-scanner-section')?.textContent || '',
       voiceBriefRemoved: !document.querySelector('#listen-brief-btn') && !/lecture vocale/i.test(document.body.innerText || ''),
-      heroImage: Boolean(document.querySelector('.ultimate-hero-media img'))
+      heroImage: Boolean(document.querySelector('.ultimate-hero-media img, #home-top3-grid .match-visual'))
     }));
 
     await win.click('[data-tab="history"]');

@@ -56,6 +56,8 @@
     probabilityCalibration: null,
     policyCandidates: null,
     sourceHealth: null,
+    marketCoverageV2: null,
+    terrainReportV2: null,
     decisionCenter: null,
     agentBlockers: null,
     clvSummary: null,
@@ -4581,6 +4583,8 @@
       state.probabilityCalibration = null;
       state.policyCandidates = null;
       state.sourceHealth = null;
+      state.marketCoverageV2 = null;
+      state.terrainReportV2 = null;
       state.decisionCenter = null;
       state.agentBlockers = null;
       state.clvSummary = null;
@@ -4690,7 +4694,9 @@
     state.modelRealityAudit = analysis.modelRealityAudit || null;
     state.probabilityCalibration = analysis.probabilityCalibration || null;
     state.policyCandidates = analysis.policyCandidates || null;
-    state.sourceHealth = analysis.sourceHealth || null;
+    state.sourceHealth = analysis.sourceHealthV5 || analysis.sourceHealth || null;
+    state.marketCoverageV2 = analysis.marketCoverageV2 || null;
+    state.terrainReportV2 = analysis.terrainReportV2 || null;
     state.decisionCenter = analysis.decisionCenter || null;
     state.agentBlockers = analysis.agentBlockers || null;
     state.clvSummary = analysis.clvSummary || null;
@@ -13150,6 +13156,50 @@
     `;
   }
 
+  function buildV3SheetSnapshotHtml(row) {
+    const sheet = row?.matchSheetV3 || null;
+    const decision = row?.pickDecisionV3 || null;
+    if (!sheet || !decision) return '';
+    const quality = sheet.summary?.sourceQuality || decision.sourceQuality || {};
+    const missing = Array.isArray(sheet.missingData) ? sheet.missingData : [];
+    const sourceCount = Array.isArray(sheet.sources) ? sheet.sources.length : 0;
+    const homeLineup = sheet.lineups?.home || {};
+    const awayLineup = sheet.lineups?.away || {};
+    const sections = [
+      homeLineup.starters?.length && awayLineup.starters?.length ? 'Compos' : null,
+      sheet.h2h?.count ? 'H2H' : null,
+      sheet.referee ? 'Arbitre' : null,
+      sheet.weather ? 'Météo' : null,
+      sheet.injuries?.home?.total || sheet.injuries?.away?.total ? 'Absences' : null,
+      sheet.tactical?.formation ? 'Tactique' : null
+    ].filter(Boolean);
+    const canBetText = decision.canBet
+      ? `Mise autorisée ${decision.stake > 0 ? formatMoney(decision.stake) : visibleStakeText(row)}`
+      : 'Observation sans bouton de mise';
+    return `
+      <article class="detail-card wide v3-sheet-card">
+        <h4>Dossier pronostic v3</h4>
+        <div class="match-context-band">
+          <span>${escapeHtml(decision.marketFamily || simpleMarketLabelForRow(row))}</span>
+          <strong>${escapeHtml(canBetText)}</strong>
+          <em>${escapeHtml(`Qualité source ${quality.score != null ? `${quality.score}/100` : quality.tier || 'à vérifier'} · ${sourceCount} sources locales`)}</em>
+        </div>
+        <div class="sheet-signal-strip compact">
+          <div class="${sections.length >= 4 ? 'ok' : 'missing'}">
+            <span>Sections remplies</span>
+            <strong>${escapeHtml(sections.length ? sections.join(' · ') : 'Dossier minimal')}</strong>
+            <em>${escapeHtml(sections.length >= 4 ? 'Assez de contexte pour lire la fiche.' : 'Le logiciel cache les blocs vides et signale les manques.')}</em>
+          </div>
+          <div class="${missing.length ? 'missing' : 'ok'}">
+            <span>À enrichir</span>
+            <strong>${escapeHtml(missing.length ? missing.slice(0, 5).join(' · ') : 'Aucun manque bloquant')}</strong>
+            <em>${escapeHtml(missing.length ? 'Ces points ne sont pas inventés.' : 'Les signaux essentiels sont présents.')}</em>
+          </div>
+        </div>
+      </article>
+    `;
+  }
+
   function buildDetailHtml(row) {
     const match = row.match || {};
     const pred = row.pred || {};
@@ -13341,6 +13391,7 @@
             </div>
           </article>
         </div>
+        ${buildV3SheetSnapshotHtml(row)}
         <!-- Sprint 81 B1+B4 — enriched-sources retire (deja onglet Sources),
              news+social fusionnes en watcher unique condense -->
         ${(() => {
@@ -14556,19 +14607,34 @@
       grid.innerHTML = '<div class="empty">Santé sources V4 indisponible.</div>';
       return;
     }
+    const scoreFor = (row) => {
+      if (Number.isFinite(Number(row.score))) return Number(row.score);
+      if (row.status === 'ok') return 100;
+      if (row.status === 'warning') return 65;
+      if (row.status === 'critical') return 20;
+      return 50;
+    };
+    const avgScore = Number.isFinite(Number(summary.avg_score))
+      ? Number(summary.avg_score)
+      : rows.length
+        ? rows.reduce((sum, row) => sum + scoreFor(row), 0) / rows.length
+        : 0;
     const cards = [
       {
         tone: Number(summary.critical || 0) ? 'danger' : Number(summary.warning || 0) ? 'warn' : 'ok',
         label: 'Score sources',
-        value: `${Number(summary.avg_score || 0).toFixed(0)}/100`,
-        detail: `${formatCount(summary.sources || rows.length)} sources · ${formatCount(summary.quarantine || 0)} quarantaine · ${formatCount(summary.optional_token_missing || 0)} tokens manquants.`
+        value: `${avgScore.toFixed(0)}/100`,
+        detail: `${formatCount(summary.sources || rows.length)} sources · ${formatCount(summary.quarantine || summary.preservedSnapshots || 0)} snapshot(s) préservé(s) · ${formatCount(summary.blocksPick || summary.optional_token_missing || 0)} blocage(s).`
       },
-      ...rows.slice(0, 7).map((row) => ({
-        tone: Number(row.score || 0) < 50 ? 'danger' : Number(row.score || 0) < 80 ? 'warn' : 'ok',
-        label: row.status || row.kind || 'source',
-        value: `${row.source || '-'} · ${formatCount(row.score || 0)}`,
-        detail: `${row.action || '-'} · âge ${row.age_min != null ? formatAge(Math.round(Number(row.age_min))) : 'inconnu'} · TTL ${row.ttl_min || '-'} min`
-      }))
+      ...rows.slice(0, 7).map((row) => {
+        const ageValue = row.age_min ?? row.age;
+        return {
+          tone: scoreFor(row) < 50 ? 'danger' : scoreFor(row) < 80 ? 'warn' : 'ok',
+          label: row.status || row.kind || 'source',
+          value: `${row.source || '-'} · ${formatCount(row.score ?? row.coverage ?? scoreFor(row))}`,
+          detail: `${row.action || row.note || '-'} · âge ${ageValue != null ? formatAge(Math.round(Number(ageValue))) : 'inconnu'} · TTL ${row.ttl_min ?? row.ttl ?? '-'} min`
+        };
+      })
     ];
     grid.innerHTML = cards.map((card) => `
       <article class="quality-report-card quality-${card.tone}">
@@ -16828,6 +16894,8 @@
       probabilityCalibration: state.probabilityCalibration || null,
       policyCandidates: state.policyCandidates || null,
       sourceHealth: state.sourceHealth || null,
+      marketCoverageV2: state.marketCoverageV2 || null,
+      terrainReportV2: state.terrainReportV2 || null,
       decisionCenter: state.decisionCenter || null,
       winamaxMarketAudit: state.winamaxMarketAudit || null,
       winamaxPromos: state.winamaxPromos || null,

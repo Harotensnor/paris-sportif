@@ -10,7 +10,7 @@ Sources consultees le 16 mai 2026 :
 - Jeu Legal France, "Garantie 2 Buts d'Ecart" Winamax : https://www.jeu-legal-france.fr/actu-pari-winamax-garantie-2-buts-ecart.html
 - SportyTrader, explication de la promotion Winamax : https://www.sportytrader.com/bookmakers/winamax/code-promo/comment-fonctionne-la-garantie-2-buts-d-ecart-de-winamax/
 
-Implementation v2.1.0 :
+Implementation v3.0.0 :
 
 - La regle ne s'applique qu'aux picks foot "Vainqueur du match", jamais aux matchs nuls, handicaps, buteurs, totals ou mi-temps.
 - Le moteur calcule une probabilite prudente que l'equipe choisie mene de deux buts avec une simulation Poisson basee sur les xG du match ou, si les xG manquent, sur la probabilite implicite du pick.

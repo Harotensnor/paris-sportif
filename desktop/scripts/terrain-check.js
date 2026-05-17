@@ -82,6 +82,13 @@ async function main() {
   const dashboard = analysis.dashboardPicks || [];
   const todayFunnel = analysis.todayFunnel?.today || {};
   const coverage = analysis.coverage24h?.summary || {};
+  assert(analysis.terrainReportV2?.schema === 'paris-sportif.terrain_report.v2', 'Terrain: rapport v2 absent', analysis.terrainReportV2);
+  assert(analysis.sourceHealthV5?.schema === 'paris-sportif.source_health.v5', 'Terrain: santé sources v5 absente', analysis.sourceHealthV5);
+  assert(analysis.marketCoverageV2?.schema === 'paris-sportif.market_coverage.v2', 'Terrain: couverture marchés v2 absente', analysis.marketCoverageV2);
+  assert(dashboard.every((pick) => pick?.pickDecisionV3?.schema === 'paris-sportif.pick_decision.v3' && pick?.matchSheetV3?.schema === 'paris-sportif.match_sheet.v3'), 'Terrain: le cockpit contient une ligne sans contrat v3', dashboard.slice(0, 3));
+  if (Number(coverage.nightPositive || 0) >= 6) {
+    assert(Number(coverage.nightDisplayed || 0) >= Math.min(6, Number(coverage.nightPositive || 0)), 'Terrain: couverture nuit v3 insuffisante', coverage);
+  }
   const now = Date.now();
   const pastDashboard = dashboard.filter((pick) => Date.parse(pick.start || pick.date || pick.kickoff || '') <= now);
   assert(pastDashboard.length === 0, 'Terrain: le cockpit expose un match déjà commencé', pastDashboard.map((pick) => ({
@@ -218,7 +225,7 @@ async function main() {
     assert(dom.nav.length <= 12, 'Terrain: navigation trop longue malgré les catégories', { nav: dom.nav });
     assert(dom.rows >= 15 && dom.rows <= 32 && dom.timeline >= 8, 'Terrain: cockpit réel insuffisant', dom);
     assert(dom.homeShellDisplay !== 'none' && dom.homeTop3Count >= Math.min(3, dom.homeTableRows) && dom.homeTableRows >= 6 && dom.homeTableRows <= 12 && dom.homeSortButtons.length >= 4, 'Terrain: nouvel accueil Top 3 + tableau triable absent ou trop long', dom);
-    assert(!dom.homeTopCards.some((text) => /À surveiller|Surveiller|Observation|Écarté|0\s*€/i.test(text)), 'Terrain: Top 3 contient une ligne non misable', dom.homeTopCards);
+    assert(!dom.homeTopCards.some((text) => /À surveiller|Surveiller|Observation|Écarté|(?:^|\n)\s*(?:Mise\s*)?0(?:[,.]00)?\s*€/i.test(text)), 'Terrain: Top 3 contient une ligne non misable', dom.homeTopCards);
     assert(dom.homeTopCards.every((text) => /Je mise/i.test(text)), 'Terrain: Top 3 sans bouton de mise clair', dom.homeTopCards);
     const tableMarketCount = new Set(dom.homeTableReadyMarkets.filter(Boolean)).size;
     const topMarketCount = new Set(dom.homeTopMarkets.filter(Boolean)).size;

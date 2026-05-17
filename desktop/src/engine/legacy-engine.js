@@ -15,6 +15,7 @@ function createLegacyEngineService({ projectRoot }) {
   const dataLitePath = path.join(root, 'data_lite.js');
   const dataTodayPath = path.join(root, 'data_today.json');
   const dataManifestPath = path.join(root, 'data_manifest.json');
+  const healthPath = path.join(root, 'health.json');
   const legacyPath = path.resolve(__dirname, 'runtime', 'legacy-app.js');
   const lineupsPath = path.join(root, 'lineups_soccer.json');
   const sofaEventsPath = path.join(root, 'sofascore_events.json');
@@ -79,7 +80,7 @@ function createLegacyEngineService({ projectRoot }) {
   function fileKey() {
     const dataStat = fs.statSync(dataPath);
     const legacyStat = fs.statSync(legacyPath);
-    return `${dataStat.mtimeMs}:${dataStat.size}:${optionalFileKey(dataLitePath)}:${optionalFileKey(dataTodayPath)}:${optionalFileKey(dataManifestPath)}:${legacyStat.mtimeMs}:${legacyStat.size}:${optionalFileKey(lineupsPath)}:${optionalFileKey(sofaEventsPath)}:${optionalFileKey(starPlayersPath)}:${optionalFileKey(winamaxMarketsPath)}:${optionalFileKey(h2hPath)}:${optionalFileKey(matchContextPath)}:${optionalFileKey(signalGapPath)}:${optionalFileKey(contextBacktestPath)}:${optionalFileKey(decisionBacktestPath)}:${optionalFileKey(decisionTuningPath)}:${optionalFileKey(decisionShadowPath)}:${optionalFileKey(oddsGuardrailsPath)}:${optionalFileKey(agentBlockerBacktestPath)}:${optionalFileKey(agentGuardrailRecommendationsPath)}:${optionalFileKey(stakeReductionBacktestPath)}:${optionalFileKey(signalConflictBacktestPath)}:${optionalFileKey(scorerQualityPath)}:${optionalFileKey(scorerCandidatesSummaryPath)}:${optionalFileKey(scorerSettlementPath)}:${optionalFileKey(scorerPendingAuditPath)}:${optionalFileKey(prematchFocusPath)}:${optionalFileKey(prematchExecutionPath)}:${optionalFileKey(signalCoverageTrendPath)}:${optionalFileKey(nextActionsPath)}:${optionalFileKey(sourceFreshnessPlanPath)}:${optionalFileKey(contextRepairPlanPath)}:${optionalFileKey(refreshPriorityPlanPath)}:${optionalFileKey(prebetChecklistPath)}:${optionalFileKey(prebetChecklistBacktestPath)}:${optionalFileKey(teamIdentityGraphPath)}:${optionalFileKey(matchDecisionTimelinePath)}:${optionalFileKey(agentBankrollSimulationPath)}:${optionalFileKey(smartPreparePlanPath)}:${optionalFileKey(sourceRegistryPath)}:${optionalFileKey(sourceQuarantinePath)}:${optionalFileKey(optionalSourcesPlanPath)}:${optionalFileKey(criticalIssueReportPath)}:${optionalFileKey(dataConsistencyReportPath)}:${optionalFileKey(uiIntegrityReportPath)}:${optionalFileKey(pickIntegrityReportPath)}:${optionalFileKey(coverageRepairEnginePath)}:${optionalFileKey(sourceCoverageTargetsPath)}:${optionalFileKey(leagueSignalQualityPath)}:${optionalFileKey(modelLabReportPath)}:${optionalFileKey(probabilityCalibrationPath)}:${optionalFileKey(policyCandidateRegistryPath)}:${optionalFileKey(sourceHealthReportPath)}:${optionalFileKey(clvSummaryPath)}:${optionalFileKey(picksHistorySummaryPath)}`;
+    return `${dataStat.mtimeMs}:${dataStat.size}:${optionalFileKey(dataLitePath)}:${optionalFileKey(dataTodayPath)}:${optionalFileKey(dataManifestPath)}:${optionalFileKey(healthPath)}:${legacyStat.mtimeMs}:${legacyStat.size}:${optionalFileKey(lineupsPath)}:${optionalFileKey(sofaEventsPath)}:${optionalFileKey(starPlayersPath)}:${optionalFileKey(winamaxMarketsPath)}:${optionalFileKey(h2hPath)}:${optionalFileKey(matchContextPath)}:${optionalFileKey(signalGapPath)}:${optionalFileKey(contextBacktestPath)}:${optionalFileKey(decisionBacktestPath)}:${optionalFileKey(decisionTuningPath)}:${optionalFileKey(decisionShadowPath)}:${optionalFileKey(oddsGuardrailsPath)}:${optionalFileKey(agentBlockerBacktestPath)}:${optionalFileKey(agentGuardrailRecommendationsPath)}:${optionalFileKey(stakeReductionBacktestPath)}:${optionalFileKey(signalConflictBacktestPath)}:${optionalFileKey(scorerQualityPath)}:${optionalFileKey(scorerCandidatesSummaryPath)}:${optionalFileKey(scorerSettlementPath)}:${optionalFileKey(scorerPendingAuditPath)}:${optionalFileKey(prematchFocusPath)}:${optionalFileKey(prematchExecutionPath)}:${optionalFileKey(signalCoverageTrendPath)}:${optionalFileKey(nextActionsPath)}:${optionalFileKey(sourceFreshnessPlanPath)}:${optionalFileKey(contextRepairPlanPath)}:${optionalFileKey(refreshPriorityPlanPath)}:${optionalFileKey(prebetChecklistPath)}:${optionalFileKey(prebetChecklistBacktestPath)}:${optionalFileKey(teamIdentityGraphPath)}:${optionalFileKey(matchDecisionTimelinePath)}:${optionalFileKey(agentBankrollSimulationPath)}:${optionalFileKey(smartPreparePlanPath)}:${optionalFileKey(sourceRegistryPath)}:${optionalFileKey(sourceQuarantinePath)}:${optionalFileKey(optionalSourcesPlanPath)}:${optionalFileKey(criticalIssueReportPath)}:${optionalFileKey(dataConsistencyReportPath)}:${optionalFileKey(uiIntegrityReportPath)}:${optionalFileKey(pickIntegrityReportPath)}:${optionalFileKey(coverageRepairEnginePath)}:${optionalFileKey(sourceCoverageTargetsPath)}:${optionalFileKey(leagueSignalQualityPath)}:${optionalFileKey(modelLabReportPath)}:${optionalFileKey(probabilityCalibrationPath)}:${optionalFileKey(policyCandidateRegistryPath)}:${optionalFileKey(sourceHealthReportPath)}:${optionalFileKey(clvSummaryPath)}:${optionalFileKey(picksHistorySummaryPath)}`;
   }
 
   function closeCurrent() {
@@ -354,6 +355,11 @@ function createLegacyEngineService({ projectRoot }) {
     return readJsonSidecarMemo(filePath, (parsed) =>
       parsed && typeof parsed === 'object' ? parsed : fallback, fallback);
   }
+
+  function readHealthReport() {
+    return readJsonSidecar(healthPath, {});
+  }
+
   // Legacy path kept for safety (currently unreachable):
   function _readJsonSidecarLegacy(filePath, fallback = {}) {
     if (!fs.existsSync(filePath)) return fallback;
@@ -1804,7 +1810,7 @@ function createLegacyEngineService({ projectRoot }) {
 
     const hasTwoGoalSafety = Boolean(row?.winamaxTwoGoalRule?.eligible);
     const twoGoalPct = Number(row?.winamaxTwoGoalRule?.leadTwoProbability || 0);
-    const severeTwoGoalSegmentLoss = sample >= 120 && Number.isFinite(roi) && roi < -0.16;
+    const severeTwoGoalSegmentLoss = sample >= 80 && Number.isFinite(roi) && roi < -0.16;
     const twoGoalContextOverride = hasTwoGoalSafety
       && isOneN2
       && isFootball
@@ -3811,6 +3817,7 @@ function createLegacyEngineService({ projectRoot }) {
     add(windowDashboard, 'displayed');
     add(windowDashboard, 'ready', (row) => row?.decisionCenter?.canBet === true);
     const total = (field) => buckets.reduce((sum, bucket) => sum + Number(bucket[field] || 0), 0);
+    const nightBucket = bucketMap.get('00-06') || {};
     return {
       schema: 'paris-sportif.coverage_24h.v1',
       generatedAt: new Date().toISOString(),
@@ -3822,7 +3829,13 @@ function createLegacyEngineService({ projectRoot }) {
         displayed: windowDashboard.length,
         reliable: total('reliable'),
         ready: total('ready'),
-        nightDisplayed: bucketMap.get('00-06')?.displayed || 0,
+        nightEvents: Number(nightBucket.events || 0),
+        nightBookable: Number(nightBucket.bookable || 0),
+        nightPredictable: Number(nightBucket.predictable || 0),
+        nightPositive: Number(nightBucket.positive || 0),
+        nightReliable: Number(nightBucket.reliable || 0),
+        nightReady: Number(nightBucket.ready || 0),
+        nightDisplayed: Number(nightBucket.displayed || 0),
         status: total('displayed') >= 15 ? 'ok' : total('displayed') >= 8 ? 'warn' : 'danger'
       },
       buckets: buckets.map((bucket) => ({
@@ -3831,6 +3844,367 @@ function createLegacyEngineService({ projectRoot }) {
           .map(([sport, count]) => ({ sport, count }))
           .sort((a, b) => b.count - a.count || a.sport.localeCompare(b.sport))
       }))
+    };
+  }
+
+  function sourceHealthStatus(source) {
+    const status = String(source?.status || 'unknown').toLowerCase();
+    if (/critical|fail|error|ko/.test(status)) return 'critical';
+    if (/warn|stale|old|quarantine/.test(status)) return 'warning';
+    if (/ok|ready|present/.test(status)) return 'ok';
+    return status || 'unknown';
+  }
+
+  function buildSourceHealthV5(report = {}, health = {}) {
+    const sourceRows = Array.isArray(report.sources) ? report.sources : [];
+    const healthSources = health && typeof health.sources === 'object' ? health.sources : {};
+    const bySource = new Map();
+    for (const source of sourceRows) {
+      const key = String(source?.source || source?.key || '').trim();
+      if (!key) continue;
+      bySource.set(key, source);
+    }
+    for (const [key, value] of Object.entries(healthSources)) {
+      if (!sourceRows.length || bySource.has(key)) {
+        bySource.set(key, { source: key, ...(bySource.get(key) || {}), ...(value || {}) });
+      }
+    }
+    const sources = [...bySource.entries()].map(([key, source]) => {
+      const rawStatus = sourceHealthStatus(source);
+      const lastError = source?.lastError || source?.last_error || source?.error || null;
+      const age = source?.age_min ?? source?.ageMinutes ?? source?.age ?? source?.last_age_min ?? null;
+      const coverage = source?.coverage ?? source?.coverage_pct ?? source?.score ?? null;
+      const note = cleanLabel(source?.note || source?.action || source?.status_detail || '', '');
+      return {
+        source: key,
+        status: rawStatus,
+        age,
+        ttl: source?.ttl_min ?? source?.ttl ?? null,
+        coverage,
+        lastError,
+        preservedSnapshot: /retained|preserved|snapshot|cache/i.test(String(note || source?.status || '')),
+        blocksPick: rawStatus === 'critical' && /winamax|lineup|injur|context|odds/i.test(key),
+        note
+      };
+    }).sort((a, b) => {
+      const order = { critical: 0, warning: 1, unknown: 2, ok: 3 };
+      return (order[a.status] ?? 2) - (order[b.status] ?? 2) || a.source.localeCompare(b.source);
+    });
+    const summary = {
+      sources: sources.length,
+      ok: sources.filter((s) => s.status === 'ok').length,
+      warning: sources.filter((s) => s.status === 'warning').length,
+      critical: sources.filter((s) => s.status === 'critical').length,
+      preservedSnapshots: sources.filter((s) => s.preservedSnapshot).length,
+      blocksPick: sources.filter((s) => s.blocksPick).length,
+      generatedAt: report.generated_at || health.generated_at || null
+    };
+    return {
+      schema: 'paris-sportif.source_health.v5',
+      generatedAt: new Date().toISOString(),
+      summary,
+      sources
+    };
+  }
+
+  function readableMarketFamily(row) {
+    const group = simpleMarketGroup(row?.marketKey || row?.market);
+    if (group === 'winner') return 'Vainqueur';
+    if (group === 'goals') return 'Buts';
+    if (group === 'btts') return 'Les deux marquent';
+    if (group === 'scorer') return 'Buteur';
+    if (group === 'halftime') return 'Mi-temps';
+    return formatMarketName(row?.marketKey || row?.market || 'Marché');
+  }
+
+  function compactSourceQuality(row) {
+    const quality = row?.contextQuality || row?.match?.context?.quality || {};
+    const score = Number(quality.score);
+    const missing = [
+      ...(Array.isArray(quality.missing) ? quality.missing : []),
+      ...(Array.isArray(quality.critical_missing) ? quality.critical_missing : [])
+    ].filter(Boolean);
+    return {
+      score: Number.isFinite(score) ? Math.max(0, Math.min(100, Math.round(score))) : null,
+      tier: quality.tier || (Number.isFinite(score) ? score >= 70 ? 'fort' : score >= 45 ? 'correct' : 'faible' : 'inconnu'),
+      gate: quality.gate || row?.contextGate?.gate || null,
+      missing: [...new Set(missing)].slice(0, 8)
+    };
+  }
+
+  function pickWhyV3(row) {
+    const bits = [];
+    const label = cleanLabel(row?.label || row?.selection || row?.pickLabel || row?.market, 'ce pari');
+    const odd = Number(row?.odd || 0);
+    const confidence = Number(row?.safeConfidence ?? row?.adjustedConfidence ?? row?.probability ?? 0);
+    const edge = Number(row?.safeEdge ?? row?.edge ?? 0);
+    if (label) bits.push(`${label} ressort comme la meilleure ligne Winamax.`);
+    if (Number.isFinite(confidence) && confidence > 0) bits.push(`Confiance ${Math.round(confidence * 100)}%.`);
+    if (Number.isFinite(odd) && odd > 1) bits.push(`Cote ${odd.toFixed(2)}.`);
+    if (Number.isFinite(edge) && edge > 0) bits.push(`Avantage estimé +${Math.round(edge * 100)}pt.`);
+    if (row?.winamaxTwoGoalRule?.eligible) {
+      bits.push(`Filet 2-0 Winamax estimé ${Math.round(Number(row.winamaxTwoGoalRule.leadTwoProbability || 0) * 100)}%.`);
+    }
+    const reason = cleanLabel(row?.decisionCenter?.mainReason || row?.reason || '', '');
+    if (reason && !bits.join(' ').includes(reason)) bits.push(reason);
+    return bits.join(' ') || 'Ligne visible car le modèle trouve un signal positif, mais elle reste à vérifier avant mise.';
+  }
+
+  function buildPickDecisionV3(row) {
+    const canBet = Boolean(row?.decisionCenter?.canBet);
+    const sourceQuality = compactSourceQuality(row);
+    const reasons = [
+      ...(Array.isArray(row?.safeAssessment?.reasons) ? row.safeAssessment.reasons : []),
+      ...(Array.isArray(row?.safeAssessment?.warnings) ? row.safeAssessment.warnings : []),
+      ...(Array.isArray(row?.contextGate?.warnings) ? row.contextGate.warnings : [])
+    ].filter(Boolean);
+    const riskLevel = canBet
+      ? sourceQuality.score != null && sourceQuality.score < 55 ? 'moderate' : 'low'
+      : row?.safeAssessment?.status === 'watch' || row?.decisionCenter?.status === 'watch' ? 'watch' : 'blocked';
+    return {
+      schema: 'paris-sportif.pick_decision.v3',
+      status: canBet ? 'ready' : row?.safeAssessment?.status === 'watch' || row?.decisionCenter?.status === 'watch' ? 'watch' : 'blocked',
+      canBet,
+      stake: canBet ? Number(row?.decisionCenter?.stake ?? row?.stake ?? 0) || 0 : 0,
+      stakeDisplay: canBet ? row?.decisionCenter?.stakeDisplay || null : '0 €',
+      why: pickWhyV3(row),
+      confidence: {
+        value: Number(row?.safeConfidence ?? row?.adjustedConfidence ?? row?.probability ?? 0) || 0,
+        label: String(row?.confidenceTrust?.label || row?.safeAssessment?.label || '').replace('Confiance de confiance', 'Confiance'),
+        drivers: Array.isArray(row?.confidenceTrust?.drivers) ? row.confidenceTrust.drivers.slice(0, 5) : []
+      },
+      risk: {
+        level: riskLevel,
+        reasons: [...new Set(reasons)].slice(0, 6)
+      },
+      sourceQuality,
+      marketFamily: readableMarketFamily(row),
+      winamaxRuleFlags: {
+        twoGoalEarlyPayout: Boolean(row?.winamaxTwoGoalRule?.eligible),
+        twoGoalSafety: row?.winamaxTwoGoalRule?.eligible ? Number(row.winamaxTwoGoalRule.leadTwoProbability || 0) : null,
+        boost: Boolean(row?.winamaxBoost?.active || row?.winamaxBoost?.boosted)
+      }
+    };
+  }
+
+  function sideLineup(match, side) {
+    const competitors = Array.isArray(match?.competitors) ? match.competitors : [];
+    const competitor = competitors.find((item) => item?.home_away === side) || (side === 'home' ? competitors[0] : competitors[1]) || {};
+    const lineup = match?.lineups?.[side] || competitor?.lineup || {};
+    const starters = Array.isArray(lineup.starters) ? lineup.starters : [];
+    const injuries = Array.isArray(competitor.injuries)
+      ? competitor.injuries
+      : Array.isArray(match?.injuries?.[side]) ? match.injuries[side] : [];
+    return {
+      team: competitor?.name || lineup.team || (side === 'home' ? match?.home : match?.away) || '',
+      formation: lineup.formation || null,
+      confirmed: lineup.confirmed === true,
+      coach: lineup.coach || competitor?.coach || null,
+      starters: starters.slice(0, 11).map((player) => ({
+        name: cleanLabel(player?.name, ''),
+        number: player?.shirt ?? player?.number ?? null,
+        position: player?.pos || player?.position || null,
+        rating: Number.isFinite(Number(player?.rating)) ? Number(player.rating) : null,
+        captain: Boolean(player?.captain)
+      })).filter((player) => player.name),
+      substitutes: Array.isArray(lineup.subs) ? lineup.subs.slice(0, 9).map((player) => cleanLabel(player?.name, '')).filter(Boolean) : [],
+      injuries: {
+        total: injuries.length,
+        names: injuries.map((injury) => cleanLabel(injury?.player || injury?.name, '')).filter(Boolean).slice(0, 8)
+      }
+    };
+  }
+
+  function sideForm(match, side) {
+    const competitors = Array.isArray(match?.competitors) ? match.competitors : [];
+    const competitor = competitors.find((item) => item?.home_away === side) || (side === 'home' ? competitors[0] : competitors[1]) || {};
+    return {
+      team: competitor?.name || '',
+      rank: competitor?.rank ?? competitor?.standing ?? null,
+      form: cleanLabel(competitor?.form || competitor?.last5 || competitor?.team_form_l5 || competitor?.form10, ''),
+      xgFor: Number.isFinite(Number(competitor?.xg_for_avg)) ? Number(competitor.xg_for_avg) : null,
+      xgAgainst: Number.isFinite(Number(competitor?.xg_against_avg)) ? Number(competitor.xg_against_avg) : null
+    };
+  }
+
+  function buildMatchSheetV3(row, sourceHealthV5) {
+    const match = row?.match || {};
+    const quality = compactSourceQuality(row);
+    const homeLineup = sideLineup(match, 'home');
+    const awayLineup = sideLineup(match, 'away');
+    const h2hMeetings = Array.isArray(match?.h2h?.meetings) ? match.h2h.meetings.slice(0, 5) : [];
+    const referee = match?.referee || match?.referee_context || null;
+    const weather = match?.weather || null;
+    const missing = new Set(quality.missing || []);
+    if (!homeLineup.starters.length || !awayLineup.starters.length) missing.add('lineups');
+    if (!h2hMeetings.length) missing.add('h2h');
+    if (!referee) missing.add('referee');
+    if (!weather) missing.add('weather');
+    if (!homeLineup.injuries.total && !awayLineup.injuries.total) missing.add('injuries');
+    const sourceNames = ['winamax', 'sofascore', 'espn', 'open_meteo', 'clubelo', 'jeff_sackmann_tennis'];
+    const sourceMap = new Map((sourceHealthV5?.sources || []).map((source) => [source.source, source]));
+    return {
+      schema: 'paris-sportif.match_sheet.v3',
+      summary: {
+        title: row?.title || match?.name || '',
+        sport: row?.sport || match?.sport || '',
+        league: row?.league || match?.league_name || '',
+        start: row?.start || match?.date || null,
+        venue: match?.venue || null,
+        sourceQuality: quality
+      },
+      lineups: { home: homeLineup, away: awayLineup },
+      players: {
+        homeKeyPlayers: homeLineup.starters.filter((player) => /F|M|A/i.test(String(player.position || ''))).slice(0, 3),
+        awayKeyPlayers: awayLineup.starters.filter((player) => /F|M|A/i.test(String(player.position || ''))).slice(0, 3)
+      },
+      teamForm: {
+        home: sideForm(match, 'home'),
+        away: sideForm(match, 'away')
+      },
+      h2h: {
+        count: h2hMeetings.length,
+        meetings: h2hMeetings.map((item) => ({
+          date: item?.date || null,
+          home: item?.home || null,
+          away: item?.away || null,
+          score: item?.score || (item?.home_score != null && item?.away_score != null ? `${item.home_score}-${item.away_score}` : null)
+        }))
+      },
+      injuries: {
+        home: homeLineup.injuries,
+        away: awayLineup.injuries
+      },
+      coach: {
+        home: homeLineup.coach,
+        away: awayLineup.coach
+      },
+      referee: referee ? {
+        name: referee.name || referee.referee || null,
+        cardsPerGame: referee.cardsPerGame ?? referee.yellowPerGame ?? referee.cards_per_match ?? null,
+        penaltiesPerGame: referee.penaltiesPerGame ?? referee.pens_per_match ?? null
+      } : null,
+      weather: weather ? {
+        city: weather.city || null,
+        tempC: weather.temp_c ?? weather.temperature ?? null,
+        windKmh: weather.wind_kmh ?? weather.wind ?? null,
+        precipitationMm: weather.precip_mm ?? weather.precip ?? null
+      } : null,
+      tactical: {
+        formation: [homeLineup.formation, awayLineup.formation].filter(Boolean).join(' vs ') || null,
+        keySignals: Array.isArray(row?.pred?.contributions) ? row.pred.contributions.slice(0, 5) : []
+      },
+      sources: sourceNames.map((name) => sourceMap.get(name)).filter(Boolean).map((source) => ({
+        source: source.source,
+        status: source.status,
+        age: source.age,
+        blocksPick: source.blocksPick
+      })),
+      missingData: [...missing].filter(Boolean).slice(0, 12)
+    };
+  }
+
+  function attachV3Contracts(row, sourceHealthV5) {
+    if (!row || typeof row !== 'object') return row;
+    return {
+      ...row,
+      pickDecisionV3: buildPickDecisionV3(row),
+      matchSheetV3: buildMatchSheetV3(row, sourceHealthV5)
+    };
+  }
+
+  function buildMarketCoverageV2(audit, rows) {
+    const simpleFamilies = new Set(['1n2', 'ou', 'btts', 'players', 'halftime', 'tennis', 'sporttotal']);
+    const expertFamilies = new Set(['handicap', 'exactscore', 'cards', 'dnb', 'doublechance']);
+    const rowFamilies = new Map();
+    for (const row of Array.isArray(rows) ? rows : []) {
+      const group = simpleMarketGroup(row?.marketKey || row?.market);
+      const family = group === 'winner'
+        ? '1n2'
+        : group === 'goals'
+          ? 'ou'
+          : group === 'scorer'
+            ? 'players'
+            : group || canonicalMarketKey(row?.marketKey || row?.market || 'other');
+      rowFamilies.set(family, (rowFamilies.get(family) || 0) + 1);
+    }
+    const families = (Array.isArray(audit?.families) ? audit.families : []).map((family) => {
+      const key = String(family.family || 'other');
+      const standard = simpleFamilies.has(key) || ['winner', 'goals', 'btts', 'scorer', 'halftime'].includes(key);
+      const expert = expertFamilies.has(key);
+      const exploited = Number(family.exploited || 0) > 0 || rowFamilies.has(key);
+      let ignoredReason = null;
+      if (!exploited && expert) ignoredReason = 'Marché avancé réservé au Mode expert';
+      if (!exploited && key === 'other') ignoredReason = 'Famille trop large, à mapper avant affichage';
+      if (!exploited && standard) ignoredReason = 'Standard disponible mais pas assez de signaux exploitables';
+      return {
+        family: key,
+        label: family.label || formatMarketName(key),
+        available: Number(family.count || 0),
+        exploited: Math.max(Number(family.exploited || 0), Number(rowFamilies.get(key) || 0)),
+        standard,
+        expert,
+        ignoredReason
+      };
+    });
+    return {
+      schema: 'paris-sportif.market_coverage.v2',
+      generatedAt: new Date().toISOString(),
+      summary: {
+        availableFamilies: Number(audit?.summary?.availableFamilies || families.length || 0),
+        exploitedFamilies: families.filter((family) => family.exploited > 0).length,
+        dormantStandard: families.filter((family) => family.standard && family.exploited <= 0).length,
+        expertOnly: families.filter((family) => family.expert).length,
+        boostsDetected: Number(audit?.summary?.boostsDetected || 0)
+      },
+      families
+    };
+  }
+
+  function buildTerrainReportV2({ data, dashboardRows, todayFunnel, coverage24h, marketCoverageV2, sourceHealthV5, decisionCenter }) {
+    const events = eventListFromDays(data?.days || {});
+    const today = dayKeyParis(new Date());
+    const todayEvents = events.filter((event) => rowDayKey(event) === today);
+    const nightSummary = coverage24h?.summary || {};
+    const bottlenecks = [];
+    if (Number(todayFunnel?.today?.displayed || 0) < 20 && Number(todayFunnel?.today?.bookableEvents || 0) >= 50) {
+      bottlenecks.push('Volume visible sous la cible v3 malgré un catalogue riche');
+    }
+    if (Number(nightSummary.nightBookable || 0) >= 6 && Number(nightSummary.nightDisplayed || 0) < 6) {
+      bottlenecks.push('Couverture nuit sous la cible 6-10');
+    }
+    if (Number(marketCoverageV2?.summary?.dormantStandard || 0) > 0) {
+      bottlenecks.push('Familles simples disponibles mais non exploitées');
+    }
+    if (Number(sourceHealthV5?.summary?.blocksPick || 0) > 0) {
+      bottlenecks.push('Une source critique bloque des picks');
+    }
+    const ready = (dashboardRows || []).filter((row) => row?.pickDecisionV3?.canBet || row?.decisionCenter?.canBet);
+    return {
+      schema: 'paris-sportif.terrain_report.v2',
+      generatedAt: new Date().toISOString(),
+      counts: {
+        todayEvents: todayEvents.length,
+        todayWinamax: todayEvents.filter((event) => event?.winamax?.available === true).length,
+        displayed24h: rollingWindowRows(dashboardRows || [], 24).length,
+        dashboardRows: (dashboardRows || []).length,
+        ready: ready.length,
+        watch: (dashboardRows || []).filter((row) => !ready.includes(row)).length,
+        nightDisplayed: Number(nightSummary.nightDisplayed || 0),
+        nightBookable: Number(nightSummary.nightBookable || 0)
+      },
+      health: {
+        sourcesCritical: Number(sourceHealthV5?.summary?.critical || 0),
+        sourcesWarning: Number(sourceHealthV5?.summary?.warning || 0),
+        decisionBlocked: Boolean(decisionCenter?.summary?.blocked)
+      },
+      bottlenecks,
+      userPromise: {
+        visible24hTarget: '20-30',
+        readyTarget: '10-15 si catalogue exploitable',
+        nightTarget: '6-10 si events nuit suffisants',
+        homepage: 'Top 3 + tableau triable + catégories'
+      }
     };
   }
 
@@ -4142,6 +4516,8 @@ function createLegacyEngineService({ projectRoot }) {
     const sourceHealthReport = readSourceHealthReport();
     const clvSummaryReport = readClvSummaryReport();
     const picksHistorySummary = readPicksHistorySummary();
+    const healthReport = readHealthReport();
+    const sourceHealthV5 = buildSourceHealthV5(sourceHealthReport, healthReport);
     const modelRealityAudit = buildModelRealityAudit(picksHistorySummary);
     const events = dedupeUpcomingBookable(
       eventListFromDays(data.days).map((match) => attachWinamaxMarkets(match, playerOddsIndex))
@@ -4178,7 +4554,8 @@ function createLegacyEngineService({ projectRoot }) {
       .map((row) => applyDecisionCenter(row, decisionGates))
       .map((row) => applyWinamaxProductLayer(row))
       .map((row) => applySafeReliabilityLayer(row));
-    const prioritizedDecisionRows = applyPriorityScores(allDecisionRows);
+    const prioritizedDecisionRows = applyPriorityScores(allDecisionRows)
+      .map((row) => attachV3Contracts(row, sourceHealthV5));
     const matches = prioritizedDecisionRows.filter((row) => !row.isMarketAlternative);
     const seen = new Set();
     const picks = prioritizedDecisionRows
@@ -4210,7 +4587,7 @@ function createLegacyEngineService({ projectRoot }) {
       })
       .slice(0, 180);
     const dashboardCandidates = prioritizedDecisionRows
-      .filter(isDashboardDisplayCandidate)
+      .filter((row) => isDashboardDisplayCandidate(row) || isNightCoverageCandidate(row))
       .sort((a, b) => {
         const aWindow = rollingWindowRows([a], 24).length ? 1 : 0;
         const bWindow = rollingWindowRows([b], 24).length ? 1 : 0;
@@ -4226,11 +4603,21 @@ function createLegacyEngineService({ projectRoot }) {
     const todayFunnel = buildTodayFunnel(data, matches, dashboardCandidates, dashboard.rows);
     const coverage24h = buildRolling24hCoverage(data, matches, dashboardCandidates, dashboard.rows);
     const winamaxMarketAudit = buildWinamaxMarketAudit(enrichedEvents, prioritizedDecisionRows);
+    const marketCoverageV2 = buildMarketCoverageV2(winamaxMarketAudit, prioritizedDecisionRows);
     const combines = buildNativeCombines(win, enrichedEvents);
     const watchlist = buildWatchlist(matches);
     const decisionCenter = buildDecisionCenterReport(prioritizedDecisionRows, decisionGates);
     const agentPositions = prebetGate.blocked || criticalGate.blocked ? [] : buildAgentPositions(win, matches);
     const agentBlockers = buildAgentBlockers(matches, agentPositions, win);
+    const terrainReportV2 = buildTerrainReportV2({
+      data,
+      dashboardRows: dashboard.rows,
+      todayFunnel,
+      coverage24h,
+      marketCoverageV2,
+      sourceHealthV5,
+      decisionCenter
+    });
 
     const analysis = {
       ok: true,
@@ -4267,8 +4654,11 @@ function createLegacyEngineService({ projectRoot }) {
         qualityPolicy: dashboard.qualityPolicy || null
       },
       winamaxMarketAudit,
+      marketCoverageV2,
       todayFunnel,
       coverage24h,
+      sourceHealthV5,
+      terrainReportV2,
       decisionCenter,
       combines,
       scorers,

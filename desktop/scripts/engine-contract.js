@@ -100,6 +100,12 @@ function testAnalysis() {
   assert(analysis.todayFunnel && analysis.todayFunnel.schema === 'paris-sportif.today_funnel.v1', 'Funnel aujourd’hui absent', analysis.todayFunnel);
   assert(analysis.coverage24h && analysis.coverage24h.schema === 'paris-sportif.coverage_24h.v1', 'Couverture 24h absente', analysis.coverage24h);
   assert(analysis.winamaxMarketAudit && analysis.winamaxMarketAudit.schema === 'paris-sportif.winamax_market_audit.v1', 'Audit marchés Winamax absent', analysis.winamaxMarketAudit);
+  assert(analysis.sourceHealthV5 && analysis.sourceHealthV5.schema === 'paris-sportif.source_health.v5', 'SourceHealth v5 absent', analysis.sourceHealthV5);
+  assert(analysis.marketCoverageV2 && analysis.marketCoverageV2.schema === 'paris-sportif.market_coverage.v2', 'MarketCoverage v2 absent', analysis.marketCoverageV2);
+  assert(analysis.terrainReportV2 && analysis.terrainReportV2.schema === 'paris-sportif.terrain_report.v2', 'TerrainReport v2 absent', analysis.terrainReportV2);
+  assert(Array.isArray(analysis.sourceHealthV5.sources) && analysis.sourceHealthV5.sources.length >= 5 && analysis.sourceHealthV5.sources.length <= 25, 'SourceHealth v5 incohérent', analysis.sourceHealthV5.summary);
+  assert(Array.isArray(analysis.marketCoverageV2.families) && analysis.marketCoverageV2.families.length >= 8, 'MarketCoverage v2 sans familles', analysis.marketCoverageV2);
+  assert(Number(analysis.terrainReportV2.counts?.dashboardRows || 0) === analysis.dashboardPicks.length, 'TerrainReport v2 ne reflète pas le cockpit', analysis.terrainReportV2.counts);
   assert(Number(analysis.winamaxMarketAudit.summary?.availableFamilies || 0) >= 8, 'Pas assez de familles de marchés Winamax détectées', analysis.winamaxMarketAudit.summary);
   const availableFamilies = Number(analysis.winamaxMarketAudit.summary?.availableFamilies || 0);
   const exploitedFamilies = Number(analysis.winamaxMarketAudit.summary?.exploitedFamilies || 0);
@@ -116,6 +122,10 @@ function testAnalysis() {
     assert(Number(pick.probability) > 0 && Number(pick.probability) <= 1, 'Pick avec probabilité invalide', pick);
     assert(Number(pick.edge) > 0, 'Pick sans edge positif', pick);
     assert(pick.decisionCenter && typeof pick.decisionCenter.canBet === 'boolean', 'Pick sans décision centrale', pick);
+    assert(pick.pickDecisionV3 && pick.pickDecisionV3.schema === 'paris-sportif.pick_decision.v3', 'PickDecision v3 absent', pick);
+    assert(typeof pick.pickDecisionV3.canBet === 'boolean' && typeof pick.pickDecisionV3.why === 'string' && pick.pickDecisionV3.why.length >= 20, 'PickDecision v3 incomplet', pick.pickDecisionV3);
+    assert(pick.matchSheetV3 && pick.matchSheetV3.schema === 'paris-sportif.match_sheet.v3', 'MatchSheet v3 absente', pick);
+    assert(pick.matchSheetV3.summary && Array.isArray(pick.matchSheetV3.missingData), 'MatchSheet v3 incomplète', pick.matchSheetV3);
     assert(pick.segmentValidation && Number(pick.segmentValidation.realConfidence || 0) > 0, 'Pick sans validation historique réelle', pick);
     assert(Number(pick.adjustedConfidence || 0) > 0, 'Pick sans confiance ajustée', pick);
     assert(pick.winamaxBetType && pick.winamaxBetType.label, 'Pick sans type de pari Winamax conseillé', pick);

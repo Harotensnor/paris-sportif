@@ -5,6 +5,17 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-17
 
+### Version v3.0.0 — Pronostics Pro Winamax : contrats v3 + terrain durci
+
+Socle v3 du plan 500 points, sans changer la règle produit : 100% Winamax, mode standard simple, expert caché.
+- Ajout des contrats moteur `PickDecision v3`, `MatchSheet v3`, `SourceHealth v5`, `MarketCoverage v2` et `TerrainReport v2` pour que chaque pick expose mise, raison, risque, qualité source, marché, règles Winamax et données manquantes.
+- Fiches match renforcées : chaque ligne cockpit transporte maintenant un dossier structuré avec résumé, compos, joueurs, forme, H2H, absences, coach, arbitre, météo, tactique, sources et `missingData` sans inventer de faux zéros.
+- Rapport terrain v2 : volume 24h, prêts, observation, nuit, sources et goulets d'étranglement sont calculés par le moteur et vérifiés par `qa:terrain`.
+- Couverture marchés v2 : familles Winamax disponibles/exploitées/standard/expert/dormantes sont exposées pour prioriser le prochain travail de volume sans rouvrir les marchés complexes.
+- Santé sources v5 : snapshots préservés, blocages éventuels et âge/TTL sont normalisés pour éviter qu'une source vide casse silencieusement les pronostics.
+- Interface : la fiche détail affiche un bloc compact `Dossier pronostic v3` avec qualité source, sections remplies et manques à enrichir.
+- Tests renforcés : `qa:engine` et `qa:terrain` vérifient désormais les contrats v3 sur les vraies lignes cockpit.
+
 ### Version v2.4.0 — Accueil ultra-compact + Vainqueurs 2-0 + source guard
 
 Corrections terrain après relance réelle de la pipeline et contrôle via le raccourci Windows.
