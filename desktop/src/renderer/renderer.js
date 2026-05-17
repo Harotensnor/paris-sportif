@@ -3350,7 +3350,7 @@
       }).filter(Boolean).slice(-5);
     }
     const raw = String(side?.team_form_l5 || side?.form || '').slice(0, 5);
-    const frenchMode = /[VN]/i.test(raw);
+    const frenchMode = /[VP]/i.test(raw) || (/[N]/i.test(raw) && !/[WL]/i.test(raw));
     return raw.split('').map((letter) => normalize(letter, frenchMode)).filter(Boolean);
   }
 
@@ -3396,7 +3396,7 @@
   function formSummaryFromCodeSequence(value) {
     const raw = String(value || '').trim().toUpperCase().replace(/[^WVNDL]/g, '').slice(0, 5);
     if (!raw) return '';
-    const frenchMode = /[VN]/.test(raw);
+    const frenchMode = /[VP]/.test(raw) || (/[N]/.test(raw) && !/[WL]/.test(raw));
     const mapped = raw.split('').map((letter) => {
       if (letter === 'W' || letter === 'V') return 'W';
       if (letter === 'L') return 'L';
@@ -3430,6 +3430,31 @@
       </div>
     `;
     return `<div class="form-strip">${render(home.name || 'Domicile', formLetters(home))}${render(away.name || 'Extérieur', formLetters(away))}</div>`;
+  }
+
+  function matchupFormCardHtml(row) {
+    const render = (side) => {
+      const context = teamContext(row, side);
+      const letters = formLetters(context || {});
+      const summary = sideFormText(context);
+      return `
+        <div class="team-form-mini">
+          <span>${escapeHtml(teamDisplayName(row, side))}</span>
+          <div class="form-strip-results">${letters.map(formBadgeHtml).join('') || '<em>Forme indisponible</em>'}</div>
+          <small>${escapeHtml(summary)}</small>
+        </div>
+      `;
+    };
+    return `
+      <div class="form-matchup-card">
+        <span>Forme récente</span>
+        <div class="form-matchup-grid">
+          ${render('home')}
+          ${render('away')}
+        </div>
+        <em>${escapeHtml(`${sideGoalText(teamContext(row, 'home'))} / ${sideGoalText(teamContext(row, 'away'))}`)}</em>
+      </div>
+    `;
   }
 
   function pickNarrative(row, signalPreview, fallback) {
@@ -4233,11 +4258,7 @@
         ${buildLineupPitch(row)}
         ${buildCoachTacticsHtml(row)}
         <div class="sport-insight-grid">
-          <div>
-            <span>Forme récente</span>
-            <strong>${escapeHtml(teamDisplayName(row, 'home'))} : ${escapeHtml(sideFormText(home))} · ${escapeHtml(teamDisplayName(row, 'away'))} : ${escapeHtml(sideFormText(away))}</strong>
-            <em>${escapeHtml(`${sideGoalText(home)} / ${sideGoalText(away)}`)}</em>
-          </div>
+          ${matchupFormCardHtml(row)}
           <div>
             <span>Arbitre</span>
             <strong>${escapeHtml(referee.name || 'Données arbitre non disponibles')}</strong>
