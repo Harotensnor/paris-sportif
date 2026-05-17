@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-17T02:17:33Z",
+  "generated_at": "2026-05-17T02:21:38Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -162,6 +162,88 @@
             "hr9": 1.38,
             "era": 4.15,
             "whip": 1.38
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815376",
+      "kickoff": "2026-05-17T17:35Z",
+      "league": "MLB",
+      "match": "Boston Red Sox at Atlanta Braves",
+      "home": "Atlanta Braves",
+      "away": "Boston Red Sox",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Atlanta Braves",
+          "pitcher": "Grant Holmes",
+          "label": "Grant Holmes moins de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "under",
+          "probability": 0.5683,
+          "fair_odds": 1.76,
+          "expected_strikeouts": 4.22,
+          "projected_ip": 5.14,
+          "inputs": {
+            "k9": 7.4,
+            "era": 4.35,
+            "whip": 1.31,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Atlanta Braves",
+          "pitcher": "Grant Holmes",
+          "label": "Grant Holmes concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5801,
+          "fair_odds": 1.72,
+          "expected_hr_allowed": 0.868,
+          "projected_ip": 5.14,
+          "inputs": {
+            "hr9": 1.52,
+            "era": 4.35,
+            "whip": 1.31
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Boston Red Sox",
+          "pitcher": "Brayan Bello",
+          "label": "Brayan Bello plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.5767,
+          "fair_odds": 1.73,
+          "expected_strikeouts": 4.83,
+          "projected_ip": 6.5,
+          "inputs": {
+            "k9": 6.69,
+            "era": 6.46,
+            "whip": 1.74,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Boston Red Sox",
+          "pitcher": "Brayan Bello",
+          "label": "Brayan Bello concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.7371,
+          "fair_odds": 1.36,
+          "expected_hr_allowed": 1.336,
+          "projected_ip": 6.5,
+          "inputs": {
+            "hr9": 1.85,
+            "era": 6.46,
+            "whip": 1.74
           },
           "side": "away"
         }
@@ -574,6 +656,52 @@
             "whip": 1.42
           },
           "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815384",
+      "kickoff": "2026-05-17T18:10Z",
+      "league": "MLB",
+      "match": "Milwaukee Brewers at Minnesota Twins",
+      "home": "Minnesota Twins",
+      "away": "Milwaukee Brewers",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Minnesota Twins",
+          "pitcher": "Bailey Ober",
+          "label": "Bailey Ober moins de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "under",
+          "probability": 0.5409,
+          "fair_odds": 1.85,
+          "expected_strikeouts": 4.33,
+          "projected_ip": 5.78,
+          "inputs": {
+            "k9": 6.75,
+            "era": 3.46,
+            "whip": 1.02,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Minnesota Twins",
+          "pitcher": "Bailey Ober",
+          "label": "Bailey Ober ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5721,
+          "fair_odds": 1.75,
+          "expected_hr_allowed": 0.559,
+          "projected_ip": 5.78,
+          "inputs": {
+            "hr9": 0.87,
+            "era": 3.46,
+            "whip": 1.02
+          },
+          "side": "home"
         }
       ]
     },
@@ -998,7 +1126,7 @@
       ]
     }
   ],
-  "props": 48,
+  "props": 54,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
