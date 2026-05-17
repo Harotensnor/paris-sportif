@@ -1,24 +1,25 @@
 {
-  "generated_at": "2026-05-17T08:04:42Z",
+  "generated_at": "2026-05-17T08:10:47Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 63,
+    "active_events": 64,
     "actionable": 17,
-    "watch": 1,
+    "watch": 2,
     "risk": 45,
     "expired_sample": 0,
     "by_type": {
-      "market_uncertain": 48,
+      "market_uncertain": 46,
       "injury_imbalance": 17,
+      "market_move": 1,
       "back_to_back_travel": 8,
       "signal_conflict": 5
     },
     "by_quality": {
       "risk": 45,
       "actionable": 17,
-      "watch": 1
+      "watch": 2
     }
   },
   "active_actionable": [
@@ -347,6 +348,24 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 14-11"
+    },
+    {
+      "event_id": "750218",
+      "date": "2026-05-17T17:00Z",
+      "sport": "football",
+      "league_code": "superlig",
+      "league_name": "Süper Lig",
+      "home": "Fenerbahce",
+      "away": "Eyupspor",
+      "match": "Fenerbahce - Eyupspor",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.49,
+      "context": "Cote away: 8.50 -> 7.75 (+8.8%)"
     }
   ],
   "active_risk": [
