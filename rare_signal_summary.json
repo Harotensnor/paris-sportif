@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-05-17T20:33:34Z",
+  "generated_at": "2026-05-17T20:43:32Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 44,
+    "active_events": 46,
     "actionable": 7,
-    "watch": 1,
+    "watch": 3,
     "risk": 36,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 4,
+      "market_move": 6,
       "back_to_back_travel": 3,
-      "market_move": 4,
       "market_uncertain": 38,
       "signal_conflict": 1
     },
     "by_quality": {
       "actionable": 7,
-      "watch": 1,
+      "watch": 3,
       "risk": 36
     }
   },
@@ -152,6 +152,24 @@
   ],
   "active_watch": [
     {
+      "event_id": "401872573",
+      "date": "2026-05-18T01:00Z",
+      "sport": "football",
+      "league_code": "ligamx",
+      "league_name": "Liga MX",
+      "home": "Pumas UNAM",
+      "away": "Pachuca",
+      "match": "Pumas UNAM - Pachuca",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 0.591,
+      "context": "Cote home: 2.35 -> 2.10 (+10.6%)"
+    },
+    {
       "event_id": "178339",
       "date": "2026-05-18T08:00Z",
       "sport": "tennis",
@@ -168,27 +186,27 @@
       "side": "away",
       "strength": 0.534,
       "context": "Cote away: 2.60 -> 2.85 (-9.6%)"
+    },
+    {
+      "event_id": "401856914",
+      "date": "2026-05-17T23:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Minnesota Lynx",
+      "away": "Chicago Sky",
+      "match": "Minnesota Lynx - Chicago Sky",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.496,
+      "context": "Cote away: 2.80 -> 2.55 (+8.9%)"
     }
   ],
   "active_risk": [
-    {
-      "event_id": "175450",
-      "date": "2026-05-19T04:00Z",
-      "sport": "tennis",
-      "league_code": "bitpandahamburgopen",
-      "league_name": "Bitpanda Hamburg Open",
-      "home": "",
-      "away": "",
-      "match": "? - ?",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 12.1%"
-    },
     {
       "event_id": "176120",
       "date": "2026-05-19T04:00Z",
@@ -206,6 +224,24 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 12.0%"
+    },
+    {
+      "event_id": "175450",
+      "date": "2026-05-19T04:00Z",
+      "sport": "tennis",
+      "league_code": "bitpandahamburgopen",
+      "league_name": "Bitpanda Hamburg Open",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 12.1%"
     },
     {
       "event_id": "178349",
