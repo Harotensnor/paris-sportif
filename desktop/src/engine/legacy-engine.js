@@ -670,7 +670,7 @@ function createLegacyEngineService({ projectRoot }) {
     const key = String(value || '').trim();
     const normalized = key.toLowerCase().replace(/[\s_-]+/g, '');
     const labels = {
-      '1n2': '1N2',
+      '1n2': 'Vainqueur du match',
       matchwinner: 'Vainqueur',
       teamtotal: 'Total équipe',
       basketballtotal: 'Total basket',
@@ -680,9 +680,9 @@ function createLegacyEngineService({ projectRoot }) {
       httotal: 'Total mi-temps',
       htou: 'Total mi-temps',
       halftimetotal: 'Total mi-temps',
-      ht1n2: '1N2 mi-temps',
-      btts: 'BTTS',
-      resultbtts: 'Résultat + BTTS',
+      ht1n2: 'Vainqueur mi-temps',
+      btts: 'Les deux équipes marquent',
+      resultbtts: 'Résultat + les deux marquent',
       doublechance: 'Double chance',
       handicap: 'Handicap',
       dnb: 'Remboursé si nul',
@@ -1447,9 +1447,9 @@ function createLegacyEngineService({ projectRoot }) {
 
   function winamaxMarketFamilyLabel(family) {
     const labels = {
-      '1n2': '1N2',
+      '1n2': 'Vainqueur du match',
       doublechance: 'Double chance',
-      btts: 'BTTS',
+      btts: 'Les deux équipes marquent',
       corners: 'Corners',
       cards: 'Cartons',
       halftime: 'Mi-temps',
@@ -1461,7 +1461,7 @@ function createLegacyEngineService({ projectRoot }) {
       basket: 'Basket totals',
       tennis: 'Tennis',
       sporttotal: 'Totals sport',
-      ou: 'Over/Under',
+      ou: 'Plus / Moins',
       other: 'Autres marchés'
     };
     return labels[family] || String(family || 'Marché');
@@ -1557,7 +1557,7 @@ function createLegacyEngineService({ projectRoot }) {
       return {
         type: 'Single',
         label: 'Single Winamax',
-        reason: 'Marché lisible avec edge positif : le single garde la variance sous contrôle.'
+        reason: 'Marché lisible avec avantage positif : le single garde la variance sous contrôle.'
       };
     }
     if (row?.isMarketAlternative) {
@@ -3351,6 +3351,14 @@ function createLegacyEngineService({ projectRoot }) {
     const sortedTodayDisplayable = sortRows(todayRows.filter(isDashboardDisplayCandidate));
     const twoGoalWinnerRows = sortRows(sourcePicks.filter((row) => row?.winamaxTwoGoalRule?.eligible && isDashboardDisplayCandidate(row)));
     const winnerRows = sortRows(sourcePicks.filter((row) => simpleMarketGroup(row?.marketKey || row?.market) === 'winner' && isDashboardDisplayCandidate(row)));
+    const sportDiversityRows = [];
+    const sportsAlreadySeen = new Set();
+    for (const row of sortRows(sourcePicks.filter(isDashboardDisplayCandidate))) {
+      const key = sportKey(row);
+      if (!key || key === 'sport' || sportsAlreadySeen.has(key)) continue;
+      sportsAlreadySeen.add(key);
+      sportDiversityRows.push(row);
+    }
     // Sprint 43 (P2 audit) : buteurs explicitement injectés dans le dashboard.
     // Sans cette injection, les buteurs avec cote Winamax confirmée mais
     // confiance < 55% restent invisibles à cause du quota market.
@@ -3390,6 +3398,14 @@ function createLegacyEngineService({ projectRoot }) {
           relaxMarket: true
         });
       }
+    }
+    if (sportDiversityRows.length) {
+      addFinalRows(sportDiversityRows, Math.min(maxDashboardRows, finalRows.length + sportDiversityRows.length), {
+        matchCap: maxPerMatch,
+        relaxSport: true,
+        relaxLeague: true,
+        relaxMarket: true
+      });
     }
     if (winnerRows.length) {
       // Quota Vainqueurs renforcé : cible 50% du cockpit standard pour

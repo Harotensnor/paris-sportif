@@ -50,6 +50,10 @@ function diskPathFor(key) {
   return path.join(STATE.cacheDir, `${key}.json`);
 }
 
+function isLocalImageUrl(url) {
+  return !url || String(url).startsWith('/api/images/cache/');
+}
+
 function readDiskCache(key) {
   const fp = diskPathFor(key);
   if (!fp) return null;
@@ -59,6 +63,7 @@ function readDiskCache(key) {
     const parsed = JSON.parse(raw);
     if (!parsed || typeof parsed !== 'object') return null;
     if (typeof parsed.expiresAt === 'number' && parsed.expiresAt > Date.now()) {
+      if (!parsed.miss && !isLocalImageUrl(parsed.url)) return null;
       return parsed;
     }
     return null;
@@ -91,6 +96,51 @@ function rememberCache(key, url, ttlMs, miss = false) {
   }
   writeDiskCache(key, payload);
   return payload;
+}
+
+function extensionFromContentType(contentType = '') {
+  const ct = String(contentType || '').toLowerCase();
+  if (ct.includes('png')) return '.png';
+  if (ct.includes('webp')) return '.webp';
+  if (ct.includes('jpeg') || ct.includes('jpg')) return '.jpg';
+  if (ct.includes('gif')) return '.gif';
+  return '.jpg';
+}
+
+async function fetchImageBuffer(url, { timeoutMs = 8000 } = {}) {
+  const controller = new AbortController();
+  const tid = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const response = await fetch(url, {
+      headers: { 'User-Agent': USER_AGENT, Accept: 'image/avif,image/webp,image/png,image/jpeg,image/*;q=0.8' },
+      signal: controller.signal,
+    });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const contentType = response.headers.get('content-type') || '';
+    if (!/^image\//i.test(contentType)) throw new Error(`Content-Type invalide: ${contentType || 'inconnu'}`);
+    const arrayBuffer = await response.arrayBuffer();
+    return { buffer: Buffer.from(arrayBuffer), contentType };
+  } finally {
+    clearTimeout(tid);
+  }
+}
+
+async function cacheRemoteImage(key, remoteUrl) {
+  if (!STATE.cacheDir || !remoteUrl) return null;
+  try {
+    const { buffer, contentType } = await fetchImageBuffer(remoteUrl);
+    if (!buffer.length || buffer.length > 3 * 1024 * 1024) return null;
+    const ext = extensionFromContentType(contentType);
+    const fileName = `${key}${ext}`;
+    const filePath = path.join(STATE.cacheDir, fileName);
+    const tmp = `${filePath}.${process.pid}.tmp`;
+    ensureDir(STATE.cacheDir);
+    fs.writeFileSync(tmp, buffer);
+    fs.renameSync(tmp, filePath);
+    return `/api/images/cache/${fileName}`;
+  } catch {
+    return null;
+  }
 }
 
 function rateLimitWait() {
@@ -270,7 +320,7 @@ async function lookupImage(kind, name, hints = {}) {
 
   // 1) In-memory cache
   const mem = STATE.cache.get(key);
-  if (mem && mem.expiresAt > Date.now()) {
+  if (mem && mem.expiresAt > Date.now() && (mem.miss || isLocalImageUrl(mem.url))) {
     return { ok: !mem.miss, url: mem.url, miss: Boolean(mem.miss), cached: 'memory' };
   }
 
@@ -290,7 +340,8 @@ async function lookupImage(kind, name, hints = {}) {
     try {
       const pixelSize = safeKind === 'team' ? 200 : 160;
       const ttlMs = safeKind === 'team' ? LOGO_TTL_MS : PLAYER_TTL_MS;
-      const url = await resolveImage(safeKind, safeName, hints, { pixelSize, ttlMs });
+      const remoteUrl = await resolveImage(safeKind, safeName, hints, { pixelSize, ttlMs });
+      const url = await cacheRemoteImage(key, remoteUrl);
       const payload = rememberCache(key, url, url ? ttlMs : MISS_TTL_MS, !url);
       return { ok: Boolean(url), url: payload.url, miss: !url, cached: 'fresh' };
     } catch (err) {

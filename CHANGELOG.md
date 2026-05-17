@@ -5,6 +5,20 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-17
 
+### Hotfix v2.2.1 — Audit terrain pronostics + cohérence cockpit
+
+Corrections ciblées après audit terrain de l'accueil et des fiches match.
+- Pipeline réelle vérifiée : `157` événements Winamax aujourd'hui, `150` signaux simples positifs, `18` lignes affichées aujourd'hui, `30` lignes cockpit et `25` opportunités sur 24h.
+- La sélection finale réserve maintenant de la place aux sports sous-représentés quand ils ont au moins un signal exploitable : football, tennis, basket, baseball et hockey remontent dans le cockpit au lieu de disparaître derrière le football.
+- Le Top 3 “prochaines 24h” est réellement trié par confiance puis cote, comme annoncé à l'écran.
+- Le badge de navigation “À miser” compte le même périmètre 24h que l'accueil, ce qui corrige l'écart visible entre le menu et le bandeau.
+- Les fiches match évitent les informations fausses ou faibles : plus de gardien proposé comme buteur probable, plus de duels tactiques gardien vs joueur, forme récente corrigée en victoires réelles, champion passé affiché seulement quand connu.
+- Les données manquantes sont mieux présentées : H2H, arbitre, coach et segments courts affichent un message honnête au lieu de `0`, `N/A` ou “insuffisant” incohérent.
+- La recherche deep n'affiche plus une énorme liste avant saisie : l'utilisateur tape d'abord une équipe, un joueur ou une ligue.
+- Le vocabulaire standard a été nettoyé : `edge`, `Kelly`, `1N2`, `BTTS` restants remplacés par `avantage`, `mise prudente`, `vainqueur du match`, `les deux marquent` sur les surfaces utilisateur.
+- L'alerte “données > 30 min” ne pollue plus l'accueil sur un snapshot encore utilisable ; le refresh automatique reste déclenché quand la donnée locale commence vraiment à dater.
+- Validation : `qa:engine`, `qa:terrain:quick`, `qa:desktop`, `qa:safe`, `qa:winamax-audit`, `qa:a11y` et capture visuelle Electron relancés sur les données terrain.
+
 ### Version v2.2.0 — Pronostics focus + accueil compact par catégories
 
 Refonte ciblée après audit terrain de la page “À miser”.

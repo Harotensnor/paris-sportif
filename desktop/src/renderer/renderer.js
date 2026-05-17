@@ -209,7 +209,7 @@
   ];
   const MARKET_PREFS = [...SIMPLE_MARKET_PREFS, ...ADVANCED_MARKET_PREFS];
   const DEFAULT_PREFERENCES = {
-    preferenceSchemaVersion: 18,
+    preferenceSchemaVersion: 19,
     bankroll: 50,
     level: 'intermediate',
     sports: SPORTS_PREFS,
@@ -226,7 +226,7 @@
     notifyQuietHoursOff: false, // Sprint 63 — opt-in pour notifs 23h-7h
     stakeMode: 'kelly',
     allocationStrategy: 'moderate',
-    dailyBudgetPct: 5,
+    dailyBudgetPct: 10,
     flatUnitPct: 1,
     maxStakePct: 5,
     stopLossPct: 5,
@@ -275,9 +275,9 @@
   };
   const REFRESH_DEFAULT_INTERVAL_MS = 30 * 60 * 1000;
   const ALLOCATION_STRATEGIES = {
-    conservative: { key: 'conservative', label: 'Conservateur', budgetPct: 3, maxPicks: 5, detail: '3% bankroll/jour, top 5 picks.' },
-    moderate: { key: 'moderate', label: 'Modéré', budgetPct: 5, maxPicks: 10, detail: '5% bankroll/jour, top 10 picks.' },
-    aggressive: { key: 'aggressive', label: 'Agressif', budgetPct: 8, maxPicks: 15, detail: '8% bankroll/jour, top 15 picks.' }
+    conservative: { key: 'conservative', label: 'Conservateur', budgetPct: 5, maxPicks: 5, detail: '5% bankroll/jour, top 5 picks.' },
+    moderate: { key: 'moderate', label: 'Modéré', budgetPct: 10, maxPicks: 10, detail: '10% bankroll/jour, top 10 picks.' },
+    aggressive: { key: 'aggressive', label: 'Agressif', budgetPct: 15, maxPicks: 15, detail: '15% bankroll/jour, top 15 picks.' }
   };
   const ALLOCATION_SHARES = [25, 20, 15, 10, 10, 5, 5, 5, 5, 5, 3, 3, 3, 3, 3];
   const REFRESH_LIVE_INTERVAL_MS = 2 * 60 * 1000;
@@ -491,9 +491,14 @@
     try {
       const parsed = JSON.parse(localStorage.getItem(USER_PREFS_KEY) || 'null');
       if (!parsed || typeof parsed !== 'object') return { ...DEFAULT_PREFERENCES };
+      const migratedDailyBudget = (Number(parsed.preferenceSchemaVersion || 0) < 19 && String(parsed.allocationStrategy || 'moderate') === 'moderate' && Number(parsed.dailyBudgetPct || 0) <= 5)
+        ? DEFAULT_PREFERENCES.dailyBudgetPct
+        : parsed.dailyBudgetPct;
       return {
         ...DEFAULT_PREFERENCES,
         ...parsed,
+        dailyBudgetPct: migratedDailyBudget ?? DEFAULT_PREFERENCES.dailyBudgetPct,
+        preferenceSchemaVersion: DEFAULT_PREFERENCES.preferenceSchemaVersion,
         sports: parsed.preferenceSchemaVersion >= 12
           ? (Array.isArray(parsed.sports) && parsed.sports.length ? parsed.sports : DEFAULT_PREFERENCES.sports)
           : mergePreferenceList(parsed.sports, DEFAULT_PREFERENCES.sports),
@@ -570,7 +575,7 @@
       return Array.isArray(rows) ? rows.filter((row) => row && typeof row === 'object') : [];
     } catch (error) {
       pushLog('error', `Paris suivis illisibles: ${error.message}`);
-      attemptProfileRestoreFromBackup('Paris suivis corrompus').catch(() => {});
+      attemptProfileRestoreFromBackup('Paris suivis corrompus').catch((restoreError) => pushLog('warn', `Restauration profil impossible: ${restoreError.message}`));
       return [];
     }
   }
@@ -961,7 +966,7 @@
       if (prefs.bugReportPrompt !== false && localStorage.getItem(BUG_REPORT_PROMPT_KEY) !== 'never') {
         showBugReportModal({ type: 'auto-error', description: 'Erreur détectée automatiquement.', error });
       } else {
-        sendBugReport({ type: 'auto-error', description: 'Erreur détectée automatiquement.', error }).catch(() => {});
+        sendBugReport({ type: 'auto-error', description: 'Erreur détectée automatiquement.', error }).catch((reportError) => pushLog('warn', `Rapport bug non envoyé: ${reportError.message}`));
       }
     });
     window.addEventListener('unhandledrejection', (event) => {
@@ -971,7 +976,7 @@
       if (prefs.bugReportPrompt !== false && localStorage.getItem(BUG_REPORT_PROMPT_KEY) !== 'never') {
         showBugReportModal({ type: 'auto-rejection', description: 'Erreur asynchrone détectée.', error: reason });
       } else {
-        sendBugReport({ type: 'auto-rejection', description: 'Erreur asynchrone détectée.', error: reason }).catch(() => {});
+        sendBugReport({ type: 'auto-rejection', description: 'Erreur asynchrone détectée.', error: reason }).catch((reportError) => pushLog('warn', `Rapport bug async non envoyé: ${reportError.message}`));
       }
     });
   }
@@ -1770,7 +1775,11 @@
       const sharePct = rawShares[index] / totalRaw;
       const allocated = budget * sharePct;
       const cap = modelStakeAmount(row);
-      const stake = Math.max(0, Number(Math.min(allocated, cap).toFixed(2)));
+      const minReadableStake = bankroll >= 50 && index < 2 ? 1 : bankroll >= 20 && index === 0 ? 0.5 : 0;
+      const rawStake = Math.min(allocated, cap);
+      const stake = rawStake > 0
+        ? Number(Math.max(rawStake, Math.min(minReadableStake, cap)).toFixed(2))
+        : 0;
       return {
         row,
         key: userBetKey(row),
@@ -1868,7 +1877,7 @@
       blocked: false,
       tone: 'ok',
       label: 'Discipline OK',
-      detail: `${prefs.stakeMode === 'flat' ? 'Flat 1u' : 'Kelly plafonné'} · cap ${Number(prefs.maxStakePct || 5).toFixed(1)}% bankroll.`
+      detail: `${prefs.stakeMode === 'flat' ? 'Mise fixe 1 unité' : 'Mise prudente plafonnée'} · cap ${Number(prefs.maxStakePct || 5).toFixed(1)}% bankroll.`
     };
   }
 
@@ -2234,7 +2243,7 @@
       : autoTrackingStopped() ? 'Stoppé pour aujourd’hui' : 'Inactif';
     node.innerHTML = `
       <strong>${escapeHtml(status)}</strong>
-      <p>Règle : ${escapeHtml(prefs.autoTrackingLevel || 'top')} · edge min ${escapeHtml(`${prefs.autoTrackingEdgeMin || 0}%`)} · ${formatCount(prefs.autoTrackingDailyLimit || 0)} pari(s)/jour.</p>
+      <p>Règle : ${escapeHtml(prefs.autoTrackingLevel || 'top')} · avantage min ${escapeHtml(`${prefs.autoTrackingEdgeMin || 0}%`)} · ${formatCount(prefs.autoTrackingDailyLimit || 0)} pari(s)/jour.</p>
       ${rows.length ? rows.map((row) => `<p>${escapeHtml(formatDateTime(row.at))} · ${escapeHtml(row.status)} · ${escapeHtml(row.title || '-')} · ${escapeHtml(row.label || '-')} · ${escapeHtml(row.stake != null ? formatMoney(row.stake) : '-')}</p>`).join('') : '<p>Aucun pick auto-tracké ou simulé.</p>'}
     `;
   }
@@ -3430,7 +3439,15 @@
   }
 
   function previousChampionForLeague(league) {
-    return league ? 'à confirmer via enrichissement web' : 'champion passé non confirmé localement';
+    const name = normalizeUiKey(league || '');
+    const known = {
+      'seriea': 'Napoli',
+      'premierleague': 'Liverpool',
+      'laliga': 'Barcelona',
+      'ligue1': 'Paris Saint-Germain',
+      'bundesliga': 'Bayern Munich'
+    };
+    return known[name] || '';
   }
 
   function seasonStakeText(row) {
@@ -3540,10 +3557,31 @@
     const enriched = players.map((player) => {
       const star = player.star || stars.get(normalizeUiKey(player.name || '')) || {};
       const stats = playerAdvancedStats(player, star);
-      const score = Number(stats.formScore || 0) + Number(stats.xgSeason || 0) * 0.4 + Number(stats.xaSeason || 0) * 0.35 + Number(stats.goals || 0) * 0.25;
+      const pos = String(player.pos || player.position || star.position || '').toLowerCase();
+      const roleBonus = /^(f|a|st|fw|att|wing|ail)/i.test(pos) ? 2.5
+        : /^(m|mid|mil)/i.test(pos) ? 1.2
+          : /^(g|gb|gk|keeper|goal)/i.test(pos) ? -4
+            : 0;
+      const score = Number(stats.formScore || 0) + Number(stats.xgSeason || 0) * 0.4 + Number(stats.xaSeason || 0) * 0.35 + Number(stats.goals || 0) * 0.25 + roleBonus;
       return { player, star, stats, score };
     });
     return enriched.sort((a, b) => b.score - a.score).slice(0, 3);
+  }
+
+  function playerPositionText(item) {
+    return String(item?.player?.pos || item?.player?.position || item?.star?.position || '').toLowerCase();
+  }
+
+  function isKeeperEntry(item) {
+    return /^(g|gb|gk|keeper|goal)/i.test(playerPositionText(item));
+  }
+
+  function isAttackingEntry(item) {
+    return /^(f|a|st|fw|att|wing|ail)/i.test(playerPositionText(item));
+  }
+
+  function isDefensiveEntry(item) {
+    return /^(d|def|cb|lb|rb|dc|lat)/i.test(playerPositionText(item));
   }
 
   function buildKeyPlayersHtml(row) {
@@ -3590,14 +3628,21 @@
   }
 
   function buildTacticalDuelsHtml(row) {
-    const home = keyPlayersForSide(row, 'home');
-    const away = keyPlayersForSide(row, 'away');
+    const home = keyPlayersForSide(row, 'home').filter((item) => !isKeeperEntry(item));
+    const away = keyPlayersForSide(row, 'away').filter((item) => !isKeeperEntry(item));
     const duels = [];
-    if (home[0] && away[0]) duels.push([home[0], away[0], 'Duel principal']);
-    if (home[1] && away[1]) duels.push([home[1], away[1], 'Création vs bloc adverse']);
-    if (home[2] && away[2]) duels.push([home[2], away[2], 'Impact banc / second rideau']);
+    const homeAttack = home.find(isAttackingEntry) || home[0];
+    const awayDefense = away.find(isDefensiveEntry) || away[1] || away[0];
+    const awayAttack = away.find(isAttackingEntry) || away[0];
+    const homeDefense = home.find(isDefensiveEntry) || home[1] || home[0];
+    const homeCreator = home.find((item) => !isAttackingEntry(item) && !isDefensiveEntry(item)) || home[1];
+    const awayMid = away.find((item) => !isAttackingEntry(item) && !isDefensiveEntry(item)) || away[1];
+    if (homeAttack && awayDefense && homeAttack !== awayDefense) duels.push([homeAttack, awayDefense, 'Attaque domicile vs défense extérieure']);
+    if (awayAttack && homeDefense && awayAttack !== homeDefense) duels.push([awayAttack, homeDefense, 'Attaque extérieure vs défense domicile']);
+    if (homeCreator && awayMid && homeCreator !== awayMid) duels.push([homeCreator, awayMid, 'Création au milieu']);
     const homeStyle = inferFootballStyle(teamContext(row, 'home'));
     const awayStyle = inferFootballStyle(teamContext(row, 'away'));
+    if (!duels.length) return '';
     return `
       <article class="detail-card wide tactical-card">
         <h4>${escapeHtml(t('tacticalAnalysis'))}</h4>
@@ -3607,7 +3652,7 @@
           <em>${escapeHtml(`${teamDisplayName(row, 'away')} : ${awayStyle}`)}</em>
         </div>
         <div class="tactical-duel-grid">
-          ${duels.length ? duels.map(([left, right, label]) => {
+          ${duels.map(([left, right, label]) => {
             const leftStats = left.stats || {};
             const rightStats = right.stats || {};
             const leftPower = Number(leftStats.xgSeason || 0) + Number(leftStats.xaSeason || 0) + Number(leftStats.formScore || 0) / 10;
@@ -3624,7 +3669,7 @@
                 <em>${escapeHtml(read)}</em>
               </div>
             `;
-          }).join('') : '<div class="empty compact-empty">Duels clés à générer dès que les titulaires sont confirmés.</div>'}
+          }).join('')}
         </div>
       </article>
     `;
@@ -3645,9 +3690,12 @@
     const likelyScorers = [
       ...keyPlayersForSide(row, 'home').slice(0, 2),
       ...keyPlayersForSide(row, 'away').slice(0, 2)
-    ].sort((a, b) => Number(b.stats?.xgSeason || 0) - Number(a.stats?.xgSeason || 0)).slice(0, 3);
+    ]
+      .filter((item) => !isKeeperEntry(item) && (isAttackingEntry(item) || Number(item?.stats?.xgSeason || 0) > 0.8 || Number(item?.stats?.goals || 0) > 0))
+      .sort((a, b) => Number(b.stats?.xgSeason || 0) - Number(a.stats?.xgSeason || 0))
+      .slice(0, 3);
     const rows = [
-      ['Buteurs probables', likelyScorers.length ? likelyScorers.map((item) => item.player?.name || item.star?.name).filter(Boolean).join(' · ') : 'à confirmer dès que les titulaires sortent'],
+      ['Buteurs probables', likelyScorers.length ? likelyScorers.map((item) => item.player?.name || item.star?.name).filter(Boolean).join(' · ') : 'buteurs non confirmés par les sources'],
       ['Cartons probables', match.referee?.cardsPerGame ? `${Number(match.referee.cardsPerGame).toFixed(1)} cartons/m arbitre` : 'arbitre ou historique cartons à enrichir'],
       ['Coups de pied arrêtés', hasMeaningfulMetric(homeSetPieces) || hasMeaningfulMetric(awaySetPieces) ? `${teamDisplayName(row, 'home')} ${numericText(homeSetPieces, ' xG CPA', 2)} · ${teamDisplayName(row, 'away')} ${numericText(awaySetPieces, ' xG CPA', 2)}` : 'signal corners/coups francs surveillé mais non confirmé'],
       ['Pénalty', Number.isFinite(homePenalty) || Number.isFinite(awayPenalty) ? `${numericText(homePenalty * 100, '% domicile', 0)} · ${numericText(awayPenalty * 100, '% extérieur', 0)}` : 'tendance penalties à confirmer'],
@@ -3761,13 +3809,20 @@
     const awayInjuries = availabilityContext(row, 'away')?.injuries || away.injuries || {};
     const h2hCount = Array.isArray(match.h2h?.meetings) ? match.h2h.meetings.length : 0;
     const refereeCards = Number(referee.cardsPerGame ?? referee.yellowPerGame ?? referee.cards_per_match);
+    const previousChampion = previousChampionForLeague(match.league_name || row.league);
+    const homeCoach = lineupContext(row, 'home')?.coach;
+    const awayCoach = lineupContext(row, 'away')?.coach;
+    const coachTitle = homeCoach || awayCoach ? 'Entraîneurs & style' : 'Styles de jeu estimés';
+    const coachHomeText = homeCoach ? `${homeCoach} · ${inferFootballStyle(home)}` : `${teamDisplayName(row, 'home')} · ${inferFootballStyle(home)}`;
+    const coachAwayText = awayCoach ? `${awayCoach} · ${inferFootballStyle(away)}` : `${teamDisplayName(row, 'away')} · ${inferFootballStyle(away)}`;
+    const h2hText = h2hCount ? `H2H ${formatCount(h2hCount)} match(s)` : 'H2H à enrichir';
     return `
       <article class="detail-card wide sport-insight-card">
         <h4>Fiche foot enrichie</h4>
         <div class="match-context-band">
           <span>${escapeHtml(match.league_name || row.league || 'Compétition')}</span>
           <strong>${escapeHtml(seasonStakeText(row))}</strong>
-          <em>${escapeHtml(`Champion passé : ${previousChampionForLeague(match.league_name || row.league)}`)}</em>
+          ${previousChampion ? `<em>${escapeHtml(`Champion passé : ${previousChampion}`)}</em>` : ''}
         </div>
         <div class="lineup-pitch" aria-label="Feuille de match probable">
           ${buildPitchColumn(row, 'home')}
@@ -3780,19 +3835,19 @@
             <em>${escapeHtml(`${sideGoalText(home)} / ${sideGoalText(away)}`)}</em>
           </div>
           <div>
-            <span>Entraîneurs & style</span>
-            <strong>${escapeHtml(`${lineupContext(row, 'home')?.coach || 'Coach domicile non confirmé'} · ${inferFootballStyle(home)}`)}</strong>
-            <em>${escapeHtml(`${lineupContext(row, 'away')?.coach || 'Coach extérieur non confirmé'} · ${inferFootballStyle(away)}`)}</em>
+            <span>${escapeHtml(coachTitle)}</span>
+            <strong>${escapeHtml(coachHomeText)}</strong>
+            <em>${escapeHtml(coachAwayText)}</em>
           </div>
           <div>
             <span>Arbitre</span>
-            <strong>${escapeHtml(referee.name || 'Arbitre non confirmé')}</strong>
-            <em>${escapeHtml(Number.isFinite(refereeCards) ? `${refereeCards.toFixed(1)} cartons/match · penalties/fautes à enrichir` : 'stats cartons/penalties à enrichir')}</em>
+            <strong>${escapeHtml(referee.name || 'Données arbitre non disponibles')}</strong>
+            <em>${escapeHtml(Number.isFinite(refereeCards) ? `${refereeCards.toFixed(1)} cartons/match` : 'Tendance arbitre non disponible')}</em>
           </div>
           <div>
             <span>Contexte</span>
             <strong>${escapeHtml(weather.city ? `${weather.city} · ${numericText(weather.temp_c, '°C', 0)} · vent ${numericText(weather.wind_kmh, ' km/h', 0)}` : 'météo non attachée')}</strong>
-            <em>${escapeHtml(`Absents : ${homeInjuries.total || 0} / ${awayInjuries.total || 0} · H2H ${formatCount(h2hCount)} match(s)`)}</em>
+            <em>${escapeHtml(`Absents : ${homeInjuries.total || 0} / ${awayInjuries.total || 0} · ${h2hText}`)}</em>
           </div>
         </div>
       </article>
@@ -4208,14 +4263,14 @@
     if (!row) return [];
     const checks = [];
     // Forme
-    const homeForm = String(row.match?.competitors?.[0]?.last5 || '').toLowerCase();
-    const awayForm = String(row.match?.competitors?.[1]?.last5 || '').toLowerCase();
-    const homeWins = (homeForm.match(/w/g) || []).length;
-    const awayWins = (awayForm.match(/w/g) || []).length;
+    const homeForm = sideFormText(teamContext(row, 'home')).toUpperCase();
+    const awayForm = sideFormText(teamContext(row, 'away')).toUpperCase();
+    const homeWins = (homeForm.match(/[WV]/g) || []).length;
+    const awayWins = (awayForm.match(/[WV]/g) || []).length;
     if (homeForm || awayForm) {
       const dominant = homeWins >= awayWins ? homeWins : awayWins;
       const tone = dominant >= 3 ? 'ok' : dominant >= 2 ? 'warn' : 'bad';
-      checks.push({ tone, icon: '🔥', label: 'Forme récente', detail: `${homeWins}W home · ${awayWins}W away` });
+      checks.push({ tone, icon: '🔥', label: 'Forme récente', detail: `${teamDisplayName(row, 'home')} ${homeWins}V · ${teamDisplayName(row, 'away')} ${awayWins}V` });
     }
     // Edge modèle
     const rawEdge = Number(row.edge || 0);
@@ -4690,7 +4745,7 @@
     maybeAutoPrematchRefresh();
     maybeNotifyPickChanges();
     runAutoTracking();
-    refreshLiveScores().catch(() => {});
+    refreshLiveScores().catch((error) => pushLog('warn', `Scores live indisponibles: ${error.message}`));
     scheduleBackgroundRefresh();
   }
 
@@ -5036,7 +5091,7 @@
       else if (Notification.permission !== 'denied') {
         Notification.requestPermission().then((permission) => {
           if (permission === 'granted') show();
-        }).catch(() => {});
+        }).catch((error) => pushLog('warn', `Permission notification impossible: ${error.message}`));
       }
     } catch {
       // Permission API non disponible dans certains profils Electron.
@@ -5391,6 +5446,19 @@
     return selected.slice(0, limit);
   }
 
+  function topThreeByConfidenceAndOdds(rows) {
+    return (Array.isArray(rows) ? rows : [])
+      .filter(isReadyToStakeRow)
+      .slice()
+      .sort((a, b) => (
+        safeConfidenceValue(b) - safeConfidenceValue(a) ||
+        Number(b.odd || 0) - Number(a.odd || 0) ||
+        Date.parse(a.start || '') - Date.parse(b.start || '') ||
+        priorityValue(b) - priorityValue(a)
+      ))
+      .slice(0, 3);
+  }
+
   // Sprint 59 (UX simplification) : résumé en 1 phrase clair pour la home.
   function renderDaySummary(rows) {
     const headline = $('#day-summary-headline');
@@ -5427,7 +5495,7 @@
   function renderReadyPicksHero(rows) {
     const wrap = $('#ready-picks-hero');
     if (!wrap) return;
-    const readyRows = balancedReadySelection(rollingReadyRows(rows), 3);
+    const readyRows = topThreeByConfidenceAndOdds(rollingReadyRows(rows));
     if (!readyRows.length) {
       wrap.innerHTML = `
         <div class="ready-hero-empty">
@@ -5755,7 +5823,22 @@
 
   function homeTopRows(rows, limit = 3) {
     const source = Array.isArray(rows) ? rows : [];
-    return diverseHomeTopRows(source, limit);
+    const ready = source.filter(isReadyToStakeRow);
+    if (ready.length >= limit) {
+      const selected = diverseHomeTopRows(ready, limit);
+      const sourceMarkets = new Set(source.map(rowMarketPreferenceKey).filter(Boolean));
+      const selectedMarkets = new Set(selected.map(rowMarketPreferenceKey).filter(Boolean));
+      if (sourceMarkets.size > 1 && selectedMarkets.size <= 1) {
+        const currentMarket = selectedMarkets.values().next().value;
+        const readyAlternative = sortHomeRows(ready, 'confidence').find((row) => rowMarketPreferenceKey(row) !== currentMarket && !selected.some((item) => userBetKey(item) === userBetKey(row)));
+        const watchAlternative = sortHomeRows(source, 'confidence').find((row) => rowMarketPreferenceKey(row) !== currentMarket && !selected.some((item) => userBetKey(item) === userBetKey(row)));
+        const alternative = readyAlternative || watchAlternative;
+        if (alternative) selected[selected.length - 1] = alternative;
+      }
+      return selected;
+    }
+    const fallback = ready.concat(source.filter((row) => !isReadyToStakeRow(row)));
+    return diverseHomeTopRows(fallback, limit);
   }
 
   function homeCategoryMeta(category) {
@@ -7037,7 +7120,7 @@
         node.className = 'today-funnel-alert danger';
         node.innerHTML = `
           <strong>${noReadyToday ? 'Aucun pari prêt aujourd’hui' : lowReadyToday ? 'Volume prêt limité aujourd’hui' : tooStrictForDailyTarget ? 'Modèle trop strict aujourd’hui' : displayed ? `${formatCount(displayed)} pari(s) aujourd'hui seulement` : 'Aucun pari simple aujourd’hui visible'}</strong>
-          <span>Aujourd’hui : ${formatCount(today.totalEvents || today.events || 0)} matchs → ${formatCount(bookable)} Winamax → ${formatCount(today.predictableMatches || today.predictable || 0)} analysables → ${formatCount(today.positiveSimplePassingFilters ?? today.simplePassingFilters ?? 0)} simples à edge positif → ${formatCount(simpleReady)} simples prêts. ${advancedReady ? `${formatCount(advancedReady)} prêts avancés restent cachés en mode standard.` : ''}</span>
+          <span>Aujourd’hui : ${formatCount(today.totalEvents || today.events || 0)} matchs → ${formatCount(bookable)} Winamax → ${formatCount(today.predictableMatches || today.predictable || 0)} analysables → ${formatCount(today.positiveSimplePassingFilters ?? today.simplePassingFilters ?? 0)} signaux simples positifs → ${formatCount(simpleReady)} simples prêts. ${advancedReady ? `${formatCount(advancedReady)} prêts avancés restent cachés en mode standard.` : ''}</span>
           <button class="ghost-btn" type="button" data-tab-target="data">Diagnostic auto</button>
         `;
         return;
@@ -7074,7 +7157,7 @@
     node.className = `today-funnel-alert ${status === 'danger' ? 'danger' : 'warn'}${status === 'ok' && displayed >= 5 ? ' hidden' : ''}`;
     node.innerHTML = `
       <strong>${displayed ? `${formatCount(displayed)} pari(s) aujourd'hui visibles` : 'Aucun pari aujourd’hui visible'}</strong>
-      <span>Funnel : ${formatCount(today.totalEvents || today.events || 0)} matchs → ${formatCount(today.bookableEvents || today.bookable || 0)} Winamax → ${formatCount(today.predictableMatches || today.predictable || 0)} analysables → ${formatCount(today.positiveSimplePassingFilters ?? today.passingFilters ?? 0)} à edge positif → ${formatCount(ready)} prêts.</span>
+      <span>Funnel : ${formatCount(today.totalEvents || today.events || 0)} matchs → ${formatCount(today.bookableEvents || today.bookable || 0)} Winamax → ${formatCount(today.predictableMatches || today.predictable || 0)} analysables → ${formatCount(today.positiveSimplePassingFilters ?? today.passingFilters ?? 0)} signaux positifs → ${formatCount(ready)} prêts.</span>
       <button class="ghost-btn" type="button" data-tab-target="data">Diagnostic auto</button>
     `;
   }
@@ -7494,9 +7577,7 @@
     renderHomeCategories(displayRows);
     // Sprint 50 (UX) : badge compteur "paris prêts" dans la nav Picks.
     try {
-      const readyCount = (displayRows || [])
-        .filter(isReadyToStakeRow)
-        .length;
+      const readyCount = rollingReadyRows(displayRows || []).length;
       const badge = $('#nav-picks-badge');
       if (badge) badge.textContent = readyCount > 0 ? String(readyCount) : '';
     } catch {
@@ -7994,7 +8075,7 @@
       const suffix = last ? ` ${last}` : '';
       caption.textContent = autoDue
         ? `${autoDue} match(s) proche(s) peuvent déclencher le pré-match final.${suffix}`
-        : `Picks avec edge positif mais attente de contexte, compo, cote ou calibration.${suffix}`;
+        : `Signaux positifs en attente de contexte, compo, cote ou calibration.${suffix}`;
     }
     if (!rows.length) {
       grid.innerHTML = '<div class="empty">Aucun pick à surveiller : les règles actuelles ne retiennent que les positions assez propres.</div>';
@@ -10419,7 +10500,7 @@
     renderPicks();
     renderTradingDesk();
     maybeNotifyPickChanges();
-    computePicks().catch(() => {});
+    computePicks().catch((error) => pushLog('warn', `Recalcul après préférences impossible: ${error.message}`));
     setSideStatus('Préférences enregistrées', 'ok');
   }
 
@@ -11279,7 +11360,14 @@
     const index = deepSearchIndex();
     renderDeepSearchOptions(index);
     const query = normalizeUiKey($('#deep-search-input')?.value || '');
-    const rows = (query ? index.filter((item) => normalizeUiKey(`${item.label} ${item.type}`).includes(query)) : index)
+    if (!query) {
+      state.deepSearchSelection = null;
+      results.innerHTML = '<div class="empty">Tape une équipe, un joueur ou une ligue pour chercher dans les matchs Winamax.</div>';
+      const detail = $('#deep-search-detail');
+      if (detail) detail.innerHTML = '<div class="empty">La fiche détaillée apparaît après ta recherche.</div>';
+      return;
+    }
+    const rows = index.filter((item) => normalizeUiKey(`${item.label} ${item.type}`).includes(query))
       .slice(0, 12);
     if (!state.deepSearchSelection && rows[0]) state.deepSearchSelection = rows[0].key;
     results.innerHTML = rows.length ? rows.map((item) => `
@@ -12382,7 +12470,7 @@
         applyPreferences({ ...prefs, expertMode: !prefs.expertMode });
       } catch { /* noop */ }
     } else if (itemId === 'action:refresh') {
-      if (typeof startRefresh === 'function') startRefresh('quick').catch(() => {});
+      if (typeof startRefresh === 'function') startRefresh('quick').catch((error) => pushLog('warn', `Refresh manuel impossible: ${error.message}`));
     }
     closeCmdK();
   }
@@ -12579,7 +12667,7 @@
       ['xG pour/contre', xg.present && (hasMeaningfulMetric(xg.for_avg) || hasMeaningfulMetric(xg.against_avg)) ? `${numericText(xg.for_avg, '', 2)} / ${numericText(xg.against_avg, '', 2)}` : 'Non disponible'],
       ['Elo', elo.value != null ? `${Math.round(Number(elo.value))}` : history.elo != null ? `${Math.round(Number(history.elo))}` : 'Non disponible'],
       ['Historique local', history.events_seen ? `${formatCount(history.events_seen)} observations` : 'Non disponible'],
-      ['Football-Data', fd?.matches ? `${formatCount(fd.matches)} matchs · BTTS ${formatPct(fd.btts_rate || 0, 0)}` : 'Non disponible']
+      ['Football-Data', fd?.matches ? `${formatCount(fd.matches)} matchs · les deux marquent ${formatPct(fd.btts_rate || 0, 0)}` : 'Non disponible']
     ];
     return `
       <article class="detail-card">
@@ -13240,7 +13328,7 @@
                     <div class="cb-fill" style="width: ${Math.min(100, Math.max(0, confPct))}%"></div>
                     <span class="cb-value">${confPct}%</span>
                   </div>
-                  ${ciTxt ? `<span class="cb-ci" title="Intervalle de confiance Wilson 95% sur le segment historique (${sample} paris)">IC 95% segment : ${escapeHtml(ciTxt)}</span>` : '<span class="cb-ci muted">Segment historique insuffisant</span>'}
+                  ${ciTxt ? `<span class="cb-ci" title="Intervalle de confiance Wilson 95% sur le segment historique (${sample} paris)">IC 95% segment : ${escapeHtml(ciTxt)}</span>` : sample >= 15 ? `<span class="cb-ci muted">Segment ${formatCount(sample)} paris · victoires détaillées à enrichir</span>` : '<span class="cb-ci muted">Sample segment encore court</span>'}
                 </div>`;
             })()}
             <div class="ultimate-tags detail-priority-strip">
@@ -13353,7 +13441,7 @@
       <section class="detail-tab-panel" data-detail-panel="odds">
         <div class="modal-grid">
           <article class="detail-card">
-            <h4>1N2</h4>
+            <h4>Vainqueur du match</h4>
             <div class="kv">${coteRows.map(([k, v]) => `<span>${escapeHtml(k)}</span><strong>${escapeHtml(v)}</strong>`).join('')}</div>
           </article>
           ${buildMarketTimingHtml(row.marketTiming)}
@@ -13753,9 +13841,9 @@
     if (!profile) return '';
     const families = profile.families || {};
     const familyLabels = {
-      n12: '1N2',
-      ou: 'O/U',
-      btts: 'BTTS',
+      n12: 'Vainqueur du match',
+      ou: 'Plus / Moins',
+      btts: 'Les deux marquent',
       teamTotal: 'Team totals',
       dnb: 'DNB',
       exactScore: 'Score exact',
@@ -13847,9 +13935,9 @@
               ${stats.highScoring >= stats.n * 0.6 ? '<em>Tendance Plus de 2,5 forte</em>' : ''}
             </div>
             <div class="h2h-stat ${stats.btts >= stats.n * 0.6 ? 'h2h-stat-strong' : ''}">
-              <span>BTTS</span>
+              <span>Les deux marquent</span>
               <strong>${stats.btts}/${stats.n}</strong>
-              ${stats.btts >= stats.n * 0.6 ? '<em>BTTS Yes fréquent</em>' : ''}
+              ${stats.btts >= stats.n * 0.6 ? '<em>Les deux équipes marquent souvent</em>' : ''}
             </div>
             <div class="h2h-stat ${stats.homeBetterCount >= stats.n * 0.5 ? 'h2h-stat-strong' : ''}">
               <span>Domicile vainqueur</span>
@@ -14547,7 +14635,7 @@
     if (!body) return;
     const rows = Array.isArray(state.agentBlockers?.rows) ? state.agentBlockers.rows : [];
     if (!rows.length) {
-      body.innerHTML = '<tr><td colspan="6" class="empty">Aucun edge positif bloqué hors agent.</td></tr>';
+      body.innerHTML = '<tr><td colspan="6" class="empty">Aucun signal positif bloqué hors agent.</td></tr>';
       return;
     }
     body.innerHTML = rows.slice(0, 12).map((row) => `
@@ -14823,7 +14911,7 @@
     if (!grid) return;
     const caption = $('#final-decision-caption');
     const summary = state.decisionCenter?.summary || {};
-    const ready = Number(summary.ready || 0);
+    const ready = rollingReadyRows(state.currentDashboardRows?.length ? state.currentDashboardRows : state.picks).length || Number(summary.ready || 0);
     const watch = Number(summary.watch || 0);
     const repairCount = Number(summary.repair || 0);
     const skip = Number(summary.skip || 0);
@@ -14833,7 +14921,7 @@
     const criticalReport = state.criticalIssueReport?.summary || {};
     if (caption) {
       caption.textContent = ready > 0
-        ? `${formatCount(ready)} pari(s) prêt(s). Les autres restent en observation.`
+        ? `${formatCount(ready)} pari(s) prêt(s) sur 24h. ${blockers > 0 || Number(criticalReport.critical || 0) > 0 ? 'Contrôle final conseillé avant grosse mise.' : 'Les autres restent en observation.'}`
         : `Aucun pari à jouer maintenant${summary.first ? ` · ${summary.first}` : ''}.`;
     }
     const cards = [
@@ -14848,7 +14936,7 @@
         tone: watch > 0 ? 'watch' : 'ok',
         label: 'À surveiller',
         value: formatCount(watch),
-        detail: `${formatCount(state.watchlist.length)} ligne(s) avec edge à rechecker sans mise.`
+        detail: `${formatCount(state.watchlist.length)} ligne(s) avec avantage à rechecker sans mise.`
       },
       {
         tone: repairCount > 0 || blockers > 0 || Number(criticalReport.critical || 0) > 0 ? 'danger' : 'ok',
@@ -14861,7 +14949,7 @@
         tone: skip > 0 ? 'warn' : 'ok',
         label: 'À éviter',
         value: formatCount(skip),
-        detail: skip > 0 ? 'Écartés par edge, cote, contexte ou modèle.' : 'Aucune ligne écartée dans les candidats.'
+        detail: skip > 0 ? 'Écartés par avantage, cote, contexte ou modèle.' : 'Aucune ligne écartée dans les candidats.'
       }
     ];
     grid.innerHTML = cards.map((card) => `
@@ -15541,7 +15629,7 @@
     }
 
     if (!alerts.length) {
-      add('ok', 'Qualité exploitable', 'Aucun blocage détecté sur les données actionnables.', 'Continuer à utiliser Kelly strict et edge positif.');
+      add('ok', 'Qualité exploitable', 'Aucun blocage détecté sur les données actionnables.', 'Continuer à utiliser une mise prudente et seulement les signaux positifs.');
     }
     return alerts.slice(0, 6);
   }
@@ -17768,7 +17856,7 @@
       const prefs = loadPreferences();
       savePreferences({ ...prefs, bankroll: getBankroll() });
       renderPreferences();
-      computePicks().catch(() => {});
+      computePicks().catch((error) => pushLog('warn', `Recalcul bankroll impossible: ${error.message}`));
     });
     $('#save-preferences-btn')?.addEventListener('click', () => applyPreferences(collectPreferencesFromForm()));
     $('#reset-preferences-btn')?.addEventListener('click', () => applyPreferences({ ...DEFAULT_PREFERENCES }));
@@ -17855,7 +17943,7 @@
     state.webEnrichments = readStorageJson(WEB_ENRICHMENT_KEY, null);
     state.newsWatcher = readStorageJson(NEWS_WATCHER_KEY, null);
     state.updateStatus = readStorageJson(UPDATE_STATUS_KEY, null);
-    loadBugReports().catch(() => {});
+    loadBugReports().catch((error) => pushLog('warn', `Rapports bug indisponibles: ${error.message}`));
     renderActionHistory();
     updateWebEnrichmentSummary();
     const storedBankroll = Number(localStorage.getItem('userBankroll') || loadPreferences().bankroll || 50);
@@ -17876,38 +17964,46 @@
     if (loadPreferences().demoMode && localStorage.getItem(DEMO_TOUR_KEY) !== '1') {
       setTimeout(() => startDemoTour(), 800);
     }
-    loadWebEnrichmentState().catch(() => {});
-    loadNewsWatcherState().catch(() => {});
-    setTimeout(() => checkForUpdates().catch(() => {}), 2500);
+    loadWebEnrichmentState().catch((error) => pushLog('warn', `État enrichissement indisponible: ${error.message}`));
+    loadNewsWatcherState().catch((error) => pushLog('warn', `État news watcher indisponible: ${error.message}`));
+    setTimeout(() => checkForUpdates().catch((error) => pushLog('warn', `Vérification mise à jour impossible: ${error.message}`)), 2500);
     await logPromise;
     setSideStatus('Calcul prêt', 'ok');
-    // Sprint 44 (P4 audit) : force-refresh au boot si data > 30 min.
+    // Force-refresh au boot si la donnée locale commence vraiment à dater.
     // L'utilisateur ferme l'app la nuit et au matin la data est obsolète.
     // Un refresh quick au démarrage garantit qu'il voit les picks frais
     // sans intervention manuelle.
     try {
-      const generatedAt = Date.parse(state.engine?.generatedAt || state.engine?.data?.generated_at || '');
-      const ageMs = Number.isFinite(generatedAt) ? Date.now() - generatedAt : Infinity;
-      if (ageMs > 30 * 60 * 1000 && !state.status?.refresh?.running) {
-        setSideStatus('Données > 30 min — refresh auto au boot', 'warn');
+      const generatedAtRaw = state.engine?.generatedAt
+        || state.engine?.data?.generated_at
+        || state.status?.generatedAt
+        || state.status?.generated_at
+        || state.status?.health?.generated_at
+        || '';
+      const generatedAt = Date.parse(generatedAtRaw);
+      const ageMs = Number.isFinite(generatedAt) ? Date.now() - generatedAt : null;
+      if (ageMs > 90 * 60 * 1000 && !state.status?.refresh?.running) {
+        setSideStatus('Données à rafraîchir — refresh auto au boot', 'warn');
         setTimeout(() => {
-          startRefresh('quick').catch((error) => {
-            setSideStatus(`Boot refresh impossible: ${error.message}`, 'warn');
-          });
+          startRefresh('quick')
+            .then(() => setSideStatus('Calcul prêt', 'ok'))
+            .catch((error) => {
+              setSideStatus(`Boot refresh impossible: ${error.message}`, 'warn');
+            });
         }, 1500);
       }
-    } catch {
-      // pas grave — l'auto-refresh interval prend le relais
+    } catch (error) {
+      pushLog('warn', `Contrôle fraîcheur au boot impossible: ${error.message}`);
     }
     scheduleBackgroundRefresh();
     renderBootPerformance();
     renderRefreshPolicy();
-    setInterval(() => refreshStatus().catch(() => {}), 30000);
+    setInterval(() => refreshStatus().catch((error) => pushLog('warn', `Statut indisponible: ${error.message}`)), 30000);
     // Sprint 44 (P3 audit) : refreshLog et renderRefreshPolicy étaient
     // appelés toutes les 5s et 1s respectivement — overkill qui contribuait
     // au pic mémoire 671 MB observé en stress test. Cadence ramenée à 30s
     // et 15s pour rester réactif sans hammerer l'UI.
-    setInterval(() => refreshLog().catch(() => {}), 30000);
+    setInterval(() => refreshLog().catch((error) => pushLog('warn', `Journal indisponible: ${error.message}`)), 30000);
     setInterval(renderRefreshPolicy, 15000);
   }
 

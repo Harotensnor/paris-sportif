@@ -92,6 +92,7 @@ const MIME_TYPES = {
   '.jpg': 'image/jpeg',
   '.jpeg': 'image/jpeg',
   '.webp': 'image/webp',
+  '.gif': 'image/gif',
   '.avif': 'image/avif',
   '.ico': 'image/x-icon'
 };
@@ -1933,6 +1934,26 @@ async function handleApi(req, res, url) {
       jsonResponse(res, 200, { ok: true, ...result });
     } catch (error) {
       jsonResponse(res, 200, { ok: false, url: null, miss: true, error: error.message });
+    }
+    return;
+  }
+  if (url.pathname.startsWith('/api/images/cache/')) {
+    try {
+      const fileName = path.basename(decodeURIComponent(url.pathname.replace('/api/images/cache/', '')));
+      const filePath = path.join(IMAGE_CACHE_ROOT, fileName);
+      if (!fileName || !isWithin(IMAGE_CACHE_ROOT, filePath) || !fs.existsSync(filePath)) {
+        jsonResponse(res, 404, { ok: false, error: 'image not found' });
+        return;
+      }
+      const ext = path.extname(filePath).toLowerCase();
+      const contentType = MIME_TYPES[ext] || 'image/jpeg';
+      res.writeHead(200, {
+        ...baseHeaders(contentType),
+        'Cache-Control': 'public, max-age=604800, immutable'
+      });
+      fs.createReadStream(filePath).pipe(res);
+    } catch (error) {
+      jsonResponse(res, 404, { ok: false, error: error.message });
     }
     return;
   }

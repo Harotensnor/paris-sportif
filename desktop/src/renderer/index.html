@@ -52,7 +52,7 @@
     <main class="main">
       <header class="topbar">
         <div>
-          <div class="eyebrow">Pronostics focus v2.2.0 · Winamax-only</div>
+          <div class="eyebrow">Pronostics focus v2.2.1 · Winamax-only</div>
           <h2 id="page-title">À miser maintenant</h2>
         </div>
         <div class="actions decision-actions">
@@ -519,7 +519,7 @@
         <div class="section-head page-section-head">
           <div>
             <h3>👤 Buteurs &amp; joueurs décisifs</h3>
-            <p>Lecture secondaire issue du modèle joueurs, à vérifier dans le marché buteur Winamax. Cotes Winamax réelles affichées quand matchées (filtre quality ≥ 35, edge ≥ +0.5pt).</p>
+            <p>Lecture secondaire issue du modèle joueurs, à vérifier dans le marché buteur Winamax. Cotes Winamax réelles affichées quand le marché est retrouvé.</p>
           </div>
           <div class="section-actions">
             <button class="ghost-btn" id="export-scorers-csv-btn">⬇ Exporter</button>
@@ -1047,7 +1047,7 @@
         <div class="section-head compact">
           <div>
             <h3>Blocages agent</h3>
-            <p>Pourquoi un edge positif reste hors mise autonome.</p>
+            <p>Pourquoi un signal positif reste hors mise autonome.</p>
           </div>
         </div>
         <div class="quality-report-grid" id="agent-blockers-grid">
@@ -1277,7 +1277,7 @@
           </article>
           <article class="preference-card">
             <h4>Alertes</h4>
-            <label>Edge notif %<input id="pref-alert-edge" type="number" min="0" max="50" step="1"></label>
+            <label>Alerte avantage %<input id="pref-alert-edge" type="number" min="0" max="50" step="1"></label>
             <label>Kickoff notif heures<input id="pref-alert-window" type="number" min="1" max="24" step="1"></label>
             <label>Brief du soir heure<input id="pref-evening-hour" type="number" min="18" max="23" step="1"></label>
             <label class="check-line"><input id="pref-prematch-alerts" type="checkbox"> Alertes pré-match 30 min</label>
@@ -1302,7 +1302,7 @@
             <h4>Discipline bankroll</h4>
             <label>Mode mise
               <select id="pref-stake-mode">
-                <option value="kelly">Kelly plafonné</option>
+                <option value="kelly">Mise prudente plafonnée</option>
                 <option value="flat">Flat 1u</option>
               </select>
             </label>
@@ -1379,7 +1379,7 @@
                 <option value="all">Tous les picks prêts</option>
               </select>
             </label>
-            <label>Edge min %<input id="pref-auto-tracking-edge" type="number" min="0" max="25" step="1"></label>
+            <label>Avantage min %<input id="pref-auto-tracking-edge" type="number" min="0" max="25" step="1"></label>
             <label>Cote min<input id="pref-auto-tracking-odd-min" type="number" min="1" max="20" step="0.05"></label>
             <label>Cote max<input id="pref-auto-tracking-odd-max" type="number" min="1" max="50" step="0.05"></label>
             <label>Budget max jour €<input id="pref-auto-tracking-budget" type="number" min="0" max="1000" step="1"></label>
@@ -1419,7 +1419,7 @@
                 <option value="auto">Auto</option>
               </select>
             </label>
-            <p class="match-sub" id="app-version-label">Paris Sportif Desktop v2.2.0</p>
+            <p class="match-sub" id="app-version-label">Paris Sportif Desktop v2.2.1</p>
             <p class="match-sub" id="update-status">Aucune vérification de mise à jour lancée.</p>
             <div class="profile-preview" id="bug-report-list">Aucun rapport de bug local.</div>
           </article>
