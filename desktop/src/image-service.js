@@ -1,5 +1,5 @@
 // Image service for Paris-Sportif Desktop.
-// Resolves real player/team images from Wikipedia Commons and caches them
+// Resolves real player/team/coach images from Wikipedia Commons and caches them
 // locally. All HTTP requests live in the main process; the renderer never
 // fetches anything from the internet. Failures degrade gracefully and the
 // renderer keeps showing the existing SVG initials avatar.
@@ -12,12 +12,16 @@ const crypto = require('crypto');
 
 const WIKI_API_BASE = 'https://en.wikipedia.org/w/api.php';
 const COMMONS_API_BASE = 'https://commons.wikimedia.org/w/api.php';
+const WIKIDATA_API_BASE = 'https://www.wikidata.org/w/api.php';
+const WIKIDATA_ENTITY_BASE = 'https://www.wikidata.org/wiki/Special:EntityData';
 const USER_AGENT = 'ParisSportifDesktop/1.0 (https://github.com/harotensnor/paris-sportif; private use)';
 const RATE_LIMIT_PER_MINUTE = 30;
 
 // TTLs (ms)
 const LOGO_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
 const PLAYER_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+const COACH_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+const COACH_LOOKUP_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 const MISS_TTL_MS = 24 * 60 * 60 * 1000; // 1 day (re-try misses every 24h)
 
 const STATE = {
@@ -48,6 +52,11 @@ function cacheKey(kind, name, hints = {}) {
 function diskPathFor(key) {
   if (!STATE.cacheDir) return null;
   return path.join(STATE.cacheDir, `${key}.json`);
+}
+
+function coachDiskPathFor(key) {
+  if (!STATE.cacheDir) return null;
+  return path.join(STATE.cacheDir, `coach-${key}.json`);
 }
 
 function isLocalImageUrl(url) {
@@ -81,6 +90,32 @@ function writeDiskCache(key, payload) {
     fs.renameSync(tmp, fp);
   } catch {
     // ignore: cache write is best-effort
+  }
+}
+
+function readCoachCache(key) {
+  const fp = coachDiskPathFor(key);
+  if (!fp) return null;
+  try {
+    if (!fs.existsSync(fp)) return null;
+    const payload = JSON.parse(fs.readFileSync(fp, 'utf8'));
+    if (!payload || payload.expiresAt <= Date.now()) return null;
+    return payload;
+  } catch {
+    return null;
+  }
+}
+
+function writeCoachCache(key, payload) {
+  const fp = coachDiskPathFor(key);
+  if (!fp) return;
+  try {
+    ensureDir(path.dirname(fp));
+    const tmp = `${fp}.${process.pid}.tmp`;
+    fs.writeFileSync(tmp, JSON.stringify(payload), 'utf8');
+    fs.renameSync(tmp, fp);
+  } catch {
+    // ignore: coach cache is best-effort
   }
 }
 
@@ -289,8 +324,32 @@ function buildPlayerQueries(name, hints = {}) {
   return [...new Set(variants.map(trimWord).filter(Boolean))];
 }
 
+function buildCoachQueries(name, hints = {}) {
+  const base = trimWord(name);
+  if (!base) return [];
+  const sport = String(hints.sport || '').toLowerCase();
+  const team = trimWord(hints.team || '');
+  const variants = [base];
+  if (team) variants.push(`${base} ${team}`);
+  if (sport) variants.push(`${base} ${sport} coach`);
+  if (sport.includes('football') || sport.includes('soccer') || sport.includes('foot')) {
+    variants.push(`${base} football manager`);
+    variants.push(`${base} football coach`);
+  }
+  if (sport.includes('basket')) variants.push(`${base} basketball coach`);
+  if (sport.includes('baseball')) variants.push(`${base} baseball manager`);
+  if (sport.includes('hockey')) variants.push(`${base} ice hockey coach`);
+  variants.push(`${base} manager`);
+  variants.push(`${base} coach`);
+  return [...new Set(variants.map(trimWord).filter(Boolean))];
+}
+
 async function resolveImage(kind, name, hints = {}, { pixelSize, ttlMs }) {
-  const queries = kind === 'team' ? buildTeamQueries(name, hints) : buildPlayerQueries(name, hints);
+  const queries = kind === 'team'
+    ? buildTeamQueries(name, hints)
+    : kind === 'coach'
+      ? buildCoachQueries(name, hints)
+      : buildPlayerQueries(name, hints);
   for (const query of queries) {
     let title = query;
     try {
@@ -313,7 +372,7 @@ async function resolveImage(kind, name, hints = {}, { pixelSize, ttlMs }) {
 }
 
 async function lookupImage(kind, name, hints = {}) {
-  const safeKind = kind === 'team' || kind === 'player' ? kind : 'team';
+  const safeKind = kind === 'team' || kind === 'player' || kind === 'coach' ? kind : 'team';
   const safeName = trimWord(name);
   if (!safeName) return { ok: false, url: null, miss: true };
   const key = cacheKey(safeKind, safeName, hints);
@@ -339,7 +398,7 @@ async function lookupImage(kind, name, hints = {}) {
   const promise = (async () => {
     try {
       const pixelSize = safeKind === 'team' ? 200 : 160;
-      const ttlMs = safeKind === 'team' ? LOGO_TTL_MS : PLAYER_TTL_MS;
+      const ttlMs = safeKind === 'team' ? LOGO_TTL_MS : safeKind === 'coach' ? COACH_TTL_MS : PLAYER_TTL_MS;
       const remoteUrl = await resolveImage(safeKind, safeName, hints, { pixelSize, ttlMs });
       const url = await cacheRemoteImage(key, remoteUrl);
       const payload = rememberCache(key, url, url ? ttlMs : MISS_TTL_MS, !url);
@@ -371,6 +430,107 @@ async function lookupBatch(items = []) {
   return results;
 }
 
+function normalizeWikidataTime(value) {
+  const raw = String(value || '').replace(/^\+/, '');
+  const year = Number(raw.slice(0, 4));
+  if (!Number.isFinite(year) || year <= 0) return '';
+  return raw.slice(0, 10);
+}
+
+function claimRankScore(claim) {
+  if (claim?.rank === 'preferred') return 3;
+  if (!claim?.qualifiers?.P582) return 2;
+  return 1;
+}
+
+function claimStartTime(claim) {
+  return normalizeWikidataTime(claim?.qualifiers?.P580?.[0]?.datavalue?.value?.time);
+}
+
+function pickCurrentCoachClaim(claims = []) {
+  const list = Array.isArray(claims) ? claims.filter((claim) => claim?.mainsnak?.datavalue?.value?.id) : [];
+  if (!list.length) return null;
+  return [...list].sort((a, b) => {
+    const rankDelta = claimRankScore(b) - claimRankScore(a);
+    if (rankDelta) return rankDelta;
+    return String(claimStartTime(b)).localeCompare(String(claimStartTime(a)));
+  })[0] || null;
+}
+
+async function wikidataSearchEntity(query) {
+  const params = new URLSearchParams({
+    action: 'wbsearchentities',
+    format: 'json',
+    language: 'en',
+    uselang: 'en',
+    limit: '5',
+    search: query
+  });
+  const data = await fetchJson(`${WIKIDATA_API_BASE}?${params.toString()}`, { timeoutMs: 7000 });
+  const rows = Array.isArray(data?.search) ? data.search : [];
+  return rows.find((row) => {
+    const text = `${row.label || ''} ${row.description || ''}`.toLowerCase();
+    return /club|team|basketball|baseball|hockey|football|soccer|tennis/.test(text);
+  }) || rows[0] || null;
+}
+
+async function wikidataEntity(id) {
+  if (!id) return null;
+  const data = await fetchJson(`${WIKIDATA_ENTITY_BASE}/${encodeURIComponent(id)}.json`, { timeoutMs: 7000 });
+  return data?.entities?.[id] || null;
+}
+
+function wikidataLabel(entity) {
+  return entity?.labels?.fr?.value || entity?.labels?.en?.value || entity?.labels?.es?.value || entity?.labels?.it?.value || '';
+}
+
+async function lookupCoach(teamName, hints = {}) {
+  const safeTeam = trimWord(teamName);
+  if (!safeTeam) return { ok: false, miss: true, coach: null };
+  const key = cacheKey('coachLookup', safeTeam, hints);
+  const disk = readCoachCache(key);
+  if (disk) return { ok: !disk.miss, miss: Boolean(disk.miss), coach: disk.coach || null, cached: 'disk' };
+
+  const sport = String(hints.sport || '').toLowerCase();
+  const variants = buildTeamQueries(safeTeam, hints);
+  if (sport.includes('football') || sport.includes('soccer') || sport.includes('foot')) variants.push(`${safeTeam} football club`);
+  variants.push(`${safeTeam} sports team`);
+  const queries = [...new Set(variants.map(trimWord).filter(Boolean))].slice(0, 5);
+
+  try {
+    for (const query of queries) {
+      const team = await wikidataSearchEntity(query);
+      if (!team?.id) continue;
+      const teamEntity = await wikidataEntity(team.id);
+      const coachClaim = pickCurrentCoachClaim(teamEntity?.claims?.P286 || []);
+      const coachId = coachClaim?.mainsnak?.datavalue?.value?.id;
+      if (!coachId) continue;
+      const coachEntity = await wikidataEntity(coachId);
+      const coachName = wikidataLabel(coachEntity);
+      if (!coachName) continue;
+      const coach = {
+        name: coachName,
+        source: 'Wikidata',
+        teamEntityId: team.id,
+        coachEntityId: coachId,
+        startDate: claimStartTime(coachClaim),
+        rank: coachClaim.rank || 'normal'
+      };
+      const payload = { coach, miss: false, expiresAt: Date.now() + COACH_LOOKUP_TTL_MS };
+      writeCoachCache(key, payload);
+      return { ok: true, miss: false, coach, cached: 'fresh' };
+    }
+  } catch (err) {
+    const payload = { coach: null, miss: true, expiresAt: Date.now() + MISS_TTL_MS, error: err && err.message };
+    writeCoachCache(key, payload);
+    return { ok: false, miss: true, coach: null, cached: 'fresh', error: err && err.message };
+  }
+
+  const payload = { coach: null, miss: true, expiresAt: Date.now() + MISS_TTL_MS };
+  writeCoachCache(key, payload);
+  return { ok: false, miss: true, coach: null, cached: 'fresh' };
+}
+
 function init({ cacheDir } = {}) {
   if (cacheDir) {
     STATE.cacheDir = cacheDir;
@@ -391,5 +551,6 @@ module.exports = {
   init,
   lookupImage,
   lookupBatch,
+  lookupCoach,
   statsSnapshot,
 };

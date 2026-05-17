@@ -5,6 +5,16 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-17
 
+### Version v4.1.4 — Photos joueurs + coach tactique
+
+Correctif fiche match orienté lisibilité : les joueurs et entraîneurs manquaient encore de présence visuelle, et la tactique coach était trop compressée pour aider à décider vite.
+- Le service d’images accepte maintenant les entraîneurs en plus des équipes et joueurs, avec recherche coach Wikidata, cache local et fallback propre.
+- Les compositions affichent une photo ou un avatar propre pour chaque titulaire visible, même dans les lignes compactes du terrain.
+- Les fiches tennis et sports US affichent des profils joueurs/pitchers/gardiens avec photo quand la donnée existe.
+- Nouvelle carte `Entraîneurs & tactique` : coach, système, style de jeu et lecture du plan de match sans inventer les noms manquants.
+- Les duels tactiques montrent désormais les deux joueurs avec photo, rôle et ligne de stats lisible.
+- Les rapports avancés V15/V16 retirent maintenant les matchs expirés du flux `Finaliser T-10`/prix au lieu de les laisser actifs.
+
 ### Version v4.1.3 — Forme récente lisible
 
 Correctif UX fiche match : les dynamiques d'équipes sortaient encore comme des codes bruts (`WWDND`, `VDVVV`, `DDDDD`), peu lisibles et peu professionnels.

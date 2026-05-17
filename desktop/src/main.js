@@ -1937,6 +1937,22 @@ async function handleApi(req, res, url) {
     }
     return;
   }
+  if (url.pathname === '/api/coaches/lookup') {
+    if (req.method !== 'POST') {
+      jsonResponse(res, 405, { ok: false, error: 'POST required' });
+      return;
+    }
+    try {
+      const payload = await readJsonBody(req, 64 * 1024);
+      const team = String(payload?.team || payload?.name || '');
+      const hints = payload?.hints && typeof payload.hints === 'object' ? payload.hints : {};
+      const result = await imageService.lookupCoach(team, hints);
+      jsonResponse(res, 200, { ok: true, ...result });
+    } catch (error) {
+      jsonResponse(res, 200, { ok: false, miss: true, coach: null, error: error.message });
+    }
+    return;
+  }
   if (url.pathname.startsWith('/api/images/cache/')) {
     try {
       const fileName = path.basename(decodeURIComponent(url.pathname.replace('/api/images/cache/', '')));

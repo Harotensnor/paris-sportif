@@ -3099,6 +3099,8 @@
   // the resolver.
   const REMOTE_IMAGE_CACHE = new Map();
   const REMOTE_IMAGE_PENDING = new Map();
+  const REMOTE_COACH_CACHE = new Map();
+  const REMOTE_COACH_PENDING = new Map();
 
   function remoteImageKey(kind, name, sport) {
     return `${kind}|${String(name || '').trim().toLowerCase()}|${String(sport || '').trim().toLowerCase()}`;
@@ -3151,7 +3153,9 @@
       });
   }
 
-  function queueRemoteImage(kind, name, sport) {
+  function queueRemoteImage(kind, name, sportOrHints) {
+    const hints = sportOrHints && typeof sportOrHints === 'object' ? sportOrHints : { sport: sportOrHints || '' };
+    const sport = hints.sport || '';
     const key = remoteImageKey(kind, name, sport);
     if (REMOTE_IMAGE_CACHE.has(key) || REMOTE_IMAGE_PENDING.has(key)) return;
     if (!name || String(name).trim() === '') {
@@ -3161,7 +3165,7 @@
     const promise = fetch('/api/images/lookup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ kind, name, hints: { sport: sport || '' } })
+      body: JSON.stringify({ kind, name, hints })
     })
       .then((response) => (response.ok ? response.json() : null))
       .then((payload) => {
@@ -3190,7 +3194,7 @@
     const remoteKey = remoteImageKey('team', label, sport);
     const remoteUrl = REMOTE_IMAGE_CACHE.has(remoteKey) ? REMOTE_IMAGE_CACHE.get(remoteKey) : undefined;
     if (remoteUrl === undefined && label) {
-      queueRemoteImage('team', label, sport);
+      queueRemoteImage('team', label, { sport });
     }
     return {
       label,
@@ -3217,7 +3221,7 @@
     const sport = hints.sport || '';
     const key = remoteImageKey('player', safeName, sport);
     if (safeName && !REMOTE_IMAGE_CACHE.has(key) && !REMOTE_IMAGE_PENDING.has(key)) {
-      queueRemoteImage('player', safeName, sport);
+      queueRemoteImage('player', safeName, hints);
     }
     const cachedUrl = REMOTE_IMAGE_CACHE.get(key);
     const hasRemote = Boolean(cachedUrl);
@@ -3225,6 +3229,66 @@
     const remoteClass = hasRemote ? ' remote-loaded' : '';
     const sizeClass = size >= 80 ? 'player-photo-xl' : size >= 60 ? 'player-photo-lg' : size >= 40 ? 'player-photo-md' : 'player-photo-sm';
     return `<span class="${escapeHtml(className)} ${sizeClass}" aria-label="${escapeHtml(safeName || 'Joueur')}">${hasRemote ? `<img src="${escapeHtml(cachedUrl)}" alt=""${remoteAttr} class="${remoteClass.trim()}">` : `<img alt=""${remoteAttr} class="${remoteClass.trim()}">`}<span class="player-photo-initials">${escapeHtml(initials)}</span></span>`;
+  }
+
+  function coachPhotoHtml(name, hints = {}, { size = 56, className = 'coach-photo player-photo' } = {}) {
+    const safeName = String(name || '').trim();
+    const initials = initialsForLabel(safeName || 'Coach');
+    const sport = hints.sport || '';
+    const key = remoteImageKey('coach', safeName, sport);
+    if (safeName && !REMOTE_IMAGE_CACHE.has(key) && !REMOTE_IMAGE_PENDING.has(key)) {
+      queueRemoteImage('coach', safeName, hints);
+    }
+    const cachedUrl = REMOTE_IMAGE_CACHE.get(key);
+    const hasRemote = Boolean(cachedUrl);
+    const remoteAttr = safeName ? ` data-remote-image="${escapeHtml(key)}"` : '';
+    const remoteClass = hasRemote ? ' remote-loaded' : '';
+    const sizeClass = size >= 80 ? 'player-photo-xl' : size >= 60 ? 'player-photo-lg' : size >= 40 ? 'player-photo-md' : 'player-photo-sm';
+    return `<span class="${escapeHtml(className)} ${sizeClass}" aria-label="${escapeHtml(safeName || 'Entraîneur')}">${hasRemote ? `<img src="${escapeHtml(cachedUrl)}" alt=""${remoteAttr} class="${remoteClass.trim()}">` : `<img alt=""${remoteAttr} class="${remoteClass.trim()}">`}<span class="player-photo-initials">${escapeHtml(initials)}</span></span>`;
+  }
+
+  function coachLookupKey(teamName, sport) {
+    return `coach|${String(teamName || '').trim().toLowerCase()}|${String(sport || '').trim().toLowerCase()}`;
+  }
+
+  function queueCoachLookup(teamName, hints = {}) {
+    const safeTeam = String(teamName || '').trim();
+    const sport = hints.sport || '';
+    const key = coachLookupKey(safeTeam, sport);
+    if (!safeTeam || REMOTE_COACH_CACHE.has(key) || REMOTE_COACH_PENDING.has(key)) return key;
+    const promise = fetch('/api/coaches/lookup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ team: safeTeam, hints })
+    })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((payload) => {
+        const coach = payload && payload.ok && payload.coach?.name ? payload.coach : null;
+        REMOTE_COACH_CACHE.set(key, coach);
+        REMOTE_COACH_PENDING.delete(key);
+        if (coach?.name) {
+          document.querySelectorAll(`[data-coach-card-key="${key}"]`).forEach((node) => {
+            node.classList.remove('coach-missing');
+            node.classList.add('coach-resolved');
+          });
+          document.querySelectorAll(`[data-coach-name-key="${key}"]`).forEach((node) => {
+            node.textContent = coach.name;
+          });
+          document.querySelectorAll(`[data-coach-source-key="${key}"]`).forEach((node) => {
+            const since = coach.startDate ? ` depuis ${coach.startDate.slice(0, 4)}` : '';
+            node.textContent = `coach retrouvé via ${coach.source || 'source ouverte'}${since}`;
+          });
+          document.querySelectorAll(`[data-coach-photo-key="${key}"]`).forEach((node) => {
+            node.innerHTML = coachPhotoHtml(coach.name, { ...hints, team: safeTeam }, { size: 64 });
+          });
+        }
+      })
+      .catch(() => {
+        REMOTE_COACH_CACHE.set(key, null);
+        REMOTE_COACH_PENDING.delete(key);
+      });
+    REMOTE_COACH_PENDING.set(key, promise);
+    return key;
   }
 
   function matchVisualHtml(row, className = 'match-visual') {
@@ -3532,6 +3596,80 @@
     return 'profil équilibré à confirmer par les compositions';
   }
 
+  function coachNameForSide(row, side) {
+    const lineup = lineupContext(row, side) || {};
+    const team = teamContext(row, side) || {};
+    const availability = availabilityContext(row, side) || {};
+    const coaches = row?.match?.context?.coaches || row?.match?.coaches || {};
+    const raw = lineup.coach || team.coach || availability.coach || coaches?.[side]?.name || coaches?.[side];
+    const text = cleanLabel(raw, '').trim();
+    return looksLikePlaceholderValue(text) ? '' : text;
+  }
+
+  function tacticalReadForSide(row, side) {
+    const team = teamContext(row, side);
+    const lineup = lineupContext(row, side) || {};
+    const formation = cleanLabel(lineup.formation || team?.formation || '', '');
+    const style = inferFootballStyle(team);
+    const xgFor = Number(team?.xg_for_avg ?? team?.xg_per90 ?? team?.history?.xg?.for_avg);
+    const xgAgainst = Number(team?.xg_against_avg ?? team?.xga_per90 ?? team?.history?.xg?.against_avg);
+    const ppda = Number(team?.ppda ?? team?.history?.ppda);
+    const over25 = Number(team?.history?.football_data?.over25_rate);
+    let read = 'Lecture prudente : le style est estimé avec les signaux d’équipe et la formation probable.';
+    if (Number.isFinite(ppda) && ppda <= 10.5) {
+      read = 'Pressing haut : l’équipe cherche à récupérer vite, ce qui augmente le rythme et les erreurs adverses.';
+    } else if (hasMeaningfulMetric(xgFor, 0.25) && xgFor >= 1.65) {
+      read = 'Projet offensif : le volume d’occasions est solide, intéressant pour un Vainqueur ou un marché buts.';
+    } else if (hasMeaningfulMetric(xgAgainst, 0.25) && xgAgainst <= 1.05) {
+      read = 'Bloc compact : priorité à la maîtrise défensive, utile pour lire les risques sur les totaux.';
+    } else if (Number.isFinite(over25) && over25 >= 0.58) {
+      read = 'Rythme ouvert : les matchs récents produisent souvent des occasions des deux côtés.';
+    }
+    return {
+      formation: formation && !looksLikePlaceholderValue(formation) ? formation : 'système à confirmer',
+      style,
+      read
+    };
+  }
+
+  function buildCoachTacticsHtml(row) {
+    const sportHint = row?.sport || row?.match?.sport || 'football';
+    const cards = ['home', 'away'].map((side) => {
+      const teamName = teamDisplayName(row, side);
+      const coachName = coachNameForSide(row, side);
+      const tactical = tacticalReadForSide(row, side);
+      const coachKey = coachLookupKey(teamName, sportHint);
+      if (!coachName) queueCoachLookup(teamName, { sport: sportHint, team: teamName });
+      const visual = coachName
+        ? coachPhotoHtml(coachName, { sport: sportHint, team: teamName }, { size: 64 })
+        : avatarHtml(row, side, 'coach-team-avatar team-avatar');
+      return `
+        <article class="coach-tactic-card ${coachName ? 'has-coach-photo' : 'coach-missing'}" data-coach-card-key="${escapeHtml(coachKey)}">
+          <div class="coach-tactic-head">
+            <span class="coach-photo-slot" data-coach-photo-key="${escapeHtml(coachKey)}">${visual}</span>
+            <div>
+              <span>${escapeHtml(teamName)}</span>
+              <strong data-coach-name-key="${escapeHtml(coachKey)}">${escapeHtml(coachName || 'Recherche coach en cours')}</strong>
+              <em data-coach-source-key="${escapeHtml(coachKey)}">${escapeHtml(coachName ? 'photo et source mises en cache si disponibles' : 'si la source ouverte ne confirme pas le nom, la fiche garde la tactique estimée')}</em>
+            </div>
+          </div>
+          <div class="coach-tactic-body">
+            <div><span>Système</span><strong>${escapeHtml(tactical.formation)}</strong></div>
+            <div><span>Style</span><strong>${escapeHtml(tactical.style)}</strong></div>
+            <p>${escapeHtml(tactical.read)}</p>
+          </div>
+        </article>
+      `;
+    }).join('');
+    return `
+      <article class="detail-card wide coach-tactics-card">
+        <h4>Entraîneurs & tactique</h4>
+        <p class="detail-text">Lecture coach, système et style de jeu. Si le nom n’est pas fiable, la fiche l’indique clairement et n’invente rien.</p>
+        <div class="coach-tactics-grid">${cards}</div>
+      </article>
+    `;
+  }
+
   function previousChampionForLeague(league) {
     const name = normalizeUiKey(league || '');
     const known = {
@@ -3737,6 +3875,19 @@
     const homeStyle = inferFootballStyle(teamContext(row, 'home'));
     const awayStyle = inferFootballStyle(teamContext(row, 'away'));
     if (!duels.length) return '';
+    const sportHint = row?.sport || row?.match?.sport || 'football';
+    const duelPlayerHtml = (item, sideLabel) => {
+      const name = item?.player?.name || item?.star?.name || sideLabel;
+      return `
+        <span class="tactical-player">
+          ${playerPhotoHtml(name, { sport: sportHint }, { size: 40 })}
+          <span>
+            <strong>${escapeHtml(name)}</strong>
+            <em>${escapeHtml(playerStatLine(item?.player || {}, item?.star || {}))}</em>
+          </span>
+        </span>
+      `;
+    };
     return `
       <article class="detail-card wide tactical-card">
         <h4>${escapeHtml(t('tacticalAnalysis'))}</h4>
@@ -3759,7 +3910,11 @@
             return `
               <div class="tactical-duel">
                 <span>${escapeHtml(label)}</span>
-                <strong>${escapeHtml(left.player.name || left.star.name || 'Joueur A')} vs ${escapeHtml(right.player.name || right.star.name || 'Joueur B')}</strong>
+                <div class="tactical-player-pair">
+                  ${duelPlayerHtml(left, 'Joueur A')}
+                  <b>vs</b>
+                  ${duelPlayerHtml(right, 'Joueur B')}
+                </div>
                 <em>${escapeHtml(read)}</em>
               </div>
             `;
@@ -3924,11 +4079,6 @@
     const h2hCount = Array.isArray(match.h2h?.meetings) ? match.h2h.meetings.length : 0;
     const refereeCards = Number(referee.cardsPerGame ?? referee.yellowPerGame ?? referee.cards_per_match);
     const previousChampion = previousChampionForLeague(match.league_name || row.league);
-    const homeCoach = lineupContext(row, 'home')?.coach;
-    const awayCoach = lineupContext(row, 'away')?.coach;
-    const coachTitle = homeCoach || awayCoach ? 'Entraîneurs & style' : 'Styles de jeu estimés';
-    const coachHomeText = homeCoach ? `${homeCoach} · ${inferFootballStyle(home)}` : `${teamDisplayName(row, 'home')} · ${inferFootballStyle(home)}`;
-    const coachAwayText = awayCoach ? `${awayCoach} · ${inferFootballStyle(away)}` : `${teamDisplayName(row, 'away')} · ${inferFootballStyle(away)}`;
     const h2hText = h2hCount ? `H2H ${formatCount(h2hCount)} match(s)` : 'H2H à enrichir';
     return `
       <article class="detail-card wide sport-insight-card">
@@ -3939,16 +4089,12 @@
           ${previousChampion ? `<em>${escapeHtml(`Champion passé : ${previousChampion}`)}</em>` : ''}
         </div>
         ${buildLineupPitch(row)}
+        ${buildCoachTacticsHtml(row)}
         <div class="sport-insight-grid">
           <div>
             <span>Forme récente</span>
             <strong>${escapeHtml(teamDisplayName(row, 'home'))} : ${escapeHtml(sideFormText(home))} · ${escapeHtml(teamDisplayName(row, 'away'))} : ${escapeHtml(sideFormText(away))}</strong>
             <em>${escapeHtml(`${sideGoalText(home)} / ${sideGoalText(away)}`)}</em>
-          </div>
-          <div>
-            <span>${escapeHtml(coachTitle)}</span>
-            <strong>${escapeHtml(coachHomeText)}</strong>
-            <em>${escapeHtml(coachAwayText)}</em>
           </div>
           <div>
             <span>Arbitre</span>
@@ -4051,12 +4197,13 @@
         statChip('WR terre', player?.clay_win_rate, '%', 0),
         statChip('Titres saison', player?.season_titles, '', 0)
       ].filter(Boolean).join('');
-      if (!chips) return '';
+      const playerName = player?.name || `Joueur ${index + 1}`;
       return `
-            <article class="key-player-card">
-              <strong>${escapeHtml(player?.name || `Joueur ${index + 1}`)}</strong>
+            <article class="key-player-card has-photo">
+              <div class="key-player-photo-wrap">${playerPhotoHtml(playerName, { sport: 'tennis' }, { size: 64 })}</div>
+              <strong>${escapeHtml(playerName)}</strong>
               <em>${escapeHtml(index === 0 ? 'Profil joueur gauche' : 'Profil joueur droit')}</em>
-              <div class="stat-chip-row">${chips}</div>
+              ${chips ? `<div class="stat-chip-row">${chips}</div>` : '<em>Stats tennis à confirmer</em>'}
             </article>`;
     }).filter(Boolean).join('');
     const rows = [
@@ -4088,6 +4235,59 @@
         </div>
         ${playerCards ? `<div class="key-player-grid">${playerCards}</div>` : ''}
       </article>
+    `;
+  }
+
+  function namesFromSportValue(value) {
+    if (!value) return [];
+    if (Array.isArray(value)) return value.flatMap((item) => namesFromSportValue(item));
+    if (typeof value === 'object') return namesFromSportValue(value.name || value.player || value.label || value.title);
+    return String(value)
+      .split(/\s+vs\s+|,|·|\/|\||;/i)
+      .map((item) => item.trim())
+      .filter((item) => item && !looksLikePlaceholderValue(item) && !/[?]/.test(item))
+      .slice(0, 8);
+  }
+
+  function buildOtherSportPeopleHtml(row, homeAdv, awayAdv) {
+    const sport = String(row?.sport || row?.match?.sport || '').toLowerCase();
+    const sportHint = row?.sport || row?.match?.sport || '';
+    const rows = [];
+    const pushPerson = (name, role, team) => {
+      const safeName = cleanLabel(name, '').trim();
+      if (!safeName || looksLikePlaceholderValue(safeName) || rows.some((item) => normalizeUiKey(item.name) === normalizeUiKey(safeName))) return;
+      rows.push({ name: safeName, role, team });
+    };
+    if (sport.includes('baseball')) {
+      pushPerson(homeAdv.starter || homeAdv.starting_pitcher || homeAdv.pitcher, 'Pitcher probable', teamDisplayName(row, 'home'));
+      pushPerson(awayAdv.starter || awayAdv.starting_pitcher || awayAdv.pitcher, 'Pitcher probable', teamDisplayName(row, 'away'));
+      namesFromSportValue(homeAdv.hot_hitters || homeAdv.lineup).forEach((name) => pushPerson(name, 'Batteur clé', teamDisplayName(row, 'home')));
+      namesFromSportValue(awayAdv.hot_hitters || awayAdv.lineup).forEach((name) => pushPerson(name, 'Batteur clé', teamDisplayName(row, 'away')));
+    } else if (sport.includes('hockey')) {
+      pushPerson(homeAdv.goalie || homeAdv.starting_goalie, 'Gardien probable', teamDisplayName(row, 'home'));
+      pushPerson(awayAdv.goalie || awayAdv.starting_goalie, 'Gardien probable', teamDisplayName(row, 'away'));
+      namesFromSportValue(homeAdv.lines || homeAdv.top_line).forEach((name) => pushPerson(name, 'Ligne forte', teamDisplayName(row, 'home')));
+      namesFromSportValue(awayAdv.lines || awayAdv.top_line).forEach((name) => pushPerson(name, 'Ligne forte', teamDisplayName(row, 'away')));
+    } else if (sport.includes('basket')) {
+      namesFromSportValue(homeAdv.starters || homeAdv.star_form || homeAdv.top_players).forEach((name) => pushPerson(name, 'Cinq majeur / star', teamDisplayName(row, 'home')));
+      namesFromSportValue(awayAdv.starters || awayAdv.star_form || awayAdv.top_players).forEach((name) => pushPerson(name, 'Cinq majeur / star', teamDisplayName(row, 'away')));
+    } else {
+      const { home, away } = getSides(row?.match || {});
+      pushPerson(home?.athlete || home?.fighter || home?.player, 'Profil principal', teamDisplayName(row, 'home'));
+      pushPerson(away?.athlete || away?.fighter || away?.player, 'Profil principal', teamDisplayName(row, 'away'));
+    }
+    if (!rows.length) return '';
+    return `
+      <h5>${escapeHtml(t('keyPlayers'))}</h5>
+      <div class="key-player-grid">
+        ${rows.slice(0, 8).map((item) => `
+          <article class="key-player-card has-photo">
+            <div class="key-player-photo-wrap">${playerPhotoHtml(item.name, { sport: sportHint, team: item.team }, { size: 64 })}</div>
+            <strong>${escapeHtml(item.name)}</strong>
+            <em>${escapeHtml(`${item.role} · ${item.team}`)}</em>
+          </article>
+        `).join('')}
+      </div>
     `;
   }
 
@@ -4131,8 +4331,9 @@
         <div class="sport-insight-grid">
           ${renderDetailPairs(sportRows)}
         </div>
+        ${buildOtherSportPeopleHtml(row, homeAdv, awayAdv) || `
         <h5>${escapeHtml(t('keyPlayers'))}</h5>
-        <div class="key-player-grid">
+        <div class="key-player-grid team-stat-grid">
           ${[
             [home?.name || 'Équipe 1', homeAdv],
             [away?.name || 'Équipe 2', awayAdv]
@@ -4150,7 +4351,7 @@
               </div>
             </article>
           `).join('')}
-        </div>
+        </div>`}
       </article>
     `;
   }
@@ -4348,7 +4549,7 @@
     if (Number(row?.oddsMovementPct || 0) <= -0.05) parts.push('cote en baisse rapide');
     // Météo / arbitre signal foot
     const refereeCards = Number(row?.match?.referee?.cardsPerGame);
-    if (Number.isFinite(refereeCards) && refereeCards >= 4.5) parts.push(`arbitre sévère (${refereeCards.toFixed(1)} cartons/m)`);
+    if (Number.isFinite(refereeCards) && refereeCards >= 4.5) parts.push('arbitre strict');
     // Avantage modèle
     if (row.safeAssessment?.reliable) parts.push('profil fiable');
     if (Number(row.priorityScore || 0) >= 60) parts.push('priorité haute');

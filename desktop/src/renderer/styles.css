@@ -6970,12 +6970,13 @@ body.trading-desk-on .tab-panel[data-panel="dashboard"].active > #cockpit-detail
 }
 
 .pitch-player-token.compact {
-  grid-template-columns: minmax(18px, auto) minmax(0, 1fr);
+  grid-template-columns: 22px minmax(16px, auto) minmax(0, 1fr);
   padding: 5px;
 }
 
-.pitch-player-token.compact .pitch-player-photo {
-  display: none;
+.pitch-player-token.compact .pitch-player-photo .player-photo {
+  width: 18px;
+  height: 18px;
 }
 
 .pitch-player-token.hot {
@@ -7080,12 +7081,93 @@ body.trading-desk-on .tab-panel[data-panel="dashboard"].active > #cockpit-detail
 }
 
 .key-player-grid,
+.coach-tactics-grid,
 .tactical-duel-grid,
 .source-mini-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 12px;
   margin-top: 12px;
+}
+
+.coach-tactics-card {
+  margin-top: 12px;
+}
+
+.coach-tactic-card {
+  min-width: 0;
+  display: grid;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid rgba(99, 102, 241, .22);
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(99, 102, 241, .10), rgba(16, 185, 129, .05));
+}
+
+.coach-tactic-card.coach-missing {
+  border-style: dashed;
+  background: var(--surface-2);
+}
+
+.coach-tactic-card.coach-resolved {
+  border-color: rgba(16, 185, 129, .34);
+  background: linear-gradient(135deg, rgba(16, 185, 129, .10), rgba(99, 102, 241, .05));
+}
+
+.coach-tactic-head {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+}
+
+.coach-tactic-head span,
+.coach-tactic-body span {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .4px;
+  text-transform: uppercase;
+}
+
+.coach-tactic-head strong,
+.coach-tactic-body strong {
+  display: block;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+.coach-tactic-head em,
+.coach-tactic-body p {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-style: normal;
+  line-height: 1.45;
+}
+
+.coach-tactic-body {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.coach-tactic-body p {
+  grid-column: 1 / -1;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.coach-team-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+}
+
+.coach-photo-slot {
+  display: inline-grid;
+  place-items: center;
 }
 
 .key-player-side {
@@ -7108,6 +7190,35 @@ body.trading-desk-on .tab-panel[data-panel="dashboard"].active > #cockpit-detail
   border: 1px solid var(--line);
   border-radius: 12px;
   background: var(--surface-2);
+}
+
+.tactical-player-pair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+}
+
+.tactical-player-pair > b {
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.tactical-player {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+}
+
+.tactical-player strong {
+  display: block;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .key-player-card strong,
@@ -7176,9 +7287,19 @@ body.trading-desk-on .tab-panel[data-panel="dashboard"].active > #cockpit-detail
 @media (max-width: 860px) {
   .match-context-band,
   .lineup-pitch,
+  .coach-tactics-grid,
   .key-player-grid,
   .tactical-duel-grid {
     grid-template-columns: 1fr;
+  }
+
+  .coach-tactic-body,
+  .tactical-player-pair {
+    grid-template-columns: 1fr;
+  }
+
+  .tactical-player-pair > b {
+    display: none;
   }
 }
 

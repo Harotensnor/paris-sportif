@@ -1938,45 +1938,9 @@ function createLegacyEngineService({ projectRoot }) {
           warnings: [`Filet 2-0 Winamax ${Math.round(twoGoalPct * 100)}%`, 'Mise prudente : avantage court mais contexte fort', ...warnings].slice(0, 4)
         };
       }
-      const nonFootWinnerReliable = isOneN2
-        && !isFootball
-        && rawEdge >= 0.003
-        && edge >= 0.003
-        && odd >= 1.30
-        && odd <= 2.10
-        && confidence >= 0.72
-        && contextScore >= 80
-        && sample >= 40
-        && Number.isFinite(roi)
-        && roi >= 0.08
-        && !row?.signalConflict?.active
-        && !row?.oddsGuardrail?.applied
-        && !hardCriticalMissing.length;
-      if (nonFootWinnerReliable) {
-        return {
-          status: 'reliable',
-          label: 'Fiable',
-          reliable: true,
-          displayable: true,
-          conservativeEdge: edge,
-          rawEdge,
-          edgeCapped: edgeInfo.capped,
-          confidence,
-          sample,
-          roi,
-          policy: policy ? {
-            key: policy.key,
-            direction: policy.direction,
-            edgeMin,
-            oddMax,
-            confidenceMin,
-            reason: policy.reason
-          } : null,
-          reliableRule: 'vainqueur-prudent',
-          reasons: [],
-          warnings: ['Vainqueur multi-sport validé par historique positif', ...warnings].slice(0, 4)
-        };
-      }
+      // Une ligne cote-based reste une ligne "à surveiller" hors filet
+      // 2-0 Winamax. Même si le segment historique est bon, on ne la rend
+      // pas actionnable tant que le dossier match reste en confiance limitée.
       // Sprint 42 : pour les sports hors foot (tennis/baseball/basket/
       // hockey), les fallbacks cote-based peuvent avoir un edge brut
       // légèrement négatif (jusqu'à -4pt) à cause des cotes serrées.
