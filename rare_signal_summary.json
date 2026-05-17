@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-05-17T20:43:32Z",
+  "generated_at": "2026-05-17T20:48:37Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 46,
-    "actionable": 7,
-    "watch": 3,
+    "actionable": 8,
+    "watch": 2,
     "risk": 36,
     "expired_sample": 0,
     "by_type": {
@@ -17,8 +17,8 @@
       "signal_conflict": 1
     },
     "by_quality": {
-      "actionable": 7,
-      "watch": 3,
+      "actionable": 8,
+      "watch": 2,
       "risk": 36
     }
   },
@@ -148,9 +148,7 @@
       "side": "away",
       "strength": 0.726,
       "context": "1 match dans les 48h + 979 km de voyage"
-    }
-  ],
-  "active_watch": [
+    },
     {
       "event_id": "401872573",
       "date": "2026-05-18T01:00Z",
@@ -160,15 +158,17 @@
       "home": "Pumas UNAM",
       "away": "Pachuca",
       "match": "Pumas UNAM - Pachuca",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
       "type": "market_move",
       "direction": "steam",
       "team": null,
       "side": "home",
-      "strength": 0.591,
-      "context": "Cote home: 2.35 -> 2.10 (+10.6%)"
-    },
+      "strength": 0.694,
+      "context": "Cote home: 2.40 -> 2.10 (+12.5%)"
+    }
+  ],
+  "active_watch": [
     {
       "event_id": "178339",
       "date": "2026-05-18T08:00Z",
@@ -208,24 +208,6 @@
   ],
   "active_risk": [
     {
-      "event_id": "176120",
-      "date": "2026-05-19T04:00Z",
-      "sport": "tennis",
-      "league_code": "internationauxdestra",
-      "league_name": "Internationaux de Strasbourg presented by Mammotion",
-      "home": "",
-      "away": "",
-      "match": "? - ?",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 12.0%"
-    },
-    {
       "event_id": "175450",
       "date": "2026-05-19T04:00Z",
       "sport": "tennis",
@@ -242,6 +224,24 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 12.1%"
+    },
+    {
+      "event_id": "176120",
+      "date": "2026-05-19T04:00Z",
+      "sport": "tennis",
+      "league_code": "internationauxdestra",
+      "league_name": "Internationaux de Strasbourg presented by Mammotion",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 12.0%"
     },
     {
       "event_id": "178349",
