@@ -58,12 +58,15 @@
     sourceHealth: null,
     sourceHealthV6: null,
     sourceHealthV7: null,
+    sourceHealthV8: null,
     marketCoverageV2: null,
     terrainReportV2: null,
     terrainReportV3: null,
     terrainReportV4: null,
+    terrainReportV5: null,
     modelBacktestV4: null,
     modelBacktestV5: null,
+    modelBacktestV6: null,
     decisionCenter: null,
     agentBlockers: null,
     clvSummary: null,
@@ -4700,15 +4703,18 @@
     state.modelRealityAudit = analysis.modelRealityAudit || null;
     state.probabilityCalibration = analysis.probabilityCalibration || null;
     state.policyCandidates = analysis.policyCandidates || null;
-    state.sourceHealth = analysis.sourceHealthV7 || analysis.sourceHealthV6 || analysis.sourceHealthV5 || analysis.sourceHealth || null;
+    state.sourceHealth = analysis.sourceHealthV8 || analysis.sourceHealthV7 || analysis.sourceHealthV6 || analysis.sourceHealthV5 || analysis.sourceHealth || null;
     state.sourceHealthV6 = analysis.sourceHealthV6 || null;
     state.sourceHealthV7 = analysis.sourceHealthV7 || null;
+    state.sourceHealthV8 = analysis.sourceHealthV8 || null;
     state.marketCoverageV2 = analysis.marketCoverageV2 || null;
     state.terrainReportV2 = analysis.terrainReportV2 || null;
     state.terrainReportV3 = analysis.terrainReportV3 || null;
     state.terrainReportV4 = analysis.terrainReportV4 || null;
+    state.terrainReportV5 = analysis.terrainReportV5 || null;
     state.modelBacktestV4 = analysis.modelBacktestV4 || null;
     state.modelBacktestV5 = analysis.modelBacktestV5 || null;
+    state.modelBacktestV6 = analysis.modelBacktestV6 || null;
     state.decisionCenter = analysis.decisionCenter || null;
     state.agentBlockers = analysis.agentBlockers || null;
     state.clvSummary = analysis.clvSummary || null;
@@ -13169,11 +13175,14 @@
   }
 
   function buildV3SheetSnapshotHtml(row) {
-    const sheet = row?.matchSheetV5 || row?.matchSheetV4 || row?.matchSheetV3 || null;
-    const decision = row?.pickDecisionV5 || row?.pickDecisionV4 || row?.pickDecisionV3 || null;
+    const sheet = row?.matchSheetV6 || row?.matchSheetV5 || row?.matchSheetV4 || row?.matchSheetV3 || null;
+    const decision = row?.pickDecisionV6 || row?.pickDecisionV5 || row?.pickDecisionV4 || row?.pickDecisionV3 || null;
     if (!sheet || !decision) return '';
     const quality = sheet.summary?.sourceQuality || decision.sourceQuality || {};
     const missing = Array.isArray(sheet.missingData) ? sheet.missingData : [];
+    const missingCritical = Array.isArray(decision.missingCriticalSignals) ? decision.missingCriticalSignals : [];
+    const sourceRepairPlan = Array.isArray(decision.sourceRepairPlan) ? decision.sourceRepairPlan : [];
+    const readiness = Number.isFinite(Number(decision.betReadinessScore)) ? Math.round(Number(decision.betReadinessScore)) : null;
     const sourceCount = Array.isArray(sheet.sources) ? sheet.sources.length : 0;
     const homeLineup = sheet.lineups?.home || {};
     const awayLineup = sheet.lineups?.away || {};
@@ -13191,11 +13200,11 @@
       : 'Observation sans bouton de mise';
     return `
       <article class="detail-card wide v3-sheet-card">
-        <h4>Dossier pronostic ${sheet.schema?.includes('v5') ? 'v5' : sheet.schema?.includes('v4') ? 'v4' : 'v3'}</h4>
+        <h4>Dossier pronostic ${sheet.schema?.includes('v6') ? 'v6' : sheet.schema?.includes('v5') ? 'v5' : sheet.schema?.includes('v4') ? 'v4' : 'v3'}</h4>
         <div class="match-context-band">
           <span>${escapeHtml(decision.marketFamily || simpleMarketLabelForRow(row))}</span>
-          <strong>${escapeHtml(canBetText)}</strong>
-          <em>${escapeHtml(`Qualité source ${quality.score != null ? `${quality.score}/100` : quality.tier || 'à vérifier'} · couverture ${sheet.sourceCoverageScore != null ? `${sheet.sourceCoverageScore}/100` : `${sourceCount} sources locales`}`)}</em>
+          <strong>${escapeHtml(readiness != null ? `${canBetText} · readiness ${readiness}/100` : canBetText)}</strong>
+          <em>${escapeHtml(decision.userFastCopy || `Qualité source ${quality.score != null ? `${quality.score}/100` : quality.tier || 'à vérifier'} · couverture ${sheet.sourceCoverageScore != null ? `${sheet.sourceCoverageScore}/100` : `${sourceCount} sources locales`}`)}</em>
         </div>
         <div class="sheet-signal-strip compact">
           <div class="${sections.length >= 4 ? 'ok' : 'missing'}">
@@ -13208,10 +13217,20 @@
             <strong>${escapeHtml(missing.length ? missing.slice(0, 5).join(' · ') : 'Aucun manque bloquant')}</strong>
             <em>${escapeHtml(missing.length ? 'Ces points ne sont pas inventés.' : 'Les signaux essentiels sont présents.')}</em>
           </div>
+          ${missingCritical.length ? `<div class="missing">
+            <span>Bloque la mise</span>
+            <strong>${escapeHtml(missingCritical.slice(0, 4).map((item) => item.reason || item.source || String(item)).join(' · '))}</strong>
+            <em>${escapeHtml('Le bouton reste absent tant que ces signaux critiques ne sont pas revenus.')}</em>
+          </div>` : ''}
           ${hidden.length ? `<div class="missing">
             <span>Masqué car vide</span>
             <strong>${escapeHtml(hidden.slice(0, 4).map((item) => item.section).join(' · '))}</strong>
             <em>${escapeHtml('Ces blocs ne polluent plus la fiche tant que la donnée fiable manque.')}</em>
+          </div>` : ''}
+          ${sourceRepairPlan.length ? `<div class="missing">
+            <span>Réparation source</span>
+            <strong>${escapeHtml(sourceRepairPlan.slice(0, 3).map((item) => item.source || item.reason || 'source').join(' · '))}</strong>
+            <em>${escapeHtml(sourceRepairPlan[0]?.repairCommand || sourceRepairPlan[0]?.reason || 'Relancer la réparation prioritaire depuis Avancé.')}</em>
           </div>` : ''}
           ${decision.repairable ? `<div class="missing">
             <span>Réparable</span>
@@ -14575,7 +14594,7 @@
     const grid = $('#model-lab-grid');
     if (!grid) return;
     const model = state.modelLab || {};
-    const backtest = state.modelBacktestV5 || state.modelBacktestV4 || {};
+    const backtest = state.modelBacktestV6 || state.modelBacktestV5 || state.modelBacktestV4 || {};
     const prob = state.probabilityCalibration || {};
     const policies = Array.isArray(state.policyCandidates?.policies) ? state.policyCandidates.policies : [];
     const summary = model.summary || {};
@@ -14648,25 +14667,29 @@
     };
     const avgScore = Number.isFinite(Number(summary.avg_score))
       ? Number(summary.avg_score)
+      : Number.isFinite(Number(summary.averageScore))
+        ? Number(summary.averageScore)
       : rows.length
         ? rows.reduce((sum, row) => sum + scoreFor(row), 0) / rows.length
         : 0;
     const cards = [
       {
-        tone: Number(summary.critical || 0) ? 'danger' : Number(summary.degraded || summary.warning || 0) ? 'warn' : 'ok',
+        tone: Number(summary.coverageCritical || summary.critical || 0) ? 'danger' : Number(summary.coverageDegraded || summary.degraded || summary.warning || 0) ? 'warn' : 'ok',
         label: 'Score sources',
         value: `${avgScore.toFixed(0)}/100`,
-        detail: `${formatCount(summary.sources || rows.length)} sources · ${formatCount(summary.degraded || 0)} dégradée(s) · ${formatCount(summary.autoRepairable || 0)} réparable(s) · gain estimé ${formatCount(summary.estimatedPickGain || 0)}.`
+        detail: `${formatCount(summary.sources || rows.length)} sources · ${formatCount(summary.coverageDegraded || summary.degraded || 0)} dégradée(s) · ${formatCount(summary.coverageCritical || summary.critical || 0)} critique(s) · ${formatCount(summary.blockedReadyCount || 0)} prêt(s) bloqué(s) · gain estimé ${formatCount(summary.estimatedReadyGain || summary.estimatedPickGain || 0)}.`
       },
       ...rows.slice(0, 7).map((row) => {
         const ageValue = row.age_min ?? row.age;
         const coverage = row.currentCoverage ?? row.coverage ?? row.score;
         const target = row.targetCoverage != null ? ` / cible ${Math.round(Number(row.targetCoverage) * 100)}%` : '';
+        const statusLabel = row.coverageStatus ? `${row.technicalStatus || row.status || 'tech'} / ${row.coverageStatus}` : (row.status || row.kind || 'source');
+        const repairLabel = row.repairCommand || row.action || row.note || row.lastError || '-';
         return {
           tone: scoreFor(row) < 50 ? 'danger' : scoreFor(row) < 80 ? 'warn' : 'ok',
-          label: row.status || row.kind || 'source',
+          label: statusLabel,
           value: `${row.source || '-'} · ${Number.isFinite(Number(coverage)) ? `${Math.round((Number(coverage) > 1 ? Number(coverage) : Number(coverage) * 100))}%${target}` : formatCount(scoreFor(row))}`,
-          detail: `${row.repairCommand ? `Réparer: ${row.repairCommand}` : row.action || row.note || '-'} · âge ${ageValue != null ? formatAge(Math.round(Number(ageValue))) : 'inconnu'} · TTL ${row.ttl_min ?? row.ttl ?? row.retryPolicy?.ttlMinutes ?? '-'} min`
+          detail: `${row.blockedReadyCount ? `${formatCount(row.blockedReadyCount)} prêt(s) bloqué(s) · ` : ''}${repairLabel}${row.providerErrorCode ? ` · erreur ${row.providerErrorCode}` : ''} · âge ${ageValue != null ? formatAge(Math.round(Number(ageValue))) : 'inconnu'} · TTL ${row.ttl_min ?? row.ttl ?? row.retryPolicy?.ttlMinutes ?? '-'} min`
         };
       })
     ];

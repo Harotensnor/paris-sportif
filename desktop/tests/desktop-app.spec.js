@@ -94,10 +94,7 @@ test('Sprint 23 desktop keeps clear Winamax picks with supervised workflows', as
 
     await win.waitForSelector('[data-panel="dashboard"].active', { timeout: 60_000 });
     await win.waitForFunction(() => document.querySelector('#metric-picks')?.textContent !== '-', null, { timeout: 90_000 });
-    await win.waitForFunction(() => (
-      document.querySelectorAll('#home-top3-grid .home-top-card').length > 0 ||
-      /Aucun pari|Top 3 incomplet/i.test(document.querySelector('#home-top3-grid')?.textContent || '')
-    ), null, { timeout: 90_000 });
+    await win.waitForFunction(() => document.querySelectorAll('#home-top3-grid .home-top-card').length > 0, null, { timeout: 90_000 });
 
     const cockpit = await win.evaluate(() => ({
       title: document.querySelector('#page-title')?.textContent || '',
@@ -203,7 +200,7 @@ test('Sprint 23 desktop keeps clear Winamax picks with supervised workflows', as
     await expect(win.locator('#pref-auto-tracking-enabled')).toHaveCount(1);
     await expect(win.locator('#pref-live-news-watcher')).toBeVisible();
     await expect(win.locator('#pref-language')).toBeVisible();
-    await expect(win.locator('#app-version-label')).toContainText('v3.2.0');
+    await expect(win.locator('#app-version-label')).toContainText('v4.0.0');
     await win.selectOption('#pref-theme', 'light');
     await expect(win.locator('body')).toHaveClass(/theme-light/);
     await win.selectOption('#pref-theme', 'dark');

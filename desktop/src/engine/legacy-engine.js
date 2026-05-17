@@ -4059,6 +4059,125 @@ function createLegacyEngineService({ projectRoot }) {
     };
   }
 
+  function buildSourceHealthV8(sourceHealthV7 = {}, sourceHealthReport = {}, healthReport = {}, coverageRepair = {}, targets = {}) {
+    const technicalRows = Array.isArray(sourceHealthReport?.sources) ? sourceHealthReport.sources : [];
+    const healthSources = Array.isArray(healthReport?.sources) ? healthReport.sources : [];
+    const repairActions = Array.isArray(coverageRepair?.actions) ? coverageRepair.actions : [];
+    const targetRows = Array.isArray(targets?.sources) ? targets.sources : [];
+    const rowsBySource = new Map();
+    const normalizeSource = (value) => String(value || '').trim();
+    const upsert = (source, patch = {}) => {
+      const key = normalizeSource(source);
+      if (!key) return;
+      rowsBySource.set(key, { ...(rowsBySource.get(key) || { source: key }), ...patch });
+    };
+    for (const source of Array.isArray(sourceHealthV7?.sources) ? sourceHealthV7.sources : []) upsert(source.source, source);
+    for (const source of technicalRows) {
+      upsert(source.source || source.key, {
+        technicalStatus: source.status || 'unknown',
+        technicalScore: Number(source.score ?? NaN),
+        age: source.age ?? source.age_min ?? null,
+        ttl: source.ttl ?? source.ttl_min ?? null,
+        technicalNote: source.note || source.action || null
+      });
+    }
+    for (const source of healthSources) {
+      upsert(source.source || source.name || source.key, {
+        lastError: source.lastError || source.error || null,
+        age: source.age ?? source.age_min ?? rowsBySource.get(normalizeSource(source.source || source.name || source.key))?.age ?? null
+      });
+    }
+    for (const target of targetRows) {
+      upsert(target.source || target.key, {
+        targetCoverage: target.target_rate ?? target.targetCoverage ?? null,
+        currentCoverage: target.current_rate ?? target.coverage ?? null
+      });
+    }
+    for (const action of repairActions) {
+      upsert(action.source || action.raw_source, {
+        repairPriority: action.priority || 'high',
+        blockedReadyCount: Number(action.critical || action.affected_matches || 0) || 0,
+        estimatedReadyGain: Number(action.estimated_gain || 0) || 0,
+        repairCommand: Array.isArray(action.command) ? action.command.join(' ') : null,
+        repairDetail: action.detail || null,
+        affectedMatches: Number(action.affected_matches || 0) || 0
+      });
+    }
+    const sources = Array.from(rowsBySource.values()).map((source) => {
+      const currentCoverage = Number(source.currentCoverage ?? source.coverage ?? NaN);
+      const targetCoverage = Number(source.targetCoverage ?? NaN);
+      const deltaToTarget = Number.isFinite(currentCoverage) && Number.isFinite(targetCoverage)
+        ? Math.max(0, targetCoverage - currentCoverage)
+        : source.deltaToTarget ?? null;
+      const technicalScore = Number(source.technicalScore);
+      const coverageScore = Number.isFinite(currentCoverage) ? Math.round(Math.max(0, Math.min(100, (currentCoverage > 1 ? currentCoverage : currentCoverage * 100)))) : null;
+      const coverageStatus = source.blocksPick || source.repairPriority === 'critical'
+        ? 'critical'
+        : deltaToTarget != null && deltaToTarget > 0.15
+          ? 'degraded'
+          : deltaToTarget != null && deltaToTarget > 0.001
+            ? 'watch'
+            : 'ok';
+      const technicalStatus = source.technicalStatus || source.status || 'unknown';
+      const unifiedScore = Math.round(Math.max(0, Math.min(100,
+        Math.min(
+          Number.isFinite(technicalScore) ? technicalScore : technicalStatus === 'ok' ? 100 : technicalStatus === 'preserved' ? 75 : 55,
+          coverageScore != null ? coverageScore : coverageStatus === 'critical' ? 35 : coverageStatus === 'degraded' ? 55 : 85
+        )
+      )));
+      const lastError = source.lastError || '';
+      const providerErrorCode = /403/.test(lastError) ? '403'
+        : /429/.test(lastError) ? '429'
+          : /5\d\d/.test(lastError) ? '5xx'
+            : lastError ? 'error' : null;
+      const ageMinutes = Number(source.age);
+      return {
+        ...source,
+        schema: undefined,
+        technicalStatus,
+        coverageStatus,
+        currentCoverage: Number.isFinite(currentCoverage) ? currentCoverage : null,
+        targetCoverage: Number.isFinite(targetCoverage) ? targetCoverage : null,
+        deltaToTarget,
+        score: unifiedScore,
+        blockedReadyCount: Number(source.blockedReadyCount || source.blocksPickCount || source.affectedMatches || 0) || 0,
+        estimatedReadyGain: Number(source.estimatedReadyGain || source.estimatedPickGain || 0) || 0,
+        lastSuccessfulFetch: Number.isFinite(ageMinutes) ? new Date(Date.now() - ageMinutes * 60000).toISOString() : null,
+        fallbackSnapshot: Boolean(source.preservedSnapshot || source.lastHealthySnapshot),
+        providerErrorCode,
+        quarantineUntil: source.quarantineUntil || null,
+        manualFallbackAllowed: technicalStatus !== 'ok' && !/^winamax$/i.test(String(source.source || '')),
+        retryPolicy: source.retryPolicy || {
+          mode: source.repairCommand ? 'signals' : 'manual',
+          maxAttempts: source.repairCommand ? 3 : 1,
+          backoffMinutes: source.repairCommand ? [5, 15, 45] : [],
+          ttlMinutes: source.ttl ?? source.ttl_min ?? null
+        }
+      };
+    }).sort((a, b) => {
+      const order = { critical: 0, degraded: 1, watch: 2, preserved: 3, unknown: 4, ok: 5 };
+      return (order[a.coverageStatus] ?? 4) - (order[b.coverageStatus] ?? 4) ||
+        Number(b.estimatedReadyGain || 0) - Number(a.estimatedReadyGain || 0) ||
+        String(a.source || '').localeCompare(String(b.source || ''));
+    });
+    return {
+      schema: 'paris-sportif.source_health.v8',
+      generatedAt: new Date().toISOString(),
+      summary: {
+        sources: sources.length,
+        technicalOk: sources.filter((s) => s.technicalStatus === 'ok').length,
+        coverageOk: sources.filter((s) => s.coverageStatus === 'ok').length,
+        coverageCritical: sources.filter((s) => s.coverageStatus === 'critical').length,
+        coverageDegraded: sources.filter((s) => s.coverageStatus === 'degraded').length,
+        fallbackSnapshots: sources.filter((s) => s.fallbackSnapshot).length,
+        blockedReadyCount: sources.reduce((sum, source) => sum + Number(source.blockedReadyCount || 0), 0),
+        estimatedReadyGain: sources.reduce((sum, source) => sum + Number(source.estimatedReadyGain || 0), 0),
+        firstRepair: sources.find((s) => s.repairCommand && (s.coverageStatus === 'critical' || s.coverageStatus === 'degraded'))?.source || null
+      },
+      sources
+    };
+  }
+
   function readableMarketFamily(row) {
     const group = simpleMarketGroup(row?.marketKey || row?.market);
     if (group === 'winner') return 'Vainqueur';
@@ -4290,6 +4409,94 @@ function createLegacyEngineService({ projectRoot }) {
         long: v4.whyLong || pickWhyV3(row),
         noBetReason: v4.canBet ? null : v4.canBetReason
       }
+    };
+  }
+
+  function buildPickDecisionV6(row, sourceHealthV8 = null) {
+    const v5 = row?.pickDecisionV5 || buildPickDecisionV5(row);
+    const sourceRows = Array.isArray(sourceHealthV8?.sources) ? sourceHealthV8.sources : [];
+    const sourceMap = new Map(sourceRows.map((source) => [String(source.source || '').toLowerCase(), source]));
+    const critical = Array.isArray(v5.missingForBet) ? v5.missingForBet : [];
+    const optional = Array.isArray(v5.missingForDisplay) ? v5.missingForDisplay : [];
+    const missingCriticalSignals = critical.map((reason) => ({
+      source: signalSourceFromMissing(reason),
+      reason
+    })).slice(0, 8);
+    const missingOptionalSignals = optional.map((reason) => ({
+      source: signalSourceFromMissing(reason),
+      reason
+    })).slice(0, 8);
+    const repairSources = [...new Set([...missingCriticalSignals, ...missingOptionalSignals].map((item) => item.source))];
+    const sourceRepairPlan = repairSources.map((source) => {
+      const rowSource = sourceMap.get(String(source).toLowerCase()) || {};
+      return {
+        source,
+        priority: rowSource.coverageStatus === 'critical' ? 'critical' : rowSource.repairPriority || 'medium',
+        command: rowSource.repairCommand || `python desktop/bin/refresh_once.py --signals --signal-source ${source}`,
+        estimatedReadyGain: Number(rowSource.estimatedReadyGain || rowSource.estimatedPickGain || 0) || 0,
+        blocksBet: missingCriticalSignals.some((item) => item.source === source)
+      };
+    }).slice(0, 6);
+    const missingPenalty = missingCriticalSignals.length * 12 + missingOptionalSignals.length * 4;
+    const sourcePenalty = v5.sourceBlocksBet ? 18 : 0;
+    const stakeAllowed = Boolean(v5.stakePolicy?.allowed && Number(v5.stakePolicy?.stake || 0) > 0);
+    const betReadinessScore = Math.round(Math.max(0, Math.min(100,
+      Number(v5.userFastBetScore || v5.modelScore || 0) + (stakeAllowed ? 10 : -8) - missingPenalty - sourcePenalty
+    )));
+    const twoGoalProbability = Number(row?.winamaxTwoGoalRule?.leadTwoProbability ?? v5.winamaxRuleFlags?.twoGoalLeadProbability ?? 0) || 0;
+    const isNight = Boolean(v5.nightStatus?.isNight);
+    return {
+      ...v5,
+      schema: 'paris-sportif.pick_decision.v6',
+      betReadinessScore,
+      missingCriticalSignals,
+      missingOptionalSignals,
+      sourceRepairPlan,
+      marketQuotaTrace: {
+        status: v5.quotaStatus?.status || 'unknown',
+        applied: Boolean(v5.quotaStatus?.applied),
+        reason: v5.quotaStatus?.reason || null
+      },
+      sportQuotaTrace: {
+        sport: row?.sport || row?.match?.sport || null,
+        cap: 'max 45% cockpit',
+        reason: row?.sportQuotaReason || null
+      },
+      leagueQuotaTrace: {
+        league: row?.match?.league_code || row?.league || row?.match?.league_name || null,
+        cap: 'max 30% cockpit',
+        reason: row?.leagueQuotaReason || null
+      },
+      twoGoalRuleTrace: {
+        eligible: Boolean(row?.winamaxTwoGoalRule?.eligible || v5.winamaxRuleFlags?.twoGoalEarlyPayout),
+        probability: twoGoalProbability,
+        adjustedEdge: Number(row?.winamaxTwoGoalRule?.afterEdge ?? v5.winamaxRuleFlags?.earlyPayoutAdjustedEdge ?? 0) || 0,
+        label: twoGoalProbability > 0 ? `Filet 2-0 Winamax ${Math.round(twoGoalProbability * 100)}%` : null
+      },
+      nightUnlockReason: isNight
+        ? stakeAllowed
+          ? 'Nuit prête : edge positif, cote Winamax et sources suffisantes'
+          : sourceRepairPlan[0]?.source
+            ? `Nuit à débloquer : réparer ${sourceRepairPlan[0].source}`
+            : 'Nuit en observation : signal encore insuffisant'
+        : null,
+      confidenceBreakdown: {
+        model: Number(v5.modelScore || 0),
+        fastBet: Number(v5.userFastBetScore || 0),
+        sourceQuality: Number(v5.sourceQuality?.score || 0),
+        readiness: betReadinessScore
+      },
+      riskBreakdown: {
+        missingCritical: missingCriticalSignals.length,
+        missingOptional: missingOptionalSignals.length,
+        sourceBlocksBet: Boolean(v5.sourceBlocksBet),
+        riskReasons: Array.isArray(v5.riskReasons) ? v5.riskReasons.slice(0, 6) : []
+      },
+      userFastCopy: stakeAllowed
+        ? `${v5.marketFamily || 'Pari'} prêt · ${v5.stakeDisplay || `${Number(v5.stake || 0).toFixed(2)} €`}`
+        : sourceRepairPlan[0]?.source
+          ? `À surveiller : ${sourceRepairPlan[0].source} à réparer avant mise`
+          : v5.userCopy?.noBetReason || 'Observation sans mise'
     };
   }
 
@@ -4532,19 +4739,91 @@ function createLegacyEngineService({ projectRoot }) {
     };
   }
 
-  function attachV3Contracts(row, sourceHealthV5, sourceHealthV6 = null, sourceHealthV7 = null) {
+  function buildMatchSheetV6(row, sourceHealthV8) {
+    const v5 = row?.matchSheetV5 || buildMatchSheetV5(row, sourceHealthV8);
+    const sport = String(v5.summary?.sport || row?.sport || row?.match?.sport || '').toLowerCase();
+    const sportTemplate = /football|soccer/.test(sport)
+      ? 'football'
+      : /tennis/.test(sport)
+        ? 'tennis'
+        : /basket/.test(sport)
+          ? 'basketball'
+          : /baseball/.test(sport)
+            ? 'baseball'
+            : /hockey/.test(sport)
+              ? 'hockey'
+              : 'generic';
+    const sectionQuality = v5.sectionQuality || {};
+    const sectionCompleteness = Object.entries(sectionQuality).map(([section, info]) => ({
+      section,
+      status: info.status,
+      score: Number(info.score || 0),
+      required: Array.isArray(v5.requiredSections) && v5.requiredSections.includes(section),
+      reason: info.reason || ''
+    }));
+    const sourceRows = Array.isArray(sourceHealthV8?.sources) ? sourceHealthV8.sources : [];
+    const evidenceLinks = sourceRows.slice(0, 8).map((source) => ({
+      source: source.source,
+      status: source.coverageStatus || source.status,
+      lastSuccessfulFetch: source.lastSuccessfulFetch || null,
+      fallbackSnapshot: Boolean(source.fallbackSnapshot)
+    }));
+    const lastEnrichedAt = v5.lastEnrichedAt || row?.match?.context?.generated_at || row?.match?.updated_at || null;
+    const dataFreshness = {
+      lastEnrichedAt,
+      sourceCount: evidenceLinks.length,
+      stale: lastEnrichedAt ? Date.now() - Date.parse(lastEnrichedAt) > 4 * 60 * 60 * 1000 : true
+    };
+    const lineupHome = v5.lineups?.home || {};
+    const lineupAway = v5.lineups?.away || {};
+    return {
+      ...v5,
+      schema: 'paris-sportif.match_sheet.v6',
+      sportTemplate,
+      sectionCompleteness,
+      evidenceLinks,
+      dataFreshness,
+      playerAvailability: {
+        homeConfirmed: Boolean(lineupHome.confirmed),
+        awayConfirmed: Boolean(lineupAway.confirmed),
+        homeStarters: Number(lineupHome.starters?.length || 0),
+        awayStarters: Number(lineupAway.starters?.length || 0),
+        homeInjuries: Number(v5.injuries?.home?.total || 0),
+        awayInjuries: Number(v5.injuries?.away?.total || 0)
+      },
+      confidenceBreakdown: {
+        lineup: Number(v5.lineupConfidence || 0),
+        players: Number(v5.playerStatsConfidence || 0),
+        teamContext: Number(v5.teamContextConfidence || 0),
+        sourceCoverage: Number(v5.sourceCoverageScore || 0)
+      },
+      sourceWarnings: sourceRows
+        .filter((source) => ['critical', 'degraded', 'watch'].includes(source.coverageStatus || source.status))
+        .slice(0, 8)
+        .map((source) => ({
+          source: source.source,
+          status: source.coverageStatus || source.status,
+          repair: source.repairCommand || null
+        }))
+    };
+  }
+
+  function attachV3Contracts(row, sourceHealthV5, sourceHealthV6 = null, sourceHealthV7 = null, sourceHealthV8 = null) {
     if (!row || typeof row !== 'object') return row;
     const v3 = {
       ...row,
       pickDecisionV3: buildPickDecisionV3(row),
       matchSheetV3: buildMatchSheetV3(row, sourceHealthV5)
     };
+    const pickDecisionV4 = buildPickDecisionV4(v3);
+    const matchSheetV4 = buildMatchSheetV4(v3, sourceHealthV6 || sourceHealthV5);
+    const pickDecisionV5 = buildPickDecisionV5({ ...v3, pickDecisionV4 });
+    const matchSheetV5 = buildMatchSheetV5({ ...v3, matchSheetV4 }, sourceHealthV7 || sourceHealthV6 || sourceHealthV5);
+    const v5 = { ...v3, pickDecisionV4, matchSheetV4, pickDecisionV5, matchSheetV5 };
     return {
-      ...v3,
-      pickDecisionV4: buildPickDecisionV4(v3),
-      matchSheetV4: buildMatchSheetV4(v3, sourceHealthV6 || sourceHealthV5),
-      pickDecisionV5: buildPickDecisionV5({ ...v3, pickDecisionV4: buildPickDecisionV4(v3) }),
-      matchSheetV5: buildMatchSheetV5({ ...v3, matchSheetV4: buildMatchSheetV4(v3, sourceHealthV6 || sourceHealthV5) }, sourceHealthV7 || sourceHealthV6 || sourceHealthV5)
+      ...v5,
+      pickDecisionV6: buildPickDecisionV6(v5, sourceHealthV8 || sourceHealthV7 || sourceHealthV6 || sourceHealthV5),
+      matchSheetV6: buildMatchSheetV6(v5, sourceHealthV8 || sourceHealthV7 || sourceHealthV6 || sourceHealthV5)
     };
   }
 
@@ -4807,6 +5086,114 @@ function createLegacyEngineService({ projectRoot }) {
     };
   }
 
+  function buildTerrainReportV5({ data, dashboardRows, todayFunnel, coverage24h, marketCoverageV2, sourceHealthV8, decisionCenter, criticalIssueReport, coverageRepairEngine, engineLoadMs }) {
+    const v4 = buildTerrainReportV4({
+      data,
+      dashboardRows,
+      todayFunnel,
+      coverage24h,
+      marketCoverageV2,
+      sourceHealthV7: sourceHealthV8,
+      decisionCenter,
+      criticalIssueReport,
+      coverageRepairEngine
+    });
+    const rows = Array.isArray(dashboardRows) ? dashboardRows : [];
+    const readyRows = rows.filter((row) => row?.pickDecisionV6?.canBet || row?.decisionCenter?.canBet);
+    const watchRows = rows.filter((row) => !readyRows.includes(row));
+    const bySport = {};
+    const byMarket = {};
+    const byLeague = {};
+    const emptySections = {};
+    for (const row of rows) {
+      const sport = String(row?.sport || row?.match?.sport || 'sport').toLowerCase();
+      const market = simpleMarketGroup(row?.marketKey || row?.market) || canonicalMarketKey(row?.marketKey || row?.market || 'market');
+      const league = compactKey(row?.match?.league_code || row?.league || row?.match?.league_name || 'league');
+      bySport[sport] = (bySport[sport] || 0) + 1;
+      byMarket[market] = (byMarket[market] || 0) + 1;
+      byLeague[league] = (byLeague[league] || 0) + 1;
+      for (const section of Array.isArray(row?.matchSheetV6?.sectionCompleteness) ? row.matchSheetV6.sectionCompleteness : []) {
+        if (section.status === 'missing_required' || section.status === 'hidden_optional') {
+          emptySections[section.section] = (emptySections[section.section] || 0) + 1;
+        }
+      }
+    }
+    const coverage = coverage24h?.summary || {};
+    const sourceSummary = sourceHealthV8?.summary || {};
+    const userVisibleBugs = [...new Set([
+      ...(Array.isArray(v4.userVisibleBugs) ? v4.userVisibleBugs : []),
+      readyRows.length < 10 && Number(todayFunnel?.today?.bookableEvents || 0) >= 30 ? 'Trop peu de vrais boutons Je mise' : null,
+      Number(coverage.nightBookable || 0) >= 6 && Number(coverage.nightReady || 0) < 3 ? 'Nuit non actionnable malgré stock visible' : null,
+      Number(sourceSummary.coverageCritical || 0) > 0 ? 'Sources techniquement OK mais couverture métier critique' : null
+    ].filter(Boolean))];
+    const repairActions = Array.isArray(coverageRepairEngine?.actions) ? coverageRepairEngine.actions : [];
+    return {
+      ...v4,
+      schema: 'paris-sportif.terrain_report.v5',
+      quickBetSummary: {
+        ...v4.quickBetSummary,
+        top3: readyRows.slice(0, 3).map((row) => ({
+          id: row.id,
+          title: row.title,
+          market: row.pickDecisionV6?.marketFamily || row.market,
+          label: row.label,
+          odd: row.odd,
+          confidence: row.pickDecisionV6?.confidence ?? row.probability,
+          readiness: row.pickDecisionV6?.betReadinessScore ?? null,
+          stake: row.pickDecisionV6?.stake ?? row.decisionCenter?.stake ?? 0,
+          why: row.pickDecisionV6?.userFastCopy || row.pickDecisionV5?.userCopy?.short || ''
+        })),
+        ready: readyRows.length,
+        watch: watchRows.length
+      },
+      volumeAudit: {
+        events24h: Number(coverage.events || 0),
+        bookable24h: Number(coverage.bookable || 0),
+        positive24h: Number(coverage.positive || 0),
+        displayed24h: Number(coverage.displayed || 0),
+        ready24h: Number(coverage.ready || 0),
+        cockpitRows: rows.length,
+        engineLoadMs: Number(engineLoadMs || 0) || null
+      },
+      nightAudit: {
+        bookable: Number(coverage.nightBookable || 0),
+        positive: Number(coverage.nightPositive || 0),
+        displayed: Number(coverage.nightDisplayed || 0),
+        ready: Number(coverage.nightReady || 0),
+        unlock: Number(coverage.nightReady || 0) >= 3 ? 'ok' : sourceSummary.firstRepair ? `Réparer ${sourceSummary.firstRepair}` : 'signal insuffisant'
+      },
+      varietyAudit: {
+        bySport,
+        byMarket,
+        byLeague,
+        winnerShare: rows.length ? Number(((byMarket.winner || 0) / rows.length).toFixed(3)) : 0,
+        goalsShare: rows.length ? Number((((byMarket.goals || 0) + (byMarket.btts || 0)) / rows.length).toFixed(3)) : 0
+      },
+      userVisibleBugs,
+      emptySections: Object.entries(emptySections).map(([section, count]) => ({ section, count })).sort((a, b) => b.count - a.count),
+      screenshotPlan: [
+        'accueil_top3_tableau_categories',
+        'fiche_football_v6',
+        'fiche_tennis_v6',
+        'source_health_v8',
+        'terrain_report_v5'
+      ],
+      consoleAudit: {
+        expectedBootErrors: 0,
+        expectedUsageErrors: 0,
+        note: 'Mesuré par qa:terrain/Playwright pendant validation finale'
+      },
+      actionableNextRepairs: repairActions.slice(0, 10).map((action) => ({
+        source: action.source || action.raw_source,
+        priority: action.priority,
+        affectedMatches: Number(action.affected_matches || 0),
+        estimatedGain: Number(action.estimated_gain || 0),
+        command: Array.isArray(action.command) ? action.command.join(' ') : null
+      })),
+      sourceHealth: sourceSummary
+    };
+  }
+
   function buildModelBacktestV4({ contextBacktestReport, decisionBacktestReport, modelLabReport, probabilityCalibrationReport, dashboardRows }) {
     const markets = Array.isArray(modelLabReport?.by_market) ? modelLabReport.by_market : [];
     const sports = Array.isArray(modelLabReport?.by_sport) ? modelLabReport.by_sport : [];
@@ -4882,6 +5269,59 @@ function createLegacyEngineService({ projectRoot }) {
         noInventedData: true,
         winamaxOddsOnly: true,
         complexStandardBlocked: true
+      }
+    };
+  }
+
+  function buildModelBacktestV6({ contextBacktestReport, decisionBacktestReport, modelLabReport, probabilityCalibrationReport, dashboardRows }) {
+    const v5 = buildModelBacktestV5({ contextBacktestReport, decisionBacktestReport, modelLabReport, probabilityCalibrationReport, dashboardRows });
+    const rows = Array.isArray(dashboardRows) ? dashboardRows : [];
+    const groupRows = (keyFn) => {
+      const map = new Map();
+      for (const row of rows) {
+        const key = String(keyFn(row) || 'unknown');
+        const bucket = map.get(key) || { key, sample: 0, ready: 0, watch: 0, avgReadiness: 0, avgConfidence: 0, avgEdge: 0 };
+        bucket.sample += 1;
+        if (row?.pickDecisionV6?.canBet || row?.decisionCenter?.canBet) bucket.ready += 1;
+        else bucket.watch += 1;
+        bucket.avgReadiness += Number(row?.pickDecisionV6?.betReadinessScore || 0) || 0;
+        bucket.avgConfidence += Number(row?.pickDecisionV6?.confidence ?? row?.probability ?? 0) || 0;
+        bucket.avgEdge += Number(row?.pickDecisionV6?.edge ?? row?.edge ?? 0) || 0;
+        map.set(key, bucket);
+      }
+      return Array.from(map.values()).map((bucket) => ({
+        ...bucket,
+        avgReadiness: bucket.sample ? bucket.avgReadiness / bucket.sample : 0,
+        avgConfidence: bucket.sample ? bucket.avgConfidence / bucket.sample : 0,
+        avgEdge: bucket.sample ? bucket.avgEdge / bucket.sample : 0,
+        roi: null,
+        wr: null,
+        brier: null
+      })).sort((a, b) => b.ready - a.ready || b.sample - a.sample || a.key.localeCompare(b.key));
+    };
+    return {
+      ...v5,
+      schema: 'paris-sportif.model_backtest.v6',
+      dimensions: {
+        ...v5.dimensions,
+        bySport: groupRows((row) => String(row?.sport || row?.match?.sport || 'sport').toLowerCase()),
+        byMarket: groupRows((row) => simpleMarketGroup(row?.marketKey || row?.market) || canonicalMarketKey(row?.marketKey || row?.market || 'market')),
+        byLeague: groupRows((row) => compactKey(row?.match?.league_code || row?.league || row?.match?.league_name || 'league')),
+        byHour: groupRows((row) => hourBucketKey(parisHour(row?.start || row?.date))),
+        bySourceQuality: groupRows((row) => row?.pickDecisionV6?.sourceQuality?.tier || 'inconnu'),
+        byDecisionStatus: groupRows((row) => row?.pickDecisionV6?.status || row?.decisionCenter?.status || 'unknown'),
+        byWinamax2Goal: groupRows((row) => row?.pickDecisionV6?.twoGoalRuleTrace?.eligible ? 'two_goal_early_payout' : 'standard')
+      },
+      guardrails: {
+        ...v5.guardrails,
+        readinessScoreRequired: true,
+        sourceRepairTraceRequired: true,
+        nightUnlockReasonRequired: true
+      },
+      acceptance: {
+        ...v5.acceptance,
+        noForcedVolume: true,
+        sourceCoverageMustExplainBlockedReady: true
       }
     };
   }
@@ -5198,6 +5638,7 @@ function createLegacyEngineService({ projectRoot }) {
     const sourceHealthV5 = buildSourceHealthV5(sourceHealthReport, healthReport);
     const sourceHealthV6 = buildSourceHealthV6(sourceHealthV5, coverageRepairEngineReport, sourceCoverageTargetsReport);
     const sourceHealthV7 = buildSourceHealthV7(sourceHealthV6, coverageRepairEngineReport, sourceCoverageTargetsReport);
+    const sourceHealthV8 = buildSourceHealthV8(sourceHealthV7, sourceHealthReport, healthReport, coverageRepairEngineReport, sourceCoverageTargetsReport);
     const modelRealityAudit = buildModelRealityAudit(picksHistorySummary);
     const events = dedupeUpcomingBookable(
       eventListFromDays(data.days).map((match) => attachWinamaxMarkets(match, playerOddsIndex))
@@ -5235,7 +5676,7 @@ function createLegacyEngineService({ projectRoot }) {
       .map((row) => applyWinamaxProductLayer(row))
       .map((row) => applySafeReliabilityLayer(row));
     const prioritizedDecisionRows = applyPriorityScores(allDecisionRows)
-      .map((row) => attachV3Contracts(row, sourceHealthV5, sourceHealthV6, sourceHealthV7));
+      .map((row) => attachV3Contracts(row, sourceHealthV5, sourceHealthV6, sourceHealthV7, sourceHealthV8));
     const matches = prioritizedDecisionRows.filter((row) => !row.isMarketAlternative);
     const seen = new Set();
     const picks = prioritizedDecisionRows
@@ -5320,6 +5761,18 @@ function createLegacyEngineService({ projectRoot }) {
       criticalIssueReport,
       coverageRepairEngine: coverageRepairEngineReport
     });
+    const terrainReportV5 = buildTerrainReportV5({
+      data,
+      dashboardRows: dashboard.rows,
+      todayFunnel,
+      coverage24h,
+      marketCoverageV2,
+      sourceHealthV8,
+      decisionCenter,
+      criticalIssueReport,
+      coverageRepairEngine: coverageRepairEngineReport,
+      engineLoadMs: engine.loadMs
+    });
     const modelBacktestV4 = buildModelBacktestV4({
       contextBacktestReport,
       decisionBacktestReport,
@@ -5328,6 +5781,13 @@ function createLegacyEngineService({ projectRoot }) {
       dashboardRows: dashboard.rows
     });
     const modelBacktestV5 = buildModelBacktestV5({
+      contextBacktestReport,
+      decisionBacktestReport,
+      modelLabReport,
+      probabilityCalibrationReport,
+      dashboardRows: dashboard.rows
+    });
+    const modelBacktestV6 = buildModelBacktestV6({
       contextBacktestReport,
       decisionBacktestReport,
       modelLabReport,
@@ -5376,11 +5836,14 @@ function createLegacyEngineService({ projectRoot }) {
       sourceHealthV5,
       sourceHealthV6,
       sourceHealthV7,
+      sourceHealthV8,
       terrainReportV2,
       terrainReportV3,
       terrainReportV4,
+      terrainReportV5,
       modelBacktestV4,
       modelBacktestV5,
+      modelBacktestV6,
       decisionCenter,
       combines,
       scorers,

@@ -8,13 +8,13 @@ Paris Sportif Desktop est le logiciel PC local pour préparer tes paris Winamax.
 
 ### Version installateur Windows
 
-La version v3.2.0 se génère avec :
+La version v4.0.0 se génère avec :
 
 ```powershell
 npm --prefix desktop run dist
 ```
 
-Le fichier attendu est `Paris Sportif Desktop Setup 3.2.0.exe`. Le build packagé embarque les données, rapports modèle et scripts nécessaires au démarrage. Python reste recommandé si tu veux relancer une pipeline complète depuis la machine installée.
+Le fichier attendu est `Paris Sportif Desktop Setup 4.0.0.exe`. Le build packagé embarque les données, rapports modèle et scripts nécessaires au démarrage. Python reste recommandé si tu veux relancer une pipeline complète depuis la machine installée.
 
 ### Version développeur
 
@@ -53,6 +53,17 @@ Depuis v1.5.0, certains matchs avec peu de contexte secondaire peuvent apparaît
 L'app ne place pas de pari automatiquement. Elle prépare le ticket et suit ton résultat.
 
 En Mode expert, l'auto-tracking supervisé peut suivre automatiquement certains tickets dans l'app selon tes règles. C'est uniquement un suivi interne : tu dois toujours ouvrir Winamax et confirmer toi-même le pari réel.
+
+## Nouveautés v4.0.0
+
+La v4.0.0 lance le chantier `Pronostics Winamax Pro, Plus Nombreux, Plus Fiables, Plus Lisibles` sans gonfler artificiellement les boutons `Je mise` :
+
+- chaque ligne cockpit porte maintenant `PickDecision v6` : readiness de pari, signaux critiques manquants, plan de réparation source, traces quotas marché/sport/ligue, trace du filet Winamax 2-0 et raison de déblocage nuit ;
+- chaque fiche expose `MatchSheet v6` : template par sport, complétude de section, liens/preuves de donnée, fraîcheur, disponibilité joueurs et détail de confiance ;
+- la santé sources passe en `SourceHealth v8`, qui sépare l’état technique de la vraie couverture métier, compte les prêts bloqués par source et garde le dernier snapshot sain ;
+- le terrain passe en `TerrainReport v5` : volume, nuit, variété, bugs visibles, sections vides, captures attendues, latence et prochaines réparations actionnables ;
+- le laboratoire modèle expose `ModelBacktest v6`, avec lecture par sport, marché, ligue, heure, qualité source, statut de décision et règle Winamax 2-0 ;
+- l’interface privilégie automatiquement ces contrats v6/v8/v5 pour expliquer pourquoi une ligne est prête, observable ou bloquée par un dossier match faible.
 
 ## Nouveautés v3.2.0
 

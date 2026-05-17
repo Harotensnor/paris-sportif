@@ -5,6 +5,17 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-17
 
+### Version v4.0.0 — Pronostics Winamax Pro : readiness v6 + sources v8 + terrain v5
+
+Passage majeur du plan v4 : l’app ne cherche pas à fabriquer plus de boutons `Je mise`, elle explique et répare les vrais blocages qui empêchent les picks de devenir actionnables.
+- Ajout de `PickDecision v6` sur chaque ligne cockpit : score readiness, signaux critiques/optionnels manquants, plan de réparation source, traces de quotas marché/sport/ligue, trace du filet Winamax 2-0 et raison de déblocage nuit.
+- Ajout de `MatchSheet v6` : template sport, complétude par section, liens de preuve, fraîcheur de donnée, disponibilité joueurs, avertissements source et breakdown confiance.
+- Ajout de `SourceHealth v8` : séparation état technique/couverture métier, sources `preserved`/`degraded` conservées, prêts bloqués par source, gain prêt estimé, dernier fetch sain et fallback snapshot.
+- Ajout de `TerrainReport v5` : audit utilisateur complet volume/nuit/variété, bugs visibles, sections vides, captures attendues, latence et réparations prioritaires.
+- Ajout de `ModelBacktest v6` : dimensions par sport, marché, ligue, heure, qualité source, statut de décision et règle Winamax 2-0 pour surveiller les promotions.
+- Interface : les fiches utilisent maintenant les contrats v6 et affichent la readiness, les signaux qui bloquent la mise et la source à réparer au lieu de laisser des cases vides.
+- Tests : `qa:engine` et `qa:terrain` exigent les contrats v6/v8/v5/v6 sur les vraies données Winamax terrain.
+
 ### Version v3.2.0 — Pronostics plus fiables : contrats v5 + terrain v4 + sources v7
 
 Suite du plan `Pronostics Plus Fiables, Plus Nombreux, Plus Propres`, avec priorité donnée aux vrais blocages terrain plutôt qu'au remplissage artificiel des boutons `Je mise`.
