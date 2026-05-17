@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-05-17T21:27:03Z",
+  "generated_at": "2026-05-17T21:33:22Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 46,
-    "actionable": 8,
-    "watch": 2,
+    "actionable": 7,
+    "watch": 3,
     "risk": 36,
     "expired_sample": 0,
     "by_type": {
@@ -17,30 +17,12 @@
       "market_uncertain": 38
     },
     "by_quality": {
-      "actionable": 8,
-      "watch": 2,
+      "watch": 3,
+      "actionable": 7,
       "risk": 36
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401856916",
-      "date": "2026-05-17T22:00Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Indiana Fever",
-      "away": "Seattle Storm",
-      "match": "Indiana Fever - Seattle Storm",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Seattle Storm",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 1-6"
-    },
     {
       "event_id": "401815388",
       "date": "2026-05-17T23:20Z",
@@ -169,6 +151,24 @@
     }
   ],
   "active_watch": [
+    {
+      "event_id": "401856916",
+      "date": "2026-05-17T22:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Indiana Fever",
+      "away": "Seattle Storm",
+      "match": "Indiana Fever - Seattle Storm",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Seattle Storm",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 1-4"
+    },
     {
       "event_id": "178339",
       "date": "2026-05-18T08:00Z",
