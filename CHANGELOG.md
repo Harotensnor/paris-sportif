@@ -5,6 +5,17 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-17
 
+### Version v3.1.0 — Contrats v4 + terrain v3 + santé sources v6
+
+Suite du chantier `Pronostics Pro Winamax`, centrée sur la qualité réelle des pronostics plutôt que sur l'ajout cosmétique.
+- Ajout de `PickDecision v4` sur chaque ligne cockpit : statut, `canBet`, mise, confiance, avantage, famille de marché, raisons de blocage, qualité source, règles Winamax et explication courte/longue.
+- Ajout de `MatchSheet v4` : sections visibles, sections cachées parce que vides, données critiques/optionnelles manquantes, confiance compositions/joueurs/contexte et couverture source.
+- Ajout de `SourceHealth v6` : sources `ok`/`preserved`/`degraded`, priorité de réparation, commande de réparation et gain estimé en picks pour attaquer les dossiers faibles.
+- Ajout de `TerrainReport v3` : résumé terrain “pari vite”, distribution marché/sport, prêts, nuit, checks UX et objectifs chiffrés 24h.
+- Ajout de `ModelBacktest v4` : lecture consolidée par sport, marché, ligue, tranche horaire et qualité de source.
+- Interface : la fiche détail affiche désormais le dossier v4, la couverture source et les blocs volontairement masqués quand la donnée fiable manque.
+- Tests : `qa:engine` et `qa:terrain` échouent maintenant si les contrats v4/v6/v3 manquent sur les vraies lignes cockpit.
+
 ### Version v3.0.0 — Pronostics Pro Winamax : contrats v3 + terrain durci
 
 Socle v3 du plan 500 points, sans changer la règle produit : 100% Winamax, mode standard simple, expert caché.

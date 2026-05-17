@@ -56,8 +56,11 @@
     probabilityCalibration: null,
     policyCandidates: null,
     sourceHealth: null,
+    sourceHealthV6: null,
     marketCoverageV2: null,
     terrainReportV2: null,
+    terrainReportV3: null,
+    modelBacktestV4: null,
     decisionCenter: null,
     agentBlockers: null,
     clvSummary: null,
@@ -4694,9 +4697,12 @@
     state.modelRealityAudit = analysis.modelRealityAudit || null;
     state.probabilityCalibration = analysis.probabilityCalibration || null;
     state.policyCandidates = analysis.policyCandidates || null;
-    state.sourceHealth = analysis.sourceHealthV5 || analysis.sourceHealth || null;
+    state.sourceHealth = analysis.sourceHealthV6 || analysis.sourceHealthV5 || analysis.sourceHealth || null;
+    state.sourceHealthV6 = analysis.sourceHealthV6 || null;
     state.marketCoverageV2 = analysis.marketCoverageV2 || null;
     state.terrainReportV2 = analysis.terrainReportV2 || null;
+    state.terrainReportV3 = analysis.terrainReportV3 || null;
+    state.modelBacktestV4 = analysis.modelBacktestV4 || null;
     state.decisionCenter = analysis.decisionCenter || null;
     state.agentBlockers = analysis.agentBlockers || null;
     state.clvSummary = analysis.clvSummary || null;
@@ -13157,15 +13163,15 @@
   }
 
   function buildV3SheetSnapshotHtml(row) {
-    const sheet = row?.matchSheetV3 || null;
-    const decision = row?.pickDecisionV3 || null;
+    const sheet = row?.matchSheetV4 || row?.matchSheetV3 || null;
+    const decision = row?.pickDecisionV4 || row?.pickDecisionV3 || null;
     if (!sheet || !decision) return '';
     const quality = sheet.summary?.sourceQuality || decision.sourceQuality || {};
     const missing = Array.isArray(sheet.missingData) ? sheet.missingData : [];
     const sourceCount = Array.isArray(sheet.sources) ? sheet.sources.length : 0;
     const homeLineup = sheet.lineups?.home || {};
     const awayLineup = sheet.lineups?.away || {};
-    const sections = [
+    const sections = Array.isArray(sheet.visibleSections) && sheet.visibleSections.length ? sheet.visibleSections : [
       homeLineup.starters?.length && awayLineup.starters?.length ? 'Compos' : null,
       sheet.h2h?.count ? 'H2H' : null,
       sheet.referee ? 'Arbitre' : null,
@@ -13173,16 +13179,17 @@
       sheet.injuries?.home?.total || sheet.injuries?.away?.total ? 'Absences' : null,
       sheet.tactical?.formation ? 'Tactique' : null
     ].filter(Boolean);
+    const hidden = Array.isArray(sheet.hiddenSections) ? sheet.hiddenSections : [];
     const canBetText = decision.canBet
       ? `Mise autorisée ${decision.stake > 0 ? formatMoney(decision.stake) : visibleStakeText(row)}`
       : 'Observation sans bouton de mise';
     return `
       <article class="detail-card wide v3-sheet-card">
-        <h4>Dossier pronostic v3</h4>
+        <h4>Dossier pronostic ${sheet.schema?.includes('v4') ? 'v4' : 'v3'}</h4>
         <div class="match-context-band">
           <span>${escapeHtml(decision.marketFamily || simpleMarketLabelForRow(row))}</span>
           <strong>${escapeHtml(canBetText)}</strong>
-          <em>${escapeHtml(`Qualité source ${quality.score != null ? `${quality.score}/100` : quality.tier || 'à vérifier'} · ${sourceCount} sources locales`)}</em>
+          <em>${escapeHtml(`Qualité source ${quality.score != null ? `${quality.score}/100` : quality.tier || 'à vérifier'} · couverture ${sheet.sourceCoverageScore != null ? `${sheet.sourceCoverageScore}/100` : `${sourceCount} sources locales`}`)}</em>
         </div>
         <div class="sheet-signal-strip compact">
           <div class="${sections.length >= 4 ? 'ok' : 'missing'}">
@@ -13195,6 +13202,11 @@
             <strong>${escapeHtml(missing.length ? missing.slice(0, 5).join(' · ') : 'Aucun manque bloquant')}</strong>
             <em>${escapeHtml(missing.length ? 'Ces points ne sont pas inventés.' : 'Les signaux essentiels sont présents.')}</em>
           </div>
+          ${hidden.length ? `<div class="missing">
+            <span>Masqué car vide</span>
+            <strong>${escapeHtml(hidden.slice(0, 4).map((item) => item.section).join(' · '))}</strong>
+            <em>${escapeHtml('Ces blocs ne polluent plus la fiche tant que la donnée fiable manque.')}</em>
+          </div>` : ''}
         </div>
       </article>
     `;
@@ -14552,6 +14564,7 @@
     const grid = $('#model-lab-grid');
     if (!grid) return;
     const model = state.modelLab || {};
+    const backtest = state.modelBacktestV4 || {};
     const prob = state.probabilityCalibration || {};
     const policies = Array.isArray(state.policyCandidates?.policies) ? state.policyCandidates.policies : [];
     const summary = model.summary || {};
@@ -14574,6 +14587,12 @@
         label: 'Calibration proba',
         value: prob.summary?.mean_abs_error != null ? formatPct(prob.summary.mean_abs_error, 1) : '-',
         detail: `${formatCount(prob.summary?.usable_buckets || 0)} bucket(s) exploitables · Brier ${Number(prob.summary?.brier || 0).toFixed(3)}.`
+      },
+      {
+        tone: Number(backtest.summary?.brier || summary.brier || 0) > 0.24 ? 'warn' : 'ok',
+        label: 'Backtest v4',
+        value: formatCount(backtest.summary?.settled || summary.settled_rows || 0),
+        detail: `Par sport/marché/ligue/tranche horaire · ROI ${formatPct(backtest.summary?.roi || summary.roi || 0, 1)}.`
       },
       {
         tone: policies.some((row) => row.priority === 'critical') ? 'danger' : policies.length ? 'warn' : 'ok',
@@ -14604,12 +14623,13 @@
     const summary = report.summary || {};
     const rows = Array.isArray(report.sources) ? report.sources : [];
     if (!rows.length) {
-      grid.innerHTML = '<div class="empty">Santé sources V4 indisponible.</div>';
+      grid.innerHTML = '<div class="empty">Santé sources indisponible.</div>';
       return;
     }
     const scoreFor = (row) => {
       if (Number.isFinite(Number(row.score))) return Number(row.score);
-      if (row.status === 'ok') return 100;
+      if (row.status === 'ok' || row.status === 'preserved') return 100;
+      if (row.status === 'degraded') return 55;
       if (row.status === 'warning') return 65;
       if (row.status === 'critical') return 20;
       return 50;
@@ -14624,7 +14644,7 @@
         tone: Number(summary.critical || 0) ? 'danger' : Number(summary.warning || 0) ? 'warn' : 'ok',
         label: 'Score sources',
         value: `${avgScore.toFixed(0)}/100`,
-        detail: `${formatCount(summary.sources || rows.length)} sources · ${formatCount(summary.quarantine || summary.preservedSnapshots || 0)} snapshot(s) préservé(s) · ${formatCount(summary.blocksPick || summary.optional_token_missing || 0)} blocage(s).`
+        detail: `${formatCount(summary.sources || rows.length)} sources · ${formatCount(summary.degraded || 0)} dégradée(s) · ${formatCount(summary.preserved || summary.preservedSnapshots || 0)} snapshot(s) préservé(s) · gain estimé ${formatCount(summary.estimatedPickGain || 0)}.`
       },
       ...rows.slice(0, 7).map((row) => {
         const ageValue = row.age_min ?? row.age;
@@ -14632,7 +14652,7 @@
           tone: scoreFor(row) < 50 ? 'danger' : scoreFor(row) < 80 ? 'warn' : 'ok',
           label: row.status || row.kind || 'source',
           value: `${row.source || '-'} · ${formatCount(row.score ?? row.coverage ?? scoreFor(row))}`,
-          detail: `${row.action || row.note || '-'} · âge ${ageValue != null ? formatAge(Math.round(Number(ageValue))) : 'inconnu'} · TTL ${row.ttl_min ?? row.ttl ?? '-'} min`
+          detail: `${row.repairCommand ? `Réparer: ${row.repairCommand}` : row.action || row.note || '-'} · âge ${ageValue != null ? formatAge(Math.round(Number(ageValue))) : 'inconnu'} · TTL ${row.ttl_min ?? row.ttl ?? '-'} min`
         };
       })
     ];

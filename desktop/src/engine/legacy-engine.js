@@ -3907,6 +3907,71 @@ function createLegacyEngineService({ projectRoot }) {
     };
   }
 
+  function buildSourceHealthV6(sourceHealthV5 = {}, coverageRepair = {}, targets = {}) {
+    const repairActions = Array.isArray(coverageRepair?.actions) ? coverageRepair.actions : [];
+    const targetRows = Array.isArray(targets?.sources) ? targets.sources : [];
+    const repairBySource = new Map();
+    for (const action of repairActions) {
+      const key = String(action?.source || action?.raw_source || '').trim();
+      if (!key) continue;
+      const previous = repairBySource.get(key);
+      if (!previous || Number(action?.estimated_gain || 0) > Number(previous?.estimated_gain || 0)) {
+        repairBySource.set(key, action);
+      }
+    }
+    const targetBySource = new Map(targetRows.map((row) => [String(row?.source || row?.key || '').trim(), row]));
+    const sources = (Array.isArray(sourceHealthV5.sources) ? sourceHealthV5.sources : []).map((source) => {
+      const key = String(source?.source || '').trim();
+      const repair = repairBySource.get(key) || null;
+      const target = targetBySource.get(key) || null;
+      const coverage = Number(source?.coverage ?? target?.current_rate ?? target?.coverage ?? NaN);
+      const targetRate = Number(repair?.target_rate ?? target?.target_rate ?? NaN);
+      const preserved = Boolean(source?.preservedSnapshot);
+      let status = source?.status || 'unknown';
+      if (preserved && status === 'ok') status = 'preserved';
+      if (Number.isFinite(coverage) && Number.isFinite(targetRate) && coverage < targetRate) status = status === 'critical' ? 'critical' : 'degraded';
+      return {
+        source: key,
+        status,
+        age: source?.age ?? null,
+        ttl: source?.ttl ?? null,
+        coverage: Number.isFinite(coverage) ? coverage : source?.coverage ?? null,
+        targetCoverage: Number.isFinite(targetRate) ? targetRate : null,
+        lastError: source?.lastError || null,
+        lastHealthySnapshot: preserved ? 'préservé' : null,
+        preservedSnapshot: preserved,
+        blocksPick: Boolean(source?.blocksPick || (repair && Number(repair.critical || 0) > 0 && /lineup|injur|context|odds/i.test(key))),
+        blocksPickCount: Number(repair?.critical || repair?.affected_matches || 0) || 0,
+        repairPriority: repair?.priority || (status === 'critical' ? 'critical' : status === 'degraded' ? 'high' : 'low'),
+        estimatedPickGain: Number(repair?.estimated_gain || 0) || 0,
+        repairCommand: Array.isArray(repair?.command) ? repair.command.join(' ') : null,
+        note: source?.note || repair?.detail || ''
+      };
+    }).sort((a, b) => {
+      const order = { critical: 0, degraded: 1, warning: 2, preserved: 3, unknown: 4, ok: 5 };
+      return (order[a.status] ?? 4) - (order[b.status] ?? 4) ||
+        Number(b.estimatedPickGain || 0) - Number(a.estimatedPickGain || 0) ||
+        a.source.localeCompare(b.source);
+    });
+    return {
+      schema: 'paris-sportif.source_health.v6',
+      generatedAt: new Date().toISOString(),
+      summary: {
+        sources: sources.length,
+        ok: sources.filter((s) => s.status === 'ok').length,
+        preserved: sources.filter((s) => s.status === 'preserved').length,
+        degraded: sources.filter((s) => s.status === 'degraded').length,
+        warning: sources.filter((s) => s.status === 'warning').length,
+        critical: sources.filter((s) => s.status === 'critical').length,
+        preservedSnapshots: sources.filter((s) => s.preservedSnapshot).length,
+        blocksPick: sources.filter((s) => s.blocksPick).length,
+        estimatedPickGain: sources.reduce((sum, source) => sum + Number(source.estimatedPickGain || 0), 0),
+        firstRepair: sources.find((s) => s.repairPriority === 'critical' || s.repairPriority === 'high')?.source || null
+      },
+      sources
+    };
+  }
+
   function readableMarketFamily(row) {
     const group = simpleMarketGroup(row?.marketKey || row?.market);
     if (group === 'winner') return 'Vainqueur';
@@ -3985,6 +4050,105 @@ function createLegacyEngineService({ projectRoot }) {
         boost: Boolean(row?.winamaxBoost?.active || row?.winamaxBoost?.boosted)
       }
     };
+  }
+
+  function pickDecisionReasonCodes(row) {
+    const codes = [];
+    if (row?.decisionCenter?.canBet) codes.push('ready_to_bet');
+    if (row?.prebetGate?.blocked) codes.push('prebet_checklist_blocked');
+    if (row?.contextGate?.gate === 'skip') codes.push('context_skip');
+    if (row?.contextGate?.agentEligible === false) codes.push('context_agent_blocked');
+    if (row?.safeAssessment?.status === 'watch') codes.push('safe_watch');
+    if (row?.safeAssessment?.status === 'reject') codes.push('safe_reject');
+    if (row?.signalConflict?.active) codes.push('signal_conflict');
+    if (row?.oddsGuardrail?.applied) codes.push('odds_guardrail');
+    if (row?.winamaxTwoGoalRule?.eligible) codes.push('winamax_2_goal_early_payout');
+    if (row?.limitedConfidence) codes.push('limited_confidence');
+    if (!isFutureStart(row)) codes.push('started_or_finished');
+    return [...new Set(codes)];
+  }
+
+  function sourceBlockingReasons(row) {
+    const quality = row?.contextQuality || row?.match?.context?.quality || {};
+    const critical = Array.isArray(quality.critical_missing) ? quality.critical_missing : [];
+    const missing = Array.isArray(quality.missing) ? quality.missing : [];
+    const reasons = [
+      ...critical.map((item) => ({ source: signalSourceFromMissing(item), reason: String(item), severity: 'critical' })),
+      ...missing.slice(0, 6).map((item) => ({ source: signalSourceFromMissing(item), reason: String(item), severity: 'missing' }))
+    ];
+    return reasons.filter((item) => item.reason).slice(0, 10);
+  }
+
+  function signalSourceFromMissing(value) {
+    const text = String(value || '').toLowerCase();
+    if (/lineup|composition/.test(text)) return 'lineups';
+    if (/injur|bless|absence|availability|roster/.test(text)) return 'injuries';
+    if (/referee|arbit/.test(text)) return 'referees';
+    if (/weather|météo|meteo|wind|rain/.test(text)) return 'weather';
+    if (/h2h|face/.test(text)) return 'h2h';
+    if (/xg|team|strength|force/.test(text)) return 'team_stats';
+    if (/odds|cote|winamax/.test(text)) return 'winamax';
+    return 'context';
+  }
+
+  function buildPickDecisionV4(row) {
+    const v3 = row?.pickDecisionV3 || buildPickDecisionV3(row);
+    const edge = Number(row?.safeEdge ?? row?.edge ?? 0) || 0;
+    const rawEdge = Number(row?.edge || 0) || 0;
+    const canBetReason = v3.canBet
+      ? (row?.decisionCenter?.mainReason || 'Pari prêt : mise autorisée par les garde-fous')
+      : (row?.decisionCenter?.mainReason || row?.safeAssessment?.reasons?.[0] || row?.contextGate?.label || 'Observation : pas de mise recommandée');
+    const marketFamily = readableMarketFamily(row);
+    const night = isNightCoverageCandidate(row);
+    return {
+      schema: 'paris-sportif.pick_decision.v4',
+      status: v3.status,
+      canBet: v3.canBet,
+      stake: v3.stake,
+      stakeDisplay: v3.stakeDisplay,
+      confidence: Number(v3.confidence?.value || row?.safeConfidence || row?.probability || 0) || 0,
+      edge,
+      rawEdge,
+      marketFamily,
+      sourceQuality: v3.sourceQuality,
+      riskReasons: v3.risk?.reasons || [],
+      decisionReasonCodes: pickDecisionReasonCodes(row),
+      canBetReason,
+      sourceBlockingReasons: sourceBlockingReasons(row),
+      marketQuotaReason: row?.quotaReason || row?.dashboardQuotaReason || null,
+      nightReason: night ? (v3.canBet ? 'Créneau nuit prêt' : 'Créneau nuit visible en observation') : null,
+      whyShort: simplePickWhyShort(row, v3),
+      whyLong: pickWhyV3(row),
+      winamaxEligibility: {
+        available: Boolean(row?.match?.winamax?.available),
+        matchId: row?.match?.winamax?.match_id || row?.id || null,
+        url: row?.winamaxUrl || row?.match?.winamax?.url || null,
+        simpleMarket: isSimpleUserMarket(row),
+        drawExcluded: isDrawSelection(row)
+      },
+      winamaxRuleFlags: {
+        ...v3.winamaxRuleFlags,
+        twoGoalEarlyPayout: Boolean(row?.winamaxTwoGoalRule?.eligible),
+        twoGoalLeadProbability: row?.winamaxTwoGoalRule?.eligible ? Number(row.winamaxTwoGoalRule.leadTwoProbability || 0) : null,
+        earlyPayoutAdjustedProbability: row?.winamaxTwoGoalRule?.eligible ? Number(row.winamaxTwoGoalRule.afterProbability || row.probability || 0) : null,
+        earlyPayoutAdjustedEdge: row?.winamaxTwoGoalRule?.eligible ? Number(row.winamaxTwoGoalRule.afterEdge || edge || 0) : null,
+        boost: Boolean(row?.winamaxBoost?.active || row?.winamaxBoost?.boosted)
+      }
+    };
+  }
+
+  function simplePickWhyShort(row, decision) {
+    const parts = [];
+    if (row?.winamaxTwoGoalRule?.eligible) {
+      parts.push(`filet 2-0 ${Math.round(Number(row.winamaxTwoGoalRule.leadTwoProbability || 0) * 100)}%`);
+    }
+    const confidence = Number(decision?.confidence?.value || row?.safeConfidence || row?.probability || 0);
+    if (confidence > 0) parts.push(`confiance ${Math.round(confidence * 100)}%`);
+    const edge = Number(row?.safeEdge ?? row?.edge ?? 0);
+    if (edge > 0) parts.push(`avantage +${Math.round(edge * 100)}pt`);
+    const reason = row?.decisionCenter?.mainReason || row?.safeAssessment?.warnings?.[0] || row?.contextGate?.label || '';
+    if (reason) parts.push(reason);
+    return parts.slice(0, 3).join(' · ') || 'Signal positif Winamax à vérifier avant mise';
   }
 
   function sideLineup(match, side) {
@@ -4104,12 +4268,71 @@ function createLegacyEngineService({ projectRoot }) {
     };
   }
 
-  function attachV3Contracts(row, sourceHealthV5) {
-    if (!row || typeof row !== 'object') return row;
+  function buildMatchSheetV4(row, sourceHealthV6) {
+    const v3 = row?.matchSheetV3 || buildMatchSheetV3(row, sourceHealthV6);
+    const visibleSections = [];
+    const hiddenSections = [];
+    const addSection = (key, visible, reason) => {
+      if (visible) visibleSections.push(key);
+      else hiddenSections.push({ section: key, reason });
+    };
+    addSection('lineups', Boolean(v3.lineups?.home?.starters?.length && v3.lineups?.away?.starters?.length), 'Compositions non confirmées ou non récupérées');
+    addSection('players', Boolean(v3.players?.homeKeyPlayers?.length || v3.players?.awayKeyPlayers?.length), 'Joueurs clés absents du snapshot fiable');
+    addSection('teamForm', Boolean(v3.teamForm?.home?.form || v3.teamForm?.away?.form), 'Forme récente indisponible');
+    addSection('h2h', Number(v3.h2h?.count || 0) >= 1, 'Historique face-à-face absent');
+    addSection('injuries', Boolean(Number(v3.injuries?.home?.total || 0) || Number(v3.injuries?.away?.total || 0)), 'Absences non confirmées');
+    addSection('coach', Boolean(v3.coach?.home || v3.coach?.away), 'Coach/style non enrichi');
+    addSection('referee', Boolean(v3.referee), 'Arbitre non publié');
+    addSection('weather', Boolean(v3.weather), 'Météo non utile ou non récupérée');
+    addSection('tactical', Boolean(v3.tactical?.formation || v3.tactical?.keySignals?.length), 'Tactique non enrichie');
+    const missing = Array.isArray(v3.missingData) ? v3.missingData : [];
+    const sourceRows = Array.isArray(sourceHealthV6?.sources) ? sourceHealthV6.sources : [];
+    const sourceCoverageScore = sourceRows.length
+      ? Math.round(sourceRows.reduce((sum, source) => {
+        const coverage = Number(source.coverage);
+        if (Number.isFinite(coverage)) return sum + Math.max(0, Math.min(100, coverage > 1 ? coverage : coverage * 100));
+        return sum + (source.status === 'ok' || source.status === 'preserved' ? 80 : source.status === 'degraded' ? 45 : 30);
+      }, 0) / sourceRows.length)
+      : null;
+    const confidenceFromPresence = (present, expected) => expected > 0 ? Math.round(Math.max(0, Math.min(100, (present / expected) * 100))) : 0;
     return {
+      ...v3,
+      schema: 'paris-sportif.match_sheet.v4',
+      visibleSections,
+      hiddenSections,
+      missingCriticalData: missing.filter((item) => /lineup|injur|odds|winamax|context|xg|team_strength/i.test(String(item))).slice(0, 10),
+      missingOptionalData: missing.filter((item) => !/lineup|injur|odds|winamax|context|xg|team_strength/i.test(String(item))).slice(0, 10),
+      sourceCoverageScore,
+      lineupConfidence: confidenceFromPresence(
+        Number(v3.lineups?.home?.starters?.length || 0) + Number(v3.lineups?.away?.starters?.length || 0),
+        22
+      ),
+      playerStatsConfidence: confidenceFromPresence(
+        Number(v3.players?.homeKeyPlayers?.length || 0) + Number(v3.players?.awayKeyPlayers?.length || 0),
+        6
+      ),
+      teamContextConfidence: confidenceFromPresence(visibleSections.filter((key) => ['teamForm', 'h2h', 'injuries', 'coach', 'referee', 'weather', 'tactical'].includes(key)).length, 7),
+      sourceCoverage: {
+        sources: sourceRows.length,
+        ok: Number(sourceHealthV6?.summary?.ok || 0),
+        degraded: Number(sourceHealthV6?.summary?.degraded || 0),
+        preserved: Number(sourceHealthV6?.summary?.preserved || sourceHealthV6?.summary?.preservedSnapshots || 0),
+        blocksPick: Number(sourceHealthV6?.summary?.blocksPick || 0)
+      }
+    };
+  }
+
+  function attachV3Contracts(row, sourceHealthV5, sourceHealthV6 = null) {
+    if (!row || typeof row !== 'object') return row;
+    const v3 = {
       ...row,
       pickDecisionV3: buildPickDecisionV3(row),
       matchSheetV3: buildMatchSheetV3(row, sourceHealthV5)
+    };
+    return {
+      ...v3,
+      pickDecisionV4: buildPickDecisionV4(v3),
+      matchSheetV4: buildMatchSheetV4(v3, sourceHealthV6 || sourceHealthV5)
     };
   }
 
@@ -4204,6 +4427,121 @@ function createLegacyEngineService({ projectRoot }) {
         readyTarget: '10-15 si catalogue exploitable',
         nightTarget: '6-10 si events nuit suffisants',
         homepage: 'Top 3 + tableau triable + catégories'
+      }
+    };
+  }
+
+  function buildTerrainReportV3({ data, dashboardRows, todayFunnel, coverage24h, marketCoverageV2, sourceHealthV6, decisionCenter, criticalIssueReport, coverageRepairEngine }) {
+    const events = eventListFromDays(data?.days || {});
+    const today = dayKeyParis(new Date());
+    const todayEvents = events.filter((event) => rowDayKey(event) === today);
+    const readyRows = (dashboardRows || []).filter((row) => row?.pickDecisionV4?.canBet || row?.decisionCenter?.canBet);
+    const watchRows = (dashboardRows || []).filter((row) => !readyRows.includes(row));
+    const marketCounts = {};
+    const sportCounts = {};
+    const readyMarketCounts = {};
+    for (const row of dashboardRows || []) {
+      const market = simpleMarketGroup(row?.marketKey || row?.market) || canonicalMarketKey(row?.marketKey || row?.market || 'other');
+      const sport = String(row?.sport || row?.match?.sport || 'sport').toLowerCase();
+      marketCounts[market] = (marketCounts[market] || 0) + 1;
+      sportCounts[sport] = (sportCounts[sport] || 0) + 1;
+      if (row?.decisionCenter?.canBet) readyMarketCounts[market] = (readyMarketCounts[market] || 0) + 1;
+    }
+    const coverage = coverage24h?.summary || {};
+    const funnel = todayFunnel?.today || {};
+    const issues = [];
+    if (Number(funnel.bookableEvents || 0) >= 50 && Number(funnel.ready || 0) < 10) issues.push('Trop peu de vrais paris prêts pour un catalogue riche');
+    if (Number(coverage.nightBookable || 0) >= 6 && Number(coverage.nightReady || 0) < 3) issues.push('Nuit visible mais pas assez actionnable');
+    if (Number(criticalIssueReport?.summary?.critical || 0) > 0) issues.push(criticalIssueReport.summary.first || 'Dossiers critiques');
+    if (Number(sourceHealthV6?.summary?.degraded || 0) > 0) issues.push('Sources dégradées à réparer');
+    const repairActions = Array.isArray(coverageRepairEngine?.actions) ? coverageRepairEngine.actions : [];
+    return {
+      schema: 'paris-sportif.terrain_report.v3',
+      generatedAt: new Date().toISOString(),
+      counts: {
+        todayEvents: todayEvents.length,
+        todayWinamax: todayEvents.filter((event) => event?.winamax?.available === true).length,
+        displayed24h: rollingWindowRows(dashboardRows || [], 24).length,
+        dashboardRows: (dashboardRows || []).length,
+        ready: readyRows.length,
+        watch: watchRows.length,
+        nightDisplayed: Number(coverage.nightDisplayed || 0),
+        nightBookable: Number(coverage.nightBookable || 0),
+        nightReady: Number(coverage.nightReady || 0),
+        positiveToday: Number(funnel.positiveSimplePassingFilters || 0),
+        simpleReadyToday: Number(funnel.simpleReady || 0)
+      },
+      distribution: {
+        marketCounts,
+        readyMarketCounts,
+        sportCounts,
+        winnerShare: (dashboardRows || []).length ? Number(((marketCounts.winner || 0) / dashboardRows.length).toFixed(3)) : 0,
+        goalsShare: (dashboardRows || []).length ? Number((((marketCounts.goals || 0) + (marketCounts.btts || 0)) / dashboardRows.length).toFixed(3)) : 0
+      },
+      uxChecks: {
+        homepageTarget: 'Top 3 + tableau triable + catégories',
+        diagnosticsShouldStayInExpert: true,
+        hideEmptySections: true,
+        actionCopyRequired: 'PARI / COTE / MISE',
+        noDrawStandard: true
+      },
+      health: {
+        sourceHealth: sourceHealthV6?.summary || null,
+        decisionBlocked: Boolean(decisionCenter?.summary?.blocked),
+        criticalIssues: Number(criticalIssueReport?.summary?.critical || 0)
+      },
+      sourceGaps: repairActions.slice(0, 8).map((action) => ({
+        source: action.source || action.raw_source,
+        priority: action.priority,
+        affectedMatches: Number(action.affected_matches || 0),
+        currentRate: action.current_rate ?? null,
+        targetRate: action.target_rate ?? null,
+        estimatedGain: Number(action.estimated_gain || 0),
+        command: Array.isArray(action.command) ? action.command.join(' ') : null
+      })),
+      issues,
+      targets: {
+        visible24h: '25-35',
+        ready: '12-18 si contexte suffisant',
+        night: '6-10 si events suffisants',
+        winnerShare: '35-50%',
+        maxGoalsShare: '35%'
+      }
+    };
+  }
+
+  function buildModelBacktestV4({ contextBacktestReport, decisionBacktestReport, modelLabReport, probabilityCalibrationReport, dashboardRows }) {
+    const markets = Array.isArray(modelLabReport?.by_market) ? modelLabReport.by_market : [];
+    const sports = Array.isArray(modelLabReport?.by_sport) ? modelLabReport.by_sport : [];
+    const leagues = Array.isArray(modelLabReport?.by_league) ? modelLabReport.by_league : [];
+    const timeBuckets = Array.isArray(modelLabReport?.by_time_bucket) ? modelLabReport.by_time_bucket : [];
+    const dashboardMarkets = {};
+    for (const row of dashboardRows || []) {
+      const market = simpleMarketGroup(row?.marketKey || row?.market) || canonicalMarketKey(row?.marketKey || row?.market || 'other');
+      dashboardMarkets[market] = (dashboardMarkets[market] || 0) + 1;
+    }
+    return {
+      schema: 'paris-sportif.model_backtest.v4',
+      generatedAt: new Date().toISOString(),
+      summary: {
+        settled: Number(modelLabReport?.summary?.settled_rows || decisionBacktestReport?.summary?.settled || contextBacktestReport?.summary?.settled || 0),
+        roi: Number(modelLabReport?.summary?.roi ?? decisionBacktestReport?.summary?.roi ?? 0),
+        brier: Number(modelLabReport?.summary?.brier ?? probabilityCalibrationReport?.summary?.brier ?? 0),
+        calibrationBuckets: Number(probabilityCalibrationReport?.summary?.usable_buckets || 0),
+        currentDashboardMarkets: dashboardMarkets
+      },
+      dimensions: {
+        bySport: sports.slice(0, 20),
+        byMarket: markets.slice(0, 20),
+        byLeague: leagues.slice(0, 20),
+        byTimeBucket: timeBuckets.slice(0, 12),
+        bySourceQuality: Array.isArray(contextBacktestReport?.by_tier) ? contextBacktestReport.by_tier : []
+      },
+      guardrails: {
+        noNegativeEdgeReady: true,
+        sourceQualityBlocksBet: true,
+        drawStandardBlocked: true,
+        complexMarketsExpertOnly: true
       }
     };
   }
@@ -4518,6 +4856,7 @@ function createLegacyEngineService({ projectRoot }) {
     const picksHistorySummary = readPicksHistorySummary();
     const healthReport = readHealthReport();
     const sourceHealthV5 = buildSourceHealthV5(sourceHealthReport, healthReport);
+    const sourceHealthV6 = buildSourceHealthV6(sourceHealthV5, coverageRepairEngineReport, sourceCoverageTargetsReport);
     const modelRealityAudit = buildModelRealityAudit(picksHistorySummary);
     const events = dedupeUpcomingBookable(
       eventListFromDays(data.days).map((match) => attachWinamaxMarkets(match, playerOddsIndex))
@@ -4555,7 +4894,7 @@ function createLegacyEngineService({ projectRoot }) {
       .map((row) => applyWinamaxProductLayer(row))
       .map((row) => applySafeReliabilityLayer(row));
     const prioritizedDecisionRows = applyPriorityScores(allDecisionRows)
-      .map((row) => attachV3Contracts(row, sourceHealthV5));
+      .map((row) => attachV3Contracts(row, sourceHealthV5, sourceHealthV6));
     const matches = prioritizedDecisionRows.filter((row) => !row.isMarketAlternative);
     const seen = new Set();
     const picks = prioritizedDecisionRows
@@ -4618,6 +4957,24 @@ function createLegacyEngineService({ projectRoot }) {
       sourceHealthV5,
       decisionCenter
     });
+    const terrainReportV3 = buildTerrainReportV3({
+      data,
+      dashboardRows: dashboard.rows,
+      todayFunnel,
+      coverage24h,
+      marketCoverageV2,
+      sourceHealthV6,
+      decisionCenter,
+      criticalIssueReport,
+      coverageRepairEngine: coverageRepairEngineReport
+    });
+    const modelBacktestV4 = buildModelBacktestV4({
+      contextBacktestReport,
+      decisionBacktestReport,
+      modelLabReport,
+      probabilityCalibrationReport,
+      dashboardRows: dashboard.rows
+    });
 
     const analysis = {
       ok: true,
@@ -4658,7 +5015,10 @@ function createLegacyEngineService({ projectRoot }) {
       todayFunnel,
       coverage24h,
       sourceHealthV5,
+      sourceHealthV6,
       terrainReportV2,
+      terrainReportV3,
+      modelBacktestV4,
       decisionCenter,
       combines,
       scorers,

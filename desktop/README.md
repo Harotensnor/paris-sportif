@@ -8,13 +8,13 @@ Paris Sportif Desktop est le logiciel PC local pour préparer tes paris Winamax.
 
 ### Version installateur Windows
 
-La version v3.0.0 se génère avec :
+La version v3.1.0 se génère avec :
 
 ```powershell
 npm --prefix desktop run dist
 ```
 
-Le fichier attendu est `Paris Sportif Desktop Setup 3.0.0.exe`. Le build packagé embarque les données, rapports modèle et scripts nécessaires au démarrage. Python reste recommandé si tu veux relancer une pipeline complète depuis la machine installée.
+Le fichier attendu est `Paris Sportif Desktop Setup 3.1.0.exe`. Le build packagé embarque les données, rapports modèle et scripts nécessaires au démarrage. Python reste recommandé si tu veux relancer une pipeline complète depuis la machine installée.
 
 ### Version développeur
 
@@ -53,6 +53,16 @@ Depuis v1.5.0, certains matchs avec peu de contexte secondaire peuvent apparaît
 L'app ne place pas de pari automatiquement. Elle prépare le ticket et suit ton résultat.
 
 En Mode expert, l'auto-tracking supervisé peut suivre automatiquement certains tickets dans l'app selon tes règles. C'est uniquement un suivi interne : tu dois toujours ouvrir Winamax et confirmer toi-même le pari réel.
+
+## Nouveautés v3.1.0
+
+La v3.1.0 durcit le chantier `Pronostics Pro Winamax` sur les points qui bloquent vraiment les paris :
+
+- chaque pick expose maintenant `PickDecision v4` : statut, mise, avantage, famille de marché, raisons de blocage, qualité source, règle Winamax 2-0 et texte court/long ;
+- chaque fiche expose `MatchSheet v4` : sections visibles, sections cachées parce que vides, données critiques manquantes, confiance compos/joueurs/contexte et couverture source ;
+- la santé sources passe en `SourceHealth v6`, avec sources dégradées, snapshots préservés, priorités de réparation et gain estimé en picks ;
+- le terrain passe en `TerrainReport v3` : résumé “pari vite”, prêts, nuit, distribution marché/sport, checks UX et goulets d’étranglement ;
+- le laboratoire modèle expose `ModelBacktest v4` pour comparer sport, marché, ligue, tranche horaire et qualité source.
 
 ## Nouveautés v3.0.0
 
