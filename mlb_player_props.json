@@ -1,136 +1,8 @@
 {
-  "generated_at": "2026-05-17T20:14:00Z",
+  "generated_at": "2026-05-17T20:18:24Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815389",
-      "kickoff": "2026-05-17T20:05Z",
-      "league": "MLB",
-      "match": "San Francisco Giants at Athletics Athletics",
-      "home": "Athletics",
-      "away": "San Francisco Giants",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Athletics",
-          "pitcher": "Jeffrey Springs",
-          "label": "Jeffrey Springs plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.589,
-          "fair_odds": 1.7,
-          "expected_strikeouts": 4.89,
-          "projected_ip": 5.44,
-          "inputs": {
-            "k9": 8.08,
-            "era": 4.22,
-            "whip": 1.22,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Athletics",
-          "pitcher": "Jeffrey Springs",
-          "label": "Jeffrey Springs concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5418,
-          "fair_odds": 1.85,
-          "expected_hr_allowed": 0.78,
-          "projected_ip": 5.44,
-          "inputs": {
-            "hr9": 1.29,
-            "era": 4.22,
-            "whip": 1.22
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "San Francisco Giants",
-          "pitcher": "Adrian Houser",
-          "label": "Adrian Houser plus de 2,5 strikeouts",
-          "line": 2.5,
-          "pick": "over",
-          "probability": 0.6118,
-          "fair_odds": 1.63,
-          "expected_strikeouts": 2.88,
-          "projected_ip": 5.25,
-          "inputs": {
-            "k9": 4.93,
-            "era": 5.79,
-            "whip": 1.48,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "San Francisco Giants",
-          "pitcher": "Adrian Houser",
-          "label": "Adrian Houser concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6312,
-          "fair_odds": 1.58,
-          "expected_hr_allowed": 0.997,
-          "projected_ip": 5.25,
-          "inputs": {
-            "hr9": 1.71,
-            "era": 5.79,
-            "whip": 1.48
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401815387",
-      "kickoff": "2026-05-17T20:07Z",
-      "league": "MLB",
-      "match": "Los Angeles Dodgers at Los Angeles Angels",
-      "home": "Los Angeles Angels",
-      "away": "Los Angeles Dodgers",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Los Angeles Dodgers",
-          "pitcher": "Roki Sasaki",
-          "label": "Roki Sasaki moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.5321,
-          "fair_odds": 1.88,
-          "expected_strikeouts": 4.37,
-          "projected_ip": 4.74,
-          "inputs": {
-            "k9": 8.29,
-            "era": 5.88,
-            "whip": 1.63,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Los Angeles Dodgers",
-          "pitcher": "Roki Sasaki",
-          "label": "Roki Sasaki concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.7192,
-          "fair_odds": 1.39,
-          "expected_hr_allowed": 1.27,
-          "projected_ip": 4.74,
-          "inputs": {
-            "hr9": 2.41,
-            "era": 5.88,
-            "whip": 1.63
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815388",
       "kickoff": "2026-05-17T23:20Z",
@@ -178,7 +50,7 @@
       ]
     }
   ],
-  "props": 8,
+  "props": 2,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"

@@ -1,46 +1,28 @@
 {
-  "generated_at": "2026-05-17T20:14:07Z",
+  "generated_at": "2026-05-17T20:18:31Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 48,
-    "actionable": 9,
-    "watch": 3,
+    "active_events": 44,
+    "actionable": 7,
+    "watch": 1,
     "risk": 36,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 6,
-      "market_move": 7,
-      "signal_conflict": 2,
+      "injury_imbalance": 4,
       "back_to_back_travel": 3,
-      "market_uncertain": 38
+      "market_move": 4,
+      "market_uncertain": 38,
+      "signal_conflict": 1
     },
     "by_quality": {
-      "actionable": 9,
-      "watch": 3,
+      "actionable": 7,
+      "watch": 1,
       "risk": 36
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401815387",
-      "date": "2026-05-17T20:07Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Los Angeles Angels",
-      "away": "Los Angeles Dodgers",
-      "match": "Los Angeles Angels - Los Angeles Dodgers",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Los Angeles Dodgers",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 6-14"
-    },
     {
       "event_id": "401856916",
       "date": "2026-05-17T22:00Z",
@@ -76,24 +58,6 @@
       "side": "away",
       "strength": 0.872,
       "context": "1 match dans les 48h + 1711 km de voyage"
-    },
-    {
-      "event_id": "401815389",
-      "date": "2026-05-17T20:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Athletics",
-      "away": "San Francisco Giants",
-      "match": "Athletics - San Francisco Giants",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "San Francisco Giants",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 5-9"
     },
     {
       "event_id": "401815452",
@@ -204,42 +168,6 @@
       "side": "away",
       "strength": 0.534,
       "context": "Cote away: 2.60 -> 2.85 (-9.6%)"
-    },
-    {
-      "event_id": "401856914",
-      "date": "2026-05-17T23:00Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Minnesota Lynx",
-      "away": "Chicago Sky",
-      "match": "Minnesota Lynx - Chicago Sky",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.496,
-      "context": "Cote away: 2.80 -> 2.55 (+8.9%)"
-    },
-    {
-      "event_id": "401872573",
-      "date": "2026-05-18T01:00Z",
-      "sport": "football",
-      "league_code": "ligamx",
-      "league_name": "Liga MX",
-      "home": "Pumas UNAM",
-      "away": "Pachuca",
-      "match": "Pumas UNAM - Pachuca",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.471,
-      "context": "Cote away: 2.95 -> 2.70 (+8.5%)"
     }
   ],
   "active_risk": [
