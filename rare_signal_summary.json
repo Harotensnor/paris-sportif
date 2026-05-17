@@ -1,26 +1,25 @@
 {
-  "generated_at": "2026-05-17T12:58:49Z",
+  "generated_at": "2026-05-17T13:07:44Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 58,
-    "actionable": 18,
+    "actionable": 17,
     "watch": 2,
-    "risk": 38,
+    "risk": 39,
     "expired_sample": 0,
     "by_type": {
       "weather_extreme": 1,
       "injury_imbalance": 17,
       "back_to_back_travel": 8,
       "market_uncertain": 35,
-      "market_move": 3,
-      "signal_conflict": 4
+      "signal_conflict": 5
     },
     "by_quality": {
       "watch": 2,
-      "actionable": 18,
-      "risk": 38
+      "actionable": 17,
+      "risk": 39
     }
   },
   "active_actionable": [
@@ -97,24 +96,6 @@
       "context": "Absences severes 0-6"
     },
     {
-      "event_id": "401842726",
-      "date": "2026-05-23T13:00Z",
-      "sport": "football",
-      "league_code": "allsvenskan",
-      "league_name": "Allsvenskan",
-      "home": "Kalmar FF",
-      "away": "Degerfors IF",
-      "match": "Kalmar FF - Degerfors IF",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "away",
-      "strength": 1.0,
-      "context": "Cote away: 2.65 -> 3.15 (-18.9%)"
-    },
-    {
       "event_id": "401815388",
       "date": "2026-05-17T23:20Z",
       "sport": "baseball",
@@ -129,8 +110,8 @@
       "direction": "fade",
       "team": "San Diego Padres",
       "side": "away",
-      "strength": 0.872,
-      "context": "1 match dans les 48h + 1711 km de voyage"
+      "strength": 0.952,
+      "context": "2 match dans les 48h + 1711 km de voyage"
     },
     {
       "event_id": "401815376",
@@ -147,8 +128,8 @@
       "direction": "fade",
       "team": "Boston Red Sox",
       "side": "away",
-      "strength": 0.83,
-      "context": "1 match dans les 48h + 1498 km de voyage"
+      "strength": 0.91,
+      "context": "2 match dans les 48h + 1498 km de voyage"
     },
     {
       "event_id": "401815378",
@@ -909,6 +890,24 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.7%"
+    },
+    {
+      "event_id": "401842726",
+      "date": "2026-05-23T13:00Z",
+      "sport": "football",
+      "league_code": "allsvenskan",
+      "league_name": "Allsvenskan",
+      "home": "Kalmar FF",
+      "away": "Degerfors IF",
+      "match": "Kalmar FF - Degerfors IF",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.9%"
     },
     {
       "event_id": "401872576",
