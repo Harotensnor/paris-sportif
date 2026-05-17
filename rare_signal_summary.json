@@ -1,23 +1,22 @@
 {
-  "generated_at": "2026-05-17T06:59:38Z",
+  "generated_at": "2026-05-17T07:08:10Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 62,
+    "active_events": 63,
     "actionable": 17,
     "watch": 1,
-    "risk": 44,
+    "risk": 45,
     "expired_sample": 0,
     "by_type": {
-      "market_uncertain": 45,
+      "market_uncertain": 46,
       "injury_imbalance": 17,
       "back_to_back_travel": 8,
-      "market_move": 3,
-      "signal_conflict": 4
+      "signal_conflict": 5
     },
     "by_quality": {
-      "risk": 44,
+      "risk": 45,
       "actionable": 17,
       "watch": 1
     }
@@ -110,8 +109,8 @@
       "direction": "fade",
       "team": "San Diego Padres",
       "side": "away",
-      "strength": 0.872,
-      "context": "1 match dans les 48h + 1711 km de voyage"
+      "strength": 0.952,
+      "context": "2 match dans les 48h + 1711 km de voyage"
     },
     {
       "event_id": "401815376",
@@ -128,8 +127,8 @@
       "direction": "fade",
       "team": "Boston Red Sox",
       "side": "away",
-      "strength": 0.83,
-      "context": "1 match dans les 48h + 1498 km de voyage"
+      "strength": 0.91,
+      "context": "2 match dans les 48h + 1498 km de voyage"
     },
     {
       "event_id": "401815378",
@@ -424,42 +423,6 @@
       "context": "marge bookmaker anormale 18.1%"
     },
     {
-      "event_id": "176147",
-      "date": "2026-05-18T04:00Z",
-      "sport": "tennis",
-      "league_code": "grandprixsonaltesser",
-      "league_name": "Grand Prix Son Altesse Royale  La Princesse Lalla Meryem",
-      "home": "",
-      "away": "",
-      "match": "? - ?",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 12.0%"
-    },
-    {
-      "event_id": "176115",
-      "date": "2026-05-18T04:00Z",
-      "sport": "tennis",
-      "league_code": "internationauxdestra",
-      "league_name": "Internationaux de Strasbourg presented by Mammotion",
-      "home": "",
-      "away": "",
-      "match": "? - ?",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 12.2%"
-    },
-    {
       "event_id": "175491",
       "date": "2026-05-18T04:00Z",
       "sport": "tennis",
@@ -496,14 +459,14 @@
       "context": "marge bookmaker anormale 12.1%"
     },
     {
-      "event_id": "401871410",
-      "date": "2026-05-18T23:30Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Buffalo Sabres",
-      "away": "Montreal Canadiens",
-      "match": "Buffalo Sabres - Montreal Canadiens",
+      "event_id": "176147",
+      "date": "2026-05-18T04:00Z",
+      "sport": "tennis",
+      "league_code": "grandprixsonaltesser",
+      "league_name": "Grand Prix Son Altesse Royale  La Princesse Lalla Meryem",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
       "quality": "risk",
       "quality_reason": "Signal de prudence, pas une opportunite directe",
       "type": "market_uncertain",
@@ -511,7 +474,25 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "home et away montent ensemble (+11.6% / +8.9%)"
+      "context": "marge bookmaker anormale 12.0%"
+    },
+    {
+      "event_id": "176115",
+      "date": "2026-05-18T04:00Z",
+      "sport": "tennis",
+      "league_code": "internationauxdestra",
+      "league_name": "Internationaux de Strasbourg presented by Mammotion",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 12.2%"
     },
     {
       "event_id": "401861386",
@@ -530,6 +511,24 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.5%"
+    },
+    {
+      "event_id": "401865537",
+      "date": "2026-05-19T22:00Z",
+      "sport": "football",
+      "league_code": "conmebol.libertadores",
+      "league_name": "Copa Libertadores",
+      "home": "Coquimbo Unido",
+      "away": "Deportes Tolima",
+      "match": "Coquimbo Unido - Deportes Tolima",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.8%"
     },
     {
       "event_id": "401865438",
@@ -568,24 +567,6 @@
       "context": "marge bookmaker anormale 18.5%"
     },
     {
-      "event_id": "401865537",
-      "date": "2026-05-19T22:00Z",
-      "sport": "football",
-      "league_code": "conmebol.libertadores",
-      "league_name": "Copa Libertadores",
-      "home": "Coquimbo Unido",
-      "away": "Deportes Tolima",
-      "match": "Coquimbo Unido - Deportes Tolima",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.8%"
-    },
-    {
       "event_id": "401865539",
       "date": "2026-05-20T00:00Z",
       "sport": "football",
@@ -622,24 +603,6 @@
       "context": "marge bookmaker anormale 18.3%"
     },
     {
-      "event_id": "401865443",
-      "date": "2026-05-20T00:30Z",
-      "sport": "football",
-      "league_code": "conmebol.sudamericana",
-      "league_name": "Copa Sudamericana",
-      "home": "São Paulo",
-      "away": "Millonarios",
-      "match": "São Paulo - Millonarios",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.7%"
-    },
-    {
       "event_id": "401865538",
       "date": "2026-05-20T00:30Z",
       "sport": "football",
@@ -656,6 +619,24 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.4%"
+    },
+    {
+      "event_id": "401865443",
+      "date": "2026-05-20T00:30Z",
+      "sport": "football",
+      "league_code": "conmebol.sudamericana",
+      "league_name": "Copa Sudamericana",
+      "home": "São Paulo",
+      "away": "Millonarios",
+      "match": "São Paulo - Millonarios",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.7%"
     },
     {
       "event_id": "401865435",
@@ -1054,6 +1035,24 @@
       "context": "marge bookmaker anormale 18.7%"
     },
     {
+      "event_id": "401859404",
+      "date": "2026-05-23T10:00Z",
+      "sport": "football",
+      "league_code": "jleague",
+      "league_name": "J-League",
+      "home": "Kyoto Sanga",
+      "away": "V-Varen Nagasaki",
+      "match": "Kyoto Sanga - V-Varen Nagasaki",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.7%"
+    },
+    {
       "event_id": "401842726",
       "date": "2026-05-23T13:00Z",
       "sport": "football",
@@ -1116,6 +1115,24 @@
       "home": "Standard Liege",
       "away": "Royal Charleroi SC",
       "match": "Standard Liege - Royal Charleroi SC",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 19.4%"
+    },
+    {
+      "event_id": "401859405",
+      "date": "2026-05-24T03:55Z",
+      "sport": "football",
+      "league_code": "jleague",
+      "league_name": "J-League",
+      "home": "Fagiano Okayama",
+      "away": "Cerezo Osaka",
+      "match": "Fagiano Okayama - Cerezo Osaka",
       "quality": "risk",
       "quality_reason": "Signal de prudence, pas une opportunite directe",
       "type": "market_uncertain",
