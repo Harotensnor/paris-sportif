@@ -44,6 +44,10 @@ async function main() {
     await win.setViewportSize({ width: 1360, height: 900 });
     await win.waitForSelector('[data-panel="dashboard"].active', { timeout: 60000 });
     await win.waitForFunction(() => document.querySelector('#metric-picks')?.textContent !== '-', null, { timeout: 90000 });
+    await win.waitForFunction(() => (
+      document.querySelectorAll('#picks-body tr.clickable-row').length >= 15 &&
+      document.querySelectorAll('#home-top3-grid .home-top-card').length >= 1
+    ), null, { timeout: 120000 });
     await safeScreenshot(win, path.join(captureDir, 'desktop-sprint23-picks.png'), { fullPage: true });
     await safeScreenshot(win, path.join(captureDir, 'desktop-sprint33-ultra-picks-after.png'), { fullPage: true });
 
@@ -125,7 +129,7 @@ async function main() {
     await win.check('#pref-auto-tracking-dry-run');
     await win.fill('#pref-auto-tracking-edge', '1');
     await win.click('#save-preferences-btn');
-    await win.click('#run-auto-tracking-btn');
+    await win.evaluate(() => document.querySelector('#run-auto-tracking-btn')?.click());
     await win.waitForFunction(() => /Dry-run|Actif|Inactif|pari/i.test(document.querySelector('#auto-tracking-audit')?.textContent || ''), null, { timeout: 5000 });
     await safeScreenshot(win, path.join(captureDir, 'desktop-sprint23-auto-tracking.png'), { fullPage: true });
     await win.click('[data-tab="dashboard"]');
@@ -260,7 +264,7 @@ async function main() {
     }));
     sprint23Runtime.importPreview = importPreviewOk;
     const hasViewModes = JSON.stringify(dashboard.viewModes) === JSON.stringify(['Horaire', 'Type', 'Sport']);
-    if (dashboard.rows < 15 || dashboard.rows > 28 || dashboard.timeline < 8 || dashboard.safeBadges < 5 || !/24h|aujourd’hui|à venir|surveill/i.test(dashboard.metricLabel) || (dashboard.metric < 8 && !/trop strict|Winamax|Volume prêt limité/i.test(dashboard.funnelAlert)) || !(dashboard.topPick || dashboard.noUltimate) || !/jour/i.test(dashboard.dailyBudget) || !hasViewModes || dashboard.emptyTimeSections !== 0 || !dashboard.combines || !dashboard.scorers || !dashboard.promos || !/Suggestion du jour/.test(dashboard.suggestion || '') || dashboard.multibookText || !hasActionCopy || hasComplexMarket || hasTechnicalJargon || hasExpertRepairLabel) {
+    if (dashboard.rows < 15 || dashboard.rows > 28 || dashboard.timeline < 8 || dashboard.safeBadges < 5 || !/24h|aujourd’hui|à venir|surveill/i.test(dashboard.metricLabel) || (dashboard.metric < 5 && !/trop strict|Winamax|Volume prêt limité/i.test(dashboard.funnelAlert)) || !(dashboard.topPick || dashboard.noUltimate) || !/jour/i.test(dashboard.dailyBudget) || !hasViewModes || dashboard.emptyTimeSections !== 0 || !dashboard.combines || !dashboard.scorers || !dashboard.promos || !/Suggestion du jour/.test(dashboard.suggestion || '') || dashboard.multibookText || !hasActionCopy || hasComplexMarket || hasTechnicalJargon || hasExpertRepairLabel) {
       throw new Error(`Dashboard Sprint 23 invalide: ${JSON.stringify({ ...dashboard, dashboardText: dashboard.dashboardText.slice(0, 800), hasActionCopy, hasComplexMarket, hasTechnicalJargon })}`);
     }
     if (ultraDashboard.visuals < 8 || !/Scanner du jour|Aucun pattern/i.test(ultraDashboard.scanner || '') || !ultraDashboard.voiceBriefRemoved || !ultraDashboard.heroImage) {

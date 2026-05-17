@@ -7079,11 +7079,12 @@
       const displayed24h = Number(state.dashboardMeta?.rolling24Displayed || coverage.displayed || 0);
       const nightActual = nightPickRows(state.currentDashboardRows?.length ? state.currentDashboardRows : state.picks, isReadyToStakeRow).length;
       const watch24h = Math.max(0, displayed24h - ready24hActual);
-      const status = ready24hActual >= 10 && nightActual >= 3 ? 'ok' : 'warn';
-      node.className = `today-funnel-alert ${status === 'ok' ? 'hidden' : 'warn'}`;
-      if (status === 'ok') return;
+      const bookable24h = Number(coverage.bookable || coverage.events || 0);
+      const criticalLow = bookable24h >= 30 && ready24hActual < 5;
+      node.className = criticalLow ? 'today-funnel-alert danger' : 'today-funnel-alert hidden';
+      if (!criticalLow) return;
       node.innerHTML = `
-        <strong>${formatCount(ready24hActual)} pari(s) prêt(s) sur les prochaines 24h</strong>
+        <strong>Seulement ${formatCount(ready24hActual)} pari(s) prêt(s) sur les prochaines 24h</strong>
         <span>Lecture utile : ${formatCount(coverage.events || 0)} matchs → ${formatCount(coverage.bookable || 0)} Winamax → ${formatCount(coverage.positive || 0)} signaux → ${formatCount(ready24hActual)} prêts${watch24h ? ` · ${formatCount(watch24h)} à surveiller` : ''} · ${formatCount(nightActual)} prêt(s) cette nuit.</span>
         <button class="ghost-btn" type="button" data-tab-target="data">Diagnostic auto</button>
       `;
@@ -7093,13 +7094,13 @@
       const today = funnel.today || {};
       const displayed = Number(today.displayed || 0);
       const ready = Number(today.ready || 0);
+      const simpleReady = Number(today.simpleReady || ready || 0);
+      const advancedReady = Number(today.advancedReady || 0);
       const bookable = Number(today.bookableEvents || today.bookable || 0);
-      const tooStrictForDailyTarget = bookable >= 30 && displayed < 10;
-      const noReadyToday = bookable >= 10 && ready < 1;
-      const lowReadyToday = bookable >= 10 && ready > 0 && ready < 8;
+      const tooStrictForDailyTarget = bookable >= 30 && simpleReady < 5;
+      const noReadyToday = bookable >= 10 && simpleReady < 1;
+      const lowReadyToday = bookable >= 30 && simpleReady > 0 && simpleReady < 5;
       if ((bookable > 0 && displayed < 5) || tooStrictForDailyTarget || noReadyToday || lowReadyToday) {
-        const simpleReady = Number(today.simpleReady || 0);
-        const advancedReady = Number(today.advancedReady || 0);
         node.className = 'today-funnel-alert danger';
         node.innerHTML = `
           <strong>${noReadyToday ? 'Aucun pari prêt aujourd’hui' : lowReadyToday ? 'Volume prêt limité aujourd’hui' : tooStrictForDailyTarget ? 'Modèle trop strict aujourd’hui' : displayed ? `${formatCount(displayed)} pari(s) aujourd'hui seulement` : 'Aucun pari simple aujourd’hui visible'}</strong>
@@ -7113,13 +7114,13 @@
       const displayed24h = Number(state.dashboardMeta?.rolling24Displayed || coverage.displayed || 0);
       const ready24h = Number(coverage.ready || 0);
       const nightDisplayed = Number(coverage.nightDisplayed || 0);
-      const healthy24h = displayed24h >= 15 && ready24h >= 10 && nightDisplayed >= 3;
+      const bookable24h = Number(coverage.bookable || coverage.events || 0);
+      const healthy24h = ready24h >= 5 || displayed24h >= 8 || bookable24h < 30;
       if (healthy24h) {
         node.classList.add('hidden');
         return;
       }
-      const status = displayed24h >= 8 ? 'warn' : 'danger';
-      node.className = `today-funnel-alert ${status}`;
+      node.className = 'today-funnel-alert danger';
       const watch24h = Math.max(0, displayed24h - ready24h);
       node.innerHTML = `
         <strong>${displayed24h ? `${formatCount(displayed24h)} opportunité(s) simples sur 24h glissantes` : 'Aucune opportunité simple sur 24h glissantes'}</strong>
@@ -13157,6 +13158,7 @@
     const decisionBundle = decisionBundleForRow(row);
     const stakeAllowed = canDisplayStake(row, decisionBundle);
     const dc = decisionBundleForRow(row);
+    const expertMode = Boolean(loadPreferences().expertMode);
     const readableDecision = dc.status === 'ready' ? 'Prêt' : dc.status === 'repair' ? 'À réparer' : dc.status === 'skip' ? 'À éviter' : (row.statusLabel || 'Observation');
     const readableReason = noBetStakeReason(row, decisionBundle) || contextGateText(row);
     const readableAction = stakeAllowed ? (dc.nextAction || 'Jouer maintenant') : 'Surveiller ou finaliser T-10';
@@ -13197,7 +13199,7 @@
       ['1', oneNtwo.home ? `@${Number(oneNtwo.home).toFixed(2)}` : '-'],
       ['N', oneNtwo.draw ? `@${Number(oneNtwo.draw).toFixed(2)}` : '-'],
       ['2', oneNtwo.away ? `@${Number(oneNtwo.away).toFixed(2)}` : '-']
-    ];
+    ].filter(([label]) => expertMode || label !== 'N');
     const explanation = cleanExplanation(pred.explain || pred.explanation || pred.reason);
     const winamaxUrl = safeExternalUrl(row.winamaxUrl, 'www.winamax.fr');
     const winamaxLink = winamaxUrl
@@ -13216,7 +13218,7 @@
       if (!signal.ok && /non disponible|n\/a|^-$|^0(?:\.0)?%?$|à enrichir/i.test(value)) return false;
       return true;
     });
-    const marketRows = buildMarketRows(markets);
+    const marketRows = buildMarketRows(markets, { expert: expertMode });
     const h2hHtml = buildH2hHtml(match);
     const calibrationHtml = buildCalibrationDetailHtml(row);
     const blockList = blockReasons(row);
@@ -13734,16 +13736,21 @@
     return signals.slice(0, 10);
   }
 
-  function buildMarketRows(markets) {
+  function buildMarketRows(markets, { expert = Boolean(loadPreferences().expertMode) } = {}) {
     const rows = [];
     const push = (market, label, odd) => {
       const n = Number(odd);
       if (Number.isFinite(n) && n > 1) rows.push({ market: formatMarketName(market), label, odd: `@${n.toFixed(2)}` });
     };
     if (markets.match_winner) {
-      markets.match_winner.slice(0, 6).forEach((item) => push(item.market || '1n2', item.label || item.side, item.odd));
+      markets.match_winner
+        .slice(0, 6)
+        .filter((item) => expert || !/\b(nul|draw|x)\b/i.test(String(item.label || item.side || item.market || '')))
+        .forEach((item) => push(item.market || '1n2', item.label || item.side, item.odd));
     }
-    ['ou', 'ou15', 'ou25', 'ou35', 'btts_rows', 'team_total', 'ht_ou', 'dnb_rows', 'baseball_total', 'hockey_total', 'tennis_games', 'tennis_sets'].forEach((key) => {
+    const standardMarketKeys = ['ou', 'ou15', 'ou25', 'ou35', 'btts_rows'];
+    const expertMarketKeys = ['ou', 'ou15', 'ou25', 'ou35', 'btts_rows', 'team_total', 'ht_ou', 'dnb_rows', 'baseball_total', 'hockey_total', 'tennis_games', 'tennis_sets'];
+    (expert ? expertMarketKeys : standardMarketKeys).forEach((key) => {
       const value = markets[key];
       if (Array.isArray(value)) {
         value.slice(0, 8).forEach((item) => push(item.market || key, item.label || item.side || key, item.odd));
@@ -13759,7 +13766,7 @@
       if (seen.has(key)) return false;
       seen.add(key);
       return true;
-    }).slice(0, 28);
+    }).slice(0, expert ? 28 : 10);
   }
 
   function buildMarketTimingHtml(timing) {

@@ -1072,7 +1072,10 @@ function createLegacyEngineService({ projectRoot }) {
     // une avance de deux buts peut payer le pari avant le score final. Le
     // boost doit donc peser plus qu'un simple bonus cosmétique, tout en
     // restant plafonné pour éviter de rendre tous les favoris jouables.
-    const boost = Math.min(0.075, leadTwoProbability * (side === 'home' ? 0.110 : 0.085));
+    const boost = Math.min(
+      side === 'home' ? 0.125 : 0.100,
+      leadTwoProbability * (side === 'home' ? 0.240 : 0.190)
+    );
     return {
       eligible: true,
       side,
@@ -1799,10 +1802,60 @@ function createLegacyEngineService({ projectRoot }) {
     if (policy?.direction === 'boost') warnings.push(`segment gagnant : filtre assoupli (${policy.reason})`);
     if (policy?.direction === 'harden') warnings.push(`segment froid : filtre durci (${policy.reason})`);
 
+    const hasTwoGoalSafety = Boolean(row?.winamaxTwoGoalRule?.eligible);
+    const twoGoalPct = Number(row?.winamaxTwoGoalRule?.leadTwoProbability || 0);
+    const severeTwoGoalSegmentLoss = sample >= 120 && Number.isFinite(roi) && roi < -0.16;
+    const twoGoalContextOverride = hasTwoGoalSafety
+      && isOneN2
+      && isFootball
+      && rawEdge >= 0.015
+      && edge >= 0.015
+      && odd >= 1.25
+      && odd <= 3.00
+      && confidence >= 0.55
+      && contextScore >= 75
+      && !severeTwoGoalSegmentLoss
+      && !row?.signalConflict?.active
+      && !row?.oddsGuardrail?.applied
+      && !hardCriticalMissing.length
+      && (
+        twoGoalPct >= 0.42 ||
+        (twoGoalPct >= 0.35 && odd <= 1.90 && confidence >= 0.64 && contextScore >= 80)
+      )
+      && (
+        !segmentNegative ||
+        (twoGoalPct >= 0.45 && rawEdge >= 0.02 && contextScore >= 85) ||
+        (twoGoalPct >= 0.35 && odd <= 1.90 && confidence >= 0.64 && contextScore >= 80)
+      );
+    if (twoGoalContextOverride) {
+      return {
+        status: 'reliable',
+        label: 'Fiable',
+        reliable: true,
+        displayable: true,
+        conservativeEdge: edge,
+        rawEdge,
+        edgeCapped: edgeInfo.capped,
+        confidence,
+        sample,
+        roi: Number.isFinite(roi) ? roi : null,
+        policy: policy ? {
+          key: policy.key,
+          direction: policy.direction,
+          edgeMin,
+          oddMax,
+          confidenceMin,
+          reason: policy.reason
+        } : null,
+        reliableRule: '2-0-context',
+        reasons: [],
+        warnings: [`Filet 2-0 Winamax ${Math.round(twoGoalPct * 100)}%`, 'Vainqueur promu prudemment par contexte fort', ...warnings].slice(0, 4)
+      };
+    }
+
     if (row?.limitedConfidence) {
-      const limitedHasTwoGoalSafety = Boolean(row?.winamaxTwoGoalRule?.eligible);
-      const twoGoalPct = Number(row?.winamaxTwoGoalRule?.leadTwoProbability || 0);
-      const severeTwoGoalSegmentLoss = sample >= 30 && Number.isFinite(roi) && roi < -0.08;
+      const limitedHasTwoGoalSafety = hasTwoGoalSafety;
+      const severeLimitedTwoGoalSegmentLoss = sample >= 30 && Number.isFinite(roi) && roi < -0.08;
       const twoGoalWinnerReliable = limitedHasTwoGoalSafety
         && rawEdge >= 0.003
         && edge >= 0.003
@@ -1810,7 +1863,7 @@ function createLegacyEngineService({ projectRoot }) {
         && odd <= 4.00
         && confidence >= 0.66
         && twoGoalPct >= 0.55
-        && !severeTwoGoalSegmentLoss
+        && !severeLimitedTwoGoalSegmentLoss
         && !row?.signalConflict?.active
         && !row?.oddsGuardrail?.applied
         && !hardCriticalMissing.length;
@@ -1849,7 +1902,7 @@ function createLegacyEngineService({ projectRoot }) {
         && confidence >= 0.70
         && twoGoalPct >= 0.42
         && contextScore >= 60
-        && !severeTwoGoalSegmentLoss
+        && !severeLimitedTwoGoalSegmentLoss
         && (!Number.isFinite(roi) || sample < 15 || roi >= -0.03)
         && !row?.signalConflict?.active
         && !row?.oddsGuardrail?.applied
@@ -1889,7 +1942,7 @@ function createLegacyEngineService({ projectRoot }) {
         && contextScore >= 80
         && sample >= 40
         && Number.isFinite(roi)
-        && roi >= 0.10
+        && roi >= 0.08
         && !row?.signalConflict?.active
         && !row?.oddsGuardrail?.applied
         && !hardCriticalMissing.length;

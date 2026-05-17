@@ -6261,26 +6261,24 @@ body.theme-light .sidebar {
   display: flex;
   align-items: end;
   justify-content: space-between;
-  gap: 12px;
-  padding: 8px 10px;
+  gap: 8px;
+  padding: 6px 8px;
   border: 1px solid rgba(16, 185, 129, .22);
-  border-radius: 10px;
+  border-radius: 8px;
   background:
     linear-gradient(135deg, rgba(16, 185, 129, .12), rgba(56, 189, 248, .06)),
     rgba(15, 23, 42, .48);
 }
 
 .betting-home-head h3 {
-  margin: 1px 0 2px;
-  font-size: 18px;
+  margin: 0;
+  font-size: 16px;
   line-height: 1.05;
   letter-spacing: 0;
 }
 
 .betting-home-head p {
-  margin: 0;
-  color: var(--muted);
-  font-size: 12px;
+  display: none;
 }
 
 .home-sort-actions {
@@ -6296,8 +6294,8 @@ body.theme-light .sidebar {
   border-radius: 7px;
   background: rgba(15, 23, 42, .48);
   color: var(--text-dim);
-  min-height: 28px;
-  padding: 0 8px;
+  min-height: 24px;
+  padding: 0 7px;
   font-weight: 800;
   cursor: pointer;
 }
@@ -6318,11 +6316,11 @@ body.theme-light .sidebar {
 .home-top-card {
   min-width: 0;
   border: 1px solid rgba(148, 163, 184, .22);
-  border-radius: 10px;
+  border-radius: 8px;
   background: rgba(15, 23, 42, .52);
-  padding: 7px;
+  padding: 6px;
   display: grid;
-  gap: 6px;
+  gap: 5px;
   cursor: pointer;
   transition: transform 180ms ease-out, border-color 180ms ease-out, background 180ms ease-out;
 }
@@ -6342,7 +6340,7 @@ body.theme-light .sidebar {
 
 .home-top-main {
   display: grid;
-  gap: 7px;
+  gap: 5px;
 }
 
 .home-top-rank {
@@ -6396,8 +6394,8 @@ body.theme-light .sidebar {
 
 .home-top-bet {
   display: grid;
-  gap: 4px;
-  padding: 7px;
+  gap: 3px;
+  padding: 6px;
   border-radius: 8px;
   background: rgba(2, 6, 23, .42);
 }
@@ -6442,7 +6440,7 @@ body.theme-light .sidebar {
 .home-top-kpis span {
   display: grid;
   gap: 2px;
-  padding: 5px 6px;
+  padding: 4px 5px;
   border-radius: 7px;
   background: rgba(15, 23, 42, .54);
   color: var(--muted);
@@ -6500,7 +6498,7 @@ body.theme-light .sidebar {
 
 .home-picks-table th,
 .home-picks-table td {
-  padding: 6px 8px;
+  padding: 5px 7px;
   border-bottom: 1px solid rgba(148, 163, 184, .13);
   text-align: left;
   vertical-align: middle;
@@ -6513,8 +6511,8 @@ body.theme-light .sidebar {
 }
 
 .home-picks-table th button {
-  min-height: 28px;
-  padding: 0 8px;
+  min-height: 24px;
+  padding: 0 7px;
   text-transform: uppercase;
   font-size: 11px;
 }

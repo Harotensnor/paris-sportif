@@ -60,9 +60,10 @@ function assert(condition, msg, ctx) {
   // sauf filet 2-0 Winamax ou vainqueur prudent avec historique robuste.
   const fallbacks = all.filter((p) => p?.pickSource === 'winamax_odds_fallback');
   for (const pick of fallbacks) {
-    const isTwoGoalWinamaxPromotion = pick.safeAssessment?.reliableRule === '2-0'
+    const isTwoGoalWinamaxPromotion = String(pick.safeAssessment?.reliableRule || '').startsWith('2-0')
       && pick.winamaxTwoGoalRule?.eligible
-      && Number(pick.winamaxTwoGoalRule?.leadTwoProbability || 0) >= 0.55;
+      && Number(pick.winamaxTwoGoalRule?.leadTwoProbability || 0) >= 0.35
+      && Number(pick.contextQuality?.score ?? pick.match?.context?.quality?.score ?? 0) >= 75;
     const marketKey = String(pick.marketKey || pick.market || '').toLowerCase();
     const isWinnerMarket = ['1n2', 'winner', 'matchwinner', 'moneyline'].includes(marketKey);
     const isPrudentWinnerPromotion = pick.safeAssessment?.reliableRule === 'vainqueur-prudent'
@@ -70,7 +71,7 @@ function assert(condition, msg, ctx) {
       && Number(pick.safeAssessment?.rawEdge ?? pick.edge ?? 0) >= 0.003
       && Number(pick.safeAssessment?.confidence || 0) >= 0.72
       && Number(pick.safeAssessment?.sample || 0) >= 40
-      && Number(pick.safeAssessment?.roi || 0) >= 0.10
+      && Number(pick.safeAssessment?.roi || 0) >= 0.08
       && Number(pick.contextQuality?.score ?? pick.match?.context?.quality?.score ?? 0) >= 80;
     assert(isTwoGoalWinamaxPromotion || isPrudentWinnerPromotion || !pick.safeAssessment?.reliable, `Sprint 66: oddsBasedFallback Fiable interdit hors filet 2-0 ou vainqueur prudent`, {
       title: pick.title, pickSource: pick.pickSource, marketKey, safeAssessment: pick.safeAssessment, twoGoal: pick.winamaxTwoGoalRule

@@ -118,6 +118,24 @@ REASON_LABELS = {
 DEBUG = False
 
 
+def _load_existing_snapshot() -> dict | None:
+    if not OUT.exists():
+        return None
+    try:
+        data = json.loads(OUT.read_text(encoding='utf-8'))
+    except Exception:
+        return None
+    return data if isinstance(data, dict) else None
+
+
+def _has_usable_snapshot(data: dict | None) -> bool:
+    if not data:
+        return False
+    scanned = data.get('scanned_teams') or {}
+    teams = data.get('teams') or {}
+    return isinstance(scanned, dict) and len(scanned) >= 4 or isinstance(teams, dict) and len(teams) >= 1
+
+
 def _get(url: str) -> dict | None:
     try:
         # v31.7.208 — bump chrome110 → chrome131.
@@ -291,6 +309,15 @@ def main() -> int:
     selected = {x.strip() for x in args.top_leagues.split(',') if x.strip()} or None
     data = collect(selected_leagues=selected, pages=max(1, args.pages),
                    hours_ahead=max(1, args.hours_ahead))
+    existing = _load_existing_snapshot()
+    if data.get('status') == 'no_source_events' and _has_usable_snapshot(existing):
+        existing['last_failed_refresh_at'] = datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace('+00:00', 'Z')
+        existing['last_failed_refresh_reason'] = 'no_source_events'
+        existing.setdefault('source_guards', {})['preserved_after_empty_refresh'] = True
+        OUT.write_text(json.dumps(existing, ensure_ascii=False, separators=(',', ':')),
+                       encoding='utf-8')
+        print(f'  warning: no Sofascore injury source events; preserved previous usable {OUT} ({OUT.stat().st_size / 1024:.1f}KB)', flush=True)
+        return 0
     OUT.write_text(json.dumps(data, ensure_ascii=False, separators=(',', ':')),
                    encoding='utf-8')
     print(f'  wrote {OUT} ({OUT.stat().st_size / 1024:.1f}KB)', flush=True)

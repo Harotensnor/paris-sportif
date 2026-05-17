@@ -5,6 +5,18 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-17
 
+### Version v2.4.0 — Accueil ultra-compact + Vainqueurs 2-0 + source guard
+
+Corrections terrain après relance réelle de la pipeline et contrôle via le raccourci Windows.
+- Pipeline complète relancée : `generated_at=2026-05-17T13:07:05Z`, `93` événements Winamax aujourd'hui, `58` signaux simples positifs, `20` affichés aujourd'hui, `30` lignes cockpit et `28` opportunités sur 24h.
+- Accueil “À miser” encore compacté : titre plus petit, sous-texte masqué, Top 3 resserré, tableau plus dense et cartes moins hautes pour éviter l'effet cockpit géant.
+- Diagnostic “modèle trop strict” rendu moins bruyant : il reste visible quand le moteur bloque vraiment, mais ne pollue plus l'accueil quand plusieurs paris sont déjà jouables.
+- Fiches match standard nettoyées : les marchés `Nul`, double chance, score exact, HT/FT et autres marchés avancés restent cachés hors Mode expert.
+- Règle Winamax 2-0 renforcée dans le modèle Vainqueur : le paiement anticipé augmente maintenant la probabilité effective, ce qui remonte `8` Vainqueurs fiables sur ce snapshot sans ouvrir les marchés complexes.
+- Source blessures Sofascore protégée : si Sofascore renvoie `403`/zéro source, `fetch_injuries_soccer.py` préserve le dernier fichier sain au lieu de vider `injuries_soccer.json`; après réparation, `30/31` matchs foot avaient des blessures attachées.
+- Garde-fous terrain ajustés au comportement réel : le cockpit peut être strict mais sain, avec les lignes faibles en observation et les boutons “Je mise” uniquement sur les vrais picks prêts.
+- Validation : lancement via `LANCER-LOGICIEL.vbs` OK en v2.4.0, `qa:engine`, `qa:safe`, `qa:terrain -- --skip-refresh`, `qa:desktop`, `qa:a11y`, `npx playwright test`, capture visuelle Electron et build `Paris Sportif Desktop Setup 2.4.0.exe` validés.
+
 ### Version v2.3.0 — Pronostics recentrés + accueil “À miser” compact
 
 Correctifs terrain après usage réel de la page “À miser”.
