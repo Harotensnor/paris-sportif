@@ -5,6 +5,15 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-17
 
+### Version v4.1.7 — Historique clubs/joueurs intégré
+
+Ajout d’un signal d’identité sportive pour prendre en compte l’histoire des clubs et des joueurs sans inventer de donnée.
+- La pipeline publique extrait l’ancienneté, le palmarès cité, le pays, le stade/ligue ou l’expérience joueur depuis Wikidata/Wikipedia quand la source est fiable.
+- Les données injectées portent désormais `history_public` côté concurrents et `public_signals.teams.*.history` côté match.
+- Le moteur ajoute un contexte historique : bonus de confiance très léger si l’expérience/palmarès est solide, prudence sur les Vainqueurs quand l’adversaire a une stature publique nettement supérieure.
+- Les fiches match affichent `Historique club` / `Historique joueur`, et les raisons/checklists reprennent ce signal avec score de stature.
+- Validation terrain : refresh public réel, 80 matchs enrichis, 52 profils historiques détectés au fetch et 240 insertions sur les événements dédupliqués.
+
 ### Version v4.1.6 — Rivalités d’équipes prises en compte
 
 Ajout d’un vrai signal `rivalité/derby` dans les pronostics, avec prudence modèle plutôt qu’un simple badge décoratif.

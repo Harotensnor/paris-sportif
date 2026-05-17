@@ -1185,6 +1185,104 @@ function createLegacyEngineService({ projectRoot }) {
     };
   }
 
+  function sideCompetitor(match, side) {
+    const competitors = Array.isArray(match?.competitors) ? match.competitors : [];
+    if (side === 'home') return competitors.find((c) => c?.home_away === 'home') || competitors[0] || {};
+    if (side === 'away') return competitors.find((c) => c?.home_away === 'away') || competitors[1] || {};
+    return {};
+  }
+
+  function publicHistoryForSide(row, side) {
+    const match = row?.match || {};
+    const publicTeam = match?.public_signals?.teams?.[side]
+      || match?.context?.public_signals?.teams?.[side]
+      || {};
+    const competitor = sideCompetitor(match, side);
+    const contextTeam = match?.context?.teams?.[side] || {};
+    const history = publicTeam?.history || competitor?.history_public || contextTeam?.history_public || {};
+    if (!history || !['ok', 'partial'].includes(String(history.status || ''))) return null;
+    return {
+      ...history,
+      side,
+      score: Math.max(0, Math.min(100, Number(history.statureScore || 0) || 0))
+    };
+  }
+
+  function historyContextForRow(row) {
+    const home = publicHistoryForSide(row, 'home');
+    const away = publicHistoryForSide(row, 'away');
+    if (!home && !away) return null;
+    const winnerSide = selectedWinnerSide(row);
+    const selected = winnerSide === 'home' ? home : winnerSide === 'away' ? away : null;
+    const opponent = winnerSide === 'home' ? away : winnerSide === 'away' ? home : null;
+    const strongest = [home, away].filter(Boolean).sort((a, b) => b.score - a.score)[0] || null;
+    const selectedGap = selected && opponent ? selected.score - opponent.score : 0;
+    return {
+      home,
+      away,
+      winnerSide,
+      selected,
+      opponent,
+      strongest,
+      selectedGap,
+      hasStrongHistory: Boolean((selected || strongest)?.score >= 70),
+      label: (selected || strongest)?.summary || ''
+    };
+  }
+
+  function applyHistoricalContext(row) {
+    const history = historyContextForRow(row);
+    if (!history) return row;
+    const marketGroup = simpleMarketGroup(row?.marketKey || row?.market);
+    const isWinner = marketGroup === 'winner';
+    const selected = history.selected;
+    const strongest = history.strongest;
+    const selectedScore = Number(selected?.score || 0);
+    const strongestScore = Number(strongest?.score || 0);
+    const scoreDelta = isWinner && selected ? (selectedScore >= 70 ? 2 : selectedScore >= 50 ? 1 : 0) : (strongestScore >= 70 ? 1 : 0);
+    const weakAgainstHistory = isWinner && selected && history.opponent && history.selectedGap <= -25;
+    const probabilityPenalty = weakAgainstHistory ? 0.008 : 0;
+    const probability = probabilityPenalty && Number(row?.probability || 0) > 0
+      ? Math.max(0.05, Number(row.probability) - probabilityPenalty)
+      : row?.probability;
+    const odd = Number(row?.odd || 0);
+    const edge = probabilityPenalty && odd > 1 && Number(probability) > 0
+      ? Number(probability) - (1 / odd)
+      : row?.edge;
+    const historyLabel = selected?.summary || strongest?.summary || 'historique public pris en compte';
+    const warningCode = weakAgainstHistory ? 'historical_gap_against_pick' : null;
+    return {
+      ...row,
+      probability,
+      edge,
+      stake: weakAgainstHistory ? Math.max(0, Number(row?.stake || 0) * 0.94) : row?.stake,
+      modelStake: weakAgainstHistory ? Math.max(0, Number(row?.modelStake || 0) * 0.94) : row?.modelStake,
+      historicalContext: {
+        ...history,
+        modelImpact: weakAgainstHistory
+          ? 'prudence : l’adversaire a une stature historique nettement supérieure'
+          : scoreDelta > 0
+            ? 'confiance légère : expérience/palmarès public confirmé'
+            : 'signal affiché sans bonus modèle'
+      },
+      confidenceTrust: row?.confidenceTrust ? {
+        ...row.confidenceTrust,
+        score: Math.max(0, Math.min(100, Number(row.confidenceTrust.score || 0) + scoreDelta - (weakAgainstHistory ? 2 : 0))),
+        drivers: [...(row.confidenceTrust.drivers || []), scoreDelta ? 'historique/palmarès public' : 'historique public']
+      } : row?.confidenceTrust,
+      contextGate: row?.contextGate ? {
+        ...row.contextGate,
+        warnings: warningCode ? [...new Set([...(row.contextGate.warnings || []), warningCode])] : row.contextGate.warnings
+      } : row?.contextGate,
+      reason: [
+        row?.reason,
+        weakAgainstHistory
+          ? `Historique public: prudence, l’adversaire a plus de stature (${historyLabel}).`
+          : `Historique public pris en compte: ${historyLabel}.`
+      ].filter(Boolean).join(' ')
+    };
+  }
+
   function oddsBasedFallback(win, match, bankroll) {
     const options = matchWinnerOptions(match);
     if (options.length < 1) return null;
@@ -5699,6 +5797,7 @@ function createLegacyEngineService({ projectRoot }) {
       .map((row) => applyProbabilityRealityCalibration(row, probabilityCalibrationReport, win, safeBankroll))
       .map((row) => applyWinamaxTwoGoalRule(row, win, safeBankroll))
       .map((row) => applyRivalryContext(row))
+      .map((row) => applyHistoricalContext(row))
       .map((row) => applyDecisionAndMarketTiming(row, clvSummaryReport, decisionTuningReport))
       .map((row) => applyOddsGuardrails(row, oddsGuardrailsReport))
       .map((row) => applyStakePrudence(row, agentGuardrailRecommendationsReport, stakeReductionBacktestReport))

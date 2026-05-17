@@ -4987,6 +4987,30 @@ body.theme-light .key-reasons-list li:hover {
   letter-spacing: 0;
 }
 
+.public-history-line {
+  background: rgba(167, 139, 250, .10);
+  border: 1px solid rgba(167, 139, 250, .24);
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+
+.public-history-line span {
+  color: #c4b5fd;
+  display: block;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .02em;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+
+.public-history-line strong {
+  color: var(--text);
+  display: block;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
 .rivalry-signal-card {
   background:
     linear-gradient(135deg, rgba(245, 158, 11, .16), rgba(16, 185, 129, .08)),

@@ -51,6 +51,7 @@ def load_signals() -> dict[str, Any]:
 def compact_team(team: dict[str, Any]) -> dict[str, Any]:
     profile = team.get("profile") or {}
     coach = team.get("coach") or None
+    history = team.get("history") or {}
     tactical = team.get("tactical") or {}
     return {
         "name": team.get("name") or team.get("label") or "",
@@ -72,6 +73,22 @@ def compact_team(team: dict[str, Any]) -> dict[str, Any]:
             "startDate": coach.get("startDate") or "",
             "confidence": coach.get("confidence") or "",
         } if isinstance(coach, dict) and coach.get("name") else None,
+        "history": {
+            "status": history.get("status") or "",
+            "type": history.get("type") or "",
+            "summary": compact_text(history.get("summary"), 320),
+            "statureScore": int(history.get("statureScore") or 0),
+            "ageYears": history.get("ageYears") if history.get("ageYears") is not None else None,
+            "foundedYear": history.get("foundedYear") if history.get("foundedYear") is not None else None,
+            "birthYear": history.get("birthYear") if history.get("birthYear") is not None else None,
+            "country": history.get("country") or "",
+            "venue": history.get("venue") or "",
+            "league": history.get("league") or "",
+            "position": history.get("position") or "",
+            "currentTeam": history.get("currentTeam") or "",
+            "tags": [compact_text(tag, 40) for tag in (history.get("tags") or [])[:6]],
+            "source": history.get("source") or "",
+        } if isinstance(history, dict) and history.get("status") in {"ok", "partial"} else {},
         "tactical": {
             "style": tactical.get("style") or "",
             "read": compact_text(tactical.get("read"), 240),
@@ -182,6 +199,9 @@ def merge_competitor(event: dict[str, Any], side: str, team: dict[str, Any]) -> 
     coach = team.get("coach")
     if coach and coach.get("name"):
         target["coach_public"] = coach
+    history = team.get("history") or {}
+    if history.get("status") in {"ok", "partial"}:
+        target["history_public"] = history
     tactical = team.get("tactical") or {}
     if tactical.get("style") or tactical.get("read"):
         target["tactical_public"] = tactical
@@ -205,6 +225,7 @@ def main() -> int:
     patched = 0
     competitor_patches = 0
     coach_patches = 0
+    history_patches = 0
     source_patches = 0
     for day in (data.get("days") or {}).values():
         events = day if isinstance(day, list) else day.get("events", []) if isinstance(day, dict) else []
@@ -230,6 +251,8 @@ def main() -> int:
                     competitor_patches += 1
                 if (team.get("coach") or {}).get("name"):
                     coach_patches += 1
+                if (team.get("history") or {}).get("status") in {"ok", "partial"}:
+                    history_patches += 1
             patched += 1
 
     size = save_data_js(data)
@@ -239,6 +262,7 @@ def main() -> int:
         "patched_matches": patched,
         "patched_competitors": competitor_patches,
         "coach_signals": coach_patches,
+        "history_signals": history_patches,
         "source_rows": source_patches,
         "data_js_bytes": size,
         "policy": "context_only_winamax_odds_only",
@@ -246,7 +270,8 @@ def main() -> int:
     write_text_atomic(REPORT_PATH, json.dumps(report, ensure_ascii=False, indent=2) + "\n")
     print(
         "[public-signals-patch] "
-        f"matches={patched} competitors={competitor_patches} coaches={coach_patches} bytes={size}"
+        f"matches={patched} competitors={competitor_patches} coaches={coach_patches} "
+        f"histories={history_patches} bytes={size}"
     )
     return 0
 

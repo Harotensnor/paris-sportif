@@ -3484,6 +3484,12 @@
     return `${n.toFixed(digits).replace(/\.0$/, '')}${suffix}`;
   }
 
+  function compactInlineText(value, limit = 120) {
+    const text = String(value || '').replace(/\s+/g, ' ').trim();
+    if (text.length <= limit) return text;
+    return `${text.slice(0, Math.max(0, limit - 1)).trim()}…`;
+  }
+
   function hasMeaningfulMetric(value, min = 0.05) {
     const n = Number(value);
     return Number.isFinite(n) && Math.abs(n) >= min;
@@ -3515,6 +3521,30 @@
     return signals?.teams?.[side] || {};
   }
 
+  function historyForSide(row, side) {
+    const publicTeam = publicTeamSignal(row, side);
+    const sides = getSides(row?.match || {});
+    const competitor = side === 'home' ? sides.home : sides.away;
+    const history = publicTeam?.history || competitor?.history_public || row?.match?.context?.teams?.[side]?.history_public || {};
+    return ['ok', 'partial'].includes(String(history?.status || '')) ? history : null;
+  }
+
+  function historySummaryLine(history) {
+    if (!history) return '';
+    const score = Number(history.statureScore || 0);
+    const tags = Array.isArray(history.tags) ? history.tags.filter(Boolean).slice(0, 2).join(' · ') : '';
+    const foundation = history.foundedYear ? `fondé en ${history.foundedYear}` : '';
+    const age = history.ageYears && history.type === 'player' ? `${history.ageYears} ans` : '';
+    return [history.summary, tags, foundation, age, score ? `stature ${Math.round(score)}/100` : ''].filter(Boolean).join(' · ');
+  }
+
+  function strongestHistoryForRow(row) {
+    return ['home', 'away']
+      .map((side) => ({ side, name: teamDisplayName(row, side), history: historyForSide(row, side) }))
+      .filter((item) => item.history)
+      .sort((a, b) => Number(b.history.statureScore || 0) - Number(a.history.statureScore || 0))[0] || null;
+  }
+
   function teamContext(row, side) {
     const contextTeam = row?.match?.context?.teams?.[side] || {};
     const sides = getSides(row?.match || {});
@@ -3524,6 +3554,7 @@
       ...(competitor || {}),
       ...(publicTeam?.profile ? { public_profile: publicTeam.profile } : {}),
       ...(publicTeam?.coach ? { coach_public: publicTeam.coach } : {}),
+      ...(publicTeam?.history ? { history_public: publicTeam.history } : {}),
       ...(publicTeam?.tactical ? { tactical_public: publicTeam.tactical } : {}),
       ...(publicTeam?.signals ? { public_signal_items: publicTeam.signals } : {}),
       ...contextTeam
@@ -4567,6 +4598,12 @@
     else if (publicTeamSignals.length) items.push(publicTeamSignals[0]);
     const rivalry = rivalryForRow(row);
     if (rivalry) items.push(`rivalité/derby ${Math.round(rivalry.intensity)}/100`);
+    const history = strongestHistoryForRow(row);
+    if (history?.history) {
+      const score = Number(history.history.statureScore || 0);
+      const tag = Array.isArray(history.history.tags) ? history.history.tags.find(Boolean) : '';
+      items.splice(2, 0, `histoire ${history.name}: ${tag || 'profil public'}${score ? ` ${Math.round(score)}/100` : ''}`);
+    }
     return items.filter(Boolean).slice(0, 3);
   }
 
@@ -4590,6 +4627,11 @@
     const rivalry = rivalryForRow(row);
     if (rivalry) {
       parts.push(`rivalité ${Math.round(rivalry.intensity)}/100`);
+    }
+    const history = strongestHistoryForRow(row);
+    if (history?.history) {
+      const score = Number(history.history.statureScore || 0);
+      parts.push(`historique ${history.name}${score ? ` ${Math.round(score)}/100` : ''}`);
     }
     // Avantage modèle fort (raw, pas le clamped)
     const rawEdge = Number(row?.edgeRaw ?? row?.edge ?? 0);
@@ -4667,6 +4709,17 @@
     const rivalry = rivalryForRow(row);
     if (rivalry) {
       checks.push({ tone: rivalry.intensity >= 80 ? 'warn' : 'ok', icon: '⚔️', label: 'Rivalité', detail: `${rivalry.label} · tension ${Math.round(rivalry.intensity)}/100` });
+    }
+    const history = strongestHistoryForRow(row);
+    if (history?.history) {
+      const score = Number(history.history.statureScore || 0);
+      const summary = historySummaryLine(history.history);
+      checks.push({
+        tone: score >= 70 ? 'ok' : score >= 45 ? 'warn' : 'warn',
+        icon: '🏛',
+        label: history.history.type === 'player' ? 'Historique joueur' : 'Historique club',
+        detail: compactInlineText(`${history.name} · ${summary || 'profil public sourcé'}`, 96)
+      });
     }
     if (sample >= 15) {
       const roi = Number(row.segmentValidation?.roi ?? row.calibration?.roi ?? 0);
@@ -13169,13 +13222,16 @@
       const team = teams?.[side] || {};
       const profile = team.profile || {};
       const coach = team.coach || {};
+      const history = team.history || {};
       const tactical = team.tactical || {};
       const sideSignals = Array.isArray(team.signals) ? team.signals : [];
-      const hasContent = team.status === 'ok' || profile.url || coach.name || sideSignals.length;
+      const hasHistory = ['ok', 'partial'].includes(String(history.status || ''));
+      const hasContent = team.status === 'ok' || profile.url || coach.name || hasHistory || sideSignals.length;
       if (!hasContent) return '';
       const title = profile.title || team.label || team.name || teamDisplayName(row, side);
       const sourceUrl = safeExternalUrl(profile.url || coach.source || '', '');
       const thumbnail = safeExternalUrl(profile.thumbnail || '', '');
+      const historyLine = historySummaryLine(history);
       return `
         <article class="signal-card signal-ok">
           <div class="public-source-head">
@@ -13187,9 +13243,11 @@
           </div>
           <small>${escapeHtml([
             coach.name ? `Coach: ${coach.name}` : '',
+            historyLine ? `Histoire: ${historyLine}` : '',
             tactical.style ? `Style: ${tactical.style}` : '',
             sideSignals[0] || ''
           ].filter(Boolean).join(' · ') || 'Profil public vérifié')}</small>
+          ${historyLine ? `<div class="public-history-line"><span>${escapeHtml(history.type === 'player' ? 'Historique joueur' : 'Historique club')}</span><strong>${escapeHtml(historyLine)}</strong></div>` : ''}
           ${sourceUrl ? `<a class="inline-source-link" href="${escapeHtml(sourceUrl)}" target="_blank" rel="noreferrer">ouvrir la source</a>` : ''}
         </article>`;
     }).join('');

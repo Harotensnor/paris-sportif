@@ -60,6 +60,35 @@ SPORT_HINTS = {
     "rugby": ("rugby", "rugby union"),
 }
 
+ASSOCIATION_FOOTBALL_BAD_HINTS = ("gaelic football", "american football", "australian rules", "rugby")
+
+
+def search_queries_for_entity(name: str, sport: str) -> list[str]:
+    clean_name = str(name or "").strip()
+    sport_key = str(sport or "").lower()
+    if not clean_name:
+        return []
+    queries = [f"{clean_name} {sport}".strip() if sport else clean_name]
+    if "football" in sport_key or "soccer" in sport_key:
+        queries.extend([
+            f"{clean_name} football club",
+            f"{clean_name} association football club",
+            f"{clean_name} soccer club",
+            f"{clean_name} FC",
+            f"{clean_name} SC",
+            f"{clean_name} OSC",
+            f"{clean_name} Calcio",
+        ])
+    elif "basket" in sport_key:
+        queries.append(f"{clean_name} basketball team")
+    elif "baseball" in sport_key:
+        queries.append(f"{clean_name} baseball team")
+    elif "hockey" in sport_key:
+        queries.append(f"{clean_name} ice hockey team")
+    elif "tennis" in sport_key:
+        queries.append(f"{clean_name} tennis player")
+    return list(dict.fromkeys(query for query in queries if query))
+
 
 def utc_now() -> datetime:
     return datetime.now(timezone.utc)
@@ -205,38 +234,48 @@ def http_json(url: str, timeout: int = 12) -> dict[str, Any] | None:
 
 
 def wikidata_search(name: str, sport: str) -> dict[str, Any] | None:
-    query = f"{name} {sport}".strip() if sport else name
-    params = urllib.parse.urlencode(
-        {
-            "action": "wbsearchentities",
-            "search": query,
-            "language": "en",
-            "uselang": "en",
-            "format": "json",
-            "limit": "6",
-        }
-    )
-    data = http_json(f"https://www.wikidata.org/w/api.php?{params}")
-    results = data.get("search") if isinstance(data, dict) else None
-    if not isinstance(results, list):
-        return None
     target = norm(name)
     hints = SPORT_HINTS.get(str(sport or "").lower(), ())
+    target_tokens = target.split()
     best: tuple[float, dict[str, Any]] | None = None
-    for result in results:
-        label = result.get("label") or ""
-        aliases = result.get("aliases") or []
-        description = str(result.get("description") or "").lower()
-        candidate_names = [label, *aliases]
-        name_score = 0.35
-        if any(norm(candidate) == target for candidate in candidate_names):
-            name_score = 0.75
-        elif target and any(target in norm(candidate) or norm(candidate) in target for candidate in candidate_names):
-            name_score = 0.55
-        hint_score = 0.18 if hints and any(hint in description for hint in hints) else 0.0
-        score = name_score + hint_score
-        if not best or score > best[0]:
-            best = (score, result)
+    for query in search_queries_for_entity(name, sport):
+        params = urllib.parse.urlencode(
+            {
+                "action": "wbsearchentities",
+                "search": query,
+                "language": "en",
+                "uselang": "en",
+                "format": "json",
+                "limit": "6",
+            }
+        )
+        data = http_json(f"https://www.wikidata.org/w/api.php?{params}")
+        results = data.get("search") if isinstance(data, dict) else None
+        if not isinstance(results, list):
+            continue
+        for result in results:
+            label = result.get("label") or ""
+            aliases = result.get("aliases") or []
+            description = str(result.get("description") or "").lower()
+            label_lower = str(label).lower()
+            if ("football" in str(sport or "").lower() or "soccer" in str(sport or "").lower()) and any(
+                bad in f"{label_lower} {description}" for bad in ASSOCIATION_FOOTBALL_BAD_HINTS
+            ):
+                continue
+            candidate_names = [label, *aliases]
+            name_score = 0.35
+            exact = any(norm(candidate) == target for candidate in candidate_names)
+            partial = target and any(target in norm(candidate) or norm(candidate) in target for candidate in candidate_names)
+            if exact:
+                name_score = 0.75
+            elif partial:
+                name_score = 0.55
+            hint_score = 0.18 if hints and any(hint in description for hint in hints) else 0.0
+            if not exact and hint_score <= 0 and len(target_tokens) <= 2:
+                continue
+            score = name_score + hint_score
+            if not best or score > best[0]:
+                best = (score, result)
     if not best or best[0] < 0.50:
         return None
     out = dict(best[1])
@@ -289,6 +328,229 @@ def qualifier_time(claim: dict[str, Any], prop: str) -> str:
         return str(items[0]["datavalue"]["value"]["time"]).lstrip("+")
     except Exception:
         return ""
+
+
+def claim_time(entity: dict[str, Any] | None, prop: str) -> str:
+    claims = ((entity or {}).get("claims") or {}).get(prop) or []
+    if not isinstance(claims, list) or not claims:
+        return ""
+    for claim in claims:
+        if not isinstance(claim, dict):
+            continue
+        try:
+            value = claim["mainsnak"]["datavalue"]["value"]
+            if isinstance(value, dict) and value.get("time"):
+                return str(value["time"])
+        except Exception:
+            continue
+    return ""
+
+
+def year_from_wikidata_time(value: Any) -> int | None:
+    match = re.search(r"([+-]?\d{1,4})", str(value or ""))
+    if not match:
+        return None
+    try:
+        year = int(match.group(1))
+    except Exception:
+        return None
+    if 1800 <= year <= utc_now().year:
+        return year
+    return None
+
+
+def claim_entity_label(entity: dict[str, Any] | None, prop: str) -> str:
+    claims = ((entity or {}).get("claims") or {}).get(prop) or []
+    if not isinstance(claims, list):
+        return ""
+    for claim in claims[:3]:
+        if not isinstance(claim, dict):
+            continue
+        qid = claim_value_id(claim)
+        if not qid:
+            continue
+        label = label_for_entity(entity_json(qid))
+        if label:
+            return label
+    return ""
+
+
+HISTORY_KEYWORDS = (
+    "founded",
+    "founded in",
+    "established",
+    "formed",
+    "created",
+    "history",
+    "won",
+    "winner",
+    "champion",
+    "champions",
+    "championship",
+    "title",
+    "titles",
+    "league title",
+    "cup",
+    "trophy",
+    "honour",
+    "honor",
+    "palmarès",
+    "palmares",
+    "final",
+    "grand slam",
+    "atp",
+    "wta",
+    "world series",
+    "all-star",
+    "olympic",
+    "hall of fame",
+    "career-high",
+    "international",
+)
+
+
+def history_sentence_from_extract(extract: Any) -> str:
+    text = re.sub(r"\s+", " ", str(extract or "")).strip()
+    if not text:
+        return ""
+    sentences = re.split(r"(?<=[.!?])\s+", text)
+    for sentence in sentences[:8]:
+        lower = sentence.lower()
+        if any(keyword in lower for keyword in HISTORY_KEYWORDS):
+            return compact_text(sentence, 260)
+    return compact_text(sentences[0] if sentences else text, 220)
+
+
+def competitor_history_fallback(name: str, sport: str, competitor: dict[str, Any] | None) -> dict[str, Any]:
+    competitor = competitor or {}
+    record = ""
+    records = competitor.get("records") if isinstance(competitor.get("records"), list) else []
+    if records:
+        record = str((records[0] or {}).get("summary") or "")
+    form = form_summary(competitor.get("team_form_l5") or competitor.get("form") or competitor.get("form10"))
+    bits = [part for part in [record and f"bilan public {record}", form and f"forme récente {form}"] if part]
+    if not bits:
+        return {"status": "missing"}
+    return {
+        "status": "partial",
+        "type": "player" if "tennis" in str(sport or "").lower() else "club",
+        "summary": compact_text(f"{name}: " + " · ".join(bits), 240),
+        "statureScore": 35,
+        "tags": ["snapshot sportif"],
+        "source": "espn_snapshot",
+    }
+
+
+def historical_profile_from_entity(
+    entity: dict[str, Any] | None,
+    wiki: dict[str, Any] | None,
+    sport: str,
+    name: str,
+    competitor: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    description = description_for_entity(entity)
+    lower = f"{description} {sport}".lower()
+    is_player = any(word in lower for word in ("player", "tennis", "boxer", "fighter", "golfer", "cyclist", "athlete"))
+    profile_type = "player" if is_player else "club"
+    founded_year = year_from_wikidata_time(claim_time(entity, "P571"))
+    birth_year = year_from_wikidata_time(claim_time(entity, "P569"))
+    current_year = utc_now().year
+    age_years = None
+    if profile_type == "player" and birth_year:
+        age_years = current_year - birth_year
+    elif profile_type == "club" and founded_year:
+        age_years = current_year - founded_year
+    country = claim_entity_label(entity, "P27" if profile_type == "player" else "P17")
+    venue = claim_entity_label(entity, "P115") if profile_type == "club" else ""
+    league = claim_entity_label(entity, "P118") if profile_type == "club" else ""
+    position = claim_entity_label(entity, "P413") if profile_type == "player" else ""
+    current_team = claim_entity_label(entity, "P54") if profile_type == "player" else ""
+    extract = (wiki or {}).get("extract") or description
+    history_sentence = history_sentence_from_extract(extract)
+    lower_extract = str(extract or "").lower()
+    tags: list[str] = []
+    stature_score = 35
+    if profile_type == "club":
+        if founded_year:
+            tags.append(f"fondé en {founded_year}")
+            if founded_year < 1950:
+                tags.append("club historique")
+                stature_score += 22
+            elif founded_year < 1980:
+                tags.append("ancienneté notable")
+                stature_score += 12
+        if venue:
+            tags.append("stade identifié")
+        if league:
+            tags.append("championnat identifié")
+    else:
+        if birth_year and age_years is not None:
+            tags.append(f"{age_years} ans")
+            if age_years >= 28:
+                tags.append("expérience élevée")
+                stature_score += 14
+        if position:
+            tags.append(position)
+        if current_team:
+            tags.append("club actuel identifié")
+    if any(keyword in lower_extract for keyword in ("champion", "title", "cup", "trophy", "won", "grand slam", "world series", "all-star", "olympic")):
+        tags.append("palmarès cité")
+        stature_score += 24
+    if country:
+        stature_score += 5
+    if venue or league or position or current_team:
+        stature_score += 5
+    if history_sentence:
+        stature_score += 8
+    summary_bits = []
+    if profile_type == "club" and founded_year:
+        summary_bits.append(f"club fondé en {founded_year}")
+    if profile_type == "player" and age_years is not None:
+        summary_bits.append(f"joueur de {age_years} ans")
+    if country:
+        summary_bits.append(country)
+    if venue:
+        summary_bits.append(f"stade: {venue}")
+    if league:
+        summary_bits.append(f"ligue: {league}")
+    if position:
+        summary_bits.append(f"poste: {position}")
+    if history_sentence:
+        summary_bits.append(history_sentence)
+    if not summary_bits:
+        return competitor_history_fallback(name, sport, competitor)
+    return {
+        "status": "ok" if history_sentence or founded_year or birth_year else "partial",
+        "type": profile_type,
+        "summary": compact_text(" · ".join(summary_bits), 360),
+        "foundedYear": founded_year,
+        "birthYear": birth_year,
+        "ageYears": age_years,
+        "country": country,
+        "venue": venue,
+        "league": league,
+        "position": position,
+        "currentTeam": current_team,
+        "statureScore": max(0, min(100, int(stature_score))),
+        "tags": list(dict.fromkeys(tags))[:6],
+        "source": "wikidata_wikipedia" if entity else "wikipedia_extract",
+    }
+
+
+def historical_profile_from_wiki(name: str, sport: str, wiki: dict[str, Any] | None, competitor: dict[str, Any] | None = None) -> dict[str, Any]:
+    sentence = history_sentence_from_extract((wiki or {}).get("extract") or "")
+    if not sentence:
+        return competitor_history_fallback(name, sport, competitor)
+    lower = sentence.lower()
+    score = 46 + (18 if any(keyword in lower for keyword in ("champion", "title", "cup", "won", "grand slam", "all-star")) else 0)
+    return {
+        "status": "partial",
+        "type": "player" if "tennis" in str(sport or "").lower() else "club",
+        "summary": compact_text(sentence, 320),
+        "statureScore": min(85, score),
+        "tags": ["historique public"] + (["palmarès cité"] if score > 46 else []),
+        "source": "wikipedia_extract",
+    }
 
 
 def current_head_coach(entity: dict[str, Any] | None) -> dict[str, Any] | None:
@@ -366,35 +628,50 @@ def wikipedia_extract(title: str, lang: str) -> dict[str, Any] | None:
 
 def wikipedia_search_title(name: str, sport: str) -> tuple[str, str, float]:
     host = "en.wikipedia.org"
-    params = urllib.parse.urlencode(
-        {
-            "action": "query",
-            "list": "search",
-            "srsearch": f"{name} {sport}".strip(),
-            "srlimit": "6",
-            "format": "json",
-        }
-    )
-    data = http_json(f"https://{host}/w/api.php?{params}")
-    results = (((data or {}).get("query") or {}).get("search") or [])
-    if not isinstance(results, list):
-        return "", "", 0.0
     target = norm(name)
     hints = SPORT_HINTS.get(str(sport or "").lower(), ())
+    target_tokens = target.split()
     best: tuple[float, str, str] | None = None
-    for result in results:
-        title = str(result.get("title") or "")
-        snippet = re.sub(r"<.*?>", " ", str(result.get("snippet") or "")).lower()
-        title_norm = norm(title)
-        score = 0.35
-        if title_norm == target:
-            score = 0.78
-        elif target and (target in title_norm or title_norm in target):
-            score = 0.58
-        if hints and any(hint in snippet for hint in hints):
-            score += 0.12
-        if not best or score > best[0]:
-            best = (score, title, snippet)
+    for query in search_queries_for_entity(name, sport):
+        params = urllib.parse.urlencode(
+            {
+                "action": "query",
+                "list": "search",
+                "srsearch": query,
+                "srlimit": "6",
+                "format": "json",
+            }
+        )
+        data = http_json(f"https://{host}/w/api.php?{params}")
+        results = (((data or {}).get("query") or {}).get("search") or [])
+        if not isinstance(results, list):
+            continue
+        for result in results:
+            title = str(result.get("title") or "")
+            snippet = re.sub(r"<.*?>", " ", str(result.get("snippet") or "")).lower()
+            title_norm = norm(title)
+            if ("football" in str(sport or "").lower() or "soccer" in str(sport or "").lower()) and any(
+                bad in f"{title.lower()} {snippet}" for bad in ASSOCIATION_FOOTBALL_BAD_HINTS
+            ):
+                continue
+            exact = title_norm == target
+            partial = target and (target in title_norm or title_norm in target)
+            score = 0.35
+            if exact:
+                score = 0.78
+            elif partial:
+                score = 0.58
+            title_hint = ("football" in str(sport or "").lower() or "soccer" in str(sport or "").lower()) and any(
+                token in f" {title.lower()} " for token in (" fc ", " sc ", " afc ", " cf ", " club ", " olympique ", " osc ", " calcio ")
+            )
+            hint_score = 0.12 if (hints and any(hint in snippet for hint in hints)) or title_hint else 0.0
+            if exact and hint_score <= 0 and len(target_tokens) <= 1:
+                continue
+            if not exact and hint_score <= 0 and len(target_tokens) <= 2:
+                continue
+            score += hint_score
+            if not best or score > best[0]:
+                best = (score, title, snippet)
     if not best or best[0] < 0.50:
         return "", "", 0.0
     return best[1], "en", round(best[0], 2)
@@ -643,6 +920,7 @@ def espn_public_fallback(name: str, sport: str, competitor: dict[str, Any] | Non
         record = str((records[0] or {}).get("summary") or "")
     bits = [part for part in [record and f"bilan {record}", form and f"forme récente {form}"] if part]
     extract = " · ".join(bits) or "Profil public issu du flux sportif déjà récupéré."
+    history = competitor_history_fallback(name, sport, competitor)
     return {
         "name": name,
         "status": "ok",
@@ -658,19 +936,20 @@ def espn_public_fallback(name: str, sport: str, competitor: dict[str, Any] | Non
             "source": "espn.com",
         },
         "coach": None,
+        "history": history,
         "tactical": {
             "style": "profil public sportif",
             "read": "Le flux public confirme l'équipe et sa dynamique récente, sans coach/tactique confirmé par source ouverte.",
             "tags": [],
             "source": "espn_snapshot",
         },
-        "quality": 42 if bits else 32,
+        "quality": (42 if bits else 32) + (6 if history.get("status") in {"ok", "partial"} else 0),
         "fetchedAt": iso_now(),
     }
 
 
 def enrich_entity(name: str, sport: str, cache: dict[str, Any], sleep_sec: float, competitor: dict[str, Any] | None = None) -> dict[str, Any]:
-    key = f"{sport.lower()}::{norm(name)}"
+    key = f"{sport.lower()}::history_v7::{norm(name)}"
     cached = cached_team(cache, key)
     if cached:
         return cached
@@ -681,6 +960,7 @@ def enrich_entity(name: str, sport: str, cache: dict[str, Any], sleep_sec: float
         "sources": [],
         "profile": {},
         "coach": None,
+        "history": {},
         "tactical": {},
         "quality": 0,
         "fetchedAt": iso_now(),
@@ -693,6 +973,7 @@ def enrich_entity(name: str, sport: str, cache: dict[str, Any], sleep_sec: float
         wiki = wikipedia_extract(title, lang) if title else None
         if wiki:
             tactical = tactical_from_text(wiki.get("extract") or "", sport)
+            history = historical_profile_from_wiki(name, sport, wiki, competitor)
             base.update(
                 {
                     "status": "ok",
@@ -705,13 +986,15 @@ def enrich_entity(name: str, sport: str, cache: dict[str, Any], sleep_sec: float
                         "thumbnail": wiki.get("thumbnail"),
                         "source": wiki.get("source") or "en.wikipedia.org",
                     },
+                    "history": history,
                     "tactical": tactical,
                     "sources": [
                         source_record("Wikipedia", wiki.get("url") or "https://en.wikipedia.org", "ok", f"profil public · confiance {confidence}"),
                     ],
-                    "quality": 55 + (10 if tactical.get("tags") else 0),
+                    "quality": 55 + (10 if tactical.get("tags") else 0) + (8 if history.get("status") in {"ok", "partial"} else 0),
                     "signals": [
                         f"Profil public confirmé: {wiki.get('title') or name}",
+                        *( [f"Histoire publique: {history['summary']}"] if history.get("summary") else [] ),
                         *( [f"Indice public: {tactical['style']}"] if tactical.get("tags") else [] ),
                     ],
                 }
@@ -732,6 +1015,12 @@ def enrich_entity(name: str, sport: str, cache: dict[str, Any], sleep_sec: float
     wiki = wikipedia_extract(title, lang) if title else None
     if title:
         time.sleep(sleep_sec)
+    if not wiki:
+        alt_title, alt_lang, _alt_confidence = wikipedia_search_title(name, sport)
+        time.sleep(sleep_sec)
+        wiki = wikipedia_extract(alt_title, alt_lang) if alt_title else None
+        if alt_title:
+            time.sleep(sleep_sec)
     coach = current_head_coach(entity)
     if coach:
         time.sleep(sleep_sec)
@@ -739,6 +1028,7 @@ def enrich_entity(name: str, sport: str, cache: dict[str, Any], sleep_sec: float
     description = description_for_entity(entity) or str(search.get("description") or "")
     extract = (wiki or {}).get("extract") or description
     tactical = tactical_from_text(extract, sport)
+    history = historical_profile_from_entity(entity, wiki, sport, name, competitor)
     base.update(
         {
             "status": "ok",
@@ -753,6 +1043,7 @@ def enrich_entity(name: str, sport: str, cache: dict[str, Any], sleep_sec: float
                 "source": (wiki or {}).get("source") or "wikidata.org",
             },
             "coach": coach,
+            "history": history,
             "tactical": tactical,
             "sources": [
                 source_record("Wikidata", f"https://www.wikidata.org/wiki/{qid}", "ok", f"identité publique · confiance {search.get('confidence')}"),
@@ -768,10 +1059,13 @@ def enrich_entity(name: str, sport: str, cache: dict[str, Any], sleep_sec: float
         base["quality"] += 20
     if tactical.get("tags"):
         base["quality"] += 10
+    if history.get("status") in {"ok", "partial"}:
+        base["quality"] += 10
     base["quality"] = min(100, int(base["quality"]))
     base["signals"] = [
         f"Profil public confirmé: {label}",
         *( [f"Coach public confirmé: {coach['name']}"] if coach else [] ),
+        *( [f"Histoire publique: {history['summary']}"] if history.get("summary") else [] ),
         *( [f"Indice tactique public: {tactical['style']}"] if tactical.get("tags") else [] ),
     ]
     set_cached_team(cache, key, base)
@@ -810,7 +1104,8 @@ def build_match_record(event: dict[str, Any], cache: dict[str, Any], sleep_sec: 
     source_count = len([source for source in sources if source.get("status") == "ok"])
     coach_count = len([team for team in teams.values() if team.get("coach")])
     rivalry_count = 1 if rivalry.get("status") == "confirmed" else 0
-    quality = min(100, source_count * 16 + coach_count * 16 + rivalry_count * 8)
+    history_count = len([team for team in teams.values() if (team.get("history") or {}).get("status") in {"ok", "partial"}])
+    quality = min(100, source_count * 16 + coach_count * 16 + rivalry_count * 8 + history_count * 6)
     return {
         "version": 1,
         "eventId": event_key(event),
@@ -831,6 +1126,7 @@ def build_match_record(event: dict[str, Any], cache: dict[str, Any], sleep_sec: 
             "teamProfiles": len([team for team in teams.values() if team.get("status") == "ok"]),
             "coaches": coach_count,
             "rivalries": rivalry_count,
+            "histories": history_count,
             "tacticalReads": len([team for team in teams.values() if (team.get("tactical") or {}).get("tags")]),
         },
     }
@@ -863,6 +1159,7 @@ def main() -> int:
             "teamProfiles": sum(int((m.get("summary") or {}).get("teamProfiles") or 0) for m in matches),
             "coaches": sum(int((m.get("summary") or {}).get("coaches") or 0) for m in matches),
             "rivalries": sum(int((m.get("summary") or {}).get("rivalries") or 0) for m in matches),
+            "histories": sum(int((m.get("summary") or {}).get("histories") or 0) for m in matches),
             "sources": sum(int((m.get("summary") or {}).get("sourceCount") or 0) for m in matches),
         },
         "matches": matches,
@@ -872,7 +1169,8 @@ def main() -> int:
         "[public-signals] "
         f"matches={payload['summary']['matches']} ok={payload['summary']['ok']} "
         f"profiles={payload['summary']['teamProfiles']} coaches={payload['summary']['coaches']} "
-        f"rivalries={payload['summary']['rivalries']} sources={payload['summary']['sources']}"
+        f"rivalries={payload['summary']['rivalries']} histories={payload['summary']['histories']} "
+        f"sources={payload['summary']['sources']}"
     )
     return 0
 
