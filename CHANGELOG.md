@@ -5,6 +5,16 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-17
 
+### Version v4.1.8 — Audit terrain QA + marchés standard nettoyés
+
+Correctif qualité après refresh réel : les garde-fous mélangeaient des signaux simples observables avec de vrais signaux positifs, ce qui créait une fausse alerte moteur.
+- `qa:engine` vérifie maintenant le bon compteur `positiveSimplePassingFilters` avant d’exiger 10 opportunités positives affichées.
+- `qa:terrain` affiche désormais le même compteur positif réel dans son résumé, au lieu de renommer les observations en signaux positifs.
+- Les marchés `Mi-temps` sont reclassés en Mode expert dans l’audit Winamax et la sélection standard, pour éviter de regonfler l’accueil avec un marché dérivé.
+- L’audit Winamax ne signale plus de famille standard dormante artificielle : `halftime` apparaît désormais côté expert.
+- Terrain complet relancé : données fraîches, contrôles moteur/terrain/desktop/safe/a11y/unit/refresh/calibration/multi-jours/stress validés.
+- Cache PWA bumpé pour éviter de revoir l’ancienne interface après lancement.
+
 ### Version v4.1.7 — Historique clubs/joueurs intégré
 
 Ajout d’un signal d’identité sportive pour prendre en compte l’histoire des clubs et des joueurs sans inventer de donnée.

@@ -335,7 +335,7 @@ function testAnalysis() {
   if (Number(today.bookableEvents || 0) >= 20 && Number(today.simpleReady || 0) >= 5) {
     assert(Number(today.displayed || 0) >= 5, 'Moins de 5 paris simples affichés aujourd’hui malgré une offre Winamax suffisante', today);
   }
-  if (Number(today.bookableEvents || 0) >= 20 && Number(today.simplePassingFilters || 0) >= 10) {
+  if (Number(today.bookableEvents || 0) >= 20 && Number(today.positiveSimplePassingFilters || 0) >= 10) {
     assert(Number(today.displayed || 0) >= 10, 'Moins de 10 opportunités simples affichées aujourd’hui malgré 10+ signaux simples positifs', today);
   }
   // Sprint 92 — le terrain du 17/05 montre un snapshot tres riche mais strict :

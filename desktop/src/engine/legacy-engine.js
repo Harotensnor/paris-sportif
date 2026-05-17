@@ -720,7 +720,8 @@ function createLegacyEngineService({ projectRoot }) {
   }
 
   function isSimpleUserMarket(row) {
-    return Boolean(simpleMarketGroup(row?.marketKey || row?.market)) && !isDrawSelection(row);
+    const group = simpleMarketGroup(row?.marketKey || row?.market);
+    return Boolean(group && group !== 'halftime') && !isDrawSelection(row);
   }
 
   function isSimpleMarketCandidate(candidate) {
@@ -824,8 +825,8 @@ function createLegacyEngineService({ projectRoot }) {
     // Sports nuit élargis : ajout du tennis (tournois Asie/Australie) et
     // de mma/boxe/rugby qui peuvent avoir des matchs nocturnes.
     if (!['baseball', 'basketball', 'hockey', 'football', 'tennis', 'mma', 'boxe', 'rugby'].includes(sport)) return false;
-    // Tous les marchés simples acceptés (winner, goals, btts, scorer, halftime).
-    if (!market) return false;
+    // Le cockpit standard reste volontairement simple : mi-temps reste expert.
+    if (!market || market === 'halftime') return false;
     const edge = Number(row?.safeEdge ?? row?.edge ?? 0);
     const probability = Number(row?.probability || 0);
     const odd = Number(row?.odd || 0);
@@ -4963,7 +4964,7 @@ function createLegacyEngineService({ projectRoot }) {
   }
 
   function buildMarketCoverageV2(audit, rows) {
-    const simpleFamilies = new Set(['1n2', 'ou', 'btts', 'players', 'halftime', 'tennis', 'sporttotal']);
+    const simpleFamilies = new Set(['1n2', 'ou', 'btts', 'players', 'tennis', 'sporttotal']);
     const expertFamilies = new Set(['handicap', 'exactscore', 'cards', 'dnb', 'doublechance']);
     const rowFamilies = new Map();
     for (const row of Array.isArray(rows) ? rows : []) {
@@ -4979,7 +4980,7 @@ function createLegacyEngineService({ projectRoot }) {
     }
     const families = (Array.isArray(audit?.families) ? audit.families : []).map((family) => {
       const key = String(family.family || 'other');
-      const standard = simpleFamilies.has(key) || ['winner', 'goals', 'btts', 'scorer', 'halftime'].includes(key);
+      const standard = simpleFamilies.has(key) || ['winner', 'goals', 'btts', 'scorer'].includes(key);
       const expert = expertFamilies.has(key);
       const exploited = Number(family.exploited || 0) > 0 || rowFamilies.has(key);
       let ignoredReason = null;

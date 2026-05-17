@@ -333,7 +333,7 @@ async function main() {
     ) && !isIgnorableConsoleMessage(message));
     assert(severe.length === 0, 'Terrain: erreurs console pendant usage réel', severe);
 
-    console.log(`qa:terrain OK: health ${health.generated_at || data.generated_at}, ${todayEvents.length} events aujourd'hui, ${todayBookable.length} Winamax, funnel ${todayFunnel.simplePassingFilters || 0} positifs simples -> ${todayFunnel.displayed || 0} affichés, cockpit ${dashboard.length}, coverage24h ${coverage.displayed || 0}, launch ${launchMs}ms.`);
+    console.log(`qa:terrain OK: health ${health.generated_at || data.generated_at}, ${todayEvents.length} events aujourd'hui, ${todayBookable.length} Winamax, funnel ${positiveSimpleToday} signaux simples positifs -> ${todayFunnel.displayed || 0} affichés, cockpit ${dashboard.length}, coverage24h ${coverage.displayed || 0}, launch ${launchMs}ms.`);
   } finally {
     await closeElectronApp(app);
     fs.rmSync(userDataDir, { recursive: true, force: true });

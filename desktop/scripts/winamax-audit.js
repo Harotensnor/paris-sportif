@@ -123,7 +123,7 @@ function main() {
     if (row.decisionCenter?.canBet) bump(sportsReady, String(row.sport || 'sport').toLowerCase());
   });
 
-  const simpleFamilies = new Set(['1n2', 'ou', 'btts', 'halftime', 'players']);
+  const simpleFamilies = new Set(['1n2', 'ou', 'btts', 'players']);
   const families = mapRows(marketFamilies, (family, count) => ({
     family,
     label: labels[family] || family,
