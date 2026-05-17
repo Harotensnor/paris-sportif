@@ -5,6 +5,19 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-17
 
+### Hotfix v2.2.2 — Pronostics honnêtes + accueil plus léger
+
+Corrections terrain après audit “je veux parier vite, sans faux fiable”.
+- Pipeline réelle relancée : `157` événements Winamax aujourd'hui, `144` signaux simples positifs, `18` lignes affichées aujourd'hui, `30` lignes cockpit et `25` opportunités sur 24h.
+- Filtre fiable corrigé en profondeur : les marchés ou profils d’avantage historiquement froids ne peuvent plus rester `✓ Fiable` par mélange incorrect entre sample segment et calibration globale.
+- Le Top 3 de l’accueil reste strictement composé de paris misables : plus de ligne `À surveiller` injectée pour faire joli ou compléter artificiellement la variété.
+- Les tests terrain/smoke jugent maintenant la variété du Top 3 uniquement sur les lignes réellement misables, afin d’éviter un faux échec quand les Vainqueurs disponibles sont volontairement bloqués.
+- Accueil encore compacté : catégories plus petites, cartes Top 3 moins hautes, tableau 24h resserré et texte secondaire réduit.
+- Les fiches match cachent davantage les données creuses : compositions/absences/équipes et fiches tennis n’affichent plus de lignes génériques quand les stats fiables ne sont pas présentes.
+- Source freshness corrigée : les sources fraîches mais surveillées ne sont plus marquées `due`; le plan distingue maintenant `attention` et vraie relance nécessaire.
+- Décision centrale clarifiée : quand un pari est jouable mais qu’un contrôle global agent reste rouge, l’interface affiche `contrôle global à suivre` au lieu de promettre que tous les garde-fous sont verts.
+- Validation : `qa:engine`, `qa:safe`, `qa:terrain:quick`, `qa:desktop`, `qa:winamax-audit`, `qa:a11y`, `npm test` et capture visuelle Electron repassés sur données terrain.
+
 ### Hotfix v2.2.1 — Audit terrain pronostics + cohérence cockpit
 
 Corrections ciblées après audit terrain de l'accueil et des fiches match.

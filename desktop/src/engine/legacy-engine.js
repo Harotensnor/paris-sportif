@@ -1682,8 +1682,12 @@ function createLegacyEngineService({ projectRoot }) {
     const edge = edgeInfo.value;
     const odd = Number(row?.odd || 0);
     const confidence = effectiveConfidence(row);
-    const sample = Number(row?.segmentValidation?.sample ?? row?.calibration?.sample ?? 0) || 0;
-    const roi = Number(row?.segmentValidation?.roi ?? row?.calibration?.roi ?? 0);
+    const segmentSampleRaw = Number(row?.segmentValidation?.sample);
+    const calibrationSample = Number(row?.calibration?.sample ?? 0) || 0;
+    const sample = Number.isFinite(segmentSampleRaw) ? segmentSampleRaw : calibrationSample;
+    const segmentRoiRaw = Number(row?.segmentValidation?.roi);
+    const calibrationRoi = Number(row?.calibration?.roi ?? 0);
+    const roi = Number.isFinite(segmentRoiRaw) ? segmentRoiRaw : calibrationRoi;
     const policy = row?.segmentPolicy || null;
     const edgeMin = Number.isFinite(Number(policy?.newEdgeMin)) ? Number(policy.newEdgeMin) : 0.03;
     const oddMax = Number.isFinite(Number(policy?.newOddMax)) ? Number(policy.newOddMax) : 6.00;
@@ -1695,8 +1699,23 @@ function createLegacyEngineService({ projectRoot }) {
     const reasons = [];
     const warnings = [];
 
+    const calibrationContextSample = Number(row?.calibration?.context?.sample ?? 0) || 0;
+    const calibrationContextRoi = Number(row?.calibration?.context?.roi ?? 0);
+    const calibrationEdgeSample = Number(row?.calibration?.edgeBucket?.sample ?? 0) || 0;
+    const calibrationEdgeRoi = Number(row?.calibration?.edgeBucket?.roi ?? 0);
+    const marketGroup = simpleMarketGroup(row?.marketKey || row?.market);
+    const robustMarketCold = marketGroup !== 'winner' && calibrationSample >= 40 && Number.isFinite(calibrationRoi) && calibrationRoi < -0.08;
+    const edgeBucketCold = calibrationEdgeSample >= 80 && Number.isFinite(calibrationEdgeRoi) && calibrationEdgeRoi < -0.12;
+    const contextBucketPositive = calibrationContextSample >= 40 && Number.isFinite(calibrationContextRoi) && calibrationContextRoi > 0.02;
+    const contextScore = Number(quality?.score ?? row?.contextQuality?.score ?? 0);
+    const coldMarketOverride = contextBucketPositive && contextScore >= 90 && (
+      (rawEdge >= 0.06 && confidence >= 0.65) ||
+      (rawEdge >= 0.03 && confidence >= 0.72 && odd <= 1.75)
+    );
+    const robustMarketBlock = robustMarketCold && !coldMarketOverride;
+    const edgeProfileBlock = edgeBucketCold && !coldMarketOverride;
     const segmentNegative = sample >= 15 && Number.isFinite(roi) && roi < 0;
-    const baseZone = rawEdge >= 0.01 && odd >= 1.30 && odd <= 6.00 && !row?.signalConflict?.active && !row?.oddsGuardrail?.applied && !hardCriticalMissing.length;
+    const baseZone = rawEdge >= 0.01 && odd >= 1.30 && odd <= 6.00 && !row?.signalConflict?.active && !row?.oddsGuardrail?.applied && !hardCriticalMissing.length && !robustMarketBlock && !edgeProfileBlock;
     const ruleA = baseZone && edge >= edgeMin && odd <= oddMax && confidence >= confidenceMin && !segmentNegative;
     const ruleB = baseZone && sample < 5 && edge >= 0.05 && odd <= 5.00 && confidence >= 0.65;
     const ruleC = baseZone && sample >= 5 && sample < 15 && edge >= 0.04 && odd <= 5.00 && confidence >= 0.60;
@@ -1732,6 +1751,8 @@ function createLegacyEngineService({ projectRoot }) {
     const nonFootCalibrationBlind = !isFootball && !isOneN2 && sportMarketSample < 30;
     if (!(rawEdge >= 0.01)) reasons.push('edge < +1pt');
     if (aberrantEdge) reasons.push(`edge brut +${Math.round(rawEdge * 100)}pt aberrant (modele surconfiant)`);
+    if (robustMarketBlock) reasons.push(`marché froid robuste (ROI ${Math.round(calibrationRoi * 100)}% sur ${calibrationSample} paris)`);
+    if (edgeProfileBlock) reasons.push(`profil d'avantage froid (ROI ${Math.round(calibrationEdgeRoi * 100)}% sur ${calibrationEdgeSample} paris)`);
     if (derivedShortNegative) reasons.push(`marche ${marketKey} segment court perdant (n=${sample}, ROI ${Math.round(roi * 100)}%)`);
     if (nonFootCalibrationBlind) reasons.push(`calibration ${sportKey || 'sport'} limitee (${sportMarketSample}/30 paris settled)`);
     if (!reliableRule && edge < Math.min(edgeMin, sample < 5 ? 0.05 : sample < 15 ? 0.04 : edgeMin)) reasons.push('edge prudent insuffisant');
@@ -1745,6 +1766,7 @@ function createLegacyEngineService({ projectRoot }) {
     if (edgeInfo.capped) warnings.push(`edge brut ${Math.round(rawEdge * 100)}% plafonné par prudence`);
     if (sample > 0 && sample < 15) warnings.push(`sample court ${sample}/15`);
     if (!sample) warnings.push('historique segment absent');
+    if (coldMarketOverride) warnings.push('marché froid compensé par contexte fort');
     if (policy?.direction === 'boost') warnings.push(`segment gagnant : filtre assoupli (${policy.reason})`);
     if (policy?.direction === 'harden') warnings.push(`segment froid : filtre durci (${policy.reason})`);
 
@@ -1877,10 +1899,12 @@ function createLegacyEngineService({ projectRoot }) {
         canBet: true,
         stake: promotedStake,
         stakeDisplay: null,
-        mainReason: 'Tous les garde-fous sont verts',
+        mainReason: Array.isArray(nextDecision.globalGates) && nextDecision.globalGates.length
+          ? 'Pari validé, contrôle global à suivre'
+          : 'Tous les garde-fous sont verts',
         nextAction: 'Miser',
         blockingGates: [],
-        riskTone: 'ok'
+        riskTone: Array.isArray(nextDecision.globalGates) && nextDecision.globalGates.length ? 'watch' : 'ok'
       };
       nextStake = promotedStake;
     }
@@ -2923,6 +2947,7 @@ function createLegacyEngineService({ projectRoot }) {
       gates.prebet?.blocked ? { key: 'agent_checklist', label: gates.prebet.label, tone: 'danger' } : null,
       gates.critical?.blocked ? { key: 'agent_critical', label: gates.critical.label, tone: 'danger' } : null
     ].filter(Boolean);
+    const hasGlobalCaution = globalGates.length > 0;
     const modelAllowsBet = row.status === 'bet' || contextRelease;
     const canBet = !uniqueBlocking.length && modelAllowsBet && effectiveStake > 0;
     const status = canBet
@@ -2940,7 +2965,13 @@ function createLegacyEngineService({ projectRoot }) {
           ? 'Surveiller'
           : 'Écarter';
     const mainReason = uniqueBlocking[0]?.label || (canBet
-      ? (softAvailabilityRelease ? 'Signal fort malgré disponibilités incomplètes' : proxyContextRelease ? 'Winamax OK · contexte proxy suffisant' : 'Tous les garde-fous sont verts')
+      ? (hasGlobalCaution
+        ? 'Pari validé, contrôle global à suivre'
+        : softAvailabilityRelease
+          ? 'Signal fort malgré disponibilités incomplètes'
+          : proxyContextRelease
+            ? 'Winamax OK · contexte proxy suffisant'
+            : 'Tous les garde-fous sont verts')
       : row.statusLabel || 'Observation prudente');
     return {
       status,
@@ -2952,7 +2983,7 @@ function createLegacyEngineService({ projectRoot }) {
       nextAction,
       blockingGates: uniqueBlocking,
       globalGates,
-      riskTone: canBet ? 'ok' : status === 'repair' ? 'danger' : status === 'watch' ? 'watch' : 'warn'
+      riskTone: canBet ? (hasGlobalCaution ? 'watch' : 'ok') : status === 'repair' ? 'danger' : status === 'watch' ? 'watch' : 'warn'
     };
   }
 

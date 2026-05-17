@@ -3925,17 +3925,49 @@
     const match = row?.match || {};
     const { home, away } = getSides(match);
     const h2h = Array.isArray(match.h2h?.meetings) ? match.h2h.meetings : [];
+    const players = [home, away];
+    const hasAny = (fields) => players.some((player) => fields.some((field) => Number.isFinite(Number(player?.[field]))));
+    const serviceReady = hasAny(['aces_per_match', 'first_serve_pct']);
+    const returnReady = hasAny(['break_points_created_pct', 'return_games_won_pct', 'break_points_saved_pct']);
+    const surfaceReady = hasAny(['hard_win_rate', 'clay_win_rate', 'grass_win_rate', 'indoor_win_rate']);
+    const titleReady = hasAny(['season_titles']);
+    const playerCards = players.map((player, index) => {
+      const chips = [
+        statChip('Aces moyens', player?.aces_per_match, '', 1),
+        statChip('1er service', player?.first_serve_pct, '%', 0),
+        statChip('Break sauvés', player?.break_points_saved_pct, '%', 0),
+        statChip('WR dur', player?.hard_win_rate, '%', 0),
+        statChip('WR terre', player?.clay_win_rate, '%', 0),
+        statChip('Titres saison', player?.season_titles, '', 0)
+      ].filter(Boolean).join('');
+      if (!chips) return '';
+      return `
+            <article class="key-player-card">
+              <strong>${escapeHtml(player?.name || `Joueur ${index + 1}`)}</strong>
+              <em>${escapeHtml(index === 0 ? 'Profil joueur gauche' : 'Profil joueur droit')}</em>
+              <div class="stat-chip-row">${chips}</div>
+            </article>`;
+    }).filter(Boolean).join('');
     const rows = [
       ['Tournoi', `${match.league_name || row.league || '-'} · ${match.round || match.draw || 'tour à confirmer'}`],
       ['Surface', match.surface || 'surface à confirmer'],
       ['Classement', `${home?.name || 'Joueur 1'} ${home?.rank ? `#${home.rank}` : 'rang ?'} · ${away?.name || 'Joueur 2'} ${away?.rank ? `#${away.rank}` : 'rang ?'}`],
       ['Forme 5 derniers', `${sideFormText(home)} / ${sideFormText(away)}`],
       ['H2H', h2h.length ? `${formatCount(h2h.length)} confrontation(s) locales` : 'historique direct à enrichir'],
-      ['Bilan par surface', 'dur / terre / gazon / indoor à enrichir depuis sources tennis'],
-      ['Service', 'aces, 1er service, points gagnés derrière la première'],
-      ['Retour', 'break points créés, jeux de retour et pression sur second service'],
-      ['Tie-breaks', 'historique tie-break et mental fin de set à enrichir'],
-      ['Stats avancées', 'aces, 1er service, balles de break et fatigue à enrichir']
+      ['Bilan par surface', surfaceReady ? [
+        home?.hard_win_rate ? `${home?.name || 'Joueur 1'} dur ${numericText(home.hard_win_rate, '%', 0)}` : '',
+        away?.hard_win_rate ? `${away?.name || 'Joueur 2'} dur ${numericText(away.hard_win_rate, '%', 0)}` : ''
+      ].filter(Boolean).join(' · ') : 'surfaces à enrichir'],
+      ['Service', serviceReady ? [
+        home?.aces_per_match ? `${home?.name || 'J1'} ${numericText(home.aces_per_match, ' aces/m', 1)}` : '',
+        away?.aces_per_match ? `${away?.name || 'J2'} ${numericText(away.aces_per_match, ' aces/m', 1)}` : ''
+      ].filter(Boolean).join(' · ') : 'service à enrichir'],
+      ['Retour', returnReady ? [
+        home?.break_points_saved_pct ? `${home?.name || 'J1'} BP sauvés ${numericText(home.break_points_saved_pct, '%', 0)}` : '',
+        away?.break_points_saved_pct ? `${away?.name || 'J2'} BP sauvés ${numericText(away.break_points_saved_pct, '%', 0)}` : ''
+      ].filter(Boolean).join(' · ') : 'retour à enrichir'],
+      ['Tie-breaks', match.tiebreak_note || 'tie-breaks à enrichir'],
+      ['Stats avancées', titleReady ? players.map((player) => player?.season_titles ? `${player.name || 'Joueur'} ${player.season_titles} titre(s)` : '').filter(Boolean).join(' · ') : 'stats avancées tennis à enrichir']
     ];
     return `
       <article class="detail-card wide sport-insight-card">
@@ -3943,22 +3975,7 @@
         <div class="sport-insight-grid">
           ${renderDetailPairs(rows)}
         </div>
-        <div class="key-player-grid">
-          ${[home, away].map((player, index) => `
-            <article class="key-player-card">
-              <strong>${escapeHtml(player?.name || `Joueur ${index + 1}`)}</strong>
-              <em>${escapeHtml(index === 0 ? 'Profil joueur gauche' : 'Profil joueur droit')}</em>
-              <div class="stat-chip-row">
-                ${statChip('Aces moyens', player?.aces_per_match, '', 1)}
-                ${statChip('1er service', player?.first_serve_pct, '%', 0)}
-                ${statChip('Break sauvés', player?.break_points_saved_pct, '%', 0)}
-                ${statChip('WR dur', player?.hard_win_rate, '%', 0)}
-                ${statChip('WR terre', player?.clay_win_rate, '%', 0)}
-                ${statChip('Titres saison', player?.season_titles, '', 0)}
-              </div>
-            </article>
-          `).join('')}
-        </div>
+        ${playerCards ? `<div class="key-player-grid">${playerCards}</div>` : ''}
       </article>
     `;
   }
@@ -5831,14 +5848,11 @@
       if (sourceMarkets.size > 1 && selectedMarkets.size <= 1) {
         const currentMarket = selectedMarkets.values().next().value;
         const readyAlternative = sortHomeRows(ready, 'confidence').find((row) => rowMarketPreferenceKey(row) !== currentMarket && !selected.some((item) => userBetKey(item) === userBetKey(row)));
-        const watchAlternative = sortHomeRows(source, 'confidence').find((row) => rowMarketPreferenceKey(row) !== currentMarket && !selected.some((item) => userBetKey(item) === userBetKey(row)));
-        const alternative = readyAlternative || watchAlternative;
-        if (alternative) selected[selected.length - 1] = alternative;
+        if (readyAlternative) selected[selected.length - 1] = readyAlternative;
       }
       return selected;
     }
-    const fallback = ready.concat(source.filter((row) => !isReadyToStakeRow(row)));
-    return diverseHomeTopRows(fallback, limit);
+    return diverseHomeTopRows(ready, limit);
   }
 
   function homeCategoryMeta(category) {
@@ -5992,8 +6006,8 @@
     }
     if (topWrap) {
       topWrap.innerHTML = topRows.length
-        ? topRows.map(homeTopCardHtml).join('')
-        : '<div class="empty compact-empty">Aucun pari exploitable sur les prochaines 24h. Lance un refresh complet ou ouvre Cockpit pour le diagnostic.</div>';
+        ? topRows.map(homeTopCardHtml).join('') + (topRows.length < 3 ? '<div class="empty compact-empty">Top 3 incomplet : le modèle refuse de compléter avec une ligne à surveiller.</div>' : '')
+        : '<div class="empty compact-empty">Aucun pari validé à miser sur les prochaines 24h. Les signaux restent consultables dans Cockpit sans bouton de mise.</div>';
     }
     if (body) {
       body.innerHTML = tableRows.length
@@ -12669,10 +12683,11 @@
       ['Historique local', history.events_seen ? `${formatCount(history.events_seen)} observations` : 'Non disponible'],
       ['Football-Data', fd?.matches ? `${formatCount(fd.matches)} matchs · les deux marquent ${formatPct(fd.btts_rate || 0, 0)}` : 'Non disponible']
     ];
+    const body = renderDetailPairs(rows);
     return `
       <article class="detail-card">
         <h4>${escapeHtml(label)} · ${escapeHtml(side?.name || '-')}</h4>
-        <div class="kv">${rows.map(([k, v]) => `<span>${escapeHtml(k)}</span><strong>${escapeHtml(v)}</strong>`).join('')}</div>
+        ${body ? `<div class="kv">${body}</div>` : '<div class="empty compact-empty">Aucune donnée équipe fiable à afficher pour l’instant.</div>'}
       </article>`;
   }
 
@@ -12702,15 +12717,17 @@
     const lineup = side?.lineup || {};
     const injuries = side?.injuries || {};
     const stars = Array.isArray(side?.stars) ? side.stars : [];
+    const rows = [
+      ['Composition', lineup.present ? `${lineup.confirmed ? 'confirmée' : lineup.projected ? 'profil probable' : 'non confirmée'} · ${lineup.starters || 0} titulaires` : 'compo non publiée'],
+      ['Formation', lineup.formation || '-'],
+      ['Absents', injuries.present ? `${injuries.total || 0} total · ${injuries.severe || 0} sévères · ${injuries.doubtful || 0} incertains` : 'source indisponible'],
+      ['Statut source', injuries.known === false ? 'matching incertain' : injuries.present ? 'source disponible' : 'source absente']
+    ];
+    const body = renderDetailPairs(rows, { keepLabels: injuries.present ? ['Absents'] : [] });
     return `
       <article class="detail-card">
         <h4>${escapeHtml(label)} · ${escapeHtml(side?.team || '-')}</h4>
-        <div class="kv">
-          <span>Composition</span><strong>${escapeHtml(lineup.present ? `${lineup.confirmed ? 'confirmée' : lineup.projected ? 'profil probable' : 'non confirmée'} · ${lineup.starters || 0} titulaires` : 'compo non publiée')}</strong>
-          <span>Formation</span><strong>${escapeHtml(lineup.formation || '-')}</strong>
-          <span>Absents</span><strong>${escapeHtml(injuries.present ? `${injuries.total || 0} total · ${injuries.severe || 0} sévères · ${injuries.doubtful || 0} incertains` : 'source indisponible')}</strong>
-          <span>Statut source</span><strong>${escapeHtml(injuries.known === false ? 'matching incertain' : injuries.present ? 'source disponible' : 'source absente')}</strong>
-        </div>
+        ${body ? `<div class="kv">${body}</div>` : '<div class="empty compact-empty">Compo et absences non publiées par les sources.</div>'}
         ${injuries.names?.length ? `<p class="detail-text">${escapeHtml(injuries.names.slice(0, 8).join(', '))}</p>` : ''}
         ${stars.length ? `<div class="market-list">${stars.slice(0, 6).map((star) => `<div class="market-row"><span>${escapeHtml(star.position || '-')}</span><strong>${escapeHtml(star.name || '-')}</strong><em>${escapeHtml(star.star_score != null ? `score ${Number(star.star_score).toFixed(2)}` : 'star')}</em></div>`).join('')}</div>` : ''}
       </article>`;

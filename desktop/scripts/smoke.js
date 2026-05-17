@@ -100,6 +100,9 @@ async function main() {
       homeTopMarkets: Array.from(document.querySelectorAll('#home-top3-grid .home-top-card')).map((node) => node.dataset.homeMarket || ''),
       homeTableRows: document.querySelectorAll('#home-picks-table-body tr.clickable-row').length,
       homeTableMarkets: Array.from(document.querySelectorAll('#home-picks-table-body tr.clickable-row')).map((node) => node.dataset.homeMarket || ''),
+      homeTableReadyMarkets: Array.from(document.querySelectorAll('#home-picks-table-body tr.clickable-row'))
+        .filter((node) => /Je mise/i.test(node.innerText || ''))
+        .map((node) => node.dataset.homeMarket || ''),
       homeSortButtons: document.querySelectorAll('[data-home-sort]').length,
       dailyBudget: document.querySelector('#daily-budget-summary')?.textContent || '',
       hasRollingSections: document.body.textContent.includes('À jouer prochainement')
@@ -129,8 +132,8 @@ async function main() {
     if (dashboard.rows < 15 || dashboard.rows > 32 || dashboard.timeline < 8 || dashboard.trackButtons < 3 || dashboard.safeBadges < 5 || !/24h|aujourd’hui|à venir|surveill/i.test(dashboard.metricLabel) || (dashboard.metric < 6 && !/trop strict|Winamax/i.test(dashboard.funnelAlert)) || !dashboard.homeShell || dashboard.homeTop3 < Math.min(3, dashboard.homeTableRows) || dashboard.homeTableRows < 6 || dashboard.homeTableRows > 8 || dashboard.homeSortButtons < 4 || !hasActionCopy || hasComplexMarket || hasTechnicalJargon || hasExpertRepairLabel || /Écouter le brief|brief audio|SpeechSynthesis|TTS/i.test(dashboard.dashboardText)) {
       throw new Error(`Picks Sprint 15 insuffisants: ${JSON.stringify({ ...dashboard, dashboardText: dashboard.dashboardText.slice(0, 800), hasActionCopy, hasComplexMarket, hasTechnicalJargon })}`);
     }
-    if (new Set(dashboard.homeTableMarkets.filter(Boolean)).size > 1 && new Set(dashboard.homeTopMarkets.filter(Boolean)).size < 2) {
-      throw new Error(`Top 3 accueil trop monotone: ${JSON.stringify({ top: dashboard.homeTopMarkets, table: dashboard.homeTableMarkets })}`);
+    if (new Set(dashboard.homeTableReadyMarkets.filter(Boolean)).size > 1 && new Set(dashboard.homeTopMarkets.filter(Boolean)).size < 2) {
+      throw new Error(`Top 3 accueil trop monotone: ${JSON.stringify({ top: dashboard.homeTopMarkets, tableReady: dashboard.homeTableReadyMarkets, table: dashboard.homeTableMarkets })}`);
     }
     if (!dashboard.combines || !dashboard.scorers || !dashboard.promos || !dashboard.bankroll.includes('€') || !dashboard.pnl.includes('€') || !dashboard.expertHidden || dashboard.multibookText) {
       throw new Error(`Cockpit Sprint 14 incohérent: ${JSON.stringify(dashboard)}`);
