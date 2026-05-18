@@ -105,11 +105,13 @@ function testAnalysis() {
   assert(analysis.sourceHealthV6 && analysis.sourceHealthV6.schema === 'paris-sportif.source_health.v6', 'SourceHealth v6 absent', analysis.sourceHealthV6);
   assert(analysis.sourceHealthV7 && analysis.sourceHealthV7.schema === 'paris-sportif.source_health.v7', 'SourceHealth v7 absent', analysis.sourceHealthV7);
   assert(analysis.sourceHealthV8 && analysis.sourceHealthV8.schema === 'paris-sportif.source_health.v8', 'SourceHealth v8 absent', analysis.sourceHealthV8);
+  assert(analysis.sourceHealthV9 && analysis.sourceHealthV9.schema === 'paris-sportif.source_health.v9', 'SourceHealth v9 absent', analysis.sourceHealthV9);
   assert(analysis.marketCoverageV2 && analysis.marketCoverageV2.schema === 'paris-sportif.market_coverage.v2', 'MarketCoverage v2 absent', analysis.marketCoverageV2);
   assert(analysis.terrainReportV2 && analysis.terrainReportV2.schema === 'paris-sportif.terrain_report.v2', 'TerrainReport v2 absent', analysis.terrainReportV2);
   assert(analysis.terrainReportV3 && analysis.terrainReportV3.schema === 'paris-sportif.terrain_report.v3', 'TerrainReport v3 absent', analysis.terrainReportV3);
   assert(analysis.terrainReportV4 && analysis.terrainReportV4.schema === 'paris-sportif.terrain_report.v4', 'TerrainReport v4 absent', analysis.terrainReportV4);
   assert(analysis.terrainReportV5 && analysis.terrainReportV5.schema === 'paris-sportif.terrain_report.v5', 'TerrainReport v5 absent', analysis.terrainReportV5);
+  assert(analysis.terrainReportV8 && analysis.terrainReportV8.schema === 'paris-sportif.terrain_report.v8', 'TerrainReport v8 absent', analysis.terrainReportV8);
   assert(analysis.modelBacktestV4 && analysis.modelBacktestV4.schema === 'paris-sportif.model_backtest.v4', 'ModelBacktest v4 absent', analysis.modelBacktestV4);
   assert(analysis.modelBacktestV5 && analysis.modelBacktestV5.schema === 'paris-sportif.model_backtest.v5', 'ModelBacktest v5 absent', analysis.modelBacktestV5);
   assert(analysis.modelBacktestV6 && analysis.modelBacktestV6.schema === 'paris-sportif.model_backtest.v6', 'ModelBacktest v6 absent', analysis.modelBacktestV6);
@@ -117,18 +119,23 @@ function testAnalysis() {
   assert(Array.isArray(analysis.sourceHealthV6.sources) && analysis.sourceHealthV6.sources.length >= 5, 'SourceHealth v6 incohérent', analysis.sourceHealthV6.summary);
   assert(Array.isArray(analysis.sourceHealthV7.sources) && analysis.sourceHealthV7.sources.length >= analysis.sourceHealthV6.sources.length, 'SourceHealth v7 incohérent', analysis.sourceHealthV7.summary);
   assert(Array.isArray(analysis.sourceHealthV8.sources) && analysis.sourceHealthV8.sources.length >= analysis.sourceHealthV7.sources.length, 'SourceHealth v8 incohérent', analysis.sourceHealthV8.summary);
+  assert(Array.isArray(analysis.sourceHealthV9.sources) && analysis.sourceHealthV9.sources.length === analysis.sourceHealthV8.sources.length, 'SourceHealth v9 incohérent', analysis.sourceHealthV9.summary);
   assert(Number.isFinite(Number(analysis.sourceHealthV6.summary?.estimatedPickGain || 0)), 'SourceHealth v6 sans gain estimé', analysis.sourceHealthV6.summary);
   assert(Number.isFinite(Number(analysis.sourceHealthV7.summary?.estimatedPickGain || 0)), 'SourceHealth v7 sans gain estimé', analysis.sourceHealthV7.summary);
   assert(Number.isFinite(Number(analysis.sourceHealthV8.summary?.estimatedReadyGain || 0)), 'SourceHealth v8 sans gain prêt estimé', analysis.sourceHealthV8.summary);
   assert(Number.isFinite(Number(analysis.sourceHealthV8.summary?.blockedReadyCount || 0)), 'SourceHealth v8 sans prêts bloqués', analysis.sourceHealthV8.summary);
+  assert(Number.isFinite(Number(analysis.sourceHealthV9.summary?.estimatedReadyGain || 0)), 'SourceHealth v9 sans gain prêt estimé', analysis.sourceHealthV9.summary);
+  assert(typeof analysis.sourceHealthV9.summary?.userMessage === 'string', 'SourceHealth v9 sans message utilisateur', analysis.sourceHealthV9.summary);
   assert(Array.isArray(analysis.marketCoverageV2.families) && analysis.marketCoverageV2.families.length >= 8, 'MarketCoverage v2 sans familles', analysis.marketCoverageV2);
   assert(Number(analysis.terrainReportV2.counts?.dashboardRows || 0) === analysis.dashboardPicks.length, 'TerrainReport v2 ne reflète pas le cockpit', analysis.terrainReportV2.counts);
   assert(Number(analysis.terrainReportV3.counts?.dashboardRows || 0) === analysis.dashboardPicks.length, 'TerrainReport v3 ne reflète pas le cockpit', analysis.terrainReportV3.counts);
   assert(Number(analysis.terrainReportV4.counts?.dashboardRows || 0) === analysis.dashboardPicks.length, 'TerrainReport v4 ne reflète pas le cockpit', analysis.terrainReportV4.counts);
   assert(Number(analysis.terrainReportV5.counts?.dashboardRows || 0) === analysis.dashboardPicks.length, 'TerrainReport v5 ne reflète pas le cockpit', analysis.terrainReportV5.counts);
+  assert(Number(analysis.terrainReportV8.quickBetSummary?.cockpitRows || 0) === analysis.dashboardPicks.length, 'TerrainReport v8 ne reflète pas le cockpit', analysis.terrainReportV8.quickBetSummary);
   assert(analysis.terrainReportV3.uxChecks?.actionCopyRequired === 'PARI / COTE / MISE', 'TerrainReport v3 sans promesse UX rapide', analysis.terrainReportV3.uxChecks);
   assert(analysis.terrainReportV4.quickBetSummary && Array.isArray(analysis.terrainReportV4.actionableNextRepairs), 'TerrainReport v4 incomplet', analysis.terrainReportV4);
   assert(analysis.terrainReportV5.quickBetSummary && analysis.terrainReportV5.nightAudit && analysis.terrainReportV5.varietyAudit, 'TerrainReport v5 incomplet', analysis.terrainReportV5);
+  assert(analysis.terrainReportV8.quickBetSummary && analysis.terrainReportV8.speedSummary && analysis.terrainReportV8.sourceSummary, 'TerrainReport v8 incomplet', analysis.terrainReportV8);
   assert(analysis.modelBacktestV6.dimensions && analysis.modelBacktestV6.dimensions.byDecisionStatus, 'ModelBacktest v6 sans dimensions', analysis.modelBacktestV6);
   const matchContext = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'match_context.json'), 'utf8'));
   const contextRows = matchContext.matches_by_id && typeof matchContext.matches_by_id === 'object'

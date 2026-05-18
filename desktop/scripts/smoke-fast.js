@@ -34,8 +34,9 @@ async function main() {
   const rendererText = fs.readFileSync(path.join(desktopRoot, 'src', 'renderer', 'renderer.js'), 'utf8');
   const mainText = fs.readFileSync(path.join(desktopRoot, 'src', 'main.js'), 'utf8');
   if (/fetch\(\s*['"]https?:\/\//i.test(rendererText)) throw new Error('Fetch internet direct détecté dans le renderer');
+  if (!mainText.includes("instant: '--instant'")) throw new Error('Mode Synchro instant absent côté main process');
   if (!mainText.includes("fast: '--fast'")) throw new Error('Mode Synchro rapide absent côté main process');
-  if (!rendererText.includes("startRefresh(mode = 'fast'")) throw new Error('Le refresh UI par défaut ne lance pas la synchro rapide');
+  if (!rendererText.includes("startRefresh(mode = 'instant'")) throw new Error('Le refresh UI par défaut doit lancer la synchro instant');
 
   const messages = [];
   const userDataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'paris-sportif-smoke-fast-'));
@@ -75,14 +76,16 @@ async function main() {
       refreshLabel: document.querySelector('#refresh-btn')?.textContent || '',
       rows: document.querySelectorAll('#home-picks-table-body tr.clickable-row').length,
       topCards: document.querySelectorAll('#home-top3-grid .home-top-card').length,
+      watchCards: document.querySelectorAll('#home-top3-grid .home-watch-card').length,
       categories: document.querySelectorAll('[data-cockpit-category]').length,
       nav: Array.from(document.querySelectorAll('.nav-btn:not(.hidden)')).map((node) => node.innerText.trim()),
       dashboardText: document.querySelector('[data-panel="dashboard"]')?.innerText || '',
       standardExpertVisible: Boolean(document.querySelector('[data-tab="data"]:not(.hidden)'))
     }));
     if (!/Picks|Paris|miser/i.test(home.title)) throw new Error(`Vue par défaut invalide: ${home.title}`);
-    if (!/Synchro rapide/i.test(home.refreshLabel)) throw new Error(`Bouton refresh non raccourci: ${home.refreshLabel}`);
-    if (home.rows < 3 || home.topCards < 1 || home.categories < 8) {
+    if (!/Synchro instant/i.test(home.refreshLabel)) throw new Error(`Bouton refresh non instantané: ${home.refreshLabel}`);
+    const topEmptyAllowed = /Aucun pari validé à miser|Top 3 incomplet/i.test(home.dashboardText);
+    if (home.rows < 3 || (!home.topCards && !home.watchCards && !topEmptyAllowed) || home.categories < 8) {
       throw new Error(`Accueil rapide incomplet: ${JSON.stringify(home)}`);
     }
     if (home.standardExpertVisible) throw new Error('Mode expert visible en standard');

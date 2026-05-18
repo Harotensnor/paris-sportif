@@ -59,11 +59,13 @@
     sourceHealthV6: null,
     sourceHealthV7: null,
     sourceHealthV8: null,
+    sourceHealthV9: null,
     marketCoverageV2: null,
     terrainReportV2: null,
     terrainReportV3: null,
     terrainReportV4: null,
     terrainReportV5: null,
+    terrainReportV8: null,
     modelBacktestV4: null,
     modelBacktestV5: null,
     modelBacktestV6: null,
@@ -300,6 +302,7 @@
   const REFRESH_URGENT_INTERVAL_MS = 5 * 60 * 1000;
   const REFRESH_ECONOMY_AFTER_MS = 60 * 60 * 1000;
   const REFRESH_ESTIMATE_SECONDS = {
+    instant: 25,
     fast: 45,
     quick: 150,
     signals: 520,
@@ -3072,6 +3075,7 @@
   }
 
   function refreshModeLabel(mode) {
+    if (mode === 'instant') return 'Synchro instant';
     if (mode === 'fast') return 'Synchro rapide';
     if (mode === 'signals') return 'Signaux lents';
     if (mode === 'quick') return 'Refresh enrichi';
@@ -3082,7 +3086,7 @@
     if (mode === 'prematch_t10') return 'Pré-match T-10';
     if (mode === 'critical') return 'File critique';
     if (mode === 'repair_context') return 'Réparer contexte';
-    return 'Synchro rapide';
+    return 'Synchro instant';
   }
 
   function signalSourceLabel(source) {
@@ -3258,8 +3262,8 @@
     }
     return {
       delayMs: REFRESH_DEFAULT_INTERVAL_MS,
-      mode: 'fast',
-      label: 'Auto-refresh 30 min.'
+      mode: 'instant',
+      label: 'Auto-refresh local 30 min : recalcul sans sources lentes.'
     };
   }
 
@@ -3341,7 +3345,7 @@
     const queue = Array.isArray(state.refreshPriorityPlan?.queue) ? state.refreshPriorityPlan.queue : [];
     if (queue[0]) return queue[0];
     const actions = Array.isArray(state.nextActions?.actions) ? state.nextActions.actions : [];
-    return actions[0] || { mode: 'fast', source: 'all', priority: 'low', title: 'Synchro rapide' };
+    return actions[0] || { mode: 'instant', source: 'all', priority: 'low', title: 'Synchro instant' };
   }
 
   function compactMatchKey(value) {
@@ -5680,15 +5684,17 @@
     state.modelRealityAudit = analysis.modelRealityAudit || null;
     state.probabilityCalibration = analysis.probabilityCalibration || null;
     state.policyCandidates = analysis.policyCandidates || null;
-    state.sourceHealth = analysis.sourceHealthV8 || analysis.sourceHealthV7 || analysis.sourceHealthV6 || analysis.sourceHealthV5 || analysis.sourceHealth || null;
+    state.sourceHealth = analysis.sourceHealthV9 || analysis.sourceHealthV8 || analysis.sourceHealthV7 || analysis.sourceHealthV6 || analysis.sourceHealthV5 || analysis.sourceHealth || null;
     state.sourceHealthV6 = analysis.sourceHealthV6 || null;
     state.sourceHealthV7 = analysis.sourceHealthV7 || null;
     state.sourceHealthV8 = analysis.sourceHealthV8 || null;
+    state.sourceHealthV9 = analysis.sourceHealthV9 || null;
     state.marketCoverageV2 = analysis.marketCoverageV2 || null;
     state.terrainReportV2 = analysis.terrainReportV2 || null;
     state.terrainReportV3 = analysis.terrainReportV3 || null;
     state.terrainReportV4 = analysis.terrainReportV4 || null;
     state.terrainReportV5 = analysis.terrainReportV5 || null;
+    state.terrainReportV8 = analysis.terrainReportV8 || null;
     state.modelBacktestV4 = analysis.modelBacktestV4 || null;
     state.modelBacktestV5 = analysis.modelBacktestV5 || null;
     state.modelBacktestV6 = analysis.modelBacktestV6 || null;
@@ -6840,27 +6846,27 @@
   function homeTopRows(rows, limit = 3) {
     const source = Array.isArray(rows) ? rows : [];
     const ready = source.filter(isReadyToStakeRow);
-    if (ready.length >= limit) {
-      const selected = diverseHomeTopRows(ready, limit);
-      const sourceMarkets = new Set(source.map(rowMarketPreferenceKey).filter(Boolean));
-      const selectedMarkets = new Set(selected.map(rowMarketPreferenceKey).filter(Boolean));
-      if (sourceMarkets.size > 1 && selectedMarkets.size <= 1) {
-        const currentMarket = selectedMarkets.values().next().value;
-        const readyAlternative = sortHomeRows(ready, 'confidence').find((row) => rowMarketPreferenceKey(row) !== currentMarket && !selected.some((item) => userBetKey(item) === userBetKey(row)));
-        if (readyAlternative) selected[selected.length - 1] = readyAlternative;
-      }
-      return selected;
-    }
     const selected = diverseHomeTopRows(ready, limit);
-    if (selected.length >= limit) return selected;
-    const selectedKeys = new Set(selected.map((row) => userBetKey(row) || row?.id || `${row?.title}:${row?.market}:${row?.label}`));
+    const sourceMarkets = new Set(source.map(rowMarketPreferenceKey).filter(Boolean));
+    const selectedMarkets = new Set(selected.map(rowMarketPreferenceKey).filter(Boolean));
+    if (selected.length >= 2 && sourceMarkets.size > 1 && selectedMarkets.size <= 1) {
+      const currentMarket = selectedMarkets.values().next().value;
+      const readyAlternative = sortHomeRows(ready, 'confidence').find((row) => rowMarketPreferenceKey(row) !== currentMarket && !selected.some((item) => userBetKey(item) === userBetKey(row)));
+      if (readyAlternative) selected[selected.length - 1] = readyAlternative;
+    }
+    return selected.slice(0, limit);
+  }
+
+  function homeWatchRows(rows, limit = 3, excludedRows = []) {
+    const source = Array.isArray(rows) ? rows : [];
+    const excluded = new Set(excludedRows.map((row) => userBetKey(row) || row?.id || `${row?.title}:${row?.market}:${row?.label}`));
     const watch = source.filter((row) => {
       const key = userBetKey(row) || row?.id || `${row?.title}:${row?.market}:${row?.label}`;
       const confidence = homeConfidenceValue(row);
       const odd = Number(row?.odd || 0);
-      return canDisplayPickCard(row) && !selectedKeys.has(key) && confidence >= 0.55 && odd > 1 && odd <= 4.5 && dangerousPickReasons(row).length === 0;
+      return canDisplayPickCard(row) && !isReadyToStakeRow(row) && !excluded.has(key) && confidence >= 0.55 && odd > 1 && odd <= 4.5 && dangerousPickReasons(row).length === 0;
     });
-    return selected.concat(diverseHomeTopRows(watch, limit - selected.length)).slice(0, limit);
+    return diverseHomeTopRows(watch, limit).slice(0, limit);
   }
 
   function homeCategoryMeta(category) {
@@ -6989,6 +6995,22 @@
     `;
   }
 
+  function homeWatchCardHtml(row, index) {
+    const confidence = Math.round(homeConfidenceValue(row) * 100);
+    const reason = userFacingGuardText(row?.decisionCenter?.mainReason || row?.safeAssessment?.blockReason || row?.contextGate?.gate || 'contexte à confirmer');
+    const marketKey = rowMarketPreferenceKey(row);
+    const sportKey = normalizeUiKey(row?.sport || 'sport');
+    return `
+      <article class="home-watch-card clickable-row" data-match-id="${escapeHtml(row.id)}" data-home-market="${escapeHtml(marketKey)}" data-home-sport="${escapeHtml(sportKey)}" tabindex="0" role="button" aria-label="Ouvrir ${escapeHtml(row.title || 'match')}">
+        <div class="home-watch-rank">À surveiller #${index + 1}</div>
+        <strong>${escapeHtml(row.title || 'Match')}</strong>
+        <span>${escapeHtml(`${formatDateLabel(row.start)} · ${countdownLabel(row.start)}`)}</span>
+        <div class="home-watch-bet">${escapeHtml(userBetLabel(row) || simpleMarketLabelForRow(row))} · ${escapeHtml(formatOdd(row.odd))} · ${confidence}%</div>
+        <p>Pas de bouton mise : ${escapeHtml(reason)}.</p>
+      </article>
+    `;
+  }
+
   function homeTableRowHtml(row) {
     const confidence = Math.round(homeConfidenceValue(row) * 100);
     const canStake = isReadyToStakeRow(row);
@@ -7034,6 +7056,7 @@
     if (subtitle) subtitle.textContent = meta.subtitle;
     const source = homeSourceRows(rows);
     const topRows = homeTopRows(source, 3);
+    const watchRows = topRows.length < 3 ? homeWatchRows(source, 3 - topRows.length, topRows) : [];
     const tableLimit = state.activeHomeCategory ? 10 : 6;
     const tableRows = sortHomeRows(source, sortMode).slice(0, tableLimit);
     $$('.home-sort-actions [data-home-sort], .home-picks-table [data-home-sort]').forEach((button) => {
@@ -7044,9 +7067,12 @@
       caption.textContent = `${formatCount(tableRows.length)} affichés ici · ${formatCount(tableLimit)} max · tri ${labels[sortMode] || 'confiance'}`;
     }
     if (topWrap) {
+      const watchHtml = watchRows.length
+        ? `<div class="home-watch-strip">${watchRows.map(homeWatchCardHtml).join('')}</div>`
+        : '';
       topWrap.innerHTML = topRows.length
-        ? topRows.map(homeTopCardHtml).join('') + (topRows.length < 3 ? '<div class="empty compact-empty">Top 3 incomplet : le modèle refuse de compléter avec une ligne à surveiller.</div>' : '')
-        : '<div class="empty compact-empty">Aucun pari validé à miser sur les prochaines 24h. Les signaux restent consultables dans Cockpit sans bouton de mise.</div>';
+        ? topRows.map(homeTopCardHtml).join('') + watchHtml + (topRows.length < 3 ? '<div class="empty compact-empty">Top 3 incomplet : le modèle refuse de transformer une ligne à surveiller en pari.</div>' : '')
+        : '<div class="empty compact-empty">Aucun pari validé à miser sur les prochaines 24h. Les meilleurs signaux restent dans le tableau, sans bouton de mise.</div>' + watchHtml;
     }
     if (body) {
       body.innerHTML = tableRows.length
@@ -17597,7 +17623,7 @@
     if (text.includes('clubelo')) {
       return { mode: 'full', source: 'all', label: 'Refresh complet' };
     }
-    return { mode: 'fast', source: 'all', label: 'Synchro rapide' };
+    return { mode: 'instant', source: 'all', label: 'Synchro instant' };
   }
 
   function renderQualityAlerts(status) {
@@ -17729,7 +17755,7 @@
     $$('.quality-action-btn').forEach((button) => {
       button.disabled = running;
     });
-    setRefreshButtonText('refresh-btn', running && !isSignals ? 'Synchro en cours' : 'Synchro rapide');
+    setRefreshButtonText('refresh-btn', running && !isSignals ? 'Synchro en cours' : 'Synchro instant');
     setRefreshButtonText('refresh-full-btn', running && status.mode === 'full' ? 'Complet en cours' : 'Refresh complet');
     setRefreshButtonText('refresh-signals-btn', running && isSignals ? `${sourceLabel} en cours` : 'Signaux lents');
     setRefreshButtonText('refresh-prematch-btn', running && isPrematch ? 'Pré-match en cours' : 'Pré-match final');
@@ -17744,7 +17770,7 @@
     return status;
   }
 
-  async function startRefresh(mode = 'fast', requestedSource = null) {
+  async function startRefresh(mode = 'instant', requestedSource = null) {
     if (automationRefreshDisabled()) {
       pushLog('info', `Refresh ${mode} ignoré en profil de test isolé.`);
       return { ok: true, started: false, skipped: true };
@@ -17778,7 +17804,7 @@
     $$('.quality-action-btn').forEach((button) => {
       button.disabled = true;
     });
-    setRefreshButtonText('refresh-btn', mode === 'signals' ? 'Synchro rapide' : 'Synchro en cours');
+    setRefreshButtonText('refresh-btn', mode === 'signals' ? 'Synchro instant' : 'Synchro en cours');
     setRefreshButtonText('refresh-full-btn', mode === 'full' ? 'Complet en cours' : 'Refresh complet');
     setRefreshButtonText('refresh-signals-btn', mode === 'signals' ? `${signalSourceLabel(source)} en cours` : 'Signaux lents');
     setRefreshButtonText('refresh-prematch-btn', mode === 'prematch' ? 'Pré-match en cours' : 'Pré-match final');
@@ -17800,7 +17826,7 @@
       $$('.quality-action-btn').forEach((button) => {
         button.disabled = false;
       });
-      setRefreshButtonText('refresh-btn', 'Synchro rapide');
+      setRefreshButtonText('refresh-btn', 'Synchro instant');
       setRefreshButtonText('refresh-full-btn', 'Refresh complet');
       setRefreshButtonText('refresh-signals-btn', 'Signaux lents');
       setRefreshButtonText('refresh-prematch-btn', 'Pré-match final');

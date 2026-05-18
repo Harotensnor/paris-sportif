@@ -91,6 +91,49 @@ function commonDecisionOutputs(stages, label, options = {}) {
   before(stages, 'build_health.py', 'finalize_inline.py', `${label} santé avant inline`);
 }
 
+function lightDecisionOutputs(stages, label) {
+  const requiredStages = [
+    'build_team_identity_graph.py',
+    'build_match_context.py',
+    'build_prebet_checklist.py',
+    'build_v7_actionability.py',
+    'build_v8_decision_cockpit.py',
+    'build_v16_final_decision.py',
+    'build_v4_audit_reports.py',
+    'build_decision_exports.py',
+    'build_health.py',
+    'finalize_inline.py'
+  ];
+  for (const stage of requiredStages) {
+    includes(stages, stage, `${label} ${stage}`);
+  }
+  before(stages, 'build_match_context.py', 'build_prebet_checklist.py', `${label} contexte avant checklist`);
+  before(stages, 'build_prebet_checklist.py', 'build_v7_actionability.py', `${label} checklist avant décision`);
+  before(stages, 'build_v8_decision_cockpit.py', 'build_v16_final_decision.py', `${label} cockpit avant final`);
+  before(stages, 'build_v16_final_decision.py', 'build_v4_audit_reports.py', `${label} décision finale avant audit`);
+  before(stages, 'build_health.py', 'finalize_inline.py', `${label} santé avant inline`);
+}
+
+function testInstant() {
+  const { stages, output } = runDry(['--instant']);
+  assert(output.includes('dry-run:'), 'résumé dry-run instant absent', { output });
+  for (const stage of [
+    'patch_winamax_markets.py',
+    'patch_all_quick.py',
+    'patch_tennis_features.py',
+    'build_match_context.py',
+    'build_refresh_priority_plan.py',
+    'build_prebet_checklist.py'
+  ]) {
+    includes(stages, stage, `instant ${stage}`);
+  }
+  lightDecisionOutputs(stages, 'instant');
+  excludes(stages, 'fetch_live.py', 'instant cache local');
+  excludes(stages, 'fetch_winamax_catalog.py', 'instant cache local');
+  excludes(stages, 'fetch_winamax_match_details.py', 'instant cache local');
+  excludes(stages, 'fetch_weather.py', 'instant cache local');
+}
+
 function testQuick() {
   const { stages, output } = runDry(['--quick']);
   assert(output.includes('dry-run:'), 'résumé dry-run quick absent', { output });
@@ -130,10 +173,7 @@ function testFast() {
   for (const stage of [
     'fetch_live.py',
     'fetch_winamax_catalog.py',
-    'patch_odds.py',
-    'snapshot_odds.py',
     'patch_winamax.py',
-    'fetch_winamax_match_details.py',
     'patch_all_quick.py',
     'patch_tennis_features.py',
     'build_match_context.py',
@@ -142,8 +182,11 @@ function testFast() {
   ]) {
     includes(stages, stage, `fast ${stage}`);
   }
-  commonDecisionOutputs(stages, 'fast', { skipQualityAudit: true });
+  lightDecisionOutputs(stages, 'fast');
   excludes(stages, 'build_v14_quality_audit.py', 'fast audit qualité long');
+  excludes(stages, 'patch_odds.py', 'fast cotes historiques longues');
+  excludes(stages, 'snapshot_odds.py', 'fast snapshot long');
+  excludes(stages, 'fetch_winamax_match_details.py', 'fast détails match long');
   before(stages, 'fetch_live.py', 'patch_all_quick.py', 'fast fetch avant patch');
   before(stages, 'fetch_winamax_catalog.py', 'patch_winamax.py', 'fast catalog avant patch Winamax');
   before(stages, 'patch_all_quick.py', 'build_match_context.py', 'fast patch avant contexte');
@@ -255,6 +298,7 @@ function testSignals() {
   commonDecisionOutputs(tennis, 'signals tennis');
 }
 
+testInstant();
 testFast();
 testQuick();
 testFull();
@@ -266,4 +310,4 @@ testCritical();
 testRepairContext();
 testSignals();
 
-console.log('Refresh contract OK: modes fast/quick/full/signals/prematch/T-60/T-30/T-10/critical/repair validés.');
+console.log('Refresh contract OK: modes instant/fast/quick/full/signals/prematch/T-60/T-30/T-10/critical/repair validés.');

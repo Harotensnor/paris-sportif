@@ -5,6 +5,17 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-18
 
+### Version v7.2.0 — Synchro instant + vérité terrain lisible
+
+Suite directe au retour “tout est trop long” : le bouton principal ne lance plus un gros pipeline déguisé.
+- Ajout d’un mode `--instant` qui reconstruit le snapshot desktop depuis le cache local : cockpit, décisions, sources, garde-fous, santé et inline final, sans fetch réseau lent.
+- Le bouton principal devient `Synchro instant` et l’auto-refresh standard utilise le cache local ; les modes `fast`, `quick`, `repair-context` et `full` restent disponibles pour les réparations et audits plus lourds.
+- `--fast` est allégé : live + catalogue Winamax + reconstruction locale, sans détails match longs, backtests complets ni sources lentes.
+- Ajout de `SourceHealth v9` et `TerrainReport v8` : l’app explique combien de mises sont bloquées par les sources, quelle source réparer en priorité et pourquoi il n’y a pas plus de boutons `Je mise`.
+- Accueil plus honnête : le Top 3 ne mélange plus les vrais paris prêts avec les lignes `À surveiller`; les candidats incomplets passent dans un bloc séparé sans bouton de mise.
+- Les contrats QA couvrent maintenant les modes `instant` et `fast` séparément, pour éviter de réintroduire des tests et synchros d’une heure dans le parcours quotidien.
+- Version desktop, package et Service Worker bumpés en `v7.2.0`.
+
 ### Version v7.1.0 — Fiches plus lisibles + décision pari rapide
 
 Suite directe du passage v7 : la fiche match devient plus claire avant le clic et les signaux faibles bloquent davantage les paris impulsifs.
