@@ -1,48 +1,30 @@
 {
-  "generated_at": "2026-05-18T22:52:19Z",
+  "generated_at": "2026-05-18T23:00:37Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 73,
-    "actionable": 39,
-    "watch": 3,
+    "active_events": 72,
+    "actionable": 37,
+    "watch": 4,
     "risk": 31,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 35,
+      "injury_imbalance": 34,
       "travel_extreme": 3,
       "market_uncertain": 31,
       "market_move": 11,
+      "signal_conflict": 7,
       "back_to_back_travel": 19,
-      "signal_conflict": 6,
       "weather_extreme": 1
     },
     "by_quality": {
-      "actionable": 39,
-      "watch": 3,
+      "actionable": 37,
+      "watch": 4,
       "risk": 31
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401815394",
-      "date": "2026-05-18T22:45Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Washington Nationals",
-      "away": "New York Mets",
-      "match": "Washington Nationals - New York Mets",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "New York Mets",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 8-14"
-    },
     {
       "event_id": "401815395",
       "date": "2026-05-18T23:05Z",
@@ -620,24 +602,6 @@
       "context": "Absences severes 8-12"
     },
     {
-      "event_id": "401815489",
-      "date": "2026-05-25T17:35Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Baltimore Orioles",
-      "away": "Tampa Bay Rays",
-      "match": "Baltimore Orioles - Tampa Bay Rays",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Baltimore Orioles",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 13-9"
-    },
-    {
       "event_id": "401815438",
       "date": "2026-05-21T17:15Z",
       "sport": "baseball",
@@ -743,6 +707,24 @@
       "type": "injury_imbalance",
       "direction": "fade",
       "team": "Arizona Diamondbacks",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 12-9"
+    },
+    {
+      "event_id": "401815489",
+      "date": "2026-05-25T17:35Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Baltimore Orioles",
+      "away": "Tampa Bay Rays",
+      "match": "Baltimore Orioles - Tampa Bay Rays",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Baltimore Orioles",
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 12-9"

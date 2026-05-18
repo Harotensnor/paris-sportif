@@ -1,85 +1,27 @@
 {
-  "generated_at": "2026-05-18T22:52:19Z",
+  "generated_at": "2026-05-18T23:00:37Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 57,
+    "active_events": 56,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 80,
+      "lookahead": 78,
       "travel_extreme": 3,
       "back_to_back_travel": 19,
       "schedule_congestion": 18
     },
     "by_decision": {
-      "abstain": 37,
+      "abstain": 36,
       "lean_home": 20
     },
     "lean_home": 20,
     "lean_away": 0,
-    "abstain": 37,
+    "abstain": 36,
     "monitor": 0
   },
   "active": [
-    {
-      "event_id": "401815394",
-      "source_event_ids": [
-        "401815394"
-      ],
-      "kickoff": "2026-05-18T22:45Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Washington Nationals",
-      "away": "New York Mets",
-      "match": "Washington Nationals - New York Mets",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Washington Nationals 0.36, New York Mets 0.36",
-      "pressure_score": 1.6,
-      "home_fade": 0.36,
-      "away_fade": 0.36,
-      "travel_score": 0,
-      "lookahead_score": 1.6,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "3 match important/proche dans les 3 jours",
-        "3 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.116,
-        "away_score": -1.234,
-        "home_fade": 0.36,
-        "away_fade": 1.36,
-        "reason": "Direction nette: Washington Nationals (+0.12)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.36
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.36
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
     {
       "event_id": "401815395",
       "source_event_ids": [
@@ -1161,11 +1103,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -1.19,
-        "away_score": -0.11,
-        "home_fade": 1.4,
+        "home_score": -0.99,
+        "away_score": -0.18,
+        "home_fade": 1.2,
         "away_fade": 0.6,
-        "reason": "Direction nette: Tampa Bay Rays (-0.11)",
+        "reason": "Direction nette: Tampa Bay Rays (-0.18)",
         "detail": [
           {
             "side": "home",
@@ -1183,7 +1125,7 @@
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.8
+            "strength": 0.6
           }
         ]
       }
@@ -2491,11 +2433,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.466,
-        "away_score": -1.707,
+        "home_score": 0.396,
+        "away_score": -1.507,
         "home_fade": 0.15,
-        "away_fade": 1.759,
-        "reason": "Direction nette: Tampa Bay Rays (+0.47)",
+        "away_fade": 1.559,
+        "reason": "Direction nette: Tampa Bay Rays (+0.40)",
         "detail": [
           {
             "side": "home",
@@ -2513,7 +2455,7 @@
             "side": "away",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.8
+            "strength": 0.6
           },
           {
             "side": "away",
@@ -3054,17 +2996,17 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.591,
-        "away_score": -1.689,
+        "home_score": 0.521,
+        "away_score": -1.489,
         "home_fade": 0.0,
-        "away_fade": 1.689,
-        "reason": "Direction nette: Tampa Bay Rays (+0.59)",
+        "away_fade": 1.489,
+        "reason": "Direction nette: Tampa Bay Rays (+0.52)",
         "detail": [
           {
             "side": "away",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.8
+            "strength": 0.6
           },
           {
             "side": "away",

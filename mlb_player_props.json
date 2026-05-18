@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-18T22:52:12Z",
+  "generated_at": "2026-05-18T23:00:30Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815394",
-      "kickoff": "2026-05-18T22:45Z",
-      "league": "MLB",
-      "match": "New York Mets at Washington Nationals",
-      "home": "Washington Nationals",
-      "away": "New York Mets",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Washington Nationals",
-          "pitcher": "Jake Irvin",
-          "label": "Jake Irvin plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.6011,
-          "fair_odds": 1.66,
-          "expected_strikeouts": 4.94,
-          "projected_ip": 4.69,
-          "inputs": {
-            "k9": 9.49,
-            "era": 5.91,
-            "whip": 1.45,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Washington Nationals",
-          "pitcher": "Jake Irvin",
-          "label": "Jake Irvin ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.516,
-          "fair_odds": 1.94,
-          "expected_hr_allowed": 0.662,
-          "projected_ip": 4.69,
-          "inputs": {
-            "hr9": 1.27,
-            "era": 5.91,
-            "whip": 1.45
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "New York Mets",
-          "pitcher": "Christian Scott",
-          "label": "Christian Scott plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.581,
-          "fair_odds": 1.72,
-          "expected_strikeouts": 4.85,
-          "projected_ip": 3.8,
-          "inputs": {
-            "k9": 11.49,
-            "era": 3.45,
-            "whip": 1.4,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "New York Mets",
-          "pitcher": "Christian Scott",
-          "label": "Christian Scott ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.7861,
-          "fair_odds": 1.27,
-          "expected_hr_allowed": 0.241,
-          "projected_ip": 3.8,
-          "inputs": {
-            "hr9": 0.57,
-            "era": 3.45,
-            "whip": 1.4
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815395",
       "kickoff": "2026-05-18T23:05Z",
@@ -2904,7 +2822,7 @@
       ]
     }
   ],
-  "props": 140,
+  "props": 136,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
