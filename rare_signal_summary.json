@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-05-18T12:17:27Z",
+  "generated_at": "2026-05-18T12:22:47Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 81,
-    "actionable": 43,
-    "watch": 10,
+    "actionable": 42,
+    "watch": 11,
     "risk": 28,
     "expired_sample": 0,
     "by_type": {
@@ -18,8 +18,8 @@
       "signal_conflict": 5
     },
     "by_quality": {
-      "actionable": 43,
-      "watch": 10,
+      "actionable": 42,
+      "watch": 11,
       "risk": 28
     }
   },
@@ -565,6 +565,24 @@
       "context": "Absences severes 7-12"
     },
     {
+      "event_id": "740966",
+      "date": "2026-05-24T15:00Z",
+      "sport": "football",
+      "league_code": "eng.1",
+      "league_name": "Premier League",
+      "home": "Brighton & Hove Albion",
+      "away": "Manchester United",
+      "match": "Brighton & Hove Albion - Manchester United",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "away",
+      "strength": 1.0,
+      "context": "Cote away: 2.80 -> 3.40 (-21.4%)"
+    },
+    {
       "event_id": "740970",
       "date": "2026-05-24T15:00Z",
       "sport": "football",
@@ -581,24 +599,6 @@
       "side": "draw",
       "strength": 1.0,
       "context": "Cote draw: 4.50 -> 5.40 (-20.0%)"
-    },
-    {
-      "event_id": "740966",
-      "date": "2026-05-24T15:00Z",
-      "sport": "football",
-      "league_code": "eng.1",
-      "league_name": "Premier League",
-      "home": "Brighton & Hove Albion",
-      "away": "Manchester United",
-      "match": "Brighton & Hove Albion - Manchester United",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "draw",
-      "strength": 0.899,
-      "context": "Cote draw: 3.40 -> 3.95 (-16.2%)"
     },
     {
       "event_id": "401815420",
@@ -763,24 +763,6 @@
       "context": "1 match dans les 48h + 979 km de voyage"
     },
     {
-      "event_id": "401865539",
-      "date": "2026-05-20T00:00Z",
-      "sport": "football",
-      "league_code": "conmebol.libertadores",
-      "league_name": "Copa Libertadores",
-      "home": "Always Ready",
-      "away": "Mirassol",
-      "match": "Always Ready - Mirassol",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "home",
-      "strength": 0.694,
-      "context": "Cote home: 4.00 -> 4.50 (-12.5%)"
-    },
-    {
       "event_id": "401861390",
       "date": "2026-05-20T11:35Z",
       "sport": "football",
@@ -871,6 +853,24 @@
       "side": "away",
       "strength": 0.556,
       "context": "Cote away: 2.50 -> 2.25 (+10.0%)"
+    },
+    {
+      "event_id": "401865539",
+      "date": "2026-05-20T00:00Z",
+      "sport": "football",
+      "league_code": "conmebol.libertadores",
+      "league_name": "Copa Libertadores",
+      "home": "Always Ready",
+      "away": "Mirassol",
+      "match": "Always Ready - Mirassol",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 0.556,
+      "context": "Cote home: 4.00 -> 4.40 (-10.0%)"
     },
     {
       "event_id": "401861539",
