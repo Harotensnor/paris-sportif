@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-05-18T14:33:35Z",
-  "calculated_at": "2026-05-18T14:33:35Z",
+  "generated_at": "2026-05-18T14:38:05Z",
+  "calculated_at": "2026-05-18T14:38:05Z",
   "source_of_truth": "data.js",
-  "data_generated_at": "2026-05-18T14:32:22.508667Z",
+  "data_generated_at": "2026-05-18T14:37:02.660367Z",
   "data_today_field": "2026-05-18",
   "events": {
     "total": 307,
-    "upcoming": 296,
+    "upcoming": 295,
     "winamax_available": 307,
     "winamax_exact": 299,
     "winamax_exact_ratio": 0.9739,
@@ -26,7 +26,7 @@
     "fd_calibration": 0,
     "fd_closing_odds": 0,
     "xg": 61,
-    "smart_money": 0
+    "smart_money": 1
   },
   "signal_health": {
     "referee": {
@@ -36,7 +36,7 @@
       "note": "referee is effective coverage: named referee or referee_context usable by the model."
     },
     "smart_money": {
-      "events": 0,
+      "events": 1,
       "status": "rare_event",
       "note": "Smart money is intentionally rare; low count is OK when odds movement does not confirm a strong signal."
     }
@@ -108,20 +108,20 @@
         "detailed_ratio": 1.0
       },
       "tennis": {
-        "exact": 138,
-        "detailed": 137,
+        "exact": 137,
+        "detailed": 136,
         "families": {
-          "match_winner": 137,
-          "tennis_games": 134,
-          "tennis_handicap": 134
+          "match_winner": 136,
+          "tennis_games": 133,
+          "tennis_handicap": 133
         },
-        "detailed_ratio": 0.9928
+        "detailed_ratio": 0.9927
       }
     },
     "market_family_counts": {
-      "match_winner": 295,
-      "tennis_games": 134,
-      "tennis_handicap": 134,
+      "match_winner": 294,
+      "tennis_games": 133,
+      "tennis_handicap": 133,
       "dnb": 109,
       "dnb_rows": 109,
       "ht_1n2": 98,
@@ -149,7 +149,7 @@
   },
   "health": {
     "status": "warning",
-    "warnings": 9,
+    "warnings": 8,
     "pipeline_drift": "warn"
   }
 }
