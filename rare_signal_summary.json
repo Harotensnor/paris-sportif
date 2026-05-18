@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-18T09:58:49Z",
+  "generated_at": "2026-05-18T10:04:28Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
@@ -10,17 +10,17 @@
     "risk": 34,
     "expired_sample": 0,
     "by_type": {
-      "market_uncertain": 36,
       "market_move": 24,
       "injury_imbalance": 37,
+      "market_uncertain": 36,
       "travel_extreme": 3,
       "back_to_back_travel": 16,
       "signal_conflict": 4
     },
     "by_quality": {
-      "risk": 34,
       "watch": 8,
-      "actionable": 41
+      "actionable": 41,
+      "risk": 34
     }
   },
   "active_actionable": [
@@ -837,24 +837,6 @@
       "context": "Cote away: 2.50 -> 2.25 (+10.0%)"
     },
     {
-      "event_id": "748959",
-      "date": "2026-05-18T18:30Z",
-      "sport": "football",
-      "league_code": "laliga2",
-      "league_name": "La Liga 2",
-      "home": "Leganés",
-      "away": "Huesca",
-      "match": "Leganés - Huesca",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "home",
-      "strength": 0.49,
-      "context": "Cote home: 1.95 -> 1.78 (+8.8%)"
-    },
-    {
       "event_id": "401873341",
       "date": "2026-05-20T00:00Z",
       "sport": "basketball",
@@ -907,27 +889,27 @@
       "side": "home",
       "strength": 0.479,
       "context": "Cote home: 2.90 -> 3.15 (-8.6%)"
+    },
+    {
+      "event_id": "748959",
+      "date": "2026-05-18T18:30Z",
+      "sport": "football",
+      "league_code": "laliga2",
+      "league_name": "La Liga 2",
+      "home": "Leganés",
+      "away": "Huesca",
+      "match": "Leganés - Huesca",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.463,
+      "context": "Cote away: 4.20 -> 3.85 (+8.3%)"
     }
   ],
   "active_risk": [
-    {
-      "event_id": "178497",
-      "date": "2026-05-18T09:50Z",
-      "sport": "tennis",
-      "league_code": "rolandgarros",
-      "league_name": "Roland Garros",
-      "home": "",
-      "away": "",
-      "match": "? - ?",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 12.1%"
-    },
     {
       "event_id": "178435",
       "date": "2026-05-19T04:00Z",
@@ -1503,6 +1485,24 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 19.0%"
+    },
+    {
+      "event_id": "748968",
+      "date": "2026-05-24T16:30Z",
+      "sport": "football",
+      "league_code": "laliga2",
+      "league_name": "La Liga 2",
+      "home": "Real Valladolid",
+      "away": "Deportivo La Coruña",
+      "match": "Real Valladolid - Deportivo La Coruña",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.6%"
     },
     {
       "event_id": "401815439",
