@@ -234,11 +234,11 @@ async function main() {
       readyHeroText: dom.readyHeroText.slice(0, 500)
     });
     // Sprint 51 : on vérifie la présence des labels-clés, pas l'ordre exact.
-    const requiredNavLabels = ['miser', 'cockpit', 'vainqueurs', 'buts', 'nuit', 'buteurs', 'combinés', 'bilan', 'recherche', 'réglages'];
+    const requiredNavLabels = ['miser', 'cockpit', 'vainqueurs', 'buts', 'nuit', 'buteurs', 'combinés', 'bilan', 'récupération', 'recherche', 'réglages'];
     const navLabels = dom.nav.map((l) => l.toLowerCase());
     const missingNav = requiredNavLabels.filter((label) => !navLabels.some((nav) => nav.includes(label)));
     assert(missingNav.length === 0, 'Terrain: navigation standard non simplifiée', { missingNav, nav: dom.nav });
-    assert(dom.nav.length <= 12, 'Terrain: navigation trop longue malgré les catégories', { nav: dom.nav });
+    assert(dom.nav.length <= 13, 'Terrain: navigation trop longue malgré les catégories', { nav: dom.nav });
     assert(dom.rows >= 15 && dom.rows <= 32 && dom.timeline >= 8, 'Terrain: cockpit réel insuffisant', dom);
     const expectedTopCount = Math.min(3, dom.homeTableReadyMarkets.length);
     assert(dom.homeShellDisplay !== 'none' && dom.homeTop3Count >= expectedTopCount && dom.homeTableRows >= 6 && dom.homeTableRows <= 12 && dom.homeSortButtons.length >= 4, 'Terrain: nouvel accueil Top 3 + tableau triable absent ou trop long', dom);

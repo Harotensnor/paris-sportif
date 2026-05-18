@@ -5,6 +5,18 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-17
 
+### Version v5.1.0 — Récupération + apprentissage pertes Winamax
+
+Suite directe au retour “j’ai tout perdu” : l’app apprend maintenant des vrais résultats Winamax et rend le mode récupération visible.
+- Ajout d’une page `Récupération` dédiée : P&L réel connu, règle du jour, plafond de mise, segment à couper et diagnostic “Pourquoi j’ai perdu ?”.
+- Ajout d’un bandeau récupération sur l’accueil : état normal/prudent/fort, nombre de vrais `Je mise`, plafond par pari et raccourci vers l’analyse des pertes.
+- L’import Winamax ne sert plus seulement à comparer : il met à jour les paris suivis ou crée des lignes externes `winamax-réel` pour alimenter le P&L, les segments perdants et le coach.
+- Le diagnostic pertes groupe les résultats par marché, sport, ligue, plage de cote et feedback post-perte, avec action conseillée pour chaque hotspot.
+- Les warnings personnels sont déclenchés beaucoup plus tôt : 2-3 pertes sur un segment suffisent à durcir le coach au lieu d’attendre un gros sample.
+- Les ajustements automatiques durcissent edge/confiance plus vite sur les segments réellement perdants de l’utilisateur.
+- Le Bilan affiche aussi le diagnostic “Pourquoi j’ai perdu ?” et relie directement au Mode récupération.
+- Correction d’une incohérence Bilan : le nombre de paris réglés inclut maintenant les voids.
+
 ### Version v5.0.2 — Protection pertes réelles
 
 Correctif prioritaire après retour utilisateur : le problème principal est la perte réelle, donc le logiciel passe en logique de récupération stricte avant de proposer une mise.

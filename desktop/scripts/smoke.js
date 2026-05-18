@@ -122,7 +122,7 @@ async function main() {
     // On vérifie que les labels clés sont présents au lieu d'exiger une
     // séquence stricte qui contraint trop l'évolution de la nav.
     const navLabels = dashboard.nav.map((l) => l.toLowerCase());
-    const requiredNavLabels = ['miser', 'cockpit', 'vainqueurs', 'buts', 'nuit', 'buteurs', 'combinés', 'bilan', 'recherche', 'réglages'];
+    const requiredNavLabels = ['miser', 'cockpit', 'vainqueurs', 'buts', 'nuit', 'buteurs', 'combinés', 'bilan', 'récupération', 'recherche', 'réglages'];
     const missingNav = requiredNavLabels.filter((label) => !navLabels.some((nav) => nav.includes(label)));
     if (missingNav.length) throw new Error(`Navigation Sprint 51 incomplète, manque: ${missingNav.join(', ')}`);
     const hasActionCopy = /PARI/i.test(dashboard.dashboardText) && /COTE/i.test(dashboard.dashboardText) && /MISE/i.test(dashboard.dashboardText);
@@ -177,6 +177,11 @@ async function main() {
     await win.waitForFunction(() => /#1/.test(document.querySelector('#bankroll-allocation-grid')?.textContent || ''), null, { timeout: 10_000 });
     await win.waitForFunction(() => /Simulation/.test(document.querySelector('#paper-simulation-grid')?.textContent || ''), null, { timeout: 10_000 });
     await win.waitForFunction(() => /Décomposition|Sample|Insight/.test(document.querySelector('#deep-analytics-summary')?.textContent + document.querySelector('#deep-analytics-insights')?.textContent || ''), null, { timeout: 10_000 });
+    await win.click('[data-tab="recovery"]');
+    await win.waitForSelector('[data-panel="recovery"].active #recovery-summary-grid .performance-card, [data-panel="recovery"].active #recovery-summary-grid .empty', { timeout: 10_000 });
+    await win.fill('#recovery-winamax-import-paste', '17/05 Bastia - Le Mans Moins de 2,5 buts cote 1.60 mise 5€ perdu');
+    await win.click('#recovery-preview-winamax-import-btn');
+    await win.waitForFunction(() => /Bastia|Perdu|perdu/i.test(document.querySelector('#recovery-winamax-import-preview')?.textContent || ''), null, { timeout: 5000 });
     await win.click('[data-tab="search"]');
     await win.waitForSelector('#deep-search-input', { timeout: 10_000 });
     await win.fill('#deep-search-input', 'Real');

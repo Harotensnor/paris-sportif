@@ -34,6 +34,7 @@
         <div class="nav-group">
           <span class="nav-group-label">SUIVI</span>
           <button class="nav-btn" data-tab="history"><span class="nav-icon">📊</span><span class="nav-label">Bilan & Stats</span></button>
+          <button class="nav-btn" data-tab="recovery"><span class="nav-icon">🛡</span><span class="nav-label">Récupération</span></button>
           <button class="nav-btn nav-legacy hidden" data-tab="calendar"><span class="nav-icon">📅</span><span class="nav-label">Calendrier</span></button>
           <button class="nav-btn" data-tab="search"><span class="nav-icon">🔍</span><span class="nav-label">Recherche</span></button>
         </div>
@@ -52,7 +53,7 @@
     <main class="main">
       <header class="topbar">
         <div>
-          <div class="eyebrow">Pronostics Pro v5.0.2 · Winamax-only</div>
+          <div class="eyebrow">Pronostics Pro v5.1.0 · Winamax-only</div>
           <h2 id="page-title">À miser maintenant</h2>
         </div>
         <div class="actions decision-actions">
@@ -244,6 +245,9 @@
           </div>
           <div class="home-top3-grid" id="home-top3-grid">
             <div class="empty compact-empty">Calcul du Top 3...</div>
+          </div>
+          <div class="recovery-strip" id="recovery-strip">
+            <div class="empty compact-empty">Protection bankroll en calcul...</div>
           </div>
           <div class="home-table-card">
             <div class="home-table-head">
@@ -723,6 +727,19 @@
 
         <div class="section-head compact">
           <div>
+            <h3>Pourquoi j’ai perdu ?</h3>
+            <p>Lecture des pertes réelles : marchés, sports, ligues, cotes et causes à couper.</p>
+          </div>
+          <div class="section-actions">
+            <button class="ghost-btn" type="button" data-tab-target="recovery">Mode récupération</button>
+          </div>
+        </div>
+        <div class="segment-grid" id="loss-diagnosis-grid">
+          <div class="empty">Aucune perte réglée ou importée pour le moment.</div>
+        </div>
+
+        <div class="section-head compact">
+          <div>
             <h3>Settlement auto</h3>
             <p>Résolution automatique des paris suivis quand les résultats locaux deviennent disponibles.</p>
           </div>
@@ -982,6 +999,45 @@
             </div>
           </section>
         </div>
+      </section>
+
+      <section class="tab-panel" data-panel="recovery">
+        <div class="section-head page-section-head">
+          <div>
+            <h3>🛡 Mode récupération</h3>
+            <p>Lecture simple après une perte : ce qui a coûté, ce qui est bloqué, et quoi faire avant de remettre une pièce.</p>
+          </div>
+          <div class="section-actions">
+            <button class="ghost-btn" type="button" data-tab-target="dashboard">Retour aux picks</button>
+            <button class="ghost-btn" type="button" data-tab-target="history">Bilan complet</button>
+          </div>
+        </div>
+        <div class="model-performance-grid" id="recovery-summary-grid">
+          <div class="empty">Analyse récupération en attente.</div>
+        </div>
+        <div class="section-head compact">
+          <div>
+            <h3>Pourquoi j’ai perdu ?</h3>
+            <p>Segments, marchés et patterns qui ressortent de tes vrais résultats Winamax et du suivi local.</p>
+          </div>
+        </div>
+        <div class="segment-grid" id="recovery-loss-diagnosis-grid">
+          <div class="empty">Aucune perte réglée pour l’instant.</div>
+        </div>
+        <div class="section-head compact">
+          <div>
+            <h3>Importer vite mes résultats Winamax</h3>
+            <p>Colle les lignes de ton historique Winamax : l’app mettra à jour les paris suivis ou créera des lignes externes pour apprendre.</p>
+          </div>
+        </div>
+        <label class="profile-field">Résultats Winamax
+          <textarea id="recovery-winamax-import-paste" rows="7" placeholder="Exemple : 17/05 Bastia - Le Mans · Moins de 2,5 buts · cote 1.60 · mise 5€ · perdu"></textarea>
+        </label>
+        <div class="section-actions">
+          <button class="ghost-btn" id="recovery-preview-winamax-import-btn" type="button">Analyser</button>
+          <button class="primary-btn" id="recovery-confirm-winamax-import-btn" type="button">Importer et apprendre</button>
+        </div>
+        <div class="profile-preview" id="recovery-winamax-import-preview">Aucun import analysé.</div>
       </section>
 
       <section class="tab-panel" data-panel="agent">
@@ -1419,7 +1475,7 @@
                 <option value="auto">Auto</option>
               </select>
             </label>
-            <p class="match-sub" id="app-version-label">Paris Sportif Desktop v5.0.2</p>
+            <p class="match-sub" id="app-version-label">Paris Sportif Desktop v5.1.0</p>
             <p class="match-sub" id="update-status">Aucune vérification de mise à jour lancée.</p>
             <div class="profile-preview" id="bug-report-list">Aucun rapport de bug local.</div>
           </article>

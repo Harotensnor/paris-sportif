@@ -1068,6 +1068,7 @@
     let pending = 0;
     let won = 0;
     let lost = 0;
+    let voided = 0;
     let wonYesterday = 0;
     let lostYesterday = 0;
     let clvSamples = 0;
@@ -1104,6 +1105,7 @@
         settled.push(bet);
         if (bet.status === 'won') won += 1;
         if (bet.status === 'lost') lost += 1;
+        if (bet.status === 'void') voided += 1;
         const day = String(bet.day || parisDayKey(new Date(bet.settledAt || bet.createdAt || Date.now()))).slice(0, 10);
         dayPnl.set(day, (dayPnl.get(day) || 0) + pnl);
         if (day === yesterday) {
@@ -1156,6 +1158,8 @@
       pending,
       won,
       lost,
+      voided,
+      settled: won + lost + voided,
       totalStake,
       settledStake,
       pnlTotal,
@@ -1311,7 +1315,7 @@
           || line.match(/\b(\d+[,.]?\d*)\s*€/i)?.[1]
           || '';
         const stake = Number(stakeToken.replace(',', '.'));
-        const status = /gagn|won/i.test(line) ? 'won' : /perd|lost/i.test(line) ? 'lost' : /void|annul|rembours/i.test(line) ? 'void' : 'pending';
+        const status = /cash\s*out|retir/i.test(line) ? 'void' : /gagn|won|valid/i.test(line) ? 'won' : /perd|lost|échec|echec/i.test(line) ? 'lost' : /void|annul|rembours/i.test(line) ? 'void' : 'pending';
         const date = line.match(/\b(\d{1,2}[\/.-]\d{1,2}(?:[\/.-]\d{2,4})?)\b/)?.[1] || new Date().toISOString().slice(0, 10);
         const match = line
           .replace(/(?:cote|mise|stake|gagné|perdu|pending|en cours|won|lost|void|annulé|remboursé)/ig, ' ')
@@ -1378,12 +1382,143 @@
     }
     const merged = [...loadWinamaxImports(), ...rows.map((row) => ({ ...row, importedAt: new Date().toISOString() }))].slice(-1000);
     writeStorageJson(WINAMAX_IMPORT_KEY, merged);
+    const applied = applyWinamaxImportToUserBets(rows);
     state.winamaxImportPreview = null;
     if ($('#winamax-import-paste')) $('#winamax-import-paste').value = '';
     renderWinamaxImportPreview();
     renderWinamaxReconciliation();
     renderHistory();
-    setSideStatus('Import Winamax confirmé', 'ok');
+    renderRecoveryPage();
+    setSideStatus(`Import Winamax confirmé · ${formatCount(applied.updated)} maj · ${formatCount(applied.created)} appris`, 'ok');
+  }
+
+  function winamaxImportExternalKey(row) {
+    return compactUiKey(`wmx:${row?.date || ''}:${row?.match || ''}:${row?.market || ''}:${row?.odd || ''}:${row?.stake || ''}:${row?.status || ''}`);
+  }
+
+  function importedPnl(row) {
+    const stake = Number(row?.stake || 0) || 0;
+    const odd = Number(row?.odd || 0) || 0;
+    if (row?.status === 'won') return stake * Math.max(0, odd - 1);
+    if (row?.status === 'lost') return -stake;
+    return 0;
+  }
+
+  function applyWinamaxImportToUserBets(rows = []) {
+    const imported = (Array.isArray(rows) ? rows : [])
+      .filter((row) => ['won', 'lost', 'void'].includes(String(row?.status || '')))
+      .filter((row) => Number(row?.stake || 0) > 0);
+    if (!imported.length) return { updated: 0, created: 0 };
+    const bets = loadUserBets();
+    const existingExternal = new Set(bets.map((bet) => bet.externalWinamaxKey).filter(Boolean));
+    let updated = 0;
+    let created = 0;
+    imported.forEach((row) => {
+      const stake = Number(row.stake || 0) || 0;
+      const odd = Number(row.odd || 0) || 0;
+      const pnl = importedPnl(row);
+      const settledAt = new Date().toISOString();
+      const matchIndex = row.appBetId
+        ? bets.findIndex((bet) => bet.id === row.appBetId)
+        : bets.findIndex((bet) => {
+          if (!['pending', 'won', 'lost', 'void'].includes(String(bet.status || ''))) return false;
+          const key = compactUiKey(`${bet.title || ''} ${bet.market || ''} ${bet.label || ''}`);
+          const importedKey = compactUiKey(`${row.match || ''} ${row.market || ''}`);
+          return importedKey && key && (key.includes(importedKey.slice(0, 14)) || importedKey.includes(key.slice(0, 14)));
+        });
+      if (matchIndex >= 0) {
+        bets[matchIndex] = {
+          ...bets[matchIndex],
+          status: row.status,
+          stake: stake || Number(bets[matchIndex].stake || 0) || 0,
+          odd: odd || Number(bets[matchIndex].odd || 0) || 0,
+          pnl,
+          settledAt,
+          settlementSource: 'winamax_import',
+          settlementReason: row.raw || 'Import Winamax',
+          importedWinamax: {
+            raw: row.raw || '',
+            match: row.match || '',
+            status: row.status,
+            importedAt: settledAt
+          }
+        };
+        updated += 1;
+        return;
+      }
+      const externalKey = winamaxImportExternalKey(row);
+      if (existingExternal.has(externalKey)) return;
+      existingExternal.add(externalKey);
+      const day = normalizeImportDate(row.date);
+      bets.push({
+        id: `wmx-ext-${Date.now()}-${created}-${Math.random().toString(36).slice(2, 7)}`,
+        key: externalKey,
+        externalWinamaxKey: externalKey,
+        matchId: null,
+        sourceEventId: null,
+        winamaxMatchId: null,
+        title: row.match || 'Pari Winamax importé',
+        sport: inferSportFromImport(row),
+        league: 'Winamax réel',
+        start: null,
+        market: row.market || 'Marché importé',
+        label: row.match || row.market || 'Résultat Winamax',
+        odd,
+        openingOdd: odd || null,
+        lastSeenOdd: odd || null,
+        closingOdd: odd || null,
+        probability: 0,
+        edge: 0,
+        edgeBucket: 'winamax_real',
+        safeStatus: 'real_import',
+        safeReliable: false,
+        priorityRank: null,
+        tier: 'winamax_import',
+        marketKey: normalizeUiKey(row.market || 'winamax_import'),
+        stake,
+        status: row.status,
+        pnl,
+        tags: ['winamax-réel'],
+        note: row.raw || '',
+        trackingSource: 'winamax_import',
+        day,
+        createdAt: `${day}T12:00:00.000Z`,
+        settledAt,
+        settlementSource: 'winamax_import',
+        settlementReason: row.raw || 'Import Winamax',
+        importedWinamax: { raw: row.raw || '', importedAt: settledAt }
+      });
+      created += 1;
+    });
+    saveUserBets(bets);
+    renderUserPnl();
+    trackedLearningAudit();
+    modelAdjustmentsFromAudit();
+    renderPicks();
+    return { updated, created };
+  }
+
+  function normalizeImportDate(value) {
+    const raw = String(value || '').trim();
+    const parts = raw.match(/^(\d{1,2})[\/.-](\d{1,2})(?:[\/.-](\d{2,4}))?$/);
+    if (parts) {
+      const year = parts[3] ? Number(parts[3].length === 2 ? `20${parts[3]}` : parts[3]) : new Date().getFullYear();
+      const month = String(Number(parts[2])).padStart(2, '0');
+      const day = String(Number(parts[1])).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+    if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw;
+    return parisDayKey();
+  }
+
+  function inferSportFromImport(row) {
+    const text = normalizeUiKey(`${row?.raw || ''} ${row?.match || ''} ${row?.market || ''}`);
+    if (/tennis|atp|wta/.test(text)) return 'Tennis';
+    if (/nba|basket/.test(text)) return 'Basketball';
+    if (/nhl|hockey/.test(text)) return 'Hockey';
+    if (/mlb|baseball/.test(text)) return 'Baseball';
+    if (/buteur|but|btts|vainqueur|ligue|premier|football|foot/.test(text)) return 'Football';
+    return 'Winamax';
   }
 
   function winamaxReconciliationSummary() {
@@ -8116,6 +8251,7 @@
     renderUltimateBet(displayRows);
     renderReadyPicksHero(displayRows);
     renderBettingHome(displayRows);
+    renderRecoveryStrip();
     renderHomeCategories(displayRows);
     // Sprint 50 (UX) : badge compteur "paris prêts" dans la nav Picks.
     try {
@@ -10220,7 +10356,11 @@
       roi: row.stake > 0 ? row.pnl / row.stake : 0,
       avgEdge: row.count ? row.edgeSum / row.count : 0,
       winRate: row.wins + row.losses > 0 ? row.wins / (row.wins + row.losses) : 0,
-      warning: row.count >= 10 && row.stake > 0 && row.pnl < 0
+      warning: row.stake > 0 && (
+        (row.count >= 3 && row.pnl < 0 && (row.pnl / row.stake) <= -0.05) ||
+        (row.losses >= 2 && row.wins === 0) ||
+        (row.count >= 5 && row.losses > row.wins && row.pnl < 0)
+      )
     })).sort((a, b) => a.roi - b.roi);
     const winners = settled.filter((bet) => bet.status === 'won');
     const losers = settled.filter((bet) => bet.status === 'lost');
@@ -10264,13 +10404,13 @@
       const count = Number(row.count || 0);
       const roi = Number(row.roi || 0);
       if (!key || !count) return;
-      if (count >= 10 && roi < -0.10) {
+      if ((count >= 3 && roi < -0.05) || (count >= 2 && Number(row.losses || 0) >= 2 && Number(row.wins || 0) === 0)) {
         byKey.set(key, {
           key,
           label: row.label || key,
           direction: 'harden',
-          edgeDelta: 0.02,
-          confidenceDelta: 0.05,
+          edgeDelta: count >= 10 ? 0.02 : 0.03,
+          confidenceDelta: count >= 10 ? 0.05 : 0.07,
           reason: `ROI ${formatPct(roi, 0)} sur ${formatCount(count)} paris suivis`
         });
       } else if (count >= 20 && roi > 0.15) {
@@ -10361,6 +10501,191 @@
         <p>${formatCount(row.count)} occurrence(s). Utilisé dans les insights personnels.</p>
       </article>
     `).join('');
+  }
+
+  function lossDiagnosis() {
+    const losses = loadUserBets()
+      .filter((bet) => String(bet.status || '') === 'lost')
+      .sort((a, b) => Date.parse(b.settledAt || b.createdAt || b.day || 0) - Date.parse(a.settledAt || a.createdAt || a.day || 0));
+    const groups = new Map();
+    const add = (key, label, bet, kind) => {
+      if (!key) return;
+      const stake = Number(bet.stake || 0) || 0;
+      const row = groups.get(key) || { key, label, kind, losses: 0, stake: 0, pnl: 0, examples: [] };
+      row.losses += 1;
+      row.stake += stake;
+      row.pnl += Number(bet.pnl || -stake) || -stake;
+      if (row.examples.length < 3) row.examples.push(bet.title || bet.label || 'Pari Winamax');
+      groups.set(key, row);
+    };
+    losses.forEach((bet) => {
+      add(`market:${bet.marketKey || normalizeUiKey(bet.market || 'market')}`, `Marché · ${bet.market || bet.marketKey || '-'}`, bet, 'market');
+      add(`sport:${bet.sport || 'inconnu'}`, `Sport · ${bet.sport || 'inconnu'}`, bet, 'sport');
+      add(`league:${bet.league || 'inconnue'}`, `Ligue · ${bet.league || 'inconnue'}`, bet, 'league');
+      add(`odd:${oddRiskBucket(bet.odd)}`, `Cotes · ${oddRiskBucketLabel(bet.odd)}`, bet, 'odd');
+      if (bet.lossFeedback?.reasonLabel) add(`feedback:${bet.lossFeedback.reason}`, `Cause · ${bet.lossFeedback.reasonLabel}`, bet, 'feedback');
+    });
+    const hotspots = Array.from(groups.values())
+      .map((row) => ({
+        ...row,
+        severity: row.losses >= 3 || row.stake >= 5 ? 'high' : row.losses >= 2 ? 'medium' : 'low',
+        advice: lossAdviceForGroup(row)
+      }))
+      .sort((a, b) => (b.losses - a.losses) || (b.stake - a.stake))
+      .slice(0, 10);
+    return {
+      losses,
+      hotspots,
+      lastLoss: losses[0] || null,
+      importedLosses: losses.filter((bet) => bet.trackingSource === 'winamax_import').length
+    };
+  }
+
+  function oddRiskBucket(odd) {
+    const value = Number(odd || 0);
+    if (!(value > 1)) return 'unknown';
+    if (value <= 1.6) return 'short';
+    if (value <= 2.2) return 'medium';
+    if (value <= 3.5) return 'high';
+    return 'very_high';
+  }
+
+  function oddRiskBucketLabel(odd) {
+    const key = oddRiskBucket(odd);
+    return key === 'short' ? '≤1.60' : key === 'medium' ? '1.61-2.20' : key === 'high' ? '2.21-3.50' : key === 'very_high' ? '>3.50' : 'inconnue';
+  }
+
+  function lossAdviceForGroup(row) {
+    if (row.kind === 'market') return 'Bloquer ou passer en observation tant que le segment ne repasse pas positif.';
+    if (row.kind === 'odd') return row.key.includes('very_high') || row.key.includes('high') ? 'Réduire fortement les cotes hautes.' : 'Contrôler la value réelle avant clic.';
+    if (row.kind === 'feedback') return 'Transformer ce motif en check obligatoire avant mise.';
+    return 'Réduire ce segment et attendre plus de preuves.';
+  }
+
+  function renderLossDiagnosis() {
+    const grids = ['#loss-diagnosis-grid', '#recovery-loss-diagnosis-grid'].map((selector) => $(selector)).filter(Boolean);
+    if (!grids.length) return;
+    const diagnosis = lossDiagnosis();
+    if (!diagnosis.losses.length) {
+      grids.forEach((grid) => { grid.innerHTML = '<div class="empty">Aucune perte réglée/importée. Colle tes résultats Winamax pour que le logiciel apprenne vraiment.</div>'; });
+      return;
+    }
+    const html = diagnosis.hotspots.length ? diagnosis.hotspots.map((row) => `
+      <article class="segment-card ${row.severity === 'high' ? 'cold' : row.severity === 'medium' ? 'sample' : 'warm'}">
+        <span>${escapeHtml(row.label)}</span>
+        <strong>${escapeHtml(formatMoney(row.pnl))}</strong>
+        <p>${formatCount(row.losses)} perte(s) · mise ${escapeHtml(formatMoney(row.stake))} · ${escapeHtml(row.examples[0] || '')}</p>
+        <em>${escapeHtml(row.advice)}</em>
+      </article>
+    `).join('') : '<div class="empty">Pertes présentes, mais pas encore de pattern répétitif.</div>';
+    grids.forEach((grid) => { grid.innerHTML = html; });
+  }
+
+  function recoveryModeStatus() {
+    const stats = userBetStats();
+    const diagnosis = lossDiagnosis();
+    const winamax = winamaxReconciliationSummary();
+    const realPnl = Number.isFinite(Number(winamax.pnl)) && winamax.rows.length ? Number(winamax.pnl) : Number(stats.pnlTotal || 0);
+    const recentPain = stats.pnlToday < 0 || stats.pnlYesterday < 0 || stats.last7Pnl < 0 || realPnl < 0 || (stats.streak?.status === 'lost' && Number(stats.streak.count || 0) >= 2);
+    const severe = realPnl <= -5 || stats.last7Pnl <= -5 || Number(stats.streak?.count || 0) >= 3;
+    const ready = rollingReadyRows(state.currentDashboardRows?.length ? state.currentDashboardRows : dashboardPickRows(readPickFilters())).length;
+    const maxBets = severe ? 1 : recentPain ? 2 : 3;
+    const maxStake = severe ? 0.5 : recentPain ? 1 : Math.max(1, getBankroll() * 0.01);
+    return {
+      active: recentPain,
+      severe,
+      label: severe ? 'Récupération forte' : recentPain ? 'Récupération prudente' : 'Mode normal protégé',
+      detail: severe
+        ? 'Soirée/performance trop rouge : 1 seul pari max, mise minimale.'
+        : recentPain
+          ? 'Période perdante : on réduit le volume et on attend les vrais spots.'
+          : 'Pas de perte récente robuste, mais les garde-fous restent actifs.',
+      realPnl,
+      stats,
+      diagnosis,
+      maxBets,
+      maxStake,
+      ready
+    };
+  }
+
+  function renderRecoveryStrip() {
+    const node = $('#recovery-strip');
+    if (!node) return;
+    const status = recoveryModeStatus();
+    node.innerHTML = `
+      <article class="recovery-card ${status.active ? 'active' : ''}">
+        <div>
+          <span class="eyebrow">${escapeHtml(status.label)}</span>
+          <strong>${escapeHtml(status.active ? 'On protège la bankroll avant de chercher à se refaire.' : 'Protection active, volume contrôlé.')}</strong>
+          <p>${escapeHtml(status.detail)}</p>
+        </div>
+        <div class="recovery-kpis">
+          <span><b>${escapeHtml(formatMoney(status.realPnl))}</b><em>P&L réel connu</em></span>
+          <span><b>${formatCount(status.ready)}</b><em>Je mise 24h</em></span>
+          <span><b>${formatCount(status.maxBets)}</b><em>max/jour</em></span>
+          <span><b>${escapeHtml(formatMoney(status.maxStake))}</b><em>max pari</em></span>
+        </div>
+        <button class="ghost-btn" type="button" data-tab-target="recovery">Comprendre mes pertes</button>
+      </article>
+    `;
+  }
+
+  function renderRecoveryPage() {
+    const grid = $('#recovery-summary-grid');
+    if (grid) {
+      const status = recoveryModeStatus();
+      const worst = status.diagnosis.hotspots[0];
+      grid.innerHTML = [
+        ['État', status.label, status.detail],
+        ['P&L réel connu', formatMoney(status.realPnl), 'Import Winamax prioritaire, sinon suivi local.'],
+        ['Règle du jour', `${formatCount(status.maxBets)} pari(s) max`, `Mise max ${formatMoney(status.maxStake)} · pas de rattrapage.`],
+        ['Segment à couper', worst ? worst.label : 'Aucun pattern', worst ? `${formatCount(worst.losses)} perte(s) · ${formatMoney(worst.pnl)}` : 'Le logiciel attend tes résultats Winamax.']
+      ].map(([label, value, detail]) => `
+        <article class="performance-card ${label === 'État' && status.active ? 'cold' : ''}">
+          <span>${escapeHtml(label)}</span>
+          <strong>${escapeHtml(value)}</strong>
+          <p>${escapeHtml(detail)}</p>
+        </article>
+      `).join('');
+    }
+    renderLossDiagnosis();
+    renderRecoveryImportPreview();
+  }
+
+  function renderRecoveryImportPreview() {
+    const node = $('#recovery-winamax-import-preview');
+    if (!node) return;
+    const preview = state.winamaxImportPreview || [];
+    if (!preview.length) {
+      node.textContent = 'Aucun import analysé.';
+      return;
+    }
+    node.innerHTML = preview.slice(0, 8).map((row) => `${escapeHtml(row.match || '-')} · ${escapeHtml(row.market || '-')} · ${row.odd ? formatOdd(row.odd) : '-'} · ${row.stake ? formatMoney(row.stake) : '-'} · ${escapeHtml(resultLabel(row.status))}`).join('<br>');
+  }
+
+  function previewRecoveryWinamaxImport() {
+    const rows = parseWinamaxPaste($('#recovery-winamax-import-paste')?.value || '');
+    state.winamaxImportPreview = reconcileWinamaxRows(rows);
+    renderRecoveryImportPreview();
+    setSideStatus(rows.length ? `${formatCount(rows.length)} résultat(s) détecté(s)` : 'Aucune ligne détectée', rows.length ? 'ok' : 'warn');
+  }
+
+  function confirmRecoveryWinamaxImport() {
+    const rows = state.winamaxImportPreview?.length ? state.winamaxImportPreview : reconcileWinamaxRows(parseWinamaxPaste($('#recovery-winamax-import-paste')?.value || ''));
+    if (!rows.length) {
+      setSideStatus('Import récupération vide', 'warn');
+      return;
+    }
+    const merged = [...loadWinamaxImports(), ...rows.map((row) => ({ ...row, importedAt: new Date().toISOString() }))].slice(-1000);
+    writeStorageJson(WINAMAX_IMPORT_KEY, merged);
+    const applied = applyWinamaxImportToUserBets(rows);
+    state.winamaxImportPreview = null;
+    if ($('#recovery-winamax-import-paste')) $('#recovery-winamax-import-paste').value = '';
+    renderRecoveryPage();
+    renderHistory();
+    renderPicks();
+    setSideStatus(`Résultats appris · ${formatCount(applied.updated)} maj · ${formatCount(applied.created)} externes`, 'ok');
   }
 
   function renderLearningAudit() {
@@ -12627,7 +12952,8 @@
       renderActiveModelAdjustments,
       renderPersonalPatterns,
       renderActivityHeatmap365,
-      renderLearningFeedback
+      renderLearningFeedback,
+      renderLossDiagnosis
     ];
     const scheduleIdle = typeof requestIdleCallback === 'function'
       ? (fn) => requestIdleCallback(fn, { timeout: 800 })
@@ -16782,6 +17108,7 @@
       scorers: 'Buteurs & joueurs',
       matches: 'Tous les matchs Winamax',
       history: t('navHistory'),
+      recovery: 'Récupération',
       agent: 'Agent',
       data: 'Avancé',
       search: t('navSearch'),
@@ -16801,6 +17128,7 @@
     }
     if (panelTab === 'calendar') renderCalendar();
     if (panelTab === 'search') renderDeepSearch();
+    if (panelTab === 'recovery') renderRecoveryPage();
     if (panelTab === 'pipeline') renderPipelinePanel(state.status);
     if (panelTab === 'help') renderHelp();
   }
@@ -17924,6 +18252,8 @@
     $('#stop-auto-tracking-btn')?.addEventListener('click', stopAutoTracking);
     $('#preview-winamax-import-btn')?.addEventListener('click', previewWinamaxImport);
     $('#confirm-winamax-import-btn')?.addEventListener('click', confirmWinamaxImport);
+    $('#recovery-preview-winamax-import-btn')?.addEventListener('click', previewRecoveryWinamaxImport);
+    $('#recovery-confirm-winamax-import-btn')?.addEventListener('click', confirmRecoveryWinamaxImport);
     $('#trading-desk')?.addEventListener('click', (event) => {
       const row = event.target.closest('[data-trading-index]');
       if (!row) return;
