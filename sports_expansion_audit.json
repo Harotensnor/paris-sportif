@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-18T00:56:54Z",
+  "generated_at": "2026-05-18T01:08:11Z",
   "source": "local data.js + sports sidecars",
   "status": "ok",
   "sections": {
@@ -29,9 +29,14 @@
       "derived_markets": 24
     },
     "J4_baseball_major_props_pool": {
-      "data_events": 15,
+      "data_events": 51,
       "sofascore_events": 46,
       "samples": [
+        {
+          "event": "San Diego Padres at Seattle Mariners",
+          "league": "MLB",
+          "code": "mlb"
+        },
         {
           "event": "San Diego Padres at Seattle Mariners",
           "league": "MLB",
@@ -51,16 +56,11 @@
           "event": "Cincinnati Reds at Philadelphia Phillies",
           "league": "MLB",
           "code": "mlb"
-        },
-        {
-          "event": "Cleveland Guardians at Detroit Tigers",
-          "league": "MLB",
-          "code": "mlb"
         }
       ],
       "pitcher_records": 83,
-      "player_prop_events": 14,
-      "player_props": 52
+      "player_prop_events": 40,
+      "player_props": 150
     },
     "J5_football_tier2": {
       "data_events": 2,
@@ -79,7 +79,7 @@
       ]
     },
     "J6_coupes_nationales": {
-      "data_events": 29,
+      "data_events": 30,
       "sofascore_events": 20,
       "samples": [
         {
@@ -103,7 +103,7 @@
           "code": "conmebol.libertadores"
         },
         {
-          "event": "Platense at Independiente Santa Fe",
+          "event": "Mirassol at Always Ready",
           "league": "Copa Libertadores",
           "code": "conmebol.libertadores"
         }
@@ -113,11 +113,6 @@
       "data_events": 38,
       "sofascore_events": 66,
       "samples": [
-        {
-          "event": "Qingdao Hainiu at Beijing Guoan",
-          "league": "Chinese Super League",
-          "code": "chn.1"
-        },
         {
           "event": "Dalian Yingbo at Shenzhen Xinpengcheng",
           "league": "Chinese Super League",
@@ -137,6 +132,11 @@
           "event": "Beijing Guoan at Qingdao West Coast",
           "league": "Chinese Super League",
           "code": "chn.1"
+        },
+        {
+          "event": "Barracas Central at Audax Italiano",
+          "league": "Copa Sudamericana",
+          "code": "conmebol.sudamericana"
         }
       ]
     },
