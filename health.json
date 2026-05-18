@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-05-18T05:25:05Z",
-  "calculated_at": "2026-05-18T05:25:05Z",
+  "generated_at": "2026-05-18T05:31:27Z",
+  "calculated_at": "2026-05-18T05:31:27Z",
   "source_of_truth": "data.js",
   "data_age_min": 1,
   "data_file_age_min": 0,
@@ -47,13 +47,13 @@
       "status": "retained_existing_referees"
     },
     "xg_team_stats": {
-      "age_min": 4,
+      "age_min": 5,
       "teams": 112,
       "leagues": 6,
       "source": "understat"
     },
     "fbref_xg": {
-      "age_min": 4,
+      "age_min": 5,
       "teams": 112,
       "leagues": 6,
       "source": "understat_compat"
@@ -73,7 +73,7 @@
       "sports": 4
     },
     "h2h_extended": {
-      "age_min": 4,
+      "age_min": 5,
       "events": 116,
       "events_with_meetings": 82,
       "meetings": 247,
@@ -369,8 +369,8 @@
     },
     "timing_edges": {
       "age_min": 0,
-      "events": 158,
-      "bet_now": 150,
+      "events": 172,
+      "bet_now": 164,
       "wait": 1,
       "price_shortening": 7
     },
@@ -478,10 +478,10 @@
     },
     "clv_history": {
       "age_min": 5,
-      "matches": 21,
-      "observations": 46,
+      "matches": 0,
+      "observations": 0,
       "mean_clv_pct": 0,
-      "positive_clv_rate": 15.2,
+      "positive_clv_rate": 0,
       "sample_status": "learning"
     }
   },
@@ -553,7 +553,7 @@
     "xg_team_stats": {
       "script": "scripts/fetch_understat_xg.py",
       "output": "xg_team_stats.json",
-      "age_min": 4,
+      "age_min": 5,
       "threshold_min": 360,
       "fast_red_min": null,
       "status": "ok"
@@ -561,7 +561,7 @@
     "fbref_xg": {
       "script": "scripts/fetch_understat_xg.py",
       "output": "fbref_xg.json",
-      "age_min": 4,
+      "age_min": 5,
       "threshold_min": 360,
       "fast_red_min": null,
       "status": "ok"
@@ -593,7 +593,7 @@
     "h2h_extended": {
       "script": "h2h_extended.json",
       "output": "h2h_extended.json",
-      "age_min": 4,
+      "age_min": 5,
       "threshold_min": 60,
       "fast_red_min": null,
       "status": "ok"
@@ -1055,7 +1055,7 @@
   ],
   "overall": "warning",
   "quality_checks": {
-    "data_generated_at": "2026-05-18T05:23:39.195334Z",
+    "data_generated_at": "2026-05-18T05:29:29.531085Z",
     "truth_scope": "all_events",
     "all_winamax_available": 349,
     "all_winamax_exact": 343,
@@ -1134,7 +1134,7 @@
   "data_truth": {
     "source_of_truth": "data.js",
     "scope": "all_events",
-    "data_generated_at": "2026-05-18T05:23:39.195334Z",
+    "data_generated_at": "2026-05-18T05:29:29.531085Z",
     "winamax_available": 349,
     "winamax_exact": 343,
     "winamax_exact_ratio": 0.9828,
@@ -1147,28 +1147,28 @@
     "status": "degraded",
     "schema_version": 2,
     "sources_validated": 11,
-    "sources_ok": 6,
-    "sources_warning": 5,
+    "sources_ok": 7,
+    "sources_warning": 4,
     "sources_critical": 0,
-    "quarantine_records": 6,
-    "anomalies_emitted": 4
+    "quarantine_records": 5,
+    "anomalies_emitted": 3
   },
   "source_health": {
-    "generated_at": "2026-05-18T05:25:05Z",
+    "generated_at": "2026-05-18T05:31:27Z",
     "sources_total": 11,
-    "sources_ok": 6,
-    "sources_warning": 5,
+    "sources_ok": 7,
+    "sources_warning": 4,
     "sources_critical": 0,
-    "source_health_avg": 90.5,
+    "source_health_avg": 91.3,
     "source_health_min": 57,
     "by_source": {
       "winamax_catalog": {
-        "score": 92,
-        "status": "warning",
+        "score": 100,
+        "status": "ok",
         "items": 690,
-        "age_min": 5,
+        "age_min": 6,
         "sla_min": 15,
-        "issues": 2
+        "issues": 1
       },
       "winamax_markets": {
         "score": 84,
@@ -1182,7 +1182,7 @@
         "score": 57,
         "status": "warning",
         "items": 0,
-        "age_min": 5,
+        "age_min": 6,
         "sla_min": 180,
         "issues": 2
       },
@@ -1190,7 +1190,7 @@
         "score": 100,
         "status": "ok",
         "items": 97,
-        "age_min": 5,
+        "age_min": 6,
         "sla_min": 180,
         "issues": 1
       },
@@ -1198,7 +1198,7 @@
         "score": 100,
         "status": "ok",
         "items": 106,
-        "age_min": 5,
+        "age_min": 6,
         "sla_min": 180,
         "issues": 1
       },
@@ -1206,7 +1206,7 @@
         "score": 100,
         "status": "ok",
         "items": 2471,
-        "age_min": 1,
+        "age_min": 2,
         "sla_min": 60,
         "issues": 1
       },
@@ -1214,7 +1214,7 @@
         "score": 71,
         "status": "warning",
         "items": 31,
-        "age_min": 5,
+        "age_min": 6,
         "sla_min": 300,
         "issues": 1
       },
@@ -1222,7 +1222,7 @@
         "score": 100,
         "status": "ok",
         "items": 630,
-        "age_min": 5,
+        "age_min": 6,
         "sla_min": 1440,
         "issues": 1
       },
@@ -1230,7 +1230,7 @@
         "score": 92,
         "status": "warning",
         "items": 1941,
-        "age_min": 5,
+        "age_min": 6,
         "sla_min": 30,
         "issues": 2
       },
@@ -1238,7 +1238,7 @@
         "score": 100,
         "status": "ok",
         "items": 3769,
-        "age_min": 5,
+        "age_min": 6,
         "sla_min": 1440,
         "issues": 1
       },
@@ -1246,7 +1246,7 @@
         "score": 100,
         "status": "ok",
         "items": 3,
-        "age_min": 5,
+        "age_min": 6,
         "sla_min": 1440,
         "issues": 1
       }
@@ -1254,25 +1254,25 @@
   },
   "observability": {
     "pipeline_traces": {
-      "generated_at": "2026-05-18T05:25:05Z",
+      "generated_at": "2026-05-18T05:31:27Z",
       "runs_observed": 99,
       "by_status": {
-        "warning": 69,
+        "warning": 67,
         "critical": 1,
-        "ok": 29
+        "ok": 31
       },
       "by_script": {
         "data_integrity_monitor.py": {
           "runs": 99,
           "errors": 1,
           "last_status": "ok",
-          "max_duration_ms": 999
+          "max_duration_ms": 1024
         }
       }
     }
   },
   "data_lineage": {
-    "generated_at": "2026-05-18T05:25:05Z",
+    "generated_at": "2026-05-18T05:31:27Z",
     "status": "ok",
     "events": 349,
     "events_missing_inline_lineage": 0,
@@ -1394,7 +1394,7 @@
     "data": {
       "status": "degraded",
       "sources_validated": 11,
-      "quarantine_records": 6,
+      "quarantine_records": 5,
       "lineage_coverage_pct": 100.0
     },
     "model": {
