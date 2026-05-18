@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-18T21:41:59Z",
+  "generated_at": "2026-05-18T21:49:22Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -808,8 +808,8 @@
           "projected_ip": 5.46,
           "inputs": {
             "k9": 9.67,
-            "era": 4.38,
-            "whip": 1.26,
+            "era": 4.2,
+            "whip": 1.24,
             "hand": "L"
           },
           "side": "home"
@@ -826,8 +826,8 @@
           "projected_ip": 5.46,
           "inputs": {
             "hr9": 0.73,
-            "era": 4.38,
-            "whip": 1.26
+            "era": 4.2,
+            "whip": 1.24
           },
           "side": "home"
         },
@@ -1579,42 +1579,6 @@
       "home": "Kansas City Royals",
       "away": "Boston Red Sox",
       "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Kansas City Royals",
-          "pitcher": "Kris Bubic",
-          "label": "Kris Bubic plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.5303,
-          "fair_odds": 1.89,
-          "expected_strikeouts": 5.64,
-          "projected_ip": 5.57,
-          "inputs": {
-            "k9": 9.12,
-            "era": 4.11,
-            "whip": 1.23,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Kansas City Royals",
-          "pitcher": "Kris Bubic",
-          "label": "Kris Bubic ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6406,
-          "fair_odds": 1.56,
-          "expected_hr_allowed": 0.445,
-          "projected_ip": 5.57,
-          "inputs": {
-            "hr9": 0.72,
-            "era": 4.11,
-            "whip": 1.23
-          },
-          "side": "home"
-        },
         {
           "market": "pitcher_strikeouts",
           "team": "Boston Red Sox",
@@ -3268,7 +3232,7 @@
       ]
     }
   ],
-  "props": 158,
+  "props": 156,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
