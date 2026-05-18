@@ -92,6 +92,15 @@ async function main() {
 
     await win.locator('[data-tab="recovery"]:visible').first().click();
     await win.waitForSelector('[data-panel="recovery"].active #recovery-summary-grid', { timeout: 8000 });
+    const recovery = await win.evaluate(() => ({
+      postDay: Boolean(document.querySelector('#recovery-postday-grid')),
+      missedSignals: Boolean(document.querySelector('#recovery-missed-signals-grid')),
+      durableFamilies: Boolean(document.querySelector('#recovery-durable-family-grid')),
+      text: document.querySelector('[data-panel="recovery"]')?.innerText || ''
+    }));
+    if (!recovery.postDay || !recovery.missedSignals || !recovery.durableFamilies || !/Ce que le modèle aurait dû voir|Familles durables/i.test(recovery.text)) {
+      throw new Error(`Page récupération incomplète: ${JSON.stringify(recovery).slice(0, 900)}`);
+    }
     await win.locator('[data-tab="preferences"]:visible').first().click();
     await win.waitForSelector('#pref-bankroll', { timeout: 8000 });
 

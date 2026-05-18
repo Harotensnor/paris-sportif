@@ -115,7 +115,9 @@
     currentDashboardRows: [],
     activeHomeCategory: null,
     bentoDragId: null,
-    learningAuditCache: null
+    learningAuditCache: null,
+    postDayAuditCache: null,
+    durableFamilyLocksCache: null
   };
 
   const ACTION_HISTORY_KEY = 'parisSportifActionHistory';
@@ -140,6 +142,8 @@
   const LIVE_NOTIFICATION_KEY = 'parisSportifLiveNotificationKeys';
   const MODEL_ADJUSTMENTS_KEY = 'parisSportifModelAdjustments';
   const LOSS_FEEDBACK_KEY = 'parisSportifLossFeedbacks';
+  const POST_DAY_AUDIT_KEY = 'parisSportifPostDayAudit';
+  const DURABLE_FAMILY_LOCKS_KEY = 'parisSportifDurableFamilyLocks';
   const UPDATE_STATUS_KEY = 'parisSportifUpdateStatus';
   const BANKROLL_TRANSACTIONS_KEY = 'parisSportifBankrollTransactions';
   const WEEKLY_REPORT_KEY = 'parisSportifWeeklyReports';
@@ -617,6 +621,14 @@
     try {
       localStorage.setItem(userBetsStorageKey(), JSON.stringify(Array.isArray(rows) ? rows : []));
       state.learningAuditCache = null;
+      state.postDayAuditCache = null;
+      state.durableFamilyLocksCache = null;
+      try {
+        postDayLearningAudit();
+        durableFamilyLocks();
+      } catch {
+        // Les rapports post-journée sont recalculés au rendu si le profil n'est pas encore prêt.
+      }
       scheduleProfileBackup();
     } catch {
       setSideStatus('Suivi pari indisponible', 'warn');
@@ -722,6 +734,8 @@
       favorites: loadFavorites(),
       webEnrichment: readStorageJson(WEB_ENRICHMENT_KEY, null),
       modelAdjustments: readStorageJson(MODEL_ADJUSTMENTS_KEY, null),
+      postDayAudit: readStorageJson(POST_DAY_AUDIT_KEY, null),
+      durableFamilyLocks: readStorageJson(DURABLE_FAMILY_LOCKS_KEY, []),
       lossFeedbacks: readStorageJson(LOSS_FEEDBACK_KEY, []),
       bankrollTransactions: readStorageJson(BANKROLL_TRANSACTIONS_KEY, []),
       weeklyReports: readStorageJson(WEEKLY_REPORT_KEY, []),
@@ -780,6 +794,8 @@
       [NOTIFIED_PICK_KEY, profile.notifiedPicks],
       [WEB_ENRICHMENT_KEY, profile.webEnrichment],
       [MODEL_ADJUSTMENTS_KEY, profile.modelAdjustments],
+      [POST_DAY_AUDIT_KEY, profile.postDayAudit],
+      [DURABLE_FAMILY_LOCKS_KEY, profile.durableFamilyLocks],
       [LOSS_FEEDBACK_KEY, profile.lossFeedbacks],
       [BANKROLL_TRANSACTIONS_KEY, profile.bankrollTransactions],
       [WEEKLY_REPORT_KEY, profile.weeklyReports],
@@ -2137,6 +2153,15 @@
   function realPerformanceGateForRow(row) {
     if (!row) return { blocked: false, reasons: [] };
     const reasons = [];
+    const durableLock = durableFamilyLockForRow(row);
+    if (durableLock) {
+      reasons.push({
+        code: `durable_family:${durableLock.family}`,
+        label: 'Famille coupée durablement',
+        detail: `${durableLock.label} : ${durableLock.reason}, verrou jusqu’au ${formatDateLabel(durableLock.lockedUntil)}.`,
+        tone: 'danger'
+      });
+    }
     const warnings = losingSegmentWarningsFor(row);
     warnings.forEach((warning) => {
       reasons.push({
@@ -2187,6 +2212,7 @@
   function realPerformanceBlockedText(row) {
     const gate = realPerformanceGateForRow(row);
     if (!gate.blocked) return '';
+    if ((gate.reasons || []).some((reason) => String(reason.code || '').startsWith('durable_family:'))) return 'Famille coupée';
     if ((gate.reasons || []).some((reason) => String(reason.code || '').startsWith('market:'))) return 'Marché coupé';
     if ((gate.reasons || []).some((reason) => String(reason.code || '').startsWith('sport:'))) return 'Sport coupé';
     if ((gate.reasons || []).some((reason) => String(reason.code || '').startsWith('league:'))) return 'Ligue coupée';
@@ -10708,6 +10734,234 @@
     return 'Réduire ce segment et attendre plus de preuves.';
   }
 
+  function betLearningDay(bet) {
+    const raw = String(bet?.day || bet?.settledAt || bet?.createdAt || bet?.placedAt || '').trim();
+    if (/^\d{4}-\d{2}-\d{2}/.test(raw)) return raw.slice(0, 10);
+    const ts = Date.parse(raw);
+    return Number.isFinite(ts) ? new Date(ts).toISOString().slice(0, 10) : parisDayKey();
+  }
+
+  function marketFamilyLabel(key) {
+    const pref = marketPrefByKey(key) || MARKET_PREFS.find((item) => item.keys?.map(normalizeUiKey).includes(normalizeUiKey(key)));
+    return pref?.label || formatMarketName(key || 'Marché');
+  }
+
+  function marketFamilyFromBet(bet) {
+    return marketGroupFromKey(marketKeyFromRow({ marketKey: bet?.marketKey, market: bet?.market })) || 'market_unknown';
+  }
+
+  function addDaysIso(day, days) {
+    const base = Date.parse(`${String(day || parisDayKey()).slice(0, 10)}T12:00:00.000Z`);
+    const date = new Date((Number.isFinite(base) ? base : Date.now()) + Number(days || 0) * 24 * 60 * 60 * 1000);
+    return date.toISOString().slice(0, 10);
+  }
+
+  function missedSignalsForLoss(bet, priorFamilyLossDays = 0) {
+    const signals = [];
+    const odd = Number(bet?.odd || 0);
+    const edge = Number(bet?.edge || 0);
+    const probability = Number(bet?.probability || 0);
+    const safeReliable = bet?.safeReliable === true;
+    const clv = Number(bet?.clvPct);
+    const family = marketFamilyFromBet(bet);
+    if (bet?.trackingSource === 'winamax_import') signals.push('Pari hors suivi app : le modèle ne l’avait pas validé comme “Je mise”.');
+    if (priorFamilyLossDays >= 1) signals.push(`${marketFamilyLabel(family)} avait déjà perdu sur ${formatCount(priorFamilyLossDays)} journée(s) avant ce pari.`);
+    if (odd > 3.5) signals.push(`Cote très haute (${formatOdd(odd)}) : à couper en récupération.`);
+    else if (odd > 2.2) signals.push(`Cote haute (${formatOdd(odd)}) : risque trop élevé après perte.`);
+    if (Number.isFinite(edge) && edge > 0 && edge < 0.08) signals.push(`Avantage trop court (${formatPct(edge, 1)}) pour autoriser une mise.`);
+    if (!(edge > 0) && bet?.trackingSource !== 'winamax_import') signals.push('Avantage non prouvé au moment du suivi.');
+    if (probability > 0 && probability < 0.65) signals.push(`Confiance insuffisante (${formatPct(probability, 0)}).`);
+    if (!safeReliable && bet?.safeStatus && bet.safeStatus !== 'real_import') signals.push('Le statut “fiable/safe” n’était pas confirmé.');
+    if (Number.isFinite(clv) && clv < -0.03) signals.push(`La cote a bougé contre toi avant kickoff (${formatPct(clv, 1)}).`);
+    if (['halftime', 'scorer', 'tennis_specials', 'points_totals'].includes(family)) signals.push(`${marketFamilyLabel(family)} est une famille volatile : observation par défaut après perte.`);
+    if (Array.isArray(bet?.coachWarnings) && bet.coachWarnings.length) signals.push(`Coach déjà prudent : ${bet.coachWarnings.slice(0, 3).join(', ')}.`);
+    if (bet?.lossFeedback?.reasonLabel) signals.push(`Feedback utilisateur : ${bet.lossFeedback.reasonLabel}.`);
+    return signals.length ? signals.slice(0, 5) : ['Aucune alerte nette enregistrée : il faut exiger plus de contexte avant de remettre cette famille en “Je mise”.'];
+  }
+
+  function postDayLearningAudit() {
+    const settled = loadUserBets().filter((bet) => ['won', 'lost', 'void'].includes(String(bet.status || '')));
+    const signature = learningAuditSignature(settled);
+    if (state.postDayAuditCache?.signature === signature) return state.postDayAuditCache.audit;
+    const byDay = new Map();
+    const byFamily = new Map();
+    const priorLossDays = new Map();
+    const missed = [];
+    settled
+      .slice()
+      .sort((a, b) => betLearningDay(a).localeCompare(betLearningDay(b)) || Date.parse(a.createdAt || '') - Date.parse(b.createdAt || ''))
+      .forEach((bet) => {
+        const day = betLearningDay(bet);
+        const family = marketFamilyFromBet(bet);
+        const stake = Math.max(0, Number(bet.stake || 0) || 0);
+        const pnl = Number(bet.pnl || 0) || (bet.status === 'lost' ? -stake : bet.status === 'won' ? stake * Math.max(0, Number(bet.odd || 1) - 1) : 0);
+        const dayRow = byDay.get(day) || { day, count: 0, wins: 0, losses: 0, voids: 0, stake: 0, pnl: 0, families: new Set() };
+        dayRow.count += 1;
+        dayRow.stake += stake;
+        dayRow.pnl += pnl;
+        dayRow.families.add(family);
+        if (bet.status === 'won') dayRow.wins += 1;
+        if (bet.status === 'lost') dayRow.losses += 1;
+        if (bet.status === 'void') dayRow.voids += 1;
+        byDay.set(day, dayRow);
+
+        const familyRow = byFamily.get(family) || { family, label: marketFamilyLabel(family), count: 0, wins: 0, losses: 0, stake: 0, pnl: 0, lossDays: new Set(), winDays: new Set(), examples: [], lastLossDay: null };
+        familyRow.count += 1;
+        familyRow.stake += stake;
+        familyRow.pnl += pnl;
+        if (bet.status === 'won') {
+          familyRow.wins += 1;
+          familyRow.winDays.add(day);
+        }
+        if (bet.status === 'lost') {
+          const prior = priorLossDays.get(family)?.size || 0;
+          familyRow.losses += 1;
+          familyRow.lossDays.add(day);
+          familyRow.lastLossDay = day;
+          if (familyRow.examples.length < 3) familyRow.examples.push(bet.title || bet.label || familyRow.label);
+          missed.push({
+            id: bet.id,
+            day,
+            title: bet.title || bet.label || 'Pari perdu',
+            family,
+            familyLabel: familyRow.label,
+            market: bet.market || familyRow.label,
+            odd: Number(bet.odd || 0) || null,
+            stake,
+            pnl,
+            trackingSource: bet.trackingSource || 'manual',
+            signals: missedSignalsForLoss(bet, prior)
+          });
+          const days = priorLossDays.get(family) || new Set();
+          days.add(day);
+          priorLossDays.set(family, days);
+        }
+        byFamily.set(family, familyRow);
+      });
+
+    const days = Array.from(byDay.values()).map((row) => ({
+      ...row,
+      families: Array.from(row.families),
+      roi: row.stake > 0 ? row.pnl / row.stake : 0
+    })).sort((a, b) => b.day.localeCompare(a.day));
+    const families = Array.from(byFamily.values()).map((row) => ({
+      ...row,
+      lossDays: Array.from(row.lossDays).sort(),
+      winDays: Array.from(row.winDays).sort(),
+      losingDays: row.lossDays.size,
+      roi: row.stake > 0 ? row.pnl / row.stake : 0,
+      shouldDurablyLock: row.lossDays.size >= 2 && row.losses >= 2 && row.pnl < 0
+    })).sort((a, b) => (Number(b.shouldDurablyLock) - Number(a.shouldDurablyLock)) || a.roi - b.roi);
+    const audit = {
+      schema: 'paris-sportif.post_day_learning.v1',
+      generatedAt: new Date().toISOString(),
+      signature,
+      settled: settled.length,
+      days,
+      families,
+      missedSignals: missed.sort((a, b) => b.day.localeCompare(a.day)).slice(0, 12)
+    };
+    state.postDayAuditCache = { signature, audit };
+    writeStorageJson(POST_DAY_AUDIT_KEY, audit);
+    return audit;
+  }
+
+  function durableFamilyLocks(audit = postDayLearningAudit()) {
+    const now = Date.now();
+    const cacheKey = `${audit?.signature || 'empty'}:${parisDayKey()}`;
+    if (state.durableFamilyLocksCache?.cacheKey === cacheKey) return state.durableFamilyLocksCache.locks;
+    const locks = (Array.isArray(audit?.families) ? audit.families : [])
+      .filter((row) => row.shouldDurablyLock)
+      .map((row) => {
+        const lockedUntil = addDaysIso(row.lastLossDay || row.lossDays?.slice(-1)?.[0] || parisDayKey(), 14);
+        return {
+          family: row.family,
+          label: row.label || marketFamilyLabel(row.family),
+          losses: row.losses,
+          losingDays: row.losingDays,
+          pnl: row.pnl,
+          stake: row.stake,
+          roi: row.roi,
+          examples: row.examples || [],
+          lastLossDay: row.lastLossDay,
+          lockedUntil,
+          active: Date.parse(`${lockedUntil}T23:59:59.999Z`) > now,
+          reason: `${formatCount(row.losses)} pertes sur ${formatCount(row.losingDays)} journées différentes`
+        };
+      })
+      .filter((row) => row.active)
+      .sort((a, b) => a.lockedUntil.localeCompare(b.lockedUntil) || a.roi - b.roi)
+      .slice(0, 10);
+    state.durableFamilyLocksCache = { cacheKey, locks };
+    writeStorageJson(DURABLE_FAMILY_LOCKS_KEY, locks);
+    return locks;
+  }
+
+  function durableFamilyLockForRow(row) {
+    if (!row) return null;
+    const family = normalizeUiKey(rowMarketPreferenceKey(row));
+    if (!family) return null;
+    return durableFamilyLocks().find((lock) => normalizeUiKey(lock.family) === family) || null;
+  }
+
+  function renderPostDayLearning() {
+    const summaryGrid = $('#recovery-postday-grid');
+    const missedGrid = $('#recovery-missed-signals-grid');
+    if (!summaryGrid && !missedGrid) return;
+    const audit = postDayLearningAudit();
+    const lastDay = audit.days?.[0] || null;
+    const locks = durableFamilyLocks(audit);
+    if (summaryGrid) {
+      if (!audit.settled) {
+        summaryGrid.innerHTML = '<div class="empty">Aucun pari réglé/importé. Après import Winamax, cette zone dira ce qu’il fallait voir avant la perte.</div>';
+      } else {
+        summaryGrid.innerHTML = [
+          ['Dernière journée analysée', lastDay ? formatDateLabel(lastDay.day) : '-', lastDay ? `${formatCount(lastDay.wins)} gagnés · ${formatCount(lastDay.losses)} perdus · P&L ${formatMoney(lastDay.pnl)}` : 'Aucune journée complète.'],
+          ['Familles à couper', `${formatCount(locks.length)} active(s)`, locks.length ? locks.map((row) => row.label).slice(0, 3).join(' · ') : 'Aucune famille ne perd sur plusieurs jours.'],
+          ['Pertes expliquées', `${formatCount(audit.missedSignals.length)} ligne(s)`, 'Chaque perte est relue avec les signaux qui auraient dû freiner le clic.']
+        ].map(([label, value, detail]) => `
+          <article class="performance-card ${label === 'Familles à couper' && locks.length ? 'cold' : ''}">
+            <span>${escapeHtml(label)}</span>
+            <strong>${escapeHtml(value)}</strong>
+            <p>${escapeHtml(detail)}</p>
+          </article>
+        `).join('');
+      }
+    }
+    if (missedGrid) {
+      if (!audit.missedSignals.length) {
+        missedGrid.innerHTML = '<div class="empty">Aucune perte récente à relire. Importe tes résultats Winamax pour déclencher l’analyse automatique.</div>';
+      } else {
+        missedGrid.innerHTML = audit.missedSignals.slice(0, 8).map((row) => `
+          <article class="segment-card cold">
+            <span>${escapeHtml(`${formatDateLabel(row.day)} · ${row.familyLabel}`)}</span>
+            <strong>${escapeHtml(row.title)}</strong>
+            <p>${escapeHtml(`${row.market || row.familyLabel} · ${row.odd ? formatOdd(row.odd) : 'cote ?'} · P&L ${formatMoney(row.pnl)}`)}</p>
+            <em>${escapeHtml(row.signals.join(' · '))}</em>
+          </article>
+        `).join('');
+      }
+    }
+  }
+
+  function renderDurableFamilyLocks() {
+    const grid = $('#recovery-durable-family-grid');
+    if (!grid) return;
+    const locks = durableFamilyLocks();
+    if (!locks.length) {
+      grid.innerHTML = '<div class="empty">Aucune famille coupée durablement. Le verrou s’active après pertes sur plusieurs jours, pas après un simple accident isolé.</div>';
+      return;
+    }
+    grid.innerHTML = locks.map((lock) => `
+      <article class="segment-card cold">
+        <span>Famille coupée jusqu’au ${escapeHtml(formatDateLabel(lock.lockedUntil))}</span>
+        <strong>${escapeHtml(lock.label)}</strong>
+        <p>${escapeHtml(`${lock.reason} · ROI ${formatPct(lock.roi, 0)} · P&L ${formatMoney(lock.pnl)}`)}</p>
+        <em>${escapeHtml(lock.examples?.length ? `Exemples : ${lock.examples.slice(0, 2).join(' · ')}` : 'Bouton Je mise verrouillé sur cette famille.')}</em>
+      </article>
+    `).join('');
+  }
+
   function renderLossDiagnosis() {
     const grids = ['#loss-diagnosis-grid', '#recovery-loss-diagnosis-grid'].map((selector) => $(selector)).filter(Boolean);
     if (!grids.length) return;
@@ -10730,7 +10984,19 @@
   function activeRealityLocks() {
     const audit = trackedLearningAudit();
     const pool = state.currentDashboardRows?.length ? state.currentDashboardRows : state.picks;
-    return (audit.warnings || []).slice(0, 8).map((warning) => {
+    const durableRows = durableFamilyLocks().map((lock) => {
+      const family = normalizeUiKey(lock.family);
+      const affected = (pool || []).filter((row) => normalizeUiKey(rowMarketPreferenceKey(row)) === family).length;
+      return {
+        ...lock,
+        key: `durable_family:${lock.family}`,
+        label: `Famille durable · ${lock.label}`,
+        count: lock.losses,
+        affected,
+        action: `Bouton Je mise coupé jusqu’au ${formatDateLabel(lock.lockedUntil)}`
+      };
+    });
+    const warningRows = (audit.warnings || []).slice(0, 8).map((warning) => {
       const key = String(warning.key || '').toLowerCase();
       const affected = (pool || []).filter((row) => segmentKeysForRow(row).includes(key)).length;
       return {
@@ -10745,6 +11011,7 @@
               : 'Seuil de prudence durci'
       };
     });
+    return [...durableRows, ...warningRows].slice(0, 8);
   }
 
   function renderRecoveryLocks() {
@@ -10833,10 +11100,12 @@
     if (grid) {
       const status = recoveryModeStatus();
       const worst = status.diagnosis.hotspots[0];
+      const durableLocks = durableFamilyLocks();
       grid.innerHTML = [
         ['État', status.label, status.detail],
         ['P&L réel connu', formatMoney(status.realPnl), 'Import Winamax prioritaire, sinon suivi local.'],
         ['Règle du jour', `${formatCount(status.maxBets)} pari(s) max`, `Mise max ${formatMoney(status.maxStake)} · pas de rattrapage.`],
+        ['Familles durables', `${formatCount(durableLocks.length)} coupée(s)`, durableLocks.length ? durableLocks.map((row) => row.label).slice(0, 2).join(' · ') : 'Aucune récidive multi-jours active.'],
         ['Segment à couper', worst ? worst.label : 'Aucun pattern', worst ? `${formatCount(worst.losses)} perte(s) · ${formatMoney(worst.pnl)}` : 'Le logiciel attend tes résultats Winamax.']
       ].map(([label, value, detail]) => `
         <article class="performance-card ${label === 'État' && status.active ? 'cold' : ''}">
@@ -10847,6 +11116,8 @@
       `).join('');
     }
     renderLossDiagnosis();
+    renderPostDayLearning();
+    renderDurableFamilyLocks();
     renderRecoveryLocks();
     renderRecoveryImportPreview();
   }

@@ -3,6 +3,17 @@
 Auto-généré depuis les messages de commit par `scripts/build_changelog.py`.
 Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
+## Desktop — 2026-05-18
+
+### Version v5.3.0 — Analyse post-journée + verrous durables
+
+Suite directe après les pertes réelles : le logiciel ne se contente plus de dire “tu as perdu”, il relit la journée et coupe les familles qui récidivent.
+- Ajout d’une zone `Ce que le modèle aurait dû voir` dans la page Récupérer : chaque perte importée/suivie ressort avec les signaux qui auraient dû freiner le clic (cote haute, edge trop court, confiance basse, CLV adverse, pari hors app, famille déjà perdante).
+- Ajout de verrous durables par famille de marché : si une famille perd sur plusieurs jours, le bouton `Je mise` est coupé pendant 14 jours et la ligne reste seulement observable.
+- Les verrous durables sont pris en compte directement par le moteur d’action : libellé `Famille coupée`, blocage du pari, résumé dans les segments coupés et sauvegarde dans le profil utilisateur.
+- Le smoke rapide vérifie maintenant que la page Récupérer contient bien l’analyse post-journée, les signaux manqués et les familles durables.
+- Version desktop, package et Service Worker bumpés en `v5.3.0`.
+
 ## Desktop — 2026-05-17
 
 ### Version v5.2.1 — Synchro rapide + tests courts
