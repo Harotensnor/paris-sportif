@@ -5,6 +5,17 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-17
 
+### Version v5.0.2 — Protection pertes réelles
+
+Correctif prioritaire après retour utilisateur : le problème principal est la perte réelle, donc le logiciel passe en logique de récupération stricte avant de proposer une mise.
+- Ajout d'une protection bankroll moteur : un pick ne peut plus rester `Je mise` si cote trop haute, edge prudent trop faible, confiance trop courte, contexte incomplet, segment historique perdant ou marché trop risqué.
+- Les Vainqueurs à cote haute sont bloqués sauf filet Winamax 2-0 réellement solide.
+- Les marchés buts serrés et les signaux en confiance limitée restent en observation, même avec un edge brut positif.
+- Les mises moteur réellement autorisées sont plafonnées à 1% de bankroll, avec plafond dur à 1€ en phase de protection.
+- Les préférences existantes migrent vers un mode conservateur : 2% de budget jour, 1% max par pari, 3 paris max/jour, 5% max engagé par jour, stop-loss 2%, confirmation après 2 pertes.
+- L'auto-tracking devient quasi verrouillé par défaut : top uniquement, 1 pari max, 1€ max, cote ≤ 3.50 et edge ≥ +8pt.
+- PickDecision v6 trace maintenant `capitalProtectionTrace`, et la QA échoue si cette protection est contournée par un bouton ou une mise positive.
+
 ### Version v5.0.1 — Anti-perte Winamax + fiche non-misable
 
 Correctif terrain après retour utilisateur : l'app ne doit plus pousser vers Winamax quand la ligne est seulement informative ou issue d'un marché trop risqué.

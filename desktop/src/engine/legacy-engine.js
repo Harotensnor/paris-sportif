@@ -2301,6 +2301,118 @@ function createLegacyEngineService({ projectRoot }) {
     };
   }
 
+  function capitalProtectionCheck(row, bankroll) {
+    const odd = Number(row?.odd || 0);
+    const edge = Number(row?.safeEdge ?? row?.edge ?? 0) || 0;
+    const confidence = Number(row?.safeConfidence ?? row?.probability ?? 0) || 0;
+    const contextScore = Number(row?.contextQuality?.score ?? row?.match?.context?.quality?.score ?? NaN);
+    const sample = Number(row?.safeAssessment?.sample ?? row?.segmentValidation?.sample ?? row?.calibration?.sample ?? 0) || 0;
+    const roi = Number(row?.safeAssessment?.roi ?? row?.segmentValidation?.roi ?? row?.calibration?.roi);
+    const group = simpleMarketGroup(row?.marketKey || row?.market || '');
+    const marketKey = canonicalMarketKey(row?.marketKey || row?.market || '');
+    const reasons = [];
+    const isWinner = group === 'winner';
+    const isScorer = group === 'scorer';
+    const isGoals = group === 'goals' || group === 'btts';
+    const twoGoalStrong = Boolean(String(row?.safeAssessment?.reliableRule || '').startsWith('2-0') &&
+      row?.winamaxTwoGoalRule?.eligible &&
+      Number(row?.winamaxTwoGoalRule?.leadTwoProbability || 0) >= 0.40);
+    if (!group) reasons.push('marché non standard');
+    if (/dnb|drawnobet|teamtotal|httotal|htou|halftime|mitemps|exact|score|card|corner|handicap|asian/i.test(marketKey)) {
+      reasons.push('marché trop risqué après pertes');
+    }
+    if (!(odd >= 1.25 && odd <= (isScorer ? 3.80 : 3.40))) {
+      reasons.push(`cote hors zone récupération @${odd ? odd.toFixed(2) : '?'}`);
+    }
+    if (edge < 0.03) reasons.push(`edge prudent trop faible (+${Math.round(edge * 100)}pt)`);
+    if (confidence < 0.64) reasons.push(`confiance trop courte (${Math.round(confidence * 100)}%)`);
+    if (Number.isFinite(contextScore) && contextScore < (isWinner || isGoals ? 62 : 55)) {
+      reasons.push(`contexte trop faible (${Math.round(contextScore)}/100)`);
+    }
+    if (sample >= 8 && Number.isFinite(roi) && roi < 0) {
+      reasons.push(`segment historique perdant (${Math.round(roi * 100)}% ROI)`);
+    }
+    if (isWinner && odd >= 2.55 && !twoGoalStrong) {
+      reasons.push('vainqueur cote haute sans filet 2-0 solide');
+    }
+    if (isGoals && odd >= 2.20 && confidence < 0.70) {
+      reasons.push('marché buts trop serré pour récupération');
+    }
+    if (row?.limitedConfidence && !twoGoalStrong) {
+      reasons.push('confiance limitée : lecture seulement');
+    }
+    const bank = Math.max(1, Number(bankroll || 50) || 50);
+    return {
+      schema: 'paris-sportif.capital_protection.v1',
+      blocked: reasons.length > 0,
+      reasons: [...new Set(reasons)].slice(0, 5),
+      maxStakePct: 0.01,
+      maxStake: Number(Math.max(0.10, Math.min(1.00, bank * 0.01)).toFixed(2)),
+      policy: 'Après perte réelle, seul un pari court, sourcé et très robuste peut afficher Je mise.'
+    };
+  }
+
+  function applyCapitalProtectionLayer(row, bankroll) {
+    const protection = capitalProtectionCheck(row, bankroll);
+    const decision = row?.decisionCenter || {};
+    const currentlyActionable = Boolean(decision.canBet || row?.status === 'bet' || Number(row?.stake || 0) > 0);
+    if (!currentlyActionable) {
+      return { ...row, capitalProtectionV1: protection };
+    }
+    if (protection.blocked) {
+      const mainReason = `Protection bankroll : ${protection.reasons[0] || 'pari trop risqué'}`;
+      return {
+        ...row,
+        stake: 0,
+        modelStake: 0,
+        status: row.status === 'skip' ? 'skip' : 'watch',
+        statusLabel: 'À surveiller · protection bankroll',
+        capitalProtectionV1: protection,
+        decisionCenter: {
+          ...decision,
+          status: 'watch',
+          canBet: false,
+          stake: 0,
+          stakeDisplay: '0 €',
+          mainReason,
+          nextAction: 'Pause',
+          blockingGates: [
+            ...(Array.isArray(decision.blockingGates) ? decision.blockingGates : []),
+            { key: 'capital_protection', label: mainReason, tone: 'danger' }
+          ],
+          riskTone: 'warn'
+        },
+        safeAssessment: row.safeAssessment ? {
+          ...row.safeAssessment,
+          warnings: [...new Set([...(row.safeAssessment.warnings || []), mainReason])].slice(0, 5)
+        } : row.safeAssessment
+      };
+    }
+    const currentStake = Number(decision.stake ?? row?.stake ?? 0) || 0;
+    const protectedStake = currentStake > 0 ? Number(Math.min(currentStake, protection.maxStake).toFixed(2)) : 0;
+    if (!(protectedStake > 0) || protectedStake === currentStake) {
+      return { ...row, capitalProtectionV1: protection };
+    }
+    return {
+      ...row,
+      stake: protectedStake,
+      modelStake: Math.min(Number(row?.modelStake || protectedStake) || protectedStake, protectedStake),
+      statusLabel: '✓ Fiable · mise protection',
+      capitalProtectionV1: {
+        ...protection,
+        stakeCapped: true,
+        beforeStake: currentStake,
+        afterStake: protectedStake
+      },
+      decisionCenter: {
+        ...decision,
+        stake: protectedStake,
+        mainReason: 'Pari validé en mode récupération : mise plafonnée',
+        blockingGates: Array.isArray(decision.blockingGates) ? decision.blockingGates : []
+      }
+    };
+  }
+
   function clamp01(value) {
     const n = Number(value);
     if (!Number.isFinite(n)) return 0;
@@ -3357,6 +3469,7 @@ function createLegacyEngineService({ projectRoot }) {
   function buildDecisionCenterReport(rows, gates) {
     const all = Array.isArray(rows) ? rows : [];
     const byStatus = { ready: 0, watch: 0, repair: 0, skip: 0 };
+    const capitalBlocked = all.filter((row) => row?.capitalProtectionV1?.blocked).length;
     for (const row of all) {
       const status = row?.decisionCenter?.status || 'skip';
       byStatus[status] = (byStatus[status] || 0) + 1;
@@ -3372,6 +3485,7 @@ function createLegacyEngineService({ projectRoot }) {
         skip: byStatus.skip || 0,
         can_bet: byStatus.ready || 0,
         blocked: false,
+        capital_protection: capitalBlocked,
         agent_blocked: Boolean(gates.prebet?.blocked || gates.critical?.blocked),
         first: byStatus.ready ? 'Paris prêts' : 'Aucun pari à jouer maintenant',
         agent_first: gates.prebet?.blocked ? gates.prebet.label : gates.critical?.blocked ? gates.critical.label : 'Agent disponible'
@@ -4443,6 +4557,7 @@ function createLegacyEngineService({ projectRoot }) {
     if (row?.signalConflict?.active) codes.push('signal_conflict');
     if (row?.oddsGuardrail?.applied) codes.push('odds_guardrail');
     if (row?.profitGuardV5?.blocked) codes.push('profit_guard_v5');
+    if (row?.capitalProtectionV1?.blocked) codes.push('capital_protection');
     if (row?.winamaxTwoGoalRule?.eligible) codes.push('winamax_2_goal_early_payout');
     if (row?.limitedConfidence) codes.push('limited_confidence');
     if (!isFutureStart(row)) codes.push('started_or_finished');
@@ -4619,8 +4734,10 @@ function createLegacyEngineService({ projectRoot }) {
     const stakeAllowed = Boolean(v5.stakePolicy?.allowed && Number(v5.stakePolicy?.stake || 0) > 0);
     const profitGuard = row?.profitGuardV5 || {};
     const profitGuardBlocked = Boolean(profitGuard.blocked);
+    const capitalProtection = row?.capitalProtectionV1 || {};
+    const capitalProtectionBlocked = Boolean(capitalProtection.blocked);
     const betReadinessScore = Math.round(Math.max(0, Math.min(100,
-      Number(v5.userFastBetScore || v5.modelScore || 0) + (stakeAllowed ? 10 : -8) - missingPenalty - sourcePenalty - (profitGuardBlocked ? 18 : 0)
+      Number(v5.userFastBetScore || v5.modelScore || 0) + (stakeAllowed ? 10 : -8) - missingPenalty - sourcePenalty - (profitGuardBlocked ? 18 : 0) - (capitalProtectionBlocked ? 22 : 0)
     )));
     const twoGoalProbability = Number(row?.winamaxTwoGoalRule?.leadTwoProbability ?? v5.winamaxRuleFlags?.twoGoalLeadProbability ?? 0) || 0;
     const isNight = Boolean(v5.nightStatus?.isNight);
@@ -4657,6 +4774,13 @@ function createLegacyEngineService({ projectRoot }) {
         reasons: Array.isArray(profitGuard.reasons) ? profitGuard.reasons.slice(0, 5) : [],
         policy: profitGuard.policy || null
       },
+      capitalProtectionTrace: {
+        blocked: capitalProtectionBlocked,
+        reasons: Array.isArray(capitalProtection.reasons) ? capitalProtection.reasons.slice(0, 5) : [],
+        maxStake: Number(capitalProtection.maxStake || 0) || 0,
+        stakeCapped: Boolean(capitalProtection.stakeCapped),
+        policy: capitalProtection.policy || null
+      },
       nightUnlockReason: isNight
         ? stakeAllowed
           ? 'Nuit prête : edge positif, cote Winamax et sources suffisantes'
@@ -4675,6 +4799,7 @@ function createLegacyEngineService({ projectRoot }) {
         missingOptional: missingOptionalSignals.length,
         sourceBlocksBet: Boolean(v5.sourceBlocksBet),
         profitGuardBlocked,
+        capitalProtectionBlocked,
         riskReasons: Array.isArray(v5.riskReasons) ? v5.riskReasons.slice(0, 6) : []
       },
       userFastCopy: stakeAllowed
@@ -5867,7 +5992,8 @@ function createLegacyEngineService({ projectRoot }) {
       .map((row) => applyPrebetGate(row, prebetChecklistReport))
       .map((row) => applyDecisionCenter(row, decisionGates))
       .map((row) => applyWinamaxProductLayer(row))
-      .map((row) => applySafeReliabilityLayer(row));
+      .map((row) => applySafeReliabilityLayer(row))
+      .map((row) => applyCapitalProtectionLayer(row, safeBankroll));
     const prioritizedDecisionRows = applyPriorityScores(allDecisionRows)
       .map((row) => attachV3Contracts(row, sourceHealthV5, sourceHealthV6, sourceHealthV7, sourceHealthV8));
     const matches = prioritizedDecisionRows.filter((row) => !row.isMarketAlternative);

@@ -220,7 +220,7 @@
   ];
   const MARKET_PREFS = [...SIMPLE_MARKET_PREFS, ...ADVANCED_MARKET_PREFS];
   const DEFAULT_PREFERENCES = {
-    preferenceSchemaVersion: 19,
+    preferenceSchemaVersion: 20,
     bankroll: 50,
     level: 'intermediate',
     sports: SPORTS_PREFS,
@@ -236,18 +236,18 @@
     topPickAlertsEnabled: true,
     notifyQuietHoursOff: false, // Sprint 63 — opt-in pour notifs 23h-7h
     stakeMode: 'kelly',
-    allocationStrategy: 'moderate',
-    dailyBudgetPct: 10,
-    flatUnitPct: 1,
-    maxStakePct: 5,
-    stopLossPct: 5,
-    takeProfitPct: 8,
+    allocationStrategy: 'conservative',
+    dailyBudgetPct: 2,
+    flatUnitPct: 0.5,
+    maxStakePct: 1,
+    stopLossPct: 2,
+    takeProfitPct: 4,
     webhookType: 'generic',
     webhookUrl: '',
     coachEnabled: true,
-    dailyBetLimit: 8,
-    dailyStakeCapPct: 20,
-    coachLossStreakConfirm: 3,
+    dailyBetLimit: 3,
+    dailyStakeCapPct: 5,
+    coachLossStreakConfirm: 2,
     coachReduceStake: true, // Sprint 78 F6 — mise auto -50% si 3L de suite
     demoMode: false,
     aiEnabled: false,
@@ -267,11 +267,11 @@
     autoTrackingConfirmed: false,
     autoTrackingDryRun: true,
     autoTrackingLevel: 'top',
-    autoTrackingEdgeMin: 5,
+    autoTrackingEdgeMin: 8,
     autoTrackingOddMin: 1.3,
-    autoTrackingOddMax: 6,
-    autoTrackingDailyBudget: 5,
-    autoTrackingDailyLimit: 3,
+    autoTrackingOddMax: 3.5,
+    autoTrackingDailyBudget: 1,
+    autoTrackingDailyLimit: 1,
     autoTrackingStartHour: 8,
     autoTrackingEndHour: 22,
     autoTrackingSports: SPORTS_PREFS,
@@ -282,7 +282,7 @@
     dashboardPreset: 'matin',
     language: 'fr',
     theme: 'dark',
-    strict: false
+    strict: true
   };
   const REFRESH_DEFAULT_INTERVAL_MS = 30 * 60 * 1000;
   const ALLOCATION_STRATEGIES = {
@@ -505,10 +505,23 @@
       const migratedDailyBudget = (Number(parsed.preferenceSchemaVersion || 0) < 19 && String(parsed.allocationStrategy || 'moderate') === 'moderate' && Number(parsed.dailyBudgetPct || 0) <= 5)
         ? DEFAULT_PREFERENCES.dailyBudgetPct
         : parsed.dailyBudgetPct;
+      const protectionMigration = Number(parsed.preferenceSchemaVersion || 0) < 20;
       return {
         ...DEFAULT_PREFERENCES,
         ...parsed,
-        dailyBudgetPct: migratedDailyBudget ?? DEFAULT_PREFERENCES.dailyBudgetPct,
+        allocationStrategy: protectionMigration ? 'conservative' : (parsed.allocationStrategy || DEFAULT_PREFERENCES.allocationStrategy),
+        dailyBudgetPct: protectionMigration ? Math.min(Number(migratedDailyBudget ?? DEFAULT_PREFERENCES.dailyBudgetPct) || DEFAULT_PREFERENCES.dailyBudgetPct, DEFAULT_PREFERENCES.dailyBudgetPct) : (migratedDailyBudget ?? DEFAULT_PREFERENCES.dailyBudgetPct),
+        flatUnitPct: protectionMigration ? Math.min(Number(parsed.flatUnitPct || DEFAULT_PREFERENCES.flatUnitPct), DEFAULT_PREFERENCES.flatUnitPct) : (parsed.flatUnitPct ?? DEFAULT_PREFERENCES.flatUnitPct),
+        maxStakePct: protectionMigration ? Math.min(Number(parsed.maxStakePct || DEFAULT_PREFERENCES.maxStakePct), DEFAULT_PREFERENCES.maxStakePct) : (parsed.maxStakePct ?? DEFAULT_PREFERENCES.maxStakePct),
+        stopLossPct: protectionMigration ? Math.min(Number(parsed.stopLossPct || DEFAULT_PREFERENCES.stopLossPct), DEFAULT_PREFERENCES.stopLossPct) : (parsed.stopLossPct ?? DEFAULT_PREFERENCES.stopLossPct),
+        dailyBetLimit: protectionMigration ? Math.min(Number(parsed.dailyBetLimit || DEFAULT_PREFERENCES.dailyBetLimit), DEFAULT_PREFERENCES.dailyBetLimit) : (parsed.dailyBetLimit ?? DEFAULT_PREFERENCES.dailyBetLimit),
+        dailyStakeCapPct: protectionMigration ? Math.min(Number(parsed.dailyStakeCapPct || DEFAULT_PREFERENCES.dailyStakeCapPct), DEFAULT_PREFERENCES.dailyStakeCapPct) : (parsed.dailyStakeCapPct ?? DEFAULT_PREFERENCES.dailyStakeCapPct),
+        coachLossStreakConfirm: protectionMigration ? Math.min(Number(parsed.coachLossStreakConfirm || DEFAULT_PREFERENCES.coachLossStreakConfirm), DEFAULT_PREFERENCES.coachLossStreakConfirm) : (parsed.coachLossStreakConfirm ?? DEFAULT_PREFERENCES.coachLossStreakConfirm),
+        autoTrackingEdgeMin: protectionMigration ? Math.max(Number(parsed.autoTrackingEdgeMin || DEFAULT_PREFERENCES.autoTrackingEdgeMin), DEFAULT_PREFERENCES.autoTrackingEdgeMin) : (parsed.autoTrackingEdgeMin ?? DEFAULT_PREFERENCES.autoTrackingEdgeMin),
+        autoTrackingOddMax: protectionMigration ? Math.min(Number(parsed.autoTrackingOddMax || DEFAULT_PREFERENCES.autoTrackingOddMax), DEFAULT_PREFERENCES.autoTrackingOddMax) : (parsed.autoTrackingOddMax ?? DEFAULT_PREFERENCES.autoTrackingOddMax),
+        autoTrackingDailyBudget: protectionMigration ? Math.min(Number(parsed.autoTrackingDailyBudget || DEFAULT_PREFERENCES.autoTrackingDailyBudget), DEFAULT_PREFERENCES.autoTrackingDailyBudget) : (parsed.autoTrackingDailyBudget ?? DEFAULT_PREFERENCES.autoTrackingDailyBudget),
+        autoTrackingDailyLimit: protectionMigration ? Math.min(Number(parsed.autoTrackingDailyLimit || DEFAULT_PREFERENCES.autoTrackingDailyLimit), DEFAULT_PREFERENCES.autoTrackingDailyLimit) : (parsed.autoTrackingDailyLimit ?? DEFAULT_PREFERENCES.autoTrackingDailyLimit),
+        strict: protectionMigration ? true : Boolean(parsed.strict ?? DEFAULT_PREFERENCES.strict),
         preferenceSchemaVersion: DEFAULT_PREFERENCES.preferenceSchemaVersion,
         sports: parsed.preferenceSchemaVersion >= 12
           ? (Array.isArray(parsed.sports) && parsed.sports.length ? parsed.sports : DEFAULT_PREFERENCES.sports)

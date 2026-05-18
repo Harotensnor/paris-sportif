@@ -188,6 +188,14 @@ function testAnalysis() {
       assert(pick.pickDecisionV6.profitGuardTrace?.blocked === true, 'PickDecision v6 ne trace pas le garde-fou profit réel', pick.pickDecisionV6);
       assert((pick.pickDecisionV4.decisionReasonCodes || []).includes('profit_guard_v5'), 'Code décision profit_guard_v5 absent', pick.pickDecisionV4);
     }
+    if (pick.capitalProtectionV1?.blocked) {
+      assert(pick.decisionCenter?.canBet !== true && Number(pick.stake || 0) === 0, 'Protection bankroll contournée par un bouton Je mise', pick);
+      assert(pick.pickDecisionV6.capitalProtectionTrace?.blocked === true, 'PickDecision v6 ne trace pas la protection bankroll', pick.pickDecisionV6);
+      assert((pick.pickDecisionV4.decisionReasonCodes || []).includes('capital_protection'), 'Code décision capital_protection absent', pick.pickDecisionV4);
+    }
+    if (pick.decisionCenter?.canBet === true) {
+      assert(Number(pick.decisionCenter.stake || pick.stake || 0) <= 1.0001, 'Mise supérieure au plafond de récupération', pick);
+    }
     assert(pick.matchSheetV3 && pick.matchSheetV3.schema === 'paris-sportif.match_sheet.v3', 'MatchSheet v3 absente', pick);
     assert(pick.matchSheetV3.summary && Array.isArray(pick.matchSheetV3.missingData), 'MatchSheet v3 incomplète', pick.matchSheetV3);
     assert(pick.matchSheetV4 && pick.matchSheetV4.schema === 'paris-sportif.match_sheet.v4', 'MatchSheet v4 absente', pick);
@@ -352,7 +360,8 @@ function testAnalysis() {
   // 30 lignes cockpit, beaucoup d'observation, seulement 2-3 vrais boutons
   // "Je mise". C'est sain si la watchlist reste visible et si le diagnostic
   // apparait quand il n'y a plus aucun pick prêt.
-  const requiredReady = analysis.decisionCenter?.summary?.agent_blocked || prebetBlocked || criticalBlocked ? 1 : 3;
+  const capitalProtectionActive = Number(analysis.decisionCenter?.summary?.capital_protection || 0) > 0;
+  const requiredReady = capitalProtectionActive ? 0 : analysis.decisionCenter?.summary?.agent_blocked || prebetBlocked || criticalBlocked ? 1 : 3;
   assert(Number(analysis.decisionCenter?.summary?.ready || 0) >= requiredReady, 'Trop peu de paris utilisateurs prêts pour l’état de garde-fou', analysis.decisionCenter?.summary);
   assert(readyUserPicks.length >= requiredReady, 'Trop peu de paris prêts visibles dans la sélection', readyUserPicks);
 
