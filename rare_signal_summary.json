@@ -1,26 +1,26 @@
 {
-  "generated_at": "2026-05-18T09:00:41Z",
+  "generated_at": "2026-05-18T09:29:20Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 84,
-    "actionable": 40,
-    "watch": 6,
-    "risk": 38,
+    "actionable": 41,
+    "watch": 8,
+    "risk": 35,
     "expired_sample": 0,
     "by_type": {
-      "market_move": 20,
+      "market_move": 23,
       "injury_imbalance": 37,
-      "market_uncertain": 39,
+      "market_uncertain": 37,
       "travel_extreme": 3,
       "back_to_back_travel": 16,
-      "signal_conflict": 5
+      "signal_conflict": 4
     },
     "by_quality": {
-      "watch": 6,
-      "actionable": 40,
-      "risk": 38
+      "watch": 8,
+      "actionable": 41,
+      "risk": 35
     }
   },
   "active_actionable": [
@@ -578,9 +578,9 @@
       "type": "market_move",
       "direction": "drift",
       "team": null,
-      "side": "away",
+      "side": "draw",
       "strength": 1.0,
-      "context": "Cote away: 5.10 -> 6.75 (-32.4%)"
+      "context": "Cote draw: 4.50 -> 5.40 (-20.0%)"
     },
     {
       "event_id": "740966",
@@ -743,6 +743,24 @@
       "side": "away",
       "strength": 0.726,
       "context": "1 match dans les 48h + 979 km de voyage"
+    },
+    {
+      "event_id": "401861390",
+      "date": "2026-05-20T11:35Z",
+      "sport": "football",
+      "league_code": "chn.1",
+      "league_name": "Chinese Super League",
+      "home": "Shanghai Shenhua",
+      "away": "Wuhan Three Towns",
+      "match": "Shanghai Shenhua - Wuhan Three Towns",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.654,
+      "context": "Cote away: 5.10 -> 4.50 (+11.8%)"
     }
   ],
   "active_watch": [
@@ -819,24 +837,6 @@
       "context": "Cote away: 2.50 -> 2.25 (+10.0%)"
     },
     {
-      "event_id": "401861390",
-      "date": "2026-05-20T11:35Z",
-      "sport": "football",
-      "league_code": "chn.1",
-      "league_name": "Chinese Super League",
-      "home": "Shanghai Shenhua",
-      "away": "Wuhan Three Towns",
-      "match": "Shanghai Shenhua - Wuhan Three Towns",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.545,
-      "context": "Cote away: 5.10 -> 4.60 (+9.8%)"
-    },
-    {
       "event_id": "748959",
       "date": "2026-05-18T18:30Z",
       "sport": "football",
@@ -853,27 +853,63 @@
       "side": "home",
       "strength": 0.49,
       "context": "Cote home: 1.95 -> 1.78 (+8.8%)"
+    },
+    {
+      "event_id": "401873341",
+      "date": "2026-05-20T00:00Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "New York Knicks",
+      "away": "Cleveland Cavaliers",
+      "match": "New York Knicks - Cleveland Cavaliers",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "away",
+      "strength": 0.479,
+      "context": "Cote away: 2.90 -> 3.15 (-8.6%)"
+    },
+    {
+      "event_id": "401873342",
+      "date": "2026-05-22T00:00Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "New York Knicks",
+      "away": "Cleveland Cavaliers",
+      "match": "New York Knicks - Cleveland Cavaliers",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "away",
+      "strength": 0.479,
+      "context": "Cote away: 2.90 -> 3.15 (-8.6%)"
+    },
+    {
+      "event_id": "401873343",
+      "date": "2026-05-24T00:00Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "Cleveland Cavaliers",
+      "away": "New York Knicks",
+      "match": "Cleveland Cavaliers - New York Knicks",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 0.479,
+      "context": "Cote home: 2.90 -> 3.15 (-8.6%)"
     }
   ],
   "active_risk": [
-    {
-      "event_id": "175500",
-      "date": "2026-05-19T04:00Z",
-      "sport": "tennis",
-      "league_code": "gonetgenevaopen",
-      "league_name": "Gonet Geneva Open",
-      "home": "",
-      "away": "",
-      "match": "? - ?",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 12.0%"
-    },
     {
       "event_id": "178435",
       "date": "2026-05-19T04:00Z",
@@ -947,6 +983,24 @@
       "context": "marge bookmaker anormale 18.2%"
     },
     {
+      "event_id": "401866585",
+      "date": "2026-05-21T16:00Z",
+      "sport": "football",
+      "league_code": "superleaguegrece",
+      "league_name": "Super League Grèce",
+      "home": "Panetolikos",
+      "away": "Asteras Tripoli",
+      "match": "Panetolikos - Asteras Tripoli",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.3%"
+    },
+    {
       "event_id": "401842777",
       "date": "2026-05-21T17:00Z",
       "sport": "football",
@@ -983,24 +1037,6 @@
       "context": "marge bookmaker anormale 18.5%"
     },
     {
-      "event_id": "401865543",
-      "date": "2026-05-22T00:30Z",
-      "sport": "football",
-      "league_code": "conmebol.libertadores",
-      "league_name": "Copa Libertadores",
-      "home": "Peñarol",
-      "away": "Corinthians",
-      "match": "Peñarol - Corinthians",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.4%"
-    },
-    {
       "event_id": "401859400",
       "date": "2026-05-22T10:30Z",
       "sport": "football",
@@ -1017,24 +1053,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.4%"
-    },
-    {
-      "event_id": "401873206",
-      "date": "2026-05-23T08:10Z",
-      "sport": "football",
-      "league_code": "aleague",
-      "league_name": "A-League",
-      "home": "Auckland FC",
-      "away": "Sydney FC",
-      "match": "Auckland FC - Sydney FC",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.3%"
     },
     {
       "event_id": "401859403",
@@ -1304,7 +1322,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "home et away montent ensemble (+12.9% / +8.0%)"
+      "context": "home et away montent ensemble (+12.9% / +6.8%)"
     },
     {
       "event_id": "401843351",
@@ -1466,7 +1484,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.3%"
+      "context": "marge bookmaker anormale 18.6%"
     },
     {
       "event_id": "748969",
@@ -1521,24 +1539,6 @@
       "side": null,
       "strength": 0.45,
       "context": "Signaux opposes: Los Angeles Angels fade 0.60, Athletics fade 0.60 -> prudence"
-    },
-    {
-      "event_id": "401873200",
-      "date": "2026-05-25T00:00Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "San Antonio Spurs",
-      "away": "Oklahoma City Thunder",
-      "match": "San Antonio Spurs - Oklahoma City Thunder",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "signal_conflict",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.45,
-      "context": "Signaux opposes: San Antonio Spurs fade 0.60, Oklahoma City Thunder fade 0.60 -> prudence"
     }
   ],
   "expired_sample": []
