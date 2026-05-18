@@ -1,27 +1,26 @@
 {
-  "generated_at": "2026-05-18T17:03:37Z",
+  "generated_at": "2026-05-18T17:08:04Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 82,
-    "actionable": 40,
-    "watch": 6,
-    "risk": 36,
+    "active_events": 75,
+    "actionable": 38,
+    "watch": 3,
+    "risk": 34,
     "expired_sample": 0,
     "by_type": {
-      "market_move": 6,
       "injury_imbalance": 39,
       "travel_extreme": 3,
-      "market_uncertain": 34,
-      "signal_conflict": 6,
+      "market_uncertain": 31,
       "back_to_back_travel": 17,
+      "signal_conflict": 5,
       "weather_extreme": 1
     },
     "by_quality": {
-      "watch": 6,
-      "actionable": 40,
-      "risk": 36
+      "actionable": 38,
+      "watch": 3,
+      "risk": 34
     }
   },
   "active_actionable": [
@@ -132,24 +131,6 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 6-11"
-    },
-    {
-      "event_id": "401871410",
-      "date": "2026-05-18T23:30Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Buffalo Sabres",
-      "away": "Montreal Canadiens",
-      "match": "Buffalo Sabres - Montreal Canadiens",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 1.85 -> 2.35 (-27.2%)"
     },
     {
       "event_id": "401815397",
@@ -656,24 +637,6 @@
       "context": "Absences severes 13-9"
     },
     {
-      "event_id": "740956",
-      "date": "2026-05-18T19:00Z",
-      "sport": "football",
-      "league_code": "eng.1",
-      "league_name": "Premier League",
-      "home": "Arsenal",
-      "away": "Burnley",
-      "match": "Arsenal - Burnley",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.794,
-      "context": "Cote away: 21.00 -> 18.00 (+14.3%)"
-    },
-    {
       "event_id": "401815414",
       "date": "2026-05-20T00:40Z",
       "sport": "baseball",
@@ -748,24 +711,6 @@
   ],
   "active_watch": [
     {
-      "event_id": "401842718",
-      "date": "2026-05-18T17:00Z",
-      "sport": "football",
-      "league_code": "allsvenskan",
-      "league_name": "Allsvenskan",
-      "home": "Örgryte IS",
-      "away": "IFK Göteborg",
-      "match": "Örgryte IS - IFK Göteborg",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "home",
-      "strength": 0.61,
-      "context": "Cote home: 4.10 -> 3.65 (+11.0%)"
-    },
-    {
       "event_id": "401815399",
       "date": "2026-05-19T00:40Z",
       "sport": "baseball",
@@ -818,66 +763,12 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 9-12"
-    },
-    {
-      "event_id": "401856919",
-      "date": "2026-05-19T02:00Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Portland Fire",
-      "away": "Connecticut Sun",
-      "match": "Portland Fire - Connecticut Sun",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.454,
-      "context": "Cote away: 2.45 -> 2.25 (+8.2%)"
-    },
-    {
-      "event_id": "748959",
-      "date": "2026-05-18T18:30Z",
-      "sport": "football",
-      "league_code": "laliga2",
-      "league_name": "La Liga 2",
-      "home": "Leganés",
-      "away": "Huesca",
-      "match": "Leganés - Huesca",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.452,
-      "context": "Cote away: 4.30 -> 3.95 (+8.1%)"
     }
   ],
   "active_risk": [
     {
       "event_id": "176097",
       "date": "2026-05-19T10:00Z",
-      "sport": "tennis",
-      "league_code": "internationauxdestra",
-      "league_name": "Internationaux de Strasbourg presented by Mammotion",
-      "home": "",
-      "away": "",
-      "match": "? - ?",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 12.0%"
-    },
-    {
-      "event_id": "176120",
-      "date": "2026-05-19T15:30Z",
       "sport": "tennis",
       "league_code": "internationauxdestra",
       "league_name": "Internationaux de Strasbourg presented by Mammotion",
@@ -1162,24 +1053,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 19.0%"
-    },
-    {
-      "event_id": "740974",
-      "date": "2026-05-24T15:00Z",
-      "sport": "football",
-      "league_code": "eng.1",
-      "league_name": "Premier League",
-      "home": "Tottenham Hotspur",
-      "away": "Everton",
-      "match": "Tottenham Hotspur - Everton",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 19.2%"
     },
     {
       "event_id": "740971",

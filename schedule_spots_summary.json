@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-05-18T17:03:37Z",
+  "generated_at": "2026-05-18T17:08:04Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 57,
+    "active_events": 58,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 82,
+      "lookahead": 84,
       "travel_extreme": 3,
       "back_to_back_travel": 17,
       "schedule_congestion": 18
     },
     "by_decision": {
-      "abstain": 39,
+      "abstain": 40,
       "lean_home": 18
     },
     "lean_home": 18,
     "lean_away": 0,
-    "abstain": 39,
+    "abstain": 40,
     "monitor": 0
   },
   "active": [
@@ -2022,6 +2022,58 @@
         "home_fade": 0.15,
         "away_fade": 0.15,
         "reason": "Direction nette: Athletics (-0.10)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401873245",
+      "source_event_ids": [
+        "401873245"
+      ],
+      "kickoff": "2026-05-21T18:00Z",
+      "sport": "football",
+      "league_code": "ligamx",
+      "league_name": "Liga MX",
+      "home": "Cruz Azul",
+      "away": "Pumas UNAM",
+      "match": "Cruz Azul - Pumas UNAM",
+      "decision": "abstain",
+      "net_team": null,
+      "reason": "Fatigue/agenda des deux cotes: Cruz Azul 0.15, Pumas UNAM 0.15",
+      "pressure_score": 0.667,
+      "home_fade": 0.15,
+      "away_fade": 0.15,
+      "travel_score": 0,
+      "lookahead_score": 0.667,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 2
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours",
+        "1 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "away",
+        "home_score": -0.098,
+        "away_score": -0.098,
+        "home_fade": 0.15,
+        "away_fade": 0.15,
+        "reason": "Direction nette: Pumas UNAM (-0.10)",
         "detail": [
           {
             "side": "home",
