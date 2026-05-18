@@ -1,14 +1,19 @@
 {
   "name": "paris-sportif-desktop",
-  "version": "5.2.0",
+  "version": "5.2.1",
   "private": true,
   "description": "Application PC locale pour Paris-Sportif.",
   "author": "Paris-Sportif",
   "main": "src/main.js",
   "scripts": {
     "start": "electron .",
-    "refresh": "python bin/refresh_once.py",
+    "refresh": "python bin/refresh_once.py --fast",
+    "refresh:fast": "python bin/refresh_once.py --fast",
+    "refresh:enriched": "python bin/refresh_once.py --quick",
+    "refresh:full": "python bin/refresh_once.py --full",
     "dist": "electron-builder --win nsis --x64",
+    "qa:desktop:fast": "node scripts/smoke-fast.js",
+    "qa:desktop:full": "node scripts/smoke.js",
     "qa:terrain": "node scripts/terrain-check.js",
     "qa:terrain:quick": "node scripts/terrain-check.js --skip-refresh",
     "qa:winamax-audit": "node scripts/winamax-audit.js"

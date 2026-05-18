@@ -5,6 +5,16 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-17
 
+### Version v5.2.1 — Synchro rapide + tests courts
+
+Correctif confort après retour terrain : les contrôles et la synchronisation étaient devenus beaucoup trop longs pour un usage quotidien.
+- Ajout d’un vrai mode `Synchro rapide` (`refresh_once.py --fast`) qui limite le travail réseau aux sources indispensables Winamax/live et reconstruit les sorties locales essentielles.
+- Le bouton principal et l’auto-refresh utilisent maintenant cette synchro rapide ; les refreshs enrichi/complet restent disponibles volontairement pour les audits profonds.
+- Le test par défaut `npm test` passe sur un smoke express desktop au lieu du parcours complet historique ; le gros smoke reste disponible via `qa:desktop:full`.
+- Ajout de `desktop/scripts/smoke-fast.js` pour vérifier vite l’accueil, les catégories, la récupération, les réglages, le Winamax-only et l’absence d’erreurs console.
+- Ajout de scripts pratiques `qa:fast`, `qa:desktop:fast`, `qa:terrain:quick`, `refresh:fast`, `refresh:enriched` et `refresh:full`.
+- Les estimations UI distinguent maintenant `Synchro rapide`, `Refresh enrichi` et `Refresh complet`, pour éviter l’impression d’un logiciel bloqué sans explication.
+
 ### Version v5.2.0 — Verrou réel anti-récidive
 
 Suite logique du mode récupération : les pertes Winamax importées deviennent maintenant un vrai verrou avant mise, pas seulement un diagnostic après coup.

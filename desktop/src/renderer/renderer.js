@@ -296,6 +296,7 @@
   const REFRESH_URGENT_INTERVAL_MS = 5 * 60 * 1000;
   const REFRESH_ECONOMY_AFTER_MS = 60 * 60 * 1000;
   const REFRESH_ESTIMATE_SECONDS = {
+    fast: 45,
     quick: 150,
     signals: 520,
     full: 900,
@@ -2890,7 +2891,9 @@
   }
 
   function refreshModeLabel(mode) {
+    if (mode === 'fast') return 'Synchro rapide';
     if (mode === 'signals') return 'Signaux lents';
+    if (mode === 'quick') return 'Refresh enrichi';
     if (mode === 'full') return 'Refresh complet';
     if (mode === 'prematch') return 'Pré-match final';
     if (mode === 'prematch_t60') return 'Pré-match T-60';
@@ -2898,7 +2901,7 @@
     if (mode === 'prematch_t10') return 'Pré-match T-10';
     if (mode === 'critical') return 'File critique';
     if (mode === 'repair_context') return 'Réparer contexte';
-    return 'Refresh rapide';
+    return 'Synchro rapide';
   }
 
   function signalSourceLabel(source) {
@@ -2949,7 +2952,7 @@
   }
 
   function estimateRefreshTotalSeconds(refresh) {
-    const mode = refresh?.mode || 'quick';
+    const mode = refresh?.mode || 'fast';
     const source = refresh?.source || 'all';
     const lastByMode = refresh?.lastByMode || {};
     const history = Array.isArray(refresh?.history) ? refresh.history : [];
@@ -2976,8 +2979,8 @@
     const source = refresh.mode === 'signals' && refresh.source ? ` · ${signalSourceLabel(refresh.source)}` : '';
     return {
       running: true,
-      mode: refresh.mode || 'quick',
-      title: `${refreshModeLabel(refresh.mode || 'quick')}${source}`,
+      mode: refresh.mode || 'fast',
+      title: `${refreshModeLabel(refresh.mode || 'fast')}${source}`,
       elapsedSec,
       totalSec,
       remainingSec,
@@ -3061,20 +3064,20 @@
     if (liveRows().length) {
       return {
         delayMs: REFRESH_LIVE_INTERVAL_MS,
-        mode: 'quick',
+        mode: 'fast',
         label: 'Auto-refresh live 2 min : match en cours suivi.'
       };
     }
     if (upcomingPickWithin(60 * 60 * 1000)) {
       return {
         delayMs: REFRESH_URGENT_INTERVAL_MS,
-        mode: 'quick',
+        mode: 'fast',
         label: 'Auto-refresh boost 5 min : match proche.'
       };
     }
     return {
       delayMs: REFRESH_DEFAULT_INTERVAL_MS,
-      mode: 'quick',
+      mode: 'fast',
       label: 'Auto-refresh 30 min.'
     };
   }
@@ -3157,7 +3160,7 @@
     const queue = Array.isArray(state.refreshPriorityPlan?.queue) ? state.refreshPriorityPlan.queue : [];
     if (queue[0]) return queue[0];
     const actions = Array.isArray(state.nextActions?.actions) ? state.nextActions.actions : [];
-    return actions[0] || { mode: 'quick', source: 'all', priority: 'low', title: 'Refresh rapide' };
+    return actions[0] || { mode: 'fast', source: 'all', priority: 'low', title: 'Synchro rapide' };
   }
 
   function compactMatchKey(value) {
@@ -8627,7 +8630,7 @@
         <div class="pipeline-head">
           <div>
             <span class="eyebrow">Refresh actif</span>
-            <strong>${escapeHtml(refreshModeLabel(refresh.mode || 'quick'))}</strong>
+            <strong>${escapeHtml(refreshModeLabel(refresh.mode || 'fast'))}</strong>
             <p>${eta?.overdue ? 'Plus long que prévu' : `Temps restant estimé ${formatDurationSeconds(eta?.remainingSec || 0)}`} · écoulé ${formatDurationSeconds(eta?.elapsedSec || 0)}</p>
           </div>
           <div class="pipeline-meter"><span style="width:${Math.round(eta?.progressPct || 0)}%"></span></div>
@@ -8654,7 +8657,7 @@
       const duration = started && finished ? Math.max(0, Math.round((finished - started) / 1000)) : null;
       return `
         <article class="refresh-card refresh-${tone}">
-          <span>${escapeHtml(refreshModeLabel(row.mode || 'quick'))}</span>
+          <span>${escapeHtml(refreshModeLabel(row.mode || 'fast'))}</span>
           <strong>${running ? 'En cours' : ok ? 'OK' : row.error ? 'Erreur' : 'Historique'}</strong>
           <p>${duration == null ? 'Durée en cours' : `Durée ${formatDurationSeconds(duration)}`}</p>
           <small>${escapeHtml(row.error || row.source || row.startedAt || '')}</small>
@@ -13541,7 +13544,7 @@
         applyPreferences({ ...prefs, expertMode: !prefs.expertMode });
       } catch { /* noop */ }
     } else if (itemId === 'action:refresh') {
-      if (typeof startRefresh === 'function') startRefresh('quick').catch((error) => pushLog('warn', `Refresh manuel impossible: ${error.message}`));
+      if (typeof startRefresh === 'function') startRefresh('fast').catch((error) => pushLog('warn', `Synchro manuelle impossible: ${error.message}`));
     }
     closeCmdK();
   }
@@ -14061,7 +14064,7 @@
               ${changes.map((item) => `<div class="block-reason-item block-warn"><span>Condition</span><strong>${escapeHtml(item)}</strong></div>`).join('')}
             </div>
             <div class="quality-alert-actions">
-              <button class="quality-action-btn" data-quality-mode="${escapeHtml(action.mode || 'quick')}" data-quality-source="${escapeHtml(action.source || 'all')}">${escapeHtml(action.label || 'Préparer')}</button>
+              <button class="quality-action-btn" data-quality-mode="${escapeHtml(action.mode || 'fast')}" data-quality-source="${escapeHtml(action.source || 'all')}">${escapeHtml(action.label || 'Préparer')}</button>
             </div>
           </article>
           <article class="detail-card wide">
@@ -15477,9 +15480,9 @@
     const button = state.smartPreparePlan?.button || {};
     const summary = state.smartPreparePlan?.summary || {};
     return {
-      mode: button.mode || summary.mode || 'quick',
+      mode: button.mode || summary.mode || 'fast',
       source: button.source || summary.source || 'all',
-      label: button.label || summary.recommendation || refreshModeLabel(summary.mode || 'quick')
+      label: button.label || summary.recommendation || refreshModeLabel(summary.mode || 'fast')
     };
   }
 
@@ -15540,7 +15543,7 @@
         <span>${escapeHtml(row.priority || 'info')}</span>
         <strong>${escapeHtml(row.label || refreshModeLabel(row.mode))}</strong>
         <p>${escapeHtml(row.reason || '-')}</p>
-        <button class="quality-action-btn" data-quality-mode="${escapeHtml(row.mode || 'quick')}" data-quality-source="${escapeHtml(row.source || 'all')}">Lancer</button>
+        <button class="quality-action-btn" data-quality-mode="${escapeHtml(row.mode || 'fast')}" data-quality-source="${escapeHtml(row.source || 'all')}">Lancer</button>
       </article>
     `).join('');
   }
@@ -15986,7 +15989,7 @@
     }
     const tone = { critical: 'danger', high: 'warn', medium: 'watch', low: 'ok' };
     grid.innerHTML = actions.slice(0, 8).map((action) => {
-      const mode = action.mode || 'quick';
+      const mode = action.mode || 'fast';
       const source = action.source || 'all';
       const label = mode === 'signals' ? `Lancer ${signalSourceLabel(source)}` : mode === 'prematch' ? 'Lancer pré-match' : 'Lancer refresh';
       return `
@@ -16043,7 +16046,7 @@
         : `${formatDateTime(row.startedAt)} · en cours ou lancé récemment`;
       return `
         <article class="quality-report-card quality-${status}">
-          <span>${escapeHtml(refreshModeLabel(row.mode || 'quick'))}</span>
+          <span>${escapeHtml(refreshModeLabel(row.mode || 'fast'))}</span>
           <strong>${escapeHtml(row.label || actionLaunchLabel(row.mode, row.source))}</strong>
           <p>${escapeHtml(`${signalSourceLabel(row.source || 'all')} · ${row.status || 'started'} · ${detail}`)}</p>
         </article>
@@ -16101,7 +16104,7 @@
     }
     const tone = { critical: 'danger', high: 'warn', medium: 'watch', low: 'ok' };
     grid.innerHTML = rows.slice(0, 8).map((row) => {
-      const mode = row.mode || 'quick';
+      const mode = row.mode || 'fast';
       const source = row.source || 'all';
       const sourceLabel = mode === 'signals' ? ` · ${signalSourceLabel(source)}` : '';
       return `
@@ -16239,7 +16242,7 @@
     }
     const tone = { critical: 'danger', high: 'warn', medium: 'watch', low: 'ok' };
     grid.innerHTML = rows.slice(0, 8).map((row, index) => {
-      const mode = row.mode || 'quick';
+      const mode = row.mode || 'fast';
       const source = row.source || 'all';
       const label = mode === 'signals' ? `Lancer ${signalSourceLabel(source)}` : mode === 'prematch' ? 'Lancer pré-match' : mode === 'critical' ? 'Lancer file critique' : mode === 'repair_context' ? 'Réparer contexte' : 'Lancer refresh';
       return `
@@ -16306,7 +16309,7 @@
 
     const banner = $('#stale-banner');
     if (status.refresh?.running) {
-      setSideStatus(`${refreshModeLabel(status.refresh.mode || 'quick')} en cours`, 'warn');
+      setSideStatus(`${refreshModeLabel(status.refresh.mode || 'fast')} en cours`, 'warn');
     } else if (status.recovery?.recoveredFromBackup) {
       banner.classList.remove('hidden');
       banner.textContent = `Recovery data : data.js est illisible, le logiciel affiche le dernier backup local (${escapeHtml(status.recovery.source || 'backup')}).`;
@@ -16985,7 +16988,7 @@
     if (text.includes('clubelo')) {
       return { mode: 'full', source: 'all', label: 'Refresh complet' };
     }
-    return { mode: 'quick', source: 'all', label: 'Rafraîchir maintenant' };
+    return { mode: 'fast', source: 'all', label: 'Synchro rapide' };
   }
 
   function renderQualityAlerts(status) {
@@ -17117,7 +17120,7 @@
     $$('.quality-action-btn').forEach((button) => {
       button.disabled = running;
     });
-    setRefreshButtonText('refresh-btn', running && !isSignals ? 'Refresh en cours' : 'Rafraîchir');
+    setRefreshButtonText('refresh-btn', running && !isSignals ? 'Synchro en cours' : 'Synchro rapide');
     setRefreshButtonText('refresh-full-btn', running && status.mode === 'full' ? 'Complet en cours' : 'Refresh complet');
     setRefreshButtonText('refresh-signals-btn', running && isSignals ? `${sourceLabel} en cours` : 'Signaux lents');
     setRefreshButtonText('refresh-prematch-btn', running && isPrematch ? 'Pré-match en cours' : 'Pré-match final');
@@ -17132,7 +17135,7 @@
     return status;
   }
 
-  async function startRefresh(mode = 'quick', requestedSource = null) {
+  async function startRefresh(mode = 'fast', requestedSource = null) {
     if (automationRefreshDisabled()) {
       pushLog('info', `Refresh ${mode} ignoré en profil de test isolé.`);
       return { ok: true, started: false, skipped: true };
@@ -17166,7 +17169,7 @@
     $$('.quality-action-btn').forEach((button) => {
       button.disabled = true;
     });
-    setRefreshButtonText('refresh-btn', mode === 'signals' ? 'Rafraîchir' : 'Refresh en cours');
+    setRefreshButtonText('refresh-btn', mode === 'signals' ? 'Synchro rapide' : 'Synchro en cours');
     setRefreshButtonText('refresh-full-btn', mode === 'full' ? 'Complet en cours' : 'Refresh complet');
     setRefreshButtonText('refresh-signals-btn', mode === 'signals' ? `${signalSourceLabel(source)} en cours` : 'Signaux lents');
     setRefreshButtonText('refresh-prematch-btn', mode === 'prematch' ? 'Pré-match en cours' : 'Pré-match final');
@@ -17188,7 +17191,7 @@
       $$('.quality-action-btn').forEach((button) => {
         button.disabled = false;
       });
-      setRefreshButtonText('refresh-btn', 'Rafraîchir');
+      setRefreshButtonText('refresh-btn', 'Synchro rapide');
       setRefreshButtonText('refresh-full-btn', 'Refresh complet');
       setRefreshButtonText('refresh-signals-btn', 'Signaux lents');
       setRefreshButtonText('refresh-prematch-btn', 'Pré-match final');
@@ -18211,7 +18214,7 @@
     $('#run-first-action-btn')?.addEventListener('click', () => {
       const action = firstNextAction();
       if (!action) return;
-      startRefresh(action.mode || 'quick', action.source || 'all').catch((error) => {
+      startRefresh(action.mode || 'fast', action.source || 'all').catch((error) => {
         setSideStatus('Action prioritaire impossible', 'danger');
         $('#refresh-log').textContent = error.stack || error.message;
       });
@@ -18801,7 +18804,7 @@
     $('#quality-alert-grid')?.addEventListener('click', (event) => {
       const button = event.target.closest('[data-quality-mode]');
       if (!button) return;
-      const mode = button.dataset.qualityMode || 'quick';
+      const mode = button.dataset.qualityMode || 'fast';
       const source = button.dataset.qualitySource || 'all';
       startRefresh(mode, source).catch((error) => {
         setSideStatus('Refresh alerte impossible', 'danger');
@@ -18811,7 +18814,7 @@
     $('#next-actions-grid')?.addEventListener('click', (event) => {
       const button = event.target.closest('[data-quality-mode]');
       if (!button) return;
-      const mode = button.dataset.qualityMode || 'quick';
+      const mode = button.dataset.qualityMode || 'fast';
       const source = button.dataset.qualitySource || 'all';
       startRefresh(mode, source).catch((error) => {
         setSideStatus('Action impossible', 'danger');
@@ -18821,7 +18824,7 @@
     $('#prebet-checklist-grid')?.addEventListener('click', (event) => {
       const button = event.target.closest('[data-quality-mode]');
       if (!button) return;
-      const mode = button.dataset.qualityMode || 'quick';
+      const mode = button.dataset.qualityMode || 'fast';
       const source = button.dataset.qualitySource || 'all';
       startRefresh(mode, source).catch((error) => {
         setSideStatus('Checklist impossible', 'danger');
@@ -18831,7 +18834,7 @@
     $('#final-decision-grid')?.addEventListener('click', (event) => {
       const button = event.target.closest('[data-quality-mode]');
       if (!button) return;
-      const mode = button.dataset.qualityMode || 'quick';
+      const mode = button.dataset.qualityMode || 'fast';
       const source = button.dataset.qualitySource || 'all';
       startRefresh(mode, source).catch((error) => {
         setSideStatus('Décision finale impossible', 'danger');
@@ -18871,7 +18874,7 @@
     $('#refresh-priority-grid')?.addEventListener('click', (event) => {
       const button = event.target.closest('[data-quality-mode]');
       if (!button) return;
-      const mode = button.dataset.qualityMode || 'quick';
+      const mode = button.dataset.qualityMode || 'fast';
       const source = button.dataset.qualitySource || 'all';
       startRefresh(mode, source).catch((error) => {
         setSideStatus('File refresh impossible', 'danger');
@@ -18881,7 +18884,7 @@
     $('#smart-prepare-data-grid')?.addEventListener('click', (event) => {
       const button = event.target.closest('[data-quality-mode]');
       if (!button) return;
-      const mode = button.dataset.qualityMode || 'quick';
+      const mode = button.dataset.qualityMode || 'fast';
       const source = button.dataset.qualitySource || 'all';
       startRefresh(mode, source).catch((error) => {
         setSideStatus('Préparation intelligente impossible', 'danger');
@@ -19072,7 +19075,7 @@
       const button = event.target.closest('[data-quality-mode]');
       if (!button) return;
       event.preventDefault();
-      const mode = button.dataset.qualityMode || 'quick';
+      const mode = button.dataset.qualityMode || 'fast';
       const source = button.dataset.qualitySource || 'all';
       startRefresh(mode, source).catch((error) => {
         setSideStatus('Action détail impossible', 'danger');
@@ -19190,7 +19193,7 @@
         scheduleBackgroundRefresh();
         return;
       }
-      startRefresh('quick').catch((error) => {
+      startRefresh('fast').catch((error) => {
         setSideStatus('Auto-refresh impossible', 'warn');
         $('#refresh-log').textContent = error.stack || error.message;
       }).finally(() => {
@@ -19256,7 +19259,7 @@
       if (ageMs > 90 * 60 * 1000 && !state.status?.refresh?.running) {
         setSideStatus('Données à rafraîchir — refresh auto au boot', 'warn');
         setTimeout(() => {
-          startRefresh('quick')
+          startRefresh('fast')
             .then(() => setSideStatus('Calcul prêt', 'ok'))
             .catch((error) => {
               setSideStatus(`Boot refresh impossible: ${error.message}`, 'warn');

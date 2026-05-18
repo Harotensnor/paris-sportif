@@ -52,6 +52,10 @@ DECISION_STACK_STAGES = [
     Stage("build_v15_operational_cleanup.py", 30),
     Stage("build_v16_final_decision.py", 30),
 ]
+FAST_DECISION_STACK_STAGES = [
+    stage for stage in DECISION_STACK_STAGES
+    if stage.script != "build_v14_quality_audit.py"
+]
 
 PUBLIC_CONTEXT_FETCH_STAGE = Stage(
     "fetch_public_match_signals.py",
@@ -63,6 +67,57 @@ PUBLIC_CONTEXT_PATCH_STAGE = Stage("patch_public_match_signals.py", 45)
 PUBLIC_CONTEXT_STAGES = [
     PUBLIC_CONTEXT_FETCH_STAGE,
     PUBLIC_CONTEXT_PATCH_STAGE,
+]
+
+FAST_STAGES = [
+    Stage("fetch_live.py", 12),
+    Stage("fetch_winamax_catalog.py", 60),
+    Stage("patch_odds.py", 45),
+    Stage("snapshot_odds.py", 30),
+    Stage("snapshot_results.py", 30),
+    Stage("patch_winamax.py", 45),
+    Stage("patch_winamax_markets.py", 45),
+    Stage(
+        "fetch_winamax_match_details.py",
+        75,
+        ["--limit", "90", "--ttl-hours", "0.75", "--horizon-days", "3"],
+        {
+            "WINAMAX_DETAILS_CAP": "90",
+            "WINAMAX_DETAILS_SLEEP": "0.05",
+            "WINAMAX_DETAILS_TTL_HOURS": "0.75",
+            "WINAMAX_DETAILS_HORIZON_DAYS": "3",
+        },
+    ),
+    Stage("patch_winamax_markets.py", 45),
+    Stage("patch_all_quick.py", 45),
+    Stage("patch_tennis_features.py", 45),
+    Stage("patch_smart_money.py", 20),
+    Stage("build_lineups_multisport.py", 25),
+    Stage("build_xg_coverage.py", 20),
+    Stage("build_match_context.py", 45),
+    Stage("build_team_identity_graph.py", 20),
+    Stage("build_picks_history.py", 45),
+    Stage("settle_picks.py", 20),
+    Stage("build_decision_tuning.py", 20),
+    Stage("build_odds_guardrails.py", 20),
+    Stage("build_scorer_quality.py", 20),
+    Stage("build_context_repair_plan.py", 20),
+    Stage("build_source_freshness_plan.py", 20),
+    Stage("build_refresh_priority_plan.py", 20),
+    Stage("build_prebet_checklist.py", 20),
+    Stage("build_prebet_checklist_backtest.py", 20),
+    Stage("build_agent_bankroll_simulation.py", 20),
+    Stage("build_match_decision_timeline.py", 20),
+    Stage("build_smart_prepare_plan.py", 20),
+    Stage("build_source_registry.py", 20),
+    Stage("build_optional_sources_plan.py", 20),
+    *FAST_DECISION_STACK_STAGES,
+    Stage("build_v4_audit_reports.py", 20),
+    Stage("build_decision_exports.py", 20),
+    Stage("build_health.py", 20),
+    Stage("build_daily_insights.py", 20),
+    Stage("finalize_inline.py", 35, required=True),
+    Stage("check_pipeline_freshness.py", 20),
 ]
 
 
@@ -738,7 +793,8 @@ def print_dry_run(stages: list[Stage]) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Refresh Paris-Sportif desktop data once.")
-    parser.add_argument("--quick", action="store_true", help="Fast refresh for the desktop app.")
+    parser.add_argument("--fast", action="store_true", help="Very fast Winamax sync used by the UI and short QA.")
+    parser.add_argument("--quick", action="store_true", help="Enriched refresh with slower context rebuilds.")
     parser.add_argument("--full", action="store_true", help="Run the heavier source refresh first.")
     parser.add_argument("--prematch", action="store_true", help="Run a focused final pre-match refresh for near kickoffs.")
     parser.add_argument("--prematch-t60", action="store_true", help="Run the T-60 semi-automatic pre-match refresh.")
@@ -760,7 +816,7 @@ def main() -> int:
     run_start_time = time.time()
     stages = []
     source = None
-    mode = "quick"
+    mode = "fast"
     if args.critical:
         mode = "critical"
         stages.extend(PREMATCH_STAGES)
@@ -796,8 +852,11 @@ def main() -> int:
         stages.extend(QUICK_STAGES)
         stages.extend(FULL_EXTRA_STAGES[1:])
         stages.extend(QUICK_STAGES)
-    else:
+    elif args.quick:
+        mode = "quick"
         stages.extend(QUICK_STAGES)
+    else:
+        stages.extend(FAST_STAGES)
 
     print("[desktop-refresh] depart", flush=True)
     print(f"[desktop-refresh] racine: {PROJECT}", flush=True)

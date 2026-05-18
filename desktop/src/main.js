@@ -70,6 +70,7 @@ rotateSprintReports();
 setInterval(rotateSprintReports, 24 * 60 * 60 * 1000); // tourne tous les jours
 const SIGNAL_SOURCES = new Set(['all', 'weather', 'referees', 'injuries', 'lineups', 'team_form', 'team_stats', 'h2h', 'context', 'public', 'public_web', 'web', 'wikipedia', 'wikidata']);
 const REFRESH_MODES = new Set([
+  'fast',
   'quick',
   'full',
   'signals',
@@ -1588,7 +1589,7 @@ function finishRefresh(exitCode, errorMessage = null) {
   refreshState.exitCode = exitCode;
   refreshState.error = errorMessage;
   const stored = safeJsonFile(REFRESH_HISTORY_PATH);
-  const mode = refreshState.mode || 'quick';
+  const mode = refreshState.mode || 'fast';
   const source = refreshState.mode === 'signals' ? (refreshState.source || 'all') : null;
   const key = mode === 'signals' && source && source !== 'all' ? `signals:${source}` : mode;
   const persisted = stored && !stored.__error && stored.lastByMode
@@ -1619,6 +1620,7 @@ function finishRefresh(exitCode, errorMessage = null) {
 function spawnPythonRefresh(mode, source = 'all') {
   const script = path.join(DESKTOP_ROOT, 'bin', 'refresh_once.py');
   const modeArgs = {
+    fast: '--fast',
     full: '--full',
     signals: '--signals',
     prematch: '--prematch',
@@ -1628,7 +1630,7 @@ function spawnPythonRefresh(mode, source = 'all') {
     repair_context: '--repair-context',
     critical: '--critical'
   };
-  const modeArg = modeArgs[mode] || '--quick';
+  const modeArg = modeArgs[mode] || '--fast';
   const args = [script, modeArg];
   if (mode === 'signals') {
     args.push('--signal-source', source || 'all');
@@ -1685,9 +1687,9 @@ function spawnPythonRefresh(mode, source = 'all') {
   trySpawn();
 }
 
-function startRefresh(mode = 'quick', source = 'all') {
+function startRefresh(mode = 'fast', source = 'all') {
   if (refreshState.running) return false;
-  const normalizedMode = REFRESH_MODES.has(mode) ? mode : 'quick';
+  const normalizedMode = REFRESH_MODES.has(mode) ? mode : 'fast';
   const normalizedSource = SIGNAL_SOURCES.has(source) ? source : 'all';
   refreshState.running = true;
   refreshState.mode = normalizedMode;
@@ -1870,7 +1872,7 @@ async function handleApi(req, res, url) {
       return;
     }
     const requestedMode = url.searchParams.get('mode');
-    const mode = REFRESH_MODES.has(requestedMode) ? requestedMode : 'quick';
+    const mode = REFRESH_MODES.has(requestedMode) ? requestedMode : 'fast';
     const requestedSource = url.searchParams.get('source') || 'all';
     const source = SIGNAL_SOURCES.has(requestedSource) ? requestedSource : 'all';
     const started = startRefresh(mode, source);
