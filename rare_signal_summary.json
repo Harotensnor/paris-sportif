@@ -1,26 +1,26 @@
 {
-  "generated_at": "2026-05-18T08:38:37Z",
+  "generated_at": "2026-05-18T08:43:00Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 83,
+    "active_events": 84,
     "actionable": 40,
     "watch": 6,
-    "risk": 37,
+    "risk": 38,
     "expired_sample": 0,
     "by_type": {
       "market_move": 20,
       "injury_imbalance": 37,
       "market_uncertain": 39,
-      "signal_conflict": 5,
       "travel_extreme": 3,
-      "back_to_back_travel": 16
+      "back_to_back_travel": 16,
+      "signal_conflict": 5
     },
     "by_quality": {
       "watch": 6,
       "actionable": 40,
-      "risk": 37
+      "risk": 38
     }
   },
   "active_actionable": [
@@ -857,11 +857,11 @@
   ],
   "active_risk": [
     {
-      "event_id": "176097",
+      "event_id": "175500",
       "date": "2026-05-19T04:00Z",
       "sport": "tennis",
-      "league_code": "internationauxdestra",
-      "league_name": "Internationaux de Strasbourg presented by Mammotion",
+      "league_code": "gonetgenevaopen",
+      "league_name": "Gonet Geneva Open",
       "home": "",
       "away": "",
       "match": "? - ?",
@@ -893,11 +893,11 @@
       "context": "marge bookmaker anormale 12.3%"
     },
     {
-      "event_id": "175500",
+      "event_id": "176097",
       "date": "2026-05-19T04:00Z",
       "sport": "tennis",
-      "league_code": "gonetgenevaopen",
-      "league_name": "Gonet Geneva Open",
+      "league_code": "internationauxdestra",
+      "league_name": "Internationaux de Strasbourg presented by Mammotion",
       "home": "",
       "away": "",
       "match": "? - ?",
@@ -1521,6 +1521,24 @@
       "side": null,
       "strength": 0.45,
       "context": "Signaux opposes: Los Angeles Angels fade 0.60, Athletics fade 0.60 -> prudence"
+    },
+    {
+      "event_id": "401873200",
+      "date": "2026-05-25T00:00Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "San Antonio Spurs",
+      "away": "Oklahoma City Thunder",
+      "match": "San Antonio Spurs - Oklahoma City Thunder",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "signal_conflict",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.45,
+      "context": "Signaux opposes: San Antonio Spurs fade 0.60, Oklahoma City Thunder fade 0.60 -> prudence"
     }
   ],
   "expired_sample": []
