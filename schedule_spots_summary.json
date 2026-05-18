@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-18T05:01:28Z",
+  "generated_at": "2026-05-18T05:05:57Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -569,11 +569,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.498,
+        "home_score": 0.015,
         "away_score": -0.795,
         "home_fade": 0.3,
         "away_fade": 0.9,
-        "reason": "Direction nette: Colorado Rockies (+0.50)",
+        "reason": "Direction nette: Colorado Rockies (+0.01)",
         "detail": [
           {
             "side": "home",
@@ -592,12 +592,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.6
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.483
           }
         ]
       }
@@ -744,10 +738,10 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.795,
-        "away_score": 0.497,
+        "away_score": 0.015,
         "home_fade": 0.9,
         "away_fade": 0.3,
-        "reason": "Direction nette: San Francisco Giants (+0.50)",
+        "reason": "Direction nette: San Francisco Giants (+0.01)",
         "detail": [
           {
             "side": "home",
@@ -766,12 +760,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.482
           }
         ]
       }
@@ -1425,13 +1413,13 @@
         "3 matchs sur les 7 derniers jours"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.914,
-        "away_score": -0.207,
-        "home_fade": 1.124,
+        "status": "abstain",
+        "net_side": null,
+        "home_score": -0.39,
+        "away_score": -0.39,
+        "home_fade": 0.6,
         "away_fade": 0.6,
-        "reason": "Direction nette: New York Knicks (-0.21)",
+        "reason": "Signaux opposes: Cleveland Cavaliers fade 0.60, New York Knicks fade 0.60 -> prudence",
         "detail": [
           {
             "side": "home",
@@ -1444,12 +1432,6 @@
             "type": "schedule_congestion",
             "direction": "fade",
             "strength": 0.6
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 0.524
           }
         ]
       }
@@ -1594,12 +1576,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "home",
-        "home_score": 0.086,
-        "away_score": -0.622,
+        "net_side": "away",
+        "home_score": -0.098,
+        "away_score": -0.098,
         "home_fade": 0.15,
-        "away_fade": 0.674,
-        "reason": "Direction nette: New York Knicks (+0.09)",
+        "away_fade": 0.15,
+        "reason": "Direction nette: Cleveland Cavaliers (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -1612,12 +1594,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 0.524
           }
         ]
       }
@@ -2092,12 +2068,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "home",
-        "home_score": 0.086,
-        "away_score": -0.622,
+        "net_side": "away",
+        "home_score": -0.098,
+        "away_score": -0.098,
         "home_fade": 0.15,
-        "away_fade": 0.674,
-        "reason": "Direction nette: New York Knicks (+0.09)",
+        "away_fade": 0.15,
+        "reason": "Direction nette: Cleveland Cavaliers (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -2110,12 +2086,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 0.524
           }
         ]
       }
@@ -2203,11 +2173,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.622,
-        "away_score": 0.086,
-        "home_fade": 0.674,
+        "home_score": -0.098,
+        "away_score": -0.098,
+        "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: New York Knicks (+0.09)",
+        "reason": "Direction nette: New York Knicks (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -2220,12 +2190,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 0.524
           }
         ]
       }
