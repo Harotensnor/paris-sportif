@@ -1,26 +1,26 @@
 {
-  "generated_at": "2026-05-18T13:35:08Z",
+  "generated_at": "2026-05-18T13:44:16Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 80,
-    "actionable": 42,
-    "watch": 11,
-    "risk": 27,
+    "active_events": 83,
+    "actionable": 43,
+    "watch": 10,
+    "risk": 30,
     "expired_sample": 0,
     "by_type": {
-      "market_move": 30,
+      "market_move": 28,
       "injury_imbalance": 37,
-      "market_uncertain": 28,
+      "market_uncertain": 30,
       "signal_conflict": 6,
       "travel_extreme": 3,
       "back_to_back_travel": 16
     },
     "by_quality": {
-      "watch": 11,
-      "actionable": 42,
-      "risk": 27
+      "watch": 10,
+      "actionable": 43,
+      "risk": 30
     }
   },
   "active_actionable": [
@@ -40,7 +40,7 @@
       "team": null,
       "side": "away",
       "strength": 1.0,
-      "context": "Cote away: 26.00 -> 19.00 (+26.9%)"
+      "context": "Cote away: 26.00 -> 18.00 (+30.8%)"
     },
     {
       "event_id": "401815390",
@@ -148,7 +148,7 @@
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 1.85 -> 2.30 (-24.5%)"
+      "context": "Cote home: 1.85 -> 2.35 (-27.2%)"
     },
     {
       "event_id": "401815396",
@@ -779,6 +779,24 @@
       "side": "away",
       "strength": 0.726,
       "context": "1 match dans les 48h + 979 km de voyage"
+    },
+    {
+      "event_id": "401865539",
+      "date": "2026-05-20T00:00Z",
+      "sport": "football",
+      "league_code": "conmebol.libertadores",
+      "league_name": "Copa Libertadores",
+      "home": "Always Ready",
+      "away": "Mirassol",
+      "match": "Always Ready - Mirassol",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 0.694,
+      "context": "Cote home: 4.00 -> 4.50 (-12.5%)"
     }
   ],
   "active_watch": [
@@ -853,24 +871,6 @@
       "side": "away",
       "strength": 0.556,
       "context": "Cote away: 2.50 -> 2.25 (+10.0%)"
-    },
-    {
-      "event_id": "401865539",
-      "date": "2026-05-20T00:00Z",
-      "sport": "football",
-      "league_code": "conmebol.libertadores",
-      "league_name": "Copa Libertadores",
-      "home": "Always Ready",
-      "away": "Mirassol",
-      "match": "Always Ready - Mirassol",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "home",
-      "strength": 0.556,
-      "context": "Cote home: 4.00 -> 4.40 (-10.0%)"
     },
     {
       "event_id": "401861539",
@@ -1448,7 +1448,61 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.2%"
+      "context": "marge bookmaker anormale 19.1%"
+    },
+    {
+      "event_id": "748964",
+      "date": "2026-05-24T16:30Z",
+      "sport": "football",
+      "league_code": "laliga2",
+      "league_name": "La Liga 2",
+      "home": "Huesca",
+      "away": "Castellón",
+      "match": "Huesca - Castellón",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 19.1%"
+    },
+    {
+      "event_id": "748965",
+      "date": "2026-05-24T16:30Z",
+      "sport": "football",
+      "league_code": "laliga2",
+      "league_name": "La Liga 2",
+      "home": "Las Palmas",
+      "away": "Real Zaragoza",
+      "match": "Las Palmas - Real Zaragoza",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.8%"
+    },
+    {
+      "event_id": "748966",
+      "date": "2026-05-24T16:30Z",
+      "sport": "football",
+      "league_code": "laliga2",
+      "league_name": "La Liga 2",
+      "home": "Mirandés",
+      "away": "Granada",
+      "match": "Mirandés - Granada",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 19.0%"
     },
     {
       "event_id": "401815439",
