@@ -2196,10 +2196,30 @@
       const confidence = safeConfidenceValue(row);
       const contextScore = Number(row?.contextQuality?.score || row?.matchSheetV6?.sectionCompleteness?.score || 0);
       const weakContext = contextScore > 0 && contextScore < 65;
+      const family = rowMarketPreferenceKey(row);
+      const todayBets = todayTrackedBets().filter((bet) => !['void', 'cancelled'].includes(String(bet.status || '')));
+      const severeRecovery = stats.pnlToday <= -3 || stats.pnlYesterday <= -3 || stats.last7Pnl <= -5 || currentLossStreak(stats) >= 3;
+      const maxRecoveryBets = severeRecovery ? 1 : 2;
+      if (todayBets.length >= maxRecoveryBets) {
+        reasons.push({
+          code: 'recovery_daily_cap',
+          label: 'Récupération : stop volume',
+          detail: `${formatCount(todayBets.length)} pari(s) déjà suivi(s) aujourd’hui. Après perte, le logiciel coupe les nouveaux clics.`,
+          tone: 'danger'
+        });
+      }
       if (odd > 2.2) reasons.push({ code: 'recovery_high_odd', label: 'Récupération : cote trop haute', detail: `Après pertes réelles, cote ${formatOdd(odd)} bloquée au-dessus de 2.20.`, tone: 'warn' });
       if (edge < 0.08) reasons.push({ code: 'recovery_edge_short', label: 'Récupération : avantage trop court', detail: `Avantage ${formatPct(edge, 1)} < 8%.`, tone: 'warn' });
       if (confidence > 0 && confidence < 0.65) reasons.push({ code: 'recovery_confidence_short', label: 'Récupération : confiance trop courte', detail: `Confiance ${formatPct(confidence, 0)} < 65%.`, tone: 'warn' });
       if (weakContext) reasons.push({ code: 'recovery_context_weak', label: 'Récupération : dossier incomplet', detail: `Contexte ${Math.round(contextScore)}/100 : observation uniquement.`, tone: 'warn' });
+      if (!isWinnerRow(row) && ['goals', 'btts', 'scorer', 'halftime', 'teamtotal'].includes(family) && edge < 0.12) {
+        reasons.push({
+          code: 'recovery_market_not_priority',
+          label: 'Récupération : marché non prioritaire',
+          detail: `${marketFamilyLabel(family)} reste visible, mais pas jouable après pertes sans avantage très net.`,
+          tone: 'warn'
+        });
+      }
     }
     return {
       blocked: reasons.length > 0,
@@ -6488,6 +6508,34 @@
         detail: 'Tickets construits à part'
       },
       {
+        key: 'strict',
+        icon: '🛡',
+        title: 'Strict',
+        rows: marketCategoryRows(allRows, 'strict'),
+        detail: 'Le plus prudent après perte'
+      },
+      {
+        key: 'value',
+        icon: '💎',
+        title: 'Cotes 2+',
+        rows: marketCategoryRows(allRows, 'value'),
+        detail: 'Rendement, sans forcer'
+      },
+      {
+        key: 'today',
+        icon: '📅',
+        title: 'Aujourd’hui',
+        rows: marketCategoryRows(allRows, 'today'),
+        detail: 'Avant minuit'
+      },
+      {
+        key: 'tomorrow',
+        icon: '🔜',
+        title: 'Demain',
+        rows: marketCategoryRows(allRows, 'tomorrow'),
+        detail: 'Préparer sans urgence'
+      },
+      {
         key: 'sport',
         icon: '🏀',
         title: 'Par sport',
@@ -6521,10 +6569,10 @@
         };
       })
       .filter((card) => card.rows.length > 0);
-    const cards = baseCards.concat(sportCards.slice(0, 3)).map((card) => {
+    const cards = baseCards.concat(sportCards.slice(0, 5)).map((card) => {
       const ready = card.rows.filter(isReadyToStakeRow).length;
       return { ...card, ready, total: card.rows.length };
-    }).filter((card) => card.key === 'cockpit' || card.total > 0).slice(0, 10);
+    }).filter((card) => card.key === 'cockpit' || card.total > 0).slice(0, 14);
     if (count) {
       count.textContent = `${formatCount(readyRows.length)} prêts · ${formatCount(cockpitRows.length)} lignes`;
     }
@@ -6649,7 +6697,16 @@
       }
       return selected;
     }
-    return diverseHomeTopRows(ready, limit);
+    const selected = diverseHomeTopRows(ready, limit);
+    if (selected.length >= limit) return selected;
+    const selectedKeys = new Set(selected.map((row) => userBetKey(row) || row?.id || `${row?.title}:${row?.market}:${row?.label}`));
+    const watch = source.filter((row) => {
+      const key = userBetKey(row) || row?.id || `${row?.title}:${row?.market}:${row?.label}`;
+      const confidence = homeConfidenceValue(row);
+      const odd = Number(row?.odd || 0);
+      return canDisplayPickCard(row) && !selectedKeys.has(key) && confidence >= 0.55 && odd > 1 && odd <= 4.5;
+    });
+    return selected.concat(diverseHomeTopRows(watch, limit - selected.length)).slice(0, limit);
   }
 
   function homeCategoryMeta(category) {
@@ -6673,6 +6730,26 @@
         kicker: 'Nuit',
         title: 'Les paris de nuit',
         subtitle: 'Sports US, Asie et matchs tardifs sur les prochaines 24h.'
+      },
+      'sport:tennis': {
+        kicker: 'Tennis',
+        title: 'Les matchs tennis à lire vite',
+        subtitle: 'Vainqueurs tennis en priorité ; les totaux jeux restent à surveiller.'
+      },
+      'sport:basketball': {
+        kicker: 'Basket',
+        title: 'Les spots basket des prochaines 24h',
+        subtitle: 'Moneyline et favoris propres, surtout nuit NBA/WNBA.'
+      },
+      'sport:baseball': {
+        kicker: 'Baseball',
+        title: 'Les spots baseball de nuit',
+        subtitle: 'Moneyline prudente ; les pitchers incertains restent sans mise.'
+      },
+      'sport:hockey': {
+        kicker: 'Hockey',
+        title: 'Les spots hockey',
+        subtitle: 'Vainqueurs simples, prudence si goalie inconnu.'
       },
       strict: {
         kicker: 'Mode strict',
@@ -6751,7 +6828,7 @@
           ${row.winamaxTwoGoalRule?.eligible ? `<div class="home-safety-pill">Filet 2-0 Winamax ${Math.round(Number(row.winamaxTwoGoalRule.leadTwoProbability || 0) * 100)}%</div>` : ''}
         </div>
         <div class="home-top-actions">
-          ${winamaxOpenButtonHtml(row, 'Ouvrir Winamax')}
+          ${canStake ? winamaxOpenButtonHtml(row, 'Ouvrir Winamax') : ''}
           ${canStake ? trackButtonHtml(row, `Je mise ${stake}`) : '<span class="match-sub">À surveiller</span>'}
         </div>
       </article>
@@ -6869,6 +6946,8 @@
       } catch {
         // Confort seulement.
       }
+      const fold = $('#cockpit-detail-section');
+      if (fold) fold.open = true;
       const sport = normalized.slice(6);
       renderPicks();
       setTimeout(() => {
@@ -8374,17 +8453,43 @@
     `).join('');
   }
 
+  function isQuickHomeRender() {
+    const dashboardActive = Boolean(document.querySelector('[data-panel="dashboard"].active'));
+    if (!dashboardActive) return false;
+    const prefs = loadPreferences();
+    const fold = $('#cockpit-detail-section');
+    return !prefs.expertMode && !state.activeHomeCategory && !fold?.open;
+  }
+
+  function scheduleIdleUiTask(task, delay = 1200) {
+    const run = () => {
+      try {
+        task();
+      } catch (error) {
+        pushLog('warn', `Tâche UI différée impossible: ${error.message}`);
+      }
+    };
+    if ('requestIdleCallback' in window) {
+      window.requestIdleCallback(run, { timeout: delay + 1200 });
+    } else {
+      setTimeout(run, delay);
+    }
+  }
+
   function renderPicks(emptyMessage) {
     const body = $('#picks-body');
     const metricLabel = $('#metric-picks-label');
+    const quickHome = isQuickHomeRender();
     renderUserPnl();
     renderSimpleTopStrip();
     renderTodayFunnelAlert();
-    renderMorningDashboard();
-    renderCoachAdvice();
-    renderTodayModelPulse();
-    updatePickFilters();
-    renderSavedStrategySelect();
+    if (!quickHome) {
+      renderMorningDashboard();
+      renderCoachAdvice();
+      renderTodayModelPulse();
+      updatePickFilters();
+      renderSavedStrategySelect();
+    }
     const filters = readPickFilters();
     const displayRows = dashboardPickRows(filters);
     state.currentDashboardRows = displayRows.slice();
@@ -8392,15 +8497,18 @@
     // the cockpit in a single batch request. This warms the image cache
     // so the swap from SVG initials to real Wikipedia logos happens in
     // one render cycle instead of N (one per card).
-    prefetchTeamLogosForRows(displayRows);
-    renderDailySuggestion(displayRows);
+    const fastRows = homeSourceRows(displayRows).slice(0, 10);
+    prefetchTeamLogosForRows(quickHome ? fastRows : displayRows);
+    if (!quickHome) renderDailySuggestion(displayRows);
     rememberDisplayedOdds(displayRows);
-    renderMarketSnapshot(displayRows);
-    renderLiveCockpit();
-    renderTradingDesk();
-    renderDaySummary(displayRows);
-    renderUltimateBet(displayRows);
-    renderReadyPicksHero(displayRows);
+    if (!quickHome) {
+      renderMarketSnapshot(displayRows);
+      renderLiveCockpit();
+      renderTradingDesk();
+      renderDaySummary(displayRows);
+      renderUltimateBet(displayRows);
+      renderReadyPicksHero(displayRows);
+    }
     renderBettingHome(displayRows);
     renderRecoveryStrip();
     renderHomeCategories(displayRows);
@@ -8412,17 +8520,24 @@
     } catch {
       // best-effort, non-bloquant
     }
-    renderTemporalCockpit(displayRows);
-    renderDailyBudgetSummary();
-    updateWebEnrichmentSummary();
-    scheduleVisibleWebEnrichment(displayRows);
-    renderSimpleTimeline(displayRows);
-    renderSimpleInlineSections();
-    renderFavoritePicksSection();
-    renderMarketScanner(displayRows);
-    renderCustomDashboard(displayRows);
+    if (!quickHome) {
+      renderTemporalCockpit(displayRows);
+      renderDailyBudgetSummary();
+      updateWebEnrichmentSummary();
+      scheduleVisibleWebEnrichment(displayRows);
+      renderSimpleTimeline(displayRows);
+      renderSimpleInlineSections();
+      renderFavoritePicksSection();
+      renderMarketScanner(displayRows);
+      renderCustomDashboard(displayRows);
+    } else {
+      scheduleIdleUiTask(() => {
+        updateWebEnrichmentSummary();
+        scheduleVisibleWebEnrichment(fastRows);
+      }, 1800);
+    }
     clearTimeout(state.aiTimer);
-    state.aiTimer = setTimeout(() => runBackgroundAi(displayRows), 600);
+    state.aiTimer = setTimeout(() => runBackgroundAi(quickHome ? fastRows : displayRows), quickHome ? 2600 : 600);
     const total = state.allPicks.length || state.picks.length || 0;
     const meta = state.dashboardMeta || {};
     const readyRows = rollingReadyRows(displayRows);
@@ -8457,6 +8572,11 @@
       : globalBlocked
         ? '0 mise tant qu’un gate est rouge'
         : `${formatCount(meta.rolling24Displayed || ready)} sur 24h · ${formatCount(nightReady)} nuit prête`;
+    if (quickHome) {
+      markFirstPickVisible(homeSourceRows(displayRows).length);
+      renderRefreshPolicy();
+      return;
+    }
     if (!displayRows.length) {
       body.innerHTML = `<tr><td colspan="7" class="empty">${escapeHtml(emptyMessage || 'Aucun pari simple avec les règles actuelles.')}</td></tr>`;
       markFirstPickVisible(0);
@@ -10904,6 +11024,15 @@
     return durableFamilyLocks().find((lock) => normalizeUiKey(lock.family) === family) || null;
   }
 
+  function postDayVerdict(audit, locks) {
+    if (!audit?.settled) return 'En attente d’import Winamax.';
+    const lastDay = audit.days?.[0] || null;
+    if (locks?.length) return `Couper ${locks.map((row) => row.label).slice(0, 2).join(' + ')} avant de rejouer.`;
+    if (lastDay && Number(lastDay.losses || 0) > Number(lastDay.wins || 0)) return 'Repartir en mode strict : 1-2 paris max, Vainqueurs propres seulement.';
+    if (lastDay && Number(lastDay.pnl || 0) < 0) return 'Journée rouge légère : éviter cotes hautes et marchés buts sans contexte fort.';
+    return 'Pas de coupure durable : continuer prudent, sans augmenter les mises.';
+  }
+
   function renderPostDayLearning() {
     const summaryGrid = $('#recovery-postday-grid');
     const missedGrid = $('#recovery-missed-signals-grid');
@@ -10917,6 +11046,7 @@
       } else {
         summaryGrid.innerHTML = [
           ['Dernière journée analysée', lastDay ? formatDateLabel(lastDay.day) : '-', lastDay ? `${formatCount(lastDay.wins)} gagnés · ${formatCount(lastDay.losses)} perdus · P&L ${formatMoney(lastDay.pnl)}` : 'Aucune journée complète.'],
+          ['Verdict demain', postDayVerdict(audit, locks), 'Règle simple avant de rouvrir Winamax.'],
           ['Familles à couper', `${formatCount(locks.length)} active(s)`, locks.length ? locks.map((row) => row.label).slice(0, 3).join(' · ') : 'Aucune famille ne perd sur plusieurs jours.'],
           ['Pertes expliquées', `${formatCount(audit.missedSignals.length)} ligne(s)`, 'Chaque perte est relue avec les signaux qui auraient dû freiner le clic.']
         ].map(([label, value, detail]) => `
@@ -17566,6 +17696,10 @@
       value: 'value',
       halftime: 'halftime',
       night: 'night',
+      tennis: 'sport:tennis',
+      basket: 'sport:basketball',
+      baseball: 'sport:baseball',
+      hockey: 'sport:hockey',
       watch: 'watch'
     };
     const cockpitCategory = categoryTabs[tab] || null;
@@ -17583,6 +17717,10 @@
       value: 'Gros gain',
       halftime: 'Mi-temps',
       night: 'Paris de nuit',
+      tennis: 'Tennis',
+      basket: 'Basket',
+      baseball: 'Baseball',
+      hockey: 'Hockey',
       watch: 'À surveiller',
       combines: 'Combinés du jour',
       scorers: 'Buteurs & joueurs',

@@ -5,6 +5,17 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-18
 
+### Version v5.4.0 — Accueil rapide + récupération stricte
+
+Suite directe après le constat “tests trop longs / logiciel lent” : l’accueil standard devient plus léger et le mode récupération bloque davantage les paris dangereux après une soirée rouge.
+- Accueil `À miser` rendu en mode rapide : seules les zones utiles au clic immédiat sont calculées au premier rendu (Top 3, tableau triable, protection bankroll, catégories). Les blocs cockpit lourds et enrichissements visuels sont différés ou réservés au Cockpit.
+- Le Top 3 ne reste plus vide quand aucun pari n’est prêt : il affiche les meilleurs candidats 24h selon confiance/cote, avec bouton de mise uniquement si le pick est réellement validé.
+- Ajout de catégories sport directes dans l’accueil compact : Tennis, Basket, Baseball et Hockey restent accessibles sans allonger la barre latérale.
+- Ajout de catégories compactes supplémentaires sur l’accueil : Strict, Cotes 2+, Aujourd’hui et Demain, pour alléger le tableau principal sans cacher les picks.
+- Mode récupération durci : après pertes réelles, stop volume quotidien renforcé, cotes hautes bloquées, marchés non prioritaires (buts/buteurs/mi-temps) coupés si l’avantage n’est pas très net.
+- La carte récupération sur l’accueil est compactée pour réduire la hauteur de la page sans supprimer le garde-fou.
+- Version desktop, package et Service Worker bumpés en `v5.4.0`.
+
 ### Version v5.3.0 — Analyse post-journée + verrous durables
 
 Suite directe après les pertes réelles : le logiciel ne se contente plus de dire “tu as perdu”, il relit la journée et coupe les familles qui récidivent.

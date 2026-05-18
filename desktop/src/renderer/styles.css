@@ -6708,7 +6708,7 @@ body.theme-light .sidebar {
 }
 
 .recovery-strip {
-  margin: 12px 0;
+  margin: 8px 0;
 }
 
 .recovery-card {
@@ -6725,6 +6725,40 @@ body.theme-light .sidebar {
 .recovery-card.active {
   border-color: rgba(245, 158, 11, .38);
   background: linear-gradient(135deg, rgba(120, 53, 15, .26), rgba(15, 23, 42, .88));
+}
+
+.betting-home-v2 .recovery-strip {
+  margin: 0;
+}
+
+.betting-home-v2 .recovery-card {
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+}
+
+.betting-home-v2 .recovery-card strong {
+  margin-top: 2px;
+  font-size: 13px;
+}
+
+.betting-home-v2 .recovery-card p {
+  display: none;
+}
+
+.betting-home-v2 .recovery-kpis {
+  grid-template-columns: repeat(3, minmax(58px, 1fr));
+  gap: 5px;
+}
+
+.betting-home-v2 .recovery-kpis span {
+  min-width: 58px;
+  padding: 5px 7px;
+}
+
+.betting-home-v2 .recovery-kpis span:nth-child(4) {
+  display: none;
 }
 
 .recovery-card strong {

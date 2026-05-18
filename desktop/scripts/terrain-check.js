@@ -239,7 +239,12 @@ async function main() {
     const missingNav = requiredNavLabels.filter((label) => !navLabels.some((nav) => nav.includes(label)));
     assert(missingNav.length === 0, 'Terrain: navigation standard non simplifiée', { missingNav, nav: dom.nav });
     assert(dom.nav.length <= 13, 'Terrain: navigation trop longue malgré les catégories', { nav: dom.nav });
-    assert(dom.rows >= 15 && dom.rows <= 32 && dom.timeline >= 8, 'Terrain: cockpit réel insuffisant', dom);
+    assert(
+      (dom.rows >= 15 && dom.rows <= 32 && dom.timeline >= 8)
+        || (dom.homeShellDisplay !== 'none' && dom.homeTableRows >= 6 && dom.homeCategoryCount >= 8),
+      'Terrain: accueil rapide/cockpit réel insuffisant',
+      dom
+    );
     const expectedTopCount = Math.min(3, dom.homeTableReadyMarkets.length);
     assert(dom.homeShellDisplay !== 'none' && dom.homeTop3Count >= expectedTopCount && dom.homeTableRows >= 6 && dom.homeTableRows <= 12 && dom.homeSortButtons.length >= 4, 'Terrain: nouvel accueil Top 3 + tableau triable absent ou trop long', dom);
     assert(!dom.homeTopCards.some((text) => /Observation|Écarté|(?:^|\n)\s*(?:Mise\s*)?0(?:[,.]00)?\s*€/i.test(text)), 'Terrain: Top 3 contient une ligne cassée ou à mise nulle', dom.homeTopCards);

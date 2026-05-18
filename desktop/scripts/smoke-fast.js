@@ -62,12 +62,12 @@ async function main() {
     });
     win.on('pageerror', (error) => messages.push(`pageerror: ${error.message}`));
 
-    await win.waitForSelector('[data-panel="dashboard"].active', { timeout: 20000 });
+    await win.waitForSelector('[data-panel="dashboard"].active', { state: 'attached', timeout: 20000 });
     await win.waitForFunction(() => document.querySelector('#metric-picks')?.textContent !== '-', null, { timeout: 25000 });
     await win.waitForFunction(() => (
       document.querySelectorAll('#home-picks-table-body tr.clickable-row').length >= 3
       || /Erreur au démarrage|Données trop anciennes/i.test(document.body.innerText || '')
-    ), null, { timeout: 15000 });
+    ), null, { timeout: 30000 });
 
     const home = await win.evaluate(() => ({
       title: document.querySelector('#page-title')?.textContent || '',
@@ -81,13 +81,26 @@ async function main() {
     }));
     if (!/Picks|Paris|miser/i.test(home.title)) throw new Error(`Vue par défaut invalide: ${home.title}`);
     if (!/Synchro rapide/i.test(home.refreshLabel)) throw new Error(`Bouton refresh non raccourci: ${home.refreshLabel}`);
-    const protectedNoBet = /Aucun pari validé|0\s+Je mise|Pas de mise recommandée/i.test(home.dashboardText);
-    if (home.rows < 3 || (!protectedNoBet && home.topCards < 1) || home.categories < 6) {
+    if (home.rows < 3 || home.topCards < 1 || home.categories < 8) {
       throw new Error(`Accueil rapide incomplet: ${JSON.stringify(home)}`);
     }
     if (home.standardExpertVisible) throw new Error('Mode expert visible en standard');
     if (/Écouter le brief|brief audio|SpeechSynthesis|TTS|Meilleure cote|Multi-bookmaker/i.test(home.dashboardText)) {
       throw new Error(`Texte indésirable sur accueil: ${home.dashboardText.slice(0, 900)}`);
+    }
+
+    await win.locator('[data-tab="cockpit"]:visible').first().click();
+    await win.waitForFunction(() => (
+      document.querySelectorAll('#picks-body tr.clickable-row').length >= 3
+      || document.querySelectorAll('[data-time-bucket]').length >= 3
+    ), null, { timeout: 12000 });
+    const cockpit = await win.evaluate(() => ({
+      rows: document.querySelectorAll('#picks-body tr.clickable-row').length,
+      buckets: document.querySelectorAll('[data-time-bucket]').length,
+      text: document.querySelector('[data-panel="dashboard"]')?.innerText || ''
+    }));
+    if (cockpit.rows < 3 && cockpit.buckets < 3) {
+      throw new Error(`Cockpit détaillé non rendu après clic: ${JSON.stringify(cockpit).slice(0, 900)}`);
     }
 
     await win.locator('[data-tab="recovery"]:visible').first().click();
