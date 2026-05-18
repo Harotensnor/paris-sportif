@@ -1,29 +1,48 @@
 {
-  "generated_at": "2026-05-18T23:15:22Z",
+  "generated_at": "2026-05-18T23:19:34Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 68,
-    "actionable": 34,
-    "watch": 3,
-    "risk": 31,
-    "expired_sample": 1,
+    "active_events": 69,
+    "actionable": 37,
+    "watch": 2,
+    "risk": 30,
+    "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 34,
+      "injury_imbalance": 32,
       "travel_extreme": 3,
-      "back_to_back_travel": 19,
-      "signal_conflict": 5,
       "market_uncertain": 30,
+      "market_move": 26,
+      "back_to_back_travel": 19,
+      "signal_conflict": 9,
       "weather_extreme": 1
     },
     "by_quality": {
-      "actionable": 34,
-      "watch": 3,
-      "risk": 31
+      "actionable": 37,
+      "watch": 2,
+      "risk": 30
     }
   },
   "active_actionable": [
+    {
+      "event_id": "401871410",
+      "date": "2026-05-18T23:30Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Buffalo Sabres",
+      "away": "Montreal Canadiens",
+      "match": "Buffalo Sabres - Montreal Canadiens",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 1.85 -> 2.35 (-27.2%)"
+    },
     {
       "event_id": "401815397",
       "date": "2026-05-18T23:40Z",
@@ -41,6 +60,24 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 7-14"
+    },
+    {
+      "event_id": "401815398",
+      "date": "2026-05-18T23:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Chicago Cubs",
+      "away": "Milwaukee Brewers",
+      "match": "Chicago Cubs - Milwaukee Brewers",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 1.0,
+      "context": "Cote away: 2.35 -> 1.76 (+25.1%)"
     },
     {
       "event_id": "401815402",
@@ -77,6 +114,24 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 5-10"
+    },
+    {
+      "event_id": "401815405",
+      "date": "2026-05-19T22:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Tampa Bay Rays",
+      "away": "Baltimore Orioles",
+      "match": "Tampa Bay Rays - Baltimore Orioles",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 1.54 -> 1.07 (+30.5%)"
     },
     {
       "event_id": "401815406",
@@ -203,6 +258,24 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 3-8"
+    },
+    {
+      "event_id": "401815420",
+      "date": "2026-05-20T17:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Tampa Bay Rays",
+      "away": "Baltimore Orioles",
+      "match": "Tampa Bay Rays - Baltimore Orioles",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 1.54 -> 1.07 (+30.5%)"
     },
     {
       "event_id": "401815426",
@@ -385,6 +458,24 @@
       "context": "Absences severes 7-12"
     },
     {
+      "event_id": "401815489",
+      "date": "2026-05-25T17:35Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Baltimore Orioles",
+      "away": "Tampa Bay Rays",
+      "match": "Baltimore Orioles - Tampa Bay Rays",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 2.20 -> 9.00 (-309.1%)"
+    },
+    {
       "event_id": "401815410",
       "date": "2026-05-19T23:40Z",
       "sport": "baseball",
@@ -421,24 +512,6 @@
       "context": "1 match dans les 48h + 1998 km de voyage"
     },
     {
-      "event_id": "401815420",
-      "date": "2026-05-20T17:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Tampa Bay Rays",
-      "away": "Baltimore Orioles",
-      "match": "Tampa Bay Rays - Baltimore Orioles",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Baltimore Orioles",
-      "side": "away",
-      "strength": 0.889,
-      "context": "2 match dans les 48h + 1396 km de voyage"
-    },
-    {
       "event_id": "401815429",
       "date": "2026-05-20T19:10Z",
       "sport": "baseball",
@@ -473,24 +546,6 @@
       "side": "away",
       "strength": 0.82,
       "context": "2 match dans les 48h + 1049 km de voyage"
-    },
-    {
-      "event_id": "401815405",
-      "date": "2026-05-19T22:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Tampa Bay Rays",
-      "away": "Baltimore Orioles",
-      "match": "Tampa Bay Rays - Baltimore Orioles",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Baltimore Orioles",
-      "side": "away",
-      "strength": 0.809,
-      "context": "1 match dans les 48h + 1396 km de voyage"
     },
     {
       "event_id": "401815396",
@@ -657,49 +712,31 @@
       "context": "Absences severes 12-9"
     },
     {
-      "event_id": "401815489",
-      "date": "2026-05-25T17:35Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Baltimore Orioles",
-      "away": "Tampa Bay Rays",
-      "match": "Baltimore Orioles - Tampa Bay Rays",
+      "event_id": "401856919",
+      "date": "2026-05-19T02:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Portland Fire",
+      "away": "Connecticut Sun",
+      "match": "Portland Fire - Connecticut Sun",
       "quality": "watch",
       "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Baltimore Orioles",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 12-9"
-    },
-    {
-      "event_id": "401815495",
-      "date": "2026-05-25T21:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Francisco Giants",
-      "away": "Arizona Diamondbacks",
-      "match": "San Francisco Giants - Arizona Diamondbacks",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Arizona Diamondbacks",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 9-12"
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.556,
+      "context": "Cote away: 2.50 -> 2.25 (+10.0%)"
     }
   ],
   "active_risk": [
     {
-      "event_id": "175456",
+      "event_id": "178416",
       "date": "2026-05-20T04:00Z",
       "sport": "tennis",
-      "league_code": "bitpandahamburgopen",
-      "league_name": "Bitpanda Hamburg Open",
+      "league_code": "rolandgarros",
+      "league_name": "Roland Garros",
       "home": "",
       "away": "",
       "match": "? - ?",
@@ -713,11 +750,11 @@
       "context": "marge bookmaker anormale 12.1%"
     },
     {
-      "event_id": "178416",
+      "event_id": "175456",
       "date": "2026-05-20T04:00Z",
       "sport": "tennis",
-      "league_code": "rolandgarros",
-      "league_name": "Roland Garros",
+      "league_code": "bitpandahamburgopen",
+      "league_name": "Bitpanda Hamburg Open",
       "home": "",
       "away": "",
       "match": "? - ?",
@@ -1233,44 +1270,7 @@
       "side": null,
       "strength": 0.45,
       "context": "Signaux opposes: San Antonio Spurs fade 0.60, Oklahoma City Thunder fade 0.60 -> prudence"
-    },
-    {
-      "event_id": "401873344",
-      "date": "2026-05-26T00:00Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "Cleveland Cavaliers",
-      "away": "New York Knicks",
-      "match": "Cleveland Cavaliers - New York Knicks",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "signal_conflict",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.45,
-      "context": "Signaux opposes: Cleveland Cavaliers fade 0.60, New York Knicks fade 0.60 -> prudence"
     }
   ],
-  "expired_sample": [
-    {
-      "event_id": "401815395",
-      "date": "2026-05-18T23:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "New York Yankees",
-      "away": "Toronto Blue Jays",
-      "match": "New York Yankees - Toronto Blue Jays",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Toronto Blue Jays",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 7-12"
-    }
-  ]
+  "expired_sample": []
 }
