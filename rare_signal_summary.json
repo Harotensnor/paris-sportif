@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-05-18T22:04:45Z",
+  "generated_at": "2026-05-18T22:07:24Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 78,
-    "actionable": 42,
-    "watch": 4,
+    "actionable": 43,
+    "watch": 3,
     "risk": 32,
     "expired_sample": 0,
     "by_type": {
@@ -19,8 +19,8 @@
       "weather_extreme": 1
     },
     "by_quality": {
-      "actionable": 42,
-      "watch": 4,
+      "actionable": 43,
+      "watch": 3,
       "risk": 32
     }
   },
@@ -656,6 +656,42 @@
       "context": "Absences severes 7-11"
     },
     {
+      "event_id": "401815399",
+      "date": "2026-05-19T00:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Colorado Rockies",
+      "away": "Texas Rangers",
+      "match": "Colorado Rockies - Texas Rangers",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Texas Rangers",
+      "side": null,
+      "strength": 0.8,
+      "context": "Absences severes 8-12"
+    },
+    {
+      "event_id": "401815414",
+      "date": "2026-05-20T00:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Colorado Rockies",
+      "away": "Texas Rangers",
+      "match": "Colorado Rockies - Texas Rangers",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Texas Rangers",
+      "side": null,
+      "strength": 0.8,
+      "context": "Absences severes 8-12"
+    },
+    {
       "event_id": "401815489",
       "date": "2026-05-25T17:35Z",
       "sport": "baseball",
@@ -690,24 +726,6 @@
       "side": "away",
       "strength": 0.789,
       "context": "2 match dans les 48h + 896 km de voyage"
-    },
-    {
-      "event_id": "401815414",
-      "date": "2026-05-20T00:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Colorado Rockies",
-      "away": "Texas Rangers",
-      "match": "Colorado Rockies - Texas Rangers",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Texas Rangers",
-      "side": "away",
-      "strength": 0.741,
-      "context": "1 match dans les 48h + 1053 km de voyage"
     },
     {
       "event_id": "401815418",
@@ -783,24 +801,6 @@
     }
   ],
   "active_watch": [
-    {
-      "event_id": "401815399",
-      "date": "2026-05-19T00:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Colorado Rockies",
-      "away": "Texas Rangers",
-      "match": "Colorado Rockies - Texas Rangers",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Texas Rangers",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 8-11"
-    },
     {
       "event_id": "401815403",
       "date": "2026-05-19T01:40Z",
