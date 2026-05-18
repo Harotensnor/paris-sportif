@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-05-18T23:24:16Z",
-  "calculated_at": "2026-05-18T23:24:16Z",
+  "generated_at": "2026-05-18T23:27:01Z",
+  "calculated_at": "2026-05-18T23:27:01Z",
   "source_of_truth": "data.js",
   "data_age_min": 1,
   "data_file_age_min": 0,
@@ -74,28 +74,28 @@
     },
     "h2h_extended": {
       "age_min": 1,
-      "events": 130,
+      "events": 129,
       "events_with_meetings": 90,
       "meetings": 291,
-      "coverage_pct": 69.2,
-      "empty_events": 40,
+      "coverage_pct": 69.8,
+      "empty_events": 39,
       "sports": 4,
       "by_sport": {
-        "baseball": {
-          "events": 44,
-          "events_with_meetings": 33,
-          "meetings": 119,
-          "sources": {
-            "espn_summary_empty": 11,
-            "seasonseries": 33
-          }
-        },
         "hockey": {
           "events": 3,
           "events_with_meetings": 3,
           "meetings": 12,
           "sources": {
             "seasonseries": 3
+          }
+        },
+        "baseball": {
+          "events": 43,
+          "events_with_meetings": 33,
+          "meetings": 119,
+          "sources": {
+            "espn_summary_empty": 10,
+            "seasonseries": 33
           }
         },
         "basketball": {
@@ -1056,7 +1056,7 @@
   ],
   "overall": "warning",
   "quality_checks": {
-    "data_generated_at": "2026-05-18T23:23:13.403462Z",
+    "data_generated_at": "2026-05-18T23:25:59.088268Z",
     "truth_scope": "all_events",
     "all_winamax_available": 318,
     "all_winamax_exact": 307,
@@ -1137,7 +1137,7 @@
   "data_truth": {
     "source_of_truth": "data.js",
     "scope": "all_events",
-    "data_generated_at": "2026-05-18T23:23:13.403462Z",
+    "data_generated_at": "2026-05-18T23:25:59.088268Z",
     "winamax_available": 318,
     "winamax_exact": 307,
     "winamax_exact_ratio": 0.9654,
@@ -1157,7 +1157,7 @@
     "anomalies_emitted": 3
   },
   "source_health": {
-    "generated_at": "2026-05-18T23:24:16Z",
+    "generated_at": "2026-05-18T23:27:01Z",
     "sources_total": 11,
     "sources_ok": 7,
     "sources_warning": 4,
@@ -1257,7 +1257,7 @@
   },
   "observability": {
     "pipeline_traces": {
-      "generated_at": "2026-05-18T23:24:16Z",
+      "generated_at": "2026-05-18T23:27:01Z",
       "runs_observed": 99,
       "by_status": {
         "warning": 67,
@@ -1269,13 +1269,13 @@
           "runs": 99,
           "errors": 1,
           "last_status": "ok",
-          "max_duration_ms": 1118
+          "max_duration_ms": 1083
         }
       }
     }
   },
   "data_lineage": {
-    "generated_at": "2026-05-18T23:24:16Z",
+    "generated_at": "2026-05-18T23:27:01Z",
     "status": "ok",
     "events": 318,
     "events_missing_inline_lineage": 0,
