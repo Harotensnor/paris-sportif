@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-05-18T06:17:10Z",
+  "generated_at": "2026-05-18T06:25:12Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 91,
+    "active_events": 92,
     "actionable": 40,
-    "watch": 6,
+    "watch": 7,
     "risk": 45,
     "expired_sample": 0,
     "by_type": {
-      "market_move": 10,
-      "injury_imbalance": 38,
+      "market_move": 9,
+      "injury_imbalance": 39,
       "market_uncertain": 48,
       "travel_extreme": 3,
       "back_to_back_travel": 17,
       "signal_conflict": 4
     },
     "by_quality": {
-      "watch": 6,
+      "watch": 7,
       "actionable": 40,
       "risk": 45
     }
@@ -783,6 +783,24 @@
       "context": "Absences severes 12-9"
     },
     {
+      "event_id": "401815495",
+      "date": "2026-05-25T21:05Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "San Francisco Giants",
+      "away": "Arizona Diamondbacks",
+      "match": "San Francisco Giants - Arizona Diamondbacks",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Arizona Diamondbacks",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 9-12"
+    },
+    {
       "event_id": "401842718",
       "date": "2026-05-18T17:00Z",
       "sport": "football",
@@ -857,11 +875,11 @@
   ],
   "active_risk": [
     {
-      "event_id": "175450",
+      "event_id": "176097",
       "date": "2026-05-19T04:00Z",
       "sport": "tennis",
-      "league_code": "bitpandahamburgopen",
-      "league_name": "Bitpanda Hamburg Open",
+      "league_code": "internationauxdestra",
+      "league_name": "Internationaux de Strasbourg presented by Mammotion",
       "home": "",
       "away": "",
       "match": "? - ?",
@@ -872,7 +890,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 12.1%"
+      "context": "marge bookmaker anormale 12.0%"
     },
     {
       "event_id": "178387",
@@ -893,11 +911,11 @@
       "context": "marge bookmaker anormale 12.1%"
     },
     {
-      "event_id": "176097",
+      "event_id": "175450",
       "date": "2026-05-19T04:00Z",
       "sport": "tennis",
-      "league_code": "internationauxdestra",
-      "league_name": "Internationaux de Strasbourg presented by Mammotion",
+      "league_code": "bitpandahamburgopen",
+      "league_name": "Bitpanda Hamburg Open",
       "home": "",
       "away": "",
       "match": "? - ?",
@@ -908,7 +926,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 12.0%"
+      "context": "marge bookmaker anormale 12.1%"
     },
     {
       "event_id": "401865447",
