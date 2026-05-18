@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-18T22:42:11Z",
+  "generated_at": "2026-05-18T22:44:34Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -112,10 +112,10 @@
         "status": "net",
         "net_side": "away",
         "home_score": -1.234,
-        "away_score": 0.116,
+        "away_score": 1.018,
         "home_fade": 1.36,
         "away_fade": 0.36,
-        "reason": "Direction nette: Cleveland Guardians (+0.12)",
+        "reason": "Direction nette: Cleveland Guardians (+1.02)",
         "detail": [
           {
             "side": "home",
@@ -134,6 +134,12 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.902
           }
         ]
       }
@@ -395,11 +401,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.649,
+        "home_score": 0.155,
         "away_score": -1.195,
         "home_fade": 0.3,
         "away_fade": 1.3,
-        "reason": "Direction nette: Philadelphia Phillies (+0.65)",
+        "reason": "Direction nette: Philadelphia Phillies (+0.15)",
         "detail": [
           {
             "side": "home",
@@ -418,12 +424,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 1.0
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.494
           }
         ]
       }
@@ -813,11 +813,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -1.195,
-        "away_score": 0.155,
-        "home_fade": 1.3,
+        "home_score": -1.694,
+        "away_score": 1.046,
+        "home_fade": 1.799,
         "away_fade": 0.3,
-        "reason": "Direction nette: Cleveland Guardians (+0.15)",
+        "reason": "Direction nette: Cleveland Guardians (+1.05)",
         "detail": [
           {
             "side": "home",
@@ -836,6 +836,18 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 1.0
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 0.499
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.716
           }
         ]
       }
@@ -1095,13 +1107,13 @@
         "3 matchs sur les 7 derniers jours"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -1.39,
-        "away_score": -0.04,
-        "home_fade": 1.6,
+        "status": "mixed",
+        "net_side": null,
+        "home_score": -1.889,
+        "away_score": 0.851,
+        "home_fade": 2.099,
         "away_fade": 0.6,
-        "reason": "Direction nette: Cleveland Guardians (-0.04)",
+        "reason": "Signaux mitigés: avantage net trop faible (Detroit Tigers -1.89, Cleveland Guardians +0.85)",
         "detail": [
           {
             "side": "home",
@@ -1120,6 +1132,18 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 1.0
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 0.499
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.716
           }
         ]
       }
@@ -1815,11 +1839,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -1.097,
-        "away_score": 0.252,
-        "home_fade": 1.15,
+        "home_score": -1.596,
+        "away_score": 1.143,
+        "home_fade": 1.649,
         "away_fade": 0.15,
-        "reason": "Direction nette: Cleveland Guardians (+0.25)",
+        "reason": "Direction nette: Cleveland Guardians (+1.14)",
         "detail": [
           {
             "side": "home",
@@ -1838,6 +1862,18 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 1.0
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 0.499
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.716
           }
         ]
       }
