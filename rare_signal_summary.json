@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-18T15:37:25Z",
+  "generated_at": "2026-05-18T15:42:31Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
@@ -10,17 +10,17 @@
     "risk": 29,
     "expired_sample": 0,
     "by_type": {
-      "market_uncertain": 29,
       "market_move": 30,
       "injury_imbalance": 37,
+      "market_uncertain": 29,
       "travel_extreme": 3,
       "back_to_back_travel": 16,
       "signal_conflict": 5
     },
     "by_quality": {
-      "risk": 29,
       "watch": 11,
-      "actionable": 45
+      "actionable": 45,
+      "risk": 29
     }
   },
   "active_actionable": [
@@ -1037,24 +1037,6 @@
   ],
   "active_risk": [
     {
-      "event_id": "178372",
-      "date": "2026-05-18T15:30Z",
-      "sport": "tennis",
-      "league_code": "rolandgarros",
-      "league_name": "Roland Garros",
-      "home": "",
-      "away": "",
-      "match": "? - ?",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 12.6%"
-    },
-    {
       "event_id": "176097",
       "date": "2026-05-19T10:00Z",
       "sport": "tennis",
@@ -1539,6 +1521,24 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.8%"
+    },
+    {
+      "event_id": "748966",
+      "date": "2026-05-24T16:30Z",
+      "sport": "football",
+      "league_code": "laliga2",
+      "league_name": "La Liga 2",
+      "home": "Mirandés",
+      "away": "Granada",
+      "match": "Mirandés - Granada",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 19.0%"
     },
     {
       "event_id": "401815439",
