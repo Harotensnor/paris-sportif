@@ -1,14 +1,14 @@
 {
-  "generated_at": "2026-05-18T23:11:09Z",
+  "generated_at": "2026-05-18T23:15:22Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 69,
-    "actionable": 35,
+    "active_events": 68,
+    "actionable": 34,
     "watch": 3,
     "risk": 31,
-    "expired_sample": 0,
+    "expired_sample": 1,
     "by_type": {
       "injury_imbalance": 34,
       "travel_extreme": 3,
@@ -18,30 +18,12 @@
       "weather_extreme": 1
     },
     "by_quality": {
-      "actionable": 35,
+      "actionable": 34,
       "watch": 3,
       "risk": 31
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401815395",
-      "date": "2026-05-18T23:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "New York Yankees",
-      "away": "Toronto Blue Jays",
-      "match": "New York Yankees - Toronto Blue Jays",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Toronto Blue Jays",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 7-12"
-    },
     {
       "event_id": "401815397",
       "date": "2026-05-18T23:40Z",
@@ -1271,5 +1253,24 @@
       "context": "Signaux opposes: Cleveland Cavaliers fade 0.60, New York Knicks fade 0.60 -> prudence"
     }
   ],
-  "expired_sample": []
+  "expired_sample": [
+    {
+      "event_id": "401815395",
+      "date": "2026-05-18T23:05Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "New York Yankees",
+      "away": "Toronto Blue Jays",
+      "match": "New York Yankees - Toronto Blue Jays",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Toronto Blue Jays",
+      "side": null,
+      "strength": 1.0,
+      "context": "Absences severes 7-12"
+    }
+  ]
 }
