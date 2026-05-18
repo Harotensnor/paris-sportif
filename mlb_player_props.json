@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-18T22:44:27Z",
+  "generated_at": "2026-05-18T22:47:26Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -15,17 +15,17 @@
           "market": "pitcher_strikeouts",
           "team": "Miami Marlins",
           "pitcher": "Max Meyer",
-          "label": "Max Meyer plus de 5,5 strikeouts",
+          "label": "Max Meyer moins de 5,5 strikeouts",
           "line": 5.5,
-          "pick": "over",
-          "probability": 0.5922,
-          "fair_odds": 1.69,
-          "expected_strikeouts": 5.94,
-          "projected_ip": 5.24,
+          "pick": "under",
+          "probability": 0.5333,
+          "fair_odds": 1.88,
+          "expected_strikeouts": 5.35,
+          "projected_ip": 4.72,
           "inputs": {
             "k9": 10.2,
             "era": 3.21,
-            "whip": 1.15,
+            "whip": 1.17,
             "hand": "R"
           },
           "side": "home"
@@ -36,14 +36,14 @@
           "pitcher": "Max Meyer",
           "label": "Max Meyer ne concède pas de home run",
           "pick": "no",
-          "probability": 0.6422,
-          "fair_odds": 1.56,
-          "expected_hr_allowed": 0.443,
-          "projected_ip": 5.24,
+          "probability": 0.6713,
+          "fair_odds": 1.49,
+          "expected_hr_allowed": 0.399,
+          "projected_ip": 4.72,
           "inputs": {
             "hr9": 0.76,
             "era": 3.21,
-            "whip": 1.15
+            "whip": 1.17
           },
           "side": "home"
         },
@@ -97,17 +97,17 @@
           "market": "pitcher_strikeouts",
           "team": "Tampa Bay Rays",
           "pitcher": "Shane McClanahan",
-          "label": "Shane McClanahan moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.5982,
-          "fair_odds": 1.67,
-          "expected_strikeouts": 5.06,
-          "projected_ip": 4.9,
+          "label": "Shane McClanahan plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.5527,
+          "fair_odds": 1.81,
+          "expected_strikeouts": 4.72,
+          "projected_ip": 4.47,
           "inputs": {
-            "k9": 9.3,
-            "era": 2.27,
-            "whip": 0.98,
+            "k9": 9.52,
+            "era": 2.21,
+            "whip": 0.96,
             "hand": "L"
           },
           "side": "home"
@@ -118,14 +118,14 @@
           "pitcher": "Shane McClanahan",
           "label": "Shane McClanahan ne concède pas de home run",
           "pick": "no",
-          "probability": 0.8823,
-          "fair_odds": 1.13,
-          "expected_hr_allowed": 0.125,
-          "projected_ip": 4.9,
+          "probability": 0.8966,
+          "fair_odds": 1.12,
+          "expected_hr_allowed": 0.109,
+          "projected_ip": 4.47,
           "inputs": {
-            "hr9": 0.23,
-            "era": 2.27,
-            "whip": 0.98
+            "hr9": 0.22,
+            "era": 2.21,
+            "whip": 0.96
           },
           "side": "home"
         },
@@ -179,17 +179,17 @@
           "market": "pitcher_strikeouts",
           "team": "Philadelphia Phillies",
           "pitcher": "Andrew Painter",
-          "label": "Andrew Painter plus de 4,5 strikeouts",
+          "label": "Andrew Painter moins de 4,5 strikeouts",
           "line": 4.5,
-          "pick": "over",
-          "probability": 0.5685,
-          "fair_odds": 1.76,
-          "expected_strikeouts": 4.79,
-          "projected_ip": 5.31,
+          "pick": "under",
+          "probability": 0.5305,
+          "fair_odds": 1.89,
+          "expected_strikeouts": 4.38,
+          "projected_ip": 4.75,
           "inputs": {
-            "k9": 8.12,
-            "era": 6.21,
-            "whip": 1.59,
+            "k9": 8.29,
+            "era": 6.16,
+            "whip": 1.61,
             "hand": "R"
           },
           "side": "home"
@@ -200,14 +200,14 @@
           "pitcher": "Andrew Painter",
           "label": "Andrew Painter concède au moins 1 home run",
           "pick": "yes",
-          "probability": 0.627,
-          "fair_odds": 1.59,
-          "expected_hr_allowed": 0.986,
-          "projected_ip": 5.31,
+          "probability": 0.5836,
+          "fair_odds": 1.71,
+          "expected_hr_allowed": 0.876,
+          "projected_ip": 4.75,
           "inputs": {
-            "hr9": 1.67,
-            "era": 6.21,
-            "whip": 1.59
+            "hr9": 1.66,
+            "era": 6.16,
+            "whip": 1.61
           },
           "side": "home"
         },
