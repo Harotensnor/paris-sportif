@@ -1,26 +1,26 @@
 {
-  "generated_at": "2026-05-18T02:32:02Z",
+  "generated_at": "2026-05-18T02:36:07Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 89,
+    "active_events": 88,
     "actionable": 39,
     "watch": 5,
-    "risk": 45,
+    "risk": 44,
     "expired_sample": 0,
     "by_type": {
       "market_move": 9,
       "injury_imbalance": 37,
-      "market_uncertain": 50,
+      "market_uncertain": 49,
+      "signal_conflict": 5,
       "travel_extreme": 3,
-      "back_to_back_travel": 17,
-      "signal_conflict": 4
+      "back_to_back_travel": 17
     },
     "by_quality": {
       "watch": 5,
       "actionable": 39,
-      "risk": 45
+      "risk": 44
     }
   },
   "active_actionable": [
@@ -815,8 +815,8 @@
       "direction": "steam",
       "team": null,
       "side": "away",
-      "strength": 0.454,
-      "context": "Cote away: 2.45 -> 2.25 (+8.2%)"
+      "strength": 0.556,
+      "context": "Cote away: 2.50 -> 2.25 (+10.0%)"
     }
   ],
   "active_risk": [
@@ -1575,24 +1575,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 19.0%"
-    },
-    {
-      "event_id": "401843353",
-      "date": "2026-05-25T15:00Z",
-      "sport": "football",
-      "league_code": "eliteserien",
-      "league_name": "Eliteserien",
-      "home": "Sarpsborg FK",
-      "away": "Molde",
-      "match": "Sarpsborg FK - Molde",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 19.6%"
     },
     {
       "event_id": "401815439",
