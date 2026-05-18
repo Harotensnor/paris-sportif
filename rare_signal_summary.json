@@ -1,26 +1,26 @@
 {
-  "generated_at": "2026-05-18T17:08:04Z",
+  "generated_at": "2026-05-18T17:45:17Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 75,
+    "active_events": 76,
     "actionable": 38,
     "watch": 3,
-    "risk": 34,
+    "risk": 35,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 39,
       "travel_extreme": 3,
-      "market_uncertain": 31,
       "back_to_back_travel": 17,
       "signal_conflict": 5,
+      "market_uncertain": 32,
       "weather_extreme": 1
     },
     "by_quality": {
       "actionable": 38,
       "watch": 3,
-      "risk": 34
+      "risk": 35
     }
   },
   "active_actionable": [
@@ -767,24 +767,6 @@
   ],
   "active_risk": [
     {
-      "event_id": "176097",
-      "date": "2026-05-19T10:00Z",
-      "sport": "tennis",
-      "league_code": "internationauxdestra",
-      "league_name": "Internationaux de Strasbourg presented by Mammotion",
-      "home": "",
-      "away": "",
-      "match": "? - ?",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 12.0%"
-    },
-    {
       "event_id": "178534",
       "date": "2026-05-20T04:00Z",
       "sport": "tennis",
@@ -1178,7 +1160,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 19.0%"
+      "context": "marge bookmaker anormale 18.1%"
     },
     {
       "event_id": "748968",
@@ -1305,6 +1287,42 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.4%"
+    },
+    {
+      "event_id": "401842723",
+      "date": "2026-05-25T17:00Z",
+      "sport": "football",
+      "league_code": "allsvenskan",
+      "league_name": "Allsvenskan",
+      "home": "IF Elfsborg",
+      "away": "BK Häcken",
+      "match": "IF Elfsborg - BK Häcken",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 19.7%"
+    },
+    {
+      "event_id": "401842727",
+      "date": "2026-05-25T17:00Z",
+      "sport": "football",
+      "league_code": "allsvenskan",
+      "league_name": "Allsvenskan",
+      "home": "IFK Göteborg",
+      "away": "Mjällby AIF",
+      "match": "IFK Göteborg - Mjällby AIF",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.6%"
     },
     {
       "event_id": "401843352",
