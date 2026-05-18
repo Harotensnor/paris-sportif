@@ -1,25 +1,26 @@
 {
-  "generated_at": "2026-05-18T21:13:41Z",
+  "generated_at": "2026-05-18T21:16:26Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 73,
-    "actionable": 40,
-    "watch": 3,
+    "active_events": 76,
+    "actionable": 42,
+    "watch": 4,
     "risk": 30,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 39,
+      "market_move": 6,
       "travel_extreme": 3,
+      "market_uncertain": 33,
       "back_to_back_travel": 19,
       "signal_conflict": 5,
-      "market_uncertain": 32,
       "weather_extreme": 1
     },
     "by_quality": {
-      "actionable": 40,
-      "watch": 3,
+      "actionable": 42,
+      "watch": 4,
       "risk": 30
     }
   },
@@ -115,6 +116,24 @@
       "context": "Absences severes 7-12"
     },
     {
+      "event_id": "401871410",
+      "date": "2026-05-18T23:30Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Buffalo Sabres",
+      "away": "Montreal Canadiens",
+      "match": "Buffalo Sabres - Montreal Canadiens",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 1.85 -> 2.35 (-27.2%)"
+    },
+    {
       "event_id": "401815397",
       "date": "2026-05-18T23:40Z",
       "sport": "baseball",
@@ -131,6 +150,24 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 7-14"
+    },
+    {
+      "event_id": "401815398",
+      "date": "2026-05-18T23:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Chicago Cubs",
+      "away": "Milwaukee Brewers",
+      "match": "Chicago Cubs - Milwaukee Brewers",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 1.0,
+      "context": "Cote away: 2.35 -> 1.76 (+25.1%)"
     },
     {
       "event_id": "401815402",
@@ -799,6 +836,24 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 9-12"
+    },
+    {
+      "event_id": "401856919",
+      "date": "2026-05-19T02:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Portland Fire",
+      "away": "Connecticut Sun",
+      "match": "Portland Fire - Connecticut Sun",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.454,
+      "context": "Cote away: 2.45 -> 2.25 (+8.2%)"
     }
   ],
   "active_risk": [

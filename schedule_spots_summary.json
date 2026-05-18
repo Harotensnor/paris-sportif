@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-18T21:13:41Z",
+  "generated_at": "2026-05-18T21:16:26Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -395,11 +395,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.155,
+        "home_score": 0.74,
         "away_score": -1.195,
         "home_fade": 0.3,
         "away_fade": 1.3,
-        "reason": "Direction nette: Philadelphia Phillies (+0.15)",
+        "reason": "Direction nette: Philadelphia Phillies (+0.74)",
         "detail": [
           {
             "side": "home",
@@ -418,6 +418,12 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 1.0
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.585
           }
         ]
       }
@@ -511,11 +517,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.595,
-        "away_score": -0.055,
-        "home_fade": 0.7,
+        "home_score": -1.446,
+        "away_score": 1.243,
+        "home_fade": 1.551,
         "away_fade": 0.3,
-        "reason": "Direction nette: Milwaukee Brewers (-0.06)",
+        "reason": "Direction nette: Milwaukee Brewers (+1.24)",
         "detail": [
           {
             "side": "home",
@@ -534,6 +540,18 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.4
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 0.851
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
           }
         ]
       }
