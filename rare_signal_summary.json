@@ -1,26 +1,25 @@
 {
-  "generated_at": "2026-05-18T21:03:39Z",
+  "generated_at": "2026-05-18T21:09:29Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 75,
+    "active_events": 74,
     "actionable": 40,
-    "watch": 4,
+    "watch": 3,
     "risk": 31,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 39,
-      "market_move": 8,
       "travel_extreme": 3,
-      "market_uncertain": 34,
-      "signal_conflict": 6,
-      "back_to_back_travel": 17,
+      "back_to_back_travel": 19,
+      "signal_conflict": 5,
+      "market_uncertain": 33,
       "weather_extreme": 1
     },
     "by_quality": {
       "actionable": 40,
-      "watch": 4,
+      "watch": 3,
       "risk": 31
     }
   },
@@ -116,24 +115,6 @@
       "context": "Absences severes 7-12"
     },
     {
-      "event_id": "401871410",
-      "date": "2026-05-18T23:30Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Buffalo Sabres",
-      "away": "Montreal Canadiens",
-      "match": "Buffalo Sabres - Montreal Canadiens",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 1.85 -> 2.35 (-27.2%)"
-    },
-    {
       "event_id": "401815397",
       "date": "2026-05-18T23:40Z",
       "sport": "baseball",
@@ -149,25 +130,7 @@
       "team": "Houston Astros",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 7-15"
-    },
-    {
-      "event_id": "401815398",
-      "date": "2026-05-18T23:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Chicago Cubs",
-      "away": "Milwaukee Brewers",
-      "match": "Chicago Cubs - Milwaukee Brewers",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 1.0,
-      "context": "Cote away: 2.39 -> 1.76 (+26.4%)"
+      "context": "Absences severes 7-14"
     },
     {
       "event_id": "401815402",
@@ -293,7 +256,7 @@
       "team": "Houston Astros",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 7-15"
+      "context": "Absences severes 7-14"
     },
     {
       "event_id": "401815417",
@@ -347,7 +310,7 @@
       "team": "Houston Astros",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 7-15"
+      "context": "Absences severes 7-14"
     },
     {
       "event_id": "401815419",
@@ -674,6 +637,24 @@
       "context": "Absences severes 13-9"
     },
     {
+      "event_id": "401815438",
+      "date": "2026-05-21T17:15Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "St. Louis Cardinals",
+      "away": "Pittsburgh Pirates",
+      "match": "St. Louis Cardinals - Pittsburgh Pirates",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Pittsburgh Pirates",
+      "side": "away",
+      "strength": 0.789,
+      "context": "2 match dans les 48h + 896 km de voyage"
+    },
+    {
       "event_id": "401815414",
       "date": "2026-05-20T00:40Z",
       "sport": "baseball",
@@ -744,6 +725,24 @@
       "side": "away",
       "strength": 0.726,
       "context": "1 match dans les 48h + 979 km de voyage"
+    },
+    {
+      "event_id": "401815428",
+      "date": "2026-05-20T23:45Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "St. Louis Cardinals",
+      "away": "Pittsburgh Pirates",
+      "match": "St. Louis Cardinals - Pittsburgh Pirates",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Pittsburgh Pirates",
+      "side": "away",
+      "strength": 0.709,
+      "context": "1 match dans les 48h + 896 km de voyage"
     }
   ],
   "active_watch": [
@@ -800,24 +799,6 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 9-12"
-    },
-    {
-      "event_id": "401856919",
-      "date": "2026-05-19T02:00Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Portland Fire",
-      "away": "Connecticut Sun",
-      "match": "Portland Fire - Connecticut Sun",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.454,
-      "context": "Cote away: 2.45 -> 2.25 (+8.2%)"
     }
   ],
   "active_risk": [

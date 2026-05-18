@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-18T21:03:32Z",
+  "generated_at": "2026-05-18T21:09:22Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -1818,6 +1818,88 @@
       ]
     },
     {
+      "event_id": "401815413",
+      "kickoff": "2026-05-19T23:45Z",
+      "league": "MLB",
+      "match": "Pittsburgh Pirates at St. Louis Cardinals",
+      "home": "St. Louis Cardinals",
+      "away": "Pittsburgh Pirates",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "St. Louis Cardinals",
+          "pitcher": "Matthew Liberatore",
+          "label": "Matthew Liberatore plus de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "over",
+          "probability": 0.5726,
+          "fair_odds": 1.75,
+          "expected_strikeouts": 3.78,
+          "projected_ip": 5.22,
+          "inputs": {
+            "k9": 6.51,
+            "era": 4.4,
+            "whip": 1.51,
+            "hand": "L"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "St. Louis Cardinals",
+          "pitcher": "Matthew Liberatore",
+          "label": "Matthew Liberatore concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.6314,
+          "fair_odds": 1.58,
+          "expected_hr_allowed": 0.998,
+          "projected_ip": 5.22,
+          "inputs": {
+            "hr9": 1.72,
+            "era": 4.4,
+            "whip": 1.51
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Pittsburgh Pirates",
+          "pitcher": "Mitch Keller",
+          "label": "Mitch Keller moins de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "under",
+          "probability": 0.5789,
+          "fair_odds": 1.73,
+          "expected_strikeouts": 4.18,
+          "projected_ip": 5.8,
+          "inputs": {
+            "k9": 6.49,
+            "era": 3.59,
+            "whip": 1.08,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Pittsburgh Pirates",
+          "pitcher": "Mitch Keller",
+          "label": "Mitch Keller ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.7199,
+          "fair_odds": 1.39,
+          "expected_hr_allowed": 0.329,
+          "projected_ip": 5.8,
+          "inputs": {
+            "hr9": 0.51,
+            "era": 3.59,
+            "whip": 1.08
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
       "event_id": "401815414",
       "kickoff": "2026-05-20T00:40Z",
       "league": "MLB",
@@ -3102,9 +3184,91 @@
           "side": "away"
         }
       ]
+    },
+    {
+      "event_id": "401815428",
+      "kickoff": "2026-05-20T23:45Z",
+      "league": "MLB",
+      "match": "Pittsburgh Pirates at St. Louis Cardinals",
+      "home": "St. Louis Cardinals",
+      "away": "Pittsburgh Pirates",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "St. Louis Cardinals",
+          "pitcher": "Michael McGreevy",
+          "label": "Michael McGreevy plus de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "over",
+          "probability": 0.6213,
+          "fair_odds": 1.61,
+          "expected_strikeouts": 3.98,
+          "projected_ip": 5.68,
+          "inputs": {
+            "k9": 6.31,
+            "era": 2.1,
+            "whip": 0.88,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "St. Louis Cardinals",
+          "pitcher": "Michael McGreevy",
+          "label": "Michael McGreevy ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5156,
+          "fair_odds": 1.94,
+          "expected_hr_allowed": 0.662,
+          "projected_ip": 5.68,
+          "inputs": {
+            "hr9": 1.05,
+            "era": 2.1,
+            "whip": 0.88
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Pittsburgh Pirates",
+          "pitcher": "Carmen Mlodzinski",
+          "label": "Carmen Mlodzinski moins de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "under",
+          "probability": 0.5733,
+          "fair_odds": 1.74,
+          "expected_strikeouts": 6.14,
+          "projected_ip": 6.43,
+          "inputs": {
+            "k9": 8.6,
+            "era": 4.4,
+            "whip": 1.44,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Pittsburgh Pirates",
+          "pitcher": "Carmen Mlodzinski",
+          "label": "Carmen Mlodzinski ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.7515,
+          "fair_odds": 1.33,
+          "expected_hr_allowed": 0.286,
+          "projected_ip": 6.43,
+          "inputs": {
+            "hr9": 0.4,
+            "era": 4.4,
+            "whip": 1.44
+          },
+          "side": "away"
+        }
+      ]
     }
   ],
-  "props": 150,
+  "props": 158,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
