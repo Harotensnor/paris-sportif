@@ -5,6 +5,15 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-18
 
+### Version v7.1.0 — Fiches plus lisibles + décision pari rapide
+
+Suite directe du passage v7 : la fiche match devient plus claire avant le clic et les signaux faibles bloquent davantage les paris impulsifs.
+- Terrain des compositions rendu plus lisible : lignes Attaque/Milieu/Défense/Gardien en flex, jetons joueurs moins écrasés, note explicite sur les compos estimées et photos uniquement quand sourcées.
+- Forme récente affichée comme une lecture pro : `Bonne dynamique`, `Forme mitigée` ou `Dynamique fragile`, plus résumé en victoires/nuls/défaites au lieu de codes bruts.
+- Fiche > Décision : ajout d’un bloc “Décision pari rapide” qui dit clairement `Jouable maintenant` ou `À surveiller, pas de clic`, avec la raison principale.
+- Garde-fou foot renforcé : si compo/blessures/xG/force équipe sont manquants et que l’avantage n’est pas large, le bouton de mise est coupé. Pour les paris buts, météo/arbitre/compos doivent être propres si l’avantage est court.
+- Version desktop, package et Service Worker bumpés en `v7.1.0`.
+
 ### Version v7.0.0 — Pari vite sécurisé + journal de décision
 
 Suite directe après les pertes réelles : le logiciel devient plus défensif sur les clics `Je mise` et garde la trace exacte de ce qu’il savait au moment du pari.

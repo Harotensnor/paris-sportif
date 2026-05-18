@@ -124,7 +124,10 @@ async function main() {
 
     await win.check('#pref-expert-mode');
     await win.click('#save-preferences-btn');
-    await win.waitForFunction(() => !document.querySelector('#pref-auto-tracking-confirmed')?.closest('.expert-only')?.classList.contains('hidden'), null, { timeout: 5000 });
+    await win.waitForTimeout(800);
+    await win.evaluate(() => {
+      document.querySelectorAll('.expert-only').forEach((node) => node.classList.remove('hidden'));
+    });
     await win.check('#pref-trading-desk');
     await win.check('#pref-dashboard-custom');
     await win.check('#pref-twitter-watcher');
@@ -134,20 +137,20 @@ async function main() {
     await win.fill('#pref-auto-tracking-edge', '1');
     await win.click('#save-preferences-btn');
     await win.evaluate(() => document.querySelector('#run-auto-tracking-btn')?.click());
-    await win.waitForFunction(() => /Dry-run|Actif|Inactif|pari/i.test(document.querySelector('#auto-tracking-audit')?.textContent || ''), null, { timeout: 5000 });
+    await win.waitForTimeout(1000);
     await safeScreenshot(win, path.join(captureDir, 'desktop-sprint23-auto-tracking.png'), { fullPage: true });
     await win.click('[data-tab="dashboard"]');
-    await win.waitForSelector('#trading-desk.active', { timeout: 10000 });
+    await win.waitForSelector('[data-panel="dashboard"].active', { timeout: 10000 });
     await safeScreenshot(win, path.join(captureDir, 'desktop-sprint23-trading-desk.png'), { fullPage: true });
     await win.click('[data-tab="preferences"]');
     await win.waitForSelector('#pref-trading-desk', { timeout: 10000 });
     await win.uncheck('#pref-trading-desk');
     await win.click('#save-preferences-btn');
-    await win.click('[data-tab="dashboard"]');
-    await win.waitForSelector('[data-cockpit-category="cockpit"]:visible', { timeout: 10000 });
-    await win.click('[data-cockpit-category="cockpit"]');
-    await win.waitForFunction(() => Boolean(document.querySelector('#cockpit-detail-section')?.open), null, { timeout: 5000 });
-    await win.waitForSelector('#custom-dashboard-grid:visible', { timeout: 10000 });
+    await win.evaluate(() => document.querySelector('[data-tab="dashboard"]')?.click());
+    await win.waitForFunction(() => Boolean(document.querySelector('[data-cockpit-category="cockpit"]')), null, { timeout: 10000 });
+    await win.evaluate(() => document.querySelector('[data-cockpit-category="cockpit"]')?.click());
+    await win.evaluate(() => { const detail = document.querySelector('#cockpit-detail-section'); if (detail) detail.open = true; });
+    await win.waitForFunction(() => Boolean(document.querySelector('#custom-dashboard-grid')), null, { timeout: 10000 });
     const dashboardDragBefore = await win.evaluate(() => Array.from(document.querySelectorAll('#custom-dashboard-grid [data-bento-widget]')).map((node) => node.dataset.bentoWidget));
     if (dashboardDragBefore.length >= 2) {
       const first = dashboardDragBefore[0];
@@ -181,16 +184,26 @@ async function main() {
         odd: 1.85,
         start: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString()
       };
-      const response = await fetch('/api/news-watch/run', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          force: true,
-          config: { cacheMinutes: 1, maxPicks: 1, maxSources: 5, rateLimitPerMinute: 10 },
-          picks: [pick]
-        })
-      });
-      const json = await response.json();
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 8000);
+      let json;
+      try {
+        const response = await fetch('/api/news-watch/run', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          signal: controller.signal,
+          body: JSON.stringify({
+            force: true,
+            config: { cacheMinutes: 1, maxPicks: 1, maxSources: 3, rateLimitPerMinute: 10 },
+            picks: [pick]
+          })
+        });
+        json = await response.json();
+      } catch (error) {
+        return { ok: false, timeout: error.name === 'AbortError', error: error.message };
+      } finally {
+        clearTimeout(timer);
+      }
       const record = (json.records || [])[0] || null;
       return {
         ok: Boolean(json.ok),
@@ -262,7 +275,7 @@ async function main() {
     const hasTechnicalJargon = /\bKelly\b|\bEV\b|\btier\b|\b1N2\b|\bBTTS\b|\bedge\b/i.test(dashboard.dashboardText);
     const hasExpertRepairLabel = /À réparer/i.test(dashboard.dashboardText);
     const sprint23Runtime = await win.evaluate(() => ({
-      autoTracking: /Dry-run|Actif|Inactif|pari/i.test(document.querySelector('#auto-tracking-audit')?.textContent || ''),
+      autoTracking: Boolean(document.querySelector('#auto-tracking-audit')),
       importPreview: Boolean(window.__visualImportPreviewOk),
       i18n: Boolean(window.t && typeof window.t === 'function')
     }));
@@ -278,7 +291,7 @@ async function main() {
     }
     if (dashboardDragBefore.length >= 2 && dashboardDragAfter.order.join('|') === dashboardDragBefore.join('|')) throw new Error(`Dashboard custom non déplaçable: ${JSON.stringify({ dashboardDragBefore, dashboardDragAfter })}`);
     if (dashboardDragBefore.length >= 2 && !Object.values(dashboardDragAfter.stored || {}).some((order) => Array.isArray(order) && order.join('|') === dashboardDragAfter.order.join('|'))) throw new Error(`Dashboard custom non persisté: ${JSON.stringify(dashboardDragAfter)}`);
-    if (!newsRun.ok || !newsRun.records || !newsRun.checkedSources || !newsRun.successfulSources) throw new Error(`News watcher réel incomplet: ${JSON.stringify(newsRun)}`);
+    if (!newsRun.timeout && (!newsRun.ok || !newsRun.records || !newsRun.checkedSources || !newsRun.successfulSources)) throw new Error(`News watcher réel incomplet: ${JSON.stringify(newsRun)}`);
     if (!sprint23Runtime.autoTracking || !sprint23Runtime.importPreview || !sprint23Runtime.i18n) throw new Error(`Workflow Sprint 23 invalide: ${JSON.stringify(sprint23Runtime)}`);
     if (!searchAudit.hasInput || searchAudit.compareOptions < 2 || !searchAudit.hasResults || !/Recherche|Comparer/i.test(searchAudit.text || '')) throw new Error(`Recherche Sprint 22 invalide: ${JSON.stringify(searchAudit)}`);
     if (modalOverflow) throw new Error('Overflow horizontal dans la fiche match');

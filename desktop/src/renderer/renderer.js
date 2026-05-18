@@ -2160,6 +2160,13 @@
     const contextScore = Number(row?.contextQuality?.score || row?.matchSheetV6?.sectionCompleteness?.score || 0);
     const isCombo = family === 'combine' || normalizeUiKey(row?.market || '').includes('combine');
     const volatileFamily = ['halftime', 'teamtotal', 'scorer', 'points_totals', 'tennis_specials', 'htft', 'half_scores', 'combine'].includes(family);
+    const football = isFootballRow(row);
+    const missingSignals = [
+      ...(row?.matchSheetV6?.missingCriticalData || []),
+      ...(row?.matchSheetV6?.missingOptionalData || []),
+      ...(row?.contextQuality?.critical_missing || []),
+      ...(row?.contextQuality?.missing || [])
+    ].map((item) => String(item || '').toLowerCase());
     if (odd > 4.5) {
       reasons.push({
         code: 'danger_high_odd',
@@ -2197,6 +2204,22 @@
         code: 'danger_context_short',
         label: 'Dossier trop pauvre',
         detail: `Contexte ${Math.round(contextScore)}/100 : pas assez de matière pour transformer ce signal en “Je mise”.`,
+        tone: 'warn'
+      });
+    }
+    if (football && ['winner', 'goals', 'btts'].includes(family) && edge < 0.18 && missingSignals.some((item) => /lineup|composition|injur|bless|xg|team_strength|force/.test(item))) {
+      reasons.push({
+        code: 'danger_missing_core_context',
+        label: 'Signaux foot critiques manquants',
+        detail: 'Compo/blessures/xG/force équipe pas assez solides : le pick reste consultable, mais le clic est coupé.',
+        tone: 'warn'
+      });
+    }
+    if (football && ['goals', 'btts'].includes(family) && edge < 0.14 && missingSignals.some((item) => /weather|meteo|météo|referee|arbitre/.test(item))) {
+      reasons.push({
+        code: 'danger_missing_total_context',
+        label: 'Totaux sans contexte complet',
+        detail: 'Pour un pari buts, météo/arbitre/compos doivent être propres si l’avantage n’est pas très large.',
         tone: 'warn'
       });
     }
@@ -3822,6 +3845,17 @@
     return parts.join(compact ? ' · ' : ', ') || 'forme non confirmée';
   }
 
+  function formToneFromLetters(letters) {
+    const list = (Array.isArray(letters) ? letters : []).filter((letter) => ['W', 'D', 'L'].includes(letter));
+    if (!list.length) return { tone: 'unknown', label: 'Forme à confirmer' };
+    const score = list.reduce((sum, letter) => sum + (letter === 'W' ? 3 : letter === 'D' ? 1 : 0), 0);
+    const max = list.length * 3;
+    const ratio = max ? score / max : 0;
+    if (ratio >= 0.66) return { tone: 'hot', label: 'Bonne dynamique' };
+    if (ratio <= 0.28) return { tone: 'cold', label: 'Dynamique fragile' };
+    return { tone: 'mixed', label: 'Forme mitigée' };
+  }
+
   function formSummaryFromCodeSequence(value) {
     const raw = String(value || '').trim().toUpperCase().replace(/[^WVNDL]/g, '').slice(0, 5);
     if (!raw) return '';
@@ -3849,15 +3883,17 @@
 
   function formStripHtml(match) {
     const { home, away } = getSides(match || {});
-    const render = (label, letters) => `
-      <div class="form-strip-row">
-        <span>${escapeHtml(label)}</span>
+    const render = (label, letters) => {
+      const tone = formToneFromLetters(letters);
+      return `
+      <div class="form-strip-row form-tone-${escapeHtml(tone.tone)}">
+        <span class="form-team-name">${escapeHtml(label)}</span>
         <div>
           <div class="form-strip-results">${letters.map(formBadgeHtml).join('') || '<em>Forme indisponible</em>'}</div>
-          ${letters.length ? `<small>${escapeHtml(formSummaryFromLetters(letters, { compact: true }))}</small>` : ''}
+          ${letters.length ? `<small><strong>${escapeHtml(tone.label)}</strong> · ${escapeHtml(formSummaryFromLetters(letters, { compact: true }))}</small>` : ''}
         </div>
-      </div>
-    `;
+      </div>`;
+    };
     return `<div class="form-strip">${render(home.name || 'Domicile', formLetters(home))}${render(away.name || 'Extérieur', formLetters(away))}</div>`;
   }
 
@@ -4661,7 +4697,13 @@
         </div>
       `;
     }
-    return `<div class="lineup-pitch" aria-label="Feuille de match probable">${columns.join('')}</div>`;
+    return `
+      <div class="lineup-pitch-note">
+        <strong>Lecture compo</strong>
+        <span>Terrain lisible par lignes : attaque, milieu, défense, gardien. Les photos/statuts sont affichés seulement quand une source les fournit.</span>
+      </div>
+      <div class="lineup-pitch" aria-label="Feuille de match probable">${columns.join('')}</div>
+    `;
   }
 
   function buildFootballInsightHtml(row) {
@@ -14598,9 +14640,22 @@
     const reasons = blockReasons(row);
     const action = smartPrepareAction();
     const decisions = decisionBundleForRow(row);
+    const quickReady = canDisplayStake(row, decisions);
+    const gate = realPerformanceGateForRow(row);
+    const quickReasons = quickReady
+      ? ['Bouton autorisé', visibleStakeText(row, decisions), simpleWhyText(row)].filter(Boolean)
+      : [noBetStakeReason(row, decisions), ...(gate.reasons || []).map((reason) => reason.label || reason.code)].filter(Boolean);
     return `
       <section class="detail-tab-panel" data-detail-panel="decision">
         <div class="modal-grid">
+          <article class="detail-card wide quick-decision-card ${quickReady ? 'quick-ready' : 'quick-watch'}">
+            <div>
+              <span>Décision pari rapide</span>
+              <strong>${escapeHtml(quickReady ? 'Jouable maintenant' : 'À surveiller, pas de clic')}</strong>
+              <p>${escapeHtml(quickReasons.slice(0, 3).join(' · ') || 'Lecture prudente.')}</p>
+            </div>
+            <b>${escapeHtml(quickReady ? visibleStakeText(row, decisions) : '0€ conseillé')}</b>
+          </article>
           <article class="detail-card">
             <h4>Décision</h4>
             <div class="kv">
