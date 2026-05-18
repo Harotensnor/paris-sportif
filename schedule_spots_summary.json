@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-18T12:55:37Z",
+  "generated_at": "2026-05-18T13:00:21Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -1247,7 +1247,7 @@
       "global_resolution": {
         "status": "abstain",
         "net_side": null,
-        "home_score": 0.058,
+        "home_score": -0.39,
         "away_score": -0.39,
         "home_fade": 0.6,
         "away_fade": 0.6,
@@ -1264,12 +1264,6 @@
             "type": "schedule_congestion",
             "direction": "fade",
             "strength": 0.6
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.448
           }
         ]
       }
@@ -1984,10 +1978,10 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.098,
-        "away_score": 0.351,
+        "away_score": -0.098,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: San Antonio Spurs (+0.35)",
+        "reason": "Direction nette: San Antonio Spurs (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -2000,12 +1994,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.448
           }
         ]
       }
@@ -2150,12 +2138,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "home",
-        "home_score": 0.351,
+        "net_side": "away",
+        "home_score": -0.098,
         "away_score": -0.098,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: San Antonio Spurs (+0.35)",
+        "reason": "Direction nette: Oklahoma City Thunder (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -2168,12 +2156,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.448
           }
         ]
       }
