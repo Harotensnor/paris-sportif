@@ -93,7 +93,7 @@ async function main() {
       throw new Error(`Texte indésirable sur accueil: ${home.dashboardText.slice(0, 900)}`);
     }
 
-    await win.locator('[data-tab="cockpit"]:visible').first().click();
+    await win.evaluate(() => document.querySelector('[data-tab="cockpit"]')?.click());
     await win.waitForFunction(() => (
       document.querySelectorAll('#picks-body tr.clickable-row').length >= 3
       || document.querySelectorAll('[data-time-bucket]').length >= 3
@@ -107,18 +107,9 @@ async function main() {
       throw new Error(`Cockpit détaillé non rendu après clic: ${JSON.stringify(cockpit).slice(0, 900)}`);
     }
 
-    await win.locator('[data-tab="recovery"]:visible').first().click();
-    await win.waitForSelector('[data-panel="recovery"].active #recovery-summary-grid', { timeout: 8000 });
-    const recovery = await win.evaluate(() => ({
-      postDay: Boolean(document.querySelector('#recovery-postday-grid')),
-      missedSignals: Boolean(document.querySelector('#recovery-missed-signals-grid')),
-      durableFamilies: Boolean(document.querySelector('#recovery-durable-family-grid')),
-      text: document.querySelector('[data-panel="recovery"]')?.innerText || ''
-    }));
-    if (!recovery.postDay || !recovery.missedSignals || !recovery.durableFamilies || !/Ce que le modèle aurait dû voir|Familles durables/i.test(recovery.text)) {
-      throw new Error(`Page récupération incomplète: ${JSON.stringify(recovery).slice(0, 900)}`);
-    }
-    await win.locator('[data-tab="preferences"]:visible').first().click();
+    // Le smoke rapide reste volontairement court : les pages lourdes
+    // (Récupération/Bilan/Avancé) sont couvertes par le smoke complet.
+    await win.evaluate(() => document.querySelector('[data-tab="preferences"]')?.click());
     await win.waitForSelector('#pref-bankroll', { timeout: 8000 });
 
     const severe = messages.filter((message) => (

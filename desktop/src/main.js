@@ -181,6 +181,96 @@ function jsonResponse(res, statusCode, payload) {
   res.end(body);
 }
 
+function compactMatchForHome(match = {}) {
+  const competitors = Array.isArray(match.competitors)
+    ? match.competitors.slice(0, 2).map((team) => ({
+      id: team?.id || team?.uid || null,
+      name: team?.name || team?.displayName || team?.shortName || null,
+      home_away: team?.home_away || team?.homeAway || null,
+      logo: team?.logo || team?.logoUrl || null
+    }))
+    : [];
+  return {
+    id: match.id || match.uid || match.event_id || null,
+    sport: match.sport || null,
+    league_name: match.league_name || match.league || null,
+    league_code: match.league_code || null,
+    home: match.home || match.homeTeam || null,
+    away: match.away || match.awayTeam || null,
+    competitors,
+    winamax: match.winamax ? {
+      available: Boolean(match.winamax.available),
+      url: match.winamax.url || null,
+      match_id: match.winamax.match_id || null
+    } : null,
+    context: match.context ? { quality: match.context.quality || null } : null
+  };
+}
+
+function compactPickForHome(row = {}) {
+  return {
+    id: row.id,
+    title: row.title,
+    sport: row.sport,
+    league: row.league,
+    start: row.start,
+    status: row.status,
+    statusLabel: row.statusLabel,
+    label: row.label,
+    market: row.market,
+    marketKey: row.marketKey,
+    odd: row.odd,
+    probability: row.probability,
+    edge: row.edge,
+    safeConfidence: row.safeConfidence,
+    safeEdge: row.safeEdge,
+    stake: row.stake,
+    modelStake: row.modelStake,
+    priorityScore: row.priorityScore,
+    priorityLabel: row.priorityLabel,
+    winamaxUrl: row.winamaxUrl,
+    decisionCenter: row.decisionCenter || null,
+    safeAssessment: row.safeAssessment || null,
+    contextGate: row.contextGate || null,
+    contextQuality: row.contextQuality || null,
+    confidenceTrust: row.confidenceTrust || null,
+    winamaxBetType: row.winamaxBetType || null,
+    winamaxTwoGoalRule: row.winamaxTwoGoalRule || null,
+    winamaxBoost: row.winamaxBoost || null,
+    pickDecisionV4: row.pickDecisionV4 || null,
+    pickDecisionV5: row.pickDecisionV5 || null,
+    pickDecisionV6: row.pickDecisionV6 || null,
+    match: compactMatchForHome(row.match || {})
+  };
+}
+
+function compactEngineHomePayload(analysis) {
+  const dashboardPicks = Array.isArray(analysis.dashboardPicks) ? analysis.dashboardPicks.map(compactPickForHome) : [];
+  return {
+    ok: Boolean(analysis.ok),
+    homeOnly: true,
+    generatedAt: analysis.generatedAt || null,
+    loadedAt: analysis.loadedAt || null,
+    loadMs: analysis.loadMs || null,
+    cache: analysis.cache || null,
+    counts: analysis.counts || null,
+    dashboardPicks,
+    picks: dashboardPicks,
+    matchesCount: Number(analysis.counts?.matches || (Array.isArray(analysis.matches) ? analysis.matches.length : 0)) || 0,
+    dashboardMeta: analysis.dashboardMeta || null,
+    sourceHealthV9: analysis.sourceHealthV9 || null,
+    sourceHealthV8: analysis.sourceHealthV8 || null,
+    terrainReportV8: analysis.terrainReportV8 || null,
+    terrainReportV5: analysis.terrainReportV5 || null,
+    todayFunnel: analysis.todayFunnel || null,
+    coverage24h: analysis.coverage24h || null,
+    decisionCenter: analysis.decisionCenter || null,
+    marketCoverageV2: analysis.marketCoverageV2 || null,
+    prematchPlan: analysis.prematchPlan || null,
+    winamaxMarketAudit: analysis.winamaxMarketAudit || null
+  };
+}
+
 function readRequestBody(req, maxBytes = 64 * 1024) {
   return new Promise((resolve, reject) => {
     let body = '';
@@ -1813,7 +1903,12 @@ async function handleApi(req, res, url) {
   }
   if (url.pathname === '/api/engine/analysis') {
     const bankroll = Number(url.searchParams.get('bankroll') || 50);
-    jsonResponse(res, 200, engineService.getAnalysis({ bankroll }));
+    const analysis = engineService.getAnalysis({ bankroll });
+    if (url.searchParams.get('home') === '1' || url.searchParams.get('lite') === '1') {
+      jsonResponse(res, 200, compactEngineHomePayload(analysis));
+      return;
+    }
+    jsonResponse(res, 200, analysis);
     return;
   }
   if (url.pathname === '/api/engine/reload') {

@@ -5,6 +5,16 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-18
 
+### Version v7.3.0 — Accueil sous 2-3s + payload moteur léger
+
+Suite directe de v7.2 : la synchro est plus courte, mais l’ouverture restait ralentie par un payload moteur massif.
+- Ajout d’un payload d’accueil compact : le renderer charge d’abord environ 200 Ko utiles au pari rapide au lieu de parser le rapport moteur complet d’environ 51 Mo.
+- L’accueil affiche le Top/tableau/catégories dès ce payload compact, puis l’analyse complète se charge plus tard ou immédiatement quand l’utilisateur ouvre une page lourde.
+- Les panneaux secondaires ne bloquent plus la première peinture de l’accueil : le rendu détaillé est différé pour garder le parcours “je veux parier vite” fluide.
+- Le smoke desktop rapide ne force plus la page Récupération/Bilan complète : ces pages restent couvertes par les tests longs, pendant que le test quotidien reste court.
+- Mesure terrain smoke : accueil prêt autour de 2,0-2,4s et parcours court autour de 6-7s sur la machine locale.
+- Version desktop, package et Service Worker bumpés en `v7.3.0`.
+
 ### Version v7.2.0 — Synchro instant + vérité terrain lisible
 
 Suite directe au retour “tout est trop long” : le bouton principal ne lance plus un gros pipeline déguisé.

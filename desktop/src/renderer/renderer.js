@@ -80,6 +80,8 @@
     weeklyReport: null,
     prematchPlan: null,
     engineReady: false,
+    engineHydrated: false,
+    engineHydrating: false,
     bootStartedAt: typeof performance !== 'undefined' ? performance.now() : Date.now(),
     windowLoadedAt: null,
     firstPickRenderedAt: null,
@@ -87,6 +89,7 @@
     refreshTimer: null,
     backgroundRefreshTimer: null,
     backgroundRefreshNextAt: null,
+    engineHydrationTimer: null,
     exportTimer: null,
     actionHistory: [],
     calendarDayFilter: null,
@@ -116,6 +119,7 @@
     winamaxImportPreview: null,
     currentDashboardRows: [],
     activeHomeCategory: null,
+    deferredEngineRenderTimer: null,
     bentoDragId: null,
     learningAuditCache: null,
     postDayAuditCache: null,
@@ -5518,6 +5522,186 @@
     };
   }
 
+  function yieldHomePaint() {
+    return new Promise((resolve) => {
+      if (typeof requestAnimationFrame === 'function') {
+        requestAnimationFrame(() => setTimeout(resolve, 0));
+      } else {
+        setTimeout(resolve, 0);
+      }
+    });
+  }
+
+  function renderSecondaryEnginePanels() {
+    renderStakeScenarios();
+    renderCombines();
+    renderPreferences();
+    renderScorers();
+    renderScorerReport();
+    renderScorerPendingAudit();
+    renderWatchlist();
+    renderPrematchFinal();
+    renderPrematchExecution();
+    renderMatches();
+    renderHistory();
+    renderContextBacktest();
+    renderDecisionBacktest();
+    renderDecisionTuning();
+    renderAgent(state.agent);
+    renderAgentGuardrailRecommendations();
+    renderStakeReductionBacktest();
+    renderLeagueMarketReductions();
+    renderSignalConflictBacktest();
+    renderPrebetChecklist();
+    renderPrebetChecklistBacktest();
+    renderFinalDecisionPanel();
+    renderSmartPreparePlan();
+    renderAgentSimulation();
+    renderCalendar();
+    renderHelp();
+    renderDeepSearch();
+    updateWebEnrichmentSummary();
+    renderActiveModelAdjustments();
+    renderLearningFeedback();
+    renderWinamaxMarketAudit();
+    if (state.status) {
+      renderQualityReport(state.status);
+      renderSourceHealth(state.status);
+      renderCoverageTrend();
+      renderNextActions();
+      renderActionHistory();
+      renderSourceFreshnessPlan();
+      renderRefreshPriorityPlan();
+      renderContextRepairPlan();
+      renderSourceRegistryCenter();
+      renderTeamIdentityGraph();
+      renderOptionalSourcesPlan();
+      renderSmartPreparePlanData();
+      renderCriticalIssues();
+      renderIntegrityReports();
+      renderCoverageRepairEngine();
+      renderModelLabV4();
+      renderSourceHealthV4();
+      renderSignalGapCenter();
+      renderQualityAlerts(state.status);
+      renderWarnings(state.status);
+      renderPipelinePanel(state.status);
+    }
+  }
+
+  function scheduleSecondaryEnginePanels() {
+    if (state.deferredEngineRenderTimer) clearTimeout(state.deferredEngineRenderTimer);
+    state.deferredEngineRenderTimer = setTimeout(() => {
+      state.deferredEngineRenderTimer = null;
+      try {
+        renderSecondaryEnginePanels();
+      } catch (error) {
+        pushLog('warn', `Rendu secondaire reporté impossible: ${error.message}`);
+      }
+    }, 0);
+  }
+
+  function applyEngineAnalysisState(analysis = {}) {
+    state.engineReady = true;
+    state.engineHydrated = !analysis.homeOnly;
+    const dashboardRows = Array.isArray(analysis.dashboardPicks) ? analysis.dashboardPicks : [];
+    state.matches = Array.isArray(analysis.matches)
+      ? analysis.matches
+      : Array.from({ length: Number(analysis.matchesCount || analysis.counts?.matches || 0) || 0 }, (_, index) => ({ id: `compact-${index}` }));
+    state.allPicks = Array.isArray(analysis.picks) ? analysis.picks : dashboardRows;
+    state.picks = dashboardRows.length ? dashboardRows : state.allPicks;
+    state.combines = Array.isArray(analysis.combines) ? analysis.combines : (analysis.homeOnly ? state.combines : []);
+    state.scorers = Array.isArray(analysis.scorers) ? analysis.scorers : (analysis.homeOnly ? state.scorers : []);
+    state.watchlist = Array.isArray(analysis.watchlist) ? analysis.watchlist : (analysis.homeOnly ? state.watchlist : []);
+    state.history = analysis.history || (analysis.homeOnly ? state.history : null);
+    state.coverage = analysis.coverage || (analysis.homeOnly ? state.coverage : null);
+    state.agent = analysis.agent || (analysis.homeOnly ? state.agent : null);
+    state.calibration = analysis.calibration || (analysis.homeOnly ? state.calibration : null);
+    state.contextSummary = analysis.context || (analysis.homeOnly ? state.contextSummary : null);
+    state.signalGaps = Array.isArray(analysis.signalGaps) ? analysis.signalGaps : (analysis.homeOnly ? state.signalGaps : []);
+    state.contextBacktest = analysis.contextBacktest || (analysis.homeOnly ? state.contextBacktest : null);
+    state.decisionBacktest = analysis.decisionBacktest || (analysis.homeOnly ? state.decisionBacktest : null);
+    state.decisionTuning = analysis.decisionTuning || (analysis.homeOnly ? state.decisionTuning : null);
+    state.decisionShadow = analysis.decisionShadow || (analysis.homeOnly ? state.decisionShadow : null);
+    state.oddsGuardrails = analysis.oddsGuardrails || (analysis.homeOnly ? state.oddsGuardrails : null);
+    state.agentBlockerBacktest = analysis.agentBlockerBacktest || (analysis.homeOnly ? state.agentBlockerBacktest : null);
+    state.agentGuardrailRecommendations = analysis.agentGuardrailRecommendations || (analysis.homeOnly ? state.agentGuardrailRecommendations : null);
+    state.stakeReductionBacktest = analysis.stakeReductionBacktest || (analysis.homeOnly ? state.stakeReductionBacktest : null);
+    state.signalConflictBacktest = analysis.signalConflictBacktest || (analysis.homeOnly ? state.signalConflictBacktest : null);
+    state.scorerQuality = analysis.scorerQuality || (analysis.homeOnly ? state.scorerQuality : null);
+    state.scorerCandidates = analysis.scorerCandidates || (analysis.homeOnly ? state.scorerCandidates : null);
+    state.scorerSettlement = analysis.scorerSettlement || (analysis.homeOnly ? state.scorerSettlement : null);
+    state.scorerPendingAudit = analysis.scorerPendingAudit || (analysis.homeOnly ? state.scorerPendingAudit : null);
+    state.prematchFocus = analysis.prematchFocus || (analysis.homeOnly ? state.prematchFocus : null);
+    state.prematchExecution = analysis.prematchExecution || (analysis.homeOnly ? state.prematchExecution : null);
+    state.signalCoverageTrend = analysis.signalCoverageTrend || (analysis.homeOnly ? state.signalCoverageTrend : null);
+    state.nextActions = analysis.nextActions || (analysis.homeOnly ? state.nextActions : null);
+    state.sourceFreshnessPlan = analysis.sourceFreshnessPlan || (analysis.homeOnly ? state.sourceFreshnessPlan : null);
+    state.contextRepairPlan = analysis.contextRepairPlan || (analysis.homeOnly ? state.contextRepairPlan : null);
+    state.refreshPriorityPlan = analysis.refreshPriorityPlan || (analysis.homeOnly ? state.refreshPriorityPlan : null);
+    state.prebetChecklist = analysis.prebetChecklist || (analysis.homeOnly ? state.prebetChecklist : null);
+    state.prebetChecklistBacktest = analysis.prebetChecklistBacktest || (analysis.homeOnly ? state.prebetChecklistBacktest : null);
+    state.teamIdentityGraph = analysis.teamIdentityGraph || (analysis.homeOnly ? state.teamIdentityGraph : null);
+    state.matchDecisionTimeline = analysis.matchDecisionTimeline || (analysis.homeOnly ? state.matchDecisionTimeline : null);
+    state.agentBankrollSimulation = analysis.agentBankrollSimulation || (analysis.homeOnly ? state.agentBankrollSimulation : null);
+    state.smartPreparePlan = analysis.smartPreparePlan || (analysis.homeOnly ? state.smartPreparePlan : null);
+    state.sourceRegistry = analysis.sourceRegistry || (analysis.homeOnly ? state.sourceRegistry : null);
+    state.sourceQuarantine = analysis.sourceQuarantine || (analysis.homeOnly ? state.sourceQuarantine : null);
+    state.optionalSourcesPlan = analysis.optionalSourcesPlan || (analysis.homeOnly ? state.optionalSourcesPlan : null);
+    state.criticalIssueReport = analysis.criticalIssueReport || (analysis.homeOnly ? state.criticalIssueReport : null);
+    state.dataConsistencyReport = analysis.dataConsistencyReport || (analysis.homeOnly ? state.dataConsistencyReport : null);
+    state.uiIntegrityReport = analysis.uiIntegrityReport || (analysis.homeOnly ? state.uiIntegrityReport : null);
+    state.pickIntegrityReport = analysis.pickIntegrityReport || (analysis.homeOnly ? state.pickIntegrityReport : null);
+    state.coverageRepairEngine = analysis.coverageRepairEngine || (analysis.homeOnly ? state.coverageRepairEngine : null);
+    state.sourceCoverageTargets = analysis.sourceCoverageTargets || (analysis.homeOnly ? state.sourceCoverageTargets : null);
+    state.leagueSignalQuality = analysis.leagueSignalQuality || (analysis.homeOnly ? state.leagueSignalQuality : null);
+    state.modelLab = analysis.modelLab || (analysis.homeOnly ? state.modelLab : null);
+    state.modelRealityAudit = analysis.modelRealityAudit || (analysis.homeOnly ? state.modelRealityAudit : null);
+    state.probabilityCalibration = analysis.probabilityCalibration || (analysis.homeOnly ? state.probabilityCalibration : null);
+    state.policyCandidates = analysis.policyCandidates || (analysis.homeOnly ? state.policyCandidates : null);
+    state.sourceHealth = analysis.sourceHealthV9 || analysis.sourceHealthV8 || analysis.sourceHealthV7 || analysis.sourceHealthV6 || analysis.sourceHealthV5 || analysis.sourceHealth || (analysis.homeOnly ? state.sourceHealth : null);
+    state.sourceHealthV6 = analysis.sourceHealthV6 || (analysis.homeOnly ? state.sourceHealthV6 : null);
+    state.sourceHealthV7 = analysis.sourceHealthV7 || (analysis.homeOnly ? state.sourceHealthV7 : null);
+    state.sourceHealthV8 = analysis.sourceHealthV8 || (analysis.homeOnly ? state.sourceHealthV8 : null);
+    state.sourceHealthV9 = analysis.sourceHealthV9 || (analysis.homeOnly ? state.sourceHealthV9 : null);
+    state.marketCoverageV2 = analysis.marketCoverageV2 || (analysis.homeOnly ? state.marketCoverageV2 : null);
+    state.terrainReportV2 = analysis.terrainReportV2 || (analysis.homeOnly ? state.terrainReportV2 : null);
+    state.terrainReportV3 = analysis.terrainReportV3 || (analysis.homeOnly ? state.terrainReportV3 : null);
+    state.terrainReportV4 = analysis.terrainReportV4 || (analysis.homeOnly ? state.terrainReportV4 : null);
+    state.terrainReportV5 = analysis.terrainReportV5 || (analysis.homeOnly ? state.terrainReportV5 : null);
+    state.terrainReportV8 = analysis.terrainReportV8 || (analysis.homeOnly ? state.terrainReportV8 : null);
+    state.modelBacktestV4 = analysis.modelBacktestV4 || (analysis.homeOnly ? state.modelBacktestV4 : null);
+    state.modelBacktestV5 = analysis.modelBacktestV5 || (analysis.homeOnly ? state.modelBacktestV5 : null);
+    state.modelBacktestV6 = analysis.modelBacktestV6 || (analysis.homeOnly ? state.modelBacktestV6 : null);
+    state.decisionCenter = analysis.decisionCenter || (analysis.homeOnly ? state.decisionCenter : null);
+    state.agentBlockers = analysis.agentBlockers || (analysis.homeOnly ? state.agentBlockers : null);
+    state.clvSummary = analysis.clvSummary || (analysis.homeOnly ? state.clvSummary : null);
+    state.dashboardMeta = analysis.dashboardMeta || (analysis.homeOnly ? state.dashboardMeta : null);
+    state.todayFunnel = analysis.todayFunnel || (analysis.homeOnly ? state.todayFunnel : null);
+    state.coverage24h = analysis.coverage24h || (analysis.homeOnly ? state.coverage24h : null);
+    state.winamaxMarketAudit = analysis.winamaxMarketAudit || (analysis.homeOnly ? state.winamaxMarketAudit : null);
+    state.prematchPlan = analysis.prematchPlan || (analysis.homeOnly ? state.prematchPlan : null);
+  }
+
+  async function hydrateFullEngineAnalysis(bankroll) {
+    if (state.engineHydrating || state.engineHydrated) return;
+    state.engineHydrating = true;
+    try {
+      const full = await fetchJson(`/api/engine/analysis?bankroll=${encodeURIComponent(bankroll)}`);
+      applyEngineAnalysisState(full);
+      refreshTrackedBetMarketData();
+      await autoSettleUserBets('engine_full_hydration');
+      $('#metric-upcoming').textContent = String(state.matches.length);
+      $('#metric-bookable').textContent = `${state.matches.length} analysés par le logiciel`;
+      renderPicks();
+      scheduleSecondaryEnginePanels();
+    } catch (error) {
+      pushLog('warn', `Hydratation complète différée impossible: ${error.message}`);
+    } finally {
+      state.engineHydrating = false;
+    }
+  }
+
   async function computePicks() {
     const status = state.status;
     if (status && status.ageMinutes > 240 && !Number(status.counts?.bookable || 0)) {
@@ -5585,186 +5769,26 @@
       state.prematchPlan = null;
       renderPicks('Données trop anciennes : le logiciel bloque les recommandations actionnables.');
       renderStakeScenarios('Scénarios bloqués : données trop anciennes.');
-      renderCombines();
-      renderPreferences();
-      renderScorers();
-      renderScorerReport();
-      renderScorerPendingAudit();
-      renderWatchlist();
-      renderPrematchFinal();
-      renderPrematchExecution();
-      renderMatches();
-      renderHistory();
-      renderAgent(null);
-      renderAgentGuardrailRecommendations();
-      renderStakeReductionBacktest();
-      renderLeagueMarketReductions();
-      renderSignalConflictBacktest();
-      renderContextBacktest();
-      renderDecisionBacktest();
-      renderDecisionTuning();
-      renderPrebetChecklist();
-      renderSourceFreshnessPlan();
-      renderRefreshPriorityPlan();
-      renderContextRepairPlan();
-      renderSmartPreparePlan();
-      renderAgentSimulation();
-      renderSourceRegistryCenter();
-      renderTeamIdentityGraph();
-      renderOptionalSourcesPlan();
-      renderSmartPreparePlanData();
-      renderCriticalIssues();
-      renderIntegrityReports();
-      renderCoverageRepairEngine();
-      renderModelLabV4();
-      renderSourceHealthV4();
-      renderActionHistory();
-      renderPrebetChecklistBacktest();
-      renderFinalDecisionPanel();
-      renderCalendar();
-      renderHelp();
-      updateWebEnrichmentSummary();
-      renderActiveModelAdjustments();
-      renderLearningFeedback();
-      if (state.status) renderPipelinePanel(state.status);
+      await yieldHomePaint();
+      scheduleSecondaryEnginePanels();
       return;
     }
     const bankroll = getBankroll();
-    const analysis = await fetchJson(`/api/engine/analysis?bankroll=${encodeURIComponent(bankroll)}`);
-    state.engineReady = true;
-    state.matches = Array.isArray(analysis.matches) ? analysis.matches : [];
-    state.allPicks = Array.isArray(analysis.picks) ? analysis.picks : [];
-    state.picks = Array.isArray(analysis.dashboardPicks) ? analysis.dashboardPicks : state.allPicks;
-    state.combines = Array.isArray(analysis.combines) ? analysis.combines : [];
-    state.scorers = Array.isArray(analysis.scorers) ? analysis.scorers : [];
-    state.watchlist = Array.isArray(analysis.watchlist) ? analysis.watchlist : [];
-    state.history = analysis.history || null;
-    state.coverage = analysis.coverage || null;
-    state.agent = analysis.agent || null;
-    state.calibration = analysis.calibration || null;
-    state.contextSummary = analysis.context || null;
-    state.signalGaps = Array.isArray(analysis.signalGaps) ? analysis.signalGaps : [];
-    state.contextBacktest = analysis.contextBacktest || null;
-    state.decisionBacktest = analysis.decisionBacktest || null;
-    state.decisionTuning = analysis.decisionTuning || null;
-    state.decisionShadow = analysis.decisionShadow || null;
-    state.oddsGuardrails = analysis.oddsGuardrails || null;
-    state.agentBlockerBacktest = analysis.agentBlockerBacktest || null;
-    state.agentGuardrailRecommendations = analysis.agentGuardrailRecommendations || null;
-    state.stakeReductionBacktest = analysis.stakeReductionBacktest || null;
-    state.signalConflictBacktest = analysis.signalConflictBacktest || null;
-    state.scorerQuality = analysis.scorerQuality || null;
-    state.scorerCandidates = analysis.scorerCandidates || null;
-    state.scorerSettlement = analysis.scorerSettlement || null;
-    state.scorerPendingAudit = analysis.scorerPendingAudit || null;
-    state.prematchFocus = analysis.prematchFocus || null;
-    state.prematchExecution = analysis.prematchExecution || null;
-    state.signalCoverageTrend = analysis.signalCoverageTrend || null;
-    state.nextActions = analysis.nextActions || null;
-    state.sourceFreshnessPlan = analysis.sourceFreshnessPlan || null;
-    state.contextRepairPlan = analysis.contextRepairPlan || null;
-    state.refreshPriorityPlan = analysis.refreshPriorityPlan || null;
-    state.prebetChecklist = analysis.prebetChecklist || null;
-    state.prebetChecklistBacktest = analysis.prebetChecklistBacktest || null;
-    state.teamIdentityGraph = analysis.teamIdentityGraph || null;
-    state.matchDecisionTimeline = analysis.matchDecisionTimeline || null;
-    state.agentBankrollSimulation = analysis.agentBankrollSimulation || null;
-    state.smartPreparePlan = analysis.smartPreparePlan || null;
-    state.sourceRegistry = analysis.sourceRegistry || null;
-    state.sourceQuarantine = analysis.sourceQuarantine || null;
-    state.optionalSourcesPlan = analysis.optionalSourcesPlan || null;
-    state.criticalIssueReport = analysis.criticalIssueReport || null;
-    state.dataConsistencyReport = analysis.dataConsistencyReport || null;
-    state.uiIntegrityReport = analysis.uiIntegrityReport || null;
-    state.pickIntegrityReport = analysis.pickIntegrityReport || null;
-    state.coverageRepairEngine = analysis.coverageRepairEngine || null;
-    state.sourceCoverageTargets = analysis.sourceCoverageTargets || null;
-    state.leagueSignalQuality = analysis.leagueSignalQuality || null;
-    state.modelLab = analysis.modelLab || null;
-    state.modelRealityAudit = analysis.modelRealityAudit || null;
-    state.probabilityCalibration = analysis.probabilityCalibration || null;
-    state.policyCandidates = analysis.policyCandidates || null;
-    state.sourceHealth = analysis.sourceHealthV9 || analysis.sourceHealthV8 || analysis.sourceHealthV7 || analysis.sourceHealthV6 || analysis.sourceHealthV5 || analysis.sourceHealth || null;
-    state.sourceHealthV6 = analysis.sourceHealthV6 || null;
-    state.sourceHealthV7 = analysis.sourceHealthV7 || null;
-    state.sourceHealthV8 = analysis.sourceHealthV8 || null;
-    state.sourceHealthV9 = analysis.sourceHealthV9 || null;
-    state.marketCoverageV2 = analysis.marketCoverageV2 || null;
-    state.terrainReportV2 = analysis.terrainReportV2 || null;
-    state.terrainReportV3 = analysis.terrainReportV3 || null;
-    state.terrainReportV4 = analysis.terrainReportV4 || null;
-    state.terrainReportV5 = analysis.terrainReportV5 || null;
-    state.terrainReportV8 = analysis.terrainReportV8 || null;
-    state.modelBacktestV4 = analysis.modelBacktestV4 || null;
-    state.modelBacktestV5 = analysis.modelBacktestV5 || null;
-    state.modelBacktestV6 = analysis.modelBacktestV6 || null;
-    state.decisionCenter = analysis.decisionCenter || null;
-    state.agentBlockers = analysis.agentBlockers || null;
-    state.clvSummary = analysis.clvSummary || null;
-    state.dashboardMeta = analysis.dashboardMeta || null;
-    state.todayFunnel = analysis.todayFunnel || null;
-    state.coverage24h = analysis.coverage24h || null;
-    state.winamaxMarketAudit = analysis.winamaxMarketAudit || null;
-    state.prematchPlan = analysis.prematchPlan || null;
+    const analysis = await fetchJson(`/api/engine/analysis?bankroll=${encodeURIComponent(bankroll)}&home=1`);
+    applyEngineAnalysisState(analysis);
     refreshTrackedBetMarketData();
-    await autoSettleUserBets('engine_refresh');
     $('#metric-upcoming').textContent = String(state.matches.length);
     $('#metric-bookable').textContent = `${state.matches.length} analysés par le logiciel`;
     renderPicks();
-    renderStakeScenarios();
-    renderCombines();
-    renderPreferences();
-    renderScorers();
-    renderScorerReport();
-    renderScorerPendingAudit();
-    renderWatchlist();
-    renderPrematchFinal();
-    renderPrematchExecution();
-    renderMatches();
-    renderHistory();
-    renderContextBacktest();
-    renderDecisionBacktest();
-    renderDecisionTuning();
-    renderAgent(state.agent);
-    renderAgentGuardrailRecommendations();
-    renderStakeReductionBacktest();
-    renderLeagueMarketReductions();
-    renderSignalConflictBacktest();
-    renderPrebetChecklist();
-    renderPrebetChecklistBacktest();
-    renderFinalDecisionPanel();
-    renderSmartPreparePlan();
-    renderAgentSimulation();
-    renderCalendar();
-    renderHelp();
-    renderDeepSearch();
-    updateWebEnrichmentSummary();
-    renderActiveModelAdjustments();
-    renderLearningFeedback();
-    renderWinamaxMarketAudit();
-    if (state.status) {
-      renderQualityReport(state.status);
-      renderSourceHealth(state.status);
-      renderCoverageTrend();
-      renderNextActions();
-      renderActionHistory();
-      renderSourceFreshnessPlan();
-      renderRefreshPriorityPlan();
-      renderContextRepairPlan();
-      renderSourceRegistryCenter();
-      renderTeamIdentityGraph();
-      renderOptionalSourcesPlan();
-      renderSmartPreparePlanData();
-      renderCriticalIssues();
-      renderIntegrityReports();
-      renderCoverageRepairEngine();
-      renderModelLabV4();
-      renderSourceHealthV4();
-      renderSignalGapCenter();
-      renderQualityAlerts(state.status);
-      renderWarnings(state.status);
-      renderPipelinePanel(state.status);
+    await yieldHomePaint();
+    if (analysis.homeOnly) {
+      if (state.engineHydrationTimer) clearTimeout(state.engineHydrationTimer);
+      state.engineHydrationTimer = setTimeout(() => {
+        state.engineHydrationTimer = null;
+        hydrateFullEngineAnalysis(bankroll);
+      }, 15000);
     }
+    else scheduleSecondaryEnginePanels();
     maybeAutoCriticalRefresh();
     maybeAutoPrematchRefresh();
     maybeNotifyPickChanges();
@@ -17938,6 +17962,13 @@
     };
     const cockpitCategory = categoryTabs[tab] || null;
     const panelTab = cockpitCategory ? 'dashboard' : tab;
+    if (!state.engineHydrated && !state.engineHydrating && ['history', 'recovery', 'agent', 'data', 'search', 'calendar', 'pipeline', 'combines', 'scorers', 'matches'].includes(panelTab)) {
+      if (state.engineHydrationTimer) {
+        clearTimeout(state.engineHydrationTimer);
+        state.engineHydrationTimer = null;
+      }
+      hydrateFullEngineAnalysis(getBankroll());
+    }
     state.activeHomeCategory = panelTab === 'dashboard' ? cockpitCategory : null;
     recordUserAction('view', tab);
     $$('.nav-btn').forEach((btn) => btn.classList.toggle('active', btn.dataset.tab === tab));
