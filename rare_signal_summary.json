@@ -1,28 +1,47 @@
 {
-  "generated_at": "2026-05-18T05:11:06Z",
+  "generated_at": "2026-05-18T05:19:26Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 87,
-    "actionable": 38,
-    "watch": 3,
-    "risk": 46,
+    "active_events": 91,
+    "actionable": 41,
+    "watch": 5,
+    "risk": 45,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 39,
+      "market_move": 10,
+      "injury_imbalance": 38,
+      "market_uncertain": 48,
       "travel_extreme": 3,
-      "market_uncertain": 47,
       "back_to_back_travel": 17,
-      "signal_conflict": 5
+      "signal_conflict": 4
     },
     "by_quality": {
-      "actionable": 38,
-      "watch": 3,
-      "risk": 46
+      "watch": 5,
+      "actionable": 41,
+      "risk": 45
     }
   },
   "active_actionable": [
+    {
+      "event_id": "740956",
+      "date": "2026-05-18T19:00Z",
+      "sport": "football",
+      "league_code": "eng.1",
+      "league_name": "Premier League",
+      "home": "Arsenal",
+      "away": "Burnley",
+      "match": "Arsenal - Burnley",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 1.0,
+      "context": "Cote away: 26.00 -> 19.00 (+26.9%)"
+    },
     {
       "event_id": "401815390",
       "date": "2026-05-18T22:40Z",
@@ -112,6 +131,24 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 7-12"
+    },
+    {
+      "event_id": "401871410",
+      "date": "2026-05-18T23:30Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Buffalo Sabres",
+      "away": "Montreal Canadiens",
+      "match": "Buffalo Sabres - Montreal Canadiens",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 1.82 -> 2.30 (-26.4%)"
     },
     {
       "event_id": "401815396",
@@ -706,9 +743,45 @@
       "side": "away",
       "strength": 0.726,
       "context": "1 match dans les 48h + 979 km de voyage"
+    },
+    {
+      "event_id": "401856919",
+      "date": "2026-05-19T02:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Portland Fire",
+      "away": "Connecticut Sun",
+      "match": "Portland Fire - Connecticut Sun",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.667,
+      "context": "Cote away: 2.50 -> 2.20 (+12.0%)"
     }
   ],
   "active_watch": [
+    {
+      "event_id": "748959",
+      "date": "2026-05-18T18:30Z",
+      "sport": "football",
+      "league_code": "laliga2",
+      "league_name": "La Liga 2",
+      "home": "Leganés",
+      "away": "Huesca",
+      "match": "Leganés - Huesca",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.625,
+      "context": "Cote away: 4.00 -> 3.55 (+11.3%)"
+    },
     {
       "event_id": "401815399",
       "date": "2026-05-19T00:40Z",
@@ -746,43 +819,43 @@
       "context": "Absences severes 12-9"
     },
     {
-      "event_id": "401815495",
-      "date": "2026-05-25T21:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Francisco Giants",
-      "away": "Arizona Diamondbacks",
-      "match": "San Francisco Giants - Arizona Diamondbacks",
+      "event_id": "401842718",
+      "date": "2026-05-18T17:00Z",
+      "sport": "football",
+      "league_code": "allsvenskan",
+      "league_name": "Allsvenskan",
+      "home": "Örgryte IS",
+      "away": "IFK Göteborg",
+      "match": "Örgryte IS - IFK Göteborg",
       "quality": "watch",
       "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Arizona Diamondbacks",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 9-12"
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 0.577,
+      "context": "Cote home: 3.85 -> 3.45 (+10.4%)"
+    },
+    {
+      "event_id": "401856918",
+      "date": "2026-05-19T00:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Dallas Wings",
+      "away": "Washington Mystics",
+      "match": "Dallas Wings - Washington Mystics",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.496,
+      "context": "Cote away: 2.80 -> 2.55 (+8.9%)"
     }
   ],
   "active_risk": [
-    {
-      "event_id": "176097",
-      "date": "2026-05-19T04:00Z",
-      "sport": "tennis",
-      "league_code": "internationauxdestra",
-      "league_name": "Internationaux de Strasbourg presented by Mammotion",
-      "home": "",
-      "away": "",
-      "match": "? - ?",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 12.0%"
-    },
     {
       "event_id": "175450",
       "date": "2026-05-19T04:00Z",
@@ -818,6 +891,24 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 12.1%"
+    },
+    {
+      "event_id": "176097",
+      "date": "2026-05-19T04:00Z",
+      "sport": "tennis",
+      "league_code": "internationauxdestra",
+      "league_name": "Internationaux de Strasbourg presented by Mammotion",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 12.0%"
     },
     {
       "event_id": "401865447",
@@ -1574,24 +1665,6 @@
       "side": null,
       "strength": 0.45,
       "context": "Signaux opposes: San Antonio Spurs fade 0.60, Oklahoma City Thunder fade 0.60 -> prudence"
-    },
-    {
-      "event_id": "401873344",
-      "date": "2026-05-26T00:00Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "Cleveland Cavaliers",
-      "away": "New York Knicks",
-      "match": "Cleveland Cavaliers - New York Knicks",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "signal_conflict",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.45,
-      "context": "Signaux opposes: Cleveland Cavaliers fade 0.60, New York Knicks fade 0.60 -> prudence"
     }
   ],
   "expired_sample": []
