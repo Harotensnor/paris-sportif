@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-05-18T21:35:40Z",
-  "calculated_at": "2026-05-18T21:35:40Z",
+  "generated_at": "2026-05-18T21:38:15Z",
+  "calculated_at": "2026-05-18T21:38:15Z",
   "source_of_truth": "data.js",
   "data_age_min": 1,
   "data_file_age_min": 0,
@@ -16,16 +16,16 @@
       "matches_detailed": 699,
       "details_ratio_pct": 100.0,
       "last_run_delta": 0,
-      "last_run_limit": 1000
+      "last_run_limit": 400
     },
     "injuries_soccer": {
-      "age_min": 1,
+      "age_min": 2,
       "teams": 0,
       "players": 0,
       "status": "no_source_events"
     },
     "lineups_soccer": {
-      "age_min": 1,
+      "age_min": 2,
       "events": 97,
       "status": "retained_existing_lineups"
     },
@@ -47,13 +47,13 @@
       "status": "retained_existing_referees"
     },
     "xg_team_stats": {
-      "age_min": 2,
+      "age_min": 1,
       "teams": 112,
       "leagues": 6,
       "source": "understat"
     },
     "fbref_xg": {
-      "age_min": 2,
+      "age_min": 1,
       "teams": 112,
       "leagues": 6,
       "source": "understat_compat"
@@ -73,7 +73,7 @@
       "sports": 4
     },
     "h2h_extended": {
-      "age_min": 2,
+      "age_min": 1,
       "events": 136,
       "events_with_meetings": 94,
       "meetings": 306,
@@ -377,7 +377,7 @@
       "price_shortening": 3
     },
     "injuries_multisport": {
-      "age_min": 2,
+      "age_min": 1,
       "teams": 133,
       "sports": 4,
       "injuries": 706,
@@ -507,7 +507,7 @@
     "injuries_soccer": {
       "script": "scripts/fetch_injuries_soccer.py",
       "output": "injuries_soccer.json",
-      "age_min": 1,
+      "age_min": 2,
       "threshold_min": 180,
       "fast_red_min": null,
       "status": "ok"
@@ -515,7 +515,7 @@
     "lineups_soccer": {
       "script": "scripts/fetch_lineups_soccer.py",
       "output": "lineups_soccer.json",
-      "age_min": 1,
+      "age_min": 2,
       "threshold_min": 180,
       "fast_red_min": null,
       "status": "ok"
@@ -555,7 +555,7 @@
     "xg_team_stats": {
       "script": "scripts/fetch_understat_xg.py",
       "output": "xg_team_stats.json",
-      "age_min": 2,
+      "age_min": 1,
       "threshold_min": 360,
       "fast_red_min": null,
       "status": "ok"
@@ -563,7 +563,7 @@
     "fbref_xg": {
       "script": "scripts/fetch_understat_xg.py",
       "output": "fbref_xg.json",
-      "age_min": 2,
+      "age_min": 1,
       "threshold_min": 360,
       "fast_red_min": null,
       "status": "ok"
@@ -595,7 +595,7 @@
     "h2h_extended": {
       "script": "h2h_extended.json",
       "output": "h2h_extended.json",
-      "age_min": 2,
+      "age_min": 1,
       "threshold_min": 60,
       "fast_red_min": null,
       "status": "ok"
@@ -891,7 +891,7 @@
     "injuries_multisport": {
       "script": "scripts/fetch_injuries.py",
       "output": "injuries_multisport.json",
-      "age_min": 2,
+      "age_min": 1,
       "threshold_min": 60,
       "fast_red_min": null,
       "status": "ok"
@@ -1056,7 +1056,7 @@
   ],
   "overall": "warning",
   "quality_checks": {
-    "data_generated_at": "2026-05-18T21:34:18.168994Z",
+    "data_generated_at": "2026-05-18T21:37:10.294604Z",
     "truth_scope": "all_events",
     "all_winamax_available": 314,
     "all_winamax_exact": 305,
@@ -1137,7 +1137,7 @@
   "data_truth": {
     "source_of_truth": "data.js",
     "scope": "all_events",
-    "data_generated_at": "2026-05-18T21:34:18.168994Z",
+    "data_generated_at": "2026-05-18T21:37:10.294604Z",
     "winamax_available": 314,
     "winamax_exact": 305,
     "winamax_exact_ratio": 0.9713,
@@ -1157,7 +1157,7 @@
     "anomalies_emitted": 4
   },
   "source_health": {
-    "generated_at": "2026-05-18T21:35:40Z",
+    "generated_at": "2026-05-18T21:38:15Z",
     "sources_total": 11,
     "sources_ok": 6,
     "sources_warning": 5,
@@ -1257,7 +1257,7 @@
   },
   "observability": {
     "pipeline_traces": {
-      "generated_at": "2026-05-18T21:35:40Z",
+      "generated_at": "2026-05-18T21:38:15Z",
       "runs_observed": 99,
       "by_status": {
         "warning": 69,
@@ -1269,13 +1269,13 @@
           "runs": 99,
           "errors": 1,
           "last_status": "ok",
-          "max_duration_ms": 1093
+          "max_duration_ms": 1095
         }
       }
     }
   },
   "data_lineage": {
-    "generated_at": "2026-05-18T21:35:40Z",
+    "generated_at": "2026-05-18T21:38:15Z",
     "status": "ok",
     "events": 314,
     "events_missing_inline_lineage": 0,
