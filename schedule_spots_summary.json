@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-18T11:52:07Z",
+  "generated_at": "2026-05-18T11:57:34Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -335,13 +335,13 @@
         "2 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "mixed",
-        "net_side": null,
+        "status": "net",
+        "net_side": "home",
         "home_score": 0.085,
-        "away_score": -0.512,
+        "away_score": -0.995,
         "home_fade": 0.3,
         "away_fade": 1.1,
-        "reason": "Signaux mitigés: avantage net trop faible (Tampa Bay Rays +0.09, Baltimore Orioles -0.51)",
+        "reason": "Direction nette: Tampa Bay Rays (+0.09)",
         "detail": [
           {
             "side": "home",
@@ -360,12 +360,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.8
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.483
           }
         ]
       }
