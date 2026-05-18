@@ -1,24 +1,23 @@
 {
-  "generated_at": "2026-05-18T02:18:02Z",
+  "generated_at": "2026-05-18T02:24:22Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 55,
+    "active_events": 53,
     "expired_sample": 0,
     "by_type": {
       "lookahead": 76,
       "travel_extreme": 3,
       "back_to_back_travel": 17,
-      "schedule_congestion": 18
+      "schedule_congestion": 16
     },
     "by_decision": {
       "abstain": 35,
-      "lean_home": 18,
-      "lean_away": 2
+      "lean_home": 18
     },
     "lean_home": 18,
-    "lean_away": 2,
+    "lean_away": 0,
     "abstain": 35,
     "monitor": 0
   },
@@ -3082,102 +3081,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.726
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815431",
-      "source_event_ids": [
-        "401815431"
-      ],
-      "kickoff": "2026-05-20T20:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Seattle Mariners",
-      "away": "Chicago White Sox",
-      "match": "Seattle Mariners - Chicago White Sox",
-      "decision": "lean_away",
-      "net_team": "Chicago White Sox",
-      "reason": "Seattle Mariners plus penalise par calendrier/voyage (0.60 vs 0.00)",
-      "pressure_score": 0.6,
-      "home_fade": 0.6,
-      "away_fade": 0.0,
-      "travel_score": 0,
-      "lookahead_score": 0,
-      "congestion_score": 0.6,
-      "types": {
-        "schedule_congestion": 1
-      },
-      "contexts": [
-        "3 matchs sur les 7 derniers jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.6,
-        "away_score": 0.21,
-        "home_fade": 0.6,
-        "away_fade": 0.0,
-        "reason": "Direction nette: Chicago White Sox (+0.21)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815432",
-      "source_event_ids": [
-        "401815432"
-      ],
-      "kickoff": "2026-05-21T00:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Diego Padres",
-      "away": "Los Angeles Dodgers",
-      "match": "San Diego Padres - Los Angeles Dodgers",
-      "decision": "lean_away",
-      "net_team": "Los Angeles Dodgers",
-      "reason": "San Diego Padres plus penalise par calendrier/voyage (0.60 vs 0.00)",
-      "pressure_score": 0.6,
-      "home_fade": 0.6,
-      "away_fade": 0.0,
-      "travel_score": 0,
-      "lookahead_score": 0,
-      "congestion_score": 0.6,
-      "types": {
-        "schedule_congestion": 1
-      },
-      "contexts": [
-        "3 matchs sur les 7 derniers jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.25,
-        "away_score": -0.79,
-        "home_fade": 0.6,
-        "away_fade": 1.0,
-        "reason": "Direction nette: San Diego Padres (-0.25)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
           }
         ]
       }
