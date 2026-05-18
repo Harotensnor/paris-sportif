@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-18T10:48:57Z",
+  "generated_at": "2026-05-18T10:57:22Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
@@ -10,17 +10,17 @@
     "risk": 30,
     "expired_sample": 0,
     "by_type": {
-      "market_uncertain": 31,
       "market_move": 27,
       "injury_imbalance": 37,
       "signal_conflict": 6,
+      "market_uncertain": 31,
       "travel_extreme": 3,
       "back_to_back_travel": 16
     },
     "by_quality": {
-      "risk": 30,
       "watch": 8,
-      "actionable": 41
+      "actionable": 41,
+      "risk": 30
     }
   },
   "active_actionable": [
@@ -911,29 +911,11 @@
   ],
   "active_risk": [
     {
-      "event_id": "178366",
-      "date": "2026-05-18T10:40Z",
+      "event_id": "178473",
+      "date": "2026-05-19T04:00Z",
       "sport": "tennis",
       "league_code": "rolandgarros",
       "league_name": "Roland Garros",
-      "home": "",
-      "away": "",
-      "match": "? - ?",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 12.6%"
-    },
-    {
-      "event_id": "176097",
-      "date": "2026-05-19T04:00Z",
-      "sport": "tennis",
-      "league_code": "internationauxdestra",
-      "league_name": "Internationaux de Strasbourg presented by Mammotion",
       "home": "",
       "away": "",
       "match": "? - ?",
@@ -947,11 +929,11 @@
       "context": "marge bookmaker anormale 12.0%"
     },
     {
-      "event_id": "178473",
+      "event_id": "176097",
       "date": "2026-05-19T04:00Z",
       "sport": "tennis",
-      "league_code": "rolandgarros",
-      "league_name": "Roland Garros",
+      "league_code": "internationauxdestra",
+      "league_name": "Internationaux de Strasbourg presented by Mammotion",
       "home": "",
       "away": "",
       "match": "? - ?",
@@ -1431,6 +1413,24 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.2%"
+    },
+    {
+      "event_id": "748964",
+      "date": "2026-05-24T16:30Z",
+      "sport": "football",
+      "league_code": "laliga2",
+      "league_name": "La Liga 2",
+      "home": "Huesca",
+      "away": "Castellón",
+      "match": "Huesca - Castellón",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 19.1%"
     },
     {
       "event_id": "401815439",
