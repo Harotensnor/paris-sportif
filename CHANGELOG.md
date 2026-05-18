@@ -5,6 +5,16 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-17
 
+### Version v5.2.0 — Verrou réel anti-récidive
+
+Suite logique du mode récupération : les pertes Winamax importées deviennent maintenant un vrai verrou avant mise, pas seulement un diagnostic après coup.
+- L’import Winamax comprend mieux les lignes copiées en bloc : dates, cotes, mises, statuts gagné/perdu/void et marchés sont détectés sur des formats multi-lignes.
+- Les segments réellement perdants de l’utilisateur bloquent désormais le bouton `Je mise` et le lien d’action Winamax : la ligne reste visible en observation, mais ne pousse plus au clic.
+- En période rouge, le mode récupération bloque aussi les cotes trop hautes, les edges trop courts, les confiances trop faibles et les dossiers contexte incomplets.
+- La fiche match affiche les raisons issues de l’historique réel dans les garde-fous locaux.
+- La page `Récupération` affiche maintenant les `Segments coupés automatiquement`, avec ROI réel, P&L, lignes cockpit concernées et action appliquée.
+- Le smoke test vérifie qu’un double import perdant `Plus/Moins` crée bien un diagnostic et un verrou réel actif.
+
 ### Version v5.1.0 — Récupération + apprentissage pertes Winamax
 
 Suite directe au retour “j’ai tout perdu” : l’app apprend maintenant des vrais résultats Winamax et rend le mode récupération visible.

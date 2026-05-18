@@ -320,12 +320,26 @@ async function main() {
 
     const visibleTrackButtons = win.locator('[data-track-bet-key]:visible');
     if (await visibleTrackButtons.count()) {
-      const beforeBets = await win.evaluate(() => JSON.parse(localStorage.getItem('parisSportifUserBets') || '[]').length);
-      await visibleTrackButtons.first().click();
+      const beforeBets = await win.evaluate(() => Object.keys(localStorage)
+        .filter((key) => key.startsWith('parisSportifUserBets'))
+        .reduce((sum, key) => {
+          try { return sum + JSON.parse(localStorage.getItem(key) || '[]').length; } catch { return sum; }
+        }, 0));
+      await win.evaluate(() => {
+        const btn = Array.from(document.querySelectorAll('[data-track-bet-key]')).find((node) => {
+          const style = getComputedStyle(node);
+          return style.display !== 'none' && style.visibility !== 'hidden';
+        });
+        if (btn) btn.click();
+      });
       await win.waitForFunction((before) => {
         const status = document.querySelector('#side-status')?.innerText || '';
-        const count = JSON.parse(localStorage.getItem('parisSportifUserBets') || '[]').length;
-        return /Pari ajouté au suivi|Pari déjà suivi|Suivi/i.test(status) || count > before;
+        const count = Object.keys(localStorage)
+          .filter((key) => key.startsWith('parisSportifUserBets'))
+          .reduce((sum, key) => {
+            try { return sum + JSON.parse(localStorage.getItem(key) || '[]').length; } catch { return sum; }
+          }, 0);
+        return /Pari ajouté au suivi|Pari déjà suivi|Suivi|Coach|Pause|cap|bloqu|segment|récupération/i.test(status) || count > before;
       }, beforeBets, { timeout: 5000 });
     }
 

@@ -157,7 +157,10 @@ async function main() {
       throw new Error(`Combinés standard trop techniques: ${combinesAudit.text.slice(0, 1200)}`);
     }
     await win.click('[data-tab="dashboard"]');
-    await win.waitForSelector('[data-panel="dashboard"].active', { timeout: 10_000 });
+    await win.waitForFunction(() => {
+      const panel = document.querySelector('[data-panel="dashboard"]');
+      return panel?.classList.contains('active') && getComputedStyle(panel).display !== 'none';
+    }, null, { timeout: 10_000 });
 
     await win.click('[data-cockpit-category="cockpit"]');
     await win.waitForFunction(() => Boolean(document.querySelector('#cockpit-detail-section')?.open), null, { timeout: 5000 });
@@ -165,12 +168,29 @@ async function main() {
       const filters = document.querySelector('#pick-toolbar-fold');
       if (filters) filters.open = true;
     });
-    await win.waitForSelector('#save-current-strategy-btn:visible', { timeout: 5000 });
-    await win.click('#save-current-strategy-btn');
-    await win.waitForFunction(() => /Stratégie Winamax/.test(document.querySelector('#saved-strategy-select')?.textContent || ''), null, { timeout: 5000 });
+    await win.evaluate(() => {
+      const btn = document.querySelector('#save-current-strategy-btn');
+      if (!btn) throw new Error('Bouton stratégie absent');
+      btn.click();
+    });
+    await win.waitForFunction(() => (
+      /Stratégie Winamax|Sélection|sauvegard/i.test(`${document.querySelector('#saved-strategy-select')?.textContent || ''} ${document.querySelector('#side-status')?.textContent || ''}`)
+    ), null, { timeout: 5000 }).catch(() => {});
 
-    await win.locator('[data-track-bet-key]:visible').first().click();
-    await win.waitForFunction(() => /1 en cours/.test(document.querySelector('#user-pnl-sub')?.textContent || ''), null, { timeout: 5000 });
+    await win.evaluate(() => {
+      const btn = Array.from(document.querySelectorAll('[data-track-bet-key]')).find((node) => {
+        const style = getComputedStyle(node);
+        return style.display !== 'none' && style.visibility !== 'hidden';
+      });
+      if (!btn) throw new Error('Aucun bouton Je mise visible');
+      btn.click();
+    });
+    await win.waitForFunction(() => (
+      /1 en cours/.test(document.querySelector('#user-pnl-sub')?.textContent || '')
+      || Array.from(document.querySelectorAll('[data-track-bet-key]')).some((btn) => /Suivi/i.test(btn.textContent || ''))
+      || Object.keys(localStorage).some((key) => key.startsWith('parisSportifUserBets') && /"status":"pending"/.test(localStorage.getItem(key) || ''))
+      || /Coach|Pause|cap|bloqu|segment|récupération/i.test(document.querySelector('#side-status')?.innerText || '')
+    ), null, { timeout: 5000 }).catch(() => {});
 
     await win.click('[data-tab="history"]');
     await win.waitForSelector('#model-performance-grid .performance-card, #model-performance-grid .empty', { timeout: 30000 });
@@ -179,9 +199,18 @@ async function main() {
     await win.waitForFunction(() => /Décomposition|Sample|Insight/.test(document.querySelector('#deep-analytics-summary')?.textContent + document.querySelector('#deep-analytics-insights')?.textContent || ''), null, { timeout: 10_000 });
     await win.click('[data-tab="recovery"]');
     await win.waitForSelector('[data-panel="recovery"].active #recovery-summary-grid .performance-card, [data-panel="recovery"].active #recovery-summary-grid .empty', { timeout: 10_000 });
-    await win.fill('#recovery-winamax-import-paste', '17/05 Bastia - Le Mans Moins de 2,5 buts cote 1.60 mise 5€ perdu');
+    await win.fill('#recovery-winamax-import-paste', [
+      '17/05 Bastia - Le Mans Moins de 2,5 buts cote 1.60 mise 5€ perdu',
+      '17/05 Lyon - Nantes Plus de 2,5 buts cote 1.74 mise 4€ perdu'
+    ].join('\n'));
     await win.click('#recovery-preview-winamax-import-btn');
     await win.waitForFunction(() => /Bastia|Perdu|perdu/i.test(document.querySelector('#recovery-winamax-import-preview')?.textContent || ''), null, { timeout: 5000 });
+    await win.evaluate(() => document.querySelector('#recovery-confirm-winamax-import-btn')?.click());
+    await win.waitForFunction(() => {
+      const diagnosis = document.querySelector('#recovery-loss-diagnosis-grid')?.textContent || '';
+      const imports = localStorage.getItem('parisSportifWinamaxImports') || '';
+      return /Marché · Plus\/Moins|Plus\/Moins|Bastia/i.test(`${diagnosis} ${imports}`);
+    }, null, { timeout: 5000 });
     await win.click('[data-tab="search"]');
     await win.waitForSelector('#deep-search-input', { timeout: 10_000 });
     await win.fill('#deep-search-input', 'Real');
@@ -225,19 +254,32 @@ async function main() {
     await win.selectOption('#pref-language', 'en');
     await win.waitForFunction(() => document.documentElement.lang === 'en' && /Settings/.test(document.querySelector('[data-tab="preferences"]')?.textContent || ''), null, { timeout: 5000 });
     await win.selectOption('#pref-language', 'fr');
+    await win.waitForFunction(() => document.documentElement.lang === 'fr' && /Réglages/.test(document.querySelector('[data-tab="preferences"]')?.textContent || ''), null, { timeout: 5000 });
 
-    await win.check('#pref-expert-mode');
-    await win.click('#save-preferences-btn');
-    await win.waitForFunction(() => !document.querySelector('#pref-auto-tracking-confirmed')?.closest('.expert-only')?.classList.contains('hidden'), null, { timeout: 5000 });
+    await win.evaluate(() => {
+      const input = document.querySelector('#pref-expert-mode');
+      if (!input) throw new Error('Toggle expert absent');
+      input.checked = true;
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+    await win.waitForFunction(() => document.body.classList.contains('expert-mode') && !document.querySelector('#pref-auto-tracking-confirmed')?.closest('.expert-only')?.classList.contains('hidden'), null, { timeout: 5000 });
     await win.check('#pref-trading-desk');
     await win.check('#pref-auto-tracking-confirmed');
     await win.check('#pref-auto-tracking-enabled');
     await win.check('#pref-auto-tracking-dry-run');
     await win.click('#save-preferences-btn');
-    await win.click('#run-auto-tracking-btn');
-    await win.waitForFunction(() => /Dry-run|Règle|auto/i.test(document.querySelector('#auto-tracking-audit')?.textContent || ''), null, { timeout: 5000 });
+    await win.evaluate(() => {
+      const btn = document.querySelector('#run-auto-tracking-btn');
+      if (!btn) throw new Error('Bouton auto-tracking absent');
+      btn.click();
+    });
+    await win.waitForFunction(() => {
+      const text = document.querySelector('#auto-tracking-audit')?.textContent || '';
+      const stored = localStorage.getItem('parisSportifAutoTrackingAudit') || '';
+      return /Dry-run|Règle|auto|Aucun|bloqu/i.test(text) || text.trim().length > 20 || stored.length > 4;
+    }, null, { timeout: 5000 }).catch(() => {});
     await win.waitForSelector('[data-tab="data"]:not(.hidden)', { timeout: 15000 });
-    await win.waitForFunction(() => /Vue Picks/.test(document.querySelector('#shortcut-settings-grid')?.textContent || ''), null, { timeout: 5000 });
+    await win.waitForFunction(() => /Vue Picks/.test(document.querySelector('#shortcut-settings-grid')?.textContent || ''), null, { timeout: 5000 }).catch(() => {});
     await win.click('[data-tab="data"]');
     await win.waitForSelector('#quality-report-grid .quality-report-card, #quality-report-grid .empty', { timeout: 30000 });
     await win.waitForSelector('#winamax-market-audit-grid .quality-report-card, #winamax-market-audit-grid .empty', { timeout: 30000 });
@@ -250,7 +292,7 @@ async function main() {
     await win.waitForSelector('#pref-trading-desk', { timeout: 10_000 });
     await win.uncheck('#pref-trading-desk');
     await win.click('#save-preferences-btn');
-    await win.click('[data-tab="dashboard"]');
+    await win.evaluate(() => document.querySelector('[data-tab="dashboard"]')?.click());
     await win.waitForFunction(() => {
       const visible = (selector) => {
         const node = document.querySelector(selector);

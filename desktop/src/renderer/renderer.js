@@ -114,7 +114,8 @@
     winamaxImportPreview: null,
     currentDashboardRows: [],
     activeHomeCategory: null,
-    bentoDragId: null
+    bentoDragId: null,
+    learningAuditCache: null
   };
 
   const ACTION_HISTORY_KEY = 'parisSportifActionHistory';
@@ -416,7 +417,14 @@
       cartons: 'cards',
       cardsou: 'cards',
       mitemps: 'ht1n2',
-      halftime: 'ht1n2'
+      halftime: 'ht1n2',
+      plusmoins: 'goals',
+      plusmoinsdebuts: 'goals',
+      overunder: 'goals',
+      lesdeuxequipesmarquent: 'btts',
+      buteur: 'scorer',
+      buteurs: 'scorer',
+      vainqueur: 'winner'
     };
     return aliases[key] || key;
   }
@@ -607,6 +615,7 @@
   function saveUserBets(rows) {
     try {
       localStorage.setItem(userBetsStorageKey(), JSON.stringify(Array.isArray(rows) ? rows : []));
+      state.learningAuditCache = null;
       scheduleProfileBackup();
     } catch {
       setSideStatus('Suivi pari indisponible', 'warn');
@@ -1305,29 +1314,67 @@
   }
 
   function parseWinamaxPaste(text) {
-    return String(text || '')
+    const rawLines = String(text || '')
       .split(/\r?\n/)
       .map((line) => line.trim())
-      .filter((line) => line.length > 8)
-      .map((line, index) => {
-        const odd = Number((line.match(/(?:cote|@)\s*:?\s*(\d+[,.]\d{1,2})/i)?.[1] || '').replace(',', '.'));
+      .filter((line) => line.length > 0);
+    const statusPattern = /cash\s*out|retir|gagn|won|valid|perd|lost|échec|echec|void|annul|rembours|en cours|pending/i;
+    const hasBetSignal = (value) => /(?:cote|@)\s*:?\s*\d+[,.]\d{1,2}|\b\d+[,.]?\d*\s*€|mise|stake/i.test(value);
+    const blocks = [];
+    let buffer = [];
+    rawLines.forEach((line) => {
+      const startsNewBet = /\b\d{1,2}[\/.-]\d{1,2}(?:[\/.-]\d{2,4})?\b/.test(line)
+        && buffer.length
+        && hasBetSignal(buffer.join(' '));
+      if (startsNewBet) {
+        blocks.push(buffer.join(' · '));
+        buffer = [];
+      }
+      buffer.push(line);
+      const joined = buffer.join(' ');
+      if (statusPattern.test(joined) && hasBetSignal(joined) && buffer.length >= 2) {
+        blocks.push(joined);
+        buffer = [];
+      }
+    });
+    if (buffer.length) blocks.push(buffer.join(' · '));
+    const rows = (blocks.length ? blocks : rawLines)
+      .map((line) => line.trim())
+      .filter((line) => line.length > 8);
+    return rows.map((line, index) => {
+        const oddToken = line.match(/(?:cote|@)\s*:?\s*(\d+[,.]\d{1,2})/i)?.[1]
+          || line.match(/\b(?:odds?)\s*:?\s*(\d+[,.]\d{1,2})/i)?.[1]
+          || '';
+        const odd = Number(oddToken.replace(',', '.'));
         const stakeToken = line.match(/(?:mise|stake)\s*:?\s*(\d+[,.]?\d*)\s*€?/i)?.[1]
           || line.match(/\b(\d+[,.]?\d*)\s*€/i)?.[1]
           || '';
         const stake = Number(stakeToken.replace(',', '.'));
-        const status = /cash\s*out|retir/i.test(line) ? 'void' : /gagn|won|valid/i.test(line) ? 'won' : /perd|lost|échec|echec/i.test(line) ? 'lost' : /void|annul|rembours/i.test(line) ? 'void' : 'pending';
+        const status = /cash\s*out|retir|void|annul|rembours/i.test(line) ? 'void' : /gagn|won|valid/i.test(line) ? 'won' : /perd|lost|échec|echec/i.test(line) ? 'lost' : 'pending';
         const date = line.match(/\b(\d{1,2}[\/.-]\d{1,2}(?:[\/.-]\d{2,4})?)\b/)?.[1] || new Date().toISOString().slice(0, 10);
         const match = line
-          .replace(/(?:cote|mise|stake|gagné|perdu|pending|en cours|won|lost|void|annulé|remboursé)/ig, ' ')
+          .replace(/\b\d{1,2}[\/.-]\d{1,2}(?:[\/.-]\d{2,4})?\b/g, ' ')
+          .replace(/(?:cote|odds?|mise|stake|gain|retour|gagné|gagne|perdu|pending|en cours|won|lost|void|annulé|annule|remboursé|rembourse|cash\s*out|validé|valide)/ig, ' ')
           .replace(/\d+[,.]?\d*\s*€?/g, ' ')
+          .replace(/\b\d+[,.]\d{1,2}\b/g, ' ')
           .replace(/\s+/g, ' ')
+          .replace(/[·|;-]+$/g, '')
           .trim();
+        const market = /buteur|marque\b|scoreur/i.test(line)
+          ? 'Buteur'
+          : /les deux|btts|marquent/i.test(line)
+            ? 'Les deux équipes marquent'
+            : /plus|moins|over|under|total/i.test(line)
+              ? 'Plus/Moins'
+              : /mi-temps|1ère mt|1ere mt|ht\b/i.test(line)
+                ? 'Mi-temps'
+                : 'Vainqueur';
         return {
           id: `wmx-${Date.now()}-${index}`,
           raw: line,
           date,
           match: match || line.slice(0, 80),
-          market: /buteur/i.test(line) ? 'Buteur' : /plus|moins|over|under/i.test(line) ? 'Plus/Moins' : /marquent|btts/i.test(line) ? 'Les deux équipes marquent' : 'Vainqueur',
+          market,
           odd: Number.isFinite(odd) && odd > 1 ? odd : null,
           stake: Number.isFinite(stake) && stake > 0 ? stake : null,
           status
@@ -1474,7 +1521,7 @@
         safeReliable: false,
         priorityRank: null,
         tier: 'winamax_import',
-        marketKey: normalizeUiKey(row.market || 'winamax_import'),
+        marketKey: rowMarketPreferenceKey({ market: row.market || 'winamax_import', marketKey: row.market || 'winamax_import' }),
         stake,
         status: row.status,
         pnl,
@@ -2082,8 +2129,67 @@
     const audit = trackedLearningAudit();
     const sportKey = `sport:${row?.sport || 'inconnu'}`;
     const leagueKey = `league:${row?.league || 'inconnue'}`;
-    const marketKey = `market:${marketKeyFromRow(row)}`;
-    return (audit.warnings || []).filter((warning) => [sportKey, leagueKey, marketKey].includes(warning.key));
+    const marketKeys = [`market:${marketKeyFromRow(row)}`, `market:${rowMarketPreferenceKey(row)}`];
+    return (audit.warnings || []).filter((warning) => [sportKey, leagueKey, ...marketKeys].includes(warning.key));
+  }
+
+  function realPerformanceGateForRow(row) {
+    if (!row) return { blocked: false, reasons: [] };
+    const reasons = [];
+    const warnings = losingSegmentWarningsFor(row);
+    warnings.forEach((warning) => {
+      reasons.push({
+        code: warning.key || 'losing_segment',
+        label: warning.label || 'Segment perdant',
+        detail: `${warning.label || 'Segment'} : ${formatMoney(warning.pnl || 0)} sur ${formatCount(warning.count || 0)} pari(s) réels.`,
+        tone: 'danger'
+      });
+    });
+    if (!warnings.length) {
+      const keys = [
+        `sport:${row?.sport || 'inconnu'}`,
+        `league:${row?.league || 'inconnue'}`,
+        `market:${marketKeyFromRow(row)}`,
+        `market:${rowMarketPreferenceKey(row)}`
+      ].map((key) => key.toLowerCase());
+      const hotspot = lossDiagnosis().hotspots.find((item) => Number(item.losses || 0) >= 2 && keys.includes(String(item.key || '').toLowerCase()));
+      if (hotspot) {
+        reasons.push({
+          code: hotspot.key || 'loss_hotspot',
+          label: hotspot.label || 'Pattern perdant',
+          detail: `${hotspot.label || 'Pattern'} : ${formatMoney(hotspot.pnl || 0)} sur ${formatCount(hotspot.losses || 0)} perte(s) réelles.`,
+          tone: 'danger'
+        });
+      }
+    }
+    const stats = userBetStats();
+    const recentLossMode = stats.pnlToday < 0 || stats.pnlYesterday < 0 || stats.last7Pnl < 0 || currentLossStreak(stats) >= 2;
+    if (recentLossMode) {
+      const odd = Number(row.odd || 0);
+      const edge = displayEdgeValue(row);
+      const confidence = safeConfidenceValue(row);
+      const contextScore = Number(row?.contextQuality?.score || row?.matchSheetV6?.sectionCompleteness?.score || 0);
+      const weakContext = contextScore > 0 && contextScore < 65;
+      if (odd > 2.2) reasons.push({ code: 'recovery_high_odd', label: 'Récupération : cote trop haute', detail: `Après pertes réelles, cote ${formatOdd(odd)} bloquée au-dessus de 2.20.`, tone: 'warn' });
+      if (edge < 0.08) reasons.push({ code: 'recovery_edge_short', label: 'Récupération : avantage trop court', detail: `Avantage ${formatPct(edge, 1)} < 8%.`, tone: 'warn' });
+      if (confidence > 0 && confidence < 0.65) reasons.push({ code: 'recovery_confidence_short', label: 'Récupération : confiance trop courte', detail: `Confiance ${formatPct(confidence, 0)} < 65%.`, tone: 'warn' });
+      if (weakContext) reasons.push({ code: 'recovery_context_weak', label: 'Récupération : dossier incomplet', detail: `Contexte ${Math.round(contextScore)}/100 : observation uniquement.`, tone: 'warn' });
+    }
+    return {
+      blocked: reasons.length > 0,
+      reasons,
+      label: reasons[0]?.label || 'Historique réel OK',
+      detail: reasons[0]?.detail || 'Aucun blocage issu de tes résultats réels.'
+    };
+  }
+
+  function realPerformanceBlockedText(row) {
+    const gate = realPerformanceGateForRow(row);
+    if (!gate.blocked) return '';
+    if ((gate.reasons || []).some((reason) => String(reason.code || '').startsWith('market:'))) return 'Marché coupé';
+    if ((gate.reasons || []).some((reason) => String(reason.code || '').startsWith('sport:'))) return 'Sport coupé';
+    if ((gate.reasons || []).some((reason) => String(reason.code || '').startsWith('league:'))) return 'Ligue coupée';
+    return 'Mode récupération';
   }
 
   function displayedOddMemory(row) {
@@ -2160,6 +2266,16 @@
           warnings: ['price_moved_against']
         };
       }
+    }
+    const realGate = realPerformanceGateForRow(row);
+    if (realGate.blocked) {
+      return {
+        allow: false,
+        tone: realGate.reasons?.[0]?.tone === 'danger' ? 'danger' : 'warn',
+        label: realGate.label,
+        detail: realGate.detail,
+        warnings: ['real_performance_gate', ...realGate.reasons.map((item) => item.code)]
+      };
     }
     const segmentWarnings = losingSegmentWarningsFor(row);
     if (segmentWarnings.length) {
@@ -6064,7 +6180,9 @@
     const discipline = bankrollDisciplineStatus();
     const trackKey = userBetKey(row);
     const isTracked = tracked.has(trackKey);
+    const realGate = realPerformanceGateForRow(row);
     if (!isBeforeKickoff(row)) return '<span class="match-sub">Déjà commencé</span>';
+    if (realGate.blocked) return `<span class="match-sub" title="${escapeHtml(realGate.detail)}">${escapeHtml(realPerformanceBlockedText(row))}</span>`;
     if (!canDisplayStake(row)) return '<span class="match-sub">À surveiller</span>';
     if (!(displayStakeAmount(row) > 0)) return '<span class="match-sub">Hors budget jour</span>';
     if (discipline.blocked) {
@@ -6076,8 +6194,12 @@
   function winamaxOpenButtonHtml(row, label = 'Ouvrir Winamax') {
     const url = safeExternalUrl(row?.winamaxUrl || row?.match?.winamax?.url, 'www.winamax.fr');
     if (!url) return '';
+    const realGate = realPerformanceGateForRow(row);
     if (!isBeforeKickoff(row)) {
       return '<span class="ghost-btn winamax-open-btn disabled" aria-disabled="true" title="Le match est terminé ou déjà commencé">Match terminé</span>';
+    }
+    if (realGate.blocked) {
+      return `<span class="ghost-btn winamax-open-btn disabled" aria-disabled="true" title="${escapeHtml(realGate.detail)}">${escapeHtml(realPerformanceBlockedText(row))}</span>`;
     }
     if (!canDisplayStake(row)) {
       return '<span class="ghost-btn winamax-open-btn disabled" aria-disabled="true" title="Lien Winamax masqué tant que le logiciel ne recommande pas de mise">Observation</span>';
@@ -10330,8 +10452,23 @@
     renderLearningAudit();
   }
 
+  function learningAuditSignature(settled) {
+    return (Array.isArray(settled) ? settled : []).map((bet) => [
+      bet.id,
+      bet.status,
+      bet.stake,
+      bet.pnl,
+      bet.marketKey || bet.market,
+      bet.sport,
+      bet.league,
+      bet.updatedAt || bet.settledAt || bet.createdAt || bet.day
+    ].join(':')).join('|');
+  }
+
   function trackedLearningAudit() {
     const settled = loadUserBets().filter((bet) => ['won', 'lost', 'void'].includes(String(bet.status || '')));
+    const signature = learningAuditSignature(settled);
+    if (state.learningAuditCache?.signature === signature) return state.learningAuditCache.audit;
     const groups = new Map();
     const register = (key, label, bet) => {
       const stake = Math.max(0, Number(bet.stake || 0) || 0);
@@ -10348,7 +10485,7 @@
     settled.forEach((bet) => {
       register(`sport:${bet.sport || 'inconnu'}`, `Sport · ${bet.sport || 'inconnu'}`, bet);
       register(`league:${bet.league || 'inconnue'}`, `Ligue · ${bet.league || 'inconnue'}`, bet);
-      register(`market:${bet.marketKey || normalizeUiKey(bet.market || 'market')}`, `Marché · ${bet.market || bet.marketKey || 'market'}`, bet);
+      register(`market:${marketGroupFromKey(marketKeyFromRow({ marketKey: bet.marketKey, market: bet.market }))}`, `Marché · ${bet.market || bet.marketKey || 'market'}`, bet);
       register(`edge:${bet.edgeBucket || edgeBucketFor(bet.edge)}`, `Bucket · ${bet.edgeBucket || edgeBucketFor(bet.edge)}`, bet);
     });
     const segments = Array.from(groups.values()).map((row) => ({
@@ -10369,6 +10506,7 @@
       : null;
     const audit = {
       generatedAt: new Date().toISOString(),
+      signature,
       settled: settled.length,
       winners: winners.length,
       losers: losers.length,
@@ -10378,6 +10516,7 @@
       best: segments.slice().sort((a, b) => b.roi - a.roi).slice(0, 3),
       worst: segments.slice(0, 3)
     };
+    state.learningAuditCache = { signature, audit };
     writeStorageJson(USER_AUDIT_KEY, audit);
     return audit;
   }
@@ -10387,6 +10526,7 @@
       `sport:${row?.sport || 'inconnu'}`,
       `league:${row?.league || 'inconnue'}`,
       `market:${row?.marketKey || marketKeyFromRow(row)}`,
+      `market:${rowMarketPreferenceKey(row)}`,
       `edge:${edgeBucketFor(row?.edge)}`
     ].map((key) => key.toLowerCase());
   }
@@ -10519,7 +10659,10 @@
       groups.set(key, row);
     };
     losses.forEach((bet) => {
-      add(`market:${bet.marketKey || normalizeUiKey(bet.market || 'market')}`, `Marché · ${bet.market || bet.marketKey || '-'}`, bet, 'market');
+      Array.from(new Set([
+        `market:${bet.marketKey || normalizeUiKey(bet.market || 'market')}`,
+        `market:${marketGroupFromKey(marketKeyFromRow({ marketKey: bet.marketKey, market: bet.market }))}`
+      ])).forEach((key) => add(key, `Marché · ${bet.market || bet.marketKey || '-'}`, bet, 'market'));
       add(`sport:${bet.sport || 'inconnu'}`, `Sport · ${bet.sport || 'inconnu'}`, bet, 'sport');
       add(`league:${bet.league || 'inconnue'}`, `Ligue · ${bet.league || 'inconnue'}`, bet, 'league');
       add(`odd:${oddRiskBucket(bet.odd)}`, `Cotes · ${oddRiskBucketLabel(bet.odd)}`, bet, 'odd');
@@ -10579,6 +10722,57 @@
       </article>
     `).join('') : '<div class="empty">Pertes présentes, mais pas encore de pattern répétitif.</div>';
     grids.forEach((grid) => { grid.innerHTML = html; });
+  }
+
+  function activeRealityLocks() {
+    const audit = trackedLearningAudit();
+    const pool = state.currentDashboardRows?.length ? state.currentDashboardRows : state.picks;
+    return (audit.warnings || []).slice(0, 8).map((warning) => {
+      const key = String(warning.key || '').toLowerCase();
+      const affected = (pool || []).filter((row) => segmentKeysForRow(row).includes(key)).length;
+      return {
+        ...warning,
+        affected,
+        action: key.startsWith('market:')
+          ? 'Marché basculé en observation'
+          : key.startsWith('sport:')
+            ? 'Sport freiné en standard'
+            : key.startsWith('league:')
+              ? 'Ligue freinée en standard'
+              : 'Seuil de prudence durci'
+      };
+    });
+  }
+
+  function renderRecoveryLocks() {
+    const grid = $('#recovery-blocked-segments-grid');
+    if (!grid) return;
+    let rows = activeRealityLocks();
+    if (!rows.length) {
+      rows = lossDiagnosis().hotspots
+        .filter((row) => Number(row.losses || 0) >= 1)
+        .slice(0, 6)
+        .map((row) => ({
+          ...row,
+          label: row.label,
+          count: row.losses,
+          roi: row.stake > 0 ? row.pnl / row.stake : -1,
+          affected: 0,
+          action: Number(row.losses || 0) >= 2 ? 'Observation forcée après pertes répétées' : 'Surveillance renforcée après perte réelle'
+        }));
+    }
+    if (!rows.length) {
+      grid.innerHTML = '<div class="empty">Aucun segment coupé. Dès que 2 pertes réelles ressortent sur la même famille, le bouton Je mise est verrouillé.</div>';
+      return;
+    }
+    grid.innerHTML = rows.map((row) => `
+      <article class="segment-card cold">
+        <span>Verrou réel actif</span>
+        <strong>${escapeHtml(row.label || row.key)}</strong>
+        <p>${escapeHtml(`${row.action} · ${formatCount(row.affected)} ligne(s) cockpit concernée(s) · ROI ${formatPct(row.roi || 0, 0)}`)}</p>
+        <em>${escapeHtml(`P&L réel ${formatMoney(row.pnl || 0)} sur ${formatCount(row.count || 0)} pari(s).`)}</em>
+      </article>
+    `).join('');
   }
 
   function recoveryModeStatus() {
@@ -10650,6 +10844,7 @@
       `).join('');
     }
     renderLossDiagnosis();
+    renderRecoveryLocks();
     renderRecoveryImportPreview();
   }
 
@@ -14510,6 +14705,7 @@
   function canDisplayStake(row, decisions = decisionBundleForRow(row)) {
     if (!isBeforeKickoff(row)) return false;
     if (trendForRow(row)?.tone === 'cold') return false;
+    if (realPerformanceGateForRow(row).blocked) return false;
     if (decisions && Object.prototype.hasOwnProperty.call(decisions, 'canBet')) {
       return decisions.canBet === true && Number(row?.stake || 0) > 0;
     }
@@ -14529,6 +14725,8 @@
   function noBetStakeReason(row, decisions = decisionBundleForRow(row)) {
     const trend = trendForRow(row);
     if (trend?.tone === 'cold') return trend.reason || 'Tendance froide';
+    const realGate = realPerformanceGateForRow(row);
+    if (realGate.blocked) return realGate.detail;
     return decisions?.mainReason
       || row?.prebetGate?.first
       || row?.statusLabel
@@ -14544,6 +14742,14 @@
   function blockReasons(row) {
     const reasons = [];
     const quality = row?.contextQuality || row?.match?.context?.quality || {};
+    const realGate = realPerformanceGateForRow(row);
+    if (realGate.blocked) {
+      reasons.push(...realGate.reasons.slice(0, 3).map((reason) => ({
+        label: reason.label || 'Historique réel',
+        detail: reason.detail || realGate.detail,
+        tone: reason.tone || 'warn'
+      })));
+    }
     if (row?.prebetGate?.blocked && !canDisplayStake(row)) {
       reasons.push({
         label: 'Checklist avant mise',
