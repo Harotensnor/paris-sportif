@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-05-18T05:45:50Z",
+  "generated_at": "2026-05-18T05:54:53Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 90,
-    "actionable": 40,
-    "watch": 5,
+    "actionable": 39,
+    "watch": 6,
     "risk": 45,
     "expired_sample": 0,
     "by_type": {
@@ -18,8 +18,8 @@
       "back_to_back_travel": 17
     },
     "by_quality": {
-      "watch": 5,
-      "actionable": 40,
+      "watch": 6,
+      "actionable": 39,
       "risk": 45
     }
   },
@@ -725,24 +725,6 @@
       "side": "away",
       "strength": 0.726,
       "context": "1 match dans les 48h + 979 km de voyage"
-    },
-    {
-      "event_id": "401856919",
-      "date": "2026-05-19T02:00Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Portland Fire",
-      "away": "Connecticut Sun",
-      "match": "Portland Fire - Connecticut Sun",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.667,
-      "context": "Cote away: 2.50 -> 2.20 (+12.0%)"
     }
   ],
   "active_watch": [
@@ -814,9 +796,27 @@
       "type": "market_move",
       "direction": "steam",
       "team": null,
-      "side": "home",
+      "side": "away",
+      "strength": 0.577,
+      "context": "Cote away: 3.85 -> 3.45 (+10.4%)"
+    },
+    {
+      "event_id": "401856919",
+      "date": "2026-05-19T02:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Portland Fire",
+      "away": "Connecticut Sun",
+      "match": "Portland Fire - Connecticut Sun",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
       "strength": 0.556,
-      "context": "Cote home: 2.00 -> 1.80 (+10.0%)"
+      "context": "Cote away: 2.50 -> 2.25 (+10.0%)"
     },
     {
       "event_id": "401856918",
@@ -839,11 +839,11 @@
   ],
   "active_risk": [
     {
-      "event_id": "175450",
+      "event_id": "176097",
       "date": "2026-05-19T04:00Z",
       "sport": "tennis",
-      "league_code": "bitpandahamburgopen",
-      "league_name": "Bitpanda Hamburg Open",
+      "league_code": "internationauxdestra",
+      "league_name": "Internationaux de Strasbourg presented by Mammotion",
       "home": "",
       "away": "",
       "match": "? - ?",
@@ -854,7 +854,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 12.1%"
+      "context": "marge bookmaker anormale 12.0%"
     },
     {
       "event_id": "178387",
@@ -875,11 +875,11 @@
       "context": "marge bookmaker anormale 12.1%"
     },
     {
-      "event_id": "176097",
+      "event_id": "175450",
       "date": "2026-05-19T04:00Z",
       "sport": "tennis",
-      "league_code": "internationauxdestra",
-      "league_name": "Internationaux de Strasbourg presented by Mammotion",
+      "league_code": "bitpandahamburgopen",
+      "league_name": "Bitpanda Hamburg Open",
       "home": "",
       "away": "",
       "match": "? - ?",
@@ -890,7 +890,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 12.0%"
+      "context": "marge bookmaker anormale 12.1%"
     },
     {
       "event_id": "401865447",
@@ -1250,7 +1250,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.3%"
+      "context": "marge bookmaker anormale 18.9%"
     },
     {
       "event_id": "740967",
@@ -1286,7 +1286,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 19.4%"
+      "context": "marge bookmaker anormale 18.9%"
     },
     {
       "event_id": "740970",
@@ -1322,7 +1322,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 19.4%"
+      "context": "marge bookmaker anormale 18.9%"
     },
     {
       "event_id": "401843351",
