@@ -5,6 +5,17 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-18
 
+### Version v7.0.0 — Pari vite sécurisé + journal de décision
+
+Suite directe après les pertes réelles : le logiciel devient plus défensif sur les clics `Je mise` et garde la trace exacte de ce qu’il savait au moment du pari.
+- Ajout d’un garde-fou global “pari dangereux” : les cotes trop hautes, la confiance trop basse, les marchés volatils et les dossiers trop pauvres restent visibles en analyse mais perdent le bouton de mise.
+- Le Top 3 évite désormais les candidats de secours risqués : pas de pick en tête si le signal est seulement spectaculaire mais fragile.
+- Chaque pari suivi enregistre une photo de décision : confiance, avantage, qualité du dossier, explication et garde-fous présents au moment du clic. Cette trace apparaît dans `Bilan & Stats`.
+- L’analyse post-journée relit aussi cette photo de décision pour expliquer plus concrètement ce que le modèle aurait dû voir avant une perte.
+- Les combinés standards passent en mode prudent : 2-3 jambes maximum, pas de même match, cote totale plus basse, jambes simples, et mise plafonnée à 1% de bankroll avec maximum 2€.
+- Ajout d’un cache local du calcul moteur : quand les fichiers data n’ont pas changé, l’accueil repasse d’un recalcul lourd à une récupération quasi immédiate. Le smoke rapide mesure maintenant séparément l’accueil prêt et le parcours complet.
+- Version desktop, package et Service Worker bumpés en `v7.0.0`.
+
 ### Version v5.4.0 — Accueil rapide + récupération stricte
 
 Suite directe après le constat “tests trop longs / logiciel lent” : l’accueil standard devient plus léger et le mode récupération bloque davantage les paris dangereux après une soirée rouge.

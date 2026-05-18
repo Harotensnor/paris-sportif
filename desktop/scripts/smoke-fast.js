@@ -68,6 +68,7 @@ async function main() {
       document.querySelectorAll('#home-picks-table-body tr.clickable-row').length >= 3
       || /Erreur au démarrage|Données trop anciennes/i.test(document.body.innerText || '')
     ), null, { timeout: 30000 });
+    const homeReadyMs = Date.now() - launchedAt;
 
     const home = await win.evaluate(() => ({
       title: document.querySelector('#page-title')?.textContent || '',
@@ -121,7 +122,7 @@ async function main() {
       message.startsWith('error:') || message.startsWith('pageerror:')
     ) && !isIgnorableConsoleMessage(message));
     if (severe.length) throw new Error(`Erreurs console: ${severe.join(' | ')}`);
-    console.log(`Desktop fast smoke OK: accueil ${home.rows} lignes, ${home.topCards} top, ${home.categories} catégories, boot ${Date.now() - launchedAt}ms.`);
+    console.log(`Desktop fast smoke OK: accueil ${home.rows} lignes, ${home.topCards} top, ${home.categories} catégories, prêt ${homeReadyMs}ms, parcours ${Date.now() - launchedAt}ms.`);
   } finally {
     await closeElectronApp(app);
     fs.rmSync(userDataDir, { recursive: true, force: true });

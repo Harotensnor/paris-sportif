@@ -11,6 +11,9 @@ const dataSource = require('./data-source');
 
 function createLegacyEngineService({ projectRoot }) {
   const root = path.resolve(projectRoot);
+  const desktopRoot = path.join(root, 'desktop');
+  const stateRoot = path.join(desktopRoot, 'state');
+  const analysisSnapshotPath = path.join(stateRoot, 'engine-analysis-cache.json');
   const dataPath = path.join(root, 'data.js');
   const dataLitePath = path.join(root, 'data_lite.js');
   const dataTodayPath = path.join(root, 'data_today.json');
@@ -95,6 +98,44 @@ function createLegacyEngineService({ projectRoot }) {
     currentKey = null;
     analysisCache = null;
     analysisCacheKey = null;
+  }
+
+  function readAnalysisSnapshot(analysisKey) {
+    try {
+      if (!fs.existsSync(analysisSnapshotPath)) return null;
+      const payload = JSON.parse(fs.readFileSync(analysisSnapshotPath, 'utf8'));
+      if (!payload || payload.analysisKey !== analysisKey || !payload.analysis || payload.analysis.ok !== true) return null;
+      return {
+        ...payload.analysis,
+        cache: {
+          ...(payload.analysis.cache || {}),
+          source: 'disk',
+          cachedAt: payload.cachedAt || null
+        }
+      };
+    } catch {
+      return null;
+    }
+  }
+
+  function writeAnalysisSnapshot(analysisKey, analysis) {
+    try {
+      fs.mkdirSync(stateRoot, { recursive: true });
+      const payload = {
+        schema: 'engine-analysis-cache-v1',
+        analysisKey,
+        cachedAt: new Date().toISOString(),
+        analysis: {
+          ...analysis,
+          cache: { source: 'fresh', cachedAt: new Date().toISOString() }
+        }
+      };
+      const tmpPath = `${analysisSnapshotPath}.tmp`;
+      fs.writeFileSync(tmpPath, JSON.stringify(payload));
+      fs.renameSync(tmpPath, analysisSnapshotPath);
+    } catch {
+      // Cache opportuniste seulement : le calcul moteur reste la source de vérité.
+    }
   }
 
   function localFetch(input) {
@@ -5899,6 +5940,14 @@ function createLegacyEngineService({ projectRoot }) {
     const safeBankroll = Number.isFinite(Number(bankroll)) && Number(bankroll) > 0 ? Number(bankroll) : 50;
     const analysisKey = `${fileKey()}:bankroll:${safeBankroll.toFixed(2)}`;
     if (!force && analysisCache && analysisCacheKey === analysisKey) return analysisCache;
+    if (!force) {
+      const snapshot = readAnalysisSnapshot(analysisKey);
+      if (snapshot) {
+        analysisCache = snapshot;
+        analysisCacheKey = analysisKey;
+        return snapshot;
+      }
+    }
     const engine = ensureEngine({ force });
     const win = engine.win;
     const data = win.PRONOSTICS_DATA || {};
@@ -6226,6 +6275,7 @@ function createLegacyEngineService({ projectRoot }) {
     };
     analysisCache = analysis;
     analysisCacheKey = analysisKey;
+    writeAnalysisSnapshot(analysisKey, analysis);
     return analysis;
   }
 

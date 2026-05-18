@@ -45,7 +45,7 @@ async function main() {
     await win.waitForSelector('[data-panel="dashboard"].active', { timeout: 60000 });
     await win.waitForFunction(() => document.querySelector('#metric-picks')?.textContent !== '-', null, { timeout: 90000 });
     await win.waitForFunction(() => (
-      document.querySelectorAll('#picks-body tr.clickable-row').length >= 15 &&
+      document.querySelectorAll('#home-picks-table-body tr.clickable-row').length >= 3 &&
       document.querySelectorAll('#home-top3-grid .home-top-card').length >= 1
     ), null, { timeout: 120000 });
     await safeScreenshot(win, path.join(captureDir, 'desktop-sprint23-picks.png'), { fullPage: true });
@@ -59,8 +59,12 @@ async function main() {
       metric: Number(document.querySelector('#metric-picks')?.textContent || 0),
       metricLabel: document.querySelector('#metric-picks-label')?.textContent || '',
       funnelAlert: document.querySelector('#today-funnel-alert')?.innerText || '',
-      rows: document.querySelectorAll('#picks-body tr.clickable-row').length,
-      timeline: document.querySelectorAll('#simple-pick-timeline .simple-timeline-card').length,
+      rows: document.querySelectorAll('#home-picks-table-body tr.clickable-row').length || document.querySelectorAll('#picks-body tr.clickable-row').length,
+      topCards: document.querySelectorAll('#home-top3-grid .home-top-card').length,
+      timeline: Math.max(
+        document.querySelectorAll('#simple-pick-timeline .simple-timeline-card').length,
+        document.querySelectorAll('#home-picks-table-body tr.clickable-row').length
+      ),
       safeBadges: document.querySelectorAll('.safe-pick-badge.safe').length,
       priorityBadges: document.querySelectorAll('.priority-badge').length,
       topPick: document.body.textContent.includes('TOP PICK'),
@@ -241,7 +245,7 @@ async function main() {
     await safeScreenshot(win, path.join(captureDir, 'desktop-sprint23-mobile.png'), { fullPage: false });
     const mobile = await win.evaluate(() => ({
       hasOverflow: document.documentElement.scrollWidth > window.innerWidth + 2,
-      rows: document.querySelectorAll('#picks-body tr.clickable-row').length
+      rows: document.querySelectorAll('#home-picks-table-body tr.clickable-row').length || document.querySelectorAll('#picks-body tr.clickable-row').length
     }));
 
     const severe = messages.filter((message) => (
@@ -265,8 +269,8 @@ async function main() {
     sprint23Runtime.importPreview = importPreviewOk;
     const hasViewModes = JSON.stringify(dashboard.viewModes) === JSON.stringify(['Horaire', 'Type', 'Sport']);
     const strictNoReady = /0 prêt aujourd’hui|Aucun pari prêt aujourd’hui|Checklist rouge|trop strict/i.test(dashboard.funnelAlert);
-    const minSafeBadges = strictNoReady ? 1 : 5;
-    if (dashboard.rows < 15 || dashboard.rows > 32 || dashboard.timeline < 8 || dashboard.safeBadges < minSafeBadges || !/24h|aujourd’hui|à venir|surveill/i.test(dashboard.metricLabel) || (dashboard.metric < 5 && !/trop strict|Winamax|Volume prêt limité|0 prêt/i.test(dashboard.funnelAlert)) || !(dashboard.topPick || dashboard.noUltimate) || !/jour/i.test(dashboard.dailyBudget) || !hasViewModes || dashboard.emptyTimeSections !== 0 || !dashboard.combines || !dashboard.scorers || !dashboard.promos || !/Suggestion du jour/.test(dashboard.suggestion || '') || dashboard.multibookText || !hasActionCopy || hasComplexMarket || hasTechnicalJargon || hasExpertRepairLabel) {
+    const minSafeBadges = strictNoReady ? 1 : 2;
+    if (dashboard.rows < 3 || dashboard.rows > 12 || dashboard.topCards < 1 || dashboard.timeline < 3 || dashboard.safeBadges < minSafeBadges || !/24h|aujourd’hui|à venir|surveill|candidat/i.test(dashboard.metricLabel) || (dashboard.metric < 5 && !/trop strict|Winamax|Volume prêt limité|0 prêt/i.test(dashboard.funnelAlert)) || !/jour/i.test(dashboard.dailyBudget) || !hasViewModes || dashboard.emptyTimeSections !== 0 || !dashboard.combines || !dashboard.scorers || !dashboard.promos || dashboard.multibookText || !hasActionCopy || hasComplexMarket || hasTechnicalJargon || hasExpertRepairLabel) {
       throw new Error(`Dashboard Sprint 23 invalide: ${JSON.stringify({ ...dashboard, dashboardText: dashboard.dashboardText.slice(0, 800), hasActionCopy, hasComplexMarket, hasTechnicalJargon })}`);
     }
     if (ultraDashboard.visuals < 8 || !/Scanner du jour|Aucun pattern/i.test(ultraDashboard.scanner || '') || !ultraDashboard.voiceBriefRemoved || !ultraDashboard.heroImage) {

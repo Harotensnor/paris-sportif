@@ -2150,9 +2150,71 @@
     return (audit.warnings || []).filter((warning) => [sportKey, leagueKey, ...marketKeys].includes(warning.key));
   }
 
+  function dangerousPickReasons(row) {
+    if (!row) return [];
+    const reasons = [];
+    const odd = Number(row?.odd || row?.totalOdd || 0);
+    const edge = displayEdgeValue(row);
+    const confidence = safeConfidenceValue(row);
+    const family = rowMarketPreferenceKey(row);
+    const contextScore = Number(row?.contextQuality?.score || row?.matchSheetV6?.sectionCompleteness?.score || 0);
+    const isCombo = family === 'combine' || normalizeUiKey(row?.market || '').includes('combine');
+    const volatileFamily = ['halftime', 'teamtotal', 'scorer', 'points_totals', 'tennis_specials', 'htft', 'half_scores', 'combine'].includes(family);
+    if (odd > 4.5) {
+      reasons.push({
+        code: 'danger_high_odd',
+        label: 'Cote hors zone rapide',
+        detail: `Cote ${formatOdd(odd)} trop haute pour un pari vite. Le pick reste analysable, mais sans bouton de mise.`,
+        tone: 'warn'
+      });
+    }
+    if (odd > 3 && edge < 0.12) {
+      reasons.push({
+        code: 'danger_high_odd_low_edge',
+        label: 'Risque mal payé',
+        detail: `Cote ${formatOdd(odd)} avec avantage ${formatPct(edge, 1)} : trop fragile pour miser vite.`,
+        tone: 'warn'
+      });
+    }
+    if (confidence > 0 && confidence < 0.55) {
+      reasons.push({
+        code: 'danger_low_confidence',
+        label: 'Confiance trop basse',
+        detail: `Confiance ${formatPct(confidence, 0)} : observation uniquement.`,
+        tone: 'warn'
+      });
+    }
+    if (volatileFamily && edge < 0.15) {
+      reasons.push({
+        code: 'danger_volatile_market',
+        label: 'Marché volatile',
+        detail: `${marketFamilyLabel(family)} demande au moins ${formatPct(0.15, 0)} d’avantage avant d’autoriser une mise.`,
+        tone: 'warn'
+      });
+    }
+    if (contextScore > 0 && contextScore < 45 && edge < 0.15) {
+      reasons.push({
+        code: 'danger_context_short',
+        label: 'Dossier trop pauvre',
+        detail: `Contexte ${Math.round(contextScore)}/100 : pas assez de matière pour transformer ce signal en “Je mise”.`,
+        tone: 'warn'
+      });
+    }
+    if (isCombo && odd > 6.5) {
+      reasons.push({
+        code: 'danger_combo_odd',
+        label: 'Combiné trop ambitieux',
+        detail: `Cote totale ${formatOdd(odd)} : les combinés standards restent limités à des tickets courts et prudents.`,
+        tone: 'warn'
+      });
+    }
+    return reasons;
+  }
+
   function realPerformanceGateForRow(row) {
     if (!row) return { blocked: false, reasons: [] };
     const reasons = [];
+    dangerousPickReasons(row).forEach((reason) => reasons.push(reason));
     const durableLock = durableFamilyLockForRow(row);
     if (durableLock) {
       reasons.push({
@@ -2369,6 +2431,45 @@
     return (open - close) / close;
   }
 
+  function decisionSnapshotForRow(row, { stake = null, coach = null } = {}) {
+    const decisions = decisionBundleForRow(row);
+    const gate = realPerformanceGateForRow(row);
+    const canBet = canDisplayStake(row, decisions);
+    const reasons = [];
+    (gate.reasons || []).slice(0, 5).forEach((reason) => {
+      reasons.push({
+        code: reason.code || 'gate',
+        label: reason.label || 'Garde-fou',
+        detail: reason.detail || gate.detail || ''
+      });
+    });
+    (coach?.warnings || []).slice(0, 4).forEach((warning) => {
+      const label = String(warning || '').replace(/_/g, ' ');
+      if (!reasons.some((reason) => reason.code === warning)) {
+        reasons.push({ code: warning, label, detail: coach.detail || '' });
+      }
+    });
+    const sourceScore = Number(row?.contextQuality?.score || row?.matchSheetV6?.sectionCompleteness?.score || 0);
+    return {
+      schema: 'decision-snapshot-v1',
+      capturedAt: new Date().toISOString(),
+      title: row?.title || '',
+      marketFamily: rowMarketPreferenceKey(row),
+      market: row?.market || '',
+      label: row?.label || '',
+      odd: Number(row?.odd || 0),
+      probability: Number(row?.probability || 0),
+      confidence: safeConfidenceValue(row),
+      edge: displayEdgeValue(row),
+      stake: Number(stake ?? row?.stake ?? 0) || 0,
+      status: canBet ? 'ready' : 'watch',
+      canBet,
+      sourceQuality: Number.isFinite(sourceScore) && sourceScore > 0 ? Math.round(sourceScore) : null,
+      why: simpleWhyText(row),
+      reasons: reasons.slice(0, 6)
+    };
+  }
+
   function buildUserBetRecord(row, { stake = displayStakeAmount(row), source = 'manual', status = 'pending', tags = [], note = '', extra = {} } = {}) {
     const now = new Date();
     const prefs = loadPreferences();
@@ -2407,6 +2508,7 @@
       trackingSource: source,
       day: parisDayKey(now),
       createdAt: now.toISOString(),
+      decisionSnapshot: extra.decisionSnapshot || decisionSnapshotForRow(row, { stake }),
       ...extra
     };
   }
@@ -2439,7 +2541,8 @@
       notifyUser(coach.label, coach.detail, row);
       return;
     }
-    bets.push(buildUserBetRecord(row, { stake, source: 'manual', extra: { coachWarnings: coach.warnings || [] } }));
+    const decisionSnapshot = decisionSnapshotForRow(row, { stake, coach });
+    bets.push(buildUserBetRecord(row, { stake, source: 'manual', extra: { coachWarnings: coach.warnings || [], decisionSnapshot } }));
     saveUserBets(bets);
     renderUserPnl();
     renderPicks();
@@ -2609,13 +2712,21 @@
       return;
     }
     const now = new Date();
-    const stake = 10;
-    const coach = coachDecisionForBet({ ...combo, id: key, market: 'Combiné', label: readableComboTitle(combo), odd: combo.totalOdd, edge: combo.edge, sport: 'multi', league: combo.sameGame ? 'Même match' : 'Plusieurs matchs' }, stake);
+    const bankroll = Math.max(1, Number(loadPreferences().bankroll || getBankroll() || 50));
+    const stake = Math.max(0.1, Math.min(2, bankroll * 0.01));
+    const legs = Array.isArray(combo.legs) ? combo.legs : [];
+    const legEdges = legs.map((leg) => Number(leg?.edge)).filter(Number.isFinite);
+    const comboEdge = Number.isFinite(Number(combo.edge))
+      ? Number(combo.edge)
+      : (legEdges.length ? legEdges.reduce((sum, value) => sum + value, 0) / legEdges.length : 0);
+    const comboDecisionRow = { ...combo, id: key, market: 'Combiné', marketKey: 'combine', label: readableComboTitle(combo), odd: combo.totalOdd, edge: comboEdge, sport: 'multi', league: combo.sameGame ? 'Même match' : 'Plusieurs matchs' };
+    const coach = coachDecisionForBet(comboDecisionRow, stake);
     if (!coach.allow) {
       setSideStatus(coach.label, coach.tone === 'danger' ? 'danger' : 'warn');
       notifyUser(coach.label, coach.detail);
       return;
     }
+    const decisionSnapshot = decisionSnapshotForRow(comboDecisionRow, { stake, coach });
     bets.push({
       id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
       key,
@@ -2628,8 +2739,8 @@
       label: combo.legs.map(readableComboLegLabel).join(' + '),
       odd: Number(combo.totalOdd || 0),
       probability: Number(combo.combinedProb || combo.avgProb || 0),
-      edge: Number(combo.edge || 0),
-      edgeBucket: edgeBucketFor(combo.edge),
+      edge: comboEdge,
+      edgeBucket: edgeBucketFor(comboEdge),
       tier: combo.type || 'combine',
       marketKey: 'combine',
       openingOdd: Number(combo.totalOdd || 0),
@@ -2643,6 +2754,7 @@
       tags: [],
       note: '',
       coachWarnings: coach.warnings || [],
+      decisionSnapshot,
       legs: combo.legs,
       day: parisDayKey(now),
       createdAt: now.toISOString()
@@ -6704,7 +6816,7 @@
       const key = userBetKey(row) || row?.id || `${row?.title}:${row?.market}:${row?.label}`;
       const confidence = homeConfidenceValue(row);
       const odd = Number(row?.odd || 0);
-      return canDisplayPickCard(row) && !selectedKeys.has(key) && confidence >= 0.55 && odd > 1 && odd <= 4.5;
+      return canDisplayPickCard(row) && !selectedKeys.has(key) && confidence >= 0.55 && odd > 1 && odd <= 4.5 && dangerousPickReasons(row).length === 0;
     });
     return selected.concat(diverseHomeTopRows(watch, limit - selected.length)).slice(0, limit);
   }
@@ -8154,14 +8266,20 @@
     const seenSignature = new Set();
     const safe = source.filter((combo) => {
       const legs = Array.isArray(combo?.legs) ? combo.legs : [];
-      if (legs.length < 2 || legs.length > 4) return false;
+      if (legs.length < 2 || legs.length > 3) return false;
       if (!legs.every(comboLegIsSimpleStandard)) return false;
       const totalOdd = Number(combo.totalOdd || combo.odd || 0);
-      if (!(totalOdd > 1.2) || totalOdd > 14) return false;
+      if (!(totalOdd > 1.2) || totalOdd > 6.5) return false;
+      if (combo.sameGame) return false;
+      if (legs.some((leg) => Number(leg?.odd || 0) > 2.6)) return false;
+      const prob = Number(combo.combinedProb || combo.avgProb || 0);
+      if (prob > 0 && prob < 0.34) return false;
+      const legEdges = legs.map((leg) => Number(leg?.edge)).filter(Number.isFinite);
+      const avgEdge = legEdges.length ? legEdges.reduce((sum, value) => sum + value, 0) / legEdges.length : Number(combo.edge || 0);
+      if (Number.isFinite(avgEdge) && avgEdge < 0.01) return false;
       const anchor = comboAnchor(combo);
       const anchorCount = byAnchor.get(anchor) || 0;
-      if (combo.sameGame && anchorCount >= 1) return false;
-      if (anchorCount >= 2) return false;
+      if (anchorCount >= 1) return false;
       const signature = legs.map((leg) => `${comboAnchor({ legs: [leg] })}:${comboLegGroup(leg)}:${readableComboLegLabel(leg)}`).sort().join('|');
       if (seenSignature.has(signature)) return false;
       byAnchor.set(anchor, anchorCount + 1);
@@ -9581,14 +9699,18 @@
       const returnForTen = totalOdd > 1 ? totalOdd * 10 : 0;
       const edgeCompound = legs.reduce((sum, leg) => sum + Number(leg.edge || 0), 0) / Math.max(1, legs.length);
       const correlation = Number(combo.correlationAvg || combo.avgCorrelation || 0);
+      const comboDecisionRow = { ...combo, id: key, market: 'Combiné', marketKey: 'combine', label: readableComboTitle(combo), odd: totalOdd, edge: edgeCompound, sport: 'multi', league: combo.sameGame ? 'Même match' : 'Plusieurs matchs' };
+      const comboGate = realPerformanceGateForRow(comboDecisionRow);
+      const comboPlayable = !comboGate.blocked && totalOdd <= 4.5 && edgeCompound >= 0.15;
+      const comboButtonTitle = comboGate.detail || 'Ticket combiné prudent uniquement';
       const titleText = `${combo.type || ''} ${combo.title || ''} ${combo.desc || ''}`.toLowerCase();
       const variant = titleText.includes('safe') || titleText.includes('lock') || titleText.includes('sûr')
-        ? 'Safe'
+        ? 'Prudent'
         : legs.some((leg) => /btts|but|total|o\/u|over|under/i.test(`${leg.market} ${leg.label}`))
-          ? 'Buts'
-          : totalOdd >= 5
-            ? 'Outsider'
-            : 'Meilleur ticket';
+          ? 'Buts prudents'
+          : legs.length === 2
+            ? '2 jambes'
+            : '3 jambes max';
       return `
         <article class="combo-card">
           <div class="combo-head">
@@ -9597,7 +9719,7 @@
               <p class="match-sub">${escapeHtml((combo.desc || 'Ticket combiné').replace(/\bBTTS\b/ig, 'les deux marquent').replace(/\b1N2\b/ig, 'vainqueur').replace(/Best Edge/ig, 'meilleur ticket').replace(/Same-game/ig, 'même match'))}</p>
             </div>
             <span class="pill">${escapeHtml(variant)}</span>
-            <span class="pill">${combo.sameGame ? 'Même match' : 'Plusieurs matchs'}</span>
+            <span class="pill">${combo.sameGame ? 'Même match' : 'Matchs séparés'}</span>
           </div>
           <div class="combo-stats">
             <div class="mini-stat"><span>Cote</span><strong>${formatOdd(combo.totalOdd).replace('@', '')}</strong></div>
@@ -9618,7 +9740,7 @@
               </div>
             `).join('')}
           </div>
-          <button class="track-bet-btn combo-track-btn${trackedCombo ? ' tracked' : ''}" type="button" data-track-combo-key="${escapeHtml(key)}">${trackedCombo ? 'Combiné suivi' : 'Je mise le combiné'}</button>
+          <button class="track-bet-btn combo-track-btn${trackedCombo ? ' tracked' : ''}" type="button" data-track-combo-key="${escapeHtml(key)}" title="${escapeHtml(comboButtonTitle)}" ${!trackedCombo && !comboPlayable ? 'disabled' : ''}>${trackedCombo ? 'Combiné suivi' : comboPlayable ? 'Je mise prudent' : 'À surveiller'}</button>
         </article>`;
     }).join('');
   }
@@ -10538,6 +10660,30 @@
     if (changed) saveUserBets(next);
   }
 
+  function decisionSnapshotSummaryHtml(bet) {
+    const snapshot = bet?.decisionSnapshot;
+    if (!snapshot || typeof snapshot !== 'object') return '';
+    const parts = [];
+    const confidence = Number(snapshot.confidence);
+    const edge = Number(snapshot.edge);
+    const sourceQuality = Number(snapshot.sourceQuality);
+    if (Number.isFinite(confidence) && confidence > 0) parts.push(`confiance ${formatPct(confidence, 0)}`);
+    if (Number.isFinite(edge)) parts.push(`avantage ${formatPct(edge, 1)}`);
+    if (Number.isFinite(sourceQuality) && sourceQuality > 0) parts.push(`dossier ${Math.round(sourceQuality)}/100`);
+    const reasons = Array.isArray(snapshot.reasons)
+      ? snapshot.reasons.map((reason) => reason.label || reason.code).filter(Boolean).slice(0, 2)
+      : [];
+    const line = parts.length ? parts.join(' · ') : 'décision enregistrée';
+    return `
+      <div class="decision-snapshot-note">
+        <strong>Au moment du clic</strong>
+        <span>${escapeHtml(line)}</span>
+        ${snapshot.why ? `<em>${escapeHtml(String(snapshot.why).slice(0, 140))}</em>` : ''}
+        ${reasons.length ? `<small>${escapeHtml(reasons.join(' · '))}</small>` : ''}
+      </div>
+    `;
+  }
+
   function renderTrackedBets() {
     const body = $('#user-bets-body');
     const chart = $('#tracked-bets-chart');
@@ -10569,6 +10715,7 @@
           <td data-label="Tags / notes">
             <input class="bet-tags-input" data-bet-tags-id="${escapeHtml(bet.id)}" value="${escapeHtml((bet.tags || []).join(', '))}" placeholder="favori, test">
             <textarea class="bet-note-input" data-bet-note-id="${escapeHtml(bet.id)}" rows="2" placeholder="Note privée">${escapeHtml(bet.note || '')}</textarea>
+            ${decisionSnapshotSummaryHtml(bet)}
             ${bet.lossFeedback?.reasonLabel ? `<div class="match-sub">Feedback: ${escapeHtml(bet.lossFeedback.reasonLabel)}</div>` : ''}
           </td>
           <td data-label="P&L">${escapeHtml(formatMoney(bet.pnl || 0))}</td>
@@ -10884,7 +11031,13 @@
     const safeReliable = bet?.safeReliable === true;
     const clv = Number(bet?.clvPct);
     const family = marketFamilyFromBet(bet);
+    const snapshot = bet?.decisionSnapshot || null;
     if (bet?.trackingSource === 'winamax_import') signals.push('Pari hors suivi app : le modèle ne l’avait pas validé comme “Je mise”.');
+    if (snapshot?.why) signals.push(`Au clic, l’explication disait : ${String(snapshot.why).slice(0, 120)}.`);
+    if (Array.isArray(snapshot?.reasons) && snapshot.reasons.length) {
+      const labels = snapshot.reasons.map((reason) => reason.label || reason.code).filter(Boolean).slice(0, 2);
+      if (labels.length) signals.push(`Garde-fous vus au clic : ${labels.join(' · ')}.`);
+    }
     if (priorFamilyLossDays >= 1) signals.push(`${marketFamilyLabel(family)} avait déjà perdu sur ${formatCount(priorFamilyLossDays)} journée(s) avant ce pari.`);
     if (odd > 3.5) signals.push(`Cote très haute (${formatOdd(odd)}) : à couper en récupération.`);
     else if (odd > 2.2) signals.push(`Cote haute (${formatOdd(odd)}) : risque trop élevé après perte.`);
