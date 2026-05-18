@@ -712,7 +712,7 @@ function createLegacyEngineService({ projectRoot }) {
     const key = calibrationUtils.normalizeMarketKey(value || '');
     const compact = String(key || value || '').toLowerCase().replace(/[^a-z0-9]+/g, '');
     if (/^(1n2|vainqueur|matchwinner|winner|moneyline)$/.test(compact)) return 'winner';
-    if (/^(ou|ou15|ou25|ou35|overunder|totalgoals|httotal|htou|halftimetotal)$/.test(compact)) return 'goals';
+    if (/^(ou|ou15|ou25|ou35|overunder|totalgoals)$/.test(compact)) return 'goals';
     if (/^(btts|les2equipes|bothteamstoscore)$/.test(compact)) return 'btts';
     if (/^(scorer|buteur|playergoal|goalscorer)$/.test(compact)) return 'scorer';
     if (/^(ht1n2|ht_1n2|halftime1n2|mitempsvainqueur)$/.test(compact)) return 'halftime';
@@ -725,7 +725,14 @@ function createLegacyEngineService({ projectRoot }) {
   }
 
   function isSimpleMarketCandidate(candidate) {
-    return Boolean(simpleMarketGroup(candidate?.market || candidate?.key || ''));
+    const group = simpleMarketGroup(candidate?.market || candidate?.key || '');
+    if (!group || group === 'halftime') return false;
+    return !isDrawSelection({
+      marketKey: candidate?.market || candidate?.key || '',
+      market: candidate?.market || candidate?.key || '',
+      label: candidate?.label || candidate?.pickLabel || candidate?.pickKey || candidate?.key || candidate?.side || '',
+      selection: candidate?.selection || candidate?.side || candidate?.value || ''
+    });
   }
 
   function isDrawSelection(row) {
@@ -926,10 +933,7 @@ function createLegacyEngineService({ projectRoot }) {
     const primaryLabel = compactKey(baseRow.label || best?.label || '');
     const rows = [];
     const seenMarkets = new Set();
-    const orderedCandidates = [
-      ...candidates.filter(isSimpleMarketCandidate),
-      ...candidates.filter((candidate) => !isSimpleMarketCandidate(candidate))
-    ];
+    const orderedCandidates = candidates.filter(isSimpleMarketCandidate);
     for (const candidate of orderedCandidates) {
       const marketKey = calibrationUtils.normalizeMarketKey(candidate.market || candidate.key || '');
       const market = formatMarketName(candidate.market || marketKey);
@@ -941,8 +945,8 @@ function createLegacyEngineService({ projectRoot }) {
       const odd = Number(candidate.odd) || 0;
       const probability = Number(candidate.prob ?? candidate.rel) || 0;
       const edge = Number(candidate.edge) || (odd > 1 && probability > 0 ? probability - (1 / odd) : 0);
-      const stake = stakeFor(win, probability, odd, bankroll);
-      if (!(edge > 0) || !(stake > 0)) continue;
+      const modelStake = stakeFor(win, probability, odd, bankroll);
+      if (!(edge > 0) || !(modelStake > 0)) continue;
       rows.push({
         market,
         marketKey,
@@ -950,11 +954,13 @@ function createLegacyEngineService({ projectRoot }) {
         odd,
         probability,
         edge,
-        stake,
-        status: edge >= 0.05 ? 'bet' : 'watch',
-        statusLabel: edge >= 0.08 ? 'Priorité multi-marché' : edge >= 0.05 ? 'Jouable multi-marché' : 'À surveiller',
+        stake: 0,
+        modelStake,
+        status: 'watch',
+        statusLabel: 'Alternative simple · lecture seulement',
         pickSource: 'runtime_market_candidate',
         isMarketAlternative: true,
+        userActionBlocked: true,
         primaryMarket: baseRow.market,
         marketCandidate: {
           market: candidate.market || marketKey,
@@ -2193,6 +2199,7 @@ function createLegacyEngineService({ projectRoot }) {
     let status = row.status;
     let statusLabel = row.statusLabel;
     const profitGuardReasons = [
+      row?.isMarketAlternative ? 'Alternative marché : lecture seulement' : null,
       row?.marketTiming?.guardApplied ? (row.marketTiming.warnings || [])[0] || 'Marché froid au backtest' : null,
       row?.signalConflict?.guardApplied ? row.signalConflict.label || 'Conflit signaux marché/contexte' : null,
       row?.oddsGuardrail?.applied ? row.oddsGuardrail.label || 'Cote haute non confirmée' : null,

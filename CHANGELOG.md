@@ -5,6 +5,20 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-17
 
+### Version v5.0.1 — Anti-perte Winamax + fiche non-misable
+
+Correctif terrain après retour utilisateur : l'app ne doit plus pousser vers Winamax quand la ligne est seulement informative ou issue d'un marché trop risqué.
+- Les alternatives de marchés sont désormais `lecture seulement` : aucune alternative ne peut créer un bouton `Je mise`, même si son edge brut paraît positif.
+- Les marchés mi-temps et totaux mi-temps ne sont plus considérés comme simples en mode standard.
+- Les alternatives complexes (`DNB`, `team total`, score exact, HT/FT, pénalty, clean sheet, mi-temps) restent hors cockpit standard.
+- Les liens `Ouvrir Winamax` sont masqués sur les lignes non validées, les matchs commencés ou les fiches en observation ; seule une ligne vraiment prête peut ouvrir l'action de pari.
+- Les fiches match affichent `Lecture uniquement` au lieu de `À jouer` quand la mise est bloquée, avec une phrase explicite indiquant que le logiciel ne recommande pas de miser.
+- Le Top 3 de l’accueil ne se remplit plus avec des lignes `À confirmer` : si moins de trois paris sont réellement misables, il reste incomplet au lieu de pousser de l’observation.
+- Les rapports hebdo/brief soir ne s'ouvrent plus automatiquement au démarrage : ils ne bloquent plus les clics sur la navigation ou les catégories.
+- Audit pertes 17/05 : `DNB` (-27,7% ROI), `team total` (-7,8%) et `1N2` très hautes cotes (-4,6%) ont été identifiés comme segments à ne pas transformer en action standard.
+- Garde-fou QA ajouté : `qa:engine` échoue si une alternative complexe est exposée ou si une alternative obtient une mise positive.
+- Validation : pipeline complète fraîche, `npm test`, `qa:engine`, `qa:safe`, `qa:desktop`, `qa:terrain` et `qa:a11y` verts après correction.
+
 ### Version v5.0.0 — Pronostics profit-first
 
 Release majeure orientée qualité des paris : l’app privilégie désormais le profit réel et la protection utilisateur avant le volume brut.

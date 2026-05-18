@@ -201,7 +201,7 @@
   const SPORTS_PREFS = ['football', 'tennis', 'basketball', 'hockey', 'baseball', 'rugby', 'football américain', 'mma', 'boxe', 'handball', 'volleyball'];
   const SIMPLE_MARKET_PREFS = [
     { key: 'winner', label: 'Vainqueur du match', keys: ['1n2', 'matchwinner', 'vainqueur'] },
-    { key: 'goals', label: 'Plus / Moins de buts', keys: ['ou', 'ou15', 'ou25', 'ou35', 'httotal', 'htou', 'halftimetotal'] },
+    { key: 'goals', label: 'Plus / Moins de buts', keys: ['ou', 'ou15', 'ou25', 'ou35'] },
     { key: 'btts', label: 'Les deux équipes marquent', keys: ['btts'] },
     { key: 'scorer', label: 'Buteurs', keys: ['scorer', 'buteur'] },
     { key: 'halftime', label: 'Mi-temps vainqueur', keys: ['ht1n2', 'ht_1n2'] }
@@ -1503,6 +1503,10 @@
     if (!force && localStorage.getItem(WEEKLY_REPORT_SEEN_KEY) === key) return;
     const report = buildWeeklyReport();
     localStorage.setItem(WEEKLY_REPORT_SEEN_KEY, key);
+    if (!force) {
+      setSideStatus(`Rapport hebdo prêt: ${formatMoney(report.stats.pnl)}`, 'ok');
+      return;
+    }
     renderWeeklyReportModal(report);
   }
 
@@ -4882,9 +4886,10 @@
 
   function actionPickHtml(row, { compact = false } = {}) {
     const stake = visibleStakeText(row);
+    const stakeAllowed = canDisplayStake(row);
     return `
       <div class="action-pick ${compact ? 'compact' : ''}">
-        <div><span>PARI :</span><strong>${escapeHtml(userBetLabel(row))}</strong></div>
+        <div><span>${stakeAllowed ? 'PARI' : 'ANALYSE'} :</span><strong>${escapeHtml(userBetLabel(row))}</strong></div>
         <div><span>COTE :</span><strong>${escapeHtml(formatOdd(row?.odd || 0))} Winamax</strong></div>
         <div><span>MISE :</span><strong>${escapeHtml(stake)}</strong></div>
         ${compact ? '' : `<p>${escapeHtml(simpleWhyText(row))}</p>`}
@@ -5923,6 +5928,12 @@
   function winamaxOpenButtonHtml(row, label = 'Ouvrir Winamax') {
     const url = safeExternalUrl(row?.winamaxUrl || row?.match?.winamax?.url, 'www.winamax.fr');
     if (!url) return '';
+    if (!isBeforeKickoff(row)) {
+      return '<span class="ghost-btn winamax-open-btn disabled" aria-disabled="true" title="Le match est terminé ou déjà commencé">Match terminé</span>';
+    }
+    if (!canDisplayStake(row)) {
+      return '<span class="ghost-btn winamax-open-btn disabled" aria-disabled="true" title="Lien Winamax masqué tant que le logiciel ne recommande pas de mise">Observation</span>';
+    }
     return `<a class="ghost-btn winamax-open-btn" href="${escapeHtml(url)}" target="_blank" rel="noreferrer">${escapeHtml(label)}</a>`;
   }
 
@@ -6339,14 +6350,7 @@
       }
       return selected;
     }
-    const readyKeys = new Set(ready.map((row) => userBetKey(row) || `${row.id}:${row.market}:${row.label}`));
-    const watch = source
-      .filter(canDisplayPickCard)
-      .filter((row) => {
-        const key = userBetKey(row) || `${row.id}:${row.market}:${row.label}`;
-        return !readyKeys.has(key);
-      });
-    return diverseHomeTopRows(ready.concat(watch), limit);
+    return diverseHomeTopRows(ready, limit);
   }
 
   function homeCategoryMeta(category) {
@@ -12059,7 +12063,11 @@
     if (!force && localStorage.getItem(EVENING_BRIEF_SEEN_KEY) === key) return;
     const brief = buildEveningBrief();
     localStorage.setItem(EVENING_BRIEF_SEEN_KEY, key);
-    if (!force) notifyUser('Brief du soir', `Ta journée : ${formatCount(brief.stats.bets)} paris, ${formatMoney(brief.stats.pnl)}.`, null);
+    if (!force) {
+      notifyUser('Brief du soir', `Ta journée : ${formatCount(brief.stats.bets)} paris, ${formatMoney(brief.stats.pnl)}.`, null);
+      setSideStatus(`Brief du soir prêt: ${formatMoney(brief.stats.pnl)}`, 'ok');
+      return;
+    }
     renderEveningBriefModal(brief);
   }
 
@@ -13882,9 +13890,11 @@
     ].filter(([label]) => expertMode || label !== 'N');
     const explanation = cleanExplanation(pred.explain || pred.explanation || pred.reason);
     const winamaxUrl = safeExternalUrl(row.winamaxUrl, 'www.winamax.fr');
-    const winamaxLink = winamaxUrl
+    const winamaxLink = stakeAllowed && winamaxUrl
       ? `<a href="${escapeHtml(winamaxUrl)}" target="_blank" rel="noreferrer">Ouvrir le match Winamax</a>`
-      : 'Lien Winamax absent';
+      : stakeAllowed
+        ? 'Lien Winamax absent'
+        : 'Masqué tant que la mise n’est pas validée';
     const fairOdd = row.probability > 0 ? 1 / row.probability : 0;
     const consensusOdd = Array.isArray(match.odds) && match.odds[0]
       ? cleanLabel(match.odds[0].details || match.odds[0].provider || '', '')
@@ -14014,11 +14024,12 @@
               <div><span>Départ</span><strong>${escapeHtml(countdownLabel(row.start))}</strong></div>
             </div>
           </article>
-          <article class="match-ticket-card">
-            <h4>À jouer</h4>
+          <article class="match-ticket-card ${stakeAllowed ? 'ticket-ready' : 'ticket-blocked'}">
+            <h4>${stakeAllowed ? 'À jouer' : 'Lecture uniquement'}</h4>
             <div class="kv">
               ${ticketRows.map(([k, v]) => `<span>${escapeHtml(k)}</span><strong>${k === 'Winamax' ? v : escapeHtml(v)}</strong>`).join('')}
             </div>
+            ${stakeAllowed ? '' : `<p class="detail-text no-bet-copy">Cette fiche explique le signal, mais le logiciel ne recommande pas de mise sur cette ligne.</p>`}
           </article>
         </div>
         ${buildV3SheetSnapshotHtml(row)}

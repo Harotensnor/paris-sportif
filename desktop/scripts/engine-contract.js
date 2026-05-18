@@ -26,12 +26,12 @@ function compactMarketKey(value) {
 
 function isSimpleDashboardMarket(pick) {
   const key = compactMarketKey(pick?.marketKey || pick?.market);
-  return /^(1n2|matchwinner|winner|moneyline|ou|ou15|ou25|ou35|httotal|htou|halftimetotal|btts|scorer|buteur|goalscorer|ht1n2|halftime1n2)$/.test(key);
+  return /^(1n2|matchwinner|winner|moneyline|ou|ou15|ou25|ou35|btts|scorer|buteur|goalscorer)$/.test(key);
 }
 
 function isDrawDashboardPick(pick) {
   const key = compactMarketKey(pick?.marketKey || pick?.market);
-  if (!/^(1n2|matchwinner|winner|moneyline|ht1n2|halftime1n2)$/.test(key)) return false;
+  if (!/^(1n2|matchwinner|winner|moneyline)$/.test(key)) return false;
   const text = String([pick?.label, pick?.pickLabel, pick?.pick, pick?.selection, pick?.side].filter(Boolean).join(' ')).toLowerCase();
   const compact = text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '');
   return /(^|[^a-z])(?:nul|draw|match\s*nul|egalite)(?:[^a-z]|$)/i.test(text)
@@ -43,8 +43,7 @@ function dashboardMarketGroup(pick) {
   if (/^(1n2|matchwinner|winner|moneyline)$/.test(key)) return 'winner';
   if (/^(scorer|buteur|goalscorer)$/.test(key)) return 'scorer';
   if (/btts/.test(key)) return 'btts';
-  if (/^(ht1n2|halftime1n2)$/.test(key)) return 'halftime';
-  if (/^(ou|ou15|ou25|ou35|httotal|htou|halftimetotal)$/.test(key)) return 'goals';
+  if (/^(ou|ou15|ou25|ou35)$/.test(key)) return 'goals';
   return 'other';
 }
 
@@ -286,11 +285,17 @@ function testAnalysis() {
   const complexDashboard = (analysis.dashboardPicks || []).filter((pick) => !isSimpleDashboardMarket(pick));
   const drawDashboard = (analysis.dashboardPicks || []).filter(isDrawDashboardPick);
   const pastDashboard = (analysis.dashboardPicks || []).filter((pick) => !isFuturePick(pick));
+  const exposedAlternatives = [...(analysis.picks || []), ...(analysis.dashboardPicks || [])]
+    .filter((pick) => pick?.isMarketAlternative);
+  const complexAlternatives = exposedAlternatives.filter((pick) => !isSimpleDashboardMarket(pick) || isDrawDashboardPick(pick));
+  const actionableAlternatives = exposedAlternatives.filter((pick) => pick?.decisionCenter?.canBet === true || Number(pick?.stake || 0) > 0);
   assert(analysis.dashboardPicks.length >= 10, 'Moins de 10 paris simples dans le cockpit', analysis.dashboardPicks);
   assert(analysis.dashboardPicks.length <= 30, 'Le cockpit standard dépasse la limite simple de 30 paris', analysis.dashboardPicks.length);
   assert(complexDashboard.length === 0, 'Marché complexe exposé dans le cockpit standard', complexDashboard);
   assert(drawDashboard.length === 0, 'Match nul exposé dans le cockpit standard', drawDashboard.map((pick) => ({ title: pick.title, market: pick.market, label: pick.label })));
   assert(pastDashboard.length === 0, 'Le cockpit expose un match déjà commencé', pastDashboard.map((pick) => ({ title: pick.title, market: pick.market, start: pick.start })));
+  assert(complexAlternatives.length === 0, 'Alternative complexe exposée en mode standard', complexAlternatives.map((pick) => ({ title: pick.title, market: pick.market, label: pick.label })));
+  assert(actionableAlternatives.length === 0, 'Alternative marché avec bouton Je mise ou mise positive', actionableAlternatives.map((pick) => ({ title: pick.title, market: pick.market, label: pick.label, stake: pick.stake, canBet: pick.decisionCenter?.canBet })));
   assert(Number(analysis.dashboardMeta?.qualityPolicy?.maxDashboardRows || 0) === 30, 'Limite cockpit v2.1.8 absente', analysis.dashboardMeta?.qualityPolicy);
   assert(topRanks.length >= 5, 'Top 5 prioritaire absent du cockpit', topRanks);
   assert(Number(analysis.dashboardPicks?.[0]?.priorityRank || 0) === 1, 'Le premier pick dashboard doit être le #1 prioritaire', analysis.dashboardPicks?.[0]);
