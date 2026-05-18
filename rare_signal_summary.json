@@ -1,26 +1,25 @@
 {
-  "generated_at": "2026-05-18T23:00:37Z",
+  "generated_at": "2026-05-18T23:11:09Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 72,
-    "actionable": 37,
-    "watch": 4,
+    "active_events": 69,
+    "actionable": 35,
+    "watch": 3,
     "risk": 31,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 34,
       "travel_extreme": 3,
-      "market_uncertain": 31,
-      "market_move": 11,
-      "signal_conflict": 7,
       "back_to_back_travel": 19,
+      "signal_conflict": 5,
+      "market_uncertain": 30,
       "weather_extreme": 1
     },
     "by_quality": {
-      "actionable": 37,
-      "watch": 4,
+      "actionable": 35,
+      "watch": 3,
       "risk": 31
     }
   },
@@ -44,24 +43,6 @@
       "context": "Absences severes 7-12"
     },
     {
-      "event_id": "401871410",
-      "date": "2026-05-18T23:30Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Buffalo Sabres",
-      "away": "Montreal Canadiens",
-      "match": "Buffalo Sabres - Montreal Canadiens",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 1.85 -> 2.35 (-27.2%)"
-    },
-    {
       "event_id": "401815397",
       "date": "2026-05-18T23:40Z",
       "sport": "baseball",
@@ -78,24 +59,6 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 7-14"
-    },
-    {
-      "event_id": "401815398",
-      "date": "2026-05-18T23:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Chicago Cubs",
-      "away": "Milwaukee Brewers",
-      "match": "Chicago Cubs - Milwaukee Brewers",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 1.0,
-      "context": "Cote away: 2.35 -> 1.76 (+25.1%)"
     },
     {
       "event_id": "401815402",
@@ -746,24 +709,6 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 9-12"
-    },
-    {
-      "event_id": "401856919",
-      "date": "2026-05-19T02:00Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Portland Fire",
-      "away": "Connecticut Sun",
-      "match": "Portland Fire - Connecticut Sun",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.556,
-      "context": "Cote away: 2.50 -> 2.25 (+10.0%)"
     }
   ],
   "active_risk": [
@@ -1074,6 +1019,24 @@
       "context": "marge bookmaker anormale 18.8%"
     },
     {
+      "event_id": "401866332",
+      "date": "2026-05-24T16:30Z",
+      "sport": "football",
+      "league_code": "proleague",
+      "league_name": "Pro League",
+      "home": "Union St.-Gilloise",
+      "away": "Anderlecht",
+      "match": "Union St.-Gilloise - Anderlecht",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.3%"
+    },
+    {
       "event_id": "748972",
       "date": "2026-05-24T16:30Z",
       "sport": "football",
@@ -1126,24 +1089,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.1%"
-    },
-    {
-      "event_id": "401866332",
-      "date": "2026-05-24T16:30Z",
-      "sport": "football",
-      "league_code": "proleague",
-      "league_name": "Pro League",
-      "home": "Union St.-Gilloise",
-      "away": "Anderlecht",
-      "match": "Union St.-Gilloise - Anderlecht",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.3%"
     },
     {
       "event_id": "401843356",

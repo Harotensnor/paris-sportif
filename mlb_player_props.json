@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-18T23:00:30Z",
+  "generated_at": "2026-05-18T23:11:02Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -467,6 +467,42 @@
       "home": "Seattle Mariners",
       "away": "Chicago White Sox",
       "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Seattle Mariners",
+          "pitcher": "Bryce Miller",
+          "label": "Bryce Miller plus de 2,5 strikeouts",
+          "line": 2.5,
+          "pick": "over",
+          "probability": 0.6095,
+          "fair_odds": 1.64,
+          "expected_strikeouts": 2.87,
+          "projected_ip": 5.1,
+          "inputs": {
+            "k9": 5.06,
+            "era": 3.38,
+            "whip": 1.69,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Seattle Mariners",
+          "pitcher": "Bryce Miller",
+          "label": "Bryce Miller concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.6162,
+          "fair_odds": 1.62,
+          "expected_hr_allowed": 0.958,
+          "projected_ip": 5.1,
+          "inputs": {
+            "hr9": 1.69,
+            "era": 3.38,
+            "whip": 1.69
+          },
+          "side": "home"
+        },
         {
           "market": "pitcher_strikeouts",
           "team": "Chicago White Sox",
@@ -2822,7 +2858,7 @@
       ]
     }
   ],
-  "props": 136,
+  "props": 138,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
