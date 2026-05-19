@@ -284,7 +284,7 @@ async function main() {
     });
     assert(!(combinesAudit.cards && combinesAudit.hasAdvanced), 'Terrain: Combinés standard trop techniques', combinesAudit.text.slice(0, 1400));
     await win.locator('[data-tab="dashboard"]:visible').first().click();
-    await win.waitForSelector('[data-panel="dashboard"].active', { timeout: 10_000 });
+    await win.waitForFunction(() => Boolean(document.querySelector('[data-panel="dashboard"].active')), null, { timeout: 10_000 });
 
     const winnerCategory = win.locator('[data-cockpit-category="winner"]:visible');
     if (await winnerCategory.count()) {

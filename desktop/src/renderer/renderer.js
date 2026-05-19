@@ -2241,13 +2241,65 @@
     return reasons;
   }
 
+  function controlledRecoveryProfile(stats = userBetStats()) {
+    const lossStreak = currentLossStreak(stats);
+    const active = stats.pnlToday < 0 || stats.pnlYesterday < 0 || stats.last7Pnl < 0 || lossStreak >= 2;
+    const severe = stats.pnlToday <= -3 || stats.pnlYesterday <= -3 || stats.last7Pnl <= -5 || lossStreak >= 3;
+    const bankroll = Math.max(1, getBankroll());
+    return {
+      active,
+      severe,
+      label: severe ? 'Reprise stricte' : active ? 'Reprise contrôlée' : 'Mode normal',
+      maxBets: severe ? 2 : active ? 4 : 6,
+      maxStake: severe ? Math.min(0.75, bankroll * 0.015) : active ? Math.min(1.25, bankroll * 0.025) : Math.max(1, bankroll * 0.04),
+      oddMax: severe ? 1.95 : active ? 2.35 : 3.25,
+      edgeMin: severe ? 0.08 : active ? 0.055 : 0.035,
+      confidenceMin: severe ? 0.65 : active ? 0.58 : 0.54,
+      contextMin: severe ? 65 : active ? 52 : 45
+    };
+  }
+
+  function isControlledRecoveryMarket(row, profile = controlledRecoveryProfile()) {
+    const family = rowMarketPreferenceKey(row);
+    if (isWinnerRow(row)) return true;
+    const edge = displayEdgeValue(row);
+    const confidence = safeConfidenceValue(row);
+    if (['goals', 'btts'].includes(family)) {
+      return edge >= profile.edgeMin + 0.04 && (!confidence || confidence >= profile.confidenceMin + 0.04);
+    }
+    return false;
+  }
+
+  function controlledRecoveryCandidate(row, profile = controlledRecoveryProfile()) {
+    if (!profile.active || !row || !canDisplayPickCard(row)) return false;
+    const odd = Number(row.odd || 0);
+    const edge = displayEdgeValue(row);
+    const confidence = safeConfidenceValue(row);
+    const contextScore = Number(row?.contextQuality?.score || row?.matchSheetV6?.sectionCompleteness?.score || 0);
+    const contextOk = !isFootballRow(row) || contextScore === 0 || contextScore >= profile.contextMin;
+    return Boolean(
+      isControlledRecoveryMarket(row, profile) &&
+      odd > 1 &&
+      odd <= profile.oddMax &&
+      edge >= profile.edgeMin &&
+      (!confidence || confidence >= profile.confidenceMin) &&
+      contextOk
+    );
+  }
+
   function realPerformanceGateForRow(row) {
     if (!row) return { blocked: false, reasons: [] };
     const reasons = [];
-    dangerousPickReasons(row).forEach((reason) => reasons.push(reason));
+    const stats = userBetStats();
+    const profile = controlledRecoveryProfile(stats);
+    const recoveryCandidate = controlledRecoveryCandidate(row, profile);
+    const addReason = (reason, { soft = false } = {}) => {
+      reasons.push(soft ? { ...reason, blocksBet: false } : reason);
+    };
+    dangerousPickReasons(row).forEach((reason) => addReason(reason));
     const durableLock = durableFamilyLockForRow(row);
     if (durableLock) {
-      reasons.push({
+      addReason({
         code: `durable_family:${durableLock.family}`,
         label: 'Famille coupée durablement',
         detail: `${durableLock.label} : ${durableLock.reason}, verrou jusqu’au ${formatDateLabel(durableLock.lockedUntil)}.`,
@@ -2256,12 +2308,12 @@
     }
     const warnings = losingSegmentWarningsFor(row);
     warnings.forEach((warning) => {
-      reasons.push({
+      addReason({
         code: warning.key || 'losing_segment',
         label: warning.label || 'Segment perdant',
         detail: `${warning.label || 'Segment'} : ${formatMoney(warning.pnl || 0)} sur ${formatCount(warning.count || 0)} pari(s) réels.`,
         tone: 'danger'
-      });
+      }, { soft: recoveryCandidate });
     });
     if (!warnings.length) {
       const keys = [
@@ -2272,52 +2324,51 @@
       ].map((key) => key.toLowerCase());
       const hotspot = lossDiagnosis().hotspots.find((item) => Number(item.losses || 0) >= 2 && keys.includes(String(item.key || '').toLowerCase()));
       if (hotspot) {
-        reasons.push({
+        addReason({
           code: hotspot.key || 'loss_hotspot',
           label: hotspot.label || 'Pattern perdant',
           detail: `${hotspot.label || 'Pattern'} : ${formatMoney(hotspot.pnl || 0)} sur ${formatCount(hotspot.losses || 0)} perte(s) réelles.`,
           tone: 'danger'
-        });
+        }, { soft: recoveryCandidate });
       }
     }
-    const stats = userBetStats();
     const recentLossMode = stats.pnlToday < 0 || stats.pnlYesterday < 0 || stats.last7Pnl < 0 || currentLossStreak(stats) >= 2;
     if (recentLossMode) {
       const odd = Number(row.odd || 0);
       const edge = displayEdgeValue(row);
       const confidence = safeConfidenceValue(row);
       const contextScore = Number(row?.contextQuality?.score || row?.matchSheetV6?.sectionCompleteness?.score || 0);
-      const weakContext = contextScore > 0 && contextScore < 65;
+      const weakContext = contextScore > 0 && contextScore < profile.contextMin;
       const family = rowMarketPreferenceKey(row);
       const todayBets = todayTrackedBets().filter((bet) => !['void', 'cancelled'].includes(String(bet.status || '')));
-      const severeRecovery = stats.pnlToday <= -3 || stats.pnlYesterday <= -3 || stats.last7Pnl <= -5 || currentLossStreak(stats) >= 3;
-      const maxRecoveryBets = severeRecovery ? 1 : 2;
-      if (todayBets.length >= maxRecoveryBets) {
-        reasons.push({
+      if (todayBets.length >= profile.maxBets) {
+        addReason({
           code: 'recovery_daily_cap',
-          label: 'Récupération : stop volume',
-          detail: `${formatCount(todayBets.length)} pari(s) déjà suivi(s) aujourd’hui. Après perte, le logiciel coupe les nouveaux clics.`,
+          label: 'Reprise contrôlée : limite atteinte',
+          detail: `${formatCount(todayBets.length)} pari(s) déjà suivi(s) aujourd’hui. Le spot reste visible, mais pas de clic supplémentaire en mode reprise.`,
           tone: 'danger'
         });
       }
-      if (odd > 2.2) reasons.push({ code: 'recovery_high_odd', label: 'Récupération : cote trop haute', detail: `Après pertes réelles, cote ${formatOdd(odd)} bloquée au-dessus de 2.20.`, tone: 'warn' });
-      if (edge < 0.08) reasons.push({ code: 'recovery_edge_short', label: 'Récupération : avantage trop court', detail: `Avantage ${formatPct(edge, 1)} < 8%.`, tone: 'warn' });
-      if (confidence > 0 && confidence < 0.65) reasons.push({ code: 'recovery_confidence_short', label: 'Récupération : confiance trop courte', detail: `Confiance ${formatPct(confidence, 0)} < 65%.`, tone: 'warn' });
-      if (weakContext) reasons.push({ code: 'recovery_context_weak', label: 'Récupération : dossier incomplet', detail: `Contexte ${Math.round(contextScore)}/100 : observation uniquement.`, tone: 'warn' });
-      if (!isWinnerRow(row) && ['goals', 'btts', 'scorer', 'halftime', 'teamtotal'].includes(family) && edge < 0.12) {
-        reasons.push({
+      if (odd > profile.oddMax) addReason({ code: 'recovery_high_odd', label: 'Reprise contrôlée : cote trop haute', detail: `Cote ${formatOdd(odd)} au-dessus de ${formatOdd(profile.oddMax)}. Visible, mais trop nerveux pour se refaire proprement.`, tone: 'warn' });
+      if (edge < profile.edgeMin) addReason({ code: 'recovery_edge_short', label: 'Reprise contrôlée : avantage trop court', detail: `Avantage ${formatPct(edge, 1)} < ${formatPct(profile.edgeMin, 1)}.`, tone: 'warn' });
+      if (confidence > 0 && confidence < profile.confidenceMin) addReason({ code: 'recovery_confidence_short', label: 'Reprise contrôlée : confiance trop courte', detail: `Confiance ${formatPct(confidence, 0)} < ${formatPct(profile.confidenceMin, 0)}.`, tone: 'warn' });
+      if (weakContext) addReason({ code: 'recovery_context_weak', label: 'Reprise contrôlée : dossier incomplet', detail: `Contexte ${Math.round(contextScore)}/100 : il faut un dossier plus solide pour cliquer après pertes.`, tone: 'warn' });
+      if (!isControlledRecoveryMarket(row, profile) && ['goals', 'btts', 'scorer', 'halftime', 'teamtotal'].includes(family)) {
+        addReason({
           code: 'recovery_market_not_priority',
-          label: 'Récupération : marché non prioritaire',
-          detail: `${marketFamilyLabel(family)} reste visible, mais pas jouable après pertes sans avantage très net.`,
+          label: 'Reprise contrôlée : marché non prioritaire',
+          detail: `${marketFamilyLabel(family)} reste visible, mais la reprise privilégie Vainqueurs et signaux simples.`,
           tone: 'warn'
         });
       }
     }
+    const blockingReasons = reasons.filter((reason) => reason.blocksBet !== false);
+    const first = blockingReasons[0] || reasons[0] || null;
     return {
-      blocked: reasons.length > 0,
+      blocked: blockingReasons.length > 0,
       reasons,
-      label: reasons[0]?.label || 'Historique réel OK',
-      detail: reasons[0]?.detail || 'Aucun blocage issu de tes résultats réels.'
+      label: first?.label || (profile.active ? 'Reprise contrôlée OK' : 'Historique réel OK'),
+      detail: first?.detail || (profile.active ? 'Spot autorisé en reprise contrôlée : mise réduite, pas de martingale.' : 'Aucun blocage issu de tes résultats réels.')
     };
   }
 
@@ -2417,7 +2468,8 @@
       };
     }
     const segmentWarnings = losingSegmentWarningsFor(row);
-    if (segmentWarnings.length) {
+    const recoveryProfile = controlledRecoveryProfile(stats);
+    if (segmentWarnings.length && !controlledRecoveryCandidate(row, recoveryProfile)) {
       return {
         allow: false,
         tone: 'danger',
@@ -2450,8 +2502,16 @@
       }
     }
     const warnings = [];
+    if (segmentWarnings.length) warnings.push('reprise_controlee_segment_surveille');
+    if (recoveryProfile.active) warnings.push('reprise_controlee');
     if (displayEdgeValue(row) < 0.05) warnings.push('edge_modere');
-    return { allow: true, label: 'Coach OK', detail: 'Garde-fous personnels respectés.', warnings };
+    return {
+      allow: true,
+      label: recoveryProfile.active ? 'Coach : reprise contrôlée OK' : 'Coach OK',
+      detail: recoveryProfile.active ? 'Le spot reste jouable avec mise réduite, sans augmenter pour récupérer.' : 'Garde-fous personnels respectés.',
+      warnings,
+      stakeReductionFactor: recoveryProfile.active ? 0.7 : 1
+    };
   }
 
   function clvPct(openOdd, closeOdd) {
@@ -6876,16 +6936,22 @@
     const watch24 = sortHomeRows(rolling24hRows(pool, canDisplayPickCard).filter((row) => !isReadyToStakeRow(row)), 'confidence');
     const weekReady = sortHomeRows(rollingWeekRows(pool, isReadyToStakeRow), 'confidence');
     const weekWatch = sortHomeRows(rollingWeekRows(pool, canDisplayPickCard).filter((row) => !isReadyToStakeRow(row)), 'confidence');
-    const row = ready24[0] || weekReady[0] || watch24[0] || weekWatch[0] || null;
+    const weekBlocked = sortHomeRows(
+      rollingWeekRows(pool, (row) => pickHasCoreData(row) && isBeforeKickoff(row))
+        .filter((row) => !isReadyToStakeRow(row) && !canDisplayPickCard(row)),
+      'confidence'
+    );
+    const row = ready24[0] || weekReady[0] || watch24[0] || weekWatch[0] || weekBlocked[0] || null;
     const status = seriousBetStatus(row);
     return {
       row,
       status,
-      scope: ready24[0] ? '24h' : weekReady[0] ? 'semaine' : watch24[0] ? '24h-watch' : weekWatch[0] ? 'semaine-watch' : 'none',
+      scope: ready24[0] ? '24h' : weekReady[0] ? 'semaine' : watch24[0] ? '24h-watch' : weekWatch[0] ? 'semaine-watch' : weekBlocked[0] ? 'semaine-bloque' : 'none',
       ready24: ready24.length,
       watch24: watch24.length,
       weekReady: weekReady.length,
-      weekWatch: weekWatch.length
+      weekWatch: weekWatch.length,
+      weekBlocked: weekBlocked.length
     };
   }
 
@@ -6906,7 +6972,7 @@
     const status = summary.status || seriousBetStatus(row);
     const confidence = Math.round(homeConfidenceValue(row) * 100);
     const reason = simpleWhyText(row) || pickReason(row) || status.detail;
-    const scopeText = summary.scope === 'semaine' || summary.scope === 'semaine-watch'
+    const scopeText = summary.scope === 'semaine' || summary.scope === 'semaine-watch' || summary.scope === 'semaine-bloque'
       ? 'meilleur spot de la semaine'
       : 'meilleur spot des 24h';
     return `
@@ -6926,7 +6992,7 @@
           <strong class="next-bet-verdict ${escapeHtml(status.tone)}">${escapeHtml(status.label)}</strong>
           <span>${escapeHtml(status.key === 'ready' ? status.action : `Re-check ${nextCheckLabel(row)}`)}</span>
           ${status.key === 'ready' ? trackButtonHtml(row, `Je mise ${visibleStakeText(row)}`) : ''}
-          ${winamaxOpenButtonHtml(row, status.key === 'ready' ? 'Ouvrir Winamax' : 'Voir Winamax')}
+          ${status.key === 'blocked' ? '' : winamaxOpenButtonHtml(row, status.key === 'ready' ? 'Ouvrir Winamax' : 'Voir Winamax')}
         </div>
       </article>
     `;
@@ -11679,16 +11745,17 @@
     const recentPain = stats.pnlToday < 0 || stats.pnlYesterday < 0 || stats.last7Pnl < 0 || realPnl < 0 || (stats.streak?.status === 'lost' && Number(stats.streak.count || 0) >= 2);
     const severe = realPnl <= -5 || stats.last7Pnl <= -5 || Number(stats.streak?.count || 0) >= 3;
     const ready = rollingReadyRows(state.currentDashboardRows?.length ? state.currentDashboardRows : dashboardPickRows(readPickFilters())).length;
-    const maxBets = severe ? 1 : recentPain ? 2 : 3;
-    const maxStake = severe ? 0.5 : recentPain ? 1 : Math.max(1, getBankroll() * 0.01);
+    const profile = controlledRecoveryProfile(stats);
+    const maxBets = severe ? Math.min(profile.maxBets, 2) : profile.maxBets;
+    const maxStake = severe ? Math.min(profile.maxStake, 0.75) : profile.maxStake;
     return {
       active: recentPain,
       severe,
-      label: severe ? 'Récupération forte' : recentPain ? 'Récupération prudente' : 'Mode normal protégé',
+      label: severe ? 'Reprise stricte' : recentPain ? 'Reprise contrôlée' : 'Mode normal protégé',
       detail: severe
-        ? 'Soirée/performance trop rouge : 1 seul pari max, mise minimale.'
+        ? 'Le logiciel continue de chercher les spots, mais uniquement sur tickets simples, cotes courtes et mise réduite.'
         : recentPain
-          ? 'Période perdante : on réduit le volume et on attend les vrais spots.'
+          ? 'On ne coupe pas les propositions : on classe les spots, on réduit la mise, et on refuse le rattrapage automatique.'
           : 'Pas de perte récente robuste, mais les garde-fous restent actifs.',
       realPnl,
       stats,
@@ -11707,16 +11774,16 @@
       <article class="recovery-card ${status.active ? 'active' : ''}">
         <div>
           <span class="eyebrow">${escapeHtml(status.label)}</span>
-          <strong>${escapeHtml(status.active ? 'On protège la bankroll avant de chercher à se refaire.' : 'Protection active, volume contrôlé.')}</strong>
+          <strong>${escapeHtml(status.active ? 'Proposer encore, mais proprement.' : 'Protection active, volume contrôlé.')}</strong>
           <p>${escapeHtml(status.detail)}</p>
         </div>
         <div class="recovery-kpis">
           <span><b>${escapeHtml(formatMoney(status.realPnl))}</b><em>P&L réel connu</em></span>
           <span><b>${formatCount(status.ready)}</b><em>Je mise 24h</em></span>
-          <span><b>${formatCount(status.maxBets)}</b><em>max/jour</em></span>
+          <span><b>${formatCount(status.maxBets)}</b><em>spots jouables</em></span>
           <span><b>${escapeHtml(formatMoney(status.maxStake))}</b><em>max pari</em></span>
         </div>
-        <button class="ghost-btn" type="button" data-tab-target="recovery">Comprendre mes pertes</button>
+        <button class="ghost-btn" type="button" data-tab-target="recovery">Voir reprise + pertes</button>
       </article>
     `;
   }
@@ -11730,7 +11797,7 @@
       grid.innerHTML = [
         ['État', status.label, status.detail],
         ['P&L réel connu', formatMoney(status.realPnl), 'Import Winamax prioritaire, sinon suivi local.'],
-        ['Règle du jour', `${formatCount(status.maxBets)} pari(s) max`, `Mise max ${formatMoney(status.maxStake)} · pas de rattrapage.`],
+        ['Règle du jour', `${formatCount(status.maxBets)} spot(s) jouable(s)`, `Mise max ${formatMoney(status.maxStake)} · pas de martingale.`],
         ['Familles durables', `${formatCount(durableLocks.length)} coupée(s)`, durableLocks.length ? durableLocks.map((row) => row.label).slice(0, 2).join(' · ') : 'Aucune récidive multi-jours active.'],
         ['Segment à couper', worst ? worst.label : 'Aucun pattern', worst ? `${formatCount(worst.losses)} perte(s) · ${formatMoney(worst.pnl)}` : 'Le logiciel attend tes résultats Winamax.']
       ].map(([label, value, detail]) => `

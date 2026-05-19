@@ -63,7 +63,7 @@ async function main() {
     });
     win.on('pageerror', (error) => messages.push(`pageerror: ${error.message}`));
 
-    await win.waitForSelector('[data-panel="dashboard"].active', { state: 'attached', timeout: 20000 });
+    await win.waitForFunction(() => Boolean(document.querySelector('[data-panel="dashboard"].active')), null, { timeout: 20000 });
     await win.waitForFunction(() => document.querySelector('#metric-picks')?.textContent !== '-', null, { timeout: 25000 });
     await win.waitForFunction(() => (
       document.querySelectorAll('#home-picks-table-body tr.clickable-row').length >= 3

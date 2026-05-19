@@ -5,6 +5,15 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.0.1 — Reprise contrôlée sans silence après pertes
+
+Suite au retour “si je perds, le logiciel doit continuer à proposer” :
+- Le mode après pertes ne rend plus automatiquement l’app muette : les meilleurs spots restent visibles, avec statut clair `Je mise`, `À surveiller` ou `Interdit`.
+- Ajout d’une vraie **reprise contrôlée** : Vainqueurs et signaux simples peuvent rester jouables si cote, avantage, confiance et contexte restent propres.
+- Les verrous dangereux restent actifs : familles durablement perdantes, cotes trop hautes, contexte critique et limite de volume bloquent encore les clics.
+- L’accueil peut maintenant remonter le meilleur spot de la semaine même si aucun pari 24h n’est prêt, pour ne jamais afficher un simple “0 pari” sans suite utile.
+- La carte pertes/reprise parle en langage parieur : “proposer encore, mais proprement”, avec limite de spots jouables et mise max réduite.
+
 ### Version v8.0.0 — Parieur First : prochain pari sérieux + pages dédiées
 
 Refonte ciblée après le constat “je ne comprends pas quoi faire et aucun pari n’est proposé clairement”.
