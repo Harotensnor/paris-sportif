@@ -1,26 +1,26 @@
 {
-  "generated_at": "2026-05-19T22:33:58Z",
+  "generated_at": "2026-05-19T22:38:13Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 65,
+    "active_events": 67,
     "actionable": 37,
-    "watch": 5,
-    "risk": 23,
+    "watch": 6,
+    "risk": 24,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 28,
-      "market_move": 16,
-      "signal_conflict": 7,
+      "market_move": 15,
       "travel_extreme": 2,
-      "market_uncertain": 19,
+      "signal_conflict": 6,
+      "market_uncertain": 20,
       "back_to_back_travel": 15
     },
     "by_quality": {
-      "watch": 5,
+      "watch": 6,
       "actionable": 37,
-      "risk": 23
+      "risk": 24
     }
   },
   "active_actionable": [
@@ -385,24 +385,6 @@
       "context": "1 match dans les 48h + 1998 km de voyage"
     },
     {
-      "event_id": "401865443",
-      "date": "2026-05-20T00:30Z",
-      "sport": "football",
-      "league_code": "conmebol.sudamericana",
-      "league_name": "Copa Sudamericana",
-      "home": "São Paulo",
-      "away": "Millonarios",
-      "match": "São Paulo - Millonarios",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.909,
-      "context": "Cote away: 5.50 -> 4.60 (+16.4%)"
-    },
-    {
       "event_id": "401815420",
       "date": "2026-05-20T17:10Z",
       "sport": "baseball",
@@ -419,6 +401,24 @@
       "side": "away",
       "strength": 0.809,
       "context": "1 match dans les 48h + 1396 km de voyage"
+    },
+    {
+      "event_id": "401865443",
+      "date": "2026-05-20T00:30Z",
+      "sport": "football",
+      "league_code": "conmebol.sudamericana",
+      "league_name": "Copa Sudamericana",
+      "home": "São Paulo",
+      "away": "Millonarios",
+      "match": "São Paulo - Millonarios",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.808,
+      "context": "Cote away: 5.50 -> 4.70 (+14.5%)"
     },
     {
       "event_id": "401815410",
@@ -781,6 +781,24 @@
       "side": "away",
       "strength": 0.593,
       "context": "Cote away: 3.75 -> 3.35 (+10.7%)"
+    },
+    {
+      "event_id": "401873341",
+      "date": "2026-05-20T00:00Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "New York Knicks",
+      "away": "Cleveland Cavaliers",
+      "match": "New York Knicks - Cleveland Cavaliers",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.463,
+      "context": "Cote away: 3.00 -> 2.75 (+8.3%)"
     }
   ],
   "active_risk": [
@@ -891,6 +909,24 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.1%"
+    },
+    {
+      "event_id": "401866328",
+      "date": "2026-05-23T18:45Z",
+      "sport": "football",
+      "league_code": "proleague",
+      "league_name": "Pro League",
+      "home": "Standard Liege",
+      "away": "Royal Charleroi SC",
+      "match": "Standard Liege - Royal Charleroi SC",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.2%"
     },
     {
       "event_id": "401859405",
