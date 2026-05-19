@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-19T20:51:55Z",
+  "generated_at": "2026-05-19T20:54:18Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -627,11 +627,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.252,
+        "home_score": 0.707,
         "away_score": -1.097,
         "home_fade": 0.15,
         "away_fade": 1.15,
-        "reason": "Direction nette: Minnesota Twins (+0.25)",
+        "reason": "Direction nette: Minnesota Twins (+0.71)",
         "detail": [
           {
             "side": "home",
@@ -650,6 +650,12 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 1.0
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.455
           }
         ]
       }
@@ -685,11 +691,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.498,
-        "away_score": 0.043,
-        "home_fade": 0.55,
+        "home_score": -0.098,
+        "away_score": -0.098,
+        "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Milwaukee Brewers (+0.04)",
+        "reason": "Direction nette: Milwaukee Brewers (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -702,12 +708,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
           }
         ]
       }
@@ -793,13 +793,13 @@
         "1 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "home",
+        "status": "mixed",
+        "net_side": null,
         "home_score": 0.043,
-        "away_score": -0.498,
+        "away_score": 0.154,
         "home_fade": 0.15,
         "away_fade": 0.55,
-        "reason": "Direction nette: Colorado Rockies (+0.04)",
+        "reason": "Signaux mitigés: avantage net trop faible (Colorado Rockies +0.04, Texas Rangers +0.15)",
         "detail": [
           {
             "side": "home",
@@ -818,6 +818,12 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.4
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.652
           }
         ]
       }
@@ -2490,19 +2496,25 @@
         "1 match dans les 48h + 1053 km de voyage"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "home",
+        "status": "mixed",
+        "net_side": null,
         "home_score": 0.399,
-        "away_score": -1.141,
+        "away_score": -0.609,
         "home_fade": 0.0,
         "away_fade": 1.141,
-        "reason": "Direction nette: Colorado Rockies (+0.40)",
+        "reason": "Signaux mitigés: avantage net trop faible (Colorado Rockies +0.40, Texas Rangers -0.61)",
         "detail": [
           {
             "side": "away",
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.4
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.532
           },
           {
             "side": "away",
