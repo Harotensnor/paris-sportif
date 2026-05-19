@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-19T20:19:49Z",
+  "generated_at": "2026-05-19T20:22:30Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815404",
-      "kickoff": "2026-05-19T20:10Z",
-      "league": "MLB",
-      "match": "Atlanta Braves at Miami Marlins",
-      "home": "Miami Marlins",
-      "away": "Atlanta Braves",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Miami Marlins",
-          "pitcher": "Braxton Garrett",
-          "label": "Braxton Garrett moins de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "under",
-          "probability": 0.6032,
-          "fair_odds": 1.66,
-          "expected_strikeouts": 6.0,
-          "projected_ip": 3.0,
-          "inputs": {
-            "k9": 18.0,
-            "era": 27.0,
-            "whip": 6.0,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Miami Marlins",
-          "pitcher": "Braxton Garrett",
-          "label": "Braxton Garrett ne concède pas de home run",
-          "pick": "no",
-          "probability": 1.0,
-          "fair_odds": 1.01,
-          "expected_hr_allowed": 0.0,
-          "projected_ip": 3.0,
-          "inputs": {
-            "hr9": 0.0,
-            "era": 27.0,
-            "whip": 6.0
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Atlanta Braves",
-          "pitcher": "Martín Pérez",
-          "label": "Martín Pérez moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.5822,
-          "fair_odds": 1.72,
-          "expected_strikeouts": 5.13,
-          "projected_ip": 6.6,
-          "inputs": {
-            "k9": 7.0,
-            "era": 2.25,
-            "whip": 0.94,
-            "hand": "L"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Atlanta Braves",
-          "pitcher": "Martín Pérez",
-          "label": "Martín Pérez concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5197,
-          "fair_odds": 1.92,
-          "expected_hr_allowed": 0.733,
-          "projected_ip": 6.6,
-          "inputs": {
-            "hr9": 1.0,
-            "era": 2.25,
-            "whip": 0.94
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815405",
       "kickoff": "2026-05-19T22:40Z",
@@ -2612,7 +2530,7 @@
       ]
     }
   ],
-  "props": 126,
+  "props": 122,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
