@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-05-19T19:42:19Z",
+  "generated_at": "2026-05-19T19:45:47Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 74,
-    "actionable": 43,
-    "watch": 8,
+    "active_events": 62,
+    "actionable": 35,
+    "watch": 4,
     "risk": 23,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 31,
-      "market_move": 31,
-      "signal_conflict": 8,
       "travel_extreme": 2,
       "market_uncertain": 19,
-      "back_to_back_travel": 15
+      "back_to_back_travel": 15,
+      "signal_conflict": 7,
+      "market_move": 12
     },
     "by_quality": {
-      "actionable": 43,
-      "watch": 8,
+      "actionable": 35,
+      "watch": 4,
       "risk": 23
     }
   },
@@ -41,24 +41,6 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 5-10"
-    },
-    {
-      "event_id": "401865533",
-      "date": "2026-05-19T22:00Z",
-      "sport": "football",
-      "league_code": "conmebol.libertadores",
-      "league_name": "Copa Libertadores",
-      "home": "Fluminense",
-      "away": "Bolívar",
-      "match": "Fluminense - Bolívar",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 1.0,
-      "context": "Cote away: 15.00 -> 12.00 (+20.0%)"
     },
     {
       "event_id": "401815406",
@@ -151,24 +133,6 @@
       "context": "Absences severes 8-14"
     },
     {
-      "event_id": "401815415",
-      "date": "2026-05-20T01:38Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Los Angeles Angels",
-      "away": "Athletics",
-      "match": "Los Angeles Angels - Athletics",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 1.0,
-      "context": "Cote away: 2.13 -> 1.68 (+21.1%)"
-    },
-    {
       "event_id": "401815417",
       "date": "2026-05-20T01:40Z",
       "sport": "baseball",
@@ -185,24 +149,6 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 9-14"
-    },
-    {
-      "event_id": "401865548",
-      "date": "2026-05-20T02:00Z",
-      "sport": "football",
-      "league_code": "conmebol.libertadores",
-      "league_name": "Copa Libertadores",
-      "home": "Independiente del Valle",
-      "away": "Libertad",
-      "match": "Independiente del Valle - Libertad",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 1.0,
-      "context": "Cote away: 8.50 -> 6.75 (+20.6%)"
     },
     {
       "event_id": "401815421",
@@ -475,24 +421,6 @@
       "context": "Cote away: 2.00 -> 1.68 (+16.0%)"
     },
     {
-      "event_id": "401865435",
-      "date": "2026-05-20T02:00Z",
-      "sport": "football",
-      "league_code": "conmebol.sudamericana",
-      "league_name": "Copa Sudamericana",
-      "home": "Deportivo Cuenca",
-      "away": "Deportivo Recoleta",
-      "match": "Deportivo Cuenca - Deportivo Recoleta",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.833,
-      "context": "Cote away: 6.00 -> 5.10 (+15.0%)"
-    },
-    {
       "event_id": "401815420",
       "date": "2026-05-20T17:10Z",
       "sport": "baseball",
@@ -601,24 +529,6 @@
       "context": "Absences severes 9-13"
     },
     {
-      "event_id": "401865448",
-      "date": "2026-05-19T22:00Z",
-      "sport": "football",
-      "league_code": "conmebol.sudamericana",
-      "league_name": "Copa Sudamericana",
-      "home": "Montevideo City Torque",
-      "away": "Deportivo Riestra",
-      "match": "Montevideo City Torque - Deportivo Riestra",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.794,
-      "context": "Cote away: 3.85 -> 3.30 (+14.3%)"
-    },
-    {
       "event_id": "401815438",
       "date": "2026-05-21T17:15Z",
       "sport": "baseball",
@@ -635,24 +545,6 @@
       "side": "away",
       "strength": 0.789,
       "context": "2 match dans les 48h + 896 km de voyage"
-    },
-    {
-      "event_id": "401865440",
-      "date": "2026-05-20T02:00Z",
-      "sport": "football",
-      "league_code": "conmebol.sudamericana",
-      "league_name": "Copa Sudamericana",
-      "home": "América de Cali",
-      "away": "Tigre",
-      "match": "América de Cali - Tigre",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.774,
-      "context": "Cote away: 3.95 -> 3.40 (+13.9%)"
     },
     {
       "event_id": "401865447",
@@ -761,42 +653,6 @@
       "side": "away",
       "strength": 0.709,
       "context": "1 match dans les 48h + 896 km de voyage"
-    },
-    {
-      "event_id": "401865443",
-      "date": "2026-05-20T00:30Z",
-      "sport": "football",
-      "league_code": "conmebol.sudamericana",
-      "league_name": "Copa Sudamericana",
-      "home": "São Paulo",
-      "away": "Millonarios",
-      "match": "São Paulo - Millonarios",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.688,
-      "context": "Cote away: 5.25 -> 4.60 (+12.4%)"
-    },
-    {
-      "event_id": "401865538",
-      "date": "2026-05-20T00:30Z",
-      "sport": "football",
-      "league_code": "conmebol.libertadores",
-      "league_name": "Copa Libertadores",
-      "home": "Boca Juniors",
-      "away": "Cruzeiro",
-      "match": "Boca Juniors - Cruzeiro",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.661,
-      "context": "Cote away: 4.20 -> 3.70 (+11.9%)"
     }
   ],
   "active_watch": [
@@ -855,42 +711,6 @@
       "context": "Absences severes 12-9"
     },
     {
-      "event_id": "401865540",
-      "date": "2026-05-20T00:00Z",
-      "sport": "football",
-      "league_code": "conmebol.libertadores",
-      "league_name": "Copa Libertadores",
-      "home": "Independiente Santa Fe",
-      "away": "Platense",
-      "match": "Independiente Santa Fe - Platense",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.593,
-      "context": "Cote away: 3.75 -> 3.35 (+10.7%)"
-    },
-    {
-      "event_id": "401865539",
-      "date": "2026-05-20T00:00Z",
-      "sport": "football",
-      "league_code": "conmebol.libertadores",
-      "league_name": "Copa Libertadores",
-      "home": "Always Ready",
-      "away": "Mirassol",
-      "match": "Always Ready - Mirassol",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "home",
-      "strength": 0.531,
-      "context": "Cote home: 5.75 -> 5.20 (+9.6%)"
-    },
-    {
       "event_id": "401866328",
       "date": "2026-05-23T18:45Z",
       "sport": "football",
@@ -907,42 +727,6 @@
       "side": "away",
       "strength": 0.505,
       "context": "Cote away: 2.20 -> 2.40 (-9.1%)"
-    },
-    {
-      "event_id": "401865438",
-      "date": "2026-05-19T22:00Z",
-      "sport": "football",
-      "league_code": "conmebol.sudamericana",
-      "league_name": "Copa Sudamericana",
-      "home": "Audax Italiano",
-      "away": "Barracas Central",
-      "match": "Audax Italiano - Barracas Central",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.479,
-      "context": "Cote away: 2.90 -> 2.65 (+8.6%)"
-    },
-    {
-      "event_id": "401865537",
-      "date": "2026-05-19T22:00Z",
-      "sport": "football",
-      "league_code": "conmebol.libertadores",
-      "league_name": "Copa Libertadores",
-      "home": "Coquimbo Unido",
-      "away": "Deportes Tolima",
-      "match": "Coquimbo Unido - Deportes Tolima",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "home",
-      "strength": 0.463,
-      "context": "Cote home: 2.40 -> 2.20 (+8.3%)"
     }
   ],
   "active_risk": [
