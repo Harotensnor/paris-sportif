@@ -1,26 +1,26 @@
 {
-  "generated_at": "2026-05-19T23:17:55Z",
+  "generated_at": "2026-05-19T23:21:34Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 60,
-    "actionable": 31,
-    "watch": 5,
-    "risk": 24,
+    "active_events": 62,
+    "actionable": 33,
+    "watch": 6,
+    "risk": 23,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 23,
       "travel_extreme": 2,
-      "market_move": 12,
-      "signal_conflict": 7,
+      "market_move": 23,
+      "signal_conflict": 8,
       "market_uncertain": 20,
       "back_to_back_travel": 15
     },
     "by_quality": {
-      "actionable": 31,
-      "watch": 5,
-      "risk": 24
+      "actionable": 33,
+      "watch": 6,
+      "risk": 23
     }
   },
   "active_actionable": [
@@ -113,6 +113,24 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 3-8"
+    },
+    {
+      "event_id": "401815420",
+      "date": "2026-05-20T17:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Tampa Bay Rays",
+      "away": "Baltimore Orioles",
+      "match": "Tampa Bay Rays - Baltimore Orioles",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 2.25 -> 1.76 (+21.8%)"
     },
     {
       "event_id": "401815426",
@@ -295,6 +313,42 @@
       "context": "Absences severes 7-13"
     },
     {
+      "event_id": "401815489",
+      "date": "2026-05-25T17:35Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Baltimore Orioles",
+      "away": "Tampa Bay Rays",
+      "match": "Baltimore Orioles - Tampa Bay Rays",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 1.52 -> 1.86 (-22.4%)"
+    },
+    {
+      "event_id": "401815504",
+      "date": "2026-05-26T22:35Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Baltimore Orioles",
+      "away": "Tampa Bay Rays",
+      "match": "Baltimore Orioles - Tampa Bay Rays",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 1.52 -> 1.86 (-22.4%)"
+    },
+    {
       "event_id": "401815425",
       "date": "2026-05-20T23:40Z",
       "sport": "baseball",
@@ -313,24 +367,6 @@
       "context": "1 match dans les 48h + 1998 km de voyage"
     },
     {
-      "event_id": "401815420",
-      "date": "2026-05-20T17:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Tampa Bay Rays",
-      "away": "Baltimore Orioles",
-      "match": "Tampa Bay Rays - Baltimore Orioles",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Baltimore Orioles",
-      "side": "away",
-      "strength": 0.809,
-      "context": "1 match dans les 48h + 1396 km de voyage"
-    },
-    {
       "event_id": "401865443",
       "date": "2026-05-20T00:30Z",
       "sport": "football",
@@ -345,8 +381,8 @@
       "direction": "steam",
       "team": null,
       "side": "away",
-      "strength": 0.808,
-      "context": "Cote away: 5.50 -> 4.70 (+14.5%)"
+      "strength": 0.909,
+      "context": "Cote away: 5.50 -> 4.60 (+16.4%)"
     },
     {
       "event_id": "401815410",
@@ -621,22 +657,22 @@
       "context": "Cote away: 4.30 -> 3.80 (+11.6%)"
     },
     {
-      "event_id": "401815489",
-      "date": "2026-05-25T17:35Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Baltimore Orioles",
-      "away": "Tampa Bay Rays",
-      "match": "Baltimore Orioles - Tampa Bay Rays",
+      "event_id": "401865440",
+      "date": "2026-05-20T02:00Z",
+      "sport": "football",
+      "league_code": "conmebol.sudamericana",
+      "league_name": "Copa Sudamericana",
+      "home": "América de Cali",
+      "away": "Tigre",
+      "match": "América de Cali - Tigre",
       "quality": "watch",
       "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Baltimore Orioles",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 12-9"
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.609,
+      "context": "Cote away: 3.65 -> 3.25 (+11.0%)"
     },
     {
       "event_id": "401865540",
@@ -657,14 +693,14 @@
       "context": "Cote away: 3.65 -> 3.30 (+9.6%)"
     },
     {
-      "event_id": "401865440",
-      "date": "2026-05-20T02:00Z",
+      "event_id": "401865539",
+      "date": "2026-05-20T00:00Z",
       "sport": "football",
-      "league_code": "conmebol.sudamericana",
-      "league_name": "Copa Sudamericana",
-      "home": "América de Cali",
-      "away": "Tigre",
-      "match": "América de Cali - Tigre",
+      "league_code": "conmebol.libertadores",
+      "league_name": "Copa Libertadores",
+      "home": "Always Ready",
+      "away": "Mirassol",
+      "match": "Always Ready - Mirassol",
       "quality": "watch",
       "quality_reason": "Signal rare present mais intensite moyenne",
       "type": "market_move",
@@ -672,28 +708,28 @@
       "team": null,
       "side": "home",
       "strength": 0.505,
-      "context": "Cote home: 2.20 -> 2.00 (+9.1%)"
+      "context": "Cote home: 5.50 -> 5.00 (+9.1%)"
+    },
+    {
+      "event_id": "401865445",
+      "date": "2026-05-21T00:30Z",
+      "sport": "football",
+      "league_code": "conmebol.sudamericana",
+      "league_name": "Copa Sudamericana",
+      "home": "River Plate",
+      "away": "Red Bull Bragantino",
+      "match": "River Plate - Red Bull Bragantino",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.505,
+      "context": "Cote away: 3.30 -> 3.00 (+9.1%)"
     }
   ],
   "active_risk": [
-    {
-      "event_id": "401815504",
-      "date": "2026-05-26T22:35Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Baltimore Orioles",
-      "away": "Tampa Bay Rays",
-      "match": "Baltimore Orioles - Tampa Bay Rays",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "signal_conflict",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.989,
-      "context": "Signaux opposes: Baltimore Orioles fade 1.20, Tampa Bay Rays fade 1.41 -> prudence"
-    },
     {
       "event_id": "178519",
       "date": "2026-05-20T09:30Z",
