@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-19T22:40:46Z",
+  "generated_at": "2026-05-19T22:46:24Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -744,10 +744,10 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.098,
-        "away_score": 0.365,
+        "away_score": -0.098,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Cleveland Cavaliers (+0.37)",
+        "reason": "Direction nette: Cleveland Cavaliers (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -760,12 +760,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.463
           }
         ]
       }
@@ -1031,13 +1025,13 @@
         "1 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -1.097,
+        "status": "mixed",
+        "net_side": null,
+        "home_score": -0.592,
         "away_score": 0.252,
         "home_fade": 1.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Cleveland Guardians (+0.25)",
+        "reason": "Signaux mitigés: avantage net trop faible (Detroit Tigers -0.59, Cleveland Guardians +0.25)",
         "detail": [
           {
             "side": "home",
@@ -1056,6 +1050,12 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 1.0
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.505
           }
         ]
       }
@@ -1731,13 +1731,13 @@
         "1 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.698,
-        "away_score": 0.112,
+        "status": "mixed",
+        "net_side": null,
+        "home_score": 0.652,
+        "away_score": -0.887,
         "home_fade": 0.75,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Tampa Bay Rays (+0.11)",
+        "away_fade": 1.15,
+        "reason": "Signaux mitigés: avantage net trop faible (Baltimore Orioles +0.65, Tampa Bay Rays -0.89)",
         "detail": [
           {
             "side": "home",
@@ -1756,6 +1756,18 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.6
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           }
         ]
       }
@@ -1849,13 +1861,13 @@
         "1 match dans les 48h + 1396 km de voyage"
       ],
       "global_resolution": {
-        "status": "abstain",
+        "status": "mixed",
         "net_side": null,
-        "home_score": -0.707,
-        "away_score": -0.989,
+        "home_score": 0.643,
+        "away_score": -1.989,
         "home_fade": 1.2,
-        "away_fade": 1.409,
-        "reason": "Signaux opposes: Baltimore Orioles fade 1.20, Tampa Bay Rays fade 1.41 -> prudence",
+        "away_fade": 2.409,
+        "reason": "Signaux mitigés: avantage net trop faible (Baltimore Orioles +0.64, Tampa Bay Rays -1.99)",
         "detail": [
           {
             "side": "home",
@@ -1874,6 +1886,18 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.6
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           },
           {
             "side": "away",
@@ -2400,19 +2424,31 @@
         "1 match dans les 48h + 1396 km de voyage"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.493,
-        "away_score": -1.409,
-        "home_fade": 0.0,
+        "status": "mixed",
+        "net_side": null,
+        "home_score": -0.507,
+        "away_score": -0.059,
+        "home_fade": 1.0,
         "away_fade": 1.409,
-        "reason": "Direction nette: Tampa Bay Rays (+0.49)",
+        "reason": "Signaux mitigés: avantage net trop faible (Tampa Bay Rays -0.51, Baltimore Orioles -0.06)",
         "detail": [
           {
             "side": "away",
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.6
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
           },
           {
             "side": "away",
