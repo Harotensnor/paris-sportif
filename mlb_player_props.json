@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-19T23:11:39Z",
+  "generated_at": "2026-05-19T23:17:48Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815409",
-      "kickoff": "2026-05-19T23:05Z",
-      "league": "MLB",
-      "match": "Toronto Blue Jays at New York Yankees",
-      "home": "New York Yankees",
-      "away": "Toronto Blue Jays",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "New York Yankees",
-          "pitcher": "Will Warren",
-          "label": "Will Warren plus de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "over",
-          "probability": 0.5049,
-          "fair_odds": 1.98,
-          "expected_strikeouts": 6.52,
-          "projected_ip": 5.23,
-          "inputs": {
-            "k9": 11.22,
-            "era": 3.42,
-            "whip": 1.16,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "New York Yankees",
-          "pitcher": "Will Warren",
-          "label": "Will Warren ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5154,
-          "fair_odds": 1.94,
-          "expected_hr_allowed": 0.663,
-          "projected_ip": 5.23,
-          "inputs": {
-            "hr9": 1.14,
-            "era": 3.42,
-            "whip": 1.16
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Toronto Blue Jays",
-          "pitcher": "Dylan Cease",
-          "label": "Dylan Cease moins de 8,5 strikeouts",
-          "line": 8.5,
-          "pick": "under",
-          "probability": 0.5359,
-          "fair_odds": 1.87,
-          "expected_strikeouts": 8.3,
-          "projected_ip": 5.79,
-          "inputs": {
-            "k9": 12.9,
-            "era": 2.41,
-            "whip": 1.18,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Toronto Blue Jays",
-          "pitcher": "Dylan Cease",
-          "label": "Dylan Cease ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.8964,
-          "fair_odds": 1.12,
-          "expected_hr_allowed": 0.109,
-          "projected_ip": 5.79,
-          "inputs": {
-            "hr9": 0.17,
-            "era": 2.41,
-            "whip": 1.18
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815410",
       "kickoff": "2026-05-19T23:40Z",
@@ -2202,7 +2120,7 @@
       ]
     }
   ],
-  "props": 106,
+  "props": 102,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
