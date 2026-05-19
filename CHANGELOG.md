@@ -5,6 +5,14 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.0.2 — Top 3 utile même sans pari validé
+
+Correction directe après le constat “le logiciel est nul / aucun pari proposé” :
+- Le Top 3 de l’accueil ne dépend plus uniquement des boutons `Je mise`; il affiche maintenant les meilleurs spots à regarder, même si le statut reste `À surveiller`.
+- Si la journée est pauvre, l’accueil va chercher les meilleurs spots de la semaine pour donner une suite utile au lieu d’un écran quasi vide.
+- Le bouton de mise reste réservé aux vrais paris validés : un spot surveillé est visible, mais ne devient pas artificiellement jouable.
+- Le tableau accueil récupère davantage de lignes pertinentes grâce au mélange 24h + semaine, sans réintroduire les gros blocs techniques.
+
 ### Version v8.0.1 — Reprise contrôlée sans silence après pertes
 
 Suite au retour “si je perds, le logiciel doit continuer à proposer” :
