@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-19T22:52:04Z",
+  "generated_at": "2026-05-19T23:02:48Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815408",
-      "kickoff": "2026-05-19T22:45Z",
-      "league": "MLB",
-      "match": "New York Mets at Washington Nationals",
-      "home": "Washington Nationals",
-      "away": "New York Mets",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Washington Nationals",
-          "pitcher": "Foster Griffin",
-          "label": "Foster Griffin moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.5118,
-          "fair_odds": 1.95,
-          "expected_strikeouts": 5.45,
-          "projected_ip": 5.67,
-          "inputs": {
-            "k9": 8.65,
-            "era": 3.53,
-            "whip": 1.14,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Washington Nationals",
-          "pitcher": "Foster Griffin",
-          "label": "Foster Griffin concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5884,
-          "fair_odds": 1.7,
-          "expected_hr_allowed": 0.888,
-          "projected_ip": 5.67,
-          "inputs": {
-            "hr9": 1.41,
-            "era": 3.53,
-            "whip": 1.14
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "New York Mets",
-          "pitcher": "Nolan McLean",
-          "label": "Nolan McLean moins de 7,5 strikeouts",
-          "line": 7.5,
-          "pick": "under",
-          "probability": 0.5798,
-          "fair_odds": 1.72,
-          "expected_strikeouts": 7.08,
-          "projected_ip": 5.79,
-          "inputs": {
-            "k9": 11.01,
-            "era": 2.92,
-            "whip": 0.96,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "New York Mets",
-          "pitcher": "Nolan McLean",
-          "label": "Nolan McLean ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6416,
-          "fair_odds": 1.56,
-          "expected_hr_allowed": 0.444,
-          "projected_ip": 5.79,
-          "inputs": {
-            "hr9": 0.69,
-            "era": 2.92,
-            "whip": 0.96
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815409",
       "kickoff": "2026-05-19T23:05Z",
@@ -2284,7 +2202,7 @@
       ]
     }
   ],
-  "props": 110,
+  "props": 106,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
