@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-05-19T12:13:48Z",
+  "generated_at": "2026-05-19T12:28:37Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 68,
+    "active_events": 69,
     "actionable": 34,
-    "watch": 1,
+    "watch": 2,
     "risk": 33,
     "expired_sample": 0,
     "by_type": {
@@ -14,12 +14,13 @@
       "back_to_back_travel": 22,
       "travel_extreme": 2,
       "signal_conflict": 8,
-      "market_uncertain": 27
+      "market_uncertain": 27,
+      "market_move": 1
     },
     "by_quality": {
       "actionable": 34,
       "risk": 33,
-      "watch": 1
+      "watch": 2
     }
   },
   "active_actionable": [
@@ -654,6 +655,24 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 12-9"
+    },
+    {
+      "event_id": "178512",
+      "date": "2026-05-20T04:00Z",
+      "sport": "tennis",
+      "league_code": "rolandgarros",
+      "league_name": "Roland Garros",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 0.463,
+      "context": "Cote home: 3.60 -> 3.90 (-8.3%)"
     }
   ],
   "active_risk": [
