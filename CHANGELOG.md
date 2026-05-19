@@ -5,6 +5,15 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.0.3 — Accueil direct, moins moche, moins chargé
+
+Correction UX après le retour “trop moche / trop d’info / aller droit au but” :
+- La première vue est recentrée sur deux choses : **prochain pari sérieux** et **Top 3 à regarder**.
+- Le tableau complet est replié par défaut derrière `Tableau complet`, au lieu de remplir l’écran dès l’ouverture.
+- Les catégories sont aussi repliées par défaut derrière `Catégories`, pour éviter l’effet grille infinie.
+- Les cartes Top 3 sont plus compactes : moins de texte, moins de badges, moins de jargon visible.
+- Le bandeau reprise/protection bankroll reste calculé, mais ne prend plus de place sur l’accueil standard.
+
 ### Version v8.0.2 — Top 3 utile même sans pari validé
 
 Correction directe après le constat “le logiciel est nul / aucun pari proposé” :

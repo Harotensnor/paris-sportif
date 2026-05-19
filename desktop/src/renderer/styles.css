@@ -6507,16 +6507,34 @@ body.theme-light .sidebar {
 
 .betting-home-v2 {
   display: grid;
-  gap: 7px;
-  margin: 0 0 7px;
+  gap: 9px;
+  margin: 0 auto 7px;
+  max-width: 1180px;
+}
+
+.betting-home-v2 .betting-home-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.betting-home-v2 .betting-home-head h3 {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.15;
+}
+
+.betting-home-v2 .betting-home-head p,
+.betting-home-v2 .home-sort-actions,
+.betting-home-v2 .recovery-strip {
+  display: none;
 }
 
 .next-bet-card {
-  border: 1px solid rgba(16, 185, 129, .34);
-  border-radius: 12px;
-  background:
-    linear-gradient(135deg, rgba(16, 185, 129, .16), rgba(14, 165, 233, .06)),
-    rgba(15, 23, 42, .58);
+  border: 1px solid rgba(16, 185, 129, .28);
+  border-radius: 8px;
+  background: rgba(15, 23, 42, .62);
   overflow: hidden;
 }
 
@@ -6526,10 +6544,10 @@ body.theme-light .sidebar {
 
 .next-bet-inner {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(190px, auto);
+  grid-template-columns: minmax(0, 1fr) minmax(170px, auto);
   align-items: stretch;
-  gap: 12px;
-  padding: 12px;
+  gap: 10px;
+  padding: 10px;
 }
 
 .next-bet-inner.watch {
@@ -6548,12 +6566,12 @@ body.theme-light .sidebar {
 .next-bet-main {
   min-width: 0;
   display: grid;
-  gap: 6px;
+  gap: 4px;
 }
 
 .next-bet-main h3 {
   margin: 0;
-  font-size: 21px;
+  font-size: 19px;
   line-height: 1.1;
   color: var(--text);
 }
@@ -6565,23 +6583,22 @@ body.theme-light .sidebar {
 }
 
 .next-bet-ticket {
-  display: grid;
-  gap: 2px;
-  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 8px;
   border: 1px solid rgba(148, 163, 184, .18);
-  border-radius: 9px;
+  border-radius: 7px;
   background: rgba(2, 6, 23, .36);
 }
 
 .next-bet-ticket span {
-  color: var(--muted);
-  font-size: 10px;
-  font-weight: 950;
-  letter-spacing: .04em;
+  display: none;
 }
 
 .next-bet-ticket strong {
-  font-size: 17px;
+  font-size: 16px;
   line-height: 1.2;
   color: var(--text);
 }
@@ -6593,7 +6610,7 @@ body.theme-light .sidebar {
 }
 
 .next-bet-reason {
-  max-width: 980px;
+  display: none;
 }
 
 .next-bet-side {
@@ -6705,7 +6722,7 @@ body.theme-light .sidebar {
 .home-top3-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 7px;
+  gap: 6px;
 }
 
 .home-top-card {
@@ -6713,9 +6730,11 @@ body.theme-light .sidebar {
   border: 1px solid rgba(148, 163, 184, .22);
   border-radius: 8px;
   background: rgba(15, 23, 42, .52);
-  padding: 6px;
+  padding: 7px;
   display: grid;
-  gap: 5px;
+  grid-template-columns: 28px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 7px;
   cursor: pointer;
   transition: transform 180ms ease-out, border-color 180ms ease-out, background 180ms ease-out;
 }
@@ -6735,7 +6754,8 @@ body.theme-light .sidebar {
 
 .home-top-main {
   display: grid;
-  gap: 5px;
+  gap: 4px;
+  min-width: 0;
 }
 
 .home-top-rank {
@@ -6761,6 +6781,10 @@ body.theme-light .sidebar {
   font-size: 13px;
   line-height: 1.2;
   overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .home-top-title span {
@@ -6777,22 +6801,13 @@ body.theme-light .sidebar {
 }
 
 .home-top-card p {
-  margin: 0;
-  color: var(--muted);
-  font-size: 11px;
-  line-height: 1.25;
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  display: none;
 }
 
 .home-top-bet {
-  display: grid;
-  gap: 3px;
-  padding: 6px;
-  border-radius: 8px;
-  background: rgba(2, 6, 23, .42);
+  display: block;
+  padding: 0;
+  background: transparent;
 }
 
 .home-top-bet span,
@@ -6807,13 +6822,14 @@ body.theme-light .sidebar {
 .home-top-bet strong {
   font-size: 14px;
   line-height: 1.22;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .home-top-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  margin-top: -2px;
+  display: none;
 }
 
 .home-top-tags span {
@@ -6829,17 +6845,17 @@ body.theme-light .sidebar {
 .home-top-kpis {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 4px;
+  gap: 3px;
 }
 
 .home-top-kpis span {
   display: grid;
-  gap: 2px;
-  padding: 4px 5px;
-  border-radius: 7px;
+  gap: 1px;
+  padding: 3px 4px;
+  border-radius: 6px;
   background: rgba(15, 23, 42, .54);
   color: var(--muted);
-  font-size: 10px;
+  font-size: 9px;
 }
 
 .home-top-kpis strong {
@@ -6850,8 +6866,9 @@ body.theme-light .sidebar {
 
 .home-top-actions {
   display: flex;
+  flex-direction: column;
   gap: 6px;
-  flex-wrap: wrap;
+  align-items: stretch;
 }
 
 .home-watch-strip {
@@ -6922,6 +6939,61 @@ body.theme-light .sidebar {
   border-radius: 10px;
   background: rgba(15, 23, 42, .42);
   overflow: hidden;
+}
+
+.home-more-panel {
+  margin: 0 auto 8px;
+  max-width: 1180px;
+  border: 1px solid rgba(148, 163, 184, .18);
+  border-radius: 8px;
+  background: rgba(15, 23, 42, .36);
+  overflow: hidden;
+}
+
+.home-more-panel > summary {
+  min-height: 42px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: pointer;
+  list-style: none;
+  color: var(--text);
+  font-weight: 900;
+}
+
+.home-more-panel > summary::-webkit-details-marker {
+  display: none;
+}
+
+.home-more-panel > summary span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.home-more-panel > summary::after {
+  content: "Ouvrir";
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.home-more-panel[open] > summary {
+  border-bottom: 1px solid rgba(148, 163, 184, .14);
+}
+
+.home-more-panel[open] > summary::after {
+  content: "Masquer";
+}
+
+.home-more-panel .home-table-head {
+  padding: 9px 12px 0;
+}
+
+.home-categories-panel .home-category-grid {
+  padding: 8px;
 }
 
 .home-picks-table .bet-status-pill {
@@ -7207,6 +7279,7 @@ body.trading-desk-on .tab-panel[data-panel="dashboard"].active > #trading-desk.e
 
 body.trading-desk-on .tab-panel[data-panel="dashboard"].active > #betting-home-v2,
 body.trading-desk-on .tab-panel[data-panel="dashboard"].active > #home-category-grid,
+body.trading-desk-on .tab-panel[data-panel="dashboard"].active > .home-categories-panel,
 body.trading-desk-on .tab-panel[data-panel="dashboard"].active > #cockpit-detail-section {
   display: none !important;
 }

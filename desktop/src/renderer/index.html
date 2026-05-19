@@ -62,7 +62,7 @@
     <main class="main">
       <header class="topbar">
         <div>
-          <div class="eyebrow">Pronostics Pro v8.0.2 · Winamax-only</div>
+          <div class="eyebrow">Pronostics Pro v8.0.3 · Winamax-only</div>
           <h2 id="page-title">À miser maintenant</h2>
         </div>
         <div class="actions decision-actions">
@@ -245,8 +245,8 @@
           <div class="betting-home-head">
             <div>
               <span class="eyebrow" id="home-kicker">Top 3 prochaines 24h</span>
-              <h3 id="home-title">Les 3 paris à regarder en premier</h3>
-              <p id="home-subtitle">Classés par confiance de réussite, puis par cote Winamax. Le reste est dans le tableau triable.</p>
+              <h3 id="home-title">À regarder maintenant</h3>
+              <p id="home-subtitle">Bouton vert = jouable. Sinon on surveille, sans forcer.</p>
             </div>
             <div class="home-sort-actions" aria-label="Tri accueil">
               <button type="button" data-home-sort="confidence">Confiance</button>
@@ -262,10 +262,14 @@
           <div class="recovery-strip" id="recovery-strip">
             <div class="empty compact-empty">Protection bankroll en calcul...</div>
           </div>
-          <div class="home-table-card">
-            <div class="home-table-head">
-              <strong>Tableau des paris 24h</strong>
+          <details class="home-more-panel home-table-card">
+            <summary>
+              <strong>Tableau complet</strong>
               <span id="home-table-caption">Tri confiance · cotes Winamax</span>
+            </summary>
+            <div class="home-table-head">
+              <strong>Paris à comparer</strong>
+              <span>Ouvre une ligne pour lire la fiche match.</span>
             </div>
             <div class="home-table-wrap">
               <table class="home-picks-table">
@@ -283,11 +287,11 @@
                   </tr>
                 </thead>
                 <tbody id="home-picks-table-body">
-                  <tr><td colspan="8" class="empty">Chargement du tableau...</td></tr>
+                  <tr><td colspan="9" class="empty">Chargement du tableau...</td></tr>
                 </tbody>
               </table>
             </div>
-          </div>
+          </details>
         </section>
 
         <!-- Compatibilité moteur : généré mais masqué sur l'accueil refait. -->
@@ -299,9 +303,15 @@
           <div class="empty">Chargement des paris à miser...</div>
         </section>
 
-        <section class="home-category-grid" id="home-category-grid" aria-label="Catégories pronostics">
-          <div class="empty compact-empty">Chargement des catégories...</div>
-        </section>
+        <details class="home-more-panel home-categories-panel">
+          <summary>
+            <strong>Catégories</strong>
+            <span>Football, nuit, vainqueurs, buteurs...</span>
+          </summary>
+          <section class="home-category-grid" id="home-category-grid" aria-label="Catégories pronostics">
+            <div class="empty compact-empty">Chargement des catégories...</div>
+          </section>
+        </details>
 
         <!-- Sprint 80 — simple-top-strip et day-summary descendus ici, en mode info passive -->
         <section class="simple-top-strip dashboard-info-strip" id="simple-top-strip">

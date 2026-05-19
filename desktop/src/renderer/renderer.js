@@ -7177,8 +7177,8 @@
     };
     return metas[category] || {
       kicker: 'Top 3 prochaines 24h',
-      title: 'Les 3 paris à regarder en premier',
-      subtitle: 'Classés par confiance de réussite, puis par cote Winamax. Le reste est dans le tableau triable.'
+      title: 'À regarder maintenant',
+      subtitle: 'Bouton vert = jouable. Sinon on surveille, sans forcer.'
     };
   }
 
