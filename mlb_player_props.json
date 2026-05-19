@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-19T20:16:09Z",
+  "generated_at": "2026-05-19T20:19:49Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -15,17 +15,17 @@
           "market": "pitcher_strikeouts",
           "team": "Miami Marlins",
           "pitcher": "Braxton Garrett",
-          "label": "Braxton Garrett plus de 6,5 strikeouts",
+          "label": "Braxton Garrett moins de 6,5 strikeouts",
           "line": 6.5,
-          "pick": "over",
-          "probability": 0.5491,
-          "fair_odds": 1.82,
-          "expected_strikeouts": 6.75,
+          "pick": "under",
+          "probability": 0.6032,
+          "fair_odds": 1.66,
+          "expected_strikeouts": 6.0,
           "projected_ip": 3.0,
           "inputs": {
-            "k9": 20.25,
-            "era": 33.75,
-            "whip": 6.75,
+            "k9": 18.0,
+            "era": 27.0,
+            "whip": 6.0,
             "hand": "L"
           },
           "side": "home"
@@ -42,8 +42,8 @@
           "projected_ip": 3.0,
           "inputs": {
             "hr9": 0.0,
-            "era": 33.75,
-            "whip": 6.75
+            "era": 27.0,
+            "whip": 6.0
           },
           "side": "home"
         },
@@ -624,18 +624,18 @@
         {
           "market": "pitcher_strikeouts",
           "team": "Houston Astros",
-          "pitcher": "Lance McCullers Jr.",
-          "label": "Lance McCullers Jr. moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.5345,
-          "fair_odds": 1.87,
-          "expected_strikeouts": 5.34,
-          "projected_ip": 4.89,
+          "pitcher": "Jason Alexander",
+          "label": "Jason Alexander plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.5118,
+          "fair_odds": 1.95,
+          "expected_strikeouts": 4.55,
+          "projected_ip": 4.8,
           "inputs": {
-            "k9": 9.84,
-            "era": 6.86,
-            "whip": 1.53,
+            "k9": 8.53,
+            "era": 14.21,
+            "whip": 2.53,
             "hand": "R"
           },
           "side": "away"
@@ -643,17 +643,17 @@
         {
           "market": "pitcher_home_run_allowed",
           "team": "Houston Astros",
-          "pitcher": "Lance McCullers Jr.",
-          "label": "Lance McCullers Jr. concède au moins 1 home run",
+          "pitcher": "Jason Alexander",
+          "label": "Jason Alexander concède au moins 1 home run",
           "pick": "yes",
-          "probability": 0.5806,
-          "fair_odds": 1.72,
-          "expected_hr_allowed": 0.869,
-          "projected_ip": 4.89,
+          "probability": 0.7801,
+          "fair_odds": 1.28,
+          "expected_hr_allowed": 1.515,
+          "projected_ip": 4.8,
           "inputs": {
-            "hr9": 1.6,
-            "era": 6.86,
-            "whip": 1.53
+            "hr9": 2.84,
+            "era": 14.21,
+            "whip": 2.53
           },
           "side": "away"
         }
