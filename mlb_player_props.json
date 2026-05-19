@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-19T04:43:26Z",
+  "generated_at": "2026-05-19T04:49:28Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -503,6 +503,42 @@
       "home": "Kansas City Royals",
       "away": "Boston Red Sox",
       "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Kansas City Royals",
+          "pitcher": "Bailey Falter",
+          "label": "Bailey Falter plus de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "over",
+          "probability": 0.5269,
+          "fair_odds": 1.9,
+          "expected_strikeouts": 3.6,
+          "projected_ip": 4.8,
+          "inputs": {
+            "k9": 6.75,
+            "era": 10.13,
+            "whip": 2.63,
+            "hand": "L"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Kansas City Royals",
+          "pitcher": "Bailey Falter",
+          "label": "Bailey Falter concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.594,
+          "fair_odds": 1.68,
+          "expected_hr_allowed": 0.901,
+          "projected_ip": 4.8,
+          "inputs": {
+            "hr9": 1.69,
+            "era": 10.13,
+            "whip": 2.63
+          },
+          "side": "home"
+        },
         {
           "market": "pitcher_strikeouts",
           "team": "Boston Red Sox",
@@ -2412,7 +2448,7 @@
       ]
     }
   ],
-  "props": 116,
+  "props": 118,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
