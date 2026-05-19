@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-19T01:32:20Z",
+  "generated_at": "2026-05-19T01:37:27Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -169,11 +169,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 1.505,
-        "away_score": -2.195,
+        "home_score": 0.155,
+        "away_score": -1.195,
         "home_fade": 0.3,
-        "away_fade": 2.3,
-        "reason": "Direction nette: Washington Nationals (+1.50)",
+        "away_fade": 1.3,
+        "reason": "Direction nette: Washington Nationals (+0.15)",
         "detail": [
           {
             "side": "home",
@@ -191,18 +191,6 @@
             "side": "away",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
             "strength": 1.0
           }
         ]
@@ -237,13 +225,13 @@
         "2 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "mixed",
-        "net_side": null,
+        "status": "net",
+        "net_side": "home",
         "home_score": 0.155,
-        "away_score": -0.51,
+        "away_score": -1.195,
         "home_fade": 0.3,
         "away_fade": 1.3,
-        "reason": "Signaux mitigés: avantage net trop faible (New York Yankees +0.15, Toronto Blue Jays -0.51)",
+        "reason": "Direction nette: New York Yankees (+0.15)",
         "detail": [
           {
             "side": "home",
@@ -262,12 +250,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.685
           }
         ]
       }
@@ -361,11 +343,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.942,
-        "away_score": 1.066,
-        "home_fade": 1.047,
+        "home_score": -0.195,
+        "away_score": -0.195,
+        "home_fade": 0.3,
         "away_fade": 0.3,
-        "reason": "Direction nette: Athletics (+1.07)",
+        "reason": "Direction nette: Athletics (-0.20)",
         "detail": [
           {
             "side": "home",
@@ -378,18 +360,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.3
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 0.747
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 1.0
           }
         ]
       }
@@ -709,11 +679,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 1.603,
-        "away_score": -2.097,
+        "home_score": 0.252,
+        "away_score": -1.097,
         "home_fade": 0.15,
-        "away_fade": 2.15,
-        "reason": "Direction nette: Minnesota Twins (+1.60)",
+        "away_fade": 1.15,
+        "reason": "Direction nette: Minnesota Twins (+0.25)",
         "detail": [
           {
             "side": "home",
@@ -731,18 +701,6 @@
             "side": "away",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
             "strength": 1.0
           }
         ]
@@ -1055,13 +1013,13 @@
         "1 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "mixed",
-        "net_side": null,
-        "home_score": -0.148,
+        "status": "net",
+        "net_side": "away",
+        "home_score": -0.698,
         "away_score": 0.112,
         "home_fade": 0.75,
         "away_fade": 0.15,
-        "reason": "Signaux mitigés: avantage net trop faible (Arizona Diamondbacks -0.15, San Francisco Giants +0.11)",
+        "reason": "Direction nette: San Francisco Giants (+0.11)",
         "detail": [
           {
             "side": "home",
@@ -1080,12 +1038,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.6
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.549
           }
         ]
       }
