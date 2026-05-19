@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-19T23:42:39Z",
+  "generated_at": "2026-05-19T23:48:08Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -726,10 +726,10 @@
         "status": "net",
         "net_side": "away",
         "home_score": -2.097,
-        "away_score": 1.449,
+        "away_score": 1.28,
         "home_fade": 2.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Cleveland Guardians (+1.45)",
+        "reason": "Direction nette: Cleveland Guardians (+1.28)",
         "detail": [
           {
             "side": "home",
@@ -759,7 +759,7 @@
             "side": "away",
             "type": "market_move",
             "direction": "steam",
-            "strength": 0.847
+            "strength": 0.678
           }
         ]
       }
@@ -1762,19 +1762,25 @@
         "1 match dans les 48h + 1998 km de voyage"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "home",
+        "status": "mixed",
+        "net_side": null,
         "home_score": 0.768,
-        "away_score": -2.194,
+        "away_score": -1.62,
         "home_fade": 0.0,
         "away_fade": 2.194,
-        "reason": "Direction nette: Kansas City Royals (+0.77)",
+        "reason": "Signaux mitigés: avantage net trop faible (Kansas City Royals +0.77, Boston Red Sox -1.62)",
         "detail": [
           {
             "side": "away",
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.8
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.575
           },
           {
             "side": "away",

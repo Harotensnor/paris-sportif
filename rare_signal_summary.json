@@ -1,26 +1,26 @@
 {
-  "generated_at": "2026-05-19T23:42:39Z",
+  "generated_at": "2026-05-19T23:48:08Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 62,
+    "active_events": 63,
     "actionable": 35,
     "watch": 4,
-    "risk": 23,
+    "risk": 24,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 23,
       "travel_extreme": 2,
-      "market_move": 24,
-      "signal_conflict": 6,
+      "market_move": 26,
+      "signal_conflict": 7,
       "market_uncertain": 20,
       "back_to_back_travel": 15
     },
     "by_quality": {
       "actionable": 35,
       "watch": 4,
-      "risk": 23
+      "risk": 24
     }
   },
   "active_actionable": [
@@ -130,7 +130,7 @@
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 2.25 -> 1.80 (+20.0%)"
+      "context": "Cote home: 2.25 -> 1.60 (+28.9%)"
     },
     {
       "event_id": "401815426",
@@ -346,7 +346,7 @@
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 1.52 -> 1.82 (-19.7%)"
+      "context": "Cote home: 1.52 -> 2.10 (-38.2%)"
     },
     {
       "event_id": "401815504",
@@ -364,25 +364,7 @@
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 1.52 -> 1.82 (-19.7%)"
-    },
-    {
-      "event_id": "401815425",
-      "date": "2026-05-20T23:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Kansas City Royals",
-      "away": "Boston Red Sox",
-      "match": "Kansas City Royals - Boston Red Sox",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Boston Red Sox",
-      "side": "away",
-      "strength": 0.93,
-      "context": "1 match dans les 48h + 1998 km de voyage"
+      "context": "Cote home: 1.52 -> 2.10 (-38.2%)"
     },
     {
       "event_id": "401865443",
@@ -509,6 +491,24 @@
       "side": null,
       "strength": 0.8,
       "context": "Absences severes 9-13"
+    },
+    {
+      "event_id": "401865539",
+      "date": "2026-05-20T00:00Z",
+      "sport": "football",
+      "league_code": "conmebol.libertadores",
+      "league_name": "Copa Libertadores",
+      "home": "Always Ready",
+      "away": "Mirassol",
+      "match": "Always Ready - Mirassol",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 0.794,
+      "context": "Cote home: 5.25 -> 4.50 (+14.3%)"
     },
     {
       "event_id": "401815438",
@@ -711,25 +711,43 @@
       "context": "Cote away: 3.75 -> 3.35 (+10.7%)"
     },
     {
-      "event_id": "401865539",
-      "date": "2026-05-20T00:00Z",
-      "sport": "football",
-      "league_code": "conmebol.libertadores",
-      "league_name": "Copa Libertadores",
-      "home": "Always Ready",
-      "away": "Mirassol",
-      "match": "Always Ready - Mirassol",
+      "event_id": "401815427",
+      "date": "2026-05-20T23:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Chicago Cubs",
+      "away": "Milwaukee Brewers",
+      "match": "Chicago Cubs - Milwaukee Brewers",
       "quality": "watch",
       "quality_reason": "Signal rare present mais intensite moyenne",
       "type": "market_move",
       "direction": "steam",
       "team": null,
-      "side": "home",
-      "strength": 0.582,
-      "context": "Cote home: 5.25 -> 4.70 (+10.5%)"
+      "side": "away",
+      "strength": 0.488,
+      "context": "Cote away: 1.82 -> 1.66 (+8.8%)"
     }
   ],
   "active_risk": [
+    {
+      "event_id": "401815425",
+      "date": "2026-05-20T23:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Kansas City Royals",
+      "away": "Boston Red Sox",
+      "match": "Kansas City Royals - Boston Red Sox",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "signal_conflict",
+      "direction": "mixed",
+      "team": null,
+      "side": null,
+      "strength": 1.0,
+      "context": "Signaux mitigés: avantage net trop faible (Kansas City Royals +0.77, Boston Red Sox -1.62)"
+    },
     {
       "event_id": "178519",
       "date": "2026-05-20T09:30Z",
