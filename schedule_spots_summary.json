@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-19T18:16:45Z",
+  "generated_at": "2026-05-19T18:25:45Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -1233,13 +1233,13 @@
         "1 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.747,
-        "away_score": -0.747,
-        "home_fade": 1.15,
-        "away_fade": 1.15,
-        "reason": "Signaux opposes: Colorado Avalanche fade 1.15, Vegas Golden Knights fade 1.15 -> prudence",
+        "status": "net",
+        "net_side": "away",
+        "home_score": -0.098,
+        "away_score": -0.098,
+        "home_fade": 0.15,
+        "away_fade": 0.15,
+        "reason": "Direction nette: Vegas Golden Knights (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -1252,18 +1252,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
           }
         ]
       }
@@ -1404,10 +1392,10 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.498,
-        "away_score": 0.609,
+        "away_score": 0.043,
         "home_fade": 0.55,
         "away_fade": 0.15,
-        "reason": "Direction nette: Connecticut Sun (+0.61)",
+        "reason": "Direction nette: Connecticut Sun (+0.04)",
         "detail": [
           {
             "side": "home",
@@ -1426,12 +1414,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.4
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.567
           }
         ]
       }
@@ -1517,13 +1499,13 @@
         "1 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.747,
-        "away_score": -0.747,
-        "home_fade": 1.15,
-        "away_fade": 1.15,
-        "reason": "Signaux opposes: Carolina Hurricanes fade 1.15, Montreal Canadiens fade 1.15 -> prudence",
+        "status": "net",
+        "net_side": "away",
+        "home_score": -0.098,
+        "away_score": -0.098,
+        "home_fade": 0.15,
+        "away_fade": 0.15,
+        "reason": "Direction nette: Montreal Canadiens (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -1536,18 +1518,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
           }
         ]
       }
