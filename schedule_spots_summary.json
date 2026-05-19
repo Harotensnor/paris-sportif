@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-19T04:49:36Z",
+  "generated_at": "2026-05-19T04:59:26Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -2112,11 +2112,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.345,
+        "home_score": 0.801,
         "away_score": -1.362,
         "home_fade": 0.15,
         "away_fade": 1.415,
-        "reason": "Direction nette: Kansas City Royals (+0.35)",
+        "reason": "Direction nette: Kansas City Royals (+0.80)",
         "detail": [
           {
             "side": "home",
@@ -2135,6 +2135,12 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.8
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.456
           },
           {
             "side": "away",
