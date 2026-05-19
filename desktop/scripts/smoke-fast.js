@@ -79,6 +79,8 @@ async function main() {
       topCards: document.querySelectorAll('#home-top3-grid .home-top-card').length,
       watchCards: document.querySelectorAll('#home-top3-grid .home-watch-card').length,
       categories: document.querySelectorAll('[data-cockpit-category]').length,
+      tableCollapsed: document.querySelector('.home-table-card')?.open === false,
+      categoriesCollapsed: document.querySelector('.home-categories-panel')?.open === false,
       nav: Array.from(document.querySelectorAll('.nav-btn:not(.hidden)')).map((node) => node.innerText.trim()),
       dashboardText: document.querySelector('[data-panel="dashboard"]')?.innerText || '',
       standardExpertVisible: Boolean(document.querySelector('[data-tab="data"]:not(.hidden)'))
@@ -91,6 +93,9 @@ async function main() {
     const topEmptyAllowed = /Aucun pari validé à miser|Top 3 incomplet/i.test(home.dashboardText);
     if (home.rows < 3 || (!home.topCards && !home.watchCards && !topEmptyAllowed) || home.categories < 8) {
       throw new Error(`Accueil rapide incomplet: ${JSON.stringify(home)}`);
+    }
+    if (!home.tableCollapsed || !home.categoriesCollapsed) {
+      throw new Error(`Accueil trop chargé: tableau/catégories doivent rester repliés par défaut ${JSON.stringify(home)}`);
     }
     if (home.standardExpertVisible) throw new Error('Mode expert visible en standard');
     if (/Écouter le brief|brief audio|SpeechSynthesis|TTS|Meilleure cote|Multi-bookmaker/i.test(home.dashboardText)) {

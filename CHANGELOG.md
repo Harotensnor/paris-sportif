@@ -5,6 +5,15 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.1.0 — Projet propre : nettoyage local + garde-fous workspace
+
+Premier palier du chantier v9 “Parieur First, Projet Propre”.
+- Ajout de `scripts/clean_local_workspace.ps1` : prévisualisation par défaut, nettoyage avec `-Execute`, conservation du dernier installateur Electron et refus de supprimer un fichier suivi par Git.
+- Nettoyage réel effectué sur la machine : `.cache`, `desktop/dist/win-unpacked`, rapports de test régénérables et anciens installateurs Electron supprimés.
+- Maintenance Git effectuée : objets libres passés d’environ 9,97 Go à quelques Mo, pack Git stabilisé autour de 1,19 Go.
+- Ajout de `npm run qa:clean` pour vérifier qu’aucun `.exe` ni build `desktop/dist` n’est suivi par Git et qu’il ne reste pas de dossiers régénérables évidents.
+- Version desktop, package et cache Service Worker bumpés en `v8.1.0`.
+
 ### Version v8.0.3 — Accueil direct, moins moche, moins chargé
 
 Correction UX après le retour “trop moche / trop d’info / aller droit au but” :

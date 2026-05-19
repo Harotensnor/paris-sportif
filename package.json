@@ -1,6 +1,6 @@
 {
   "name": "paris-sportif",
-  "version": "8.0.3",
+  "version": "8.1.0",
   "description": "Logiciel PC local de prédictions Paris-Sportif.",
   "private": true,
   "scripts": {
@@ -23,7 +23,8 @@
     "qa:visual-capture": "node desktop/scripts/visual-baseline.js capture",
     "qa:terrain": "node desktop/scripts/terrain-check.js",
     "qa:terrain:quick": "node desktop/scripts/terrain-check.js --skip-refresh",
-    "qa:winamax-audit": "node desktop/scripts/winamax-audit.js"
+    "qa:winamax-audit": "node desktop/scripts/winamax-audit.js",
+    "qa:clean": "node scripts/qa_clean_workspace.js"
   },
   "devDependencies": {
     "@playwright/test": "^1.48.0",
