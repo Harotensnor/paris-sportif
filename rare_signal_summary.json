@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-05-19T21:57:42Z",
+  "generated_at": "2026-05-19T22:00:38Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 70,
-    "actionable": 38,
-    "watch": 9,
+    "actionable": 37,
+    "watch": 10,
     "risk": 23,
     "expired_sample": 0,
     "by_type": {
@@ -18,8 +18,8 @@
       "back_to_back_travel": 15
     },
     "by_quality": {
-      "watch": 9,
-      "actionable": 38,
+      "watch": 10,
+      "actionable": 37,
       "risk": 23
     }
   },
@@ -583,24 +583,6 @@
       "context": "1 match dans les 48h + 1161 km de voyage"
     },
     {
-      "event_id": "401865539",
-      "date": "2026-05-20T00:00Z",
-      "sport": "football",
-      "league_code": "conmebol.libertadores",
-      "league_name": "Copa Libertadores",
-      "home": "Always Ready",
-      "away": "Mirassol",
-      "match": "Always Ready - Mirassol",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "home",
-      "strength": 0.741,
-      "context": "Cote home: 6.00 -> 5.20 (+13.3%)"
-    },
-    {
       "event_id": "401815429",
       "date": "2026-05-20T19:10Z",
       "sport": "baseball",
@@ -835,6 +817,24 @@
       "side": "away",
       "strength": 0.593,
       "context": "Cote away: 3.75 -> 3.35 (+10.7%)"
+    },
+    {
+      "event_id": "401865539",
+      "date": "2026-05-20T00:00Z",
+      "sport": "football",
+      "league_code": "conmebol.libertadores",
+      "league_name": "Copa Libertadores",
+      "home": "Always Ready",
+      "away": "Mirassol",
+      "match": "Always Ready - Mirassol",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 0.531,
+      "context": "Cote home: 5.75 -> 5.20 (+9.6%)"
     },
     {
       "event_id": "401866328",
