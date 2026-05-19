@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-05-19T23:21:34Z",
+  "generated_at": "2026-05-19T23:23:57Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 62,
-    "actionable": 33,
-    "watch": 6,
+    "actionable": 34,
+    "watch": 5,
     "risk": 23,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 23,
       "travel_extreme": 2,
-      "market_move": 23,
+      "market_move": 24,
       "signal_conflict": 8,
       "market_uncertain": 20,
       "back_to_back_travel": 15
     },
     "by_quality": {
-      "actionable": 33,
-      "watch": 6,
+      "actionable": 34,
+      "watch": 5,
       "risk": 23
     }
   },
@@ -130,7 +130,7 @@
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 2.25 -> 1.76 (+21.8%)"
+      "context": "Cote home: 2.25 -> 1.78 (+20.9%)"
     },
     {
       "event_id": "401815426",
@@ -328,7 +328,7 @@
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 1.52 -> 1.86 (-22.4%)"
+      "context": "Cote home: 1.52 -> 1.82 (-19.7%)"
     },
     {
       "event_id": "401815504",
@@ -346,7 +346,7 @@
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 1.52 -> 1.86 (-22.4%)"
+      "context": "Cote home: 1.52 -> 1.82 (-19.7%)"
     },
     {
       "event_id": "401815425",
@@ -601,6 +601,24 @@
       "context": "1 match dans les 48h + 896 km de voyage"
     },
     {
+      "event_id": "401865445",
+      "date": "2026-05-21T00:30Z",
+      "sport": "football",
+      "league_code": "conmebol.sudamericana",
+      "league_name": "Copa Sudamericana",
+      "home": "River Plate",
+      "away": "Red Bull Bragantino",
+      "match": "River Plate - Red Bull Bragantino",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.673,
+      "context": "Cote away: 3.30 -> 2.90 (+12.1%)"
+    },
+    {
       "event_id": "401815414",
       "date": "2026-05-20T00:40Z",
       "sport": "baseball",
@@ -709,24 +727,6 @@
       "side": "home",
       "strength": 0.505,
       "context": "Cote home: 5.50 -> 5.00 (+9.1%)"
-    },
-    {
-      "event_id": "401865445",
-      "date": "2026-05-21T00:30Z",
-      "sport": "football",
-      "league_code": "conmebol.sudamericana",
-      "league_name": "Copa Sudamericana",
-      "home": "River Plate",
-      "away": "Red Bull Bragantino",
-      "match": "River Plate - Red Bull Bragantino",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.505,
-      "context": "Cote away: 3.30 -> 3.00 (+9.1%)"
     }
   ],
   "active_risk": [
