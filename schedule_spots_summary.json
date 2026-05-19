@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-05-19T23:48:08Z",
+  "generated_at": "2026-05-19T23:51:00Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 43,
+    "active_events": 40,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 60,
-      "travel_extreme": 2,
+      "lookahead": 54,
       "back_to_back_travel": 15,
+      "travel_extreme": 1,
       "schedule_congestion": 8
     },
     "by_decision": {
-      "abstain": 27,
-      "lean_home": 16
+      "abstain": 25,
+      "lean_home": 15
     },
-    "lean_home": 16,
+    "lean_home": 15,
     "lean_away": 0,
-    "abstain": 27,
+    "abstain": 25,
     "monitor": 0
   },
   "active": [
@@ -296,116 +296,6 @@
             "type": "schedule_congestion",
             "direction": "fade",
             "strength": 0.6
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815411",
-      "source_event_ids": [
-        "401815411"
-      ],
-      "kickoff": "2026-05-19T23:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Minnesota Twins",
-      "away": "Houston Astros",
-      "match": "Minnesota Twins - Houston Astros",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Minnesota Twins 0.15, Houston Astros 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.252,
-        "away_score": -1.097,
-        "home_fade": 0.15,
-        "away_fade": 1.15,
-        "reason": "Direction nette: Minnesota Twins (+0.25)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815412",
-      "source_event_ids": [
-        "401815412"
-      ],
-      "kickoff": "2026-05-19T23:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Chicago Cubs",
-      "away": "Milwaukee Brewers",
-      "match": "Chicago Cubs - Milwaukee Brewers",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Chicago Cubs 0.15, Milwaukee Brewers 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
-        "home_fade": 0.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Milwaukee Brewers (-0.10)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
           }
         ]
       }
@@ -1979,72 +1869,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.709
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815410",
-      "source_event_ids": [
-        "401815410"
-      ],
-      "kickoff": "2026-05-19T23:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Kansas City Royals",
-      "away": "Boston Red Sox",
-      "match": "Kansas City Royals - Boston Red Sox",
-      "decision": "lean_home",
-      "net_team": "Kansas City Royals",
-      "reason": "Boston Red Sox plus penalise par calendrier/voyage (0.61 vs 0.15)",
-      "pressure_score": 1.131,
-      "home_fade": 0.15,
-      "away_fade": 0.615,
-      "travel_score": 0.465,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2,
-        "travel_extreme": 1
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours",
-        "Deplacement estime 1998 km, decalage ~1.6h"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.345,
-        "away_score": -1.362,
-        "home_fade": 0.15,
-        "away_fade": 1.415,
-        "reason": "Direction nette: Kansas City Royals (+0.35)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.8
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.465
           }
         ]
       }

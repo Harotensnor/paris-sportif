@@ -1,47 +1,29 @@
 {
-  "generated_at": "2026-05-19T23:48:08Z",
+  "generated_at": "2026-05-19T23:51:00Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 63,
-    "actionable": 35,
+    "active_events": 61,
+    "actionable": 33,
     "watch": 4,
     "risk": 24,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 23,
-      "travel_extreme": 2,
       "market_move": 26,
       "signal_conflict": 7,
+      "injury_imbalance": 21,
       "market_uncertain": 20,
-      "back_to_back_travel": 15
+      "back_to_back_travel": 15,
+      "travel_extreme": 1
     },
     "by_quality": {
-      "actionable": 35,
+      "actionable": 33,
       "watch": 4,
       "risk": 24
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401815411",
-      "date": "2026-05-19T23:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Minnesota Twins",
-      "away": "Houston Astros",
-      "match": "Minnesota Twins - Houston Astros",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Houston Astros",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 8-13"
-    },
     {
       "event_id": "401815415",
       "date": "2026-05-20T01:38Z",
@@ -383,24 +365,6 @@
       "side": "away",
       "strength": 0.808,
       "context": "Cote away: 5.50 -> 4.70 (+14.5%)"
-    },
-    {
-      "event_id": "401815410",
-      "date": "2026-05-19T23:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Kansas City Royals",
-      "away": "Boston Red Sox",
-      "match": "Kansas City Royals - Boston Red Sox",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Boston Red Sox",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 7-11"
     },
     {
       "event_id": "401815418",
