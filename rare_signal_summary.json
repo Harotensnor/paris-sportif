@@ -1,26 +1,27 @@
 {
-  "generated_at": "2026-05-19T00:08:03Z",
+  "generated_at": "2026-05-19T00:13:12Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 71,
-    "actionable": 32,
-    "watch": 4,
-    "risk": 35,
+    "active_events": 68,
+    "actionable": 31,
+    "watch": 5,
+    "risk": 32,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 33,
-      "back_to_back_travel": 21,
+      "injury_imbalance": 32,
+      "market_move": 22,
+      "back_to_back_travel": 19,
+      "signal_conflict": 12,
       "travel_extreme": 2,
-      "signal_conflict": 8,
-      "market_uncertain": 31,
+      "market_uncertain": 32,
       "weather_extreme": 1
     },
     "by_quality": {
-      "watch": 4,
-      "actionable": 32,
-      "risk": 35
+      "watch": 5,
+      "actionable": 31,
+      "risk": 32
     }
   },
   "active_actionable": [
@@ -529,24 +530,6 @@
       "context": "1 match dans les 48h + 1049 km de voyage"
     },
     {
-      "event_id": "401815510",
-      "date": "2026-05-27T01:45Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Francisco Giants",
-      "away": "Arizona Diamondbacks",
-      "match": "San Francisco Giants - Arizona Diamondbacks",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Arizona Diamondbacks",
-      "side": "away",
-      "strength": 0.74,
-      "context": "1 match dans les 48h + 1049 km de voyage"
-    },
-    {
       "event_id": "401872904",
       "date": "2026-05-23T00:00Z",
       "sport": "hockey",
@@ -673,9 +656,7 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 9-12"
-    }
-  ],
-  "active_risk": [
+    },
     {
       "event_id": "401815504",
       "date": "2026-05-26T22:35Z",
@@ -685,15 +666,17 @@
       "home": "Baltimore Orioles",
       "away": "Tampa Bay Rays",
       "match": "Baltimore Orioles - Tampa Bay Rays",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "signal_conflict",
-      "direction": "abstain",
-      "team": null,
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Baltimore Orioles",
       "side": null,
-      "strength": 0.989,
-      "context": "Signaux opposes: Baltimore Orioles fade 1.20, Tampa Bay Rays fade 1.41 -> prudence"
-    },
+      "strength": 0.6,
+      "context": "Absences severes 12-9"
+    }
+  ],
+  "active_risk": [
     {
       "event_id": "175503",
       "date": "2026-05-20T04:00Z",
@@ -1269,42 +1252,6 @@
       "side": null,
       "strength": 0.45,
       "context": "Signaux opposes: Cleveland Cavaliers fade 0.60, New York Knicks fade 0.60 -> prudence"
-    },
-    {
-      "event_id": "401873201",
-      "date": "2026-05-27T00:30Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "Oklahoma City Thunder",
-      "away": "San Antonio Spurs",
-      "match": "Oklahoma City Thunder - San Antonio Spurs",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "signal_conflict",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.45,
-      "context": "Signaux opposes: Oklahoma City Thunder fade 0.60, San Antonio Spurs fade 0.60 -> prudence"
-    },
-    {
-      "event_id": "401872906",
-      "date": "2026-05-27T01:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Vegas Golden Knights",
-      "away": "Colorado Avalanche",
-      "match": "Vegas Golden Knights - Colorado Avalanche",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "signal_conflict",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.45,
-      "context": "Signaux opposes: Vegas Golden Knights fade 0.60, Colorado Avalanche fade 0.60 -> prudence"
     }
   ],
   "expired_sample": []
