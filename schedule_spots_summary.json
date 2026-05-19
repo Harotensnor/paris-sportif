@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-05-19T14:52:43Z",
+  "generated_at": "2026-05-19T14:55:52Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 49,
+    "active_events": 47,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 72,
+      "lookahead": 70,
       "travel_extreme": 2,
-      "back_to_back_travel": 15,
+      "back_to_back_travel": 14,
       "schedule_congestion": 8
     },
     "by_decision": {
-      "abstain": 33,
-      "lean_home": 16
+      "abstain": 32,
+      "lean_home": 15
     },
-    "lean_home": 16,
+    "lean_home": 15,
     "lean_away": 0,
-    "abstain": 33,
+    "abstain": 32,
     "monitor": 0
   },
   "active": [
@@ -800,64 +800,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815414",
-      "source_event_ids": [
-        "401815414"
-      ],
-      "kickoff": "2026-05-20T00:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Colorado Rockies",
-      "away": "Texas Rangers",
-      "match": "Colorado Rockies - Texas Rangers",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Colorado Rockies 0.15, Texas Rangers 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.112,
-        "away_score": -0.698,
-        "home_fade": 0.15,
-        "away_fade": 0.75,
-        "reason": "Direction nette: Colorado Rockies (+0.11)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.6
           }
         ]
       }
@@ -2498,57 +2440,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.789
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815429",
-      "source_event_ids": [
-        "401815429"
-      ],
-      "kickoff": "2026-05-20T19:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Colorado Rockies",
-      "away": "Texas Rangers",
-      "match": "Colorado Rockies - Texas Rangers",
-      "decision": "lean_home",
-      "net_team": "Colorado Rockies",
-      "reason": "Texas Rangers plus penalise par calendrier/voyage (0.74 vs 0.00)",
-      "pressure_score": 0.741,
-      "home_fade": 0.0,
-      "away_fade": 0.741,
-      "travel_score": 0.741,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "1 match dans les 48h + 1053 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.469,
-        "away_score": -1.341,
-        "home_fade": 0.0,
-        "away_fade": 1.341,
-        "reason": "Direction nette: Colorado Rockies (+0.47)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.741
           }
         ]
       }
