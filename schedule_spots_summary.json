@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-19T03:20:45Z",
+  "generated_at": "2026-05-19T03:24:34Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -344,10 +344,10 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.195,
-        "away_score": -0.195,
+        "away_score": 0.286,
         "home_fade": 0.3,
         "away_fade": 0.3,
-        "reason": "Direction nette: Athletics (-0.20)",
+        "reason": "Direction nette: Athletics (+0.29)",
         "detail": [
           {
             "side": "home",
@@ -360,6 +360,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.3
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.481
           }
         ]
       }
@@ -679,11 +685,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.602,
+        "home_score": 1.603,
         "away_score": -2.097,
         "home_fade": 0.15,
         "away_fade": 2.15,
-        "reason": "Direction nette: Minnesota Twins (+0.60)",
+        "reason": "Direction nette: Minnesota Twins (+1.60)",
         "detail": [
           {
             "side": "home",
@@ -701,6 +707,12 @@
             "side": "away",
             "type": "injury_imbalance",
             "direction": "fade",
+            "strength": 1.0
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
             "strength": 1.0
           },
           {
@@ -853,11 +865,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 1.462,
-        "away_score": -1.698,
+        "home_score": 0.112,
+        "away_score": -0.698,
         "home_fade": 0.15,
-        "away_fade": 1.75,
-        "reason": "Direction nette: Colorado Rockies (+1.46)",
+        "away_fade": 0.75,
+        "reason": "Direction nette: Colorado Rockies (+0.11)",
         "detail": [
           {
             "side": "home",
@@ -876,18 +888,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.6
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
           }
         ]
       }
@@ -2218,11 +2218,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.345,
+        "home_score": 0.801,
         "away_score": -1.362,
         "home_fade": 0.15,
         "away_fade": 1.415,
-        "reason": "Direction nette: Kansas City Royals (+0.35)",
+        "reason": "Direction nette: Kansas City Royals (+0.80)",
         "detail": [
           {
             "side": "home",
@@ -2241,6 +2241,12 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.8
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.456
           },
           {
             "side": "away",
