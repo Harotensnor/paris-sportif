@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-05-19T03:48:06Z",
+  "generated_at": "2026-05-19T03:57:03Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 44,
+    "active_events": 40,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 64,
+      "lookahead": 58,
       "travel_extreme": 2,
       "back_to_back_travel": 13,
-      "schedule_congestion": 8
+      "schedule_congestion": 6
     },
     "by_decision": {
-      "abstain": 30,
+      "abstain": 26,
       "lean_home": 14
     },
     "lean_home": 14,
     "lean_away": 0,
-    "abstain": 30,
+    "abstain": 26,
     "monitor": 0
   },
   "active": [
@@ -343,11 +343,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.195,
-        "away_score": -0.195,
-        "home_fade": 0.3,
+        "home_score": -1.195,
+        "away_score": 1.155,
+        "home_fade": 1.3,
         "away_fade": 0.3,
-        "reason": "Direction nette: Athletics (-0.20)",
+        "reason": "Direction nette: Athletics (+1.15)",
         "detail": [
           {
             "side": "home",
@@ -360,6 +360,18 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.3
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
           }
         ]
       }
@@ -400,58 +412,6 @@
         "home_fade": 0.6,
         "away_fade": 0.6,
         "reason": "Signaux opposes: Cleveland Cavaliers fade 0.60, New York Knicks fade 0.60 -> prudence",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401873201",
-      "source_event_ids": [
-        "401873201"
-      ],
-      "kickoff": "2026-05-27T00:30Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "Oklahoma City Thunder",
-      "away": "San Antonio Spurs",
-      "match": "Oklahoma City Thunder - San Antonio Spurs",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Oklahoma City Thunder 0.60, San Antonio Spurs 0.60",
-      "pressure_score": 1.2,
-      "home_fade": 0.6,
-      "away_fade": 0.6,
-      "travel_score": 0,
-      "lookahead_score": 0,
-      "congestion_score": 1.2,
-      "types": {
-        "schedule_congestion": 2
-      },
-      "contexts": [
-        "3 matchs sur les 7 derniers jours",
-        "3 matchs sur les 7 derniers jours"
-      ],
-      "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.39,
-        "away_score": -0.39,
-        "home_fade": 0.6,
-        "away_fade": 0.6,
-        "reason": "Signaux opposes: Oklahoma City Thunder fade 0.60, San Antonio Spurs fade 0.60 -> prudence",
         "detail": [
           {
             "side": "home",
@@ -667,11 +627,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.252,
-        "away_score": -1.097,
+        "home_score": 1.603,
+        "away_score": -2.097,
         "home_fade": 0.15,
-        "away_fade": 1.15,
-        "reason": "Direction nette: Minnesota Twins (+0.25)",
+        "away_fade": 2.15,
+        "reason": "Direction nette: Minnesota Twins (+1.60)",
         "detail": [
           {
             "side": "home",
@@ -689,6 +649,18 @@
             "side": "away",
             "type": "injury_imbalance",
             "direction": "fade",
+            "strength": 1.0
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
             "strength": 1.0
           }
         ]
@@ -1199,58 +1171,6 @@
       }
     },
     {
-      "event_id": "401873198",
-      "source_event_ids": [
-        "401873198"
-      ],
-      "kickoff": "2026-05-21T00:30Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "Oklahoma City Thunder",
-      "away": "San Antonio Spurs",
-      "match": "Oklahoma City Thunder - San Antonio Spurs",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Oklahoma City Thunder 0.15, San Antonio Spurs 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
-        "home_fade": 0.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: San Antonio Spurs (-0.10)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401815430",
       "source_event_ids": [
         "401815430"
@@ -1281,11 +1201,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
-        "home_fade": 0.15,
+        "home_score": -1.097,
+        "away_score": 1.252,
+        "home_fade": 1.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Athletics (-0.10)",
+        "reason": "Direction nette: Athletics (+1.25)",
         "detail": [
           {
             "side": "home",
@@ -1298,6 +1218,18 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
           }
         ]
       }
@@ -1407,58 +1339,6 @@
       }
     },
     {
-      "event_id": "401873199",
-      "source_event_ids": [
-        "401873199"
-      ],
-      "kickoff": "2026-05-23T00:30Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "San Antonio Spurs",
-      "away": "Oklahoma City Thunder",
-      "match": "San Antonio Spurs - Oklahoma City Thunder",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: San Antonio Spurs 0.15, Oklahoma City Thunder 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
-        "home_fade": 0.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Oklahoma City Thunder (-0.10)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401873343",
       "source_event_ids": [
         "401873343"
@@ -1494,58 +1374,6 @@
         "home_fade": 0.15,
         "away_fade": 0.15,
         "reason": "Direction nette: New York Knicks (-0.10)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401873200",
-      "source_event_ids": [
-        "401873200"
-      ],
-      "kickoff": "2026-05-25T00:00Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "San Antonio Spurs",
-      "away": "Oklahoma City Thunder",
-      "match": "San Antonio Spurs - Oklahoma City Thunder",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: San Antonio Spurs 0.15, Oklahoma City Thunder 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
-        "home_fade": 0.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Oklahoma City Thunder (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -2088,11 +1916,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.345,
+        "home_score": 0.801,
         "away_score": -1.362,
         "home_fade": 0.15,
         "away_fade": 1.415,
-        "reason": "Direction nette: Kansas City Royals (+0.35)",
+        "reason": "Direction nette: Kansas City Royals (+0.80)",
         "detail": [
           {
             "side": "home",
@@ -2111,6 +1939,12 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.8
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.456
           },
           {
             "side": "away",
@@ -2151,11 +1985,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 1.574,
+        "home_score": 1.717,
         "away_score": -2.871,
         "home_fade": 0.0,
         "away_fade": 2.871,
-        "reason": "Direction nette: Minnesota Twins (+1.57)",
+        "reason": "Direction nette: Minnesota Twins (+1.72)",
         "detail": [
           {
             "side": "away",
@@ -2167,7 +2001,7 @@
             "side": "home",
             "type": "market_move",
             "direction": "steam",
-            "strength": 0.57
+            "strength": 0.712
           },
           {
             "side": "away",
