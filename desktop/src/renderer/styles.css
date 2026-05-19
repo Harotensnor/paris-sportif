@@ -6511,6 +6511,147 @@ body.theme-light .sidebar {
   margin: 0 0 7px;
 }
 
+.next-bet-card {
+  border: 1px solid rgba(16, 185, 129, .34);
+  border-radius: 12px;
+  background:
+    linear-gradient(135deg, rgba(16, 185, 129, .16), rgba(14, 165, 233, .06)),
+    rgba(15, 23, 42, .58);
+  overflow: hidden;
+}
+
+.next-bet-card.compact {
+  margin-bottom: 12px;
+}
+
+.next-bet-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(190px, auto);
+  align-items: stretch;
+  gap: 12px;
+  padding: 12px;
+}
+
+.next-bet-inner.watch {
+  border-left: 5px solid rgba(245, 158, 11, .9);
+}
+
+.next-bet-inner.ok {
+  border-left: 5px solid rgba(16, 185, 129, .95);
+}
+
+.next-bet-inner.danger,
+.next-bet-inner.empty-state {
+  border-left: 5px solid rgba(248, 113, 113, .9);
+}
+
+.next-bet-main {
+  min-width: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.next-bet-main h3 {
+  margin: 0;
+  font-size: 21px;
+  line-height: 1.1;
+  color: var(--text);
+}
+
+.next-bet-main p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.next-bet-ticket {
+  display: grid;
+  gap: 2px;
+  padding: 8px 10px;
+  border: 1px solid rgba(148, 163, 184, .18);
+  border-radius: 9px;
+  background: rgba(2, 6, 23, .36);
+}
+
+.next-bet-ticket span {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: .04em;
+}
+
+.next-bet-ticket strong {
+  font-size: 17px;
+  line-height: 1.2;
+  color: var(--text);
+}
+
+.next-bet-ticket em {
+  color: var(--muted);
+  font-style: normal;
+  font-size: 12px;
+}
+
+.next-bet-reason {
+  max-width: 980px;
+}
+
+.next-bet-side {
+  display: grid;
+  align-content: center;
+  gap: 8px;
+  min-width: 190px;
+}
+
+.next-bet-side > span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.next-bet-verdict,
+.bet-status-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-weight: 950;
+  font-size: 12px;
+  border: 1px solid rgba(148, 163, 184, .18);
+}
+
+.next-bet-verdict.ok,
+.bet-status-pill.ok {
+  color: #86efac;
+  border-color: rgba(16, 185, 129, .45);
+  background: rgba(16, 185, 129, .14);
+}
+
+.next-bet-verdict.watch,
+.bet-status-pill.watch {
+  color: #fcd34d;
+  border-color: rgba(245, 158, 11, .42);
+  background: rgba(245, 158, 11, .14);
+}
+
+.next-bet-verdict.danger,
+.bet-status-pill.danger {
+  color: #fca5a5;
+  border-color: rgba(248, 113, 113, .42);
+  background: rgba(248, 113, 113, .13);
+}
+
+.category-page {
+  display: grid;
+  gap: 12px;
+}
+
+.category-top-grid {
+  margin-bottom: 0;
+}
+
 .betting-home-head {
   display: flex;
   align-items: end;
@@ -6783,6 +6924,26 @@ body.theme-light .sidebar {
   overflow: hidden;
 }
 
+.home-picks-table .bet-status-pill {
+  white-space: nowrap;
+}
+
+@media (max-width: 1100px) {
+  .next-bet-inner {
+    grid-template-columns: 1fr;
+  }
+
+  .next-bet-side {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: center;
+  }
+
+  .home-top3-grid,
+  .home-watch-strip {
+    grid-template-columns: 1fr;
+  }
+}
+
 .recovery-strip {
   margin: 8px 0;
 }
@@ -7051,7 +7212,7 @@ body.trading-desk-on .tab-panel[data-panel="dashboard"].active > #cockpit-detail
 }
 
 /* Fiche match rapide : trois onglets lisibles, le reste reste hors parcours mise. */
-#match-modal.quick-bet-mode .modal-tab:not([data-detail-tab="summary"]):not([data-detail-tab="context"]):not([data-detail-tab="teams"]) {
+#match-modal.quick-bet-mode .modal-tab:not([data-detail-tab="summary"]):not([data-detail-tab="context"]):not([data-detail-tab="teams"]):not([data-detail-tab="sources"]) {
   display: none !important;
 }
 

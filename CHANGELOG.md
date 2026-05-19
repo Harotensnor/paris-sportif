@@ -3,6 +3,17 @@
 Auto-généré depuis les messages de commit par `scripts/build_changelog.py`.
 Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
+## Desktop — 2026-05-19
+
+### Version v8.0.0 — Parieur First : prochain pari sérieux + pages dédiées
+
+Refonte ciblée après le constat “je ne comprends pas quoi faire et aucun pari n’est proposé clairement”.
+- L’accueil répond maintenant d’abord à la question utile : **prochain pari sérieux**, avec statut `Je mise`, `À surveiller` ou `Interdit`, raison simple, cote, confiance et prochain re-check.
+- Les catégories principales deviennent de vraies pages : Football, Semaine, Nuit, Vainqueurs, Buts, Tennis, Basket, Baseball, Hockey et À surveiller ne déroulent plus simplement le cockpit sur l’accueil.
+- Le tableau accueil gagne un tri par statut et affiche explicitement pourquoi une ligne reste en surveillance au lieu de laisser croire qu’il manque un pari.
+- La fiche match passe en lecture plus humaine : onglets `Décision`, `Analyse`, `Compos`, `Sources`, avec le détail technique gardé hors parcours standard.
+- Les boutons de navigation et l’intitulé produit passent sur `v8.0.0`, avec cache Service Worker renouvelé.
+
 ## Desktop — 2026-05-18
 
 ### Version v7.3.0 — Accueil sous 2-3s + payload moteur léger

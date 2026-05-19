@@ -320,7 +320,7 @@
   };
   const I18N_MESSAGES = {
     fr: {
-      navPicks: 'À miser',
+      navPicks: "Aujourd'hui",
       navHistory: 'Bilan & Stats',
       navSearch: 'Recherche',
       navSettings: 'Réglages',
@@ -337,7 +337,7 @@
       tacticalAnalysis: 'Analyse tactique'
     },
     en: {
-      navPicks: "Today's bets",
+      navPicks: 'Today',
       navHistory: 'Stats',
       navSearch: 'Search',
       navSettings: 'Settings',
@@ -6767,20 +6767,23 @@
   function homeSortMode() {
     try {
       const value = localStorage.getItem(HOME_SORT_KEY) || 'confidence';
-      return ['confidence', 'kickoff', 'date', 'odd'].includes(value) ? value : 'confidence';
+      return ['confidence', 'kickoff', 'date', 'odd', 'status'].includes(value) ? value : 'confidence';
     } catch {
       return 'confidence';
     }
   }
 
   function setHomeSort(mode) {
-    const next = ['confidence', 'kickoff', 'date', 'odd'].includes(mode) ? mode : 'confidence';
+    const next = ['confidence', 'kickoff', 'date', 'odd', 'status'].includes(mode) ? mode : 'confidence';
     try {
       localStorage.setItem(HOME_SORT_KEY, next);
     } catch {
       // Tri de confort seulement.
     }
     renderBettingHome(state.currentDashboardRows.length ? state.currentDashboardRows : state.picks);
+    if ($('[data-panel="category"]')?.classList.contains('active')) {
+      renderCategoryPage(state.activeHomeCategory || 'cockpit');
+    }
   }
 
   function homeConfidenceValue(row) {
@@ -6801,6 +6804,139 @@
     const winnerBonus = isWinnerRow(row) ? 8 : 0;
     const safetyBonus = row?.winamaxTwoGoalRule?.eligible ? Math.min(8, Number(row.winamaxTwoGoalRule.leadTwoProbability || 0) * 10) : 0;
     return confidence * 100 + oddBonus + readyBonus + winnerBonus + safetyBonus;
+  }
+
+  function seriousBetStatus(row) {
+    if (!row || !canDisplayPickCard(row)) {
+      return {
+        key: 'blocked',
+        label: 'Interdit',
+        tone: 'danger',
+        action: 'Ne pas miser',
+        detail: 'Le match n’est pas assez propre ou n’est plus jouable.'
+      };
+    }
+    if (isReadyToStakeRow(row)) {
+      return {
+        key: 'ready',
+        label: 'Je mise',
+        tone: 'ok',
+        action: `Mise ${visibleStakeText(row)}`,
+        detail: 'Pari actionnable avec garde-fous positifs.'
+      };
+    }
+    const reason = userFacingGuardText(
+      row?.decisionCenter?.mainReason ||
+      row?.safeAssessment?.blockReason ||
+      row?.contextGate?.label ||
+      row?.contextGate?.gate ||
+      'contexte à confirmer'
+    );
+    return {
+      key: 'watch',
+      label: 'À surveiller',
+      tone: 'watch',
+      action: 'Attendre le re-check',
+      detail: reason
+    };
+  }
+
+  function seriousBetStatusHtml(row, { compact = false } = {}) {
+    const status = seriousBetStatus(row);
+    const label = compact ? status.label : `${status.label}${status.detail ? ` · ${status.detail}` : ''}`;
+    return `<span class="bet-status-pill ${escapeHtml(status.tone)}">${escapeHtml(label)}</span>`;
+  }
+
+  function nextCheckLabel(row) {
+    const ts = rowKickoffTime(row);
+    if (!Number.isFinite(ts)) return 'au prochain refresh';
+    const now = Date.now();
+    const minutes = Math.round((ts - now) / 60000);
+    if (minutes <= 0) return 'match imminent';
+    if (minutes <= 75) return 'dans 5 minutes';
+    if (minutes <= 180) return 'à T-30';
+    if (minutes <= 420) return 'à T-60';
+    return 'au prochain refresh important';
+  }
+
+  function rollingWeekRows(rows = state.picks, predicate = canDisplayPickCard) {
+    const now = Date.now();
+    const week = now + 7 * 24 * 60 * 60 * 1000;
+    return (Array.isArray(rows) ? rows : [])
+      .filter((row) => {
+        const ts = rowKickoffTime(row);
+        return pickHasCoreData(row) && Number.isFinite(ts) && ts > now && ts <= week && predicate(row);
+      })
+      .sort((a, b) => homePickScore(b) - homePickScore(a) || rowKickoffTime(a) - rowKickoffTime(b));
+  }
+
+  function nextSeriousBetSummary(rows = state.picks) {
+    const pool = Array.isArray(rows) ? rows : [];
+    const ready24 = sortHomeRows(rolling24hRows(pool, isReadyToStakeRow), 'confidence');
+    const watch24 = sortHomeRows(rolling24hRows(pool, canDisplayPickCard).filter((row) => !isReadyToStakeRow(row)), 'confidence');
+    const weekReady = sortHomeRows(rollingWeekRows(pool, isReadyToStakeRow), 'confidence');
+    const weekWatch = sortHomeRows(rollingWeekRows(pool, canDisplayPickCard).filter((row) => !isReadyToStakeRow(row)), 'confidence');
+    const row = ready24[0] || weekReady[0] || watch24[0] || weekWatch[0] || null;
+    const status = seriousBetStatus(row);
+    return {
+      row,
+      status,
+      scope: ready24[0] ? '24h' : weekReady[0] ? 'semaine' : watch24[0] ? '24h-watch' : weekWatch[0] ? 'semaine-watch' : 'none',
+      ready24: ready24.length,
+      watch24: watch24.length,
+      weekReady: weekReady.length,
+      weekWatch: weekWatch.length
+    };
+  }
+
+  function nextBetCardHtml(summary, { compact = false } = {}) {
+    const row = summary?.row || null;
+    if (!row) {
+      return `
+        <article class="next-bet-inner empty-state">
+          <div>
+            <span class="eyebrow">Prochain pari sérieux</span>
+            <h3>Aucun spot exploitable trouvé</h3>
+            <p>Le logiciel ne trouve pas assez de contexte Winamax fiable. Mieux vaut attendre le prochain refresh que cliquer au hasard.</p>
+          </div>
+          <strong class="next-bet-verdict danger">Ne pas miser</strong>
+        </article>
+      `;
+    }
+    const status = summary.status || seriousBetStatus(row);
+    const confidence = Math.round(homeConfidenceValue(row) * 100);
+    const reason = simpleWhyText(row) || pickReason(row) || status.detail;
+    const scopeText = summary.scope === 'semaine' || summary.scope === 'semaine-watch'
+      ? 'meilleur spot de la semaine'
+      : 'meilleur spot des 24h';
+    return `
+      <article class="next-bet-inner ${escapeHtml(status.tone)} clickable-row" data-match-id="${escapeHtml(row.id)}" tabindex="0" role="button" aria-label="Ouvrir ${escapeHtml(row.title || 'match')}">
+        <div class="next-bet-main">
+          <span class="eyebrow">Prochain pari sérieux · ${escapeHtml(scopeText)}</span>
+          <h3>${escapeHtml(row.title || 'Match')}</h3>
+          <p>${escapeHtml(formatDateLabel(row.start))} · ${escapeHtml(countdownLabel(row.start))} · ${escapeHtml(row.sport || 'Sport')} · ${escapeHtml(row.league || 'Winamax')}</p>
+          <div class="next-bet-ticket">
+            <span>PARI</span>
+            <strong>${escapeHtml(userBetLabel(row) || simpleMarketLabelForRow(row))}</strong>
+            <em>Cote ${escapeHtml(formatOdd(row.odd))} · confiance ${escapeHtml(`${confidence}%`)}</em>
+          </div>
+          <p class="next-bet-reason">${escapeHtml(reason)}</p>
+        </div>
+        <div class="next-bet-side">
+          <strong class="next-bet-verdict ${escapeHtml(status.tone)}">${escapeHtml(status.label)}</strong>
+          <span>${escapeHtml(status.key === 'ready' ? status.action : `Re-check ${nextCheckLabel(row)}`)}</span>
+          ${status.key === 'ready' ? trackButtonHtml(row, `Je mise ${visibleStakeText(row)}`) : ''}
+          ${winamaxOpenButtonHtml(row, status.key === 'ready' ? 'Ouvrir Winamax' : 'Voir Winamax')}
+        </div>
+      </article>
+    `;
+  }
+
+  function renderNextSeriousBet(rows, target = '#next-bet-card') {
+    const node = $(target);
+    if (!node) return;
+    const summary = nextSeriousBetSummary(rows);
+    node.innerHTML = nextBetCardHtml(summary, { compact: node.classList.contains('compact') });
   }
 
   function diverseHomeTopRows(rows, limit = 3) {
@@ -6864,6 +7000,16 @@
         || kickoff(a) - kickoff(b)
       ));
     }
+    if (mode === 'status') {
+      const statusRank = (row) => {
+        const key = seriousBetStatus(row).key;
+        return key === 'ready' ? 3 : key === 'watch' ? 2 : 1;
+      };
+      return arr.sort((a, b) => (
+        statusRank(b) - statusRank(a)
+        || confidenceSort(a, b)
+      ));
+    }
     return arr.sort(confidenceSort);
   }
 
@@ -6914,6 +7060,16 @@
         kicker: 'Nuit',
         title: 'Les paris de nuit',
         subtitle: 'Sports US, Asie et matchs tardifs sur les prochaines 24h.'
+      },
+      week: {
+        kicker: 'Semaine',
+        title: 'Les prochains spots à suivre',
+        subtitle: 'Le meilleur spot peut être demain ou plus tard : la page évite de forcer un mauvais pari aujourd’hui.'
+      },
+      'sport:football': {
+        kicker: 'Football',
+        title: 'Football : priorité aux paris simples',
+        subtitle: 'Vainqueurs, buts simples et buteurs vérifiés, avec prudence si compos/blessures manquent.'
       },
       'sport:tennis': {
         kicker: 'Tennis',
@@ -7059,6 +7215,7 @@
         <td data-label="Pari"><strong>${escapeHtml(userBetLabel(row) || simpleMarketLabelForRow(row))}</strong><div class="match-sub">${escapeHtml(simpleMarketLabelForRow(row))}</div></td>
         <td data-label="Confiance"><span class="home-confidence-pill">${escapeHtml(`${confidence}%`)}</span></td>
         <td data-label="Cote"><strong>${escapeHtml(formatOdd(row.odd))}</strong></td>
+        <td data-label="Statut">${seriousBetStatusHtml(row, { compact: true })}<div class="match-sub">${escapeHtml(seriousBetStatus(row).detail)}</div></td>
         <td data-label="Mise">${escapeHtml(visibleStakeText(row))}</td>
         <td data-label="Action"><div class="home-table-action">${winamaxOpenButtonHtml(row, 'Winamax')}${canStake ? trackButtonHtml(row, 'Je mise') : '<span class="match-sub">Surveiller</span>'}</div></td>
       </tr>
@@ -7079,6 +7236,7 @@
     if (title) title.textContent = meta.title;
     if (subtitle) subtitle.textContent = meta.subtitle;
     const source = homeSourceRows(rows);
+    renderNextSeriousBet(source, '#next-bet-card');
     const topRows = homeTopRows(source, 3);
     const watchRows = topRows.length < 3 ? homeWatchRows(source, 3 - topRows.length, topRows) : [];
     const tableLimit = state.activeHomeCategory ? 10 : 6;
@@ -7087,7 +7245,7 @@
       button.classList.toggle('active', button.dataset.homeSort === sortMode);
     });
     if (caption) {
-      const labels = { confidence: 'confiance puis cote', kickoff: 'heure de départ', date: 'date', odd: 'cote Winamax' };
+      const labels = { confidence: 'confiance puis cote', kickoff: 'heure de départ', date: 'date', odd: 'cote Winamax', status: 'statut de mise' };
       caption.textContent = `${formatCount(tableRows.length)} affichés ici · ${formatCount(tableLimit)} max · tri ${labels[sortMode] || 'confiance'}`;
     }
     if (topWrap) {
@@ -7101,7 +7259,97 @@
     if (body) {
       body.innerHTML = tableRows.length
         ? tableRows.map(homeTableRowHtml).join('')
-        : '<tr><td colspan="8" class="empty">Aucun pari dans le tableau 24h avec les filtres actuels.</td></tr>';
+        : '<tr><td colspan="9" class="empty">Aucun pari dans le tableau 24h avec les filtres actuels.</td></tr>';
+    }
+  }
+
+  function categoryTabToKey(tab) {
+    const map = {
+      cockpit: 'cockpit',
+      winners: 'winner',
+      goals: 'goals',
+      night: 'night',
+      football: 'sport:football',
+      tennis: 'sport:tennis',
+      basket: 'sport:basketball',
+      baseball: 'sport:baseball',
+      hockey: 'sport:hockey',
+      week: 'week',
+      watch: 'watch',
+      strict: 'strict',
+      value: 'value'
+    };
+    return map[tab] || tab || 'cockpit';
+  }
+
+  function tabForHomeCategory(category) {
+    const key = String(category || '').toLowerCase();
+    const map = {
+      cockpit: 'cockpit',
+      ready: 'dashboard',
+      winner: 'winners',
+      goals: 'goals',
+      scorer: 'scorers',
+      night: 'night',
+      watch: 'watch',
+      today: 'dashboard',
+      tomorrow: 'week',
+      week: 'week',
+      combines: 'combines',
+      'sport:football': 'football',
+      'sport:tennis': 'tennis',
+      'sport:basketball': 'basket',
+      'sport:baseball': 'baseball',
+      'sport:hockey': 'hockey',
+      strict: 'strict',
+      value: 'value'
+    };
+    return map[key] || (key.startsWith('sport:') ? 'football' : 'cockpit');
+  }
+
+  function categoryRowsForPage(category, rows = state.currentDashboardRows.length ? state.currentDashboardRows : state.picks) {
+    const source = Array.isArray(rows) ? rows : [];
+    if (category === 'week') return rollingWeekRows(source, canDisplayPickCard);
+    if (category === 'cockpit') return rolling24hRows(source, canDisplayPickCard);
+    return category === 'watch'
+      ? rollingWeekRows(source, canDisplayPickCard).filter((row) => !isReadyToStakeRow(row)).slice(0, 40)
+      : marketCategoryRows(source, category);
+  }
+
+  function renderCategoryPage(category = state.activeHomeCategory || 'cockpit') {
+    const key = category || 'cockpit';
+    const rows = categoryRowsForPage(key);
+    const sortMode = homeSortMode();
+    const sorted = sortHomeRows(rows, sortMode);
+    const topRows = diverseHomeTopRows(sorted.filter(isReadyToStakeRow), 3);
+    const fallbackTop = topRows.length >= 3 ? [] : diverseHomeTopRows(sorted.filter((row) => !isReadyToStakeRow(row)), 3 - topRows.length, topRows);
+    const tableRows = sorted.slice(0, key === 'week' || key === 'watch' ? 18 : 14);
+    const meta = key === 'week'
+      ? { kicker: 'Semaine', title: 'Les prochains spots à suivre', subtitle: 'Le logiciel montre le meilleur spot à venir même si rien n’est à miser aujourd’hui.' }
+      : homeCategoryMeta(key);
+    const kicker = $('#category-page-kicker');
+    const title = $('#category-page-title');
+    const subtitle = $('#category-page-subtitle');
+    const top = $('#category-top3-grid');
+    const body = $('#category-picks-table-body');
+    const caption = $('#category-table-caption');
+    const tableTitle = $('#category-table-title');
+    if (kicker) kicker.textContent = meta.kicker;
+    if (title) title.textContent = meta.title;
+    if (subtitle) subtitle.textContent = meta.subtitle;
+    if (tableTitle) tableTitle.textContent = `Tableau ${meta.title.toLowerCase()}`;
+    if (caption) caption.textContent = `${formatCount(tableRows.length)} lignes · ${formatCount(sorted.filter(isReadyToStakeRow).length)} prêtes · tri ${sortMode}`;
+    renderNextSeriousBet(sorted, '#category-next-bet-card');
+    if (top) {
+      const watchHtml = fallbackTop.length ? `<div class="home-watch-strip">${fallbackTop.map(homeWatchCardHtml).join('')}</div>` : '';
+      top.innerHTML = topRows.length
+        ? topRows.map(homeTopCardHtml).join('') + watchHtml
+        : watchHtml || '<div class="empty compact-empty">Aucun spot solide dans cette catégorie pour le moment.</div>';
+    }
+    if (body) {
+      body.innerHTML = tableRows.length
+        ? tableRows.map(homeTableRowHtml).join('')
+        : '<tr><td colspan="9" class="empty">Aucune ligne dans cette page pour le moment.</td></tr>';
     }
   }
 
@@ -8231,7 +8479,7 @@
           : 'Aucun pari prêt aujourd’hui';
         node.innerHTML = `
           <strong>${noReadyToday ? noReadyTitle : lowReadyToday ? 'Volume prêt limité aujourd’hui' : tooStrictForDailyTarget ? 'Modèle trop strict aujourd’hui' : displayed ? `${formatCount(displayed)} pari(s) aujourd'hui seulement` : 'Aucun pari simple aujourd’hui visible'}</strong>
-          <span>Aujourd’hui : ${formatCount(today.totalEvents || today.events || 0)} matchs → ${formatCount(bookable)} Winamax → ${formatCount(today.predictableMatches || today.predictable || 0)} analysables → ${formatCount(today.positiveSimplePassingFilters ?? today.simplePassingFilters ?? 0)} signaux simples positifs → ${formatCount(simpleReady)} simples prêts.${futureReadyOutsideToday ? ` ${formatCount(futureReadyOutsideToday)} pari(s) prêts existent plus tard dans le cockpit.` : ''} ${advancedReady ? `${formatCount(advancedReady)} prêts avancés restent cachés en mode standard.` : ''}</span>
+          <span>${tooStrictForDailyTarget ? 'Modèle trop strict / sources trop faibles : ' : ''}Aujourd’hui : ${formatCount(today.totalEvents || today.events || 0)} matchs → ${formatCount(bookable)} Winamax → ${formatCount(today.predictableMatches || today.predictable || 0)} analysables → ${formatCount(today.positiveSimplePassingFilters ?? today.simplePassingFilters ?? 0)} signaux simples positifs → ${formatCount(simpleReady)} simples prêts.${futureReadyOutsideToday ? ` ${formatCount(futureReadyOutsideToday)} pari(s) prêts existent plus tard dans le cockpit.` : ''} ${advancedReady ? `${formatCount(advancedReady)} prêts avancés restent cachés en mode standard.` : ''}</span>
           <button class="ghost-btn" type="button" data-tab-target="data">Diagnostic auto</button>
         `;
         return;
@@ -8720,6 +8968,9 @@
       renderReadyPicksHero(displayRows);
     }
     renderBettingHome(displayRows);
+    if ($('[data-panel="category"]')?.classList.contains('active')) {
+      renderCategoryPage(state.activeHomeCategory || 'cockpit');
+    }
     renderRecoveryStrip();
     renderHomeCategories(displayRows);
     // Sprint 50 (UX) : badge compteur "paris prêts" dans la nav Picks.
@@ -17954,6 +18205,8 @@
       value: 'value',
       halftime: 'halftime',
       night: 'night',
+      football: 'sport:football',
+      week: 'week',
       tennis: 'sport:tennis',
       basket: 'sport:basketball',
       baseball: 'sport:baseball',
@@ -17961,7 +18214,7 @@
       watch: 'watch'
     };
     const cockpitCategory = categoryTabs[tab] || null;
-    const panelTab = cockpitCategory ? 'dashboard' : tab;
+    const panelTab = cockpitCategory ? 'category' : tab;
     if (!state.engineHydrated && !state.engineHydrating && ['history', 'recovery', 'agent', 'data', 'search', 'calendar', 'pipeline', 'combines', 'scorers', 'matches'].includes(panelTab)) {
       if (state.engineHydrationTimer) {
         clearTimeout(state.engineHydrationTimer);
@@ -17969,13 +18222,18 @@
       }
       hydrateFullEngineAnalysis(getBankroll());
     }
-    state.activeHomeCategory = panelTab === 'dashboard' ? cockpitCategory : null;
+    if (!state.engineHydrated && !state.engineHydrating && tab === 'week') {
+      hydrateFullEngineAnalysis(getBankroll());
+    }
+    state.activeHomeCategory = panelTab === 'category' ? cockpitCategory : null;
     recordUserAction('view', tab);
     $$('.nav-btn').forEach((btn) => btn.classList.toggle('active', btn.dataset.tab === tab));
     $$('.tab-panel').forEach((panel) => panel.classList.toggle('active', panel.dataset.panel === panelTab));
     const titles = {
-      dashboard: 'À miser maintenant',
+      dashboard: 'Aujourd’hui',
       cockpit: 'Cockpit pronostics',
+      football: 'Football',
+      week: 'Semaine',
       winners: 'Vainqueurs',
       goals: 'Buts',
       strict: 'Strict',
@@ -17991,7 +18249,7 @@
       scorers: 'Buteurs & joueurs',
       matches: 'Tous les matchs Winamax',
       history: t('navHistory'),
-      recovery: 'Récupération',
+      recovery: 'Pourquoi j’ai perdu',
       agent: 'Agent',
       data: 'Avancé',
       search: t('navSearch'),
@@ -18007,7 +18265,8 @@
       renderPicks();
     }
     if (cockpitCategory) {
-      setTimeout(() => openCockpitCategory(cockpitCategory), 20);
+      renderCategoryPage(cockpitCategory);
+      setSideStatus(titles[tab] || 'Catégorie ouverte', 'ok');
     }
     if (panelTab === 'calendar') renderCalendar();
     if (panelTab === 'search') renderDeepSearch();
@@ -19151,11 +19410,14 @@
         return;
       }
       const tabButton = event.target.closest('[data-tab-target]');
-      if (tabButton) switchTab(tabButton.dataset.tabTarget || 'dashboard');
+      if (tabButton) {
+        switchTab(tabButton.dataset.tabTarget || 'dashboard');
+        return;
+      }
       const cockpitCategory = event.target.closest('[data-cockpit-category]');
       if (cockpitCategory) {
         event.preventDefault();
-        openCockpitCategory(cockpitCategory.dataset.cockpitCategory || 'cockpit');
+        switchTab(tabForHomeCategory(cockpitCategory.dataset.cockpitCategory || 'cockpit'));
         return;
       }
       const picksModeButton = event.target.closest('[data-picks-view-mode]');
@@ -19451,7 +19713,7 @@
         $('#refresh-log').textContent = error.stack || error.message;
       });
     });
-    ['home-top3-grid', 'home-picks-table-body', 'ultimate-bet-card', 'ready-picks-hero', 'live-cockpit', 'time-cockpit', 'simple-pick-timeline', 'favorite-picks-grid', 'simple-scorers-grid', 'bankroll-allocation-grid', 'picks-body', 'stake-scenario-body', 'watchlist-grid', 'prematch-final-grid', 'matches-body', 'combines-list', 'scorers-list', 'agent-positions-body', 'agent-blockers-body', 'deep-search-detail'].forEach((id) => {
+    ['next-bet-card', 'home-top3-grid', 'home-picks-table-body', 'category-next-bet-card', 'category-top3-grid', 'category-picks-table-body', 'ultimate-bet-card', 'ready-picks-hero', 'live-cockpit', 'time-cockpit', 'simple-pick-timeline', 'favorite-picks-grid', 'simple-scorers-grid', 'bankroll-allocation-grid', 'picks-body', 'stake-scenario-body', 'watchlist-grid', 'prematch-final-grid', 'matches-body', 'combines-list', 'scorers-list', 'agent-positions-body', 'agent-blockers-body', 'deep-search-detail'].forEach((id) => {
       const node = $(`#${id}`);
       if (!node) return;
       node.addEventListener('click', openMatchFromEvent);

@@ -75,6 +75,7 @@ async function main() {
       title: document.querySelector('#page-title')?.textContent || '',
       refreshLabel: document.querySelector('#refresh-btn')?.textContent || '',
       rows: document.querySelectorAll('#home-picks-table-body tr.clickable-row').length,
+      nextBetText: document.querySelector('#next-bet-card')?.innerText || '',
       topCards: document.querySelectorAll('#home-top3-grid .home-top-card').length,
       watchCards: document.querySelectorAll('#home-top3-grid .home-watch-card').length,
       categories: document.querySelectorAll('[data-cockpit-category]').length,
@@ -82,8 +83,11 @@ async function main() {
       dashboardText: document.querySelector('[data-panel="dashboard"]')?.innerText || '',
       standardExpertVisible: Boolean(document.querySelector('[data-tab="data"]:not(.hidden)'))
     }));
-    if (!/Picks|Paris|miser/i.test(home.title)) throw new Error(`Vue par défaut invalide: ${home.title}`);
+    if (!/Aujourd|Picks|Paris|miser/i.test(home.title)) throw new Error(`Vue par défaut invalide: ${home.title}`);
     if (!/Synchro instant/i.test(home.refreshLabel)) throw new Error(`Bouton refresh non instantané: ${home.refreshLabel}`);
+    if (!/Prochain pari sérieux|Aucun spot exploitable/i.test(home.nextBetText)) {
+      throw new Error(`Bloc prochain pari sérieux absent: ${home.nextBetText.slice(0, 300)}`);
+    }
     const topEmptyAllowed = /Aucun pari validé à miser|Top 3 incomplet/i.test(home.dashboardText);
     if (home.rows < 3 || (!home.topCards && !home.watchCards && !topEmptyAllowed) || home.categories < 8) {
       throw new Error(`Accueil rapide incomplet: ${JSON.stringify(home)}`);
@@ -93,18 +97,21 @@ async function main() {
       throw new Error(`Texte indésirable sur accueil: ${home.dashboardText.slice(0, 900)}`);
     }
 
-    await win.evaluate(() => document.querySelector('[data-tab="cockpit"]')?.click());
+    await win.evaluate(() => document.querySelector('[data-tab="football"]')?.click());
     await win.waitForFunction(() => (
-      document.querySelectorAll('#picks-body tr.clickable-row').length >= 3
-      || document.querySelectorAll('[data-time-bucket]').length >= 3
+      document.querySelector('[data-panel="category"].active')
+      && (
+        document.querySelectorAll('#category-picks-table-body tr.clickable-row').length >= 1
+        || /Aucune ligne|Aucun spot/i.test(document.querySelector('[data-panel="category"]')?.innerText || '')
+      )
     ), null, { timeout: 12000 });
     const cockpit = await win.evaluate(() => ({
-      rows: document.querySelectorAll('#picks-body tr.clickable-row').length,
-      buckets: document.querySelectorAll('[data-time-bucket]').length,
-      text: document.querySelector('[data-panel="dashboard"]')?.innerText || ''
+      rows: document.querySelectorAll('#category-picks-table-body tr.clickable-row').length,
+      top: document.querySelectorAll('#category-top3-grid .home-top-card, #category-top3-grid .home-watch-card').length,
+      text: document.querySelector('[data-panel="category"]')?.innerText || ''
     }));
-    if (cockpit.rows < 3 && cockpit.buckets < 3) {
-      throw new Error(`Cockpit détaillé non rendu après clic: ${JSON.stringify(cockpit).slice(0, 900)}`);
+    if (cockpit.rows < 1 && !/Aucune ligne|Aucun spot/i.test(cockpit.text)) {
+      throw new Error(`Page catégorie Football non rendue après clic: ${JSON.stringify(cockpit).slice(0, 900)}`);
     }
 
     // Le smoke rapide reste volontairement court : les pages lourdes

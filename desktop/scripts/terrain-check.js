@@ -197,6 +197,7 @@ async function main() {
         readyHeroText: document.querySelector('#ready-picks-hero')?.innerText || '',
         readyHeroDisplay: getComputedStyle(document.querySelector('#ready-picks-hero')).display,
         homeShellDisplay: getComputedStyle(document.querySelector('#betting-home-v2')).display,
+        nextBetText: document.querySelector('#next-bet-card')?.innerText || '',
         homeTop3Count: document.querySelectorAll('#home-top3-grid .home-top-card').length,
         homeTopMarkets: Array.from(document.querySelectorAll('#home-top3-grid .home-top-card')).map((node) => node.dataset.homeMarket || ''),
         homeTopCards: Array.from(document.querySelectorAll('#home-top3-grid .home-top-card')).map((node) => node.innerText || ''),
@@ -226,7 +227,8 @@ async function main() {
         })
       };
     });
-    assert(/Picks|Paris|miser/i.test(dom.title), 'Terrain: la vue Picks ne s’ouvre pas par défaut', dom);
+    assert(/Aujourd|Picks|Paris|miser/i.test(dom.title), 'Terrain: la vue principale ne s’ouvre pas par défaut', dom);
+    assert(/Prochain pari sérieux|Aucun spot exploitable/i.test(dom.nextBetText), 'Terrain: bloc prochain pari sérieux absent', dom);
     assert(!/@@\d/i.test(dom.dashboardText), 'Terrain: cote affichée avec double @', dom.dashboardText.match(/@@.{0,12}/g));
     assert(!(dom.trackButtonCount > 0 && /Aucun pari prêt aujourd’hui/i.test(dom.alertText)), 'Terrain: bannière 0 prêt contradictoire avec des boutons de mise', {
       alertText: dom.alertText,
@@ -234,11 +236,11 @@ async function main() {
       readyHeroText: dom.readyHeroText.slice(0, 500)
     });
     // Sprint 51 : on vérifie la présence des labels-clés, pas l'ordre exact.
-    const requiredNavLabels = ['miser', 'cockpit', 'vainqueurs', 'buts', 'nuit', 'buteurs', 'combinés', 'bilan', 'récupération', 'recherche', 'réglages'];
+    const requiredNavLabels = ['aujourd', 'football', 'semaine', 'vainqueurs', 'buts', 'nuit', 'buteurs', 'combinés', 'surveiller', 'bilan', 'perdu', 'recherche', 'réglages'];
     const navLabels = dom.nav.map((l) => l.toLowerCase());
     const missingNav = requiredNavLabels.filter((label) => !navLabels.some((nav) => nav.includes(label)));
-    assert(missingNav.length === 0, 'Terrain: navigation standard non simplifiée', { missingNav, nav: dom.nav });
-    assert(dom.nav.length <= 13, 'Terrain: navigation trop longue malgré les catégories', { nav: dom.nav });
+    assert(missingNav.length === 0, 'Terrain: navigation Parieur First incomplète', { missingNav, nav: dom.nav });
+    assert(dom.nav.length <= 18, 'Terrain: navigation trop longue malgré les pages dédiées', { nav: dom.nav });
     assert(
       (dom.rows >= 15 && dom.rows <= 32 && dom.timeline >= 8)
         || (dom.homeShellDisplay !== 'none' && dom.homeTableRows >= 6 && dom.homeCategoryCount >= 8),
@@ -259,7 +261,7 @@ async function main() {
     assert(dom.expertHomeLeaks.length === 0, 'Terrain: le Mode expert pollue encore l’accueil À miser', dom.expertHomeLeaks);
     assert(!/Modèle aujourd'hui|Conseils du jour|Décision finale locale/i.test(dom.dashboardText), 'Terrain: blocs diagnostic visibles sur l’accueil rapide', dom.dashboardText.slice(0, 1800));
     assert(!/Écouter le brief|brief audio|SpeechSynthesis|TTS/i.test(dom.dashboardText), 'Terrain: brief audio revenu dans le parcours standard', dom.dashboardText.slice(0, 1800));
-    assert(/Cockpit pronostics/i.test(dom.cockpitSummary), 'Terrain: catégorie Cockpit pronostics absente', dom);
+    assert(/Cockpit pronostics/i.test(dom.cockpitSummary), 'Terrain: catégorie Cockpit pronostics absente côté expert/catégories', dom);
     if (Number(todayFunnel.bookableEvents || 0) >= 30 && Number(todayFunnel.displayed || 0) < 10 && dom.trackButtonCount < 1) {
       assert(/trop strict|modèle trop strict/i.test(dom.alertText), 'Terrain: le garde-fou trop strict n’est pas visible', { todayFunnel, alertText: dom.alertText });
     }
@@ -287,24 +289,25 @@ async function main() {
     const winnerCategory = win.locator('[data-cockpit-category="winner"]:visible');
     if (await winnerCategory.count()) {
       await winnerCategory.first().click();
-      await win.waitForFunction(() => Boolean(document.querySelector('#cockpit-detail-section')?.open), null, { timeout: 5000 });
+      await win.waitForFunction(() => Boolean(document.querySelector('[data-panel="category"].active')), null, { timeout: 5000 });
       const categoryState = await win.evaluate(() => ({
-        open: Boolean(document.querySelector('#cockpit-detail-section')?.open),
-        mode: localStorage.getItem('parisSportifPicksViewMode'),
-        winnerVisible: Boolean(document.querySelector('[data-time-bucket="winner"]'))
+        active: Boolean(document.querySelector('[data-panel="category"].active')),
+        title: document.querySelector('#category-page-title')?.textContent || '',
+        rows: document.querySelectorAll('#category-picks-table-body tr.clickable-row').length,
+        text: document.querySelector('[data-panel="category"]')?.innerText || ''
       }));
-      assert(categoryState.open && categoryState.mode === 'type' && categoryState.winnerVisible, 'Terrain: catégorie Vainqueurs n’ouvre pas le Cockpit dédié', categoryState);
+      assert(categoryState.active && /Vainqueur/i.test(categoryState.title) && (categoryState.rows > 0 || /Aucune ligne|Aucun spot/i.test(categoryState.text)), 'Terrain: catégorie Vainqueurs n’ouvre pas sa page dédiée', categoryState);
     }
 
     await win.locator('[data-tab="winners"]:visible').first().click();
-    await win.waitForFunction(() => Boolean(document.querySelector('#cockpit-detail-section')?.open), null, { timeout: 5000 });
+    await win.waitForFunction(() => Boolean(document.querySelector('[data-panel="category"].active')), null, { timeout: 5000 });
     const navCategoryState = await win.evaluate(() => ({
       active: document.querySelector('.nav-btn.active')?.dataset.tab || '',
       title: document.querySelector('#page-title')?.textContent || '',
-      mode: localStorage.getItem('parisSportifPicksViewMode'),
-      winnerVisible: Boolean(document.querySelector('[data-time-bucket="winner"]'))
+      categoryTitle: document.querySelector('#category-page-title')?.textContent || '',
+      rows: document.querySelectorAll('#category-picks-table-body tr.clickable-row').length
     }));
-    assert(navCategoryState.active === 'winners' && /Vainqueurs/i.test(navCategoryState.title) && navCategoryState.mode === 'type' && navCategoryState.winnerVisible, 'Terrain: navigation Vainqueurs dédiée cassée', navCategoryState);
+    assert(navCategoryState.active === 'winners' && /Vainqueurs/i.test(navCategoryState.title) && /Vainqueur/i.test(navCategoryState.categoryTitle), 'Terrain: navigation Vainqueurs dédiée cassée', navCategoryState);
 
     const firstMatchCard = win.locator('[data-match-id]:visible').first();
     if (await firstMatchCard.count()) {
@@ -315,8 +318,8 @@ async function main() {
         text: document.querySelector('#match-modal')?.innerText || '',
         advancedDetailsVisible: Boolean(Array.from(document.querySelectorAll('#match-modal .detail-expert-details, #match-modal .detail-audit')).find((node) => getComputedStyle(node).display !== 'none'))
       }));
-      assert(modalState.visibleTabs.length <= 3, 'Terrain: fiche match encore trop chargée en onglets', modalState.visibleTabs);
-      assert(!modalState.visibleTabs.some((label) => /cotes avanc|signaux|timeline|sources|modèle|h2h|face-à-face/i.test(label)), 'Terrain: onglets techniques visibles dans la fiche rapide', modalState.visibleTabs);
+      assert(modalState.visibleTabs.length <= 4, 'Terrain: fiche match encore trop chargée en onglets', modalState.visibleTabs);
+      assert(!modalState.visibleTabs.some((label) => /cotes avanc|signaux|timeline|modèle|h2h|face-à-face/i.test(label)), 'Terrain: onglets techniques visibles dans la fiche rapide', modalState.visibleTabs);
       assert(!modalState.advancedDetailsVisible, 'Terrain: détails techniques visibles dans la fiche rapide', modalState);
       assert(!/\bKelly\b|Marchés détaillés|Audit technique|Vue technique/i.test(modalState.text), 'Terrain: jargon technique visible dans la fiche rapide', modalState.text.slice(0, 1800));
       await win.locator('#modal-close').click();
