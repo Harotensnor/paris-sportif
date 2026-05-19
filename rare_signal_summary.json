@@ -1,16 +1,16 @@
 {
-  "generated_at": "2026-05-19T14:55:52Z",
+  "generated_at": "2026-05-19T15:07:27Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 76,
-    "actionable": 37,
-    "watch": 11,
+    "active_events": 75,
+    "actionable": 39,
+    "watch": 8,
     "risk": 28,
     "expired_sample": 0,
     "by_type": {
-      "market_move": 19,
+      "market_move": 18,
       "injury_imbalance": 29,
       "signal_conflict": 7,
       "travel_extreme": 2,
@@ -18,8 +18,8 @@
       "back_to_back_travel": 14
     },
     "by_quality": {
-      "watch": 11,
-      "actionable": 37,
+      "watch": 8,
+      "actionable": 39,
       "risk": 28
     }
   },
@@ -403,6 +403,24 @@
       "context": "1 match dans les 48h + 1998 km de voyage"
     },
     {
+      "event_id": "401865539",
+      "date": "2026-05-20T00:00Z",
+      "sport": "football",
+      "league_code": "conmebol.libertadores",
+      "league_name": "Copa Libertadores",
+      "home": "Always Ready",
+      "away": "Mirassol",
+      "match": "Always Ready - Mirassol",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 0.918,
+      "context": "Cote home: 5.75 -> 4.80 (+16.5%)"
+    },
+    {
       "event_id": "401865443",
       "date": "2026-05-20T00:30Z",
       "sport": "football",
@@ -601,6 +619,24 @@
       "context": "1 match dans les 48h + 1161 km de voyage"
     },
     {
+      "event_id": "401865537",
+      "date": "2026-05-19T22:00Z",
+      "sport": "football",
+      "league_code": "conmebol.libertadores",
+      "league_name": "Copa Libertadores",
+      "home": "Coquimbo Unido",
+      "away": "Deportes Tolima",
+      "match": "Coquimbo Unido - Deportes Tolima",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.735,
+      "context": "Cote away: 3.40 -> 2.95 (+13.2%)"
+    },
+    {
       "event_id": "401872904",
       "date": "2026-05-23T00:00Z",
       "sport": "hockey",
@@ -747,24 +783,6 @@
       "context": "Absences severes 12-9"
     },
     {
-      "event_id": "401865537",
-      "date": "2026-05-19T22:00Z",
-      "sport": "football",
-      "league_code": "conmebol.libertadores",
-      "league_name": "Copa Libertadores",
-      "home": "Coquimbo Unido",
-      "away": "Deportes Tolima",
-      "match": "Coquimbo Unido - Deportes Tolima",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.589,
-      "context": "Cote away: 3.30 -> 2.95 (+10.6%)"
-    },
-    {
       "event_id": "401865448",
       "date": "2026-05-19T22:00Z",
       "sport": "football",
@@ -817,42 +835,6 @@
       "side": "away",
       "strength": 0.529,
       "context": "Cote away: 3.15 -> 2.85 (+9.5%)"
-    },
-    {
-      "event_id": "401865539",
-      "date": "2026-05-20T00:00Z",
-      "sport": "football",
-      "league_code": "conmebol.libertadores",
-      "league_name": "Copa Libertadores",
-      "home": "Always Ready",
-      "away": "Mirassol",
-      "match": "Always Ready - Mirassol",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "home",
-      "strength": 0.505,
-      "context": "Cote home: 5.50 -> 5.00 (+9.1%)"
-    },
-    {
-      "event_id": "401872121",
-      "date": "2026-05-19T18:00Z",
-      "sport": "football",
-      "league_code": "ita.2",
-      "league_name": "Serie B",
-      "home": "Monza",
-      "away": "Juve Stabia",
-      "match": "Monza - Juve Stabia",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "home",
-      "strength": 0.464,
-      "context": "Cote home: 1.83 -> 1.68 (+8.3%)"
     },
     {
       "event_id": "401865438",
