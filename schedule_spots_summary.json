@@ -1,100 +1,27 @@
 {
-  "generated_at": "2026-05-20T22:09:33Z",
+  "generated_at": "2026-05-20T22:15:08Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 35,
+    "active_events": 32,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 46,
-      "back_to_back_travel": 11,
+      "lookahead": 42,
+      "back_to_back_travel": 9,
       "travel_extreme": 1,
-      "schedule_congestion": 24
+      "schedule_congestion": 22
     },
     "by_decision": {
-      "abstain": 24,
-      "lean_home": 11
+      "abstain": 23,
+      "lean_home": 9
     },
-    "lean_home": 11,
+    "lean_home": 9,
     "lean_away": 0,
-    "abstain": 24,
+    "abstain": 23,
     "monitor": 0
   },
   "active": [
-    {
-      "event_id": "401815495",
-      "source_event_ids": [
-        "401815495"
-      ],
-      "kickoff": "2026-05-25T21:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Francisco Giants",
-      "away": "Arizona Diamondbacks",
-      "match": "San Francisco Giants - Arizona Diamondbacks",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: San Francisco Giants 0.90, Arizona Diamondbacks 0.90",
-      "pressure_score": 2.533,
-      "home_fade": 0.9,
-      "away_fade": 0.9,
-      "travel_score": 0,
-      "lookahead_score": 1.333,
-      "congestion_score": 1.2,
-      "types": {
-        "schedule_congestion": 2,
-        "lookahead": 2
-      },
-      "contexts": [
-        "3 matchs sur les 7 derniers jours",
-        "2 match important/proche dans les 3 jours",
-        "3 matchs sur les 7 derniers jours",
-        "2 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.305,
-        "away_score": -1.385,
-        "home_fade": 0.9,
-        "away_fade": 1.7,
-        "reason": "Direction nette: San Francisco Giants (-0.30)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.8
-          }
-        ]
-      }
-    },
     {
       "event_id": "401873200",
       "source_event_ids": [
@@ -1616,72 +1543,6 @@
       }
     },
     {
-      "event_id": "401815510",
-      "source_event_ids": [
-        "401815510"
-      ],
-      "kickoff": "2026-05-27T01:45Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Francisco Giants",
-      "away": "Arizona Diamondbacks",
-      "match": "San Francisco Giants - Arizona Diamondbacks",
-      "decision": "lean_home",
-      "net_team": "San Francisco Giants",
-      "reason": "Arizona Diamondbacks plus penalise par calendrier/voyage (0.89 vs 0.15)",
-      "pressure_score": 1.407,
-      "home_fade": 0.15,
-      "away_fade": 0.89,
-      "travel_score": 0.74,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours",
-        "1 match dans les 48h + 1049 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.441,
-        "away_score": -1.637,
-        "home_fade": 0.15,
-        "away_fade": 1.69,
-        "reason": "Direction nette: San Francisco Giants (+0.44)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.8
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.74
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401815425",
       "source_event_ids": [
         "401815425"
@@ -1922,57 +1783,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.709
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815525",
-      "source_event_ids": [
-        "401815525"
-      ],
-      "kickoff": "2026-05-27T19:45Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Francisco Giants",
-      "away": "Arizona Diamondbacks",
-      "match": "San Francisco Giants - Arizona Diamondbacks",
-      "decision": "lean_home",
-      "net_team": "San Francisco Giants",
-      "reason": "Arizona Diamondbacks plus penalise par calendrier/voyage (0.82 vs 0.00)",
-      "pressure_score": 0.82,
-      "home_fade": 0.0,
-      "away_fade": 0.82,
-      "travel_score": 0.82,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "2 match dans les 48h + 1049 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.567,
-        "away_score": -1.62,
-        "home_fade": 0.0,
-        "away_fade": 1.62,
-        "reason": "Direction nette: San Francisco Giants (+0.57)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.8
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.82
           }
         ]
       }
