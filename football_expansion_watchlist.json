@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-20T03:57:44Z",
+  "generated_at": "2026-05-20T04:13:31Z",
   "source": "data.js bookable feed + sofascore_events source feed",
   "status": "ok",
   "categories": {
@@ -149,16 +149,24 @@
     },
     "J6_coupes": {
       "label": "Coupes",
-      "bookable": 19,
+      "bookable": 21,
       "source": 43,
       "samples": [
         {
-          "event_id": "401865545",
+          "event_id": "401865548",
           "source": "winamax_exact",
-          "kickoff": "2026-05-20T22:00Z",
-          "match": "Universitario at Nacional",
+          "kickoff": "2026-05-20T02:00Z",
+          "match": "Libertad at Independiente del Valle",
           "league": "Copa Libertadores",
           "code": "conmebol.libertadores"
+        },
+        {
+          "event_id": "401865435",
+          "source": "winamax_exact",
+          "kickoff": "2026-05-20T02:00Z",
+          "match": "Deportivo Recoleta at Deportivo Cuenca",
+          "league": "Copa Sudamericana",
+          "code": "conmebol.sudamericana"
         },
         {
           "event_id": "401865436",
@@ -185,6 +193,14 @@
           "code": "conmebol.sudamericana"
         },
         {
+          "event_id": "401865545",
+          "source": "winamax_exact",
+          "kickoff": "2026-05-20T22:00Z",
+          "match": "Universitario at Nacional",
+          "league": "Copa Libertadores",
+          "code": "conmebol.libertadores"
+        },
+        {
           "event_id": "401865442",
           "source": "winamax_exact",
           "kickoff": "2026-05-21T00:00Z",
@@ -199,31 +215,31 @@
           "match": "Botafogo at Independiente Petrolero",
           "league": "Copa Sudamericana",
           "code": "conmebol.sudamericana"
-        },
-        {
-          "event_id": "401865534",
-          "source": "winamax_exact",
-          "kickoff": "2026-05-21T00:30Z",
-          "match": "Estudiantes de La Plata at Flamengo",
-          "league": "Copa Libertadores",
-          "code": "conmebol.libertadores"
-        },
-        {
-          "event_id": "401865546",
-          "source": "winamax_exact",
-          "kickoff": "2026-05-21T00:30Z",
-          "match": "Lanús at Liga de Quito",
-          "league": "Copa Libertadores",
-          "code": "conmebol.libertadores"
         }
       ],
       "status": "ok"
     },
     "J7_asie_latam": {
       "label": "Asie / Amérique latine",
-      "bookable": 26,
+      "bookable": 28,
       "source": 66,
       "samples": [
+        {
+          "event_id": "401865548",
+          "source": "winamax_exact",
+          "kickoff": "2026-05-20T02:00Z",
+          "match": "Libertad at Independiente del Valle",
+          "league": "Copa Libertadores",
+          "code": "conmebol.libertadores"
+        },
+        {
+          "event_id": "401865435",
+          "source": "winamax_exact",
+          "kickoff": "2026-05-20T02:00Z",
+          "match": "Deportivo Recoleta at Deportivo Cuenca",
+          "league": "Copa Sudamericana",
+          "code": "conmebol.sudamericana"
+        },
         {
           "event_id": "401861539",
           "source": "winamax_exact",
@@ -257,14 +273,6 @@
           "code": "chn.1"
         },
         {
-          "event_id": "401865545",
-          "source": "winamax_exact",
-          "kickoff": "2026-05-20T22:00Z",
-          "match": "Universitario at Nacional",
-          "league": "Copa Libertadores",
-          "code": "conmebol.libertadores"
-        },
-        {
           "event_id": "401865436",
           "source": "winamax_exact",
           "kickoff": "2026-05-20T22:00Z",
@@ -279,21 +287,13 @@
           "match": "Vasco da Gama at Club Olimpia",
           "league": "Copa Sudamericana",
           "code": "conmebol.sudamericana"
-        },
-        {
-          "event_id": "401865444",
-          "source": "winamax_exact",
-          "kickoff": "2026-05-20T22:00Z",
-          "match": "San Lorenzo at Santos",
-          "league": "Copa Sudamericana",
-          "code": "conmebol.sudamericana"
         }
       ],
       "status": "ok"
     }
   },
   "summary": {
-    "bookable_total": 45,
+    "bookable_total": 49,
     "source_total": 141,
     "ok_categories": 2
   }
