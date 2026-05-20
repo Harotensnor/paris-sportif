@@ -5,6 +5,14 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.48 — Pages catégorie sans doublon match
+
+UX navigation.
+- Les pages dédiées `Semaine`, `Vainqueurs`, `Buts`, `Buteurs`, `Nuit` et les autres catégories réutilisent maintenant la même logique que l'accueil pour choisir les spots à surveiller.
+- Un match déjà présent dans le Top prêt ne peut plus réapparaître juste en dessous comme spot à surveiller.
+- Les catégories ressemblent moins à une même page dupliquée : elles montrent une sélection plus propre et plus utile.
+- Version app, package et cache Service Worker bumpés en `v8.6.48`.
+
 ### Version v8.6.47 — Bannière “rien maintenant” utile
 
 UX.

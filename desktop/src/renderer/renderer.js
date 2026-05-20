@@ -7599,7 +7599,7 @@
     const sortMode = homeSortMode();
     const sorted = sortHomeRows(rows, sortMode);
     const topRows = diverseHomeTopRows(sorted.filter(isReadyToStakeRow), 3);
-    const fallbackTop = topRows.length >= 3 ? [] : diverseHomeTopRows(sorted.filter((row) => !isReadyToStakeRow(row)), 3 - topRows.length, topRows);
+    const fallbackTop = topRows.length >= 3 ? [] : homeWatchRows(sorted, 3 - topRows.length, topRows);
     const tableRows = sorted.slice(0, key === 'week' || key === 'watch' ? 18 : 14);
     const meta = key === 'week'
       ? { kicker: 'Semaine', title: 'Les prochains spots à suivre', subtitle: 'Le logiciel montre le meilleur spot à venir même si rien n’est à miser aujourd’hui.' }
