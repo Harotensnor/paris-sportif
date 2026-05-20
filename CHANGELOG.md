@@ -5,6 +5,14 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.41 — Top 3 moins chargé
+
+UX.
+- Les cartes Top 3 remplacent les trois mini-blocs `Confiance / Cote / Mise` par une seule ligne compacte.
+- L'objectif est de lire immédiatement : match, pari, cote, confiance, mise.
+- Cela réduit encore l'effet cockpit technique sur l'accueil.
+- Version app, package et cache Service Worker bumpés en `v8.6.41`.
+
 ### Version v8.6.40 — Compteur semaine utile
 
 UX.

@@ -6901,6 +6901,15 @@ body.theme-light .sidebar {
   overflow: hidden;
 }
 
+.home-top-bet em {
+  display: block;
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 800;
+}
+
 .home-top-tags {
   display: none;
 }
@@ -6916,7 +6925,7 @@ body.theme-light .sidebar {
 }
 
 .home-top-kpis {
-  display: grid;
+  display: none;
   grid-template-columns: repeat(3, 1fr);
   gap: 3px;
 }

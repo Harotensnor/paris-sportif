@@ -7392,6 +7392,7 @@
           <div class="home-top-bet">
             <span>PARI</span>
             <strong>${escapeHtml(userBetLabel(row) || simpleMarketLabelForRow(row))}</strong>
+            <em>${escapeHtml(`${formatOdd(row.odd)} · confiance ${confidence}% · mise ${stake}`)}</em>
           </div>
           <div class="home-top-tags">
             <span>${escapeHtml(simpleMarketLabelForRow(row))}</span>
