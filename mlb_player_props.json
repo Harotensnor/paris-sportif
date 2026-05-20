@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-20T13:58:20Z",
+  "generated_at": "2026-05-20T14:10:40Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -93,6 +93,42 @@
       "home": "Tampa Bay Rays",
       "away": "Baltimore Orioles",
       "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Tampa Bay Rays",
+          "pitcher": "Steven Matz",
+          "label": "Steven Matz plus de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "over",
+          "probability": 0.62,
+          "fair_odds": 1.61,
+          "expected_strikeouts": 3.97,
+          "projected_ip": 5.3,
+          "inputs": {
+            "k9": 6.75,
+            "era": 3.86,
+            "whip": 1.1,
+            "hand": "L"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Tampa Bay Rays",
+          "pitcher": "Steven Matz",
+          "label": "Steven Matz concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5742,
+          "fair_odds": 1.74,
+          "expected_hr_allowed": 0.854,
+          "projected_ip": 5.3,
+          "inputs": {
+            "hr9": 1.45,
+            "era": 3.86,
+            "whip": 1.1
+          },
+          "side": "home"
+        },
         {
           "market": "pitcher_strikeouts",
           "team": "Baltimore Orioles",
@@ -1382,7 +1418,7 @@
       ]
     }
   ],
-  "props": 66,
+  "props": 68,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"

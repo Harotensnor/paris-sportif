@@ -1,10 +1,92 @@
 {
-  "generated_at": "2026-05-20T13:58:50Z",
+  "generated_at": "2026-05-20T14:11:09Z",
   "method": "Full Bivariate Poisson MLE Dixon-Coles. Coordinate-descent avec golden-section search 1D. Pure Python (pas de scipy).",
   "min_matches_per_league": 40,
   "min_matches_per_team": 5,
-  "n_leagues_fit": 2,
+  "n_leagues_fit": 3,
   "leagues": {
+    "chn.1": {
+      "n_matches": 41,
+      "n_teams": 12,
+      "gamma": 0.5159,
+      "rho": -0.1922,
+      "log_lik": -113.26,
+      "iterations": 3,
+      "teams": {
+        "Beijing Guoan": {
+          "alpha": 0.4238,
+          "beta": -0.421,
+          "rank_off": 3,
+          "rank_def": 2
+        },
+        "Chengdu Rongcheng": {
+          "alpha": 0.3844,
+          "beta": 0.6762,
+          "rank_off": 4,
+          "rank_def": 12
+        },
+        "Chongqing Tonglianglong": {
+          "alpha": -0.6489,
+          "beta": -0.0471,
+          "rank_off": 11,
+          "rank_def": 7
+        },
+        "Dalian Yingbo": {
+          "alpha": -0.3877,
+          "beta": -0.3815,
+          "rank_off": 10,
+          "rank_def": 3
+        },
+        "Henan Songshan Longmen": {
+          "alpha": 0.0048,
+          "beta": 0.0225,
+          "rank_off": 7,
+          "rank_def": 8
+        },
+        "Qingdao Hainiu": {
+          "alpha": 0.4575,
+          "beta": -0.0622,
+          "rank_off": 2,
+          "rank_def": 6
+        },
+        "Shanghai Port": {
+          "alpha": 0.0105,
+          "beta": 0.415,
+          "rank_off": 6,
+          "rank_def": 10
+        },
+        "Shanghai Shenhua": {
+          "alpha": 0.1081,
+          "beta": -0.2538,
+          "rank_off": 5,
+          "rank_def": 4
+        },
+        "Shenzhen Xinpengcheng": {
+          "alpha": -0.679,
+          "beta": 0.5822,
+          "rank_off": 12,
+          "rank_def": 11
+        },
+        "Wuhan Three Towns": {
+          "alpha": -0.1172,
+          "beta": -0.4848,
+          "rank_off": 8,
+          "rank_def": 1
+        },
+        "Yunnan Yukun": {
+          "alpha": -0.2205,
+          "beta": 0.1595,
+          "rank_off": 9,
+          "rank_def": 9
+        },
+        "Zhejiang Professional FC": {
+          "alpha": 0.6642,
+          "beta": -0.205,
+          "rank_off": 1,
+          "rank_def": 5
+        }
+      }
+    },
     "esp.1": {
       "n_matches": 50,
       "n_teams": 18,
