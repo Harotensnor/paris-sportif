@@ -39,6 +39,8 @@ const STRESS_REPORT_PATH = path.join(STATE_ROOT, 'stress-report.json');
 const IMAGE_CACHE_ROOT = path.join(STATE_ROOT, 'images');
 const HOME_COMPACT_CACHE_PATH = path.join(STATE_ROOT, 'engine-home-compact-payload.json');
 const DATA_MANIFEST_PATH = path.join(PROJECT_ROOT, 'data_manifest.json');
+const ENGINE_SOURCE_PATH = path.join(DESKTOP_ROOT, 'src', 'engine', 'legacy-engine.js');
+const HOME_COMPACT_PAYLOAD_VERSION = '20260520-capital-protection-v2';
 imageService.init({ cacheDir: IMAGE_CACHE_ROOT });
 
 // Sprint 44 (P5 audit) : rotation automatique des rapports sprintXX-*.json
@@ -276,9 +278,18 @@ function compactEngineHomePayload(analysis) {
 
 function homeCompactSignature() {
   const manifest = safeJsonFile(DATA_MANIFEST_PATH);
+  const engineSignature = (() => {
+    try {
+      const stat = fs.statSync(ENGINE_SOURCE_PATH);
+      return `${stat.size}:${Math.round(stat.mtimeMs)}`;
+    } catch {
+      return 'engine-unknown';
+    }
+  })();
   return {
-    schema: 'engine-home-compact-cache-v2',
-    appVersion: String(desktopPackage.version || '0.0.0'),
+    schema: 'engine-home-compact-cache-v3',
+    payloadVersion: HOME_COMPACT_PAYLOAD_VERSION,
+    engineSignature,
     dataGeneratedAt: manifest && !manifest.__error ? String(manifest.generated_at || '') : '',
     today: manifest && !manifest.__error ? String(manifest.today || '') : ''
   };
@@ -291,7 +302,8 @@ function readHomeCompactPayload() {
     if (!envelope || !envelope.payload || envelope.payload.ok !== true) return null;
     const signature = homeCompactSignature();
     if (envelope.schema !== signature.schema) return null;
-    if (String(envelope.appVersion || '') !== signature.appVersion) return null;
+    if (String(envelope.payloadVersion || '') !== signature.payloadVersion) return null;
+    if (String(envelope.engineSignature || '') !== signature.engineSignature) return null;
     if (String(envelope.dataGeneratedAt || '') !== signature.dataGeneratedAt) return null;
     if (String(envelope.today || '') !== signature.today) return null;
     return {

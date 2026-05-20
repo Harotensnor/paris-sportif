@@ -5,6 +5,14 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.32 — Cache accueil moins jetable
+
+Performance.
+- Le cache compact de l'accueil n'est plus invalidé à chaque micro-version.
+- Il se réinitialise maintenant quand le moteur pronostic ou le format du payload compact changent, plus quand seul le texte/UI change.
+- Objectif : éviter de recalculer l'accueil inutilement et réduire la sensation de lenteur après petits correctifs.
+- Version app, package et cache Service Worker bumpés en `v8.6.32`.
+
 ### Version v8.6.31 — Blocages écrits en langage parieur
 
 UX pronostics.
