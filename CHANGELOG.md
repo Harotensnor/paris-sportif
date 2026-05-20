@@ -5,6 +5,22 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.43 — Pas de doublon match dans le Top 3
+
+Fix UX.
+- La ligne `À surveiller` du Top 3 ne peut plus reprendre un match déjà présent dans les spots prêts.
+- Exemple corrigé : `Lazio - Pisa` ne doit pas apparaître à la fois en BTTS prêt et en Vainqueur à surveiller.
+- Cela rend le Top 3 plus varié et plus utile pour décider vite.
+- Version app, package et cache Service Worker bumpés en `v8.6.43`.
+
+### Version v8.6.42 — Vainqueur à surveiller dans le Top 3
+
+Pronostics / UX.
+- Si aucun spot `Vainqueur` n'est prêt dans le Top 3, la ligne `À surveiller` privilégie maintenant le meilleur Vainqueur disponible.
+- Cela évite un Top 3 entièrement dominé par les marchés buts quand l'utilisateur veut aussi suivre les vainqueurs.
+- Le bouton `Je mise` reste interdit si le Vainqueur est bloqué par contexte, historique ou avantage insuffisant.
+- Version app, package et cache Service Worker bumpés en `v8.6.42`.
+
 ### Version v8.6.41 — Top 3 moins chargé
 
 UX.

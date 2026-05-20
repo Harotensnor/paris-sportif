@@ -7293,13 +7293,32 @@
   function homeWatchRows(rows, limit = 3, excludedRows = []) {
     const source = Array.isArray(rows) ? rows : [];
     const excluded = new Set(excludedRows.map((row) => userBetKey(row) || row?.id || `${row?.title}:${row?.market}:${row?.label}`));
+    const excludedMatches = new Set(excludedRows.map((row) => String(row?.id || row?.match?.winamax?.match_id || row?.title || '')).filter(Boolean));
     const watch = source.filter((row) => {
       const key = userBetKey(row) || row?.id || `${row?.title}:${row?.market}:${row?.label}`;
+      const matchKey = String(row?.id || row?.match?.winamax?.match_id || row?.title || '');
+      if (matchKey && excludedMatches.has(matchKey)) return false;
       const confidence = homeConfidenceValue(row);
       const odd = Number(row?.odd || 0);
       return canDisplayPickCard(row) && !isReadyToStakeRow(row) && !excluded.has(key) && confidence >= 0.55 && odd > 1 && odd <= 4.5 && dangerousPickReasons(row).length === 0;
     });
-    return diverseHomeTopRows(watch, limit).slice(0, limit);
+    const selected = [];
+    const selectedKeys = new Set();
+    const add = (row) => {
+      const key = userBetKey(row) || row?.id || `${row?.title}:${row?.market}:${row?.label}`;
+      if (!row || selectedKeys.has(key) || selected.length >= limit) return false;
+      selectedKeys.add(key);
+      selected.push(row);
+      return true;
+    };
+    if (!excludedRows.some(isWinnerRow)) {
+      const winnerWatch = sortHomeRows(watch, 'confidence').find(isWinnerRow);
+      if (winnerWatch) add(winnerWatch);
+    }
+    diverseHomeTopRows(watch, limit)
+      .filter((row) => !selectedKeys.has(userBetKey(row) || row?.id || `${row?.title}:${row?.market}:${row?.label}`))
+      .forEach(add);
+    return selected.slice(0, limit);
   }
 
   function homeFallbackSpotRows(rows, limit = 3, excludedRows = []) {
