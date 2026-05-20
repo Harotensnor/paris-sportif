@@ -6922,6 +6922,25 @@
     return 'au prochain refresh important';
   }
 
+  function conciseBlockerLabels(row, limit = 3) {
+    if (!row) return [];
+    const labels = [];
+    const add = (value) => {
+      const text = userFacingGuardText(value || '').replace(/\s+/g, ' ').trim();
+      if (!text || labels.some((item) => normalizeUiKey(item) === normalizeUiKey(text))) return;
+      labels.push(text);
+    };
+    add(row?.decisionCenter?.mainReason);
+    add(row?.safeAssessment?.blockReason);
+    add(row?.contextGate?.label || row?.contextGate?.gate);
+    dangerousPickReasons(row).forEach((reason) => add(reason.label || reason.detail));
+    [
+      ...(row?.matchSheetV6?.missingCriticalData || []),
+      ...(row?.contextQuality?.critical_missing || [])
+    ].slice(0, 4).forEach((item) => add(String(item)));
+    return labels.slice(0, limit);
+  }
+
   function rollingWeekRows(rows = state.picks, predicate = canDisplayPickCard) {
     const now = Date.now();
     const week = now + 7 * 24 * 60 * 60 * 1000;
@@ -6975,6 +6994,7 @@
     const status = summary.status || seriousBetStatus(row);
     const confidence = Math.round(homeConfidenceValue(row) * 100);
     const reason = simpleWhyText(row) || pickReason(row) || status.detail;
+    const blockers = status.key === 'ready' ? [] : conciseBlockerLabels(row, 3);
     const scopeText = summary.scope === 'semaine' || summary.scope === 'semaine-watch' || summary.scope === 'semaine-bloque'
       ? 'meilleur spot de la semaine'
       : 'meilleur spot des 24h';
@@ -6989,6 +7009,7 @@
             <strong>${escapeHtml(userBetLabel(row) || simpleMarketLabelForRow(row))}</strong>
             <em>Cote ${escapeHtml(formatOdd(row.odd))} · confiance ${escapeHtml(`${confidence}%`)}</em>
           </div>
+          ${blockers.length ? `<div class="next-bet-blockers"><span>Bloque</span><strong>${escapeHtml(blockers.join(' · '))}</strong></div>` : ''}
           <p class="next-bet-reason">${escapeHtml(reason)}</p>
         </div>
         <div class="next-bet-side">
@@ -7015,6 +7036,12 @@
     const weekWatch = rollingWeekRows(pool, canDisplayPickCard).filter((row) => !isReadyToStakeRow(row));
     const blockedCore = rollingWeekRows(pool, (row) => pickHasCoreData(row) && isBeforeKickoff(row)).filter((row) => !canDisplayPickCard(row));
     const sourceGaps = pool.reduce((sum, row) => sum + Number(row?.contextQuality?.critical_missing?.length || row?.matchSheetV6?.missingCriticalData?.length || 0), 0);
+    const blockers = [];
+    const addBlocker = (value) => {
+      const text = userFacingGuardText(value || '').replace(/\s+/g, ' ').trim();
+      if (text && !blockers.some((item) => normalizeUiKey(item) === normalizeUiKey(text))) blockers.push(text);
+    };
+    watch24.concat(blockedCore).slice(0, 10).forEach((row) => conciseBlockerLabels(row, 2).forEach(addBlocker));
     const firstReason = ready24.length
       ? `${formatCount(ready24.length)} pari(s) jouable(s), le reste attend un meilleur contexte.`
       : watch24.length
@@ -7030,6 +7057,7 @@
       weekWatch: weekWatch.length,
       blocked: blockedCore.length,
       sourceGaps,
+      blockers: blockers.slice(0, 3),
       text: firstReason
     };
   }
@@ -7042,6 +7070,7 @@
       <div>
         <span class="eyebrow">Pourquoi pas plus ?</span>
         <strong>${escapeHtml(summary.text)}</strong>
+        ${summary.blockers?.length ? `<small class="why-not-more-detail">À corriger : ${escapeHtml(summary.blockers.join(' · '))}</small>` : ''}
       </div>
       <div class="why-not-more-kpis">
         <span><b>${formatCount(summary.ready24)}</b><em>jouable</em></span>

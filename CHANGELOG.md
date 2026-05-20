@@ -5,6 +5,14 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.6 — Blocages lisibles
+
+Suite “je comprends pourquoi je ne dois pas cliquer”.
+- Le bloc `Prochain pari sérieux` affiche maintenant les 1-3 raisons concrètes qui bloquent un spot à surveiller : contexte, compo, segment, cote ou signaux critiques.
+- Le bloc `Pourquoi pas plus ?` remonte aussi les blocages dominants au lieu de seulement donner des compteurs.
+- Objectif UX : quand il n’y a pas de `Je mise`, le logiciel explique quoi attendre et quoi corriger sans jargon d’ingénieur.
+- Version app, package et cache Service Worker bumpés en `v8.6.6`.
+
 ### Version v8.6.5 — Pages catégorie plus directes
 
 Suite “vraies pages, pas filtres déguisés”.
