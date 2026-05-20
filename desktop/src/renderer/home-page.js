@@ -125,10 +125,31 @@
     return CATEGORY_TO_TAB[key] || (key.startsWith('sport:') ? 'football' : 'cockpit');
   }
 
+  function categoryDecisionText(category, stats = {}) {
+    const key = String(category || '').toLowerCase();
+    const total = Number(stats.total || 0);
+    const ready = Number(stats.ready || 0);
+    const watch = Number(stats.watch || 0);
+    if (!total) {
+      if (key === 'night') return 'Rien de propre cette nuit : mieux vaut attendre le prochain refresh.';
+      if (key === 'week') return 'Aucun spot sérieux trouvé cette semaine dans le cache actuel.';
+      return 'Aucun spot propre dans cette catégorie pour le moment.';
+    }
+    if (ready > 0) {
+      if (key === 'watch') return 'Cette page reste volontairement sans mise directe : surveille les re-checks.';
+      return `${ready} pari${ready > 1 ? 's' : ''} jouable${ready > 1 ? 's' : ''}. Commence par le meilleur spot, pas par tout jouer.`;
+    }
+    if (watch > 0) {
+      return `${watch} spot${watch > 1 ? 's' : ''} à surveiller. Pas de bouton tant que le dossier n’est pas assez propre.`;
+    }
+    return 'Des lignes existent, mais les garde-fous refusent la mise.';
+  }
+
   window.PSHomePage = Object.freeze({
     metaFor,
     categoryTabToKey,
     tabForHomeCategory,
+    categoryDecisionText,
     categoryMeta: CATEGORY_META,
     defaultMeta: DEFAULT_META
   });

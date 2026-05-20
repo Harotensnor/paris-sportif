@@ -5,6 +5,14 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.5 — Pages catégorie plus directes
+
+Suite “vraies pages, pas filtres déguisés”.
+- Chaque page catégorie affiche maintenant une lecture rapide dédiée : décision, nombre de paris jouables, spots à surveiller, prochain départ et meilleur spot.
+- Les textes de décision sont centralisés dans le module accueil pour garder un langage parieur simple et testable.
+- Ajout de tests unitaires sur les copies catégorie (`prêt`, `à surveiller`, nuit vide).
+- Version app, package et cache Service Worker bumpés en `v8.6.5`.
+
 ### Version v8.6.4 — Catégories moins vides
 
 Suite “prochain spot utile”.

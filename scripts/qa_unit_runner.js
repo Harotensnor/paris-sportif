@@ -192,6 +192,9 @@ test('desktop home page category routing is stable', () => {
   assert(homePageModule.tabForHomeCategory('sport:tennis') === 'tennis', 'tennis category route');
   assert(homePageModule.tabForHomeCategory('night') === 'night', 'night category route');
   assert(/nuit/i.test(homePageModule.metaFor('night').title), 'night metadata');
+  assert(/2 paris jouables/.test(homePageModule.categoryDecisionText('winner', { total: 5, ready: 2, watch: 3 })), 'ready category copy');
+  assert(/3 spots à surveiller/.test(homePageModule.categoryDecisionText('night', { total: 3, ready: 0, watch: 3 })), 'watch category copy');
+  assert(/Rien de propre cette nuit/.test(homePageModule.categoryDecisionText('night', { total: 0, ready: 0, watch: 0 })), 'empty night copy');
   assert(/regarder/i.test(homePageModule.metaFor('unknown-category').title), 'fallback metadata');
 });
 

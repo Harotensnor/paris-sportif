@@ -7371,6 +7371,50 @@
       : marketCategoryRows(source, category);
   }
 
+  function categoryDecisionText(category, stats) {
+    if (window.PSHomePage?.categoryDecisionText) return window.PSHomePage.categoryDecisionText(category, stats);
+    if (!stats?.total) return 'Aucun spot propre dans cette catégorie pour le moment.';
+    if (stats.ready > 0) return `${formatCount(stats.ready)} pari(s) jouable(s). Commence par le meilleur spot.`;
+    if (stats.watch > 0) return `${formatCount(stats.watch)} spot(s) à surveiller. Pas de bouton tant que le dossier n’est pas assez propre.`;
+    return 'Des lignes existent, mais les garde-fous refusent la mise.';
+  }
+
+  function renderCategorySummaryStrip(category, rows) {
+    const node = $('#category-summary-strip');
+    if (!node) return;
+    const list = Array.isArray(rows) ? rows : [];
+    const ready = list.filter(isReadyToStakeRow);
+    const watch = list.filter((row) => !isReadyToStakeRow(row) && canDisplayPickCard(row));
+    const next = sortHomeRows(list, 'kickoff')[0] || null;
+    const best = sortHomeRows(list, 'confidence')[0] || null;
+    const stats = { total: list.length, ready: ready.length, watch: watch.length };
+    const decision = categoryDecisionText(category, stats);
+    const nextText = next ? `${formatDateLabel(next.start)} · ${countdownLabel(next.start)}` : 'aucun départ';
+    const bestText = best ? `${userBetLabel(best) || simpleMarketLabelForRow(best)} · ${formatOdd(best.odd)}` : 'aucun spot';
+    node.innerHTML = `
+      <article class="category-summary-card decision">
+        <span>Décision</span>
+        <strong>${escapeHtml(decision)}</strong>
+      </article>
+      <article class="category-summary-card">
+        <span>Jouables</span>
+        <strong>${escapeHtml(formatCount(ready.length))}</strong>
+      </article>
+      <article class="category-summary-card">
+        <span>À surveiller</span>
+        <strong>${escapeHtml(formatCount(watch.length))}</strong>
+      </article>
+      <article class="category-summary-card">
+        <span>Prochain</span>
+        <strong>${escapeHtml(nextText)}</strong>
+      </article>
+      <article class="category-summary-card">
+        <span>Meilleur spot</span>
+        <strong>${escapeHtml(bestText)}</strong>
+      </article>
+    `;
+  }
+
   function renderCategoryPage(category = state.activeHomeCategory || 'cockpit') {
     const key = category || 'cockpit';
     const rows = categoryRowsForPage(key);
@@ -7395,6 +7439,7 @@
     if (tableTitle) tableTitle.textContent = `Tableau ${meta.title.toLowerCase()}`;
     if (caption) caption.textContent = `${formatCount(tableRows.length)} lignes · ${formatCount(sorted.filter(isReadyToStakeRow).length)} prêtes · tri ${sortMode}`;
     renderNextSeriousBet(sorted, '#category-next-bet-card');
+    renderCategorySummaryStrip(key, sorted);
     if (top) {
       const watchHtml = fallbackTop.length ? `<div class="home-watch-strip">${fallbackTop.map(homeWatchCardHtml).join('')}</div>` : '';
       top.innerHTML = topRows.length
