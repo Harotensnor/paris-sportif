@@ -266,13 +266,13 @@ function assessPick(row, calibration) {
       : leagueBlock
         ? 'ligue froide'
         : thresholdBlock
-          ? `edge trop faible pour contexte ${contextTier}`
+          ? `avantage trop faible pour contexte ${contextTier}`
           : trustBlock
             ? 'confiance insuffisante pour ce contexte'
         : null;
   const label = bucket.count < calibration.minSamples
     ? `Historique en attente (${bucket.count}/${minSamples})`
-    : `Historique ${bucket.count} réglés · ROI ${formatPct(bucket.roi)}`;
+    : `Historique ${bucket.count} réglés · ${bucket.roi >= 0 ? 'favorable' : 'défavorable'}`;
   return {
     marketKey,
     leagueKey,
@@ -329,7 +329,7 @@ function annotateMatches(rows, calibration) {
       ...row,
       stake: 0,
       status: 'watch',
-      statusLabel: assessment.mode === 'reinforced_caution' ? 'Prudence renforcée' : 'Freiné par historique',
+      statusLabel: assessment.mode === 'reinforced_caution' ? 'Prudence renforcée' : 'À surveiller · historique froid',
       calibration: assessment
     };
   });

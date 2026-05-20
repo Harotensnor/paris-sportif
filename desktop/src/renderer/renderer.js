@@ -2999,7 +2999,7 @@
     const label = row?.limitedConfidence
       ? 'Confiance limitée'
       : status === 'reliable' ? '✓ Fiable' : status === 'watch' ? 'À surveiller' : 'Écarté';
-    const reason = (assessment.reasons || assessment.warnings || []).slice(0, 2).join(' · ') || 'Filtre fiable et safe';
+    const reason = (assessment.reasons || assessment.warnings || []).slice(0, 2).map(userFacingGuardText).join(' · ') || 'Filtre fiable et prudent';
     return `<span class="safe-pick-badge ${escapeHtml(cls)}" title="${escapeHtml(reason)}">${escapeHtml(label)}</span>`;
   }
 
@@ -3007,8 +3007,8 @@
     const edge = displayEdgeValue(row);
     const raw = Number(row?.edge || 0);
     const capped = Boolean(row?.safeAssessment?.edgeCapped) && raw > edge + 0.001;
-    const title = capped ? `Edge brut ${formatPct(raw, 1)} plafonné par prudence` : 'Edge prudent utilisé pour décider';
-    return `<span title="${escapeHtml(title)}">${escapeHtml(formatPct(edge, 1))}</span>${capped ? '<div class="match-sub">edge prudent</div>' : ''}`;
+    const title = capped ? `Avantage initial ${formatPct(raw, 1)} réduit par prudence` : 'Avantage prudent utilisé pour décider';
+    return `<span title="${escapeHtml(title)}">${escapeHtml(formatPct(edge, 1))}</span>${capped ? '<div class="match-sub">avantage prudent</div>' : ''}`;
   }
 
   function priorityValue(row) {
@@ -3084,14 +3084,14 @@
       return {
         tone: 'hot',
         label: 'Tendance forte',
-        reason: `ROI ${formatPct(effectiveRoi, 0)} sur ${formatCount(count)} paris similaires`
+        reason: `historique favorable sur ${formatCount(count)} paris similaires`
       };
     }
     if (count >= 10 && effectiveRoi < -0.20) {
       return {
         tone: 'cold',
         label: 'Tendance froide',
-        reason: `ROI ${formatPct(effectiveRoi, 0)} sur ${formatCount(count)} paris similaires`
+        reason: `historique défavorable sur ${formatCount(count)} paris similaires`
       };
     }
     return null;
@@ -5169,8 +5169,17 @@
       .replace(/confiance limitée\s*:\s*lecture seulement/gi, 'dossier incomplet, observation seulement')
       .replace(/confiance limitée\s*:\s*cote Winamax \+ contexte léger/gi, 'contexte trop léger pour cliquer')
       .replace(/confiance limitée\s*:\s*cote Winamax \+ filet 2-0 à vérifier/gi, 'filet 2-0 intéressant, mais dossier encore à vérifier')
+      .replace(/edge brut \+[0-9.,]+pt aberrant \(modele surconfiant\)/gi, 'écart trop extrême entre modèle et cote, je préfère vérifier')
       .replace(/avantage brut \+[0-9.,]+pt aberrant \(modèle surconfiant\)/gi, 'écart trop extrême entre modèle et cote, je préfère vérifier')
+      .replace(/avantage annonc[eé] trop extr[eê]me\s*:\s*je pr[eé]f[eè]re v[eé]rifier/gi, 'écart trop extrême entre modèle et cote, je préfère vérifier')
+      .replace(/march[eé] froid robuste \(ROI\s*-?[0-9.,]+% sur [0-9 ]+ paris\)/gi, 'marché souvent perdant en historique')
+      .replace(/march[eé] souvent perdant en historique \([0-9 ]+ cas similaires\)/gi, 'marché souvent perdant en historique')
       .replace(/profil d['’]avantage froid \(ROI\s*-?[0-9.,]+% sur [0-9 ]+ paris\)/gi, 'profil similaire trop perdant en historique')
+      .replace(/profil similaire souvent perdant en historique \([0-9 ]+ cas similaires\)/gi, 'profil similaire trop perdant en historique')
+      .replace(/pas assez d['’]historique ([^)]+) pour ce march[eé] \([^)]+\)/gi, 'pas assez d’historique fiable sur ce sport/marché')
+      .replace(/historique similaire perdant \([0-9 ]+ cas\)/gi, 'historique similaire perdant')
+      .replace(/Mode récupération\s*:/gi, 'Mode récupération :')
+      .replace(/Protection bankroll\s*:/gi, 'Mode récupération :')
       .replace(/\bmodele\b/gi, 'modèle')
       .replace(/\bedge\b/gi, 'avantage')
       .replace(/\bKelly nul\b/gi, 'mise non positive')
@@ -7036,9 +7045,9 @@
     const sample = Number(row?.segmentValidation?.sample ?? row?.safeAssessment?.sample ?? 0);
     const roi = Number(row?.segmentValidation?.roi ?? row?.safeAssessment?.roi);
     if (Number.isFinite(roi) && sample >= 15 && roi < -0.02) {
-      return `historique défavorable : ${formatCount(sample)} cas similaires, rendement ${Math.round(roi * 100)}%`;
+      return `historique défavorable : ${formatCount(sample)} cas similaires ont trop souvent perdu`;
     }
-    const capitalReason = (row?.capitalProtectionV1?.reasons || []).find((reason) => /segment historique perdant|confiance limitée/i.test(String(reason || '')));
+    const capitalReason = (row?.capitalProtectionV1?.reasons || []).find((reason) => /historique .*perdant|confiance limitée/i.test(String(reason || '')));
     return capitalReason ? userFacingGuardText(capitalReason) : '';
   }
 

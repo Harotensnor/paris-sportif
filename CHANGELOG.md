@@ -5,6 +5,14 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.57 — Blocages pronostics lisibles
+
+UX pronostics.
+- Les raisons qui bloquent un bouton `Je mise` parlent maintenant en langage parieur : avantage trop faible, historique similaire perdant, contexte trop léger ou dossier à vérifier.
+- Les anciens libellés trop techniques comme `edge brut`, `ROI sur X paris`, `calibration limitée` et `Protection bankroll` sont retirés des zones de décision rapide.
+- Le mode récupération reste strict après perte réelle, mais il explique plus clairement pourquoi une ligne passe en observation.
+- Version app, package et cache Service Worker bumpés en `v8.6.57`.
+
 ### Version v8.6.56 — Data lite vraiment légère
 
 Performance projet.

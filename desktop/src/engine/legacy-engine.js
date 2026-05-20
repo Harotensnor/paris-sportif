@@ -1009,7 +1009,7 @@ function createLegacyEngineService({ projectRoot }) {
         stake: 0,
         modelStake,
         status: 'watch',
-        statusLabel: 'Alternative simple · lecture seulement',
+        statusLabel: 'À surveiller · marché alternatif',
         pickSource: 'runtime_market_candidate',
         isMarketAlternative: true,
         userActionBlocked: true,
@@ -1400,7 +1400,7 @@ function createLegacyEngineService({ projectRoot }) {
       stake,
       modelStake,
       status: 'watch',
-      statusLabel: 'Confiance limitée · à surveiller',
+      statusLabel: 'À surveiller · dossier léger',
       pickSource: 'winamax_odds_fallback',
       limitedConfidence: true,
       confidenceTrust: {
@@ -1417,7 +1417,7 @@ function createLegacyEngineService({ projectRoot }) {
       contextGate: {
         gate: 'odds_fallback',
         agentEligible: true,
-        label: footballTwoGoalCandidate ? 'Confiance limitée : cote Winamax + filet 2-0 à vérifier' : 'Confiance limitée : cote Winamax + contexte léger',
+        label: footballTwoGoalCandidate ? 'Filet 2-0 intéressant, dossier à vérifier' : 'Contexte trop léger pour cliquer',
         warnings: [footballTwoGoalCandidate ? 'Vainqueur à surveiller : vérifier la règle 2-0 sur Winamax' : 'Signal basé sur la cote Winamax, à surveiller avant mise']
       },
       modelSkipOverridden: true
@@ -1936,7 +1936,7 @@ function createLegacyEngineService({ projectRoot }) {
       roi: Number.isFinite(roi) ? roi : null,
       marketGroup,
       label: applies
-        ? `segment précis positif (${Math.round(roi * 100)}% ROI sur ${sample} paris)`
+        ? `historique précis favorable (${sample} paris similaires)`
       : ''
     };
   }
@@ -2075,14 +2075,14 @@ function createLegacyEngineService({ projectRoot }) {
       && !(Number(row?.winamaxTwoGoalRule?.leadTwoProbability || 0) >= 0.42)
       && confidence < (rivalry.severe ? 0.72 : 0.68)
       && edge < (rivalry.severe ? 0.055 : 0.045);
-    if (!(rawEdge >= 0.01)) reasons.push('edge < +1pt');
-    if (aberrantEdge) reasons.push(`edge brut +${Math.round(rawEdge * 100)}pt aberrant (modele surconfiant)`);
-    if (robustMarketBlock) reasons.push(`marché froid robuste (ROI ${Math.round(calibrationRoi * 100)}% sur ${calibrationSample} paris)`);
-    if (edgeProfileBlock) reasons.push(`profil d'avantage froid (ROI ${Math.round(calibrationEdgeRoi * 100)}% sur ${calibrationEdgeSample} paris)`);
-    if (derivedShortNegative) reasons.push(`marche ${marketKey} segment court perdant (n=${sample}, ROI ${Math.round(roi * 100)}%)`);
-    if (nonFootCalibrationBlind) reasons.push(`calibration ${sportKey || 'sport'} limitee (${sportMarketSample}/30 paris settled)`);
+    if (!(rawEdge >= 0.01)) reasons.push('avantage trop faible');
+    if (aberrantEdge) reasons.push(`avantage annoncé trop extrême : je préfère vérifier`);
+    if (robustMarketBlock) reasons.push(`marché souvent perdant en historique (${calibrationSample} cas similaires)`);
+    if (edgeProfileBlock) reasons.push(`profil similaire souvent perdant en historique (${calibrationEdgeSample} cas similaires)`);
+    if (derivedShortNegative) reasons.push(`marché ${marketKey} perdant sur petit historique (${sample} cas)`);
+    if (nonFootCalibrationBlind) reasons.push(`pas assez d'historique ${sportKey || 'sport'} pour ce marché (${sportMarketSample}/30)`);
     if (rivalryMarginalWinnerBlock) reasons.push(`rivalité/derby : Vainqueur trop marginal (${Math.round(rivalry.intensity)}% tension)`);
-    if (!reliableRule && edge < Math.min(edgeMin, sample < 5 ? 0.05 : sample < 15 ? 0.04 : edgeMin)) reasons.push('edge prudent insuffisant');
+    if (!reliableRule && edge < Math.min(edgeMin, sample < 5 ? 0.05 : sample < 15 ? 0.04 : edgeMin)) reasons.push('avantage utile insuffisant');
     if (odd < 1.30 || odd > (sample < 15 ? Math.min(5.00, oddMax) : oddMax)) reasons.push(`cote hors zone solo 1.30-${(sample < 15 ? Math.min(5.00, oddMax) : oddMax).toFixed(2)}`);
     if (!reliableRule && confidence < (sample < 5 ? 0.65 : sample < 15 ? 0.60 : confidenceMin)) reasons.push('confiance insuffisante');
     if (segmentNegative) reasons.push('segment historique négatif');
@@ -2090,8 +2090,8 @@ function createLegacyEngineService({ projectRoot }) {
     if (row?.oddsGuardrail?.applied) reasons.push(row.oddsGuardrail.label || 'cote à vérifier');
     if (hardCriticalMissing.length) reasons.push(`signal critique manquant: ${hardCriticalMissing.slice(0, 2).join(', ')}`);
     if (softAvailabilityMissing) warnings.push('disponibilités joueurs incomplètes');
-    if (edgeInfo.capped) warnings.push(`edge brut ${Math.round(rawEdge * 100)}% plafonné par prudence`);
-    if (sample > 0 && sample < 15) warnings.push(`sample court ${sample}/15`);
+    if (edgeInfo.capped) warnings.push(`avantage annoncé plafonné par prudence`);
+    if (sample > 0 && sample < 15) warnings.push(`historique court ${sample}/15`);
     if (!sample) warnings.push('historique segment absent');
     if (preciseSegmentOverride.applies) warnings.push(preciseSegmentOverride.label);
     else if (coldMarketOverride) warnings.push('marché froid compensé par contexte fort');
@@ -2267,7 +2267,7 @@ function createLegacyEngineService({ projectRoot }) {
           reason: policy.reason
         } : null,
         reliableRule: null,
-        reasons: [limitedHasTwoGoalSafety ? 'confiance limitée : cote Winamax + filet 2-0 à vérifier' : 'confiance limitée : cote Winamax + contexte léger'],
+        reasons: [limitedHasTwoGoalSafety ? 'filet 2-0 intéressant, dossier à vérifier' : 'contexte trop léger pour cliquer'],
         warnings: ['À surveiller avant mise', ...warnings].slice(0, 4)
       };
     }
@@ -2316,7 +2316,7 @@ function createLegacyEngineService({ projectRoot }) {
     let status = row.status;
     let statusLabel = row.statusLabel;
     const profitGuardReasons = [
-      row?.isMarketAlternative && !actionableAlternative ? 'Alternative marché : lecture seulement' : null,
+      row?.isMarketAlternative && !actionableAlternative ? 'marché alternatif à lire seulement' : null,
       row?.marketTiming?.guardApplied ? (row.marketTiming.warnings || [])[0] || 'Marché froid au backtest' : null,
       row?.signalConflict?.guardApplied ? row.signalConflict.label || 'Conflit signaux marché/contexte' : null,
       row?.oddsGuardrail?.applied ? row.oddsGuardrail.label || 'Cote haute non confirmée' : null,
@@ -2441,13 +2441,13 @@ function createLegacyEngineService({ projectRoot }) {
     if (!(odd >= 1.25 && odd <= (isScorer ? 3.80 : 3.40))) {
       reasons.push(`cote hors zone récupération @${odd ? odd.toFixed(2) : '?'}`);
     }
-    if (edge < 0.03) reasons.push(`edge prudent trop faible (+${Math.round(edge * 100)}pt)`);
+    if (edge < 0.03) reasons.push(`avantage trop faible pour relancer`);
     if (confidence < 0.64) reasons.push(`confiance trop courte (${Math.round(confidence * 100)}%)`);
     if (Number.isFinite(contextScore) && contextScore < (isWinner || isGoals ? 62 : 55)) {
       reasons.push(`contexte trop faible (${Math.round(contextScore)}/100)`);
     }
     if (sample >= 8 && Number.isFinite(roi) && roi < 0) {
-      reasons.push(`segment historique perdant (${Math.round(roi * 100)}% ROI)`);
+      reasons.push(`historique similaire perdant (${sample} cas)`);
     }
     if (isWinner && odd >= 2.55 && !twoGoalStrong) {
       reasons.push('vainqueur cote haute sans filet 2-0 solide');
@@ -2456,7 +2456,7 @@ function createLegacyEngineService({ projectRoot }) {
       reasons.push('marché buts trop serré pour récupération');
     }
     if (row?.limitedConfidence && !twoGoalStrong) {
-      reasons.push('confiance limitée : lecture seulement');
+      reasons.push('dossier incomplet, observation seulement');
     }
     const bank = Math.max(1, Number(bankroll || 50) || 50);
     return {
@@ -2477,7 +2477,7 @@ function createLegacyEngineService({ projectRoot }) {
       return { ...row, capitalProtectionV1: protection };
     }
     if (protection.blocked) {
-      const mainReason = `Protection bankroll : ${protection.reasons[0] || 'pari trop risqué'}`;
+      const mainReason = `Mode récupération : ${protection.reasons[0] || 'pari trop risqué'}`;
       return {
         ...row,
         stake: 0,
@@ -2578,12 +2578,12 @@ function createLegacyEngineService({ projectRoot }) {
 
   function priorityReasonForRow(row, parts) {
     const bits = [];
-    bits.push(`edge ${Math.round(Number(row?.safeEdge ?? row?.edge ?? 0) * 100)}pt`);
+    bits.push(`avantage ${Math.round(Number(row?.safeEdge ?? row?.edge ?? 0) * 100)}pt`);
     bits.push(`confiance ${Math.round(effectiveConfidence(row) * 100)}%`);
     const sample = Number(row?.safeAssessment?.sample ?? row?.segmentValidation?.sample ?? row?.calibration?.sample ?? 0) || 0;
     const roi = Number(row?.safeAssessment?.roi ?? row?.segmentValidation?.roi ?? row?.calibration?.roi ?? 0);
-    if (sample >= 15) bits.push(`segment ${sample} paris · ROI ${Number.isFinite(roi) ? Math.round(roi * 100) : 0}%`);
-    else bits.push('sample court mais signal fort');
+    if (sample >= 15) bits.push(`historique ${sample} paris similaires · ${Number.isFinite(roi) && roi >= 0 ? 'favorable' : 'à surveiller'}`);
+    else bits.push('historique court mais signal fort');
     bits.push(`départ ${Math.max(0, Math.round(((Date.parse(row?.start || '') || Date.now()) - Date.now()) / 60000))} min`);
     if (row?.winamaxBoost) bits.push('boost Winamax');
     if (row?.winamaxTwoGoalRule?.eligible) bits.push(`filet 2-0 ${Math.round(Number(row.winamaxTwoGoalRule.leadTwoProbability || 0) * 100)}%`);
@@ -2974,7 +2974,7 @@ function createLegacyEngineService({ projectRoot }) {
         newOddMax: 8,
         oldConfidenceMin: 0.55,
         newConfidenceMin: 0.55,
-        reason: `ROI ${Math.round(roi * 100)}% sur ${bucket.count} paris réglés`
+        reason: `historique favorable sur ${bucket.count} paris réglés`
       };
     }
     if (roi < -0.10) {
@@ -2992,7 +2992,7 @@ function createLegacyEngineService({ projectRoot }) {
         newOddMax: 6,
         oldConfidenceMin: 0.55,
         newConfidenceMin: 0.60,
-        reason: `ROI ${Math.round(roi * 100)}% sur ${bucket.count} paris réglés`
+        reason: `historique défavorable sur ${bucket.count} paris réglés`
       };
     }
     return null;
