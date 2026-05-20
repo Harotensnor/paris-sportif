@@ -5,6 +5,13 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.53 — Signaux fiche plus lisibles
+
+UX fiches match.
+- Les signaux de forme n'affichent plus des abréviations comme `2V` : ils deviennent `2 victoires`.
+- Le bloc `Avantage modèle` devient `Avantage du pari`, plus compréhensible hors mode expert.
+- Version app, package et cache Service Worker bumpés en `v8.6.53`.
+
 ### Version v8.6.52 — Page pertes plus lisible
 
 UX pertes.

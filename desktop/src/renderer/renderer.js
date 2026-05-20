@@ -5424,12 +5424,14 @@
     if (homeForm || awayForm) {
       const dominant = homeWins >= awayWins ? homeWins : awayWins;
       const tone = dominant >= 3 ? 'ok' : dominant >= 2 ? 'warn' : 'bad';
-      checks.push({ tone, icon: '🔥', label: 'Forme récente', detail: `${teamDisplayName(row, 'home')} ${homeWins}V · ${teamDisplayName(row, 'away')} ${awayWins}V` });
+      const homeFormText = `${homeWins} victoire${homeWins > 1 ? 's' : ''}`;
+      const awayFormText = `${awayWins} victoire${awayWins > 1 ? 's' : ''}`;
+      checks.push({ tone, icon: '🔥', label: 'Forme récente', detail: `${teamDisplayName(row, 'home')} : ${homeFormText} · ${teamDisplayName(row, 'away')} : ${awayFormText}` });
     }
-    // Edge modèle
+    // Avantage du pari
     const rawEdge = Number(row.edge || 0);
     const edgeTone = rawEdge >= 0.05 ? 'ok' : rawEdge >= 0.02 ? 'warn' : 'bad';
-    checks.push({ tone: edgeTone, icon: '🧠', label: 'Avantage modèle', detail: `${rawEdge > 0 ? '+' : ''}${(rawEdge * 100).toFixed(1)}pt` });
+    checks.push({ tone: edgeTone, icon: '🧠', label: 'Avantage du pari', detail: `${rawEdge > 0 ? '+' : ''}${(rawEdge * 100).toFixed(1)} point${Math.abs(rawEdge * 100) >= 2 ? 's' : ''}` });
     // Confiance / segment
     const conf = Number(row.safeAssessment?.confidence || row.probability || 0);
     const sample = Number(row.segmentValidation?.sample || row.calibration?.sample || 0);
