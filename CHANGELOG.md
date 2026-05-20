@@ -5,6 +5,15 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.56 — Data lite vraiment légère
+
+Performance projet.
+- Le générateur `data_lite.js` ne garde plus les objets match complets dans le blob de premier affichage.
+- Le scope reste utile pour aujourd'hui et la semaine, mais avec des événements compactés et un cap plus strict par journée.
+- Sur le snapshot local, `data_lite.js` passe d'environ 4,96 Mo à environ 215 Ko.
+- L'audit taille valide maintenant `data_lite.js`; les dépassements restants concernent les dettes legacy `legacy-app.js` et `pronostics.html`.
+- Version app, package et cache Service Worker bumpés en `v8.6.56`.
+
 ### Version v8.6.55 — Semaine sans recalcul lourd
 
 Performance.

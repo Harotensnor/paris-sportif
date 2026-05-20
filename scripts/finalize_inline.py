@@ -41,14 +41,14 @@ DATA_TODAY = ROOT / 'data_today.json'
 DATA_MANIFEST = ROOT / 'data_manifest.json'
 DATA_LITE_JS = ROOT / 'data_lite.js'
 DATA_LITE_72H = ROOT / 'data_lite_72h.json'
-# v55.2 — Boot autonome 7j + historique 7j.
-# Le dashboard ne doit plus démarrer sur 5 matchs du jour puis attendre le
-# chargement async pour afficher demain / la semaine. Le blob lite couvre une
-# fenêtre utile (J-7 → J+7) avec cap par jour, ce qui garde le premier écran
-# cohérent même si data.js full arrive quelques secondes après.
-LITE_PAST_DAYS = 7
+# v8.6.56 — vrai blob lite.
+# Le précédent scope J-7 → J+7 gardait les objets match complets et pouvait
+# dépasser 4-5 MB, ce qui rendait le "lite" aussi lourd que la data full.
+# Le desktop moderne utilise /api/engine/analysis?home=1 pour l'accueil; le
+# site statique a seulement besoin d'un premier écran rapide avant le full.
+LITE_PAST_DAYS = 0
 LITE_FUTURE_DAYS = 7
-BOOT_EVENT_CAP = 50
+BOOT_EVENT_CAP = 9
 
 
 ALLOWED_SPORTS = {'football', 'tennis', 'basketball', 'hockey', 'baseball', 'football-american'}
@@ -71,6 +71,107 @@ def paris_today_iso():
         except Exception:
             pass
     return datetime.now(timezone.utc).strftime('%Y-%m-%d')
+
+
+def compact_competitor(comp):
+    if not isinstance(comp, dict):
+        return comp
+    out = {}
+    for key in ('id', 'name', 'short', 'abbr', 'logo', 'color', 'home_away', 'score', 'winner', 'form', 'rank'):
+        if comp.get(key) not in (None, '', [], {}):
+            out[key] = comp.get(key)
+    records = comp.get('records')
+    if isinstance(records, list) and records:
+        first = records[0]
+        if isinstance(first, dict):
+            rec = {k: first.get(k) for k in ('name', 'summary', 'type') if first.get(k) not in (None, '')}
+            if rec:
+                out['records'] = [rec]
+    elo = comp.get('elo') or comp.get('clubelo')
+    if isinstance(elo, dict):
+        slim = {k: elo.get(k) for k in ('value', 'rank', 'country', 'level') if elo.get(k) not in (None, '')}
+        if slim:
+            out['elo'] = slim
+    elif elo not in (None, ''):
+        out['clubelo'] = elo
+    return out
+
+
+def compact_market_item(item):
+    if not isinstance(item, dict):
+        return item
+    return {
+        key: item.get(key)
+        for key in ('market', 'side', 'odd', 'label', 'title', 'source')
+        if item.get(key) not in (None, '', [], {})
+    }
+
+
+def compact_winamax(winamax):
+    if not isinstance(winamax, dict):
+        return winamax
+    out = {}
+    for key in ('available', 'url', 'note', 'match_id', 'tournament'):
+        if winamax.get(key) not in (None, '', [], {}):
+            out[key] = winamax.get(key)
+    markets = winamax.get('markets')
+    if isinstance(markets, dict):
+        slim_markets = {}
+        for key in ('1n2', 'match_winner', 'over_under', 'btts', 'players'):
+            value = markets.get(key)
+            if isinstance(value, list):
+                slim = [compact_market_item(item) for item in value[:10]]
+                slim_markets[key] = [item for item in slim if item]
+            elif isinstance(value, dict):
+                slim_markets[key] = {
+                    k: value.get(k)
+                    for k in ('home', 'draw', 'away', 'over', 'under', 'yes', 'no', 'home_name', 'away_name')
+                    if value.get(k) not in (None, '', [], {})
+                }
+            elif value not in (None, '', [], {}):
+                slim_markets[key] = value
+        if slim_markets:
+            out['markets'] = slim_markets
+    return out
+
+
+def compact_weather(weather):
+    if not isinstance(weather, dict):
+        return weather
+    return {
+        key: weather.get(key)
+        for key in ('city', 'temp_c', 'temperature', 'wind_kph', 'wind', 'rain_mm', 'rain', 'condition')
+        if weather.get(key) not in (None, '', [], {})
+    }
+
+
+def compact_event_for_lite(event):
+    if not isinstance(event, dict):
+        return event
+    out = {}
+    for key in (
+        'id', 'date', 'name', 'shortName', 'status', 'detail', 'completed',
+        'venue', 'city', 'country', 'league_code', 'league_name',
+        'league_country', 'league_priority', 'sport'
+    ):
+        if event.get(key) not in (None, '', [], {}):
+            out[key] = event.get(key)
+    comps = event.get('competitors')
+    if isinstance(comps, list) and comps:
+        out['competitors'] = [compact_competitor(comp) for comp in comps if comp is not None]
+    odds = event.get('odds')
+    if isinstance(odds, list) and odds:
+        out['odds'] = odds[:3]
+    scorers = event.get('scorers')
+    if isinstance(scorers, list) and scorers:
+        out['scorers'] = scorers[:8]
+    winamax = compact_winamax(event.get('winamax'))
+    if winamax:
+        out['winamax'] = winamax
+    weather = compact_weather(event.get('weather'))
+    if weather:
+        out['weather'] = weather
+    return out
 
 
 def main():
@@ -158,10 +259,10 @@ def main():
         bucket = days.get(key, [])
         if not bucket:
             continue
-        lite_days[key] = sorted(
+        lite_days[key] = [compact_event_for_lite(event) for event in sorted(
             bucket,
             key=lambda m: (not ((m.get('winamax') or {}).get('available')), m.get('date') or ''),
-        )[:BOOT_EVENT_CAP]
+        )[:BOOT_EVENT_CAP]]
 
     lite = {
         'generated_at': manifest['generated_at'],
