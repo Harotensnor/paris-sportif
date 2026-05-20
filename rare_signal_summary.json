@@ -1,24 +1,23 @@
 {
-  "generated_at": "2026-05-20T23:48:13Z",
+  "generated_at": "2026-05-20T23:53:44Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 44,
-    "actionable": 22,
+    "active_events": 42,
+    "actionable": 20,
     "watch": 1,
     "risk": 21,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 9,
-      "travel_extreme": 1,
-      "market_move": 15,
-      "signal_conflict": 7,
+      "market_move": 14,
       "market_uncertain": 20,
+      "signal_conflict": 6,
+      "injury_imbalance": 8,
       "back_to_back_travel": 6
     },
     "by_quality": {
-      "actionable": 22,
+      "actionable": 20,
       "watch": 1,
       "risk": 21
     }
@@ -205,24 +204,6 @@
       "context": "Absences severes 7-13"
     },
     {
-      "event_id": "401815425",
-      "date": "2026-05-20T23:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Kansas City Royals",
-      "away": "Boston Red Sox",
-      "match": "Kansas City Royals - Boston Red Sox",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Boston Red Sox",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 7-11"
-    },
-    {
       "event_id": "401856922",
       "date": "2026-05-21T01:00Z",
       "sport": "basketball",
@@ -401,24 +382,6 @@
       "side": "away",
       "strength": 0.709,
       "context": "1 match dans les 48h + 896 km de voyage"
-    },
-    {
-      "event_id": "401815428",
-      "date": "2026-05-20T23:45Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "St. Louis Cardinals",
-      "away": "Pittsburgh Pirates",
-      "match": "St. Louis Cardinals - Pittsburgh Pirates",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.673,
-      "context": "Cote away: 1.98 -> 1.74 (+12.1%)"
     }
   ],
   "active_watch": [

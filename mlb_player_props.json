@@ -1,172 +1,8 @@
 {
-  "generated_at": "2026-05-20T23:48:06Z",
+  "generated_at": "2026-05-20T23:53:38Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815425",
-      "kickoff": "2026-05-20T23:40Z",
-      "league": "MLB",
-      "match": "Boston Red Sox at Kansas City Royals",
-      "home": "Kansas City Royals",
-      "away": "Boston Red Sox",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Kansas City Royals",
-          "pitcher": "Michael Wacha",
-          "label": "Michael Wacha moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.5664,
-          "fair_odds": 1.77,
-          "expected_strikeouts": 5.2,
-          "projected_ip": 6.34,
-          "inputs": {
-            "k9": 7.38,
-            "era": 2.83,
-            "whip": 0.99,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Kansas City Royals",
-          "pitcher": "Michael Wacha",
-          "label": "Michael Wacha concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5395,
-          "fair_odds": 1.85,
-          "expected_hr_allowed": 0.775,
-          "projected_ip": 6.34,
-          "inputs": {
-            "hr9": 1.1,
-            "era": 2.83,
-            "whip": 0.99
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Boston Red Sox",
-          "pitcher": "Connelly Early",
-          "label": "Connelly Early plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.603,
-          "fair_odds": 1.66,
-          "expected_strikeouts": 4.95,
-          "projected_ip": 5.24,
-          "inputs": {
-            "k9": 8.5,
-            "era": 3.21,
-            "whip": 1.2,
-            "hand": "L"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Boston Red Sox",
-          "pitcher": "Connelly Early",
-          "label": "Connelly Early concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5366,
-          "fair_odds": 1.86,
-          "expected_hr_allowed": 0.769,
-          "projected_ip": 5.24,
-          "inputs": {
-            "hr9": 1.32,
-            "era": 3.21,
-            "whip": 1.2
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401815427",
-      "kickoff": "2026-05-20T23:40Z",
-      "league": "MLB",
-      "match": "Milwaukee Brewers at Chicago Cubs",
-      "home": "Chicago Cubs",
-      "away": "Milwaukee Brewers",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Chicago Cubs",
-          "pitcher": "Edward Cabrera",
-          "label": "Edward Cabrera plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.6127,
-          "fair_odds": 1.63,
-          "expected_strikeouts": 5.0,
-          "projected_ip": 5.67,
-          "inputs": {
-            "k9": 7.94,
-            "era": 4.06,
-            "whip": 1.31,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Chicago Cubs",
-          "pitcher": "Edward Cabrera",
-          "label": "Edward Cabrera concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5884,
-          "fair_odds": 1.7,
-          "expected_hr_allowed": 0.888,
-          "projected_ip": 5.67,
-          "inputs": {
-            "hr9": 1.41,
-            "era": 4.06,
-            "whip": 1.31
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Milwaukee Brewers",
-          "pitcher": "Kyle Harrison",
-          "label": "Kyle Harrison plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.5888,
-          "fair_odds": 1.7,
-          "expected_strikeouts": 5.93,
-          "projected_ip": 4.78,
-          "inputs": {
-            "k9": 11.17,
-            "era": 2.09,
-            "whip": 1.19,
-            "hand": "L"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Milwaukee Brewers",
-          "pitcher": "Kyle Harrison",
-          "label": "Kyle Harrison ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6898,
-          "fair_odds": 1.45,
-          "expected_hr_allowed": 0.371,
-          "projected_ip": 4.78,
-          "inputs": {
-            "hr9": 0.7,
-            "era": 2.09,
-            "whip": 1.19
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815428",
       "kickoff": "2026-05-20T23:45Z",
@@ -182,14 +18,14 @@
           "label": "Michael McGreevy plus de 3,5 strikeouts",
           "line": 3.5,
           "pick": "over",
-          "probability": 0.6213,
-          "fair_odds": 1.61,
-          "expected_strikeouts": 3.98,
-          "projected_ip": 5.68,
+          "probability": 0.5225,
+          "fair_odds": 1.91,
+          "expected_strikeouts": 3.58,
+          "projected_ip": 5.21,
           "inputs": {
-            "k9": 6.31,
-            "era": 2.1,
-            "whip": 0.88,
+            "k9": 6.19,
+            "era": 2.06,
+            "whip": 0.86,
             "hand": "R"
           },
           "side": "home"
@@ -200,14 +36,14 @@
           "pitcher": "Michael McGreevy",
           "label": "Michael McGreevy ne concède pas de home run",
           "pick": "no",
-          "probability": 0.5156,
-          "fair_odds": 1.94,
-          "expected_hr_allowed": 0.662,
-          "projected_ip": 5.68,
+          "probability": 0.5509,
+          "fair_odds": 1.82,
+          "expected_hr_allowed": 0.596,
+          "projected_ip": 5.21,
           "inputs": {
-            "hr9": 1.05,
-            "era": 2.1,
-            "whip": 0.88
+            "hr9": 1.03,
+            "era": 2.06,
+            "whip": 0.86
           },
           "side": "home"
         },
@@ -670,7 +506,7 @@
       ]
     }
   ],
-  "props": 32,
+  "props": 24,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
