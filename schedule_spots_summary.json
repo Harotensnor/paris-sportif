@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-20T18:34:47Z",
+  "generated_at": "2026-05-20T18:37:04Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -118,13 +118,13 @@
         "2 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.795,
-        "away_score": 0.015,
+        "status": "mixed",
+        "net_side": null,
+        "home_score": 0.555,
+        "away_score": -0.985,
         "home_fade": 0.9,
-        "away_fade": 0.3,
-        "reason": "Direction nette: Tampa Bay Rays (+0.01)",
+        "away_fade": 1.3,
+        "reason": "Signaux mitigés: avantage net trop faible (Baltimore Orioles +0.56, Tampa Bay Rays -0.99)",
         "detail": [
           {
             "side": "home",
@@ -143,6 +143,18 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.6
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           }
         ]
       }
@@ -622,13 +634,13 @@
         "1 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.747,
-        "away_score": -0.747,
-        "home_fade": 1.15,
-        "away_fade": 1.15,
-        "reason": "Signaux opposes: Colorado Avalanche fade 1.15, Vegas Golden Knights fade 1.15 -> prudence",
+        "status": "net",
+        "net_side": "away",
+        "home_score": -0.098,
+        "away_score": -0.098,
+        "home_fade": 0.15,
+        "away_fade": 0.15,
+        "reason": "Direction nette: Vegas Golden Knights (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -641,18 +653,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
           }
         ]
       }
@@ -1392,13 +1392,13 @@
         "1 match dans les 48h + 1396 km de voyage"
       ],
       "global_resolution": {
-        "status": "abstain",
+        "status": "mixed",
         "net_side": null,
-        "home_score": -0.414,
-        "away_score": -0.697,
+        "home_score": 0.936,
+        "away_score": -1.697,
         "home_fade": 0.75,
-        "away_fade": 0.959,
-        "reason": "Signaux opposes: Baltimore Orioles fade 0.75, Tampa Bay Rays fade 0.96 -> prudence",
+        "away_fade": 1.959,
+        "reason": "Signaux mitigés: avantage net trop faible (Baltimore Orioles +0.94, Tampa Bay Rays -1.70)",
         "detail": [
           {
             "side": "home",
@@ -1417,6 +1417,18 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.6
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           },
           {
             "side": "away",
@@ -1818,19 +1830,31 @@
         "1 match dans les 48h + 1396 km de voyage"
       ],
       "global_resolution": {
-        "status": "abstain",
+        "status": "mixed",
         "net_side": null,
-        "home_score": -0.317,
-        "away_score": -0.599,
+        "home_score": 1.033,
+        "away_score": -1.599,
         "home_fade": 0.6,
-        "away_fade": 0.809,
-        "reason": "Signaux opposes: Baltimore Orioles fade 0.60, Tampa Bay Rays fade 0.81 -> prudence",
+        "away_fade": 1.809,
+        "reason": "Signaux mitigés: avantage net trop faible (Baltimore Orioles +1.03, Tampa Bay Rays -1.60)",
         "detail": [
           {
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.6
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           },
           {
             "side": "away",
