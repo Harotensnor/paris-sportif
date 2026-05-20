@@ -6944,6 +6944,16 @@
     return 'au prochain refresh important';
   }
 
+  function historicalBlockerText(row) {
+    const sample = Number(row?.segmentValidation?.sample ?? row?.safeAssessment?.sample ?? 0);
+    const roi = Number(row?.segmentValidation?.roi ?? row?.safeAssessment?.roi);
+    if (Number.isFinite(roi) && sample >= 15 && roi < -0.02) {
+      return `segment similaire perdant (${Math.round(roi * 100)}% ROI sur ${formatCount(sample)} paris)`;
+    }
+    const capitalReason = (row?.capitalProtectionV1?.reasons || []).find((reason) => /segment historique perdant|confiance limitée/i.test(String(reason || '')));
+    return capitalReason ? userFacingGuardText(capitalReason) : '';
+  }
+
   function conciseBlockerLabels(row, limit = 3) {
     if (!row) return [];
     const labels = [];
@@ -6952,6 +6962,7 @@
       if (!text || labels.some((item) => normalizeUiKey(item) === normalizeUiKey(text))) return;
       labels.push(text);
     };
+    add(historicalBlockerText(row));
     add(row?.decisionCenter?.mainReason);
     add(row?.safeAssessment?.blockReason);
     add(row?.contextGate?.label || row?.contextGate?.gate);
@@ -7307,7 +7318,7 @@
 
   function homeWatchCardHtml(row, index) {
     const confidence = Math.round(homeConfidenceValue(row) * 100);
-    const reason = userFacingGuardText(row?.decisionCenter?.mainReason || row?.safeAssessment?.blockReason || row?.contextGate?.gate || 'contexte à confirmer');
+    const reason = historicalBlockerText(row) || userFacingGuardText(row?.decisionCenter?.mainReason || row?.safeAssessment?.blockReason || row?.contextGate?.gate || 'contexte à confirmer');
     const marketKey = rowMarketPreferenceKey(row);
     const sportKey = normalizeUiKey(row?.sport || 'sport');
     return `

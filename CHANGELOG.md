@@ -5,6 +5,14 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.25 — Blocage historique lisible
+
+UX pronostics.
+- Les cartes `À surveiller` affichent maintenant le vrai motif historique quand un segment similaire perd de l'argent.
+- Exemple : `segment similaire perdant (-18% ROI sur 113 paris)` au lieu de `Freiné par historique`.
+- Le bloc `Prochain pari sérieux` remonte aussi ce motif dans les raisons de blocage.
+- Version app, package et cache Service Worker bumpés en `v8.6.25`.
+
 ### Version v8.6.24 — Lanceur Windows traçable
 
 Stabilité utilisateur.
