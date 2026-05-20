@@ -59,8 +59,8 @@
     },
     value: {
       kicker: 'Gros gain',
-      title: 'Cotes plus hautes, toujours filtrées',
-      subtitle: 'Cotes 2+ avec avantage positif ou pari prêt, pour chercher du rendement sans ouvrir les marchés complexes.'
+      title: 'Gros gain propre',
+      subtitle: 'Cotes 2+ avec avantage positif ou pari prêt, pour chercher du rendement sans ouvrir les marchés dangereux.'
     },
     watch: {
       kicker: 'À surveiller',

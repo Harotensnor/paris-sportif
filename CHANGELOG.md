@@ -5,6 +5,13 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.12 — Pages Safe et Gros gain visibles
+
+UX parieur.
+- La navigation standard expose maintenant deux entrées directes : `Safe` pour les spots les plus prudents et `Gros gain` pour les cotes 2+ filtrées.
+- La page `Gros gain` est renommée en `Gros gain propre` pour clarifier qu’elle cherche du rendement sans ouvrir les marchés dangereux.
+- Version app, package et cache Service Worker bumpés en `v8.6.12`.
+
 ### Version v8.6.11 — Accueil moins lourd au démarrage
 
 Performance.

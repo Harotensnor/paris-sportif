@@ -112,6 +112,9 @@ async function main() {
       throw new Error(`Accueil trop chargé: tableau/catégories ne doivent pas être visibles ${JSON.stringify(home.visibleHomePanels)}`);
     }
     if (home.standardExpertVisible) throw new Error('Mode expert visible en standard');
+    if (!home.nav.some((item) => /Safe/i.test(item)) || !home.nav.some((item) => /Gros gain/i.test(item))) {
+      throw new Error(`Navigation parieur incomplète: ${JSON.stringify(home.nav)}`);
+    }
     if (/Écouter le brief|brief audio|SpeechSynthesis|TTS|Meilleure cote|Multi-bookmaker/i.test(home.dashboardText)) {
       throw new Error(`Texte indésirable sur accueil: ${home.dashboardText.slice(0, 900)}`);
     }
