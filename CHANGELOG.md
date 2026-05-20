@@ -5,6 +5,14 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.28 — Bouton de reprise plus clair
+
+UX pronostics.
+- Les paris prêts plafonnés par la protection bankroll s'affichent maintenant comme `Je mise mini`.
+- Le détail utilisateur indique `Reprise prudente : mise plafonnée, pas de martingale`.
+- L'accueil compact conserve l'information de protection bankroll pour ne pas masquer ce statut.
+- Version app, package et cache Service Worker bumpés en `v8.6.28`.
+
 ### Version v8.6.27 — Segment précis gagnant prioritaire
 
 Pronostics.

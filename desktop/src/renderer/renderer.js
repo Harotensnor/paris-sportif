@@ -6906,12 +6906,13 @@
       };
     }
     if (isReadyToStakeRow(row)) {
+      const recovery = isRecoveryStakeRow(row);
       return {
         key: 'ready',
-        label: 'Je mise',
+        label: recovery ? 'Je mise mini' : 'Je mise',
         tone: 'ok',
         action: `Mise ${visibleStakeText(row)}`,
-        detail: 'Pari actionnable avec garde-fous positifs.'
+        detail: recovery ? 'Reprise prudente : mise plafonnée, pas de martingale.' : 'Pari actionnable avec garde-fous positifs.'
       };
     }
     const reason = userFacingGuardText(
@@ -6934,6 +6935,12 @@
     const status = seriousBetStatus(row);
     const label = compact ? status.label : `${status.label}${status.detail ? ` · ${status.detail}` : ''}`;
     return `<span class="bet-status-pill ${escapeHtml(status.tone)}">${escapeHtml(label)}</span>`;
+  }
+
+  function isRecoveryStakeRow(row) {
+    if (!row || !isReadyToStakeRow(row)) return false;
+    const reason = `${row?.decisionCenter?.mainReason || ''} ${row?.capitalProtectionV1?.policy || ''}`;
+    return Boolean(row?.capitalProtectionV1?.stakeCapped || /reprise|recuperation|récupération|plafonn/i.test(reason));
   }
 
   function nextCheckLabel(row) {
@@ -7281,6 +7288,7 @@
     const kickoff = `${formatDateLabel(row.start)} · ${countdownLabel(row.start)}`;
     const why = simpleWhyText(row);
     const canStake = isReadyToStakeRow(row);
+    const recoveryStake = isRecoveryStakeRow(row);
     const stake = canStake ? visibleStakeText(row) : 'À confirmer';
     const marketKey = rowMarketPreferenceKey(row);
     const sportKey = normalizeUiKey(row?.sport || 'sport');
@@ -7303,6 +7311,7 @@
           <div class="home-top-tags">
             <span>${escapeHtml(simpleMarketLabelForRow(row))}</span>
             ${isWinnerRow(row) ? '<span>Vainqueur prioritaire</span>' : ''}
+            ${recoveryStake ? '<span>Reprise prudente</span>' : ''}
           </div>
           <p>${escapeHtml(why)}</p>
           <div class="home-top-kpis">
@@ -7314,7 +7323,7 @@
         </div>
         <div class="home-top-actions">
           ${canStake ? winamaxOpenButtonHtml(row, 'Ouvrir Winamax') : ''}
-          ${canStake ? trackButtonHtml(row, `Je mise ${stake}`) : '<span class="match-sub">À surveiller</span>'}
+          ${canStake ? trackButtonHtml(row, `${recoveryStake ? 'Je mise mini' : 'Je mise'} ${stake}`) : '<span class="match-sub">À surveiller</span>'}
         </div>
       </article>
     `;

@@ -233,6 +233,7 @@ function compactPickForHome(row = {}) {
     winamaxUrl: row.winamaxUrl,
     decisionCenter: row.decisionCenter || null,
     safeAssessment: row.safeAssessment || null,
+    capitalProtectionV1: row.capitalProtectionV1 || null,
     contextGate: row.contextGate || null,
     contextQuality: row.contextQuality || null,
     confidenceTrust: row.confidenceTrust || null,
