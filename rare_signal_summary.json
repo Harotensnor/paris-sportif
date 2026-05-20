@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-20T15:36:22Z",
+  "generated_at": "2026-05-20T16:07:50Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
@@ -10,7 +10,7 @@
     "risk": 24,
     "expired_sample": 0,
     "by_type": {
-      "market_move": 21,
+      "market_move": 20,
       "injury_imbalance": 23,
       "back_to_back_travel": 16,
       "signal_conflict": 10,
@@ -18,12 +18,30 @@
       "market_uncertain": 21
     },
     "by_quality": {
-      "watch": 11,
       "actionable": 35,
+      "watch": 11,
       "risk": 24
     }
   },
   "active_actionable": [
+    {
+      "event_id": "401843286",
+      "date": "2026-05-20T17:00Z",
+      "sport": "football",
+      "league_code": "eliteserien",
+      "league_name": "Eliteserien",
+      "home": "Lillestrom",
+      "away": "Kristiansund BK",
+      "match": "Lillestrom - Kristiansund BK",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 1.0,
+      "context": "Cote away: 6.50 -> 5.30 (+18.5%)"
+    },
     {
       "event_id": "401815421",
       "date": "2026-05-20T17:05Z",
@@ -565,24 +583,6 @@
       "context": "1 match dans les 48h + 1161 km de voyage"
     },
     {
-      "event_id": "401843286",
-      "date": "2026-05-20T17:00Z",
-      "sport": "football",
-      "league_code": "eliteserien",
-      "league_name": "Eliteserien",
-      "home": "Lillestrom",
-      "away": "Kristiansund BK",
-      "match": "Lillestrom - Kristiansund BK",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.741,
-      "context": "Cote away: 6.00 -> 5.20 (+13.3%)"
-    },
-    {
       "event_id": "401815429",
       "date": "2026-05-20T19:10Z",
       "sport": "baseball",
@@ -657,22 +657,22 @@
   ],
   "active_watch": [
     {
-      "event_id": "401865444",
-      "date": "2026-05-20T22:00Z",
+      "event_id": "401862911",
+      "date": "2026-05-20T19:00Z",
       "sport": "football",
-      "league_code": "conmebol.sudamericana",
-      "league_name": "Copa Sudamericana",
-      "home": "Santos",
-      "away": "San Lorenzo",
-      "match": "Santos - San Lorenzo",
+      "league_code": "europaleague",
+      "league_name": "Europa League",
+      "home": "SC Freiburg",
+      "away": "Aston Villa",
+      "match": "SC Freiburg - Aston Villa",
       "quality": "watch",
       "quality_reason": "Signal rare present mais intensite moyenne",
       "type": "market_move",
       "direction": "steam",
       "team": null,
-      "side": "away",
-      "strength": 0.617,
-      "context": "Cote away: 4.50 -> 4.00 (+11.1%)"
+      "side": "home",
+      "strength": 0.628,
+      "context": "Cote home: 5.75 -> 5.10 (+11.3%)"
     },
     {
       "event_id": "401865447",
@@ -779,8 +779,8 @@
       "direction": "steam",
       "team": null,
       "side": "home",
-      "strength": 0.564,
-      "context": "Cote home: 3.45 -> 3.10 (+10.1%)"
+      "strength": 0.572,
+      "context": "Cote home: 3.40 -> 3.05 (+10.3%)"
     },
     {
       "event_id": "401865436",
@@ -819,24 +819,6 @@
       "context": "Cote away: 3.10 -> 2.80 (+9.7%)"
     },
     {
-      "event_id": "401862911",
-      "date": "2026-05-20T19:00Z",
-      "sport": "football",
-      "league_code": "europaleague",
-      "league_name": "Europa League",
-      "home": "SC Freiburg",
-      "away": "Aston Villa",
-      "match": "SC Freiburg - Aston Villa",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "home",
-      "strength": 0.531,
-      "context": "Cote home: 5.75 -> 5.20 (+9.6%)"
-    },
-    {
       "event_id": "401865546",
       "date": "2026-05-21T00:30Z",
       "sport": "football",
@@ -853,6 +835,24 @@
       "side": "away",
       "strength": 0.529,
       "context": "Cote away: 4.20 -> 3.80 (+9.5%)"
+    },
+    {
+      "event_id": "401865444",
+      "date": "2026-05-20T22:00Z",
+      "sport": "football",
+      "league_code": "conmebol.sudamericana",
+      "league_name": "Copa Sudamericana",
+      "home": "Santos",
+      "away": "San Lorenzo",
+      "match": "Santos - San Lorenzo",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.505,
+      "context": "Cote away: 4.40 -> 4.00 (+9.1%)"
     }
   ],
   "active_risk": [
@@ -983,6 +983,24 @@
       "context": "marge bookmaker anormale 19.3%"
     },
     {
+      "event_id": "401861395",
+      "date": "2026-05-24T11:00Z",
+      "sport": "football",
+      "league_code": "chn.1",
+      "league_name": "Chinese Super League",
+      "home": "Yunnan Yukun",
+      "away": "Qingdao West Coast",
+      "match": "Yunnan Yukun - Qingdao West Coast",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.1%"
+    },
+    {
       "event_id": "401861542",
       "date": "2026-05-24T11:35Z",
       "sport": "football",
@@ -999,24 +1017,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.5%"
-    },
-    {
-      "event_id": "401861397",
-      "date": "2026-05-24T12:00Z",
-      "sport": "football",
-      "league_code": "chn.1",
-      "league_name": "Chinese Super League",
-      "home": "Shanghai Shenhua",
-      "away": "Shenzhen Xinpengcheng",
-      "match": "Shanghai Shenhua - Shenzhen Xinpengcheng",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.3%"
     },
     {
       "event_id": "401842725",
