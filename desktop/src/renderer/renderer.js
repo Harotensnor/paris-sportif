@@ -7167,23 +7167,37 @@
     const weekWatch = rollingWeekRows(pool, canDisplayPickCard).filter((row) => !isReadyToStakeRow(row));
     const blockedCore = rollingWeekRows(pool, (row) => pickHasCoreData(row) && isBeforeKickoff(row)).filter((row) => !canDisplayPickCard(row));
     const sourceGaps = pool.reduce((sum, row) => sum + Number(row?.contextQuality?.critical_missing?.length || row?.matchSheetV6?.missingCriticalData?.length || 0), 0);
-    const blockers = [];
+    const blockerCounts = new Map();
     const addBlocker = (value) => {
       const text = userFacingGuardText(value || '').replace(/\s+/g, ' ').trim();
-      if (text && !blockers.some((item) => normalizeUiKey(item) === normalizeUiKey(text))) blockers.push(text);
+      if (!text) return;
+      const key = normalizeUiKey(text);
+      const current = blockerCounts.get(key) || { label: text, count: 0 };
+      current.count += 1;
+      blockerCounts.set(key, current);
     };
-    watch24.concat(blockedCore).slice(0, 10).forEach((row) => conciseBlockerLabels(row, 2).forEach(addBlocker));
+    watch24.concat(blockedCore, weekWatch).slice(0, 30).forEach((row) => conciseBlockerLabels(row, 2).forEach(addBlocker));
+    const blockers = Array.from(blockerCounts.values())
+      .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label, 'fr'))
+      .slice(0, 3)
+      .map((item) => item.count > 1 ? `${item.label} (${item.count})` : item.label);
+    const nextSpot = ready24[0] || watch24[0] || weekReady[0] || weekWatch[0] || blockedCore[0] || null;
     const firstReason = ready24.length
-      ? `${formatCount(ready24.length)} pari(s) jouable(s), le reste attend un meilleur contexte.`
+      ? `${formatCount(ready24.length)} pari(s) jouable(s). Le reste attend un meilleur dossier.`
       : weekReady.length
         ? `Rien à cliquer dans les 24h, mais ${formatCount(weekReady.length)} spot(s) prêt(s) plus tard cette semaine.`
       : watch24.length
         ? `${formatCount(watch24.length)} spot(s) à surveiller dans les 24h, mais pas assez propres pour cliquer.`
         : weekWatch.length
-          ? `Aucun clic propre maintenant; prochain spot interessant cette semaine.`
+          ? `Aucun clic propre maintenant ; prochain spot intéressant cette semaine.`
         : blockedCore.length
-            ? `Des matchs existent, mais les securites du logiciel coupent la mise.`
+            ? `Des matchs existent, mais les sécurités du logiciel coupent la mise.`
             : `Journée pauvre sur Winamax pour le modèle.`;
+    const nextAction = ready24.length
+      ? 'Action : joue seulement le meilleur spot, puis stop si le contexte change.'
+      : nextSpot
+        ? `Action : attendre le re-check ${nextCheckLabel(nextSpot)}.`
+        : 'Action : attendre le prochain refresh Winamax.';
     return {
       ready24: ready24.length,
       watch24: watch24.length,
@@ -7192,6 +7206,7 @@
       blocked: blockedCore.length,
       sourceGaps,
       blockers: blockers.slice(0, 3),
+      nextAction,
       text: firstReason
     };
   }
@@ -7204,7 +7219,8 @@
       <div>
         <span class="eyebrow">Pourquoi pas plus ?</span>
         <strong>${escapeHtml(summary.text)}</strong>
-        ${summary.blockers?.length ? `<small class="why-not-more-detail">À corriger : ${escapeHtml(summary.blockers.join(' · '))}</small>` : ''}
+        <small class="why-not-more-detail">${escapeHtml(summary.nextAction)}</small>
+        ${summary.blockers?.length ? `<small class="why-not-more-detail">Ce qui bloque le plus : ${escapeHtml(summary.blockers.join(' · '))}</small>` : ''}
       </div>
       <div class="why-not-more-kpis">
         <span><b>${formatCount(summary.ready24)}</b><em>jouable</em></span>

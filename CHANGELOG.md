@@ -5,6 +5,14 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.58 — “Pourquoi pas plus ?” plus utile
+
+UX accueil.
+- Le bloc `Pourquoi pas plus ?` donne maintenant une action simple : jouer uniquement le meilleur spot, attendre le re-check, ou attendre le prochain refresh.
+- Les blocages sont regroupés par cause dominante avec compteur, au lieu d’une liste de phrases techniques dispersées.
+- Quand aucun pari n’est prêt, l’accueil continue à proposer le meilleur spot à suivre et l’heure de relecture attendue.
+- Version app, package et cache Service Worker bumpés en `v8.6.58`.
+
 ### Version v8.6.57 — Blocages pronostics lisibles
 
 UX pronostics.
