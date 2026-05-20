@@ -18647,6 +18647,7 @@
       cockpit: 'cockpit',
       winners: 'winner',
       goals: 'goals',
+      scorers: 'scorer',
       strict: 'strict',
       value: 'value',
       halftime: 'halftime',

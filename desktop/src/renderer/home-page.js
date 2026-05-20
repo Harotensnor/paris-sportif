@@ -17,6 +17,11 @@
       title: 'Plus / Moins et les deux marquent',
       subtitle: 'Tous les paris buts sont regroupés ici pour ne pas charger l’accueil principal.'
     },
+    scorer: {
+      kicker: 'Buteurs',
+      title: 'Buteurs vérifiés',
+      subtitle: 'Uniquement les joueurs avec vraie cote Winamax et dossier assez lisible ; sinon la ligne reste à surveiller.'
+    },
     night: {
       kicker: 'Nuit',
       title: 'Les prochaines nuits à surveiller',
@@ -79,6 +84,7 @@
     cockpit: 'cockpit',
     winners: 'winner',
     goals: 'goals',
+    scorers: 'scorer',
     night: 'night',
     football: 'sport:football',
     tennis: 'sport:tennis',
@@ -133,15 +139,22 @@
     if (!total) {
       if (key === 'night') return 'Aucun spot nuit propre dans la semaine : inutile de forcer.';
       if (key === 'week') return 'Aucun spot sérieux trouvé cette semaine dans le cache actuel.';
+      if (key === 'scorer') return 'Aucun buteur vérifié pour le moment : pas de pari joueur sans cote et titularisation crédibles.';
+      if (key === 'winner') return 'Aucun Vainqueur assez propre maintenant : on attend un meilleur dossier.';
       return 'Aucun spot propre dans cette catégorie pour le moment.';
     }
     if (ready > 0) {
       if (key === 'watch') return 'Cette page reste volontairement sans mise directe : surveille les re-checks.';
       if (key === 'night') return `${ready} pari${ready > 1 ? 's' : ''} de nuit jouable${ready > 1 ? 's' : ''}. Joue simple, pas en rattrapage.`;
+      if (key === 'scorer') return `${ready} buteur${ready > 1 ? 's' : ''} jouable${ready > 1 ? 's' : ''}. Mise prudente : ce marché reste plus volatile.`;
+      if (key === 'winner') return `${ready} pari${ready > 1 ? 's' : ''} jouable${ready > 1 ? 's' : ''} côté Vainqueur. Priorité au meilleur spot, surtout si filet 2-0 disponible.`;
+      if (key === 'goals') return `${ready} pari${ready > 1 ? 's' : ''} Buts jouable${ready > 1 ? 's' : ''}. Évite d’empiler plusieurs totaux du même match.`;
       return `${ready} pari${ready > 1 ? 's' : ''} jouable${ready > 1 ? 's' : ''}. Commence par le meilleur spot, pas par tout jouer.`;
     }
     if (watch > 0) {
       if (key === 'night') return `${watch} spot${watch > 1 ? 's' : ''} de nuit à surveiller. Pas de mise tant que les absences/stars ne sont pas propres.`;
+      if (key === 'scorer') return `${watch} buteur${watch > 1 ? 's' : ''} à surveiller. On attend cote, titulaire probable ou forme joueur plus nette.`;
+      if (key === 'winner') return `${watch} Vainqueur${watch > 1 ? 's' : ''} à surveiller. Pas de clic tant que le contexte ne confirme pas.`;
       return `${watch} spot${watch > 1 ? 's' : ''} à surveiller. Pas de bouton tant que le dossier n’est pas assez propre.`;
     }
     return 'Des lignes existent, mais les garde-fous refusent la mise.';

@@ -5,6 +5,14 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.49 — Buteurs en vraie page catégorie
+
+UX navigation.
+- La navigation `Buteurs` utilise maintenant la même page catégorie propre que `Vainqueurs`, `Buts`, `Nuit` et `Football`.
+- Les messages sont adaptés au marché joueur : mise prudente, cote réelle Winamax, titularisation et forme joueur.
+- Cela évite une vieille page plus lourde et rapproche la navigation d’un vrai parcours parieur.
+- Version app, package et cache Service Worker bumpés en `v8.6.49`.
+
 ### Version v8.6.48 — Pages catégorie sans doublon match
 
 UX navigation.
