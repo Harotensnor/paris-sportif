@@ -5,6 +5,14 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.45 — Feuille de match plus propre
+
+UX fiches match.
+- Le rendu des compositions passe d'un faux terrain visuel à une feuille de match par lignes.
+- Les blocs `Attaque / Milieu / Défense / Gardien` restent lisibles, mais sans dessin de terrain qui semblait bricolé quand la compo était partielle.
+- Les joueurs gardent photo/numéro/poste quand la source le fournit, avec fallback propre.
+- Version app, package et cache Service Worker bumpés en `v8.6.45`.
+
 ### Version v8.6.44 — Raisons de blocage plus lisibles
 
 UX.
