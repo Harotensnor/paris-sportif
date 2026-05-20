@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-20T03:22:33Z",
+  "generated_at": "2026-05-20T03:28:03Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -582,13 +582,13 @@
         "1 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.747,
-        "away_score": -0.747,
-        "home_fade": 1.15,
-        "away_fade": 1.15,
-        "reason": "Signaux opposes: Colorado Avalanche fade 1.15, Vegas Golden Knights fade 1.15 -> prudence",
+        "status": "net",
+        "net_side": "away",
+        "home_score": -0.098,
+        "away_score": -0.098,
+        "home_fade": 0.15,
+        "away_fade": 0.15,
+        "reason": "Direction nette: Vegas Golden Knights (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -601,18 +601,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
           }
         ]
       }
@@ -2024,13 +2012,13 @@
         "1 match dans les 48h + 1049 km de voyage"
       ],
       "global_resolution": {
-        "status": "mixed",
-        "net_side": null,
-        "home_score": -1.541,
-        "away_score": 0.89,
-        "home_fade": 1.8,
+        "status": "net",
+        "net_side": "away",
+        "home_score": -1.445,
+        "away_score": -0.143,
+        "home_fade": 1.704,
         "away_fade": 0.74,
-        "reason": "Signaux mitigés: avantage net trop faible (Arizona Diamondbacks -1.54, San Francisco Giants +0.89)",
+        "reason": "Direction nette: San Francisco Giants (-0.14)",
         "detail": [
           {
             "side": "home",
@@ -2042,13 +2030,7 @@
             "side": "home",
             "type": "market_move",
             "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 1.0
+            "strength": 0.904
           },
           {
             "side": "away",
