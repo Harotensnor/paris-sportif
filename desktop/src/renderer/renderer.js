@@ -6813,21 +6813,20 @@
     const allRows = Array.isArray(rows) ? rows : [];
     const cockpitRows = rolling24hRows(allRows, canDisplayPickCard);
     const readyRows = cockpitRows.filter(isReadyToStakeRow);
-    const sportCount = uniqueCleanLabels(cockpitRows.map((row) => row.sport)).length;
     const baseCards = [
-      {
-        key: 'cockpit',
-        icon: '🎛',
-        title: 'Cockpit pronostics',
-        rows: cockpitRows,
-        detail: 'Tout ouvrir, filtrer, comparer'
-      },
       {
         key: 'ready',
         icon: '✅',
         title: 'À miser',
         rows: marketCategoryRows(allRows, 'ready'),
         detail: 'Uniquement les paris avec bouton'
+      },
+      {
+        key: 'sport:football',
+        icon: '⚽',
+        title: 'Football',
+        rows: marketCategoryRows(allRows, 'sport:football'),
+        detail: 'Priorité foot et marchés simples'
       },
       {
         key: 'winner',
@@ -6842,6 +6841,13 @@
         title: 'Nuit',
         rows: marketCategoryRows(allRows, 'night'),
         detail: 'Sports US / Asie'
+      },
+      {
+        key: 'week',
+        icon: '📅',
+        title: 'Semaine',
+        rows: rollingWeekRows(allRows, canDisplayPickCard),
+        detail: 'Le prochain spot sérieux'
       },
       {
         key: 'goals',
@@ -6865,39 +6871,11 @@
         detail: 'Tickets construits à part'
       },
       {
-        key: 'strict',
-        icon: '🛡',
-        title: 'Strict',
-        rows: marketCategoryRows(allRows, 'strict'),
-        detail: 'Le plus prudent après perte'
-      },
-      {
         key: 'value',
         icon: '💎',
         title: 'Cotes 2+',
         rows: marketCategoryRows(allRows, 'value'),
-        detail: 'Rendement, sans forcer'
-      },
-      {
-        key: 'today',
-        icon: '📅',
-        title: 'Aujourd’hui',
-        rows: marketCategoryRows(allRows, 'today'),
-        detail: 'Avant minuit'
-      },
-      {
-        key: 'tomorrow',
-        icon: '🔜',
-        title: 'Demain',
-        rows: marketCategoryRows(allRows, 'tomorrow'),
-        detail: 'Préparer sans urgence'
-      },
-      {
-        key: 'sport',
-        icon: '🏀',
-        title: 'Par sport',
-        rows: cockpitRows,
-        detail: `${formatCount(sportCount)} sport${sportCount > 1 ? 's' : ''} couvert${sportCount > 1 ? 's' : ''}`
+        detail: 'Plus ambitieux, toujours filtré'
       },
       {
         key: 'watch',
@@ -6907,7 +6885,7 @@
         detail: 'Signaux utiles, sans bouton de mise'
       }
     ];
-    const sportCards = ['football', 'tennis', 'basketball', 'hockey', 'baseball']
+    const sportCards = ['tennis', 'basketball', 'hockey', 'baseball']
       .map((sport) => {
         const rowsForSport = marketCategoryRows(allRows, `sport:${sport}`);
         const labels = {
@@ -6926,10 +6904,10 @@
         };
       })
       .filter((card) => card.rows.length > 0);
-    const cards = baseCards.concat(sportCards.slice(0, 5)).map((card) => {
+    const cards = baseCards.concat(sportCards.slice(0, 3)).map((card) => {
       const ready = card.rows.filter(isReadyToStakeRow).length;
       return { ...card, ready, total: card.rows.length };
-    }).filter((card) => card.key === 'cockpit' || card.total > 0).slice(0, 14);
+    }).filter((card) => card.total > 0 || card.key === 'ready').slice(0, 10);
     if (count) {
       count.textContent = `${formatCount(readyRows.length)} prêts · ${formatCount(cockpitRows.length)} lignes`;
     }

@@ -5,6 +5,14 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.59 — Catégories accueil plus courtes
+
+UX navigation.
+- Les catégories de l'accueil retirent les entrées trop cockpit/techniques et gardent les raccourcis vraiment utiles : À miser, Football, Vainqueurs, Buteurs, Nuit, Semaine, Buts, Combinés, Cotes 2+ et À surveiller.
+- Le bloc catégories affiche moins de cartes et sert maintenant de vraie navigation de parieur, pas d’inventaire complet du moteur.
+- Les entrées sport secondaires restent disponibles seulement si elles ont des lignes à montrer.
+- Version app, package et cache Service Worker bumpés en `v8.6.59`.
+
 ### Version v8.6.58 — “Pourquoi pas plus ?” plus utile
 
 UX accueil.
