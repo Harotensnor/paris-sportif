@@ -326,27 +326,30 @@ def build_candidate_reports(generated: str) -> tuple[dict[str, Any], dict[str, A
         "hard_skip": 5,
     }
     out.sort(key=lambda row: (order.get(text(row.get("v16_status")), 99), text(row.get("kickoff")), text(row.get("match"))))
-    counts = Counter(row["v16_status"] for row in out)
+    expired_rows = [row for row in out if text(row.get("t10_window")) == "expired" or text(row.get("blocking_gate")) == "expired"]
+    active_rows = [row for row in out if row not in expired_rows]
+    counts = Counter(row["v16_status"] for row in active_rows)
     ready = counts.get("ready_now", 0)
-    t10_windows = Counter(text(row.get("t10_window")) for row in out if row.get("v16_status") == "wait_t10")
-    gate_counts = Counter(text(row.get("blocking_gate")) for row in out if not row.get("can_bet"))
+    t10_windows = Counter(text(row.get("t10_window")) for row in active_rows if row.get("v16_status") == "wait_t10")
+    gate_counts = Counter(text(row.get("blocking_gate")) for row in active_rows if not row.get("can_bet"))
     primary_action = next(
         (
             text(row.get("next_action"))
-            for row in out
+            for row in active_rows
             if text(row.get("next_action")) and text(row.get("next_action")) not in {"Jouer maintenant", "Écarter"}
         ),
         "",
     )
     summary = {
-        "candidates": len(out),
+        "candidates": len(active_rows),
+        "expired_removed_from_action": len(expired_rows),
         "ready_now": ready,
         "wait_t10": counts.get("wait_t10", 0),
         "wait_price": counts.get("wait_price", 0),
         "repair_source": counts.get("repair_source", 0),
         "market_hostile": counts.get("market_hostile", 0),
         "hard_skip": counts.get("hard_skip", 0),
-        "stake_zero_for_non_ready": all(row["stake"] == "0 €" for row in out if not row["can_bet"]),
+        "stake_zero_for_non_ready": all(row["stake"] == "0 €" for row in active_rows if not row["can_bet"]),
         "message": "Aucun pari à jouer maintenant" if ready == 0 else f"{ready} pari(s) prêt(s)",
         "next_action": primary_action or ("Finaliser T-10" if counts.get("wait_t10", 0) else "Rechecker prix" if counts.get("wait_price", 0) else "Réparer source"),
         "prebet_ready": prebet_ready,
@@ -360,9 +363,9 @@ def build_candidate_reports(generated: str) -> tuple[dict[str, Any], dict[str, A
         "schema": "paris-sportif.v16.candidate_resolution.v1",
         "generated_at": generated,
         "summary": summary,
-        "rows": out,
+        "rows": active_rows,
     }
-    t10_rows = [row for row in out if row["v16_status"] in {"ready_now", "wait_t10"}]
+    t10_rows = [row for row in active_rows if row["v16_status"] in {"ready_now", "wait_t10"}]
     t10_decision = {
         "schema": "paris-sportif.v16.t10_decision.v1",
         "generated_at": generated,
@@ -393,7 +396,7 @@ def build_candidate_reports(generated: str) -> tuple[dict[str, Any], dict[str, A
             "ticket_status": "ready" if ready else "no_bet_now",
             "agent_allowed": ready > 0 and prebet_ready and prematch_ready and health_blocking == 0,
         },
-        "rows": out,
+        "rows": active_rows,
     }
     agent_allowed = bool(final_ticket["summary"]["agent_allowed"])
     agent_gate = {
@@ -406,7 +409,7 @@ def build_candidate_reports(generated: str) -> tuple[dict[str, Any], dict[str, A
             "reason": "Ticket V16 prêt." if agent_allowed else summary["message"],
             "blocking_gate": "" if agent_allowed else summary["next_action"],
         },
-        "rows": [row for row in out if row["v16_status"] == "ready_now"],
+        "rows": [row for row in active_rows if row["v16_status"] == "ready_now"],
     }
     return candidate_resolution, t10_decision, final_ticket, agent_gate
 

@@ -78,6 +78,9 @@ async function main() {
     }
   );
   const health = JSON.parse(fs.readFileSync(path.join(root, 'health.json'), 'utf8'));
+  const v16Ticket = fs.existsSync(path.join(root, 'v16_final_ticket.json'))
+    ? JSON.parse(fs.readFileSync(path.join(root, 'v16_final_ticket.json'), 'utf8'))
+    : { rows: [] };
   const generatedAt = Date.parse(health.generated_at || data.generated_at || '');
   assert(Number.isFinite(generatedAt), 'health.json/data.js sans generated_at exploitable');
   assert(Date.now() - generatedAt < 2 * 60 * 60 * 1000, 'Données terrain trop anciennes', { generated_at: health.generated_at || data.generated_at });
@@ -127,6 +130,13 @@ async function main() {
     title: pick.title,
     market: pick.market,
     start: pick.start
+  })));
+  const expiredTicketRows = (Array.isArray(v16Ticket.rows) ? v16Ticket.rows : []).filter((row) => Date.parse(row.kickoff || '') <= now);
+  assert(expiredTicketRows.length === 0, 'Terrain: ticket final V16 expose encore des matchs expirés', expiredTicketRows.slice(0, 5).map((row) => ({
+    match: row.match,
+    market: row.market,
+    kickoff: row.kickoff,
+    status: row.v16_status
   })));
   assert(dashboard.length >= 18, 'Terrain: moins de 18 opportunités simples cockpit', { count: dashboard.length });
   const positiveSimpleToday = Number(todayFunnel.positiveSimplePassingFilters ?? todayFunnel.simplePassingFilters ?? 0);

@@ -5,6 +5,14 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.16 — Ticket final sans vieux matchs
+
+Fiabilité décision.
+- Le ticket final V16 retire maintenant les matchs expirés du flux actionnable au lieu de les compter comme candidats du jour.
+- Le rapport garde un compteur `expired_removed_from_action`, mais ne pollue plus la décision utilisateur avec des lignes fantômes du 18/05 ou 19/05.
+- Le test terrain vérifie désormais que le ticket final n’expose aucun match déjà commencé.
+- Version app, package et cache Service Worker bumpés en `v8.6.16`.
+
 ### Version v8.6.15 — Synchro instant cohérente
 
 Performance / fiabilité.
