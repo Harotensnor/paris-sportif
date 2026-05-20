@@ -5,6 +5,13 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.34 — Français plus propre sur l'accueil
+
+UX polish.
+- Correction de libellés visibles (`à surveiller`, `Journée`, `modèle`) pour éviter l'effet texte brut.
+- Les raisons de blocage convertissent aussi `modele` en `modèle`.
+- Version app, package et cache Service Worker bumpés en `v8.6.34`.
+
 ### Version v8.6.33 — Libellés mini-mise cohérents
 
 UX pronostics.

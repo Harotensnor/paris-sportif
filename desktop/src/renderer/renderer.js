@@ -5102,6 +5102,7 @@
       .replace(/confiance limitée\s*:\s*lecture seulement/gi, 'dossier incomplet, observation seulement')
       .replace(/confiance limitée\s*:\s*cote Winamax \+ contexte léger/gi, 'contexte trop léger pour cliquer')
       .replace(/confiance limitée\s*:\s*cote Winamax \+ filet 2-0 à vérifier/gi, 'filet 2-0 intéressant, mais dossier encore à vérifier')
+      .replace(/\bmodele\b/gi, 'modèle')
       .replace(/\bedge\b/gi, 'avantage')
       .replace(/\bKelly nul\b/gi, 'mise non positive')
       .replace(/\bKelly\b/gi, 'mise')
@@ -7096,12 +7097,12 @@
       : weekReady.length
         ? `Rien à cliquer dans les 24h, mais ${formatCount(weekReady.length)} spot(s) prêt(s) plus tard cette semaine.`
       : watch24.length
-        ? `${formatCount(watch24.length)} spot(s) a surveiller dans les 24h, mais pas assez propres pour cliquer.`
+        ? `${formatCount(watch24.length)} spot(s) à surveiller dans les 24h, mais pas assez propres pour cliquer.`
         : weekWatch.length
           ? `Aucun clic propre maintenant; prochain spot interessant cette semaine.`
         : blockedCore.length
             ? `Des matchs existent, mais les securites du logiciel coupent la mise.`
-            : `Journee pauvre sur Winamax pour le modele.`;
+            : `Journée pauvre sur Winamax pour le modèle.`;
     return {
       ready24: ready24.length,
       watch24: watch24.length,
@@ -7126,7 +7127,7 @@
       </div>
       <div class="why-not-more-kpis">
         <span><b>${formatCount(summary.ready24)}</b><em>jouable</em></span>
-        <span><b>${formatCount(summary.watch24)}</b><em>a surveiller</em></span>
+        <span><b>${formatCount(summary.watch24)}</b><em>à surveiller</em></span>
         <span><b>${formatCount(summary.weekReady || summary.weekWatch)}</b><em>${summary.weekReady ? 'semaine prête' : 'semaine'}</em></span>
       </div>
     `;
