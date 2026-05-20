@@ -276,7 +276,7 @@ function compactEngineHomePayload(analysis) {
 function homeCompactSignature() {
   const manifest = safeJsonFile(DATA_MANIFEST_PATH);
   return {
-    schema: 'engine-home-compact-cache-v1',
+    schema: 'engine-home-compact-cache-v2',
     appVersion: String(desktopPackage.version || '0.0.0'),
     dataGeneratedAt: manifest && !manifest.__error ? String(manifest.generated_at || '') : '',
     today: manifest && !manifest.__error ? String(manifest.today || '') : ''
@@ -290,6 +290,7 @@ function readHomeCompactPayload() {
     if (!envelope || !envelope.payload || envelope.payload.ok !== true) return null;
     const signature = homeCompactSignature();
     if (envelope.schema !== signature.schema) return null;
+    if (String(envelope.appVersion || '') !== signature.appVersion) return null;
     if (String(envelope.dataGeneratedAt || '') !== signature.dataGeneratedAt) return null;
     if (String(envelope.today || '') !== signature.today) return null;
     return {

@@ -5,6 +5,15 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.27 — Segment précis gagnant prioritaire
+
+Pronostics.
+- Le moteur ne laisse plus une règle générique `marché froid` bloquer automatiquement un segment précis qui gagne réellement.
+- Pour les marchés foot simples comme BTTS, un segment validé, positif, assez fourni, avec contexte/confiance/cote corrects peut redevenir `Je mise`.
+- La protection bankroll reste active : la mise est plafonnée en mode reprise après pertes.
+- Le cache d'accueil compact est invalidé quand la version change, pour éviter qu'une vieille analyse continue d'afficher `0 prêt`.
+- Version app, package et cache Service Worker bumpés en `v8.6.27`.
+
 ### Version v8.6.26 — Moins de lag après ouverture
 
 Performance.

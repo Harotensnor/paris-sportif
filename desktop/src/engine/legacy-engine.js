@@ -1906,6 +1906,40 @@ function createLegacyEngineService({ projectRoot }) {
     return { value: adjusted, capped: true };
   }
 
+  function precisePositiveSegmentOverride(row) {
+    const segment = row?.segmentValidation || {};
+    const marketGroup = simpleMarketGroup(row?.marketKey || row?.market);
+    const sample = Number(segment.sample || 0) || 0;
+    const roi = Number(segment.roi);
+    const rawEdge = Number(row?.edge || 0);
+    const odd = Number(row?.odd || 0);
+    const confidence = effectiveConfidence(row);
+    const contextScore = Number(row?.contextQuality?.score ?? row?.match?.context?.quality?.score ?? 0);
+    const sportKey = String(row?.sport || row?.match?.sport || '').toLowerCase();
+    const positiveSegment = sample >= 50 &&
+      Number.isFinite(roi) &&
+      roi >= 0.05 &&
+      (segment.status === 'validated' || segment.tone === 'warm');
+    const simpleFootballGoals = /football|soccer/.test(sportKey) &&
+      (marketGroup === 'goals' || marketGroup === 'btts');
+    const applies = Boolean(positiveSegment &&
+      simpleFootballGoals &&
+      rawEdge >= 0.06 &&
+      confidence >= 0.70 &&
+      contextScore >= 65 &&
+      odd >= 1.35 &&
+      odd <= 2.20);
+    return {
+      applies,
+      sample,
+      roi: Number.isFinite(roi) ? roi : null,
+      marketGroup,
+      label: applies
+        ? `segment précis positif (${Math.round(roi * 100)}% ROI sur ${sample} paris)`
+        : ''
+    };
+  }
+
   function safeAssessmentForRow(row) {
     const rawEdge = Number(row?.edge || 0);
     const edgeInfo = conservativeEdge(row);
@@ -1963,7 +1997,8 @@ function createLegacyEngineService({ projectRoot }) {
       && odd >= 1.30
       && odd <= 2.10
       && (!Number.isFinite(calibrationEdgeRoi) || calibrationEdgeRoi > -0.16);
-    const coldMarketOverride = (contextBucketPositive && contextScore >= 90 && (
+    const preciseSegmentOverride = precisePositiveSegmentOverride(row);
+    const coldMarketOverride = preciseSegmentOverride.applies || (contextBucketPositive && contextScore >= 90 && (
       (rawEdge >= 0.06 && confidence >= 0.65) ||
       (rawEdge >= 0.03 && confidence >= 0.72 && odd <= 1.75)
     )) || strongContextDerivedOverride;
@@ -2029,7 +2064,8 @@ function createLegacyEngineService({ projectRoot }) {
     if (edgeInfo.capped) warnings.push(`edge brut ${Math.round(rawEdge * 100)}% plafonné par prudence`);
     if (sample > 0 && sample < 15) warnings.push(`sample court ${sample}/15`);
     if (!sample) warnings.push('historique segment absent');
-    if (coldMarketOverride) warnings.push('marché froid compensé par contexte fort');
+    if (preciseSegmentOverride.applies) warnings.push(preciseSegmentOverride.label);
+    else if (coldMarketOverride) warnings.push('marché froid compensé par contexte fort');
     if (rivalry?.caution) warnings.push(`rivalité/derby ${Math.round(rivalry.intensity)}% : variance plus élevée`);
     if (policy?.direction === 'boost') warnings.push(`segment gagnant : filtre assoupli (${policy.reason})`);
     if (policy?.direction === 'harden') warnings.push(`segment froid : filtre durci (${policy.reason})`);
@@ -2692,6 +2728,11 @@ function createLegacyEngineService({ projectRoot }) {
     if (degradeMarkets.has(marketKey)) {
       tone = 'cold';
       warnings.push('Backtest décision défavorable');
+    }
+    const preciseSegmentOverride = precisePositiveSegmentOverride(row);
+    if (tone === 'cold' && preciseSegmentOverride.applies) {
+      tone = 'tracked';
+      warnings.push(preciseSegmentOverride.label);
     }
     if (watchMarkets.has(marketKey)) warnings.push('Watchlist historiquement intéressante');
     const label = n > 0 && Number.isFinite(meanClv)
