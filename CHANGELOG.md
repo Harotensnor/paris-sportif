@@ -5,6 +5,15 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.2 — Pages Combinés et Buteurs plus directes
+
+Suite “Parieur First” : les pages dédiées commencent à répondre comme de vraies pages, pas comme un tableau filtré.
+- La page `Combinés` affiche maintenant un résumé en haut : meilleur ticket simple ou message clair s'il n'y a aucun combiné sain.
+- La page `Buteurs` affiche maintenant le meilleur joueur à suivre en haut, avec photo/fallback, match, cote et statut de mise.
+- Les pages `Combinés` et `Buteurs` se rendent immédiatement au clic, même si l'hydratation complète tourne encore en arrière-plan.
+- Le test terrain vérifie ces résumés pour éviter un retour aux anciennes pages trop techniques.
+- Version app, package et cache Service Worker bumpés en `v8.6.2`.
+
 ### Version v8.6.1 — Moins de travail de fond au démarrage
 
 Optimisation anti-lag : l'accueil doit rester prioritaire.

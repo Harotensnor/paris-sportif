@@ -280,11 +280,23 @@ async function main() {
       const text = document.querySelector('[data-panel="combines"]')?.innerText || '';
       return {
         cards: document.querySelectorAll('#combines-list .combo-card').length,
+        focus: document.querySelector('#combines-focus-card')?.innerText || '',
         text,
         hasAdvanced: /Handicap|Remboursé|Double chance|Score exact|HT\/FT|\b1N2\b|\bDNB\b|\bBTTS\b|Same-game|Best Edge|Kelly|edge/i.test(text)
       };
     });
+    assert(/Meilleur combiné|Aucun combiné sain/i.test(combinesAudit.focus), 'Terrain: page Combinés sans résumé parieur en haut', combinesAudit.focus);
     assert(!(combinesAudit.cards && combinesAudit.hasAdvanced), 'Terrain: Combinés standard trop techniques', combinesAudit.text.slice(0, 1400));
+
+    await win.locator('[data-tab="scorers"]:visible').first().click();
+    await win.waitForFunction(() => Boolean(document.querySelector('[data-panel="scorers"].active #scorers-focus-card')), null, { timeout: 10_000 });
+    const scorersAudit = await win.evaluate(() => ({
+      focus: document.querySelector('#scorers-focus-card')?.innerText || '',
+      cards: document.querySelectorAll('#scorers-list .scorer-card').length,
+      text: document.querySelector('[data-panel="scorers"]')?.innerText || ''
+    }));
+    assert(/Meilleur buteur|Aucun buteur propre/i.test(scorersAudit.focus), 'Terrain: page Buteurs sans résumé parieur en haut', scorersAudit.focus);
+
     await win.locator('[data-tab="dashboard"]:visible').first().click();
     await win.waitForFunction(() => Boolean(document.querySelector('[data-panel="dashboard"].active')), null, { timeout: 10_000 });
 

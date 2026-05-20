@@ -10076,6 +10076,7 @@
     const wrap = $('#combines-list');
     if (!wrap) return;
     const displayCombines = displayCombinesForUser(state.combines, { limit: 14 });
+    renderCombinesFocus(displayCombines, Array.isArray(state.combines) ? state.combines.length : 0);
     if (!displayCombines.length) {
       const hidden = Array.isArray(state.combines) ? state.combines.length : 0;
       wrap.innerHTML = `<div class="empty">Aucun combiné simple exploitable maintenant.${hidden ? ' Les tickets trop techniques ou trop corrélés restent masqués en mode standard.' : ''}</div>`;
@@ -10140,6 +10141,42 @@
           <button class="track-bet-btn combo-track-btn${trackedCombo ? ' tracked' : ''}" type="button" data-track-combo-key="${escapeHtml(key)}" title="${escapeHtml(comboButtonTitle)}" ${!trackedCombo && !comboPlayable ? 'disabled' : ''}>${trackedCombo ? 'Combiné suivi' : comboPlayable ? 'Je mise prudent' : 'À surveiller'}</button>
         </article>`;
     }).join('');
+  }
+
+  function renderCombinesFocus(displayCombines, totalRaw = 0) {
+    const node = $('#combines-focus-card');
+    if (!node) return;
+    const combos = Array.isArray(displayCombines) ? displayCombines : [];
+    if (!combos.length) {
+      node.innerHTML = `
+        <div class="next-bet-inner">
+          <span class="next-bet-kicker">Combinés</span>
+          <h3>Aucun combiné sain maintenant</h3>
+          <p>${escapeHtml(totalRaw ? 'Le logiciel cache les tickets trop corrélés ou trop techniques. Mieux vaut jouer un simple propre que forcer un combiné.' : 'Aucun ticket combiné utile dans le snapshot actuel.')}</p>
+          <div class="next-bet-status watch">À surveiller</div>
+        </div>`;
+      return;
+    }
+    const combo = combos[0];
+    const legs = Array.isArray(combo.legs) ? combo.legs : [];
+    const key = comboKey(combo);
+    const totalOdd = Number(combo.totalOdd || 0);
+    const avgEdge = legs.reduce((sum, leg) => sum + Number(leg.edge || 0), 0) / Math.max(1, legs.length);
+    const playable = totalOdd > 1 && totalOdd <= 4.5 && avgEdge >= 0.15 && legs.length >= 2 && legs.length <= 3;
+    node.innerHTML = `
+      <div class="next-bet-inner">
+        <span class="next-bet-kicker">Meilleur combiné simple</span>
+        <h3>${escapeHtml(readableComboTitle(combo))}</h3>
+        <p>${escapeHtml(legs.map((leg) => `${leg.title || 'Match'} : ${readableComboLegLabel(leg)}`).slice(0, 3).join(' · ') || 'Ticket combiné à vérifier.')}</p>
+        <div class="next-bet-line">
+          <strong>Cote ${escapeHtml(formatOdd(totalOdd))}</strong>
+          <span>${formatCount(legs.length)} jambes · retour 10€ ${totalOdd > 1 ? escapeHtml(formatMoney(totalOdd * 10)) : '-'}</span>
+        </div>
+        <div class="next-bet-status ${playable ? 'ready' : 'watch'}">${playable ? 'Je mise prudent' : 'À surveiller'}</div>
+        <div class="next-bet-actions">
+          <button class="track-bet-btn combo-track-btn" type="button" data-track-combo-key="${escapeHtml(key)}" ${playable ? '' : 'disabled'}>${playable ? 'Suivre ce combiné' : 'Pas assez propre'}</button>
+        </div>
+      </div>`;
   }
 
   function scorerAvatarHtml(scorer) {
@@ -10251,6 +10288,7 @@
     const wrap = $('#scorers-list');
     if (!wrap) return;
     const rows = filteredScorers();
+    renderScorersFocus(rows);
     if (!state.scorers.length) {
       wrap.innerHTML = '<div class="empty">Aucun pick joueur disponible aujourd’hui. Le logiciel l’indique clairement au lieu de remplir avec du bruit.</div>';
       return;
@@ -10300,6 +10338,46 @@
             : `${winamaxUrl ? `<a class="ghost-btn" href="${escapeHtml(winamaxUrl)}" target="_blank" rel="noreferrer">Vérifier sur Winamax</a>` : '<span class="match-sub">Cote Winamax non confirmée</span>'}`}
         </article>`;
     }).join('');
+  }
+
+  function renderScorersFocus(rows) {
+    const node = $('#scorers-focus-card');
+    if (!node) return;
+    const list = Array.isArray(rows) ? rows : [];
+    const best = list.find((scorer) => Number(scorer.odd || 0) > 1 && Number(scorer.edge || 0) >= 0.005) || list[0] || null;
+    if (!best) {
+      node.innerHTML = `
+        <div class="next-bet-inner">
+          <span class="next-bet-kicker">Buteurs</span>
+          <h3>Aucun buteur propre maintenant</h3>
+          <p>Le logiciel garde cette page vide plutôt que d'inventer un joueur ou une cote.</p>
+          <div class="next-bet-status watch">À vérifier plus tard</div>
+        </div>`;
+      return;
+    }
+    const row = scorerToTrackRow(best);
+    const canTrack = Boolean(row.decisionCenter?.canBet);
+    const kickoff = `${formatDateLabel(best.start)} · ${countdownLabel(best.start)}`;
+    const quality = best.playerQuality || {};
+    node.innerHTML = `
+      <div class="next-bet-inner">
+        <span class="next-bet-kicker">Meilleur buteur à suivre</span>
+        <div class="player-line">
+          ${scorerAvatarHtml(best)}
+          <div>
+            <h3>${escapeHtml(best.name || row.label || 'Joueur')}</h3>
+            <p>${escapeHtml(best.teamName || 'Équipe')} · ${escapeHtml(best.title || row.title || 'Match')} · ${escapeHtml(kickoff)}</p>
+          </div>
+        </div>
+        <div class="next-bet-line">
+          <strong>${escapeHtml(row.label || 'Buteur')} · ${escapeHtml(formatOdd(row.odd))}</strong>
+          <span>Confiance joueur ${Number.isFinite(Number(quality.score)) ? `${Math.round(Number(quality.score))}/100` : 'à confirmer'}</span>
+        </div>
+        <div class="next-bet-status ${canTrack ? 'ready' : 'watch'}">${canTrack ? 'Je mise' : 'À vérifier sur Winamax'}</div>
+        <div class="next-bet-actions">
+          ${canTrack ? `<button type="button" class="track-bet-btn scorer-track-btn" data-track-scorer-id="${escapeHtml(best.id)}">Suivre ce buteur</button>` : '<span class="match-sub">Cote ou edge joueur insuffisant.</span>'}
+        </div>
+      </div>`;
   }
 
   function renderScorerReport() {
@@ -18324,6 +18402,12 @@
       setSideStatus(titles[tab] || 'Catégorie ouverte', 'ok');
     }
     if (panelTab === 'calendar') renderCalendar();
+    if (panelTab === 'combines') renderCombines();
+    if (panelTab === 'scorers') {
+      renderScorers();
+      renderScorerReport();
+      renderScorerPendingAudit();
+    }
     if (panelTab === 'search') renderDeepSearch();
     if (panelTab === 'recovery') renderRecoveryPage();
     if (panelTab === 'pipeline') renderPipelinePanel(state.status);
