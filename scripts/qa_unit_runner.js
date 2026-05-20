@@ -96,6 +96,9 @@ const dataAccess = loadModule('src/data-access.js', {
     },
   },
 });
+const homePageModule = loadModule('desktop/src/renderer/home-page.js', {
+  window: {},
+}).window.PSHomePage;
 
 function touch(...names) {
   names.forEach(name => covered.add(name));
@@ -178,6 +181,15 @@ test('data access helpers use one source of truth', () => {
   assert(age.minutes === 25 && age.status === 'fresh', 'data age');
   const picks = dataAccess.getDisplayablePicks({ forceModule: true });
   assert(picks.length === 1 && picks[0].matchId === 'm1', 'winamax only');
+});
+
+test('desktop home page category routing is stable', () => {
+  assert(homePageModule.categoryTabToKey('football') === 'sport:football', 'football tab route');
+  assert(homePageModule.categoryTabToKey('winners') === 'winner', 'winners tab route');
+  assert(homePageModule.tabForHomeCategory('sport:tennis') === 'tennis', 'tennis category route');
+  assert(homePageModule.tabForHomeCategory('night') === 'night', 'night category route');
+  assert(/nuit/i.test(homePageModule.metaFor('night').title), 'night metadata');
+  assert(/regarder/i.test(homePageModule.metaFor('unknown-category').title), 'fallback metadata');
 });
 
 const started = Date.now();

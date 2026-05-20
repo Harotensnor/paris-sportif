@@ -10,6 +10,7 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 Premier découpage prudent du gros renderer, sans changer l'expérience visible.
 - Les libellés et routes des catégories d'accueil passent dans `desktop/src/renderer/home-page.js`.
 - `renderer.js` garde un fallback interne, mais délègue maintenant cette partie au module dédié quand il est chargé.
+- Le test unitaire couvre maintenant les routes `Football`, `Nuit`, `Vainqueurs` et les métadonnées de fallback du module accueil.
 - Le smoke rapide affiche désormais le nombre réel de spots visibles (`prêts` + `à surveiller`) pour éviter les logs trompeurs quand aucun pari n'est validé.
 - Version app, package et cache Service Worker bumpés en `v8.6.0`.
 
