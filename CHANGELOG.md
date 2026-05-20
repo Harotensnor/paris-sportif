@@ -5,6 +5,14 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.29 — Accueil lancé en parallèle
+
+Performance.
+- Au démarrage, le statut, l'info application et les picks d'accueil sont chargés en parallèle.
+- Le premier écran n'attend plus inutilement la version et le statut avant de calculer le bloc `Prochain pari sérieux`.
+- Objectif : réduire la sensation de logiciel qui mouline avant de répondre au parieur.
+- Version app, package et cache Service Worker bumpés en `v8.6.29`.
+
 ### Version v8.6.28 — Bouton de reprise plus clair
 
 UX pronostics.

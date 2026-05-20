@@ -20492,12 +20492,12 @@
     scheduleIdleUiTask(() => renderPreferences(), 2500);
     const statusPromise = refreshStatus();
     const logPromise = refreshLog().catch(() => null);
-    await fetchJson('/api/app-info').then((info) => {
+    const appInfoPromise = fetchJson('/api/app-info').then((info) => {
       state.appInfo = info || null;
       if ($('[data-panel="preferences"].active')) renderPreferences();
     }).catch((error) => pushLog('warn', `Info application indisponible: ${error.message}`));
-    await statusPromise;
-    await computePicks();
+    const picksPromise = computePicks();
+    await Promise.all([statusPromise, appInfoPromise, picksPromise]);
     maybeShowWeeklyReport();
     maybeShowEveningBrief();
     if (loadPreferences().demoMode && localStorage.getItem(DEMO_TOUR_KEY) !== '1') {
