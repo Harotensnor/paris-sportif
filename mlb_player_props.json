@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-20T23:53:38Z",
+  "generated_at": "2026-05-20T23:56:27Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815428",
-      "kickoff": "2026-05-20T23:45Z",
-      "league": "MLB",
-      "match": "Pittsburgh Pirates at St. Louis Cardinals",
-      "home": "St. Louis Cardinals",
-      "away": "Pittsburgh Pirates",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "St. Louis Cardinals",
-          "pitcher": "Michael McGreevy",
-          "label": "Michael McGreevy plus de 3,5 strikeouts",
-          "line": 3.5,
-          "pick": "over",
-          "probability": 0.5225,
-          "fair_odds": 1.91,
-          "expected_strikeouts": 3.58,
-          "projected_ip": 5.21,
-          "inputs": {
-            "k9": 6.19,
-            "era": 2.06,
-            "whip": 0.86,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "St. Louis Cardinals",
-          "pitcher": "Michael McGreevy",
-          "label": "Michael McGreevy ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5509,
-          "fair_odds": 1.82,
-          "expected_hr_allowed": 0.596,
-          "projected_ip": 5.21,
-          "inputs": {
-            "hr9": 1.03,
-            "era": 2.06,
-            "whip": 0.86
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Pittsburgh Pirates",
-          "pitcher": "Carmen Mlodzinski",
-          "label": "Carmen Mlodzinski moins de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "under",
-          "probability": 0.5733,
-          "fair_odds": 1.74,
-          "expected_strikeouts": 6.14,
-          "projected_ip": 6.43,
-          "inputs": {
-            "k9": 8.6,
-            "era": 4.4,
-            "whip": 1.44,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Pittsburgh Pirates",
-          "pitcher": "Carmen Mlodzinski",
-          "label": "Carmen Mlodzinski ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.7515,
-          "fair_odds": 1.33,
-          "expected_hr_allowed": 0.286,
-          "projected_ip": 6.43,
-          "inputs": {
-            "hr9": 0.4,
-            "era": 4.4,
-            "whip": 1.44
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815430",
       "kickoff": "2026-05-21T01:38Z",
@@ -506,7 +424,7 @@
       ]
     }
   ],
-  "props": 24,
+  "props": 20,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"

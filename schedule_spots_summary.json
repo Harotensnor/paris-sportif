@@ -1,23 +1,23 @@
 {
-  "generated_at": "2026-05-20T23:53:44Z",
+  "generated_at": "2026-05-20T23:56:34Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 23,
+    "active_events": 22,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 34,
+      "lookahead": 32,
       "back_to_back_travel": 6,
       "schedule_congestion": 12
     },
     "by_decision": {
-      "abstain": 17,
+      "abstain": 16,
       "lean_home": 6
     },
     "lean_home": 6,
     "lean_away": 0,
-    "abstain": 17,
+    "abstain": 16,
     "monitor": 0
   },
   "active": [
@@ -240,64 +240,6 @@
             "type": "schedule_congestion",
             "direction": "fade",
             "strength": 0.6
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815428",
-      "source_event_ids": [
-        "401815428"
-      ],
-      "kickoff": "2026-05-20T23:45Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "St. Louis Cardinals",
-      "away": "Pittsburgh Pirates",
-      "match": "St. Louis Cardinals - Pittsburgh Pirates",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: St. Louis Cardinals 0.15, Pittsburgh Pirates 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.043,
-        "away_score": -0.498,
-        "home_fade": 0.15,
-        "away_fade": 0.55,
-        "reason": "Direction nette: St. Louis Cardinals (+0.04)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
           }
         ]
       }
