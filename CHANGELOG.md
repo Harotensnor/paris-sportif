@@ -5,6 +5,14 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.26 — Moins de lag après ouverture
+
+Performance.
+- L'hydratation complète du moteur n'est plus lancée automatiquement 45s après l'accueil standard.
+- Elle est reportée à 2 minutes et ne démarre seule que si l'app est en arrière-plan ou si le Mode expert est actif.
+- Les pages lourdes déclenchent toujours le moteur complet au clic, donc le parcours standard reste léger.
+- Version app, package et cache Service Worker bumpés en `v8.6.26`.
+
 ### Version v8.6.25 — Blocage historique lisible
 
 UX pronostics.

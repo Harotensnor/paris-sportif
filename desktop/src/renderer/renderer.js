@@ -5868,8 +5868,12 @@
       if (state.engineHydrationTimer) clearTimeout(state.engineHydrationTimer);
       state.engineHydrationTimer = setTimeout(() => {
         state.engineHydrationTimer = null;
-        hydrateFullEngineAnalysis(bankroll);
-      }, 45000);
+        if (document.hidden || loadPreferences().expertMode) {
+          hydrateFullEngineAnalysis(bankroll);
+        } else {
+          pushLog('info', 'Hydratation complète reportée : accueil parieur prioritaire');
+        }
+      }, 120000);
     }
     else scheduleSecondaryEnginePanels();
     maybeAutoCriticalRefresh();
