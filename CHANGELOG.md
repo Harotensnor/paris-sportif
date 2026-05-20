@@ -5,6 +5,14 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.40 — Compteur semaine utile
+
+UX.
+- Quand aucun pari n'est prêt dans les 24h mais que des spots prêts existent plus tard dans la semaine, l'accueil affiche maintenant `Spots prêts cette semaine`.
+- Le compteur principal ne donne plus une impression de `0 pari` alors que le logiciel a déjà identifié le prochain pari sérieux.
+- Le sous-texte précise `0 dans les 24h · X prêts sur la semaine`.
+- Version app, package et cache Service Worker bumpés en `v8.6.40`.
+
 ### Version v8.6.39 — Aucun match commencé dans le cockpit
 
 Fix critique.

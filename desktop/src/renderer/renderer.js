@@ -9261,6 +9261,8 @@
     const meta = state.dashboardMeta || {};
     const readyRows = rollingReadyRows(displayRows);
     const ready = readyRows.length;
+    const weekReadyRows = rollingWeekRows(displayRows, isReadyToStakeRow);
+    const weekReady = weekReadyRows.length;
     const nightReady = nightPickRows(displayRows, isReadyToStakeRow).length;
     const today = state.todayFunnel?.today || state.status?.analysis?.todayFunnel?.today || {};
     const todayReady = Number(today.ready || meta.todayReady || 0);
@@ -9268,29 +9270,37 @@
     if (metricLabel) {
       metricLabel.textContent = ready > 0
         ? 'Paris prêts sur 24h'
+        : weekReady > 0
+          ? 'Spots prêts cette semaine'
         : todayDisplayed > 0
           ? 'À surveiller avant minuit'
           : 'Candidats surveillés';
     }
-    $('#metric-picks').textContent = String(ready > 0 ? ready : todayDisplayed > 0 ? todayDisplayed : (meta.todayPicks || state.picks.length || 0));
+    $('#metric-picks').textContent = String(ready > 0 ? ready : weekReady > 0 ? weekReady : todayDisplayed > 0 ? todayDisplayed : (meta.todayPicks || state.picks.length || 0));
     const globalBlocked = Boolean(state.decisionCenter?.summary?.blocked);
     const caption = pickFiltersActive(filters)
       ? `${formatCount(displayRows.length)} pari(s) filtré(s) sur ${formatCount(total)} lignes prêtes.`
       : ready > 0
         ? `${formatCount(ready)} pari(s) prêt(s) sur les prochaines 24h, dont ${formatCount(nightReady)} cette nuit.`
+        : weekReady > 0
+          ? `Rien à cliquer dans les 24h : ${formatCount(weekReady)} spot(s) prêt(s) sont déjà identifiés cette semaine.`
         : todayDisplayed > 0
           ? `${formatCount(todayDisplayed)} opportunité(s) avant minuit à surveiller, aucune mise validée.`
             : meta.mode === 'bestAvailable'
               ? 'Aucun pari prêt dans la fenêtre courte : affichage des meilleurs candidats à surveiller.'
               : 'Aucun pari à jouer maintenant : candidats surveillés sans mise.';
     const sectionTitle = $('#picks-section-title');
-    if (sectionTitle) sectionTitle.textContent = ready > 0 ? 'À miser maintenant' : todayDisplayed > 0 ? 'À surveiller avant minuit' : 'Sélection surveillée';
+    if (sectionTitle) sectionTitle.textContent = ready > 0 ? 'À miser maintenant' : weekReady > 0 ? 'Prochains spots prêts' : todayDisplayed > 0 ? 'À surveiller avant minuit' : 'Sélection surveillée';
     $('#picks-caption').textContent = caption;
     $('#metric-picks-sub').textContent = total > state.picks.length
       ? `${state.picks.length} affichés · ${total} paris analysés au total`
       : globalBlocked
         ? '0 mise tant qu’un gate est rouge'
-        : `${formatCount(meta.rolling24Displayed || ready)} sur 24h · ${formatCount(nightReady)} nuit prête`;
+        : ready > 0
+          ? `${formatCount(meta.rolling24Displayed || ready)} sur 24h · ${formatCount(nightReady)} nuit prête`
+          : weekReady > 0
+            ? `0 dans les 24h · ${formatCount(weekReady)} prêt(s) sur la semaine`
+            : `${formatCount(meta.rolling24Displayed || ready)} sur 24h · ${formatCount(nightReady)} nuit prête`;
     if (quickHome) {
       markFirstPickVisible(homeSourceRows(displayRows).length);
       renderRefreshPolicy();
