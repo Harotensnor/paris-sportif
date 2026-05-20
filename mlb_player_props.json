@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-20T17:44:21Z",
+  "generated_at": "2026-05-20T18:04:48Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815426",
-      "kickoff": "2026-05-20T17:40Z",
-      "league": "MLB",
-      "match": "Houston Astros at Minnesota Twins",
-      "home": "Minnesota Twins",
-      "away": "Houston Astros",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Minnesota Twins",
-          "pitcher": "Joe Ryan",
-          "label": "Joe Ryan moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.5775,
-          "fair_odds": 1.73,
-          "expected_strikeouts": 5.15,
-          "projected_ip": 5.02,
-          "inputs": {
-            "k9": 9.24,
-            "era": 3.2,
-            "whip": 1.01,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Minnesota Twins",
-          "pitcher": "Joe Ryan",
-          "label": "Joe Ryan ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.7441,
-          "fair_odds": 1.34,
-          "expected_hr_allowed": 0.296,
-          "projected_ip": 5.02,
-          "inputs": {
-            "hr9": 0.53,
-            "era": 3.2,
-            "whip": 1.01
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Houston Astros",
-          "pitcher": "Mike Burrows",
-          "label": "Mike Burrows moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.592,
-          "fair_odds": 1.69,
-          "expected_strikeouts": 5.09,
-          "projected_ip": 5.57,
-          "inputs": {
-            "k9": 8.23,
-            "era": 5.72,
-            "whip": 1.53,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Houston Astros",
-          "pitcher": "Mike Burrows",
-          "label": "Mike Burrows concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6695,
-          "fair_odds": 1.49,
-          "expected_hr_allowed": 1.107,
-          "projected_ip": 5.57,
-          "inputs": {
-            "hr9": 1.79,
-            "era": 5.72,
-            "whip": 1.53
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815429",
       "kickoff": "2026-05-20T19:10Z",
@@ -1254,7 +1172,7 @@
       ]
     }
   ],
-  "props": 60,
+  "props": 56,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"

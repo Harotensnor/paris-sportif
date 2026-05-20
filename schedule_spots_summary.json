@@ -1,22 +1,22 @@
 {
-  "generated_at": "2026-05-20T17:44:28Z",
+  "generated_at": "2026-05-20T18:04:54Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 41,
+    "active_events": 40,
     "expired_sample": 0,
     "by_type": {
-      "back_to_back_travel": 16,
+      "back_to_back_travel": 15,
       "lookahead": 50,
       "travel_extreme": 1,
       "schedule_congestion": 28
     },
     "by_decision": {
       "abstain": 25,
-      "lean_home": 16
+      "lean_home": 15
     },
-    "lean_home": 16,
+    "lean_home": 15,
     "lean_away": 0,
     "abstain": 25,
     "monitor": 0
@@ -1609,11 +1609,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.215,
-        "away_score": -2.118,
+        "home_score": 0.145,
+        "away_score": -1.918,
         "home_fade": 0.6,
-        "away_fade": 2.328,
-        "reason": "Direction nette: Miami Marlins (+0.21)",
+        "away_fade": 2.128,
+        "reason": "Direction nette: Miami Marlins (+0.14)",
         "detail": [
           {
             "side": "home",
@@ -1631,7 +1631,7 @@
             "side": "away",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 1.0
+            "strength": 0.8
           },
           {
             "side": "away",
@@ -1675,11 +1675,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.535,
-        "away_score": -1.906,
+        "home_score": 0.465,
+        "away_score": -1.706,
         "home_fade": 0.15,
-        "away_fade": 1.958,
-        "reason": "Direction nette: Miami Marlins (+0.54)",
+        "away_fade": 1.758,
+        "reason": "Direction nette: Miami Marlins (+0.47)",
         "detail": [
           {
             "side": "home",
@@ -1697,7 +1697,7 @@
             "side": "away",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 1.0
+            "strength": 0.8
           },
           {
             "side": "away",
@@ -2075,57 +2075,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.709
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815426",
-      "source_event_ids": [
-        "401815426"
-      ],
-      "kickoff": "2026-05-20T17:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Minnesota Twins",
-      "away": "Houston Astros",
-      "match": "Minnesota Twins - Houston Astros",
-      "decision": "lean_home",
-      "net_team": "Minnesota Twins",
-      "reason": "Houston Astros plus penalise par calendrier/voyage (0.95 vs 0.00)",
-      "pressure_score": 0.951,
-      "home_fade": 0.0,
-      "away_fade": 0.951,
-      "travel_score": 0.951,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "2 match dans les 48h + 1703 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.683,
-        "away_score": -1.951,
-        "home_fade": 0.0,
-        "away_fade": 1.951,
-        "reason": "Direction nette: Minnesota Twins (+0.68)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.951
           }
         ]
       }

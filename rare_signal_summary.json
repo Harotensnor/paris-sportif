@@ -1,64 +1,28 @@
 {
-  "generated_at": "2026-05-20T17:44:28Z",
+  "generated_at": "2026-05-20T18:04:54Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 51,
-    "actionable": 26,
+    "active_events": 50,
+    "actionable": 25,
     "watch": 1,
     "risk": 24,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 21,
-      "back_to_back_travel": 16,
+      "back_to_back_travel": 15,
+      "injury_imbalance": 20,
       "signal_conflict": 9,
       "travel_extreme": 1,
       "market_uncertain": 17
     },
     "by_quality": {
-      "actionable": 26,
+      "actionable": 25,
       "risk": 24,
       "watch": 1
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401815426",
-      "date": "2026-05-20T17:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Minnesota Twins",
-      "away": "Houston Astros",
-      "match": "Minnesota Twins - Houston Astros",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Houston Astros",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 8-13"
-    },
-    {
-      "event_id": "401815419",
-      "date": "2026-05-20T22:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Miami Marlins",
-      "away": "Atlanta Braves",
-      "match": "Miami Marlins - Atlanta Braves",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Atlanta Braves",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 5-10"
-    },
     {
       "event_id": "401815422",
       "date": "2026-05-20T22:40Z",
@@ -166,24 +130,6 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 8-14"
-    },
-    {
-      "event_id": "401815434",
-      "date": "2026-05-21T22:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Miami Marlins",
-      "away": "Atlanta Braves",
-      "match": "Miami Marlins - Atlanta Braves",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Atlanta Braves",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 5-10"
     },
     {
       "event_id": "401815437",
@@ -294,6 +240,24 @@
       "context": "1 match dans les 48h + 1396 km de voyage"
     },
     {
+      "event_id": "401815419",
+      "date": "2026-05-20T22:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Miami Marlins",
+      "away": "Atlanta Braves",
+      "match": "Miami Marlins - Atlanta Braves",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Atlanta Braves",
+      "side": "away",
+      "strength": 0.808,
+      "context": "2 match dans les 48h + 991 km de voyage"
+    },
+    {
       "event_id": "401856922",
       "date": "2026-05-21T01:00Z",
       "sport": "basketball",
@@ -328,6 +292,24 @@
       "side": null,
       "strength": 0.8,
       "context": "Absences severes 6-2"
+    },
+    {
+      "event_id": "401815434",
+      "date": "2026-05-21T22:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Miami Marlins",
+      "away": "Atlanta Braves",
+      "match": "Miami Marlins - Atlanta Braves",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Atlanta Braves",
+      "side": null,
+      "strength": 0.8,
+      "context": "Absences severes 5-9"
     },
     {
       "event_id": "401856929",
