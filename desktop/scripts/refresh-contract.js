@@ -99,6 +99,7 @@ function lightDecisionOutputs(stages, label) {
     'build_prebet_checklist.py',
     'build_v7_actionability.py',
     'build_v8_decision_cockpit.py',
+    'build_v15_operational_cleanup.py',
     'build_v16_final_decision.py'
   ];
   for (const stage of requiredStages) {
@@ -109,7 +110,8 @@ function lightDecisionOutputs(stages, label) {
   before(stages, 'build_health.py', 'build_prebet_checklist.py', `${label} santé fraîche avant checklist`);
   before(stages, 'build_match_context.py', 'build_prebet_checklist.py', `${label} contexte avant checklist`);
   before(stages, 'build_prebet_checklist.py', 'build_v7_actionability.py', `${label} checklist avant décision`);
-  before(stages, 'build_v8_decision_cockpit.py', 'build_v16_final_decision.py', `${label} cockpit avant final`);
+  before(stages, 'build_v8_decision_cockpit.py', 'build_v15_operational_cleanup.py', `${label} cockpit avant synthèse V15`);
+  before(stages, 'build_v15_operational_cleanup.py', 'build_v16_final_decision.py', `${label} V15 avant final`);
 }
 
 function testInstant() {
@@ -126,7 +128,7 @@ function testInstant() {
     includes(stages, stage, `instant ${stage}`);
   }
   lightDecisionOutputs(stages, 'instant');
-  assert(stages.length <= 12, 'instant doit rester un recalcul court, pas une mini-pipeline complète', { count: stages.length, stages });
+  assert(stages.length <= 13, 'instant doit rester un recalcul court, pas une mini-pipeline complète', { count: stages.length, stages });
   excludes(stages, 'fetch_live.py', 'instant cache local');
   excludes(stages, 'fetch_winamax_catalog.py', 'instant cache local');
   excludes(stages, 'fetch_winamax_match_details.py', 'instant cache local');

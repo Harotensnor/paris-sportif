@@ -59,6 +59,7 @@ FAST_DECISION_STACK_STAGES = [
 INSTANT_DECISION_STACK_STAGES = [
     Stage("build_v7_actionability.py", 20),
     Stage("build_v8_decision_cockpit.py", 20),
+    Stage("build_v15_operational_cleanup.py", 20),
     Stage("build_v16_final_decision.py", 20),
 ]
 

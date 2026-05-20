@@ -104,6 +104,31 @@ def is_expired_kickoff(kickoff: Any, generated: str) -> bool:
     return bool(ko and now and ko <= now)
 
 
+def report_is_newer(left: dict[str, Any], right: dict[str, Any]) -> bool:
+    left_dt = parse_dt(left.get("generated_at"))
+    right_dt = parse_dt(right.get("generated_at"))
+    if not left_dt:
+        return False
+    if not right_dt:
+        return True
+    return left_dt > right_dt
+
+
+def normalized_price_rows(report: dict[str, Any]) -> list[dict[str, Any]]:
+    rows = report.get("rows") if isinstance(report.get("rows"), list) else []
+    out: list[dict[str, Any]] = []
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        normalized = dict(row)
+        normalized["status"] = normalized.get("status") or normalized.get("v13_status") or normalized.get("v14_status")
+        normalized["match"] = normalized.get("match") or normalized.get("title")
+        normalized["reason"] = normalized.get("reason") or normalized.get("primary_reason") or normalized.get("no_bet_reason")
+        normalized["action"] = normalized.get("action") or normalized.get("next_action")
+        out.append(normalized)
+    return out
+
+
 def classify_price_row(row: dict[str, Any]) -> tuple[str, str, str, int]:
     status = text(row.get("status"))
     current = number(row.get("current_odd"))
@@ -133,7 +158,10 @@ def classify_price_row(row: dict[str, Any]) -> tuple[str, str, str, int]:
 
 def build_action_reports(generated: str) -> tuple[dict[str, Any], dict[str, Any]]:
     price = read_json("v14_price_action_report.json", {})
-    rows = price.get("rows") if isinstance(price.get("rows"), list) else []
+    v13 = read_json("v13_price_alerts_report.json", {})
+    if report_is_newer(v13, price):
+        price = v13
+    rows = normalized_price_rows(price)
     out: list[dict[str, Any]] = []
     for row in rows:
         if is_expired_kickoff(row.get("kickoff"), generated):

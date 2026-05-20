@@ -5,6 +5,14 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.67 — Ticket instant cohérent
+
+Fixes / tests.
+- Le mode instant recalcule maintenant V15 avant V16 : le ticket final ne tombe plus en “recalcul profond” juste parce que V15 était plus vieux que la data.
+- V15 préfère le rapport prix V13 quand il est plus frais que V14, afin de ne pas utiliser une ancienne synthèse prix après un refresh rapide.
+- Le contrat de refresh vérifie explicitement l’ordre `V8 -> V15 -> V16`.
+- Version app, package et cache Service Worker bumpés en `v8.6.67`.
+
 ### Version v8.6.66 — Refresh rapide et spots du jour visibles
 
 Performance / pronostics.
