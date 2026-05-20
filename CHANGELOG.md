@@ -10,6 +10,7 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 Pronostics.
 - Le moteur dashboard utilise maintenant le vrai edge brut pour départager les lignes à surveiller quand `safeEdge` est ramené à zéro.
 - Les candidats nuit et confiance limitée ne sont plus artificiellement traités comme neutres quand leur edge brut est négatif.
+- La navigation standard reste sous le plafond terrain : le hockey, moins prioritaire, repasse en accès caché tandis que `Safe` et `Gros gain` restent visibles.
 - Version app, package et cache Service Worker bumpés en `v8.6.14`.
 
 ### Version v8.6.13 — Tri plus sain des spots
