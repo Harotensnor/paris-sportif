@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-20T04:26:15Z",
+  "generated_at": "2026-05-20T04:29:32Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -536,6 +536,52 @@
             "hr9": 0.98,
             "era": 1.96,
             "whip": 0.91
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815422",
+      "kickoff": "2026-05-20T22:40Z",
+      "league": "MLB",
+      "match": "Cleveland Guardians at Detroit Tigers",
+      "home": "Detroit Tigers",
+      "away": "Cleveland Guardians",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Cleveland Guardians",
+          "pitcher": "Tanner Bibee",
+          "label": "Tanner Bibee plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.5465,
+          "fair_odds": 1.83,
+          "expected_strikeouts": 4.7,
+          "projected_ip": 5.2,
+          "inputs": {
+            "k9": 8.13,
+            "era": 4.15,
+            "whip": 1.35,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Cleveland Guardians",
+          "pitcher": "Tanner Bibee",
+          "label": "Tanner Bibee concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.503,
+          "fair_odds": 1.99,
+          "expected_hr_allowed": 0.699,
+          "projected_ip": 5.2,
+          "inputs": {
+            "hr9": 1.21,
+            "era": 4.15,
+            "whip": 1.35
           },
           "side": "away"
         }
@@ -1254,7 +1300,7 @@
       ]
     }
   ],
-  "props": 60,
+  "props": 62,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
