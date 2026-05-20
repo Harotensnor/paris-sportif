@@ -50,7 +50,7 @@ async function main() {
   const rendererText = fs.readFileSync(path.join(desktopRoot, 'src', 'renderer', 'renderer.js'), 'utf8');
   const mainText = fs.readFileSync(path.join(desktopRoot, 'src', 'main.js'), 'utf8');
   if (/fetch\(\s*['"]https?:\/\//i.test(rendererText)) throw new Error('Fetch internet direct détecté dans le renderer');
-  if (!mainText.includes("instant: '--instant'")) throw new Error('Mode Synchro instant absent côté main process');
+  if (!mainText.includes("instant: '--instant'")) throw new Error('Mode recalcul instant absent côté main process');
   if (!mainText.includes("fast: '--fast'")) throw new Error('Mode Synchro rapide absent côté main process');
   if (!rendererText.includes("startRefresh(mode = 'instant'")) throw new Error('Le refresh UI par défaut doit lancer la synchro instant');
 
@@ -113,7 +113,7 @@ async function main() {
       standardExpertVisible: Boolean(document.querySelector('[data-tab="data"]:not(.hidden)'))
     }));
     if (!/Aujourd|Picks|Paris|miser/i.test(home.title)) throw new Error(`Vue par défaut invalide: ${home.title}`);
-    if (!/Synchro instant/i.test(home.refreshLabel)) throw new Error(`Bouton refresh non instantané: ${home.refreshLabel}`);
+    if (!/Recalcul instant|Synchro instant/i.test(home.refreshLabel)) throw new Error(`Bouton refresh non instantané: ${home.refreshLabel}`);
     if (!/Prochain pari sérieux|Aucun spot exploitable/i.test(home.nextBetText)) {
       throw new Error(`Bloc prochain pari sérieux absent: ${home.nextBetText.slice(0, 300)}`);
     }

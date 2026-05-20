@@ -309,9 +309,9 @@
   const REFRESH_ESTIMATE_SECONDS = {
     instant: 12,
     fast: 35,
-    quick: 150,
+    quick: 240,
     signals: 520,
-    full: 900,
+    full: 1200,
     prematch: 420,
     prematch_t60: 280,
     prematch_t30: 260,
@@ -3226,18 +3226,18 @@
   }
 
   function refreshModeLabel(mode) {
-    if (mode === 'instant') return 'Synchro instant';
+    if (mode === 'instant') return 'Recalcul instant';
     if (mode === 'fast') return 'Synchro rapide';
-    if (mode === 'signals') return 'Signaux lents';
-    if (mode === 'quick') return 'Refresh enrichi';
-    if (mode === 'full') return 'Refresh complet';
+    if (mode === 'signals') return 'Réparer signaux';
+    if (mode === 'quick') return 'Maintenance enrichie';
+    if (mode === 'full') return 'Maintenance complète';
     if (mode === 'prematch') return 'Pré-match final';
     if (mode === 'prematch_t60') return 'Pré-match T-60';
     if (mode === 'prematch_t30') return 'Pré-match T-30';
     if (mode === 'prematch_t10') return 'Pré-match T-10';
     if (mode === 'critical') return 'File critique';
     if (mode === 'repair_context') return 'Réparer contexte';
-    return 'Synchro instant';
+    return 'Recalcul instant';
   }
 
   function signalSourceLabel(source) {
@@ -3496,7 +3496,7 @@
     const queue = Array.isArray(state.refreshPriorityPlan?.queue) ? state.refreshPriorityPlan.queue : [];
     if (queue[0]) return queue[0];
     const actions = Array.isArray(state.nextActions?.actions) ? state.nextActions.actions : [];
-    return actions[0] || { mode: 'instant', source: 'all', priority: 'low', title: 'Synchro instant' };
+    return actions[0] || { mode: 'instant', source: 'all', priority: 'low', title: 'Recalcul instant' };
   }
 
   function compactMatchKey(value) {
@@ -9706,7 +9706,7 @@
   }
 
   function autoPrematchEnabled() {
-    return localStorage.getItem('autoPrematchEnabled') !== 'off';
+    return localStorage.getItem('autoPrematchEnabled') === 'on';
   }
 
   function automationRefreshDisabled() {
@@ -9732,7 +9732,7 @@
   }
 
   function autoCriticalEnabled() {
-    return localStorage.getItem('autoCriticalEnabled') !== 'off';
+    return localStorage.getItem('autoCriticalEnabled') === 'on';
   }
 
   function readAutoCriticalLast() {
@@ -18280,9 +18280,9 @@
       const weatherRatio = Number(coverage.weather || 0) / football;
       const refereeRatio = Number(coverage.refereeUsable || 0) / football;
       const lineupRatio = Number(coverage.lineups || 0) / football;
-      if (weatherRatio < 0.50) add('warn', 'Météo peu couverte', `${formatCount(coverage.weather || 0)}/${formatCount(football)} matchs foot.`, 'Lancer Signaux lents.');
-      if (refereeRatio < 0.40) add('warn', 'Arbitres peu couverts', `${formatCount(coverage.refereeUsable || 0)}/${formatCount(football)} matchs foot.`, 'Lancer Signaux lents.');
-      if (lineupRatio < 0.35) add('warn', 'Lineups faibles', `${formatCount(coverage.lineups || 0)}/${formatCount(football)} matchs foot.`, 'Attendre les compositions ou relancer Signaux lents.');
+      if (weatherRatio < 0.50) add('warn', 'Météo peu couverte', `${formatCount(coverage.weather || 0)}/${formatCount(football)} matchs foot.`, 'Réparer les signaux météo.');
+      if (refereeRatio < 0.40) add('warn', 'Arbitres peu couverts', `${formatCount(coverage.refereeUsable || 0)}/${formatCount(football)} matchs foot.`, 'Réparer les signaux arbitres.');
+      if (lineupRatio < 0.35) add('warn', 'Lineups faibles', `${formatCount(coverage.lineups || 0)}/${formatCount(football)} matchs foot.`, 'Attendre les compositions ou réparer les signaux.');
     }
 
     if (!alerts.length) {
@@ -18375,9 +18375,9 @@
       };
     }
     if (text.includes('clubelo')) {
-      return { mode: 'full', source: 'all', label: 'Refresh complet' };
+      return { mode: 'full', source: 'all', label: 'Maintenance complète' };
     }
-    return { mode: 'instant', source: 'all', label: 'Synchro instant' };
+    return { mode: 'instant', source: 'all', label: 'Recalcul instant' };
   }
 
   function renderQualityAlerts(status) {
@@ -18509,9 +18509,9 @@
     $$('.quality-action-btn').forEach((button) => {
       button.disabled = running;
     });
-    setRefreshButtonText('refresh-btn', running && !isSignals ? 'Synchro en cours' : 'Synchro instant');
-    setRefreshButtonText('refresh-full-btn', running && status.mode === 'full' ? 'Complet en cours' : 'Refresh complet');
-    setRefreshButtonText('refresh-signals-btn', running && isSignals ? `${sourceLabel} en cours` : 'Signaux lents');
+    setRefreshButtonText('refresh-btn', running && !isSignals ? 'Recalcul en cours' : 'Recalcul instant');
+    setRefreshButtonText('refresh-full-btn', running && status.mode === 'full' ? 'Maintenance en cours' : 'Maintenance complète');
+    setRefreshButtonText('refresh-signals-btn', running && isSignals ? `${sourceLabel} en cours` : 'Réparer signaux');
     setRefreshButtonText('refresh-prematch-btn', running && isPrematch ? 'Pré-match en cours' : 'Pré-match final');
     setRefreshButtonText('refresh-prematch-t60-btn', running && isPrematchT60 ? 'T-60 en cours' : 'T-60');
     setRefreshButtonText('refresh-prematch-t30-btn', running && isPrematchT30 ? 'T-30 en cours' : 'T-30');
@@ -18558,9 +18558,9 @@
     $$('.quality-action-btn').forEach((button) => {
       button.disabled = true;
     });
-    setRefreshButtonText('refresh-btn', mode === 'signals' ? 'Synchro instant' : 'Synchro en cours');
-    setRefreshButtonText('refresh-full-btn', mode === 'full' ? 'Complet en cours' : 'Refresh complet');
-    setRefreshButtonText('refresh-signals-btn', mode === 'signals' ? `${signalSourceLabel(source)} en cours` : 'Signaux lents');
+    setRefreshButtonText('refresh-btn', mode === 'signals' ? 'Recalcul instant' : 'Recalcul en cours');
+    setRefreshButtonText('refresh-full-btn', mode === 'full' ? 'Maintenance en cours' : 'Maintenance complète');
+    setRefreshButtonText('refresh-signals-btn', mode === 'signals' ? `${signalSourceLabel(source)} en cours` : 'Réparer signaux');
     setRefreshButtonText('refresh-prematch-btn', mode === 'prematch' ? 'Pré-match en cours' : 'Pré-match final');
     setRefreshButtonText('refresh-prematch-t60-btn', mode === 'prematch_t60' ? 'T-60 en cours' : 'T-60');
     setRefreshButtonText('refresh-prematch-t30-btn', mode === 'prematch_t30' ? 'T-30 en cours' : 'T-30');
@@ -18580,9 +18580,9 @@
       $$('.quality-action-btn').forEach((button) => {
         button.disabled = false;
       });
-      setRefreshButtonText('refresh-btn', 'Synchro instant');
-      setRefreshButtonText('refresh-full-btn', 'Refresh complet');
-      setRefreshButtonText('refresh-signals-btn', 'Signaux lents');
+      setRefreshButtonText('refresh-btn', 'Recalcul instant');
+      setRefreshButtonText('refresh-full-btn', 'Maintenance complète');
+      setRefreshButtonText('refresh-signals-btn', 'Réparer signaux');
       setRefreshButtonText('refresh-prematch-btn', 'Pré-match final');
       setRefreshButtonText('refresh-prematch-t60-btn', 'T-60');
       setRefreshButtonText('refresh-prematch-t30-btn', 'T-30');
@@ -18680,7 +18680,6 @@
       cockpit: 'cockpit',
       winners: 'winner',
       goals: 'goals',
-      scorers: 'scorer',
       strict: 'strict',
       value: 'value',
       halftime: 'halftime',
@@ -19606,7 +19605,7 @@
       $('#refresh-log').textContent = error.stack || error.message;
     }));
     $('#refresh-full-btn')?.addEventListener('click', () => startRefresh('full').catch((error) => {
-      setSideStatus('Refresh complet impossible', 'danger');
+      setSideStatus('Maintenance complète impossible', 'danger');
       $('#refresh-log').textContent = error.stack || error.message;
     }));
     $('#refresh-signals-btn').addEventListener('click', () => startRefresh('signals').catch((error) => {

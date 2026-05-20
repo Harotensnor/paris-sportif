@@ -91,7 +91,7 @@ INSTANT_STAGES = [
 ]
 
 FAST_STAGES = [
-    Stage("fetch_live.py", 12),
+    Stage("fetch_live.py", 35),
     Stage("fetch_winamax_catalog.py", 45),
     Stage("patch_winamax.py", 25),
     *INSTANT_STAGES,

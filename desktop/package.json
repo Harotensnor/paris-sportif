@@ -1,6 +1,6 @@
 {
   "name": "paris-sportif-desktop",
-  "version": "8.6.61",
+  "version": "8.6.62",
   "private": true,
   "description": "Application PC locale pour Paris-Sportif.",
   "author": "Paris-Sportif",
@@ -17,6 +17,7 @@
     "qa:desktop:full": "node scripts/smoke.js",
     "qa:terrain": "node scripts/terrain-check.js",
     "qa:terrain:quick": "node scripts/terrain-check.js --skip-refresh",
+    "qa:terrain:full": "node scripts/terrain-check.js --full-refresh",
     "qa:winamax-audit": "node scripts/winamax-audit.js"
   },
   "build": {

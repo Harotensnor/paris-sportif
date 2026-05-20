@@ -71,9 +71,17 @@ async function main() {
   const root = path.resolve(__dirname, '..', '..');
   const desktopRoot = path.join(root, 'desktop');
   const skipRefresh = process.argv.includes('--skip-refresh') || process.env.PARIS_TERRAIN_SKIP_REFRESH === '1';
+  const fullRefresh = process.argv.includes('--full-refresh') || process.env.PARIS_TERRAIN_FULL_REFRESH === '1';
+  const refreshModeArg = process.argv.find((arg) => arg.startsWith('--refresh-mode='));
+  const requestedRefreshMode = refreshModeArg ? refreshModeArg.split('=').slice(1).join('=') : '';
+  const allowedRefreshModes = new Set(['instant', 'fast', 'quick', 'full', 'prematch', 'critical', 'repair-context']);
+  const refreshMode = requestedRefreshMode && allowedRefreshModes.has(requestedRefreshMode)
+    ? requestedRefreshMode
+    : fullRefresh ? 'full' : 'fast';
+  const refreshFlag = `--${refreshMode}`;
 
   if (!skipRefresh) {
-    await run(process.platform === 'win32' ? 'python' : 'python3', ['desktop/bin/refresh_once.py', '--full'], { cwd: root });
+    await run(process.platform === 'win32' ? 'python' : 'python3', ['desktop/bin/refresh_once.py', refreshFlag], { cwd: root });
   }
 
   const runtimeData = dataSource.loadRuntimeDataStable(root);
@@ -416,7 +424,7 @@ async function main() {
     ) && !isIgnorableConsoleMessage(message));
     assert(severe.length === 0, 'Terrain: erreurs console pendant usage réel', severe);
 
-    console.log(`qa:terrain OK: health ${health.generated_at || data.generated_at}, ${todayEvents.length} events aujourd'hui, ${todayBookable.length} Winamax, funnel ${positiveSimpleToday} signaux simples positifs -> ${todayFunnel.displayed || 0} affichés, cockpit ${dashboard.length}, coverage24h ${coverage.displayed || 0}, launch ${launchMs}ms.`);
+    console.log(`qa:terrain OK: refresh ${skipRefresh ? 'skip' : refreshMode}, health ${health.generated_at || data.generated_at}, ${todayEvents.length} events aujourd'hui, ${todayBookable.length} Winamax, funnel ${positiveSimpleToday} signaux simples positifs -> ${todayFunnel.displayed || 0} affichés, cockpit ${dashboard.length}, coverage24h ${coverage.displayed || 0}, launch ${launchMs}ms.`);
   } finally {
     await closeElectronApp(app);
     fs.rmSync(userDataDir, { recursive: true, force: true });
