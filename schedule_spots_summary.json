@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-20T04:13:37Z",
+  "generated_at": "2026-05-20T04:17:28Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -127,13 +127,13 @@
         "2 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.305,
-        "away_score": -1.385,
+        "status": "mixed",
+        "net_side": null,
+        "home_score": 1.045,
+        "away_score": -2.385,
         "home_fade": 0.9,
-        "away_fade": 1.7,
-        "reason": "Direction nette: San Francisco Giants (-0.30)",
+        "away_fade": 2.7,
+        "reason": "Signaux mitigés: avantage net trop faible (San Francisco Giants +1.04, Arizona Diamondbacks -2.39)",
         "detail": [
           {
             "side": "home",
@@ -164,6 +164,18 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.8
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           }
         ]
       }
@@ -1685,11 +1697,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.441,
-        "away_score": -1.637,
+        "home_score": 1.791,
+        "away_score": -2.637,
         "home_fade": 0.15,
-        "away_fade": 1.69,
-        "reason": "Direction nette: San Francisco Giants (+0.44)",
+        "away_fade": 2.69,
+        "reason": "Direction nette: San Francisco Giants (+1.79)",
         "detail": [
           {
             "side": "home",
@@ -1708,6 +1720,18 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.8
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           },
           {
             "side": "away",
@@ -2144,19 +2168,31 @@
         "2 match dans les 48h + 1049 km de voyage"
       ],
       "global_resolution": {
-        "status": "abstain",
+        "status": "mixed",
         "net_side": null,
-        "home_score": -0.513,
-        "away_score": -0.54,
-        "home_fade": 0.8,
+        "home_score": -1.513,
+        "away_score": 0.81,
+        "home_fade": 1.8,
         "away_fade": 0.82,
-        "reason": "Signaux opposes: Arizona Diamondbacks fade 0.80, San Francisco Giants fade 0.82 -> prudence",
+        "reason": "Signaux mitigés: avantage net trop faible (Arizona Diamondbacks -1.51, San Francisco Giants +0.81)",
         "detail": [
           {
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.8
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
           },
           {
             "side": "away",
@@ -2197,17 +2233,29 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.567,
-        "away_score": -1.62,
+        "home_score": 1.917,
+        "away_score": -2.62,
         "home_fade": 0.0,
-        "away_fade": 1.62,
-        "reason": "Direction nette: San Francisco Giants (+0.57)",
+        "away_fade": 2.62,
+        "reason": "Direction nette: San Francisco Giants (+1.92)",
         "detail": [
           {
             "side": "away",
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.8
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           },
           {
             "side": "away",
