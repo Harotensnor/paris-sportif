@@ -7077,6 +7077,7 @@
     const pool = Array.isArray(rows) ? rows : [];
     const ready24 = rolling24hRows(pool, isReadyToStakeRow);
     const watch24 = rolling24hRows(pool, canDisplayPickCard).filter((row) => !isReadyToStakeRow(row));
+    const weekReady = rollingWeekRows(pool, isReadyToStakeRow);
     const weekWatch = rollingWeekRows(pool, canDisplayPickCard).filter((row) => !isReadyToStakeRow(row));
     const blockedCore = rollingWeekRows(pool, (row) => pickHasCoreData(row) && isBeforeKickoff(row)).filter((row) => !canDisplayPickCard(row));
     const sourceGaps = pool.reduce((sum, row) => sum + Number(row?.contextQuality?.critical_missing?.length || row?.matchSheetV6?.missingCriticalData?.length || 0), 0);
@@ -7088,6 +7089,8 @@
     watch24.concat(blockedCore).slice(0, 10).forEach((row) => conciseBlockerLabels(row, 2).forEach(addBlocker));
     const firstReason = ready24.length
       ? `${formatCount(ready24.length)} pari(s) jouable(s), le reste attend un meilleur contexte.`
+      : weekReady.length
+        ? `Rien à cliquer dans les 24h, mais ${formatCount(weekReady.length)} spot(s) prêt(s) plus tard cette semaine.`
       : watch24.length
         ? `${formatCount(watch24.length)} spot(s) a surveiller dans les 24h, mais pas assez propres pour cliquer.`
         : weekWatch.length
@@ -7098,6 +7101,7 @@
     return {
       ready24: ready24.length,
       watch24: watch24.length,
+      weekReady: weekReady.length,
       weekWatch: weekWatch.length,
       blocked: blockedCore.length,
       sourceGaps,
@@ -7119,7 +7123,7 @@
       <div class="why-not-more-kpis">
         <span><b>${formatCount(summary.ready24)}</b><em>jouable</em></span>
         <span><b>${formatCount(summary.watch24)}</b><em>a surveiller</em></span>
-        <span><b>${formatCount(summary.weekWatch)}</b><em>semaine</em></span>
+        <span><b>${formatCount(summary.weekReady || summary.weekWatch)}</b><em>${summary.weekReady ? 'semaine prête' : 'semaine'}</em></span>
       </div>
     `;
   }

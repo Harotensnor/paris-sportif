@@ -5,6 +5,13 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.30 — Semaine prête visible
+
+UX pronostics.
+- Le bloc `Pourquoi pas plus ?` distingue maintenant les paris prêts dans les 24h et les spots prêts plus tard dans la semaine.
+- Quand aucun clic propre n'existe tout de suite, l'accueil peut dire clairement qu'un spot semaine est prêt au lieu de donner une impression de zéro proposition.
+- Version app, package et cache Service Worker bumpés en `v8.6.30`.
+
 ### Version v8.6.29 — Accueil lancé en parallèle
 
 Performance.
