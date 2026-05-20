@@ -5,6 +5,14 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.24 — Lanceur Windows traçable
+
+Stabilité utilisateur.
+- `LANCER-LOGICIEL.bat` écrit maintenant un journal dans `desktop/state/launcher.log`.
+- Les erreurs Node/npm/Electron ne disparaissent plus silencieusement quand le logiciel est lancé via le `.vbs`.
+- Le log indique aussi si l'ouverture passe par Electron direct ou par `npm start`.
+- Version app, package et cache Service Worker bumpés en `v8.6.24`.
+
 ### Version v8.6.23 — Alerte critique périmée ignorée
 
 Fiabilité pronostics.
