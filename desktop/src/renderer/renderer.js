@@ -12708,8 +12708,7 @@
     if (webhookType) webhookType.value = prefs.webhookType || 'generic';
     const webhookUrl = $('#pref-webhook-url');
     if (webhookUrl) webhookUrl.value = prefs.webhookUrl || '';
-    const versionLabel = $('#app-version-label');
-    if (versionLabel) versionLabel.textContent = `Paris Sportif Desktop v${state.appInfo?.version || '1.0.0'}`;
+    renderAppVersionLabels();
     applyTheme(prefs);
     renderUpdateStatus();
     renderShortcutSettings();
@@ -12747,6 +12746,14 @@
     node.textContent = status.available
       ? `Version ${status.latestVersion || ''} disponible${status.assetName ? ` · ${status.assetName}` : ''}.`
       : `À jour (${status.currentVersion || 'version locale'}) · vérifié ${status.checkedAt ? formatDateTime(status.checkedAt) : '-'}.`;
+  }
+
+  function renderAppVersionLabels() {
+    const version = state.appInfo?.version || 'locale';
+    const versionLabel = $('#app-version-label');
+    if (versionLabel) versionLabel.textContent = `Paris Sportif Desktop v${version}`;
+    const topVersion = $('#app-top-version');
+    if (topVersion) topVersion.textContent = `Pronostics Pro v${version} · Winamax-only`;
   }
 
   function closeUpdateModal() {
@@ -20612,6 +20619,7 @@
     const logPromise = refreshLog().catch(() => null);
     const appInfoPromise = fetchJson('/api/app-info').then((info) => {
       state.appInfo = info || null;
+      renderAppVersionLabels();
       if ($('[data-panel="preferences"].active')) renderPreferences();
     }).catch((error) => pushLog('warn', `Info application indisponible: ${error.message}`));
     const picksPromise = computePicks();

@@ -5,6 +5,14 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.46 — Version affichée fiable
+
+Fix UX.
+- La barre du haut n'affiche plus une ancienne version codée en dur.
+- Le libellé `Pronostics Pro v...` est maintenant alimenté par la vraie version de l'application.
+- Cela évite l'impression que les changements ne sont pas chargés.
+- Version app, package et cache Service Worker bumpés en `v8.6.46`.
+
 ### Version v8.6.45 — Feuille de match plus propre
 
 UX fiches match.
