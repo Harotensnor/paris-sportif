@@ -37,6 +37,8 @@ const UPDATE_STATUS_PATH = path.join(STATE_ROOT, 'update-status.json');
 const BUG_REPORT_ROOT = path.join(STATE_ROOT, 'bug-reports');
 const STRESS_REPORT_PATH = path.join(STATE_ROOT, 'stress-report.json');
 const IMAGE_CACHE_ROOT = path.join(STATE_ROOT, 'images');
+const HOME_COMPACT_CACHE_PATH = path.join(STATE_ROOT, 'engine-home-compact-payload.json');
+const DATA_MANIFEST_PATH = path.join(PROJECT_ROOT, 'data_manifest.json');
 imageService.init({ cacheDir: IMAGE_CACHE_ROOT });
 
 // Sprint 44 (P5 audit) : rotation automatique des rapports sprintXX-*.json
@@ -269,6 +271,56 @@ function compactEngineHomePayload(analysis) {
     prematchPlan: analysis.prematchPlan || null,
     winamaxMarketAudit: analysis.winamaxMarketAudit || null
   };
+}
+
+function homeCompactSignature() {
+  const manifest = safeJsonFile(DATA_MANIFEST_PATH);
+  return {
+    schema: 'engine-home-compact-cache-v1',
+    appVersion: String(desktopPackage.version || '0.0.0'),
+    dataGeneratedAt: manifest && !manifest.__error ? String(manifest.generated_at || '') : '',
+    today: manifest && !manifest.__error ? String(manifest.today || '') : ''
+  };
+}
+
+function readHomeCompactPayload() {
+  try {
+    if (!fs.existsSync(HOME_COMPACT_CACHE_PATH)) return null;
+    const envelope = readJsonFileDefault(HOME_COMPACT_CACHE_PATH, null);
+    if (!envelope || !envelope.payload || envelope.payload.ok !== true) return null;
+    const signature = homeCompactSignature();
+    if (envelope.schema !== signature.schema) return null;
+    if (String(envelope.dataGeneratedAt || '') !== signature.dataGeneratedAt) return null;
+    if (String(envelope.today || '') !== signature.today) return null;
+    return {
+      ...envelope.payload,
+      cache: {
+        ...(envelope.payload.cache || {}),
+        source: 'compact-disk',
+        cachedAt: envelope.cachedAt || null
+      }
+    };
+  } catch {
+    return null;
+  }
+}
+
+function writeHomeCompactPayload(payload) {
+  try {
+    if (!payload || payload.ok !== true) return;
+    const signature = homeCompactSignature();
+    fs.mkdirSync(path.dirname(HOME_COMPACT_CACHE_PATH), { recursive: true });
+    const envelope = {
+      ...signature,
+      cachedAt: new Date().toISOString(),
+      payload
+    };
+    const tmpPath = `${HOME_COMPACT_CACHE_PATH}.${process.pid}.tmp`;
+    fs.writeFileSync(tmpPath, JSON.stringify(envelope), 'utf8');
+    fs.renameSync(tmpPath, HOME_COMPACT_CACHE_PATH);
+  } catch {
+    // Cache d'accueil opportuniste : si l'écriture échoue, le moteur répond normalement.
+  }
 }
 
 function readRequestBody(req, maxBytes = 64 * 1024) {
@@ -1904,8 +1956,15 @@ async function handleApi(req, res, url) {
   if (url.pathname === '/api/engine/analysis') {
     const bankroll = Number(url.searchParams.get('bankroll') || 50);
     if (url.searchParams.get('home') === '1' || url.searchParams.get('lite') === '1') {
+      const cachedHome = readHomeCompactPayload();
+      if (cachedHome) {
+        jsonResponse(res, 200, cachedHome);
+        return;
+      }
       const analysis = engineService.getAnalysis({ bankroll, homeOnly: true });
-      jsonResponse(res, 200, compactEngineHomePayload(analysis));
+      const payload = compactEngineHomePayload(analysis);
+      writeHomeCompactPayload(payload);
+      jsonResponse(res, 200, payload);
       return;
     }
     const analysis = engineService.getAnalysis({ bankroll });

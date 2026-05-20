@@ -20455,6 +20455,7 @@
     installGlobalErrorReporting();
     installPerformanceObserver();
     applyTheme(loadPreferences());
+    applyExpertMode();
     pushLog('info', 'Démarrage du cockpit desktop');
     markAppSessionStart();
     bindEvents();

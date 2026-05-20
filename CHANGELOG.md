@@ -5,6 +5,15 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.17 — Accueil plus rapide
+
+Performance / UX.
+- Le mode accueil léger lit maintenant son petit cache dédié avant le gros cache moteur complet.
+- L’app écrit un cache compact `Top 3 + résumé accueil` pour éviter de refaire le moteur au démarrage suivant quand les données n’ont pas changé.
+- Le mode standard masque `Avancé` dès le début du boot, même quand l’accueil apparaît très vite.
+- Le smoke desktop rapide utilise une vérification plus stable de la page Réglages après accélération du boot.
+- Version app, package et cache Service Worker bumpés en `v8.6.17`.
+
 ### Version v8.6.16 — Ticket final sans vieux matchs
 
 Fiabilité décision.

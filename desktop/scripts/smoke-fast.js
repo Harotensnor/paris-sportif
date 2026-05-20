@@ -155,7 +155,11 @@ async function main() {
     // Le smoke rapide reste court : il vérifie les pages utiles au parieur
     // sans ouvrir les panneaux techniques lourds.
     await win.evaluate(() => document.querySelector('[data-tab="preferences"]')?.click());
-    await win.waitForSelector('#pref-bankroll', { timeout: 8000 });
+    await win.waitForFunction(() => {
+      const panel = document.querySelector('[data-panel="preferences"].active');
+      const input = document.querySelector('#pref-bankroll');
+      return Boolean(panel && input && input.offsetParent !== null);
+    }, null, { timeout: 8000 });
 
     const severe = messages.filter((message) => (
       message.startsWith('error:') || message.startsWith('pageerror:')

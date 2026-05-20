@@ -6087,7 +6087,7 @@ function createLegacyEngineService({ projectRoot }) {
     if (!force && analysisCache && analysisCacheKey === analysisKey && !(analysisCache.homeOnly && !homeOnly)) return analysisCache;
     if (!force) {
       const snapshot = homeOnly
-        ? (readAnalysisSnapshot(analysisKey) || readAnalysisSnapshot(analysisKey, homeAnalysisSnapshotPath))
+        ? (readAnalysisSnapshot(analysisKey, homeAnalysisSnapshotPath) || readAnalysisSnapshot(analysisKey))
         : readAnalysisSnapshot(analysisKey);
       if (snapshot) {
         analysisCache = snapshot;
