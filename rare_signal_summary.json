@@ -1,26 +1,24 @@
 {
-  "generated_at": "2026-05-20T20:59:00Z",
+  "generated_at": "2026-05-20T21:05:38Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 43,
-    "actionable": 21,
-    "watch": 1,
-    "risk": 21,
+    "active_events": 45,
+    "actionable": 22,
+    "watch": 0,
+    "risk": 23,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 16,
-      "back_to_back_travel": 9,
+      "back_to_back_travel": 11,
       "travel_extreme": 1,
-      "market_move": 7,
-      "market_uncertain": 20,
-      "signal_conflict": 7
+      "signal_conflict": 6,
+      "market_uncertain": 20
     },
     "by_quality": {
-      "actionable": 21,
-      "watch": 1,
-      "risk": 21
+      "actionable": 22,
+      "risk": 23
     }
   },
   "active_actionable": [
@@ -151,40 +149,22 @@
       "context": "Absences severes 7-13"
     },
     {
-      "event_id": "401815495",
-      "date": "2026-05-25T21:05Z",
+      "event_id": "401815425",
+      "date": "2026-05-20T23:40Z",
       "sport": "baseball",
       "league_code": "mlb",
       "league_name": "MLB",
-      "home": "San Francisco Giants",
-      "away": "Arizona Diamondbacks",
-      "match": "San Francisco Giants - Arizona Diamondbacks",
+      "home": "Kansas City Royals",
+      "away": "Boston Red Sox",
+      "match": "Kansas City Royals - Boston Red Sox",
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 1.90 -> 2.30 (-21.1%)"
-    },
-    {
-      "event_id": "401815510",
-      "date": "2026-05-27T01:45Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Francisco Giants",
-      "away": "Arizona Diamondbacks",
-      "match": "San Francisco Giants - Arizona Diamondbacks",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 1.90 -> 2.30 (-21.1%)"
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Boston Red Sox",
+      "side": "away",
+      "strength": 0.93,
+      "context": "1 match dans les 48h + 1998 km de voyage"
     },
     {
       "event_id": "401815525",
@@ -197,12 +177,12 @@
       "match": "San Francisco Giants - Arizona Diamondbacks",
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 1.90 -> 2.30 (-21.1%)"
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Arizona Diamondbacks",
+      "side": "away",
+      "strength": 0.82,
+      "context": "2 match dans les 48h + 1049 km de voyage"
     },
     {
       "event_id": "401815419",
@@ -221,24 +201,6 @@
       "side": "away",
       "strength": 0.808,
       "context": "2 match dans les 48h + 991 km de voyage"
-    },
-    {
-      "event_id": "401815425",
-      "date": "2026-05-20T23:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Kansas City Royals",
-      "away": "Boston Red Sox",
-      "match": "Kansas City Royals - Boston Red Sox",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Boston Red Sox",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 7-11"
     },
     {
       "event_id": "401856922",
@@ -313,6 +275,60 @@
       "context": "Absences severes 6-2"
     },
     {
+      "event_id": "401815495",
+      "date": "2026-05-25T21:05Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "San Francisco Giants",
+      "away": "Arizona Diamondbacks",
+      "match": "San Francisco Giants - Arizona Diamondbacks",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Arizona Diamondbacks",
+      "side": null,
+      "strength": 0.8,
+      "context": "Absences severes 9-13"
+    },
+    {
+      "event_id": "401815510",
+      "date": "2026-05-27T01:45Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "San Francisco Giants",
+      "away": "Arizona Diamondbacks",
+      "match": "San Francisco Giants - Arizona Diamondbacks",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Arizona Diamondbacks",
+      "side": null,
+      "strength": 0.8,
+      "context": "Absences severes 9-13"
+    },
+    {
+      "event_id": "401815438",
+      "date": "2026-05-21T17:15Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "St. Louis Cardinals",
+      "away": "Pittsburgh Pirates",
+      "match": "St. Louis Cardinals - Pittsburgh Pirates",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Pittsburgh Pirates",
+      "side": "away",
+      "strength": 0.789,
+      "context": "2 match dans les 48h + 896 km de voyage"
+    },
+    {
       "event_id": "401873384",
       "date": "2026-05-23T23:00Z",
       "sport": "hockey",
@@ -385,8 +401,8 @@
       "context": "1 match dans les 48h + 979 km de voyage"
     },
     {
-      "event_id": "401815438",
-      "date": "2026-05-21T17:15Z",
+      "event_id": "401815428",
+      "date": "2026-05-20T23:45Z",
       "sport": "baseball",
       "league_code": "mlb",
       "league_name": "MLB",
@@ -403,26 +419,7 @@
       "context": "1 match dans les 48h + 896 km de voyage"
     }
   ],
-  "active_watch": [
-    {
-      "event_id": "178423",
-      "date": "2026-05-21T09:00Z",
-      "sport": "tennis",
-      "league_code": "rolandgarros",
-      "league_name": "Roland Garros",
-      "home": "",
-      "away": "",
-      "match": "? - ?",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "home",
-      "strength": 0.538,
-      "context": "Cote home: 3.10 -> 3.40 (-9.7%)"
-    }
-  ],
+  "active_watch": [],
   "active_risk": [
     {
       "event_id": "178424",
@@ -747,6 +744,42 @@
       "side": null,
       "strength": 0.488,
       "context": "Signaux opposes: San Antonio Spurs fade 0.75, Oklahoma City Thunder fade 0.75 -> prudence"
+    },
+    {
+      "event_id": "401873344",
+      "date": "2026-05-26T00:00Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "Cleveland Cavaliers",
+      "away": "New York Knicks",
+      "match": "Cleveland Cavaliers - New York Knicks",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "signal_conflict",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.488,
+      "context": "Signaux opposes: Cleveland Cavaliers fade 0.75, New York Knicks fade 0.75 -> prudence"
+    },
+    {
+      "event_id": "401815439",
+      "date": "2026-05-22T01:38Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Los Angeles Angels",
+      "away": "Athletics",
+      "match": "Los Angeles Angels - Athletics",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "signal_conflict",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.45,
+      "context": "Signaux opposes: Los Angeles Angels fade 0.60, Athletics fade 0.60 -> prudence"
     },
     {
       "event_id": "401873201",
