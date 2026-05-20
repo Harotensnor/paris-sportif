@@ -1,54 +1,8 @@
 {
-  "generated_at": "2026-05-20T22:51:59Z",
+  "generated_at": "2026-05-20T22:57:07Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815423",
-      "kickoff": "2026-05-20T22:45Z",
-      "league": "MLB",
-      "match": "New York Mets at Washington Nationals",
-      "home": "Washington Nationals",
-      "away": "New York Mets",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Washington Nationals",
-          "pitcher": "Zack Littell",
-          "label": "Zack Littell plus de 2,5 strikeouts",
-          "line": 2.5,
-          "pick": "over",
-          "probability": 0.5979,
-          "fair_odds": 1.67,
-          "expected_strikeouts": 2.83,
-          "projected_ip": 5.89,
-          "inputs": {
-            "k9": 4.32,
-            "era": 6.05,
-            "whip": 1.49,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Washington Nationals",
-          "pitcher": "Zack Littell",
-          "label": "Zack Littell concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.8612,
-          "fair_odds": 1.16,
-          "expected_hr_allowed": 1.975,
-          "projected_ip": 5.89,
-          "inputs": {
-            "hr9": 3.02,
-            "era": 6.05,
-            "whip": 1.49
-          },
-          "side": "home"
-        }
-      ]
-    },
     {
       "event_id": "401815424",
       "kickoff": "2026-05-20T23:05Z",
@@ -798,7 +752,7 @@
       ]
     }
   ],
-  "props": 38,
+  "props": 36,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
