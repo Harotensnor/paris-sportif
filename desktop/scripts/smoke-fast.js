@@ -139,7 +139,8 @@ async function main() {
       message.startsWith('error:') || message.startsWith('pageerror:')
     ) && !isIgnorableConsoleMessage(message));
     if (severe.length) throw new Error(`Erreurs console: ${severe.join(' | ')}`);
-    console.log(`Desktop fast smoke OK: accueil ${home.rows} lignes, ${home.topCards} top, ${home.categories} catégories, prêt ${homeReadyMs}ms, parcours ${Date.now() - launchedAt}ms.`);
+    const visibleSpots = home.topCards + home.watchCards;
+    console.log(`Desktop fast smoke OK: accueil ${visibleSpots} spot(s) visibles (${home.topCards} prêts, ${home.watchCards} à surveiller), ${home.categories} catégorie(s) cachée(s), prêt ${homeReadyMs}ms, parcours ${Date.now() - launchedAt}ms.`);
   } finally {
     await closeElectronApp(app);
     fs.rmSync(userDataDir, { recursive: true, force: true });

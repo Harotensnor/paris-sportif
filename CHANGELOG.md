@@ -5,6 +5,14 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.0 — Début du découpage accueil
+
+Premier découpage prudent du gros renderer, sans changer l'expérience visible.
+- Les libellés et routes des catégories d'accueil passent dans `desktop/src/renderer/home-page.js`.
+- `renderer.js` garde un fallback interne, mais délègue maintenant cette partie au module dédié quand il est chargé.
+- Le smoke rapide affiche désormais le nombre réel de spots visibles (`prêts` + `à surveiller`) pour éviter les logs trompeurs quand aucun pari n'est validé.
+- Version app, package et cache Service Worker bumpés en `v8.6.0`.
+
 ### Version v8.5.0 — Accueil standard rendu plus léger
 
 Optimisation visible : l’accueil standard ne calcule plus les blocs cachés.

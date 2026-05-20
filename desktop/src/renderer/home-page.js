@@ -1,0 +1,135 @@
+(function () {
+  'use strict';
+
+  const CATEGORY_META = {
+    cockpit: {
+      kicker: 'Cockpit 24h',
+      title: 'Tous les paris triables',
+      subtitle: 'Vue complète pour filtrer, comparer et ouvrir les sections détaillées.'
+    },
+    winner: {
+      kicker: 'Vainqueurs',
+      title: 'Les paris Vainqueur en priorité',
+      subtitle: 'Focus sur les matchs à résultat simple, avec filet 2-0 Winamax quand il est disponible.'
+    },
+    goals: {
+      kicker: 'Buts',
+      title: 'Plus / Moins et les deux marquent',
+      subtitle: 'Tous les paris buts sont regroupés ici pour ne pas charger l’accueil principal.'
+    },
+    night: {
+      kicker: 'Nuit',
+      title: 'Les paris de nuit',
+      subtitle: 'Sports US, Asie et matchs tardifs sur les prochaines 24h.'
+    },
+    week: {
+      kicker: 'Semaine',
+      title: 'Les prochains spots à suivre',
+      subtitle: 'Le meilleur spot peut être demain ou plus tard : la page évite de forcer un mauvais pari aujourd’hui.'
+    },
+    'sport:football': {
+      kicker: 'Football',
+      title: 'Football : priorité aux paris simples',
+      subtitle: 'Vainqueurs, buts simples et buteurs vérifiés, avec prudence si compos/blessures manquent.'
+    },
+    'sport:tennis': {
+      kicker: 'Tennis',
+      title: 'Les matchs tennis à lire vite',
+      subtitle: 'Vainqueurs tennis en priorité ; les totaux jeux restent à surveiller.'
+    },
+    'sport:basketball': {
+      kicker: 'Basket',
+      title: 'Les spots basket des prochaines 24h',
+      subtitle: 'Moneyline et favoris propres, surtout nuit NBA/WNBA.'
+    },
+    'sport:baseball': {
+      kicker: 'Baseball',
+      title: 'Les spots baseball de nuit',
+      subtitle: 'Moneyline prudente ; les pitchers incertains restent sans mise.'
+    },
+    'sport:hockey': {
+      kicker: 'Hockey',
+      title: 'Les spots hockey',
+      subtitle: 'Vainqueurs simples, prudence si goalie inconnu.'
+    },
+    strict: {
+      kicker: 'Mode strict',
+      title: 'Les paris les plus propres',
+      subtitle: 'Seulement les lignes avec contexte correct, badge fiable et mise autorisée.'
+    },
+    value: {
+      kicker: 'Gros gain',
+      title: 'Cotes plus hautes, toujours filtrées',
+      subtitle: 'Cotes 2+ avec avantage positif ou pari prêt, pour chercher du rendement sans ouvrir les marchés complexes.'
+    },
+    watch: {
+      kicker: 'À surveiller',
+      title: 'Signaux utiles, sans mise directe',
+      subtitle: 'Ces lignes attendent un re-check, une cote ou un contexte plus propre avant d’être jouées.'
+    }
+  };
+
+  const DEFAULT_META = {
+    kicker: 'Top 3 prochaines 24h',
+    title: 'À regarder maintenant',
+    subtitle: 'Bouton vert = jouable. Sinon on surveille, sans forcer.'
+  };
+
+  const TAB_TO_CATEGORY = {
+    cockpit: 'cockpit',
+    winners: 'winner',
+    goals: 'goals',
+    night: 'night',
+    football: 'sport:football',
+    tennis: 'sport:tennis',
+    basket: 'sport:basketball',
+    baseball: 'sport:baseball',
+    hockey: 'sport:hockey',
+    week: 'week',
+    watch: 'watch',
+    strict: 'strict',
+    value: 'value'
+  };
+
+  const CATEGORY_TO_TAB = {
+    cockpit: 'cockpit',
+    ready: 'dashboard',
+    winner: 'winners',
+    goals: 'goals',
+    scorer: 'scorers',
+    night: 'night',
+    watch: 'watch',
+    today: 'dashboard',
+    tomorrow: 'week',
+    week: 'week',
+    combines: 'combines',
+    'sport:football': 'football',
+    'sport:tennis': 'tennis',
+    'sport:basketball': 'basket',
+    'sport:baseball': 'baseball',
+    'sport:hockey': 'hockey',
+    strict: 'strict',
+    value: 'value'
+  };
+
+  function metaFor(category) {
+    return CATEGORY_META[category] || DEFAULT_META;
+  }
+
+  function categoryTabToKey(tab) {
+    return TAB_TO_CATEGORY[tab] || tab || 'cockpit';
+  }
+
+  function tabForHomeCategory(category) {
+    const key = String(category || '').toLowerCase();
+    return CATEGORY_TO_TAB[key] || (key.startsWith('sport:') ? 'football' : 'cockpit');
+  }
+
+  window.PSHomePage = Object.freeze({
+    metaFor,
+    categoryTabToKey,
+    tabForHomeCategory,
+    categoryMeta: CATEGORY_META,
+    defaultMeta: DEFAULT_META
+  });
+}());
