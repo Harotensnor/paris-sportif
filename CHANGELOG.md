@@ -5,6 +5,15 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.18 — Top 3 honnête
+
+UX / sécurité pari.
+- La grille `Top 3` ne transforme plus les meilleurs spots à surveiller en cartes visuellement prêtes.
+- Un vrai bouton `Je mise` apparaît uniquement si le gate final autorise réellement la mise.
+- Quand le modèle bloque la journée, l’accueil affiche maintenant des cartes `À surveiller` plutôt que de laisser croire à 3 vrais prêts.
+- Le smoke desktop rapide tolère mieux les dossiers temporaires Windows encore verrouillés à la fermeture d’Electron.
+- Version app, package et cache Service Worker bumpés en `v8.6.18`.
+
 ### Version v8.6.17 — Accueil plus rapide
 
 Performance / UX.

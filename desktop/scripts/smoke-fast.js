@@ -21,6 +21,22 @@ async function closeElectronApp(app) {
   }
 }
 
+async function removeTempDirBestEffort(dir) {
+  if (!dir) return;
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    try {
+      fs.rmSync(dir, { recursive: true, force: true });
+      return;
+    } catch (error) {
+      if (attempt === 4) {
+        console.warn(`[smoke-fast] dossier temporaire conservé (${error.code || error.message}) : ${dir}`);
+        return;
+      }
+      await new Promise((resolve) => setTimeout(resolve, 250 + attempt * 250));
+    }
+  }
+}
+
 function isIgnorableConsoleMessage(message) {
   return /Failed to load resource:\s*net::ERR_(EMPTY_RESPONSE|ABORTED|NO_BUFFER_SPACE|NETWORK_CHANGED|TIMED_OUT)/i.test(String(message || ''));
 }
@@ -169,7 +185,7 @@ async function main() {
     console.log(`Desktop fast smoke OK: accueil ${visibleSpots} spot(s) visibles (${home.topCards} prêts, ${home.watchCards} à surveiller), ${home.categories} catégorie(s) cachée(s), prêt ${homeReadyMs}ms, parcours ${Date.now() - launchedAt}ms.`);
   } finally {
     await closeElectronApp(app);
-    fs.rmSync(userDataDir, { recursive: true, force: true });
+    await removeTempDirBestEffort(userDataDir);
   }
 }
 

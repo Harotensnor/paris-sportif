@@ -7180,14 +7180,12 @@
   function homeTopRows(rows, limit = 3) {
     const source = Array.isArray(rows) ? rows : [];
     const ready = source.filter(isReadyToStakeRow);
-    const watch = source.filter((row) => canDisplayPickCard(row) && !isReadyToStakeRow(row));
-    const topSource = ready.concat(watch);
-    const selected = diverseHomeTopRows(topSource, limit);
+    const selected = diverseHomeTopRows(ready, limit);
     const sourceMarkets = new Set(source.map(rowMarketPreferenceKey).filter(Boolean));
     const selectedMarkets = new Set(selected.map(rowMarketPreferenceKey).filter(Boolean));
     if (selected.length >= 2 && sourceMarkets.size > 1 && selectedMarkets.size <= 1) {
       const currentMarket = selectedMarkets.values().next().value;
-      const readyAlternative = sortHomeRows(topSource, 'confidence').find((row) => rowMarketPreferenceKey(row) !== currentMarket && !selected.some((item) => userBetKey(item) === userBetKey(row)));
+      const readyAlternative = sortHomeRows(ready, 'confidence').find((row) => rowMarketPreferenceKey(row) !== currentMarket && !selected.some((item) => userBetKey(item) === userBetKey(row)));
       if (readyAlternative) selected[selected.length - 1] = readyAlternative;
     }
     return selected.slice(0, limit);
