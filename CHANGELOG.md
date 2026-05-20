@@ -5,6 +5,13 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.61 — Texte de suivi 100% français
+
+UX.
+- Le résumé de série ne mélange plus anglais et français : `wins/losses` devient `gagné(s)/perdu(s) de suite`.
+- `streak neutre` devient `série neutre`, plus naturel pour l’utilisateur.
+- Version app, package et cache Service Worker bumpés en `v8.6.61`.
+
 ### Version v8.6.60 — Navigation standard moins chargée
 
 UX navigation.

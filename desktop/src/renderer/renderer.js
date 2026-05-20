@@ -1302,8 +1302,8 @@
     const best = stats.bestSegment;
     const worst = stats.worstSegment;
     const streak = stats.streak?.count
-      ? `${stats.streak.count} ${stats.streak.status === 'won' ? 'wins' : 'losses'}`
-      : 'streak neutre';
+      ? `${formatCount(stats.streak.count)} ${stats.streak.status === 'won' ? 'gagné(s)' : 'perdu(s)'} de suite`
+      : 'série neutre';
     if (!best && !worst) return `Aucun pari suivi · ${streak}`;
     const bestText = best ? `Meilleur ${best.sport}: ${formatMoney(best.pnl)}` : 'Meilleur -';
     const worstText = worst && worst !== best ? `Pire ${worst.sport}: ${formatMoney(worst.pnl)}` : '';
