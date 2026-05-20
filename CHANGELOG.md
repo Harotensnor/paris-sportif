@@ -5,6 +5,22 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.37 — Top 3 orienté vrais spots
+
+UX / pronostics.
+- L'accueil priorise maintenant les vrais paris prêts de la semaine avant les lignes seulement à surveiller dans les 24h.
+- Le libellé `Top 3 prochaines 24h` devient `Top 3 spots sérieux` pour être plus honnête quand le meilleur pari est plus tard.
+- Objectif : répondre à “je mise quoi ou j'attends quoi ?” sans cacher un bon spot parce qu'il tombe demain ou après-demain.
+- Version app, package et cache Service Worker bumpés en `v8.6.37`.
+
+### Version v8.6.36 — Cache accueil signé par contenu moteur
+
+Performance / fiabilité.
+- La signature du cache d'accueil utilise maintenant une empreinte du contenu moteur.
+- Cela évite de servir un ancien Top 3 quand deux corrections pronostics arrivent rapidement.
+- Objectif : l'accueil reflète toujours la dernière règle moteur réellement chargée.
+- Version app, package et cache Service Worker bumpés en `v8.6.36`.
+
 ### Version v8.6.35 — Alternatives simples actionnables
 
 Pronostics.

@@ -7248,7 +7248,7 @@
 
   function homeCategoryMeta(category) {
     return window.PSHomePage?.metaFor(category) || {
-      kicker: 'Top 3 prochaines 24h',
+      kicker: 'Top 3 spots sérieux',
       title: 'À regarder maintenant',
       subtitle: 'Bouton vert = jouable. Sinon on surveille, sans forcer.'
     };
@@ -7257,9 +7257,17 @@
   function homeSourceRows(rows) {
     const category = state.activeHomeCategory || null;
     if (category && category !== 'cockpit') return marketCategoryRows(rows, category);
-    const ready = rolling24hRows(rows, isReadyToStakeRow);
+    const ready24 = rolling24hRows(rows, isReadyToStakeRow);
+    const seen = new Set(ready24.map((row) => userBetKey(row) || `${row.id}:${row.market}:${row.label}`));
+    const weekReady = rollingWeekRows(rows, isReadyToStakeRow)
+      .filter((row) => {
+        const key = userBetKey(row) || `${row.id}:${row.market}:${row.label}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+    const ready = ready24.concat(weekReady);
     if (ready.length >= 6) return ready;
-    const seen = new Set(ready.map((row) => userBetKey(row) || `${row.id}:${row.market}:${row.label}`));
     const watch = rolling24hRows(rows, canDisplayPickCard)
       .filter((row) => {
         const key = userBetKey(row) || `${row.id}:${row.market}:${row.label}`;

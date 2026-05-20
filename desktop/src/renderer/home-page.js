@@ -70,7 +70,7 @@
   };
 
   const DEFAULT_META = {
-    kicker: 'Top 3 prochaines 24h',
+    kicker: 'Top 3 spots sérieux',
     title: 'À regarder maintenant',
     subtitle: 'Bouton vert = jouable. Sinon on surveille, sans forcer.'
   };
