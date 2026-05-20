@@ -51,6 +51,8 @@ function createLegacyEngineService({ projectRoot }) {
   const refreshPriorityPlanPath = path.join(root, 'refresh_priority_plan.json');
   const prebetChecklistPath = path.join(root, 'prebet_checklist_report.json');
   const prebetChecklistBacktestPath = path.join(root, 'prebet_checklist_backtest.json');
+  const actionCockpitPath = path.join(root, 'v15_action_cockpit_report.json');
+  const finalTicketPath = path.join(root, 'v16_final_ticket.json');
   const teamIdentityGraphPath = path.join(root, 'team_identity_graph.json');
   const matchDecisionTimelinePath = path.join(root, 'match_decision_timeline.json');
   const agentBankrollSimulationPath = path.join(root, 'agent_bankroll_simulation.json');
@@ -85,7 +87,7 @@ function createLegacyEngineService({ projectRoot }) {
   function fileKey() {
     const dataStat = fs.statSync(dataPath);
     const legacyStat = fs.statSync(legacyPath);
-    return `${dataStat.mtimeMs}:${dataStat.size}:${optionalFileKey(engineSourcePath)}:${optionalFileKey(dataLitePath)}:${optionalFileKey(dataTodayPath)}:${optionalFileKey(dataManifestPath)}:${optionalFileKey(healthPath)}:${legacyStat.mtimeMs}:${legacyStat.size}:${optionalFileKey(lineupsPath)}:${optionalFileKey(sofaEventsPath)}:${optionalFileKey(starPlayersPath)}:${optionalFileKey(winamaxMarketsPath)}:${optionalFileKey(h2hPath)}:${optionalFileKey(matchContextPath)}:${optionalFileKey(signalGapPath)}:${optionalFileKey(contextBacktestPath)}:${optionalFileKey(decisionBacktestPath)}:${optionalFileKey(decisionTuningPath)}:${optionalFileKey(decisionShadowPath)}:${optionalFileKey(oddsGuardrailsPath)}:${optionalFileKey(agentBlockerBacktestPath)}:${optionalFileKey(agentGuardrailRecommendationsPath)}:${optionalFileKey(stakeReductionBacktestPath)}:${optionalFileKey(signalConflictBacktestPath)}:${optionalFileKey(scorerQualityPath)}:${optionalFileKey(scorerCandidatesSummaryPath)}:${optionalFileKey(scorerSettlementPath)}:${optionalFileKey(scorerPendingAuditPath)}:${optionalFileKey(prematchFocusPath)}:${optionalFileKey(prematchExecutionPath)}:${optionalFileKey(signalCoverageTrendPath)}:${optionalFileKey(nextActionsPath)}:${optionalFileKey(sourceFreshnessPlanPath)}:${optionalFileKey(contextRepairPlanPath)}:${optionalFileKey(refreshPriorityPlanPath)}:${optionalFileKey(prebetChecklistPath)}:${optionalFileKey(prebetChecklistBacktestPath)}:${optionalFileKey(teamIdentityGraphPath)}:${optionalFileKey(matchDecisionTimelinePath)}:${optionalFileKey(agentBankrollSimulationPath)}:${optionalFileKey(smartPreparePlanPath)}:${optionalFileKey(sourceRegistryPath)}:${optionalFileKey(sourceQuarantinePath)}:${optionalFileKey(optionalSourcesPlanPath)}:${optionalFileKey(criticalIssueReportPath)}:${optionalFileKey(dataConsistencyReportPath)}:${optionalFileKey(uiIntegrityReportPath)}:${optionalFileKey(pickIntegrityReportPath)}:${optionalFileKey(coverageRepairEnginePath)}:${optionalFileKey(sourceCoverageTargetsPath)}:${optionalFileKey(leagueSignalQualityPath)}:${optionalFileKey(modelLabReportPath)}:${optionalFileKey(probabilityCalibrationPath)}:${optionalFileKey(policyCandidateRegistryPath)}:${optionalFileKey(sourceHealthReportPath)}:${optionalFileKey(clvSummaryPath)}:${optionalFileKey(picksHistorySummaryPath)}`;
+    return `${dataStat.mtimeMs}:${dataStat.size}:${optionalFileKey(engineSourcePath)}:${optionalFileKey(dataLitePath)}:${optionalFileKey(dataTodayPath)}:${optionalFileKey(dataManifestPath)}:${optionalFileKey(healthPath)}:${legacyStat.mtimeMs}:${legacyStat.size}:${optionalFileKey(lineupsPath)}:${optionalFileKey(sofaEventsPath)}:${optionalFileKey(starPlayersPath)}:${optionalFileKey(winamaxMarketsPath)}:${optionalFileKey(h2hPath)}:${optionalFileKey(matchContextPath)}:${optionalFileKey(signalGapPath)}:${optionalFileKey(contextBacktestPath)}:${optionalFileKey(decisionBacktestPath)}:${optionalFileKey(decisionTuningPath)}:${optionalFileKey(decisionShadowPath)}:${optionalFileKey(oddsGuardrailsPath)}:${optionalFileKey(agentBlockerBacktestPath)}:${optionalFileKey(agentGuardrailRecommendationsPath)}:${optionalFileKey(stakeReductionBacktestPath)}:${optionalFileKey(signalConflictBacktestPath)}:${optionalFileKey(scorerQualityPath)}:${optionalFileKey(scorerCandidatesSummaryPath)}:${optionalFileKey(scorerSettlementPath)}:${optionalFileKey(scorerPendingAuditPath)}:${optionalFileKey(prematchFocusPath)}:${optionalFileKey(prematchExecutionPath)}:${optionalFileKey(signalCoverageTrendPath)}:${optionalFileKey(nextActionsPath)}:${optionalFileKey(sourceFreshnessPlanPath)}:${optionalFileKey(contextRepairPlanPath)}:${optionalFileKey(refreshPriorityPlanPath)}:${optionalFileKey(prebetChecklistPath)}:${optionalFileKey(prebetChecklistBacktestPath)}:${optionalFileKey(actionCockpitPath)}:${optionalFileKey(finalTicketPath)}:${optionalFileKey(teamIdentityGraphPath)}:${optionalFileKey(matchDecisionTimelinePath)}:${optionalFileKey(agentBankrollSimulationPath)}:${optionalFileKey(smartPreparePlanPath)}:${optionalFileKey(sourceRegistryPath)}:${optionalFileKey(sourceQuarantinePath)}:${optionalFileKey(optionalSourcesPlanPath)}:${optionalFileKey(criticalIssueReportPath)}:${optionalFileKey(dataConsistencyReportPath)}:${optionalFileKey(uiIntegrityReportPath)}:${optionalFileKey(pickIntegrityReportPath)}:${optionalFileKey(coverageRepairEnginePath)}:${optionalFileKey(sourceCoverageTargetsPath)}:${optionalFileKey(leagueSignalQualityPath)}:${optionalFileKey(modelLabReportPath)}:${optionalFileKey(probabilityCalibrationPath)}:${optionalFileKey(policyCandidateRegistryPath)}:${optionalFileKey(sourceHealthReportPath)}:${optionalFileKey(clvSummaryPath)}:${optionalFileKey(picksHistorySummaryPath)}`;
   }
 
   function closeCurrent() {
@@ -508,6 +510,14 @@ function createLegacyEngineService({ projectRoot }) {
 
   function readPrebetChecklistBacktestReport() {
     return readJsonSidecar(prebetChecklistBacktestPath, {});
+  }
+
+  function readActionCockpitReport() {
+    return readJsonSidecar(actionCockpitPath, {});
+  }
+
+  function readFinalTicketReport() {
+    return readJsonSidecar(finalTicketPath, {});
   }
 
   function readTeamIdentityGraphReport() {
@@ -6203,6 +6213,8 @@ function createLegacyEngineService({ projectRoot }) {
     const refreshPriorityPlanReport = readRefreshPriorityPlanReport();
     const prebetChecklistReport = readPrebetChecklistReport();
     const prebetChecklistBacktestReport = readPrebetChecklistBacktestReport();
+    const actionCockpitReport = readActionCockpitReport();
+    const finalTicketReport = readFinalTicketReport();
     const teamIdentityGraphReport = readTeamIdentityGraphReport();
     const matchDecisionTimelineReport = readMatchDecisionTimelineReport();
     const agentBankrollSimulationReport = readAgentBankrollSimulationReport();
@@ -6360,6 +6372,8 @@ function createLegacyEngineService({ projectRoot }) {
         decisionCenter,
         winamaxMarketAudit,
         marketCoverageV2,
+        actionCockpit: actionCockpitReport && actionCockpitReport.schema ? actionCockpitReport : null,
+        finalTicket: finalTicketReport && finalTicketReport.schema ? finalTicketReport : null,
         prematchPlan: { autoDue: 0, next: null, enabledByDefault: true }
       };
       analysisCache = analysis;
@@ -6530,6 +6544,8 @@ function createLegacyEngineService({ projectRoot }) {
       refreshPriorityPlan: refreshPriorityPlanReport && refreshPriorityPlanReport.schema ? refreshPriorityPlanReport : null,
       prebetChecklist: prebetChecklistReport && prebetChecklistReport.schema ? prebetChecklistReport : null,
       prebetChecklistBacktest: prebetChecklistBacktestReport && prebetChecklistBacktestReport.schema ? prebetChecklistBacktestReport : null,
+      actionCockpit: actionCockpitReport && actionCockpitReport.schema ? actionCockpitReport : null,
+      finalTicket: finalTicketReport && finalTicketReport.schema ? finalTicketReport : null,
       teamIdentityGraph: teamIdentityGraphReport && teamIdentityGraphReport.schema ? teamIdentityGraphReport : null,
       matchDecisionTimeline: matchDecisionTimelineReport && matchDecisionTimelineReport.schema ? matchDecisionTimelineReport : null,
       agentBankrollSimulation: agentBankrollSimulationReport && agentBankrollSimulationReport.schema ? agentBankrollSimulationReport : null,

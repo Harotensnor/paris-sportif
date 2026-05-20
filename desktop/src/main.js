@@ -41,7 +41,7 @@ const IMAGE_CACHE_ROOT = path.join(STATE_ROOT, 'images');
 const HOME_COMPACT_CACHE_PATH = path.join(STATE_ROOT, 'engine-home-compact-payload.json');
 const DATA_MANIFEST_PATH = path.join(PROJECT_ROOT, 'data_manifest.json');
 const ENGINE_SOURCE_PATH = path.join(DESKTOP_ROOT, 'src', 'engine', 'legacy-engine.js');
-const HOME_COMPACT_PAYLOAD_VERSION = '20260520-content-hash-v1';
+const HOME_COMPACT_PAYLOAD_VERSION = '20260521-final-ticket-v1';
 imageService.init({ cacheDir: IMAGE_CACHE_ROOT });
 
 // Sprint 44 (P5 audit) : rotation automatique des rapports sprintXX-*.json
@@ -276,6 +276,8 @@ function compactEngineHomePayload(analysis) {
     decisionCenter: analysis.decisionCenter || null,
     marketCoverageV2: analysis.marketCoverageV2 || null,
     prematchPlan: analysis.prematchPlan || null,
+    actionCockpit: analysis.actionCockpit || null,
+    finalTicket: analysis.finalTicket || null,
     winamaxMarketAudit: analysis.winamaxMarketAudit || null
   };
 }

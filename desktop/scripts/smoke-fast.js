@@ -120,6 +120,14 @@ async function main() {
     if (!/Pourquoi pas plus/i.test(home.whyNotMoreText)) {
       throw new Error(`Bloc Pourquoi pas plus absent: ${home.whyNotMoreText.slice(0, 300)}`);
     }
+    const finalTicketPath = path.join(root, 'v16_final_ticket.json');
+    if (fs.existsSync(finalTicketPath)) {
+      const finalTicket = JSON.parse(fs.readFileSync(finalTicketPath, 'utf8'));
+      const waitT10 = Number(finalTicket?.summary?.wait_t10 || 0);
+      if (waitT10 > 0 && !/T-10|Finaliser/i.test(home.whyNotMoreText)) {
+        throw new Error(`Les ${waitT10} spot(s) T-10 ne sont pas visibles dans Pourquoi pas plus: ${home.whyNotMoreText.slice(0, 500)}`);
+      }
+    }
     const topEmptyAllowed = /Aucun spot exploitable|Erreur au démarrage|Données trop anciennes/i.test(home.topGridText);
     if ((!home.topCards && !home.watchCards && !topEmptyAllowed)) {
       throw new Error(`Accueil rapide incomplet: ${JSON.stringify(home)}`);

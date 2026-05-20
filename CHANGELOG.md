@@ -5,6 +5,14 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.68 — Spots T-10 visibles
+
+UX pronostics.
+- L’accueil lit maintenant le ticket final V15/V16 : un spot “prix OK mais attente contrôle T-10” ne disparaît plus derrière un vague “à surveiller”.
+- Les cartes et le tableau affichent “À finaliser T-10” ou “Cote à attendre” avec une action de re-check claire, sans transformer ces lignes en faux `Je mise`.
+- Le tri de l’accueil favorise les spots qui ont vraiment passé le prix mais attendent le dernier contrôle.
+- Version app, package et cache Service Worker bumpés en `v8.6.68`.
+
 ### Version v8.6.67 — Ticket instant cohérent
 
 Fixes / tests.

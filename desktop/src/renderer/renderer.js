@@ -37,6 +37,8 @@
     refreshPriorityPlan: null,
     prebetChecklist: null,
     prebetChecklistBacktest: null,
+    actionCockpit: null,
+    finalTicket: null,
     teamIdentityGraph: null,
     matchDecisionTimeline: null,
     agentBankrollSimulation: null,
@@ -5810,6 +5812,8 @@
     state.refreshPriorityPlan = analysis.refreshPriorityPlan || (analysis.homeOnly ? state.refreshPriorityPlan : null);
     state.prebetChecklist = analysis.prebetChecklist || (analysis.homeOnly ? state.prebetChecklist : null);
     state.prebetChecklistBacktest = analysis.prebetChecklistBacktest || (analysis.homeOnly ? state.prebetChecklistBacktest : null);
+    state.actionCockpit = analysis.actionCockpit || (analysis.homeOnly ? state.actionCockpit : null);
+    state.finalTicket = analysis.finalTicket || (analysis.homeOnly ? state.finalTicket : null);
     state.teamIdentityGraph = analysis.teamIdentityGraph || (analysis.homeOnly ? state.teamIdentityGraph : null);
     state.matchDecisionTimeline = analysis.matchDecisionTimeline || (analysis.homeOnly ? state.matchDecisionTimeline : null);
     state.agentBankrollSimulation = analysis.agentBankrollSimulation || (analysis.homeOnly ? state.agentBankrollSimulation : null);
@@ -6956,8 +6960,108 @@
     const oddBonus = odd > 1 ? Math.min(14, Math.max(0, (odd - 1) * 4)) : 0;
     const readyBonus = isReadyToStakeRow(row) ? 9 : 0;
     const winnerBonus = isWinnerRow(row) ? 8 : 0;
+    const ticket = ticketStatusForRow(row);
+    const ticketBonus = ticket?.key === 't10' ? 7 : ticket?.key === 'price' ? 3 : 0;
     const safetyBonus = row?.winamaxTwoGoalRule?.eligible ? Math.min(8, Number(row.winamaxTwoGoalRule.leadTwoProbability || 0) * 10) : 0;
-    return confidence * 100 + edgeBonus + oddBonus + readyBonus + winnerBonus + safetyBonus;
+    return confidence * 100 + edgeBonus + oddBonus + readyBonus + winnerBonus + safetyBonus + ticketBonus;
+  }
+
+  function ticketMatchId(value) {
+    return String(value || '')
+      .replace(/^wnx:/i, '')
+      .replace(/^espn:/i, '')
+      .replace(/^sofa:/i, '')
+      .trim();
+  }
+
+  function ticketRows() {
+    const rows = [];
+    const addRows = (report, source) => {
+      if (!report || !Array.isArray(report.rows)) return;
+      report.rows.forEach((row) => rows.push({ ...row, _ticketSource: source }));
+    };
+    addRows(state.finalTicket, 'v16');
+    addRows(state.actionCockpit, 'v15');
+    return rows;
+  }
+
+  function ticketMarketGroup(ticket) {
+    const key = normalizeUiKey(ticket?.market || ticket?.market_family || '');
+    if (key === '1n2' || key === 'matchwinner' || key === 'winner') return 'winner';
+    if (key === 'ou' || key === 'overunder' || key === 'goals') return 'goals';
+    if (key === 'btts' || key === 'lesdeuxequipesmarquent') return 'btts';
+    if (key === 'players' || key === 'scorer' || key === 'buteur') return 'scorer';
+    if (key === 'halftime' || key === 'ht1n2') return 'halftime';
+    return key || 'unknown';
+  }
+
+  function pickTextMatches(rowText, ticketText) {
+    const left = normalizeUiKey(rowText);
+    const right = normalizeUiKey(ticketText);
+    if (!left || !right) return false;
+    if (left === right) return true;
+    const min = Math.min(left.length, right.length);
+    return min >= 5 && (left.includes(right) || right.includes(left));
+  }
+
+  function ticketPickMatchesRow(row, ticket) {
+    const group = rowMarketPreferenceKey(row);
+    if (ticketMarketGroup(ticket) !== group) return false;
+    const rowLabel = userBetLabel(row) || row?.label || '';
+    const ticketPick = ticket?.pick || ticket?.selection || '';
+    if (group === 'winner') {
+      if (/nul|draw|match nul/i.test(String(ticketPick)) || /nul|match nul/i.test(String(rowLabel))) {
+        return /nul|draw|match nul/i.test(String(ticketPick)) && /nul|match nul/i.test(String(rowLabel));
+      }
+      return pickTextMatches(row?.label || rowLabel, ticketPick);
+    }
+    if (group === 'goals' || group === 'btts' || group === 'halftime') {
+      return pickTextMatches(row?.label || rowLabel, ticketPick);
+    }
+    if (group === 'scorer') {
+      return pickTextMatches(row?.label || rowLabel, ticketPick);
+    }
+    return false;
+  }
+
+  function ticketStatusForRow(row) {
+    if (!row) return null;
+    const ids = [
+      row?.match?.winamax?.match_id,
+      row?.winamax?.match_id,
+      row?.match_id,
+      row?.id,
+      row?.uid
+    ].map(ticketMatchId).filter(Boolean);
+    const match = ticketRows()
+      .filter((ticket) => ids.includes(ticketMatchId(ticket?.match_id || ticket?.id)))
+      .find((ticket) => ticketPickMatchesRow(row, ticket));
+    if (!match) return null;
+    const status = String(match.v16_status || match.v15_status || '').toLowerCase();
+    const gate = String(match.blocking_gate || '').toLowerCase();
+    if (status === 'wait_t10' || status === 'needs_t10' || gate === 'not_due_yet') {
+      return {
+        key: 't10',
+        label: 'À finaliser T-10',
+        tone: 'watch',
+        action: 'Finaliser T-10',
+        refreshMode: 'prematch_t10',
+        detail: 'Prix OK : dernier contrôle obligatoire avant de miser.',
+        ticket: match
+      };
+    }
+    if (status === 'wait_price' || status === 'price_watch' || gate === 'price') {
+      return {
+        key: 'price',
+        label: 'Cote à attendre',
+        tone: 'watch',
+        action: 'Rechecker la cote',
+        refreshMode: 'instant',
+        detail: 'La cote Winamax doit remonter avant de miser.',
+        ticket: match
+      };
+    }
+    return null;
   }
 
   function seriousBetStatus(row) {
@@ -6980,6 +7084,8 @@
         detail: recovery ? 'Reprise prudente : mise plafonnée, pas de martingale.' : 'Pari actionnable avec garde-fous positifs.'
       };
     }
+    const ticket = ticketStatusForRow(row);
+    if (ticket) return ticket;
     const reason = userFacingGuardText(
       row?.decisionCenter?.mainReason ||
       row?.safeAssessment?.blockReason ||
@@ -7018,6 +7124,11 @@
     if (minutes <= 180) return 'à T-30';
     if (minutes <= 420) return 'à T-60';
     return 'au prochain refresh important';
+  }
+
+  function statusRefreshButtonHtml(status, fallbackLabel = 'Rechecker') {
+    if (!status?.refreshMode) return '';
+    return `<button type="button" class="ghost-btn home-refresh-action" data-home-refresh-mode="${escapeHtml(status.refreshMode)}">${escapeHtml(status.action || fallbackLabel)}</button>`;
   }
 
   function historicalBlockerText(row) {
@@ -7072,12 +7183,12 @@
         .filter((row) => !isReadyToStakeRow(row) && !canDisplayPickCard(row)),
       'confidence'
     );
-    const row = ready24[0] || weekReady[0] || watch24[0] || weekWatch[0] || weekBlocked[0] || null;
+    const row = ready24[0] || watch24[0] || weekReady[0] || weekWatch[0] || weekBlocked[0] || null;
     const status = seriousBetStatus(row);
     return {
       row,
       status,
-      scope: ready24[0] ? '24h' : weekReady[0] ? 'semaine' : watch24[0] ? '24h-watch' : weekWatch[0] ? 'semaine-watch' : weekBlocked[0] ? 'semaine-bloque' : 'none',
+      scope: ready24[0] ? '24h' : watch24[0] ? '24h-watch' : weekReady[0] ? 'semaine' : weekWatch[0] ? 'semaine-watch' : weekBlocked[0] ? 'semaine-bloque' : 'none',
       ready24: ready24.length,
       watch24: watch24.length,
       weekReady: weekReady.length,
@@ -7125,6 +7236,7 @@
           <strong class="next-bet-verdict ${escapeHtml(status.tone)}">${escapeHtml(status.label)}</strong>
           <span>${escapeHtml(status.key === 'ready' ? status.action : `Re-check ${nextCheckLabel(row)}`)}</span>
           ${status.key === 'ready' ? trackButtonHtml(row, `${isRecoveryStakeRow(row) ? 'Je mise mini' : 'Je mise'} ${visibleStakeText(row)}`) : ''}
+          ${status.key !== 'ready' ? statusRefreshButtonHtml(status) : ''}
           ${status.key === 'blocked' ? '' : winamaxOpenButtonHtml(row, status.key === 'ready' ? 'Ouvrir Winamax' : 'Voir Winamax')}
         </div>
       </article>
@@ -7145,6 +7257,9 @@
     const weekReady = rollingWeekRows(pool, isReadyToStakeRow);
     const weekWatch = rollingWeekRows(pool, canDisplayPickCard).filter((row) => !isReadyToStakeRow(row));
     const blockedCore = rollingWeekRows(pool, (row) => pickHasCoreData(row) && isBeforeKickoff(row)).filter((row) => !canDisplayPickCard(row));
+    const ticketSummary = state.finalTicket?.summary || state.actionCockpit?.summary || {};
+    const t10Count = Number(ticketSummary.wait_t10 ?? ticketSummary.needs_t10 ?? 0) || 0;
+    const priceCount = Number(ticketSummary.wait_price ?? ticketSummary.price_watch ?? 0) || 0;
     const sourceGaps = pool.reduce((sum, row) => sum + Number(row?.contextQuality?.critical_missing?.length || row?.matchSheetV6?.missingCriticalData?.length || 0), 0);
     const blockerCounts = new Map();
     const addBlocker = (value) => {
@@ -7161,19 +7276,28 @@
       .slice(0, 3)
       .map((item) => item.count > 1 ? `${item.label} (${item.count})` : item.label);
     const nextSpot = ready24[0] || watch24[0] || weekReady[0] || weekWatch[0] || blockedCore[0] || null;
+    const nextStatus = nextSpot ? seriousBetStatus(nextSpot) : null;
     const firstReason = ready24.length
       ? `${formatCount(ready24.length)} pari(s) jouable(s). Le reste attend un meilleur dossier.`
+      : t10Count > 0
+        ? `${formatCount(t10Count)} spot(s) ont le prix OK, mais attendent le dernier contrôle T-10.`
       : weekReady.length
         ? `Rien à cliquer dans les 24h, mais ${formatCount(weekReady.length)} spot(s) prêt(s) plus tard cette semaine.`
       : watch24.length
         ? `${formatCount(watch24.length)} spot(s) à surveiller dans les 24h, mais pas assez propres pour cliquer.`
         : weekWatch.length
           ? `Aucun clic propre maintenant ; prochain spot intéressant cette semaine.`
-        : blockedCore.length
+      : blockedCore.length
             ? `Des matchs existent, mais les sécurités du logiciel coupent la mise.`
             : `Journée pauvre sur Winamax pour le modèle.`;
     const nextAction = ready24.length
       ? 'Action : joue seulement le meilleur spot, puis stop si le contexte change.'
+      : t10Count > 0
+        ? 'Action : lancer Finaliser T-10 quand le match approche, puis miser seulement si le bouton vert apparaît.'
+      : nextStatus?.key === 't10'
+        ? `Action : ${nextStatus.action.toLowerCase()} ${nextCheckLabel(nextSpot)}, pas de mise avant ce contrôle.`
+      : nextStatus?.key === 'price'
+        ? 'Action : attendre une meilleure cote Winamax, puis rechecker.'
       : nextSpot
         ? `Action : attendre le re-check ${nextCheckLabel(nextSpot)}.`
         : 'Action : attendre le prochain refresh Winamax.';
@@ -7184,7 +7308,10 @@
       weekWatch: weekWatch.length,
       blocked: blockedCore.length,
       sourceGaps,
+      t10Count,
+      priceCount,
       blockers: blockers.slice(0, 3),
+      actionButton: !ready24.length && t10Count > 0 ? { label: 'Finaliser T-10', mode: 'prematch_t10' } : null,
       nextAction,
       text: firstReason
     };
@@ -7199,11 +7326,12 @@
         <span class="eyebrow">Pourquoi pas plus ?</span>
         <strong>${escapeHtml(summary.text)}</strong>
         <small class="why-not-more-detail">${escapeHtml(summary.nextAction)}</small>
+        ${summary.actionButton ? `<button type="button" class="ghost-btn home-refresh-action" data-home-refresh-mode="${escapeHtml(summary.actionButton.mode)}">${escapeHtml(summary.actionButton.label)}</button>` : ''}
         ${summary.blockers?.length ? `<small class="why-not-more-detail">Ce qui bloque le plus : ${escapeHtml(summary.blockers.join(' · '))}</small>` : ''}
       </div>
       <div class="why-not-more-kpis">
         <span><b>${formatCount(summary.ready24)}</b><em>jouable</em></span>
-        <span><b>${formatCount(summary.watch24)}</b><em>à surveiller</em></span>
+        <span><b>${formatCount(summary.t10Count || summary.watch24)}</b><em>${summary.t10Count ? 'T-10' : 'à surveiller'}</em></span>
         <span><b>${formatCount(summary.weekReady || summary.weekWatch)}</b><em>${summary.weekReady ? 'semaine prête' : 'semaine'}</em></span>
       </div>
     `;
@@ -7250,8 +7378,17 @@
   function sortHomeRows(rows, mode = homeSortMode()) {
     const arr = (Array.isArray(rows) ? rows : []).slice();
     const kickoff = (row) => rowKickoffTime(row);
+    const actionRank = (row) => {
+      const key = seriousBetStatus(row).key;
+      if (key === 'ready') return 4;
+      if (key === 't10') return 3;
+      if (key === 'price') return 2;
+      if (key === 'watch') return 1;
+      return 0;
+    };
     const confidenceSort = (a, b) => (
       Number(isReadyToStakeRow(b)) - Number(isReadyToStakeRow(a))
+      || actionRank(b) - actionRank(a)
       || rankingEdgeValue(b) - rankingEdgeValue(a)
       || homePickScore(b) - homePickScore(a)
       || homeConfidenceValue(b) - homeConfidenceValue(a)
@@ -7273,8 +7410,8 @@
     }
     if (mode === 'status') {
       const statusRank = (row) => {
-        const key = seriousBetStatus(row).key;
-        return key === 'ready' ? 3 : key === 'watch' ? 2 : 1;
+        const rank = actionRank(row);
+        return rank || 1;
       };
       return arr.sort((a, b) => (
         statusRank(b) - statusRank(a)
@@ -7461,6 +7598,7 @@
   function homeTableRowHtml(row) {
     const confidence = Math.round(homeConfidenceValue(row) * 100);
     const canStake = isReadyToStakeRow(row);
+    const status = seriousBetStatus(row);
     const stakeText = canStake ? visibleStakeText(row) : '—';
     const day = formatDayKey(row.start);
     const hour = new Date(row.start || '').toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
@@ -7483,9 +7621,9 @@
         <td data-label="Pari"><strong>${escapeHtml(userBetLabel(row) || simpleMarketLabelForRow(row))}</strong><div class="match-sub">${escapeHtml(simpleMarketLabelForRow(row))}</div></td>
         <td data-label="Confiance"><span class="home-confidence-pill">${escapeHtml(`${confidence}%`)}</span></td>
         <td data-label="Cote"><strong>${escapeHtml(formatOdd(row.odd))}</strong></td>
-        <td data-label="Statut">${seriousBetStatusHtml(row, { compact: true })}<div class="match-sub">${escapeHtml(seriousBetStatus(row).detail)}</div></td>
+        <td data-label="Statut">${seriousBetStatusHtml(row, { compact: true })}<div class="match-sub">${escapeHtml(status.detail)}</div></td>
         <td data-label="Mise">${escapeHtml(stakeText)}</td>
-        <td data-label="Action"><div class="home-table-action">${winamaxOpenButtonHtml(row, 'Winamax')}${canStake ? trackButtonHtml(row, 'Je mise') : '<span class="match-sub">Surveiller</span>'}</div></td>
+        <td data-label="Action"><div class="home-table-action">${winamaxOpenButtonHtml(row, 'Winamax')}${canStake ? trackButtonHtml(row, 'Je mise') : (statusRefreshButtonHtml(status) || '<span class="match-sub">Surveiller</span>')}</div></td>
       </tr>
     `;
   }
@@ -19600,6 +19738,18 @@
     openMatchDetail(row.dataset.matchId);
   }
 
+  function triggerHomeRefreshAction(event) {
+    const button = event.target.closest('[data-home-refresh-mode]');
+    if (!button) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const mode = button.dataset.homeRefreshMode || 'instant';
+    startRefresh(mode).catch((error) => {
+      setSideStatus('Re-check impossible', 'danger');
+      $('#refresh-log').textContent = error.stack || error.message;
+    });
+  }
+
   function bindEvents() {
     $$('.nav-btn').forEach((btn) => btn.addEventListener('click', () => switchTab(btn.dataset.tab)));
     $('#refresh-btn').addEventListener('click', () => startRefresh().catch((error) => {
@@ -20198,6 +20348,11 @@
         setSideStatus('Refresh signal impossible', 'danger');
         $('#refresh-log').textContent = error.stack || error.message;
       });
+    });
+    ['next-bet-card', 'home-top3-grid', 'why-not-more-card', 'home-picks-table-body', 'category-next-bet-card', 'category-top3-grid', 'category-picks-table-body'].forEach((id) => {
+      const node = $(`#${id}`);
+      if (!node) return;
+      node.addEventListener('click', triggerHomeRefreshAction);
     });
     ['next-bet-card', 'home-top3-grid', 'why-not-more-card', 'home-picks-table-body', 'category-next-bet-card', 'category-top3-grid', 'category-picks-table-body', 'ultimate-bet-card', 'ready-picks-hero', 'live-cockpit', 'time-cockpit', 'simple-pick-timeline', 'favorite-picks-grid', 'simple-scorers-grid', 'bankroll-allocation-grid', 'picks-body', 'stake-scenario-body', 'watchlist-grid', 'prematch-final-grid', 'matches-body', 'combines-list', 'scorers-list', 'agent-positions-body', 'agent-blockers-body', 'deep-search-detail'].forEach((id) => {
       const node = $(`#${id}`);
