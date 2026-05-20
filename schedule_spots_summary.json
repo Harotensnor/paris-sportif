@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-05-20T22:49:29Z",
+  "generated_at": "2026-05-20T22:52:06Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 28,
+    "active_events": 26,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 42,
-      "back_to_back_travel": 7,
+      "lookahead": 38,
       "travel_extreme": 1,
+      "back_to_back_travel": 6,
       "schedule_congestion": 12
     },
     "by_decision": {
-      "abstain": 20,
-      "lean_home": 8
+      "abstain": 19,
+      "lean_home": 7
     },
-    "lean_home": 8,
+    "lean_home": 7,
     "lean_away": 0,
-    "abstain": 20,
+    "abstain": 19,
     "monitor": 0
   },
   "active": [
@@ -241,64 +241,6 @@
             "type": "schedule_congestion",
             "direction": "fade",
             "strength": 0.6
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815422",
-      "source_event_ids": [
-        "401815422"
-      ],
-      "kickoff": "2026-05-20T22:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Detroit Tigers",
-      "away": "Cleveland Guardians",
-      "match": "Detroit Tigers - Cleveland Guardians",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Detroit Tigers 0.15, Cleveland Guardians 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -1.097,
-        "away_score": 0.252,
-        "home_fade": 1.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Cleveland Guardians (+0.25)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
           }
         ]
       }
@@ -1259,72 +1201,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.728
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815419",
-      "source_event_ids": [
-        "401815419"
-      ],
-      "kickoff": "2026-05-20T22:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Miami Marlins",
-      "away": "Atlanta Braves",
-      "match": "Miami Marlins - Atlanta Braves",
-      "decision": "lean_home",
-      "net_team": "Miami Marlins",
-      "reason": "Atlanta Braves plus penalise par calendrier/voyage (0.96 vs 0.15)",
-      "pressure_score": 1.475,
-      "home_fade": 0.15,
-      "away_fade": 0.958,
-      "travel_score": 0.808,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours",
-        "2 match dans les 48h + 991 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.465,
-        "away_score": -1.706,
-        "home_fade": 0.15,
-        "away_fade": 1.758,
-        "reason": "Direction nette: Miami Marlins (+0.47)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.8
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.808
           }
         ]
       }

@@ -1,136 +1,8 @@
 {
-  "generated_at": "2026-05-20T22:49:22Z",
+  "generated_at": "2026-05-20T22:51:59Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815419",
-      "kickoff": "2026-05-20T22:40Z",
-      "league": "MLB",
-      "match": "Atlanta Braves at Miami Marlins",
-      "home": "Miami Marlins",
-      "away": "Atlanta Braves",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Miami Marlins",
-          "pitcher": "Janson Junk",
-          "label": "Janson Junk plus de 3,5 strikeouts",
-          "line": 3.5,
-          "pick": "over",
-          "probability": 0.5531,
-          "fair_odds": 1.81,
-          "expected_strikeouts": 3.7,
-          "projected_ip": 5.1,
-          "inputs": {
-            "k9": 6.53,
-            "era": 4.06,
-            "whip": 1.22,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Miami Marlins",
-          "pitcher": "Janson Junk",
-          "label": "Janson Junk ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5484,
-          "fair_odds": 1.82,
-          "expected_hr_allowed": 0.601,
-          "projected_ip": 5.1,
-          "inputs": {
-            "hr9": 1.06,
-            "era": 4.06,
-            "whip": 1.22
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Atlanta Braves",
-          "pitcher": "Chris Sale",
-          "label": "Chris Sale moins de 7,5 strikeouts",
-          "line": 7.5,
-          "pick": "under",
-          "probability": 0.5745,
-          "fair_odds": 1.74,
-          "expected_strikeouts": 7.11,
-          "projected_ip": 6.11,
-          "inputs": {
-            "k9": 10.47,
-            "era": 1.96,
-            "whip": 0.91,
-            "hand": "L"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Atlanta Braves",
-          "pitcher": "Chris Sale",
-          "label": "Chris Sale ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5141,
-          "fair_odds": 1.95,
-          "expected_hr_allowed": 0.665,
-          "projected_ip": 6.11,
-          "inputs": {
-            "hr9": 0.98,
-            "era": 1.96,
-            "whip": 0.91
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401815422",
-      "kickoff": "2026-05-20T22:40Z",
-      "league": "MLB",
-      "match": "Cleveland Guardians at Detroit Tigers",
-      "home": "Detroit Tigers",
-      "away": "Cleveland Guardians",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Cleveland Guardians",
-          "pitcher": "Tanner Bibee",
-          "label": "Tanner Bibee moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.5612,
-          "fair_odds": 1.78,
-          "expected_strikeouts": 4.25,
-          "projected_ip": 4.74,
-          "inputs": {
-            "k9": 8.08,
-            "era": 4.13,
-            "whip": 1.34,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Cleveland Guardians",
-          "pitcher": "Tanner Bibee",
-          "label": "Tanner Bibee ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5318,
-          "fair_odds": 1.88,
-          "expected_hr_allowed": 0.632,
-          "projected_ip": 4.74,
-          "inputs": {
-            "hr9": 1.2,
-            "era": 4.13,
-            "whip": 1.34
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815423",
       "kickoff": "2026-05-20T22:45Z",
@@ -926,7 +798,7 @@
       ]
     }
   ],
-  "props": 44,
+  "props": 38,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"

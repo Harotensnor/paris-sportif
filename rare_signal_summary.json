@@ -1,47 +1,29 @@
 {
-  "generated_at": "2026-05-20T22:49:29Z",
+  "generated_at": "2026-05-20T22:52:06Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 48,
-    "actionable": 26,
+    "active_events": 46,
+    "actionable": 24,
     "watch": 1,
     "risk": 21,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 13,
-      "back_to_back_travel": 7,
-      "market_move": 12,
+      "injury_imbalance": 11,
+      "market_move": 13,
       "signal_conflict": 7,
       "travel_extreme": 1,
-      "market_uncertain": 20
+      "market_uncertain": 20,
+      "back_to_back_travel": 6
     },
     "by_quality": {
-      "actionable": 26,
+      "actionable": 24,
       "watch": 1,
       "risk": 21
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401815422",
-      "date": "2026-05-20T22:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Detroit Tigers",
-      "away": "Cleveland Guardians",
-      "match": "Detroit Tigers - Cleveland Guardians",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Detroit Tigers",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 13-1"
-    },
     {
       "event_id": "401815423",
       "date": "2026-05-20T22:45Z",
@@ -94,7 +76,7 @@
       "team": null,
       "side": "away",
       "strength": 1.0,
-      "context": "Cote away: 7.50 -> 6.00 (+20.0%)"
+      "context": "Cote away: 8.00 -> 6.00 (+25.0%)"
     },
     {
       "event_id": "401865450",
@@ -131,24 +113,6 @@
       "side": "home",
       "strength": 1.0,
       "context": "Cote home: 1.57 -> 1.94 (-23.5%)"
-    },
-    {
-      "event_id": "401865534",
-      "date": "2026-05-21T00:30Z",
-      "sport": "football",
-      "league_code": "conmebol.libertadores",
-      "league_name": "Copa Libertadores",
-      "home": "Flamengo",
-      "away": "Estudiantes de La Plata",
-      "match": "Flamengo - Estudiantes de La Plata",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 1.0,
-      "context": "Cote away: 7.50 -> 6.00 (+20.0%)"
     },
     {
       "event_id": "401865544",
@@ -241,24 +205,6 @@
       "context": "Absences severes 7-13"
     },
     {
-      "event_id": "401815419",
-      "date": "2026-05-20T22:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Miami Marlins",
-      "away": "Atlanta Braves",
-      "match": "Miami Marlins - Atlanta Braves",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Atlanta Braves",
-      "side": "away",
-      "strength": 0.808,
-      "context": "2 match dans les 48h + 991 km de voyage"
-    },
-    {
       "event_id": "401815425",
       "date": "2026-05-20T23:40Z",
       "sport": "baseball",
@@ -347,6 +293,24 @@
       "side": null,
       "strength": 0.8,
       "context": "Absences severes 6-2"
+    },
+    {
+      "event_id": "401865534",
+      "date": "2026-05-21T00:30Z",
+      "sport": "football",
+      "league_code": "conmebol.libertadores",
+      "league_name": "Copa Libertadores",
+      "home": "Flamengo",
+      "away": "Estudiantes de La Plata",
+      "match": "Flamengo - Estudiantes de La Plata",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.794,
+      "context": "Cote away: 7.00 -> 6.00 (+14.3%)"
     },
     {
       "event_id": "401815430",
