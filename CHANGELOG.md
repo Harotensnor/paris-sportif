@@ -12,6 +12,7 @@ Suite “Parieur First” : les pages dédiées commencent à répondre comme de
 - La page `Buteurs` affiche maintenant le meilleur joueur à suivre en haut, avec photo/fallback, match, cote et statut de mise.
 - Les pages `Combinés` et `Buteurs` se rendent immédiatement au clic, même si l'hydratation complète tourne encore en arrière-plan.
 - Le test terrain vérifie ces résumés pour éviter un retour aux anciennes pages trop techniques.
+- Les anciens packs d'audit, captures et screenshots suivis par Git sont sortis du dépôt ; `.gitignore` bloque leur retour.
 - Version app, package et cache Service Worker bumpés en `v8.6.2`.
 
 ### Version v8.6.1 — Moins de travail de fond au démarrage
