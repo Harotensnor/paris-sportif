@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-20T20:17:35Z",
+  "generated_at": "2026-05-20T20:26:30Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815431",
-      "kickoff": "2026-05-20T20:10Z",
-      "league": "MLB",
-      "match": "Chicago White Sox at Seattle Mariners",
-      "home": "Seattle Mariners",
-      "away": "Chicago White Sox",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Seattle Mariners",
-          "pitcher": "Emerson Hancock",
-          "label": "Emerson Hancock plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.532,
-          "fair_odds": 1.88,
-          "expected_strikeouts": 5.65,
-          "projected_ip": 5.42,
-          "inputs": {
-            "k9": 9.38,
-            "era": 2.96,
-            "whip": 0.99,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Seattle Mariners",
-          "pitcher": "Emerson Hancock",
-          "label": "Emerson Hancock concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5484,
-          "fair_odds": 1.82,
-          "expected_hr_allowed": 0.795,
-          "projected_ip": 5.42,
-          "inputs": {
-            "hr9": 1.32,
-            "era": 2.96,
-            "whip": 0.99
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Chicago White Sox",
-          "pitcher": "Sean Burke",
-          "label": "Sean Burke plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.5206,
-          "fair_odds": 1.92,
-          "expected_strikeouts": 5.6,
-          "projected_ip": 6.6,
-          "inputs": {
-            "k9": 7.63,
-            "era": 4.1,
-            "whip": 1.18,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Chicago White Sox",
-          "pitcher": "Sean Burke",
-          "label": "Sean Burke ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5056,
-          "fair_odds": 1.98,
-          "expected_hr_allowed": 0.682,
-          "projected_ip": 6.6,
-          "inputs": {
-            "hr9": 0.93,
-            "era": 4.1,
-            "whip": 1.18
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815419",
       "kickoff": "2026-05-20T22:40Z",
@@ -1008,7 +926,7 @@
       ]
     }
   ],
-  "props": 48,
+  "props": 44,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
