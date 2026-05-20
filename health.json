@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-05-20T03:42:14Z",
-  "calculated_at": "2026-05-20T03:42:14Z",
+  "generated_at": "2026-05-20T03:45:14Z",
+  "calculated_at": "2026-05-20T03:45:14Z",
   "source_of_truth": "data.js",
   "data_age_min": 1,
   "data_file_age_min": 0,
@@ -73,7 +73,7 @@
       "sports": 4
     },
     "h2h_extended": {
-      "age_min": 1,
+      "age_min": 2,
       "events": 127,
       "events_with_meetings": 82,
       "meetings": 316,
@@ -325,16 +325,16 @@
     },
     "detected_angles": {
       "age_min": 0,
-      "events": 64,
-      "angles": 144,
+      "events": 83,
+      "angles": 175,
       "by_type": {
         "market_uncertain": 21,
+        "market_move": 44,
         "injury_imbalance": 25,
         "back_to_back_travel": 16,
-        "signal_conflict": 7,
+        "signal_conflict": 8,
         "lookahead": 48,
         "travel_extreme": 1,
-        "market_move": 14,
         "schedule_congestion": 12
       }
     },
@@ -348,30 +348,30 @@
     },
     "rare_signals": {
       "age_min": 0,
-      "signals": 80,
+      "signals": 111,
       "by_type": {
         "market_uncertain": 21,
+        "market_move": 44,
         "injury_imbalance": 21,
         "back_to_back_travel": 16,
-        "signal_conflict": 7,
-        "travel_extreme": 1,
-        "market_move": 14
+        "signal_conflict": 8,
+        "travel_extreme": 1
       }
     },
     "rare_signal_summary": {
       "age_min": 0,
-      "active": 55,
-      "actionable": 29,
-      "watch": 3,
+      "active": 75,
+      "actionable": 42,
+      "watch": 10,
       "risk": 23,
       "status": "ok"
     },
     "timing_edges": {
       "age_min": 0,
-      "events": 240,
-      "bet_now": 231,
-      "wait": 9,
-      "price_shortening": 0
+      "events": 147,
+      "bet_now": 117,
+      "wait": 11,
+      "price_shortening": 19
     },
     "injuries_multisport": {
       "age_min": 2,
@@ -592,7 +592,7 @@
     "h2h_extended": {
       "script": "h2h_extended.json",
       "output": "h2h_extended.json",
-      "age_min": 1,
+      "age_min": 2,
       "threshold_min": 60,
       "fast_red_min": null,
       "status": "ok"
@@ -1054,7 +1054,7 @@
   ],
   "overall": "warning",
   "quality_checks": {
-    "data_generated_at": "2026-05-20T03:41:12.010491Z",
+    "data_generated_at": "2026-05-20T03:44:12.297032Z",
     "truth_scope": "all_events",
     "all_winamax_available": 257,
     "all_winamax_exact": 257,
@@ -1071,7 +1071,7 @@
     "winamax_detail_gap_to_target": 0,
     "winamax_detail_fetch_cap_reco": 90,
     "winamax_detail_status": "ok",
-    "actionable_external_odds": 0,
+    "actionable_external_odds": 38,
     "football_invalid_form": 0,
     "events_with_xg": 57,
     "winamax_coverage": {
@@ -1133,7 +1133,7 @@
   "data_truth": {
     "source_of_truth": "data.js",
     "scope": "all_events",
-    "data_generated_at": "2026-05-20T03:41:12.010491Z",
+    "data_generated_at": "2026-05-20T03:44:12.297032Z",
     "winamax_available": 257,
     "winamax_exact": 257,
     "winamax_exact_ratio": 1.0,
@@ -1153,7 +1153,7 @@
     "anomalies_emitted": 4
   },
   "source_health": {
-    "generated_at": "2026-05-20T03:42:14Z",
+    "generated_at": "2026-05-20T03:45:14Z",
     "sources_total": 11,
     "sources_ok": 6,
     "sources_warning": 5,
@@ -1253,7 +1253,7 @@
   },
   "observability": {
     "pipeline_traces": {
-      "generated_at": "2026-05-20T03:42:14Z",
+      "generated_at": "2026-05-20T03:45:14Z",
       "runs_observed": 99,
       "by_status": {
         "warning": 69,
@@ -1265,13 +1265,13 @@
           "runs": 99,
           "errors": 1,
           "last_status": "ok",
-          "max_duration_ms": 1019
+          "max_duration_ms": 1029
         }
       }
     }
   },
   "data_lineage": {
-    "generated_at": "2026-05-20T03:42:14Z",
+    "generated_at": "2026-05-20T03:45:14Z",
     "status": "ok",
     "events": 257,
     "events_missing_inline_lineage": 0,
@@ -1279,8 +1279,8 @@
     "source_counts": {
       "espn": 257,
       "winamax": 257,
-      "h2h": 127,
       "weather": 97,
+      "h2h": 88,
       "xg": 57,
       "injuries": 56,
       "clubelo": 43,
