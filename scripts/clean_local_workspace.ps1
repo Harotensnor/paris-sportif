@@ -1,6 +1,7 @@
 param(
   [switch]$Execute,
   [switch]$PruneGit,
+  [switch]$RestoreGeneratedTracked,
   [int]$KeepInstallers = 1
 )
 
@@ -60,6 +61,26 @@ Write-Host "Paris-Sportif local cleanup ($Mode)"
 Write-Host "Root: $Root"
 Write-Host ""
 
+$GeneratedTracked = @(
+  "data.js",
+  "data_lite.js",
+  "data_manifest.json",
+  "data_today.json",
+  "health.json",
+  "lineups_multisport.json",
+  "odds_history.jsonl",
+  "picks_history.jsonl",
+  "picks_history_summary.json",
+  "pronostics.html",
+  "qa-unit-report.json",
+  "results_archive.jsonl",
+  "signal_gap_report.json",
+  "signal_unmatched.log",
+  "sofascore_events.json",
+  "winamax_catalog.json",
+  "xg_coverage.json"
+)
+
 $safeDirs = @(
   @{ Path = ".cache"; Reason = "cache sources externes regenerable" },
   @{ Path = "playwright-report"; Reason = "rapport Playwright regenerable" },
@@ -109,6 +130,29 @@ if ($PruneGit) {
   } else {
     Write-Host "DRY-RUN would run: git reflog expire --expire=now --expire-unreachable=now --all"
     Write-Host "DRY-RUN would run: git gc --prune=now"
+  }
+}
+
+if ($RestoreGeneratedTracked) {
+  Write-Host ""
+  Write-Host "$Mode restore fichiers terrain generes suivis"
+  $dirty = @()
+  foreach ($rel in $GeneratedTracked) {
+    $resolved = Resolve-InRepo $rel
+    if (-not $resolved) { continue }
+    $status = @(git -C $Root status --porcelain -- $rel 2>$null)
+    if ($status.Count -gt 0) {
+      $dirty += $rel
+      Write-Host "$Mode restore tracked generated :: $rel"
+    }
+  }
+  if ($Execute -and $dirty.Count -gt 0) {
+    git -C $Root restore -- $dirty
+  }
+  if ($dirty.Count -eq 0) {
+    Write-Host "Aucun fichier terrain genere a restaurer."
+  } elseif (-not $Execute) {
+    Write-Host "DRY-RUN: relance avec -Execute -RestoreGeneratedTracked pour restaurer ces fichiers."
   }
 }
 

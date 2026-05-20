@@ -27,6 +27,25 @@ function mb(file) {
 
 const tracked = git(['ls-files']).split(/\r?\n/).filter(Boolean);
 const failures = [];
+const generatedTracked = new Set([
+  'data.js',
+  'data_lite.js',
+  'data_manifest.json',
+  'data_today.json',
+  'health.json',
+  'lineups_multisport.json',
+  'odds_history.jsonl',
+  'picks_history.jsonl',
+  'picks_history_summary.json',
+  'pronostics.html',
+  'qa-unit-report.json',
+  'results_archive.jsonl',
+  'signal_gap_report.json',
+  'signal_unmatched.log',
+  'sofascore_events.json',
+  'winamax_catalog.json',
+  'xg_coverage.json',
+]);
 
 const trackedExe = tracked.filter((file) => /\.exe$/i.test(file));
 if (trackedExe.length) failures.push(`Executables suivis par Git: ${trackedExe.slice(0, 5).join(', ')}`);
@@ -48,6 +67,13 @@ const largeTracked = tracked
   .filter((file) => fs.existsSync(file) && fs.statSync(file).isFile() && mb(file) >= 20)
   .map((file) => `${path.relative(root, file).replace(/\\/g, '/')} (${mb(file)} MB)`);
 
+const dirtyTracked = git(['status', '--porcelain'])
+  .split(/\r?\n/)
+  .filter(Boolean)
+  .map((line) => line.slice(3).replace(/\\/g, '/'));
+const dirtyGenerated = dirtyTracked.filter((file) => generatedTracked.has(file));
+const dirtyCode = dirtyTracked.filter((file) => !generatedTracked.has(file));
+
 if (failures.length) {
   console.error(`qa:clean FAILED\n- ${failures.join('\n- ')}`);
   process.exit(1);
@@ -56,4 +82,10 @@ if (failures.length) {
 console.log(`qa:clean OK: aucun .exe/dist suivi, ${installers.length} installateur local conserve, ${largeTracked.length} gros fichier(s) suivi(s) >=20MB.`);
 if (largeTracked.length) {
   console.log(`Gros fichiers suivis a revoir plus tard: ${largeTracked.slice(0, 6).join(' | ')}`);
+}
+if (dirtyGenerated.length) {
+  console.log(`Fichiers terrain generes modifies: ${dirtyGenerated.length} (${dirtyGenerated.slice(0, 8).join(', ')}${dirtyGenerated.length > 8 ? ', ...' : ''})`);
+}
+if (dirtyCode.length) {
+  console.log(`Fichiers code/doc modifies: ${dirtyCode.length} (${dirtyCode.slice(0, 8).join(', ')}${dirtyCode.length > 8 ? ', ...' : ''})`);
 }

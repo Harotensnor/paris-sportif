@@ -5,6 +5,13 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Outillage — Propreté des fichiers terrain
+
+Suite “ne plus confondre code sale et données régénérées”.
+- `qa:clean` liste maintenant séparément les fichiers terrain générés modifiés et les vrais fichiers code/doc modifiés.
+- `scripts/clean_local_workspace.ps1` gagne l’option `-RestoreGeneratedTracked`, en dry-run par défaut, pour prévisualiser puis restaurer uniquement les fichiers terrain suivis par Git.
+- Le nettoyage reste volontairement sûr : aucun fichier suivi n’est restauré sans `-Execute -RestoreGeneratedTracked`.
+
 ### Version v8.6.7 — Accueil moteur plus léger
 
 Suite “le logiciel ne doit pas mettre 10 ans à répondre”.
