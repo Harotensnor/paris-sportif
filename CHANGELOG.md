@@ -5,6 +5,14 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.21 — Accueil plus clair quand il faut attendre
+
+UX parieur.
+- Le bloc `Prochain pari sérieux` dit maintenant `Attendre` plutôt que `Ne pas miser` quand aucun pari propre n'est disponible.
+- Les messages d'accueil expliquent que le logiciel continue de chercher les meilleurs spots, sans forcer de bouton mise.
+- Le texte `garde-fous` est remplacé par une formulation plus simple côté accueil standard.
+- Version app, package et cache Service Worker bumpés en `v8.6.21`.
+
 ### Version v8.6.20 — Statut léger + accueil préchauffé
 
 Performance / simplicité.

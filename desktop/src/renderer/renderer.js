@@ -7006,10 +7006,10 @@
         <article class="next-bet-inner empty-state">
           <div>
             <span class="eyebrow">Prochain pari sérieux</span>
-            <h3>Aucun spot exploitable trouvé</h3>
-            <p>Le logiciel ne trouve pas assez de contexte Winamax fiable. Mieux vaut attendre le prochain refresh que cliquer au hasard.</p>
+            <h3>Rien de propre à miser maintenant</h3>
+            <p>Le logiciel continue de chercher. Dès qu’un match devient assez solide, il remonte ici avec une cote Winamax et une action claire.</p>
           </div>
-          <strong class="next-bet-verdict danger">Ne pas miser</strong>
+          <strong class="next-bet-verdict danger">Attendre</strong>
         </article>
       `;
     }
@@ -7070,8 +7070,8 @@
         ? `${formatCount(watch24.length)} spot(s) a surveiller dans les 24h, mais pas assez propres pour cliquer.`
         : weekWatch.length
           ? `Aucun clic propre maintenant; prochain spot interessant cette semaine.`
-          : blockedCore.length
-            ? `Des matchs existent, mais les garde-fous coupent la mise.`
+        : blockedCore.length
+            ? `Des matchs existent, mais les securites du logiciel coupent la mise.`
             : `Journee pauvre sur Winamax pour le modele.`;
     return {
       ready24: ready24.length,
@@ -7392,7 +7392,7 @@
         : '';
       topWrap.innerHTML = topRows.length
         ? topRows.map(homeTopCardHtml).join('') + watchHtml + (topRows.length < 3 ? '<div class="empty compact-empty">Top 3 incomplet : le modèle refuse de transformer une ligne à surveiller en pari.</div>' : '')
-        : '<div class="empty compact-empty">Aucun pari validé à miser sur les prochaines 24h. Les meilleurs spots restent affichés à surveiller, sans bouton de mise.</div>' + watchHtml + fallbackHtml;
+        : '<div class="empty compact-empty">Pas de clic propre sur les prochaines 24h. Je garde quand même les meilleurs spots à surveiller, sans bouton de mise forcé.</div>' + watchHtml + fallbackHtml;
     }
     if (body && !quickHome) {
       body.innerHTML = tableRows.length
