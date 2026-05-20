@@ -5,6 +5,14 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.3 — Forme lisible isolée en module
+
+Suite du découpage UI sans framework.
+- La conversion des formes brutes (`WWDND`, `LLW`, etc.) passe dans `desktop/src/renderer/form-text.js`.
+- Le renderer garde un fallback, mais délègue maintenant au module chargé avant lui.
+- Les tests unitaires verrouillent la conversion en phrases lisibles pour éviter le retour des codes moches.
+- Version app, package et cache Service Worker bumpés en `v8.6.3`.
+
 ### Version v8.6.2 — Pages Combinés et Buteurs plus directes
 
 Suite “Parieur First” : les pages dédiées commencent à répondre comme de vraies pages, pas comme un tableau filtré.

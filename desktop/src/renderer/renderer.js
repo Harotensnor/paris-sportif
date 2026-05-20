@@ -3896,6 +3896,7 @@
   }
 
   function formSummaryFromLetters(letters, { compact = false } = {}) {
+    if (window.PSFormText?.summaryFromLetters) return window.PSFormText.summaryFromLetters(letters, { compact });
     const list = (Array.isArray(letters) ? letters : []).filter((letter) => ['W', 'D', 'L'].includes(letter));
     if (!list.length) return 'forme non confirmée';
     const counts = {
@@ -3925,6 +3926,7 @@
   }
 
   function formSummaryFromCodeSequence(value) {
+    if (window.PSFormText?.summaryFromCodeSequence) return window.PSFormText.summaryFromCodeSequence(value);
     const raw = String(value || '').trim().toUpperCase().replace(/[^WVNDL]/g, '').slice(0, 10);
     if (!raw) return '';
     const frenchMode = /[VP]/.test(raw) || (/[N]/.test(raw) && !/[WL]/.test(raw));
@@ -3939,6 +3941,7 @@
   }
 
   function prettifyFormCodesInText(value) {
+    if (window.PSFormText?.prettify) return window.PSFormText.prettify(value);
     let text = String(value || '');
     text = text.replace(/\bforme\s+([WVNDL]{3,10})\s*\/\s*([WVNDL]{3,10})\b/gi, (_match, home, away) => {
       const homeText = formSummaryFromCodeSequence(home);

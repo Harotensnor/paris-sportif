@@ -68,10 +68,12 @@ async function main() {
     await win.waitForFunction(() => (
       document.querySelector('#next-bet-card .next-bet-inner')
       && document.querySelector('#why-not-more-card')?.innerText?.trim()
-      && (
-        document.querySelectorAll('#home-top3-grid .home-top-card, #home-top3-grid .home-watch-card').length >= 1
-        || /Aucun spot exploitable|Erreur au démarrage|Données trop anciennes/i.test(document.body.innerText || '')
-      )
+      && (() => {
+        const top = document.querySelector('#home-top3-grid');
+        const topText = top?.innerText || '';
+        return top?.querySelectorAll('.home-top-card, .home-watch-card').length >= 1
+          || /Aucun spot exploitable|Erreur au démarrage|Données trop anciennes/i.test(topText);
+      })()
     ), null, { timeout: 30000 });
     const homeReadyMs = Date.now() - launchedAt;
 
@@ -81,6 +83,7 @@ async function main() {
       rows: document.querySelectorAll('#home-picks-table-body tr.clickable-row').length,
       nextBetText: document.querySelector('#next-bet-card')?.innerText || '',
       whyNotMoreText: document.querySelector('#why-not-more-card')?.innerText || '',
+      topGridText: document.querySelector('#home-top3-grid')?.innerText || '',
       topCards: document.querySelectorAll('#home-top3-grid .home-top-card').length,
       watchCards: document.querySelectorAll('#home-top3-grid .home-watch-card').length,
       categories: document.querySelectorAll('[data-cockpit-category]').length,
@@ -101,7 +104,7 @@ async function main() {
     if (!/Pourquoi pas plus/i.test(home.whyNotMoreText)) {
       throw new Error(`Bloc Pourquoi pas plus absent: ${home.whyNotMoreText.slice(0, 300)}`);
     }
-    const topEmptyAllowed = /Aucun spot exploitable|Erreur au démarrage|Données trop anciennes/i.test(home.dashboardText);
+    const topEmptyAllowed = /Aucun spot exploitable|Erreur au démarrage|Données trop anciennes/i.test(home.topGridText);
     if ((!home.topCards && !home.watchCards && !topEmptyAllowed)) {
       throw new Error(`Accueil rapide incomplet: ${JSON.stringify(home)}`);
     }

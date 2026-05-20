@@ -99,6 +99,9 @@ const dataAccess = loadModule('src/data-access.js', {
 const homePageModule = loadModule('desktop/src/renderer/home-page.js', {
   window: {},
 }).window.PSHomePage;
+const formTextModule = loadModule('desktop/src/renderer/form-text.js', {
+  window: {},
+}).window.PSFormText;
 
 function touch(...names) {
   names.forEach(name => covered.add(name));
@@ -190,6 +193,13 @@ test('desktop home page category routing is stable', () => {
   assert(homePageModule.tabForHomeCategory('night') === 'night', 'night category route');
   assert(/nuit/i.test(homePageModule.metaFor('night').title), 'night metadata');
   assert(/regarder/i.test(homePageModule.metaFor('unknown-category').title), 'fallback metadata');
+});
+
+test('desktop form text replaces raw form codes', () => {
+  assert(formTextModule.summaryFromCodeSequence('WWDND') === '2 victoires, 3 nuls', 'WWDND summary');
+  assert(formTextModule.summaryFromCodeSequence('LLW') === '1 victoire, 2 défaites', 'LLW summary');
+  assert(/domicile 2 victoires/.test(formTextModule.prettify('forme WWDND / LLW')), 'home form text');
+  assert(!/\bWWDND\b/.test(formTextModule.prettify('forme WWDND / LLW')), 'raw code removed');
 });
 
 const started = Date.now();
