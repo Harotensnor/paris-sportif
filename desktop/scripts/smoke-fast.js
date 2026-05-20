@@ -76,11 +76,15 @@ async function main() {
       refreshLabel: document.querySelector('#refresh-btn')?.textContent || '',
       rows: document.querySelectorAll('#home-picks-table-body tr.clickable-row').length,
       nextBetText: document.querySelector('#next-bet-card')?.innerText || '',
+      whyNotMoreText: document.querySelector('#why-not-more-card')?.innerText || '',
       topCards: document.querySelectorAll('#home-top3-grid .home-top-card').length,
       watchCards: document.querySelectorAll('#home-top3-grid .home-watch-card').length,
       categories: document.querySelectorAll('[data-cockpit-category]').length,
       tableCollapsed: document.querySelector('.home-table-card')?.open === false,
       categoriesCollapsed: document.querySelector('.home-categories-panel')?.open === false,
+      visibleHomePanels: Array.from(document.querySelectorAll('[data-panel="dashboard"].active > *'))
+        .filter((node) => getComputedStyle(node).display !== 'none')
+        .map((node) => node.id || node.className || node.tagName),
       nav: Array.from(document.querySelectorAll('.nav-btn:not(.hidden)')).map((node) => node.innerText.trim()),
       dashboardText: document.querySelector('[data-panel="dashboard"]')?.innerText || '',
       standardExpertVisible: Boolean(document.querySelector('[data-tab="data"]:not(.hidden)'))
@@ -90,12 +94,15 @@ async function main() {
     if (!/Prochain pari sérieux|Aucun spot exploitable/i.test(home.nextBetText)) {
       throw new Error(`Bloc prochain pari sérieux absent: ${home.nextBetText.slice(0, 300)}`);
     }
+    if (!/Pourquoi pas plus/i.test(home.whyNotMoreText)) {
+      throw new Error(`Bloc Pourquoi pas plus absent: ${home.whyNotMoreText.slice(0, 300)}`);
+    }
     const topEmptyAllowed = /Aucun pari validé à miser|Top 3 incomplet/i.test(home.dashboardText);
     if (home.rows < 3 || (!home.topCards && !home.watchCards && !topEmptyAllowed) || home.categories < 8) {
       throw new Error(`Accueil rapide incomplet: ${JSON.stringify(home)}`);
     }
-    if (!home.tableCollapsed || !home.categoriesCollapsed) {
-      throw new Error(`Accueil trop chargé: tableau/catégories doivent rester repliés par défaut ${JSON.stringify(home)}`);
+    if (home.visibleHomePanels.some((name) => /home-category-grid|home-categories-panel|home-table-card/i.test(String(name)))) {
+      throw new Error(`Accueil trop chargé: tableau/catégories ne doivent pas être visibles ${JSON.stringify(home.visibleHomePanels)}`);
     }
     if (home.standardExpertVisible) throw new Error('Mode expert visible en standard');
     if (/Écouter le brief|brief audio|SpeechSynthesis|TTS|Meilleure cote|Multi-bookmaker/i.test(home.dashboardText)) {

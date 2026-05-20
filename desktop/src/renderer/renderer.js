@@ -7005,6 +7005,49 @@
     node.innerHTML = nextBetCardHtml(summary, { compact: node.classList.contains('compact') });
   }
 
+  function whyNotMoreSummary(rows = state.picks) {
+    const pool = Array.isArray(rows) ? rows : [];
+    const ready24 = rolling24hRows(pool, isReadyToStakeRow);
+    const watch24 = rolling24hRows(pool, canDisplayPickCard).filter((row) => !isReadyToStakeRow(row));
+    const weekWatch = rollingWeekRows(pool, canDisplayPickCard).filter((row) => !isReadyToStakeRow(row));
+    const blockedCore = rollingWeekRows(pool, (row) => pickHasCoreData(row) && isBeforeKickoff(row)).filter((row) => !canDisplayPickCard(row));
+    const sourceGaps = pool.reduce((sum, row) => sum + Number(row?.contextQuality?.critical_missing?.length || row?.matchSheetV6?.missingCriticalData?.length || 0), 0);
+    const firstReason = ready24.length
+      ? `${formatCount(ready24.length)} pari(s) jouable(s), le reste attend un meilleur contexte.`
+      : watch24.length
+        ? `${formatCount(watch24.length)} spot(s) a surveiller dans les 24h, mais pas assez propres pour cliquer.`
+        : weekWatch.length
+          ? `Aucun clic propre maintenant; prochain spot interessant cette semaine.`
+          : blockedCore.length
+            ? `Des matchs existent, mais les garde-fous coupent la mise.`
+            : `Journee pauvre sur Winamax pour le modele.`;
+    return {
+      ready24: ready24.length,
+      watch24: watch24.length,
+      weekWatch: weekWatch.length,
+      blocked: blockedCore.length,
+      sourceGaps,
+      text: firstReason
+    };
+  }
+
+  function renderWhyNotMore(rows, target = '#why-not-more-card') {
+    const node = $(target);
+    if (!node) return;
+    const summary = whyNotMoreSummary(rows);
+    node.innerHTML = `
+      <div>
+        <span class="eyebrow">Pourquoi pas plus ?</span>
+        <strong>${escapeHtml(summary.text)}</strong>
+      </div>
+      <div class="why-not-more-kpis">
+        <span><b>${formatCount(summary.ready24)}</b><em>jouable</em></span>
+        <span><b>${formatCount(summary.watch24)}</b><em>a surveiller</em></span>
+        <span><b>${formatCount(summary.weekWatch)}</b><em>semaine</em></span>
+      </div>
+    `;
+  }
+
   function diverseHomeTopRows(rows, limit = 3) {
     const sorted = sortHomeRows(rows, 'confidence');
     const selected = [];
@@ -7312,6 +7355,7 @@
     if (subtitle) subtitle.textContent = meta.subtitle;
     const source = homeSourceRows(rows);
     renderNextSeriousBet(source, '#next-bet-card');
+    renderWhyNotMore(rows, '#why-not-more-card');
     const topRows = homeTopRows(source, 3);
     const watchRows = topRows.length < 3 ? homeWatchRows(source, 3 - topRows.length, topRows) : [];
     const tableLimit = state.activeHomeCategory ? 10 : 6;
@@ -19789,7 +19833,7 @@
         $('#refresh-log').textContent = error.stack || error.message;
       });
     });
-    ['next-bet-card', 'home-top3-grid', 'home-picks-table-body', 'category-next-bet-card', 'category-top3-grid', 'category-picks-table-body', 'ultimate-bet-card', 'ready-picks-hero', 'live-cockpit', 'time-cockpit', 'simple-pick-timeline', 'favorite-picks-grid', 'simple-scorers-grid', 'bankroll-allocation-grid', 'picks-body', 'stake-scenario-body', 'watchlist-grid', 'prematch-final-grid', 'matches-body', 'combines-list', 'scorers-list', 'agent-positions-body', 'agent-blockers-body', 'deep-search-detail'].forEach((id) => {
+    ['next-bet-card', 'home-top3-grid', 'why-not-more-card', 'home-picks-table-body', 'category-next-bet-card', 'category-top3-grid', 'category-picks-table-body', 'ultimate-bet-card', 'ready-picks-hero', 'live-cockpit', 'time-cockpit', 'simple-pick-timeline', 'favorite-picks-grid', 'simple-scorers-grid', 'bankroll-allocation-grid', 'picks-body', 'stake-scenario-body', 'watchlist-grid', 'prematch-final-grid', 'matches-body', 'combines-list', 'scorers-list', 'agent-positions-body', 'agent-blockers-body', 'deep-search-detail'].forEach((id) => {
       const node = $(`#${id}`);
       if (!node) return;
       node.addEventListener('click', openMatchFromEvent);

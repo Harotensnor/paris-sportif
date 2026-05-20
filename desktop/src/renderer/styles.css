@@ -6531,6 +6531,11 @@ body.theme-light .sidebar {
   display: none;
 }
 
+.tab-panel[data-panel="dashboard"].active > .home-categories-panel,
+.tab-panel[data-panel="dashboard"].active .home-table-card {
+  display: none;
+}
+
 .next-bet-card {
   border: 1px solid rgba(16, 185, 129, .28);
   border-radius: 8px;
@@ -6932,6 +6937,52 @@ body.theme-light .sidebar {
   border: 1px solid rgba(56, 189, 248, .24);
   font-size: 11px;
   font-weight: 850;
+}
+
+.why-not-more-card {
+  max-width: 1180px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 10px;
+  border: 1px solid rgba(148, 163, 184, .18);
+  border-radius: 8px;
+  background: rgba(15, 23, 42, .44);
+}
+
+.why-not-more-card strong {
+  display: block;
+  margin-top: 2px;
+  font-size: 14px;
+  line-height: 1.25;
+  color: var(--text);
+}
+
+.why-not-more-kpis {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(70px, auto));
+  gap: 6px;
+}
+
+.why-not-more-kpis span {
+  display: grid;
+  gap: 1px;
+  min-width: 70px;
+  padding: 5px 7px;
+  border-radius: 7px;
+  background: rgba(2, 6, 23, .34);
+}
+
+.why-not-more-kpis b {
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.why-not-more-kpis em {
+  color: var(--muted);
+  font-size: 10px;
+  font-style: normal;
 }
 
 .home-table-card {

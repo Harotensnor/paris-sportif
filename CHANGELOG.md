@@ -5,6 +5,15 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.2.0 — Accueil parieur pur + inventaire UI
+
+Suite directe du chantier v9 : l’accueil standard devient une vraie page “quoi faire maintenant”.
+- La première vue visible est limitée à 3 blocs : `Prochain pari sérieux`, `Top 3 spots`, `Pourquoi pas plus ?`.
+- Le tableau complet et les catégories ne sont plus visibles sur l’accueil standard; ils restent accessibles via les pages dédiées/navigation.
+- Ajout du bloc `Pourquoi pas plus ?` : il explique en langage simple pourquoi le logiciel ne force pas plus de clics `Je mise`.
+- Le smoke desktop vérifie maintenant que l’accueil ne ré-affiche pas tableau/catégories en standard.
+- Ajout de `npm run qa:ui-inventory` pour cartographier les gros fichiers UI et préparer le découpage v8.3 sans couper à l’aveugle.
+
 ### Version v8.1.0 — Projet propre : nettoyage local + garde-fous workspace
 
 Premier palier du chantier v9 “Parieur First, Projet Propre”.
