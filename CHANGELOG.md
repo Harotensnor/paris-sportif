@@ -5,6 +5,14 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.7 — Accueil moteur plus léger
+
+Suite “le logiciel ne doit pas mettre 10 ans à répondre”.
+- L’endpoint accueil (`home=1`) demande maintenant une analyse moteur allégée : dashboard, Top spots, couverture 24h et santé source, sans construire les rapports lourds.
+- L’analyse complète reste différée en arrière-plan pour les pages expertes et les rapports.
+- Le cache disque complet reste intact, et un cache accueil séparé accélère les relancements sans écraser l’analyse complète.
+- Version app, package et cache Service Worker bumpés en `v8.6.7`.
+
 ### Version v8.6.6 — Blocages lisibles
 
 Suite “je comprends pourquoi je ne dois pas cliquer”.

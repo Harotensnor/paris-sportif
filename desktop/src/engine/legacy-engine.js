@@ -14,6 +14,7 @@ function createLegacyEngineService({ projectRoot }) {
   const desktopRoot = path.join(root, 'desktop');
   const stateRoot = path.join(desktopRoot, 'state');
   const analysisSnapshotPath = path.join(stateRoot, 'engine-analysis-cache.json');
+  const homeAnalysisSnapshotPath = path.join(stateRoot, 'engine-analysis-home-cache.json');
   const dataPath = path.join(root, 'data.js');
   const dataLitePath = path.join(root, 'data_lite.js');
   const dataTodayPath = path.join(root, 'data_today.json');
@@ -101,10 +102,10 @@ function createLegacyEngineService({ projectRoot }) {
     analysisCacheKey = null;
   }
 
-  function readAnalysisSnapshot(analysisKey) {
+  function readAnalysisSnapshot(analysisKey, snapshotPath = analysisSnapshotPath) {
     try {
-      if (!fs.existsSync(analysisSnapshotPath)) return null;
-      const payload = JSON.parse(fs.readFileSync(analysisSnapshotPath, 'utf8'));
+      if (!fs.existsSync(snapshotPath)) return null;
+      const payload = JSON.parse(fs.readFileSync(snapshotPath, 'utf8'));
       if (!payload || payload.analysisKey !== analysisKey || !payload.analysis || payload.analysis.ok !== true) return null;
       return {
         ...payload.analysis,
@@ -119,7 +120,7 @@ function createLegacyEngineService({ projectRoot }) {
     }
   }
 
-  function writeAnalysisSnapshot(analysisKey, analysis) {
+  function writeAnalysisSnapshot(analysisKey, analysis, snapshotPath = analysisSnapshotPath) {
     try {
       fs.mkdirSync(stateRoot, { recursive: true });
       const payload = {
@@ -131,9 +132,9 @@ function createLegacyEngineService({ projectRoot }) {
           cache: { source: 'fresh', cachedAt: new Date().toISOString() }
         }
       };
-      const tmpPath = `${analysisSnapshotPath}.tmp`;
+      const tmpPath = `${snapshotPath}.tmp`;
       fs.writeFileSync(tmpPath, JSON.stringify(payload));
-      fs.renameSync(tmpPath, analysisSnapshotPath);
+      fs.renameSync(tmpPath, snapshotPath);
     } catch {
       // Cache opportuniste seulement : le calcul moteur reste la source de vérité.
     }
@@ -6065,12 +6066,14 @@ function createLegacyEngineService({ projectRoot }) {
     return historyUtils.readHistorySummary(root);
   }
 
-  function getAnalysis({ bankroll = 50, force = false } = {}) {
+  function getAnalysis({ bankroll = 50, force = false, homeOnly = false } = {}) {
     const safeBankroll = Number.isFinite(Number(bankroll)) && Number(bankroll) > 0 ? Number(bankroll) : 50;
     const analysisKey = `${fileKey()}:bankroll:${safeBankroll.toFixed(2)}`;
-    if (!force && analysisCache && analysisCacheKey === analysisKey) return analysisCache;
+    if (!force && analysisCache && analysisCacheKey === analysisKey && !(analysisCache.homeOnly && !homeOnly)) return analysisCache;
     if (!force) {
-      const snapshot = readAnalysisSnapshot(analysisKey);
+      const snapshot = homeOnly
+        ? (readAnalysisSnapshot(analysisKey) || readAnalysisSnapshot(analysisKey, homeAnalysisSnapshotPath))
+        : readAnalysisSnapshot(analysisKey);
       if (snapshot) {
         analysisCache = snapshot;
         analysisCacheKey = analysisKey;
@@ -6223,9 +6226,57 @@ function createLegacyEngineService({ projectRoot }) {
     const coverage24h = buildRolling24hCoverage(data, matches, dashboardCandidates, dashboard.rows);
     const winamaxMarketAudit = buildWinamaxMarketAudit(enrichedEvents, prioritizedDecisionRows);
     const marketCoverageV2 = buildMarketCoverageV2(winamaxMarketAudit, prioritizedDecisionRows);
+    const decisionCenter = buildDecisionCenterReport(prioritizedDecisionRows, decisionGates);
+    if (homeOnly) {
+      const analysis = {
+        ok: true,
+        homeOnly: true,
+        generatedAt: data.generated_at || null,
+        loadedAt: engine.loadedAt,
+        loadMs: engine.loadMs,
+        cache: { source: 'fresh-home', cachedAt: new Date().toISOString() },
+        counts: {
+          matches: matches.length,
+          picks: dashboard.rows.length,
+          dashboardPicks: dashboard.rows.length,
+          combines: 0,
+          scorers: scorers.length
+        },
+        matchesCount: matches.length,
+        dashboardPicks: dashboard.rows,
+        picks: dashboard.rows,
+        dashboardMeta: {
+          mode: dashboard.mode,
+          horizonHours: dashboard.horizonHours,
+          todayPicks: dashboard.todayPicks || 0,
+          todayReady: dashboard.todayReady || 0,
+          totalPicks: dashboard.rows.length,
+          readyPicks: dashboard.rows.filter((row) => row?.decisionCenter?.canBet).length,
+          rolling24Picks: dashboard.rolling24Picks || 0,
+          rolling24Displayed: dashboard.rolling24Displayed || 0,
+          rolling24Target: dashboard.rolling24Target || 0,
+          blocked: decisionCenter.summary.blocked,
+          qualityPolicy: dashboard.qualityPolicy || null
+        },
+        sourceHealthV5,
+        sourceHealthV6,
+        sourceHealthV7,
+        sourceHealthV8,
+        sourceHealthV9,
+        todayFunnel,
+        coverage24h,
+        decisionCenter,
+        winamaxMarketAudit,
+        marketCoverageV2,
+        prematchPlan: { autoDue: 0, next: null, enabledByDefault: true }
+      };
+      analysisCache = analysis;
+      analysisCacheKey = analysisKey;
+      writeAnalysisSnapshot(analysisKey, analysis, homeAnalysisSnapshotPath);
+      return analysis;
+    }
     const combines = buildNativeCombines(win, enrichedEvents);
     const watchlist = buildWatchlist(matches);
-    const decisionCenter = buildDecisionCenterReport(prioritizedDecisionRows, decisionGates);
     const agentPositions = prebetGate.blocked || criticalGate.blocked ? [] : buildAgentPositions(win, matches);
     const agentBlockers = buildAgentBlockers(matches, agentPositions, win);
     const terrainReportV2 = buildTerrainReportV2({

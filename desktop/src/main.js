@@ -1903,11 +1903,12 @@ async function handleApi(req, res, url) {
   }
   if (url.pathname === '/api/engine/analysis') {
     const bankroll = Number(url.searchParams.get('bankroll') || 50);
-    const analysis = engineService.getAnalysis({ bankroll });
     if (url.searchParams.get('home') === '1' || url.searchParams.get('lite') === '1') {
+      const analysis = engineService.getAnalysis({ bankroll, homeOnly: true });
       jsonResponse(res, 200, compactEngineHomePayload(analysis));
       return;
     }
+    const analysis = engineService.getAnalysis({ bankroll });
     jsonResponse(res, 200, analysis);
     return;
   }
