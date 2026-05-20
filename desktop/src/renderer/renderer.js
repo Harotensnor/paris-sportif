@@ -8908,6 +8908,34 @@
     return safe.slice(0, limit);
   }
 
+  function combinePlayability(combo) {
+    const legs = Array.isArray(combo?.legs) ? combo.legs : [];
+    const key = comboKey(combo);
+    const totalOdd = Number(combo?.totalOdd || combo?.combinedOdd || combo?.odd || 0);
+    const avgEdge = legs.reduce((sum, leg) => sum + Number(leg.edge || 0), 0) / Math.max(1, legs.length);
+    const correlation = Number(combo?.correlationAvg || combo?.avgCorrelation || 0);
+    const comboDecisionRow = { ...combo, id: key, market: 'Combiné', marketKey: 'combine', label: readableComboTitle(combo), odd: totalOdd, edge: avgEdge, sport: 'multi', league: combo?.sameGame ? 'Même match' : 'Plusieurs matchs' };
+    const gate = realPerformanceGateForRow(comboDecisionRow);
+    const reasons = [];
+    if (gate.blocked && gate.detail) reasons.push(gate.detail);
+    if (legs.length < 2) reasons.push('il faut au moins 2 jambes');
+    if (legs.length > 3) reasons.push('plus de 3 jambes devient trop risqué');
+    if (!(totalOdd > 1)) reasons.push('cote totale manquante');
+    if (totalOdd > 4.5) reasons.push('cote totale trop haute pour un ticket prudent');
+    if (avgEdge < 0.15) reasons.push('avantage moyen trop faible');
+    const playable = !gate.blocked && totalOdd > 1 && totalOdd <= 4.5 && avgEdge >= 0.15 && legs.length >= 2 && legs.length <= 3;
+    return {
+      legs,
+      key,
+      totalOdd,
+      avgEdge,
+      correlation,
+      playable,
+      reason: reasons[0] || 'Ticket combiné prudent uniquement',
+      returnForTen: totalOdd > 1 ? totalOdd * 10 : 0
+    };
+  }
+
   function renderSimpleInlineSections() {
     const combines = displayCombinesForUser(state.combines, { limit: 4 });
     const realScorers = (Array.isArray(state.scorers) ? state.scorers : [])
@@ -10327,17 +10355,16 @@
       return edgeB - edgeA || Number(b.totalOdd || 0) - Number(a.totalOdd || 0);
     });
     wrap.innerHTML = sortedCombines.map((combo) => {
-      const legs = Array.isArray(combo.legs) ? combo.legs : [];
-      const key = comboKey(combo);
+      const play = combinePlayability(combo);
+      const legs = play.legs;
+      const key = play.key;
       const trackedCombo = tracked.has(key);
-      const totalOdd = Number(combo.totalOdd || 0);
-      const returnForTen = totalOdd > 1 ? totalOdd * 10 : 0;
-      const edgeCompound = legs.reduce((sum, leg) => sum + Number(leg.edge || 0), 0) / Math.max(1, legs.length);
-      const correlation = Number(combo.correlationAvg || combo.avgCorrelation || 0);
-      const comboDecisionRow = { ...combo, id: key, market: 'Combiné', marketKey: 'combine', label: readableComboTitle(combo), odd: totalOdd, edge: edgeCompound, sport: 'multi', league: combo.sameGame ? 'Même match' : 'Plusieurs matchs' };
-      const comboGate = realPerformanceGateForRow(comboDecisionRow);
-      const comboPlayable = !comboGate.blocked && totalOdd <= 4.5 && edgeCompound >= 0.15;
-      const comboButtonTitle = comboGate.detail || 'Ticket combiné prudent uniquement';
+      const totalOdd = play.totalOdd;
+      const returnForTen = play.returnForTen;
+      const edgeCompound = play.avgEdge;
+      const correlation = play.correlation;
+      const comboPlayable = play.playable;
+      const comboButtonTitle = play.reason;
       const titleText = `${combo.type || ''} ${combo.title || ''} ${combo.desc || ''}`.toLowerCase();
       const variant = titleText.includes('safe') || titleText.includes('lock') || titleText.includes('sûr')
         ? 'Prudent'
@@ -10395,11 +10422,11 @@
       return;
     }
     const combo = combos[0];
-    const legs = Array.isArray(combo.legs) ? combo.legs : [];
-    const key = comboKey(combo);
-    const totalOdd = Number(combo.totalOdd || 0);
-    const avgEdge = legs.reduce((sum, leg) => sum + Number(leg.edge || 0), 0) / Math.max(1, legs.length);
-    const playable = totalOdd > 1 && totalOdd <= 4.5 && avgEdge >= 0.15 && legs.length >= 2 && legs.length <= 3;
+    const play = combinePlayability(combo);
+    const legs = play.legs;
+    const key = play.key;
+    const totalOdd = play.totalOdd;
+    const playable = play.playable;
     node.innerHTML = `
       <div class="next-bet-inner">
         <span class="next-bet-kicker">Meilleur combiné simple</span>
@@ -10410,6 +10437,7 @@
           <span>${formatCount(legs.length)} jambes · retour 10€ ${totalOdd > 1 ? escapeHtml(formatMoney(totalOdd * 10)) : '-'}</span>
         </div>
         <div class="next-bet-status ${playable ? 'ready' : 'watch'}">${playable ? 'Je mise prudent' : 'À surveiller'}</div>
+        ${playable ? '' : `<p class="next-bet-note">${escapeHtml(play.reason)}</p>`}
         <div class="next-bet-actions">
           <button class="track-bet-btn combo-track-btn" type="button" data-track-combo-key="${escapeHtml(key)}" ${playable ? '' : 'disabled'}>${playable ? 'Suivre ce combiné' : 'Pas assez propre'}</button>
         </div>

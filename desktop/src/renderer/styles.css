@@ -6694,6 +6694,53 @@ body.theme-light .sidebar {
   background: rgba(248, 113, 113, .13);
 }
 
+.next-bet-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.next-bet-line strong {
+  color: var(--text);
+}
+
+.next-bet-status {
+  width: fit-content;
+  padding: 5px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 950;
+  border: 1px solid rgba(148, 163, 184, .2);
+}
+
+.next-bet-status.ready {
+  color: #86efac;
+  border-color: rgba(16, 185, 129, .42);
+  background: rgba(16, 185, 129, .14);
+}
+
+.next-bet-status.watch {
+  color: #fcd34d;
+  border-color: rgba(245, 158, 11, .38);
+  background: rgba(245, 158, 11, .12);
+}
+
+.next-bet-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.next-bet-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .category-page {
   display: grid;
   gap: 12px;

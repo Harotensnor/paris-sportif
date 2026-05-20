@@ -5,6 +5,14 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.50 — Combinés avec garde-fou unique
+
+Fix pronostics.
+- Le bloc `Meilleur combiné` et les cartes combinés utilisent maintenant exactement la même décision de jouabilité.
+- Un combiné bloqué par segment froid, cote trop haute, trop de jambes ou avantage moyen faible ne peut plus être suivi depuis le bloc principal par incohérence UI.
+- Quand un combiné reste à surveiller, l'app affiche une raison simple au lieu d'un bouton ambigu.
+- Version app, package et cache Service Worker bumpés en `v8.6.50`.
+
 ### Version v8.6.49 — Buteurs en vraie page catégorie
 
 UX navigation.
