@@ -7460,6 +7460,7 @@
   function homeTableRowHtml(row) {
     const confidence = Math.round(homeConfidenceValue(row) * 100);
     const canStake = isReadyToStakeRow(row);
+    const stakeText = canStake ? visibleStakeText(row) : '—';
     const day = formatDayKey(row.start);
     const hour = new Date(row.start || '').toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
     const validHour = hour && hour !== 'Invalid Date' ? hour : '-';
@@ -7482,7 +7483,7 @@
         <td data-label="Confiance"><span class="home-confidence-pill">${escapeHtml(`${confidence}%`)}</span></td>
         <td data-label="Cote"><strong>${escapeHtml(formatOdd(row.odd))}</strong></td>
         <td data-label="Statut">${seriousBetStatusHtml(row, { compact: true })}<div class="match-sub">${escapeHtml(seriousBetStatus(row).detail)}</div></td>
-        <td data-label="Mise">${escapeHtml(visibleStakeText(row))}</td>
+        <td data-label="Mise">${escapeHtml(stakeText)}</td>
         <td data-label="Action"><div class="home-table-action">${winamaxOpenButtonHtml(row, 'Winamax')}${canStake ? trackButtonHtml(row, 'Je mise') : '<span class="match-sub">Surveiller</span>'}</div></td>
       </tr>
     `;
