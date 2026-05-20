@@ -5,6 +5,14 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.60 — Navigation standard moins chargée
+
+UX navigation.
+- La barre latérale standard retire `Safe` et `Gros gain` des pages principales : ces filtres restent accessibles via les catégories, mais ne polluent plus le parcours de base.
+- La navigation visible se concentre sur les vraies entrées parieur : Aujourd’hui, Football, Semaine, Nuit, Vainqueurs, Buts, Buteurs, Combinés, À surveiller, Bilan et Réglages.
+- Le smoke desktop vérifie maintenant cette navigation plus simple.
+- Version app, package et cache Service Worker bumpés en `v8.6.60`.
+
 ### Version v8.6.59 — Catégories accueil plus courtes
 
 UX navigation.
