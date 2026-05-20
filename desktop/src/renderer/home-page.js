@@ -145,6 +145,7 @@
     }
     if (ready > 0) {
       if (key === 'watch') return 'Cette page reste volontairement sans mise directe : surveille les re-checks.';
+      if (key === 'week') return `${ready} spot${ready > 1 ? 's' : ''} prêt${ready > 1 ? 's' : ''} à venir. Pas besoin de forcer aujourd’hui : garde le meilleur en ligne de mire.`;
       if (key === 'night') return `${ready} pari${ready > 1 ? 's' : ''} de nuit jouable${ready > 1 ? 's' : ''}. Joue simple, pas en rattrapage.`;
       if (key === 'scorer') return `${ready} buteur${ready > 1 ? 's' : ''} jouable${ready > 1 ? 's' : ''}. Mise prudente : ce marché reste plus volatile.`;
       if (key === 'winner') return `${ready} pari${ready > 1 ? 's' : ''} jouable${ready > 1 ? 's' : ''} côté Vainqueur. Priorité au meilleur spot, surtout si filet 2-0 disponible.`;

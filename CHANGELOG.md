@@ -5,6 +5,13 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.54 — Page Semaine plus claire
+
+UX navigation.
+- Quand des spots prêts existent plus tard dans la semaine, la page `Semaine` dit maintenant clairement qu'ils sont `à venir`.
+- Le message évite de pousser à forcer aujourd'hui quand le meilleur pari sérieux est plus tard.
+- Version app, package et cache Service Worker bumpés en `v8.6.54`.
+
 ### Version v8.6.53 — Signaux fiche plus lisibles
 
 UX fiches match.
