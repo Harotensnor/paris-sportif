@@ -5,6 +5,14 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.55 — Semaine sans recalcul lourd
+
+Performance.
+- Ouvrir la page `Semaine` ne déclenche plus l'hydratation complète du moteur.
+- La page utilise le payload léger déjà chargé par l'accueil, ce qui évite un ralentissement inutile quand le parieur cherche juste le prochain spot.
+- Les pages réellement lourdes gardent leur hydratation complète à l'ouverture.
+- Version app, package et cache Service Worker bumpés en `v8.6.55`.
+
 ### Version v8.6.54 — Page Semaine plus claire
 
 UX navigation.

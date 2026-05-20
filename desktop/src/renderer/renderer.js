@@ -18699,9 +18699,6 @@
       }
       hydrateFullEngineAnalysis(getBankroll());
     }
-    if (!state.engineHydrated && !state.engineHydrating && tab === 'week') {
-      hydrateFullEngineAnalysis(getBankroll());
-    }
     state.activeHomeCategory = panelTab === 'category' ? cockpitCategory : null;
     recordUserAction('view', tab);
     $$('.nav-btn').forEach((btn) => btn.classList.toggle('active', btn.dataset.tab === tab));
