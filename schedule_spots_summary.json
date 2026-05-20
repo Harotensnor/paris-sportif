@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-20T02:18:03Z",
+  "generated_at": "2026-05-20T02:27:38Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -506,13 +506,13 @@
         "1 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.043,
-        "away_score": -0.498,
-        "home_fade": 0.15,
+        "status": "mixed",
+        "net_side": null,
+        "home_score": -0.957,
+        "away_score": 0.852,
+        "home_fade": 1.15,
         "away_fade": 0.55,
-        "reason": "Direction nette: St. Louis Cardinals (+0.04)",
+        "reason": "Signaux mitigés: avantage net trop faible (St. Louis Cardinals -0.96, Pittsburgh Pirates +0.85)",
         "detail": [
           {
             "side": "home",
@@ -531,6 +531,18 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.4
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
           }
         ]
       }
@@ -2117,19 +2129,31 @@
         "Deplacement estime 1998 km, decalage ~1.6h"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.443,
-        "away_score": -1.265,
-        "home_fade": 0.0,
+        "status": "abstain",
+        "net_side": null,
+        "home_score": -0.557,
+        "away_score": 0.085,
+        "home_fade": 1.0,
         "away_fade": 1.265,
-        "reason": "Direction nette: Kansas City Royals (+0.44)",
+        "reason": "Signaux opposes: Kansas City Royals fade 1.00, Boston Red Sox fade 1.26 -> prudence",
         "detail": [
           {
             "side": "away",
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.8
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
           },
           {
             "side": "away",
