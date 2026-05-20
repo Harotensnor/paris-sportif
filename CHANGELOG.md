@@ -5,6 +5,13 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.52 — Page pertes plus lisible
+
+UX pertes.
+- La page `Pourquoi j’ai perdu` remplace plusieurs libellés `ROI/P&L/cockpit` par `rendement`, `résultat` et `spots concernés`.
+- Les verrous de familles restent aussi stricts, mais leur explication est plus proche du langage parieur.
+- Version app, package et cache Service Worker bumpés en `v8.6.52`.
+
 ### Version v8.6.51 — Accueil avec moins de jargon
 
 UX.

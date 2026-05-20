@@ -11979,7 +11979,7 @@
       <article class="segment-card cold">
         <span>Famille coupée jusqu’au ${escapeHtml(formatDateLabel(lock.lockedUntil))}</span>
         <strong>${escapeHtml(lock.label)}</strong>
-        <p>${escapeHtml(`${lock.reason} · ROI ${formatPct(lock.roi, 0)} · P&L ${formatMoney(lock.pnl)}`)}</p>
+        <p>${escapeHtml(`${lock.reason} · rendement ${formatPct(lock.roi, 0)} · résultat ${formatMoney(lock.pnl)}`)}</p>
         <em>${escapeHtml(lock.examples?.length ? `Exemples : ${lock.examples.slice(0, 2).join(' · ')}` : 'Bouton Je mise verrouillé sur cette famille.')}</em>
       </article>
     `).join('');
@@ -12062,8 +12062,8 @@
       <article class="segment-card cold">
         <span>Verrou réel actif</span>
         <strong>${escapeHtml(row.label || row.key)}</strong>
-        <p>${escapeHtml(`${row.action} · ${formatCount(row.affected)} ligne(s) cockpit concernée(s) · ROI ${formatPct(row.roi || 0, 0)}`)}</p>
-        <em>${escapeHtml(`P&L réel ${formatMoney(row.pnl || 0)} sur ${formatCount(row.count || 0)} pari(s).`)}</em>
+        <p>${escapeHtml(`${row.action} · ${formatCount(row.affected)} spot(s) concerné(s) · rendement ${formatPct(row.roi || 0, 0)}`)}</p>
+        <em>${escapeHtml(`Résultat réel ${formatMoney(row.pnl || 0)} sur ${formatCount(row.count || 0)} pari(s).`)}</em>
       </article>
     `).join('');
   }
