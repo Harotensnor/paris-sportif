@@ -5,6 +5,15 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.35 — Alternatives simples actionnables
+
+Pronostics.
+- Un marché alternatif n'est plus bloqué automatiquement s'il est simple, exact Winamax, segment positif, bien coté et suffisamment sourcé.
+- Cela permet à certains BTTS/Vainqueurs simples de devenir `Je mise mini` au lieu de rester `lecture seulement`.
+- Sécurité ajoutée : une alternative ne devient pas actionnable si elle est l'inverse du marché principal du même match.
+- Le cache compact conserve maintenant le statut `alternative` pour que l'accueil affiche la vraie décision.
+- Version app, package et cache Service Worker bumpés en `v8.6.35`.
+
 ### Version v8.6.34 — Français plus propre sur l'accueil
 
 UX polish.

@@ -756,7 +756,8 @@ function createLegacyEngineService({ projectRoot }) {
     const compact = String(key || value || '').toLowerCase().replace(/[^a-z0-9]+/g, '');
     if (/^(1n2|vainqueur|matchwinner|winner|moneyline)$/.test(compact)) return 'winner';
     if (/^(ou|ou15|ou25|ou35|overunder|totalgoals)$/.test(compact)) return 'goals';
-    if (/^(btts|les2equipes|bothteamstoscore)$/.test(compact)) return 'btts';
+    if (/^(btts|les2equipes|lesdeuxequipes|lesdeuxquipes|bothteamstoscore)$/.test(compact)) return 'btts';
+    if (/les.*quipe.*marque|both.*team.*score/.test(compact)) return 'btts';
     if (/^(scorer|buteur|playergoal|goalscorer)$/.test(compact)) return 'scorer';
     if (/^(ht1n2|ht_1n2|halftime1n2|mitempsvainqueur)$/.test(compact)) return 'halftime';
     return '';
@@ -1936,8 +1937,36 @@ function createLegacyEngineService({ projectRoot }) {
       marketGroup,
       label: applies
         ? `segment précis positif (${Math.round(roi * 100)}% ROI sur ${sample} paris)`
-        : ''
+      : ''
     };
+  }
+
+  function actionableSimpleMarketAlternative(row, assessment = null) {
+    if (!row?.isMarketAlternative) return false;
+    const group = simpleMarketGroup(row?.marketKey || row?.market);
+    if (!['winner', 'goals', 'btts'].includes(group)) return false;
+    const primaryGroup = simpleMarketGroup(row?.primaryMarket || '');
+    if (primaryGroup && primaryGroup === group) return false;
+    const source = String(row?.marketCandidate?.source || row?.pickSource || '').toLowerCase();
+    if (!/winamax_exact|winamax_detail|winamax_market/.test(source)) return false;
+    if (row?.limitedConfidence) return false;
+    const safe = assessment || row?.safeAssessment || {};
+    if (safe.status !== 'reliable' && safe.reliable !== true) return false;
+    const odd = Number(row?.odd || 0);
+    const edge = Number(safe.conservativeEdge ?? row?.safeEdge ?? row?.edge ?? 0);
+    const confidence = Number(safe.confidence ?? effectiveConfidence(row));
+    const contextScore = Number(row?.contextQuality?.score ?? row?.match?.context?.quality?.score ?? 0);
+    const sample = Number(safe.sample ?? row?.segmentValidation?.sample ?? 0) || 0;
+    const roi = Number(safe.roi ?? row?.segmentValidation?.roi);
+    const precise = precisePositiveSegmentOverride(row);
+    return odd >= 1.35 &&
+      odd <= 2.20 &&
+      edge >= 0.05 &&
+      confidence >= 0.70 &&
+      contextScore >= 65 &&
+      !row?.signalConflict?.active &&
+      !row?.oddsGuardrail?.applied &&
+      (precise.applies || (sample >= 50 && Number.isFinite(roi) && roi >= 0.05));
   }
 
   function safeAssessmentForRow(row) {
@@ -2281,12 +2310,13 @@ function createLegacyEngineService({ projectRoot }) {
 
   function applySafeReliabilityLayer(row) {
     const assessment = safeAssessmentForRow(row);
+    const actionableAlternative = actionableSimpleMarketAlternative(row, assessment);
     let nextDecision = row.decisionCenter || {};
     let nextStake = row.stake;
     let status = row.status;
     let statusLabel = row.statusLabel;
     const profitGuardReasons = [
-      row?.isMarketAlternative ? 'Alternative marché : lecture seulement' : null,
+      row?.isMarketAlternative && !actionableAlternative ? 'Alternative marché : lecture seulement' : null,
       row?.marketTiming?.guardApplied ? (row.marketTiming.warnings || [])[0] || 'Marché froid au backtest' : null,
       row?.signalConflict?.guardApplied ? row.signalConflict.label || 'Conflit signaux marché/contexte' : null,
       row?.oddsGuardrail?.applied ? row.oddsGuardrail.label || 'Cote haute non confirmée' : null,

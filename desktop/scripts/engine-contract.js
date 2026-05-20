@@ -39,12 +39,42 @@ function isDrawDashboardPick(pick) {
 }
 
 function dashboardMarketGroup(pick) {
-  const key = compactMarketKey(pick?.marketKey || pick?.market);
+  return marketGroupFromValue(pick?.marketKey || pick?.market);
+}
+
+function marketGroupFromValue(value) {
+  const key = compactMarketKey(value);
   if (/^(1n2|matchwinner|winner|moneyline)$/.test(key)) return 'winner';
   if (/^(scorer|buteur|goalscorer)$/.test(key)) return 'scorer';
-  if (/btts/.test(key)) return 'btts';
+  if (/btts|les2equipes|lesdeuxequipes|lesdeuxquipes/.test(key)) return 'btts';
   if (/^(ou|ou15|ou25|ou35)$/.test(key)) return 'goals';
   return 'other';
+}
+
+function isActionableSimpleAlternative(pick) {
+  if (!pick?.isMarketAlternative) return false;
+  const group = dashboardMarketGroup(pick);
+  if (!['winner', 'goals', 'btts'].includes(group)) return false;
+  if (marketGroupFromValue(pick.primaryMarket || '') === group) return false;
+  const source = String(pick?.marketCandidate?.source || pick?.pickSource || '').toLowerCase();
+  if (!/winamax_exact|winamax_detail|winamax_market/.test(source)) return false;
+  const odd = Number(pick?.odd || 0);
+  const edge = Number(pick?.safeEdge ?? pick?.edge ?? 0);
+  const confidence = Number(pick?.safeConfidence ?? pick?.probability ?? 0);
+  const contextScore = Number(pick?.contextQuality?.score ?? pick?.match?.context?.quality?.score ?? 0);
+  const sample = Number(pick?.safeAssessment?.sample ?? pick?.segmentValidation?.sample ?? 0) || 0;
+  const roi = Number(pick?.safeAssessment?.roi ?? pick?.segmentValidation?.roi);
+  return isSimpleDashboardMarket(pick) &&
+    !isDrawDashboardPick(pick) &&
+    pick?.safeAssessment?.reliable === true &&
+    odd >= 1.35 &&
+    odd <= 2.20 &&
+    edge >= 0.05 &&
+    confidence >= 0.70 &&
+    contextScore >= 65 &&
+    sample >= 50 &&
+    Number.isFinite(roi) &&
+    roi >= 0.05;
 }
 
 function isFuturePick(pick) {
@@ -304,13 +334,14 @@ function testAnalysis() {
     .filter((pick) => pick?.isMarketAlternative);
   const complexAlternatives = exposedAlternatives.filter((pick) => !isSimpleDashboardMarket(pick) || isDrawDashboardPick(pick));
   const actionableAlternatives = exposedAlternatives.filter((pick) => pick?.decisionCenter?.canBet === true || Number(pick?.stake || 0) > 0);
+  const unsafeActionableAlternatives = actionableAlternatives.filter((pick) => !isActionableSimpleAlternative(pick));
   assert(analysis.dashboardPicks.length >= 10, 'Moins de 10 paris simples dans le cockpit', analysis.dashboardPicks);
   assert(analysis.dashboardPicks.length <= 30, 'Le cockpit standard dépasse la limite simple de 30 paris', analysis.dashboardPicks.length);
   assert(complexDashboard.length === 0, 'Marché complexe exposé dans le cockpit standard', complexDashboard);
   assert(drawDashboard.length === 0, 'Match nul exposé dans le cockpit standard', drawDashboard.map((pick) => ({ title: pick.title, market: pick.market, label: pick.label })));
   assert(pastDashboard.length === 0, 'Le cockpit expose un match déjà commencé', pastDashboard.map((pick) => ({ title: pick.title, market: pick.market, start: pick.start })));
   assert(complexAlternatives.length === 0, 'Alternative complexe exposée en mode standard', complexAlternatives.map((pick) => ({ title: pick.title, market: pick.market, label: pick.label })));
-  assert(actionableAlternatives.length === 0, 'Alternative marché avec bouton Je mise ou mise positive', actionableAlternatives.map((pick) => ({ title: pick.title, market: pick.market, label: pick.label, stake: pick.stake, canBet: pick.decisionCenter?.canBet })));
+  assert(unsafeActionableAlternatives.length === 0, 'Alternative marché dangereuse avec bouton Je mise ou mise positive', unsafeActionableAlternatives.map((pick) => ({ title: pick.title, market: pick.market, label: pick.label, stake: pick.stake, canBet: pick.decisionCenter?.canBet, source: pick.marketCandidate?.source, primaryMarket: pick.primaryMarket })));
   assert(Number(analysis.dashboardMeta?.qualityPolicy?.maxDashboardRows || 0) === 30, 'Limite cockpit v2.1.8 absente', analysis.dashboardMeta?.qualityPolicy);
   assert(topRanks.length >= 5, 'Top 5 prioritaire absent du cockpit', topRanks);
   assert(Number(analysis.dashboardPicks?.[0]?.priorityRank || 0) === 1, 'Le premier pick dashboard doit être le #1 prioritaire', analysis.dashboardPicks?.[0]);
