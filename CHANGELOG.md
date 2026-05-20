@@ -5,6 +5,13 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.13 — Tri plus sain des spots
+
+Pronostics.
+- Le tri accueil/catégories privilégie maintenant les spots à avantage positif avant les lignes seulement “à surveiller” avec edge négatif.
+- Les lignes bloquées peuvent rester visibles pour information, mais elles passent derrière les vrais spots positifs.
+- Version app, package et cache Service Worker bumpés en `v8.6.13`.
+
 ### Version v8.6.12 — Pages Safe et Gros gain visibles
 
 UX parieur.

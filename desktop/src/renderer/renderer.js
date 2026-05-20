@@ -2910,6 +2910,14 @@
     return Number.isFinite(value) ? value : 0;
   }
 
+  function rankingEdgeValue(row) {
+    const safe = Number(row?.safeEdge);
+    const raw = Number(row?.edge);
+    if (Number.isFinite(safe) && safe > 0) return safe;
+    if (Number.isFinite(raw)) return raw;
+    return Number.isFinite(safe) ? safe : 0;
+  }
+
   function safeConfidenceValue(row) {
     const value = Number(row?.safeConfidence);
     if (Number.isFinite(value) && value > 0) return value;
@@ -6874,11 +6882,13 @@
   function homePickScore(row) {
     const confidence = homeConfidenceValue(row);
     const odd = Number(row?.odd || 0);
+    const edge = rankingEdgeValue(row);
+    const edgeBonus = edge > 0 ? Math.min(26, edge * 180) : Math.max(-34, edge * 180);
     const oddBonus = odd > 1 ? Math.min(14, Math.max(0, (odd - 1) * 4)) : 0;
     const readyBonus = isReadyToStakeRow(row) ? 9 : 0;
     const winnerBonus = isWinnerRow(row) ? 8 : 0;
     const safetyBonus = row?.winamaxTwoGoalRule?.eligible ? Math.min(8, Number(row.winamaxTwoGoalRule.leadTwoProbability || 0) * 10) : 0;
-    return confidence * 100 + oddBonus + readyBonus + winnerBonus + safetyBonus;
+    return confidence * 100 + edgeBonus + oddBonus + readyBonus + winnerBonus + safetyBonus;
   }
 
   function seriousBetStatus(row) {
@@ -7135,6 +7145,7 @@
     const kickoff = (row) => rowKickoffTime(row);
     const confidenceSort = (a, b) => (
       Number(isReadyToStakeRow(b)) - Number(isReadyToStakeRow(a))
+      || rankingEdgeValue(b) - rankingEdgeValue(a)
       || homePickScore(b) - homePickScore(a)
       || homeConfidenceValue(b) - homeConfidenceValue(a)
       || Number(b?.odd || 0) - Number(a?.odd || 0)
