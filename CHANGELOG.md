@@ -5,6 +5,13 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.11 — Accueil moins lourd au démarrage
+
+Performance.
+- Au démarrage, l’app ne remplit plus les gros panneaux techniques invisibles : les rapports avancés se rendent quand l’utilisateur ouvre `Avancé` ou `Pipeline`.
+- Les préférences ne sont plus rendues deux fois avant l’accueil ; elles se préparent en tâche légère ou au clic sur `Réglages`.
+- Version app, package et cache Service Worker bumpés en `v8.6.11`.
+
 ### Version v8.6.10 — Reprise rapide testée
 
 Performance + non-régression.

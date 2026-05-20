@@ -17489,10 +17489,42 @@
     }).join('');
   }
 
+  function isStatusDetailPanelActive() {
+    return Boolean($('[data-panel="data"].active') || $('[data-panel="pipeline"].active'));
+  }
+
+  function renderStatusDetails(status = state.status) {
+    if (!status) return;
+    renderFiles(status.files || []);
+    renderQualityReport(status);
+    renderCoverageTrend();
+    renderNextActions();
+    renderActionHistory();
+    renderPrebetChecklist();
+    renderPrebetChecklistBacktest();
+    renderFinalDecisionPanel();
+    renderSourceFreshnessPlan();
+    renderContextRepairPlan();
+    renderRefreshPriorityPlan();
+    renderSignalGapCenter();
+    renderRefreshSummary(status);
+    renderRefreshJournal(status);
+    renderSourceHealth(status);
+    renderCriticalIssues();
+    renderIntegrityReports();
+    renderCoverageRepairEngine();
+    renderModelLabV4();
+    renderSourceHealthV4();
+    renderWinamaxMarketAudit();
+    renderQualityAlerts(status);
+    renderWarnings(status);
+    renderWinamaxMarketAudit();
+  }
+
   function renderStatus(status) {
     state.status = status;
     renderRefreshEta(status.refresh || null);
-    renderPipelinePanel(status);
+    if (isStatusDetailPanelActive()) renderPipelinePanel(status);
     $('#metric-age').textContent = formatAge(status.ageMinutes);
     $('#metric-generated').textContent = status.generatedAt ? new Date(status.generatedAt).toLocaleString('fr-FR') : '-';
     if (!state.matches.length) {
@@ -17521,31 +17553,7 @@
     }
     renderBootPerformance();
     renderRefreshPolicy();
-
-    renderFiles(status.files || []);
-    renderQualityReport(status);
-    renderCoverageTrend();
-    renderNextActions();
-    renderActionHistory();
-    renderPrebetChecklist();
-    renderPrebetChecklistBacktest();
-    renderFinalDecisionPanel();
-    renderSourceFreshnessPlan();
-    renderContextRepairPlan();
-    renderRefreshPriorityPlan();
-    renderSignalGapCenter();
-    renderRefreshSummary(status);
-    renderRefreshJournal(status);
-    renderSourceHealth(status);
-    renderCriticalIssues();
-    renderIntegrityReports();
-    renderCoverageRepairEngine();
-    renderModelLabV4();
-    renderSourceHealthV4();
-    renderWinamaxMarketAudit();
-    renderQualityAlerts(status);
-    renderWarnings(status);
-    renderWinamaxMarketAudit();
+    if (isStatusDetailPanelActive()) renderStatusDetails(status);
   }
 
   function renderFiles(files) {
@@ -18560,8 +18568,10 @@
     }
     if (panelTab === 'search') renderDeepSearch();
     if (panelTab === 'recovery') renderRecoveryPage();
-    if (panelTab === 'pipeline') renderPipelinePanel(state.status);
+    if (panelTab === 'pipeline') renderStatusDetails(state.status);
+    if (panelTab === 'data') renderStatusDetails(state.status);
     if (panelTab === 'help') renderHelp();
+    if (panelTab === 'preferences') renderPreferences();
   }
 
   function exportCsv() {
@@ -20448,13 +20458,12 @@
     const storedBankroll = Number(localStorage.getItem('userBankroll') || loadPreferences().bankroll || 50);
     if (Number.isFinite(storedBankroll) && storedBankroll > 0) $('#bankroll-input').value = String(storedBankroll);
     switchTab('dashboard');
-    renderUserPnl();
-    renderPreferences();
+    scheduleIdleUiTask(() => renderPreferences(), 2500);
     const statusPromise = refreshStatus();
     const logPromise = refreshLog().catch(() => null);
     await fetchJson('/api/app-info').then((info) => {
       state.appInfo = info || null;
-      renderPreferences();
+      if ($('[data-panel="preferences"].active')) renderPreferences();
     }).catch((error) => pushLog('warn', `Info application indisponible: ${error.message}`));
     await statusPromise;
     await computePicks();
