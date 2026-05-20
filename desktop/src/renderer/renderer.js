@@ -5169,6 +5169,8 @@
       .replace(/confiance limitée\s*:\s*lecture seulement/gi, 'dossier incomplet, observation seulement')
       .replace(/confiance limitée\s*:\s*cote Winamax \+ contexte léger/gi, 'contexte trop léger pour cliquer')
       .replace(/confiance limitée\s*:\s*cote Winamax \+ filet 2-0 à vérifier/gi, 'filet 2-0 intéressant, mais dossier encore à vérifier')
+      .replace(/avantage brut \+[0-9.,]+pt aberrant \(modèle surconfiant\)/gi, 'écart trop extrême entre modèle et cote, je préfère vérifier')
+      .replace(/profil d['’]avantage froid \(ROI\s*-?[0-9.,]+% sur [0-9 ]+ paris\)/gi, 'profil similaire trop perdant en historique')
       .replace(/\bmodele\b/gi, 'modèle')
       .replace(/\bedge\b/gi, 'avantage')
       .replace(/\bKelly nul\b/gi, 'mise non positive')
@@ -7032,7 +7034,7 @@
     const sample = Number(row?.segmentValidation?.sample ?? row?.safeAssessment?.sample ?? 0);
     const roi = Number(row?.segmentValidation?.roi ?? row?.safeAssessment?.roi);
     if (Number.isFinite(roi) && sample >= 15 && roi < -0.02) {
-      return `segment similaire perdant (${Math.round(roi * 100)}% ROI sur ${formatCount(sample)} paris)`;
+      return `historique défavorable : ${formatCount(sample)} cas similaires, rendement ${Math.round(roi * 100)}%`;
     }
     const capitalReason = (row?.capitalProtectionV1?.reasons || []).find((reason) => /segment historique perdant|confiance limitée/i.test(String(reason || '')));
     return capitalReason ? userFacingGuardText(capitalReason) : '';

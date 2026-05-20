@@ -5,6 +5,14 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.44 — Raisons de blocage plus lisibles
+
+UX.
+- Les raisons affichées dans le Top 3 parlent davantage parieur : historique défavorable, dossier à vérifier, écart modèle/cote trop extrême.
+- Les formulations `ROI`, `edge` et `modèle surconfiant` sont réduites sur l'accueil standard.
+- Les détails techniques restent disponibles dans les vues avancées.
+- Version app, package et cache Service Worker bumpés en `v8.6.44`.
+
 ### Version v8.6.43 — Pas de doublon match dans le Top 3
 
 Fix UX.
