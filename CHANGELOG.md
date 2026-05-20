@@ -5,6 +5,14 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.23 — Alerte critique périmée ignorée
+
+Fiabilité pronostics.
+- Le moteur n'utilise plus un ancien `critical_issue_report` pour bloquer les paris quand la donnée terrain actuelle est plus récente.
+- Un diagnostic critique plus vieux que la data fraîche devient une alerte ignorée, au lieu de maintenir l'app en rouge.
+- Objectif : éviter les faux `0 Je mise` causés par un rapport “données trop anciennes” déjà dépassé.
+- Version app, package et cache Service Worker bumpés en `v8.6.23`.
+
 ### Version v8.6.22 — Tableau accueil prêt dès l'affichage rapide
 
 UX / vitesse.

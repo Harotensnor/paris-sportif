@@ -3410,14 +3410,20 @@ function createLegacyEngineService({ projectRoot }) {
     };
   }
 
-  function criticalGateForReport(report) {
+  function criticalGateForReport(report, data = null) {
     const summary = report && report.schema ? report.summary || {} : {};
-    const blocked = Boolean(summary.blocks_bet || Number(summary.critical || 0) > 0);
+    const reportTs = Date.parse(report?.generated_at || report?.generatedAt || '');
+    const dataTs = Date.parse(data?.generated_at || data?.generatedAt || '');
+    const stale = Number.isFinite(reportTs) && Number.isFinite(dataTs) && reportTs < dataTs - 5 * 60 * 1000;
+    const blocked = !stale && Boolean(summary.blocks_bet || Number(summary.critical || 0) > 0);
     return {
       blocked,
+      stale,
       issues: Number(summary.issues || 0),
-      critical: Number(summary.critical || 0),
-      label: blocked ? (summary.first || 'État critique à corriger') : 'Aucun état critique bloquant'
+      critical: stale ? 0 : Number(summary.critical || 0),
+      label: stale
+        ? 'Ancien diagnostic critique ignoré'
+        : blocked ? (summary.first || 'État critique à corriger') : 'Aucun état critique bloquant'
     };
   }
 
@@ -6183,7 +6189,7 @@ function createLegacyEngineService({ projectRoot }) {
     const primaryBaseRows = baseRows.filter((row) => !row.isMarketAlternative);
     const candidateAgentPositions = buildAgentPositions(win, primaryBaseRows);
     const prebetGate = prebetGateForReport(prebetChecklistReport);
-    const criticalGate = criticalGateForReport(criticalIssueReport);
+    const criticalGate = criticalGateForReport(criticalIssueReport, data);
     const decisionGates = { prebet: prebetGate, critical: criticalGate };
     const allDecisionRows = baseRows
       .map((row) => applyPrebetGate(row, prebetChecklistReport))
