@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-20T23:08:25Z",
+  "generated_at": "2026-05-20T23:17:07Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815424",
-      "kickoff": "2026-05-20T23:05Z",
-      "league": "MLB",
-      "match": "Toronto Blue Jays at New York Yankees",
-      "home": "New York Yankees",
-      "away": "Toronto Blue Jays",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "New York Yankees",
-          "pitcher": "Cam Schlittler",
-          "label": "Cam Schlittler plus de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "over",
-          "probability": 0.5586,
-          "fair_odds": 1.79,
-          "expected_strikeouts": 6.8,
-          "projected_ip": 6.0,
-          "inputs": {
-            "k9": 10.2,
-            "era": 1.35,
-            "whip": 0.78,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "New York Yankees",
-          "pitcher": "Cam Schlittler",
-          "label": "Cam Schlittler ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.8187,
-          "fair_odds": 1.22,
-          "expected_hr_allowed": 0.2,
-          "projected_ip": 6.0,
-          "inputs": {
-            "hr9": 0.3,
-            "era": 1.35,
-            "whip": 0.78
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Toronto Blue Jays",
-          "pitcher": "Trey Yesavage",
-          "label": "Trey Yesavage moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.5695,
-          "fair_odds": 1.76,
-          "expected_strikeouts": 5.19,
-          "projected_ip": 4.78,
-          "inputs": {
-            "k9": 9.78,
-            "era": 1.4,
-            "whip": 1.29,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Toronto Blue Jays",
-          "pitcher": "Trey Yesavage",
-          "label": "Trey Yesavage ne concède pas de home run",
-          "pick": "no",
-          "probability": 1.0,
-          "fair_odds": 1.01,
-          "expected_hr_allowed": 0.0,
-          "projected_ip": 4.78,
-          "inputs": {
-            "hr9": 0.0,
-            "era": 1.4,
-            "whip": 1.29
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815425",
       "kickoff": "2026-05-20T23:40Z",
@@ -752,7 +670,7 @@
       ]
     }
   ],
-  "props": 36,
+  "props": 32,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
