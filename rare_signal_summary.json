@@ -1,25 +1,26 @@
 {
-  "generated_at": "2026-05-20T09:06:16Z",
+  "generated_at": "2026-05-20T09:10:12Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 55,
+    "active_events": 56,
     "actionable": 26,
-    "watch": 3,
-    "risk": 26,
+    "watch": 5,
+    "risk": 25,
     "expired_sample": 0,
     "by_type": {
-      "market_uncertain": 19,
+      "market_uncertain": 18,
+      "market_move": 2,
       "injury_imbalance": 23,
       "back_to_back_travel": 18,
       "signal_conflict": 9,
       "travel_extreme": 1
     },
     "by_quality": {
-      "risk": 26,
-      "actionable": 26,
-      "watch": 3
+      "risk": 25,
+      "watch": 5,
+      "actionable": 26
     }
   },
   "active_actionable": [
@@ -546,6 +547,42 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 12-9"
+    },
+    {
+      "event_id": "178457",
+      "date": "2026-05-20T14:00Z",
+      "sport": "tennis",
+      "league_code": "rolandgarros",
+      "league_name": "Roland Garros",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 0.534,
+      "context": "Cote home: 2.60 -> 2.35 (+9.6%)"
+    },
+    {
+      "event_id": "401861540",
+      "date": "2026-05-20T12:00Z",
+      "sport": "football",
+      "league_code": "chn.1",
+      "league_name": "Chinese Super League",
+      "home": "Chongqing Tonglianglong",
+      "away": "Yunnan Yukun",
+      "match": "Chongqing Tonglianglong - Yunnan Yukun",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 0.454,
+      "context": "Cote home: 2.45 -> 2.65 (-8.2%)"
     }
   ],
   "active_risk": [
@@ -728,24 +765,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 19.0%"
-    },
-    {
-      "event_id": "740974",
-      "date": "2026-05-24T15:00Z",
-      "sport": "football",
-      "league_code": "eng.1",
-      "league_name": "Premier League",
-      "home": "Tottenham Hotspur",
-      "away": "Everton",
-      "match": "Tottenham Hotspur - Everton",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.1%"
     },
     {
       "event_id": "401843351",
