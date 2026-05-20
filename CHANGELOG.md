@@ -5,6 +5,13 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.69 — Prochain pari sérieux plus propre
+
+UX pronostics.
+- Le bloc `Prochain pari sérieux` privilégie de nouveau un vrai pari prêt de la semaine quand aucun pari n’est jouable dans les 24h.
+- Les spots T-10 restent visibles dans `Pourquoi pas plus ?`, avec l’action `Finaliser T-10`, sans remplacer le meilleur vrai pari par une ligne faible à surveiller.
+- Version app, package et cache Service Worker bumpés en `v8.6.69`.
+
 ### Version v8.6.68 — Spots T-10 visibles
 
 UX pronostics.

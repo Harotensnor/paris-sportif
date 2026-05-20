@@ -7183,12 +7183,12 @@
         .filter((row) => !isReadyToStakeRow(row) && !canDisplayPickCard(row)),
       'confidence'
     );
-    const row = ready24[0] || watch24[0] || weekReady[0] || weekWatch[0] || weekBlocked[0] || null;
+    const row = ready24[0] || weekReady[0] || watch24[0] || weekWatch[0] || weekBlocked[0] || null;
     const status = seriousBetStatus(row);
     return {
       row,
       status,
-      scope: ready24[0] ? '24h' : watch24[0] ? '24h-watch' : weekReady[0] ? 'semaine' : weekWatch[0] ? 'semaine-watch' : weekBlocked[0] ? 'semaine-bloque' : 'none',
+      scope: ready24[0] ? '24h' : weekReady[0] ? 'semaine' : watch24[0] ? '24h-watch' : weekWatch[0] ? 'semaine-watch' : weekBlocked[0] ? 'semaine-bloque' : 'none',
       ready24: ready24.length,
       watch24: watch24.length,
       weekReady: weekReady.length,
