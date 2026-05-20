@@ -5,6 +5,15 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.22 — Tableau accueil prêt dès l'affichage rapide
+
+UX / vitesse.
+- Le tableau triable de l'accueil est rempli même en rendu rapide compact.
+- Ouvrir le tableau ne montre plus un corps vide pendant l'hydratation complète du moteur.
+- Le caption de tri reste cohérent dès le premier affichage.
+- Le test terrain ouvre les pages Combinés/Buteurs avec retry pour éviter les faux échecs Electron intermittents.
+- Version app, package et cache Service Worker bumpés en `v8.6.22`.
+
 ### Version v8.6.21 — Accueil plus clair quand il faut attendre
 
 UX parieur.

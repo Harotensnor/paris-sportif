@@ -31,6 +31,25 @@ async function firstWindow(app) {
   return app.windows()[0] || app.waitForEvent('window', { timeout: 10000 });
 }
 
+async function clickTabAndWait(win, tab, panel, readySelector, timeout = 10_000) {
+  let lastError = null;
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    try {
+      await win.locator(`[data-tab="${tab}"]:visible`).first().click();
+      await win.waitForFunction(
+        ({ panelName, selector }) => Boolean(document.querySelector(`[data-panel="${panelName}"].active ${selector}`)),
+        { panelName: panel, selector: readySelector },
+        { timeout }
+      );
+      return;
+    } catch (error) {
+      lastError = error;
+      await win.waitForTimeout(250 + attempt * 250);
+    }
+  }
+  throw lastError;
+}
+
 async function closeElectronApp(app) {
   if (!app) return;
   try {
@@ -303,8 +322,7 @@ async function main() {
     assert(!dom.hasStartedButton, 'Terrain: bouton actionnable pour match déjà commencé', dom);
     assert(!dom.hiddenAdvancedVisible, 'Terrain: Avancé visible sans Mode expert', dom);
 
-    await win.locator('[data-tab="combines"]:visible').first().click();
-    await win.waitForFunction(() => Boolean(document.querySelector('[data-panel="combines"].active #combines-list')), null, { timeout: 10_000 });
+    await clickTabAndWait(win, 'combines', 'combines', '#combines-list');
     const combinesAudit = await win.evaluate(() => {
       const text = document.querySelector('[data-panel="combines"]')?.innerText || '';
       return {
@@ -317,8 +335,7 @@ async function main() {
     assert(/Meilleur combiné|Aucun combiné sain/i.test(combinesAudit.focus), 'Terrain: page Combinés sans résumé parieur en haut', combinesAudit.focus);
     assert(!(combinesAudit.cards && combinesAudit.hasAdvanced), 'Terrain: Combinés standard trop techniques', combinesAudit.text.slice(0, 1400));
 
-    await win.locator('[data-tab="scorers"]:visible').first().click();
-    await win.waitForFunction(() => Boolean(document.querySelector('[data-panel="scorers"].active #scorers-focus-card')), null, { timeout: 10_000 });
+    await clickTabAndWait(win, 'scorers', 'scorers', '#scorers-focus-card');
     const scorersAudit = await win.evaluate(() => ({
       focus: document.querySelector('#scorers-focus-card')?.innerText || '',
       cards: document.querySelectorAll('#scorers-list .scorer-card').length,

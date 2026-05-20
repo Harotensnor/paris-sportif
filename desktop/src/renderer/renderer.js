@@ -7357,7 +7357,6 @@
     const body = $('#home-picks-table-body');
     const caption = $('#home-table-caption');
     const sortMode = homeSortMode();
-    const quickHome = isQuickHomeRender();
     if (!topWrap && !body) return;
     const meta = homeCategoryMeta(state.activeHomeCategory);
     const kicker = $('#home-kicker');
@@ -7379,7 +7378,7 @@
     $$('.home-sort-actions [data-home-sort], .home-picks-table [data-home-sort]').forEach((button) => {
       button.classList.toggle('active', button.dataset.homeSort === sortMode);
     });
-    if (caption && !quickHome) {
+    if (caption) {
       const labels = { confidence: 'confiance puis cote', kickoff: 'heure de départ', date: 'date', odd: 'cote Winamax', status: 'statut de mise' };
       caption.textContent = `${formatCount(tableRows.length)} affichés ici · ${formatCount(tableLimit)} max · tri ${labels[sortMode] || 'confiance'}`;
     }
@@ -7394,12 +7393,10 @@
         ? topRows.map(homeTopCardHtml).join('') + watchHtml + (topRows.length < 3 ? '<div class="empty compact-empty">Top 3 incomplet : le modèle refuse de transformer une ligne à surveiller en pari.</div>' : '')
         : '<div class="empty compact-empty">Pas de clic propre sur les prochaines 24h. Je garde quand même les meilleurs spots à surveiller, sans bouton de mise forcé.</div>' + watchHtml + fallbackHtml;
     }
-    if (body && !quickHome) {
+    if (body) {
       body.innerHTML = tableRows.length
         ? tableRows.map(homeTableRowHtml).join('')
         : '<tr><td colspan="9" class="empty">Aucun pari dans le tableau 24h avec les filtres actuels.</td></tr>';
-    } else if (body && quickHome) {
-      body.innerHTML = '';
     }
   }
 
