@@ -93,14 +93,11 @@ function commonDecisionOutputs(stages, label, options = {}) {
 
 function lightDecisionOutputs(stages, label) {
   const requiredStages = [
-    'build_team_identity_graph.py',
     'build_match_context.py',
     'build_prebet_checklist.py',
     'build_v7_actionability.py',
     'build_v8_decision_cockpit.py',
     'build_v16_final_decision.py',
-    'build_v4_audit_reports.py',
-    'build_decision_exports.py',
     'build_health.py',
     'finalize_inline.py'
   ];
@@ -110,7 +107,6 @@ function lightDecisionOutputs(stages, label) {
   before(stages, 'build_match_context.py', 'build_prebet_checklist.py', `${label} contexte avant checklist`);
   before(stages, 'build_prebet_checklist.py', 'build_v7_actionability.py', `${label} checklist avant décision`);
   before(stages, 'build_v8_decision_cockpit.py', 'build_v16_final_decision.py', `${label} cockpit avant final`);
-  before(stages, 'build_v16_final_decision.py', 'build_v4_audit_reports.py', `${label} décision finale avant audit`);
   before(stages, 'build_health.py', 'finalize_inline.py', `${label} santé avant inline`);
 }
 
@@ -128,10 +124,13 @@ function testInstant() {
     includes(stages, stage, `instant ${stage}`);
   }
   lightDecisionOutputs(stages, 'instant');
+  assert(stages.length <= 12, 'instant doit rester un recalcul court, pas une mini-pipeline complète', { count: stages.length, stages });
   excludes(stages, 'fetch_live.py', 'instant cache local');
   excludes(stages, 'fetch_winamax_catalog.py', 'instant cache local');
   excludes(stages, 'fetch_winamax_match_details.py', 'instant cache local');
   excludes(stages, 'fetch_weather.py', 'instant cache local');
+  excludes(stages, 'build_v4_audit_reports.py', 'instant sans audit long');
+  excludes(stages, 'build_decision_exports.py', 'instant sans exports lourds');
 }
 
 function testQuick() {

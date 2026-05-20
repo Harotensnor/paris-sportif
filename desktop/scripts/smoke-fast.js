@@ -66,8 +66,12 @@ async function main() {
     await win.waitForFunction(() => Boolean(document.querySelector('[data-panel="dashboard"].active')), null, { timeout: 20000 });
     await win.waitForFunction(() => document.querySelector('#metric-picks')?.textContent !== '-', null, { timeout: 25000 });
     await win.waitForFunction(() => (
-      document.querySelectorAll('#home-picks-table-body tr.clickable-row').length >= 3
-      || /Erreur au démarrage|Données trop anciennes/i.test(document.body.innerText || '')
+      document.querySelector('#next-bet-card .next-bet-inner')
+      && document.querySelector('#why-not-more-card')?.innerText?.trim()
+      && (
+        document.querySelectorAll('#home-top3-grid .home-top-card, #home-top3-grid .home-watch-card').length >= 1
+        || /Aucun pari validé à miser|Top 3 incomplet|Erreur au démarrage|Données trop anciennes/i.test(document.body.innerText || '')
+      )
     ), null, { timeout: 30000 });
     const homeReadyMs = Date.now() - launchedAt;
 
@@ -98,7 +102,7 @@ async function main() {
       throw new Error(`Bloc Pourquoi pas plus absent: ${home.whyNotMoreText.slice(0, 300)}`);
     }
     const topEmptyAllowed = /Aucun pari validé à miser|Top 3 incomplet/i.test(home.dashboardText);
-    if (home.rows < 3 || (!home.topCards && !home.watchCards && !topEmptyAllowed) || home.categories < 8) {
+    if ((!home.topCards && !home.watchCards && !topEmptyAllowed)) {
       throw new Error(`Accueil rapide incomplet: ${JSON.stringify(home)}`);
     }
     if (home.visibleHomePanels.some((name) => /home-category-grid|home-categories-panel|home-table-card/i.test(String(name)))) {

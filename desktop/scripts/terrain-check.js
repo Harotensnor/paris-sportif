@@ -159,7 +159,14 @@ async function main() {
     await win.waitForSelector('[data-panel="dashboard"].active', { timeout: 60000 });
     await win.waitForFunction(() => document.querySelector('#metric-picks')?.textContent !== '-', null, { timeout: 90000 });
     await win.waitForFunction(() => (
-      document.querySelectorAll('#home-picks-table-body tr.clickable-row').length >= 6
+      (
+        document.querySelector('#next-bet-card .next-bet-inner')
+        && document.querySelector('#why-not-more-card')?.innerText?.trim()
+        && (
+          document.querySelectorAll('#home-top3-grid .home-top-card, #home-top3-grid .home-watch-card').length >= 1
+          || /Aucun pari validé à miser|Top 3 incomplet/i.test(document.body.innerText || '')
+        )
+      )
       || /Erreur au démarrage|Données trop anciennes/i.test(document.body.innerText || '')
     ), null, { timeout: 45000 });
 
@@ -199,8 +206,9 @@ async function main() {
         homeShellDisplay: getComputedStyle(document.querySelector('#betting-home-v2')).display,
         nextBetText: document.querySelector('#next-bet-card')?.innerText || '',
         homeTop3Count: document.querySelectorAll('#home-top3-grid .home-top-card').length,
-        homeTopMarkets: Array.from(document.querySelectorAll('#home-top3-grid .home-top-card')).map((node) => node.dataset.homeMarket || ''),
-        homeTopCards: Array.from(document.querySelectorAll('#home-top3-grid .home-top-card')).map((node) => node.innerText || ''),
+        homeWatchCount: document.querySelectorAll('#home-top3-grid .home-watch-card').length,
+        homeTopMarkets: Array.from(document.querySelectorAll('#home-top3-grid .home-top-card, #home-top3-grid .home-watch-card')).map((node) => node.dataset.homeMarket || ''),
+        homeTopCards: Array.from(document.querySelectorAll('#home-top3-grid .home-top-card, #home-top3-grid .home-watch-card')).map((node) => node.innerText || ''),
         homeTableRows: document.querySelectorAll('#home-picks-table-body tr.clickable-row').length,
         homeTableMarkets: Array.from(document.querySelectorAll('#home-picks-table-body tr.clickable-row')).map((node) => node.dataset.homeMarket || ''),
         homeTableReadyMarkets: Array.from(document.querySelectorAll('#home-picks-table-body tr.clickable-row'))
@@ -241,21 +249,15 @@ async function main() {
     const missingNav = requiredNavLabels.filter((label) => !navLabels.some((nav) => nav.includes(label)));
     assert(missingNav.length === 0, 'Terrain: navigation Parieur First incomplète', { missingNav, nav: dom.nav });
     assert(dom.nav.length <= 18, 'Terrain: navigation trop longue malgré les pages dédiées', { nav: dom.nav });
-    assert(
-      (dom.rows >= 15 && dom.rows <= 32 && dom.timeline >= 8)
-        || (dom.homeShellDisplay !== 'none' && dom.homeTableRows >= 6 && dom.homeCategoryCount >= 8),
-      'Terrain: accueil rapide/cockpit réel insuffisant',
-      dom
-    );
+    assert(dom.homeShellDisplay !== 'none' && (dom.homeTop3Count + dom.homeWatchCount) >= 1, 'Terrain: accueil rapide sans spot visible', dom);
     const expectedTopCount = Math.min(3, dom.homeTableReadyMarkets.length);
-    assert(dom.homeShellDisplay !== 'none' && dom.homeTop3Count >= expectedTopCount && dom.homeTableRows >= 6 && dom.homeTableRows <= 12 && dom.homeSortButtons.length >= 4, 'Terrain: nouvel accueil Top 3 + tableau triable absent ou trop long', dom);
+    assert(dom.homeShellDisplay !== 'none' && (dom.homeTop3Count + dom.homeWatchCount) >= expectedTopCount && dom.homeSortButtons.length >= 4, 'Terrain: nouvel accueil Top 3 absent ou cassé', dom);
     assert(!dom.homeTopCards.some((text) => /Observation|Écarté|(?:^|\n)\s*(?:Mise\s*)?0(?:[,.]00)?\s*€/i.test(text)), 'Terrain: Top 3 contient une ligne cassée ou à mise nulle', dom.homeTopCards);
     assert(dom.homeTopCards.every((text) => /Je mise|À surveiller/i.test(text)), 'Terrain: Top 3 sans action claire', dom.homeTopCards);
     const tableMarketCount = new Set(dom.homeTableReadyMarkets.filter(Boolean)).size;
     const topMarketCount = new Set(dom.homeTopMarkets.filter(Boolean)).size;
     assert(tableMarketCount <= 1 || topMarketCount >= 2, 'Terrain: Top 3 trop monotone malgré plusieurs marchés prêts', { top: dom.homeTopMarkets, tableReady: dom.homeTableReadyMarkets, table: dom.homeTableMarkets });
-    assert(dom.homeCategoryCount >= 6, 'Terrain: catégories pronostics insuffisantes pour alléger l’accueil', dom);
-    assert(!dom.homeCategoryTexts.some((text) => /\b0\s+ligne/i.test(text)), 'Terrain: catégorie vide visible sur l’accueil', dom.homeCategoryTexts);
+    assert(dom.homeCategoryCount === 0, 'Terrain: catégories rendues sur l’accueil standard alors qu’elles ont leurs pages dédiées', dom);
     assert(!dom.cockpitOpen, 'Terrain: Cockpit détaillé ouvert par défaut, accueil trop chargé', dom);
     assert(dom.cockpitDisplay === 'none' && dom.readyHeroDisplay === 'none' && dom.liveDisplay === 'none' && dom.stakeScenarioDisplay === 'none', 'Terrain: accueil encore surchargé par des blocs secondaires', dom);
     assert(dom.expertHomeLeaks.length === 0, 'Terrain: le Mode expert pollue encore l’accueil À miser', dom.expertHomeLeaks);
@@ -318,8 +320,8 @@ async function main() {
         text: document.querySelector('#match-modal')?.innerText || '',
         advancedDetailsVisible: Boolean(Array.from(document.querySelectorAll('#match-modal .detail-expert-details, #match-modal .detail-audit')).find((node) => getComputedStyle(node).display !== 'none'))
       }));
-      assert(modalState.visibleTabs.length <= 4, 'Terrain: fiche match encore trop chargée en onglets', modalState.visibleTabs);
-      assert(!modalState.visibleTabs.some((label) => /cotes avanc|signaux|timeline|modèle|h2h|face-à-face/i.test(label)), 'Terrain: onglets techniques visibles dans la fiche rapide', modalState.visibleTabs);
+      assert(modalState.visibleTabs.length <= 3, 'Terrain: fiche match encore trop chargée en onglets', modalState.visibleTabs);
+      assert(!modalState.visibleTabs.some((label) => /compos|composition|cotes avanc|signaux|timeline|modèle|h2h|face-à-face/i.test(label)), 'Terrain: onglets secondaires visibles dans la fiche rapide', modalState.visibleTabs);
       assert(!modalState.advancedDetailsVisible, 'Terrain: détails techniques visibles dans la fiche rapide', modalState);
       assert(!/\bKelly\b|Marchés détaillés|Audit technique|Vue technique/i.test(modalState.text), 'Terrain: jargon technique visible dans la fiche rapide', modalState.text.slice(0, 1800));
       await win.locator('#modal-close').click();

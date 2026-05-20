@@ -306,8 +306,8 @@
   const REFRESH_URGENT_INTERVAL_MS = 5 * 60 * 1000;
   const REFRESH_ECONOMY_AFTER_MS = 60 * 60 * 1000;
   const REFRESH_ESTIMATE_SECONDS = {
-    instant: 25,
-    fast: 45,
+    instant: 12,
+    fast: 35,
     quick: 150,
     signals: 520,
     full: 900,
@@ -7150,6 +7150,18 @@
     return diverseHomeTopRows(watch, limit).slice(0, limit);
   }
 
+  function homeFallbackSpotRows(rows, limit = 3, excludedRows = []) {
+    const source = Array.isArray(rows) ? rows : [];
+    const excluded = new Set(excludedRows.map((row) => userBetKey(row) || row?.id || `${row?.title}:${row?.market}:${row?.label}`));
+    const candidates = rollingWeekRows(source, (row) => pickHasCoreData(row) && isBeforeKickoff(row))
+      .filter((row) => {
+        const key = userBetKey(row) || row?.id || `${row?.title}:${row?.market}:${row?.label}`;
+        const odd = Number(row?.odd || 0);
+        return !excluded.has(key) && odd > 1 && odd <= 6.5;
+      });
+    return diverseHomeTopRows(candidates, limit).slice(0, limit);
+  }
+
   function homeCategoryMeta(category) {
     const metas = {
       cockpit: {
@@ -7345,6 +7357,7 @@
     const body = $('#home-picks-table-body');
     const caption = $('#home-table-caption');
     const sortMode = homeSortMode();
+    const quickHome = isQuickHomeRender();
     if (!topWrap && !body) return;
     const meta = homeCategoryMeta(state.activeHomeCategory);
     const kicker = $('#home-kicker');
@@ -7358,12 +7371,13 @@
     renderWhyNotMore(rows, '#why-not-more-card');
     const topRows = homeTopRows(source, 3);
     const watchRows = topRows.length < 3 ? homeWatchRows(source, 3 - topRows.length, topRows) : [];
+    const fallbackRows = topRows.length || watchRows.length ? [] : homeFallbackSpotRows(rows, 3);
     const tableLimit = state.activeHomeCategory ? 10 : 6;
     const tableRows = sortHomeRows(source, sortMode).slice(0, tableLimit);
     $$('.home-sort-actions [data-home-sort], .home-picks-table [data-home-sort]').forEach((button) => {
       button.classList.toggle('active', button.dataset.homeSort === sortMode);
     });
-    if (caption) {
+    if (caption && !quickHome) {
       const labels = { confidence: 'confiance puis cote', kickoff: 'heure de départ', date: 'date', odd: 'cote Winamax', status: 'statut de mise' };
       caption.textContent = `${formatCount(tableRows.length)} affichés ici · ${formatCount(tableLimit)} max · tri ${labels[sortMode] || 'confiance'}`;
     }
@@ -7371,14 +7385,19 @@
       const watchHtml = watchRows.length
         ? `<div class="home-watch-strip">${watchRows.map(homeWatchCardHtml).join('')}</div>`
         : '';
+      const fallbackHtml = fallbackRows.length
+        ? `<div class="home-watch-strip">${fallbackRows.map(homeWatchCardHtml).join('')}</div>`
+        : '';
       topWrap.innerHTML = topRows.length
         ? topRows.map(homeTopCardHtml).join('') + watchHtml + (topRows.length < 3 ? '<div class="empty compact-empty">Top 3 incomplet : le modèle refuse de transformer une ligne à surveiller en pari.</div>' : '')
-        : '<div class="empty compact-empty">Aucun pari validé à miser sur les prochaines 24h. Les meilleurs signaux restent dans le tableau, sans bouton de mise.</div>' + watchHtml;
+        : '<div class="empty compact-empty">Aucun pari validé à miser sur les prochaines 24h. Les meilleurs spots restent affichés à surveiller, sans bouton de mise.</div>' + watchHtml + fallbackHtml;
     }
-    if (body) {
+    if (body && !quickHome) {
       body.innerHTML = tableRows.length
         ? tableRows.map(homeTableRowHtml).join('')
         : '<tr><td colspan="9" class="empty">Aucun pari dans le tableau 24h avec les filtres actuels.</td></tr>';
+    } else if (body && quickHome) {
+      body.innerHTML = '';
     }
   }
 
@@ -9090,8 +9109,10 @@
     if ($('[data-panel="category"]')?.classList.contains('active')) {
       renderCategoryPage(state.activeHomeCategory || 'cockpit');
     }
-    renderRecoveryStrip();
-    renderHomeCategories(displayRows);
+    if (!quickHome) {
+      renderRecoveryStrip();
+      renderHomeCategories(displayRows);
+    }
     // Sprint 50 (UX) : badge compteur "paris prêts" dans la nav Picks.
     try {
       const readyCount = rollingReadyRows(displayRows || []).length;

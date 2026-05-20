@@ -5,6 +5,32 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.5.0 — Accueil standard rendu plus léger
+
+Optimisation visible : l’accueil standard ne calcule plus les blocs cachés.
+- Le tableau complet et les catégories ne sont plus rendus derrière l’accueil compact quand le mode standard est actif.
+- Le smoke rapide valide maintenant les trois vrais blocs visibles (`Prochain pari sérieux`, `Top 3`, `Pourquoi pas plus ?`) au lieu d’attendre des lignes de tableau cachées.
+- Quand aucun pari n’est validé, le Top 3 montre quand même les meilleurs spots de la semaine à surveiller, sans bouton `Je mise`.
+- Le rendu garde les pages dédiées intactes : Football, Vainqueurs, Nuit, etc. continuent de charger leur tableau quand on les ouvre.
+- Version app, package et cache Service Worker bumpés en `v8.5.0`.
+
+### Version v8.4.0 — Synchro instant plus courte
+
+Chantier vitesse : le bouton standard doit recalculer vite au lieu de rejouer une mini-pipeline.
+- La synchro `instant` passe de 22 étapes à 12 étapes ciblées : marchés Winamax, patch local, contexte, checklist, décision finale, santé et inline.
+- Les audits/exports lourds ne tournent plus dans l’instantané ; ils restent réservés aux modes enrichis/avancés.
+- L’estimation UI descend à 12 s pour `Synchro instant` et 35 s pour `fast`.
+- Le contrat refresh bloque désormais toute régression qui ferait redevenir `instant` une pipeline longue.
+- Version app, package et cache Service Worker bumpés en `v8.4.0`.
+
+### Version v8.3.0 — Fiche match standard en 3 onglets
+
+Suite du chantier “Parieur First” : la fiche match rapide doit aider à décider, pas ouvrir dix tiroirs.
+- Fiche match standard simplifiée : seuls `Décision`, `Analyse` et `Sources` restent visibles en lecture rapide.
+- Les onglets secondaires `Compos` / `Face-à-face` ne surchargent plus l’expérience standard ; les informations utiles restent dans les blocs d’analyse et les sources.
+- Le test terrain bloque désormais toute régression qui ré-afficherait des onglets secondaires ou techniques dans la fiche rapide.
+- Version app, package et cache Service Worker bumpés en `v8.3.0`.
+
 ### Version v8.2.0 — Accueil parieur pur + inventaire UI
 
 Suite directe du chantier v9 : l’accueil standard devient une vraie page “quoi faire maintenant”.
