@@ -5,6 +5,15 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.51 — Accueil avec moins de jargon
+
+UX.
+- Le petit résumé bankroll de l'accueil n'affiche plus `ROI` en standard : il garde seulement le résultat du jour et les paris en cours.
+- Le fallback version dans les réglages ne mentionne plus une ancienne `v7.1.0` si le JavaScript n'a pas encore rafraîchi le libellé.
+- Le widget bankroll secondaire parle de `rendement` au lieu de `ROI`.
+- Objectif : éviter les signaux contradictoires et le vocabulaire trop analyste sur les zones visibles rapidement.
+- Version app, package et cache Service Worker bumpés en `v8.6.51`.
+
 ### Version v8.6.50 — Combinés avec garde-fou unique
 
 Fix pronostics.

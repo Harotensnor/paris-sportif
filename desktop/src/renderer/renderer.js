@@ -1319,7 +1319,7 @@
     if (totalNode) totalNode.textContent = formatMoney(stats.pnlTotal);
     if (subNode) {
       const demo = loadPreferences().demoMode ? 'DÉMO · ' : '';
-      subNode.textContent = `${demo}Jour ${formatMoney(stats.pnlToday)} · ROI ${formatPct(stats.roi, 1)} · ${formatCount(stats.pending)} en cours`;
+      subNode.textContent = `${demo}Jour ${formatMoney(stats.pnlToday)} · ${formatCount(stats.pending)} en cours`;
     }
     if (sparklineNode) sparklineNode.innerHTML = sparklineSvg(stats.sparkline);
     if (segmentsNode) segmentsNode.textContent = segmentSummaryText(stats);
@@ -9121,7 +9121,7 @@
     const cards = [
       { id: 'top', label: 'TOP PICK', value: top ? `${top.title} · ${userBetLabel(top)}` : 'Aucun top pick', detail: top ? `${formatOdd(top.odd)} · mise ${visibleStakeText(top)}` : 'Refresh conseillé', size: 'xl' },
       { id: 'next', label: 'Prochains picks', value: `${formatCount(pool.length)} visibles`, detail: pool.slice(0, 3).map((row) => `${countdownLabel(row.start)} ${row.title}`).join(' · ') || 'Aucune ligne', size: 'wide' },
-      { id: 'bankroll', label: 'Bankroll + P&L', value: formatMoney(stats.pnlTotal), detail: `Jour ${formatMoney(stats.pnlToday)} · ROI ${formatPct(stats.roi, 1)}`, size: '' },
+      { id: 'bankroll', label: 'Bankroll + P&L', value: formatMoney(stats.pnlTotal), detail: `Jour ${formatMoney(stats.pnlToday)} · rendement ${formatPct(stats.roi, 1)}`, size: '' },
       { id: 'scanner', label: 'Scanner', value: `${formatCount(scannerPatterns.length)} pattern(s)`, detail: scannerPatterns[0]?.detail || 'Aucun pattern inter-matchs net.', size: '' },
       { id: 'news', label: 'News watcher', value: `${formatCount(latestNews.length)} alertes récentes`, detail: latestNews.map((row) => row.headline || row.title).join(' · ') || 'Aucune news impactante', size: '' },
       { id: 'live', label: 'Live', value: `${formatCount(live.length)} match(s)`, detail: live.map((row) => row.title).join(' · ') || 'Aucun live suivi', size: '' },
