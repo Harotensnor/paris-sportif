@@ -306,7 +306,7 @@
   const REFRESH_LIVE_INTERVAL_MS = 2 * 60 * 1000;
   const REFRESH_URGENT_INTERVAL_MS = 5 * 60 * 1000;
   const REFRESH_ECONOMY_AFTER_MS = 60 * 60 * 1000;
-  const REFRESH_ESTIMATE_SECONDS = {
+  const REFRESH_ESTIMATE_SECONDS = window.PSRefreshLabels?.estimateSeconds || {
     instant: 12,
     fast: 35,
     quick: 240,
@@ -3226,7 +3226,7 @@
   }
 
   function refreshModeLabel(mode) {
-    if (mode === 'instant') return 'Recalcul instant';
+    if (window.PSRefreshLabels?.modeLabel) return window.PSRefreshLabels.modeLabel(mode);
     if (mode === 'fast') return 'Synchro rapide';
     if (mode === 'signals') return 'Réparer signaux';
     if (mode === 'quick') return 'Maintenance enrichie';
@@ -3241,6 +3241,7 @@
   }
 
   function signalSourceLabel(source) {
+    if (window.PSRefreshLabels?.sourceLabel) return window.PSRefreshLabels.sourceLabel(source);
     const labels = {
       all: 'Tous signaux',
       weather: 'Météo',
