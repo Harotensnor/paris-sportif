@@ -5,6 +5,14 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.19 — Ticket final sans vieux diagnostic
+
+Fiabilité décision.
+- Le ticket final V16 refuse maintenant d'utiliser un diagnostic V15 plus ancien que la donnée terrain fraîche.
+- Après une synchro instant, V16 affiche `Ticket final en attente d'un recalcul profond` au lieu de recycler de vieux candidats prix/T-10.
+- L'action proposée devient `Lancer recalcul profond`, pour éviter de faire croire qu'une simple synchro instant suffit à recréer le dossier complet.
+- Version app, package et cache Service Worker bumpés en `v8.6.19`.
+
 ### Version v8.6.18 — Top 3 honnête
 
 UX / sécurité pari.

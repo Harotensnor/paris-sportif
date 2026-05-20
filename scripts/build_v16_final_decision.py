@@ -100,6 +100,26 @@ def iso_at(value: Any, minutes_before: int = 10) -> str:
     return (kickoff - timedelta(minutes=minutes_before)).isoformat().replace("+00:00", "Z")
 
 
+def data_generated_at() -> str:
+    manifest = read_json("data_manifest.json", {})
+    if isinstance(manifest, dict) and text(manifest.get("generated_at")):
+        return text(manifest.get("generated_at"))
+    data = read_json("data_today.json", [])
+    if isinstance(data, dict) and text(data.get("generated_at")):
+        return text(data.get("generated_at"))
+    return ""
+
+
+def upstream_is_stale(upstream_generated: Any, data_generated: Any) -> bool:
+    upstream = parse_dt(upstream_generated)
+    data = parse_dt(data_generated)
+    if not data:
+        return False
+    if not upstream:
+        return True
+    return upstream < data - timedelta(seconds=30)
+
+
 def t10_window(minutes_to_kickoff: int | None) -> str:
     if minutes_to_kickoff is None:
         return "unknown"
@@ -269,6 +289,77 @@ def build_candidate_reports(generated: str) -> tuple[dict[str, Any], dict[str, A
     prebet = read_json("prebet_checklist_report.json", {})
     prematch = read_json("prematch_execution_plan.json", {})
     health_noise = read_json("v15_health_noise_report.json", {})
+    data_generated = data_generated_at()
+    v15_generated = text(v15.get("generated_at"))
+    if upstream_is_stale(v15_generated, data_generated):
+        summary = {
+            "candidates": 0,
+            "expired_removed_from_action": 0,
+            "ready_now": 0,
+            "wait_t10": 0,
+            "wait_price": 0,
+            "repair_source": 0,
+            "market_hostile": 0,
+            "hard_skip": 0,
+            "stake_zero_for_non_ready": True,
+            "message": "Ticket final en attente d'un recalcul profond",
+            "next_action": "Lancer recalcul profond",
+            "prebet_ready": False,
+            "prematch_ready": False,
+            "health_blocking": 0,
+            "t10_due_now": 0,
+            "t10_not_due_yet": 0,
+            "blocking_gates": {"stale_upstream": 1},
+            "stale_upstream": True,
+            "data_generated_at": data_generated,
+            "v15_generated_at": v15_generated,
+        }
+        candidate_resolution = {
+            "schema": "paris-sportif.v16.candidate_resolution.v1",
+            "generated_at": generated,
+            "summary": summary,
+            "rows": [],
+        }
+        t10_decision = {
+            "schema": "paris-sportif.v16.t10_decision.v1",
+            "generated_at": generated,
+            "summary": {
+                "candidates": 0,
+                "ready_now": 0,
+                "wait_t10": 0,
+                "due_now": 0,
+                "not_due_yet": 0,
+                "blocked_prebet": 0,
+                "blocked_prematch": 0,
+                "final_gate": "blocked",
+                "message": "Entrées V15 plus anciennes que la data : ticket final non exploitable.",
+                "stale_upstream": True,
+            },
+            "rows": [],
+        }
+        final_ticket = {
+            "schema": "paris-sportif.v16.final_ticket.v1",
+            "generated_at": generated,
+            "summary": {
+                **summary,
+                "ticket_status": "stale_upstream",
+                "agent_allowed": False,
+            },
+            "rows": [],
+        }
+        agent_gate = {
+            "schema": "paris-sportif.v16.agent_gate.v1",
+            "generated_at": generated,
+            "summary": {
+                "status": "blocked",
+                "agent_allowed": False,
+                "ready_now": 0,
+                "reason": summary["message"],
+                "blocking_gate": "stale_upstream",
+            },
+            "rows": [],
+        }
+        return candidate_resolution, t10_decision, final_ticket, agent_gate
     rows = v15.get("rows") if isinstance(v15.get("rows"), list) else []
     prebet_summary = prebet.get("summary") if isinstance(prebet.get("summary"), dict) else {}
     prematch_summary = prematch.get("summary") if isinstance(prematch.get("summary"), dict) else {}
