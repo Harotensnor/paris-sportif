@@ -1637,22 +1637,38 @@ function fileMeta(name) {
   }
 }
 
+function sumManifestEventCounts(manifest) {
+  const counts = manifest && typeof manifest === 'object' ? manifest.event_counts : null;
+  if (!counts || typeof counts !== 'object') return null;
+  return Object.values(counts).reduce((sum, value) => sum + (Number(value) || 0), 0);
+}
+
+function manifestDayCount(manifest) {
+  if (!manifest || typeof manifest !== 'object') return null;
+  if (Array.isArray(manifest.days)) return manifest.days.length;
+  const counts = manifest.event_counts && typeof manifest.event_counts === 'object' ? manifest.event_counts : null;
+  return counts ? Object.keys(counts).length : null;
+}
+
 function getDataStatus() {
   if (!refreshState.running) loadRefreshHistory();
-  const dataJs = extractDataJs();
   const manifest = safeJsonFile(path.join(PROJECT_ROOT, 'data_manifest.json'));
   const health = safeJsonFile(path.join(PROJECT_ROOT, 'health.json'));
-  const today = safeJsonFile(path.join(PROJECT_ROOT, 'data_today.json'));
+  const todayPayload = safeJsonFile(path.join(PROJECT_ROOT, 'data_today.json'));
+  const manifestOk = manifest && !manifest.__error;
+  const todayEvents = Array.isArray(todayPayload) ? todayPayload : [];
+  const needsDataJsFallback = !manifestOk || !Array.isArray(todayPayload);
+  const dataJs = needsDataJsFallback ? extractDataJs() : null;
   const generatedAt =
-    dataJs.generatedAt ||
     (manifest && !manifest.__error ? manifest.generated_at : null) ||
-    (health && !health.__error ? health.generated_at : null);
+    (health && !health.__error ? health.generated_at : null) ||
+    (dataJs ? dataJs.generatedAt : null);
   const ageMinutes = computeAgeMinutes(generatedAt);
-  const allRows = eventListFromDays(dataJs.days);
-  const allEvents = allRows.map((row) => row.event).filter(Boolean);
-  const todayEvents = Array.isArray(today) ? today : [];
+  const fallbackRows = dataJs ? eventListFromDays(dataJs.days) : [];
+  const fallbackEvents = fallbackRows.map((row) => row.event).filter(Boolean);
   const now = Date.now();
-  const upcoming = allEvents.filter((event) => {
+  const upcomingSource = todayEvents.length ? todayEvents : fallbackEvents;
+  const upcoming = upcomingSource.filter((event) => {
     const ts = Date.parse(event.date || event.startDate || '');
     return !event.completed && Number.isFinite(ts) && ts > now - 30 * 60000;
   });
@@ -1670,15 +1686,15 @@ function getDataStatus() {
     generatedAt,
     ageMinutes,
     status,
-    source: dataJs.parseable ? 'data.js' : 'metadata',
-    recovery: dataJs.recoveredFromBackup ? {
+    source: dataJs && dataJs.parseable ? 'data.js' : 'metadata',
+    recovery: dataJs && dataJs.recoveredFromBackup ? {
       recoveredFromBackup: true,
       source: dataJs.source,
       primaryError: dataJs.primaryError || null
     } : null,
     counts: {
-      days: dataJs.days ? Object.keys(dataJs.days).length : 0,
-      events: allEvents.length,
+      days: manifestDayCount(manifest) ?? (dataJs?.days ? Object.keys(dataJs.days).length : 0),
+      events: sumManifestEventCounts(manifest) ?? fallbackEvents.length,
       upcoming: upcoming.length,
       bookable: bookable.length,
       today: todayEvents.length
@@ -1758,6 +1774,11 @@ function finishRefresh(exitCode, errorMessage = null) {
   refreshState.history.unshift(summary);
   refreshState.history = refreshState.history.slice(0, 20);
   persistRefreshHistory();
+  if (summary.ok && summary.mode !== 'signals') {
+    setTimeout(() => {
+      warmHomeCompactAnalysis('apres refresh');
+    }, 50);
+  }
 }
 
 function spawnPythonRefresh(mode, source = 'all') {
@@ -2355,6 +2376,17 @@ function warmEngineAnalysis() {
     engineService.getAnalysis({ bankroll: 50 });
   }).catch((error) => {
     appendRefreshLine(`[desktop] préchauffage moteur ignoré: ${error.message}`);
+  });
+}
+
+function warmHomeCompactAnalysis(reason = '') {
+  if (testMode) return Promise.resolve();
+  return Promise.resolve().then(() => {
+    const analysis = engineService.getAnalysis({ bankroll: 50, homeOnly: true });
+    writeHomeCompactPayload(compactEngineHomePayload(analysis));
+    appendRefreshLine(`[desktop] accueil rapide prêt${reason ? ` (${reason})` : ''}`);
+  }).catch((error) => {
+    appendRefreshLine(`[desktop] préchauffage accueil ignoré: ${error.message}`);
   });
 }
 

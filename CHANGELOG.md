@@ -5,6 +5,14 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.20 — Statut léger + accueil préchauffé
+
+Performance / simplicité.
+- Le statut de données lit maintenant le manifeste léger et `data_today.json` avant de tomber sur le gros `data.js`.
+- Après une synchro réussie, le cache compact d'accueil est préchauffé en arrière-plan pour éviter un gros recalcul au prochain affichage.
+- L'accueil reste utilisable même quand les sources profondes sont encore en train de se recalculer.
+- Version app, package et cache Service Worker bumpés en `v8.6.20`.
+
 ### Version v8.6.19 — Ticket final sans vieux diagnostic
 
 Fiabilité décision.
