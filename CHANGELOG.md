@@ -11,6 +11,7 @@ Optimisation visible : l’accueil standard ne calcule plus les blocs cachés.
 - Le tableau complet et les catégories ne sont plus rendus derrière l’accueil compact quand le mode standard est actif.
 - Le smoke rapide valide maintenant les trois vrais blocs visibles (`Prochain pari sérieux`, `Top 3`, `Pourquoi pas plus ?`) au lieu d’attendre des lignes de tableau cachées.
 - Quand aucun pari n’est validé, le Top 3 montre quand même les meilleurs spots de la semaine à surveiller, sans bouton `Je mise`.
+- Les séquences de forme brutes de 3 à 10 matchs (`WWDND`, `LLW`, etc.) sont converties en phrases lisibles avant affichage.
 - Le rendu garde les pages dédiées intactes : Football, Vainqueurs, Nuit, etc. continuent de charger leur tableau quand on les ouvre.
 - Version app, package et cache Service Worker bumpés en `v8.5.0`.
 

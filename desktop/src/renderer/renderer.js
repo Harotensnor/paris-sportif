@@ -3925,7 +3925,7 @@
   }
 
   function formSummaryFromCodeSequence(value) {
-    const raw = String(value || '').trim().toUpperCase().replace(/[^WVNDL]/g, '').slice(0, 5);
+    const raw = String(value || '').trim().toUpperCase().replace(/[^WVNDL]/g, '').slice(0, 10);
     if (!raw) return '';
     const frenchMode = /[VP]/.test(raw) || (/[N]/.test(raw) && !/[WL]/.test(raw));
     const mapped = raw.split('').map((letter) => {
@@ -3940,12 +3940,12 @@
 
   function prettifyFormCodesInText(value) {
     let text = String(value || '');
-    text = text.replace(/\bforme\s+([WVNDL]{3,5})\s*\/\s*([WVNDL]{3,5})\b/gi, (_match, home, away) => {
+    text = text.replace(/\bforme\s+([WVNDL]{3,10})\s*\/\s*([WVNDL]{3,10})\b/gi, (_match, home, away) => {
       const homeText = formSummaryFromCodeSequence(home);
       const awayText = formSummaryFromCodeSequence(away);
       return `forme : domicile ${homeText} · extérieur ${awayText}`;
     });
-    text = text.replace(/\b([WVNDL]{4,5})\b/g, (match) => formSummaryFromCodeSequence(match) || match);
+    text = text.replace(/\b([WVNDL]{3,10})\b/g, (match) => formSummaryFromCodeSequence(match) || match);
     return text;
   }
 
@@ -7260,6 +7260,20 @@
     return ready.concat(watch, week).slice(0, 30);
   }
 
+  function mergeUniqueRows(...groups) {
+    const seen = new Set();
+    const out = [];
+    for (const group of groups) {
+      for (const row of (Array.isArray(group) ? group : [])) {
+        const key = userBetKey(row) || row?.id || `${row?.title || ''}:${row?.market || ''}:${row?.label || ''}:${row?.start || ''}`;
+        if (!key || seen.has(key)) continue;
+        seen.add(key);
+        out.push(row);
+      }
+    }
+    return out;
+  }
+
   function homeTopCardHtml(row, index) {
     const rank = index + 1;
     const confidence = Math.round(homeConfidenceValue(row) * 100);
@@ -7366,12 +7380,14 @@
     if (kicker) kicker.textContent = meta.kicker;
     if (title) title.textContent = meta.title;
     if (subtitle) subtitle.textContent = meta.subtitle;
+    const broadRows = mergeUniqueRows(rows, state.picks, state.allPicks);
     const source = homeSourceRows(rows);
-    renderNextSeriousBet(source, '#next-bet-card');
-    renderWhyNotMore(rows, '#why-not-more-card');
-    const topRows = homeTopRows(source, 3);
-    const watchRows = topRows.length < 3 ? homeWatchRows(source, 3 - topRows.length, topRows) : [];
-    const fallbackRows = topRows.length || watchRows.length ? [] : homeFallbackSpotRows(rows, 3);
+    const topSource = source.length ? source : homeSourceRows(broadRows);
+    renderNextSeriousBet(broadRows, '#next-bet-card');
+    renderWhyNotMore(broadRows, '#why-not-more-card');
+    const topRows = homeTopRows(topSource, 3);
+    const watchRows = topRows.length < 3 ? homeWatchRows(topSource, 3 - topRows.length, topRows) : [];
+    const fallbackRows = topRows.length || watchRows.length ? [] : homeFallbackSpotRows(broadRows, 3);
     const tableLimit = state.activeHomeCategory ? 10 : 6;
     const tableRows = sortHomeRows(source, sortMode).slice(0, tableLimit);
     $$('.home-sort-actions [data-home-sort], .home-picks-table [data-home-sort]').forEach((button) => {
