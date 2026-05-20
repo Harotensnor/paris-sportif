@@ -70,7 +70,7 @@ async function main() {
       && document.querySelector('#why-not-more-card')?.innerText?.trim()
       && (
         document.querySelectorAll('#home-top3-grid .home-top-card, #home-top3-grid .home-watch-card').length >= 1
-        || /Aucun pari validé à miser|Top 3 incomplet|Erreur au démarrage|Données trop anciennes/i.test(document.body.innerText || '')
+        || /Aucun spot exploitable|Erreur au démarrage|Données trop anciennes/i.test(document.body.innerText || '')
       )
     ), null, { timeout: 30000 });
     const homeReadyMs = Date.now() - launchedAt;
@@ -101,7 +101,7 @@ async function main() {
     if (!/Pourquoi pas plus/i.test(home.whyNotMoreText)) {
       throw new Error(`Bloc Pourquoi pas plus absent: ${home.whyNotMoreText.slice(0, 300)}`);
     }
-    const topEmptyAllowed = /Aucun pari validé à miser|Top 3 incomplet/i.test(home.dashboardText);
+    const topEmptyAllowed = /Aucun spot exploitable|Erreur au démarrage|Données trop anciennes/i.test(home.dashboardText);
     if ((!home.topCards && !home.watchCards && !topEmptyAllowed)) {
       throw new Error(`Accueil rapide incomplet: ${JSON.stringify(home)}`);
     }

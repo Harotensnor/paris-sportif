@@ -5846,7 +5846,7 @@
       state.engineHydrationTimer = setTimeout(() => {
         state.engineHydrationTimer = null;
         hydrateFullEngineAnalysis(bankroll);
-      }, 15000);
+      }, 45000);
     }
     else scheduleSecondaryEnginePanels();
     maybeAutoCriticalRefresh();

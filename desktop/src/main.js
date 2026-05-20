@@ -2290,6 +2290,7 @@ function createWindow(port) {
 }
 
 function warmEngineAnalysis() {
+  if (testMode) return Promise.resolve();
   return Promise.resolve().then(() => {
     engineService.getAnalysis({ bankroll: 50 });
   }).catch((error) => {
@@ -2322,7 +2323,7 @@ if (!gotSingleInstanceLock) {
     createWindow(port);
     setTimeout(() => {
       warmEngineAnalysis();
-    }, 1000);
+    }, 6000);
   });
 
   app.on('activate', () => {

@@ -275,7 +275,7 @@ async function main() {
     assert(!dom.hiddenAdvancedVisible, 'Terrain: Avancé visible sans Mode expert', dom);
 
     await win.locator('[data-tab="combines"]:visible').first().click();
-    await win.waitForSelector('#combines-list', { timeout: 10_000 });
+    await win.waitForFunction(() => Boolean(document.querySelector('[data-panel="combines"].active #combines-list')), null, { timeout: 10_000 });
     const combinesAudit = await win.evaluate(() => {
       const text = document.querySelector('[data-panel="combines"]')?.innerText || '';
       return {

@@ -5,6 +5,14 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.1 — Moins de travail de fond au démarrage
+
+Optimisation anti-lag : l'accueil doit rester prioritaire.
+- Le préchauffage moteur côté application attend maintenant 6 s au lieu de se lancer quasi immédiatement.
+- En mode test isolé, ce préchauffage est désactivé pour mesurer uniquement l'interface visible.
+- L'hydratation complète des panneaux lourds est repoussée à 45 s après l'accueil ; elle reste immédiate si l'utilisateur ouvre une page qui en a vraiment besoin.
+- Version app, package et cache Service Worker bumpés en `v8.6.1`.
+
 ### Version v8.6.0 — Début du découpage accueil
 
 Premier découpage prudent du gros renderer, sans changer l'expérience visible.
