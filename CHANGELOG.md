@@ -5,6 +5,14 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.31 — Blocages écrits en langage parieur
+
+UX pronostics.
+- Les blocages techniques comme `Alternative marché : lecture seulement` sont traduits en phrases plus claires.
+- Exemple : `marché visible, cote Winamax à confirmer avant mise`.
+- Les signaux 2-0 ou contexte léger sont expliqués sans jargon moteur.
+- Version app, package et cache Service Worker bumpés en `v8.6.31`.
+
 ### Version v8.6.30 — Semaine prête visible
 
 UX pronostics.
