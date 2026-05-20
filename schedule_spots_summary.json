@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-05-20T19:51:29Z",
+  "generated_at": "2026-05-20T19:57:38Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 34,
+    "active_events": 31,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 50,
-      "back_to_back_travel": 11,
+      "lookahead": 46,
+      "back_to_back_travel": 9,
       "travel_extreme": 1,
       "schedule_congestion": 12
     },
     "by_decision": {
-      "abstain": 22,
-      "lean_home": 12
+      "abstain": 21,
+      "lean_home": 10
     },
-    "lean_home": 12,
+    "lean_home": 10,
     "lean_away": 0,
-    "abstain": 22,
+    "abstain": 21,
     "monitor": 0
   },
   "active": [
@@ -85,76 +85,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815489",
-      "source_event_ids": [
-        "401815489"
-      ],
-      "kickoff": "2026-05-25T17:35Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Baltimore Orioles",
-      "away": "Tampa Bay Rays",
-      "match": "Baltimore Orioles - Tampa Bay Rays",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Baltimore Orioles 0.30, Tampa Bay Rays 0.30",
-      "pressure_score": 1.333,
-      "home_fade": 0.3,
-      "away_fade": 0.3,
-      "travel_score": 0,
-      "lookahead_score": 1.333,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "2 match important/proche dans les 3 jours",
-        "2 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -1.331,
-        "away_score": 1.203,
-        "home_fade": 1.436,
-        "away_fade": 0.3,
-        "reason": "Direction nette: Tampa Bay Rays (+1.20)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 0.536
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 1.0
           }
         ]
       }
@@ -518,13 +448,13 @@
         "1 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "home",
+        "status": "mixed",
+        "net_side": null,
         "home_score": 0.252,
-        "away_score": -1.097,
+        "away_score": -0.551,
         "home_fade": 0.15,
         "away_fade": 1.15,
-        "reason": "Direction nette: New York Yankees (+0.25)",
+        "reason": "Signaux mitigés: avantage net trop faible (New York Yankees +0.25, Toronto Blue Jays -0.55)",
         "detail": [
           {
             "side": "home",
@@ -543,6 +473,12 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.546
           }
         ]
       }
@@ -576,13 +512,13 @@
         "1 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "home",
+        "status": "mixed",
+        "net_side": null,
         "home_score": 0.043,
-        "away_score": -0.498,
+        "away_score": 0.232,
         "home_fade": 0.15,
         "away_fade": 0.55,
-        "reason": "Direction nette: St. Louis Cardinals (+0.04)",
+        "reason": "Signaux mitigés: avantage net trop faible (St. Louis Cardinals +0.04, Pittsburgh Pirates +0.23)",
         "detail": [
           {
             "side": "home",
@@ -601,6 +537,12 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.4
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.73
           }
         ]
       }
@@ -634,13 +576,13 @@
         "1 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
-        "home_fade": 0.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Vegas Golden Knights (-0.10)",
+        "status": "abstain",
+        "net_side": null,
+        "home_score": -0.747,
+        "away_score": -0.747,
+        "home_fade": 1.15,
+        "away_fade": 1.15,
+        "reason": "Signaux opposes: Colorado Avalanche fade 1.15, Vegas Golden Knights fade 1.15 -> prudence",
         "detail": [
           {
             "side": "home",
@@ -653,6 +595,18 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           }
         ]
       }
@@ -739,12 +693,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
+        "net_side": "home",
+        "home_score": 0.665,
         "away_score": -0.098,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Athletics (-0.10)",
+        "reason": "Direction nette: Los Angeles Angels (+0.67)",
         "detail": [
           {
             "side": "home",
@@ -757,6 +711,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.763
           }
         ]
       }
@@ -1362,84 +1322,6 @@
       }
     },
     {
-      "event_id": "401815504",
-      "source_event_ids": [
-        "401815504"
-      ],
-      "kickoff": "2026-05-26T22:35Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Baltimore Orioles",
-      "away": "Tampa Bay Rays",
-      "match": "Baltimore Orioles - Tampa Bay Rays",
-      "decision": "lean_home",
-      "net_team": "Baltimore Orioles",
-      "reason": "Tampa Bay Rays plus penalise par calendrier/voyage (0.96 vs 0.15)",
-      "pressure_score": 1.476,
-      "home_fade": 0.15,
-      "away_fade": 0.959,
-      "travel_score": 0.809,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours",
-        "1 match dans les 48h + 1396 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.95,
-        "away_score": 0.491,
-        "home_fade": 1.286,
-        "away_fade": 0.959,
-        "reason": "Signaux opposes: Baltimore Orioles fade 1.29, Tampa Bay Rays fade 0.96 -> prudence",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 0.536
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.809
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401815419",
       "source_event_ids": [
         "401815419"
@@ -1803,69 +1685,6 @@
       }
     },
     {
-      "event_id": "401815519",
-      "source_event_ids": [
-        "401815519"
-      ],
-      "kickoff": "2026-05-27T22:35Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Baltimore Orioles",
-      "away": "Tampa Bay Rays",
-      "match": "Baltimore Orioles - Tampa Bay Rays",
-      "decision": "lean_home",
-      "net_team": "Baltimore Orioles",
-      "reason": "Tampa Bay Rays plus penalise par calendrier/voyage (0.81 vs 0.00)",
-      "pressure_score": 0.809,
-      "home_fade": 0.0,
-      "away_fade": 0.809,
-      "travel_score": 0.809,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "1 match dans les 48h + 1396 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.853,
-        "away_score": 0.588,
-        "home_fade": 1.136,
-        "away_fade": 0.809,
-        "reason": "Signaux opposes: Baltimore Orioles fade 1.14, Tampa Bay Rays fade 0.81 -> prudence",
-        "detail": [
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 0.536
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.809
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401815438",
       "source_event_ids": [
         "401815438"
@@ -1893,19 +1712,31 @@
         "1 match dans les 48h + 896 km de voyage"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.388,
-        "away_score": -1.109,
-        "home_fade": 0.0,
+        "status": "mixed",
+        "net_side": null,
+        "home_score": -0.1,
+        "away_score": -0.308,
+        "home_fade": 0.488,
         "away_fade": 1.109,
-        "reason": "Direction nette: St. Louis Cardinals (+0.39)",
+        "reason": "Signaux mitigés: avantage net trop faible (St. Louis Cardinals -0.10, Pittsburgh Pirates -0.31)",
         "detail": [
           {
             "side": "away",
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.4
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 0.488
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.63
           },
           {
             "side": "away",
