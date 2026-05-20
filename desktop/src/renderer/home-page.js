@@ -19,8 +19,8 @@
     },
     night: {
       kicker: 'Nuit',
-      title: 'Les paris de nuit',
-      subtitle: 'Sports US, Asie et matchs tardifs sur les prochaines 24h.'
+      title: 'Les prochaines nuits à surveiller',
+      subtitle: 'Sports US, Asie et matchs tardifs sur la semaine : prêt si dossier solide, sinon prochain re-check.'
     },
     week: {
       kicker: 'Semaine',
@@ -131,15 +131,17 @@
     const ready = Number(stats.ready || 0);
     const watch = Number(stats.watch || 0);
     if (!total) {
-      if (key === 'night') return 'Rien de propre cette nuit : mieux vaut attendre le prochain refresh.';
+      if (key === 'night') return 'Aucun spot nuit propre dans la semaine : inutile de forcer.';
       if (key === 'week') return 'Aucun spot sérieux trouvé cette semaine dans le cache actuel.';
       return 'Aucun spot propre dans cette catégorie pour le moment.';
     }
     if (ready > 0) {
       if (key === 'watch') return 'Cette page reste volontairement sans mise directe : surveille les re-checks.';
+      if (key === 'night') return `${ready} pari${ready > 1 ? 's' : ''} de nuit jouable${ready > 1 ? 's' : ''}. Joue simple, pas en rattrapage.`;
       return `${ready} pari${ready > 1 ? 's' : ''} jouable${ready > 1 ? 's' : ''}. Commence par le meilleur spot, pas par tout jouer.`;
     }
     if (watch > 0) {
+      if (key === 'night') return `${watch} spot${watch > 1 ? 's' : ''} de nuit à surveiller. Pas de mise tant que les absences/stars ne sont pas propres.`;
       return `${watch} spot${watch > 1 ? 's' : ''} à surveiller. Pas de bouton tant que le dossier n’est pas assez propre.`;
     }
     return 'Des lignes existent, mais les garde-fous refusent la mise.';

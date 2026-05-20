@@ -1816,8 +1816,20 @@
     return rolling24hRows(rows, isReadyToStakeRow);
   }
 
+  function isNightWindowRow(row) {
+    const parts = parisDateParts(row?.start);
+    const hour = parts?.hour ?? new Date(row?.start).getHours();
+    return hour >= 0 && hour < 7;
+  }
+
   function nightPickRows(rows = state.picks, predicate = canDisplayPickCard) {
     return rolling24hRows(rows, predicate).filter((row) => {
+      return isNightWindowRow(row);
+    });
+  }
+
+  function rollingWeekNightRows(rows = state.picks, predicate = canDisplayPickCard) {
+    return rollingWeekRows(rows, predicate).filter((row) => {
       const parts = parisDateParts(row.start);
       const hour = parts?.hour ?? new Date(row.start).getHours();
       return hour >= 0 && hour < 7;
@@ -6670,7 +6682,7 @@
     if (category === 'scorer') return arr.filter((row) => rowMarketPreferenceKey(row) === 'scorer');
     if (category === 'halftime') return arr.filter((row) => rowMarketPreferenceKey(row) === 'halftime');
     if (category === 'watch') return arr.filter((row) => !isReadyToStakeRow(row));
-    if (category === 'night') return nightPickRows(rows, canDisplayPickCard);
+    if (category === 'night') return rollingWeekNightRows(rows, canDisplayPickCard);
     if (String(category || '').startsWith('sport:')) {
       const wanted = normalizeUiKey(String(category).slice(6));
       return arr.filter((row) => normalizeUiKey(row?.sport || 'sport') === wanted);
@@ -18486,7 +18498,7 @@
     };
     const cockpitCategory = categoryTabs[tab] || null;
     const panelTab = cockpitCategory ? 'category' : tab;
-    if (!state.engineHydrated && !state.engineHydrating && ['history', 'recovery', 'agent', 'data', 'search', 'calendar', 'pipeline', 'combines', 'scorers', 'matches'].includes(panelTab)) {
+    if (!state.engineHydrated && !state.engineHydrating && ['history', 'agent', 'data', 'search', 'calendar', 'pipeline', 'combines', 'scorers', 'matches'].includes(panelTab)) {
       if (state.engineHydrationTimer) {
         clearTimeout(state.engineHydrationTimer);
         state.engineHydrationTimer = null;

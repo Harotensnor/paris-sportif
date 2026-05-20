@@ -5,6 +5,14 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.10 — Reprise rapide testée
+
+Performance + non-régression.
+- La page `Pourquoi j’ai perdu` s’ouvre maintenant depuis l’analyse légère déjà chargée, sans lancer immédiatement toute l’analyse lourde.
+- Le smoke desktop rapide vérifie désormais aussi le plan concret de reprise : prochain spot, rythme, segment à éviter et prochain re-check.
+- La page `Nuit` regarde maintenant les prochaines nuits de la semaine, pas seulement la fenêtre 24h, pour afficher le prochain spot tardif utile quand la nuit immédiate est pauvre.
+- Version app, package et cache Service Worker bumpés en `v8.6.10`.
+
 ### Version v8.6.9 — Reprise sans masquer les vrais prêts
 
 Fix produit.

@@ -133,8 +133,24 @@ async function main() {
       throw new Error(`Page catégorie Football non rendue après clic: ${JSON.stringify(cockpit).slice(0, 900)}`);
     }
 
-    // Le smoke rapide reste volontairement court : les pages lourdes
-    // (Récupération/Bilan/Avancé) sont couvertes par le smoke complet.
+    await win.evaluate(() => document.querySelector('[data-tab="recovery"]')?.click());
+    await win.waitForFunction(() => (
+      document.querySelector('[data-panel="recovery"].active')
+      && document.querySelectorAll('#recovery-action-grid .segment-card').length >= 4
+    ), null, { timeout: 8000 });
+    const recovery = await win.evaluate(() => ({
+      actions: document.querySelector('#recovery-action-grid')?.innerText || '',
+      summary: document.querySelector('#recovery-summary-grid')?.innerText || ''
+    }));
+    if (!/Prochain spot/i.test(recovery.actions) || !/Rythme/i.test(recovery.actions) || !/À éviter/i.test(recovery.actions) || !/Prochain re-check/i.test(recovery.actions)) {
+      throw new Error(`Plan de reprise incomplet: ${JSON.stringify(recovery).slice(0, 900)}`);
+    }
+    if (!/Mode normal|Reprise/i.test(recovery.summary)) {
+      throw new Error(`Résumé récupération absent: ${JSON.stringify(recovery).slice(0, 900)}`);
+    }
+
+    // Le smoke rapide reste court : il vérifie les pages utiles au parieur
+    // sans ouvrir les panneaux techniques lourds.
     await win.evaluate(() => document.querySelector('[data-tab="preferences"]')?.click());
     await win.waitForSelector('#pref-bankroll', { timeout: 8000 });
 
