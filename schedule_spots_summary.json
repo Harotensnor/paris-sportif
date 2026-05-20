@@ -1,22 +1,22 @@
 {
-  "generated_at": "2026-05-20T17:06:24Z",
+  "generated_at": "2026-05-20T17:44:28Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 43,
+    "active_events": 41,
     "expired_sample": 0,
     "by_type": {
-      "back_to_back_travel": 18,
+      "back_to_back_travel": 16,
       "lookahead": 50,
       "travel_extreme": 1,
       "schedule_congestion": 28
     },
     "by_decision": {
       "abstain": 25,
-      "lean_home": 18
+      "lean_home": 16
     },
-    "lean_home": 18,
+    "lean_home": 16,
     "lean_away": 0,
     "abstain": 25,
     "monitor": 0
@@ -2131,57 +2131,6 @@
       }
     },
     {
-      "event_id": "401815420",
-      "source_event_ids": [
-        "401815420"
-      ],
-      "kickoff": "2026-05-20T17:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Tampa Bay Rays",
-      "away": "Baltimore Orioles",
-      "match": "Tampa Bay Rays - Baltimore Orioles",
-      "decision": "lean_home",
-      "net_team": "Tampa Bay Rays",
-      "reason": "Baltimore Orioles plus penalise par calendrier/voyage (0.89 vs 0.00)",
-      "pressure_score": 0.889,
-      "home_fade": 0.0,
-      "away_fade": 0.889,
-      "travel_score": 0.889,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "2 match dans les 48h + 1396 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.521,
-        "away_score": -1.489,
-        "home_fade": 0.0,
-        "away_fade": 1.489,
-        "reason": "Direction nette: Tampa Bay Rays (+0.52)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.889
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401815429",
       "source_event_ids": [
         "401815429"
@@ -2211,18 +2160,12 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.427,
-        "away_score": -1.221,
+        "home_score": 0.287,
+        "away_score": -0.821,
         "home_fade": 0.0,
-        "away_fade": 1.221,
-        "reason": "Direction nette: Colorado Rockies (+0.43)",
+        "away_fade": 0.821,
+        "reason": "Direction nette: Colorado Rockies (+0.29)",
         "detail": [
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
-          },
           {
             "side": "away",
             "type": "back_to_back_travel",
@@ -2432,57 +2375,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.789
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815421",
-      "source_event_ids": [
-        "401815421"
-      ],
-      "kickoff": "2026-05-20T17:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Philadelphia Phillies",
-      "away": "Cincinnati Reds",
-      "match": "Philadelphia Phillies - Cincinnati Reds",
-      "decision": "lean_home",
-      "net_team": "Philadelphia Phillies",
-      "reason": "Cincinnati Reds plus penalise par calendrier/voyage (0.77 vs 0.00)",
-      "pressure_score": 0.771,
-      "home_fade": 0.0,
-      "away_fade": 0.771,
-      "travel_score": 0.771,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "2 match dans les 48h + 806 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.62,
-        "away_score": -1.771,
-        "home_fade": 0.0,
-        "away_fade": 1.771,
-        "reason": "Direction nette: Philadelphia Phillies (+0.62)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.771
           }
         ]
       }
