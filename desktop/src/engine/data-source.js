@@ -145,6 +145,7 @@ function loadRuntimeData(root, { allowFallback = true } = {}) {
   if (!allowFallback) return { data: primary, primary, lite, todayJson, manifest, truth };
 
   const repaired = cloneJson(primary);
+  repaired.today = today;
   repaired.days = repaired.days && typeof repaired.days === 'object' ? repaired.days : {};
   const candidateDays = new Set([
     today,

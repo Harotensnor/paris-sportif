@@ -28,6 +28,10 @@ import re
 import hashlib
 from pathlib import Path
 from datetime import datetime, timedelta, timezone
+try:
+    from zoneinfo import ZoneInfo
+except Exception:  # pragma: no cover - fallback vieux Python
+    ZoneInfo = None
 from _data_io import save_data_js, write_text_atomic
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -60,6 +64,15 @@ def filter_event(ev):
     return True
 
 
+def paris_today_iso():
+    if ZoneInfo is not None:
+        try:
+            return datetime.now(ZoneInfo('Europe/Paris')).strftime('%Y-%m-%d')
+        except Exception:
+            pass
+    return datetime.now(timezone.utc).strftime('%Y-%m-%d')
+
+
 def main():
     if not DATA_JS.exists():
         print('[finalize_inline] data.js missing, skipping.', flush=True)
@@ -72,6 +85,11 @@ def main():
         return
     data = json.loads(m.group(1))
     data['generated_at'] = datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace('+00:00', 'Z')
+    # `data.today` peut rester figé si fetch_live a échoué ou si un mode
+    # instant repart d'un cache ancien. Le frontend et les sidecars doivent
+    # toujours parler de la vraie journée Europe/Paris, pas de l'ancienne clé.
+    today = paris_today_iso()
+    data['today'] = today
 
     # Phase 3 #2 : filter golf et events sans competitors valides AVANT
     # de produire les sidecar JSONs et de réinjecter dans pronostics.html.
@@ -89,7 +107,6 @@ def main():
     # gardait un top-level generated_at stale et affichait un faux stale state.
     save_data_js(data, DATA_JS)
 
-    today = data.get('today') or datetime.utcnow().strftime('%Y-%m-%d')
     days = data.get('days') or {}
     today_events = days.get(today, [])
 

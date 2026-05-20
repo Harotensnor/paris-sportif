@@ -60,6 +60,11 @@ async function main() {
   const runtimeData = dataSource.loadRuntimeDataStable(root);
   const data = runtimeData.data;
   const today = dataSource.parisDay();
+  assert(data.today === today, 'Terrain: data.today ne correspond pas à la vraie journée Europe/Paris', {
+    data_today: data.today,
+    paris_today: today,
+    generated_at: data.generated_at
+  });
   const events = dataSource.eventListFromDays(data.days || {});
   const todayEvents = events.filter((event) => dataSource.parisDay(event.date || event.startDate || event.kickoff || event.__dayKey) === today);
   const todayBookable = todayEvents.filter((event) => event?.winamax?.available === true);
@@ -76,6 +81,17 @@ async function main() {
   const generatedAt = Date.parse(health.generated_at || data.generated_at || '');
   assert(Number.isFinite(generatedAt), 'health.json/data.js sans generated_at exploitable');
   assert(Date.now() - generatedAt < 2 * 60 * 60 * 1000, 'Données terrain trop anciennes', { generated_at: health.generated_at || data.generated_at });
+  const dataGeneratedAt = Date.parse(data.generated_at || '');
+  const healthDataAge = Number(health.data_age_min);
+  const actualDataAgeMin = Number.isFinite(dataGeneratedAt) ? Math.max(0, Math.round((Date.now() - dataGeneratedAt) / 60000)) : null;
+  if (actualDataAgeMin !== null && actualDataAgeMin <= 10) {
+    assert(Number.isFinite(healthDataAge) && healthDataAge <= 30, 'Terrain: health.json annonce une donnée vieille alors que data.js est frais', {
+      data_generated_at: data.generated_at,
+      actualDataAgeMin,
+      health_data_age_min: health.data_age_min,
+      health_data_file_age_min: health.data_file_age_min
+    });
+  }
 
   const engine = createLegacyEngineService({ projectRoot: root });
   const analysis = engine.getAnalysis({ bankroll: 50, force: true });

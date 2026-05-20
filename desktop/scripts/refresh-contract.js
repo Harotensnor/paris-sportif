@@ -94,20 +94,22 @@ function commonDecisionOutputs(stages, label, options = {}) {
 function lightDecisionOutputs(stages, label) {
   const requiredStages = [
     'build_match_context.py',
+    'finalize_inline.py',
+    'build_health.py',
     'build_prebet_checklist.py',
     'build_v7_actionability.py',
     'build_v8_decision_cockpit.py',
-    'build_v16_final_decision.py',
-    'build_health.py',
-    'finalize_inline.py'
+    'build_v16_final_decision.py'
   ];
   for (const stage of requiredStages) {
     includes(stages, stage, `${label} ${stage}`);
   }
+  before(stages, 'build_match_context.py', 'finalize_inline.py', `${label} contexte avant inline`);
+  before(stages, 'finalize_inline.py', 'build_health.py', `${label} inline avant santé`);
+  before(stages, 'build_health.py', 'build_prebet_checklist.py', `${label} santé fraîche avant checklist`);
   before(stages, 'build_match_context.py', 'build_prebet_checklist.py', `${label} contexte avant checklist`);
   before(stages, 'build_prebet_checklist.py', 'build_v7_actionability.py', `${label} checklist avant décision`);
   before(stages, 'build_v8_decision_cockpit.py', 'build_v16_final_decision.py', `${label} cockpit avant final`);
-  before(stages, 'build_health.py', 'finalize_inline.py', `${label} santé avant inline`);
 }
 
 function testInstant() {

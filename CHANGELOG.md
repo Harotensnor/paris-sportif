@@ -5,6 +5,16 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.15 — Synchro instant cohérente
+
+Performance / fiabilité.
+- La synchro instant écrit maintenant le snapshot final avant de recalculer la santé et la checklist pré-pari.
+- L’app ne mélange plus une donnée finale fraîche avec une ancienne alerte `data.js trop vieux`, ce qui évite des blocages incohérents après refresh rapide.
+- Le snapshot final force maintenant `data.today` sur la vraie journée Europe/Paris, au lieu de garder une ancienne clé quand la synchro repart d’un cache.
+- La lecture runtime réaligne aussi le champ `today` réparé avec le manifest, pour éviter qu’une ancienne date reste dans le moteur léger.
+- Le test terrain vérifie désormais que `health.json` ne raconte pas une donnée vieille quand `data.js` vient d’être régénéré.
+- Version app, package et cache Service Worker bumpés en `v8.6.15`.
+
 ### Version v8.6.14 — Moteur aligné avec le tri positif
 
 Pronostics.

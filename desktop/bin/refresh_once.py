@@ -80,10 +80,13 @@ INSTANT_STAGES = [
     Stage("patch_tennis_features.py", 25),
     Stage("build_match_context.py", 25),
     Stage("build_refresh_priority_plan.py", 15),
+    # finalize_inline.py bumpe generated_at dans data.js. En mode instant,
+    # il n'y a pas de fetch_live avant la checklist : sans cette étape ici,
+    # health/prebet pouvaient garder l'âge du snapshot précédent.
+    Stage("finalize_inline.py", 30, required=True),
+    Stage("build_health.py", 15),
     Stage("build_prebet_checklist.py", 15),
     *INSTANT_DECISION_STACK_STAGES,
-    Stage("build_health.py", 15),
-    Stage("finalize_inline.py", 30, required=True),
     Stage("check_pipeline_freshness.py", 15),
 ]
 
