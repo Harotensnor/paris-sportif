@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-05-20T13:47:10Z",
+  "generated_at": "2026-05-20T13:58:27Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 55,
+    "active_events": 56,
     "actionable": 26,
-    "watch": 3,
+    "watch": 4,
     "risk": 26,
     "expired_sample": 0,
     "by_type": {
@@ -14,11 +14,12 @@
       "back_to_back_travel": 18,
       "signal_conflict": 9,
       "travel_extreme": 1,
+      "market_move": 1,
       "market_uncertain": 19
     },
     "by_quality": {
       "actionable": 26,
-      "watch": 3,
+      "watch": 4,
       "risk": 26
     }
   },
@@ -546,6 +547,24 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 12-9"
+    },
+    {
+      "event_id": "178545",
+      "date": "2026-05-21T04:00Z",
+      "sport": "tennis",
+      "league_code": "rolandgarros",
+      "league_name": "Roland Garros",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "away",
+      "strength": 0.529,
+      "context": "Cote away: 2.10 -> 2.30 (-9.5%)"
     }
   ],
   "active_risk": [
@@ -727,7 +746,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.1%"
+      "context": "marge bookmaker anormale 18.3%"
     },
     {
       "event_id": "401842725",
