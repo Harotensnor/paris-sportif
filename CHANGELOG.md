@@ -5,6 +5,14 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.8 — Plan de reprise concret
+
+Suite “j’ai perdu, qu’est-ce que je fais maintenant ?”.
+- La page `Pourquoi j’ai perdu` affiche maintenant un plan concret : prochain spot, rythme max, segment à éviter et prochain re-check.
+- Le plan utilise les garde-fous existants : reprise contrôlée, segments perdants, familles coupées durablement et prochains spots visibles.
+- Objectif : continuer à proposer des paris sans tomber dans le rattrapage automatique ou les marchés déjà perdants.
+- Version app, package et cache Service Worker bumpés en `v8.6.8`.
+
 ### Outillage — Propreté des fichiers terrain
 
 Suite “ne plus confondre code sale et données régénérées”.

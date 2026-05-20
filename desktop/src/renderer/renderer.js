@@ -11880,6 +11880,63 @@
     `).join('');
   }
 
+  function recoveryActionPlan(status = recoveryModeStatus()) {
+    const pool = mergeUniqueRows(state.currentDashboardRows, state.picks, state.allPicks);
+    const profile = controlledRecoveryProfile(status.stats);
+    const strictReady = sortHomeRows(pool.filter((row) => isReadyToStakeRow(row) && controlledRecoveryCandidate(row, profile)), 'confidence');
+    const watch = sortHomeRows(pool.filter((row) => canDisplayPickCard(row) && !isReadyToStakeRow(row)), 'confidence');
+    const nextSpot = strictReady[0] || watch[0] || null;
+    const worst = status.diagnosis.hotspots[0] || null;
+    const locks = durableFamilyLocks();
+    const avoid = locks[0]
+      ? `${locks[0].label} jusqu’au ${formatDateLabel(locks[0].lockedUntil)}`
+      : worst
+        ? `${worst.label} (${formatMoney(worst.pnl)})`
+        : 'aucun segment répété';
+    const nextStatus = nextSpot ? seriousBetStatus(nextSpot) : null;
+    return [
+      {
+        tone: nextStatus?.key === 'ready' ? 'warm' : 'sample',
+        label: 'Prochain spot',
+        value: nextSpot ? nextSpot.title || 'Match' : 'Aucun spot propre',
+        detail: nextSpot
+          ? `${userBetLabel(nextSpot) || simpleMarketLabelForRow(nextSpot)} · ${formatOdd(nextSpot.odd)} · ${nextStatus?.label || 'À surveiller'}`
+          : 'Attendre le prochain refresh plutôt que de forcer.'
+      },
+      {
+        tone: status.active ? 'cold' : 'warm',
+        label: 'Rythme',
+        value: `${formatCount(status.maxBets)} pari(s) max`,
+        detail: `Mise max ${formatMoney(status.maxStake)} · cotes simples en priorité.`
+      },
+      {
+        tone: locks.length || worst ? 'cold' : 'warm',
+        label: 'À éviter',
+        value: avoid,
+        detail: locks.length ? 'Bouton coupé automatiquement sur cette famille.' : 'Surveillance renforcée, pas de coupure durable.'
+      },
+      {
+        tone: 'sample',
+        label: 'Prochain re-check',
+        value: nextSpot ? nextCheckLabel(nextSpot) : 'au prochain refresh',
+        detail: nextSpot ? `${formatDateLabel(nextSpot.start)} · ${nextSpot.league || nextSpot.sport || 'Winamax'}` : 'Le logiciel relira les spots dès que les données changent.'
+      }
+    ];
+  }
+
+  function renderRecoveryActionPlan() {
+    const grid = $('#recovery-action-grid');
+    if (!grid) return;
+    const rows = recoveryActionPlan();
+    grid.innerHTML = rows.map((row) => `
+      <article class="segment-card ${escapeHtml(row.tone)}">
+        <span>${escapeHtml(row.label)}</span>
+        <strong>${escapeHtml(row.value)}</strong>
+        <p>${escapeHtml(row.detail)}</p>
+      </article>
+    `).join('');
+  }
+
   function recoveryModeStatus() {
     const stats = userBetStats();
     const diagnosis = lossDiagnosis();
@@ -11951,6 +12008,7 @@
         </article>
       `).join('');
     }
+    renderRecoveryActionPlan();
     renderLossDiagnosis();
     renderPostDayLearning();
     renderDurableFamilyLocks();
