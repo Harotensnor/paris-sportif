@@ -5,6 +5,22 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.39 — Aucun match commencé dans le cockpit
+
+Fix critique.
+- La sélection finale du cockpit exclut maintenant les picks dont le coup d'envoi est déjà passé.
+- Cela évite qu'un match encore présent dans les données Winamax du jour reste visible après son démarrage.
+- Le test moteur a capturé le cas `Seattle Mariners - Chicago White Sox` déjà commencé : il est maintenant filtré côté moteur.
+- Version app, package et cache Service Worker bumpés en `v8.6.39`.
+
+### Version v8.6.38 — Accueil instantané avec cache frais
+
+Performance / UX.
+- L'interface conserve un cache local compact du dernier accueil frais.
+- Au lancement suivant, le Top 3 et le bloc `Prochain pari sérieux` peuvent s'afficher immédiatement, puis le moteur remplace par le calcul courant.
+- Le cache n'est pas utilisé si la donnée a plus de 4h, pour éviter de proposer un pari périmé.
+- Version app, package et cache Service Worker bumpés en `v8.6.38`.
+
 ### Version v8.6.37 — Top 3 orienté vrais spots
 
 UX / pronostics.

@@ -3812,6 +3812,7 @@ function createLegacyEngineService({ projectRoot }) {
     const maxPerLeague = Math.max(2, Math.ceil(maxDashboardRows * 0.20));
     const simplePicks = (Array.isArray(picks) ? picks : [])
       .filter(isSimpleUserMarket)
+      .filter(isFutureStart)
       .filter((row) => row?.contextGate?.gate !== 'skip');
     const sourcePicks = simplePicks.length ? simplePicks : [];
     const rolling24 = rollingWindowRows(sourcePicks, 24);

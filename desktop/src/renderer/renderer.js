@@ -177,6 +177,7 @@
   const DASHBOARD_LAYOUT_KEY = 'parisSportifDashboardLayouts';
   const PICKS_VIEW_MODE_KEY = 'parisSportifPicksViewMode';
   const HOME_SORT_KEY = 'parisSportifHomeSort';
+  const HOME_ANALYSIS_CACHE_KEY = 'parisSportifHomeAnalysisCacheV1';
   const DEFAULT_SHORTCUTS = {
     dashboard: 'Ctrl+1',
     history: 'Ctrl+2',
@@ -657,6 +658,72 @@
     } catch {
       // Donnée de confort : l'app reste utilisable même si le profil bloque l'écriture.
     }
+  }
+
+  function cacheableHomeAnalysis(analysis = {}) {
+    const dashboardPicks = Array.isArray(analysis.dashboardPicks) ? analysis.dashboardPicks.slice(0, 40) : [];
+    const picks = Array.isArray(analysis.picks) ? analysis.picks.slice(0, 40) : dashboardPicks;
+    return {
+      ok: Boolean(analysis.ok),
+      homeOnly: true,
+      generatedAt: analysis.generatedAt || null,
+      loadedAt: analysis.loadedAt || null,
+      loadMs: analysis.loadMs || null,
+      cache: analysis.cache || null,
+      counts: analysis.counts || null,
+      dashboardPicks,
+      picks,
+      matchesCount: analysis.matchesCount || Number(analysis.counts?.matches || 0) || 0,
+      dashboardMeta: analysis.dashboardMeta || null,
+      sourceHealthV9: analysis.sourceHealthV9 || null,
+      sourceHealthV8: analysis.sourceHealthV8 || null,
+      terrainReportV8: analysis.terrainReportV8 || null,
+      terrainReportV5: analysis.terrainReportV5 || null,
+      todayFunnel: analysis.todayFunnel || null,
+      coverage24h: analysis.coverage24h || null,
+      decisionCenter: analysis.decisionCenter || null,
+      marketCoverageV2: analysis.marketCoverageV2 || null,
+      prematchPlan: analysis.prematchPlan || null,
+      winamaxMarketAudit: analysis.winamaxMarketAudit || null
+    };
+  }
+
+  function rememberHomeAnalysisCache(analysis = {}) {
+    if (!analysis?.homeOnly || !Array.isArray(analysis.dashboardPicks) || !analysis.dashboardPicks.length) return;
+    writeStorageJson(HOME_ANALYSIS_CACHE_KEY, {
+      schema: 'paris-sportif.home-analysis-cache.v1',
+      savedAt: new Date().toISOString(),
+      analysis: cacheableHomeAnalysis(analysis)
+    });
+  }
+
+  function readHomeAnalysisCache() {
+    const envelope = readStorageJson(HOME_ANALYSIS_CACHE_KEY, null);
+    if (!envelope || envelope.schema !== 'paris-sportif.home-analysis-cache.v1') return null;
+    const analysis = envelope.analysis || null;
+    if (!analysis?.ok || !Array.isArray(analysis.dashboardPicks) || !analysis.dashboardPicks.length) return null;
+    const generatedAt = Date.parse(analysis.generatedAt || analysis.generated_at || '');
+    if (Number.isFinite(generatedAt) && Date.now() - generatedAt > 4 * 60 * 60 * 1000) return null;
+    const savedAt = Date.parse(envelope.savedAt || '');
+    if (Number.isFinite(savedAt) && Date.now() - savedAt > 12 * 60 * 60 * 1000) return null;
+    return {
+      ...analysis,
+      homeOnly: true,
+      cache: {
+        ...(analysis.cache || {}),
+        source: 'renderer-instant-home-cache',
+        cachedAt: envelope.savedAt || analysis.cache?.cachedAt || null
+      }
+    };
+  }
+
+  function renderInstantHomeCache() {
+    const cached = readHomeAnalysisCache();
+    if (!cached) return false;
+    applyEngineAnalysisState(cached);
+    renderPicks();
+    setSideStatus('Accueil prêt · cache frais', 'ok');
+    return true;
   }
 
   function appendStorageRow(key, row, limit = 500) {
@@ -5864,6 +5931,7 @@
     const bankroll = getBankroll();
     const analysis = await fetchJson(`/api/engine/analysis?bankroll=${encodeURIComponent(bankroll)}&home=1`);
     applyEngineAnalysisState(analysis);
+    rememberHomeAnalysisCache(analysis);
     refreshTrackedBetMarketData();
     $('#metric-upcoming').textContent = String(state.matches.length);
     $('#metric-bookable').textContent = `${state.matches.length} analysés par le logiciel`;
@@ -20506,6 +20574,7 @@
     const storedBankroll = Number(localStorage.getItem('userBankroll') || loadPreferences().bankroll || 50);
     if (Number.isFinite(storedBankroll) && storedBankroll > 0) $('#bankroll-input').value = String(storedBankroll);
     switchTab('dashboard');
+    renderInstantHomeCache();
     scheduleIdleUiTask(() => renderPreferences(), 2500);
     const statusPromise = refreshStatus();
     const logPromise = refreshLog().catch(() => null);
