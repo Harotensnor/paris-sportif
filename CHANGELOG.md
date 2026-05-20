@@ -5,6 +5,13 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.4 — Catégories moins vides
+
+Suite “prochain spot utile”.
+- Les pages catégorie utilisent maintenant une source élargie (`cockpit`, picks moteur, picks 24h/semaine) au lieu de dépendre seulement de la liste compacte visible.
+- Football, Tennis, Nuit, Vainqueurs et `À surveiller` peuvent donc montrer le prochain spot connu même si l'accueil standard reste volontairement court.
+- Version app, package et cache Service Worker bumpés en `v8.6.4`.
+
 ### Version v8.6.3 — Forme lisible isolée en module
 
 Suite du découpage UI sans framework.

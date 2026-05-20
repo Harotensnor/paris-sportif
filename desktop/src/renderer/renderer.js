@@ -7363,7 +7363,7 @@
   }
 
   function categoryRowsForPage(category, rows = state.currentDashboardRows.length ? state.currentDashboardRows : state.picks) {
-    const source = Array.isArray(rows) ? rows : [];
+    const source = mergeUniqueRows(rows, state.picks, state.allPicks);
     if (category === 'week') return rollingWeekRows(source, canDisplayPickCard);
     if (category === 'cockpit') return rolling24hRows(source, canDisplayPickCard);
     return category === 'watch'
