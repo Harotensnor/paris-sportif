@@ -11883,7 +11883,10 @@
   function recoveryActionPlan(status = recoveryModeStatus()) {
     const pool = mergeUniqueRows(state.currentDashboardRows, state.picks, state.allPicks);
     const profile = controlledRecoveryProfile(status.stats);
-    const strictReady = sortHomeRows(pool.filter((row) => isReadyToStakeRow(row) && controlledRecoveryCandidate(row, profile)), 'confidence');
+    const strictReady = sortHomeRows(pool.filter((row) => {
+      if (!isReadyToStakeRow(row)) return false;
+      return status.active ? controlledRecoveryCandidate(row, profile) : true;
+    }), 'confidence');
     const watch = sortHomeRows(pool.filter((row) => canDisplayPickCard(row) && !isReadyToStakeRow(row)), 'confidence');
     const nextSpot = strictReady[0] || watch[0] || null;
     const worst = status.diagnosis.hotspots[0] || null;

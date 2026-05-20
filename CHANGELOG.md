@@ -5,6 +5,13 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.9 — Reprise sans masquer les vrais prêts
+
+Fix produit.
+- En mode normal, le plan de reprise reprend maintenant le meilleur vrai `Je mise` au lieu d’appliquer à tort le filtre réservé aux journées de perte.
+- Le filtre strict de reprise reste actif uniquement quand le profil est réellement en récupération.
+- Version app, package et cache Service Worker bumpés en `v8.6.9`.
+
 ### Version v8.6.8 — Plan de reprise concret
 
 Suite “j’ai perdu, qu’est-ce que je fais maintenant ?”.
