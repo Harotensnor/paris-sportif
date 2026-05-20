@@ -7063,7 +7063,7 @@
         <div class="next-bet-side">
           <strong class="next-bet-verdict ${escapeHtml(status.tone)}">${escapeHtml(status.label)}</strong>
           <span>${escapeHtml(status.key === 'ready' ? status.action : `Re-check ${nextCheckLabel(row)}`)}</span>
-          ${status.key === 'ready' ? trackButtonHtml(row, `Je mise ${visibleStakeText(row)}`) : ''}
+          ${status.key === 'ready' ? trackButtonHtml(row, `${isRecoveryStakeRow(row) ? 'Je mise mini' : 'Je mise'} ${visibleStakeText(row)}`) : ''}
           ${status.key === 'blocked' ? '' : winamaxOpenButtonHtml(row, status.key === 'ready' ? 'Ouvrir Winamax' : 'Voir Winamax')}
         </div>
       </article>
@@ -7422,7 +7422,7 @@
         ? `<div class="home-watch-strip">${fallbackRows.map(homeWatchCardHtml).join('')}</div>`
         : '';
       topWrap.innerHTML = topRows.length
-        ? topRows.map(homeTopCardHtml).join('') + watchHtml + (topRows.length < 3 ? '<div class="empty compact-empty">Top 3 incomplet : le modèle refuse de transformer une ligne à surveiller en pari.</div>' : '')
+        ? topRows.map(homeTopCardHtml).join('') + watchHtml + (topRows.length < 3 ? '<div class="empty compact-empty">Je garde les autres spots en surveillance plutôt que de forcer un mauvais clic.</div>' : '')
         : '<div class="empty compact-empty">Pas de clic propre sur les prochaines 24h. Je garde quand même les meilleurs spots à surveiller, sans bouton de mise forcé.</div>' + watchHtml + fallbackHtml;
     }
     if (body) {

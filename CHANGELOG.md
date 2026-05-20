@@ -5,6 +5,14 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.33 — Libellés mini-mise cohérents
+
+UX pronostics.
+- Le bloc `Prochain pari sérieux` affiche maintenant `Je mise mini` aussi sur le bouton d'action.
+- Le message `Top 3 incomplet` est remplacé par une phrase de parieur plus simple.
+- Objectif : moins de vocabulaire technique, moins d'effet cockpit.
+- Version app, package et cache Service Worker bumpés en `v8.6.33`.
+
 ### Version v8.6.32 — Cache accueil moins jetable
 
 Performance.
