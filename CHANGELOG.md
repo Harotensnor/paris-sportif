@@ -5,6 +5,13 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.14 — Moteur aligné avec le tri positif
+
+Pronostics.
+- Le moteur dashboard utilise maintenant le vrai edge brut pour départager les lignes à surveiller quand `safeEdge` est ramené à zéro.
+- Les candidats nuit et confiance limitée ne sont plus artificiellement traités comme neutres quand leur edge brut est négatif.
+- Version app, package et cache Service Worker bumpés en `v8.6.14`.
+
 ### Version v8.6.13 — Tri plus sain des spots
 
 Pronostics.

@@ -838,6 +838,14 @@ function createLegacyEngineService({ projectRoot }) {
     return Number.isFinite(ts) && ts > now;
   }
 
+  function rankingEdgeValue(row) {
+    const safe = Number(row?.safeEdge);
+    const raw = Number(row?.edge);
+    if (Number.isFinite(safe) && safe > 0) return safe;
+    if (Number.isFinite(raw)) return raw;
+    return Number.isFinite(safe) ? safe : 0;
+  }
+
   function isDashboardDisplayCandidate(row) {
     if (!row || row.status === 'skip') return false;
     if (!isSimpleUserMarket(row)) return false;
@@ -851,7 +859,7 @@ function createLegacyEngineService({ projectRoot }) {
     // pour information mais le filtre fiable empêche la mise impulsive.
     if (row.limitedConfidence === true) {
       const odd = Number(row?.odd || 0);
-      const edge = Number(row?.safeEdge ?? row?.edge ?? 0);
+      const edge = rankingEdgeValue(row);
       if (odd >= 1.30 && odd <= 4.50 && edge >= -0.04) {
         return row.safeAssessment?.displayable !== false || edge >= -0.04;
       }
@@ -877,7 +885,7 @@ function createLegacyEngineService({ projectRoot }) {
     if (!['baseball', 'basketball', 'hockey', 'football', 'tennis', 'mma', 'boxe', 'rugby'].includes(sport)) return false;
     // Le cockpit standard reste volontairement simple : mi-temps reste expert.
     if (!market || market === 'halftime') return false;
-    const edge = Number(row?.safeEdge ?? row?.edge ?? 0);
+    const edge = rankingEdgeValue(row);
     const probability = Number(row?.probability || 0);
     const odd = Number(row?.odd || 0);
     // Cote max élargie à 5.00 (vs 4.00) pour intégrer plus d'outsiders nuit.
@@ -2583,8 +2591,15 @@ function createLegacyEngineService({ projectRoot }) {
     }
     const exploited = new Map();
     for (const row of Array.isArray(rows) ? rows : []) {
-      if (!row || !(row.edge > 0) || !(row.odd > 1)) continue;
-      const family = winamaxMarketFamily(row.marketKey || row.market);
+      if (!row || row.status === 'skip' || !(row.odd > 1)) continue;
+      const group = simpleMarketGroup(row.marketKey || row.market);
+      const family = group === 'winner'
+        ? '1n2'
+        : group === 'goals'
+          ? 'ou'
+          : group === 'scorer'
+            ? 'players'
+            : group || winamaxMarketFamily(row.marketKey || row.market);
       exploited.set(family, (exploited.get(family) || 0) + 1);
     }
     const availableFamilies = Array.from(familyCounts.entries())
@@ -3728,8 +3743,8 @@ function createLegacyEngineService({ projectRoot }) {
       pick?.decisionCenter?.canBet ? 1 : 0,
       pick?.safeAssessment?.reliable ? 1 : 0,
       pick?.decisionCenter?.status === 'ready' ? 1 : 0,
+      rankingEdgeValue(pick),
       Number(pick?.priorityScore || 0),
-      Number(pick?.safeEdge ?? pick?.edge ?? 0),
       Number(pick?.safeConfidence ?? pick?.probability ?? 0)
     ];
     const sortRows = (rows) => [...rows].sort((a, b) => {
@@ -6196,8 +6211,8 @@ function createLegacyEngineService({ projectRoot }) {
         if (reliableDelta) return reliableDelta;
         const readyDelta = Number(Boolean(b.decisionCenter?.canBet)) - Number(Boolean(a.decisionCenter?.canBet));
         if (readyDelta) return readyDelta;
-        return (Number(b.priorityScore || 0) - Number(a.priorityScore || 0)) ||
-          (Number(b.safeEdge ?? b.edge ?? 0) - Number(a.safeEdge ?? a.edge ?? 0)) ||
+        return (rankingEdgeValue(b) - rankingEdgeValue(a)) ||
+          (Number(b.priorityScore || 0) - Number(a.priorityScore || 0)) ||
           (Number(b.safeConfidence ?? b.probability ?? 0) - Number(a.safeConfidence ?? a.probability ?? 0)) ||
           (Date.parse(a.start || '') - Date.parse(b.start || ''));
       })
@@ -6216,8 +6231,8 @@ function createLegacyEngineService({ projectRoot }) {
         if (bWindow !== aWindow) return bWindow - aWindow;
         const readyDelta = Number(Boolean(b.decisionCenter?.canBet)) - Number(Boolean(a.decisionCenter?.canBet));
         if (readyDelta) return readyDelta;
-        return (Number(b.priorityScore || 0) - Number(a.priorityScore || 0)) ||
-          (Number(b.safeEdge ?? b.edge ?? 0) - Number(a.safeEdge ?? a.edge ?? 0)) ||
+        return (rankingEdgeValue(b) - rankingEdgeValue(a)) ||
+          (Number(b.priorityScore || 0) - Number(a.priorityScore || 0)) ||
           (Number(b.safeConfidence ?? b.probability ?? 0) - Number(a.safeConfidence ?? a.probability ?? 0)) ||
           (Date.parse(a.start || '') - Date.parse(b.start || ''));
       });
