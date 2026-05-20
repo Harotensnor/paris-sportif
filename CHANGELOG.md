@@ -5,6 +5,14 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.47 — Bannière “rien maintenant” utile
+
+UX.
+- Quand il n'y a rien à cliquer aujourd'hui mais que des spots prêts existent plus tard, la bannière n'affiche plus une alerte rouge technique.
+- Le message devient `Rien à cliquer maintenant · X spots prêts à venir`.
+- Le bouton renvoie vers la page `Semaine` au lieu de `Diagnostic auto`.
+- Version app, package et cache Service Worker bumpés en `v8.6.47`.
+
 ### Version v8.6.46 — Version affichée fiable
 
 Fix UX.

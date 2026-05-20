@@ -8751,14 +8751,15 @@
       const noReadyToday = bookable >= 10 && simpleReady < 1;
       const lowReadyToday = bookable >= 30 && simpleReady > 0 && simpleReady < 5;
       if ((bookable > 0 && displayed < 5) || tooStrictForDailyTarget || noReadyToday || lowReadyToday) {
-        node.className = 'today-funnel-alert danger';
+        const hasNextReady = futureReadyOutsideToday > 0;
+        node.className = hasNextReady ? 'today-funnel-alert' : 'today-funnel-alert danger';
         const noReadyTitle = futureReadyOutsideToday
-          ? `0 prêt aujourd’hui · ${formatCount(futureReadyOutsideToday)} à venir`
+          ? `Rien à cliquer maintenant · ${formatCount(futureReadyOutsideToday)} spot(s) prêt(s) à venir`
           : 'Aucun pari prêt aujourd’hui';
         node.innerHTML = `
           <strong>${noReadyToday ? noReadyTitle : lowReadyToday ? 'Volume prêt limité aujourd’hui' : tooStrictForDailyTarget ? 'Modèle trop strict aujourd’hui' : displayed ? `${formatCount(displayed)} pari(s) aujourd'hui seulement` : 'Aucun pari simple aujourd’hui visible'}</strong>
-          <span>${tooStrictForDailyTarget ? 'Modèle trop strict / sources trop faibles : ' : ''}Aujourd’hui : ${formatCount(today.totalEvents || today.events || 0)} matchs → ${formatCount(bookable)} Winamax → ${formatCount(today.predictableMatches || today.predictable || 0)} analysables → ${formatCount(today.positiveSimplePassingFilters ?? today.simplePassingFilters ?? 0)} signaux simples positifs → ${formatCount(simpleReady)} simples prêts.${futureReadyOutsideToday ? ` ${formatCount(futureReadyOutsideToday)} pari(s) prêts existent plus tard dans le cockpit.` : ''} ${advancedReady ? `${formatCount(advancedReady)} prêts avancés restent cachés en mode standard.` : ''}</span>
-          <button class="ghost-btn" type="button" data-tab-target="data">Diagnostic auto</button>
+          <span>${hasNextReady ? 'Pas besoin de forcer un mauvais clic : le prochain vrai spot est déjà listé dans la semaine.' : `${tooStrictForDailyTarget ? 'Modèle trop strict / sources trop faibles : ' : ''}Aujourd’hui : ${formatCount(today.totalEvents || today.events || 0)} matchs → ${formatCount(bookable)} Winamax → ${formatCount(today.predictableMatches || today.predictable || 0)} analysables → ${formatCount(today.positiveSimplePassingFilters ?? today.simplePassingFilters ?? 0)} signaux simples positifs → ${formatCount(simpleReady)} simples prêts.`} ${advancedReady ? `${formatCount(advancedReady)} prêts avancés restent cachés en mode standard.` : ''}</span>
+          <button class="ghost-btn" type="button" data-tab-target="${hasNextReady ? 'week' : 'data'}">${hasNextReady ? 'Voir la semaine' : 'Diagnostic auto'}</button>
         `;
         return;
       }
