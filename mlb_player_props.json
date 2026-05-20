@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-20T19:17:23Z",
+  "generated_at": "2026-05-20T19:20:20Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815429",
-      "kickoff": "2026-05-20T19:10Z",
-      "league": "MLB",
-      "match": "Texas Rangers at Colorado Rockies",
-      "home": "Colorado Rockies",
-      "away": "Texas Rangers",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Colorado Rockies",
-          "pitcher": "Kyle Freeland",
-          "label": "Kyle Freeland moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.5321,
-          "fair_odds": 1.88,
-          "expected_strikeouts": 4.37,
-          "projected_ip": 4.74,
-          "inputs": {
-            "k9": 8.29,
-            "era": 7.22,
-            "whip": 1.66,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Colorado Rockies",
-          "pitcher": "Kyle Freeland",
-          "label": "Kyle Freeland concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6267,
-          "fair_odds": 1.6,
-          "expected_hr_allowed": 0.985,
-          "projected_ip": 4.74,
-          "inputs": {
-            "hr9": 1.87,
-            "era": 7.22,
-            "whip": 1.66
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Texas Rangers",
-          "pitcher": "Jack Leiter",
-          "label": "Jack Leiter moins de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "under",
-          "probability": 0.5915,
-          "fair_odds": 1.69,
-          "expected_strikeouts": 6.06,
-          "projected_ip": 5.47,
-          "inputs": {
-            "k9": 9.97,
-            "era": 4.35,
-            "whip": 1.35,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Texas Rangers",
-          "pitcher": "Jack Leiter",
-          "label": "Jack Leiter concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5855,
-          "fair_odds": 1.71,
-          "expected_hr_allowed": 0.881,
-          "projected_ip": 5.47,
-          "inputs": {
-            "hr9": 1.45,
-            "era": 4.35,
-            "whip": 1.35
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815433",
       "kickoff": "2026-05-20T19:40Z",
@@ -1172,7 +1090,7 @@
       ]
     }
   ],
-  "props": 56,
+  "props": 52,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
