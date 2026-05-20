@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-20T03:53:00Z",
+  "generated_at": "2026-05-20T03:57:50Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -178,11 +178,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 1.435,
-        "away_score": -1.995,
+        "home_score": 0.696,
+        "away_score": -0.995,
         "home_fade": 0.3,
-        "away_fade": 2.1,
-        "reason": "Direction nette: San Francisco Giants (+1.44)",
+        "away_fade": 1.1,
+        "reason": "Direction nette: San Francisco Giants (+0.70)",
         "detail": [
           {
             "side": "home",
@@ -206,13 +206,7 @@
             "side": "home",
             "type": "market_move",
             "direction": "steam",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
+            "strength": 0.611
           }
         ]
       }
@@ -582,13 +576,13 @@
         "1 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.747,
-        "away_score": -0.747,
-        "home_fade": 1.15,
-        "away_fade": 1.15,
-        "reason": "Signaux opposes: Colorado Avalanche fade 1.15, Vegas Golden Knights fade 1.15 -> prudence",
+        "status": "net",
+        "net_side": "away",
+        "home_score": -0.098,
+        "away_score": -0.098,
+        "home_fade": 0.15,
+        "away_fade": 0.15,
+        "reason": "Direction nette: Vegas Golden Knights (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -601,18 +595,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
           }
         ]
       }
@@ -1564,11 +1546,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 1.791,
-        "away_score": -2.637,
+        "home_score": 1.053,
+        "away_score": -1.637,
         "home_fade": 0.15,
-        "away_fade": 2.69,
-        "reason": "Direction nette: San Francisco Giants (+1.79)",
+        "away_fade": 1.69,
+        "reason": "Direction nette: San Francisco Giants (+1.05)",
         "detail": [
           {
             "side": "home",
@@ -1592,13 +1574,7 @@
             "side": "home",
             "type": "market_move",
             "direction": "steam",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
+            "strength": 0.611
           },
           {
             "side": "away",
@@ -1810,11 +1786,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 1.917,
-        "away_score": -2.62,
+        "home_score": 1.178,
+        "away_score": -1.62,
         "home_fade": 0.0,
-        "away_fade": 2.62,
-        "reason": "Direction nette: San Francisco Giants (+1.92)",
+        "away_fade": 1.62,
+        "reason": "Direction nette: San Francisco Giants (+1.18)",
         "detail": [
           {
             "side": "away",
@@ -1826,13 +1802,7 @@
             "side": "home",
             "type": "market_move",
             "direction": "steam",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
+            "strength": 0.611
           },
           {
             "side": "away",
@@ -2026,11 +1996,11 @@
       "global_resolution": {
         "status": "mixed",
         "net_side": null,
-        "home_score": -1.541,
-        "away_score": 0.89,
-        "home_fade": 1.8,
-        "away_fade": 0.74,
-        "reason": "Signaux mitigés: avantage net trop faible (Arizona Diamondbacks -1.54, San Francisco Giants +0.89)",
+        "home_score": 0.809,
+        "away_score": -1.46,
+        "home_fade": 0.8,
+        "away_fade": 1.74,
+        "reason": "Signaux mitigés: avantage net trop faible (Arizona Diamondbacks +0.81, San Francisco Giants -1.46)",
         "detail": [
           {
             "side": "home",
@@ -2041,13 +2011,13 @@
           {
             "side": "home",
             "type": "market_move",
-            "direction": "drift",
+            "direction": "steam",
             "strength": 1.0
           },
           {
             "side": "away",
             "type": "market_move",
-            "direction": "steam",
+            "direction": "drift",
             "strength": 1.0
           },
           {
