@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-05-20T05:04:15Z",
+  "generated_at": "2026-05-20T05:12:32Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 55,
-    "actionable": 26,
+    "active_events": 56,
+    "actionable": 27,
     "watch": 3,
     "risk": 26,
     "expired_sample": 0,
@@ -14,11 +14,12 @@
       "injury_imbalance": 23,
       "back_to_back_travel": 18,
       "signal_conflict": 9,
+      "market_move": 1,
       "travel_extreme": 1
     },
     "by_quality": {
       "risk": 26,
-      "actionable": 26,
+      "actionable": 27,
       "watch": 3
     }
   },
@@ -256,6 +257,24 @@
       "side": "away",
       "strength": 0.889,
       "context": "2 match dans les 48h + 1396 km de voyage"
+    },
+    {
+      "event_id": "401856921",
+      "date": "2026-05-20T23:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Indiana Fever",
+      "away": "Portland Fire",
+      "match": "Indiana Fever - Portland Fire",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "away",
+      "strength": 0.874,
+      "context": "Cote away: 5.40 -> 6.25 (-15.7%)"
     },
     {
       "event_id": "401815429",
