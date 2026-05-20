@@ -5,6 +5,17 @@ Les sections sont heuristiques : Features / Fixes / Performance / Docs.
 
 ## Desktop — 2026-05-19
 
+### Version v8.6.66 — Refresh rapide et spots du jour visibles
+
+Performance / pronostics.
+- Le refresh rapide saute l’enrichissement ESPN lent : les cotes actionnables restent 100% Winamax, et la partie live passe d’environ 26s à environ 3s.
+- Les fetchs live sport tournent en parallèle pour réduire la synchro sans attendre chaque sport l’un après l’autre.
+- Le calcul de journée utilise maintenant Europe/Paris avec fallback Windows sans tzdata : plus de bug “mauvaise journée” après minuit.
+- Le pipeline rapide recalcule V15/V16 pour éviter un ticket final bloqué par un vieux rapport interne.
+- Les garde-fous agent restent visibles mais ne bloquent plus globalement les meilleurs spots utilisateur : les blocages se font ligne par ligne.
+- Le cockpit affiche maintenant les signaux simples positifs du jour avant de remplir avec la semaine : terrain vérifié à 8 signaux simples positifs -> 12 affichés.
+- Version app, package et cache Service Worker bumpés en `v8.6.66`.
+
 ### Version v8.6.61 — Texte de suivi 100% français
 
 UX.

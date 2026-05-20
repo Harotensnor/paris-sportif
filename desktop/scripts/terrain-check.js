@@ -380,7 +380,10 @@ async function main() {
     const firstMatchCard = win.locator('[data-match-id]:visible').first();
     if (await firstMatchCard.count()) {
       await firstMatchCard.click();
-      await win.waitForSelector('#match-modal:not(.hidden)', { timeout: 5000 });
+      await win.waitForFunction(() => {
+        const modal = document.querySelector('#match-modal');
+        return Boolean(modal && !modal.classList.contains('hidden') && getComputedStyle(modal).display !== 'none');
+      }, null, { timeout: 5000 });
       const modalState = await win.evaluate(() => ({
         visibleTabs: Array.from(document.querySelectorAll('#match-modal .modal-tab')).filter((node) => getComputedStyle(node).display !== 'none').map((node) => node.textContent.trim()),
         text: document.querySelector('#match-modal')?.innerText || '',

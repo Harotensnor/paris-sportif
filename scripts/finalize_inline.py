@@ -70,7 +70,14 @@ def paris_today_iso():
             return datetime.now(ZoneInfo('Europe/Paris')).strftime('%Y-%m-%d')
         except Exception:
             pass
-    return datetime.now(timezone.utc).strftime('%Y-%m-%d')
+    now_utc = datetime.now(timezone.utc).replace(tzinfo=None)
+    def last_sunday(year, month):
+        day = datetime(year, month + 1, 1) - timedelta(days=1) if month < 12 else datetime(year, 12, 31)
+        return day - timedelta(days=(day.weekday() + 1) % 7)
+    start = last_sunday(now_utc.year, 3).replace(hour=1, minute=0, second=0, microsecond=0)
+    end = last_sunday(now_utc.year, 10).replace(hour=1, minute=0, second=0, microsecond=0)
+    offset = 2 if start <= now_utc < end else 1
+    return (now_utc + timedelta(hours=offset)).strftime('%Y-%m-%d')
 
 
 def compact_competitor(comp):

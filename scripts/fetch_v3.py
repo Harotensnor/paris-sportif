@@ -10,8 +10,40 @@ import os
 import time
 import tempfile
 from pathlib import Path
+try:
+    from zoneinfo import ZoneInfo
+except Exception:  # pragma: no cover - old Python fallback
+    ZoneInfo = None
 
 DATA_JS = str(Path(__file__).resolve().parent.parent / 'data.js')
+def load_paris_tz():
+    if not ZoneInfo:
+        return None
+    try:
+        return ZoneInfo('Europe/Paris')
+    except Exception:
+        return None
+
+
+PARIS_TZ = load_paris_tz()
+
+
+def last_sunday(year, month):
+    day = datetime(year, month + 1, 1) - timedelta(days=1) if month < 12 else datetime(year, 12, 31)
+    return day - timedelta(days=(day.weekday() + 1) % 7)
+
+
+def paris_offset_hours(utc_dt):
+    start = last_sunday(utc_dt.year, 3).replace(hour=1, minute=0, second=0, microsecond=0)
+    end = last_sunday(utc_dt.year, 10).replace(hour=1, minute=0, second=0, microsecond=0)
+    return 2 if start <= utc_dt < end else 1
+
+
+def paris_today():
+    if PARIS_TZ:
+        return datetime.now(PARIS_TZ).date()
+    now_utc = datetime.utcnow()
+    return (now_utc + timedelta(hours=paris_offset_hours(now_utc))).date()
 
 # ---------------------------------------------------------------------------
 # League registry
@@ -572,7 +604,7 @@ def fetch_standings():
 def main():
     # Today is resolved dynamically so cron runs always regenerate for the current
     # day. The hardcoded fallback is only used if system clock is somehow broken.
-    today = date.today()
+    today = paris_today()
     days = [today + timedelta(days=i) for i in range(-2, 8)]
     result = {
         'generated_at': datetime.utcnow().isoformat() + 'Z',

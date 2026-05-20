@@ -4016,6 +4016,16 @@ function createLegacyEngineService({ projectRoot }) {
         addFinalRows(sortedTodayReady, todayReadyTarget, { enforceMatchCap: false, relaxSport: true, relaxLeague: true });
       }
     }
+    if (todayVisibleTarget > 0 && finalRows.filter((row) => dayKeyParis(row.start) === todayKey).length < todayVisibleTarget) {
+      // Les spots du jour passent avant les quotas semaine/sport. Sinon le
+      // cockpit peut afficher 30 lignes futures tout en cachant les signaux
+      // simples positifs du jour, ce qui donne l'impression qu'il ne propose rien.
+      addFinalRows(sortedTodayDisplayable, todayVisibleTarget, { enforceMatchCap: true });
+      if (finalRows.filter((row) => dayKeyParis(row.start) === todayKey).length < todayVisibleTarget) {
+        todayCapRelaxed = true;
+        addFinalRows(sortedTodayDisplayable, todayVisibleTarget, { matchCap: maxPerMatch, relaxSport: true, relaxLeague: true });
+      }
+    }
     if (nightRows.length) {
       const nightTarget = Math.min(8, nightRows.length);
       addFinalRows(sortRows(nightRows), Math.min(maxDashboardRows, finalRows.length + nightTarget), {
@@ -4073,17 +4083,6 @@ function createLegacyEngineService({ projectRoot }) {
           relaxLeague: true,
           relaxMarket: true
         });
-      }
-    }
-    if (todayVisibleTarget > 0 && finalRows.filter((row) => dayKeyParis(row.start) === todayKey).length < todayVisibleTarget) {
-      // Sprint 86 : les lignes "Vainqueur" et "Buteur" doivent passer
-      // avant le remplissage général du jour. Sinon les Plus/Moins occupent
-      // les 24 premières places et l'accueil donne une fausse impression de
-      // monotonie.
-      addFinalRows(sortedTodayDisplayable, todayVisibleTarget, { enforceMatchCap: true });
-      if (finalRows.filter((row) => dayKeyParis(row.start) === todayKey).length < todayVisibleTarget) {
-        todayCapRelaxed = true;
-        addFinalRows(sortedTodayDisplayable, todayVisibleTarget, { matchCap: maxPerMatch, relaxSport: true, relaxLeague: true });
       }
     }
     addFinalRows(sortedRollingReady, Math.max(rollingReadyTarget, Math.min(target24, sortedRollingReady.length)));

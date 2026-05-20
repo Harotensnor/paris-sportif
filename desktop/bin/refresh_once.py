@@ -74,7 +74,7 @@ PUBLIC_CONTEXT_STAGES = [
     PUBLIC_CONTEXT_PATCH_STAGE,
 ]
 
-INSTANT_STAGES = [
+INSTANT_PRE_DECISION_STAGES = [
     Stage("patch_winamax_markets.py", 20),
     Stage("patch_all_quick.py", 25),
     Stage("patch_tennis_features.py", 25),
@@ -86,15 +86,21 @@ INSTANT_STAGES = [
     Stage("finalize_inline.py", 30, required=True),
     Stage("build_health.py", 15),
     Stage("build_prebet_checklist.py", 15),
+]
+
+INSTANT_STAGES = [
+    *INSTANT_PRE_DECISION_STAGES,
     *INSTANT_DECISION_STACK_STAGES,
     Stage("check_pipeline_freshness.py", 15),
 ]
 
 FAST_STAGES = [
-    Stage("fetch_live.py", 35),
+    Stage("fetch_live.py", 15, env={"FETCH_LIVE_SKIP_ESPN_ODDS": "1"}),
     Stage("fetch_winamax_catalog.py", 45),
     Stage("patch_winamax.py", 25),
-    *INSTANT_STAGES,
+    *INSTANT_PRE_DECISION_STAGES,
+    *FAST_DECISION_STACK_STAGES,
+    Stage("check_pipeline_freshness.py", 15),
 ]
 
 
