@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-21T02:17:10Z",
+  "generated_at": "2026-05-21T02:21:48Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -227,13 +227,13 @@
         "3 matchs sur les 7 derniers jours"
       ],
       "global_resolution": {
-        "status": "mixed",
-        "net_side": null,
-        "home_score": 0.96,
-        "away_score": -1.39,
-        "home_fade": 0.6,
-        "away_fade": 1.6,
-        "reason": "Signaux mitigés: avantage net trop faible (San Antonio Spurs +0.96, Oklahoma City Thunder -1.39)",
+        "status": "net",
+        "net_side": "away",
+        "home_score": -1.007,
+        "away_score": -0.174,
+        "home_fade": 1.217,
+        "away_fade": 0.6,
+        "reason": "Direction nette: Oklahoma City Thunder (-0.17)",
         "detail": [
           {
             "side": "home",
@@ -250,14 +250,8 @@
           {
             "side": "home",
             "type": "market_move",
-            "direction": "steam",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
             "direction": "drift",
-            "strength": 1.0
+            "strength": 0.617
           }
         ]
       }
@@ -518,12 +512,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "home",
-        "home_score": 0.902,
-        "away_score": -0.098,
-        "home_fade": 0.15,
+        "net_side": "away",
+        "home_score": -1.097,
+        "away_score": 1.079,
+        "home_fade": 1.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Colorado Avalanche (+0.90)",
+        "reason": "Direction nette: Vegas Golden Knights (+1.08)",
         "detail": [
           {
             "side": "home",
@@ -540,8 +534,14 @@
           {
             "side": "home",
             "type": "market_move",
-            "direction": "steam",
+            "direction": "drift",
             "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.826
           }
         ]
       }
@@ -576,12 +576,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "home",
-        "home_score": 1.252,
-        "away_score": -1.097,
-        "home_fade": 0.15,
-        "away_fade": 1.15,
-        "reason": "Direction nette: San Antonio Spurs (+1.25)",
+        "net_side": "away",
+        "home_score": -0.715,
+        "away_score": 0.119,
+        "home_fade": 0.767,
+        "away_fade": 0.15,
+        "reason": "Direction nette: Oklahoma City Thunder (+0.12)",
         "detail": [
           {
             "side": "home",
@@ -598,14 +598,8 @@
           {
             "side": "home",
             "type": "market_move",
-            "direction": "steam",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
             "direction": "drift",
-            "strength": 1.0
+            "strength": 0.617
           }
         ]
       }
@@ -692,12 +686,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "home",
-        "home_score": 1.252,
-        "away_score": -1.097,
-        "home_fade": 0.15,
-        "away_fade": 1.15,
-        "reason": "Direction nette: San Antonio Spurs (+1.25)",
+        "net_side": "away",
+        "home_score": -0.715,
+        "away_score": 0.119,
+        "home_fade": 0.767,
+        "away_fade": 0.15,
+        "reason": "Direction nette: Oklahoma City Thunder (+0.12)",
         "detail": [
           {
             "side": "home",
@@ -714,14 +708,8 @@
           {
             "side": "home",
             "type": "market_move",
-            "direction": "steam",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
             "direction": "drift",
-            "strength": 1.0
+            "strength": 0.617
           }
         ]
       }
@@ -808,12 +796,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "away",
-        "home_score": -1.097,
-        "away_score": 1.252,
-        "home_fade": 1.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: San Antonio Spurs (+1.25)",
+        "net_side": "home",
+        "home_score": 0.119,
+        "away_score": -0.715,
+        "home_fade": 0.15,
+        "away_fade": 0.767,
+        "reason": "Direction nette: Oklahoma City Thunder (+0.12)",
         "detail": [
           {
             "side": "home",
@@ -828,16 +816,10 @@
             "strength": 0.15
           },
           {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
             "side": "away",
             "type": "market_move",
-            "direction": "steam",
-            "strength": 1.0
+            "direction": "drift",
+            "strength": 0.617
           }
         ]
       }
@@ -872,12 +854,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": 0.902,
+        "net_side": "home",
+        "home_score": 1.079,
+        "away_score": -1.097,
         "home_fade": 0.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Colorado Avalanche (+0.90)",
+        "away_fade": 1.15,
+        "reason": "Direction nette: Vegas Golden Knights (+1.08)",
         "detail": [
           {
             "side": "home",
@@ -892,9 +874,15 @@
             "strength": 0.15
           },
           {
-            "side": "away",
+            "side": "home",
             "type": "market_move",
             "direction": "steam",
+            "strength": 0.826
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
             "strength": 1.0
           }
         ]
@@ -1123,13 +1111,13 @@
         "1 match dans les 48h + 979 km de voyage"
       ],
       "global_resolution": {
-        "status": "mixed",
+        "status": "abstain",
         "net_side": null,
-        "home_score": 0.864,
-        "away_score": -1.116,
-        "home_fade": 0.6,
+        "home_score": -1.136,
+        "away_score": 0.061,
+        "home_fade": 1.6,
         "away_fade": 1.326,
-        "reason": "Signaux mitigés: avantage net trop faible (Colorado Avalanche +0.86, Vegas Golden Knights -1.12)",
+        "reason": "Signaux opposes: Colorado Avalanche fade 1.60, Vegas Golden Knights fade 1.33 -> prudence",
         "detail": [
           {
             "side": "home",
@@ -1146,8 +1134,14 @@
           {
             "side": "home",
             "type": "market_move",
-            "direction": "steam",
+            "direction": "drift",
             "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.826
           },
           {
             "side": "away",
@@ -1249,13 +1243,13 @@
         "1 match dans les 48h + 979 km de voyage"
       ],
       "global_resolution": {
-        "status": "mixed",
-        "net_side": null,
-        "home_score": 0.157,
-        "away_score": 0.177,
+        "status": "net",
+        "net_side": "home",
+        "home_score": 1.333,
+        "away_score": -1.823,
         "home_fade": 0.15,
-        "away_fade": 0.876,
-        "reason": "Signaux mitigés: avantage net trop faible (Vegas Golden Knights +0.16, Colorado Avalanche +0.18)",
+        "away_fade": 1.876,
+        "reason": "Direction nette: Vegas Golden Knights (+1.33)",
         "detail": [
           {
             "side": "home",
@@ -1270,9 +1264,15 @@
             "strength": 0.15
           },
           {
-            "side": "away",
+            "side": "home",
             "type": "market_move",
             "direction": "steam",
+            "strength": 0.826
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
             "strength": 1.0
           },
           {
