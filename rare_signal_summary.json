@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-05-21T23:29:34Z",
+  "generated_at": "2026-05-21T23:32:48Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 55,
-    "actionable": 29,
-    "watch": 5,
+    "actionable": 30,
+    "watch": 4,
     "risk": 21,
     "expired_sample": 0,
     "by_type": {
@@ -18,8 +18,8 @@
       "back_to_back_travel": 18
     },
     "by_quality": {
-      "actionable": 29,
-      "watch": 5,
+      "actionable": 30,
+      "watch": 4,
       "risk": 21
     }
   },
@@ -457,6 +457,24 @@
       "context": "1 match dans les 48h + 1161 km de voyage"
     },
     {
+      "event_id": "401815440",
+      "date": "2026-05-22T01:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Arizona Diamondbacks",
+      "away": "Colorado Rockies",
+      "match": "Arizona Diamondbacks - Colorado Rockies",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.759,
+      "context": "Cote away: 2.78 -> 2.40 (+13.7%)"
+    },
+    {
       "event_id": "401872905",
       "date": "2026-05-25T00:00Z",
       "sport": "hockey",
@@ -583,24 +601,6 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 0-3"
-    },
-    {
-      "event_id": "401815440",
-      "date": "2026-05-22T01:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Arizona Diamondbacks",
-      "away": "Colorado Rockies",
-      "match": "Arizona Diamondbacks - Colorado Rockies",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.58,
-      "context": "Cote away: 2.68 -> 2.40 (+10.4%)"
     },
     {
       "event_id": "401815451",
