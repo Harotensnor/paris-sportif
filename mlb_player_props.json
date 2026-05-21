@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-20T23:59:28Z",
+  "generated_at": "2026-05-21T00:03:41Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -422,9 +422,173 @@
           "side": "home"
         }
       ]
+    },
+    {
+      "event_id": "401815440",
+      "kickoff": "2026-05-22T01:40Z",
+      "league": "MLB",
+      "match": "Colorado Rockies at Arizona Diamondbacks",
+      "home": "Arizona Diamondbacks",
+      "away": "Colorado Rockies",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Arizona Diamondbacks",
+          "pitcher": "Michael Soroka",
+          "label": "Michael Soroka moins de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "under",
+          "probability": 0.5802,
+          "fair_odds": 1.72,
+          "expected_strikeouts": 6.11,
+          "projected_ip": 5.44,
+          "inputs": {
+            "k9": 10.1,
+            "era": 3.49,
+            "whip": 1.33,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Arizona Diamondbacks",
+          "pitcher": "Michael Soroka",
+          "label": "Michael Soroka ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.643,
+          "fair_odds": 1.56,
+          "expected_hr_allowed": 0.442,
+          "projected_ip": 5.44,
+          "inputs": {
+            "hr9": 0.73,
+            "era": 3.49,
+            "whip": 1.33
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Colorado Rockies",
+          "pitcher": "Tomoyuki Sugano",
+          "label": "Tomoyuki Sugano plus de 2,5 strikeouts",
+          "line": 2.5,
+          "pick": "over",
+          "probability": 0.5851,
+          "fair_odds": 1.71,
+          "expected_strikeouts": 2.78,
+          "projected_ip": 5.22,
+          "inputs": {
+            "k9": 4.79,
+            "era": 4.02,
+            "whip": 1.26,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Colorado Rockies",
+          "pitcher": "Tomoyuki Sugano",
+          "label": "Tomoyuki Sugano concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.6314,
+          "fair_odds": 1.58,
+          "expected_hr_allowed": 0.998,
+          "projected_ip": 5.22,
+          "inputs": {
+            "hr9": 1.72,
+            "era": 4.02,
+            "whip": 1.26
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815454",
+      "kickoff": "2026-05-23T01:40Z",
+      "league": "MLB",
+      "match": "Colorado Rockies at Arizona Diamondbacks",
+      "home": "Arizona Diamondbacks",
+      "away": "Colorado Rockies",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Arizona Diamondbacks",
+          "pitcher": "Zac Gallen",
+          "label": "Zac Gallen moins de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "under",
+          "probability": 0.5285,
+          "fair_odds": 1.89,
+          "expected_strikeouts": 3.4,
+          "projected_ip": 4.9,
+          "inputs": {
+            "k9": 6.24,
+            "era": 4.78,
+            "whip": 1.43,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Arizona Diamondbacks",
+          "pitcher": "Zac Gallen",
+          "label": "Zac Gallen concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5046,
+          "fair_odds": 1.98,
+          "expected_hr_allowed": 0.702,
+          "projected_ip": 4.9,
+          "inputs": {
+            "hr9": 1.29,
+            "era": 4.78,
+            "whip": 1.43
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Colorado Rockies",
+          "pitcher": "Michael Lorenzen",
+          "label": "Michael Lorenzen plus de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "over",
+          "probability": 0.5181,
+          "fair_odds": 1.93,
+          "expected_strikeouts": 3.57,
+          "projected_ip": 4.82,
+          "inputs": {
+            "k9": 6.66,
+            "era": 7.03,
+            "whip": 1.91,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Colorado Rockies",
+          "pitcher": "Michael Lorenzen",
+          "label": "Michael Lorenzen concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5889,
+          "fair_odds": 1.7,
+          "expected_hr_allowed": 0.889,
+          "projected_ip": 4.82,
+          "inputs": {
+            "hr9": 1.66,
+            "era": 7.03,
+            "whip": 1.91
+          },
+          "side": "away"
+        }
+      ]
     }
   ],
-  "props": 20,
+  "props": 28,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
