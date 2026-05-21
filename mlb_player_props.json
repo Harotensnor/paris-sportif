@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-21T23:13:48Z",
+  "generated_at": "2026-05-21T23:19:52Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815437",
-      "kickoff": "2026-05-21T23:05Z",
-      "league": "MLB",
-      "match": "Toronto Blue Jays at New York Yankees",
-      "home": "New York Yankees",
-      "away": "Toronto Blue Jays",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "New York Yankees",
-          "pitcher": "Carlos Rodón",
-          "label": "Carlos Rodón moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.6128,
-          "fair_odds": 1.63,
-          "expected_strikeouts": 5.0,
-          "projected_ip": 4.0,
-          "inputs": {
-            "k9": 11.25,
-            "era": 5.63,
-            "whip": 1.63,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "New York Yankees",
-          "pitcher": "Carlos Rodón",
-          "label": "Carlos Rodón ne concède pas de home run",
-          "pick": "no",
-          "probability": 1.0,
-          "fair_odds": 1.01,
-          "expected_hr_allowed": 0.0,
-          "projected_ip": 4.0,
-          "inputs": {
-            "hr9": 0.0,
-            "era": 5.63,
-            "whip": 1.63
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Toronto Blue Jays",
-          "pitcher": "Braydon Fisher",
-          "label": "Braydon Fisher moins de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "under",
-          "probability": 0.6004,
-          "fair_odds": 1.67,
-          "expected_strikeouts": 6.01,
-          "projected_ip": 6.6,
-          "inputs": {
-            "k9": 8.2,
-            "era": 3.08,
-            "whip": 1.06,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Toronto Blue Jays",
-          "pitcher": "Braydon Fisher",
-          "label": "Braydon Fisher ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6073,
-          "fair_odds": 1.65,
-          "expected_hr_allowed": 0.499,
-          "projected_ip": 6.6,
-          "inputs": {
-            "hr9": 0.68,
-            "era": 3.08,
-            "whip": 1.06
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815440",
       "kickoff": "2026-05-22T01:40Z",
@@ -1664,7 +1582,7 @@
       ]
     }
   ],
-  "props": 80,
+  "props": 76,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"

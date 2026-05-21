@@ -1,47 +1,29 @@
 {
-  "generated_at": "2026-05-21T23:14:01Z",
+  "generated_at": "2026-05-21T23:20:05Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 55,
-    "actionable": 31,
+    "actionable": 30,
     "watch": 4,
-    "risk": 20,
+    "risk": 21,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 17,
       "market_move": 10,
-      "market_uncertain": 64,
+      "market_uncertain": 65,
       "signal_conflict": 4,
+      "injury_imbalance": 16,
       "back_to_back_travel": 19,
       "travel_extreme": 6
     },
     "by_quality": {
-      "actionable": 31,
+      "actionable": 30,
       "watch": 4,
-      "risk": 20
+      "risk": 21
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401815437",
-      "date": "2026-05-21T23:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "New York Yankees",
-      "away": "Toronto Blue Jays",
-      "match": "New York Yankees - Toronto Blue Jays",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Toronto Blue Jays",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 7-13"
-    },
     {
       "event_id": "401865446",
       "date": "2026-05-22T00:00Z",
@@ -58,7 +40,7 @@
       "team": null,
       "side": "away",
       "strength": 1.0,
-      "context": "Cote away: 17.00 -> 11.50 (+32.4%)"
+      "context": "Cote away: 15.00 -> 11.50 (+23.3%)"
     },
     {
       "event_id": "401873383",
@@ -963,6 +945,24 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 19.2%"
+    },
+    {
+      "event_id": "401865557",
+      "date": "2026-05-28T22:00Z",
+      "sport": "football",
+      "league_code": "conmebol.libertadores",
+      "league_name": "Copa Libertadores",
+      "home": "Palmeiras",
+      "away": "Atlético Junior",
+      "match": "Palmeiras - Atlético Junior",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 19.7%"
     },
     {
       "event_id": "401815443",

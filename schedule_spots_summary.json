@@ -1,24 +1,23 @@
 {
-  "generated_at": "2026-05-21T23:14:01Z",
+  "generated_at": "2026-05-21T23:20:05Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 55,
+    "active_events": 54,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 84,
+      "lookahead": 83,
       "travel_extreme": 9,
       "back_to_back_travel": 20,
       "schedule_congestion": 26
     },
     "by_decision": {
       "abstain": 29,
-      "lean_home": 25,
-      "lean_away": 1
+      "lean_home": 25
     },
     "lean_home": 25,
-    "lean_away": 1,
+    "lean_away": 0,
     "abstain": 29,
     "monitor": 0
   },
@@ -3140,57 +3139,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.914
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815437",
-      "source_event_ids": [
-        "401815437"
-      ],
-      "kickoff": "2026-05-21T23:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "New York Yankees",
-      "away": "Toronto Blue Jays",
-      "match": "New York Yankees - Toronto Blue Jays",
-      "decision": "lean_away",
-      "net_team": "Toronto Blue Jays",
-      "reason": "New York Yankees plus penalise par calendrier/voyage (0.36 vs 0.00)",
-      "pressure_score": 0.8,
-      "home_fade": 0.36,
-      "away_fade": 0.0,
-      "travel_score": 0,
-      "lookahead_score": 0.8,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 1
-      },
-      "contexts": [
-        "3 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.01,
-        "away_score": -0.874,
-        "home_fade": 0.36,
-        "away_fade": 1.0,
-        "reason": "Direction nette: New York Yankees (-0.01)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.36
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
           }
         ]
       }
