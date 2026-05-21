@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-05-21T12:28:34Z",
+  "generated_at": "2026-05-21T12:33:10Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 51,
+    "active_events": 50,
     "actionable": 17,
     "watch": 8,
-    "risk": 26,
+    "risk": 25,
     "expired_sample": 0,
     "by_type": {
-      "market_uncertain": 23,
       "market_move": 16,
       "injury_imbalance": 10,
       "back_to_back_travel": 8,
-      "signal_conflict": 8
+      "signal_conflict": 8,
+      "market_uncertain": 22
     },
     "by_quality": {
-      "risk": 26,
       "actionable": 17,
-      "watch": 8
+      "watch": 8,
+      "risk": 25
     }
   },
   "active_actionable": [
@@ -494,24 +494,6 @@
       "side": null,
       "strength": 0.979,
       "context": "Signaux opposes: Arizona Diamondbacks fade 1.20, Colorado Rockies fade 1.40 -> prudence"
-    },
-    {
-      "event_id": "178522",
-      "date": "2026-05-21T12:20Z",
-      "sport": "tennis",
-      "league_code": "rolandgarros",
-      "league_name": "Roland Garros",
-      "home": "",
-      "away": "",
-      "match": "? - ?",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 12.5%"
     },
     {
       "event_id": "178425",
