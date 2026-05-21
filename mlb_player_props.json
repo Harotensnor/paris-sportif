@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-21T01:13:22Z",
+  "generated_at": "2026-05-21T01:17:12Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -210,6 +210,42 @@
             "whip": 1.54
           },
           "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "New York Mets",
+          "pitcher": "David Peterson",
+          "label": "David Peterson moins de 7,5 strikeouts",
+          "line": 7.5,
+          "pick": "under",
+          "probability": 0.5951,
+          "fair_odds": 1.68,
+          "expected_strikeouts": 7.0,
+          "projected_ip": 6.6,
+          "inputs": {
+            "k9": 9.55,
+            "era": 5.4,
+            "whip": 1.57,
+            "hand": "L"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "New York Mets",
+          "pitcher": "David Peterson",
+          "label": "David Peterson ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.7349,
+          "fair_odds": 1.36,
+          "expected_hr_allowed": 0.308,
+          "projected_ip": 6.6,
+          "inputs": {
+            "hr9": 0.42,
+            "era": 5.4,
+            "whip": 1.57
+          },
+          "side": "away"
         }
       ]
     },
@@ -506,7 +542,7 @@
       ]
     }
   ],
-  "props": 24,
+  "props": 26,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
