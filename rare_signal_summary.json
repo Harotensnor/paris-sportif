@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-05-21T13:26:12Z",
+  "generated_at": "2026-05-21T13:29:54Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 54,
+    "active_events": 58,
     "actionable": 18,
     "watch": 9,
-    "risk": 27,
+    "risk": 31,
     "expired_sample": 0,
     "by_type": {
+      "market_uncertain": 28,
       "market_move": 18,
       "injury_imbalance": 10,
       "back_to_back_travel": 8,
-      "signal_conflict": 8,
-      "market_uncertain": 24
+      "signal_conflict": 8
     },
     "by_quality": {
+      "risk": 31,
       "actionable": 18,
-      "watch": 9,
-      "risk": 27
+      "watch": 9
     }
   },
   "active_actionable": [
@@ -532,6 +532,42 @@
       "context": "Signaux opposes: Arizona Diamondbacks fade 1.20, Colorado Rockies fade 1.40 -> prudence"
     },
     {
+      "event_id": "178551",
+      "date": "2026-05-21T13:20Z",
+      "sport": "tennis",
+      "league_code": "rolandgarros",
+      "league_name": "Roland Garros",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 12.0%"
+    },
+    {
+      "event_id": "178426",
+      "date": "2026-05-21T13:25Z",
+      "sport": "tennis",
+      "league_code": "rolandgarros",
+      "league_name": "Roland Garros",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 12.5%"
+    },
+    {
       "event_id": "178425",
       "date": "2026-05-22T10:30Z",
       "sport": "tennis",
@@ -784,6 +820,24 @@
       "context": "marge bookmaker anormale 19.3%"
     },
     {
+      "event_id": "401865560",
+      "date": "2026-05-26T22:00Z",
+      "sport": "football",
+      "league_code": "conmebol.libertadores",
+      "league_name": "Copa Libertadores",
+      "home": "Lanús",
+      "away": "Mirassol",
+      "match": "Lanús - Mirassol",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.3%"
+    },
+    {
       "event_id": "401865461",
       "date": "2026-05-27T00:30Z",
       "sport": "football",
@@ -802,6 +856,24 @@
       "context": "marge bookmaker anormale 18.1%"
     },
     {
+      "event_id": "401865555",
+      "date": "2026-05-27T00:30Z",
+      "sport": "football",
+      "league_code": "conmebol.libertadores",
+      "league_name": "Copa Libertadores",
+      "home": "Flamengo",
+      "away": "Cusco FC",
+      "match": "Flamengo - Cusco FC",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.0%"
+    },
+    {
       "event_id": "401865562",
       "date": "2026-05-27T22:00Z",
       "sport": "football",
@@ -817,7 +889,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.7%"
+      "context": "marge bookmaker anormale 18.3%"
     },
     {
       "event_id": "401865457",
@@ -925,7 +997,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.2%"
+      "context": "marge bookmaker anormale 19.1%"
     },
     {
       "event_id": "401865549",
