@@ -1,14 +1,14 @@
 {
-  "generated_at": "2026-05-21T20:12:06Z",
+  "generated_at": "2026-05-21T20:15:12Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 49,
-    "actionable": 16,
+    "active_events": 48,
+    "actionable": 15,
     "watch": 9,
     "risk": 24,
-    "expired_sample": 0,
+    "expired_sample": 1,
     "by_type": {
       "injury_imbalance": 6,
       "market_move": 17,
@@ -17,30 +17,12 @@
       "back_to_back_travel": 7
     },
     "by_quality": {
-      "actionable": 16,
+      "actionable": 15,
       "watch": 9,
       "risk": 24
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401815436",
-      "date": "2026-05-21T20:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Washington Nationals",
-      "away": "New York Mets",
-      "match": "Washington Nationals - New York Mets",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "New York Mets",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 7-14"
-    },
     {
       "event_id": "401865439",
       "date": "2026-05-21T22:00Z",
@@ -493,7 +475,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 13.3%"
+      "context": "marge bookmaker anormale 12.9%"
     },
     {
       "event_id": "401859406",
@@ -910,5 +892,24 @@
       "context": "Signaux opposes: San Antonio Spurs fade 0.60, Oklahoma City Thunder fade 0.60 -> prudence"
     }
   ],
-  "expired_sample": []
+  "expired_sample": [
+    {
+      "event_id": "401815436",
+      "date": "2026-05-21T20:05Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Washington Nationals",
+      "away": "New York Mets",
+      "match": "Washington Nationals - New York Mets",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "New York Mets",
+      "side": null,
+      "strength": 1.0,
+      "context": "Absences severes 7-14"
+    }
+  ]
 }
