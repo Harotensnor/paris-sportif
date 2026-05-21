@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-05-21T12:46:53Z",
+  "generated_at": "2026-05-21T12:51:04Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 51,
-    "actionable": 18,
-    "watch": 8,
+    "actionable": 17,
+    "watch": 9,
     "risk": 25,
     "expired_sample": 0,
     "by_type": {
@@ -17,8 +17,8 @@
       "market_uncertain": 22
     },
     "by_quality": {
-      "actionable": 18,
-      "watch": 8,
+      "watch": 9,
+      "actionable": 17,
       "risk": 25
     }
   },
@@ -166,24 +166,6 @@
       "side": "away",
       "strength": 0.845,
       "context": "Cote away: 4.60 -> 3.90 (+15.2%)"
-    },
-    {
-      "event_id": "401866584",
-      "date": "2026-05-21T15:00Z",
-      "sport": "football",
-      "league_code": "superleaguegrece",
-      "league_name": "Super League Grèce",
-      "home": "Atromitos",
-      "away": "Panserraikos FC",
-      "match": "Atromitos - Panserraikos FC",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.808,
-      "context": "Cote away: 5.50 -> 4.70 (+14.5%)"
     },
     {
       "event_id": "401815434",
@@ -420,6 +402,24 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 3-0"
+    },
+    {
+      "event_id": "401866584",
+      "date": "2026-05-21T15:00Z",
+      "sport": "football",
+      "league_code": "superleaguegrece",
+      "league_name": "Super League Grèce",
+      "home": "Atromitos",
+      "away": "Panserraikos FC",
+      "match": "Atromitos - Panserraikos FC",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.582,
+      "context": "Cote away: 5.25 -> 4.70 (+10.5%)"
     },
     {
       "event_id": "401865535",
