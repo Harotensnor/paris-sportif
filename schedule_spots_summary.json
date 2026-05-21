@@ -1,13 +1,13 @@
 {
-  "generated_at": "2026-05-21T22:43:42Z",
+  "generated_at": "2026-05-21T22:52:18Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 56,
+    "active_events": 55,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 85,
+      "lookahead": 84,
       "travel_extreme": 9,
       "back_to_back_travel": 20,
       "schedule_congestion": 26
@@ -15,10 +15,10 @@
     "by_decision": {
       "abstain": 29,
       "lean_home": 25,
-      "lean_away": 2
+      "lean_away": 1
     },
     "lean_home": 25,
-    "lean_away": 2,
+    "lean_away": 1,
     "abstain": 29,
     "monitor": 0
   },
@@ -1072,10 +1072,10 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.098,
-        "away_score": 0.627,
+        "away_score": 0.408,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Pumas UNAM (+0.63)",
+        "reason": "Direction nette: Pumas UNAM (+0.41)",
         "detail": [
           {
             "side": "home",
@@ -1093,7 +1093,7 @@
             "side": "away",
             "type": "market_move",
             "direction": "steam",
-            "strength": 0.725
+            "strength": 0.505
           }
         ]
       }
@@ -3140,57 +3140,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.914
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815434",
-      "source_event_ids": [
-        "401815434"
-      ],
-      "kickoff": "2026-05-21T22:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Miami Marlins",
-      "away": "Atlanta Braves",
-      "match": "Miami Marlins - Atlanta Braves",
-      "decision": "lean_away",
-      "net_team": "Atlanta Braves",
-      "reason": "Miami Marlins plus penalise par calendrier/voyage (0.36 vs 0.00)",
-      "pressure_score": 0.8,
-      "home_fade": 0.36,
-      "away_fade": 0.0,
-      "travel_score": 0,
-      "lookahead_score": 0.8,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 1
-      },
-      "contexts": [
-        "3 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.15,
-        "away_score": -0.474,
-        "home_fade": 0.36,
-        "away_fade": 0.6,
-        "reason": "Direction nette: Miami Marlins (-0.15)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.36
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.6
           }
         ]
       }

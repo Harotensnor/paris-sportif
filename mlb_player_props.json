@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-21T22:43:30Z",
+  "generated_at": "2026-05-21T22:52:05Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815434",
-      "kickoff": "2026-05-21T22:40Z",
-      "league": "MLB",
-      "match": "Atlanta Braves at Miami Marlins",
-      "home": "Miami Marlins",
-      "away": "Atlanta Braves",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Miami Marlins",
-          "pitcher": "Sandy Alcantara",
-          "label": "Sandy Alcantara moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.5082,
-          "fair_odds": 1.97,
-          "expected_strikeouts": 4.47,
-          "projected_ip": 6.32,
-          "inputs": {
-            "k9": 6.36,
-            "era": 3.53,
-            "whip": 1.26,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Miami Marlins",
-          "pitcher": "Sandy Alcantara",
-          "label": "Sandy Alcantara ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6701,
-          "fair_odds": 1.49,
-          "expected_hr_allowed": 0.4,
-          "projected_ip": 6.32,
-          "inputs": {
-            "hr9": 0.57,
-            "era": 3.53,
-            "whip": 1.26
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Atlanta Braves",
-          "pitcher": "Spencer Strider",
-          "label": "Spencer Strider plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.5658,
-          "fair_odds": 1.77,
-          "expected_strikeouts": 5.81,
-          "projected_ip": 4.73,
-          "inputs": {
-            "k9": 11.05,
-            "era": 2.45,
-            "whip": 1.23,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Atlanta Braves",
-          "pitcher": "Spencer Strider",
-          "label": "Spencer Strider ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.7256,
-          "fair_odds": 1.38,
-          "expected_hr_allowed": 0.321,
-          "projected_ip": 4.73,
-          "inputs": {
-            "hr9": 0.61,
-            "era": 2.45,
-            "whip": 1.23
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815437",
       "kickoff": "2026-05-21T23:05Z",
@@ -1746,7 +1664,7 @@
       ]
     }
   ],
-  "props": 84,
+  "props": 80,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
