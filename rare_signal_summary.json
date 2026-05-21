@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-05-21T04:13:19Z",
+  "generated_at": "2026-05-21T04:25:33Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 56,
-    "actionable": 18,
-    "watch": 8,
+    "actionable": 17,
+    "watch": 9,
     "risk": 30,
     "expired_sample": 0,
     "by_type": {
@@ -17,8 +17,8 @@
       "market_uncertain": 30
     },
     "by_quality": {
-      "actionable": 18,
-      "watch": 8,
+      "actionable": 17,
+      "watch": 9,
       "risk": 30
     }
   },
@@ -150,22 +150,22 @@
       "context": "Cote away: 7.00 -> 5.80 (+17.1%)"
     },
     {
-      "event_id": "401865535",
-      "date": "2026-05-21T22:00Z",
+      "event_id": "401873245",
+      "date": "2026-05-22T02:00Z",
       "sport": "football",
-      "league_code": "conmebol.libertadores",
-      "league_name": "Copa Libertadores",
-      "home": "Deportivo La Guaira",
-      "away": "Independiente Rivadavia",
-      "match": "Deportivo La Guaira - Independiente Rivadavia",
+      "league_code": "ligamx",
+      "league_name": "Liga MX",
+      "home": "Cruz Azul",
+      "away": "Pumas UNAM",
+      "match": "Cruz Azul - Pumas UNAM",
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
       "type": "market_move",
       "direction": "steam",
       "team": null,
-      "side": "home",
-      "strength": 0.827,
-      "context": "Cote home: 4.70 -> 4.00 (+14.9%)"
+      "side": "away",
+      "strength": 0.845,
+      "context": "Cote away: 4.60 -> 3.90 (+15.2%)"
     },
     {
       "event_id": "401815434",
@@ -220,24 +220,6 @@
       "side": "away",
       "strength": 0.762,
       "context": "1 match dans les 48h + 1161 km de voyage"
-    },
-    {
-      "event_id": "401873245",
-      "date": "2026-05-22T02:00Z",
-      "sport": "football",
-      "league_code": "ligamx",
-      "league_name": "Liga MX",
-      "home": "Cruz Azul",
-      "away": "Pumas UNAM",
-      "match": "Cruz Azul - Pumas UNAM",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.741,
-      "context": "Cote away: 4.50 -> 3.90 (+13.3%)"
     },
     {
       "event_id": "401872905",
@@ -349,6 +331,24 @@
     }
   ],
   "active_watch": [
+    {
+      "event_id": "401865535",
+      "date": "2026-05-21T22:00Z",
+      "sport": "football",
+      "league_code": "conmebol.libertadores",
+      "league_name": "Copa Libertadores",
+      "home": "Deportivo La Guaira",
+      "away": "Independiente Rivadavia",
+      "match": "Deportivo La Guaira - Independiente Rivadavia",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 0.617,
+      "context": "Cote home: 4.50 -> 4.00 (+11.1%)"
+    },
     {
       "event_id": "401815440",
       "date": "2026-05-22T01:40Z",
