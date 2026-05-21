@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-21T00:08:06Z",
+  "generated_at": "2026-05-21T00:12:01Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815430",
-      "kickoff": "2026-05-21T01:38Z",
-      "league": "MLB",
-      "match": "Athletics Athletics at Los Angeles Angels",
-      "home": "Los Angeles Angels",
-      "away": "Athletics",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Los Angeles Angels",
-          "pitcher": "José Soriano",
-          "label": "José Soriano plus de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "over",
-          "probability": 0.5297,
-          "fair_odds": 1.89,
-          "expected_strikeouts": 6.65,
-          "projected_ip": 5.92,
-          "inputs": {
-            "k9": 10.11,
-            "era": 2.41,
-            "whip": 1.07,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Los Angeles Angels",
-          "pitcher": "José Soriano",
-          "label": "José Soriano ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6106,
-          "fair_odds": 1.64,
-          "expected_hr_allowed": 0.493,
-          "projected_ip": 5.92,
-          "inputs": {
-            "hr9": 0.75,
-            "era": 2.41,
-            "whip": 1.07
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Athletics",
-          "pitcher": "Luis Severino",
-          "label": "Luis Severino moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.5323,
-          "fair_odds": 1.88,
-          "expected_strikeouts": 5.35,
-          "projected_ip": 5.42,
-          "inputs": {
-            "k9": 8.89,
-            "era": 4.45,
-            "whip": 1.57,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Athletics",
-          "pitcher": "Luis Severino",
-          "label": "Luis Severino ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5003,
-          "fair_odds": 2.0,
-          "expected_hr_allowed": 0.693,
-          "projected_ip": 5.42,
-          "inputs": {
-            "hr9": 1.15,
-            "era": 4.45,
-            "whip": 1.57
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815435",
       "kickoff": "2026-05-21T17:10Z",
@@ -588,7 +506,7 @@
       ]
     }
   ],
-  "props": 28,
+  "props": 24,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
