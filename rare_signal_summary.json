@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-05-21T05:48:14Z",
+  "generated_at": "2026-05-21T05:52:41Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 56,
-    "actionable": 18,
-    "watch": 8,
-    "risk": 30,
+    "active_events": 55,
+    "actionable": 17,
+    "watch": 10,
+    "risk": 28,
     "expired_sample": 0,
     "by_type": {
       "market_move": 19,
-      "signal_conflict": 9,
       "injury_imbalance": 10,
       "back_to_back_travel": 8,
-      "market_uncertain": 30
+      "signal_conflict": 8,
+      "market_uncertain": 28
     },
     "by_quality": {
-      "actionable": 18,
-      "watch": 8,
-      "risk": 30
+      "actionable": 17,
+      "watch": 10,
+      "risk": 28
     }
   },
   "active_actionable": [
@@ -328,7 +328,9 @@
       "side": "away",
       "strength": 0.707,
       "context": "Cote away: 5.50 -> 4.80 (+12.7%)"
-    },
+    }
+  ],
+  "active_watch": [
     {
       "event_id": "401856924",
       "date": "2026-05-22T00:00Z",
@@ -338,17 +340,33 @@
       "home": "New York Liberty",
       "away": "Golden State Valkyries",
       "match": "New York Liberty - Golden State Valkyries",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
       "type": "market_move",
       "direction": "steam",
       "team": null,
       "side": "away",
-      "strength": 0.654,
-      "context": "Cote away: 3.40 -> 3.00 (+11.8%)"
-    }
-  ],
-  "active_watch": [
+      "strength": 0.644,
+      "context": "Cote away: 3.45 -> 3.05 (+11.6%)"
+    },
+    {
+      "event_id": "401842777",
+      "date": "2026-05-21T17:00Z",
+      "sport": "football",
+      "league_code": "allsvenskan",
+      "league_name": "Allsvenskan",
+      "home": "IF Elfsborg",
+      "away": "Mjällby AIF",
+      "match": "IF Elfsborg - Mjällby AIF",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.641,
+      "context": "Cote away: 2.60 -> 2.30 (+11.5%)"
+    },
     {
       "event_id": "401865535",
       "date": "2026-05-21T22:00Z",
@@ -422,24 +440,6 @@
       "context": "Absences severes 3-0"
     },
     {
-      "event_id": "401842777",
-      "date": "2026-05-21T17:00Z",
-      "sport": "football",
-      "league_code": "allsvenskan",
-      "league_name": "Allsvenskan",
-      "home": "IF Elfsborg",
-      "away": "Mjällby AIF",
-      "match": "IF Elfsborg - Mjällby AIF",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.545,
-      "context": "Cote away: 2.55 -> 2.30 (+9.8%)"
-    },
-    {
       "event_id": "401856925",
       "date": "2026-05-22T00:00Z",
       "sport": "basketball",
@@ -492,6 +492,24 @@
       "side": "away",
       "strength": 0.457,
       "context": "Cote away: 3.65 -> 3.35 (+8.2%)"
+    },
+    {
+      "event_id": "401865541",
+      "date": "2026-05-22T00:30Z",
+      "sport": "football",
+      "league_code": "conmebol.libertadores",
+      "league_name": "Copa Libertadores",
+      "home": "Universidad Católica",
+      "away": "Barcelona SC",
+      "match": "Universidad Católica - Barcelona SC",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.454,
+      "context": "Cote away: 4.90 -> 4.50 (+8.2%)"
     }
   ],
   "active_risk": [
@@ -532,24 +550,6 @@
       "context": "marge bookmaker anormale 12.1%"
     },
     {
-      "event_id": "401859405",
-      "date": "2026-05-24T03:55Z",
-      "sport": "football",
-      "league_code": "jleague",
-      "league_name": "J-League",
-      "home": "Fagiano Okayama",
-      "away": "Cerezo Osaka",
-      "match": "Fagiano Okayama - Cerezo Osaka",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 19.1%"
-    },
-    {
       "event_id": "401859406",
       "date": "2026-05-24T05:00Z",
       "sport": "football",
@@ -566,24 +566,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.5%"
-    },
-    {
-      "event_id": "401859407",
-      "date": "2026-05-24T08:00Z",
-      "sport": "football",
-      "league_code": "jleague",
-      "league_name": "J-League",
-      "home": "Shimizu S-Pulse",
-      "away": "Gamba Osaka",
-      "match": "Shimizu S-Pulse - Gamba Osaka",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 19.3%"
     },
     {
       "event_id": "401861541",
