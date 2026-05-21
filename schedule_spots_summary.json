@@ -1,23 +1,23 @@
 {
-  "generated_at": "2026-05-21T02:08:28Z",
+  "generated_at": "2026-05-21T02:12:16Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 25,
+    "active_events": 24,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 36,
       "back_to_back_travel": 10,
+      "lookahead": 34,
       "schedule_congestion": 16
     },
     "by_decision": {
-      "abstain": 15,
+      "abstain": 14,
       "lean_home": 10
     },
     "lean_home": 10,
     "lean_away": 0,
-    "abstain": 15,
+    "abstain": 14,
     "monitor": 0
   },
   "active": [
@@ -120,13 +120,13 @@
         "1 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "abstain",
+        "status": "mixed",
         "net_side": null,
-        "home_score": -0.488,
-        "away_score": -0.488,
-        "home_fade": 0.75,
+        "home_score": -1.488,
+        "away_score": 0.862,
+        "home_fade": 1.75,
         "away_fade": 0.75,
-        "reason": "Signaux opposes: Oklahoma City Thunder fade 0.75, San Antonio Spurs fade 0.75 -> prudence",
+        "reason": "Signaux mitigés: avantage net trop faible (Oklahoma City Thunder -1.49, San Antonio Spurs +0.86)",
         "detail": [
           {
             "side": "home",
@@ -151,6 +151,18 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
           }
         ]
       }
@@ -361,13 +373,13 @@
         "3 matchs sur les 7 derniers jours"
       ],
       "global_resolution": {
-        "status": "abstain",
+        "status": "mixed",
         "net_side": null,
-        "home_score": -0.39,
-        "away_score": -0.39,
+        "home_score": 0.96,
+        "away_score": -1.39,
         "home_fade": 0.6,
-        "away_fade": 0.6,
-        "reason": "Signaux opposes: San Antonio Spurs fade 0.60, Oklahoma City Thunder fade 0.60 -> prudence",
+        "away_fade": 1.6,
+        "reason": "Signaux mitigés: avantage net trop faible (San Antonio Spurs +0.96, Oklahoma City Thunder -1.39)",
         "detail": [
           {
             "side": "home",
@@ -380,58 +392,18 @@
             "type": "schedule_congestion",
             "direction": "fade",
             "strength": 0.6
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401856923",
-      "source_event_ids": [
-        "401856923"
-      ],
-      "kickoff": "2026-05-21T02:00Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Seattle Storm",
-      "away": "Connecticut Sun",
-      "match": "Seattle Storm - Connecticut Sun",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Seattle Storm 0.15, Connecticut Sun 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
-        "home_fade": 0.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Connecticut Sun (-0.10)",
-        "detail": [
+          },
           {
             "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
           },
           {
             "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           }
         ]
       }
@@ -674,12 +646,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
+        "net_side": "home",
+        "home_score": 1.252,
+        "away_score": -1.097,
         "home_fade": 0.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Oklahoma City Thunder (-0.10)",
+        "away_fade": 1.15,
+        "reason": "Direction nette: San Antonio Spurs (+1.25)",
         "detail": [
           {
             "side": "home",
@@ -692,6 +664,18 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           }
         ]
       }
@@ -778,12 +762,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
+        "net_side": "home",
+        "home_score": 1.252,
+        "away_score": -1.097,
         "home_fade": 0.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Oklahoma City Thunder (-0.10)",
+        "away_fade": 1.15,
+        "reason": "Direction nette: San Antonio Spurs (+1.25)",
         "detail": [
           {
             "side": "home",
@@ -796,6 +780,18 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           }
         ]
       }
