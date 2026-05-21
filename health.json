@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-05-21T06:14:48Z",
-  "calculated_at": "2026-05-21T06:14:48Z",
+  "generated_at": "2026-05-21T06:18:35Z",
+  "calculated_at": "2026-05-21T06:18:35Z",
   "source_of_truth": "data.js",
   "data_age_min": 1,
   "data_file_age_min": 0,
@@ -11,12 +11,12 @@
       "matches": 679
     },
     "winamax_markets": {
-      "age_min": 1,
+      "age_min": 0,
       "matches_with_odds": 638,
       "matches_detailed": 638,
       "details_ratio_pct": 100.0,
       "last_run_delta": 0,
-      "last_run_limit": 400
+      "last_run_limit": 1000
     },
     "injuries_soccer": {
       "age_min": 2,
@@ -475,10 +475,10 @@
     },
     "clv_history": {
       "age_min": 2,
-      "matches": 0,
-      "observations": 0,
+      "matches": 21,
+      "observations": 52,
       "mean_clv_pct": 0,
-      "positive_clv_rate": 0,
+      "positive_clv_rate": 21.2,
       "sample_status": "learning"
     }
   },
@@ -494,7 +494,7 @@
     "winamax_markets": {
       "script": "scripts/fetch_winamax_match_details.py",
       "output": "winamax_markets.json",
-      "age_min": 1,
+      "age_min": 0,
       "threshold_min": 15,
       "fast_red_min": 30,
       "status": "ok"
@@ -1052,7 +1052,7 @@
   ],
   "overall": "warning",
   "quality_checks": {
-    "data_generated_at": "2026-05-21T06:13:34.740253Z",
+    "data_generated_at": "2026-05-21T06:17:14.592864Z",
     "truth_scope": "all_events",
     "all_winamax_available": 189,
     "all_winamax_exact": 189,
@@ -1131,7 +1131,7 @@
   "data_truth": {
     "source_of_truth": "data.js",
     "scope": "all_events",
-    "data_generated_at": "2026-05-21T06:13:34.740253Z",
+    "data_generated_at": "2026-05-21T06:17:14.592864Z",
     "winamax_available": 189,
     "winamax_exact": 189,
     "winamax_exact_ratio": 1.0,
@@ -1151,7 +1151,7 @@
     "anomalies_emitted": 3
   },
   "source_health": {
-    "generated_at": "2026-05-21T06:14:48Z",
+    "generated_at": "2026-05-21T06:18:35Z",
     "sources_total": 11,
     "sources_ok": 8,
     "sources_warning": 3,
@@ -1251,7 +1251,7 @@
   },
   "observability": {
     "pipeline_traces": {
-      "generated_at": "2026-05-21T06:14:48Z",
+      "generated_at": "2026-05-21T06:18:35Z",
       "runs_observed": 99,
       "by_status": {
         "warning": 65,
@@ -1263,13 +1263,13 @@
           "runs": 99,
           "errors": 1,
           "last_status": "ok",
-          "max_duration_ms": 2434
+          "max_duration_ms": 2443
         }
       }
     }
   },
   "data_lineage": {
-    "generated_at": "2026-05-21T06:14:48Z",
+    "generated_at": "2026-05-21T06:18:35Z",
     "status": "ok",
     "events": 189,
     "events_missing_inline_lineage": 0,
