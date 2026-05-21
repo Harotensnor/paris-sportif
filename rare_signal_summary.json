@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-05-21T12:25:47Z",
+  "generated_at": "2026-05-21T12:28:34Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 52,
+    "active_events": 51,
     "actionable": 17,
-    "watch": 10,
-    "risk": 25,
+    "watch": 8,
+    "risk": 26,
     "expired_sample": 0,
     "by_type": {
-      "market_move": 18,
+      "market_uncertain": 23,
+      "market_move": 16,
       "injury_imbalance": 10,
       "back_to_back_travel": 8,
-      "signal_conflict": 8,
-      "market_uncertain": 22
+      "signal_conflict": 8
     },
     "by_quality": {
+      "risk": 26,
       "actionable": 17,
-      "watch": 10,
-      "risk": 25
+      "watch": 8
     }
   },
   "active_actionable": [
@@ -386,24 +386,6 @@
       "context": "Absences severes 3-0"
     },
     {
-      "event_id": "401873226",
-      "date": "2026-05-21T19:00Z",
-      "sport": "football",
-      "league_code": "eredivisie",
-      "league_name": "Eredivisie",
-      "home": "FC Utrecht",
-      "away": "Heerenveen",
-      "match": "FC Utrecht - Heerenveen",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.593,
-      "context": "Cote away: 3.75 -> 3.35 (+10.7%)"
-    },
-    {
       "event_id": "401865541",
       "date": "2026-05-22T00:30Z",
       "sport": "football",
@@ -438,24 +420,6 @@
       "side": "home",
       "strength": 0.568,
       "context": "Cote home: 4.40 -> 3.95 (+10.2%)"
-    },
-    {
-      "event_id": "401856925",
-      "date": "2026-05-22T00:00Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Minnesota Lynx",
-      "away": "Toronto Tempo",
-      "match": "Minnesota Lynx - Toronto Tempo",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.521,
-      "context": "Cote away: 3.20 -> 2.90 (+9.4%)"
     },
     {
       "event_id": "401866585",
@@ -530,6 +494,24 @@
       "side": null,
       "strength": 0.979,
       "context": "Signaux opposes: Arizona Diamondbacks fade 1.20, Colorado Rockies fade 1.40 -> prudence"
+    },
+    {
+      "event_id": "178522",
+      "date": "2026-05-21T12:20Z",
+      "sport": "tennis",
+      "league_code": "rolandgarros",
+      "league_name": "Roland Garros",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 12.5%"
     },
     {
       "event_id": "178425",
