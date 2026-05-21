@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-21T02:14:57Z",
+  "generated_at": "2026-05-21T02:17:10Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -518,12 +518,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
+        "net_side": "home",
+        "home_score": 0.902,
         "away_score": -0.098,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Vegas Golden Knights (-0.10)",
+        "reason": "Direction nette: Colorado Avalanche (+0.90)",
         "detail": [
           {
             "side": "home",
@@ -536,6 +536,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
           }
         ]
       }
@@ -868,10 +874,10 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.098,
-        "away_score": -0.098,
+        "away_score": 0.902,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Colorado Avalanche (-0.10)",
+        "reason": "Direction nette: Colorado Avalanche (+0.90)",
         "detail": [
           {
             "side": "home",
@@ -884,6 +890,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
           }
         ]
       }
@@ -1111,13 +1123,13 @@
         "1 match dans les 48h + 979 km de voyage"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.136,
+        "status": "mixed",
+        "net_side": null,
+        "home_score": 0.864,
         "away_score": -1.116,
         "home_fade": 0.6,
         "away_fade": 1.326,
-        "reason": "Direction nette: Colorado Avalanche (-0.14)",
+        "reason": "Signaux mitigés: avantage net trop faible (Colorado Avalanche +0.86, Vegas Golden Knights -1.12)",
         "detail": [
           {
             "side": "home",
@@ -1130,6 +1142,12 @@
             "type": "schedule_congestion",
             "direction": "fade",
             "strength": 0.6
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
           },
           {
             "side": "away",
@@ -1231,13 +1249,13 @@
         "1 match dans les 48h + 979 km de voyage"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "home",
+        "status": "mixed",
+        "net_side": null,
         "home_score": 0.157,
-        "away_score": -0.823,
+        "away_score": 0.177,
         "home_fade": 0.15,
         "away_fade": 0.876,
-        "reason": "Direction nette: Vegas Golden Knights (+0.16)",
+        "reason": "Signaux mitigés: avantage net trop faible (Vegas Golden Knights +0.16, Colorado Avalanche +0.18)",
         "detail": [
           {
             "side": "home",
@@ -1250,6 +1268,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
           },
           {
             "side": "away",
