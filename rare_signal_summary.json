@@ -1,24 +1,25 @@
 {
-  "generated_at": "2026-05-21T17:04:12Z",
+  "generated_at": "2026-05-21T17:08:31Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 41,
-    "actionable": 13,
+    "actionable": 14,
     "watch": 3,
-    "risk": 25,
+    "risk": 24,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 7,
       "back_to_back_travel": 10,
-      "market_uncertain": 70,
+      "market_uncertain": 69,
+      "market_move": 2,
       "signal_conflict": 5
     },
     "by_quality": {
-      "actionable": 13,
+      "actionable": 14,
       "watch": 3,
-      "risk": 25
+      "risk": 24
     }
   },
   "active_actionable": [
@@ -75,6 +76,24 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 7-13"
+    },
+    {
+      "event_id": "175699",
+      "date": "2026-05-24T04:00Z",
+      "sport": "tennis",
+      "league_code": "rolandgarros",
+      "league_name": "Roland Garros",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "away",
+      "strength": 1.0,
+      "context": "Cote away: 2.85 -> 3.40 (-19.3%)"
     },
     {
       "event_id": "401815434",
@@ -314,24 +333,6 @@
     }
   ],
   "active_risk": [
-    {
-      "event_id": "175591",
-      "date": "2026-05-24T04:00Z",
-      "sport": "tennis",
-      "league_code": "rolandgarros",
-      "league_name": "Roland Garros",
-      "home": "",
-      "away": "",
-      "match": "? - ?",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 12.9%"
-    },
     {
       "event_id": "401859406",
       "date": "2026-05-24T05:00Z",
