@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-21T06:42:35Z",
+  "generated_at": "2026-05-21T06:45:58Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
@@ -10,11 +10,11 @@
     "risk": 28,
     "expired_sample": 0,
     "by_type": {
-      "market_move": 19,
+      "market_move": 18,
       "injury_imbalance": 10,
       "back_to_back_travel": 8,
       "signal_conflict": 8,
-      "market_uncertain": 28
+      "market_uncertain": 29
     },
     "by_quality": {
       "actionable": 17,
@@ -168,6 +168,24 @@
       "context": "Cote away: 4.60 -> 3.90 (+15.2%)"
     },
     {
+      "event_id": "401866584",
+      "date": "2026-05-21T15:00Z",
+      "sport": "football",
+      "league_code": "superleaguegrece",
+      "league_name": "Super League Grèce",
+      "home": "Atromitos",
+      "away": "Panserraikos FC",
+      "match": "Atromitos - Panserraikos FC",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.808,
+      "context": "Cote away: 5.50 -> 4.70 (+14.5%)"
+    },
+    {
       "event_id": "401815434",
       "date": "2026-05-21T22:40Z",
       "sport": "baseball",
@@ -310,24 +328,6 @@
       "side": "away",
       "strength": 0.709,
       "context": "1 match dans les 48h + 896 km de voyage"
-    },
-    {
-      "event_id": "401866584",
-      "date": "2026-05-21T15:00Z",
-      "sport": "football",
-      "league_code": "superleaguegrece",
-      "league_name": "Super League Grèce",
-      "home": "Atromitos",
-      "away": "Panserraikos FC",
-      "match": "Atromitos - Panserraikos FC",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.707,
-      "context": "Cote away: 5.50 -> 4.80 (+12.7%)"
     }
   ],
   "active_watch": [
