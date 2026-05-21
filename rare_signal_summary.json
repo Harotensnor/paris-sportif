@@ -1,25 +1,26 @@
 {
-  "generated_at": "2026-05-21T21:09:48Z",
+  "generated_at": "2026-05-21T21:15:50Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 55,
+    "active_events": 54,
     "actionable": 26,
     "watch": 3,
-    "risk": 26,
+    "risk": 25,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 19,
       "back_to_back_travel": 21,
       "signal_conflict": 7,
       "travel_extreme": 6,
-      "market_uncertain": 67
+      "market_uncertain": 66,
+      "market_move": 1
     },
     "by_quality": {
       "actionable": 26,
       "watch": 3,
-      "risk": 26
+      "risk": 25
     }
   },
   "active_actionable": [
@@ -890,24 +891,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.7%"
-    },
-    {
-      "event_id": "401865551",
-      "date": "2026-05-28T22:00Z",
-      "sport": "football",
-      "league_code": "conmebol.libertadores",
-      "league_name": "Copa Libertadores",
-      "home": "Cerro Porteño",
-      "away": "Sporting Cristal",
-      "match": "Cerro Porteño - Sporting Cristal",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 19.2%"
     },
     {
       "event_id": "401815447",
