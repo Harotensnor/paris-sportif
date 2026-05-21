@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-21T16:18:53Z",
+  "generated_at": "2026-05-21T16:23:22Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -325,13 +325,13 @@
         "1 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
-        "home_fade": 0.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Montreal Canadiens (-0.10)",
+        "status": "abstain",
+        "net_side": null,
+        "home_score": -0.747,
+        "away_score": -0.747,
+        "home_fade": 1.15,
+        "away_fade": 1.15,
+        "reason": "Signaux opposes: Carolina Hurricanes fade 1.15, Montreal Canadiens fade 1.15 -> prudence",
         "detail": [
           {
             "side": "home",
@@ -344,6 +344,18 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           }
         ]
       }
@@ -380,10 +392,10 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.098,
-        "away_score": -0.098,
+        "away_score": 0.506,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Pumas UNAM (-0.10)",
+        "reason": "Direction nette: Pumas UNAM (+0.51)",
         "detail": [
           {
             "side": "home",
@@ -396,6 +408,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.604
           }
         ]
       }
@@ -1318,10 +1336,10 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.547,
-        "away_score": 0.06,
+        "away_score": 0.6,
         "home_fade": 0.6,
         "away_fade": 0.15,
-        "reason": "Direction nette: Golden State Valkyries (+0.06)",
+        "reason": "Direction nette: Golden State Valkyries (+0.60)",
         "detail": [
           {
             "side": "away",
@@ -1334,6 +1352,12 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.6
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.54
           }
         ]
       }
