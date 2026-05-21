@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-05-21T19:05:19Z",
+  "generated_at": "2026-05-21T19:09:00Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 49,
-    "actionable": 17,
-    "watch": 8,
+    "actionable": 16,
+    "watch": 9,
     "risk": 24,
     "expired_sample": 0,
     "by_type": {
@@ -17,8 +17,8 @@
       "back_to_back_travel": 7
     },
     "by_quality": {
-      "actionable": 17,
-      "watch": 8,
+      "actionable": 16,
+      "watch": 9,
       "risk": 24
     }
   },
@@ -294,24 +294,6 @@
       "context": "Cote away: 4.70 -> 4.10 (+12.8%)"
     },
     {
-      "event_id": "401865535",
-      "date": "2026-05-21T22:00Z",
-      "sport": "football",
-      "league_code": "conmebol.libertadores",
-      "league_name": "Copa Libertadores",
-      "home": "Deportivo La Guaira",
-      "away": "Independiente Rivadavia",
-      "match": "Deportivo La Guaira - Independiente Rivadavia",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "home",
-      "strength": 0.661,
-      "context": "Cote home: 4.20 -> 3.70 (+11.9%)"
-    },
-    {
       "event_id": "401865441",
       "date": "2026-05-21T22:00Z",
       "sport": "football",
@@ -438,6 +420,24 @@
       "side": "home",
       "strength": 0.589,
       "context": "Cote home: 3.30 -> 2.95 (+10.6%)"
+    },
+    {
+      "event_id": "401865535",
+      "date": "2026-05-21T22:00Z",
+      "sport": "football",
+      "league_code": "conmebol.libertadores",
+      "league_name": "Copa Libertadores",
+      "home": "Deportivo La Guaira",
+      "away": "Independiente Rivadavia",
+      "match": "Deportivo La Guaira - Independiente Rivadavia",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 0.542,
+      "context": "Cote home: 4.10 -> 3.70 (+9.8%)"
     },
     {
       "event_id": "401865543",
