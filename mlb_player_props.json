@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-21T05:12:36Z",
+  "generated_at": "2026-05-21T05:18:10Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -374,6 +374,42 @@
             "whip": 1.63
           },
           "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Toronto Blue Jays",
+          "pitcher": "Braydon Fisher",
+          "label": "Braydon Fisher moins de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "under",
+          "probability": 0.6004,
+          "fair_odds": 1.67,
+          "expected_strikeouts": 6.01,
+          "projected_ip": 6.6,
+          "inputs": {
+            "k9": 8.2,
+            "era": 3.08,
+            "whip": 1.06,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Toronto Blue Jays",
+          "pitcher": "Braydon Fisher",
+          "label": "Braydon Fisher ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6073,
+          "fair_odds": 1.65,
+          "expected_hr_allowed": 0.499,
+          "projected_ip": 6.6,
+          "inputs": {
+            "hr9": 0.68,
+            "era": 3.08,
+            "whip": 1.06
+          },
+          "side": "away"
         }
       ]
     },
@@ -542,7 +578,7 @@
       ]
     }
   ],
-  "props": 26,
+  "props": 28,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
