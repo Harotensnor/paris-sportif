@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-21T15:53:31Z",
+  "generated_at": "2026-05-21T15:57:03Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -119,11 +119,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.834,
-        "away_score": -0.024,
-        "home_fade": 0.96,
+        "home_score": -0.234,
+        "away_score": -0.234,
+        "home_fade": 0.36,
         "away_fade": 0.36,
-        "reason": "Direction nette: Colorado Rockies (-0.02)",
+        "reason": "Direction nette: Colorado Rockies (-0.23)",
         "detail": [
           {
             "side": "home",
@@ -136,12 +136,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.36
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.6
           }
         ]
       }
@@ -398,10 +392,10 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.098,
-        "away_score": 0.506,
+        "away_score": -0.098,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Pumas UNAM (+0.51)",
+        "reason": "Direction nette: Pumas UNAM (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -414,12 +408,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.604
           }
         ]
       }
@@ -871,13 +859,13 @@
         "1 match dans les 48h + 943 km de voyage"
       ],
       "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.543,
-        "away_score": -0.704,
-        "home_fade": 0.9,
+        "status": "net",
+        "net_side": "home",
+        "home_score": 0.057,
+        "away_score": -0.914,
+        "home_fade": 0.3,
         "away_fade": 1.019,
-        "reason": "Signaux opposes: Arizona Diamondbacks fade 0.90, Colorado Rockies fade 1.02 -> prudence",
+        "reason": "Direction nette: Arizona Diamondbacks (+0.06)",
         "detail": [
           {
             "side": "home",
@@ -890,12 +878,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.3
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.6
           },
           {
             "side": "away",
@@ -937,13 +919,13 @@
         "2 match dans les 48h + 943 km de voyage"
       ],
       "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.71,
-        "away_score": -0.979,
-        "home_fade": 1.2,
+        "status": "net",
+        "net_side": "home",
+        "home_score": -0.11,
+        "away_score": -1.189,
+        "home_fade": 0.6,
         "away_fade": 1.399,
-        "reason": "Signaux opposes: Arizona Diamondbacks fade 1.20, Colorado Rockies fade 1.40 -> prudence",
+        "reason": "Direction nette: Arizona Diamondbacks (-0.11)",
         "detail": [
           {
             "side": "home",
@@ -954,12 +936,6 @@
           {
             "side": "away",
             "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.6
           },
@@ -1243,13 +1219,13 @@
         "1 match dans les 48h + 943 km de voyage"
       ],
       "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.446,
-        "away_score": -0.606,
-        "home_fade": 0.75,
+        "status": "net",
+        "net_side": "home",
+        "home_score": 0.154,
+        "away_score": -0.816,
+        "home_fade": 0.15,
         "away_fade": 0.869,
-        "reason": "Signaux opposes: Arizona Diamondbacks fade 0.75, Colorado Rockies fade 0.87 -> prudence",
+        "reason": "Direction nette: Arizona Diamondbacks (+0.15)",
         "detail": [
           {
             "side": "home",
@@ -1262,12 +1238,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.6
           },
           {
             "side": "away",
@@ -1360,10 +1330,10 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.547,
-        "away_score": 0.6,
+        "away_score": 0.06,
         "home_fade": 0.6,
         "away_fade": 0.15,
-        "reason": "Direction nette: Golden State Valkyries (+0.60)",
+        "reason": "Direction nette: Golden State Valkyries (+0.06)",
         "detail": [
           {
             "side": "away",
@@ -1376,12 +1346,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.54
           }
         ]
       }
