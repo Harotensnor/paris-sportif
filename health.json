@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-05-21T02:48:30Z",
-  "calculated_at": "2026-05-21T02:48:30Z",
+  "generated_at": "2026-05-21T02:52:08Z",
+  "calculated_at": "2026-05-21T02:52:08Z",
   "source_of_truth": "data.js",
   "data_age_min": 1,
   "data_file_age_min": 0,
@@ -11,12 +11,12 @@
       "matches": 684
     },
     "winamax_markets": {
-      "age_min": 0,
+      "age_min": 1,
       "matches_with_odds": 643,
       "matches_detailed": 643,
       "details_ratio_pct": 100.0,
       "last_run_delta": 0,
-      "last_run_limit": 1000
+      "last_run_limit": 400
     },
     "injuries_soccer": {
       "age_min": 1,
@@ -494,7 +494,7 @@
     "winamax_markets": {
       "script": "scripts/fetch_winamax_match_details.py",
       "output": "winamax_markets.json",
-      "age_min": 0,
+      "age_min": 1,
       "threshold_min": 15,
       "fast_red_min": 30,
       "status": "ok"
@@ -1052,7 +1052,7 @@
   ],
   "overall": "warning",
   "quality_checks": {
-    "data_generated_at": "2026-05-21T02:47:11.813355Z",
+    "data_generated_at": "2026-05-21T02:50:54.018228Z",
     "truth_scope": "all_events",
     "all_winamax_available": 187,
     "all_winamax_exact": 187,
@@ -1131,7 +1131,7 @@
   "data_truth": {
     "source_of_truth": "data.js",
     "scope": "all_events",
-    "data_generated_at": "2026-05-21T02:47:11.813355Z",
+    "data_generated_at": "2026-05-21T02:50:54.018228Z",
     "winamax_available": 187,
     "winamax_exact": 187,
     "winamax_exact_ratio": 1.0,
@@ -1151,7 +1151,7 @@
     "anomalies_emitted": 3
   },
   "source_health": {
-    "generated_at": "2026-05-21T02:48:30Z",
+    "generated_at": "2026-05-21T02:52:08Z",
     "sources_total": 11,
     "sources_ok": 7,
     "sources_warning": 4,
@@ -1251,7 +1251,7 @@
   },
   "observability": {
     "pipeline_traces": {
-      "generated_at": "2026-05-21T02:48:30Z",
+      "generated_at": "2026-05-21T02:52:08Z",
       "runs_observed": 99,
       "by_status": {
         "warning": 67,
@@ -1263,13 +1263,13 @@
           "runs": 99,
           "errors": 1,
           "last_status": "ok",
-          "max_duration_ms": 1047
+          "max_duration_ms": 1064
         }
       }
     }
   },
   "data_lineage": {
-    "generated_at": "2026-05-21T02:48:30Z",
+    "generated_at": "2026-05-21T02:52:08Z",
     "status": "ok",
     "events": 187,
     "events_missing_inline_lineage": 0,
