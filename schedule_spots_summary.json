@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-21T02:42:23Z",
+  "generated_at": "2026-05-21T02:46:04Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -227,13 +227,13 @@
         "3 matchs sur les 7 derniers jours"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -1.007,
-        "away_score": -0.174,
-        "home_fade": 1.217,
+        "status": "mixed",
+        "net_side": null,
+        "home_score": -1.39,
+        "away_score": 0.415,
+        "home_fade": 1.6,
         "away_fade": 0.6,
-        "reason": "Direction nette: Oklahoma City Thunder (-0.17)",
+        "reason": "Signaux mitigés: avantage net trop faible (San Antonio Spurs -1.39, Oklahoma City Thunder +0.41)",
         "detail": [
           {
             "side": "home",
@@ -251,7 +251,13 @@
             "side": "home",
             "type": "market_move",
             "direction": "drift",
-            "strength": 0.617
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.455
           }
         ]
       }
@@ -577,11 +583,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.715,
-        "away_score": 0.119,
-        "home_fade": 0.767,
+        "home_score": -1.097,
+        "away_score": 0.707,
+        "home_fade": 1.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Oklahoma City Thunder (+0.12)",
+        "reason": "Direction nette: Oklahoma City Thunder (+0.71)",
         "detail": [
           {
             "side": "home",
@@ -599,7 +605,13 @@
             "side": "home",
             "type": "market_move",
             "direction": "drift",
-            "strength": 0.617
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.455
           }
         ]
       }
@@ -687,11 +699,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.715,
-        "away_score": 0.119,
-        "home_fade": 0.767,
+        "home_score": -1.097,
+        "away_score": 0.707,
+        "home_fade": 1.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Oklahoma City Thunder (+0.12)",
+        "reason": "Direction nette: Oklahoma City Thunder (+0.71)",
         "detail": [
           {
             "side": "home",
@@ -709,7 +721,13 @@
             "side": "home",
             "type": "market_move",
             "direction": "drift",
-            "strength": 0.617
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.455
           }
         ]
       }
@@ -797,11 +815,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.119,
-        "away_score": -0.715,
+        "home_score": 0.707,
+        "away_score": -1.097,
         "home_fade": 0.15,
-        "away_fade": 0.767,
-        "reason": "Direction nette: Oklahoma City Thunder (+0.12)",
+        "away_fade": 1.15,
+        "reason": "Direction nette: Oklahoma City Thunder (+0.71)",
         "detail": [
           {
             "side": "home",
@@ -816,10 +834,16 @@
             "strength": 0.15
           },
           {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.455
+          },
+          {
             "side": "away",
             "type": "market_move",
             "direction": "drift",
-            "strength": 0.617
+            "strength": 1.0
           }
         ]
       }

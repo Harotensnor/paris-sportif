@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-05-21T02:42:23Z",
+  "generated_at": "2026-05-21T02:46:04Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 64,
-    "actionable": 22,
+    "actionable": 25,
     "watch": 9,
-    "risk": 33,
+    "risk": 30,
     "expired_sample": 0,
     "by_type": {
-      "market_move": 41,
-      "signal_conflict": 10,
+      "market_move": 43,
+      "signal_conflict": 11,
       "injury_imbalance": 9,
       "back_to_back_travel": 8,
-      "market_uncertain": 35
+      "market_uncertain": 31
     },
     "by_quality": {
-      "actionable": 22,
+      "actionable": 25,
       "watch": 9,
-      "risk": 33
+      "risk": 30
     }
   },
   "active_actionable": [
@@ -147,25 +147,43 @@
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 13.00 -> 60.00 (-361.5%)"
+      "context": "Cote home: 13.00 -> 100.00 (-669.2%)"
     },
     {
-      "event_id": "401856929",
-      "date": "2026-05-23T02:00Z",
+      "event_id": "401873199",
+      "date": "2026-05-23T00:30Z",
       "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Seattle Storm",
-      "away": "Connecticut Sun",
-      "match": "Seattle Storm - Connecticut Sun",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "San Antonio Spurs",
+      "away": "Oklahoma City Thunder",
+      "match": "San Antonio Spurs - Oklahoma City Thunder",
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
       "type": "market_move",
-      "direction": "steam",
+      "direction": "drift",
       "team": null,
-      "side": "away",
+      "side": "home",
       "strength": 1.0,
-      "context": "Cote away: 2.10 -> 1.72 (+18.1%)"
+      "context": "Cote home: 4.50 -> 11.00 (-144.4%)"
+    },
+    {
+      "event_id": "401873200",
+      "date": "2026-05-25T00:00Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "San Antonio Spurs",
+      "away": "Oklahoma City Thunder",
+      "match": "San Antonio Spurs - Oklahoma City Thunder",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 4.50 -> 11.00 (-144.4%)"
     },
     {
       "event_id": "401872905",
@@ -184,6 +202,24 @@
       "side": "draw",
       "strength": 1.0,
       "context": "Cote draw: 4.40 -> 14.00 (-218.2%)"
+    },
+    {
+      "event_id": "401873201",
+      "date": "2026-05-27T00:30Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "Oklahoma City Thunder",
+      "away": "San Antonio Spurs",
+      "match": "Oklahoma City Thunder - San Antonio Spurs",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "away",
+      "strength": 1.0,
+      "context": "Cote away: 4.50 -> 11.00 (-144.4%)"
     },
     {
       "event_id": "401872906",
@@ -219,7 +255,25 @@
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 13.00 -> 60.00 (-361.5%)"
+      "context": "Cote home: 13.00 -> 100.00 (-669.2%)"
+    },
+    {
+      "event_id": "401873202",
+      "date": "2026-05-29T00:30Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "San Antonio Spurs",
+      "away": "Oklahoma City Thunder",
+      "match": "San Antonio Spurs - Oklahoma City Thunder",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 4.50 -> 11.00 (-144.4%)"
     },
     {
       "event_id": "401865449",
@@ -622,14 +676,14 @@
       "context": "marge bookmaker anormale 12.1%"
     },
     {
-      "event_id": "401873199",
-      "date": "2026-05-23T00:30Z",
+      "event_id": "401856929",
+      "date": "2026-05-23T02:00Z",
       "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "San Antonio Spurs",
-      "away": "Oklahoma City Thunder",
-      "match": "San Antonio Spurs - Oklahoma City Thunder",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Seattle Storm",
+      "away": "Connecticut Sun",
+      "match": "Seattle Storm - Connecticut Sun",
       "quality": "risk",
       "quality_reason": "Signal de prudence, pas une opportunite directe",
       "type": "market_uncertain",
@@ -637,7 +691,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 12.6%"
+      "context": "marge bookmaker anormale 13.3%"
     },
     {
       "event_id": "401859405",
@@ -802,24 +856,6 @@
       "context": "marge bookmaker anormale 18.5%"
     },
     {
-      "event_id": "401873200",
-      "date": "2026-05-25T00:00Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "San Antonio Spurs",
-      "away": "Oklahoma City Thunder",
-      "match": "San Antonio Spurs - Oklahoma City Thunder",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 12.6%"
-    },
-    {
       "event_id": "401843356",
       "date": "2026-05-25T12:30Z",
       "sport": "football",
@@ -910,14 +946,14 @@
       "context": "marge bookmaker anormale 18.8%"
     },
     {
-      "event_id": "401865459",
+      "event_id": "401865456",
       "date": "2026-05-26T22:00Z",
       "sport": "football",
       "league_code": "conmebol.sudamericana",
       "league_name": "Copa Sudamericana",
-      "home": "São Paulo",
-      "away": "Boston River",
-      "match": "São Paulo - Boston River",
+      "home": "Millonarios",
+      "away": "O'Higgins",
+      "match": "Millonarios - O'Higgins",
       "quality": "risk",
       "quality_reason": "Signal de prudence, pas une opportunite directe",
       "type": "market_uncertain",
@@ -925,7 +961,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.5%"
+      "context": "marge bookmaker anormale 18.1%"
     },
     {
       "event_id": "401865461",
@@ -998,24 +1034,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.0%"
-    },
-    {
-      "event_id": "401873201",
-      "date": "2026-05-27T00:30Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "Oklahoma City Thunder",
-      "away": "San Antonio Spurs",
-      "match": "Oklahoma City Thunder - San Antonio Spurs",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 12.6%"
     },
     {
       "event_id": "401865562",
@@ -1124,24 +1142,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.6%"
-    },
-    {
-      "event_id": "401873202",
-      "date": "2026-05-29T00:30Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "San Antonio Spurs",
-      "away": "Oklahoma City Thunder",
-      "match": "San Antonio Spurs - Oklahoma City Thunder",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 12.6%"
     },
     {
       "event_id": "401873344",
