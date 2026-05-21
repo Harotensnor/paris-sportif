@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-05-21T19:43:14Z",
+  "generated_at": "2026-05-21T19:47:39Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 49,
-    "actionable": 16,
-    "watch": 9,
+    "actionable": 15,
+    "watch": 10,
     "risk": 24,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 6,
-      "market_move": 20,
+      "market_move": 18,
       "market_uncertain": 74,
-      "signal_conflict": 8,
+      "signal_conflict": 5,
       "back_to_back_travel": 7
     },
     "by_quality": {
-      "actionable": 16,
-      "watch": 9,
+      "actionable": 15,
+      "watch": 10,
       "risk": 24
     }
   },
@@ -148,24 +148,6 @@
       "side": "away",
       "strength": 0.799,
       "context": "2 match dans les 48h + 943 km de voyage"
-    },
-    {
-      "event_id": "401815440",
-      "date": "2026-05-22T01:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Arizona Diamondbacks",
-      "away": "Colorado Rockies",
-      "match": "Arizona Diamondbacks - Colorado Rockies",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.788,
-      "context": "Cote away: 2.68 -> 2.30 (+14.2%)"
     },
     {
       "event_id": "401873384",
@@ -456,6 +438,24 @@
       "side": "home",
       "strength": 0.513,
       "context": "Cote home: 3.25 -> 2.95 (+9.2%)"
+    },
+    {
+      "event_id": "401815440",
+      "date": "2026-05-22T01:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Arizona Diamondbacks",
+      "away": "Colorado Rockies",
+      "match": "Arizona Diamondbacks - Colorado Rockies",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.477,
+      "context": "Cote away: 2.68 -> 2.45 (+8.6%)"
     },
     {
       "event_id": "401865541",
@@ -835,7 +835,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.7%"
+      "context": "marge bookmaker anormale 19.7%"
     },
     {
       "event_id": "401865549",
