@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-05-21T01:40:39Z",
-  "calculated_at": "2026-05-21T01:40:39Z",
+  "generated_at": "2026-05-21T01:42:53Z",
+  "calculated_at": "2026-05-21T01:42:53Z",
   "source_of_truth": "data.js",
   "data_age_min": 1,
   "data_file_age_min": 0,
@@ -11,7 +11,7 @@
       "matches": 686
     },
     "winamax_markets": {
-      "age_min": 1,
+      "age_min": 0,
       "matches_with_odds": 645,
       "matches_detailed": 645,
       "details_ratio_pct": 100.0,
@@ -494,7 +494,7 @@
     "winamax_markets": {
       "script": "scripts/fetch_winamax_match_details.py",
       "output": "winamax_markets.json",
-      "age_min": 1,
+      "age_min": 0,
       "threshold_min": 15,
       "fast_red_min": 30,
       "status": "ok"
@@ -1052,7 +1052,7 @@
   ],
   "overall": "warning",
   "quality_checks": {
-    "data_generated_at": "2026-05-21T01:39:36.075929Z",
+    "data_generated_at": "2026-05-21T01:41:49.909370Z",
     "truth_scope": "all_events",
     "all_winamax_available": 179,
     "all_winamax_exact": 179,
@@ -1131,7 +1131,7 @@
   "data_truth": {
     "source_of_truth": "data.js",
     "scope": "all_events",
-    "data_generated_at": "2026-05-21T01:39:36.075929Z",
+    "data_generated_at": "2026-05-21T01:41:49.909370Z",
     "winamax_available": 179,
     "winamax_exact": 179,
     "winamax_exact_ratio": 1.0,
@@ -1144,28 +1144,28 @@
     "status": "degraded",
     "schema_version": 2,
     "sources_validated": 11,
-    "sources_ok": 7,
-    "sources_warning": 4,
+    "sources_ok": 6,
+    "sources_warning": 5,
     "sources_critical": 0,
-    "quarantine_records": 5,
-    "anomalies_emitted": 3
+    "quarantine_records": 6,
+    "anomalies_emitted": 4
   },
   "source_health": {
-    "generated_at": "2026-05-21T01:40:39Z",
+    "generated_at": "2026-05-21T01:42:53Z",
     "sources_total": 11,
-    "sources_ok": 7,
-    "sources_warning": 4,
+    "sources_ok": 6,
+    "sources_warning": 5,
     "sources_critical": 0,
-    "source_health_avg": 92.8,
+    "source_health_avg": 92.1,
     "source_health_min": 57,
     "by_source": {
       "winamax_catalog": {
-        "score": 100,
-        "status": "ok",
+        "score": 92,
+        "status": "warning",
         "items": 686,
         "age_min": 2,
         "sla_min": 15,
-        "issues": 1
+        "issues": 2
       },
       "winamax_markets": {
         "score": 84,
@@ -1251,25 +1251,25 @@
   },
   "observability": {
     "pipeline_traces": {
-      "generated_at": "2026-05-21T01:40:39Z",
+      "generated_at": "2026-05-21T01:42:53Z",
       "runs_observed": 99,
       "by_status": {
-        "warning": 67,
+        "warning": 69,
         "critical": 1,
-        "ok": 31
+        "ok": 29
       },
       "by_script": {
         "data_integrity_monitor.py": {
           "runs": 99,
           "errors": 1,
           "last_status": "ok",
-          "max_duration_ms": 1063
+          "max_duration_ms": 1080
         }
       }
     }
   },
   "data_lineage": {
-    "generated_at": "2026-05-21T01:40:39Z",
+    "generated_at": "2026-05-21T01:42:53Z",
     "status": "ok",
     "events": 179,
     "events_missing_inline_lineage": 0,
@@ -1376,7 +1376,7 @@
     "data": {
       "status": "degraded",
       "sources_validated": 11,
-      "quarantine_records": 5,
+      "quarantine_records": 6,
       "lineage_coverage_pct": 100.0
     },
     "model": {
