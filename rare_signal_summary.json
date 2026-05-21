@@ -1,23 +1,23 @@
 {
-  "generated_at": "2026-05-21T18:58:15Z",
+  "generated_at": "2026-05-21T19:05:19Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 47,
-    "actionable": 15,
+    "active_events": 49,
+    "actionable": 17,
     "watch": 8,
     "risk": 24,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 6,
-      "market_move": 14,
-      "market_uncertain": 76,
-      "signal_conflict": 4,
+      "market_move": 18,
+      "market_uncertain": 74,
+      "signal_conflict": 7,
       "back_to_back_travel": 7
     },
     "by_quality": {
-      "actionable": 15,
+      "actionable": 17,
       "watch": 8,
       "risk": 24
     }
@@ -150,6 +150,24 @@
       "context": "2 match dans les 48h + 943 km de voyage"
     },
     {
+      "event_id": "401815440",
+      "date": "2026-05-22T01:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Arizona Diamondbacks",
+      "away": "Colorado Rockies",
+      "match": "Arizona Diamondbacks - Colorado Rockies",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.788,
+      "context": "Cote away: 2.68 -> 2.30 (+14.2%)"
+    },
+    {
       "event_id": "401873384",
       "date": "2026-05-23T23:00Z",
       "sport": "hockey",
@@ -274,6 +292,24 @@
       "side": "away",
       "strength": 0.709,
       "context": "Cote away: 4.70 -> 4.10 (+12.8%)"
+    },
+    {
+      "event_id": "401865535",
+      "date": "2026-05-21T22:00Z",
+      "sport": "football",
+      "league_code": "conmebol.libertadores",
+      "league_name": "Copa Libertadores",
+      "home": "Deportivo La Guaira",
+      "away": "Independiente Rivadavia",
+      "match": "Deportivo La Guaira - Independiente Rivadavia",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 0.661,
+      "context": "Cote home: 4.20 -> 3.70 (+11.9%)"
     },
     {
       "event_id": "401865441",
@@ -422,22 +458,22 @@
       "context": "Cote home: 2.35 -> 2.15 (+8.5%)"
     },
     {
-      "event_id": "401865535",
-      "date": "2026-05-21T22:00Z",
-      "sport": "football",
-      "league_code": "conmebol.libertadores",
-      "league_name": "Copa Libertadores",
-      "home": "Deportivo La Guaira",
-      "away": "Independiente Rivadavia",
-      "match": "Deportivo La Guaira - Independiente Rivadavia",
+      "event_id": "401856925",
+      "date": "2026-05-22T00:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Minnesota Lynx",
+      "away": "Toronto Tempo",
+      "match": "Minnesota Lynx - Toronto Tempo",
       "quality": "watch",
       "quality_reason": "Signal rare present mais intensite moyenne",
       "type": "market_move",
       "direction": "steam",
       "team": null,
-      "side": "home",
-      "strength": 0.463,
-      "context": "Cote home: 4.20 -> 3.85 (+8.3%)"
+      "side": "away",
+      "strength": 0.455,
+      "context": "Cote away: 3.05 -> 2.80 (+8.2%)"
     }
   ],
   "active_risk": [
@@ -637,7 +673,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.5%"
+      "context": "marge bookmaker anormale 18.9%"
     },
     {
       "event_id": "401865560",
@@ -727,7 +763,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.8%"
+      "context": "marge bookmaker anormale 18.7%"
     },
     {
       "event_id": "401865563",

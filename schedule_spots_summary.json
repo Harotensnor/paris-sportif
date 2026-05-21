@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-21T18:58:15Z",
+  "generated_at": "2026-05-21T19:05:19Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -120,10 +120,10 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.234,
-        "away_score": -0.234,
+        "away_score": 0.554,
         "home_fade": 0.36,
         "away_fade": 0.36,
-        "reason": "Direction nette: Colorado Rockies (-0.23)",
+        "reason": "Direction nette: Colorado Rockies (+0.55)",
         "detail": [
           {
             "side": "home",
@@ -136,6 +136,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.36
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.788
           }
         ]
       }
@@ -865,13 +871,13 @@
         "1 match dans les 48h + 943 km de voyage"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "home",
+        "status": "mixed",
+        "net_side": null,
         "home_score": 0.057,
-        "away_score": -0.914,
+        "away_score": -0.273,
         "home_fade": 0.3,
         "away_fade": 1.019,
-        "reason": "Direction nette: Arizona Diamondbacks (+0.06)",
+        "reason": "Signaux mitigés: avantage net trop faible (Arizona Diamondbacks +0.06, Colorado Rockies -0.27)",
         "detail": [
           {
             "side": "home",
@@ -884,6 +890,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.3
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.641
           },
           {
             "side": "away",
@@ -925,13 +937,13 @@
         "2 match dans les 48h + 943 km de voyage"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "home",
+        "status": "mixed",
+        "net_side": null,
         "home_score": -0.11,
-        "away_score": -1.189,
+        "away_score": -0.548,
         "home_fade": 0.6,
         "away_fade": 1.399,
-        "reason": "Direction nette: Arizona Diamondbacks (-0.11)",
+        "reason": "Signaux mitigés: avantage net trop faible (Arizona Diamondbacks -0.11, Colorado Rockies -0.55)",
         "detail": [
           {
             "side": "home",
@@ -944,6 +956,12 @@
             "type": "schedule_congestion",
             "direction": "fade",
             "strength": 0.6
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.641
           },
           {
             "side": "away",
@@ -1225,13 +1243,13 @@
         "1 match dans les 48h + 943 km de voyage"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "home",
+        "status": "mixed",
+        "net_side": null,
         "home_score": 0.154,
-        "away_score": -0.816,
+        "away_score": -0.175,
         "home_fade": 0.15,
         "away_fade": 0.869,
-        "reason": "Direction nette: Arizona Diamondbacks (+0.15)",
+        "reason": "Signaux mitigés: avantage net trop faible (Arizona Diamondbacks +0.15, Colorado Rockies -0.18)",
         "detail": [
           {
             "side": "home",
@@ -1244,6 +1262,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.641
           },
           {
             "side": "away",
@@ -1285,10 +1309,10 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.547,
-        "away_score": 0.6,
+        "away_score": 0.06,
         "home_fade": 0.6,
         "away_fade": 0.15,
-        "reason": "Direction nette: Golden State Valkyries (+0.60)",
+        "reason": "Direction nette: Golden State Valkyries (+0.06)",
         "detail": [
           {
             "side": "away",
@@ -1301,12 +1325,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.54
           }
         ]
       }
