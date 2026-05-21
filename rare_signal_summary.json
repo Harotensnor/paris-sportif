@@ -1,25 +1,24 @@
 {
-  "generated_at": "2026-05-21T13:59:28Z",
+  "generated_at": "2026-05-21T14:04:49Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 42,
+    "active_events": 45,
     "actionable": 12,
     "watch": 3,
-    "risk": 27,
+    "risk": 30,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 10,
-      "back_to_back_travel": 8,
+      "back_to_back_travel": 10,
       "market_uncertain": 24,
-      "signal_conflict": 6,
-      "market_move": 1
+      "signal_conflict": 8
     },
     "by_quality": {
       "actionable": 12,
       "watch": 3,
-      "risk": 27
+      "risk": 30
     }
   },
   "active_actionable": [
@@ -78,24 +77,6 @@
       "context": "Absences severes 7-13"
     },
     {
-      "event_id": "401865555",
-      "date": "2026-05-27T00:30Z",
-      "sport": "football",
-      "league_code": "conmebol.libertadores",
-      "league_name": "Copa Libertadores",
-      "home": "Flamengo",
-      "away": "Cusco FC",
-      "match": "Flamengo - Cusco FC",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "away",
-      "strength": 1.0,
-      "context": "Cote away: 8.00 -> 9.50 (-18.8%)"
-    },
-    {
       "event_id": "401815434",
       "date": "2026-05-21T22:40Z",
       "sport": "baseball",
@@ -112,6 +93,24 @@
       "side": null,
       "strength": 0.8,
       "context": "Absences severes 5-9"
+    },
+    {
+      "event_id": "401815438",
+      "date": "2026-05-21T17:15Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "St. Louis Cardinals",
+      "away": "Pittsburgh Pirates",
+      "match": "St. Louis Cardinals - Pittsburgh Pirates",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Pittsburgh Pirates",
+      "side": "away",
+      "strength": 0.789,
+      "context": "2 match dans les 48h + 896 km de voyage"
     },
     {
       "event_id": "401873384",
@@ -148,6 +147,24 @@
       "side": "away",
       "strength": 0.762,
       "context": "1 match dans les 48h + 1161 km de voyage"
+    },
+    {
+      "event_id": "401872904",
+      "date": "2026-05-23T00:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Colorado Avalanche",
+      "away": "Vegas Golden Knights",
+      "match": "Colorado Avalanche - Vegas Golden Knights",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Vegas Golden Knights",
+      "side": "away",
+      "strength": 0.726,
+      "context": "1 match dans les 48h + 979 km de voyage"
     },
     {
       "event_id": "401872905",
@@ -220,24 +237,6 @@
       "side": "away",
       "strength": 0.719,
       "context": "1 match dans les 48h + 943 km de voyage"
-    },
-    {
-      "event_id": "401815438",
-      "date": "2026-05-21T17:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "St. Louis Cardinals",
-      "away": "Pittsburgh Pirates",
-      "match": "St. Louis Cardinals - Pittsburgh Pirates",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Pittsburgh Pirates",
-      "side": "away",
-      "strength": 0.709,
-      "context": "1 match dans les 48h + 896 km de voyage"
     }
   ],
   "active_watch": [
@@ -586,6 +585,24 @@
       "context": "marge bookmaker anormale 18.1%"
     },
     {
+      "event_id": "401865555",
+      "date": "2026-05-27T00:30Z",
+      "sport": "football",
+      "league_code": "conmebol.libertadores",
+      "league_name": "Copa Libertadores",
+      "home": "Flamengo",
+      "away": "Cusco FC",
+      "match": "Flamengo - Cusco FC",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.2%"
+    },
+    {
       "event_id": "401865562",
       "date": "2026-05-27T22:00Z",
       "sport": "football",
@@ -746,6 +763,42 @@
       "side": null,
       "strength": 0.488,
       "context": "Signaux opposes: Cleveland Cavaliers fade 0.75, New York Knicks fade 0.75 -> prudence"
+    },
+    {
+      "event_id": "401873201",
+      "date": "2026-05-27T00:30Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "Oklahoma City Thunder",
+      "away": "San Antonio Spurs",
+      "match": "Oklahoma City Thunder - San Antonio Spurs",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "signal_conflict",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.488,
+      "context": "Signaux opposes: Oklahoma City Thunder fade 0.75, San Antonio Spurs fade 0.75 -> prudence"
+    },
+    {
+      "event_id": "401872906",
+      "date": "2026-05-27T01:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Vegas Golden Knights",
+      "away": "Colorado Avalanche",
+      "match": "Vegas Golden Knights - Colorado Avalanche",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "signal_conflict",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.488,
+      "context": "Signaux opposes: Vegas Golden Knights fade 0.75, Colorado Avalanche fade 0.75 -> prudence"
     },
     {
       "event_id": "401873345",
