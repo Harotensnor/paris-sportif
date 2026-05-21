@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-05-21T20:08:40Z",
+  "generated_at": "2026-05-21T20:12:06Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 49,
-    "actionable": 15,
-    "watch": 10,
+    "actionable": 16,
+    "watch": 9,
     "risk": 24,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 6,
-      "market_move": 18,
-      "market_uncertain": 74,
+      "market_move": 17,
+      "market_uncertain": 75,
       "signal_conflict": 5,
       "back_to_back_travel": 7
     },
     "by_quality": {
-      "actionable": 15,
-      "watch": 10,
+      "actionable": 16,
+      "watch": 9,
       "risk": 24
     }
   },
@@ -57,7 +57,7 @@
       "team": null,
       "side": "away",
       "strength": 1.0,
-      "context": "Cote away: 15.00 -> 10.50 (+30.0%)"
+      "context": "Cote away: 14.00 -> 10.50 (+25.0%)"
     },
     {
       "event_id": "401815437",
@@ -111,7 +111,7 @@
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 1.49 -> 1.82 (-22.3%)"
+      "context": "Cote home: 1.49 -> 1.84 (-23.7%)"
     },
     {
       "event_id": "401865449",
@@ -276,6 +276,24 @@
       "context": "Cote home: 2.45 -> 2.15 (+12.2%)"
     },
     {
+      "event_id": "401865535",
+      "date": "2026-05-21T22:00Z",
+      "sport": "football",
+      "league_code": "conmebol.libertadores",
+      "league_name": "Copa Libertadores",
+      "home": "Deportivo La Guaira",
+      "away": "Independiente Rivadavia",
+      "match": "Deportivo La Guaira - Independiente Rivadavia",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 0.678,
+      "context": "Cote home: 4.10 -> 3.60 (+12.2%)"
+    },
+    {
       "event_id": "401865441",
       "date": "2026-05-21T22:00Z",
       "sport": "football",
@@ -402,24 +420,6 @@
       "side": "away",
       "strength": 0.546,
       "context": "Cote away: 3.05 -> 2.75 (+9.8%)"
-    },
-    {
-      "event_id": "401865535",
-      "date": "2026-05-21T22:00Z",
-      "sport": "football",
-      "league_code": "conmebol.libertadores",
-      "league_name": "Copa Libertadores",
-      "home": "Deportivo La Guaira",
-      "away": "Independiente Rivadavia",
-      "match": "Deportivo La Guaira - Independiente Rivadavia",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "home",
-      "strength": 0.542,
-      "context": "Cote home: 4.10 -> 3.70 (+9.8%)"
     },
     {
       "event_id": "401865437",
