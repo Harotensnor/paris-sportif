@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-05-21T05:42:55Z",
-  "calculated_at": "2026-05-21T05:42:55Z",
+  "generated_at": "2026-05-21T05:48:20Z",
+  "calculated_at": "2026-05-21T05:48:20Z",
   "source_of_truth": "data.js",
   "data_age_min": 1,
   "data_file_age_min": 0,
@@ -11,12 +11,12 @@
       "matches": 679
     },
     "winamax_markets": {
-      "age_min": 1,
+      "age_min": 0,
       "matches_with_odds": 638,
       "matches_detailed": 638,
       "details_ratio_pct": 100.0,
       "last_run_delta": 0,
-      "last_run_limit": 400
+      "last_run_limit": 1000
     },
     "injuries_soccer": {
       "age_min": 2,
@@ -103,8 +103,8 @@
           "events_with_meetings": 7,
           "meetings": 27,
           "sources": {
-            "seasonseries": 7,
-            "espn_summary_empty": 4
+            "espn_summary_empty": 4,
+            "seasonseries": 7
           }
         },
         "hockey": {
@@ -494,7 +494,7 @@
     "winamax_markets": {
       "script": "scripts/fetch_winamax_match_details.py",
       "output": "winamax_markets.json",
-      "age_min": 1,
+      "age_min": 0,
       "threshold_min": 15,
       "fast_red_min": 30,
       "status": "ok"
@@ -1052,7 +1052,7 @@
   ],
   "overall": "warning",
   "quality_checks": {
-    "data_generated_at": "2026-05-21T05:41:33.564280Z",
+    "data_generated_at": "2026-05-21T05:46:46.341123Z",
     "truth_scope": "all_events",
     "all_winamax_available": 189,
     "all_winamax_exact": 189,
@@ -1131,7 +1131,7 @@
   "data_truth": {
     "source_of_truth": "data.js",
     "scope": "all_events",
-    "data_generated_at": "2026-05-21T05:41:33.564280Z",
+    "data_generated_at": "2026-05-21T05:46:46.341123Z",
     "winamax_available": 189,
     "winamax_exact": 189,
     "winamax_exact_ratio": 1.0,
@@ -1151,7 +1151,7 @@
     "anomalies_emitted": 4
   },
   "source_health": {
-    "generated_at": "2026-05-21T05:42:55Z",
+    "generated_at": "2026-05-21T05:48:20Z",
     "sources_total": 11,
     "sources_ok": 7,
     "sources_warning": 4,
@@ -1203,7 +1203,7 @@
         "score": 100,
         "status": "ok",
         "items": 2694,
-        "age_min": 1,
+        "age_min": 2,
         "sla_min": 60,
         "issues": 1
       },
@@ -1251,7 +1251,7 @@
   },
   "observability": {
     "pipeline_traces": {
-      "generated_at": "2026-05-21T05:42:55Z",
+      "generated_at": "2026-05-21T05:48:20Z",
       "runs_observed": 99,
       "by_status": {
         "warning": 67,
@@ -1263,13 +1263,13 @@
           "runs": 99,
           "errors": 1,
           "last_status": "ok",
-          "max_duration_ms": 2442
+          "max_duration_ms": 2438
         }
       }
     }
   },
   "data_lineage": {
-    "generated_at": "2026-05-21T05:42:55Z",
+    "generated_at": "2026-05-21T05:48:20Z",
     "status": "ok",
     "events": 189,
     "events_missing_inline_lineage": 0,
