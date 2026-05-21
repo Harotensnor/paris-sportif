@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-05-21T15:37:48Z",
+  "generated_at": "2026-05-21T15:43:48Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 53,
     "actionable": 19,
-    "watch": 10,
-    "risk": 24,
+    "watch": 11,
+    "risk": 23,
     "expired_sample": 0,
     "by_type": {
-      "market_move": 22,
+      "market_move": 24,
       "signal_conflict": 8,
       "injury_imbalance": 11,
       "back_to_back_travel": 8,
-      "market_uncertain": 22
+      "market_uncertain": 21
     },
     "by_quality": {
-      "watch": 10,
+      "watch": 11,
       "actionable": 19,
-      "risk": 24
+      "risk": 23
     }
   },
   "active_actionable": [
@@ -129,7 +129,25 @@
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 1.50 -> 1.82 (-20.9%)"
+      "context": "Cote home: 1.50 -> 1.80 (-19.6%)"
+    },
+    {
+      "event_id": "401865449",
+      "date": "2026-05-22T02:00Z",
+      "sport": "football",
+      "league_code": "conmebol.sudamericana",
+      "league_name": "Copa Sudamericana",
+      "home": "Macará",
+      "away": "Alianza Atlético",
+      "match": "Macará - Alianza Atlético",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 1.0,
+      "context": "Cote away: 8.00 -> 6.25 (+21.9%)"
     },
     {
       "event_id": "401865557",
@@ -148,24 +166,6 @@
       "side": "away",
       "strength": 1.0,
       "context": "Cote away: 7.50 -> 9.00 (-20.0%)"
-    },
-    {
-      "event_id": "401865449",
-      "date": "2026-05-22T02:00Z",
-      "sport": "football",
-      "league_code": "conmebol.sudamericana",
-      "league_name": "Copa Sudamericana",
-      "home": "Macará",
-      "away": "Alianza Atlético",
-      "match": "Macará - Alianza Atlético",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.926,
-      "context": "Cote away: 7.50 -> 6.25 (+16.7%)"
     },
     {
       "event_id": "401815434",
@@ -368,42 +368,6 @@
   ],
   "active_watch": [
     {
-      "event_id": "401865543",
-      "date": "2026-05-22T00:30Z",
-      "sport": "football",
-      "league_code": "conmebol.libertadores",
-      "league_name": "Copa Libertadores",
-      "home": "Peñarol",
-      "away": "Corinthians",
-      "match": "Peñarol - Corinthians",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.617,
-      "context": "Cote away: 3.15 -> 2.80 (+11.1%)"
-    },
-    {
-      "event_id": "401856925",
-      "date": "2026-05-22T00:00Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Minnesota Lynx",
-      "away": "Toronto Tempo",
-      "match": "Minnesota Lynx - Toronto Tempo",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.608,
-      "context": "Cote away: 3.20 -> 2.85 (+10.9%)"
-    },
-    {
       "event_id": "401873245",
       "date": "2026-05-22T02:00Z",
       "sport": "football",
@@ -512,6 +476,42 @@
       "context": "Cote home: 2.60 -> 2.35 (+9.6%)"
     },
     {
+      "event_id": "401866585",
+      "date": "2026-05-21T16:00Z",
+      "sport": "football",
+      "league_code": "superleaguegrece",
+      "league_name": "Super League Grèce",
+      "home": "Panetolikos",
+      "away": "Asteras Tripoli",
+      "match": "Panetolikos - Asteras Tripoli",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.521,
+      "context": "Cote away: 3.20 -> 2.90 (+9.4%)"
+    },
+    {
+      "event_id": "401856925",
+      "date": "2026-05-22T00:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Minnesota Lynx",
+      "away": "Toronto Tempo",
+      "match": "Minnesota Lynx - Toronto Tempo",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.521,
+      "context": "Cote away: 3.20 -> 2.90 (+9.4%)"
+    },
+    {
       "event_id": "401865437",
       "date": "2026-05-22T00:30Z",
       "sport": "football",
@@ -546,6 +546,24 @@
       "side": "away",
       "strength": 0.486,
       "context": "Cote away: 4.00 -> 3.65 (+8.8%)"
+    },
+    {
+      "event_id": "401865543",
+      "date": "2026-05-22T00:30Z",
+      "sport": "football",
+      "league_code": "conmebol.libertadores",
+      "league_name": "Copa Libertadores",
+      "home": "Peñarol",
+      "away": "Corinthians",
+      "match": "Peñarol - Corinthians",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 0.473,
+      "context": "Cote home: 2.35 -> 2.15 (+8.5%)"
     }
   ],
   "active_risk": [
@@ -674,24 +692,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 19.0%"
-    },
-    {
-      "event_id": "740974",
-      "date": "2026-05-24T15:00Z",
-      "sport": "football",
-      "league_code": "eng.1",
-      "league_name": "Premier League",
-      "home": "Tottenham Hotspur",
-      "away": "Everton",
-      "match": "Tottenham Hotspur - Everton",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.1%"
     },
     {
       "event_id": "748970",
