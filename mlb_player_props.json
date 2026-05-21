@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-21T17:21:14Z",
+  "generated_at": "2026-05-21T17:27:16Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815438",
-      "kickoff": "2026-05-21T17:15Z",
-      "league": "MLB",
-      "match": "Pittsburgh Pirates at St. Louis Cardinals",
-      "home": "St. Louis Cardinals",
-      "away": "Pittsburgh Pirates",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "St. Louis Cardinals",
-          "pitcher": "Dustin May",
-          "label": "Dustin May plus de 3,5 strikeouts",
-          "line": 3.5,
-          "pick": "over",
-          "probability": 0.5266,
-          "fair_odds": 1.9,
-          "expected_strikeouts": 3.6,
-          "projected_ip": 4.9,
-          "inputs": {
-            "k9": 6.61,
-            "era": 4.96,
-            "whip": 1.43,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "St. Louis Cardinals",
-          "pitcher": "Dustin May",
-          "label": "Dustin May ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.606,
-          "fair_odds": 1.65,
-          "expected_hr_allowed": 0.501,
-          "projected_ip": 4.9,
-          "inputs": {
-            "hr9": 0.92,
-            "era": 4.96,
-            "whip": 1.43
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Pittsburgh Pirates",
-          "pitcher": "Braxton Ashcraft",
-          "label": "Braxton Ashcraft moins de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "under",
-          "probability": 0.562,
-          "fair_odds": 1.78,
-          "expected_strikeouts": 6.2,
-          "projected_ip": 6.12,
-          "inputs": {
-            "k9": 9.11,
-            "era": 3.09,
-            "whip": 1.05,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Pittsburgh Pirates",
-          "pitcher": "Braxton Ashcraft",
-          "label": "Braxton Ashcraft ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5764,
-          "fair_odds": 1.73,
-          "expected_hr_allowed": 0.551,
-          "projected_ip": 6.12,
-          "inputs": {
-            "hr9": 0.81,
-            "era": 3.09,
-            "whip": 1.05
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815436",
       "kickoff": "2026-05-21T20:05Z",
@@ -496,7 +414,7 @@
       ]
     }
   ],
-  "props": 24,
+  "props": 20,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"

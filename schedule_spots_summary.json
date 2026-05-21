@@ -1,21 +1,21 @@
 {
-  "generated_at": "2026-05-21T17:21:29Z",
+  "generated_at": "2026-05-21T17:27:31Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 24,
+    "active_events": 23,
     "expired_sample": 0,
     "by_type": {
-      "back_to_back_travel": 8,
       "lookahead": 35,
+      "back_to_back_travel": 7,
       "schedule_congestion": 12
     },
     "by_decision": {
       "abstain": 15,
-      "lean_home": 9
+      "lean_home": 8
     },
-    "lean_home": 9,
+    "lean_home": 8,
     "lean_away": 0,
     "abstain": 15,
     "monitor": 0
@@ -1250,57 +1250,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.719
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815438",
-      "source_event_ids": [
-        "401815438"
-      ],
-      "kickoff": "2026-05-21T17:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "St. Louis Cardinals",
-      "away": "Pittsburgh Pirates",
-      "match": "St. Louis Cardinals - Pittsburgh Pirates",
-      "decision": "lean_home",
-      "net_team": "St. Louis Cardinals",
-      "reason": "Pittsburgh Pirates plus penalise par calendrier/voyage (0.71 vs 0.00)",
-      "pressure_score": 0.709,
-      "home_fade": 0.0,
-      "away_fade": 0.709,
-      "travel_score": 0.709,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "1 match dans les 48h + 896 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.388,
-        "away_score": -1.109,
-        "home_fade": 0.0,
-        "away_fade": 1.109,
-        "reason": "Direction nette: St. Louis Cardinals (+0.39)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.709
           }
         ]
       }
