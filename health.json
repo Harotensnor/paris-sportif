@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-05-21T03:30:20Z",
-  "calculated_at": "2026-05-21T03:30:20Z",
+  "generated_at": "2026-05-21T03:32:43Z",
+  "calculated_at": "2026-05-21T03:32:43Z",
   "source_of_truth": "data.js",
   "data_age_min": 1,
   "data_file_age_min": 0,
@@ -8,15 +8,15 @@
     "winamax_catalog": {
       "age_min": 1,
       "tournaments": 140,
-      "matches": 681
+      "matches": 682
     },
     "winamax_markets": {
       "age_min": 0,
-      "matches_with_odds": 640,
-      "matches_detailed": 640,
+      "matches_with_odds": 641,
+      "matches_detailed": 641,
       "details_ratio_pct": 100.0,
       "last_run_delta": 0,
-      "last_run_limit": 400
+      "last_run_limit": 1000
     },
     "injuries_soccer": {
       "age_min": 1,
@@ -326,9 +326,9 @@
     "detected_angles": {
       "age_min": 0,
       "events": 69,
-      "angles": 137,
+      "angles": 139,
       "by_type": {
-        "market_move": 31,
+        "market_move": 33,
         "signal_conflict": 10,
         "injury_imbalance": 11,
         "back_to_back_travel": 8,
@@ -347,9 +347,9 @@
     },
     "rare_signals": {
       "age_min": 0,
-      "signals": 89,
+      "signals": 91,
       "by_type": {
-        "market_move": 31,
+        "market_move": 33,
         "signal_conflict": 10,
         "injury_imbalance": 9,
         "back_to_back_travel": 8,
@@ -367,9 +367,9 @@
     "timing_edges": {
       "age_min": 0,
       "events": 132,
-      "bet_now": 113,
+      "bet_now": 112,
       "wait": 6,
-      "price_shortening": 13
+      "price_shortening": 14
     },
     "injuries_multisport": {
       "age_min": 1,
@@ -462,7 +462,7 @@
     },
     "boosted_odds": {
       "age_min": 0,
-      "matches_scanned": 640,
+      "matches_scanned": 641,
       "boosts": 0,
       "status": "no_explicit_boosts"
     },
@@ -1052,7 +1052,7 @@
   ],
   "overall": "warning",
   "quality_checks": {
-    "data_generated_at": "2026-05-21T03:29:18.352815Z",
+    "data_generated_at": "2026-05-21T03:31:35.023680Z",
     "truth_scope": "all_events",
     "all_winamax_available": 186,
     "all_winamax_exact": 186,
@@ -1131,7 +1131,7 @@
   "data_truth": {
     "source_of_truth": "data.js",
     "scope": "all_events",
-    "data_generated_at": "2026-05-21T03:29:18.352815Z",
+    "data_generated_at": "2026-05-21T03:31:35.023680Z",
     "winamax_available": 186,
     "winamax_exact": 186,
     "winamax_exact_ratio": 1.0,
@@ -1151,7 +1151,7 @@
     "anomalies_emitted": 3
   },
   "source_health": {
-    "generated_at": "2026-05-21T03:30:20Z",
+    "generated_at": "2026-05-21T03:32:43Z",
     "sources_total": 11,
     "sources_ok": 7,
     "sources_warning": 4,
@@ -1162,15 +1162,15 @@
       "winamax_catalog": {
         "score": 100,
         "status": "ok",
-        "items": 681,
-        "age_min": 1,
+        "items": 682,
+        "age_min": 2,
         "sla_min": 15,
         "issues": 1
       },
       "winamax_markets": {
         "score": 84,
         "status": "warning",
-        "items": 640,
+        "items": 641,
         "age_min": 1,
         "sla_min": 15,
         "issues": 3
@@ -1179,7 +1179,7 @@
         "score": 57,
         "status": "warning",
         "items": 0,
-        "age_min": 2,
+        "age_min": 1,
         "sla_min": 180,
         "issues": 2
       },
@@ -1187,7 +1187,7 @@
         "score": 100,
         "status": "ok",
         "items": 97,
-        "age_min": 2,
+        "age_min": 1,
         "sla_min": 180,
         "issues": 1
       },
@@ -1251,7 +1251,7 @@
   },
   "observability": {
     "pipeline_traces": {
-      "generated_at": "2026-05-21T03:30:20Z",
+      "generated_at": "2026-05-21T03:32:43Z",
       "runs_observed": 99,
       "by_status": {
         "warning": 67,
@@ -1263,13 +1263,13 @@
           "runs": 99,
           "errors": 1,
           "last_status": "ok",
-          "max_duration_ms": 997
+          "max_duration_ms": 1061
         }
       }
     }
   },
   "data_lineage": {
-    "generated_at": "2026-05-21T03:30:20Z",
+    "generated_at": "2026-05-21T03:32:43Z",
     "status": "ok",
     "events": 186,
     "events_missing_inline_lineage": 0,
