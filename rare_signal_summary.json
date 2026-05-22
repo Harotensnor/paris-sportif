@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-05-22T08:46:16Z",
+  "generated_at": "2026-05-22T08:49:55Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 67,
-    "actionable": 37,
-    "watch": 7,
+    "actionable": 36,
+    "watch": 8,
     "risk": 23,
     "expired_sample": 0,
     "by_type": {
-      "market_move": 6,
+      "market_move": 7,
+      "signal_conflict": 7,
       "injury_imbalance": 29,
-      "signal_conflict": 6,
       "travel_extreme": 6,
       "market_uncertain": 41,
       "back_to_back_travel": 21
     },
     "by_quality": {
-      "actionable": 37,
-      "watch": 7,
+      "watch": 8,
+      "actionable": 36,
       "risk": 23
     }
   },
@@ -475,24 +475,6 @@
       "context": "1 match dans les 48h + 1657 km de voyage"
     },
     {
-      "event_id": "401859400",
-      "date": "2026-05-22T10:30Z",
-      "sport": "football",
-      "league_code": "jleague",
-      "league_name": "J-League",
-      "home": "Machida Zelvia",
-      "away": "Urawa Red Diamonds",
-      "match": "Machida Zelvia - Urawa Red Diamonds",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.855,
-      "context": "Cote away: 3.25 -> 2.75 (+15.4%)"
-    },
-    {
       "event_id": "401815455",
       "date": "2026-05-23T01:38Z",
       "sport": "baseball",
@@ -781,6 +763,24 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 3-0"
+    },
+    {
+      "event_id": "401859400",
+      "date": "2026-05-22T10:30Z",
+      "sport": "football",
+      "league_code": "jleague",
+      "league_name": "J-League",
+      "home": "Machida Zelvia",
+      "away": "Urawa Red Diamonds",
+      "match": "Machida Zelvia - Urawa Red Diamonds",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.598,
+      "context": "Cote away: 3.25 -> 2.90 (+10.8%)"
     },
     {
       "event_id": "401815451",
@@ -1142,7 +1142,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.3%"
+      "context": "marge bookmaker anormale 18.5%"
     },
     {
       "event_id": "401815443",
