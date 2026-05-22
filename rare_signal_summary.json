@@ -1,26 +1,26 @@
 {
-  "generated_at": "2026-05-22T05:20:47Z",
+  "generated_at": "2026-05-22T05:24:46Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 62,
+    "active_events": 61,
     "actionable": 35,
-    "watch": 7,
-    "risk": 20,
+    "watch": 5,
+    "risk": 21,
     "expired_sample": 0,
     "by_type": {
-      "market_move": 7,
-      "signal_conflict": 7,
-      "injury_imbalance": 28,
+      "injury_imbalance": 29,
+      "signal_conflict": 6,
       "travel_extreme": 6,
       "market_uncertain": 51,
+      "market_move": 2,
       "back_to_back_travel": 21
     },
     "by_quality": {
-      "watch": 7,
       "actionable": 35,
-      "risk": 20
+      "risk": 21,
+      "watch": 5
     }
   },
   "active_actionable": [
@@ -349,6 +349,24 @@
       "context": "Absences severes 8-13"
     },
     {
+      "event_id": "401815538",
+      "date": "2026-05-29T23:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "New York Mets",
+      "away": "Miami Marlins",
+      "match": "New York Mets - Miami Marlins",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "New York Mets",
+      "side": null,
+      "strength": 1.0,
+      "context": "Absences severes 14-6"
+    },
+    {
       "event_id": "401815485",
       "date": "2026-05-24T23:20Z",
       "sport": "baseball",
@@ -635,24 +653,6 @@
       "side": "away",
       "strength": 0.703,
       "context": "1 match dans les 48h + 867 km de voyage"
-    },
-    {
-      "event_id": "401863529",
-      "date": "2026-05-22T19:00Z",
-      "sport": "football",
-      "league_code": "coupedefrance",
-      "league_name": "Coupe de France",
-      "home": "Lens",
-      "away": "Nice",
-      "match": "Lens - Nice",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "draw",
-      "strength": 0.661,
-      "context": "Cote draw: 4.20 -> 4.70 (-11.9%)"
     }
   ],
   "active_watch": [
@@ -667,12 +667,12 @@
       "match": "Indiana Fever - Golden State Valkyries",
       "quality": "watch",
       "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.608,
-      "context": "Cote away: 3.20 -> 2.85 (+10.9%)"
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Golden State Valkyries",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 0-3"
     },
     {
       "event_id": "401856929",
@@ -727,42 +727,6 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 3-0"
-    },
-    {
-      "event_id": "401873416",
-      "date": "2026-05-22T17:30Z",
-      "sport": "football",
-      "league_code": "bundesligaautriche",
-      "league_name": "Bundesliga Autriche",
-      "home": "SV Josko Ried",
-      "away": "Rapid Vienna",
-      "match": "SV Josko Ried - Rapid Vienna",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.585,
-      "context": "Cote away: 2.85 -> 2.55 (+10.5%)"
-    },
-    {
-      "event_id": "401859400",
-      "date": "2026-05-22T10:30Z",
-      "sport": "football",
-      "league_code": "jleague",
-      "league_name": "J-League",
-      "home": "Machida Zelvia",
-      "away": "Urawa Red Diamonds",
-      "match": "Machida Zelvia - Urawa Red Diamonds",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "home",
-      "strength": 0.579,
-      "context": "Cote home: 2.40 -> 2.15 (+10.4%)"
     },
     {
       "event_id": "401815451",
@@ -1143,6 +1107,24 @@
       "side": null,
       "strength": 0.45,
       "context": "Signaux opposes: San Antonio Spurs fade 0.60, Oklahoma City Thunder fade 0.60 -> prudence"
+    },
+    {
+      "event_id": "401873346",
+      "date": "2026-05-30T00:00Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "Cleveland Cavaliers",
+      "away": "New York Knicks",
+      "match": "Cleveland Cavaliers - New York Knicks",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "signal_conflict",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.45,
+      "context": "Signaux opposes: Cleveland Cavaliers fade 0.60, New York Knicks fade 0.60 -> prudence"
     }
   ],
   "expired_sample": []
