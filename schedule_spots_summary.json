@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-22T01:12:22Z",
+  "generated_at": "2026-05-22T01:17:47Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -918,10 +918,10 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.195,
-        "away_score": 0.396,
+        "away_score": 0.291,
         "home_fade": 0.3,
         "away_fade": 0.3,
-        "reason": "Direction nette: Colorado Rockies (+0.40)",
+        "reason": "Direction nette: Colorado Rockies (+0.29)",
         "detail": [
           {
             "side": "home",
@@ -939,7 +939,7 @@
             "side": "away",
             "type": "market_move",
             "direction": "steam",
-            "strength": 0.591
+            "strength": 0.486
           }
         ]
       }
@@ -1086,7 +1086,7 @@
         "status": "abstain",
         "net_side": null,
         "home_score": -0.39,
-        "away_score": -0.39,
+        "away_score": 0.366,
         "home_fade": 0.6,
         "away_fade": 0.6,
         "reason": "Signaux opposes: Cleveland Cavaliers fade 0.60, New York Knicks fade 0.60 -> prudence",
@@ -1102,6 +1102,12 @@
             "type": "schedule_congestion",
             "direction": "fade",
             "strength": 0.6
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.756
           }
         ]
       }
@@ -1421,11 +1427,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
-        "home_fade": 0.15,
+        "home_score": -1.097,
+        "away_score": 1.252,
+        "home_fade": 1.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Montreal Canadiens (-0.10)",
+        "reason": "Direction nette: Montreal Canadiens (+1.25)",
         "detail": [
           {
             "side": "home",
@@ -1438,6 +1444,18 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
           }
         ]
       }
@@ -1532,10 +1550,10 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.098,
-        "away_score": -0.098,
+        "away_score": 0.658,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: New York Knicks (-0.10)",
+        "reason": "Direction nette: New York Knicks (+0.66)",
         "detail": [
           {
             "side": "home",
@@ -1548,6 +1566,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.756
           }
         ]
       }
@@ -1636,10 +1660,10 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.098,
-        "away_score": -0.098,
+        "away_score": 0.658,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: New York Knicks (-0.10)",
+        "reason": "Direction nette: New York Knicks (+0.66)",
         "detail": [
           {
             "side": "home",
@@ -1652,6 +1676,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.756
           }
         ]
       }
@@ -1686,12 +1716,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
+        "net_side": "home",
+        "home_score": 1.252,
+        "away_score": -1.097,
         "home_fade": 0.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Carolina Hurricanes (-0.10)",
+        "away_fade": 1.15,
+        "reason": "Direction nette: Montreal Canadiens (+1.25)",
         "detail": [
           {
             "side": "home",
@@ -1704,6 +1734,18 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           }
         ]
       }
@@ -1738,12 +1780,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
+        "net_side": "home",
+        "home_score": 0.658,
         "away_score": -0.098,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Cleveland Cavaliers (-0.10)",
+        "reason": "Direction nette: New York Knicks (+0.66)",
         "detail": [
           {
             "side": "home",
@@ -1756,6 +1798,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.756
           }
         ]
       }
@@ -2140,13 +2188,13 @@
         "1 match dans les 48h + 1161 km de voyage"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.123,
-        "away_score": -1.152,
-        "home_fade": 0.6,
+        "status": "abstain",
+        "net_side": null,
+        "home_score": -1.123,
+        "away_score": 0.198,
+        "home_fade": 1.6,
         "away_fade": 1.362,
-        "reason": "Direction nette: Carolina Hurricanes (-0.12)",
+        "reason": "Signaux opposes: Carolina Hurricanes fade 1.60, Montreal Canadiens fade 1.36 -> prudence",
         "detail": [
           {
             "side": "home",
@@ -2159,6 +2207,18 @@
             "type": "schedule_congestion",
             "direction": "fade",
             "strength": 0.6
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
           },
           {
             "side": "away",
@@ -2262,11 +2322,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.461,
+        "home_score": 0.003,
         "away_score": -0.76,
         "home_fade": 0.3,
         "away_fade": 0.865,
-        "reason": "Direction nette: Kansas City Royals (+0.46)",
+        "reason": "Direction nette: Kansas City Royals (+0.00)",
         "detail": [
           {
             "side": "home",
@@ -2279,12 +2339,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.3
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.459
           },
           {
             "side": "away",
@@ -2828,11 +2882,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.169,
-        "away_score": -0.86,
+        "home_score": 1.519,
+        "away_score": -1.86,
         "home_fade": 0.15,
-        "away_fade": 0.912,
-        "reason": "Direction nette: Montreal Canadiens (+0.17)",
+        "away_fade": 1.912,
+        "reason": "Direction nette: Montreal Canadiens (+1.52)",
         "detail": [
           {
             "side": "home",
@@ -2845,6 +2899,18 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           },
           {
             "side": "away",
