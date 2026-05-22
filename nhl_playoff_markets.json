@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-22T00:01:57Z",
+  "generated_at": "2026-05-22T00:06:07Z",
   "source": "derived from nhl_stats already patched into data.js",
   "status": "ok",
   "events": [
@@ -426,7 +426,60 @@
           "fair_odds": 1.43
         }
       }
+    },
+    {
+      "event_id": "401873387",
+      "kickoff": "2026-05-30T00:00Z",
+      "league": "NHL",
+      "match": "Montreal Canadiens at Carolina Hurricanes",
+      "home": "Carolina Hurricanes",
+      "away": "Montreal Canadiens",
+      "projection": {
+        "home_goals": 3.47,
+        "away_goals": 3.11,
+        "total_goals": 6.58,
+        "home_goalie": "Frederik Andersen",
+        "away_goalie": "Jakub Dobes"
+      },
+      "markets": {
+        "winner": {
+          "pick": "home",
+          "probability": 0.6742,
+          "fair_odds": 1.48
+        },
+        "totals": [
+          {
+            "line": 4.5,
+            "pick": "over",
+            "probability": 0.8833,
+            "fair_odds": 1.13
+          },
+          {
+            "line": 5.5,
+            "pick": "over",
+            "probability": 0.7318,
+            "fair_odds": 1.37
+          },
+          {
+            "line": 6.5,
+            "pick": "over",
+            "probability": 0.5179,
+            "fair_odds": 1.93
+          },
+          {
+            "line": 7.5,
+            "pick": "under",
+            "probability": 0.7014,
+            "fair_odds": 1.43
+          }
+        ],
+        "first_period_total_1_5": {
+          "pick": "over",
+          "probability": 0.7243,
+          "fair_odds": 1.38
+        }
+      }
     }
   ],
-  "markets": 48
+  "markets": 54
 }

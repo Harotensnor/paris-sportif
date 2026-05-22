@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-22T00:01:57Z",
+  "generated_at": "2026-05-22T00:06:07Z",
   "source": "data.js bookable feed + sofascore_events source feed",
   "status": "ok",
   "categories": {
@@ -77,7 +77,7 @@
     },
     "J5_football_tier2": {
       "label": "Ligues tier 2",
-      "bookable": 1,
+      "bookable": 2,
       "source": 20,
       "samples": [
         {
@@ -85,6 +85,14 @@
           "source": "winamax_exact",
           "kickoff": "2026-05-24T18:00Z",
           "match": "Monza at Catanzaro",
+          "league": "Serie B",
+          "code": "ita.2"
+        },
+        {
+          "event_id": "401873595",
+          "source": "winamax_exact",
+          "kickoff": "2026-05-29T18:00Z",
+          "match": "Catanzaro at Monza",
           "league": "Serie B",
           "code": "ita.2"
         },
@@ -135,23 +143,23 @@
           "match": "Fujieda MYFC vs Fukushima United FC",
           "league": "J2/J3 League, East B",
           "code": "jpn.2"
-        },
-        {
-          "event_id": "sofa_15346049",
-          "source": "sofascore_watch",
-          "kickoff": "2026-05-06T05:00Z",
-          "match": "Hokkaido Consadole Sapporo vs AC Nagano Parceiro",
-          "league": "J2/J3 League, East B",
-          "code": "jpn.2"
         }
       ],
       "status": "ok"
     },
     "J6_coupes": {
       "label": "Coupes",
-      "bookable": 26,
+      "bookable": 27,
       "source": 43,
       "samples": [
+        {
+          "event_id": "401865447",
+          "source": "winamax_exact",
+          "kickoff": "2026-05-20T22:00Z",
+          "match": "Vasco da Gama at Club Olimpia",
+          "league": "Copa Sudamericana",
+          "code": "conmebol.sudamericana"
+        },
         {
           "event_id": "401865439",
           "source": "winamax_exact",
@@ -207,23 +215,23 @@
           "match": "Alianza Atlético at Macará",
           "league": "Copa Sudamericana",
           "code": "conmebol.sudamericana"
-        },
-        {
-          "event_id": "401865560",
-          "source": "winamax_exact",
-          "kickoff": "2026-05-26T22:00Z",
-          "match": "Mirassol at Lanús",
-          "league": "Copa Libertadores",
-          "code": "conmebol.libertadores"
         }
       ],
       "status": "ok"
     },
     "J7_asie_latam": {
       "label": "Asie / Amérique latine",
-      "bookable": 35,
+      "bookable": 36,
       "source": 66,
       "samples": [
+        {
+          "event_id": "401865447",
+          "source": "winamax_exact",
+          "kickoff": "2026-05-20T22:00Z",
+          "match": "Vasco da Gama at Club Olimpia",
+          "league": "Copa Sudamericana",
+          "code": "conmebol.sudamericana"
+        },
         {
           "event_id": "401865439",
           "source": "winamax_exact",
@@ -279,21 +287,13 @@
           "match": "Alianza Atlético at Macará",
           "league": "Copa Sudamericana",
           "code": "conmebol.sudamericana"
-        },
-        {
-          "event_id": "401861392",
-          "source": "winamax_exact",
-          "kickoff": "2026-05-23T11:00Z",
-          "match": "Tianjin Jinmen Tiger at Shanghai Port",
-          "league": "Chinese Super League",
-          "code": "chn.1"
         }
       ],
       "status": "ok"
     }
   },
   "summary": {
-    "bookable_total": 62,
+    "bookable_total": 65,
     "source_total": 141,
     "ok_categories": 3
   }
