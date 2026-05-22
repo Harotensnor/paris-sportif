@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-22T01:46:47Z",
+  "generated_at": "2026-05-22T01:54:23Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -588,6 +588,52 @@
       ]
     },
     {
+      "event_id": "401815448",
+      "kickoff": "2026-05-22T23:15Z",
+      "league": "MLB",
+      "match": "Washington Nationals at Atlanta Braves",
+      "home": "Atlanta Braves",
+      "away": "Washington Nationals",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Washington Nationals",
+          "pitcher": "Miles Mikolas",
+          "label": "Miles Mikolas moins de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "under",
+          "probability": 0.5154,
+          "fair_odds": 1.94,
+          "expected_strikeouts": 4.44,
+          "projected_ip": 6.6,
+          "inputs": {
+            "k9": 6.05,
+            "era": 6.91,
+            "whip": 1.49,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Washington Nationals",
+          "pitcher": "Miles Mikolas",
+          "label": "Miles Mikolas concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.8254,
+          "fair_odds": 1.21,
+          "expected_hr_allowed": 1.745,
+          "projected_ip": 6.6,
+          "inputs": {
+            "hr9": 2.38,
+            "era": 6.91,
+            "whip": 1.49
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
       "event_id": "401815450",
       "kickoff": "2026-05-22T23:40Z",
       "league": "MLB",
@@ -745,6 +791,88 @@
           "inputs": {
             "hr9": 1.75,
             "era": 4.45,
+            "whip": 1.15
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815455",
+      "kickoff": "2026-05-23T01:38Z",
+      "league": "MLB",
+      "match": "Texas Rangers at Los Angeles Angels",
+      "home": "Los Angeles Angels",
+      "away": "Texas Rangers",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Los Angeles Angels",
+          "pitcher": "Walbert Ureña",
+          "label": "Walbert Ureña plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.6055,
+          "fair_odds": 1.65,
+          "expected_strikeouts": 4.96,
+          "projected_ip": 5.52,
+          "inputs": {
+            "k9": 8.1,
+            "era": 2.7,
+            "whip": 1.35,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Los Angeles Angels",
+          "pitcher": "Walbert Ureña",
+          "label": "Walbert Ureña ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.7182,
+          "fair_odds": 1.39,
+          "expected_hr_allowed": 0.331,
+          "projected_ip": 5.52,
+          "inputs": {
+            "hr9": 0.54,
+            "era": 2.7,
+            "whip": 1.35
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Texas Rangers",
+          "pitcher": "Nathan Eovaldi",
+          "label": "Nathan Eovaldi moins de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "under",
+          "probability": 0.5915,
+          "fair_odds": 1.69,
+          "expected_strikeouts": 6.06,
+          "projected_ip": 6.02,
+          "inputs": {
+            "k9": 9.05,
+            "era": 3.62,
+            "whip": 1.15,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Texas Rangers",
+          "pitcher": "Nathan Eovaldi",
+          "label": "Nathan Eovaldi concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.6685,
+          "fair_odds": 1.5,
+          "expected_hr_allowed": 1.104,
+          "projected_ip": 6.02,
+          "inputs": {
+            "hr9": 1.65,
+            "era": 3.62,
             "whip": 1.15
           },
           "side": "away"
@@ -2540,7 +2668,7 @@
       ]
     }
   ],
-  "props": 122,
+  "props": 128,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"

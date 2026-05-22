@@ -1,23 +1,23 @@
 {
-  "generated_at": "2026-05-22T01:46:57Z",
+  "generated_at": "2026-05-22T01:54:36Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 55,
+    "active_events": 56,
     "expired_sample": 0,
     "by_type": {
       "lookahead": 82,
-      "travel_extreme": 9,
+      "travel_extreme": 10,
       "back_to_back_travel": 19,
       "schedule_congestion": 24
     },
     "by_decision": {
       "abstain": 30,
-      "lean_home": 24,
+      "lean_home": 25,
       "lean_away": 1
     },
-    "lean_home": 24,
+    "lean_home": 25,
     "lean_away": 1,
     "abstain": 30,
     "monitor": 0
@@ -1077,13 +1077,13 @@
         "3 matchs sur les 7 derniers jours"
       ],
       "global_resolution": {
-        "status": "abstain",
+        "status": "mixed",
         "net_side": null,
-        "home_score": 0.239,
-        "away_score": -0.39,
-        "home_fade": 0.6,
+        "home_score": -1.39,
+        "away_score": 0.96,
+        "home_fade": 1.6,
         "away_fade": 0.6,
-        "reason": "Signaux opposes: Cleveland Cavaliers fade 0.60, New York Knicks fade 0.60 -> prudence",
+        "reason": "Signaux mitigés: avantage net trop faible (Cleveland Cavaliers -1.39, New York Knicks +0.96)",
         "detail": [
           {
             "side": "home",
@@ -1100,8 +1100,14 @@
           {
             "side": "home",
             "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
             "direction": "steam",
-            "strength": 0.629
+            "strength": 1.0
           }
         ]
       }
@@ -1530,12 +1536,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "home",
-        "home_score": 0.531,
-        "away_score": -0.098,
-        "home_fade": 0.15,
+        "net_side": "away",
+        "home_score": -1.097,
+        "away_score": 1.252,
+        "home_fade": 1.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Cleveland Cavaliers (+0.53)",
+        "reason": "Direction nette: New York Knicks (+1.25)",
         "detail": [
           {
             "side": "home",
@@ -1552,8 +1558,14 @@
           {
             "side": "home",
             "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
             "direction": "steam",
-            "strength": 0.629
+            "strength": 1.0
           }
         ]
       }
@@ -1640,12 +1652,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "home",
-        "home_score": 0.531,
-        "away_score": -0.098,
-        "home_fade": 0.15,
+        "net_side": "away",
+        "home_score": -1.097,
+        "away_score": 1.252,
+        "home_fade": 1.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Cleveland Cavaliers (+0.53)",
+        "reason": "Direction nette: New York Knicks (+1.25)",
         "detail": [
           {
             "side": "home",
@@ -1662,8 +1674,14 @@
           {
             "side": "home",
             "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
             "direction": "steam",
-            "strength": 0.629
+            "strength": 1.0
           }
         ]
       }
@@ -1762,12 +1780,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": 0.531,
+        "net_side": "home",
+        "home_score": 1.252,
+        "away_score": -1.097,
         "home_fade": 0.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Cleveland Cavaliers (+0.53)",
+        "away_fade": 1.15,
+        "reason": "Direction nette: New York Knicks (+1.25)",
         "detail": [
           {
             "side": "home",
@@ -1782,10 +1800,16 @@
             "strength": 0.15
           },
           {
-            "side": "away",
+            "side": "home",
             "type": "market_move",
             "direction": "steam",
-            "strength": 0.629
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           }
         ]
       }
@@ -3309,6 +3333,57 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 1.0
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815455",
+      "source_event_ids": [
+        "401815455"
+      ],
+      "kickoff": "2026-05-23T01:38Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Los Angeles Angels",
+      "away": "Texas Rangers",
+      "match": "Los Angeles Angels - Texas Rangers",
+      "decision": "lean_home",
+      "net_team": "Los Angeles Angels",
+      "reason": "Texas Rangers plus penalise par calendrier/voyage (0.45 vs 0.00)",
+      "pressure_score": 0.45,
+      "home_fade": 0.0,
+      "away_fade": 0.45,
+      "travel_score": 0.45,
+      "lookahead_score": 0,
+      "congestion_score": 0,
+      "types": {
+        "travel_extreme": 1
+      },
+      "contexts": [
+        "Deplacement estime 1934 km, decalage ~1.4h"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": 0.437,
+        "away_score": -1.25,
+        "home_fade": 0.0,
+        "away_fade": 1.25,
+        "reason": "Direction nette: Los Angeles Angels (+0.44)",
+        "detail": [
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.8
+          },
+          {
+            "side": "away",
+            "type": "travel_extreme",
+            "direction": "fade",
+            "strength": 0.45
           }
         ]
       }
