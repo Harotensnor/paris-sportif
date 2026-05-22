@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-22T15:29:40Z",
+  "generated_at": "2026-05-22T19:10:12Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815449",
-      "kickoff": "2026-05-22T18:20Z",
-      "league": "MLB",
-      "match": "Houston Astros at Chicago Cubs",
-      "home": "Chicago Cubs",
-      "away": "Houston Astros",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Chicago Cubs",
-          "pitcher": "Jameson Taillon",
-          "label": "Jameson Taillon plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.5293,
-          "fair_odds": 1.89,
-          "expected_strikeouts": 4.62,
-          "projected_ip": 5.58,
-          "inputs": {
-            "k9": 7.46,
-            "era": 4.97,
-            "whip": 1.2,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Chicago Cubs",
-          "pitcher": "Jameson Taillon",
-          "label": "Jameson Taillon concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.828,
-          "fair_odds": 1.21,
-          "expected_hr_allowed": 1.76,
-          "projected_ip": 5.58,
-          "inputs": {
-            "hr9": 2.84,
-            "era": 4.97,
-            "whip": 1.2
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Houston Astros",
-          "pitcher": "Spencer Arrighetti",
-          "label": "Spencer Arrighetti plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.5702,
-          "fair_odds": 1.75,
-          "expected_strikeouts": 5.83,
-          "projected_ip": 6.0,
-          "inputs": {
-            "k9": 8.75,
-            "era": 1.5,
-            "whip": 1.19,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Houston Astros",
-          "pitcher": "Spencer Arrighetti",
-          "label": "Spencer Arrighetti ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.8465,
-          "fair_odds": 1.18,
-          "expected_hr_allowed": 0.167,
-          "projected_ip": 6.0,
-          "inputs": {
-            "hr9": 0.25,
-            "era": 1.5,
-            "whip": 1.19
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815441",
       "kickoff": "2026-05-22T22:40Z",
@@ -3062,7 +2980,7 @@
       ]
     }
   ],
-  "props": 146,
+  "props": 142,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
