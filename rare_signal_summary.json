@@ -1,27 +1,26 @@
 {
-  "generated_at": "2026-05-22T13:58:50Z",
+  "generated_at": "2026-05-22T14:08:30Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 73,
-    "actionable": 37,
-    "watch": 8,
-    "risk": 28,
+    "active_events": 72,
+    "actionable": 36,
+    "watch": 6,
+    "risk": 30,
     "expired_sample": 0,
     "by_type": {
-      "market_move": 8,
       "injury_imbalance": 29,
-      "signal_conflict": 6,
+      "signal_conflict": 7,
       "travel_extreme": 6,
-      "market_uncertain": 35,
-      "back_to_back_travel": 21,
+      "back_to_back_travel": 22,
+      "market_uncertain": 34,
       "weather_extreme": 1
     },
     "by_quality": {
-      "watch": 8,
-      "actionable": 37,
-      "risk": 28
+      "actionable": 36,
+      "risk": 30,
+      "watch": 6
     }
   },
   "active_actionable": [
@@ -114,24 +113,6 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 7-14"
-    },
-    {
-      "event_id": "401872904",
-      "date": "2026-05-23T00:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Colorado Avalanche",
-      "away": "Vegas Golden Knights",
-      "match": "Colorado Avalanche - Vegas Golden Knights",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 1.49 -> 1.82 (-22.3%)"
     },
     {
       "event_id": "401815464",
@@ -348,24 +329,6 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 8-13"
-    },
-    {
-      "event_id": "401865462",
-      "date": "2026-05-28T00:30Z",
-      "sport": "football",
-      "league_code": "conmebol.sudamericana",
-      "league_name": "Copa Sudamericana",
-      "home": "River Plate",
-      "away": "Blooming",
-      "match": "River Plate - Blooming",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "away",
-      "strength": 1.0,
-      "context": "Cote away: 11.00 -> 13.00 (-18.2%)"
     },
     {
       "event_id": "401815538",
@@ -602,22 +565,22 @@
       "context": "2 match dans les 48h + 867 km de voyage"
     },
     {
-      "event_id": "401865464",
-      "date": "2026-05-28T00:30Z",
-      "sport": "football",
-      "league_code": "conmebol.sudamericana",
-      "league_name": "Copa Sudamericana",
-      "home": "Red Bull Bragantino",
-      "away": "Carabobo",
-      "match": "Red Bull Bragantino - Carabobo",
+      "event_id": "401872904",
+      "date": "2026-05-23T00:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Colorado Avalanche",
+      "away": "Vegas Golden Knights",
+      "match": "Colorado Avalanche - Vegas Golden Knights",
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "draw",
-      "strength": 0.751,
-      "context": "Cote draw: 3.70 -> 4.20 (-13.5%)"
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Vegas Golden Knights",
+      "side": "away",
+      "strength": 0.726,
+      "context": "1 match dans les 48h + 979 km de voyage"
     },
     {
       "event_id": "401872905",
@@ -654,6 +617,24 @@
       "side": "away",
       "strength": 0.726,
       "context": "1 match dans les 48h + 979 km de voyage"
+    },
+    {
+      "event_id": "401815454",
+      "date": "2026-05-23T01:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Arizona Diamondbacks",
+      "away": "Colorado Rockies",
+      "match": "Arizona Diamondbacks - Colorado Rockies",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Colorado Rockies",
+      "side": "away",
+      "strength": 0.719,
+      "context": "1 match dans les 48h + 943 km de voyage"
     },
     {
       "event_id": "401815469",
@@ -784,24 +765,6 @@
       "context": "Meteo dure: vent 35 km/h, pluie 0.0 mm"
     },
     {
-      "event_id": "401873416",
-      "date": "2026-05-22T17:30Z",
-      "sport": "football",
-      "league_code": "bundesligaautriche",
-      "league_name": "Bundesliga Autriche",
-      "home": "SV Josko Ried",
-      "away": "Rapid Vienna",
-      "match": "SV Josko Ried - Rapid Vienna",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.585,
-      "context": "Cote away: 2.85 -> 2.55 (+10.5%)"
-    },
-    {
       "event_id": "401815451",
       "date": "2026-05-22T23:40Z",
       "sport": "baseball",
@@ -818,24 +781,6 @@
       "side": "away",
       "strength": 0.565,
       "context": "Deplacement estime 2428 km, decalage ~1.9h"
-    },
-    {
-      "event_id": "401856927",
-      "date": "2026-05-22T23:30Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Atlanta Dream",
-      "away": "Dallas Wings",
-      "match": "Atlanta Dream - Dallas Wings",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.479,
-      "context": "Cote away: 2.90 -> 2.65 (+8.6%)"
     }
   ],
   "active_risk": [
@@ -1092,6 +1037,24 @@
       "context": "marge bookmaker anormale 19.2%"
     },
     {
+      "event_id": "401865462",
+      "date": "2026-05-28T00:30Z",
+      "sport": "football",
+      "league_code": "conmebol.sudamericana",
+      "league_name": "Copa Sudamericana",
+      "home": "River Plate",
+      "away": "Blooming",
+      "match": "River Plate - Blooming",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.1%"
+    },
+    {
       "event_id": "401865564",
       "date": "2026-05-28T00:30Z",
       "sport": "football",
@@ -1306,6 +1269,24 @@
       "side": null,
       "strength": 0.488,
       "context": "Signaux opposes: Vegas Golden Knights fade 0.75, Colorado Avalanche fade 0.75 -> prudence"
+    },
+    {
+      "event_id": "401873345",
+      "date": "2026-05-28T00:00Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "New York Knicks",
+      "away": "Cleveland Cavaliers",
+      "match": "New York Knicks - Cleveland Cavaliers",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "signal_conflict",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.488,
+      "context": "Signaux opposes: New York Knicks fade 0.75, Cleveland Cavaliers fade 0.75 -> prudence"
     },
     {
       "event_id": "401873202",
