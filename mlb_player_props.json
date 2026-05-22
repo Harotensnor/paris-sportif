@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-22T02:58:21Z",
+  "generated_at": "2026-05-22T03:04:12Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -1920,6 +1920,52 @@
       ]
     },
     {
+      "event_id": "401815467",
+      "kickoff": "2026-05-24T01:40Z",
+      "league": "MLB",
+      "match": "Athletics Athletics at San Diego Padres",
+      "home": "San Diego Padres",
+      "away": "Athletics",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "San Diego Padres",
+          "pitcher": "Michael King",
+          "label": "Michael King plus de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "over",
+          "probability": 0.5785,
+          "fair_odds": 1.73,
+          "expected_strikeouts": 5.87,
+          "projected_ip": 5.81,
+          "inputs": {
+            "k9": 9.1,
+            "era": 2.31,
+            "whip": 1.06,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "San Diego Padres",
+          "pitcher": "Michael King",
+          "label": "Michael King ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6702,
+          "fair_odds": 1.49,
+          "expected_hr_allowed": 0.4,
+          "projected_ip": 5.81,
+          "inputs": {
+            "hr9": 0.62,
+            "era": 2.31,
+            "whip": 1.06
+          },
+          "side": "home"
+        }
+      ]
+    },
+    {
       "event_id": "401815470",
       "kickoff": "2026-05-24T02:05Z",
       "league": "MLB",
@@ -2806,6 +2852,52 @@
       ]
     },
     {
+      "event_id": "401815482",
+      "kickoff": "2026-05-24T20:10Z",
+      "league": "MLB",
+      "match": "Athletics Athletics at San Diego Padres",
+      "home": "San Diego Padres",
+      "away": "Athletics",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "San Diego Padres",
+          "pitcher": "Michael King",
+          "label": "Michael King plus de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "over",
+          "probability": 0.5785,
+          "fair_odds": 1.73,
+          "expected_strikeouts": 5.87,
+          "projected_ip": 5.81,
+          "inputs": {
+            "k9": 9.1,
+            "era": 2.31,
+            "whip": 1.06,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "San Diego Padres",
+          "pitcher": "Michael King",
+          "label": "Michael King ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6702,
+          "fair_odds": 1.49,
+          "expected_hr_allowed": 0.4,
+          "projected_ip": 5.81,
+          "inputs": {
+            "hr9": 0.62,
+            "era": 2.31,
+            "whip": 1.06
+          },
+          "side": "home"
+        }
+      ]
+    },
+    {
       "event_id": "401815484",
       "kickoff": "2026-05-24T20:10Z",
       "league": "MLB",
@@ -2934,7 +3026,7 @@
       ]
     }
   ],
-  "props": 140,
+  "props": 144,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"

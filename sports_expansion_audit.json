@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-22T02:58:21Z",
+  "generated_at": "2026-05-22T03:04:12Z",
   "source": "local data.js + sports sidecars",
   "status": "ok",
   "sections": {
@@ -23,11 +23,21 @@
       "derived_markets": 24
     },
     "J4_baseball_major_props_pool": {
-      "data_events": 49,
+      "data_events": 53,
       "sofascore_events": 46,
       "samples": [
         {
           "event": "Athletics Athletics at Los Angeles Angels",
+          "league": "MLB",
+          "code": "mlb"
+        },
+        {
+          "event": "Athletics Athletics at Los Angeles Angels",
+          "league": "MLB",
+          "code": "mlb"
+        },
+        {
+          "event": "Colorado Rockies at Arizona Diamondbacks",
           "league": "MLB",
           "code": "mlb"
         },
@@ -40,21 +50,11 @@
           "event": "Cleveland Guardians at Philadelphia Phillies",
           "league": "MLB",
           "code": "mlb"
-        },
-        {
-          "event": "St. Louis Cardinals at Cincinnati Reds",
-          "league": "MLB",
-          "code": "mlb"
-        },
-        {
-          "event": "Tampa Bay Rays at New York Yankees",
-          "league": "MLB",
-          "code": "mlb"
         }
       ],
       "pitcher_records": 75,
-      "player_prop_events": 41,
-      "player_props": 140
+      "player_prop_events": 43,
+      "player_props": 144
     },
     "J5_football_tier2": {
       "data_events": 2,
@@ -73,7 +73,7 @@
       ]
     },
     "J6_coupes_nationales": {
-      "data_events": 20,
+      "data_events": 21,
       "sofascore_events": 20,
       "samples": [
         {
@@ -82,14 +82,9 @@
           "code": "conmebol.sudamericana"
         },
         {
-          "event": "Mirassol at Lanús",
-          "league": "Copa Libertadores",
-          "code": "conmebol.libertadores"
-        },
-        {
-          "event": "Always Ready at Liga de Quito",
-          "league": "Copa Libertadores",
-          "code": "conmebol.libertadores"
+          "event": "Alianza Atlético at Macará",
+          "league": "Copa Sudamericana",
+          "code": "conmebol.sudamericana"
         },
         {
           "event": "Montevideo City Torque at Grêmio",
@@ -100,15 +95,25 @@
           "event": "O'Higgins at Millonarios",
           "league": "Copa Sudamericana",
           "code": "conmebol.sudamericana"
+        },
+        {
+          "event": "Boston River at São Paulo",
+          "league": "Copa Sudamericana",
+          "code": "conmebol.sudamericana"
         }
       ]
     },
     "J7_asie_latam": {
-      "data_events": 29,
+      "data_events": 30,
       "sofascore_events": 66,
       "samples": [
         {
           "event": "Vasco da Gama at Club Olimpia",
+          "league": "Copa Sudamericana",
+          "code": "conmebol.sudamericana"
+        },
+        {
+          "event": "Alianza Atlético at Macará",
           "league": "Copa Sudamericana",
           "code": "conmebol.sudamericana"
         },
@@ -124,11 +129,6 @@
         },
         {
           "event": "Chengdu Rongcheng at Dalian Yingbo",
-          "league": "Chinese Super League",
-          "code": "chn.1"
-        },
-        {
-          "event": "Chongqing Tonglianglong at Qingdao Hainiu",
           "league": "Chinese Super League",
           "code": "chn.1"
         }
