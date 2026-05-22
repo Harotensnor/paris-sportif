@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-22T08:38:13Z",
+  "generated_at": "2026-05-22T08:42:06Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -1245,12 +1245,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "home",
-        "home_score": 0.437,
+        "net_side": "away",
+        "home_score": -0.098,
         "away_score": -0.098,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: SV Josko Ried (+0.44)",
+        "reason": "Direction nette: Rapid Vienna (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -1263,12 +1263,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.534
           }
         ]
       }
@@ -2894,11 +2888,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": -0.493,
-        "away_score": -1.473,
-        "home_fade": 1.15,
-        "away_fade": 1.876,
-        "reason": "Direction nette: Colorado Avalanche (-0.49)",
+        "home_score": 0.157,
+        "away_score": -0.823,
+        "home_fade": 0.15,
+        "away_fade": 0.876,
+        "reason": "Direction nette: Colorado Avalanche (+0.16)",
         "detail": [
           {
             "side": "home",
@@ -2911,18 +2905,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
           },
           {
             "side": "away",
