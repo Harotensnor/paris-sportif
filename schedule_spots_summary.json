@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-22T02:17:50Z",
+  "generated_at": "2026-05-22T02:22:01Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -1478,11 +1478,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
-        "home_fade": 0.15,
+        "home_score": -1.097,
+        "away_score": 0.252,
+        "home_fade": 1.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Montreal Canadiens (-0.10)",
+        "reason": "Direction nette: Montreal Canadiens (+0.25)",
         "detail": [
           {
             "side": "home",
@@ -1495,6 +1495,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           }
         ]
       }
@@ -1743,12 +1749,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
+        "net_side": "home",
+        "home_score": 0.252,
+        "away_score": -1.097,
         "home_fade": 0.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Carolina Hurricanes (-0.10)",
+        "away_fade": 1.15,
+        "reason": "Direction nette: Montreal Canadiens (+0.25)",
         "detail": [
           {
             "side": "home",
@@ -1761,6 +1767,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           }
         ]
       }
@@ -2338,13 +2350,13 @@
         "1 match dans les 48h + 1161 km de voyage"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.123,
-        "away_score": -1.152,
-        "home_fade": 0.6,
+        "status": "abstain",
+        "net_side": null,
+        "home_score": -1.123,
+        "away_score": -0.802,
+        "home_fade": 1.6,
         "away_fade": 1.362,
-        "reason": "Direction nette: Carolina Hurricanes (-0.12)",
+        "reason": "Signaux opposes: Carolina Hurricanes fade 1.60, Montreal Canadiens fade 1.36 -> prudence",
         "detail": [
           {
             "side": "home",
@@ -2357,6 +2369,12 @@
             "type": "schedule_congestion",
             "direction": "fade",
             "strength": 0.6
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           },
           {
             "side": "away",
@@ -2968,11 +2986,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.169,
-        "away_score": -0.86,
+        "home_score": 0.519,
+        "away_score": -1.86,
         "home_fade": 0.15,
-        "away_fade": 0.912,
-        "reason": "Direction nette: Montreal Canadiens (+0.17)",
+        "away_fade": 1.912,
+        "reason": "Direction nette: Montreal Canadiens (+0.52)",
         "detail": [
           {
             "side": "home",
@@ -2985,6 +3003,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           },
           {
             "side": "away",
