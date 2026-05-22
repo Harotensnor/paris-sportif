@@ -1,13 +1,13 @@
 {
-  "generated_at": "2026-05-22T03:42:11Z",
+  "generated_at": "2026-05-22T03:52:10Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 48,
-    "actionable": 33,
-    "watch": 7,
-    "risk": 8,
+    "active_events": 47,
+    "actionable": 34,
+    "watch": 6,
+    "risk": 7,
     "expired_sample": 0,
     "by_type": {
       "market_move": 7,
@@ -18,9 +18,9 @@
       "back_to_back_travel": 20
     },
     "by_quality": {
-      "watch": 7,
-      "actionable": 33,
-      "risk": 8
+      "watch": 6,
+      "actionable": 34,
+      "risk": 7
     }
   },
   "active_actionable": [
@@ -130,7 +130,7 @@
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 1.52 -> 1.86 (-22.3%)"
+      "context": "Cote home: 1.52 -> 1.84 (-21.0%)"
     },
     {
       "event_id": "401815464",
@@ -347,6 +347,24 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 8-13"
+    },
+    {
+      "event_id": "401873246",
+      "date": "2026-05-25T01:00Z",
+      "sport": "football",
+      "league_code": "ligamx",
+      "league_name": "Liga MX",
+      "home": "Pumas UNAM",
+      "away": "Cruz Azul",
+      "match": "Pumas UNAM - Cruz Azul",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 5.00 -> 6.00 (-20.0%)"
     },
     {
       "event_id": "401815485",
@@ -727,24 +745,6 @@
       "side": "away",
       "strength": 0.565,
       "context": "Deplacement estime 2428 km, decalage ~1.9h"
-    },
-    {
-      "event_id": "401815454",
-      "date": "2026-05-23T01:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Arizona Diamondbacks",
-      "away": "Colorado Rockies",
-      "match": "Arizona Diamondbacks - Colorado Rockies",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.466,
-      "context": "Cote away: 2.62 -> 2.40 (+8.4%)"
     }
   ],
   "active_risk": [
@@ -855,24 +855,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 19.0%"
-    },
-    {
-      "event_id": "401843356",
-      "date": "2026-05-25T12:30Z",
-      "sport": "football",
-      "league_code": "eliteserien",
-      "league_name": "Eliteserien",
-      "home": "IK Start",
-      "away": "Vålerenga",
-      "match": "IK Start - Vålerenga",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 19.1%"
     },
     {
       "event_id": "401815443",
