@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-22T19:10:42Z",
+  "generated_at": "2026-05-22T20:52:48Z",
   "method": "Maher (1982) Poisson regression simplifiée. alpha_off = goals_for / expected_gf · beta_def = goals_against / expected_ga · normalisé par moyennes ligue home/away.",
   "min_matches_per_league": 40,
   "min_matches_per_team": 5,
@@ -246,21 +246,35 @@
     "ita.1": {
       "league_avg_home": 1.12,
       "league_avg_away": 1.15,
-      "n_matches": 40,
+      "n_matches": 41,
       "teams": {
         "Lecce": {
-          "alpha_off": 1.223,
-          "beta_def": 0.885,
+          "alpha_off": 1.226,
+          "beta_def": 0.887,
           "n_matches": 5,
           "gf_avg": 1.4,
           "ga_avg": 1.0
         },
         "Pisa": {
-          "alpha_off": 0.352,
-          "beta_def": 1.93,
+          "alpha_off": 0.353,
+          "beta_def": 1.936,
           "n_matches": 5,
           "gf_avg": 0.4,
           "ga_avg": 2.2
+        },
+        "Fiorentina": {
+          "alpha_off": 0.53,
+          "beta_def": 0.88,
+          "n_matches": 5,
+          "gf_avg": 0.6,
+          "ga_avg": 1.0
+        },
+        "Atalanta": {
+          "alpha_off": 1.056,
+          "beta_def": 1.237,
+          "n_matches": 5,
+          "gf_avg": 1.2,
+          "ga_avg": 1.4
         }
       }
     },

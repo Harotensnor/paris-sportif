@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-22T19:10:41Z",
+  "generated_at": "2026-05-22T20:52:48Z",
   "method": "Dixon-Coles MLE grid search (ρ ∈ [-0.30, 0.10] step 0.005), λ_h, λ_a fixés à moyenne empirique par ligue. CI 95% via LR test.",
   "min_matches": 40,
   "default_rho": -0.13,
@@ -111,12 +111,12 @@
       "reason": "n=1 < 40"
     },
     "bundesligaautriche": {
-      "n": 3,
+      "n": 4,
       "rho_measured": null,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "n=3 < 40"
+      "reason": "n=4 < 40"
     },
     "caf.champions": {
       "n": 1,
@@ -550,17 +550,17 @@
       "reason": "n=1 < 40"
     },
     "ita.1": {
-      "n": 40,
-      "rho_measured": -0.205,
+      "n": 41,
+      "rho_measured": -0.24,
       "rho_literature": -0.18,
       "rho_used": -0.18,
       "source": "literature_fallback",
       "reason": "CI trop large (0.400) ou fit nul",
-      "log_lik": -115.18,
+      "log_lik": -117.0,
       "ci_lo": -0.3,
       "ci_hi": 0.1,
-      "lambda_h": 1.125,
-      "lambda_a": 1.15
+      "lambda_h": 1.122,
+      "lambda_a": 1.146
     },
     "ita.2": {
       "n": 35,

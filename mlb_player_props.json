@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-22T19:10:12Z",
+  "generated_at": "2026-05-22T20:52:18Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -470,36 +470,36 @@
         {
           "market": "pitcher_strikeouts",
           "team": "Baltimore Orioles",
-          "pitcher": "Chris Bassitt",
-          "label": "Chris Bassitt plus de 3,5 strikeouts",
-          "line": 3.5,
-          "pick": "over",
-          "probability": 0.5659,
-          "fair_odds": 1.77,
-          "expected_strikeouts": 3.75,
-          "projected_ip": 5.38,
+          "pitcher": "Keegan Akin",
+          "label": "Keegan Akin moins de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "under",
+          "probability": 0.5835,
+          "fair_odds": 1.71,
+          "expected_strikeouts": 6.09,
+          "projected_ip": 6.6,
           "inputs": {
-            "k9": 6.28,
-            "era": 5.44,
-            "whip": 1.7,
-            "hand": "R"
+            "k9": 8.31,
+            "era": 13.5,
+            "whip": 1.96,
+            "hand": "L"
           },
           "side": "home"
         },
         {
           "market": "pitcher_home_run_allowed",
           "team": "Baltimore Orioles",
-          "pitcher": "Chris Bassitt",
-          "label": "Chris Bassitt ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6055,
-          "fair_odds": 1.65,
-          "expected_hr_allowed": 0.502,
-          "projected_ip": 5.38,
+          "pitcher": "Keegan Akin",
+          "label": "Keegan Akin concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.7825,
+          "fair_odds": 1.28,
+          "expected_hr_allowed": 1.525,
+          "projected_ip": 6.6,
           "inputs": {
-            "hr9": 0.84,
-            "era": 5.44,
-            "whip": 1.7
+            "hr9": 2.08,
+            "era": 13.5,
+            "whip": 1.96
           },
           "side": "home"
         },
@@ -551,37 +551,73 @@
       "props": [
         {
           "market": "pitcher_strikeouts",
-          "team": "Washington Nationals",
-          "pitcher": "Miles Mikolas",
-          "label": "Miles Mikolas moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.5154,
-          "fair_odds": 1.94,
-          "expected_strikeouts": 4.44,
-          "projected_ip": 6.6,
+          "team": "Atlanta Braves",
+          "pitcher": "Bryce Elder",
+          "label": "Bryce Elder plus de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "over",
+          "probability": 0.5123,
+          "fair_odds": 1.95,
+          "expected_strikeouts": 5.56,
+          "projected_ip": 6.22,
           "inputs": {
-            "k9": 6.05,
-            "era": 6.91,
-            "whip": 1.49,
+            "k9": 8.04,
+            "era": 2.01,
+            "whip": 0.99,
             "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Atlanta Braves",
+          "pitcher": "Bryce Elder",
+          "label": "Bryce Elder ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6744,
+          "fair_odds": 1.48,
+          "expected_hr_allowed": 0.394,
+          "projected_ip": 6.22,
+          "inputs": {
+            "hr9": 0.57,
+            "era": 2.01,
+            "whip": 0.99
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Washington Nationals",
+          "pitcher": "Richard Lovelady",
+          "label": "Richard Lovelady plus de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "over",
+          "probability": 0.6084,
+          "fair_odds": 1.64,
+          "expected_strikeouts": 3.93,
+          "projected_ip": 4.8,
+          "inputs": {
+            "k9": 7.36,
+            "era": 3.68,
+            "whip": 1.64,
+            "hand": "L"
           },
           "side": "away"
         },
         {
           "market": "pitcher_home_run_allowed",
           "team": "Washington Nationals",
-          "pitcher": "Miles Mikolas",
-          "label": "Miles Mikolas concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.8254,
-          "fair_odds": 1.21,
-          "expected_hr_allowed": 1.745,
-          "projected_ip": 6.6,
+          "pitcher": "Richard Lovelady",
+          "label": "Richard Lovelady ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5189,
+          "fair_odds": 1.93,
+          "expected_hr_allowed": 0.656,
+          "projected_ip": 4.8,
           "inputs": {
-            "hr9": 2.38,
-            "era": 6.91,
-            "whip": 1.49
+            "hr9": 1.23,
+            "era": 3.68,
+            "whip": 1.64
           },
           "side": "away"
         }
@@ -1074,6 +1110,88 @@
             "hr9": 2.15,
             "era": 4.3,
             "whip": 1.3
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401873647",
+      "kickoff": "2026-05-23T17:10Z",
+      "league": "MLB",
+      "match": "St. Louis Cardinals at Cincinnati Reds",
+      "home": "Cincinnati Reds",
+      "away": "St. Louis Cardinals",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Cincinnati Reds",
+          "pitcher": "Chase Petty",
+          "label": "Chase Petty moins de 2,5 strikeouts",
+          "line": 2.5,
+          "pick": "under",
+          "probability": 0.9154,
+          "fair_odds": 1.09,
+          "expected_strikeouts": 0.92,
+          "projected_ip": 5.2,
+          "inputs": {
+            "k9": 1.59,
+            "era": 4.76,
+            "whip": 1.06,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Cincinnati Reds",
+          "pitcher": "Chase Petty",
+          "label": "Chase Petty concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.6009,
+          "fair_odds": 1.66,
+          "expected_hr_allowed": 0.919,
+          "projected_ip": 5.2,
+          "inputs": {
+            "hr9": 1.59,
+            "era": 4.76,
+            "whip": 1.06
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "St. Louis Cardinals",
+          "pitcher": "Kyle Leahy",
+          "label": "Kyle Leahy plus de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "over",
+          "probability": 0.5629,
+          "fair_odds": 1.78,
+          "expected_strikeouts": 3.74,
+          "projected_ip": 5.02,
+          "inputs": {
+            "k9": 6.7,
+            "era": 3.94,
+            "whip": 1.55,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "St. Louis Cardinals",
+          "pitcher": "Kyle Leahy",
+          "label": "Kyle Leahy ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5176,
+          "fair_odds": 1.93,
+          "expected_hr_allowed": 0.658,
+          "projected_ip": 5.02,
+          "inputs": {
+            "hr9": 1.18,
+            "era": 3.94,
+            "whip": 1.55
           },
           "side": "away"
         }
@@ -1591,6 +1709,42 @@
       "props": [
         {
           "market": "pitcher_strikeouts",
+          "team": "Atlanta Braves",
+          "pitcher": "Grant Holmes",
+          "label": "Grant Holmes moins de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "under",
+          "probability": 0.5734,
+          "fair_odds": 1.74,
+          "expected_strikeouts": 4.2,
+          "projected_ip": 5.23,
+          "inputs": {
+            "k9": 7.23,
+            "era": 3.8,
+            "whip": 1.27,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Atlanta Braves",
+          "pitcher": "Grant Holmes",
+          "label": "Grant Holmes concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5385,
+          "fair_odds": 1.86,
+          "expected_hr_allowed": 0.773,
+          "projected_ip": 5.23,
+          "inputs": {
+            "hr9": 1.33,
+            "era": 3.8,
+            "whip": 1.27
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
           "team": "Washington Nationals",
           "pitcher": "Jake Irvin",
           "label": "Jake Irvin moins de 5,5 strikeouts",
@@ -1720,18 +1874,18 @@
         {
           "market": "pitcher_strikeouts",
           "team": "Cincinnati Reds",
-          "pitcher": "Brady Singer",
-          "label": "Brady Singer moins de 3,5 strikeouts",
-          "line": 3.5,
+          "pitcher": "Chase Petty",
+          "label": "Chase Petty moins de 2,5 strikeouts",
+          "line": 2.5,
           "pick": "under",
-          "probability": 0.528,
-          "fair_odds": 1.89,
-          "expected_strikeouts": 3.4,
-          "projected_ip": 4.6,
+          "probability": 0.9154,
+          "fair_odds": 1.09,
+          "expected_strikeouts": 0.92,
+          "projected_ip": 5.2,
           "inputs": {
-            "k9": 6.65,
-            "era": 6.26,
-            "whip": 1.7,
+            "k9": 1.59,
+            "era": 4.76,
+            "whip": 1.06,
             "hand": "R"
           },
           "side": "home"
@@ -1739,35 +1893,35 @@
         {
           "market": "pitcher_home_run_allowed",
           "team": "Cincinnati Reds",
-          "pitcher": "Brady Singer",
-          "label": "Brady Singer concède au moins 1 home run",
+          "pitcher": "Chase Petty",
+          "label": "Chase Petty concède au moins 1 home run",
           "pick": "yes",
-          "probability": 0.7535,
-          "fair_odds": 1.33,
-          "expected_hr_allowed": 1.4,
-          "projected_ip": 4.6,
+          "probability": 0.6009,
+          "fair_odds": 1.66,
+          "expected_hr_allowed": 0.919,
+          "projected_ip": 5.2,
           "inputs": {
-            "hr9": 2.74,
-            "era": 6.26,
-            "whip": 1.7
+            "hr9": 1.59,
+            "era": 4.76,
+            "whip": 1.06
           },
           "side": "home"
         },
         {
           "market": "pitcher_strikeouts",
           "team": "St. Louis Cardinals",
-          "pitcher": "Andre Pallante",
-          "label": "Andre Pallante moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.513,
-          "fair_odds": 1.95,
-          "expected_strikeouts": 4.45,
-          "projected_ip": 5.44,
+          "pitcher": "Kyle Leahy",
+          "label": "Kyle Leahy plus de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "over",
+          "probability": 0.5629,
+          "fair_odds": 1.78,
+          "expected_strikeouts": 3.74,
+          "projected_ip": 5.02,
           "inputs": {
-            "k9": 7.35,
-            "era": 4.04,
-            "whip": 1.35,
+            "k9": 6.7,
+            "era": 3.94,
+            "whip": 1.55,
             "hand": "R"
           },
           "side": "away"
@@ -1775,17 +1929,17 @@
         {
           "market": "pitcher_home_run_allowed",
           "team": "St. Louis Cardinals",
-          "pitcher": "Andre Pallante",
-          "label": "Andre Pallante ne concède pas de home run",
+          "pitcher": "Kyle Leahy",
+          "label": "Kyle Leahy ne concède pas de home run",
           "pick": "no",
-          "probability": 0.5141,
-          "fair_odds": 1.95,
-          "expected_hr_allowed": 0.665,
-          "projected_ip": 5.44,
+          "probability": 0.5176,
+          "fair_odds": 1.93,
+          "expected_hr_allowed": 0.658,
+          "projected_ip": 5.02,
           "inputs": {
-            "hr9": 1.1,
-            "era": 4.04,
-            "whip": 1.35
+            "hr9": 1.18,
+            "era": 3.94,
+            "whip": 1.55
           },
           "side": "away"
         }
@@ -2396,36 +2550,36 @@
         {
           "market": "pitcher_strikeouts",
           "team": "Cincinnati Reds",
-          "pitcher": "Nick Lodolo",
-          "label": "Nick Lodolo plus de 3,5 strikeouts",
+          "pitcher": "Brady Singer",
+          "label": "Brady Singer moins de 3,5 strikeouts",
           "line": 3.5,
-          "pick": "over",
-          "probability": 0.5444,
-          "fair_odds": 1.84,
-          "expected_strikeouts": 3.67,
-          "projected_ip": 5.0,
+          "pick": "under",
+          "probability": 0.528,
+          "fair_odds": 1.89,
+          "expected_strikeouts": 3.4,
+          "projected_ip": 4.6,
           "inputs": {
-            "k9": 6.6,
-            "era": 7.2,
-            "whip": 1.53,
-            "hand": "L"
+            "k9": 6.65,
+            "era": 6.26,
+            "whip": 1.7,
+            "hand": "R"
           },
           "side": "home"
         },
         {
           "market": "pitcher_home_run_allowed",
           "team": "Cincinnati Reds",
-          "pitcher": "Nick Lodolo",
-          "label": "Nick Lodolo concède au moins 1 home run",
+          "pitcher": "Brady Singer",
+          "label": "Brady Singer concède au moins 1 home run",
           "pick": "yes",
-          "probability": 0.7364,
-          "fair_odds": 1.36,
-          "expected_hr_allowed": 1.333,
-          "projected_ip": 5.0,
+          "probability": 0.7535,
+          "fair_odds": 1.33,
+          "expected_hr_allowed": 1.4,
+          "projected_ip": 4.6,
           "inputs": {
-            "hr9": 2.4,
-            "era": 7.2,
-            "whip": 1.53
+            "hr9": 2.74,
+            "era": 6.26,
+            "whip": 1.7
           },
           "side": "home"
         },
@@ -2769,6 +2923,42 @@
       "props": [
         {
           "market": "pitcher_strikeouts",
+          "team": "Atlanta Braves",
+          "pitcher": "Martín Pérez",
+          "label": "Martín Pérez moins de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "under",
+          "probability": 0.5789,
+          "fair_odds": 1.73,
+          "expected_strikeouts": 6.12,
+          "projected_ip": 6.6,
+          "inputs": {
+            "k9": 8.34,
+            "era": 2.85,
+            "whip": 1.0,
+            "hand": "L"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Atlanta Braves",
+          "pitcher": "Martín Pérez",
+          "label": "Martín Pérez concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5537,
+          "fair_odds": 1.81,
+          "expected_hr_allowed": 0.807,
+          "projected_ip": 6.6,
+          "inputs": {
+            "hr9": 1.1,
+            "era": 2.85,
+            "whip": 1.0
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
           "team": "Washington Nationals",
           "pitcher": "Foster Griffin",
           "label": "Foster Griffin moins de 5,5 strikeouts",
@@ -2980,7 +3170,7 @@
       ]
     }
   ],
-  "props": 142,
+  "props": 152,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"

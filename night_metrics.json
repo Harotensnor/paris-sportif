@@ -1,32 +1,32 @@
 {
-  "generated_at": "2026-05-22T19:10:26Z",
-  "calculated_at": "2026-05-22T19:10:26Z",
+  "generated_at": "2026-05-22T20:52:32Z",
+  "calculated_at": "2026-05-22T20:52:32Z",
   "source_of_truth": "data.js",
-  "data_generated_at": "2026-05-22T19:08:57.648386Z",
+  "data_generated_at": "2026-05-22T20:50:29.994847Z",
   "data_today_field": "2026-05-22",
   "events": {
-    "total": 295,
-    "upcoming": 278,
-    "winamax_available": 295,
-    "winamax_exact": 294,
+    "total": 296,
+    "upcoming": 277,
+    "winamax_available": 296,
+    "winamax_exact": 295,
     "winamax_exact_ratio": 0.9966,
     "markets_more_than_1n2": 116,
-    "form_l10": 112,
+    "form_l10": 113,
     "h2h": 0,
-    "lineups": 54,
+    "lineups": 55,
     "football_lineups": 0,
-    "starter_signals": 54,
+    "starter_signals": 55,
     "clubelo": 44,
     "weather": 108,
-    "injuries": 74,
+    "injuries": 70,
     "referee": 27,
     "referee_named": 0,
     "referee_context": 27,
     "referee_signal": 27,
     "fd_calibration": 0,
     "fd_closing_odds": 0,
-    "xg": 73,
-    "smart_money": 0
+    "xg": 71,
+    "smart_money": 1
   },
   "signal_health": {
     "referee": {
@@ -36,7 +36,7 @@
       "note": "referee is effective coverage: named referee or referee_context usable by the model."
     },
     "smart_money": {
-      "events": 0,
+      "events": 1,
       "status": "rare_event",
       "note": "Smart money is intentionally rare; low count is OK when odds movement does not confirm a strong signal."
     }
@@ -44,12 +44,12 @@
   "winamax_markets": {
     "matches": 688,
     "detailed_market_matches": 497,
-    "detailed_ratio_vs_exact": 1.6905,
+    "detailed_ratio_vs_exact": 1.6847,
     "gap_to_50pct_exact": 0,
     "recommended_detail_fetch_cap": 90,
     "detail_by_sport": {
       "baseball": {
-        "exact": 50,
+        "exact": 51,
         "detailed": 0,
         "families": {},
         "detailed_ratio": 0.0
@@ -70,23 +70,23 @@
         "detailed_ratio": 0.5625
       },
       "football": {
-        "exact": 109,
-        "detailed": 96,
+        "exact": 107,
+        "detailed": 94,
         "families": {
-          "dnb": 96,
-          "dnb_rows": 96,
-          "match_winner": 96,
-          "btts": 95,
-          "btts_rows": 95,
-          "handicap": 95,
-          "ht_1n2": 95,
-          "ht_1n2_rows": 95,
-          "ht_ou": 95,
-          "ou": 95,
-          "ou15": 95,
-          "ou25": 95
+          "dnb": 94,
+          "dnb_rows": 94,
+          "match_winner": 94,
+          "btts": 93,
+          "btts_rows": 93,
+          "handicap": 93,
+          "ht_1n2": 93,
+          "ht_1n2_rows": 93,
+          "ht_ou": 93,
+          "ou": 93,
+          "ou15": 93,
+          "ou25": 93
         },
-        "detailed_ratio": 0.8807
+        "detailed_ratio": 0.8785
       },
       "hockey": {
         "exact": 8,
@@ -112,21 +112,21 @@
       }
     },
     "market_family_counts": {
-      "dnb": 109,
-      "dnb_rows": 109,
-      "match_winner": 109,
-      "ht_1n2": 104,
-      "ht_1n2_rows": 104,
-      "btts": 99,
-      "btts_rows": 99,
-      "ou": 99,
-      "team_total": 99,
-      "double_chance": 98,
-      "handicap": 95,
-      "ht_ou": 95,
-      "ou15": 95,
-      "ou25": 95,
-      "ou35": 95,
+      "dnb": 107,
+      "dnb_rows": 107,
+      "match_winner": 107,
+      "ht_1n2": 102,
+      "ht_1n2_rows": 102,
+      "btts": 97,
+      "btts_rows": 97,
+      "ou": 97,
+      "team_total": 97,
+      "double_chance": 96,
+      "handicap": 93,
+      "ht_ou": 93,
+      "ou15": 93,
+      "ou25": 93,
+      "ou35": 93,
       "basket_handicap": 9,
       "basket_team_total": 9,
       "basket_total": 9,
@@ -141,7 +141,7 @@
   },
   "health": {
     "status": "warning",
-    "warnings": 9,
+    "warnings": 8,
     "pipeline_drift": "warn"
   }
 }

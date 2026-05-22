@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-05-22T19:10:42Z",
+  "generated_at": "2026-05-22T20:52:49Z",
   "method": "Full Bivariate Poisson MLE Dixon-Coles. Coordinate-descent avec golden-section search 1D. Pure Python (pas de scipy).",
   "min_matches_per_league": 40,
   "min_matches_per_team": 5,
-  "n_leagues_fit": 3,
+  "n_leagues_fit": 4,
   "leagues": {
     "chn.1": {
       "n_matches": 41,
@@ -202,6 +202,40 @@
           "beta": -0.2793,
           "rank_off": 2,
           "rank_def": 5
+        }
+      }
+    },
+    "ita.1": {
+      "n_matches": 41,
+      "n_teams": 4,
+      "gamma": 0.1147,
+      "rho": -0.1541,
+      "log_lik": -114.99,
+      "iterations": 2,
+      "teams": {
+        "Atalanta": {
+          "alpha": 0.4725,
+          "beta": -0.1187,
+          "rank_off": 2,
+          "rank_def": 2
+        },
+        "Fiorentina": {
+          "alpha": -0.2659,
+          "beta": 0.3527,
+          "rank_off": 3,
+          "rank_def": 4
+        },
+        "Lecce": {
+          "alpha": 0.4818,
+          "beta": 0.0578,
+          "rank_off": 1,
+          "rank_def": 3
+        },
+        "Pisa": {
+          "alpha": -0.6885,
+          "beta": -0.2917,
+          "rank_off": 4,
+          "rank_def": 1
         }
       }
     },
