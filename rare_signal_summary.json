@@ -1,46 +1,28 @@
 {
-  "generated_at": "2026-05-22T21:56:05Z",
+  "generated_at": "2026-05-22T22:50:16Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 76,
-    "actionable": 40,
-    "watch": 5,
+    "active_events": 73,
+    "actionable": 38,
+    "watch": 4,
     "risk": 31,
-    "expired_sample": 0,
+    "expired_sample": 1,
     "by_type": {
-      "injury_imbalance": 32,
+      "injury_imbalance": 30,
       "signal_conflict": 7,
       "travel_extreme": 6,
       "back_to_back_travel": 25,
       "market_uncertain": 32
     },
     "by_quality": {
-      "actionable": 40,
+      "actionable": 38,
       "risk": 31,
-      "watch": 5
+      "watch": 4
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401815446",
-      "date": "2026-05-22T22:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Cincinnati Reds",
-      "away": "St. Louis Cardinals",
-      "match": "Cincinnati Reds - St. Louis Cardinals",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Cincinnati Reds",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 8-3"
-    },
     {
       "event_id": "401815445",
       "date": "2026-05-22T23:07Z",
@@ -474,24 +456,6 @@
       "context": "Absences severes 5-9"
     },
     {
-      "event_id": "401815455",
-      "date": "2026-05-23T01:38Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Los Angeles Angels",
-      "away": "Texas Rangers",
-      "match": "Los Angeles Angels - Texas Rangers",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Texas Rangers",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 6-10"
-    },
-    {
       "event_id": "401815452",
       "date": "2026-05-23T01:40Z",
       "sport": "baseball",
@@ -746,22 +710,22 @@
   ],
   "active_watch": [
     {
-      "event_id": "401856928",
-      "date": "2026-05-22T23:30Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Indiana Fever",
-      "away": "Golden State Valkyries",
-      "match": "Indiana Fever - Golden State Valkyries",
+      "event_id": "401815455",
+      "date": "2026-05-23T01:38Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Los Angeles Angels",
+      "away": "Texas Rangers",
+      "match": "Los Angeles Angels - Texas Rangers",
       "quality": "watch",
       "quality_reason": "Signal rare present mais intensite moyenne",
       "type": "injury_imbalance",
       "direction": "fade",
-      "team": "Golden State Valkyries",
+      "team": "Texas Rangers",
       "side": null,
       "strength": 0.6,
-      "context": "Absences severes 0-3"
+      "context": "Absences severes 7-10"
     },
     {
       "event_id": "401856929",
@@ -798,24 +762,6 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 4-1"
-    },
-    {
-      "event_id": "401856944",
-      "date": "2026-05-29T02:00Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Golden State Valkyries",
-      "away": "Indiana Fever",
-      "match": "Golden State Valkyries - Indiana Fever",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Golden State Valkyries",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 3-0"
     },
     {
       "event_id": "401815451",
@@ -1072,6 +1018,24 @@
       "context": "marge bookmaker anormale 18.1%"
     },
     {
+      "event_id": "401865562",
+      "date": "2026-05-27T22:00Z",
+      "sport": "football",
+      "league_code": "conmebol.libertadores",
+      "league_name": "Copa Libertadores",
+      "home": "Independiente del Valle",
+      "away": "Rosario Central",
+      "match": "Independiente del Valle - Rosario Central",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 19.2%"
+    },
+    {
       "event_id": "401865453",
       "date": "2026-05-27T22:00Z",
       "sport": "football",
@@ -1124,24 +1088,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.3%"
-    },
-    {
-      "event_id": "401865562",
-      "date": "2026-05-27T22:00Z",
-      "sport": "football",
-      "league_code": "conmebol.libertadores",
-      "league_name": "Copa Libertadores",
-      "home": "Independiente del Valle",
-      "away": "Rosario Central",
-      "match": "Independiente del Valle - Rosario Central",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 19.2%"
     },
     {
       "event_id": "401865564",
@@ -1216,42 +1162,6 @@
       "context": "marge bookmaker anormale 19.0%"
     },
     {
-      "event_id": "401865549",
-      "date": "2026-05-29T00:30Z",
-      "sport": "football",
-      "league_code": "conmebol.libertadores",
-      "league_name": "Copa Libertadores",
-      "home": "Boca Juniors",
-      "away": "Universidad Católica",
-      "match": "Boca Juniors - Universidad Católica",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.5%"
-    },
-    {
-      "event_id": "401865553",
-      "date": "2026-05-29T00:30Z",
-      "sport": "football",
-      "league_code": "conmebol.libertadores",
-      "league_name": "Copa Libertadores",
-      "home": "Cruzeiro",
-      "away": "Barcelona SC",
-      "match": "Cruzeiro - Barcelona SC",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.3%"
-    },
-    {
       "event_id": "401865451",
       "date": "2026-05-29T00:30Z",
       "sport": "football",
@@ -1286,6 +1196,42 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 19.2%"
+    },
+    {
+      "event_id": "401865549",
+      "date": "2026-05-29T00:30Z",
+      "sport": "football",
+      "league_code": "conmebol.libertadores",
+      "league_name": "Copa Libertadores",
+      "home": "Boca Juniors",
+      "away": "Universidad Católica",
+      "match": "Boca Juniors - Universidad Católica",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.5%"
+    },
+    {
+      "event_id": "401865553",
+      "date": "2026-05-29T00:30Z",
+      "sport": "football",
+      "league_code": "conmebol.libertadores",
+      "league_name": "Copa Libertadores",
+      "home": "Cruzeiro",
+      "away": "Barcelona SC",
+      "match": "Cruzeiro - Barcelona SC",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.3%"
     },
     {
       "event_id": "401815443",
@@ -1396,5 +1342,24 @@
       "context": "Signaux opposes: Cleveland Cavaliers fade 0.60, New York Knicks fade 0.60 -> prudence"
     }
   ],
-  "expired_sample": []
+  "expired_sample": [
+    {
+      "event_id": "401815446",
+      "date": "2026-05-22T22:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Cincinnati Reds",
+      "away": "St. Louis Cardinals",
+      "match": "Cincinnati Reds - St. Louis Cardinals",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Cincinnati Reds",
+      "side": null,
+      "strength": 1.0,
+      "context": "Absences severes 8-3"
+    }
+  ]
 }
