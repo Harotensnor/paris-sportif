@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-05-22T08:08:49Z",
-  "calculated_at": "2026-05-22T08:08:49Z",
+  "generated_at": "2026-05-22T08:13:25Z",
+  "calculated_at": "2026-05-22T08:13:25Z",
   "source_of_truth": "data.js",
   "data_age_min": 1,
   "data_file_age_min": 0,
@@ -47,13 +47,13 @@
       "status": "retained_existing_referees"
     },
     "xg_team_stats": {
-      "age_min": 3,
+      "age_min": 2,
       "teams": 112,
       "leagues": 6,
       "source": "understat"
     },
     "fbref_xg": {
-      "age_min": 3,
+      "age_min": 2,
       "teams": 112,
       "leagues": 6,
       "source": "understat_compat"
@@ -375,7 +375,7 @@
       "price_shortening": 5
     },
     "injuries_multisport": {
-      "age_min": 3,
+      "age_min": 2,
       "teams": 129,
       "sports": 4,
       "injuries": 700,
@@ -553,7 +553,7 @@
     "xg_team_stats": {
       "script": "scripts/fetch_understat_xg.py",
       "output": "xg_team_stats.json",
-      "age_min": 3,
+      "age_min": 2,
       "threshold_min": 360,
       "fast_red_min": null,
       "status": "ok"
@@ -561,7 +561,7 @@
     "fbref_xg": {
       "script": "scripts/fetch_understat_xg.py",
       "output": "fbref_xg.json",
-      "age_min": 3,
+      "age_min": 2,
       "threshold_min": 360,
       "fast_red_min": null,
       "status": "ok"
@@ -889,7 +889,7 @@
     "injuries_multisport": {
       "script": "scripts/fetch_injuries.py",
       "output": "injuries_multisport.json",
-      "age_min": 3,
+      "age_min": 2,
       "threshold_min": 60,
       "fast_red_min": null,
       "status": "ok"
@@ -1055,7 +1055,7 @@
   ],
   "overall": "warning",
   "quality_checks": {
-    "data_generated_at": "2026-05-22T08:07:27.595583Z",
+    "data_generated_at": "2026-05-22T08:11:59.462039Z",
     "truth_scope": "all_events",
     "all_winamax_available": 294,
     "all_winamax_exact": 294,
@@ -1134,7 +1134,7 @@
   "data_truth": {
     "source_of_truth": "data.js",
     "scope": "all_events",
-    "data_generated_at": "2026-05-22T08:07:27.595583Z",
+    "data_generated_at": "2026-05-22T08:11:59.462039Z",
     "winamax_available": 294,
     "winamax_exact": 294,
     "winamax_exact_ratio": 1.0,
@@ -1147,28 +1147,28 @@
     "status": "degraded",
     "schema_version": 2,
     "sources_validated": 11,
-    "sources_ok": 7,
-    "sources_warning": 4,
+    "sources_ok": 6,
+    "sources_warning": 5,
     "sources_critical": 0,
-    "quarantine_records": 5,
-    "anomalies_emitted": 3
+    "quarantine_records": 6,
+    "anomalies_emitted": 4
   },
   "source_health": {
-    "generated_at": "2026-05-22T08:08:49Z",
+    "generated_at": "2026-05-22T08:13:25Z",
     "sources_total": 11,
-    "sources_ok": 7,
-    "sources_warning": 4,
+    "sources_ok": 6,
+    "sources_warning": 5,
     "sources_critical": 0,
-    "source_health_avg": 93.1,
+    "source_health_avg": 92.4,
     "source_health_min": 57,
     "by_source": {
       "winamax_catalog": {
-        "score": 100,
-        "status": "ok",
+        "score": 92,
+        "status": "warning",
         "items": 732,
         "age_min": 3,
         "sla_min": 15,
-        "issues": 1
+        "issues": 2
       },
       "winamax_markets": {
         "score": 84,
@@ -1254,25 +1254,25 @@
   },
   "observability": {
     "pipeline_traces": {
-      "generated_at": "2026-05-22T08:08:49Z",
+      "generated_at": "2026-05-22T08:13:25Z",
       "runs_observed": 99,
       "by_status": {
-        "warning": 67,
+        "warning": 69,
         "critical": 1,
-        "ok": 31
+        "ok": 29
       },
       "by_script": {
         "data_integrity_monitor.py": {
           "runs": 99,
           "errors": 1,
           "last_status": "ok",
-          "max_duration_ms": 1906
+          "max_duration_ms": 2067
         }
       }
     }
   },
   "data_lineage": {
-    "generated_at": "2026-05-22T08:08:49Z",
+    "generated_at": "2026-05-22T08:13:25Z",
     "status": "ok",
     "events": 294,
     "events_missing_inline_lineage": 0,
@@ -1377,7 +1377,7 @@
     "data": {
       "status": "degraded",
       "sources_validated": 11,
-      "quarantine_records": 5,
+      "quarantine_records": 6,
       "lineage_coverage_pct": 100.0
     },
     "model": {
