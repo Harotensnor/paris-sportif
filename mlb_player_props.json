@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-22T20:52:18Z",
+  "generated_at": "2026-05-22T21:55:53Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -1207,6 +1207,42 @@
       "props": [
         {
           "market": "pitcher_strikeouts",
+          "team": "New York Yankees",
+          "pitcher": "Ryan Weathers",
+          "label": "Ryan Weathers plus de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "over",
+          "probability": 0.5487,
+          "fair_odds": 1.82,
+          "expected_strikeouts": 6.75,
+          "projected_ip": 5.57,
+          "inputs": {
+            "k9": 10.91,
+            "era": 3.58,
+            "whip": 1.13,
+            "hand": "L"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "New York Yankees",
+          "pitcher": "Ryan Weathers",
+          "label": "Ryan Weathers concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5871,
+          "fair_odds": 1.7,
+          "expected_hr_allowed": 0.884,
+          "projected_ip": 5.57,
+          "inputs": {
+            "hr9": 1.43,
+            "era": 3.58,
+            "whip": 1.13
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
           "team": "Tampa Bay Rays",
           "pitcher": "Drew Rasmussen",
           "label": "Drew Rasmussen moins de 5,5 strikeouts",
@@ -1696,6 +1732,42 @@
             "whip": 1.12
           },
           "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "New York Mets",
+          "pitcher": "Freddy Peralta",
+          "label": "Freddy Peralta moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.5278,
+          "fair_odds": 1.89,
+          "expected_strikeouts": 5.37,
+          "projected_ip": 5.41,
+          "inputs": {
+            "k9": 8.94,
+            "era": 3.31,
+            "whip": 1.25,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "New York Mets",
+          "pitcher": "Freddy Peralta",
+          "label": "Freddy Peralta ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5515,
+          "fair_odds": 1.81,
+          "expected_hr_allowed": 0.595,
+          "projected_ip": 5.41,
+          "inputs": {
+            "hr9": 0.99,
+            "era": 3.31,
+            "whip": 1.25
+          },
+          "side": "away"
         }
       ]
     },
@@ -2503,6 +2575,42 @@
       "props": [
         {
           "market": "pitcher_strikeouts",
+          "team": "New York Yankees",
+          "pitcher": "Will Warren",
+          "label": "Will Warren moins de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "under",
+          "probability": 0.5674,
+          "fair_odds": 1.76,
+          "expected_strikeouts": 6.17,
+          "projected_ip": 5.21,
+          "inputs": {
+            "k9": 10.66,
+            "era": 3.61,
+            "whip": 1.18,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "New York Yankees",
+          "pitcher": "Will Warren",
+          "label": "Will Warren ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5509,
+          "fair_odds": 1.82,
+          "expected_hr_allowed": 0.596,
+          "projected_ip": 5.21,
+          "inputs": {
+            "hr9": 1.03,
+            "era": 3.61,
+            "whip": 1.18
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
           "team": "Tampa Bay Rays",
           "pitcher": "Shane McClanahan",
           "label": "Shane McClanahan moins de 5,5 strikeouts",
@@ -2534,6 +2642,52 @@
             "hr9": 0.4,
             "era": 2.82,
             "whip": 1.05
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815474",
+      "kickoff": "2026-05-24T17:40Z",
+      "league": "MLB",
+      "match": "New York Mets at Miami Marlins",
+      "home": "Miami Marlins",
+      "away": "New York Mets",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "New York Mets",
+          "pitcher": "Christian Scott",
+          "label": "Christian Scott plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.5875,
+          "fair_odds": 1.7,
+          "expected_strikeouts": 4.88,
+          "projected_ip": 3.84,
+          "inputs": {
+            "k9": 11.44,
+            "era": 4.12,
+            "whip": 1.47,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "New York Mets",
+          "pitcher": "Christian Scott",
+          "label": "Christian Scott ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.8218,
+          "fair_odds": 1.22,
+          "expected_hr_allowed": 0.196,
+          "projected_ip": 3.84,
+          "inputs": {
+            "hr9": 0.46,
+            "era": 4.12,
+            "whip": 1.47
           },
           "side": "away"
         }
@@ -3170,7 +3324,7 @@
       ]
     }
   ],
-  "props": 152,
+  "props": 160,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
