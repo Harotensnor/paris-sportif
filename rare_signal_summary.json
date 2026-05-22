@@ -1,27 +1,27 @@
 {
-  "generated_at": "2026-05-22T14:47:03Z",
+  "generated_at": "2026-05-22T14:50:21Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 70,
+    "active_events": 72,
     "actionable": 35,
-    "watch": 6,
+    "watch": 8,
     "risk": 29,
     "expired_sample": 0,
     "by_type": {
+      "market_move": 4,
       "injury_imbalance": 29,
       "signal_conflict": 6,
       "travel_extreme": 6,
       "market_uncertain": 34,
-      "market_move": 2,
       "back_to_back_travel": 21,
       "weather_extreme": 1
     },
     "by_quality": {
+      "watch": 8,
       "actionable": 35,
-      "risk": 29,
-      "watch": 6
+      "risk": 29
     }
   },
   "active_actionable": [
@@ -748,6 +748,24 @@
       "context": "Meteo dure: vent 35 km/h, pluie 0.0 mm"
     },
     {
+      "event_id": "401873416",
+      "date": "2026-05-22T17:30Z",
+      "sport": "football",
+      "league_code": "bundesligaautriche",
+      "league_name": "Bundesliga Autriche",
+      "home": "SV Josko Ried",
+      "away": "Rapid Vienna",
+      "match": "SV Josko Ried - Rapid Vienna",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.585,
+      "context": "Cote away: 2.85 -> 2.55 (+10.5%)"
+    },
+    {
       "event_id": "401815451",
       "date": "2026-05-22T23:40Z",
       "sport": "baseball",
@@ -764,6 +782,24 @@
       "side": "away",
       "strength": 0.565,
       "context": "Deplacement estime 2428 km, decalage ~1.9h"
+    },
+    {
+      "event_id": "401856927",
+      "date": "2026-05-22T23:30Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Atlanta Dream",
+      "away": "Dallas Wings",
+      "match": "Atlanta Dream - Dallas Wings",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.479,
+      "context": "Cote away: 2.90 -> 2.65 (+8.6%)"
     }
   ],
   "active_risk": [
