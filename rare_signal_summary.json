@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-05-22T09:46:20Z",
+  "generated_at": "2026-05-22T09:50:00Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 66,
+    "active_events": 67,
     "actionable": 36,
-    "watch": 7,
+    "watch": 8,
     "risk": 23,
     "expired_sample": 0,
     "by_type": {
@@ -14,11 +14,12 @@
       "injury_imbalance": 29,
       "signal_conflict": 6,
       "travel_extreme": 6,
-      "market_uncertain": 38,
-      "back_to_back_travel": 21
+      "market_uncertain": 37,
+      "back_to_back_travel": 21,
+      "weather_extreme": 1
     },
     "by_quality": {
-      "watch": 7,
+      "watch": 8,
       "actionable": 36,
       "risk": 23
     }
@@ -747,6 +748,24 @@
       "context": "Absences severes 3-0"
     },
     {
+      "event_id": "401843351",
+      "date": "2026-05-24T16:00Z",
+      "sport": "football",
+      "league_code": "eliteserien",
+      "league_name": "Eliteserien",
+      "home": "Kristiansund BK",
+      "away": "Viking FK",
+      "match": "Kristiansund BK - Viking FK",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "weather_extreme",
+      "direction": "under_goals",
+      "team": null,
+      "side": null,
+      "strength": 0.588,
+      "context": "Meteo dure: vent 35 km/h, pluie 0.0 mm"
+    },
+    {
       "event_id": "401859400",
       "date": "2026-05-22T10:30Z",
       "sport": "football",
@@ -818,7 +837,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 12.9%"
+      "context": "marge bookmaker anormale 12.1%"
     },
     {
       "event_id": "401859406",
