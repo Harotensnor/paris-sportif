@@ -1,26 +1,25 @@
 {
-  "generated_at": "2026-05-22T05:59:43Z",
+  "generated_at": "2026-05-22T06:05:01Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 64,
+    "active_events": 63,
     "actionable": 36,
-    "watch": 7,
-    "risk": 21,
+    "watch": 5,
+    "risk": 22,
     "expired_sample": 0,
     "by_type": {
-      "market_move": 7,
-      "signal_conflict": 8,
       "injury_imbalance": 29,
+      "signal_conflict": 7,
       "travel_extreme": 6,
-      "market_uncertain": 40,
-      "back_to_back_travel": 21
+      "back_to_back_travel": 22,
+      "market_uncertain": 39
     },
     "by_quality": {
-      "watch": 7,
       "actionable": 36,
-      "risk": 21
+      "risk": 22,
+      "watch": 5
     }
   },
   "active_actionable": [
@@ -113,24 +112,6 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 7-14"
-    },
-    {
-      "event_id": "401872904",
-      "date": "2026-05-23T00:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Colorado Avalanche",
-      "away": "Vegas Golden Knights",
-      "match": "Colorado Avalanche - Vegas Golden Knights",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 1.52 -> 1.84 (-21.0%)"
     },
     {
       "event_id": "401815464",
@@ -583,6 +564,24 @@
       "context": "2 match dans les 48h + 867 km de voyage"
     },
     {
+      "event_id": "401872904",
+      "date": "2026-05-23T00:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Colorado Avalanche",
+      "away": "Vegas Golden Knights",
+      "match": "Colorado Avalanche - Vegas Golden Knights",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Vegas Golden Knights",
+      "side": "away",
+      "strength": 0.726,
+      "context": "1 match dans les 48h + 979 km de voyage"
+    },
+    {
       "event_id": "401872905",
       "date": "2026-05-25T00:00Z",
       "sport": "hockey",
@@ -619,6 +618,24 @@
       "context": "1 match dans les 48h + 979 km de voyage"
     },
     {
+      "event_id": "401815454",
+      "date": "2026-05-23T01:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Arizona Diamondbacks",
+      "away": "Colorado Rockies",
+      "match": "Arizona Diamondbacks - Colorado Rockies",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Colorado Rockies",
+      "side": "away",
+      "strength": 0.719,
+      "context": "1 match dans les 48h + 943 km de voyage"
+    },
+    {
       "event_id": "401815469",
       "date": "2026-05-24T02:10Z",
       "sport": "baseball",
@@ -653,24 +670,6 @@
       "side": "away",
       "strength": 0.703,
       "context": "1 match dans les 48h + 867 km de voyage"
-    },
-    {
-      "event_id": "401863529",
-      "date": "2026-05-22T19:00Z",
-      "sport": "football",
-      "league_code": "coupedefrance",
-      "league_name": "Coupe de France",
-      "home": "Lens",
-      "away": "Nice",
-      "match": "Lens - Nice",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "draw",
-      "strength": 0.661,
-      "context": "Cote draw: 4.20 -> 4.70 (-11.9%)"
     }
   ],
   "active_watch": [
@@ -685,12 +684,12 @@
       "match": "Indiana Fever - Golden State Valkyries",
       "quality": "watch",
       "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.608,
-      "context": "Cote away: 3.20 -> 2.85 (+10.9%)"
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Golden State Valkyries",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 0-3"
     },
     {
       "event_id": "401856929",
@@ -747,24 +746,6 @@
       "context": "Absences severes 3-0"
     },
     {
-      "event_id": "401859400",
-      "date": "2026-05-22T10:30Z",
-      "sport": "football",
-      "league_code": "jleague",
-      "league_name": "J-League",
-      "home": "Machida Zelvia",
-      "away": "Urawa Red Diamonds",
-      "match": "Machida Zelvia - Urawa Red Diamonds",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "home",
-      "strength": 0.579,
-      "context": "Cote home: 2.40 -> 2.15 (+10.4%)"
-    },
-    {
       "event_id": "401815451",
       "date": "2026-05-22T23:40Z",
       "sport": "baseball",
@@ -781,24 +762,6 @@
       "side": "away",
       "strength": 0.565,
       "context": "Deplacement estime 2428 km, decalage ~1.9h"
-    },
-    {
-      "event_id": "401873416",
-      "date": "2026-05-22T17:30Z",
-      "sport": "football",
-      "league_code": "bundesligaautriche",
-      "league_name": "Bundesliga Autriche",
-      "home": "SV Josko Ried",
-      "away": "Rapid Vienna",
-      "match": "SV Josko Ried - Rapid Vienna",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.487,
-      "context": "Cote away: 2.85 -> 2.60 (+8.8%)"
     }
   ],
   "active_risk": [
@@ -947,24 +910,6 @@
       "context": "marge bookmaker anormale 18.6%"
     },
     {
-      "event_id": "401865562",
-      "date": "2026-05-27T22:00Z",
-      "sport": "football",
-      "league_code": "conmebol.libertadores",
-      "league_name": "Copa Libertadores",
-      "home": "Independiente del Valle",
-      "away": "Rosario Central",
-      "match": "Independiente del Valle - Rosario Central",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 19.2%"
-    },
-    {
       "event_id": "401865457",
       "date": "2026-05-27T22:00Z",
       "sport": "football",
@@ -999,6 +944,24 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.3%"
+    },
+    {
+      "event_id": "401865562",
+      "date": "2026-05-27T22:00Z",
+      "sport": "football",
+      "league_code": "conmebol.libertadores",
+      "league_name": "Copa Libertadores",
+      "home": "Independiente del Valle",
+      "away": "Rosario Central",
+      "match": "Independiente del Valle - Rosario Central",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 19.2%"
     },
     {
       "event_id": "401865556",
@@ -1143,6 +1106,24 @@
       "side": null,
       "strength": 0.488,
       "context": "Signaux opposes: Vegas Golden Knights fade 0.75, Colorado Avalanche fade 0.75 -> prudence"
+    },
+    {
+      "event_id": "401873345",
+      "date": "2026-05-28T00:00Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "New York Knicks",
+      "away": "Cleveland Cavaliers",
+      "match": "New York Knicks - Cleveland Cavaliers",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "signal_conflict",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.488,
+      "context": "Signaux opposes: New York Knicks fade 0.75, Cleveland Cavaliers fade 0.75 -> prudence"
     },
     {
       "event_id": "401873202",
