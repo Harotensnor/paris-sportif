@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-22T08:57:34Z",
+  "generated_at": "2026-05-22T09:08:47Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -9,16 +9,16 @@
     "by_type": {
       "lookahead": 88,
       "travel_extreme": 12,
-      "back_to_back_travel": 21,
-      "schedule_congestion": 20
+      "back_to_back_travel": 22,
+      "schedule_congestion": 24
     },
     "by_decision": {
-      "abstain": 31,
-      "lean_home": 27
+      "abstain": 30,
+      "lean_home": 28
     },
-    "lean_home": 27,
+    "lean_home": 28,
     "lean_away": 0,
-    "abstain": 31,
+    "abstain": 30,
     "monitor": 0
   },
   "active": [
@@ -405,6 +405,73 @@
         "home_fade": 0.75,
         "away_fade": 0.75,
         "reason": "Signaux opposes: Vegas Golden Knights fade 0.75, Colorado Avalanche fade 0.75 -> prudence",
+        "detail": [
+          {
+            "side": "home",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401873345",
+      "source_event_ids": [
+        "401873345"
+      ],
+      "kickoff": "2026-05-28T00:00Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "New York Knicks",
+      "away": "Cleveland Cavaliers",
+      "match": "New York Knicks - Cleveland Cavaliers",
+      "decision": "abstain",
+      "net_team": null,
+      "reason": "Fatigue/agenda des deux cotes: New York Knicks 0.75, Cleveland Cavaliers 0.75",
+      "pressure_score": 1.867,
+      "home_fade": 0.75,
+      "away_fade": 0.75,
+      "travel_score": 0,
+      "lookahead_score": 0.667,
+      "congestion_score": 1.2,
+      "types": {
+        "schedule_congestion": 2,
+        "lookahead": 2
+      },
+      "contexts": [
+        "3 matchs sur les 7 derniers jours",
+        "1 match important/proche dans les 3 jours",
+        "3 matchs sur les 7 derniers jours",
+        "1 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "abstain",
+        "net_side": null,
+        "home_score": -0.488,
+        "away_score": -0.488,
+        "home_fade": 0.75,
+        "away_fade": 0.75,
+        "reason": "Signaux opposes: New York Knicks fade 0.75, Cleveland Cavaliers fade 0.75 -> prudence",
         "detail": [
           {
             "side": "home",
@@ -1002,58 +1069,6 @@
       }
     },
     {
-      "event_id": "401815454",
-      "source_event_ids": [
-        "401815454"
-      ],
-      "kickoff": "2026-05-23T01:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Arizona Diamondbacks",
-      "away": "Colorado Rockies",
-      "match": "Arizona Diamondbacks - Colorado Rockies",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Arizona Diamondbacks 0.30, Colorado Rockies 0.30",
-      "pressure_score": 1.333,
-      "home_fade": 0.3,
-      "away_fade": 0.3,
-      "travel_score": 0,
-      "lookahead_score": 1.333,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "2 match important/proche dans les 3 jours",
-        "2 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.195,
-        "away_score": -0.195,
-        "home_fade": 0.3,
-        "away_fade": 0.3,
-        "reason": "Direction nette: Colorado Rockies (-0.20)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401873202",
       "source_event_ids": [
         "401873202"
@@ -1245,12 +1260,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "home",
-        "home_score": 0.437,
+        "net_side": "away",
+        "home_score": -0.098,
         "away_score": -0.098,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: SV Josko Ried (+0.44)",
+        "reason": "Direction nette: Rapid Vienna (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -1263,12 +1278,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.534
           }
         ]
       }
@@ -1766,58 +1775,6 @@
       }
     },
     {
-      "event_id": "401873345",
-      "source_event_ids": [
-        "401873345"
-      ],
-      "kickoff": "2026-05-28T00:00Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "New York Knicks",
-      "away": "Cleveland Cavaliers",
-      "match": "New York Knicks - Cleveland Cavaliers",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: New York Knicks 0.15, Cleveland Cavaliers 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
-        "home_fade": 0.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Cleveland Cavaliers (-0.10)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401815465",
       "source_event_ids": [
         "401815465"
@@ -2101,6 +2058,66 @@
       }
     },
     {
+      "event_id": "401815454",
+      "source_event_ids": [
+        "401815454"
+      ],
+      "kickoff": "2026-05-23T01:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Arizona Diamondbacks",
+      "away": "Colorado Rockies",
+      "match": "Arizona Diamondbacks - Colorado Rockies",
+      "decision": "lean_home",
+      "net_team": "Arizona Diamondbacks",
+      "reason": "Colorado Rockies plus penalise par calendrier/voyage (1.02 vs 0.30)",
+      "pressure_score": 2.052,
+      "home_fade": 0.3,
+      "away_fade": 1.019,
+      "travel_score": 0.719,
+      "lookahead_score": 1.333,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 2,
+        "back_to_back_travel": 1
+      },
+      "contexts": [
+        "2 match important/proche dans les 3 jours",
+        "2 match important/proche dans les 3 jours",
+        "1 match dans les 48h + 943 km de voyage"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": 0.057,
+        "away_score": -0.914,
+        "home_fade": 0.3,
+        "away_fade": 1.019,
+        "reason": "Direction nette: Arizona Diamondbacks (+0.06)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.3
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.3
+          },
+          {
+            "side": "away",
+            "type": "back_to_back_travel",
+            "direction": "fade",
+            "strength": 0.719
+          }
+        ]
+      }
+    },
+    {
       "event_id": "401815470",
       "source_event_ids": [
         "401815470"
@@ -2170,6 +2187,66 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.917
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815484",
+      "source_event_ids": [
+        "401815484"
+      ],
+      "kickoff": "2026-05-24T20:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Arizona Diamondbacks",
+      "away": "Colorado Rockies",
+      "match": "Arizona Diamondbacks - Colorado Rockies",
+      "decision": "lean_home",
+      "net_team": "Arizona Diamondbacks",
+      "reason": "Colorado Rockies plus penalise par calendrier/voyage (1.40 vs 0.60)",
+      "pressure_score": 1.999,
+      "home_fade": 0.6,
+      "away_fade": 1.399,
+      "travel_score": 0.799,
+      "lookahead_score": 0,
+      "congestion_score": 1.2,
+      "types": {
+        "schedule_congestion": 2,
+        "back_to_back_travel": 1
+      },
+      "contexts": [
+        "3 matchs sur les 7 derniers jours",
+        "3 matchs sur les 7 derniers jours",
+        "2 match dans les 48h + 943 km de voyage"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": -0.11,
+        "away_score": -1.189,
+        "home_fade": 0.6,
+        "away_fade": 1.399,
+        "reason": "Direction nette: Arizona Diamondbacks (-0.11)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "away",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "away",
+            "type": "back_to_back_travel",
+            "direction": "fade",
+            "strength": 0.799
           }
         ]
       }
@@ -2894,11 +2971,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": -0.493,
-        "away_score": -1.473,
-        "home_fade": 1.15,
-        "away_fade": 1.876,
-        "reason": "Direction nette: Colorado Avalanche (-0.49)",
+        "home_score": 0.157,
+        "away_score": -0.823,
+        "home_fade": 0.15,
+        "away_fade": 0.876,
+        "reason": "Direction nette: Colorado Avalanche (+0.16)",
         "detail": [
           {
             "side": "home",
@@ -2911,18 +2988,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
           },
           {
             "side": "away",
@@ -3320,51 +3385,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.914
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815484",
-      "source_event_ids": [
-        "401815484"
-      ],
-      "kickoff": "2026-05-24T20:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Arizona Diamondbacks",
-      "away": "Colorado Rockies",
-      "match": "Arizona Diamondbacks - Colorado Rockies",
-      "decision": "lean_home",
-      "net_team": "Arizona Diamondbacks",
-      "reason": "Colorado Rockies plus penalise par calendrier/voyage (0.80 vs 0.00)",
-      "pressure_score": 0.799,
-      "home_fade": 0.0,
-      "away_fade": 0.799,
-      "travel_score": 0.799,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "2 match dans les 48h + 943 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.28,
-        "away_score": -0.799,
-        "home_fade": 0.0,
-        "away_fade": 0.799,
-        "reason": "Direction nette: Arizona Diamondbacks (+0.28)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.799
           }
         ]
       }
