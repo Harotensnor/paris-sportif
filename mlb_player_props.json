@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-22T01:09:39Z",
+  "generated_at": "2026-05-22T01:12:09Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815440",
-      "kickoff": "2026-05-22T01:40Z",
-      "league": "MLB",
-      "match": "Colorado Rockies at Arizona Diamondbacks",
-      "home": "Arizona Diamondbacks",
-      "away": "Colorado Rockies",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Arizona Diamondbacks",
-          "pitcher": "Michael Soroka",
-          "label": "Michael Soroka moins de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "under",
-          "probability": 0.5802,
-          "fair_odds": 1.72,
-          "expected_strikeouts": 6.11,
-          "projected_ip": 5.44,
-          "inputs": {
-            "k9": 10.1,
-            "era": 3.49,
-            "whip": 1.33,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Arizona Diamondbacks",
-          "pitcher": "Michael Soroka",
-          "label": "Michael Soroka ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.643,
-          "fair_odds": 1.56,
-          "expected_hr_allowed": 0.442,
-          "projected_ip": 5.44,
-          "inputs": {
-            "hr9": 0.73,
-            "era": 3.49,
-            "whip": 1.33
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Colorado Rockies",
-          "pitcher": "Tomoyuki Sugano",
-          "label": "Tomoyuki Sugano plus de 2,5 strikeouts",
-          "line": 2.5,
-          "pick": "over",
-          "probability": 0.5851,
-          "fair_odds": 1.71,
-          "expected_strikeouts": 2.78,
-          "projected_ip": 5.22,
-          "inputs": {
-            "k9": 4.79,
-            "era": 4.02,
-            "whip": 1.26,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Colorado Rockies",
-          "pitcher": "Tomoyuki Sugano",
-          "label": "Tomoyuki Sugano concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6314,
-          "fair_odds": 1.58,
-          "expected_hr_allowed": 0.998,
-          "projected_ip": 5.22,
-          "inputs": {
-            "hr9": 1.72,
-            "era": 4.02,
-            "whip": 1.26
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815449",
       "kickoff": "2026-05-22T18:20Z",
@@ -2622,7 +2540,7 @@
       ]
     }
   ],
-  "props": 126,
+  "props": 122,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
