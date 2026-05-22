@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-05-22T04:37:38Z",
+  "generated_at": "2026-05-22T04:40:20Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 46,
-    "actionable": 33,
+    "active_events": 47,
+    "actionable": 34,
     "watch": 7,
     "risk": 6,
     "expired_sample": 0,
     "by_type": {
-      "market_move": 8,
-      "signal_conflict": 6,
+      "market_move": 10,
+      "signal_conflict": 5,
       "injury_imbalance": 27,
       "travel_extreme": 6,
-      "market_uncertain": 53,
+      "market_uncertain": 52,
       "back_to_back_travel": 20
     },
     "by_quality": {
       "watch": 7,
-      "actionable": 33,
+      "actionable": 34,
       "risk": 6
     }
   },
@@ -347,6 +347,24 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 8-13"
+    },
+    {
+      "event_id": "401873246",
+      "date": "2026-05-25T01:00Z",
+      "sport": "football",
+      "league_code": "ligamx",
+      "league_name": "Liga MX",
+      "home": "Pumas UNAM",
+      "away": "Cruz Azul",
+      "match": "Pumas UNAM - Cruz Azul",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 9.50 -> 2.60 (+72.6%)"
     },
     {
       "event_id": "401815485",
