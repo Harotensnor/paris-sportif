@@ -1,27 +1,26 @@
 {
-  "generated_at": "2026-05-22T11:03:11Z",
+  "generated_at": "2026-05-22T11:07:32Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 64,
+    "active_events": 66,
     "actionable": 36,
-    "watch": 5,
-    "risk": 23,
+    "watch": 6,
+    "risk": 24,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 29,
-      "signal_conflict": 6,
+      "signal_conflict": 7,
       "travel_extreme": 6,
-      "back_to_back_travel": 21,
+      "back_to_back_travel": 22,
       "market_uncertain": 37,
-      "weather_extreme": 1,
-      "market_move": 1
+      "weather_extreme": 1
     },
     "by_quality": {
       "actionable": 36,
-      "risk": 23,
-      "watch": 5
+      "risk": 24,
+      "watch": 6
     }
   },
   "active_actionable": [
@@ -440,24 +439,6 @@
       "context": "1 match dans les 48h + 1802 km de voyage"
     },
     {
-      "event_id": "401856944",
-      "date": "2026-05-29T02:00Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Golden State Valkyries",
-      "away": "Indiana Fever",
-      "match": "Golden State Valkyries - Indiana Fever",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "home",
-      "strength": 0.877,
-      "context": "Cote home: 2.85 -> 3.30 (-15.8%)"
-    },
-    {
       "event_id": "401815462",
       "date": "2026-05-23T17:35Z",
       "sport": "baseball",
@@ -638,6 +619,24 @@
       "context": "1 match dans les 48h + 979 km de voyage"
     },
     {
+      "event_id": "401815454",
+      "date": "2026-05-23T01:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Arizona Diamondbacks",
+      "away": "Colorado Rockies",
+      "match": "Arizona Diamondbacks - Colorado Rockies",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Colorado Rockies",
+      "side": "away",
+      "strength": 0.719,
+      "context": "1 match dans les 48h + 943 km de voyage"
+    },
+    {
       "event_id": "401815469",
       "date": "2026-05-24T02:10Z",
       "sport": "baseball",
@@ -728,6 +727,24 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 4-1"
+    },
+    {
+      "event_id": "401856944",
+      "date": "2026-05-29T02:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Golden State Valkyries",
+      "away": "Indiana Fever",
+      "match": "Golden State Valkyries - Indiana Fever",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Golden State Valkyries",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 3-0"
     },
     {
       "event_id": "401843351",
@@ -930,6 +947,24 @@
       "context": "marge bookmaker anormale 18.1%"
     },
     {
+      "event_id": "401865562",
+      "date": "2026-05-27T22:00Z",
+      "sport": "football",
+      "league_code": "conmebol.libertadores",
+      "league_name": "Copa Libertadores",
+      "home": "Independiente del Valle",
+      "away": "Rosario Central",
+      "match": "Independiente del Valle - Rosario Central",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 19.2%"
+    },
+    {
       "event_id": "401865457",
       "date": "2026-05-27T22:00Z",
       "sport": "football",
@@ -964,24 +999,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.3%"
-    },
-    {
-      "event_id": "401865562",
-      "date": "2026-05-27T22:00Z",
-      "sport": "football",
-      "league_code": "conmebol.libertadores",
-      "league_name": "Copa Libertadores",
-      "home": "Independiente del Valle",
-      "away": "Rosario Central",
-      "match": "Independiente del Valle - Rosario Central",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 19.2%"
     },
     {
       "event_id": "401865563",
@@ -1144,6 +1161,24 @@
       "side": null,
       "strength": 0.488,
       "context": "Signaux opposes: Vegas Golden Knights fade 0.75, Colorado Avalanche fade 0.75 -> prudence"
+    },
+    {
+      "event_id": "401873345",
+      "date": "2026-05-28T00:00Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "New York Knicks",
+      "away": "Cleveland Cavaliers",
+      "match": "New York Knicks - Cleveland Cavaliers",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "signal_conflict",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.488,
+      "context": "Signaux opposes: New York Knicks fade 0.75, Cleveland Cavaliers fade 0.75 -> prudence"
     },
     {
       "event_id": "401873202",
