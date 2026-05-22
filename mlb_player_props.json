@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-22T02:00:20Z",
+  "generated_at": "2026-05-22T02:04:28Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -1546,6 +1546,52 @@
       ]
     },
     {
+      "event_id": "401815463",
+      "kickoff": "2026-05-23T20:10Z",
+      "league": "MLB",
+      "match": "Washington Nationals at Atlanta Braves",
+      "home": "Atlanta Braves",
+      "away": "Washington Nationals",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Washington Nationals",
+          "pitcher": "Jake Irvin",
+          "label": "Jake Irvin moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.601,
+          "fair_odds": 1.66,
+          "expected_strikeouts": 5.05,
+          "projected_ip": 4.62,
+          "inputs": {
+            "k9": 9.84,
+            "era": 5.79,
+            "whip": 1.48,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Washington Nationals",
+          "pitcher": "Jake Irvin",
+          "label": "Jake Irvin ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5001,
+          "fair_odds": 2.0,
+          "expected_hr_allowed": 0.693,
+          "projected_ip": 4.62,
+          "inputs": {
+            "hr9": 1.35,
+            "era": 5.79,
+            "whip": 1.48
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
       "event_id": "401815466",
       "kickoff": "2026-05-23T20:10Z",
       "league": "MLB",
@@ -1788,6 +1834,52 @@
             "whip": 1.45
           },
           "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815470",
+      "kickoff": "2026-05-24T02:05Z",
+      "league": "MLB",
+      "match": "Texas Rangers at Los Angeles Angels",
+      "home": "Los Angeles Angels",
+      "away": "Texas Rangers",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Los Angeles Angels",
+          "pitcher": "Reid Detmers",
+          "label": "Reid Detmers moins de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "under",
+          "probability": 0.5825,
+          "fair_odds": 1.72,
+          "expected_strikeouts": 6.1,
+          "projected_ip": 5.5,
+          "inputs": {
+            "k9": 9.98,
+            "era": 5.07,
+            "whip": 1.29,
+            "hand": "L"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Los Angeles Angels",
+          "pitcher": "Reid Detmers",
+          "label": "Reid Detmers ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6722,
+          "fair_odds": 1.49,
+          "expected_hr_allowed": 0.397,
+          "projected_ip": 5.5,
+          "inputs": {
+            "hr9": 0.65,
+            "era": 5.07,
+            "whip": 1.29
+          },
+          "side": "home"
         }
       ]
     },
@@ -2586,6 +2678,52 @@
       ]
     },
     {
+      "event_id": "401815478",
+      "kickoff": "2026-05-24T20:10Z",
+      "league": "MLB",
+      "match": "Washington Nationals at Atlanta Braves",
+      "home": "Atlanta Braves",
+      "away": "Washington Nationals",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Washington Nationals",
+          "pitcher": "Foster Griffin",
+          "label": "Foster Griffin moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.5218,
+          "fair_odds": 1.92,
+          "expected_strikeouts": 5.4,
+          "projected_ip": 5.6,
+          "inputs": {
+            "k9": 8.68,
+            "era": 4.02,
+            "whip": 1.18,
+            "hand": "L"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Washington Nationals",
+          "pitcher": "Foster Griffin",
+          "label": "Foster Griffin concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.6328,
+          "fair_odds": 1.58,
+          "expected_hr_allowed": 1.002,
+          "projected_ip": 5.6,
+          "inputs": {
+            "hr9": 1.61,
+            "era": 4.02,
+            "whip": 1.18
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
       "event_id": "401815484",
       "kickoff": "2026-05-24T20:10Z",
       "league": "MLB",
@@ -2666,9 +2804,55 @@
           "side": "away"
         }
       ]
+    },
+    {
+      "event_id": "401815485",
+      "kickoff": "2026-05-24T23:20Z",
+      "league": "MLB",
+      "match": "Texas Rangers at Los Angeles Angels",
+      "home": "Los Angeles Angels",
+      "away": "Texas Rangers",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Los Angeles Angels",
+          "pitcher": "Reid Detmers",
+          "label": "Reid Detmers moins de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "under",
+          "probability": 0.5825,
+          "fair_odds": 1.72,
+          "expected_strikeouts": 6.1,
+          "projected_ip": 5.5,
+          "inputs": {
+            "k9": 9.98,
+            "era": 5.07,
+            "whip": 1.29,
+            "hand": "L"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Los Angeles Angels",
+          "pitcher": "Reid Detmers",
+          "label": "Reid Detmers ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6722,
+          "fair_odds": 1.49,
+          "expected_hr_allowed": 0.397,
+          "projected_ip": 5.5,
+          "inputs": {
+            "hr9": 0.65,
+            "era": 5.07,
+            "whip": 1.29
+          },
+          "side": "home"
+        }
+      ]
     }
   ],
-  "props": 128,
+  "props": 136,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
