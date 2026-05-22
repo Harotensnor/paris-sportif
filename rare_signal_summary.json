@@ -1,26 +1,27 @@
 {
-  "generated_at": "2026-05-22T12:20:15Z",
+  "generated_at": "2026-05-22T12:27:01Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 71,
     "actionable": 36,
-    "watch": 6,
-    "risk": 29,
+    "watch": 7,
+    "risk": 28,
     "expired_sample": 0,
     "by_type": {
+      "market_move": 4,
       "injury_imbalance": 29,
-      "signal_conflict": 7,
+      "signal_conflict": 6,
       "travel_extreme": 6,
-      "back_to_back_travel": 22,
-      "market_uncertain": 39,
+      "market_uncertain": 40,
+      "back_to_back_travel": 21,
       "weather_extreme": 1
     },
     "by_quality": {
+      "watch": 7,
       "actionable": 36,
-      "risk": 29,
-      "watch": 6
+      "risk": 28
     }
   },
   "active_actionable": [
@@ -113,6 +114,24 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 7-14"
+    },
+    {
+      "event_id": "401872904",
+      "date": "2026-05-23T00:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Colorado Avalanche",
+      "away": "Vegas Golden Knights",
+      "match": "Colorado Avalanche - Vegas Golden Knights",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 1.49 -> 1.84 (-23.7%)"
     },
     {
       "event_id": "401815464",
@@ -565,24 +584,6 @@
       "context": "2 match dans les 48h + 867 km de voyage"
     },
     {
-      "event_id": "401872904",
-      "date": "2026-05-23T00:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Colorado Avalanche",
-      "away": "Vegas Golden Knights",
-      "match": "Colorado Avalanche - Vegas Golden Knights",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Vegas Golden Knights",
-      "side": "away",
-      "strength": 0.726,
-      "context": "1 match dans les 48h + 979 km de voyage"
-    },
-    {
       "event_id": "401872905",
       "date": "2026-05-25T00:00Z",
       "sport": "hockey",
@@ -619,24 +620,6 @@
       "context": "1 match dans les 48h + 979 km de voyage"
     },
     {
-      "event_id": "401815454",
-      "date": "2026-05-23T01:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Arizona Diamondbacks",
-      "away": "Colorado Rockies",
-      "match": "Arizona Diamondbacks - Colorado Rockies",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Colorado Rockies",
-      "side": "away",
-      "strength": 0.719,
-      "context": "1 match dans les 48h + 943 km de voyage"
-    },
-    {
       "event_id": "401815469",
       "date": "2026-05-24T02:10Z",
       "sport": "baseball",
@@ -671,6 +654,24 @@
       "side": "away",
       "strength": 0.703,
       "context": "1 match dans les 48h + 867 km de voyage"
+    },
+    {
+      "event_id": "401856927",
+      "date": "2026-05-22T23:30Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Atlanta Dream",
+      "away": "Dallas Wings",
+      "match": "Atlanta Dream - Dallas Wings",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.67,
+      "context": "Cote away: 2.90 -> 2.55 (+12.1%)"
     }
   ],
   "active_watch": [
@@ -781,6 +782,24 @@
       "side": "away",
       "strength": 0.565,
       "context": "Deplacement estime 2428 km, decalage ~1.9h"
+    },
+    {
+      "event_id": "401873416",
+      "date": "2026-05-22T17:30Z",
+      "sport": "football",
+      "league_code": "bundesligaautriche",
+      "league_name": "Bundesliga Autriche",
+      "home": "SV Josko Ried",
+      "away": "Rapid Vienna",
+      "match": "SV Josko Ried - Rapid Vienna",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 0.524,
+      "context": "Cote home: 2.65 -> 2.40 (+9.4%)"
     }
   ],
   "active_risk": [
@@ -1251,24 +1270,6 @@
       "side": null,
       "strength": 0.488,
       "context": "Signaux opposes: Vegas Golden Knights fade 0.75, Colorado Avalanche fade 0.75 -> prudence"
-    },
-    {
-      "event_id": "401873345",
-      "date": "2026-05-28T00:00Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "New York Knicks",
-      "away": "Cleveland Cavaliers",
-      "match": "New York Knicks - Cleveland Cavaliers",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "signal_conflict",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.488,
-      "context": "Signaux opposes: New York Knicks fade 0.75, Cleveland Cavaliers fade 0.75 -> prudence"
     },
     {
       "event_id": "401873202",
