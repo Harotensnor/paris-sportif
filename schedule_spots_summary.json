@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-05-22T02:48:21Z",
+  "generated_at": "2026-05-22T02:53:05Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 60,
+    "active_events": 52,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 90,
+      "lookahead": 78,
       "travel_extreme": 12,
-      "back_to_back_travel": 23,
-      "schedule_congestion": 23
+      "back_to_back_travel": 21,
+      "schedule_congestion": 19
     },
     "by_decision": {
-      "abstain": 31,
-      "lean_home": 29
+      "abstain": 25,
+      "lean_home": 27
     },
-    "lean_home": 29,
+    "lean_home": 27,
     "lean_away": 0,
-    "abstain": 31,
+    "abstain": 25,
     "monitor": 0
   },
   "active": [
@@ -975,10 +975,10 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.195,
-        "away_score": -0.195,
+        "away_score": 0.291,
         "home_fade": 0.3,
         "away_fade": 0.3,
-        "reason": "Direction nette: Colorado Rockies (-0.20)",
+        "reason": "Direction nette: Colorado Rockies (+0.29)",
         "detail": [
           {
             "side": "home",
@@ -991,6 +991,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.3
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.486
           }
         ]
       }
@@ -1106,58 +1112,6 @@
       }
     },
     {
-      "event_id": "401873346",
-      "source_event_ids": [
-        "401873346"
-      ],
-      "kickoff": "2026-05-30T00:00Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "Cleveland Cavaliers",
-      "away": "New York Knicks",
-      "match": "Cleveland Cavaliers - New York Knicks",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Cleveland Cavaliers 0.60, New York Knicks 0.60",
-      "pressure_score": 1.2,
-      "home_fade": 0.6,
-      "away_fade": 0.6,
-      "travel_score": 0,
-      "lookahead_score": 0,
-      "congestion_score": 1.2,
-      "types": {
-        "schedule_congestion": 2
-      },
-      "contexts": [
-        "3 matchs sur les 7 derniers jours",
-        "3 matchs sur les 7 derniers jours"
-      ],
-      "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.39,
-        "away_score": -0.39,
-        "home_fade": 0.6,
-        "away_fade": 0.6,
-        "reason": "Signaux opposes: Cleveland Cavaliers fade 0.60, New York Knicks fade 0.60 -> prudence",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401873416",
       "source_event_ids": [
         "401873416"
@@ -1186,13 +1140,13 @@
         "1 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
+        "status": "mixed",
+        "net_side": null,
+        "home_score": 0.458,
+        "away_score": 0.487,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Rapid Vienna (-0.10)",
+        "reason": "Signaux mitigés: avantage net trop faible (SV Josko Ried +0.46, Rapid Vienna +0.49)",
         "detail": [
           {
             "side": "home",
@@ -1205,6 +1159,18 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.556
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.585
           }
         ]
       }
@@ -1430,64 +1396,6 @@
       }
     },
     {
-      "event_id": "401873384",
-      "source_event_ids": [
-        "401873384"
-      ],
-      "kickoff": "2026-05-23T23:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Carolina Hurricanes",
-      "away": "Montreal Canadiens",
-      "match": "Carolina Hurricanes - Montreal Canadiens",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Carolina Hurricanes 0.15, Montreal Canadiens 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -1.097,
-        "away_score": 0.252,
-        "home_fade": 1.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Montreal Canadiens (+0.25)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401815461",
       "source_event_ids": [
         "401815461"
@@ -1546,58 +1454,6 @@
       }
     },
     {
-      "event_id": "401873343",
-      "source_event_ids": [
-        "401873343"
-      ],
-      "kickoff": "2026-05-24T00:00Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "Cleveland Cavaliers",
-      "away": "New York Knicks",
-      "match": "Cleveland Cavaliers - New York Knicks",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Cleveland Cavaliers 0.15, New York Knicks 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
-        "home_fade": 0.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: New York Knicks (-0.10)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401873200",
       "source_event_ids": [
         "401873200"
@@ -1633,168 +1489,6 @@
         "home_fade": 0.15,
         "away_fade": 0.15,
         "reason": "Direction nette: Oklahoma City Thunder (-0.10)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401873344",
-      "source_event_ids": [
-        "401873344"
-      ],
-      "kickoff": "2026-05-26T00:00Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "Cleveland Cavaliers",
-      "away": "New York Knicks",
-      "match": "Cleveland Cavaliers - New York Knicks",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Cleveland Cavaliers 0.15, New York Knicks 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
-        "home_fade": 0.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: New York Knicks (-0.10)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401873385",
-      "source_event_ids": [
-        "401873385"
-      ],
-      "kickoff": "2026-05-26T00:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Montreal Canadiens",
-      "away": "Carolina Hurricanes",
-      "match": "Montreal Canadiens - Carolina Hurricanes",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Montreal Canadiens 0.15, Carolina Hurricanes 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.252,
-        "away_score": -1.097,
-        "home_fade": 0.15,
-        "away_fade": 1.15,
-        "reason": "Direction nette: Montreal Canadiens (+0.25)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401873345",
-      "source_event_ids": [
-        "401873345"
-      ],
-      "kickoff": "2026-05-28T00:00Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "New York Knicks",
-      "away": "Cleveland Cavaliers",
-      "match": "New York Knicks - Cleveland Cavaliers",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: New York Knicks 0.15, Cleveland Cavaliers 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
-        "home_fade": 0.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Cleveland Cavaliers (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -2297,72 +1991,6 @@
             "type": "travel_extreme",
             "direction": "fade",
             "strength": 0.65
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401873387",
-      "source_event_ids": [
-        "401873387"
-      ],
-      "kickoff": "2026-05-30T00:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Carolina Hurricanes",
-      "away": "Montreal Canadiens",
-      "match": "Carolina Hurricanes - Montreal Canadiens",
-      "decision": "lean_home",
-      "net_team": "Carolina Hurricanes",
-      "reason": "Montreal Canadiens plus penalise par calendrier/voyage (1.36 vs 0.60)",
-      "pressure_score": 1.962,
-      "home_fade": 0.6,
-      "away_fade": 1.362,
-      "travel_score": 0.762,
-      "lookahead_score": 0,
-      "congestion_score": 1.2,
-      "types": {
-        "schedule_congestion": 2,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "3 matchs sur les 7 derniers jours",
-        "3 matchs sur les 7 derniers jours",
-        "1 match dans les 48h + 1161 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -1.123,
-        "away_score": -0.802,
-        "home_fade": 1.6,
-        "away_fade": 1.362,
-        "reason": "Signaux opposes: Carolina Hurricanes fade 1.60, Montreal Canadiens fade 1.36 -> prudence",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.762
           }
         ]
       }
@@ -2930,72 +2558,6 @@
       }
     },
     {
-      "event_id": "401873386",
-      "source_event_ids": [
-        "401873386"
-      ],
-      "kickoff": "2026-05-28T00:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Montreal Canadiens",
-      "away": "Carolina Hurricanes",
-      "match": "Montreal Canadiens - Carolina Hurricanes",
-      "decision": "lean_home",
-      "net_team": "Montreal Canadiens",
-      "reason": "Carolina Hurricanes plus penalise par calendrier/voyage (0.91 vs 0.15)",
-      "pressure_score": 1.429,
-      "home_fade": 0.15,
-      "away_fade": 0.912,
-      "travel_score": 0.762,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours",
-        "1 match dans les 48h + 1161 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.519,
-        "away_score": -1.86,
-        "home_fade": 0.15,
-        "away_fade": 1.912,
-        "reason": "Direction nette: Montreal Canadiens (+0.52)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.762
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401872904",
       "source_event_ids": [
         "401872904"
@@ -3028,11 +2590,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.157,
-        "away_score": -0.823,
-        "home_fade": 0.15,
-        "away_fade": 0.876,
-        "reason": "Direction nette: Colorado Avalanche (+0.16)",
+        "home_score": -0.493,
+        "away_score": -1.473,
+        "home_fade": 1.15,
+        "away_fade": 1.876,
+        "reason": "Direction nette: Colorado Avalanche (-0.49)",
         "detail": [
           {
             "side": "home",
@@ -3045,6 +2607,18 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           },
           {
             "side": "away",

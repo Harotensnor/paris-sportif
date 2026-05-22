@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-22T02:48:11Z",
+  "generated_at": "2026-05-22T02:52:52Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -874,6 +874,88 @@
             "hr9": 1.65,
             "era": 3.62,
             "whip": 1.15
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815452",
+      "kickoff": "2026-05-23T01:40Z",
+      "league": "MLB",
+      "match": "Athletics Athletics at San Diego Padres",
+      "home": "San Diego Padres",
+      "away": "Athletics",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "San Diego Padres",
+          "pitcher": "Lucas Giolito",
+          "label": "Lucas Giolito moins de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "under",
+          "probability": 0.6443,
+          "fair_odds": 1.55,
+          "expected_strikeouts": 3.0,
+          "projected_ip": 5.0,
+          "inputs": {
+            "k9": 5.4,
+            "era": 5.4,
+            "whip": 0.8,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "San Diego Padres",
+          "pitcher": "Lucas Giolito",
+          "label": "Lucas Giolito ne concède pas de home run",
+          "pick": "no",
+          "probability": 1.0,
+          "fair_odds": 1.01,
+          "expected_hr_allowed": 0.0,
+          "projected_ip": 5.0,
+          "inputs": {
+            "hr9": 0.0,
+            "era": 5.4,
+            "whip": 0.8
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Athletics",
+          "pitcher": "J.T. Ginn",
+          "label": "J.T. Ginn moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.5061,
+          "fair_odds": 1.98,
+          "expected_strikeouts": 5.47,
+          "projected_ip": 6.39,
+          "inputs": {
+            "k9": 7.71,
+            "era": 2.98,
+            "whip": 1.07,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Athletics",
+          "pitcher": "J.T. Ginn",
+          "label": "J.T. Ginn concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5254,
+          "fair_odds": 1.9,
+          "expected_hr_allowed": 0.745,
+          "projected_ip": 6.39,
+          "inputs": {
+            "hr9": 1.05,
+            "era": 2.98,
+            "whip": 1.07
           },
           "side": "away"
         }
@@ -2852,7 +2934,7 @@
       ]
     }
   ],
-  "props": 136,
+  "props": 140,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
