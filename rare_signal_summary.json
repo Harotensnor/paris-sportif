@@ -1,82 +1,28 @@
 {
-  "generated_at": "2026-05-22T22:50:16Z",
+  "generated_at": "2026-05-22T23:54:00Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 73,
-    "actionable": 38,
-    "watch": 4,
-    "risk": 31,
-    "expired_sample": 1,
+    "active_events": 67,
+    "actionable": 35,
+    "watch": 2,
+    "risk": 30,
+    "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 30,
-      "signal_conflict": 7,
-      "travel_extreme": 6,
       "back_to_back_travel": 25,
+      "injury_imbalance": 24,
+      "signal_conflict": 6,
+      "travel_extreme": 4,
       "market_uncertain": 32
     },
     "by_quality": {
-      "actionable": 38,
-      "risk": 31,
-      "watch": 4
+      "actionable": 35,
+      "watch": 2,
+      "risk": 30
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401815445",
-      "date": "2026-05-22T23:07Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Toronto Blue Jays",
-      "away": "Pittsburgh Pirates",
-      "match": "Toronto Blue Jays - Pittsburgh Pirates",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Toronto Blue Jays",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 13-4"
-    },
-    {
-      "event_id": "401815444",
-      "date": "2026-05-22T23:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Miami Marlins",
-      "away": "New York Mets",
-      "match": "Miami Marlins - New York Mets",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "New York Mets",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 6-14"
-    },
-    {
-      "event_id": "401815450",
-      "date": "2026-05-22T23:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Milwaukee Brewers",
-      "away": "Los Angeles Dodgers",
-      "match": "Milwaukee Brewers - Los Angeles Dodgers",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Los Angeles Dodgers",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 7-14"
-    },
     {
       "event_id": "401873647",
       "date": "2026-05-23T17:10Z",
@@ -438,24 +384,6 @@
       "context": "1 match dans les 48h + 1521 km de voyage"
     },
     {
-      "event_id": "401815447",
-      "date": "2026-05-22T23:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "New York Yankees",
-      "away": "Tampa Bay Rays",
-      "match": "New York Yankees - Tampa Bay Rays",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Tampa Bay Rays",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 5-9"
-    },
-    {
       "event_id": "401815452",
       "date": "2026-05-23T01:40Z",
       "sport": "baseball",
@@ -472,6 +400,24 @@
       "side": null,
       "strength": 0.8,
       "context": "Absences severes 9-5"
+    },
+    {
+      "event_id": "401856929",
+      "date": "2026-05-23T02:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Seattle Storm",
+      "away": "Connecticut Sun",
+      "match": "Seattle Storm - Connecticut Sun",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Seattle Storm",
+      "side": null,
+      "strength": 0.8,
+      "context": "Absences severes 6-2"
     },
     {
       "event_id": "401815467",
@@ -728,24 +674,6 @@
       "context": "Absences severes 7-10"
     },
     {
-      "event_id": "401856929",
-      "date": "2026-05-23T02:00Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Seattle Storm",
-      "away": "Connecticut Sun",
-      "match": "Seattle Storm - Connecticut Sun",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Seattle Storm",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 5-2"
-    },
-    {
       "event_id": "401856931",
       "date": "2026-05-23T22:00Z",
       "sport": "basketball",
@@ -762,24 +690,6 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 4-1"
-    },
-    {
-      "event_id": "401815451",
-      "date": "2026-05-22T23:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Kansas City Royals",
-      "away": "Seattle Mariners",
-      "match": "Kansas City Royals - Seattle Mariners",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "travel_extreme",
-      "direction": "fade",
-      "team": "Seattle Mariners",
-      "side": "away",
-      "strength": 0.565,
-      "context": "Deplacement estime 2428 km, decalage ~1.9h"
     }
   ],
   "active_risk": [
@@ -928,24 +838,6 @@
       "context": "marge bookmaker anormale 18.3%"
     },
     {
-      "event_id": "401865465",
-      "date": "2026-05-26T22:00Z",
-      "sport": "football",
-      "league_code": "conmebol.sudamericana",
-      "league_name": "Copa Sudamericana",
-      "home": "Palestino",
-      "away": "Deportivo Riestra",
-      "match": "Palestino - Deportivo Riestra",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.6%"
-    },
-    {
       "event_id": "401865560",
       "date": "2026-05-26T22:00Z",
       "sport": "football",
@@ -962,6 +854,24 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.1%"
+    },
+    {
+      "event_id": "401865465",
+      "date": "2026-05-26T22:00Z",
+      "sport": "football",
+      "league_code": "conmebol.sudamericana",
+      "league_name": "Copa Sudamericana",
+      "home": "Palestino",
+      "away": "Deportivo Riestra",
+      "match": "Palestino - Deportivo Riestra",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.6%"
     },
     {
       "event_id": "401865554",
@@ -1234,24 +1144,6 @@
       "context": "marge bookmaker anormale 18.3%"
     },
     {
-      "event_id": "401815443",
-      "date": "2026-05-22T23:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Boston Red Sox",
-      "away": "Minnesota Twins",
-      "match": "Boston Red Sox - Minnesota Twins",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "signal_conflict",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.627,
-      "context": "Signaux opposes: Boston Red Sox fade 0.90, Minnesota Twins fade 0.78 -> prudence"
-    },
-    {
       "event_id": "401873201",
       "date": "2026-05-27T00:30Z",
       "sport": "basketball",
@@ -1342,24 +1234,5 @@
       "context": "Signaux opposes: Cleveland Cavaliers fade 0.60, New York Knicks fade 0.60 -> prudence"
     }
   ],
-  "expired_sample": [
-    {
-      "event_id": "401815446",
-      "date": "2026-05-22T22:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Cincinnati Reds",
-      "away": "St. Louis Cardinals",
-      "match": "Cincinnati Reds - St. Louis Cardinals",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Cincinnati Reds",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 8-3"
-    }
-  ]
+  "expired_sample": []
 }

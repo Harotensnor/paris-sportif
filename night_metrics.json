@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-05-22T22:50:18Z",
-  "calculated_at": "2026-05-22T22:50:18Z",
+  "generated_at": "2026-05-22T23:54:02Z",
+  "calculated_at": "2026-05-22T23:54:02Z",
   "source_of_truth": "data.js",
-  "data_generated_at": "2026-05-22T22:48:36.968521Z",
+  "data_generated_at": "2026-05-22T23:51:52.735092Z",
   "data_today_field": "2026-05-22",
   "events": {
     "total": 296,
@@ -18,7 +18,7 @@
     "starter_signals": 56,
     "clubelo": 44,
     "weather": 108,
-    "injuries": 70,
+    "injuries": 75,
     "referee": 27,
     "referee_named": 0,
     "referee_context": 27,
@@ -26,7 +26,7 @@
     "fd_calibration": 0,
     "fd_closing_odds": 0,
     "xg": 71,
-    "smart_money": 1
+    "smart_money": 0
   },
   "signal_health": {
     "referee": {
@@ -36,7 +36,7 @@
       "note": "referee is effective coverage: named referee or referee_context usable by the model."
     },
     "smart_money": {
-      "events": 1,
+      "events": 0,
       "status": "rare_event",
       "note": "Smart money is intentionally rare; low count is OK when odds movement does not confirm a strong signal."
     }
@@ -141,7 +141,7 @@
   },
   "health": {
     "status": "warning",
-    "warnings": 8,
+    "warnings": 9,
     "pipeline_drift": "warn"
   }
 }
