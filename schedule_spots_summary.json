@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-22T01:29:06Z",
+  "generated_at": "2026-05-22T01:32:56Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -10,7 +10,7 @@
       "lookahead": 82,
       "travel_extreme": 9,
       "back_to_back_travel": 19,
-      "schedule_congestion": 25
+      "schedule_congestion": 24
     },
     "by_decision": {
       "abstain": 30,
@@ -1085,8 +1085,8 @@
       "global_resolution": {
         "status": "abstain",
         "net_side": null,
-        "home_score": -0.39,
-        "away_score": 0.328,
+        "home_score": 0.239,
+        "away_score": -0.39,
         "home_fade": 0.6,
         "away_fade": 0.6,
         "reason": "Signaux opposes: Cleveland Cavaliers fade 0.60, New York Knicks fade 0.60 -> prudence",
@@ -1104,10 +1104,10 @@
             "strength": 0.6
           },
           {
-            "side": "away",
+            "side": "home",
             "type": "market_move",
             "direction": "steam",
-            "strength": 0.718
+            "strength": 0.629
           }
         ]
       }
@@ -1548,12 +1548,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": 0.621,
+        "net_side": "home",
+        "home_score": 0.531,
+        "away_score": -0.098,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: New York Knicks (+0.62)",
+        "reason": "Direction nette: Cleveland Cavaliers (+0.53)",
         "detail": [
           {
             "side": "home",
@@ -1568,10 +1568,10 @@
             "strength": 0.15
           },
           {
-            "side": "away",
+            "side": "home",
             "type": "market_move",
             "direction": "steam",
-            "strength": 0.718
+            "strength": 0.629
           }
         ]
       }
@@ -1658,12 +1658,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": 0.621,
+        "net_side": "home",
+        "home_score": 0.531,
+        "away_score": -0.098,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: New York Knicks (+0.62)",
+        "reason": "Direction nette: Cleveland Cavaliers (+0.53)",
         "detail": [
           {
             "side": "home",
@@ -1678,10 +1678,10 @@
             "strength": 0.15
           },
           {
-            "side": "away",
+            "side": "home",
             "type": "market_move",
             "direction": "steam",
-            "strength": 0.718
+            "strength": 0.629
           }
         ]
       }
@@ -1780,12 +1780,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "home",
-        "home_score": 0.621,
-        "away_score": -0.098,
+        "net_side": "away",
+        "home_score": -0.098,
+        "away_score": 0.531,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: New York Knicks (+0.62)",
+        "reason": "Direction nette: Cleveland Cavaliers (+0.53)",
         "detail": [
           {
             "side": "home",
@@ -1800,10 +1800,10 @@
             "strength": 0.15
           },
           {
-            "side": "home",
+            "side": "away",
             "type": "market_move",
             "direction": "steam",
-            "strength": 0.718
+            "strength": 0.629
           }
         ]
       }
@@ -2534,65 +2534,6 @@
       }
     },
     {
-      "event_id": "401815474",
-      "source_event_ids": [
-        "401815474"
-      ],
-      "kickoff": "2026-05-24T17:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Miami Marlins",
-      "away": "New York Mets",
-      "match": "Miami Marlins - New York Mets",
-      "decision": "lean_home",
-      "net_team": "Miami Marlins",
-      "reason": "New York Mets plus penalise par calendrier/voyage (0.96 vs 0.60)",
-      "pressure_score": 1.563,
-      "home_fade": 0.6,
-      "away_fade": 0.963,
-      "travel_score": 0.963,
-      "lookahead_score": 0,
-      "congestion_score": 0.6,
-      "types": {
-        "schedule_congestion": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "3 matchs sur les 7 derniers jours",
-        "2 match dans les 48h + 1767 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.087,
-        "away_score": -1.753,
-        "home_fade": 0.6,
-        "away_fade": 1.963,
-        "reason": "Direction nette: Miami Marlins (+0.09)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.963
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401815459",
       "source_event_ids": [
         "401815459"
@@ -3161,6 +3102,57 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.3
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815474",
+      "source_event_ids": [
+        "401815474"
+      ],
+      "kickoff": "2026-05-24T17:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Miami Marlins",
+      "away": "New York Mets",
+      "match": "Miami Marlins - New York Mets",
+      "decision": "lean_home",
+      "net_team": "Miami Marlins",
+      "reason": "New York Mets plus penalise par calendrier/voyage (0.96 vs 0.00)",
+      "pressure_score": 0.963,
+      "home_fade": 0.0,
+      "away_fade": 0.963,
+      "travel_score": 0.963,
+      "lookahead_score": 0,
+      "congestion_score": 0,
+      "types": {
+        "back_to_back_travel": 1
+      },
+      "contexts": [
+        "2 match dans les 48h + 1767 km de voyage"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": 0.687,
+        "away_score": -1.963,
+        "home_fade": 0.0,
+        "away_fade": 1.963,
+        "reason": "Direction nette: Miami Marlins (+0.69)",
+        "detail": [
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "back_to_back_travel",
+            "direction": "fade",
+            "strength": 0.963
           }
         ]
       }
