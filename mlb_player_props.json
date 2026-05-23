@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-23T17:57:13Z",
+  "generated_at": "2026-05-23T18:54:42Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815464",
-      "kickoff": "2026-05-23T18:20Z",
-      "league": "MLB",
-      "match": "Houston Astros at Chicago Cubs",
-      "home": "Chicago Cubs",
-      "away": "Houston Astros",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Chicago Cubs",
-          "pitcher": "Colin Rea",
-          "label": "Colin Rea plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.5253,
-          "fair_odds": 1.9,
-          "expected_strikeouts": 5.62,
-          "projected_ip": 6.6,
-          "inputs": {
-            "k9": 7.66,
-            "era": 4.98,
-            "whip": 1.43,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Chicago Cubs",
-          "pitcher": "Colin Rea",
-          "label": "Colin Rea concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5697,
-          "fair_odds": 1.76,
-          "expected_hr_allowed": 0.843,
-          "projected_ip": 6.6,
-          "inputs": {
-            "hr9": 1.15,
-            "era": 4.98,
-            "whip": 1.43
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Houston Astros",
-          "pitcher": "Kai-Wei Teng",
-          "label": "Kai-Wei Teng moins de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "under",
-          "probability": 0.5228,
-          "fair_odds": 1.91,
-          "expected_strikeouts": 6.39,
-          "projected_ip": 6.6,
-          "inputs": {
-            "k9": 8.71,
-            "era": 2.61,
-            "whip": 1.1,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Houston Astros",
-          "pitcher": "Kai-Wei Teng",
-          "label": "Kai-Wei Teng ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5283,
-          "fair_odds": 1.89,
-          "expected_hr_allowed": 0.638,
-          "projected_ip": 6.6,
-          "inputs": {
-            "hr9": 0.87,
-            "era": 2.61,
-            "whip": 1.1
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815460",
       "kickoff": "2026-05-23T19:07Z",
@@ -1418,36 +1336,36 @@
         {
           "market": "pitcher_strikeouts",
           "team": "Tampa Bay Rays",
-          "pitcher": "Shane McClanahan",
-          "label": "Shane McClanahan moins de 5,5 strikeouts",
+          "pitcher": "Drew Rasmussen",
+          "label": "Drew Rasmussen moins de 5,5 strikeouts",
           "line": 5.5,
           "pick": "under",
-          "probability": 0.5744,
-          "fair_odds": 1.74,
-          "expected_strikeouts": 5.17,
-          "projected_ip": 4.91,
+          "probability": 0.6125,
+          "fair_odds": 1.63,
+          "expected_strikeouts": 5.0,
+          "projected_ip": 5.33,
           "inputs": {
-            "k9": 9.47,
-            "era": 2.82,
-            "whip": 1.05,
-            "hand": "L"
+            "k9": 8.44,
+            "era": 3.19,
+            "whip": 1.0,
+            "hand": "R"
           },
           "side": "away"
         },
         {
           "market": "pitcher_home_run_allowed",
           "team": "Tampa Bay Rays",
-          "pitcher": "Shane McClanahan",
-          "label": "Shane McClanahan ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.8039,
-          "fair_odds": 1.24,
-          "expected_hr_allowed": 0.218,
-          "projected_ip": 4.91,
+          "pitcher": "Drew Rasmussen",
+          "label": "Drew Rasmussen concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5399,
+          "fair_odds": 1.85,
+          "expected_hr_allowed": 0.776,
+          "projected_ip": 5.33,
           "inputs": {
-            "hr9": 0.4,
-            "era": 2.82,
-            "whip": 1.05
+            "hr9": 1.31,
+            "era": 3.19,
+            "whip": 1.0
           },
           "side": "away"
         }
@@ -1753,6 +1671,42 @@
       "home": "Chicago Cubs",
       "away": "Houston Astros",
       "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Chicago Cubs",
+          "pitcher": "Shota Imanaga",
+          "label": "Shota Imanaga moins de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "under",
+          "probability": 0.5921,
+          "fair_odds": 1.69,
+          "expected_strikeouts": 6.05,
+          "projected_ip": 5.82,
+          "inputs": {
+            "k9": 9.36,
+            "era": 3.38,
+            "whip": 1.04,
+            "hand": "L"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Chicago Cubs",
+          "pitcher": "Shota Imanaga",
+          "label": "Shota Imanaga ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5006,
+          "fair_odds": 2.0,
+          "expected_hr_allowed": 0.692,
+          "projected_ip": 5.82,
+          "inputs": {
+            "hr9": 1.07,
+            "era": 3.38,
+            "whip": 1.04
+          },
+          "side": "home"
+        },
         {
           "market": "pitcher_strikeouts",
           "team": "Houston Astros",
@@ -2176,7 +2130,7 @@
       ]
     }
   ],
-  "props": 104,
+  "props": 102,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"

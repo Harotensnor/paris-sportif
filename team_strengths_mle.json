@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-23T17:57:45Z",
+  "generated_at": "2026-05-23T18:55:13Z",
   "method": "Full Bivariate Poisson MLE Dixon-Coles. Coordinate-descent avec golden-section search 1D. Pure Python (pas de scipy).",
   "min_matches_per_league": 40,
   "min_matches_per_team": 5,
@@ -276,35 +276,47 @@
       }
     },
     "ita.1": {
-      "n_matches": 41,
-      "n_teams": 4,
-      "gamma": 0.1147,
-      "rho": -0.1541,
-      "log_lik": -114.99,
+      "n_matches": 42,
+      "n_teams": 6,
+      "gamma": 0.1194,
+      "rho": -0.238,
+      "log_lik": -116.34,
       "iterations": 2,
       "teams": {
         "Atalanta": {
-          "alpha": 0.4725,
-          "beta": -0.1187,
-          "rank_off": 2,
+          "alpha": 0.221,
+          "beta": -0.108,
+          "rank_off": 3,
           "rank_def": 2
         },
+        "Bologna": {
+          "alpha": 0.3394,
+          "beta": 0.1962,
+          "rank_off": 2,
+          "rank_def": 5
+        },
         "Fiorentina": {
-          "alpha": -0.2659,
-          "beta": 0.3527,
-          "rank_off": 3,
+          "alpha": -0.5116,
+          "beta": 0.2508,
+          "rank_off": 5,
+          "rank_def": 6
+        },
+        "Internazionale": {
+          "alpha": 0.8015,
+          "beta": 0.1776,
+          "rank_off": 1,
           "rank_def": 4
         },
         "Lecce": {
-          "alpha": 0.4818,
-          "beta": 0.0578,
-          "rank_off": 1,
+          "alpha": 0.1478,
+          "beta": -0.0441,
+          "rank_off": 4,
           "rank_def": 3
         },
         "Pisa": {
-          "alpha": -0.6885,
-          "beta": -0.2917,
-          "rank_off": 4,
+          "alpha": -0.9981,
+          "beta": -0.4725,
+          "rank_off": 6,
           "rank_def": 1
         }
       }
