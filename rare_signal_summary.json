@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-05-22T23:54:00Z",
+  "generated_at": "2026-05-23T01:34:05Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 67,
     "actionable": 35,
-    "watch": 2,
-    "risk": 30,
+    "watch": 3,
+    "risk": 29,
     "expired_sample": 0,
     "by_type": {
-      "back_to_back_travel": 25,
-      "injury_imbalance": 24,
+      "injury_imbalance": 25,
+      "back_to_back_travel": 26,
       "signal_conflict": 6,
       "travel_extreme": 4,
       "market_uncertain": 32
     },
     "by_quality": {
+      "watch": 3,
       "actionable": 35,
-      "watch": 2,
-      "risk": 30
+      "risk": 29
     }
   },
   "active_actionable": [
@@ -240,6 +240,24 @@
       "context": "Absences severes 14-6"
     },
     {
+      "event_id": "401815553",
+      "date": "2026-05-30T20:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "New York Mets",
+      "away": "Miami Marlins",
+      "match": "New York Mets - Miami Marlins",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "New York Mets",
+      "side": null,
+      "strength": 1.0,
+      "context": "Absences severes 14-6"
+    },
+    {
       "event_id": "401815485",
       "date": "2026-05-24T23:20Z",
       "sport": "baseball",
@@ -402,24 +420,6 @@
       "context": "Absences severes 9-5"
     },
     {
-      "event_id": "401856929",
-      "date": "2026-05-23T02:00Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Seattle Storm",
-      "away": "Connecticut Sun",
-      "match": "Seattle Storm - Connecticut Sun",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Seattle Storm",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 6-2"
-    },
-    {
       "event_id": "401815467",
       "date": "2026-05-24T01:40Z",
       "sport": "baseball",
@@ -546,24 +546,6 @@
       "context": "1 match dans les 48h + 1161 km de voyage"
     },
     {
-      "event_id": "401872904",
-      "date": "2026-05-23T00:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Colorado Avalanche",
-      "away": "Vegas Golden Knights",
-      "match": "Colorado Avalanche - Vegas Golden Knights",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Vegas Golden Knights",
-      "side": "away",
-      "strength": 0.726,
-      "context": "1 match dans les 48h + 979 km de voyage"
-    },
-    {
       "event_id": "401872905",
       "date": "2026-05-25T00:00Z",
       "sport": "hockey",
@@ -595,6 +577,24 @@
       "type": "back_to_back_travel",
       "direction": "fade",
       "team": "Vegas Golden Knights",
+      "side": "away",
+      "strength": 0.726,
+      "context": "1 match dans les 48h + 979 km de voyage"
+    },
+    {
+      "event_id": "401872908",
+      "date": "2026-05-31T00:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Vegas Golden Knights",
+      "away": "Colorado Avalanche",
+      "match": "Vegas Golden Knights - Colorado Avalanche",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Colorado Avalanche",
       "side": "away",
       "strength": 0.726,
       "context": "1 match dans les 48h + 979 km de voyage"
@@ -672,6 +672,24 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 7-10"
+    },
+    {
+      "event_id": "401856929",
+      "date": "2026-05-23T02:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Seattle Storm",
+      "away": "Connecticut Sun",
+      "match": "Seattle Storm - Connecticut Sun",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Seattle Storm",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 6-3"
     },
     {
       "event_id": "401856931",
@@ -928,24 +946,6 @@
       "context": "marge bookmaker anormale 18.1%"
     },
     {
-      "event_id": "401865562",
-      "date": "2026-05-27T22:00Z",
-      "sport": "football",
-      "league_code": "conmebol.libertadores",
-      "league_name": "Copa Libertadores",
-      "home": "Independiente del Valle",
-      "away": "Rosario Central",
-      "match": "Independiente del Valle - Rosario Central",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 19.2%"
-    },
-    {
       "event_id": "401865453",
       "date": "2026-05-27T22:00Z",
       "sport": "football",
@@ -998,6 +998,24 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.3%"
+    },
+    {
+      "event_id": "401865562",
+      "date": "2026-05-27T22:00Z",
+      "sport": "football",
+      "league_code": "conmebol.libertadores",
+      "league_name": "Copa Libertadores",
+      "home": "Independiente del Valle",
+      "away": "Rosario Central",
+      "match": "Independiente del Valle - Rosario Central",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 19.2%"
     },
     {
       "event_id": "401865564",
@@ -1144,42 +1162,6 @@
       "context": "marge bookmaker anormale 18.3%"
     },
     {
-      "event_id": "401873201",
-      "date": "2026-05-27T00:30Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "Oklahoma City Thunder",
-      "away": "San Antonio Spurs",
-      "match": "Oklahoma City Thunder - San Antonio Spurs",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "signal_conflict",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.488,
-      "context": "Signaux opposes: Oklahoma City Thunder fade 0.75, San Antonio Spurs fade 0.75 -> prudence"
-    },
-    {
-      "event_id": "401872906",
-      "date": "2026-05-27T01:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Vegas Golden Knights",
-      "away": "Colorado Avalanche",
-      "match": "Vegas Golden Knights - Colorado Avalanche",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "signal_conflict",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.488,
-      "context": "Signaux opposes: Vegas Golden Knights fade 0.75, Colorado Avalanche fade 0.75 -> prudence"
-    },
-    {
       "event_id": "401873345",
       "date": "2026-05-28T00:00Z",
       "sport": "basketball",
@@ -1212,8 +1194,8 @@
       "direction": "abstain",
       "team": null,
       "side": null,
-      "strength": 0.45,
-      "context": "Signaux opposes: San Antonio Spurs fade 0.60, Oklahoma City Thunder fade 0.60 -> prudence"
+      "strength": 0.488,
+      "context": "Signaux opposes: San Antonio Spurs fade 0.75, Oklahoma City Thunder fade 0.75 -> prudence"
     },
     {
       "event_id": "401873346",
@@ -1232,6 +1214,24 @@
       "side": null,
       "strength": 0.45,
       "context": "Signaux opposes: Cleveland Cavaliers fade 0.60, New York Knicks fade 0.60 -> prudence"
+    },
+    {
+      "event_id": "401873203",
+      "date": "2026-05-31T00:00Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "Oklahoma City Thunder",
+      "away": "San Antonio Spurs",
+      "match": "Oklahoma City Thunder - San Antonio Spurs",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "signal_conflict",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.45,
+      "context": "Signaux opposes: Oklahoma City Thunder fade 0.60, San Antonio Spurs fade 0.60 -> prudence"
     }
   ],
   "expired_sample": []

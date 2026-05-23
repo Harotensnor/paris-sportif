@@ -1,22 +1,22 @@
 {
-  "generated_at": "2026-05-22T23:54:00Z",
+  "generated_at": "2026-05-23T01:34:05Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 52,
+    "active_events": 53,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 72,
-      "back_to_back_travel": 25,
+      "lookahead": 74,
       "travel_extreme": 9,
-      "schedule_congestion": 30
+      "back_to_back_travel": 26,
+      "schedule_congestion": 32
     },
     "by_decision": {
       "abstain": 24,
-      "lean_home": 28
+      "lean_home": 29
     },
-    "lean_home": 28,
+    "lean_home": 29,
     "lean_away": 0,
     "abstain": 24,
     "monitor": 0
@@ -300,140 +300,6 @@
       }
     },
     {
-      "event_id": "401873201",
-      "source_event_ids": [
-        "401873201"
-      ],
-      "kickoff": "2026-05-27T00:30Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "Oklahoma City Thunder",
-      "away": "San Antonio Spurs",
-      "match": "Oklahoma City Thunder - San Antonio Spurs",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Oklahoma City Thunder 0.75, San Antonio Spurs 0.75",
-      "pressure_score": 1.867,
-      "home_fade": 0.75,
-      "away_fade": 0.75,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 1.2,
-      "types": {
-        "schedule_congestion": 2,
-        "lookahead": 2
-      },
-      "contexts": [
-        "3 matchs sur les 7 derniers jours",
-        "1 match important/proche dans les 3 jours",
-        "3 matchs sur les 7 derniers jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.488,
-        "away_score": -0.488,
-        "home_fade": 0.75,
-        "away_fade": 0.75,
-        "reason": "Signaux opposes: Oklahoma City Thunder fade 0.75, San Antonio Spurs fade 0.75 -> prudence",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401872906",
-      "source_event_ids": [
-        "401872906"
-      ],
-      "kickoff": "2026-05-27T01:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Vegas Golden Knights",
-      "away": "Colorado Avalanche",
-      "match": "Vegas Golden Knights - Colorado Avalanche",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Vegas Golden Knights 0.75, Colorado Avalanche 0.75",
-      "pressure_score": 1.867,
-      "home_fade": 0.75,
-      "away_fade": 0.75,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 1.2,
-      "types": {
-        "schedule_congestion": 2,
-        "lookahead": 2
-      },
-      "contexts": [
-        "3 matchs sur les 7 derniers jours",
-        "1 match important/proche dans les 3 jours",
-        "3 matchs sur les 7 derniers jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.488,
-        "away_score": -0.488,
-        "home_fade": 0.75,
-        "away_fade": 0.75,
-        "reason": "Signaux opposes: Vegas Golden Knights fade 0.75, Colorado Avalanche fade 0.75 -> prudence",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401873345",
       "source_event_ids": [
         "401873345"
@@ -496,6 +362,146 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401873202",
+      "source_event_ids": [
+        "401873202"
+      ],
+      "kickoff": "2026-05-29T00:30Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "San Antonio Spurs",
+      "away": "Oklahoma City Thunder",
+      "match": "San Antonio Spurs - Oklahoma City Thunder",
+      "decision": "abstain",
+      "net_team": null,
+      "reason": "Fatigue/agenda des deux cotes: San Antonio Spurs 0.75, Oklahoma City Thunder 0.75",
+      "pressure_score": 1.867,
+      "home_fade": 0.75,
+      "away_fade": 0.75,
+      "travel_score": 0,
+      "lookahead_score": 0.667,
+      "congestion_score": 1.2,
+      "types": {
+        "schedule_congestion": 2,
+        "lookahead": 2
+      },
+      "contexts": [
+        "3 matchs sur les 7 derniers jours",
+        "1 match important/proche dans les 3 jours",
+        "3 matchs sur les 7 derniers jours",
+        "1 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "abstain",
+        "net_side": null,
+        "home_score": -0.488,
+        "away_score": -0.488,
+        "home_fade": 0.75,
+        "away_fade": 0.75,
+        "reason": "Signaux opposes: San Antonio Spurs fade 0.75, Oklahoma City Thunder fade 0.75 -> prudence",
+        "detail": [
+          {
+            "side": "home",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815538",
+      "source_event_ids": [
+        "401815538"
+      ],
+      "kickoff": "2026-05-29T23:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "New York Mets",
+      "away": "Miami Marlins",
+      "match": "New York Mets - Miami Marlins",
+      "decision": "abstain",
+      "net_team": null,
+      "reason": "Fatigue/agenda des deux cotes: New York Mets 0.75, Miami Marlins 0.75",
+      "pressure_score": 1.867,
+      "home_fade": 0.75,
+      "away_fade": 0.75,
+      "travel_score": 0,
+      "lookahead_score": 0.667,
+      "congestion_score": 1.2,
+      "types": {
+        "schedule_congestion": 2,
+        "lookahead": 2
+      },
+      "contexts": [
+        "3 matchs sur les 7 derniers jours",
+        "1 match important/proche dans les 3 jours",
+        "3 matchs sur les 7 derniers jours",
+        "1 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "away",
+        "home_score": -1.488,
+        "away_score": -0.138,
+        "home_fade": 1.75,
+        "away_fade": 0.75,
+        "reason": "Direction nette: Miami Marlins (-0.14)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 1.0
           }
         ]
       }
@@ -727,116 +733,6 @@
       }
     },
     {
-      "event_id": "401873202",
-      "source_event_ids": [
-        "401873202"
-      ],
-      "kickoff": "2026-05-29T00:30Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "San Antonio Spurs",
-      "away": "Oklahoma City Thunder",
-      "match": "San Antonio Spurs - Oklahoma City Thunder",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: San Antonio Spurs 0.60, Oklahoma City Thunder 0.60",
-      "pressure_score": 1.2,
-      "home_fade": 0.6,
-      "away_fade": 0.6,
-      "travel_score": 0,
-      "lookahead_score": 0,
-      "congestion_score": 1.2,
-      "types": {
-        "schedule_congestion": 2
-      },
-      "contexts": [
-        "3 matchs sur les 7 derniers jours",
-        "3 matchs sur les 7 derniers jours"
-      ],
-      "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.39,
-        "away_score": -0.39,
-        "home_fade": 0.6,
-        "away_fade": 0.6,
-        "reason": "Signaux opposes: San Antonio Spurs fade 0.60, Oklahoma City Thunder fade 0.60 -> prudence",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815538",
-      "source_event_ids": [
-        "401815538"
-      ],
-      "kickoff": "2026-05-29T23:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "New York Mets",
-      "away": "Miami Marlins",
-      "match": "New York Mets - Miami Marlins",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: New York Mets 0.60, Miami Marlins 0.60",
-      "pressure_score": 1.2,
-      "home_fade": 0.6,
-      "away_fade": 0.6,
-      "travel_score": 0,
-      "lookahead_score": 0,
-      "congestion_score": 1.2,
-      "types": {
-        "schedule_congestion": 2
-      },
-      "contexts": [
-        "3 matchs sur les 7 derniers jours",
-        "3 matchs sur les 7 derniers jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -1.39,
-        "away_score": -0.04,
-        "home_fade": 1.6,
-        "away_fade": 0.6,
-        "reason": "Direction nette: Miami Marlins (-0.04)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401873346",
       "source_event_ids": [
         "401873346"
@@ -889,53 +785,53 @@
       }
     },
     {
-      "event_id": "401873199",
+      "event_id": "401873203",
       "source_event_ids": [
-        "401873199"
+        "401873203"
       ],
-      "kickoff": "2026-05-23T00:30Z",
+      "kickoff": "2026-05-31T00:00Z",
       "sport": "basketball",
       "league_code": "nba",
       "league_name": "NBA",
-      "home": "San Antonio Spurs",
-      "away": "Oklahoma City Thunder",
-      "match": "San Antonio Spurs - Oklahoma City Thunder",
+      "home": "Oklahoma City Thunder",
+      "away": "San Antonio Spurs",
+      "match": "Oklahoma City Thunder - San Antonio Spurs",
       "decision": "abstain",
       "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: San Antonio Spurs 0.15, Oklahoma City Thunder 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
+      "reason": "Fatigue/agenda des deux cotes: Oklahoma City Thunder 0.60, San Antonio Spurs 0.60",
+      "pressure_score": 1.2,
+      "home_fade": 0.6,
+      "away_fade": 0.6,
       "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
+      "lookahead_score": 0,
+      "congestion_score": 1.2,
       "types": {
-        "lookahead": 2
+        "schedule_congestion": 2
       },
       "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
+        "3 matchs sur les 7 derniers jours",
+        "3 matchs sur les 7 derniers jours"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
-        "home_fade": 0.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Oklahoma City Thunder (-0.10)",
+        "status": "abstain",
+        "net_side": null,
+        "home_score": -0.39,
+        "away_score": -0.39,
+        "home_fade": 0.6,
+        "away_fade": 0.6,
+        "reason": "Signaux opposes: Oklahoma City Thunder fade 0.60, San Antonio Spurs fade 0.60 -> prudence",
         "detail": [
           {
             "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
           },
           {
             "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
           }
         ]
       }
@@ -1439,6 +1335,110 @@
       }
     },
     {
+      "event_id": "401873201",
+      "source_event_ids": [
+        "401873201"
+      ],
+      "kickoff": "2026-05-27T00:30Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "Oklahoma City Thunder",
+      "away": "San Antonio Spurs",
+      "match": "Oklahoma City Thunder - San Antonio Spurs",
+      "decision": "abstain",
+      "net_team": null,
+      "reason": "Fatigue/agenda des deux cotes: Oklahoma City Thunder 0.15, San Antonio Spurs 0.15",
+      "pressure_score": 0.667,
+      "home_fade": 0.15,
+      "away_fade": 0.15,
+      "travel_score": 0,
+      "lookahead_score": 0.667,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 2
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours",
+        "1 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "away",
+        "home_score": -0.098,
+        "away_score": -0.098,
+        "home_fade": 0.15,
+        "away_fade": 0.15,
+        "reason": "Direction nette: San Antonio Spurs (-0.10)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401872906",
+      "source_event_ids": [
+        "401872906"
+      ],
+      "kickoff": "2026-05-27T01:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Vegas Golden Knights",
+      "away": "Colorado Avalanche",
+      "match": "Vegas Golden Knights - Colorado Avalanche",
+      "decision": "abstain",
+      "net_team": null,
+      "reason": "Fatigue/agenda des deux cotes: Vegas Golden Knights 0.15, Colorado Avalanche 0.15",
+      "pressure_score": 0.667,
+      "home_fade": 0.15,
+      "away_fade": 0.15,
+      "travel_score": 0,
+      "lookahead_score": 0.667,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 2
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours",
+        "1 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "away",
+        "home_score": -0.098,
+        "away_score": -0.098,
+        "home_fade": 0.15,
+        "away_fade": 0.15,
+        "reason": "Direction nette: Colorado Avalanche (-0.10)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          }
+        ]
+      }
+    },
+    {
       "event_id": "401873386",
       "source_event_ids": [
         "401873386"
@@ -1508,6 +1508,80 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.762
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401872907",
+      "source_event_ids": [
+        "401872907"
+      ],
+      "kickoff": "2026-05-29T00:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Colorado Avalanche",
+      "away": "Vegas Golden Knights",
+      "match": "Colorado Avalanche - Vegas Golden Knights",
+      "decision": "lean_home",
+      "net_team": "Colorado Avalanche",
+      "reason": "Vegas Golden Knights plus penalise par calendrier/voyage (1.48 vs 0.75)",
+      "pressure_score": 2.592,
+      "home_fade": 0.75,
+      "away_fade": 1.476,
+      "travel_score": 0.726,
+      "lookahead_score": 0.667,
+      "congestion_score": 1.2,
+      "types": {
+        "schedule_congestion": 2,
+        "lookahead": 2,
+        "back_to_back_travel": 1
+      },
+      "contexts": [
+        "3 matchs sur les 7 derniers jours",
+        "1 match important/proche dans les 3 jours",
+        "3 matchs sur les 7 derniers jours",
+        "1 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": -0.233,
+        "away_score": -1.213,
+        "home_fade": 0.75,
+        "away_fade": 1.476,
+        "reason": "Direction nette: Colorado Avalanche (-0.23)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "back_to_back_travel",
+            "direction": "fade",
+            "strength": 0.726
           }
         ]
       }
@@ -1724,6 +1798,72 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 1.0
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815553",
+      "source_event_ids": [
+        "401815553"
+      ],
+      "kickoff": "2026-05-30T20:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "New York Mets",
+      "away": "Miami Marlins",
+      "match": "New York Mets - Miami Marlins",
+      "decision": "lean_home",
+      "net_team": "New York Mets",
+      "reason": "Miami Marlins plus penalise par calendrier/voyage (1.48 vs 0.60)",
+      "pressure_score": 2.083,
+      "home_fade": 0.6,
+      "away_fade": 1.483,
+      "travel_score": 0.883,
+      "lookahead_score": 0,
+      "congestion_score": 1.2,
+      "types": {
+        "schedule_congestion": 2,
+        "back_to_back_travel": 1
+      },
+      "contexts": [
+        "3 matchs sur les 7 derniers jours",
+        "3 matchs sur les 7 derniers jours",
+        "1 match dans les 48h + 1767 km de voyage"
+      ],
+      "global_resolution": {
+        "status": "abstain",
+        "net_side": null,
+        "home_score": -1.081,
+        "away_score": -0.923,
+        "home_fade": 1.6,
+        "away_fade": 1.483,
+        "reason": "Signaux opposes: New York Mets fade 1.60, Miami Marlins fade 1.48 -> prudence",
+        "detail": [
+          {
+            "side": "home",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "away",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "back_to_back_travel",
+            "direction": "fade",
+            "strength": 0.883
           }
         ]
       }
@@ -2050,20 +2190,20 @@
       }
     },
     {
-      "event_id": "401872907",
+      "event_id": "401872908",
       "source_event_ids": [
-        "401872907"
+        "401872908"
       ],
-      "kickoff": "2026-05-29T00:00Z",
+      "kickoff": "2026-05-31T00:00Z",
       "sport": "hockey",
       "league_code": "nhl",
       "league_name": "NHL",
-      "home": "Colorado Avalanche",
-      "away": "Vegas Golden Knights",
-      "match": "Colorado Avalanche - Vegas Golden Knights",
+      "home": "Vegas Golden Knights",
+      "away": "Colorado Avalanche",
+      "match": "Vegas Golden Knights - Colorado Avalanche",
       "decision": "lean_home",
-      "net_team": "Colorado Avalanche",
-      "reason": "Vegas Golden Knights plus penalise par calendrier/voyage (1.33 vs 0.60)",
+      "net_team": "Vegas Golden Knights",
+      "reason": "Colorado Avalanche plus penalise par calendrier/voyage (1.33 vs 0.60)",
       "pressure_score": 1.926,
       "home_fade": 0.6,
       "away_fade": 1.326,
@@ -2086,7 +2226,7 @@
         "away_score": -1.116,
         "home_fade": 0.6,
         "away_fade": 1.326,
-        "reason": "Direction nette: Colorado Avalanche (-0.14)",
+        "reason": "Direction nette: Vegas Golden Knights (-0.14)",
         "detail": [
           {
             "side": "home",
@@ -2600,66 +2740,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.762
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401872904",
-      "source_event_ids": [
-        "401872904"
-      ],
-      "kickoff": "2026-05-23T00:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Colorado Avalanche",
-      "away": "Vegas Golden Knights",
-      "match": "Colorado Avalanche - Vegas Golden Knights",
-      "decision": "lean_home",
-      "net_team": "Colorado Avalanche",
-      "reason": "Vegas Golden Knights plus penalise par calendrier/voyage (0.88 vs 0.15)",
-      "pressure_score": 1.392,
-      "home_fade": 0.15,
-      "away_fade": 0.876,
-      "travel_score": 0.726,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours",
-        "1 match dans les 48h + 979 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.157,
-        "away_score": -0.823,
-        "home_fade": 0.15,
-        "away_fade": 0.876,
-        "reason": "Direction nette: Colorado Avalanche (+0.16)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.726
           }
         ]
       }
