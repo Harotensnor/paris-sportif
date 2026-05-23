@@ -1,64 +1,46 @@
 {
-  "generated_at": "2026-05-23T21:37:35Z",
+  "generated_at": "2026-05-23T23:34:21Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 58,
-    "actionable": 27,
-    "watch": 5,
+    "active_events": 57,
+    "actionable": 25,
+    "watch": 6,
     "risk": 26,
     "expired_sample": 0,
     "by_type": {
-      "market_uncertain": 24,
-      "market_move": 9,
-      "back_to_back_travel": 15,
-      "injury_imbalance": 22,
-      "travel_extreme": 3,
-      "signal_conflict": 7
+      "market_move": 7,
+      "injury_imbalance": 20,
+      "signal_conflict": 6,
+      "market_uncertain": 23,
+      "back_to_back_travel": 14,
+      "travel_extreme": 2
     },
     "by_quality": {
-      "actionable": 27,
-      "watch": 5,
+      "watch": 6,
+      "actionable": 25,
       "risk": 26
     }
   },
   "active_actionable": [
     {
-      "event_id": "401873384",
-      "date": "2026-05-23T23:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Carolina Hurricanes",
-      "away": "Montreal Canadiens",
-      "match": "Carolina Hurricanes - Montreal Canadiens",
+      "event_id": "401856932",
+      "date": "2026-05-24T00:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Las Vegas Aces",
+      "away": "Los Angeles Sparks",
+      "match": "Las Vegas Aces - Los Angeles Sparks",
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
       "type": "market_move",
-      "direction": "drift",
+      "direction": "steam",
       "team": null,
-      "side": "home",
+      "side": "away",
       "strength": 1.0,
-      "context": "Cote home: 1.49 -> 1.78 (-19.6%)"
-    },
-    {
-      "event_id": "401815465",
-      "date": "2026-05-23T23:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Milwaukee Brewers",
-      "away": "Los Angeles Dodgers",
-      "match": "Milwaukee Brewers - Los Angeles Dodgers",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Los Angeles Dodgers",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 7-14"
+      "context": "Cote away: 4.30 -> 3.50 (+18.6%)"
     },
     {
       "event_id": "401815475",
@@ -257,24 +239,6 @@
       "side": "away",
       "strength": 0.89,
       "context": "1 match dans les 48h + 1802 km de voyage"
-    },
-    {
-      "event_id": "401815461",
-      "date": "2026-05-23T23:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Cincinnati Reds",
-      "away": "St. Louis Cardinals",
-      "match": "Cincinnati Reds - St. Louis Cardinals",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Cincinnati Reds",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 7-3"
     },
     {
       "event_id": "401815467",
@@ -601,6 +565,24 @@
       "side": "away",
       "strength": 0.556,
       "context": "Cote away: 2.50 -> 2.25 (+10.0%)"
+    },
+    {
+      "event_id": "401873343",
+      "date": "2026-05-24T00:00Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "Cleveland Cavaliers",
+      "away": "New York Knicks",
+      "match": "Cleveland Cavaliers - New York Knicks",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.471,
+      "context": "Cote away: 2.24 -> 2.05 (+8.5%)"
     }
   ],
   "active_risk": [
