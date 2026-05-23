@@ -1,5 +1,68 @@
 {
-  "generated_at": "2026-05-22T07:34:50Z",
-  "status": "skipped",
-  "series": []
+  "generated_at": "2026-05-23T06:27:22Z",
+  "schema": "bankroll_simulation_v1",
+  "start_bankroll": 1000.0,
+  "final_bankroll": 1007.85,
+  "profit": 7.85,
+  "roi_pct": 0.78,
+  "n_picks": 4,
+  "n_staked": 3,
+  "staked_total": 74.32,
+  "max_drawdown": 46.92,
+  "max_drawdown_pct": 4.69,
+  "sharpe_per_pick": 0.073,
+  "series": [
+    {
+      "i": 1,
+      "id": "401873416",
+      "date": "2026-05-22T17:30Z",
+      "sport": "football",
+      "tier": "skip",
+      "cote": 2.3,
+      "pick_prob": 0.3713,
+      "stake": 0.0,
+      "pnl": 0.0,
+      "bankroll": 1000.0,
+      "drawdown_pct": 0.0
+    },
+    {
+      "i": 2,
+      "id": "401815449",
+      "date": "2026-05-22T18:20Z",
+      "sport": "baseball",
+      "tier": "standard",
+      "cote": 1.66,
+      "pick_prob": 0.677,
+      "stake": 46.92,
+      "pnl": -46.92,
+      "bankroll": 953.08,
+      "drawdown_pct": 4.69
+    },
+    {
+      "i": 3,
+      "id": "737161",
+      "date": "2026-05-22T18:45Z",
+      "sport": "football",
+      "tier": "skip",
+      "cote": 3.5,
+      "pick_prob": 0.3474,
+      "stake": 20.57,
+      "pnl": 51.42,
+      "bankroll": 1004.5,
+      "drawdown_pct": 0.0
+    },
+    {
+      "i": 4,
+      "id": "401863529",
+      "date": "2026-05-22T19:00Z",
+      "sport": "football",
+      "tier": "skip",
+      "cote": 1.49,
+      "pick_prob": 0.6801,
+      "stake": 6.83,
+      "pnl": 3.35,
+      "bankroll": 1007.85,
+      "drawdown_pct": 0.0
+    }
+  ]
 }
