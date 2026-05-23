@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-05-23T14:07:10Z",
+  "generated_at": "2026-05-23T15:05:25Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 61,
+    "active_events": 68,
     "actionable": 33,
-    "watch": 3,
-    "risk": 25,
+    "watch": 7,
+    "risk": 28,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 24,
+      "injury_imbalance": 28,
       "back_to_back_travel": 25,
       "signal_conflict": 6,
       "travel_extreme": 4,
-      "market_uncertain": 21
+      "market_uncertain": 24
     },
     "by_quality": {
       "actionable": 33,
-      "watch": 3,
-      "risk": 25
+      "watch": 7,
+      "risk": 28
     }
   },
   "active_actionable": [
@@ -656,6 +656,60 @@
       "context": "Absences severes 4-1"
     },
     {
+      "event_id": "401815492",
+      "date": "2026-05-25T18:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Chicago White Sox",
+      "away": "Minnesota Twins",
+      "match": "Chicago White Sox - Minnesota Twins",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Chicago White Sox",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 10-7"
+    },
+    {
+      "event_id": "401815507",
+      "date": "2026-05-26T23:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Chicago White Sox",
+      "away": "Minnesota Twins",
+      "match": "Chicago White Sox - Minnesota Twins",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Chicago White Sox",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 10-7"
+    },
+    {
+      "event_id": "401815522",
+      "date": "2026-05-27T23:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Chicago White Sox",
+      "away": "Minnesota Twins",
+      "match": "Chicago White Sox - Minnesota Twins",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Chicago White Sox",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 10-7"
+    },
+    {
       "event_id": "401856942",
       "date": "2026-05-28T02:00Z",
       "sport": "basketball",
@@ -672,6 +726,24 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 4-1"
+    },
+    {
+      "event_id": "401815534",
+      "date": "2026-05-28T18:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Chicago White Sox",
+      "away": "Minnesota Twins",
+      "match": "Chicago White Sox - Minnesota Twins",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Chicago White Sox",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 10-7"
     }
   ],
   "active_risk": [
@@ -892,14 +964,14 @@
       "context": "marge bookmaker anormale 19.2%"
     },
     {
-      "event_id": "401865553",
-      "date": "2026-05-29T00:30Z",
+      "event_id": "401865557",
+      "date": "2026-05-28T22:00Z",
       "sport": "football",
       "league_code": "conmebol.libertadores",
       "league_name": "Copa Libertadores",
-      "home": "Cruzeiro",
-      "away": "Barcelona SC",
-      "match": "Cruzeiro - Barcelona SC",
+      "home": "Palmeiras",
+      "away": "Atlético Junior",
+      "match": "Palmeiras - Atlético Junior",
       "quality": "risk",
       "quality_reason": "Signal de prudence, pas une opportunite directe",
       "type": "market_uncertain",
@@ -907,7 +979,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.3%"
+      "context": "marge bookmaker anormale 18.5%"
     },
     {
       "event_id": "401865451",
@@ -944,6 +1016,42 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.0%"
+    },
+    {
+      "event_id": "401865553",
+      "date": "2026-05-29T00:30Z",
+      "sport": "football",
+      "league_code": "conmebol.libertadores",
+      "league_name": "Copa Libertadores",
+      "home": "Cruzeiro",
+      "away": "Barcelona SC",
+      "match": "Cruzeiro - Barcelona SC",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.3%"
+    },
+    {
+      "event_id": "401842737",
+      "date": "2026-05-29T17:00Z",
+      "sport": "football",
+      "league_code": "allsvenskan",
+      "league_name": "Allsvenskan",
+      "home": "Örgryte IS",
+      "away": "IF Elfsborg",
+      "match": "Örgryte IS - IF Elfsborg",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.8%"
     },
     {
       "event_id": "401843360",
@@ -1000,24 +1108,6 @@
       "context": "marge bookmaker anormale 18.7%"
     },
     {
-      "event_id": "401842737",
-      "date": "2026-05-29T17:00Z",
-      "sport": "football",
-      "league_code": "allsvenskan",
-      "league_name": "Allsvenskan",
-      "home": "Örgryte IS",
-      "away": "IF Elfsborg",
-      "match": "Örgryte IS - IF Elfsborg",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.8%"
-    },
-    {
       "event_id": "401842730",
       "date": "2026-05-30T13:00Z",
       "sport": "football",
@@ -1052,6 +1142,42 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.7%"
+    },
+    {
+      "event_id": "401843361",
+      "date": "2026-05-30T14:00Z",
+      "sport": "football",
+      "league_code": "eliteserien",
+      "league_name": "Eliteserien",
+      "home": "Molde",
+      "away": "Sandefjord",
+      "match": "Molde - Sandefjord",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.7%"
+    },
+    {
+      "event_id": "748977",
+      "date": "2026-05-30T14:15Z",
+      "sport": "football",
+      "league_code": "laliga2",
+      "league_name": "La Liga 2",
+      "home": "Ceuta",
+      "away": "Albacete",
+      "match": "Ceuta - Albacete",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 20.2%"
     },
     {
       "event_id": "401873345",
