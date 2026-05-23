@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-23T18:54:42Z",
+  "generated_at": "2026-05-23T19:58:37Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815460",
-      "kickoff": "2026-05-23T19:07Z",
-      "league": "MLB",
-      "match": "Pittsburgh Pirates at Toronto Blue Jays",
-      "home": "Toronto Blue Jays",
-      "away": "Pittsburgh Pirates",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Toronto Blue Jays",
-          "pitcher": "Patrick Corbin",
-          "label": "Patrick Corbin moins de 3,5 strikeouts",
-          "line": 3.5,
-          "pick": "under",
-          "probability": 0.6127,
-          "fair_odds": 1.63,
-          "expected_strikeouts": 3.11,
-          "projected_ip": 4.76,
-          "inputs": {
-            "k9": 5.87,
-            "era": 4.23,
-            "whip": 1.49,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Toronto Blue Jays",
-          "pitcher": "Patrick Corbin",
-          "label": "Patrick Corbin ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6081,
-          "fair_odds": 1.64,
-          "expected_hr_allowed": 0.497,
-          "projected_ip": 4.76,
-          "inputs": {
-            "hr9": 0.94,
-            "era": 4.23,
-            "whip": 1.49
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Pittsburgh Pirates",
-          "pitcher": "Paul Skenes",
-          "label": "Paul Skenes moins de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "under",
-          "probability": 0.5406,
-          "fair_odds": 1.85,
-          "expected_strikeouts": 6.3,
-          "projected_ip": 5.5,
-          "inputs": {
-            "k9": 10.31,
-            "era": 2.62,
-            "whip": 0.71,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Pittsburgh Pirates",
-          "pitcher": "Paul Skenes",
-          "label": "Paul Skenes ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6059,
-          "fair_odds": 1.65,
-          "expected_hr_allowed": 0.501,
-          "projected_ip": 5.5,
-          "inputs": {
-            "hr9": 0.82,
-            "era": 2.62,
-            "whip": 0.71
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815456",
       "kickoff": "2026-05-23T20:05Z",
@@ -2130,7 +2048,7 @@
       ]
     }
   ],
-  "props": 102,
+  "props": 98,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
