@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-23T10:17:56Z",
+  "generated_at": "2026-05-23T11:13:09Z",
   "method": "Dixon-Coles MLE grid search (ρ ∈ [-0.30, 0.10] step 0.005), λ_h, λ_a fixés à moyenne empirique par ligue. CI 95% via LR test.",
   "min_matches": 40,
   "default_rho": -0.13,
@@ -47,12 +47,12 @@
       "reason": "n=19 < 40"
     },
     "aus.1": {
-      "n": 12,
+      "n": 13,
       "rho_measured": null,
       "rho_literature": -0.12,
       "rho_used": -0.12,
       "source": "literature_fallback",
-      "reason": "n=12 < 40"
+      "reason": "n=13 < 40"
     },
     "aut.1": {
       "n": 18,
@@ -510,12 +510,17 @@
       "reason": "n=28 < 40"
     },
     "idn.1": {
-      "n": 35,
-      "rho_measured": null,
+      "n": 41,
+      "rho_measured": -0.225,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "n=35 < 40"
+      "reason": "CI trop large (0.390) ou fit nul",
+      "log_lik": -146.97,
+      "ci_lo": -0.3,
+      "ci_hi": 0.09,
+      "lambda_h": 1.561,
+      "lambda_a": 1.049
     },
     "ileaguechampionshipg": {
       "n": 1,
@@ -587,17 +592,17 @@
       "reason": "n=1 < 40"
     },
     "jpn.1": {
-      "n": 54,
-      "rho_measured": -0.055,
+      "n": 56,
+      "rho_measured": -0.02,
       "rho_literature": -0.12,
       "rho_used": -0.12,
       "source": "literature_fallback",
       "reason": "CI trop large (0.400) ou fit nul",
-      "log_lik": -157.7,
+      "log_lik": -164.67,
       "ci_lo": -0.3,
       "ci_hi": 0.1,
-      "lambda_h": 1.444,
-      "lambda_a": 1.167
+      "lambda_h": 1.482,
+      "lambda_a": 1.161
     },
     "laliga2": {
       "n": 4,
