@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-23T16:57:59Z",
+  "generated_at": "2026-05-23T17:57:23Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -7,18 +7,18 @@
     "active_events": 49,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 66,
-      "back_to_back_travel": 25,
+      "lookahead": 64,
+      "back_to_back_travel": 24,
       "travel_extreme": 8,
-      "schedule_congestion": 32
+      "schedule_congestion": 34
     },
     "by_decision": {
-      "abstain": 22,
-      "lean_home": 27
+      "abstain": 23,
+      "lean_home": 26
     },
-    "lean_home": 27,
+    "lean_home": 26,
     "lean_away": 0,
-    "abstain": 22,
+    "abstain": 23,
     "monitor": 0
   },
   "active": [
@@ -507,20 +507,20 @@
       }
     },
     {
-      "event_id": "401873647",
+      "event_id": "401815457",
       "source_event_ids": [
-        "401873647"
+        "401815457"
       ],
-      "kickoff": "2026-05-23T17:10Z",
+      "kickoff": "2026-05-23T20:05Z",
       "sport": "baseball",
       "league_code": "mlb",
       "league_name": "MLB",
-      "home": "Cincinnati Reds",
-      "away": "St. Louis Cardinals",
-      "match": "Cincinnati Reds - St. Louis Cardinals",
+      "home": "Baltimore Orioles",
+      "away": "Detroit Tigers",
+      "match": "Baltimore Orioles - Detroit Tigers",
       "decision": "abstain",
       "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Cincinnati Reds 0.30, St. Louis Cardinals 0.30",
+      "reason": "Fatigue/agenda des deux cotes: Baltimore Orioles 0.30, Detroit Tigers 0.30",
       "pressure_score": 1.333,
       "home_fade": 0.3,
       "away_fade": 0.3,
@@ -536,12 +536,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "away",
-        "home_score": -1.195,
-        "away_score": 0.155,
-        "home_fade": 1.3,
-        "away_fade": 0.3,
-        "reason": "Direction nette: St. Louis Cardinals (+0.15)",
+        "net_side": "home",
+        "home_score": -0.055,
+        "away_score": -0.595,
+        "home_fade": 0.3,
+        "away_fade": 0.7,
+        "reason": "Direction nette: Baltimore Orioles (-0.06)",
         "detail": [
           {
             "side": "home",
@@ -556,10 +556,10 @@
             "strength": 0.3
           },
           {
-            "side": "home",
+            "side": "away",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 1.0
+            "strength": 0.4
           }
         ]
       }
@@ -618,6 +618,64 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 1.0
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401873649",
+      "source_event_ids": [
+        "401873649"
+      ],
+      "kickoff": "2026-05-24T22:05Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Baltimore Orioles",
+      "away": "Detroit Tigers",
+      "match": "Baltimore Orioles - Detroit Tigers",
+      "decision": "abstain",
+      "net_team": null,
+      "reason": "Fatigue/agenda des deux cotes: Baltimore Orioles 0.60, Detroit Tigers 0.60",
+      "pressure_score": 1.2,
+      "home_fade": 0.6,
+      "away_fade": 0.6,
+      "travel_score": 0,
+      "lookahead_score": 0,
+      "congestion_score": 1.2,
+      "types": {
+        "schedule_congestion": 2
+      },
+      "contexts": [
+        "3 matchs sur les 7 derniers jours",
+        "3 matchs sur les 7 derniers jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": -0.25,
+        "away_score": -0.79,
+        "home_fade": 0.6,
+        "away_fade": 1.0,
+        "reason": "Direction nette: Baltimore Orioles (-0.25)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "away",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.4
           }
         ]
       }
@@ -843,64 +901,6 @@
       }
     },
     {
-      "event_id": "401815457",
-      "source_event_ids": [
-        "401815457"
-      ],
-      "kickoff": "2026-05-23T20:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Baltimore Orioles",
-      "away": "Detroit Tigers",
-      "match": "Baltimore Orioles - Detroit Tigers",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Baltimore Orioles 0.15, Detroit Tigers 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.043,
-        "away_score": -0.498,
-        "home_fade": 0.15,
-        "away_fade": 0.55,
-        "reason": "Direction nette: Baltimore Orioles (+0.04)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401815461",
       "source_event_ids": [
         "401815461"
@@ -1064,6 +1064,64 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.8
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815472",
+      "source_event_ids": [
+        "401815472"
+      ],
+      "kickoff": "2026-05-24T16:35Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Baltimore Orioles",
+      "away": "Detroit Tigers",
+      "match": "Baltimore Orioles - Detroit Tigers",
+      "decision": "abstain",
+      "net_team": null,
+      "reason": "Fatigue/agenda des deux cotes: Baltimore Orioles 0.15, Detroit Tigers 0.15",
+      "pressure_score": 0.667,
+      "home_fade": 0.15,
+      "away_fade": 0.15,
+      "travel_score": 0,
+      "lookahead_score": 0.667,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 2
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours",
+        "1 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": 0.043,
+        "away_score": -0.498,
+        "home_fade": 0.15,
+        "away_fade": 0.55,
+        "reason": "Direction nette: Baltimore Orioles (+0.04)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.4
           }
         ]
       }
@@ -2253,72 +2311,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.883
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815462",
-      "source_event_ids": [
-        "401815462"
-      ],
-      "kickoff": "2026-05-23T17:35Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "New York Yankees",
-      "away": "Tampa Bay Rays",
-      "match": "New York Yankees - Tampa Bay Rays",
-      "decision": "lean_home",
-      "net_team": "New York Yankees",
-      "reason": "Tampa Bay Rays plus penalise par calendrier/voyage (1.01 vs 0.15)",
-      "pressure_score": 1.528,
-      "home_fade": 0.15,
-      "away_fade": 1.011,
-      "travel_score": 0.861,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours",
-        "1 match dans les 48h + 1657 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.554,
-        "away_score": -1.959,
-        "home_fade": 0.15,
-        "away_fade": 2.011,
-        "reason": "Direction nette: New York Yankees (+0.55)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.861
           }
         ]
       }

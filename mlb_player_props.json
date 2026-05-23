@@ -1,172 +1,8 @@
 {
-  "generated_at": "2026-05-23T16:57:50Z",
+  "generated_at": "2026-05-23T17:57:13Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401873647",
-      "kickoff": "2026-05-23T17:10Z",
-      "league": "MLB",
-      "match": "St. Louis Cardinals at Cincinnati Reds",
-      "home": "Cincinnati Reds",
-      "away": "St. Louis Cardinals",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Cincinnati Reds",
-          "pitcher": "Chase Petty",
-          "label": "Chase Petty moins de 2,5 strikeouts",
-          "line": 2.5,
-          "pick": "under",
-          "probability": 0.9154,
-          "fair_odds": 1.09,
-          "expected_strikeouts": 0.92,
-          "projected_ip": 5.2,
-          "inputs": {
-            "k9": 1.59,
-            "era": 4.76,
-            "whip": 1.06,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Cincinnati Reds",
-          "pitcher": "Chase Petty",
-          "label": "Chase Petty concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6009,
-          "fair_odds": 1.66,
-          "expected_hr_allowed": 0.919,
-          "projected_ip": 5.2,
-          "inputs": {
-            "hr9": 1.59,
-            "era": 4.76,
-            "whip": 1.06
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "St. Louis Cardinals",
-          "pitcher": "Kyle Leahy",
-          "label": "Kyle Leahy plus de 3,5 strikeouts",
-          "line": 3.5,
-          "pick": "over",
-          "probability": 0.5629,
-          "fair_odds": 1.78,
-          "expected_strikeouts": 3.74,
-          "projected_ip": 5.02,
-          "inputs": {
-            "k9": 6.7,
-            "era": 3.94,
-            "whip": 1.55,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "St. Louis Cardinals",
-          "pitcher": "Kyle Leahy",
-          "label": "Kyle Leahy ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5176,
-          "fair_odds": 1.93,
-          "expected_hr_allowed": 0.658,
-          "projected_ip": 5.02,
-          "inputs": {
-            "hr9": 1.18,
-            "era": 3.94,
-            "whip": 1.55
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401815462",
-      "kickoff": "2026-05-23T17:35Z",
-      "league": "MLB",
-      "match": "Tampa Bay Rays at New York Yankees",
-      "home": "New York Yankees",
-      "away": "Tampa Bay Rays",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "New York Yankees",
-          "pitcher": "Ryan Weathers",
-          "label": "Ryan Weathers plus de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "over",
-          "probability": 0.5487,
-          "fair_odds": 1.82,
-          "expected_strikeouts": 6.75,
-          "projected_ip": 5.57,
-          "inputs": {
-            "k9": 10.91,
-            "era": 3.58,
-            "whip": 1.13,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "New York Yankees",
-          "pitcher": "Ryan Weathers",
-          "label": "Ryan Weathers concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5871,
-          "fair_odds": 1.7,
-          "expected_hr_allowed": 0.884,
-          "projected_ip": 5.57,
-          "inputs": {
-            "hr9": 1.43,
-            "era": 3.58,
-            "whip": 1.13
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Tampa Bay Rays",
-          "pitcher": "Drew Rasmussen",
-          "label": "Drew Rasmussen moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.6125,
-          "fair_odds": 1.63,
-          "expected_strikeouts": 5.0,
-          "projected_ip": 5.33,
-          "inputs": {
-            "k9": 8.44,
-            "era": 3.19,
-            "whip": 1.0,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Tampa Bay Rays",
-          "pitcher": "Drew Rasmussen",
-          "label": "Drew Rasmussen concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5399,
-          "fair_odds": 1.85,
-          "expected_hr_allowed": 0.776,
-          "projected_ip": 5.33,
-          "inputs": {
-            "hr9": 1.31,
-            "era": 3.19,
-            "whip": 1.0
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815464",
       "kickoff": "2026-05-23T18:20Z",
@@ -1326,6 +1162,52 @@
       ]
     },
     {
+      "event_id": "401815472",
+      "kickoff": "2026-05-24T16:35Z",
+      "league": "MLB",
+      "match": "Detroit Tigers at Baltimore Orioles",
+      "home": "Baltimore Orioles",
+      "away": "Detroit Tigers",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Baltimore Orioles",
+          "pitcher": "Trevor Rogers",
+          "label": "Trevor Rogers moins de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "under",
+          "probability": 0.593,
+          "fair_odds": 1.69,
+          "expected_strikeouts": 4.13,
+          "projected_ip": 4.75,
+          "inputs": {
+            "k9": 7.82,
+            "era": 6.87,
+            "whip": 1.66,
+            "hand": "L"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Baltimore Orioles",
+          "pitcher": "Trevor Rogers",
+          "label": "Trevor Rogers ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5365,
+          "fair_odds": 1.86,
+          "expected_hr_allowed": 0.623,
+          "projected_ip": 4.75,
+          "inputs": {
+            "hr9": 1.18,
+            "era": 6.87,
+            "whip": 1.66
+          },
+          "side": "home"
+        }
+      ]
+    },
+    {
       "event_id": "401815471",
       "kickoff": "2026-05-24T17:35Z",
       "league": "MLB",
@@ -1404,52 +1286,6 @@
             "whip": 1.02
           },
           "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401815472",
-      "kickoff": "2026-05-24T17:35Z",
-      "league": "MLB",
-      "match": "Detroit Tigers at Baltimore Orioles",
-      "home": "Baltimore Orioles",
-      "away": "Detroit Tigers",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Baltimore Orioles",
-          "pitcher": "Trevor Rogers",
-          "label": "Trevor Rogers moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.593,
-          "fair_odds": 1.69,
-          "expected_strikeouts": 4.13,
-          "projected_ip": 4.75,
-          "inputs": {
-            "k9": 7.82,
-            "era": 6.87,
-            "whip": 1.66,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Baltimore Orioles",
-          "pitcher": "Trevor Rogers",
-          "label": "Trevor Rogers ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5365,
-          "fair_odds": 1.86,
-          "expected_hr_allowed": 0.623,
-          "projected_ip": 4.75,
-          "inputs": {
-            "hr9": 1.18,
-            "era": 6.87,
-            "whip": 1.66
-          },
-          "side": "home"
         }
       ]
     },
@@ -2248,6 +2084,52 @@
       ]
     },
     {
+      "event_id": "401873649",
+      "kickoff": "2026-05-24T22:05Z",
+      "league": "MLB",
+      "match": "Detroit Tigers at Baltimore Orioles",
+      "home": "Baltimore Orioles",
+      "away": "Detroit Tigers",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Baltimore Orioles",
+          "pitcher": "Trevor Rogers",
+          "label": "Trevor Rogers moins de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "under",
+          "probability": 0.593,
+          "fair_odds": 1.69,
+          "expected_strikeouts": 4.13,
+          "projected_ip": 4.75,
+          "inputs": {
+            "k9": 7.82,
+            "era": 6.87,
+            "whip": 1.66,
+            "hand": "L"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Baltimore Orioles",
+          "pitcher": "Trevor Rogers",
+          "label": "Trevor Rogers ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5365,
+          "fair_odds": 1.86,
+          "expected_hr_allowed": 0.623,
+          "projected_ip": 4.75,
+          "inputs": {
+            "hr9": 1.18,
+            "era": 6.87,
+            "whip": 1.66
+          },
+          "side": "home"
+        }
+      ]
+    },
+    {
       "event_id": "401815485",
       "kickoff": "2026-05-24T23:20Z",
       "league": "MLB",
@@ -2294,7 +2176,7 @@
       ]
     }
   ],
-  "props": 110,
+  "props": 104,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
