@@ -1,182 +1,8 @@
 {
-  "generated_at": "2026-05-24T01:35:20Z",
+  "generated_at": "2026-05-24T03:07:01Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815467",
-      "kickoff": "2026-05-24T01:40Z",
-      "league": "MLB",
-      "match": "Athletics Athletics at San Diego Padres",
-      "home": "San Diego Padres",
-      "away": "Athletics",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "San Diego Padres",
-          "pitcher": "Michael King",
-          "label": "Michael King plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.5785,
-          "fair_odds": 1.73,
-          "expected_strikeouts": 5.87,
-          "projected_ip": 5.81,
-          "inputs": {
-            "k9": 9.1,
-            "era": 2.31,
-            "whip": 1.06,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "San Diego Padres",
-          "pitcher": "Michael King",
-          "label": "Michael King ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6702,
-          "fair_odds": 1.49,
-          "expected_hr_allowed": 0.4,
-          "projected_ip": 5.81,
-          "inputs": {
-            "hr9": 0.62,
-            "era": 2.31,
-            "whip": 1.06
-          },
-          "side": "home"
-        }
-      ]
-    },
-    {
-      "event_id": "401815470",
-      "kickoff": "2026-05-24T02:05Z",
-      "league": "MLB",
-      "match": "Texas Rangers at Los Angeles Angels",
-      "home": "Los Angeles Angels",
-      "away": "Texas Rangers",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Los Angeles Angels",
-          "pitcher": "Reid Detmers",
-          "label": "Reid Detmers moins de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "under",
-          "probability": 0.5825,
-          "fair_odds": 1.72,
-          "expected_strikeouts": 6.1,
-          "projected_ip": 5.5,
-          "inputs": {
-            "k9": 9.98,
-            "era": 5.07,
-            "whip": 1.29,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Los Angeles Angels",
-          "pitcher": "Reid Detmers",
-          "label": "Reid Detmers ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6722,
-          "fair_odds": 1.49,
-          "expected_hr_allowed": 0.397,
-          "projected_ip": 5.5,
-          "inputs": {
-            "hr9": 0.65,
-            "era": 5.07,
-            "whip": 1.29
-          },
-          "side": "home"
-        }
-      ]
-    },
-    {
-      "event_id": "401815469",
-      "kickoff": "2026-05-24T02:10Z",
-      "league": "MLB",
-      "match": "Colorado Rockies at Arizona Diamondbacks",
-      "home": "Arizona Diamondbacks",
-      "away": "Colorado Rockies",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Arizona Diamondbacks",
-          "pitcher": "Ryne Nelson",
-          "label": "Ryne Nelson plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.5236,
-          "fair_odds": 1.91,
-          "expected_strikeouts": 4.6,
-          "projected_ip": 5.2,
-          "inputs": {
-            "k9": 7.96,
-            "era": 5.19,
-            "whip": 1.19,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Arizona Diamondbacks",
-          "pitcher": "Ryne Nelson",
-          "label": "Ryne Nelson concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6664,
-          "fair_odds": 1.5,
-          "expected_hr_allowed": 1.098,
-          "projected_ip": 5.2,
-          "inputs": {
-            "hr9": 1.9,
-            "era": 5.19,
-            "whip": 1.19
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Colorado Rockies",
-          "pitcher": "Jose Quintana",
-          "label": "Jose Quintana moins de 2,5 strikeouts",
-          "line": 2.5,
-          "pick": "under",
-          "probability": 0.5092,
-          "fair_odds": 1.96,
-          "expected_strikeouts": 2.47,
-          "projected_ip": 4.9,
-          "inputs": {
-            "k9": 4.54,
-            "era": 4.08,
-            "whip": 1.41,
-            "hand": "L"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Colorado Rockies",
-          "pitcher": "Jose Quintana",
-          "label": "Jose Quintana concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5231,
-          "fair_odds": 1.91,
-          "expected_hr_allowed": 0.74,
-          "projected_ip": 4.9,
-          "inputs": {
-            "hr9": 1.36,
-            "era": 4.08,
-            "whip": 1.41
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815475",
       "kickoff": "2026-05-24T16:15Z",
@@ -559,6 +385,42 @@
       "home": "Miami Marlins",
       "away": "New York Mets",
       "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Miami Marlins",
+          "pitcher": "Tyler Phillips",
+          "label": "Tyler Phillips moins de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "under",
+          "probability": 0.5442,
+          "fair_odds": 1.84,
+          "expected_strikeouts": 4.32,
+          "projected_ip": 4.8,
+          "inputs": {
+            "k9": 8.1,
+            "era": 1.2,
+            "whip": 1.27,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Miami Marlins",
+          "pitcher": "Tyler Phillips",
+          "label": "Tyler Phillips ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.8521,
+          "fair_odds": 1.17,
+          "expected_hr_allowed": 0.16,
+          "projected_ip": 4.8,
+          "inputs": {
+            "hr9": 0.3,
+            "era": 1.2,
+            "whip": 1.27
+          },
+          "side": "home"
+        },
         {
           "market": "pitcher_strikeouts",
           "team": "New York Mets",
@@ -1310,7 +1172,7 @@
       ]
     }
   ],
-  "props": 62,
+  "props": 56,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
