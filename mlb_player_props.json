@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-24T22:39:52Z",
+  "generated_at": "2026-05-24T23:43:20Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815485",
-      "kickoff": "2026-05-24T23:20Z",
-      "league": "MLB",
-      "match": "Texas Rangers at Los Angeles Angels",
-      "home": "Los Angeles Angels",
-      "away": "Texas Rangers",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Los Angeles Angels",
-          "pitcher": "Reid Detmers",
-          "label": "Reid Detmers moins de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "under",
-          "probability": 0.5825,
-          "fair_odds": 1.72,
-          "expected_strikeouts": 6.1,
-          "projected_ip": 5.5,
-          "inputs": {
-            "k9": 9.98,
-            "era": 5.07,
-            "whip": 1.29,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Los Angeles Angels",
-          "pitcher": "Reid Detmers",
-          "label": "Reid Detmers ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6722,
-          "fair_odds": 1.49,
-          "expected_hr_allowed": 0.397,
-          "projected_ip": 5.5,
-          "inputs": {
-            "hr9": 0.65,
-            "era": 5.07,
-            "whip": 1.29
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Texas Rangers",
-          "pitcher": "MacKenzie Gore",
-          "label": "MacKenzie Gore moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.5002,
-          "fair_odds": 2.0,
-          "expected_strikeouts": 5.5,
-          "projected_ip": 4.9,
-          "inputs": {
-            "k9": 10.1,
-            "era": 4.78,
-            "whip": 1.33,
-            "hand": "L"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Texas Rangers",
-          "pitcher": "MacKenzie Gore",
-          "label": "MacKenzie Gore ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5494,
-          "fair_odds": 1.82,
-          "expected_hr_allowed": 0.599,
-          "projected_ip": 4.9,
-          "inputs": {
-            "hr9": 1.1,
-            "era": 4.78,
-            "whip": 1.33
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815492",
       "kickoff": "2026-05-25T18:10Z",
@@ -178,7 +96,7 @@
       ]
     }
   ],
-  "props": 8,
+  "props": 4,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"

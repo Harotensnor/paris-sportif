@@ -1,55 +1,55 @@
 {
-  "generated_at": "2026-05-24T22:39:56Z",
-  "calculated_at": "2026-05-24T22:39:56Z",
+  "generated_at": "2026-05-24T23:43:24Z",
+  "calculated_at": "2026-05-24T23:43:24Z",
   "source_of_truth": "data.js",
-  "data_generated_at": "2026-05-24T22:38:54.143988Z",
+  "data_generated_at": "2026-05-24T23:42:20.267468Z",
   "data_today_field": "2026-05-24",
   "events": {
-    "total": 241,
-    "upcoming": 198,
-    "winamax_available": 241,
-    "winamax_exact": 234,
-    "winamax_exact_ratio": 0.971,
-    "markets_more_than_1n2": 29,
-    "form_l10": 71,
-    "h2h": 43,
-    "lineups": 25,
+    "total": 212,
+    "upcoming": 196,
+    "winamax_available": 212,
+    "winamax_exact": 212,
+    "winamax_exact_ratio": 1.0,
+    "markets_more_than_1n2": 28,
+    "form_l10": 48,
+    "h2h": 42,
+    "lineups": 16,
     "football_lineups": 0,
-    "starter_signals": 25,
-    "clubelo": 26,
-    "weather": 76,
-    "injuries": 48,
-    "referee": 10,
+    "starter_signals": 16,
+    "clubelo": 16,
+    "weather": 66,
+    "injuries": 33,
+    "referee": 0,
     "referee_named": 0,
-    "referee_context": 10,
-    "referee_signal": 10,
-    "fd_calibration": 6,
+    "referee_context": 0,
+    "referee_signal": 0,
+    "fd_calibration": 0,
     "fd_closing_odds": 0,
-    "xg": 60,
-    "smart_money": 3
+    "xg": 50,
+    "smart_money": 0
   },
   "signal_health": {
     "referee": {
-      "effective_events": 10,
+      "effective_events": 0,
       "named_events": 0,
-      "context_events": 10,
+      "context_events": 0,
       "note": "referee is effective coverage: named referee or referee_context usable by the model."
     },
     "smart_money": {
-      "events": 3,
+      "events": 0,
       "status": "rare_event",
       "note": "Smart money is intentionally rare; low count is OK when odds movement does not confirm a strong signal."
     }
   },
   "winamax_markets": {
-    "matches": 527,
-    "detailed_market_matches": 212,
-    "detailed_ratio_vs_exact": 0.906,
+    "matches": 503,
+    "detailed_market_matches": 199,
+    "detailed_ratio_vs_exact": 0.9387,
     "gap_to_50pct_exact": 0,
     "recommended_detail_fetch_cap": 90,
     "detail_by_sport": {
       "baseball": {
-        "exact": 12,
+        "exact": 10,
         "detailed": 0,
         "families": {},
         "detailed_ratio": 0.0
@@ -125,7 +125,7 @@
   },
   "health": {
     "status": "warning",
-    "warnings": 9,
+    "warnings": 10,
     "pipeline_drift": "warn"
   }
 }

@@ -1,352 +1,26 @@
 {
-  "generated_at": "2026-05-24T22:39:55Z",
+  "generated_at": "2026-05-24T23:43:23Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 21,
+    "active_events": 20,
     "expired_sample": 0,
     "by_type": {
-      "travel_extreme": 1,
-      "back_to_back_travel": 7,
       "lookahead": 30,
-      "schedule_congestion": 20
+      "back_to_back_travel": 6,
+      "schedule_congestion": 17
     },
     "by_decision": {
-      "abstain": 14,
-      "lean_home": 7
+      "abstain": 10,
+      "lean_home": 10
     },
-    "lean_home": 7,
+    "lean_home": 10,
     "lean_away": 0,
-    "abstain": 14,
+    "abstain": 10,
     "monitor": 0
   },
   "active": [
-    {
-      "event_id": "401815507",
-      "source_event_ids": [
-        "401815507"
-      ],
-      "kickoff": "2026-05-26T23:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Chicago White Sox",
-      "away": "Minnesota Twins",
-      "match": "Chicago White Sox - Minnesota Twins",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Chicago White Sox 1.10, Minnesota Twins 1.10",
-      "pressure_score": 2.933,
-      "home_fade": 1.1,
-      "away_fade": 1.1,
-      "travel_score": 0,
-      "lookahead_score": 1.333,
-      "congestion_score": 1.6,
-      "types": {
-        "schedule_congestion": 2,
-        "lookahead": 2
-      },
-      "contexts": [
-        "4 matchs sur les 7 derniers jours",
-        "2 match important/proche dans les 3 jours",
-        "4 matchs sur les 7 derniers jours",
-        "2 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "mixed",
-        "net_side": null,
-        "home_score": -2.515,
-        "away_score": 0.405,
-        "home_fade": 2.9,
-        "away_fade": 1.1,
-        "reason": "Signaux mitigés: avantage net trop faible (Chicago White Sox -2.52, Minnesota Twins +0.41)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.8
-          },
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.8
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.8
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.49
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815492",
-      "source_event_ids": [
-        "401815492"
-      ],
-      "kickoff": "2026-05-25T18:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Chicago White Sox",
-      "away": "Minnesota Twins",
-      "match": "Chicago White Sox - Minnesota Twins",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Chicago White Sox 0.96, Minnesota Twins 0.96",
-      "pressure_score": 2.8,
-      "home_fade": 0.96,
-      "away_fade": 0.96,
-      "travel_score": 0,
-      "lookahead_score": 1.6,
-      "congestion_score": 1.2,
-      "types": {
-        "schedule_congestion": 2,
-        "lookahead": 2
-      },
-      "contexts": [
-        "3 matchs sur les 7 derniers jours",
-        "3 match important/proche dans les 3 jours",
-        "3 matchs sur les 7 derniers jours",
-        "3 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "mixed",
-        "net_side": null,
-        "home_score": -2.424,
-        "away_score": 0.496,
-        "home_fade": 2.76,
-        "away_fade": 0.96,
-        "reason": "Signaux mitigés: avantage net trop faible (Chicago White Sox -2.42, Minnesota Twins +0.50)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.36
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.36
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.8
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.49
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815522",
-      "source_event_ids": [
-        "401815522"
-      ],
-      "kickoff": "2026-05-27T23:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Chicago White Sox",
-      "away": "Minnesota Twins",
-      "match": "Chicago White Sox - Minnesota Twins",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Chicago White Sox 1.15, Minnesota Twins 1.15",
-      "pressure_score": 2.667,
-      "home_fade": 1.15,
-      "away_fade": 1.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 2.0,
-      "types": {
-        "schedule_congestion": 2,
-        "lookahead": 2
-      },
-      "contexts": [
-        "5 matchs sur les 7 derniers jours",
-        "1 match important/proche dans les 3 jours",
-        "5 matchs sur les 7 derniers jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "mixed",
-        "net_side": null,
-        "home_score": -2.548,
-        "away_score": 0.373,
-        "home_fade": 2.95,
-        "away_fade": 1.15,
-        "reason": "Signaux mitigés: avantage net trop faible (Chicago White Sox -2.55, Minnesota Twins +0.37)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.8
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.49
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815534",
-      "source_event_ids": [
-        "401815534"
-      ],
-      "kickoff": "2026-05-28T18:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Chicago White Sox",
-      "away": "Minnesota Twins",
-      "match": "Chicago White Sox - Minnesota Twins",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Chicago White Sox 1.00, Minnesota Twins 1.00",
-      "pressure_score": 2.0,
-      "home_fade": 1.0,
-      "away_fade": 1.0,
-      "travel_score": 0,
-      "lookahead_score": 0,
-      "congestion_score": 2.0,
-      "types": {
-        "schedule_congestion": 2
-      },
-      "contexts": [
-        "6 matchs sur les 7 derniers jours",
-        "6 matchs sur les 7 derniers jours"
-      ],
-      "global_resolution": {
-        "status": "mixed",
-        "net_side": null,
-        "home_score": -2.45,
-        "away_score": 0.47,
-        "home_fade": 2.8,
-        "away_fade": 1.0,
-        "reason": "Signaux mitigés: avantage net trop faible (Chicago White Sox -2.45, Minnesota Twins +0.47)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.8
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.49
-          }
-        ]
-      }
-    },
     {
       "event_id": "401873202",
       "source_event_ids": [
@@ -379,13 +53,13 @@
         "1 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.488,
-        "away_score": -0.488,
+        "status": "net",
+        "net_side": "home",
+        "home_score": -0.348,
+        "away_score": -0.887,
         "home_fade": 0.75,
-        "away_fade": 0.75,
-        "reason": "Signaux opposes: San Antonio Spurs fade 0.75, Oklahoma City Thunder fade 0.75 -> prudence",
+        "away_fade": 1.15,
+        "reason": "Direction nette: San Antonio Spurs (-0.35)",
         "detail": [
           {
             "side": "home",
@@ -410,6 +84,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.4
           }
         ]
       }
@@ -443,13 +123,13 @@
         "3 matchs sur les 7 derniers jours"
       ],
       "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.39,
-        "away_score": -0.39,
-        "home_fade": 0.6,
+        "status": "net",
+        "net_side": "away",
+        "home_score": -0.79,
+        "away_score": -0.25,
+        "home_fade": 1.0,
         "away_fade": 0.6,
-        "reason": "Signaux opposes: Oklahoma City Thunder fade 0.60, San Antonio Spurs fade 0.60 -> prudence",
+        "reason": "Direction nette: San Antonio Spurs (-0.25)",
         "detail": [
           {
             "side": "home",
@@ -462,6 +142,12 @@
             "type": "schedule_congestion",
             "direction": "fade",
             "strength": 0.6
+          },
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.4
           }
         ]
       }
@@ -547,13 +233,13 @@
         "1 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": 0.386,
+        "status": "mixed",
+        "net_side": null,
+        "home_score": 0.043,
+        "away_score": -0.014,
         "home_fade": 0.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Oklahoma City Thunder (+0.39)",
+        "away_fade": 0.55,
+        "reason": "Signaux mitigés: avantage net trop faible (San Antonio Spurs +0.04, Oklahoma City Thunder -0.01)",
         "detail": [
           {
             "side": "home",
@@ -566,6 +252,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.4
           },
           {
             "side": "away",
@@ -711,11 +403,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
-        "home_fade": 0.15,
+        "home_score": -0.498,
+        "away_score": 0.043,
+        "home_fade": 0.55,
         "away_fade": 0.15,
-        "reason": "Direction nette: San Antonio Spurs (-0.10)",
+        "reason": "Direction nette: San Antonio Spurs (+0.04)",
         "detail": [
           {
             "side": "home",
@@ -728,6 +420,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.4
           }
         ]
       }
@@ -963,6 +661,162 @@
       }
     },
     {
+      "event_id": "401815492",
+      "source_event_ids": [
+        "401815492"
+      ],
+      "kickoff": "2026-05-25T18:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Chicago White Sox",
+      "away": "Minnesota Twins",
+      "match": "Chicago White Sox - Minnesota Twins",
+      "decision": "lean_home",
+      "net_team": "Chicago White Sox",
+      "reason": "Minnesota Twins plus penalise par calendrier/voyage (0.96 vs 0.36)",
+      "pressure_score": 2.2,
+      "home_fade": 0.36,
+      "away_fade": 0.96,
+      "travel_score": 0,
+      "lookahead_score": 1.6,
+      "congestion_score": 0.6,
+      "types": {
+        "lookahead": 2,
+        "schedule_congestion": 1
+      },
+      "contexts": [
+        "3 match important/proche dans les 3 jours",
+        "3 matchs sur les 7 derniers jours",
+        "3 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "mixed",
+        "net_side": null,
+        "home_score": 0.526,
+        "away_score": -1.554,
+        "home_fade": 1.16,
+        "away_fade": 1.96,
+        "reason": "Signaux mitigés: avantage net trop faible (Chicago White Sox +0.53, Minnesota Twins -1.55)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.36
+          },
+          {
+            "side": "away",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.36
+          },
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.8
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815507",
+      "source_event_ids": [
+        "401815507"
+      ],
+      "kickoff": "2026-05-26T23:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Chicago White Sox",
+      "away": "Minnesota Twins",
+      "match": "Chicago White Sox - Minnesota Twins",
+      "decision": "lean_home",
+      "net_team": "Chicago White Sox",
+      "reason": "Minnesota Twins plus penalise par calendrier/voyage (1.10 vs 0.30)",
+      "pressure_score": 2.133,
+      "home_fade": 0.3,
+      "away_fade": 1.1,
+      "travel_score": 0,
+      "lookahead_score": 1.333,
+      "congestion_score": 0.8,
+      "types": {
+        "lookahead": 2,
+        "schedule_congestion": 1
+      },
+      "contexts": [
+        "2 match important/proche dans les 3 jours",
+        "4 matchs sur les 7 derniers jours",
+        "2 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "mixed",
+        "net_side": null,
+        "home_score": 0.635,
+        "away_score": -1.715,
+        "home_fade": 1.1,
+        "away_fade": 2.1,
+        "reason": "Signaux mitigés: avantage net trop faible (Chicago White Sox +0.63, Minnesota Twins -1.72)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.3
+          },
+          {
+            "side": "away",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.8
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.3
+          },
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.8
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
+          }
+        ]
+      }
+    },
+    {
       "event_id": "401873388",
       "source_event_ids": [
         "401873388"
@@ -1078,6 +932,154 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.726
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815522",
+      "source_event_ids": [
+        "401815522"
+      ],
+      "kickoff": "2026-05-27T23:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Chicago White Sox",
+      "away": "Minnesota Twins",
+      "match": "Chicago White Sox - Minnesota Twins",
+      "decision": "lean_home",
+      "net_team": "Chicago White Sox",
+      "reason": "Minnesota Twins plus penalise par calendrier/voyage (1.15 vs 0.15)",
+      "pressure_score": 1.667,
+      "home_fade": 0.15,
+      "away_fade": 1.15,
+      "travel_score": 0,
+      "lookahead_score": 0.667,
+      "congestion_score": 1.0,
+      "types": {
+        "lookahead": 2,
+        "schedule_congestion": 1
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours",
+        "5 matchs sur les 7 derniers jours",
+        "1 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "mixed",
+        "net_side": null,
+        "home_score": 0.802,
+        "away_score": -1.817,
+        "home_fade": 0.95,
+        "away_fade": 2.15,
+        "reason": "Signaux mitigés: avantage net trop faible (Chicago White Sox +0.80, Minnesota Twins -1.82)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.8
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815534",
+      "source_event_ids": [
+        "401815534"
+      ],
+      "kickoff": "2026-05-28T18:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Chicago White Sox",
+      "away": "Minnesota Twins",
+      "match": "Chicago White Sox - Minnesota Twins",
+      "decision": "lean_home",
+      "net_team": "Chicago White Sox",
+      "reason": "Minnesota Twins plus penalise par calendrier/voyage (1.00 vs 0.60)",
+      "pressure_score": 1.6,
+      "home_fade": 0.6,
+      "away_fade": 1.0,
+      "travel_score": 0,
+      "lookahead_score": 0,
+      "congestion_score": 1.6,
+      "types": {
+        "schedule_congestion": 2
+      },
+      "contexts": [
+        "3 matchs sur les 7 derniers jours",
+        "6 matchs sur les 7 derniers jours"
+      ],
+      "global_resolution": {
+        "status": "mixed",
+        "net_side": null,
+        "home_score": 0.3,
+        "away_score": -1.51,
+        "home_fade": 1.4,
+        "away_fade": 2.0,
+        "reason": "Signaux mitigés: avantage net trop faible (Chicago White Sox +0.30, Minnesota Twins -1.51)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "away",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 1.0
+          },
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.8
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           }
         ]
       }
@@ -1270,65 +1272,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.726
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815485",
-      "source_event_ids": [
-        "401815485"
-      ],
-      "kickoff": "2026-05-24T23:20Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Los Angeles Angels",
-      "away": "Texas Rangers",
-      "match": "Los Angeles Angels - Texas Rangers",
-      "decision": "lean_home",
-      "net_team": "Los Angeles Angels",
-      "reason": "Texas Rangers plus penalise par calendrier/voyage (1.37 vs 0.00)",
-      "pressure_score": 1.366,
-      "home_fade": 0.0,
-      "away_fade": 1.366,
-      "travel_score": 1.366,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "travel_extreme": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "Deplacement estime 1934 km, decalage ~1.4h",
-        "1 match dans les 48h + 1934 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.758,
-        "away_score": -2.166,
-        "home_fade": 0.0,
-        "away_fade": 2.166,
-        "reason": "Direction nette: Los Angeles Angels (+0.76)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.8
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.45
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.917
           }
         ]
       }
