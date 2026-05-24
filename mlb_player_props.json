@@ -1,136 +1,8 @@
 {
-  "generated_at": "2026-05-24T15:58:38Z",
+  "generated_at": "2026-05-24T16:51:05Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815475",
-      "kickoff": "2026-05-24T16:15Z",
-      "league": "MLB",
-      "match": "Pittsburgh Pirates at Toronto Blue Jays",
-      "home": "Toronto Blue Jays",
-      "away": "Pittsburgh Pirates",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Toronto Blue Jays",
-          "pitcher": "Dylan Cease",
-          "label": "Dylan Cease moins de 8,5 strikeouts",
-          "line": 8.5,
-          "pick": "under",
-          "probability": 0.5233,
-          "fair_odds": 1.91,
-          "expected_strikeouts": 8.37,
-          "projected_ip": 5.71,
-          "inputs": {
-            "k9": 13.19,
-            "era": 2.98,
-            "whip": 1.22,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Toronto Blue Jays",
-          "pitcher": "Dylan Cease",
-          "label": "Dylan Cease ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.7422,
-          "fair_odds": 1.35,
-          "expected_hr_allowed": 0.298,
-          "projected_ip": 5.71,
-          "inputs": {
-            "hr9": 0.47,
-            "era": 2.98,
-            "whip": 1.22
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Pittsburgh Pirates",
-          "pitcher": "Mitch Keller",
-          "label": "Mitch Keller moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.6035,
-          "fair_odds": 1.66,
-          "expected_strikeouts": 4.09,
-          "projected_ip": 5.81,
-          "inputs": {
-            "k9": 6.33,
-            "era": 3.86,
-            "whip": 1.06,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Pittsburgh Pirates",
-          "pitcher": "Mitch Keller",
-          "label": "Mitch Keller ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6702,
-          "fair_odds": 1.49,
-          "expected_hr_allowed": 0.4,
-          "projected_ip": 5.81,
-          "inputs": {
-            "hr9": 0.62,
-            "era": 3.86,
-            "whip": 1.06
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401815472",
-      "kickoff": "2026-05-24T16:35Z",
-      "league": "MLB",
-      "match": "Detroit Tigers at Baltimore Orioles",
-      "home": "Baltimore Orioles",
-      "away": "Detroit Tigers",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Baltimore Orioles",
-          "pitcher": "Trevor Rogers",
-          "label": "Trevor Rogers moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.593,
-          "fair_odds": 1.69,
-          "expected_strikeouts": 4.13,
-          "projected_ip": 4.75,
-          "inputs": {
-            "k9": 7.82,
-            "era": 6.87,
-            "whip": 1.66,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Baltimore Orioles",
-          "pitcher": "Trevor Rogers",
-          "label": "Trevor Rogers ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5365,
-          "fair_odds": 1.86,
-          "expected_hr_allowed": 0.623,
-          "projected_ip": 4.75,
-          "inputs": {
-            "hr9": 1.18,
-            "era": 6.87,
-            "whip": 1.66
-          },
-          "side": "home"
-        }
-      ]
-    },
     {
       "event_id": "401815471",
       "kickoff": "2026-05-24T17:35Z",
@@ -502,42 +374,6 @@
             "whip": 1.7
           },
           "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "St. Louis Cardinals",
-          "pitcher": "Matthew Liberatore",
-          "label": "Matthew Liberatore moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.559,
-          "fair_odds": 1.79,
-          "expected_strikeouts": 4.26,
-          "projected_ip": 5.12,
-          "inputs": {
-            "k9": 7.49,
-            "era": 4.7,
-            "whip": 1.55,
-            "hand": "L"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "St. Louis Cardinals",
-          "pitcher": "Matthew Liberatore",
-          "label": "Matthew Liberatore concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5906,
-          "fair_odds": 1.69,
-          "expected_hr_allowed": 0.893,
-          "projected_ip": 5.12,
-          "inputs": {
-            "hr9": 1.57,
-            "era": 4.7,
-            "whip": 1.55
-          },
-          "side": "away"
         }
       ]
     },
@@ -1242,9 +1078,101 @@
           "side": "away"
         }
       ]
+    },
+    {
+      "event_id": "401815492",
+      "kickoff": "2026-05-25T18:10Z",
+      "league": "MLB",
+      "match": "Minnesota Twins at Chicago White Sox",
+      "home": "Chicago White Sox",
+      "away": "Minnesota Twins",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Minnesota Twins",
+          "pitcher": "Zebby Matthews",
+          "label": "Zebby Matthews plus de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "over",
+          "probability": 0.5007,
+          "fair_odds": 2.0,
+          "expected_strikeouts": 5.5,
+          "projected_ip": 6.5,
+          "inputs": {
+            "k9": 7.62,
+            "era": 1.38,
+            "whip": 0.77,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Minnesota Twins",
+          "pitcher": "Zebby Matthews",
+          "label": "Zebby Matthews ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6075,
+          "fair_odds": 1.65,
+          "expected_hr_allowed": 0.498,
+          "projected_ip": 6.5,
+          "inputs": {
+            "hr9": 0.69,
+            "era": 1.38,
+            "whip": 0.77
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815507",
+      "kickoff": "2026-05-26T23:40Z",
+      "league": "MLB",
+      "match": "Minnesota Twins at Chicago White Sox",
+      "home": "Chicago White Sox",
+      "away": "Minnesota Twins",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Minnesota Twins",
+          "pitcher": "Joe Ryan",
+          "label": "Joe Ryan plus de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "over",
+          "probability": 0.5002,
+          "fair_odds": 2.0,
+          "expected_strikeouts": 5.5,
+          "projected_ip": 5.11,
+          "inputs": {
+            "k9": 9.69,
+            "era": 3.02,
+            "whip": 0.97,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Minnesota Twins",
+          "pitcher": "Joe Ryan",
+          "label": "Joe Ryan ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.7615,
+          "fair_odds": 1.31,
+          "expected_hr_allowed": 0.272,
+          "projected_ip": 5.11,
+          "inputs": {
+            "hr9": 0.48,
+            "era": 3.02,
+            "whip": 0.97
+          },
+          "side": "away"
+        }
+      ]
     }
   ],
-  "props": 60,
+  "props": 56,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"

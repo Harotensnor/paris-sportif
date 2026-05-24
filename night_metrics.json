@@ -1,23 +1,23 @@
 {
-  "generated_at": "2026-05-24T15:58:45Z",
-  "calculated_at": "2026-05-24T15:58:45Z",
+  "generated_at": "2026-05-24T16:51:12Z",
+  "calculated_at": "2026-05-24T16:51:12Z",
   "source_of_truth": "data.js",
-  "data_generated_at": "2026-05-24T15:56:48.799665Z",
+  "data_generated_at": "2026-05-24T16:49:24.777773Z",
   "data_today_field": "2026-05-24",
   "events": {
-    "total": 308,
+    "total": 293,
     "upcoming": 244,
-    "winamax_available": 308,
-    "winamax_exact": 291,
-    "winamax_exact_ratio": 0.9448,
-    "markets_more_than_1n2": 62,
-    "form_l10": 118,
+    "winamax_available": 293,
+    "winamax_exact": 277,
+    "winamax_exact_ratio": 0.9454,
+    "markets_more_than_1n2": 55,
+    "form_l10": 115,
     "h2h": 0,
-    "lineups": 29,
+    "lineups": 31,
     "football_lineups": 0,
-    "starter_signals": 29,
-    "clubelo": 44,
-    "weather": 106,
+    "starter_signals": 31,
+    "clubelo": 43,
+    "weather": 98,
     "injuries": 74,
     "referee": 27,
     "referee_named": 0,
@@ -25,8 +25,8 @@
     "referee_signal": 27,
     "fd_calibration": 0,
     "fd_closing_odds": 0,
-    "xg": 73,
-    "smart_money": 0
+    "xg": 83,
+    "smart_money": 1
   },
   "signal_health": {
     "referee": {
@@ -36,15 +36,15 @@
       "note": "referee is effective coverage: named referee or referee_context usable by the model."
     },
     "smart_money": {
-      "events": 0,
+      "events": 1,
       "status": "rare_event",
       "note": "Smart money is intentionally rare; low count is OK when odds movement does not confirm a strong signal."
     }
   },
   "winamax_markets": {
-    "matches": 589,
-    "detailed_market_matches": 263,
-    "detailed_ratio_vs_exact": 0.9038,
+    "matches": 563,
+    "detailed_market_matches": 250,
+    "detailed_ratio_vs_exact": 0.9025,
     "gap_to_50pct_exact": 0,
     "recommended_detail_fetch_cap": 90,
     "detail_by_sport": {
@@ -55,29 +55,29 @@
         "detailed_ratio": 0.0
       },
       "basketball": {
-        "exact": 14,
+        "exact": 13,
         "detailed": 0,
         "families": {},
         "detailed_ratio": 0.0
       },
       "football": {
-        "exact": 91,
-        "detailed": 60,
+        "exact": 90,
+        "detailed": 55,
         "families": {
-          "dnb": 60,
-          "dnb_rows": 60,
-          "match_winner": 60,
-          "btts": 59,
-          "btts_rows": 59,
-          "double_chance": 59,
-          "handicap": 59,
-          "ht_1n2": 59,
-          "ht_1n2_rows": 59,
-          "ht_ou": 59,
-          "ou": 59,
-          "ou15": 59
+          "dnb": 55,
+          "dnb_rows": 55,
+          "match_winner": 55,
+          "btts": 54,
+          "btts_rows": 54,
+          "double_chance": 54,
+          "handicap": 54,
+          "ht_1n2": 54,
+          "ht_1n2_rows": 54,
+          "ht_ou": 54,
+          "ou": 54,
+          "ou15": 54
         },
-        "detailed_ratio": 0.6593
+        "detailed_ratio": 0.6111
       },
       "hockey": {
         "exact": 8,
@@ -86,28 +86,28 @@
         "detailed_ratio": 0.0
       },
       "tennis": {
-        "exact": 105,
+        "exact": 107,
         "detailed": 0,
         "families": {},
         "detailed_ratio": 0.0
       }
     },
     "market_family_counts": {
-      "dnb": 60,
-      "dnb_rows": 60,
-      "match_winner": 60,
-      "btts": 59,
-      "btts_rows": 59,
-      "double_chance": 59,
-      "handicap": 59,
-      "ht_1n2": 59,
-      "ht_1n2_rows": 59,
-      "ht_ou": 59,
-      "ou": 59,
-      "ou15": 59,
-      "ou25": 59,
-      "ou35": 59,
-      "team_total": 59
+      "dnb": 55,
+      "dnb_rows": 55,
+      "match_winner": 55,
+      "btts": 54,
+      "btts_rows": 54,
+      "double_chance": 54,
+      "handicap": 54,
+      "ht_1n2": 54,
+      "ht_1n2_rows": 54,
+      "ht_ou": 54,
+      "ou": 54,
+      "ou15": 54,
+      "ou25": 54,
+      "ou35": 54,
+      "team_total": 54
     }
   },
   "backtest": {
@@ -125,7 +125,7 @@
   },
   "health": {
     "status": "warning",
-    "warnings": 10,
+    "warnings": 9,
     "pipeline_drift": "warn"
   }
 }
