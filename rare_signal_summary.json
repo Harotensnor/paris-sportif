@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-05-24T18:54:49Z",
+  "generated_at": "2026-05-24T19:57:50Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 62,
+    "active_events": 57,
     "actionable": 20,
-    "watch": 1,
-    "risk": 41,
+    "watch": 0,
+    "risk": 37,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 13,
       "back_to_back_travel": 11,
-      "market_uncertain": 37,
-      "signal_conflict": 6
+      "injury_imbalance": 12,
+      "market_uncertain": 34,
+      "market_move": 8,
+      "signal_conflict": 9
     },
     "by_quality": {
-      "watch": 1,
       "actionable": 20,
-      "risk": 41
+      "risk": 37
     }
   },
   "active_actionable": [
@@ -41,6 +41,60 @@
       "context": "Absences severes 5-0"
     },
     {
+      "event_id": "401815492",
+      "date": "2026-05-25T18:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Chicago White Sox",
+      "away": "Minnesota Twins",
+      "match": "Chicago White Sox - Minnesota Twins",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 2.85 -> 3.70 (-29.8%)"
+    },
+    {
+      "event_id": "401815507",
+      "date": "2026-05-26T23:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Chicago White Sox",
+      "away": "Minnesota Twins",
+      "match": "Chicago White Sox - Minnesota Twins",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 2.85 -> 3.70 (-29.8%)"
+    },
+    {
+      "event_id": "401815522",
+      "date": "2026-05-27T23:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Chicago White Sox",
+      "away": "Minnesota Twins",
+      "match": "Chicago White Sox - Minnesota Twins",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 2.85 -> 3.70 (-29.8%)"
+    },
+    {
       "event_id": "401856942",
       "date": "2026-05-28T02:00Z",
       "sport": "basketball",
@@ -57,6 +111,24 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 5-0"
+    },
+    {
+      "event_id": "401815534",
+      "date": "2026-05-28T18:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Chicago White Sox",
+      "away": "Minnesota Twins",
+      "match": "Chicago White Sox - Minnesota Twins",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 2.85 -> 3.70 (-29.8%)"
     },
     {
       "event_id": "401815538",
@@ -127,8 +199,8 @@
       "direction": "fade",
       "team": "Texas Rangers",
       "side": "away",
-      "strength": 0.997,
-      "context": "2 match dans les 48h + 1934 km de voyage"
+      "strength": 0.917,
+      "context": "1 match dans les 48h + 1934 km de voyage"
     },
     {
       "event_id": "401815482",
@@ -165,96 +237,6 @@
       "side": null,
       "strength": 0.8,
       "context": "Absences severes 11-15"
-    },
-    {
-      "event_id": "401815492",
-      "date": "2026-05-25T18:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Chicago White Sox",
-      "away": "Minnesota Twins",
-      "match": "Chicago White Sox - Minnesota Twins",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Chicago White Sox",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 11-7"
-    },
-    {
-      "event_id": "401815507",
-      "date": "2026-05-26T23:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Chicago White Sox",
-      "away": "Minnesota Twins",
-      "match": "Chicago White Sox - Minnesota Twins",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Chicago White Sox",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 11-7"
-    },
-    {
-      "event_id": "401815522",
-      "date": "2026-05-27T23:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Chicago White Sox",
-      "away": "Minnesota Twins",
-      "match": "Chicago White Sox - Minnesota Twins",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Chicago White Sox",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 11-7"
-    },
-    {
-      "event_id": "401815534",
-      "date": "2026-05-28T18:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Chicago White Sox",
-      "away": "Minnesota Twins",
-      "match": "Chicago White Sox - Minnesota Twins",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Chicago White Sox",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 11-7"
-    },
-    {
-      "event_id": "401815484",
-      "date": "2026-05-24T20:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Arizona Diamondbacks",
-      "away": "Colorado Rockies",
-      "match": "Arizona Diamondbacks - Colorado Rockies",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Colorado Rockies",
-      "side": "away",
-      "strength": 0.799,
-      "context": "2 match dans les 48h + 943 km de voyage"
     },
     {
       "event_id": "401815478",
@@ -381,28 +363,27 @@
       "side": "away",
       "strength": 0.726,
       "context": "1 match dans les 48h + 979 km de voyage"
-    }
-  ],
-  "active_watch": [
+    },
     {
-      "event_id": "401856934",
-      "date": "2026-05-24T19:30Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "New York Liberty",
-      "away": "Dallas Wings",
-      "match": "New York Liberty - Dallas Wings",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
+      "event_id": "401815484",
+      "date": "2026-05-24T20:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Arizona Diamondbacks",
+      "away": "Colorado Rockies",
+      "match": "Arizona Diamondbacks - Colorado Rockies",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
       "direction": "fade",
-      "team": "New York Liberty",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 3-0"
+      "team": "Colorado Rockies",
+      "side": "away",
+      "strength": 0.719,
+      "context": "1 match dans les 48h + 943 km de voyage"
     }
   ],
+  "active_watch": [],
   "active_risk": [
     {
       "event_id": "401843350",
@@ -459,24 +440,6 @@
       "context": "marge bookmaker anormale 18.4%"
     },
     {
-      "event_id": "401865558",
-      "date": "2026-05-27T00:30Z",
-      "sport": "football",
-      "league_code": "conmebol.libertadores",
-      "league_name": "Copa Libertadores",
-      "home": "Nacional",
-      "away": "Coquimbo Unido",
-      "match": "Nacional - Coquimbo Unido",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.1%"
-    },
-    {
       "event_id": "175714",
       "date": "2026-05-27T04:00Z",
       "sport": "tennis",
@@ -492,7 +455,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 12.3%"
+      "context": "marge bookmaker anormale 12.1%"
     },
     {
       "event_id": "401865466",
@@ -960,7 +923,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.9%"
+      "context": "marge bookmaker anormale 18.8%"
     },
     {
       "event_id": "748976",
@@ -981,24 +944,6 @@
       "context": "marge bookmaker anormale 19.0%"
     },
     {
-      "event_id": "748983",
-      "date": "2026-05-31T16:30Z",
-      "sport": "football",
-      "league_code": "laliga2",
-      "league_name": "La Liga 2",
-      "home": "Deportivo La Coruña",
-      "away": "Las Palmas",
-      "match": "Deportivo La Coruña - Las Palmas",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 19.8%"
-    },
-    {
       "event_id": "748981",
       "date": "2026-05-31T16:30Z",
       "sport": "football",
@@ -1014,7 +959,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.5%"
+      "context": "marge bookmaker anormale 18.8%"
     },
     {
       "event_id": "748985",
@@ -1053,24 +998,6 @@
       "context": "marge bookmaker anormale 19.0%"
     },
     {
-      "event_id": "748979",
-      "date": "2026-05-31T16:30Z",
-      "sport": "football",
-      "league_code": "laliga2",
-      "league_name": "La Liga 2",
-      "home": "Real Zaragoza",
-      "away": "Málaga",
-      "match": "Real Zaragoza - Málaga",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 19.1%"
-    },
-    {
       "event_id": "401873202",
       "date": "2026-05-29T00:30Z",
       "sport": "basketball",
@@ -1087,24 +1014,6 @@
       "side": null,
       "strength": 0.488,
       "context": "Signaux opposes: San Antonio Spurs fade 0.75, Oklahoma City Thunder fade 0.75 -> prudence"
-    },
-    {
-      "event_id": "401873346",
-      "date": "2026-05-30T00:00Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "Cleveland Cavaliers",
-      "away": "New York Knicks",
-      "match": "Cleveland Cavaliers - New York Knicks",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "signal_conflict",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.488,
-      "context": "Signaux opposes: Cleveland Cavaliers fade 0.75, New York Knicks fade 0.75 -> prudence"
     },
     {
       "event_id": "401873203",
