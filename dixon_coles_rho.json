@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-05-24T09:18:46Z",
+  "generated_at": "2026-05-24T14:09:10Z",
   "method": "Dixon-Coles MLE grid search (ρ ∈ [-0.30, 0.10] step 0.005), λ_h, λ_a fixés à moyenne empirique par ligue. CI 95% via LR test.",
   "min_matches": 40,
   "default_rho": -0.13,
-  "n_leagues": 138,
+  "n_leagues": 139,
   "n_measured": 0,
   "leagues": {
     "1lig": {
@@ -37,6 +37,14 @@
       "rho_used": -0.13,
       "source": "literature_fallback",
       "reason": "n=1 < 40"
+    },
+    "allsvenskan": {
+      "n": 2,
+      "rho_measured": null,
+      "rho_literature": -0.13,
+      "rho_used": -0.13,
+      "source": "literature_fallback",
+      "reason": "n=2 < 40"
     },
     "arg.1": {
       "n": 19,
@@ -191,17 +199,17 @@
       "reason": "n=5 < 40"
     },
     "chn.1": {
-      "n": 41,
-      "rho_measured": -0.05,
+      "n": 46,
+      "rho_measured": 0.035,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
       "reason": "CI trop large (0.400) ou fit nul",
-      "log_lik": -124.74,
+      "log_lik": -143.84,
       "ci_lo": -0.3,
       "ci_hi": 0.1,
-      "lambda_h": 1.902,
-      "lambda_a": 1.39
+      "lambda_h": 1.826,
+      "lambda_a": 1.543
     },
     "col.1": {
       "n": 18,

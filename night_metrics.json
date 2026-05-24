@@ -1,32 +1,32 @@
 {
-  "generated_at": "2026-05-24T09:18:27Z",
-  "calculated_at": "2026-05-24T09:18:27Z",
+  "generated_at": "2026-05-24T14:08:47Z",
+  "calculated_at": "2026-05-24T14:08:47Z",
   "source_of_truth": "data.js",
-  "data_generated_at": "2026-05-24T09:17:07.042523Z",
+  "data_generated_at": "2026-05-24T14:06:46.627900Z",
   "data_today_field": "2026-05-24",
   "events": {
-    "total": 316,
-    "upcoming": 267,
-    "winamax_available": 316,
-    "winamax_exact": 299,
-    "winamax_exact_ratio": 0.9462,
-    "markets_more_than_1n2": 71,
-    "form_l10": 105,
-    "h2h": 95,
-    "lineups": 25,
+    "total": 308,
+    "upcoming": 253,
+    "winamax_available": 308,
+    "winamax_exact": 291,
+    "winamax_exact_ratio": 0.9448,
+    "markets_more_than_1n2": 62,
+    "form_l10": 118,
+    "h2h": 0,
+    "lineups": 29,
     "football_lineups": 0,
-    "starter_signals": 25,
-    "clubelo": 45,
-    "weather": 107,
-    "injuries": 67,
+    "starter_signals": 29,
+    "clubelo": 44,
+    "weather": 99,
+    "injuries": 74,
     "referee": 27,
     "referee_named": 0,
     "referee_context": 27,
     "referee_signal": 27,
     "fd_calibration": 0,
     "fd_closing_odds": 0,
-    "xg": 67,
-    "smart_money": 1
+    "xg": 73,
+    "smart_money": 0
   },
   "signal_health": {
     "referee": {
@@ -36,15 +36,15 @@
       "note": "referee is effective coverage: named referee or referee_context usable by the model."
     },
     "smart_money": {
-      "events": 1,
+      "events": 0,
       "status": "rare_event",
       "note": "Smart money is intentionally rare; low count is OK when odds movement does not confirm a strong signal."
     }
   },
   "winamax_markets": {
-    "matches": 625,
-    "detailed_market_matches": 298,
-    "detailed_ratio_vs_exact": 0.9967,
+    "matches": 589,
+    "detailed_market_matches": 263,
+    "detailed_ratio_vs_exact": 0.9038,
     "gap_to_50pct_exact": 0,
     "recommended_detail_fetch_cap": 90,
     "detail_by_sport": {
@@ -55,29 +55,29 @@
         "detailed_ratio": 0.0
       },
       "basketball": {
-        "exact": 13,
+        "exact": 14,
         "detailed": 0,
         "families": {},
         "detailed_ratio": 0.0
       },
       "football": {
-        "exact": 92,
-        "detailed": 68,
+        "exact": 91,
+        "detailed": 60,
         "families": {
-          "dnb": 68,
-          "dnb_rows": 68,
-          "match_winner": 68,
-          "btts": 67,
-          "btts_rows": 67,
-          "double_chance": 67,
-          "handicap": 67,
-          "ht_1n2": 67,
-          "ht_1n2_rows": 67,
-          "ht_ou": 67,
-          "ou": 67,
-          "ou15": 67
+          "dnb": 60,
+          "dnb_rows": 60,
+          "match_winner": 60,
+          "btts": 59,
+          "btts_rows": 59,
+          "double_chance": 59,
+          "handicap": 59,
+          "ht_1n2": 59,
+          "ht_1n2_rows": 59,
+          "ht_ou": 59,
+          "ou": 59,
+          "ou15": 59
         },
-        "detailed_ratio": 0.7391
+        "detailed_ratio": 0.6593
       },
       "hockey": {
         "exact": 8,
@@ -86,28 +86,28 @@
         "detailed_ratio": 0.0
       },
       "tennis": {
-        "exact": 128,
+        "exact": 114,
         "detailed": 0,
         "families": {},
         "detailed_ratio": 0.0
       }
     },
     "market_family_counts": {
-      "dnb": 68,
-      "dnb_rows": 68,
-      "match_winner": 68,
-      "btts": 67,
-      "btts_rows": 67,
-      "double_chance": 67,
-      "handicap": 67,
-      "ht_1n2": 67,
-      "ht_1n2_rows": 67,
-      "ht_ou": 67,
-      "ou": 67,
-      "ou15": 67,
-      "ou25": 67,
-      "ou35": 67,
-      "team_total": 67
+      "dnb": 60,
+      "dnb_rows": 60,
+      "match_winner": 60,
+      "btts": 59,
+      "btts_rows": 59,
+      "double_chance": 59,
+      "handicap": 59,
+      "ht_1n2": 59,
+      "ht_1n2_rows": 59,
+      "ht_ou": 59,
+      "ou": 59,
+      "ou15": 59,
+      "ou25": 59,
+      "ou35": 59,
+      "team_total": 59
     }
   },
   "backtest": {
@@ -125,7 +125,7 @@
   },
   "health": {
     "status": "warning",
-    "warnings": 9,
+    "warnings": 10,
     "pipeline_drift": "warn"
   }
 }

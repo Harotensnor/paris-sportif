@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-24T09:18:19Z",
+  "generated_at": "2026-05-24T14:08:40Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -994,6 +994,42 @@
             "whip": 1.06
           },
           "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Athletics",
+          "pitcher": "Luis Medina",
+          "label": "Luis Medina plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.5307,
+          "fair_odds": 1.88,
+          "expected_strikeouts": 4.63,
+          "projected_ip": 4.8,
+          "inputs": {
+            "k9": 8.68,
+            "era": 2.41,
+            "whip": 1.18,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Athletics",
+          "pitcher": "Luis Medina",
+          "label": "Luis Medina ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.7741,
+          "fair_odds": 1.29,
+          "expected_hr_allowed": 0.256,
+          "projected_ip": 4.8,
+          "inputs": {
+            "hr9": 0.48,
+            "era": 2.41,
+            "whip": 1.18
+          },
+          "side": "away"
         }
       ]
     },
@@ -1168,11 +1204,47 @@
             "whip": 1.29
           },
           "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Texas Rangers",
+          "pitcher": "MacKenzie Gore",
+          "label": "MacKenzie Gore moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.5002,
+          "fair_odds": 2.0,
+          "expected_strikeouts": 5.5,
+          "projected_ip": 4.9,
+          "inputs": {
+            "k9": 10.1,
+            "era": 4.78,
+            "whip": 1.33,
+            "hand": "L"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Texas Rangers",
+          "pitcher": "MacKenzie Gore",
+          "label": "MacKenzie Gore ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5494,
+          "fair_odds": 1.82,
+          "expected_hr_allowed": 0.599,
+          "projected_ip": 4.9,
+          "inputs": {
+            "hr9": 1.1,
+            "era": 4.78,
+            "whip": 1.33
+          },
+          "side": "away"
         }
       ]
     }
   ],
-  "props": 56,
+  "props": 60,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
