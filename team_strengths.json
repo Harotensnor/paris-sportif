@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-24T17:50:50Z",
+  "generated_at": "2026-05-24T18:55:10Z",
   "method": "Maher (1982) Poisson regression simplifiée. alpha_off = goals_for / expected_gf · beta_def = goals_against / expected_ga · normalisé par moyennes ligue home/away.",
   "min_matches_per_league": 40,
   "min_matches_per_team": 5,
@@ -433,58 +433,72 @@
       }
     },
     "ita.1": {
-      "league_avg_home": 1.19,
-      "league_avg_away": 1.19,
-      "n_matches": 43,
+      "league_avg_home": 1.18,
+      "league_avg_away": 1.16,
+      "n_matches": 44,
       "teams": {
+        "Napoli": {
+          "alpha_off": 1.705,
+          "beta_def": 0.514,
+          "n_matches": 5,
+          "gf_avg": 2.0,
+          "ga_avg": 0.6
+        },
         "Bologna": {
-          "alpha_off": 1.18,
-          "beta_def": 1.18,
+          "alpha_off": 1.194,
+          "beta_def": 1.198,
           "n_matches": 5,
           "gf_avg": 1.4,
           "ga_avg": 1.4
         },
         "Lecce": {
-          "alpha_off": 1.18,
-          "beta_def": 0.843,
+          "alpha_off": 1.203,
+          "beta_def": 0.849,
           "n_matches": 5,
           "gf_avg": 1.4,
           "ga_avg": 1.0
         },
         "Pisa": {
-          "alpha_off": 0.422,
-          "beta_def": 1.827,
+          "alpha_off": 0.427,
+          "beta_def": 1.851,
           "n_matches": 6,
           "gf_avg": 0.5,
           "ga_avg": 2.17
         },
         "Fiorentina": {
-          "alpha_off": 0.506,
-          "beta_def": 0.843,
+          "alpha_off": 0.512,
+          "beta_def": 0.856,
           "n_matches": 5,
           "gf_avg": 0.6,
           "ga_avg": 1.0
         },
         "Internazionale": {
-          "alpha_off": 1.855,
-          "beta_def": 1.012,
+          "alpha_off": 1.883,
+          "beta_def": 1.023,
           "n_matches": 5,
           "gf_avg": 2.2,
           "ga_avg": 1.2
         },
         "Atalanta": {
-          "alpha_off": 1.012,
-          "beta_def": 1.18,
+          "alpha_off": 1.027,
+          "beta_def": 1.194,
           "n_matches": 5,
           "gf_avg": 1.2,
           "ga_avg": 1.4
         },
         "Lazio": {
-          "alpha_off": 1.18,
-          "beta_def": 1.686,
+          "alpha_off": 1.194,
+          "beta_def": 1.712,
           "n_matches": 5,
           "gf_avg": 1.4,
           "ga_avg": 2.0
+        },
+        "Udinese": {
+          "alpha_off": 1.198,
+          "beta_def": 0.853,
+          "n_matches": 5,
+          "gf_avg": 1.4,
+          "ga_avg": 1.0
         }
       }
     },

@@ -1,22 +1,22 @@
 {
-  "generated_at": "2026-05-24T17:50:28Z",
+  "generated_at": "2026-05-24T18:54:49Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 31,
+    "active_events": 28,
     "expired_sample": 0,
     "by_type": {
-      "travel_extreme": 3,
-      "back_to_back_travel": 14,
       "lookahead": 35,
-      "schedule_congestion": 32
+      "back_to_back_travel": 11,
+      "schedule_congestion": 32,
+      "travel_extreme": 1
     },
     "by_decision": {
       "abstain": 16,
-      "lean_home": 15
+      "lean_home": 12
     },
-    "lean_home": 15,
+    "lean_home": 12,
     "lean_away": 0,
     "abstain": 16,
     "monitor": 0
@@ -1395,118 +1395,6 @@
       }
     },
     {
-      "event_id": "401815480",
-      "source_event_ids": [
-        "401815480"
-      ],
-      "kickoff": "2026-05-24T18:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Milwaukee Brewers",
-      "away": "Los Angeles Dodgers",
-      "match": "Milwaukee Brewers - Los Angeles Dodgers",
-      "decision": "lean_home",
-      "net_team": "Milwaukee Brewers",
-      "reason": "Los Angeles Dodgers plus penalise par calendrier/voyage (1.65 vs 0.00)",
-      "pressure_score": 1.65,
-      "home_fade": 0.0,
-      "away_fade": 1.65,
-      "travel_score": 1.65,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "travel_extreme": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "Deplacement estime 2796 km, decalage ~2.0h",
-        "2 match dans les 48h + 2796 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.928,
-        "away_score": -2.65,
-        "home_fade": 0.0,
-        "away_fade": 2.65,
-        "reason": "Direction nette: Milwaukee Brewers (+0.93)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.65
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815481",
-      "source_event_ids": [
-        "401815481"
-      ],
-      "kickoff": "2026-05-24T18:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Kansas City Royals",
-      "away": "Seattle Mariners",
-      "match": "Kansas City Royals - Seattle Mariners",
-      "decision": "lean_home",
-      "net_team": "Kansas City Royals",
-      "reason": "Seattle Mariners plus penalise par calendrier/voyage (1.56 vs 0.00)",
-      "pressure_score": 1.565,
-      "home_fade": 0.0,
-      "away_fade": 1.565,
-      "travel_score": 1.565,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "travel_extreme": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "Deplacement estime 2428 km, decalage ~1.9h",
-        "2 match dans les 48h + 2428 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.548,
-        "away_score": -1.565,
-        "home_fade": 0.0,
-        "away_fade": 1.565,
-        "reason": "Direction nette: Kansas City Royals (+0.55)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.565
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401815485",
       "source_event_ids": [
         "401815485"
@@ -1681,57 +1569,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.726
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815479",
-      "source_event_ids": [
-        "401815479"
-      ],
-      "kickoff": "2026-05-24T18:20Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Chicago Cubs",
-      "away": "Houston Astros",
-      "match": "Chicago Cubs - Houston Astros",
-      "decision": "lean_home",
-      "net_team": "Chicago Cubs",
-      "reason": "Houston Astros plus penalise par calendrier/voyage (0.91 vs 0.00)",
-      "pressure_score": 0.914,
-      "home_fade": 0.0,
-      "away_fade": 0.914,
-      "travel_score": 0.914,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "2 match dans les 48h + 1521 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.53,
-        "away_score": -1.514,
-        "home_fade": 0.0,
-        "away_fade": 1.514,
-        "reason": "Direction nette: Chicago Cubs (+0.53)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.914
           }
         ]
       }
