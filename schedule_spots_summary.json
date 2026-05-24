@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-05-24T16:51:10Z",
+  "generated_at": "2026-05-24T17:50:28Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 35,
+    "active_events": 31,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 36,
-      "travel_extreme": 4,
-      "back_to_back_travel": 17,
-      "schedule_congestion": 34
+      "travel_extreme": 3,
+      "back_to_back_travel": 14,
+      "lookahead": 35,
+      "schedule_congestion": 32
     },
     "by_decision": {
-      "abstain": 17,
-      "lean_home": 18
+      "abstain": 16,
+      "lean_home": 15
     },
-    "lean_home": 18,
+    "lean_home": 15,
     "lean_away": 0,
-    "abstain": 17,
+    "abstain": 16,
     "monitor": 0
   },
   "active": [
@@ -502,64 +502,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815476",
-      "source_event_ids": [
-        "401815476"
-      ],
-      "kickoff": "2026-05-24T17:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Cincinnati Reds",
-      "away": "St. Louis Cardinals",
-      "match": "Cincinnati Reds - St. Louis Cardinals",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Cincinnati Reds 0.60, St. Louis Cardinals 0.60",
-      "pressure_score": 1.2,
-      "home_fade": 0.6,
-      "away_fade": 0.6,
-      "travel_score": 0,
-      "lookahead_score": 0,
-      "congestion_score": 1.2,
-      "types": {
-        "schedule_congestion": 2
-      },
-      "contexts": [
-        "3 matchs sur les 7 derniers jours",
-        "3 matchs sur les 7 derniers jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -1.19,
-        "away_score": -0.11,
-        "home_fade": 1.4,
-        "away_fade": 0.6,
-        "reason": "Direction nette: St. Louis Cardinals (-0.11)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.8
           }
         ]
       }
@@ -1333,73 +1275,6 @@
       }
     },
     {
-      "event_id": "401815473",
-      "source_event_ids": [
-        "401815473"
-      ],
-      "kickoff": "2026-05-24T17:35Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Boston Red Sox",
-      "away": "Minnesota Twins",
-      "match": "Boston Red Sox - Minnesota Twins",
-      "decision": "lean_home",
-      "net_team": "Boston Red Sox",
-      "reason": "Minnesota Twins plus penalise par calendrier/voyage (1.69 vs 0.00)",
-      "pressure_score": 2.056,
-      "home_fade": 0.0,
-      "away_fade": 1.69,
-      "travel_score": 1.39,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 1,
-        "travel_extreme": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "2 match important/proche dans les 3 jours",
-        "Deplacement estime 1802 km, decalage ~1.5h",
-        "2 match dans les 48h + 1802 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.009,
-        "away_score": -1.48,
-        "home_fade": 0.6,
-        "away_fade": 1.69,
-        "reason": "Direction nette: Boston Red Sox (-0.01)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.419
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.97
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401873388",
       "source_event_ids": [
         "401873388"
@@ -1811,108 +1686,6 @@
       }
     },
     {
-      "event_id": "401815474",
-      "source_event_ids": [
-        "401815474"
-      ],
-      "kickoff": "2026-05-24T17:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Miami Marlins",
-      "away": "New York Mets",
-      "match": "Miami Marlins - New York Mets",
-      "decision": "lean_home",
-      "net_team": "Miami Marlins",
-      "reason": "New York Mets plus penalise par calendrier/voyage (0.96 vs 0.00)",
-      "pressure_score": 0.963,
-      "home_fade": 0.0,
-      "away_fade": 0.963,
-      "travel_score": 0.963,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "2 match dans les 48h + 1767 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.687,
-        "away_score": -1.963,
-        "home_fade": 0.0,
-        "away_fade": 1.963,
-        "reason": "Direction nette: Miami Marlins (+0.69)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.963
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815477",
-      "source_event_ids": [
-        "401815477"
-      ],
-      "kickoff": "2026-05-24T17:35Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "New York Yankees",
-      "away": "Tampa Bay Rays",
-      "match": "New York Yankees - Tampa Bay Rays",
-      "decision": "lean_home",
-      "net_team": "New York Yankees",
-      "reason": "Tampa Bay Rays plus penalise par calendrier/voyage (0.94 vs 0.00)",
-      "pressure_score": 0.941,
-      "home_fade": 0.0,
-      "away_fade": 0.941,
-      "travel_score": 0.941,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "2 match dans les 48h + 1657 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.679,
-        "away_score": -1.941,
-        "home_fade": 0.0,
-        "away_fade": 1.941,
-        "reason": "Direction nette: New York Yankees (+0.68)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.941
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401815479",
       "source_event_ids": [
         "401815479"
@@ -1942,17 +1715,17 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.6,
-        "away_score": -1.714,
+        "home_score": 0.53,
+        "away_score": -1.514,
         "home_fade": 0.0,
-        "away_fade": 1.714,
-        "reason": "Direction nette: Chicago Cubs (+0.60)",
+        "away_fade": 1.514,
+        "reason": "Direction nette: Chicago Cubs (+0.53)",
         "detail": [
           {
             "side": "away",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.8
+            "strength": 0.6
           },
           {
             "side": "away",

@@ -1,64 +1,28 @@
 {
-  "generated_at": "2026-05-24T16:51:10Z",
+  "generated_at": "2026-05-24T17:50:28Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 63,
-    "actionable": 27,
+    "active_events": 59,
+    "actionable": 23,
     "watch": 1,
     "risk": 35,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 19,
-      "back_to_back_travel": 17,
+      "injury_imbalance": 15,
       "travel_extreme": 2,
+      "back_to_back_travel": 14,
       "market_uncertain": 31,
       "signal_conflict": 6
     },
     "by_quality": {
-      "actionable": 27,
+      "actionable": 23,
       "watch": 1,
       "risk": 35
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401815477",
-      "date": "2026-05-24T17:35Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "New York Yankees",
-      "away": "Tampa Bay Rays",
-      "match": "New York Yankees - Tampa Bay Rays",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Tampa Bay Rays",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 5-10"
-    },
-    {
-      "event_id": "401815474",
-      "date": "2026-05-24T17:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Miami Marlins",
-      "away": "New York Mets",
-      "match": "Miami Marlins - New York Mets",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "New York Mets",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 6-14"
-    },
     {
       "event_id": "401815480",
       "date": "2026-05-24T18:10Z",
@@ -204,24 +168,6 @@
       "context": "2 match dans les 48h + 1934 km de voyage"
     },
     {
-      "event_id": "401815473",
-      "date": "2026-05-24T17:35Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Boston Red Sox",
-      "away": "Minnesota Twins",
-      "match": "Boston Red Sox - Minnesota Twins",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Minnesota Twins",
-      "side": "away",
-      "strength": 0.97,
-      "context": "2 match dans les 48h + 1802 km de voyage"
-    },
-    {
       "event_id": "401815479",
       "date": "2026-05-24T18:20Z",
       "sport": "baseball",
@@ -238,24 +184,6 @@
       "side": "away",
       "strength": 0.914,
       "context": "2 match dans les 48h + 1521 km de voyage"
-    },
-    {
-      "event_id": "401815476",
-      "date": "2026-05-24T17:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Cincinnati Reds",
-      "away": "St. Louis Cardinals",
-      "match": "Cincinnati Reds - St. Louis Cardinals",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Cincinnati Reds",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 7-3"
     },
     {
       "event_id": "401815482",
@@ -640,7 +568,7 @@
       "context": "marge bookmaker anormale 18.1%"
     },
     {
-      "event_id": "175564",
+      "event_id": "175760",
       "date": "2026-05-27T04:00Z",
       "sport": "tennis",
       "league_code": "rolandgarros",
@@ -712,24 +640,6 @@
       "context": "marge bookmaker anormale 18.3%"
     },
     {
-      "event_id": "401865563",
-      "date": "2026-05-28T00:30Z",
-      "sport": "football",
-      "league_code": "conmebol.libertadores",
-      "league_name": "Copa Libertadores",
-      "home": "Fluminense",
-      "away": "Deportivo La Guaira",
-      "match": "Fluminense - Deportivo La Guaira",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.4%"
-    },
-    {
       "event_id": "401865462",
       "date": "2026-05-28T00:30Z",
       "sport": "football",
@@ -746,6 +656,24 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.0%"
+    },
+    {
+      "event_id": "401865563",
+      "date": "2026-05-28T00:30Z",
+      "sport": "football",
+      "league_code": "conmebol.libertadores",
+      "league_name": "Copa Libertadores",
+      "home": "Fluminense",
+      "away": "Deportivo La Guaira",
+      "match": "Fluminense - Deportivo La Guaira",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.4%"
     },
     {
       "event_id": "401865551",
@@ -784,6 +712,24 @@
       "context": "marge bookmaker anormale 18.5%"
     },
     {
+      "event_id": "401865553",
+      "date": "2026-05-29T00:30Z",
+      "sport": "football",
+      "league_code": "conmebol.libertadores",
+      "league_name": "Copa Libertadores",
+      "home": "Cruzeiro",
+      "away": "Barcelona SC",
+      "match": "Cruzeiro - Barcelona SC",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.3%"
+    },
+    {
       "event_id": "401865451",
       "date": "2026-05-29T00:30Z",
       "sport": "football",
@@ -820,14 +766,14 @@
       "context": "marge bookmaker anormale 18.0%"
     },
     {
-      "event_id": "401865553",
-      "date": "2026-05-29T00:30Z",
+      "event_id": "401842737",
+      "date": "2026-05-29T17:00Z",
       "sport": "football",
-      "league_code": "conmebol.libertadores",
-      "league_name": "Copa Libertadores",
-      "home": "Cruzeiro",
-      "away": "Barcelona SC",
-      "match": "Cruzeiro - Barcelona SC",
+      "league_code": "allsvenskan",
+      "league_name": "Allsvenskan",
+      "home": "Örgryte IS",
+      "away": "IF Elfsborg",
+      "match": "Örgryte IS - IF Elfsborg",
       "quality": "risk",
       "quality_reason": "Signal de prudence, pas une opportunite directe",
       "type": "market_uncertain",
@@ -835,7 +781,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.3%"
+      "context": "marge bookmaker anormale 18.8%"
     },
     {
       "event_id": "401843360",
@@ -890,24 +836,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.7%"
-    },
-    {
-      "event_id": "401842737",
-      "date": "2026-05-29T17:00Z",
-      "sport": "football",
-      "league_code": "allsvenskan",
-      "league_name": "Allsvenskan",
-      "home": "Örgryte IS",
-      "away": "IF Elfsborg",
-      "match": "Örgryte IS - IF Elfsborg",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.8%"
     },
     {
       "event_id": "401861400",
