@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-24T20:44:58Z",
+  "generated_at": "2026-05-24T21:40:24Z",
   "method": "Full Bivariate Poisson MLE Dixon-Coles. Coordinate-descent avec golden-section search 1D. Pure Python (pas de scipy).",
   "min_matches_per_league": 40,
   "min_matches_per_team": 5,
@@ -388,66 +388,102 @@
       }
     },
     "ita.1": {
-      "n_matches": 44,
-      "n_teams": 9,
-      "gamma": 0.095,
-      "rho": -0.2105,
-      "log_lik": -117.61,
-      "iterations": 2,
+      "n_matches": 48,
+      "n_teams": 15,
+      "gamma": -0.0646,
+      "rho": -0.2348,
+      "log_lik": -119.72,
+      "iterations": 3,
       "teams": {
+        "AC Milan": {
+          "alpha": 0.0046,
+          "beta": -0.5913,
+          "rank_off": 11,
+          "rank_def": 1
+        },
         "Atalanta": {
-          "alpha": 0.0681,
-          "beta": -0.2337,
-          "rank_off": 6,
-          "rank_def": 3
+          "alpha": 0.0197,
+          "beta": -0.4485,
+          "rank_off": 10,
+          "rank_def": 4
         },
         "Bologna": {
-          "alpha": 0.2446,
-          "beta": 0.11,
+          "alpha": 0.3727,
+          "beta": 0.0867,
+          "rank_off": 4,
+          "rank_def": 10
+        },
+        "Cagliari": {
+          "alpha": 0.245,
+          "beta": -0.1049,
+          "rank_off": 6,
+          "rank_def": 9
+        },
+        "Como": {
+          "alpha": 0.6246,
+          "beta": 1.5182,
           "rank_off": 3,
+          "rank_def": 15
+        },
+        "Cremonese": {
+          "alpha": 0.3089,
+          "beta": -0.3208,
+          "rank_off": 5,
           "rank_def": 6
         },
         "Fiorentina": {
-          "alpha": -0.6796,
-          "beta": 0.1437,
-          "rank_off": 8,
+          "alpha": -0.4969,
+          "beta": -0.1931,
+          "rank_off": 12,
           "rank_def": 7
         },
+        "Genoa": {
+          "alpha": -1.4756,
+          "beta": 0.1075,
+          "rank_off": 15,
+          "rank_def": 11
+        },
+        "Hellas Verona": {
+          "alpha": -0.7976,
+          "beta": 0.3479,
+          "rank_off": 13,
+          "rank_def": 13
+        },
         "Internazionale": {
-          "alpha": 0.5453,
-          "beta": 0.095,
-          "rank_off": 1,
-          "rank_def": 5
+          "alpha": 0.7674,
+          "beta": -0.1687,
+          "rank_off": 2,
+          "rank_def": 8
         },
         "Lazio": {
-          "alpha": 0.1413,
-          "beta": -0.4855,
-          "rank_off": 4,
-          "rank_def": 1
-        },
-        "Lecce": {
-          "alpha": 0.0042,
-          "beta": -0.1117,
+          "alpha": 0.2206,
+          "beta": -0.488,
           "rank_off": 7,
-          "rank_def": 4
-        },
-        "Napoli": {
-          "alpha": 0.5244,
-          "beta": 0.6023,
-          "rank_off": 2,
-          "rank_def": 9
-        },
-        "Pisa": {
-          "alpha": -0.9257,
-          "beta": -0.4705,
-          "rank_off": 9,
           "rank_def": 2
         },
+        "Lecce": {
+          "alpha": 0.1625,
+          "beta": -0.3754,
+          "rank_off": 8,
+          "rank_def": 5
+        },
+        "Napoli": {
+          "alpha": 0.7767,
+          "beta": 0.7612,
+          "rank_off": 1,
+          "rank_def": 14
+        },
+        "Pisa": {
+          "alpha": -0.8951,
+          "beta": -0.4636,
+          "rank_off": 14,
+          "rank_def": 3
+        },
         "Udinese": {
-          "alpha": 0.0774,
-          "beta": 0.3504,
-          "rank_off": 5,
-          "rank_def": 8
+          "alpha": 0.1625,
+          "beta": 0.3328,
+          "rank_off": 9,
+          "rank_def": 12
         }
       }
     },

@@ -1,42 +1,42 @@
 {
-  "generated_at": "2026-05-24T20:44:43Z",
-  "calculated_at": "2026-05-24T20:44:43Z",
+  "generated_at": "2026-05-24T21:40:08Z",
+  "calculated_at": "2026-05-24T21:40:08Z",
   "source_of_truth": "data.js",
-  "data_generated_at": "2026-05-24T20:43:14.704991Z",
+  "data_generated_at": "2026-05-24T21:39:05.109498Z",
   "data_today_field": "2026-05-24",
   "events": {
-    "total": 248,
-    "upcoming": 213,
-    "winamax_available": 248,
-    "winamax_exact": 235,
-    "winamax_exact_ratio": 0.9476,
-    "markets_more_than_1n2": 29,
-    "form_l10": 80,
-    "h2h": 50,
-    "lineups": 22,
+    "total": 230,
+    "upcoming": 202,
+    "winamax_available": 230,
+    "winamax_exact": 224,
+    "winamax_exact_ratio": 0.9739,
+    "markets_more_than_1n2": 28,
+    "form_l10": 64,
+    "h2h": 45,
+    "lineups": 19,
     "football_lineups": 0,
-    "starter_signals": 22,
-    "clubelo": 33,
-    "weather": 83,
-    "injuries": 50,
-    "referee": 17,
+    "starter_signals": 19,
+    "clubelo": 25,
+    "weather": 75,
+    "injuries": 41,
+    "referee": 9,
     "referee_named": 0,
-    "referee_context": 17,
-    "referee_signal": 17,
+    "referee_context": 9,
+    "referee_signal": 9,
     "fd_calibration": 0,
     "fd_closing_odds": 0,
-    "xg": 67,
-    "smart_money": 2
+    "xg": 59,
+    "smart_money": 1
   },
   "signal_health": {
     "referee": {
-      "effective_events": 17,
+      "effective_events": 9,
       "named_events": 0,
-      "context_events": 17,
+      "context_events": 9,
       "note": "referee is effective coverage: named referee or referee_context usable by the model."
     },
     "smart_money": {
-      "events": 2,
+      "events": 1,
       "status": "rare_event",
       "note": "Smart money is intentionally rare; low count is OK when odds movement does not confirm a strong signal."
     }
@@ -44,40 +44,40 @@
   "winamax_markets": {
     "matches": 527,
     "detailed_market_matches": 212,
-    "detailed_ratio_vs_exact": 0.9021,
+    "detailed_ratio_vs_exact": 0.9464,
     "gap_to_50pct_exact": 0,
     "recommended_detail_fetch_cap": 90,
     "detail_by_sport": {
       "baseball": {
-        "exact": 17,
+        "exact": 13,
         "detailed": 0,
         "families": {},
         "detailed_ratio": 0.0
       },
       "basketball": {
-        "exact": 14,
+        "exact": 13,
         "detailed": 0,
         "families": {},
         "detailed_ratio": 0.0
       },
       "football": {
-        "exact": 74,
-        "detailed": 29,
+        "exact": 69,
+        "detailed": 28,
         "families": {
-          "btts": 29,
-          "btts_rows": 29,
-          "dnb": 29,
-          "dnb_rows": 29,
-          "double_chance": 29,
-          "handicap": 29,
-          "ht_1n2": 29,
-          "ht_1n2_rows": 29,
-          "ht_ou": 29,
-          "match_winner": 29,
-          "ou": 29,
-          "ou15": 29
+          "btts": 28,
+          "btts_rows": 28,
+          "dnb": 28,
+          "dnb_rows": 28,
+          "double_chance": 28,
+          "handicap": 28,
+          "ht_1n2": 28,
+          "ht_1n2_rows": 28,
+          "ht_ou": 28,
+          "match_winner": 28,
+          "ou": 28,
+          "ou15": 28
         },
-        "detailed_ratio": 0.3919
+        "detailed_ratio": 0.4058
       },
       "hockey": {
         "exact": 8,
@@ -86,28 +86,28 @@
         "detailed_ratio": 0.0
       },
       "tennis": {
-        "exact": 100,
+        "exact": 99,
         "detailed": 0,
         "families": {},
         "detailed_ratio": 0.0
       }
     },
     "market_family_counts": {
-      "btts": 29,
-      "btts_rows": 29,
-      "dnb": 29,
-      "dnb_rows": 29,
-      "double_chance": 29,
-      "handicap": 29,
-      "ht_1n2": 29,
-      "ht_1n2_rows": 29,
-      "ht_ou": 29,
-      "match_winner": 29,
-      "ou": 29,
-      "ou15": 29,
-      "ou25": 29,
-      "ou35": 29,
-      "team_total": 29
+      "btts": 28,
+      "btts_rows": 28,
+      "dnb": 28,
+      "dnb_rows": 28,
+      "double_chance": 28,
+      "handicap": 28,
+      "ht_1n2": 28,
+      "ht_1n2_rows": 28,
+      "ht_ou": 28,
+      "match_winner": 28,
+      "ou": 28,
+      "ou15": 28,
+      "ou25": 28,
+      "ou35": 28,
+      "team_total": 28
     }
   },
   "backtest": {
