@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-23T06:27:22Z",
+  "generated_at": "2026-05-24T06:52:39Z",
   "schema": "calibration_per_sport_league_v1",
   "top5_leagues": [
     "eng.1",
@@ -10,6 +10,106 @@
   ],
   "groups": {
     "baseball:all": {
+      "n": 13,
+      "wins": 5,
+      "losses": 8,
+      "win_rate": 0.38461538461538464,
+      "win_rate_ci": [
+        0.1771,
+        0.6448
+      ],
+      "flat_pnl": -3.02,
+      "flat_roi_pct": -23.23,
+      "flat_roi_ci_pct": [
+        -71.38,
+        33.85
+      ],
+      "kelly_pnl": 2.03,
+      "brier": 0.3155,
+      "logloss": 0.8353,
+      "avg_cote": 1.76,
+      "avg_pick_prob": 0.569,
+      "avg_edge_pct": -1.76,
+      "avg_ev_pct": -1.38,
+      "avg_clv_pct": -4.83,
+      "n_with_clv": 9
+    },
+    "basketball:all": {
+      "n": 2,
+      "wins": 1,
+      "losses": 1,
+      "win_rate": 0.5,
+      "win_rate_ci": [
+        0.0945,
+        0.9055
+      ],
+      "flat_pnl": -0.2,
+      "flat_roi_pct": -10.0,
+      "flat_roi_ci_pct": [
+        -100.0,
+        80.0
+      ],
+      "kelly_pnl": 0.0,
+      "brier": 0.2396,
+      "logloss": 0.6722,
+      "avg_cote": 1.74,
+      "avg_pick_prob": 0.516,
+      "avg_edge_pct": -5.9,
+      "avg_ev_pct": -10.09,
+      "avg_clv_pct": 0.0,
+      "n_with_clv": 1
+    },
+    "football:other": {
+      "n": 16,
+      "wins": 11,
+      "losses": 5,
+      "win_rate": 0.6875,
+      "win_rate_ci": [
+        0.444,
+        0.8584
+      ],
+      "flat_pnl": 2.53,
+      "flat_roi_pct": 15.79,
+      "flat_roi_ci_pct": [
+        -23.8,
+        56.43
+      ],
+      "kelly_pnl": 0.47,
+      "brier": 0.2144,
+      "logloss": 0.6189,
+      "avg_cote": 1.82,
+      "avg_pick_prob": 0.55,
+      "avg_edge_pct": -5.0,
+      "avg_ev_pct": -7.07,
+      "avg_clv_pct": -8.21,
+      "n_with_clv": 7
+    },
+    "football:top5": {
+      "n": 9,
+      "wins": 6,
+      "losses": 3,
+      "win_rate": 0.6666666666666666,
+      "win_rate_ci": [
+        0.3542,
+        0.8794
+      ],
+      "flat_pnl": 2.53,
+      "flat_roi_pct": 28.11,
+      "flat_roi_ci_pct": [
+        -32.5,
+        91.11
+      ],
+      "kelly_pnl": 9.24,
+      "brier": 0.1955,
+      "logloss": 0.5821,
+      "avg_cote": 1.99,
+      "avg_pick_prob": 0.514,
+      "avg_edge_pct": -0.93,
+      "avg_ev_pct": -0.8,
+      "avg_clv_pct": null,
+      "n_with_clv": 0
+    },
+    "hockey:all": {
       "n": 1,
       "wins": 0,
       "losses": 1,
@@ -24,63 +124,13 @@
         -100.0,
         -100.0
       ],
-      "kelly_pnl": -4.69,
-      "brier": 0.4584,
-      "logloss": 1.1302,
-      "avg_cote": 1.66,
-      "avg_pick_prob": 0.677,
-      "avg_edge_pct": 7.46,
-      "avg_ev_pct": 12.39,
-      "avg_clv_pct": -2.01,
-      "n_with_clv": 1
-    },
-    "football:other": {
-      "n": 2,
-      "wins": 2,
-      "losses": 0,
-      "win_rate": 1.0,
-      "win_rate_ci": [
-        0.3424,
-        1.0
-      ],
-      "flat_pnl": 1.79,
-      "flat_roi_pct": 89.5,
-      "flat_roi_ci_pct": [
-        49.0,
-        130.0
-      ],
-      "kelly_pnl": 0.33,
-      "brier": 0.2488,
-      "logloss": 0.6882,
-      "avg_cote": 1.9,
-      "avg_pick_prob": 0.526,
-      "avg_edge_pct": -2.73,
-      "avg_ev_pct": -6.64,
-      "avg_clv_pct": null,
-      "n_with_clv": 0
-    },
-    "football:top5": {
-      "n": 1,
-      "wins": 1,
-      "losses": 0,
-      "win_rate": 1.0,
-      "win_rate_ci": [
-        0.2065,
-        1.0
-      ],
-      "flat_pnl": 2.5,
-      "flat_roi_pct": 250.0,
-      "flat_roi_ci_pct": [
-        250.0,
-        250.0
-      ],
-      "kelly_pnl": 5.14,
-      "brier": 0.4259,
-      "logloss": 1.0574,
-      "avg_cote": 3.5,
-      "avg_pick_prob": 0.347,
-      "avg_edge_pct": 6.17,
-      "avg_ev_pct": 21.58,
+      "kelly_pnl": -3.98,
+      "brier": 0.3027,
+      "logloss": 0.799,
+      "avg_cote": 2.15,
+      "avg_pick_prob": 0.55,
+      "avg_edge_pct": 8.51,
+      "avg_ev_pct": 18.3,
       "avg_clv_pct": null,
       "n_with_clv": 0
     }
