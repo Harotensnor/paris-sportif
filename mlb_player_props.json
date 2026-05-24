@@ -1,54 +1,8 @@
 {
-  "generated_at": "2026-05-24T21:40:04Z",
+  "generated_at": "2026-05-24T22:39:52Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401873649",
-      "kickoff": "2026-05-24T22:05Z",
-      "league": "MLB",
-      "match": "Detroit Tigers at Baltimore Orioles",
-      "home": "Baltimore Orioles",
-      "away": "Detroit Tigers",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Baltimore Orioles",
-          "pitcher": "Trevor Rogers",
-          "label": "Trevor Rogers moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.593,
-          "fair_odds": 1.69,
-          "expected_strikeouts": 4.13,
-          "projected_ip": 4.75,
-          "inputs": {
-            "k9": 7.82,
-            "era": 6.87,
-            "whip": 1.66,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Baltimore Orioles",
-          "pitcher": "Trevor Rogers",
-          "label": "Trevor Rogers ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5365,
-          "fair_odds": 1.86,
-          "expected_hr_allowed": 0.623,
-          "projected_ip": 4.75,
-          "inputs": {
-            "hr9": 1.18,
-            "era": 6.87,
-            "whip": 1.66
-          },
-          "side": "home"
-        }
-      ]
-    },
     {
       "event_id": "401815485",
       "kickoff": "2026-05-24T23:20Z",
@@ -224,7 +178,7 @@
       ]
     }
   ],
-  "props": 10,
+  "props": 8,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
