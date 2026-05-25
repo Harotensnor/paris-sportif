@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-25T13:01:12Z",
+  "generated_at": "2026-05-25T15:49:39Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -2428,6 +2428,42 @@
             "whip": 1.47
           },
           "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Chicago Cubs",
+          "pitcher": "Jameson Taillon",
+          "label": "Jameson Taillon plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.5419,
+          "fair_odds": 1.85,
+          "expected_strikeouts": 4.68,
+          "projected_ip": 5.51,
+          "inputs": {
+            "k9": 7.64,
+            "era": 5.2,
+            "whip": 1.27,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Chicago Cubs",
+          "pitcher": "Jameson Taillon",
+          "label": "Jameson Taillon concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.8166,
+          "fair_odds": 1.22,
+          "expected_hr_allowed": 1.696,
+          "projected_ip": 5.51,
+          "inputs": {
+            "hr9": 2.77,
+            "era": 5.2,
+            "whip": 1.27
+          },
+          "side": "away"
         }
       ]
     },
@@ -2642,7 +2678,7 @@
       ]
     }
   ],
-  "props": 126,
+  "props": 128,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"

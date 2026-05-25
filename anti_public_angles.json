@@ -1,15 +1,34 @@
 {
-  "generated_at": "2026-05-25T13:01:15Z",
+  "generated_at": "2026-05-25T15:49:42Z",
   "source": "data.js event.smart_money derived from odds_history",
   "status": "ok",
   "summary": {
     "active": 1,
-    "expired_sample": 0,
+    "expired_sample": 1,
     "by_type": {
-      "underdog_steam": 1
+      "underdog_steam": 1,
+      "balanced_steam": 1
     }
   },
   "active": [
+    {
+      "event_id": "401815493",
+      "kickoff": "2026-05-25T19:40Z",
+      "sport": "baseball",
+      "league": "mlb",
+      "match": "New York Yankees at Kansas City Royals",
+      "side": "home",
+      "pick_key": "1",
+      "type": "balanced_steam",
+      "reason": "Mouvement cote net 10.5% sur home",
+      "odd_open": 2.29,
+      "odd_latest": 2.05,
+      "odd_drop_pct": 10.48,
+      "confidence": 0.849,
+      "snapshots": 4
+    }
+  ],
+  "expired_sample": [
     {
       "event_id": "401873417",
       "kickoff": "2026-05-25T15:00Z",
@@ -26,6 +45,5 @@
       "confidence": 0.856,
       "snapshots": 3
     }
-  ],
-  "expired_sample": []
+  ]
 }
