@@ -1,64 +1,28 @@
 {
-  "generated_at": "2026-05-25T22:42:48Z",
+  "generated_at": "2026-05-25T23:47:18Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 59,
-    "actionable": 35,
-    "watch": 3,
+    "active_events": 57,
+    "actionable": 34,
+    "watch": 2,
     "risk": 21,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 24,
-      "travel_extreme": 9,
-      "signal_conflict": 10,
+      "injury_imbalance": 22,
       "back_to_back_travel": 22,
+      "travel_extreme": 7,
+      "signal_conflict": 9,
       "market_uncertain": 20
     },
     "by_quality": {
-      "actionable": 35,
-      "watch": 3,
+      "actionable": 34,
+      "watch": 2,
       "risk": 21
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401815497",
-      "date": "2026-05-25T22:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Diego Padres",
-      "away": "Philadelphia Phillies",
-      "match": "San Diego Padres - Philadelphia Phillies",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "San Diego Padres",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 9-3"
-    },
-    {
-      "event_id": "401815488",
-      "date": "2026-05-25T23:07Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Toronto Blue Jays",
-      "away": "Miami Marlins",
-      "match": "Toronto Blue Jays - Miami Marlins",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Toronto Blue Jays",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 13-6"
-    },
     {
       "event_id": "401815505",
       "date": "2026-05-26T22:10Z",
@@ -420,6 +384,24 @@
       "context": "1 match dans les 48h + 1396 km de voyage"
     },
     {
+      "event_id": "401856936",
+      "date": "2026-05-26T00:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "New York Liberty",
+      "away": "Portland Fire",
+      "match": "New York Liberty - Portland Fire",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "New York Liberty",
+      "side": null,
+      "strength": 0.8,
+      "context": "Absences severes 4-0"
+    },
+    {
       "event_id": "401815507",
       "date": "2026-05-26T23:40Z",
       "sport": "baseball",
@@ -656,24 +638,6 @@
   ],
   "active_watch": [
     {
-      "event_id": "401856936",
-      "date": "2026-05-26T00:00Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "New York Liberty",
-      "away": "Portland Fire",
-      "match": "New York Liberty - Portland Fire",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "New York Liberty",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 3-0"
-    },
-    {
       "event_id": "401815509",
       "date": "2026-05-26T23:40Z",
       "sport": "baseball",
@@ -748,24 +712,6 @@
       "context": "marge bookmaker anormale 18.5%"
     },
     {
-      "event_id": "401865458",
-      "date": "2026-05-29T00:30Z",
-      "sport": "football",
-      "league_code": "conmebol.sudamericana",
-      "league_name": "Copa Sudamericana",
-      "home": "Tigre",
-      "away": "Alianza Atlético",
-      "match": "Tigre - Alianza Atlético",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.0%"
-    },
-    {
       "event_id": "401865553",
       "date": "2026-05-29T00:30Z",
       "sport": "football",
@@ -782,6 +728,24 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.1%"
+    },
+    {
+      "event_id": "401865458",
+      "date": "2026-05-29T00:30Z",
+      "sport": "football",
+      "league_code": "conmebol.sudamericana",
+      "league_name": "Copa Sudamericana",
+      "home": "Tigre",
+      "away": "Alianza Atlético",
+      "match": "Tigre - Alianza Atlético",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.0%"
     },
     {
       "event_id": "401861543",
