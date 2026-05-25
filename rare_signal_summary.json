@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-05-25T03:40:34Z",
+  "generated_at": "2026-05-25T08:13:33Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 64,
-    "actionable": 33,
+    "active_events": 68,
+    "actionable": 36,
     "watch": 3,
-    "risk": 28,
+    "risk": 29,
     "expired_sample": 0,
     "by_type": {
-      "market_uncertain": 26,
       "injury_imbalance": 25,
       "travel_extreme": 6,
-      "signal_conflict": 7,
-      "back_to_back_travel": 17
+      "signal_conflict": 8,
+      "back_to_back_travel": 20,
+      "market_uncertain": 26
     },
     "by_quality": {
-      "risk": 28,
-      "actionable": 33,
-      "watch": 3
+      "actionable": 36,
+      "watch": 3,
+      "risk": 29
     }
   },
   "active_actionable": [
@@ -616,6 +616,60 @@
       "side": "away",
       "strength": 0.74,
       "context": "1 match dans les 48h + 1049 km de voyage"
+    },
+    {
+      "event_id": "401872907",
+      "date": "2026-05-29T00:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Colorado Avalanche",
+      "away": "Vegas Golden Knights",
+      "match": "Colorado Avalanche - Vegas Golden Knights",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Vegas Golden Knights",
+      "side": "away",
+      "strength": 0.726,
+      "context": "1 match dans les 48h + 979 km de voyage"
+    },
+    {
+      "event_id": "401872908",
+      "date": "2026-05-31T00:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Vegas Golden Knights",
+      "away": "Colorado Avalanche",
+      "match": "Vegas Golden Knights - Colorado Avalanche",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Colorado Avalanche",
+      "side": "away",
+      "strength": 0.726,
+      "context": "1 match dans les 48h + 979 km de voyage"
+    },
+    {
+      "event_id": "401872909",
+      "date": "2026-06-02T00:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Colorado Avalanche",
+      "away": "Vegas Golden Knights",
+      "match": "Colorado Avalanche - Vegas Golden Knights",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Vegas Golden Knights",
+      "side": "away",
+      "strength": 0.726,
+      "context": "1 match dans les 48h + 979 km de voyage"
     }
   ],
   "active_watch": [
@@ -676,24 +730,6 @@
   ],
   "active_risk": [
     {
-      "event_id": "401843353",
-      "date": "2026-05-25T15:00Z",
-      "sport": "football",
-      "league_code": "eliteserien",
-      "league_name": "Eliteserien",
-      "home": "Sarpsborg FK",
-      "away": "Molde",
-      "match": "Sarpsborg FK - Molde",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.3%"
-    },
-    {
       "event_id": "175714",
       "date": "2026-05-27T04:00Z",
       "sport": "tennis",
@@ -748,6 +784,24 @@
       "context": "marge bookmaker anormale 18.5%"
     },
     {
+      "event_id": "401865553",
+      "date": "2026-05-29T00:30Z",
+      "sport": "football",
+      "league_code": "conmebol.libertadores",
+      "league_name": "Copa Libertadores",
+      "home": "Cruzeiro",
+      "away": "Barcelona SC",
+      "match": "Cruzeiro - Barcelona SC",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.1%"
+    },
+    {
       "event_id": "401865451",
       "date": "2026-05-29T00:30Z",
       "sport": "football",
@@ -784,14 +838,14 @@
       "context": "marge bookmaker anormale 18.0%"
     },
     {
-      "event_id": "401865553",
-      "date": "2026-05-29T00:30Z",
+      "event_id": "401842737",
+      "date": "2026-05-29T17:00Z",
       "sport": "football",
-      "league_code": "conmebol.libertadores",
-      "league_name": "Copa Libertadores",
-      "home": "Cruzeiro",
-      "away": "Barcelona SC",
-      "match": "Cruzeiro - Barcelona SC",
+      "league_code": "allsvenskan",
+      "league_name": "Allsvenskan",
+      "home": "Örgryte IS",
+      "away": "IF Elfsborg",
+      "match": "Örgryte IS - IF Elfsborg",
       "quality": "risk",
       "quality_reason": "Signal de prudence, pas une opportunite directe",
       "type": "market_uncertain",
@@ -799,7 +853,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.1%"
+      "context": "marge bookmaker anormale 18.8%"
     },
     {
       "event_id": "401843360",
@@ -856,24 +910,6 @@
       "context": "marge bookmaker anormale 18.7%"
     },
     {
-      "event_id": "401842737",
-      "date": "2026-05-29T17:00Z",
-      "sport": "football",
-      "league_code": "allsvenskan",
-      "league_name": "Allsvenskan",
-      "home": "Örgryte IS",
-      "away": "IF Elfsborg",
-      "match": "Örgryte IS - IF Elfsborg",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.8%"
-    },
-    {
       "event_id": "401861400",
       "date": "2026-05-30T10:00Z",
       "sport": "football",
@@ -889,7 +925,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.2%"
+      "context": "marge bookmaker anormale 19.0%"
     },
     {
       "event_id": "401861544",
@@ -943,7 +979,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.5%"
+      "context": "marge bookmaker anormale 18.4%"
     },
     {
       "event_id": "401861402",
@@ -961,7 +997,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 19.4%"
+      "context": "marge bookmaker anormale 19.0%"
     },
     {
       "event_id": "401861403",
@@ -1123,7 +1159,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.8%"
+      "context": "marge bookmaker anormale 18.9%"
     },
     {
       "event_id": "748980",
@@ -1144,6 +1180,24 @@
       "context": "marge bookmaker anormale 19.0%"
     },
     {
+      "event_id": "748979",
+      "date": "2026-05-31T16:30Z",
+      "sport": "football",
+      "league_code": "laliga2",
+      "league_name": "La Liga 2",
+      "home": "Real Zaragoza",
+      "away": "Málaga",
+      "match": "Real Zaragoza - Málaga",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 19.2%"
+    },
+    {
       "event_id": "401873346",
       "date": "2026-05-30T00:00Z",
       "sport": "basketball",
@@ -1160,6 +1214,24 @@
       "side": null,
       "strength": 0.488,
       "context": "Signaux opposes: Cleveland Cavaliers fade 0.75, New York Knicks fade 0.75 -> prudence"
+    },
+    {
+      "event_id": "401873203",
+      "date": "2026-05-31T00:00Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "Oklahoma City Thunder",
+      "away": "San Antonio Spurs",
+      "match": "Oklahoma City Thunder - San Antonio Spurs",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "signal_conflict",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.45,
+      "context": "Signaux opposes: Oklahoma City Thunder fade 0.60, San Antonio Spurs fade 0.60 -> prudence"
     },
     {
       "event_id": "401873347",
