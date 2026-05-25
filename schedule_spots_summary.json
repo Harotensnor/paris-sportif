@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-05-25T20:23:12Z",
+  "generated_at": "2026-05-25T21:41:22Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 49,
+    "active_events": 48,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 68,
+      "lookahead": 66,
       "travel_extreme": 6,
       "back_to_back_travel": 20,
       "schedule_congestion": 24
     },
     "by_decision": {
-      "abstain": 24,
+      "abstain": 23,
       "lean_home": 25
     },
     "lean_home": 25,
     "lean_away": 0,
-    "abstain": 24,
+    "abstain": 23,
     "monitor": 0
   },
   "active": [
@@ -85,58 +85,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815495",
-      "source_event_ids": [
-        "401815495"
-      ],
-      "kickoff": "2026-05-25T21:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Francisco Giants",
-      "away": "Arizona Diamondbacks",
-      "match": "San Francisco Giants - Arizona Diamondbacks",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: San Francisco Giants 0.30, Arizona Diamondbacks 0.30",
-      "pressure_score": 1.333,
-      "home_fade": 0.3,
-      "away_fade": 0.3,
-      "travel_score": 0,
-      "lookahead_score": 1.333,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "2 match important/proche dans les 3 jours",
-        "2 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.195,
-        "away_score": -0.195,
-        "home_fade": 0.3,
-        "away_fade": 0.3,
-        "reason": "Direction nette: Arizona Diamondbacks (-0.20)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
           }
         ]
       }
@@ -288,11 +236,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.595,
-        "away_score": -0.055,
-        "home_fade": 0.7,
+        "home_score": -0.195,
+        "away_score": -0.195,
+        "home_fade": 0.3,
         "away_fade": 0.3,
-        "reason": "Direction nette: Colorado Rockies (-0.06)",
+        "reason": "Direction nette: Colorado Rockies (-0.20)",
         "detail": [
           {
             "side": "home",
@@ -305,12 +253,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.3
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
           }
         ]
       }
@@ -2325,11 +2267,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": -0.219,
-        "away_score": -0.754,
-        "home_fade": 0.55,
+        "home_score": 0.181,
+        "away_score": -0.894,
+        "home_fade": 0.15,
         "away_fade": 0.947,
-        "reason": "Direction nette: Los Angeles Dodgers (-0.22)",
+        "reason": "Direction nette: Los Angeles Dodgers (+0.18)",
         "detail": [
           {
             "side": "home",
@@ -2342,12 +2284,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
           },
           {
             "side": "away",
@@ -2834,18 +2770,12 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": -0.121,
-        "away_score": -0.657,
-        "home_fade": 0.4,
+        "home_score": 0.279,
+        "away_score": -0.797,
+        "home_fade": 0.0,
         "away_fade": 0.797,
-        "reason": "Direction nette: Los Angeles Dodgers (-0.12)",
+        "reason": "Direction nette: Los Angeles Dodgers (+0.28)",
         "detail": [
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
-          },
           {
             "side": "away",
             "type": "back_to_back_travel",
