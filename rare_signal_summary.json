@@ -1,46 +1,28 @@
 {
-  "generated_at": "2026-05-25T17:28:03Z",
+  "generated_at": "2026-05-25T19:00:08Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 69,
-    "actionable": 36,
-    "watch": 4,
+    "active_events": 66,
+    "actionable": 34,
+    "watch": 3,
     "risk": 29,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 26,
+      "injury_imbalance": 23,
       "travel_extreme": 6,
       "signal_conflict": 8,
       "back_to_back_travel": 20,
       "market_uncertain": 26
     },
     "by_quality": {
-      "actionable": 36,
-      "watch": 4,
+      "actionable": 34,
+      "watch": 3,
       "risk": 29
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401815486",
-      "date": "2026-05-25T17:35Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Pittsburgh Pirates",
-      "away": "Chicago Cubs",
-      "match": "Pittsburgh Pirates - Chicago Cubs",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Chicago Cubs",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 4-10"
-    },
     {
       "event_id": "401815487",
       "date": "2026-05-25T20:10Z",
@@ -420,24 +402,6 @@
       "context": "1 match dans les 48h + 1396 km de voyage"
     },
     {
-      "event_id": "401815492",
-      "date": "2026-05-25T18:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Chicago White Sox",
-      "away": "Minnesota Twins",
-      "match": "Chicago White Sox - Minnesota Twins",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Chicago White Sox",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 11-7"
-    },
-    {
       "event_id": "401815507",
       "date": "2026-05-26T23:40Z",
       "sport": "baseball",
@@ -674,24 +638,6 @@
   ],
   "active_watch": [
     {
-      "event_id": "401815494",
-      "date": "2026-05-25T18:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Milwaukee Brewers",
-      "away": "St. Louis Cardinals",
-      "match": "Milwaukee Brewers - St. Louis Cardinals",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Milwaukee Brewers",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 6-3"
-    },
-    {
       "event_id": "401856936",
       "date": "2026-05-26T00:00Z",
       "sport": "basketball",
@@ -784,24 +730,6 @@
       "context": "marge bookmaker anormale 18.5%"
     },
     {
-      "event_id": "401865553",
-      "date": "2026-05-29T00:30Z",
-      "sport": "football",
-      "league_code": "conmebol.libertadores",
-      "league_name": "Copa Libertadores",
-      "home": "Cruzeiro",
-      "away": "Barcelona SC",
-      "match": "Cruzeiro - Barcelona SC",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.1%"
-    },
-    {
       "event_id": "401865451",
       "date": "2026-05-29T00:30Z",
       "sport": "football",
@@ -836,6 +764,24 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.0%"
+    },
+    {
+      "event_id": "401865553",
+      "date": "2026-05-29T00:30Z",
+      "sport": "football",
+      "league_code": "conmebol.libertadores",
+      "league_name": "Copa Libertadores",
+      "home": "Cruzeiro",
+      "away": "Barcelona SC",
+      "match": "Cruzeiro - Barcelona SC",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.1%"
     },
     {
       "event_id": "401861543",
