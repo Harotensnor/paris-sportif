@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-26T01:34:42Z",
+  "generated_at": "2026-05-26T02:59:50Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815498",
-      "kickoff": "2026-05-26T01:40Z",
-      "league": "MLB",
-      "match": "Seattle Mariners at Athletics Athletics",
-      "home": "Athletics",
-      "away": "Seattle Mariners",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Athletics",
-          "pitcher": "Luis Severino",
-          "label": "Luis Severino plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.5581,
-          "fair_odds": 1.79,
-          "expected_strikeouts": 5.77,
-          "projected_ip": 5.56,
-          "inputs": {
-            "k9": 9.34,
-            "era": 4.23,
-            "whip": 1.44,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Athletics",
-          "pitcher": "Luis Severino",
-          "label": "Luis Severino concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5148,
-          "fair_odds": 1.94,
-          "expected_hr_allowed": 0.723,
-          "projected_ip": 5.56,
-          "inputs": {
-            "hr9": 1.17,
-            "era": 4.23,
-            "whip": 1.44
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Seattle Mariners",
-          "pitcher": "Emerson Hancock",
-          "label": "Emerson Hancock plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.5934,
-          "fair_odds": 1.69,
-          "expected_strikeouts": 5.95,
-          "projected_ip": 5.82,
-          "inputs": {
-            "k9": 9.2,
-            "era": 3.07,
-            "whip": 1.06,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Seattle Mariners",
-          "pitcher": "Emerson Hancock",
-          "label": "Emerson Hancock concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5486,
-          "fair_odds": 1.82,
-          "expected_hr_allowed": 0.795,
-          "projected_ip": 5.82,
-          "inputs": {
-            "hr9": 1.23,
-            "era": 3.07,
-            "whip": 1.06
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815505",
       "kickoff": "2026-05-26T22:10Z",
@@ -454,52 +372,6 @@
             "hr9": 1.71,
             "era": 3.0,
             "whip": 1.14
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401815503",
-      "kickoff": "2026-05-26T23:07Z",
-      "league": "MLB",
-      "match": "Miami Marlins at Toronto Blue Jays",
-      "home": "Toronto Blue Jays",
-      "away": "Miami Marlins",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Miami Marlins",
-          "pitcher": "Sandy Alcantara",
-          "label": "Sandy Alcantara moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.5408,
-          "fair_odds": 1.85,
-          "expected_strikeouts": 4.33,
-          "projected_ip": 6.29,
-          "inputs": {
-            "k9": 6.2,
-            "era": 4.0,
-            "whip": 1.28,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Miami Marlins",
-          "pitcher": "Sandy Alcantara",
-          "label": "Sandy Alcantara ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5797,
-          "fair_odds": 1.72,
-          "expected_hr_allowed": 0.545,
-          "projected_ip": 6.29,
-          "inputs": {
-            "hr9": 0.78,
-            "era": 4.0,
-            "whip": 1.28
           },
           "side": "away"
         }
@@ -1122,88 +994,6 @@
             "whip": 0.84
           },
           "side": "home"
-        }
-      ]
-    },
-    {
-      "event_id": "401815518",
-      "kickoff": "2026-05-27T17:07Z",
-      "league": "MLB",
-      "match": "Miami Marlins at Toronto Blue Jays",
-      "home": "Toronto Blue Jays",
-      "away": "Miami Marlins",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Toronto Blue Jays",
-          "pitcher": "Kevin Gausman",
-          "label": "Kevin Gausman plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.5101,
-          "fair_odds": 1.96,
-          "expected_strikeouts": 5.55,
-          "projected_ip": 5.82,
-          "inputs": {
-            "k9": 8.58,
-            "era": 3.23,
-            "whip": 1.05,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Toronto Blue Jays",
-          "pitcher": "Kevin Gausman",
-          "label": "Kevin Gausman ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.581,
-          "fair_odds": 1.72,
-          "expected_hr_allowed": 0.543,
-          "projected_ip": 5.82,
-          "inputs": {
-            "hr9": 0.84,
-            "era": 3.23,
-            "whip": 1.05
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Miami Marlins",
-          "pitcher": "Eury Pérez",
-          "label": "Eury Pérez plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.5383,
-          "fair_odds": 1.86,
-          "expected_strikeouts": 5.68,
-          "projected_ip": 5.29,
-          "inputs": {
-            "k9": 9.66,
-            "era": 4.91,
-            "whip": 1.3,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Miami Marlins",
-          "pitcher": "Eury Pérez",
-          "label": "Eury Pérez concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6297,
-          "fair_odds": 1.59,
-          "expected_hr_allowed": 0.994,
-          "projected_ip": 5.29,
-          "inputs": {
-            "hr9": 1.69,
-            "era": 4.91,
-            "whip": 1.3
-          },
-          "side": "away"
         }
       ]
     },
@@ -2412,7 +2202,7 @@
       ]
     }
   ],
-  "props": 116,
+  "props": 106,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
