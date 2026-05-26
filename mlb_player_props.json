@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-26T16:33:38Z",
+  "generated_at": "2026-05-26T18:46:01Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -372,6 +372,134 @@
             "hr9": 1.71,
             "era": 3.0,
             "whip": 1.14
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815503",
+      "kickoff": "2026-05-26T23:07Z",
+      "league": "MLB",
+      "match": "Miami Marlins at Toronto Blue Jays",
+      "home": "Toronto Blue Jays",
+      "away": "Miami Marlins",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Toronto Blue Jays",
+          "pitcher": "Braydon Fisher",
+          "label": "Braydon Fisher plus de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "over",
+          "probability": 0.5762,
+          "fair_odds": 1.74,
+          "expected_strikeouts": 6.89,
+          "projected_ip": 6.6,
+          "inputs": {
+            "k9": 9.4,
+            "era": 2.73,
+            "whip": 1.01,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Toronto Blue Jays",
+          "pitcher": "Braydon Fisher",
+          "label": "Braydon Fisher ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6393,
+          "fair_odds": 1.56,
+          "expected_hr_allowed": 0.447,
+          "projected_ip": 6.6,
+          "inputs": {
+            "hr9": 0.61,
+            "era": 2.73,
+            "whip": 1.01
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Miami Marlins",
+          "pitcher": "Sandy Alcantara",
+          "label": "Sandy Alcantara moins de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "under",
+          "probability": 0.5408,
+          "fair_odds": 1.85,
+          "expected_strikeouts": 4.33,
+          "projected_ip": 6.29,
+          "inputs": {
+            "k9": 6.2,
+            "era": 4.0,
+            "whip": 1.28,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Miami Marlins",
+          "pitcher": "Sandy Alcantara",
+          "label": "Sandy Alcantara ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5797,
+          "fair_odds": 1.72,
+          "expected_hr_allowed": 0.545,
+          "projected_ip": 6.29,
+          "inputs": {
+            "hr9": 0.78,
+            "era": 4.0,
+            "whip": 1.28
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815502",
+      "kickoff": "2026-05-26T23:10Z",
+      "league": "MLB",
+      "match": "Cincinnati Reds at New York Mets",
+      "home": "New York Mets",
+      "away": "Cincinnati Reds",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Cincinnati Reds",
+          "pitcher": "Chase Burns",
+          "label": "Chase Burns moins de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "under",
+          "probability": 0.5206,
+          "fair_odds": 1.92,
+          "expected_strikeouts": 6.4,
+          "projected_ip": 5.9,
+          "inputs": {
+            "k9": 9.76,
+            "era": 1.83,
+            "whip": 0.95,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Cincinnati Reds",
+          "pitcher": "Chase Burns",
+          "label": "Chase Burns concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5041,
+          "fair_odds": 1.98,
+          "expected_hr_allowed": 0.701,
+          "projected_ip": 5.9,
+          "inputs": {
+            "hr9": 1.07,
+            "era": 1.83,
+            "whip": 0.95
           },
           "side": "away"
         }
@@ -994,6 +1122,88 @@
             "whip": 0.84
           },
           "side": "home"
+        }
+      ]
+    },
+    {
+      "event_id": "401815518",
+      "kickoff": "2026-05-27T17:07Z",
+      "league": "MLB",
+      "match": "Miami Marlins at Toronto Blue Jays",
+      "home": "Toronto Blue Jays",
+      "away": "Miami Marlins",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Toronto Blue Jays",
+          "pitcher": "Kevin Gausman",
+          "label": "Kevin Gausman plus de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "over",
+          "probability": 0.5101,
+          "fair_odds": 1.96,
+          "expected_strikeouts": 5.55,
+          "projected_ip": 5.82,
+          "inputs": {
+            "k9": 8.58,
+            "era": 3.23,
+            "whip": 1.05,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Toronto Blue Jays",
+          "pitcher": "Kevin Gausman",
+          "label": "Kevin Gausman ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.581,
+          "fair_odds": 1.72,
+          "expected_hr_allowed": 0.543,
+          "projected_ip": 5.82,
+          "inputs": {
+            "hr9": 0.84,
+            "era": 3.23,
+            "whip": 1.05
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Miami Marlins",
+          "pitcher": "Eury Pérez",
+          "label": "Eury Pérez plus de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "over",
+          "probability": 0.5383,
+          "fair_odds": 1.86,
+          "expected_strikeouts": 5.68,
+          "projected_ip": 5.29,
+          "inputs": {
+            "k9": 9.66,
+            "era": 4.91,
+            "whip": 1.3,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Miami Marlins",
+          "pitcher": "Eury Pérez",
+          "label": "Eury Pérez concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.6297,
+          "fair_odds": 1.59,
+          "expected_hr_allowed": 0.994,
+          "projected_ip": 5.29,
+          "inputs": {
+            "hr9": 1.69,
+            "era": 4.91,
+            "whip": 1.3
+          },
+          "side": "away"
         }
       ]
     },
@@ -1664,6 +1874,52 @@
       ]
     },
     {
+      "event_id": "401815517",
+      "kickoff": "2026-05-27T23:10Z",
+      "league": "MLB",
+      "match": "Cincinnati Reds at New York Mets",
+      "home": "New York Mets",
+      "away": "Cincinnati Reds",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Cincinnati Reds",
+          "pitcher": "Andrew Abbott",
+          "label": "Andrew Abbott moins de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "under",
+          "probability": 0.5197,
+          "fair_odds": 1.92,
+          "expected_strikeouts": 3.43,
+          "projected_ip": 5.11,
+          "inputs": {
+            "k9": 6.04,
+            "era": 3.97,
+            "whip": 1.46,
+            "hand": "L"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Cincinnati Reds",
+          "pitcher": "Andrew Abbott",
+          "label": "Andrew Abbott ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5325,
+          "fair_odds": 1.88,
+          "expected_hr_allowed": 0.63,
+          "projected_ip": 5.11,
+          "inputs": {
+            "hr9": 1.11,
+            "era": 3.97,
+            "whip": 1.46
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
       "event_id": "401815522",
       "kickoff": "2026-05-27T23:40Z",
       "league": "MLB",
@@ -2202,7 +2458,7 @@
       ]
     }
   ],
-  "props": 106,
+  "props": 118,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"

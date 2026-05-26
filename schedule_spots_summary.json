@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-05-26T16:33:40Z",
+  "generated_at": "2026-05-26T18:46:04Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 44,
+    "active_events": 49,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 56,
-      "back_to_back_travel": 21,
-      "travel_extreme": 6,
+      "lookahead": 62,
+      "back_to_back_travel": 25,
+      "travel_extreme": 8,
       "schedule_congestion": 25
     },
     "by_decision": {
-      "abstain": 18,
-      "lean_home": 25,
+      "abstain": 19,
+      "lean_home": 29,
       "lean_away": 1
     },
-    "lean_home": 25,
+    "lean_home": 29,
     "lean_away": 1,
-    "abstain": 18,
+    "abstain": 19,
     "monitor": 0
   },
   "active": [
@@ -943,6 +943,58 @@
       }
     },
     {
+      "event_id": "401856938",
+      "source_event_ids": [
+        "401856938"
+      ],
+      "kickoff": "2026-05-27T23:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "New York Liberty",
+      "away": "Phoenix Mercury",
+      "match": "New York Liberty - Phoenix Mercury",
+      "decision": "abstain",
+      "net_team": null,
+      "reason": "Fatigue/agenda des deux cotes: New York Liberty 0.15, Phoenix Mercury 0.15",
+      "pressure_score": 0.667,
+      "home_fade": 0.15,
+      "away_fade": 0.15,
+      "travel_score": 0,
+      "lookahead_score": 0.667,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 2
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours",
+        "1 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "away",
+        "home_score": -0.098,
+        "away_score": -0.098,
+        "home_fade": 0.15,
+        "away_fade": 0.15,
+        "reason": "Direction nette: Phoenix Mercury (-0.10)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          }
+        ]
+      }
+    },
+    {
       "event_id": "401815521",
       "source_event_ids": [
         "401815521"
@@ -1416,6 +1468,80 @@
             "type": "travel_extreme",
             "direction": "fade",
             "strength": 0.737
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815503",
+      "source_event_ids": [
+        "401815503"
+      ],
+      "kickoff": "2026-05-26T23:07Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Toronto Blue Jays",
+      "away": "Miami Marlins",
+      "match": "Toronto Blue Jays - Miami Marlins",
+      "decision": "lean_home",
+      "net_team": "Toronto Blue Jays",
+      "reason": "Miami Marlins plus penalise par calendrier/voyage (1.54 vs 0.15)",
+      "pressure_score": 2.056,
+      "home_fade": 0.15,
+      "away_fade": 1.54,
+      "travel_score": 1.39,
+      "lookahead_score": 0.667,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 2,
+        "travel_extreme": 1,
+        "back_to_back_travel": 1
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours",
+        "1 match important/proche dans les 3 jours",
+        "Deplacement estime 1988 km, decalage ~0.1h",
+        "1 match dans les 48h + 1988 km de voyage"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": -0.611,
+        "away_score": -1.137,
+        "home_fade": 1.15,
+        "away_fade": 1.54,
+        "reason": "Direction nette: Toronto Blue Jays (-0.61)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "travel_extreme",
+            "direction": "fade",
+            "strength": 0.462
+          },
+          {
+            "side": "away",
+            "type": "back_to_back_travel",
+            "direction": "fade",
+            "strength": 0.928
           }
         ]
       }
@@ -1964,6 +2090,65 @@
       }
     },
     {
+      "event_id": "401815518",
+      "source_event_ids": [
+        "401815518"
+      ],
+      "kickoff": "2026-05-27T17:07Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Toronto Blue Jays",
+      "away": "Miami Marlins",
+      "match": "Toronto Blue Jays - Miami Marlins",
+      "decision": "lean_home",
+      "net_team": "Toronto Blue Jays",
+      "reason": "Miami Marlins plus penalise par calendrier/voyage (1.46 vs 0.00)",
+      "pressure_score": 1.462,
+      "home_fade": 0.0,
+      "away_fade": 1.462,
+      "travel_score": 1.462,
+      "lookahead_score": 0,
+      "congestion_score": 0,
+      "types": {
+        "travel_extreme": 1,
+        "back_to_back_travel": 1
+      },
+      "contexts": [
+        "Deplacement estime 1988 km, decalage ~0.1h",
+        "2 match dans les 48h + 1988 km de voyage"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": -0.488,
+        "away_score": -1.112,
+        "home_fade": 1.0,
+        "away_fade": 1.462,
+        "reason": "Direction nette: Toronto Blue Jays (-0.49)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "travel_extreme",
+            "direction": "fade",
+            "strength": 0.462
+          },
+          {
+            "side": "away",
+            "type": "back_to_back_travel",
+            "direction": "fade",
+            "strength": 1.0
+          }
+        ]
+      }
+    },
+    {
       "event_id": "401873386",
       "source_event_ids": [
         "401873386"
@@ -2257,6 +2442,72 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.726
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815502",
+      "source_event_ids": [
+        "401815502"
+      ],
+      "kickoff": "2026-05-26T23:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "New York Mets",
+      "away": "Cincinnati Reds",
+      "match": "New York Mets - Cincinnati Reds",
+      "decision": "lean_home",
+      "net_team": "New York Mets",
+      "reason": "Cincinnati Reds plus penalise par calendrier/voyage (0.87 vs 0.15)",
+      "pressure_score": 1.382,
+      "home_fade": 0.15,
+      "away_fade": 0.865,
+      "travel_score": 0.715,
+      "lookahead_score": 0.667,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 2,
+        "back_to_back_travel": 1
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours",
+        "1 match important/proche dans les 3 jours",
+        "1 match dans les 48h + 927 km de voyage"
+      ],
+      "global_resolution": {
+        "status": "abstain",
+        "net_side": null,
+        "home_score": -0.847,
+        "away_score": -0.463,
+        "home_fade": 1.15,
+        "away_fade": 0.865,
+        "reason": "Signaux opposes: New York Mets fade 1.15, Cincinnati Reds fade 0.87 -> prudence",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "back_to_back_travel",
+            "direction": "fade",
+            "strength": 0.715
           }
         ]
       }
@@ -2626,6 +2877,57 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.797
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815517",
+      "source_event_ids": [
+        "401815517"
+      ],
+      "kickoff": "2026-05-27T23:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "New York Mets",
+      "away": "Cincinnati Reds",
+      "match": "New York Mets - Cincinnati Reds",
+      "decision": "lean_home",
+      "net_team": "New York Mets",
+      "reason": "Cincinnati Reds plus penalise par calendrier/voyage (0.72 vs 0.00)",
+      "pressure_score": 0.715,
+      "home_fade": 0.0,
+      "away_fade": 0.715,
+      "travel_score": 0.715,
+      "lookahead_score": 0,
+      "congestion_score": 0,
+      "types": {
+        "back_to_back_travel": 1
+      },
+      "contexts": [
+        "1 match dans les 48h + 927 km de voyage"
+      ],
+      "global_resolution": {
+        "status": "abstain",
+        "net_side": null,
+        "home_score": -0.75,
+        "away_score": -0.365,
+        "home_fade": 1.0,
+        "away_fade": 0.715,
+        "reason": "Signaux opposes: New York Mets fade 1.00, Cincinnati Reds fade 0.72 -> prudence",
+        "detail": [
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "back_to_back_travel",
+            "direction": "fade",
+            "strength": 0.715
           }
         ]
       }
