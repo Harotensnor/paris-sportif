@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-25T23:47:16Z",
+  "generated_at": "2026-05-26T01:34:42Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815496",
-      "kickoff": "2026-05-26T01:10Z",
-      "league": "MLB",
-      "match": "Colorado Rockies at Los Angeles Dodgers",
-      "home": "Los Angeles Dodgers",
-      "away": "Colorado Rockies",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Los Angeles Dodgers",
-          "pitcher": "Eric Lauer",
-          "label": "Eric Lauer moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.5479,
-          "fair_odds": 1.83,
-          "expected_strikeouts": 4.31,
-          "projected_ip": 6.02,
-          "inputs": {
-            "k9": 6.44,
-            "era": 6.69,
-            "whip": 1.49,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Los Angeles Dodgers",
-          "pitcher": "Eric Lauer",
-          "label": "Eric Lauer concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.8377,
-          "fair_odds": 1.19,
-          "expected_hr_allowed": 1.818,
-          "projected_ip": 6.02,
-          "inputs": {
-            "hr9": 2.72,
-            "era": 6.69,
-            "whip": 1.49
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Colorado Rockies",
-          "pitcher": "Kyle Freeland",
-          "label": "Kyle Freeland moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.5368,
-          "fair_odds": 1.86,
-          "expected_strikeouts": 4.35,
-          "projected_ip": 4.76,
-          "inputs": {
-            "k9": 8.22,
-            "era": 7.04,
-            "whip": 1.7,
-            "hand": "L"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Colorado Rockies",
-          "pitcher": "Kyle Freeland",
-          "label": "Kyle Freeland concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6726,
-          "fair_odds": 1.49,
-          "expected_hr_allowed": 1.117,
-          "projected_ip": 4.76,
-          "inputs": {
-            "hr9": 2.11,
-            "era": 7.04,
-            "whip": 1.7
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815498",
       "kickoff": "2026-05-26T01:40Z",
@@ -588,52 +506,6 @@
       ]
     },
     {
-      "event_id": "401815502",
-      "kickoff": "2026-05-26T23:10Z",
-      "league": "MLB",
-      "match": "Cincinnati Reds at New York Mets",
-      "home": "New York Mets",
-      "away": "Cincinnati Reds",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Cincinnati Reds",
-          "pitcher": "Chase Burns",
-          "label": "Chase Burns moins de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "under",
-          "probability": 0.5206,
-          "fair_odds": 1.92,
-          "expected_strikeouts": 6.4,
-          "projected_ip": 5.9,
-          "inputs": {
-            "k9": 9.76,
-            "era": 1.83,
-            "whip": 0.95,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Cincinnati Reds",
-          "pitcher": "Chase Burns",
-          "label": "Chase Burns concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5041,
-          "fair_odds": 1.98,
-          "expected_hr_allowed": 0.701,
-          "projected_ip": 5.9,
-          "inputs": {
-            "hr9": 1.07,
-            "era": 1.83,
-            "whip": 0.95
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
       "event_id": "401815507",
       "kickoff": "2026-05-26T23:40Z",
       "league": "MLB",
@@ -710,6 +582,88 @@
             "hr9": 0.48,
             "era": 3.02,
             "whip": 0.97
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815508",
+      "kickoff": "2026-05-26T23:40Z",
+      "league": "MLB",
+      "match": "New York Yankees at Kansas City Royals",
+      "home": "Kansas City Royals",
+      "away": "New York Yankees",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Kansas City Royals",
+          "pitcher": "Bailey Falter",
+          "label": "Bailey Falter moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.5226,
+          "fair_odds": 1.91,
+          "expected_strikeouts": 5.4,
+          "projected_ip": 6.6,
+          "inputs": {
+            "k9": 7.36,
+            "era": 9.82,
+            "whip": 2.86,
+            "hand": "L"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Kansas City Royals",
+          "pitcher": "Bailey Falter",
+          "label": "Bailey Falter concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5942,
+          "fair_odds": 1.68,
+          "expected_hr_allowed": 0.902,
+          "projected_ip": 6.6,
+          "inputs": {
+            "hr9": 1.23,
+            "era": 9.82,
+            "whip": 2.86
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "New York Yankees",
+          "pitcher": "Cam Schlittler",
+          "label": "Cam Schlittler plus de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "over",
+          "probability": 0.5624,
+          "fair_odds": 1.78,
+          "expected_strikeouts": 6.82,
+          "projected_ip": 6.0,
+          "inputs": {
+            "k9": 10.23,
+            "era": 1.5,
+            "whip": 0.86,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "New York Yankees",
+          "pitcher": "Cam Schlittler",
+          "label": "Cam Schlittler ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.8353,
+          "fair_odds": 1.2,
+          "expected_hr_allowed": 0.18,
+          "projected_ip": 6.0,
+          "inputs": {
+            "hr9": 0.27,
+            "era": 1.5,
+            "whip": 0.86
           },
           "side": "away"
         }
@@ -1920,52 +1874,6 @@
       ]
     },
     {
-      "event_id": "401815517",
-      "kickoff": "2026-05-27T23:10Z",
-      "league": "MLB",
-      "match": "Cincinnati Reds at New York Mets",
-      "home": "New York Mets",
-      "away": "Cincinnati Reds",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Cincinnati Reds",
-          "pitcher": "Andrew Abbott",
-          "label": "Andrew Abbott moins de 3,5 strikeouts",
-          "line": 3.5,
-          "pick": "under",
-          "probability": 0.5197,
-          "fair_odds": 1.92,
-          "expected_strikeouts": 3.43,
-          "projected_ip": 5.11,
-          "inputs": {
-            "k9": 6.04,
-            "era": 3.97,
-            "whip": 1.46,
-            "hand": "L"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Cincinnati Reds",
-          "pitcher": "Andrew Abbott",
-          "label": "Andrew Abbott ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5325,
-          "fair_odds": 1.88,
-          "expected_hr_allowed": 0.63,
-          "projected_ip": 5.11,
-          "inputs": {
-            "hr9": 1.11,
-            "era": 3.97,
-            "whip": 1.46
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
       "event_id": "401815522",
       "kickoff": "2026-05-27T23:40Z",
       "league": "MLB",
@@ -2046,9 +1954,465 @@
           "side": "away"
         }
       ]
+    },
+    {
+      "event_id": "401815523",
+      "kickoff": "2026-05-27T23:40Z",
+      "league": "MLB",
+      "match": "New York Yankees at Kansas City Royals",
+      "home": "Kansas City Royals",
+      "away": "New York Yankees",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Kansas City Royals",
+          "pitcher": "Noah Cameron",
+          "label": "Noah Cameron plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.5791,
+          "fair_odds": 1.73,
+          "expected_strikeouts": 4.84,
+          "projected_ip": 5.24,
+          "inputs": {
+            "k9": 8.31,
+            "era": 4.72,
+            "whip": 1.45,
+            "hand": "L"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Kansas City Royals",
+          "pitcher": "Noah Cameron",
+          "label": "Noah Cameron ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5782,
+          "fair_odds": 1.73,
+          "expected_hr_allowed": 0.548,
+          "projected_ip": 5.24,
+          "inputs": {
+            "hr9": 0.94,
+            "era": 4.72,
+            "whip": 1.45
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "New York Yankees",
+          "pitcher": "Gerrit Cole",
+          "label": "Gerrit Cole moins de 2,5 strikeouts",
+          "line": 2.5,
+          "pick": "under",
+          "probability": 0.6681,
+          "fair_odds": 1.5,
+          "expected_strikeouts": 2.0,
+          "projected_ip": 6.0,
+          "inputs": {
+            "k9": 3.0,
+            "era": 0.0,
+            "whip": 0.83,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "New York Yankees",
+          "pitcher": "Gerrit Cole",
+          "label": "Gerrit Cole ne concède pas de home run",
+          "pick": "no",
+          "probability": 1.0,
+          "fair_odds": 1.01,
+          "expected_hr_allowed": 0.0,
+          "projected_ip": 6.0,
+          "inputs": {
+            "hr9": 0.0,
+            "era": 0.0,
+            "whip": 0.83
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815521",
+      "kickoff": "2026-05-28T00:05Z",
+      "league": "MLB",
+      "match": "Houston Astros at Texas Rangers",
+      "home": "Texas Rangers",
+      "away": "Houston Astros",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Texas Rangers",
+          "pitcher": "Nathan Eovaldi",
+          "label": "Nathan Eovaldi moins de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "under",
+          "probability": 0.5923,
+          "fair_odds": 1.69,
+          "expected_strikeouts": 6.05,
+          "projected_ip": 6.12,
+          "inputs": {
+            "k9": 8.9,
+            "era": 3.65,
+            "whip": 1.14,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Texas Rangers",
+          "pitcher": "Nathan Eovaldi",
+          "label": "Nathan Eovaldi concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.6654,
+          "fair_odds": 1.5,
+          "expected_hr_allowed": 1.095,
+          "projected_ip": 6.12,
+          "inputs": {
+            "hr9": 1.61,
+            "era": 3.65,
+            "whip": 1.14
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Houston Astros",
+          "pitcher": "Spencer Arrighetti",
+          "label": "Spencer Arrighetti plus de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "over",
+          "probability": 0.5457,
+          "fair_odds": 1.83,
+          "expected_strikeouts": 5.71,
+          "projected_ip": 5.86,
+          "inputs": {
+            "k9": 8.78,
+            "era": 1.32,
+            "whip": 1.2,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Houston Astros",
+          "pitcher": "Spencer Arrighetti",
+          "label": "Spencer Arrighetti ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.8666,
+          "fair_odds": 1.15,
+          "expected_hr_allowed": 0.143,
+          "projected_ip": 5.86,
+          "inputs": {
+            "hr9": 0.22,
+            "era": 1.32,
+            "whip": 1.2
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815529",
+      "kickoff": "2026-05-28T17:10Z",
+      "league": "MLB",
+      "match": "Los Angeles Angels at Detroit Tigers",
+      "home": "Detroit Tigers",
+      "away": "Los Angeles Angels",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Detroit Tigers",
+          "pitcher": "Jack Flaherty",
+          "label": "Jack Flaherty plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.6126,
+          "fair_odds": 1.63,
+          "expected_strikeouts": 5.0,
+          "projected_ip": 4.27,
+          "inputs": {
+            "k9": 10.53,
+            "era": 5.94,
+            "whip": 1.66,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Detroit Tigers",
+          "pitcher": "Jack Flaherty",
+          "label": "Jack Flaherty concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5163,
+          "fair_odds": 1.94,
+          "expected_hr_allowed": 0.726,
+          "projected_ip": 4.27,
+          "inputs": {
+            "hr9": 1.53,
+            "era": 5.94,
+            "whip": 1.66
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Los Angeles Angels",
+          "pitcher": "Grayson Rodriguez",
+          "label": "Grayson Rodriguez moins de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "under",
+          "probability": 0.5273,
+          "fair_odds": 1.9,
+          "expected_strikeouts": 4.39,
+          "projected_ip": 4.55,
+          "inputs": {
+            "k9": 8.68,
+            "era": 10.61,
+            "whip": 2.14,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Los Angeles Angels",
+          "pitcher": "Grayson Rodriguez",
+          "label": "Grayson Rodriguez ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6155,
+          "fair_odds": 1.62,
+          "expected_hr_allowed": 0.485,
+          "projected_ip": 4.55,
+          "inputs": {
+            "hr9": 0.96,
+            "era": 10.61,
+            "whip": 2.14
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815534",
+      "kickoff": "2026-05-28T18:10Z",
+      "league": "MLB",
+      "match": "Minnesota Twins at Chicago White Sox",
+      "home": "Chicago White Sox",
+      "away": "Minnesota Twins",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Chicago White Sox",
+          "pitcher": "Erick Fedde",
+          "label": "Erick Fedde moins de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "under",
+          "probability": 0.587,
+          "fair_odds": 1.7,
+          "expected_strikeouts": 4.15,
+          "projected_ip": 6.6,
+          "inputs": {
+            "k9": 5.66,
+            "era": 5.47,
+            "whip": 1.46,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Chicago White Sox",
+          "pitcher": "Erick Fedde",
+          "label": "Erick Fedde concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.7993,
+          "fair_odds": 1.25,
+          "expected_hr_allowed": 1.606,
+          "projected_ip": 6.6,
+          "inputs": {
+            "hr9": 2.19,
+            "era": 5.47,
+            "whip": 1.46
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Minnesota Twins",
+          "pitcher": "Taj Bradley",
+          "label": "Taj Bradley plus de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "over",
+          "probability": 0.5109,
+          "fair_odds": 1.96,
+          "expected_strikeouts": 6.55,
+          "projected_ip": 5.78,
+          "inputs": {
+            "k9": 10.21,
+            "era": 2.77,
+            "whip": 1.17,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Minnesota Twins",
+          "pitcher": "Taj Bradley",
+          "label": "Taj Bradley ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5721,
+          "fair_odds": 1.75,
+          "expected_hr_allowed": 0.559,
+          "projected_ip": 5.78,
+          "inputs": {
+            "hr9": 0.87,
+            "era": 2.77,
+            "whip": 1.17
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815530",
+      "kickoff": "2026-05-28T20:10Z",
+      "league": "MLB",
+      "match": "Atlanta Braves at Boston Red Sox",
+      "home": "Boston Red Sox",
+      "away": "Atlanta Braves",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Atlanta Braves",
+          "pitcher": "Chris Sale",
+          "label": "Chris Sale moins de 7,5 strikeouts",
+          "line": 7.5,
+          "pick": "under",
+          "probability": 0.5572,
+          "fair_odds": 1.79,
+          "expected_strikeouts": 7.2,
+          "projected_ip": 6.2,
+          "inputs": {
+            "k9": 10.45,
+            "era": 1.89,
+            "whip": 0.87,
+            "hand": "L"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Atlanta Braves",
+          "pitcher": "Chris Sale",
+          "label": "Chris Sale ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5492,
+          "fair_odds": 1.82,
+          "expected_hr_allowed": 0.599,
+          "projected_ip": 6.2,
+          "inputs": {
+            "hr9": 0.87,
+            "era": 1.89,
+            "whip": 0.87
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815531",
+      "kickoff": "2026-05-28T22:40Z",
+      "league": "MLB",
+      "match": "Chicago Cubs at Pittsburgh Pirates",
+      "home": "Pittsburgh Pirates",
+      "away": "Chicago Cubs",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Pittsburgh Pirates",
+          "pitcher": "Paul Skenes",
+          "label": "Paul Skenes plus de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "over",
+          "probability": 0.5854,
+          "fair_odds": 1.71,
+          "expected_strikeouts": 5.91,
+          "projected_ip": 5.45,
+          "inputs": {
+            "k9": 9.75,
+            "era": 3.0,
+            "whip": 0.82,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Pittsburgh Pirates",
+          "pitcher": "Paul Skenes",
+          "label": "Paul Skenes ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5796,
+          "fair_odds": 1.73,
+          "expected_hr_allowed": 0.545,
+          "projected_ip": 5.45,
+          "inputs": {
+            "hr9": 0.9,
+            "era": 3.0,
+            "whip": 0.82
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Chicago Cubs",
+          "pitcher": "Colin Rea",
+          "label": "Colin Rea moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.5275,
+          "fair_odds": 1.9,
+          "expected_strikeouts": 5.38,
+          "projected_ip": 6.6,
+          "inputs": {
+            "k9": 7.33,
+            "era": 4.83,
+            "whip": 1.37,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Chicago Cubs",
+          "pitcher": "Colin Rea",
+          "label": "Colin Rea concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.6229,
+          "fair_odds": 1.61,
+          "expected_hr_allowed": 0.975,
+          "projected_ip": 6.6,
+          "inputs": {
+            "hr9": 1.33,
+            "era": 4.83,
+            "whip": 1.37
+          },
+          "side": "away"
+        }
+      ]
     }
   ],
-  "props": 98,
+  "props": 116,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
