@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-26T20:38:42Z",
+  "generated_at": "2026-05-26T22:13:34Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -352,12 +352,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "home",
-        "home_score": -0.055,
-        "away_score": -0.595,
+        "net_side": "away",
+        "home_score": -0.195,
+        "away_score": -0.195,
         "home_fade": 0.3,
-        "away_fade": 0.7,
-        "reason": "Direction nette: Texas Rangers (-0.06)",
+        "away_fade": 0.3,
+        "reason": "Direction nette: Houston Astros (-0.20)",
         "detail": [
           {
             "side": "home",
@@ -370,12 +370,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
           }
         ]
       }
@@ -467,13 +461,13 @@
         "3 matchs sur les 7 derniers jours"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.25,
-        "away_score": -0.79,
+        "status": "abstain",
+        "net_side": null,
+        "home_score": -0.39,
+        "away_score": -0.39,
         "home_fade": 0.6,
-        "away_fade": 1.0,
-        "reason": "Direction nette: Texas Rangers (-0.25)",
+        "away_fade": 0.6,
+        "reason": "Signaux opposes: Texas Rangers fade 0.60, Houston Astros fade 0.60 -> prudence",
         "detail": [
           {
             "side": "home",
@@ -486,12 +480,6 @@
             "type": "schedule_congestion",
             "direction": "fade",
             "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
           }
         ]
       }
@@ -1024,12 +1012,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "home",
-        "home_score": 0.043,
-        "away_score": -0.498,
+        "net_side": "away",
+        "home_score": -0.098,
+        "away_score": -0.098,
         "home_fade": 0.15,
-        "away_fade": 0.55,
-        "reason": "Direction nette: Texas Rangers (+0.04)",
+        "away_fade": 0.15,
+        "reason": "Direction nette: Houston Astros (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -1042,12 +1030,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
           }
         ]
       }

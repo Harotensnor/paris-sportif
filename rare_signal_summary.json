@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-05-26T20:38:42Z",
+  "generated_at": "2026-05-26T22:13:34Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 57,
+    "active_events": 58,
     "actionable": 40,
     "watch": 0,
-    "risk": 17,
+    "risk": 18,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 24,
       "back_to_back_travel": 25,
       "travel_extreme": 8,
-      "signal_conflict": 5,
+      "signal_conflict": 6,
       "market_uncertain": 16
     },
     "by_quality": {
       "actionable": 40,
-      "risk": 17
+      "risk": 18
     }
   },
   "active_actionable": [
@@ -1032,6 +1032,24 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 19.2%"
+    },
+    {
+      "event_id": "401815533",
+      "date": "2026-05-29T00:05Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Texas Rangers",
+      "away": "Houston Astros",
+      "match": "Texas Rangers - Houston Astros",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "signal_conflict",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.45,
+      "context": "Signaux opposes: Texas Rangers fade 0.60, Houston Astros fade 0.60 -> prudence"
     },
     {
       "event_id": "401873389",
