@@ -1,31 +1,31 @@
 {
-  "generated_at": "2026-05-27T07:55:04Z",
-  "calculated_at": "2026-05-27T07:55:04Z",
+  "generated_at": "2026-05-27T11:29:00Z",
+  "calculated_at": "2026-05-27T11:29:00Z",
   "source_of_truth": "data.js",
-  "data_generated_at": "2026-05-27T07:53:26.766950Z",
+  "data_generated_at": "2026-05-27T11:27:41.136905Z",
   "data_today_field": "2026-05-27",
   "events": {
-    "total": 205,
-    "upcoming": 160,
-    "winamax_available": 205,
-    "winamax_exact": 204,
-    "winamax_exact_ratio": 0.9951,
-    "markets_more_than_1n2": 21,
-    "form_l10": 78,
+    "total": 196,
+    "upcoming": 166,
+    "winamax_available": 196,
+    "winamax_exact": 195,
+    "winamax_exact_ratio": 0.9949,
+    "markets_more_than_1n2": 10,
+    "form_l10": 75,
     "h2h": 0,
-    "lineups": 29,
+    "lineups": 28,
     "football_lineups": 0,
-    "starter_signals": 29,
+    "starter_signals": 28,
     "clubelo": 10,
-    "weather": 66,
-    "injuries": 68,
+    "weather": 54,
+    "injuries": 72,
     "referee": 0,
     "referee_named": 0,
     "referee_context": 0,
     "referee_signal": 0,
     "fd_calibration": 0,
     "fd_closing_odds": 0,
-    "xg": 43,
+    "xg": 31,
     "smart_money": 3
   },
   "signal_health": {
@@ -42,9 +42,9 @@
     }
   },
   "winamax_markets": {
-    "matches": 545,
-    "detailed_market_matches": 162,
-    "detailed_ratio_vs_exact": 0.7941,
+    "matches": 529,
+    "detailed_market_matches": 150,
+    "detailed_ratio_vs_exact": 0.7692,
     "gap_to_50pct_exact": 0,
     "recommended_detail_fetch_cap": 90,
     "detail_by_sport": {
@@ -86,7 +86,7 @@
         "detailed_ratio": 0.0
       },
       "tennis": {
-        "exact": 55,
+        "exact": 61,
         "detailed": 0,
         "families": {},
         "detailed_ratio": 0.0
@@ -111,15 +111,17 @@
     }
   },
   "backtest": {
-    "overall_roi_pct": -12.51,
-    "overall_brier": 0.258,
+    "overall_roi_pct": -6.49,
+    "overall_brier": 0.2535,
     "by_sport_roi_pct": {
-      "baseball": -5.18,
-      "basketball": -71.12,
-      "football": -9.85,
-      "hockey": -25.6
+      "baseball": 10.05,
+      "basketball": -29.77,
+      "football": -16.04,
+      "hockey": 4.43
     },
-    "cold_sports": []
+    "cold_sports": [
+      "football"
+    ]
   },
   "health": {
     "status": "warning",
