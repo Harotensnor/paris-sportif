@@ -1,23 +1,23 @@
 {
-  "generated_at": "2026-05-27T03:38:48Z",
+  "generated_at": "2026-05-27T07:55:03Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 34,
+    "active_events": 31,
     "expired_sample": 0,
     "by_type": {
       "travel_extreme": 6,
-      "back_to_back_travel": 20,
-      "lookahead": 34,
-      "schedule_congestion": 23
+      "back_to_back_travel": 17,
+      "lookahead": 30,
+      "schedule_congestion": 21
     },
     "by_decision": {
       "abstain": 12,
-      "lean_home": 21,
+      "lean_home": 18,
       "lean_away": 1
     },
-    "lean_home": 21,
+    "lean_home": 18,
     "lean_away": 1,
     "abstain": 12,
     "monitor": 0
@@ -1086,66 +1086,6 @@
       }
     },
     {
-      "event_id": "401872909",
-      "source_event_ids": [
-        "401872909"
-      ],
-      "kickoff": "2026-06-02T00:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Colorado Avalanche",
-      "away": "Vegas Golden Knights",
-      "match": "Colorado Avalanche - Vegas Golden Knights",
-      "decision": "lean_home",
-      "net_team": "Colorado Avalanche",
-      "reason": "Vegas Golden Knights plus penalise par calendrier/voyage (1.33 vs 0.60)",
-      "pressure_score": 1.926,
-      "home_fade": 0.6,
-      "away_fade": 1.326,
-      "travel_score": 0.726,
-      "lookahead_score": 0,
-      "congestion_score": 1.2,
-      "types": {
-        "schedule_congestion": 2,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "3 matchs sur les 7 derniers jours",
-        "3 matchs sur les 7 derniers jours",
-        "1 match dans les 48h + 979 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.136,
-        "away_score": -1.116,
-        "home_fade": 0.6,
-        "away_fade": 1.326,
-        "reason": "Direction nette: Colorado Avalanche (-0.14)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.726
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401815527",
       "source_event_ids": [
         "401815527"
@@ -1623,126 +1563,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.762
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401872907",
-      "source_event_ids": [
-        "401872907"
-      ],
-      "kickoff": "2026-05-29T00:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Colorado Avalanche",
-      "away": "Vegas Golden Knights",
-      "match": "Colorado Avalanche - Vegas Golden Knights",
-      "decision": "lean_home",
-      "net_team": "Colorado Avalanche",
-      "reason": "Vegas Golden Knights plus penalise par calendrier/voyage (0.88 vs 0.15)",
-      "pressure_score": 1.392,
-      "home_fade": 0.15,
-      "away_fade": 0.876,
-      "travel_score": 0.726,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours",
-        "1 match dans les 48h + 979 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.157,
-        "away_score": -0.823,
-        "home_fade": 0.15,
-        "away_fade": 0.876,
-        "reason": "Direction nette: Colorado Avalanche (+0.16)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.726
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401872908",
-      "source_event_ids": [
-        "401872908"
-      ],
-      "kickoff": "2026-05-31T00:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Vegas Golden Knights",
-      "away": "Colorado Avalanche",
-      "match": "Vegas Golden Knights - Colorado Avalanche",
-      "decision": "lean_home",
-      "net_team": "Vegas Golden Knights",
-      "reason": "Colorado Avalanche plus penalise par calendrier/voyage (0.88 vs 0.15)",
-      "pressure_score": 1.392,
-      "home_fade": 0.15,
-      "away_fade": 0.876,
-      "travel_score": 0.726,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours",
-        "1 match dans les 48h + 979 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.157,
-        "away_score": -0.823,
-        "home_fade": 0.15,
-        "away_fade": 0.876,
-        "reason": "Direction nette: Vegas Golden Knights (+0.16)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.726
           }
         ]
       }
