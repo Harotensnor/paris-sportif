@@ -1,45 +1,27 @@
 {
-  "generated_at": "2026-05-27T01:33:58Z",
+  "generated_at": "2026-05-27T03:38:48Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 53,
-    "actionable": 35,
+    "active_events": 50,
+    "actionable": 32,
     "watch": 0,
     "risk": 18,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 21,
-      "travel_extreme": 7,
-      "back_to_back_travel": 23,
+      "injury_imbalance": 20,
+      "travel_extreme": 6,
+      "back_to_back_travel": 20,
       "signal_conflict": 3,
       "market_uncertain": 16
     },
     "by_quality": {
-      "actionable": 35,
+      "actionable": 32,
       "risk": 18
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401815512",
-      "date": "2026-05-27T01:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Diego Padres",
-      "away": "Philadelphia Phillies",
-      "match": "San Diego Padres - Philadelphia Phillies",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "San Diego Padres",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 9-3"
-    },
     {
       "event_id": "401815518",
       "date": "2026-05-27T17:07Z",
@@ -491,24 +473,6 @@
       "context": "Absences severes 4-0"
     },
     {
-      "event_id": "401815511",
-      "date": "2026-05-27T02:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Los Angeles Dodgers",
-      "away": "Colorado Rockies",
-      "match": "Los Angeles Dodgers - Colorado Rockies",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Colorado Rockies",
-      "side": "away",
-      "strength": 0.797,
-      "context": "1 match dans les 48h + 1334 km de voyage"
-    },
-    {
       "event_id": "401815526",
       "date": "2026-05-28T02:10Z",
       "sport": "baseball",
@@ -579,24 +543,6 @@
       "side": "away",
       "strength": 0.762,
       "context": "1 match dans les 48h + 1161 km de voyage"
-    },
-    {
-      "event_id": "401815510",
-      "date": "2026-05-27T01:45Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Francisco Giants",
-      "away": "Arizona Diamondbacks",
-      "match": "San Francisco Giants - Arizona Diamondbacks",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Arizona Diamondbacks",
-      "side": "away",
-      "strength": 0.74,
-      "context": "1 match dans les 48h + 1049 km de voyage"
     },
     {
       "event_id": "401872907",
