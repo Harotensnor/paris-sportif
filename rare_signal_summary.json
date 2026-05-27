@@ -1,63 +1,27 @@
 {
-  "generated_at": "2026-05-27T16:32:12Z",
+  "generated_at": "2026-05-27T18:42:05Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 46,
-    "actionable": 29,
+    "active_events": 43,
+    "actionable": 26,
     "watch": 0,
     "risk": 17,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 20,
-      "travel_extreme": 6,
-      "back_to_back_travel": 17,
+      "back_to_back_travel": 16,
+      "injury_imbalance": 17,
+      "travel_extreme": 5,
       "signal_conflict": 3,
       "market_uncertain": 15
     },
     "by_quality": {
-      "actionable": 29,
+      "actionable": 26,
       "risk": 17
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401815518",
-      "date": "2026-05-27T17:07Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Toronto Blue Jays",
-      "away": "Miami Marlins",
-      "match": "Toronto Blue Jays - Miami Marlins",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Toronto Blue Jays",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 13-6"
-    },
-    {
-      "event_id": "401815520",
-      "date": "2026-05-27T17:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Cleveland Guardians",
-      "away": "Washington Nationals",
-      "match": "Cleveland Guardians - Washington Nationals",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Washington Nationals",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 2-7"
-    },
     {
       "event_id": "401815527",
       "date": "2026-05-27T20:10Z",
@@ -435,24 +399,6 @@
       "side": "away",
       "strength": 0.809,
       "context": "1 match dans les 48h + 1396 km de voyage"
-    },
-    {
-      "event_id": "401815524",
-      "date": "2026-05-27T17:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Milwaukee Brewers",
-      "away": "St. Louis Cardinals",
-      "match": "Milwaukee Brewers - St. Louis Cardinals",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Milwaukee Brewers",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 7-3"
     },
     {
       "event_id": "401856942",
