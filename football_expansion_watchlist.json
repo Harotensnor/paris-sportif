@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-26T23:24:31Z",
+  "generated_at": "2026-05-27T01:33:56Z",
   "source": "data.js bookable feed + sofascore_events source feed",
   "status": "ok",
   "categories": {
@@ -77,17 +77,9 @@
     },
     "J5_football_tier2": {
       "label": "Ligues tier 2",
-      "bookable": 2,
+      "bookable": 1,
       "source": 20,
       "samples": [
-        {
-          "event_id": "401873594",
-          "source": "winamax_exact",
-          "kickoff": "2026-05-24T18:00Z",
-          "match": "Monza at Catanzaro",
-          "league": "Serie B",
-          "code": "ita.2"
-        },
         {
           "event_id": "401873595",
           "source": "winamax_exact",
@@ -143,6 +135,14 @@
           "match": "Fujieda MYFC vs Fukushima United FC",
           "league": "J2/J3 League, East B",
           "code": "jpn.2"
+        },
+        {
+          "event_id": "sofa_15346049",
+          "source": "sofascore_watch",
+          "kickoff": "2026-05-06T05:00Z",
+          "match": "Hokkaido Consadole Sapporo vs AC Nagano Parceiro",
+          "league": "J2/J3 League, East B",
+          "code": "jpn.2"
         }
       ],
       "status": "ok"
@@ -153,22 +153,6 @@
       "source": 43,
       "samples": [
         {
-          "event_id": "401865560",
-          "source": "winamax_exact",
-          "kickoff": "2026-05-26T22:00Z",
-          "match": "Mirassol at Lanús",
-          "league": "Copa Libertadores",
-          "code": "conmebol.libertadores"
-        },
-        {
-          "event_id": "401865561",
-          "source": "winamax_exact",
-          "kickoff": "2026-05-26T22:00Z",
-          "match": "Always Ready at Liga de Quito",
-          "league": "Copa Libertadores",
-          "code": "conmebol.libertadores"
-        },
-        {
           "event_id": "401865455",
           "source": "winamax_exact",
           "kickoff": "2026-05-26T22:00Z",
@@ -201,20 +185,36 @@
           "code": "conmebol.sudamericana"
         },
         {
-          "event_id": "401865554",
+          "event_id": "401865560",
           "source": "winamax_exact",
-          "kickoff": "2026-05-27T00:30Z",
-          "match": "Independiente Medellín at Estudiantes de La Plata",
+          "kickoff": "2026-05-26T22:00Z",
+          "match": "Mirassol at Lanús",
           "league": "Copa Libertadores",
           "code": "conmebol.libertadores"
         },
         {
-          "event_id": "401865555",
+          "event_id": "401865561",
           "source": "winamax_exact",
-          "kickoff": "2026-05-27T00:30Z",
-          "match": "Cusco FC at Flamengo",
+          "kickoff": "2026-05-26T22:00Z",
+          "match": "Always Ready at Liga de Quito",
           "league": "Copa Libertadores",
           "code": "conmebol.libertadores"
+        },
+        {
+          "event_id": "401865461",
+          "source": "winamax_exact",
+          "kickoff": "2026-05-27T00:30Z",
+          "match": "Deportivo Recoleta at San Lorenzo",
+          "league": "Copa Sudamericana",
+          "code": "conmebol.sudamericana"
+        },
+        {
+          "event_id": "401865460",
+          "source": "winamax_exact",
+          "kickoff": "2026-05-27T00:30Z",
+          "match": "Deportivo Cuenca at Santos",
+          "league": "Copa Sudamericana",
+          "code": "conmebol.sudamericana"
         }
       ],
       "status": "ok"
@@ -225,22 +225,6 @@
       "source": 66,
       "samples": [
         {
-          "event_id": "401865560",
-          "source": "winamax_exact",
-          "kickoff": "2026-05-26T22:00Z",
-          "match": "Mirassol at Lanús",
-          "league": "Copa Libertadores",
-          "code": "conmebol.libertadores"
-        },
-        {
-          "event_id": "401865561",
-          "source": "winamax_exact",
-          "kickoff": "2026-05-26T22:00Z",
-          "match": "Always Ready at Liga de Quito",
-          "league": "Copa Libertadores",
-          "code": "conmebol.libertadores"
-        },
-        {
           "event_id": "401865455",
           "source": "winamax_exact",
           "kickoff": "2026-05-26T22:00Z",
@@ -273,27 +257,43 @@
           "code": "conmebol.sudamericana"
         },
         {
-          "event_id": "401865554",
+          "event_id": "401865560",
           "source": "winamax_exact",
-          "kickoff": "2026-05-27T00:30Z",
-          "match": "Independiente Medellín at Estudiantes de La Plata",
+          "kickoff": "2026-05-26T22:00Z",
+          "match": "Mirassol at Lanús",
           "league": "Copa Libertadores",
           "code": "conmebol.libertadores"
         },
         {
-          "event_id": "401865555",
+          "event_id": "401865561",
           "source": "winamax_exact",
-          "kickoff": "2026-05-27T00:30Z",
-          "match": "Cusco FC at Flamengo",
+          "kickoff": "2026-05-26T22:00Z",
+          "match": "Always Ready at Liga de Quito",
           "league": "Copa Libertadores",
           "code": "conmebol.libertadores"
+        },
+        {
+          "event_id": "401865461",
+          "source": "winamax_exact",
+          "kickoff": "2026-05-27T00:30Z",
+          "match": "Deportivo Recoleta at San Lorenzo",
+          "league": "Copa Sudamericana",
+          "code": "conmebol.sudamericana"
+        },
+        {
+          "event_id": "401865460",
+          "source": "winamax_exact",
+          "kickoff": "2026-05-27T00:30Z",
+          "match": "Deportivo Cuenca at Santos",
+          "league": "Copa Sudamericana",
+          "code": "conmebol.sudamericana"
         }
       ],
       "status": "ok"
     }
   },
   "summary": {
-    "bookable_total": 72,
+    "bookable_total": 71,
     "source_total": 141,
     "ok_categories": 3
   }
