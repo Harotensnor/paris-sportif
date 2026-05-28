@@ -1,24 +1,25 @@
 {
-  "generated_at": "2026-05-28T02:56:50Z",
+  "generated_at": "2026-05-28T06:57:29Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 23,
-    "actionable": 12,
+    "active_events": 19,
+    "actionable": 10,
     "watch": 0,
-    "risk": 11,
+    "risk": 9,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 9,
+      "market_move": 18,
+      "injury_imbalance": 6,
       "travel_extreme": 1,
-      "back_to_back_travel": 6,
+      "back_to_back_travel": 3,
       "market_uncertain": 10,
-      "signal_conflict": 1
+      "signal_conflict": 2
     },
     "by_quality": {
-      "actionable": 12,
-      "risk": 11
+      "actionable": 10,
+      "risk": 9
     }
   },
   "active_actionable": [
@@ -77,6 +78,24 @@
       "context": "Absences severes 4-10"
     },
     {
+      "event_id": "175537",
+      "date": "2026-05-29T04:00Z",
+      "sport": "tennis",
+      "league_code": "rolandgarros",
+      "league_name": "Roland Garros",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 11.00 -> 7.00 (+36.4%)"
+    },
+    {
       "event_id": "401815583",
       "date": "2026-06-01T23:40Z",
       "sport": "baseball",
@@ -93,24 +112,6 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 7-12"
-    },
-    {
-      "event_id": "401815586",
-      "date": "2026-06-02T01:38Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Los Angeles Angels",
-      "away": "Colorado Rockies",
-      "match": "Los Angeles Angels - Colorado Rockies",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Colorado Rockies",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 8-13"
     },
     {
       "event_id": "401815597",
@@ -131,24 +132,6 @@
       "context": "Absences severes 7-12"
     },
     {
-      "event_id": "401815601",
-      "date": "2026-06-03T01:38Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Los Angeles Angels",
-      "away": "Colorado Rockies",
-      "match": "Los Angeles Angels - Colorado Rockies",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Colorado Rockies",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 8-13"
-    },
-    {
       "event_id": "401815612",
       "date": "2026-06-03T17:00Z",
       "sport": "baseball",
@@ -167,24 +150,6 @@
       "context": "Absences severes 7-12"
     },
     {
-      "event_id": "401815616",
-      "date": "2026-06-04T01:38Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Los Angeles Angels",
-      "away": "Colorado Rockies",
-      "match": "Los Angeles Angels - Colorado Rockies",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Colorado Rockies",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 8-13"
-    },
-    {
       "event_id": "401815530",
       "date": "2026-05-28T20:10Z",
       "sport": "baseball",
@@ -199,26 +164,26 @@
       "direction": "fade",
       "team": "Atlanta Braves",
       "side": "away",
-      "strength": 0.91,
-      "context": "2 match dans les 48h + 1498 km de voyage"
+      "strength": 0.83,
+      "context": "1 match dans les 48h + 1498 km de voyage"
     },
     {
-      "event_id": "401873387",
-      "date": "2026-05-30T00:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Carolina Hurricanes",
-      "away": "Montreal Canadiens",
-      "match": "Carolina Hurricanes - Montreal Canadiens",
+      "event_id": "175724",
+      "date": "2026-05-28T09:00Z",
+      "sport": "tennis",
+      "league_code": "rolandgarros",
+      "league_name": "Roland Garros",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Montreal Canadiens",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
       "side": "away",
-      "strength": 0.762,
-      "context": "1 match dans les 48h + 1161 km de voyage"
+      "strength": 0.794,
+      "context": "Cote away: 4.20 -> 3.60 (+14.3%)"
     },
     {
       "event_id": "401873388",
@@ -241,24 +206,6 @@
   ],
   "active_watch": [],
   "active_risk": [
-    {
-      "event_id": "175528",
-      "date": "2026-05-29T04:00Z",
-      "sport": "tennis",
-      "league_code": "rolandgarros",
-      "league_name": "Roland Garros",
-      "home": "",
-      "away": "",
-      "match": "? - ?",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 12.1%"
-    },
     {
       "event_id": "401843360",
       "date": "2026-05-29T17:00Z",
@@ -420,24 +367,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.1%"
-    },
-    {
-      "event_id": "401873389",
-      "date": "2026-06-03T00:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Carolina Hurricanes",
-      "away": "Montreal Canadiens",
-      "match": "Carolina Hurricanes - Montreal Canadiens",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "signal_conflict",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.45,
-      "context": "Signaux opposes: Carolina Hurricanes fade 0.60, Montreal Canadiens fade 0.60 -> prudence"
     }
   ],
   "expired_sample": []
