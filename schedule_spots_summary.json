@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-05-28T01:27:39Z",
+  "generated_at": "2026-05-28T02:56:50Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 20,
+    "active_events": 16,
     "expired_sample": 0,
     "by_type": {
-      "back_to_back_travel": 9,
-      "travel_extreme": 4,
-      "lookahead": 24,
-      "schedule_congestion": 17
+      "travel_extreme": 1,
+      "back_to_back_travel": 6,
+      "lookahead": 20,
+      "schedule_congestion": 15
     },
     "by_decision": {
-      "abstain": 6,
-      "lean_home": 10,
-      "lean_away": 4
+      "abstain": 9,
+      "lean_home": 6,
+      "lean_away": 1
     },
-    "lean_home": 10,
-    "lean_away": 4,
-    "abstain": 6,
+    "lean_home": 6,
+    "lean_away": 1,
+    "abstain": 9,
     "monitor": 0
   },
   "active": [
@@ -286,6 +286,122 @@
       }
     },
     {
+      "event_id": "401815541",
+      "source_event_ids": [
+        "401815541"
+      ],
+      "kickoff": "2026-05-29T23:05Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Baltimore Orioles",
+      "away": "Toronto Blue Jays",
+      "match": "Baltimore Orioles - Toronto Blue Jays",
+      "decision": "abstain",
+      "net_team": null,
+      "reason": "Fatigue/agenda des deux cotes: Baltimore Orioles 0.30, Toronto Blue Jays 0.30",
+      "pressure_score": 1.333,
+      "home_fade": 0.3,
+      "away_fade": 0.3,
+      "travel_score": 0,
+      "lookahead_score": 1.333,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 2
+      },
+      "contexts": [
+        "2 match important/proche dans les 3 jours",
+        "2 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": -0.055,
+        "away_score": -0.595,
+        "home_fade": 0.3,
+        "away_fade": 0.7,
+        "reason": "Direction nette: Baltimore Orioles (-0.06)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.3
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.3
+          },
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.4
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815571",
+      "source_event_ids": [
+        "401815571"
+      ],
+      "kickoff": "2026-05-31T16:15Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Baltimore Orioles",
+      "away": "Toronto Blue Jays",
+      "match": "Baltimore Orioles - Toronto Blue Jays",
+      "decision": "abstain",
+      "net_team": null,
+      "reason": "Fatigue/agenda des deux cotes: Baltimore Orioles 0.60, Toronto Blue Jays 0.60",
+      "pressure_score": 1.2,
+      "home_fade": 0.6,
+      "away_fade": 0.6,
+      "travel_score": 0,
+      "lookahead_score": 0,
+      "congestion_score": 1.2,
+      "types": {
+        "schedule_congestion": 2
+      },
+      "contexts": [
+        "3 matchs sur les 7 derniers jours",
+        "3 matchs sur les 7 derniers jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": -0.25,
+        "away_score": -0.79,
+        "home_fade": 0.6,
+        "away_fade": 1.0,
+        "reason": "Direction nette: Baltimore Orioles (-0.25)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "away",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.4
+          }
+        ]
+      }
+    },
+    {
       "event_id": "401873389",
       "source_event_ids": [
         "401873389"
@@ -396,6 +512,64 @@
       }
     },
     {
+      "event_id": "401815556",
+      "source_event_ids": [
+        "401815556"
+      ],
+      "kickoff": "2026-05-30T20:05Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Baltimore Orioles",
+      "away": "Toronto Blue Jays",
+      "match": "Baltimore Orioles - Toronto Blue Jays",
+      "decision": "abstain",
+      "net_team": null,
+      "reason": "Fatigue/agenda des deux cotes: Baltimore Orioles 0.15, Toronto Blue Jays 0.15",
+      "pressure_score": 0.667,
+      "home_fade": 0.15,
+      "away_fade": 0.15,
+      "travel_score": 0,
+      "lookahead_score": 0.667,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 2
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours",
+        "1 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": 0.043,
+        "away_score": -0.498,
+        "home_fade": 0.15,
+        "away_fade": 0.55,
+        "reason": "Direction nette: Baltimore Orioles (+0.04)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.4
+          }
+        ]
+      }
+    },
+    {
       "event_id": "401815601",
       "source_event_ids": [
         "401815601"
@@ -476,146 +650,6 @@
       }
     },
     {
-      "event_id": "401815609",
-      "source_event_ids": [
-        "401815609"
-      ],
-      "kickoff": "2026-06-03T22:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Philadelphia Phillies",
-      "away": "San Diego Padres",
-      "match": "Philadelphia Phillies - San Diego Padres",
-      "decision": "lean_home",
-      "net_team": "Philadelphia Phillies",
-      "reason": "San Diego Padres plus penalise par calendrier/voyage (2.04 vs 0.15)",
-      "pressure_score": 2.553,
-      "home_fade": 0.15,
-      "away_fade": 2.036,
-      "travel_score": 1.886,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2,
-        "travel_extreme": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours",
-        "Deplacement estime 3811 km, decalage ~2.8h",
-        "1 match dans les 48h + 3811 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.913,
-        "away_score": -2.984,
-        "home_fade": 0.15,
-        "away_fade": 3.036,
-        "reason": "Direction nette: Philadelphia Phillies (+0.91)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.886
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815594",
-      "source_event_ids": [
-        "401815594"
-      ],
-      "kickoff": "2026-06-02T22:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Philadelphia Phillies",
-      "away": "San Diego Padres",
-      "match": "Philadelphia Phillies - San Diego Padres",
-      "decision": "lean_home",
-      "net_team": "Philadelphia Phillies",
-      "reason": "San Diego Padres plus penalise par calendrier/voyage (1.19 vs 0.30)",
-      "pressure_score": 2.22,
-      "home_fade": 0.3,
-      "away_fade": 1.186,
-      "travel_score": 0.886,
-      "lookahead_score": 1.333,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2,
-        "travel_extreme": 1
-      },
-      "contexts": [
-        "2 match important/proche dans les 3 jours",
-        "2 match important/proche dans les 3 jours",
-        "Deplacement estime 3811 km, decalage ~2.8h"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.465,
-        "away_score": -2.081,
-        "home_fade": 0.3,
-        "away_fade": 2.186,
-        "reason": "Direction nette: Philadelphia Phillies (+0.47)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.886
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401815616",
       "source_event_ids": [
         "401815616"
@@ -677,72 +711,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.875
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815541",
-      "source_event_ids": [
-        "401815541"
-      ],
-      "kickoff": "2026-05-29T23:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Baltimore Orioles",
-      "away": "Toronto Blue Jays",
-      "match": "Baltimore Orioles - Toronto Blue Jays",
-      "decision": "lean_away",
-      "net_team": "Toronto Blue Jays",
-      "reason": "Baltimore Orioles plus penalise par calendrier/voyage (0.90 vs 0.30)",
-      "pressure_score": 1.933,
-      "home_fade": 0.9,
-      "away_fade": 0.3,
-      "travel_score": 0,
-      "lookahead_score": 1.333,
-      "congestion_score": 0.6,
-      "types": {
-        "schedule_congestion": 1,
-        "lookahead": 2
-      },
-      "contexts": [
-        "3 matchs sur les 7 derniers jours",
-        "2 match important/proche dans les 3 jours",
-        "2 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.655,
-        "away_score": -0.385,
-        "home_fade": 0.9,
-        "away_fade": 0.7,
-        "reason": "Signaux opposes: Baltimore Orioles fade 0.90, Toronto Blue Jays fade 0.70 -> prudence",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
           }
         ]
       }
@@ -814,65 +782,6 @@
       }
     },
     {
-      "event_id": "401815621",
-      "source_event_ids": [
-        "401815621"
-      ],
-      "kickoff": "2026-06-04T17:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Philadelphia Phillies",
-      "away": "San Diego Padres",
-      "match": "Philadelphia Phillies - San Diego Padres",
-      "decision": "lean_home",
-      "net_team": "Philadelphia Phillies",
-      "reason": "San Diego Padres plus penalise par calendrier/voyage (1.89 vs 0.00)",
-      "pressure_score": 1.886,
-      "home_fade": 0.0,
-      "away_fade": 1.886,
-      "travel_score": 1.886,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "travel_extreme": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "Deplacement estime 3811 km, decalage ~2.8h",
-        "2 match dans les 48h + 3811 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 1.01,
-        "away_score": -2.886,
-        "home_fade": 0.0,
-        "away_fade": 2.886,
-        "reason": "Direction nette: Philadelphia Phillies (+1.01)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.886
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401815529",
       "source_event_ids": [
         "401815529"
@@ -927,130 +836,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815571",
-      "source_event_ids": [
-        "401815571"
-      ],
-      "kickoff": "2026-05-31T16:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Baltimore Orioles",
-      "away": "Toronto Blue Jays",
-      "match": "Baltimore Orioles - Toronto Blue Jays",
-      "decision": "lean_away",
-      "net_team": "Toronto Blue Jays",
-      "reason": "Baltimore Orioles plus penalise par calendrier/voyage (1.00 vs 0.60)",
-      "pressure_score": 1.6,
-      "home_fade": 1.0,
-      "away_fade": 0.6,
-      "travel_score": 0,
-      "lookahead_score": 0,
-      "congestion_score": 1.6,
-      "types": {
-        "schedule_congestion": 2
-      },
-      "contexts": [
-        "5 matchs sur les 7 derniers jours",
-        "3 matchs sur les 7 derniers jours"
-      ],
-      "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.65,
-        "away_score": -0.65,
-        "home_fade": 1.0,
-        "away_fade": 1.0,
-        "reason": "Signaux opposes: Baltimore Orioles fade 1.00, Toronto Blue Jays fade 1.00 -> prudence",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815556",
-      "source_event_ids": [
-        "401815556"
-      ],
-      "kickoff": "2026-05-30T20:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Baltimore Orioles",
-      "away": "Toronto Blue Jays",
-      "match": "Baltimore Orioles - Toronto Blue Jays",
-      "decision": "lean_away",
-      "net_team": "Toronto Blue Jays",
-      "reason": "Baltimore Orioles plus penalise par calendrier/voyage (0.95 vs 0.15)",
-      "pressure_score": 1.467,
-      "home_fade": 0.95,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0.8,
-      "types": {
-        "schedule_congestion": 1,
-        "lookahead": 2
-      },
-      "contexts": [
-        "4 matchs sur les 7 derniers jours",
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.758,
-        "away_score": -0.218,
-        "home_fade": 0.95,
-        "away_fade": 0.55,
-        "reason": "Direction nette: Toronto Blue Jays (-0.22)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.8
-          },
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
           }
         ]
       }
@@ -1216,51 +1001,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.91
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815526",
-      "source_event_ids": [
-        "401815526"
-      ],
-      "kickoff": "2026-05-28T02:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Los Angeles Dodgers",
-      "away": "Colorado Rockies",
-      "match": "Los Angeles Dodgers - Colorado Rockies",
-      "decision": "lean_home",
-      "net_team": "Los Angeles Dodgers",
-      "reason": "Colorado Rockies plus penalise par calendrier/voyage (0.80 vs 0.00)",
-      "pressure_score": 0.797,
-      "home_fade": 0.0,
-      "away_fade": 0.797,
-      "travel_score": 0.797,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "1 match dans les 48h + 1334 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.279,
-        "away_score": -0.797,
-        "home_fade": 0.0,
-        "away_fade": 0.797,
-        "reason": "Direction nette: Los Angeles Dodgers (+0.28)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.797
           }
         ]
       }

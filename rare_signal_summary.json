@@ -1,23 +1,23 @@
 {
-  "generated_at": "2026-05-28T01:27:39Z",
+  "generated_at": "2026-05-28T02:56:50Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 28,
-    "actionable": 17,
+    "active_events": 23,
+    "actionable": 12,
     "watch": 0,
     "risk": 11,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 13,
-      "back_to_back_travel": 9,
-      "travel_extreme": 4,
-      "market_uncertain": 8,
-      "signal_conflict": 3
+      "injury_imbalance": 9,
+      "travel_extreme": 1,
+      "back_to_back_travel": 6,
+      "market_uncertain": 10,
+      "signal_conflict": 1
     },
     "by_quality": {
-      "actionable": 17,
+      "actionable": 12,
       "risk": 11
     }
   },
@@ -113,24 +113,6 @@
       "context": "Absences severes 8-13"
     },
     {
-      "event_id": "401815594",
-      "date": "2026-06-02T22:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Philadelphia Phillies",
-      "away": "San Diego Padres",
-      "match": "Philadelphia Phillies - San Diego Padres",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "San Diego Padres",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 3-9"
-    },
-    {
       "event_id": "401815597",
       "date": "2026-06-02T23:40Z",
       "sport": "baseball",
@@ -185,24 +167,6 @@
       "context": "Absences severes 7-12"
     },
     {
-      "event_id": "401815609",
-      "date": "2026-06-03T22:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Philadelphia Phillies",
-      "away": "San Diego Padres",
-      "match": "Philadelphia Phillies - San Diego Padres",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "San Diego Padres",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 3-9"
-    },
-    {
       "event_id": "401815616",
       "date": "2026-06-04T01:38Z",
       "sport": "baseball",
@@ -221,24 +185,6 @@
       "context": "Absences severes 8-13"
     },
     {
-      "event_id": "401815621",
-      "date": "2026-06-04T17:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Philadelphia Phillies",
-      "away": "San Diego Padres",
-      "match": "Philadelphia Phillies - San Diego Padres",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "San Diego Padres",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 3-9"
-    },
-    {
       "event_id": "401815530",
       "date": "2026-05-28T20:10Z",
       "sport": "baseball",
@@ -255,42 +201,6 @@
       "side": "away",
       "strength": 0.91,
       "context": "2 match dans les 48h + 1498 km de voyage"
-    },
-    {
-      "event_id": "401856942",
-      "date": "2026-05-28T02:00Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Seattle Storm",
-      "away": "Washington Mystics",
-      "match": "Seattle Storm - Washington Mystics",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Seattle Storm",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 4-0"
-    },
-    {
-      "event_id": "401815526",
-      "date": "2026-05-28T02:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Los Angeles Dodgers",
-      "away": "Colorado Rockies",
-      "match": "Los Angeles Dodgers - Colorado Rockies",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Colorado Rockies",
-      "side": "away",
-      "strength": 0.797,
-      "context": "1 match dans les 48h + 1334 km de voyage"
     },
     {
       "event_id": "401873387",
@@ -331,6 +241,24 @@
   ],
   "active_watch": [],
   "active_risk": [
+    {
+      "event_id": "175528",
+      "date": "2026-05-29T04:00Z",
+      "sport": "tennis",
+      "league_code": "rolandgarros",
+      "league_name": "Roland Garros",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 12.1%"
+    },
     {
       "event_id": "401843360",
       "date": "2026-05-29T17:00Z",
@@ -422,6 +350,24 @@
       "context": "marge bookmaker anormale 18.4%"
     },
     {
+      "event_id": "401873670",
+      "date": "2026-05-31T05:00Z",
+      "sport": "football",
+      "league_code": "jleague",
+      "league_name": "J-League",
+      "home": "Shimizu S-Pulse",
+      "away": "Yokohama F. Marinos",
+      "match": "Shimizu S-Pulse - Yokohama F. Marinos",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.1%"
+    },
+    {
       "event_id": "401861403",
       "date": "2026-05-31T11:35Z",
       "sport": "football",
@@ -474,42 +420,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.1%"
-    },
-    {
-      "event_id": "401815541",
-      "date": "2026-05-29T23:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Baltimore Orioles",
-      "away": "Toronto Blue Jays",
-      "match": "Baltimore Orioles - Toronto Blue Jays",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "signal_conflict",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.655,
-      "context": "Signaux opposes: Baltimore Orioles fade 0.90, Toronto Blue Jays fade 0.70 -> prudence"
-    },
-    {
-      "event_id": "401815571",
-      "date": "2026-05-31T16:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Baltimore Orioles",
-      "away": "Toronto Blue Jays",
-      "match": "Baltimore Orioles - Toronto Blue Jays",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "signal_conflict",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.65,
-      "context": "Signaux opposes: Baltimore Orioles fade 1.00, Toronto Blue Jays fade 1.00 -> prudence"
     },
     {
       "event_id": "401873389",
