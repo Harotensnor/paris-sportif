@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-28T10:57:15Z",
+  "generated_at": "2026-05-28T13:09:07Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -96,18 +96,18 @@
         {
           "market": "pitcher_strikeouts",
           "team": "Chicago White Sox",
-          "pitcher": "Erick Fedde",
-          "label": "Erick Fedde moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.587,
-          "fair_odds": 1.7,
-          "expected_strikeouts": 4.15,
-          "projected_ip": 6.6,
+          "pitcher": "Davis Martin",
+          "label": "Davis Martin plus de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "over",
+          "probability": 0.5097,
+          "fair_odds": 1.96,
+          "expected_strikeouts": 6.55,
+          "projected_ip": 6.12,
           "inputs": {
-            "k9": 5.66,
-            "era": 5.47,
-            "whip": 1.46,
+            "k9": 9.63,
+            "era": 2.04,
+            "whip": 1.02,
             "hand": "R"
           },
           "side": "home"
@@ -115,53 +115,53 @@
         {
           "market": "pitcher_home_run_allowed",
           "team": "Chicago White Sox",
-          "pitcher": "Erick Fedde",
-          "label": "Erick Fedde concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.7993,
-          "fair_odds": 1.25,
-          "expected_hr_allowed": 1.606,
-          "projected_ip": 6.6,
+          "pitcher": "Davis Martin",
+          "label": "Davis Martin ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.7414,
+          "fair_odds": 1.35,
+          "expected_hr_allowed": 0.299,
+          "projected_ip": 6.12,
           "inputs": {
-            "hr9": 2.19,
-            "era": 5.47,
-            "whip": 1.46
+            "hr9": 0.44,
+            "era": 2.04,
+            "whip": 1.02
           },
           "side": "home"
         },
         {
           "market": "pitcher_strikeouts",
           "team": "Minnesota Twins",
-          "pitcher": "Taj Bradley",
-          "label": "Taj Bradley plus de 6,5 strikeouts",
+          "pitcher": "Kendry Rojas",
+          "label": "Kendry Rojas moins de 6,5 strikeouts",
           "line": 6.5,
-          "pick": "over",
+          "pick": "under",
           "probability": 0.5109,
           "fair_odds": 1.96,
-          "expected_strikeouts": 6.55,
-          "projected_ip": 5.78,
+          "expected_strikeouts": 6.45,
+          "projected_ip": 6.6,
           "inputs": {
-            "k9": 10.21,
-            "era": 2.77,
-            "whip": 1.17,
-            "hand": "R"
+            "k9": 8.79,
+            "era": 1.26,
+            "whip": 1.47,
+            "hand": "L"
           },
           "side": "away"
         },
         {
           "market": "pitcher_home_run_allowed",
           "team": "Minnesota Twins",
-          "pitcher": "Taj Bradley",
-          "label": "Taj Bradley ne concède pas de home run",
+          "pitcher": "Kendry Rojas",
+          "label": "Kendry Rojas ne concède pas de home run",
           "pick": "no",
-          "probability": 0.5721,
-          "fair_odds": 1.75,
-          "expected_hr_allowed": 0.559,
-          "projected_ip": 5.78,
+          "probability": 1.0,
+          "fair_odds": 1.01,
+          "expected_hr_allowed": 0.0,
+          "projected_ip": 6.6,
           "inputs": {
-            "hr9": 0.87,
-            "era": 2.77,
-            "whip": 1.17
+            "hr9": 0.0,
+            "era": 1.26,
+            "whip": 1.47
           },
           "side": "away"
         }
@@ -175,6 +175,42 @@
       "home": "Boston Red Sox",
       "away": "Atlanta Braves",
       "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Boston Red Sox",
+          "pitcher": "Payton Tolle",
+          "label": "Payton Tolle moins de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "under",
+          "probability": 0.5171,
+          "fair_odds": 1.93,
+          "expected_strikeouts": 6.42,
+          "projected_ip": 6.03,
+          "inputs": {
+            "k9": 9.57,
+            "era": 2.45,
+            "whip": 0.82,
+            "hand": "L"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Boston Red Sox",
+          "pitcher": "Payton Tolle",
+          "label": "Payton Tolle ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6089,
+          "fair_odds": 1.64,
+          "expected_hr_allowed": 0.496,
+          "projected_ip": 6.03,
+          "inputs": {
+            "hr9": 0.74,
+            "era": 2.45,
+            "whip": 0.82
+          },
+          "side": "home"
+        },
         {
           "market": "pitcher_strikeouts",
           "team": "Atlanta Braves",
@@ -208,6 +244,88 @@
             "hr9": 0.87,
             "era": 1.89,
             "whip": 0.87
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815532",
+      "kickoff": "2026-05-28T22:35Z",
+      "league": "MLB",
+      "match": "Toronto Blue Jays at Baltimore Orioles",
+      "home": "Baltimore Orioles",
+      "away": "Toronto Blue Jays",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Baltimore Orioles",
+          "pitcher": "Chris Bassitt",
+          "label": "Chris Bassitt moins de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "under",
+          "probability": 0.5679,
+          "fair_odds": 1.76,
+          "expected_strikeouts": 4.23,
+          "projected_ip": 5.89,
+          "inputs": {
+            "k9": 6.46,
+            "era": 5.51,
+            "whip": 1.67,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Baltimore Orioles",
+          "pitcher": "Chris Bassitt",
+          "label": "Chris Bassitt ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6083,
+          "fair_odds": 1.64,
+          "expected_hr_allowed": 0.497,
+          "projected_ip": 5.89,
+          "inputs": {
+            "hr9": 0.76,
+            "era": 5.51,
+            "whip": 1.67
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Toronto Blue Jays",
+          "pitcher": "Patrick Corbin",
+          "label": "Patrick Corbin plus de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "over",
+          "probability": 0.5106,
+          "fair_odds": 1.96,
+          "expected_strikeouts": 3.54,
+          "projected_ip": 4.9,
+          "inputs": {
+            "k9": 6.5,
+            "era": 3.86,
+            "whip": 1.4,
+            "hand": "L"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Toronto Blue Jays",
+          "pitcher": "Patrick Corbin",
+          "label": "Patrick Corbin ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6434,
+          "fair_odds": 1.55,
+          "expected_hr_allowed": 0.441,
+          "projected_ip": 4.9,
+          "inputs": {
+            "hr9": 0.81,
+            "era": 3.86,
+            "whip": 1.4
           },
           "side": "away"
         }
@@ -294,9 +412,137 @@
           "side": "away"
         }
       ]
+    },
+    {
+      "event_id": "401815541",
+      "kickoff": "2026-05-29T23:05Z",
+      "league": "MLB",
+      "match": "Toronto Blue Jays at Baltimore Orioles",
+      "home": "Baltimore Orioles",
+      "away": "Toronto Blue Jays",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Baltimore Orioles",
+          "pitcher": "Trevor Rogers",
+          "label": "Trevor Rogers plus de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "over",
+          "probability": 0.5892,
+          "fair_odds": 1.7,
+          "expected_strikeouts": 3.84,
+          "projected_ip": 4.69,
+          "inputs": {
+            "k9": 7.38,
+            "era": 6.96,
+            "whip": 1.62,
+            "hand": "L"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Baltimore Orioles",
+          "pitcher": "Trevor Rogers",
+          "label": "Trevor Rogers ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.516,
+          "fair_odds": 1.94,
+          "expected_hr_allowed": 0.662,
+          "projected_ip": 4.69,
+          "inputs": {
+            "hr9": 1.27,
+            "era": 6.96,
+            "whip": 1.62
+          },
+          "side": "home"
+        }
+      ]
+    },
+    {
+      "event_id": "401815556",
+      "kickoff": "2026-05-30T20:05Z",
+      "league": "MLB",
+      "match": "Toronto Blue Jays at Baltimore Orioles",
+      "home": "Baltimore Orioles",
+      "away": "Toronto Blue Jays",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Baltimore Orioles",
+          "pitcher": "Brandon Young",
+          "label": "Brandon Young plus de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "over",
+          "probability": 0.5505,
+          "fair_odds": 1.82,
+          "expected_strikeouts": 3.69,
+          "projected_ip": 5.16,
+          "inputs": {
+            "k9": 6.44,
+            "era": 3.47,
+            "whip": 1.4,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Baltimore Orioles",
+          "pitcher": "Brandon Young",
+          "label": "Brandon Young concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5086,
+          "fair_odds": 1.97,
+          "expected_hr_allowed": 0.711,
+          "projected_ip": 5.16,
+          "inputs": {
+            "hr9": 1.24,
+            "era": 3.47,
+            "whip": 1.4
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Toronto Blue Jays",
+          "pitcher": "Trey Yesavage",
+          "label": "Trey Yesavage plus de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "over",
+          "probability": 0.5698,
+          "fair_odds": 1.76,
+          "expected_strikeouts": 5.83,
+          "projected_ip": 5.33,
+          "inputs": {
+            "k9": 9.84,
+            "era": 2.25,
+            "whip": 1.06,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Toronto Blue Jays",
+          "pitcher": "Trey Yesavage",
+          "label": "Trey Yesavage ne concède pas de home run",
+          "pick": "no",
+          "probability": 1.0,
+          "fair_odds": 1.01,
+          "expected_hr_allowed": 0.0,
+          "projected_ip": 5.33,
+          "inputs": {
+            "hr9": 0.0,
+            "era": 2.25,
+            "whip": 1.06
+          },
+          "side": "away"
+        }
+      ]
     }
   ],
-  "props": 14,
+  "props": 26,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
