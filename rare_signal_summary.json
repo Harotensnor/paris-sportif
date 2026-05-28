@@ -1,45 +1,27 @@
 {
-  "generated_at": "2026-05-27T23:43:06Z",
+  "generated_at": "2026-05-28T01:27:39Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 31,
-    "actionable": 19,
+    "active_events": 28,
+    "actionable": 17,
     "watch": 0,
-    "risk": 12,
+    "risk": 11,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 13,
-      "back_to_back_travel": 10,
-      "travel_extreme": 3,
-      "signal_conflict": 4,
-      "market_uncertain": 8
+      "back_to_back_travel": 9,
+      "travel_extreme": 4,
+      "market_uncertain": 8,
+      "signal_conflict": 3
     },
     "by_quality": {
-      "actionable": 19,
-      "risk": 12
+      "actionable": 17,
+      "risk": 11
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401815522",
-      "date": "2026-05-27T23:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Chicago White Sox",
-      "away": "Minnesota Twins",
-      "match": "Chicago White Sox - Minnesota Twins",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Chicago White Sox",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 12-7"
-    },
     {
       "event_id": "401815529",
       "date": "2026-05-28T17:10Z",
@@ -239,6 +221,24 @@
       "context": "Absences severes 8-13"
     },
     {
+      "event_id": "401815621",
+      "date": "2026-06-04T17:05Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Philadelphia Phillies",
+      "away": "San Diego Padres",
+      "match": "Philadelphia Phillies - San Diego Padres",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "San Diego Padres",
+      "side": null,
+      "strength": 1.0,
+      "context": "Absences severes 3-9"
+    },
+    {
       "event_id": "401815530",
       "date": "2026-05-28T20:10Z",
       "sport": "baseball",
@@ -255,24 +255,6 @@
       "side": "away",
       "strength": 0.91,
       "context": "2 match dans les 48h + 1498 km de voyage"
-    },
-    {
-      "event_id": "401815523",
-      "date": "2026-05-27T23:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Kansas City Royals",
-      "away": "New York Yankees",
-      "match": "Kansas City Royals - New York Yankees",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "New York Yankees",
-      "side": "away",
-      "strength": 0.882,
-      "context": "1 match dans les 48h + 1759 km de voyage"
     },
     {
       "event_id": "401856942",
@@ -309,24 +291,6 @@
       "side": "away",
       "strength": 0.797,
       "context": "1 match dans les 48h + 1334 km de voyage"
-    },
-    {
-      "event_id": "401873386",
-      "date": "2026-05-28T00:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Montreal Canadiens",
-      "away": "Carolina Hurricanes",
-      "match": "Montreal Canadiens - Carolina Hurricanes",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Carolina Hurricanes",
-      "side": "away",
-      "strength": 0.762,
-      "context": "1 match dans les 48h + 1161 km de voyage"
     },
     {
       "event_id": "401873387",
@@ -512,8 +476,8 @@
       "context": "marge bookmaker anormale 18.1%"
     },
     {
-      "event_id": "401815532",
-      "date": "2026-05-28T22:35Z",
+      "event_id": "401815541",
+      "date": "2026-05-29T23:05Z",
       "sport": "baseball",
       "league_code": "mlb",
       "league_name": "MLB",
@@ -526,8 +490,8 @@
       "direction": "abstain",
       "team": null,
       "side": null,
-      "strength": 0.694,
-      "context": "Signaux opposes: Baltimore Orioles fade 0.96, Toronto Blue Jays fade 0.76 -> prudence"
+      "strength": 0.655,
+      "context": "Signaux opposes: Baltimore Orioles fade 0.90, Toronto Blue Jays fade 0.70 -> prudence"
     },
     {
       "event_id": "401815571",
@@ -546,24 +510,6 @@
       "side": null,
       "strength": 0.65,
       "context": "Signaux opposes: Baltimore Orioles fade 1.00, Toronto Blue Jays fade 1.00 -> prudence"
-    },
-    {
-      "event_id": "401815533",
-      "date": "2026-05-29T00:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Texas Rangers",
-      "away": "Houston Astros",
-      "match": "Texas Rangers - Houston Astros",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "signal_conflict",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.45,
-      "context": "Signaux opposes: Texas Rangers fade 0.60, Houston Astros fade 0.60 -> prudence"
     },
     {
       "event_id": "401873389",
