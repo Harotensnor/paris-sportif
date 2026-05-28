@@ -1,23 +1,23 @@
 {
-  "generated_at": "2026-05-28T21:34:37Z",
+  "generated_at": "2026-05-28T22:57:01Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 11,
+    "active_events": 10,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 16,
+      "lookahead": 14,
       "back_to_back_travel": 2,
       "schedule_congestion": 10
     },
     "by_decision": {
-      "abstain": 9,
+      "abstain": 8,
       "lean_home": 2
     },
     "lean_home": 2,
     "lean_away": 0,
-    "abstain": 9,
+    "abstain": 8,
     "monitor": 0
   },
   "active": [
@@ -163,64 +163,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815532",
-      "source_event_ids": [
-        "401815532"
-      ],
-      "kickoff": "2026-05-28T22:35Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Baltimore Orioles",
-      "away": "Toronto Blue Jays",
-      "match": "Baltimore Orioles - Toronto Blue Jays",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Baltimore Orioles 0.36, Toronto Blue Jays 0.36",
-      "pressure_score": 1.6,
-      "home_fade": 0.36,
-      "away_fade": 0.36,
-      "travel_score": 0,
-      "lookahead_score": 1.6,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "3 match important/proche dans les 3 jours",
-        "3 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.046,
-        "away_score": -1.034,
-        "home_fade": 0.36,
-        "away_fade": 1.16,
-        "reason": "Direction nette: Baltimore Orioles (+0.05)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.36
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.36
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.8
           }
         ]
       }
