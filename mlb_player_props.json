@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-28T19:33:10Z",
+  "generated_at": "2026-05-28T21:34:36Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815530",
-      "kickoff": "2026-05-28T20:10Z",
-      "league": "MLB",
-      "match": "Atlanta Braves at Boston Red Sox",
-      "home": "Boston Red Sox",
-      "away": "Atlanta Braves",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Boston Red Sox",
-          "pitcher": "Payton Tolle",
-          "label": "Payton Tolle moins de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "under",
-          "probability": 0.5171,
-          "fair_odds": 1.93,
-          "expected_strikeouts": 6.42,
-          "projected_ip": 6.03,
-          "inputs": {
-            "k9": 9.57,
-            "era": 2.45,
-            "whip": 0.82,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Boston Red Sox",
-          "pitcher": "Payton Tolle",
-          "label": "Payton Tolle ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6089,
-          "fair_odds": 1.64,
-          "expected_hr_allowed": 0.496,
-          "projected_ip": 6.03,
-          "inputs": {
-            "hr9": 0.74,
-            "era": 2.45,
-            "whip": 0.82
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Atlanta Braves",
-          "pitcher": "Chris Sale",
-          "label": "Chris Sale moins de 7,5 strikeouts",
-          "line": 7.5,
-          "pick": "under",
-          "probability": 0.5572,
-          "fair_odds": 1.79,
-          "expected_strikeouts": 7.2,
-          "projected_ip": 6.2,
-          "inputs": {
-            "k9": 10.45,
-            "era": 1.89,
-            "whip": 0.87,
-            "hand": "L"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Atlanta Braves",
-          "pitcher": "Chris Sale",
-          "label": "Chris Sale ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5492,
-          "fair_odds": 1.82,
-          "expected_hr_allowed": 0.599,
-          "projected_ip": 6.2,
-          "inputs": {
-            "hr9": 0.87,
-            "era": 1.89,
-            "whip": 0.87
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815532",
       "kickoff": "2026-05-28T22:35Z",
@@ -378,7 +296,7 @@
       ]
     }
   ],
-  "props": 18,
+  "props": 14,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
