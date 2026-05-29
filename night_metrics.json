@@ -1,32 +1,32 @@
 {
-  "generated_at": "2026-05-29T00:03:17Z",
-  "calculated_at": "2026-05-29T00:03:17Z",
+  "generated_at": "2026-05-29T02:59:19Z",
+  "calculated_at": "2026-05-29T02:59:19Z",
   "source_of_truth": "data.js",
-  "data_generated_at": "2026-05-29T00:01:52.513558Z",
-  "data_today_field": "2026-05-28",
+  "data_generated_at": "2026-05-29T02:58:30.467449Z",
+  "data_today_field": "2026-05-29",
   "events": {
-    "total": 131,
-    "upcoming": 82,
-    "winamax_available": 131,
-    "winamax_exact": 129,
-    "winamax_exact_ratio": 0.9847,
-    "markets_more_than_1n2": 4,
-    "form_l10": 40,
-    "h2h": 0,
-    "lineups": 12,
+    "total": 74,
+    "upcoming": 69,
+    "winamax_available": 74,
+    "winamax_exact": 72,
+    "winamax_exact_ratio": 0.973,
+    "markets_more_than_1n2": 1,
+    "form_l10": 18,
+    "h2h": 20,
+    "lineups": 6,
     "football_lineups": 0,
-    "starter_signals": 12,
+    "starter_signals": 6,
     "clubelo": 9,
-    "weather": 41,
-    "injuries": 36,
+    "weather": 35,
+    "injuries": 14,
     "referee": 0,
     "referee_named": 0,
     "referee_context": 0,
     "referee_signal": 0,
     "fd_calibration": 0,
     "fd_closing_odds": 0,
-    "xg": 17,
-    "smart_money": 7
+    "xg": 11,
+    "smart_money": 2
   },
   "signal_health": {
     "referee": {
@@ -36,48 +36,48 @@
       "note": "referee is effective coverage: named referee or referee_context usable by the model."
     },
     "smart_money": {
-      "events": 7,
-      "status": "active",
+      "events": 2,
+      "status": "rare_event",
       "note": "Smart money is intentionally rare; low count is OK when odds movement does not confirm a strong signal."
     }
   },
   "winamax_markets": {
-    "matches": 473,
-    "detailed_market_matches": 137,
-    "detailed_ratio_vs_exact": 1.062,
+    "matches": 461,
+    "detailed_market_matches": 132,
+    "detailed_ratio_vs_exact": 1.8333,
     "gap_to_50pct_exact": 0,
     "recommended_detail_fetch_cap": 90,
     "detail_by_sport": {
       "baseball": {
-        "exact": 9,
+        "exact": 4,
         "detailed": 0,
         "families": {},
         "detailed_ratio": 0.0
       },
       "basketball": {
-        "exact": 9,
+        "exact": 6,
         "detailed": 0,
         "families": {},
         "detailed_ratio": 0.0
       },
       "football": {
-        "exact": 45,
-        "detailed": 2,
+        "exact": 41,
+        "detailed": 1,
         "families": {
-          "btts": 2,
-          "btts_rows": 2,
-          "dnb": 2,
-          "dnb_rows": 2,
-          "double_chance": 2,
-          "handicap": 2,
-          "ht_1n2": 2,
-          "ht_1n2_rows": 2,
-          "ht_ou": 2,
-          "match_winner": 2,
-          "ou": 2,
-          "ou15": 2
+          "btts": 1,
+          "btts_rows": 1,
+          "dnb": 1,
+          "dnb_rows": 1,
+          "double_chance": 1,
+          "handicap": 1,
+          "ht_1n2": 1,
+          "ht_1n2_rows": 1,
+          "ht_ou": 1,
+          "match_winner": 1,
+          "ou": 1,
+          "ou15": 1
         },
-        "detailed_ratio": 0.0444
+        "detailed_ratio": 0.0244
       },
       "hockey": {
         "exact": 3,
@@ -86,28 +86,28 @@
         "detailed_ratio": 0.0
       },
       "tennis": {
-        "exact": 16,
+        "exact": 15,
         "detailed": 0,
         "families": {},
         "detailed_ratio": 0.0
       }
     },
     "market_family_counts": {
-      "btts": 2,
-      "btts_rows": 2,
-      "dnb": 2,
-      "dnb_rows": 2,
-      "double_chance": 2,
-      "handicap": 2,
-      "ht_1n2": 2,
-      "ht_1n2_rows": 2,
-      "ht_ou": 2,
-      "match_winner": 2,
-      "ou": 2,
-      "ou15": 2,
-      "ou25": 2,
-      "ou35": 2,
-      "team_total": 2
+      "btts": 1,
+      "btts_rows": 1,
+      "dnb": 1,
+      "dnb_rows": 1,
+      "double_chance": 1,
+      "handicap": 1,
+      "ht_1n2": 1,
+      "ht_1n2_rows": 1,
+      "ht_ou": 1,
+      "match_winner": 1,
+      "ou": 1,
+      "ou15": 1,
+      "ou25": 1,
+      "ou35": 1,
+      "team_total": 1
     }
   },
   "backtest": {
