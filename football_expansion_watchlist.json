@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-29T21:15:59Z",
+  "generated_at": "2026-05-29T22:45:18Z",
   "source": "data.js bookable feed + sofascore_events source feed",
   "status": "ok",
   "categories": {
@@ -77,17 +77,9 @@
     },
     "J5_football_tier2": {
       "label": "Ligues tier 2",
-      "bookable": 1,
+      "bookable": 0,
       "source": 20,
       "samples": [
-        {
-          "event_id": "401873595",
-          "source": "winamax_exact",
-          "kickoff": "2026-05-29T18:00Z",
-          "match": "Catanzaro at Monza",
-          "league": "Serie B",
-          "code": "ita.2"
-        },
         {
           "event_id": "sofa_15345973",
           "source": "sofascore_watch",
@@ -143,9 +135,17 @@
           "match": "Hokkaido Consadole Sapporo vs AC Nagano Parceiro",
           "league": "J2/J3 League, East B",
           "code": "jpn.2"
+        },
+        {
+          "event_id": "sofa_15346051",
+          "source": "sofascore_watch",
+          "kickoff": "2026-05-06T05:00Z",
+          "match": "RB Omiya Ardija vs Iwaki FC",
+          "league": "J2/J3 League, East B",
+          "code": "jpn.2"
         }
       ],
-      "status": "ok"
+      "status": "watch"
     },
     "J6_coupes": {
       "label": "Coupes",
@@ -221,17 +221,9 @@
     },
     "J7_asie_latam": {
       "label": "Asie / Amérique latine",
-      "bookable": 8,
+      "bookable": 7,
       "source": 66,
       "samples": [
-        {
-          "event_id": "401861543",
-          "source": "winamax_exact",
-          "kickoff": "2026-05-29T11:35Z",
-          "match": "Shanghai Port at Liaoning Tieren",
-          "league": "Chinese Super League",
-          "code": "chn.1"
-        },
         {
           "event_id": "401861400",
           "source": "winamax_exact",
@@ -287,14 +279,22 @@
           "match": "Yunnan Yukun at Wuhan Three Towns",
           "league": "Chinese Super League",
           "code": "chn.1"
+        },
+        {
+          "event_id": "sofa_15832759",
+          "source": "sofascore_watch",
+          "kickoff": "2026-05-06T22:00Z",
+          "match": "Cusco FC vs Estudiantes de La Plata",
+          "league": "CONMEBOL Libertadores, Group A",
+          "code": "conmebol.libertadores"
         }
       ],
       "status": "ok"
     }
   },
   "summary": {
-    "bookable_total": 9,
+    "bookable_total": 7,
     "source_total": 141,
-    "ok_categories": 2
+    "ok_categories": 1
   }
 }

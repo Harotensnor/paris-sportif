@@ -1,23 +1,24 @@
 {
-  "generated_at": "2026-05-29T21:16:01Z",
+  "generated_at": "2026-05-29T22:45:20Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 38,
+    "active_events": 43,
     "actionable": 35,
-    "watch": 0,
+    "watch": 5,
     "risk": 3,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 31,
+      "injury_imbalance": 38,
       "travel_extreme": 9,
-      "signal_conflict": 7,
+      "signal_conflict": 9,
       "back_to_back_travel": 20,
       "market_uncertain": 2
     },
     "by_quality": {
       "actionable": 35,
+      "watch": 5,
       "risk": 3
     }
   },
@@ -56,7 +57,7 @@
       "team": "New York Mets",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 13-5"
+      "context": "Absences severes 13-6"
     },
     {
       "event_id": "401815542",
@@ -200,7 +201,7 @@
       "team": "New York Mets",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 13-5"
+      "context": "Absences severes 13-6"
     },
     {
       "event_id": "401815560",
@@ -344,7 +345,7 @@
       "team": "New York Mets",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 13-5"
+      "context": "Absences severes 13-6"
     },
     {
       "event_id": "401815575",
@@ -653,17 +654,108 @@
       "context": "1 match dans les 48h + 1161 km de voyage"
     }
   ],
-  "active_watch": [],
+  "active_watch": [
+    {
+      "event_id": "401856946",
+      "date": "2026-05-29T23:30Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Washington Mystics",
+      "away": "Los Angeles Sparks",
+      "match": "Washington Mystics - Los Angeles Sparks",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Los Angeles Sparks",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 1-4"
+    },
+    {
+      "event_id": "401815543",
+      "date": "2026-05-29T23:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Chicago White Sox",
+      "away": "Detroit Tigers",
+      "match": "Chicago White Sox - Detroit Tigers",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Detroit Tigers",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 13-16"
+    },
+    {
+      "event_id": "401815546",
+      "date": "2026-05-30T00:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Colorado Rockies",
+      "away": "San Francisco Giants",
+      "match": "Colorado Rockies - San Francisco Giants",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Colorado Rockies",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 12-9"
+    },
+    {
+      "event_id": "401815558",
+      "date": "2026-05-30T18:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Chicago White Sox",
+      "away": "Detroit Tigers",
+      "match": "Chicago White Sox - Detroit Tigers",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Detroit Tigers",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 13-16"
+    },
+    {
+      "event_id": "401815573",
+      "date": "2026-05-31T18:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Chicago White Sox",
+      "away": "Detroit Tigers",
+      "match": "Chicago White Sox - Detroit Tigers",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Detroit Tigers",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 13-16"
+    }
+  ],
   "active_risk": [
     {
-      "event_id": "401873670",
-      "date": "2026-05-31T05:00Z",
-      "sport": "football",
-      "league_code": "jleague",
-      "league_name": "J-League",
-      "home": "Shimizu S-Pulse",
-      "away": "Yokohama F. Marinos",
-      "match": "Shimizu S-Pulse - Yokohama F. Marinos",
+      "event_id": "175759",
+      "date": "2026-05-31T04:00Z",
+      "sport": "tennis",
+      "league_code": "rolandgarros",
+      "league_name": "Roland Garros",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
       "quality": "risk",
       "quality_reason": "Signal de prudence, pas une opportunite directe",
       "type": "market_uncertain",
@@ -671,7 +763,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.1%"
+      "context": "marge bookmaker anormale 12.6%"
     },
     {
       "event_id": "401861403",
