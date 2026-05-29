@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-05-29T10:51:16Z",
+  "generated_at": "2026-05-29T12:42:45Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 27,
-    "actionable": 15,
+    "active_events": 25,
+    "actionable": 13,
     "watch": 9,
     "risk": 3,
     "expired_sample": 0,
     "by_type": {
-      "market_move": 11,
-      "signal_conflict": 4,
+      "market_move": 8,
       "injury_imbalance": 14,
       "travel_extreme": 3,
+      "signal_conflict": 3,
       "market_uncertain": 3,
       "back_to_back_travel": 2
     },
     "by_quality": {
-      "actionable": 15,
       "watch": 9,
+      "actionable": 13,
       "risk": 3
     }
   },
@@ -94,7 +94,7 @@
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 1.42 -> 1.70 (-19.7%)"
+      "context": "Cote home: 1.40 -> 1.70 (-21.4%)"
     },
     {
       "event_id": "401815545",
@@ -257,45 +257,27 @@
       "side": "away",
       "strength": 0.762,
       "context": "1 match dans les 48h + 1161 km de voyage"
-    },
+    }
+  ],
+  "active_watch": [
     {
-      "event_id": "401861543",
-      "date": "2026-05-29T11:35Z",
-      "sport": "football",
-      "league_code": "chn.1",
-      "league_name": "Chinese Super League",
-      "home": "Liaoning Tieren",
-      "away": "Shanghai Port",
-      "match": "Liaoning Tieren - Shanghai Port",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "home",
-      "strength": 0.725,
-      "context": "Cote home: 2.30 -> 2.00 (+13.0%)"
-    },
-    {
-      "event_id": "401843363",
+      "event_id": "401843364",
       "date": "2026-05-29T17:00Z",
       "sport": "football",
       "league_code": "eliteserien",
       "league_name": "Eliteserien",
-      "home": "Vålerenga",
-      "away": "Kristiansund BK",
-      "match": "Vålerenga - Kristiansund BK",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
+      "home": "KFUM Oslo",
+      "away": "Tromso",
+      "match": "KFUM Oslo - Tromso",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
       "type": "market_move",
       "direction": "steam",
       "team": null,
-      "side": "away",
-      "strength": 0.694,
-      "context": "Cote away: 4.80 -> 4.20 (+12.5%)"
-    }
-  ],
-  "active_watch": [
+      "side": "home",
+      "strength": 0.606,
+      "context": "Cote home: 2.75 -> 2.45 (+10.9%)"
+    },
     {
       "event_id": "401815539",
       "date": "2026-05-29T22:45Z",
@@ -387,40 +369,22 @@
       "context": "Cote away: 4.20 -> 3.80 (+9.5%)"
     },
     {
-      "event_id": "401843364",
+      "event_id": "401843363",
       "date": "2026-05-29T17:00Z",
       "sport": "football",
       "league_code": "eliteserien",
       "league_name": "Eliteserien",
-      "home": "KFUM Oslo",
-      "away": "Tromso",
-      "match": "KFUM Oslo - Tromso",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.524,
-      "context": "Cote away: 2.65 -> 2.40 (+9.4%)"
-    },
-    {
-      "event_id": "401842737",
-      "date": "2026-05-29T17:00Z",
-      "sport": "football",
-      "league_code": "allsvenskan",
-      "league_name": "Allsvenskan",
-      "home": "Örgryte IS",
-      "away": "IF Elfsborg",
-      "match": "Örgryte IS - IF Elfsborg",
+      "home": "Vålerenga",
+      "away": "Kristiansund BK",
+      "match": "Vålerenga - Kristiansund BK",
       "quality": "watch",
       "quality_reason": "Signal rare present mais intensite moyenne",
       "type": "market_move",
       "direction": "steam",
       "team": null,
       "side": "home",
-      "strength": 0.499,
-      "context": "Cote home: 3.90 -> 3.55 (+9.0%)"
+      "strength": 0.49,
+      "context": "Cote home: 1.67 -> 1.52 (+8.8%)"
     },
     {
       "event_id": "401856948",
