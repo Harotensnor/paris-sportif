@@ -1,21 +1,22 @@
 {
-  "generated_at": "2026-05-29T02:59:18Z",
+  "generated_at": "2026-05-29T07:00:52Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 5,
+    "active_events": 8,
     "expired_sample": 0,
     "by_type": {
+      "travel_extreme": 3,
       "lookahead": 8,
       "back_to_back_travel": 2,
       "schedule_congestion": 2
     },
     "by_decision": {
       "abstain": 3,
-      "lean_home": 2
+      "lean_home": 5
     },
-    "lean_home": 2,
+    "lean_home": 5,
     "lean_away": 0,
     "abstain": 3,
     "monitor": 0
@@ -222,11 +223,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": -0.481,
-        "away_score": -1.51,
-        "home_fade": 1.15,
-        "away_fade": 1.912,
-        "reason": "Direction nette: Carolina Hurricanes (-0.48)",
+        "home_score": 0.169,
+        "away_score": -0.86,
+        "home_fade": 0.15,
+        "away_fade": 0.912,
+        "reason": "Direction nette: Carolina Hurricanes (+0.17)",
         "detail": [
           {
             "side": "home",
@@ -239,18 +240,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
           },
           {
             "side": "away",
@@ -317,6 +306,159 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.762
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815549",
+      "source_event_ids": [
+        "401815549"
+      ],
+      "kickoff": "2026-05-30T02:15Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Los Angeles Dodgers",
+      "away": "Philadelphia Phillies",
+      "match": "Los Angeles Dodgers - Philadelphia Phillies",
+      "decision": "lean_home",
+      "net_team": "Los Angeles Dodgers",
+      "reason": "Philadelphia Phillies plus penalise par calendrier/voyage (0.89 vs 0.00)",
+      "pressure_score": 0.894,
+      "home_fade": 0.0,
+      "away_fade": 0.894,
+      "travel_score": 0.894,
+      "lookahead_score": 0,
+      "congestion_score": 0,
+      "types": {
+        "travel_extreme": 1
+      },
+      "contexts": [
+        "Deplacement estime 3842 km, decalage ~2.9h"
+      ],
+      "global_resolution": {
+        "status": "abstain",
+        "net_side": null,
+        "home_score": -0.687,
+        "away_score": -0.544,
+        "home_fade": 1.0,
+        "away_fade": 0.894,
+        "reason": "Signaux opposes: Los Angeles Dodgers fade 1.00, Philadelphia Phillies fade 0.89 -> prudence",
+        "detail": [
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "travel_extreme",
+            "direction": "fade",
+            "strength": 0.894
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815540",
+      "source_event_ids": [
+        "401815540"
+      ],
+      "kickoff": "2026-05-29T22:45Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Washington Nationals",
+      "away": "San Diego Padres",
+      "match": "Washington Nationals - San Diego Padres",
+      "decision": "lean_home",
+      "net_team": "Washington Nationals",
+      "reason": "San Diego Padres plus penalise par calendrier/voyage (0.85 vs 0.00)",
+      "pressure_score": 0.85,
+      "home_fade": 0.0,
+      "away_fade": 0.85,
+      "travel_score": 0.85,
+      "lookahead_score": 0,
+      "congestion_score": 0,
+      "types": {
+        "travel_extreme": 1
+      },
+      "contexts": [
+        "Deplacement estime 3656 km, decalage ~2.7h"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": 0.508,
+        "away_score": -1.45,
+        "home_fade": 0.0,
+        "away_fade": 1.45,
+        "reason": "Direction nette: Washington Nationals (+0.51)",
+        "detail": [
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "away",
+            "type": "travel_extreme",
+            "direction": "fade",
+            "strength": 0.85
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815535",
+      "source_event_ids": [
+        "401815535"
+      ],
+      "kickoff": "2026-05-29T23:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Tampa Bay Rays",
+      "away": "Los Angeles Angels",
+      "match": "Tampa Bay Rays - Los Angeles Angels",
+      "decision": "lean_home",
+      "net_team": "Tampa Bay Rays",
+      "reason": "Los Angeles Angels plus penalise par calendrier/voyage (0.79 vs 0.00)",
+      "pressure_score": 0.794,
+      "home_fade": 0.0,
+      "away_fade": 0.794,
+      "travel_score": 0.794,
+      "lookahead_score": 0,
+      "congestion_score": 0,
+      "types": {
+        "travel_extreme": 1
+      },
+      "contexts": [
+        "Deplacement estime 3414 km, decalage ~2.3h"
+      ],
+      "global_resolution": {
+        "status": "abstain",
+        "net_side": null,
+        "home_score": -0.522,
+        "away_score": -0.514,
+        "home_fade": 0.8,
+        "away_fade": 0.794,
+        "reason": "Signaux opposes: Tampa Bay Rays fade 0.80, Los Angeles Angels fade 0.79 -> prudence",
+        "detail": [
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.8
+          },
+          {
+            "side": "away",
+            "type": "travel_extreme",
+            "direction": "fade",
+            "strength": 0.794
           }
         ]
       }
