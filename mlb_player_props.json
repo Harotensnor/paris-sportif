@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-29T07:00:50Z",
+  "generated_at": "2026-05-29T10:51:15Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -384,6 +384,42 @@
             "whip": 1.48
           },
           "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Boston Red Sox",
+          "pitcher": "Tyler Samaniego",
+          "label": "Tyler Samaniego plus de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "over",
+          "probability": 0.5269,
+          "fair_odds": 1.9,
+          "expected_strikeouts": 3.6,
+          "projected_ip": 4.8,
+          "inputs": {
+            "k9": 6.75,
+            "era": 1.04,
+            "whip": 1.15,
+            "hand": "L"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Boston Red Sox",
+          "pitcher": "Tyler Samaniego",
+          "label": "Tyler Samaniego ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.7578,
+          "fair_odds": 1.32,
+          "expected_hr_allowed": 0.277,
+          "projected_ip": 4.8,
+          "inputs": {
+            "hr9": 0.52,
+            "era": 1.04,
+            "whip": 1.15
+          },
+          "side": "away"
         }
       ]
     },
@@ -480,18 +516,18 @@
         {
           "market": "pitcher_strikeouts",
           "team": "St. Louis Cardinals",
-          "pitcher": "Kyle Leahy",
-          "label": "Kyle Leahy moins de 4,5 strikeouts",
+          "pitcher": "Andre Pallante",
+          "label": "Andre Pallante moins de 4,5 strikeouts",
           "line": 4.5,
           "pick": "under",
-          "probability": 0.5844,
-          "fair_odds": 1.71,
-          "expected_strikeouts": 4.16,
-          "projected_ip": 5.02,
+          "probability": 0.5486,
+          "fair_odds": 1.82,
+          "expected_strikeouts": 4.3,
+          "projected_ip": 5.5,
           "inputs": {
-            "k9": 7.46,
-            "era": 4.44,
-            "whip": 1.58,
+            "k9": 7.04,
+            "era": 3.76,
+            "whip": 1.25,
             "hand": "R"
           },
           "side": "home"
@@ -499,17 +535,17 @@
         {
           "market": "pitcher_home_run_allowed",
           "team": "St. Louis Cardinals",
-          "pitcher": "Kyle Leahy",
-          "label": "Kyle Leahy concède au moins 1 home run",
+          "pitcher": "Andre Pallante",
+          "label": "Andre Pallante concède au moins 1 home run",
           "pick": "yes",
-          "probability": 0.5471,
-          "fair_odds": 1.83,
-          "expected_hr_allowed": 0.792,
-          "projected_ip": 5.02,
+          "probability": 0.5048,
+          "fair_odds": 1.98,
+          "expected_hr_allowed": 0.703,
+          "projected_ip": 5.5,
           "inputs": {
-            "hr9": 1.42,
-            "era": 4.44,
-            "whip": 1.58
+            "hr9": 1.15,
+            "era": 3.76,
+            "whip": 1.25
           },
           "side": "home"
         },
@@ -643,6 +679,42 @@
       "props": [
         {
           "market": "pitcher_strikeouts",
+          "team": "Texas Rangers",
+          "pitcher": "Kumar Rocker",
+          "label": "Kumar Rocker plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.5394,
+          "fair_odds": 1.85,
+          "expected_strikeouts": 4.67,
+          "projected_ip": 5.56,
+          "inputs": {
+            "k9": 7.56,
+            "era": 3.96,
+            "whip": 1.36,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Texas Rangers",
+          "pitcher": "Kumar Rocker",
+          "label": "Kumar Rocker ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5738,
+          "fair_odds": 1.74,
+          "expected_hr_allowed": 0.556,
+          "projected_ip": 5.56,
+          "inputs": {
+            "hr9": 0.9,
+            "era": 3.96,
+            "whip": 1.36
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
           "team": "Kansas City Royals",
           "pitcher": "Seth Lugo",
           "label": "Seth Lugo plus de 4,5 strikeouts",
@@ -687,6 +759,42 @@
       "home": "Houston Astros",
       "away": "Milwaukee Brewers",
       "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Houston Astros",
+          "pitcher": "Peter Lambert",
+          "label": "Peter Lambert plus de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "over",
+          "probability": 0.5394,
+          "fair_odds": 1.85,
+          "expected_strikeouts": 5.68,
+          "projected_ip": 5.73,
+          "inputs": {
+            "k9": 8.93,
+            "era": 3.79,
+            "whip": 1.17,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Houston Astros",
+          "pitcher": "Peter Lambert",
+          "label": "Peter Lambert ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.7509,
+          "fair_odds": 1.33,
+          "expected_hr_allowed": 0.286,
+          "projected_ip": 5.73,
+          "inputs": {
+            "hr9": 0.45,
+            "era": 3.79,
+            "whip": 1.17
+          },
+          "side": "home"
+        },
         {
           "market": "pitcher_strikeouts",
           "team": "Milwaukee Brewers",
@@ -1062,9 +1170,55 @@
           "side": "away"
         }
       ]
+    },
+    {
+      "event_id": "401815571",
+      "kickoff": "2026-05-31T16:15Z",
+      "league": "MLB",
+      "match": "Toronto Blue Jays at Baltimore Orioles",
+      "home": "Baltimore Orioles",
+      "away": "Toronto Blue Jays",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Baltimore Orioles",
+          "pitcher": "Kyle Bradish",
+          "label": "Kyle Bradish plus de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "over",
+          "probability": 0.5049,
+          "fair_odds": 1.98,
+          "expected_strikeouts": 5.52,
+          "projected_ip": 5.28,
+          "inputs": {
+            "k9": 9.41,
+            "era": 3.86,
+            "whip": 1.47,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Baltimore Orioles",
+          "pitcher": "Kyle Bradish",
+          "label": "Kyle Bradish ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5306,
+          "fair_odds": 1.88,
+          "expected_hr_allowed": 0.634,
+          "projected_ip": 5.28,
+          "inputs": {
+            "hr9": 1.08,
+            "era": 3.86,
+            "whip": 1.47
+          },
+          "side": "home"
+        }
+      ]
     }
   ],
-  "props": 50,
+  "props": 58,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
