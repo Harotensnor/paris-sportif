@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-05-30T22:38:49Z",
+  "generated_at": "2026-05-30T23:39:57Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 21,
+    "active_events": 19,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 18,
+      "lookahead": 14,
       "back_to_back_travel": 14,
       "travel_extreme": 7,
       "schedule_congestion": 4
     },
     "by_decision": {
-      "abstain": 6,
+      "abstain": 4,
       "lean_home": 15
     },
     "lean_home": 15,
     "lean_away": 0,
-    "abstain": 6,
+    "abstain": 4,
     "monitor": 0
   },
   "active": [
@@ -134,116 +134,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.8
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815551",
-      "source_event_ids": [
-        "401815551"
-      ],
-      "kickoff": "2026-05-30T23:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Cincinnati Reds",
-      "away": "Atlanta Braves",
-      "match": "Cincinnati Reds - Atlanta Braves",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Cincinnati Reds 0.15, Atlanta Braves 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
-        "home_fade": 0.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Atlanta Braves (-0.10)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815557",
-      "source_event_ids": [
-        "401815557"
-      ],
-      "kickoff": "2026-05-30T23:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "St. Louis Cardinals",
-      "away": "Chicago Cubs",
-      "match": "St. Louis Cardinals - Chicago Cubs",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: St. Louis Cardinals 0.15, Chicago Cubs 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.252,
-        "away_score": -1.097,
-        "home_fade": 0.15,
-        "away_fade": 1.15,
-        "reason": "Direction nette: St. Louis Cardinals (+0.25)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
           }
         ]
       }
@@ -833,13 +723,13 @@
         "1 match dans les 48h + 1522 km de voyage"
       ],
       "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.405,
-        "away_score": -0.722,
-        "home_fade": 0.75,
+        "status": "net",
+        "net_side": "home",
+        "home_score": -0.205,
+        "away_score": -0.792,
+        "home_fade": 0.55,
         "away_fade": 0.984,
-        "reason": "Signaux opposes: Colorado Rockies fade 0.75, San Francisco Giants fade 0.98 -> prudence",
+        "reason": "Direction nette: Colorado Rockies (-0.21)",
         "detail": [
           {
             "side": "home",
@@ -857,7 +747,7 @@
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.6
+            "strength": 0.4
           },
           {
             "side": "away",
@@ -1109,19 +999,19 @@
         "2 match dans les 48h + 1522 km de voyage"
       ],
       "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.28,
-        "away_score": -0.704,
-        "home_fade": 0.6,
+        "status": "net",
+        "net_side": "home",
+        "home_score": -0.08,
+        "away_score": -0.774,
+        "home_fade": 0.4,
         "away_fade": 0.914,
-        "reason": "Signaux opposes: Colorado Rockies fade 0.60, San Francisco Giants fade 0.91 -> prudence",
+        "reason": "Direction nette: Colorado Rockies (-0.08)",
         "detail": [
           {
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.6
+            "strength": 0.4
           },
           {
             "side": "away",
