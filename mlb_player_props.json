@@ -1,218 +1,8 @@
 {
-  "generated_at": "2026-05-29T23:56:04Z",
+  "generated_at": "2026-05-30T01:48:01Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815544",
-      "kickoff": "2026-05-30T00:05Z",
-      "league": "MLB",
-      "match": "Kansas City Royals at Texas Rangers",
-      "home": "Texas Rangers",
-      "away": "Kansas City Royals",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Texas Rangers",
-          "pitcher": "Kumar Rocker",
-          "label": "Kumar Rocker plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.5394,
-          "fair_odds": 1.85,
-          "expected_strikeouts": 4.67,
-          "projected_ip": 5.56,
-          "inputs": {
-            "k9": 7.56,
-            "era": 3.96,
-            "whip": 1.36,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Texas Rangers",
-          "pitcher": "Kumar Rocker",
-          "label": "Kumar Rocker ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5738,
-          "fair_odds": 1.74,
-          "expected_hr_allowed": 0.556,
-          "projected_ip": 5.56,
-          "inputs": {
-            "hr9": 0.9,
-            "era": 3.96,
-            "whip": 1.36
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Kansas City Royals",
-          "pitcher": "Seth Lugo",
-          "label": "Seth Lugo plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.594,
-          "fair_odds": 1.68,
-          "expected_strikeouts": 4.91,
-          "projected_ip": 5.91,
-          "inputs": {
-            "k9": 7.48,
-            "era": 3.74,
-            "whip": 1.38,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Kansas City Royals",
-          "pitcher": "Seth Lugo",
-          "label": "Seth Lugo ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.759,
-          "fair_odds": 1.32,
-          "expected_hr_allowed": 0.276,
-          "projected_ip": 5.91,
-          "inputs": {
-            "hr9": 0.42,
-            "era": 3.74,
-            "whip": 1.38
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401815545",
-      "kickoff": "2026-05-30T00:10Z",
-      "league": "MLB",
-      "match": "Milwaukee Brewers at Houston Astros",
-      "home": "Houston Astros",
-      "away": "Milwaukee Brewers",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Houston Astros",
-          "pitcher": "Peter Lambert",
-          "label": "Peter Lambert plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.5394,
-          "fair_odds": 1.85,
-          "expected_strikeouts": 5.68,
-          "projected_ip": 5.73,
-          "inputs": {
-            "k9": 8.93,
-            "era": 3.79,
-            "whip": 1.17,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Houston Astros",
-          "pitcher": "Peter Lambert",
-          "label": "Peter Lambert ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.7509,
-          "fair_odds": 1.33,
-          "expected_hr_allowed": 0.286,
-          "projected_ip": 5.73,
-          "inputs": {
-            "hr9": 0.45,
-            "era": 3.79,
-            "whip": 1.17
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Milwaukee Brewers",
-          "pitcher": "Brandon Sproat",
-          "label": "Brandon Sproat plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.5908,
-          "fair_odds": 1.69,
-          "expected_strikeouts": 5.94,
-          "projected_ip": 5.53,
-          "inputs": {
-            "k9": 9.67,
-            "era": 5.84,
-            "whip": 1.54,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Milwaukee Brewers",
-          "pitcher": "Brandon Sproat",
-          "label": "Brandon Sproat concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6708,
-          "fair_odds": 1.49,
-          "expected_hr_allowed": 1.111,
-          "projected_ip": 5.53,
-          "inputs": {
-            "hr9": 1.81,
-            "era": 5.84,
-            "whip": 1.54
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401815546",
-      "kickoff": "2026-05-30T00:40Z",
-      "league": "MLB",
-      "match": "San Francisco Giants at Colorado Rockies",
-      "home": "Colorado Rockies",
-      "away": "San Francisco Giants",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "San Francisco Giants",
-          "pitcher": "Adrian Houser",
-          "label": "Adrian Houser moins de 3,5 strikeouts",
-          "line": 3.5,
-          "pick": "under",
-          "probability": 0.6223,
-          "fair_odds": 1.61,
-          "expected_strikeouts": 3.07,
-          "projected_ip": 5.22,
-          "inputs": {
-            "k9": 5.3,
-            "era": 5.3,
-            "whip": 1.48,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "San Francisco Giants",
-          "pitcher": "Adrian Houser",
-          "label": "Adrian Houser concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5482,
-          "fair_odds": 1.82,
-          "expected_hr_allowed": 0.795,
-          "projected_ip": 5.22,
-          "inputs": {
-            "hr9": 1.37,
-            "era": 5.3,
-            "whip": 1.48
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815548",
       "kickoff": "2026-05-30T01:40Z",
@@ -420,6 +210,42 @@
             "whip": 1.42
           },
           "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Philadelphia Phillies",
+          "pitcher": "Jesús Luzardo",
+          "label": "Jesús Luzardo moins de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "under",
+          "probability": 0.5006,
+          "fair_odds": 2.0,
+          "expected_strikeouts": 6.5,
+          "projected_ip": 5.56,
+          "inputs": {
+            "k9": 10.51,
+            "era": 4.38,
+            "whip": 1.28,
+            "hand": "L"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Philadelphia Phillies",
+          "pitcher": "Jesús Luzardo",
+          "label": "Jesús Luzardo ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6368,
+          "fair_odds": 1.57,
+          "expected_hr_allowed": 0.451,
+          "projected_ip": 5.56,
+          "inputs": {
+            "hr9": 0.73,
+            "era": 4.38,
+            "whip": 1.28
+          },
+          "side": "away"
         }
       ]
     },
@@ -595,6 +421,42 @@
       "home": "Washington Nationals",
       "away": "San Diego Padres",
       "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Washington Nationals",
+          "pitcher": "Foster Griffin",
+          "label": "Foster Griffin moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.5099,
+          "fair_odds": 1.96,
+          "expected_strikeouts": 5.45,
+          "projected_ip": 5.64,
+          "inputs": {
+            "k9": 8.71,
+            "era": 3.63,
+            "whip": 1.13,
+            "hand": "L"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Washington Nationals",
+          "pitcher": "Foster Griffin",
+          "label": "Foster Griffin concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5967,
+          "fair_odds": 1.68,
+          "expected_hr_allowed": 0.908,
+          "projected_ip": 5.64,
+          "inputs": {
+            "hr9": 1.45,
+            "era": 3.63,
+            "whip": 1.13
+          },
+          "side": "home"
+        },
         {
           "market": "pitcher_strikeouts",
           "team": "San Diego Padres",
@@ -1542,6 +1404,42 @@
             "whip": 0.98
           },
           "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Philadelphia Phillies",
+          "pitcher": "Andrew Painter",
+          "label": "Andrew Painter moins de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "under",
+          "probability": 0.5135,
+          "fair_odds": 1.95,
+          "expected_strikeouts": 4.44,
+          "projected_ip": 5.56,
+          "inputs": {
+            "k9": 7.2,
+            "era": 5.4,
+            "whip": 1.46,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Philadelphia Phillies",
+          "pitcher": "Andrew Painter",
+          "label": "Andrew Painter concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5406,
+          "fair_odds": 1.85,
+          "expected_hr_allowed": 0.778,
+          "projected_ip": 5.56,
+          "inputs": {
+            "hr9": 1.26,
+            "era": 5.4,
+            "whip": 1.46
+          },
+          "side": "away"
         }
       ]
     },
@@ -1681,6 +1579,42 @@
       "home": "Washington Nationals",
       "away": "San Diego Padres",
       "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Washington Nationals",
+          "pitcher": "Zack Littell",
+          "label": "Zack Littell plus de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "over",
+          "probability": 0.5558,
+          "fair_odds": 1.8,
+          "expected_strikeouts": 3.71,
+          "projected_ip": 6.6,
+          "inputs": {
+            "k9": 5.06,
+            "era": 5.23,
+            "whip": 1.39,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Washington Nationals",
+          "pitcher": "Zack Littell",
+          "label": "Zack Littell concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.8436,
+          "fair_odds": 1.19,
+          "expected_hr_allowed": 1.855,
+          "projected_ip": 6.6,
+          "inputs": {
+            "hr9": 2.53,
+            "era": 5.23,
+            "whip": 1.39
+          },
+          "side": "home"
+        },
         {
           "market": "pitcher_strikeouts",
           "team": "San Diego Padres",
@@ -2546,6 +2480,42 @@
             "whip": 0.98
           },
           "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Philadelphia Phillies",
+          "pitcher": "Andrew Painter",
+          "label": "Andrew Painter moins de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "under",
+          "probability": 0.5135,
+          "fair_odds": 1.95,
+          "expected_strikeouts": 4.44,
+          "projected_ip": 5.56,
+          "inputs": {
+            "k9": 7.2,
+            "era": 5.4,
+            "whip": 1.46,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Philadelphia Phillies",
+          "pitcher": "Andrew Painter",
+          "label": "Andrew Painter concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5406,
+          "fair_odds": 1.85,
+          "expected_hr_allowed": 0.778,
+          "projected_ip": 5.56,
+          "inputs": {
+            "hr9": 1.26,
+            "era": 5.4,
+            "whip": 1.46
+          },
+          "side": "away"
         }
       ]
     },
