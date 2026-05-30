@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-30T10:33:23Z",
+  "generated_at": "2026-05-30T11:14:11Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -1195,7 +1195,7 @@
         "status": "abstain",
         "net_side": null,
         "home_score": -0.42,
-        "away_score": -0.682,
+        "away_score": -0.209,
         "home_fade": 0.75,
         "away_fade": 0.944,
         "reason": "Signaux opposes: Tampa Bay Rays fade 0.75, Los Angeles Angels fade 0.94 -> prudence",
@@ -1217,6 +1217,12 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.6
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.473
           },
           {
             "side": "away",
