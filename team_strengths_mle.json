@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-30T08:44:39Z",
+  "generated_at": "2026-05-30T10:33:36Z",
   "method": "Full Bivariate Poisson MLE Dixon-Coles. Coordinate-descent avec golden-section search 1D. Pure Python (pas de scipy).",
   "min_matches_per_league": 40,
   "min_matches_per_team": 5,
@@ -500,126 +500,132 @@
       }
     },
     "jpn.1": {
-      "n_matches": 62,
-      "n_teams": 19,
-      "gamma": 0.2866,
-      "rho": -0.1383,
-      "log_lik": -170.54,
+      "n_matches": 65,
+      "n_teams": 20,
+      "gamma": 0.2819,
+      "rho": -0.1521,
+      "log_lik": -178.24,
       "iterations": 3,
       "teams": {
         "Avispa Fukuoka": {
-          "alpha": -0.4081,
-          "beta": -0.0035,
+          "alpha": -0.3256,
+          "beta": -0.0984,
           "rank_off": 16,
-          "rank_def": 9
+          "rank_def": 7
         },
         "Cerezo Osaka": {
-          "alpha": 0.4034,
-          "beta": 0.0848,
+          "alpha": 0.3826,
+          "beta": 0.0444,
           "rank_off": 4,
-          "rank_def": 13
+          "rank_def": 12
         },
         "FC Tokyo": {
-          "alpha": 0.2118,
-          "beta": 0.0116,
+          "alpha": 0.2004,
+          "beta": -0.0345,
           "rank_off": 7,
-          "rank_def": 10
+          "rank_def": 9
         },
         "Fagiano Okayama": {
-          "alpha": -0.0099,
-          "beta": 0.9451,
-          "rank_off": 10,
-          "rank_def": 19
+          "alpha": -0.0364,
+          "beta": 0.8861,
+          "rank_off": 12,
+          "rank_def": 20
+        },
+        "Gamba Osaka": {
+          "alpha": 0.3037,
+          "beta": 0.236,
+          "rank_off": 5,
+          "rank_def": 17
         },
         "JEF United Ichihara-Chiba": {
-          "alpha": 0.2513,
-          "beta": -0.4656,
+          "alpha": 0.2642,
+          "beta": -0.521,
           "rank_off": 6,
           "rank_def": 2
         },
         "Kashima Antlers": {
-          "alpha": -0.0587,
-          "beta": 0.0998,
-          "rank_off": 12,
-          "rank_def": 14
+          "alpha": -0.0551,
+          "beta": 0.0746,
+          "rank_off": 13,
+          "rank_def": 15
         },
         "Kashiwa Reysol": {
-          "alpha": -0.3048,
-          "beta": 0.0209,
-          "rank_off": 15,
+          "alpha": -0.3557,
+          "beta": 0.02,
+          "rank_off": 17,
           "rank_def": 11
         },
         "Kawasaki Frontale": {
-          "alpha": -0.1283,
-          "beta": 0.1092,
+          "alpha": -0.1398,
+          "beta": 0.0595,
           "rank_off": 14,
-          "rank_def": 15
+          "rank_def": 14
         },
         "Kyoto Sanga": {
-          "alpha": -0.7425,
-          "beta": -0.411,
-          "rank_off": 19,
-          "rank_def": 3
+          "alpha": -0.7446,
+          "beta": -0.3538,
+          "rank_off": 20,
+          "rank_def": 4
         },
         "Machida Zelvia": {
-          "alpha": -0.0099,
-          "beta": 0.4737,
+          "alpha": -0.012,
+          "beta": 0.4426,
           "rank_off": 11,
-          "rank_def": 17
+          "rank_def": 18
         },
         "Mito Hollyhock": {
-          "alpha": -0.0738,
-          "beta": -0.7605,
-          "rank_off": 13,
+          "alpha": -0.2675,
+          "beta": -0.6638,
+          "rank_off": 15,
           "rank_def": 1
         },
         "Nagoya Grampus": {
-          "alpha": 0.516,
-          "beta": -0.368,
-          "rank_off": 2,
-          "rank_def": 4
+          "alpha": 0.5347,
+          "beta": -0.3933,
+          "rank_off": 1,
+          "rank_def": 3
         },
         "Sanfrecce Hiroshima": {
-          "alpha": 0.5462,
-          "beta": 0.0511,
-          "rank_off": 1,
-          "rank_def": 12
+          "alpha": 0.5197,
+          "beta": 0.0444,
+          "rank_off": 2,
+          "rank_def": 13
         },
         "Shimizu S-Pulse": {
-          "alpha": -0.5509,
-          "beta": -0.1556,
-          "rank_off": 17,
-          "rank_def": 6
-        },
-        "Tokyo Verdy 1969": {
-          "alpha": -0.6636,
-          "beta": -0.0523,
+          "alpha": -0.5322,
+          "beta": -0.2261,
           "rank_off": 18,
-          "rank_def": 8
-        },
-        "Urawa Red Diamonds": {
-          "alpha": 0.1027,
-          "beta": 0.5677,
-          "rank_off": 9,
-          "rank_def": 18
-        },
-        "V-Varen Nagasaki": {
-          "alpha": 0.3338,
-          "beta": -0.2345,
-          "rank_off": 5,
           "rank_def": 5
         },
+        "Tokyo Verdy 1969": {
+          "alpha": -0.5473,
+          "beta": 0.0049,
+          "rank_off": 19,
+          "rank_def": 10
+        },
+        "Urawa Red Diamonds": {
+          "alpha": 0.082,
+          "beta": 0.5216,
+          "rank_off": 10,
+          "rank_def": 19
+        },
+        "V-Varen Nagasaki": {
+          "alpha": 0.1121,
+          "beta": -0.0926,
+          "rank_off": 9,
+          "rank_def": 8
+        },
         "Vissel Kobe": {
-          "alpha": 0.1329,
-          "beta": 0.1939,
+          "alpha": 0.1609,
+          "beta": 0.1872,
           "rank_off": 8,
           "rank_def": 16
         },
         "Yokohama F. Marinos": {
-          "alpha": 0.4522,
-          "beta": -0.1068,
+          "alpha": 0.4558,
+          "beta": -0.1378,
           "rank_off": 3,
-          "rank_def": 7
+          "rank_def": 6
         }
       }
     }
