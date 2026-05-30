@@ -1,63 +1,27 @@
 {
-  "generated_at": "2026-05-30T01:48:03Z",
+  "generated_at": "2026-05-30T02:53:39Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 29,
-    "actionable": 27,
+    "active_events": 26,
+    "actionable": 24,
     "watch": 0,
     "risk": 2,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 26,
-      "travel_extreme": 7,
-      "signal_conflict": 7,
-      "back_to_back_travel": 19,
+      "injury_imbalance": 24,
+      "back_to_back_travel": 18,
+      "travel_extreme": 6,
+      "signal_conflict": 6,
       "market_uncertain": 2
     },
     "by_quality": {
-      "actionable": 27,
+      "actionable": 24,
       "risk": 2
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401815547",
-      "date": "2026-05-30T02:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Seattle Mariners",
-      "away": "Arizona Diamondbacks",
-      "match": "Seattle Mariners - Arizona Diamondbacks",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Arizona Diamondbacks",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 6-11"
-    },
-    {
-      "event_id": "401815549",
-      "date": "2026-05-30T02:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Los Angeles Dodgers",
-      "away": "Philadelphia Phillies",
-      "match": "Los Angeles Dodgers - Philadelphia Phillies",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Los Angeles Dodgers",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 16-3"
-    },
     {
       "event_id": "401815555",
       "date": "2026-05-30T20:05Z",
@@ -489,24 +453,6 @@
       "side": null,
       "strength": 0.8,
       "context": "Absences severes 14-10"
-    },
-    {
-      "event_id": "401873388",
-      "date": "2026-05-31T23:30Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Montreal Canadiens",
-      "away": "Carolina Hurricanes",
-      "match": "Montreal Canadiens - Carolina Hurricanes",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Carolina Hurricanes",
-      "side": "away",
-      "strength": 0.762,
-      "context": "1 match dans les 48h + 1161 km de voyage"
     }
   ],
   "active_watch": [],
