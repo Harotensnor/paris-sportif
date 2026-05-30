@@ -1,23 +1,23 @@
 {
-  "generated_at": "2026-05-30T06:15:07Z",
-  "calculated_at": "2026-05-30T06:15:07Z",
+  "generated_at": "2026-05-30T08:44:32Z",
+  "calculated_at": "2026-05-30T08:44:32Z",
   "source_of_truth": "data.js",
-  "data_generated_at": "2026-05-30T06:14:12.296076Z",
+  "data_generated_at": "2026-05-30T08:43:16.006719Z",
   "data_today_field": "2026-05-30",
   "events": {
     "total": 108,
-    "upcoming": 104,
+    "upcoming": 100,
     "winamax_available": 108,
     "winamax_exact": 108,
     "winamax_exact_ratio": 1.0,
     "markets_more_than_1n2": 1,
     "form_l10": 42,
-    "h2h": 52,
+    "h2h": 47,
     "lineups": 30,
     "football_lineups": 0,
     "starter_signals": 30,
     "clubelo": 7,
-    "weather": 31,
+    "weather": 35,
     "injuries": 37,
     "referee": 0,
     "referee_named": 0,
@@ -26,7 +26,7 @@
     "fd_calibration": 0,
     "fd_closing_odds": 0,
     "xg": 9,
-    "smart_money": 1
+    "smart_money": 2
   },
   "signal_health": {
     "referee": {
@@ -36,7 +36,7 @@
       "note": "referee is effective coverage: named referee or referee_context usable by the model."
     },
     "smart_money": {
-      "events": 1,
+      "events": 2,
       "status": "rare_event",
       "note": "Smart money is intentionally rare; low count is OK when odds movement does not confirm a strong signal."
     }
@@ -61,7 +61,7 @@
         "detailed_ratio": 0.0
       },
       "football": {
-        "exact": 44,
+        "exact": 40,
         "detailed": 1,
         "families": {
           "btts": 1,
@@ -77,7 +77,7 @@
           "ou": 1,
           "ou15": 1
         },
-        "detailed_ratio": 0.0227
+        "detailed_ratio": 0.025
       },
       "tennis": {
         "exact": 24,
@@ -105,17 +105,15 @@
     }
   },
   "backtest": {
-    "overall_roi_pct": -3.85,
-    "overall_brier": 0.2484,
+    "overall_roi_pct": -3.42,
+    "overall_brier": 0.2518,
     "by_sport_roi_pct": {
-      "baseball": -0.47,
-      "basketball": 3.3,
-      "football": -10.65,
-      "hockey": 11.5
+      "baseball": -2.42,
+      "basketball": -8.1,
+      "football": -4.58,
+      "hockey": 9.67
     },
-    "cold_sports": [
-      "football"
-    ]
+    "cold_sports": []
   },
   "health": {
     "status": "warning",

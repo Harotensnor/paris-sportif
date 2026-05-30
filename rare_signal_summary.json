@@ -1,65 +1,29 @@
 {
-  "generated_at": "2026-05-30T06:15:06Z",
+  "generated_at": "2026-05-30T08:44:31Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 47,
-    "actionable": 37,
+    "active_events": 46,
+    "actionable": 36,
     "watch": 8,
     "risk": 2,
     "expired_sample": 0,
     "by_type": {
-      "market_move": 40,
-      "signal_conflict": 14,
+      "market_move": 36,
+      "signal_conflict": 11,
       "injury_imbalance": 24,
       "travel_extreme": 6,
       "market_uncertain": 2,
       "back_to_back_travel": 9
     },
     "by_quality": {
-      "actionable": 37,
       "watch": 8,
+      "actionable": 36,
       "risk": 2
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401873666",
-      "date": "2026-05-30T07:00Z",
-      "sport": "football",
-      "league_code": "jleague",
-      "league_name": "J-League",
-      "home": "Gamba Osaka",
-      "away": "Tokyo Verdy 1969",
-      "match": "Gamba Osaka - Tokyo Verdy 1969",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 1.0,
-      "context": "Cote away: 3.40 -> 2.20 (+35.3%)"
-    },
-    {
-      "event_id": "401861544",
-      "date": "2026-05-30T12:00Z",
-      "sport": "football",
-      "league_code": "chn.1",
-      "league_name": "Chinese Super League",
-      "home": "Chongqing Tonglianglong",
-      "away": "Beijing Guoan",
-      "match": "Chongqing Tonglianglong - Beijing Guoan",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 4.50 -> 3.60 (+20.0%)"
-    },
     {
       "event_id": "401815552",
       "date": "2026-05-30T20:10Z",
@@ -148,7 +112,7 @@
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 2.09 -> 4.30 (-105.7%)"
+      "context": "Cote home: 2.04 -> 4.30 (-110.8%)"
     },
     {
       "event_id": "401815563",
@@ -363,8 +327,26 @@
       "direction": "steam",
       "team": null,
       "side": "away",
-      "strength": 0.855,
-      "context": "Cote away: 3.25 -> 2.75 (+15.4%)"
+      "strength": 0.995,
+      "context": "Cote away: 3.35 -> 2.75 (+17.9%)"
+    },
+    {
+      "event_id": "401861544",
+      "date": "2026-05-30T12:00Z",
+      "sport": "football",
+      "league_code": "chn.1",
+      "league_name": "Chinese Super League",
+      "home": "Chongqing Tonglianglong",
+      "away": "Beijing Guoan",
+      "match": "Chongqing Tonglianglong - Beijing Guoan",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 0.904,
+      "context": "Cote home: 4.30 -> 3.60 (+16.3%)"
     },
     {
       "event_id": "401815555",
@@ -529,6 +511,24 @@
       "context": "Absences severes 14-10"
     },
     {
+      "event_id": "401842735",
+      "date": "2026-05-30T13:00Z",
+      "sport": "football",
+      "league_code": "allsvenskan",
+      "league_name": "Allsvenskan",
+      "home": "GAIS",
+      "away": "Kalmar FF",
+      "match": "GAIS - Kalmar FF",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 0.794,
+      "context": "Cote home: 2.10 -> 1.80 (+14.3%)"
+    },
+    {
       "event_id": "401815550",
       "date": "2026-05-30T20:10Z",
       "sport": "baseball",
@@ -565,6 +565,24 @@
       "context": "Cote away: 7.00 -> 6.00 (+14.3%)"
     },
     {
+      "event_id": "401842730",
+      "date": "2026-05-30T13:00Z",
+      "sport": "football",
+      "league_code": "allsvenskan",
+      "league_name": "Allsvenskan",
+      "home": "AIK",
+      "away": "IK Sirius",
+      "match": "AIK - IK Sirius",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 0.781,
+      "context": "Cote home: 3.20 -> 2.75 (+14.1%)"
+    },
+    {
       "event_id": "401842736",
       "date": "2026-05-31T12:00Z",
       "sport": "football",
@@ -583,40 +601,22 @@
       "context": "Cote away: 2.90 -> 2.50 (+13.8%)"
     },
     {
-      "event_id": "401873667",
-      "date": "2026-05-30T07:00Z",
+      "event_id": "748977",
+      "date": "2026-05-30T14:15Z",
       "sport": "football",
-      "league_code": "jleague",
-      "league_name": "J-League",
-      "home": "Avispa Fukuoka",
-      "away": "JEF United Ichihara-Chiba",
-      "match": "Avispa Fukuoka - JEF United Ichihara-Chiba",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.722,
-      "context": "Cote away: 3.85 -> 3.35 (+13.0%)"
-    },
-    {
-      "event_id": "401842730",
-      "date": "2026-05-30T13:00Z",
-      "sport": "football",
-      "league_code": "allsvenskan",
-      "league_name": "Allsvenskan",
-      "home": "AIK",
-      "away": "IK Sirius",
-      "match": "AIK - IK Sirius",
+      "league_code": "laliga2",
+      "league_name": "La Liga 2",
+      "home": "Ceuta",
+      "away": "Albacete",
+      "match": "Ceuta - Albacete",
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
       "type": "market_move",
       "direction": "steam",
       "team": null,
       "side": "home",
-      "strength": 0.705,
-      "context": "Cote home: 3.15 -> 2.75 (+12.7%)"
+      "strength": 0.748,
+      "context": "Cote home: 2.60 -> 2.25 (+13.5%)"
     },
     {
       "event_id": "401842731",
@@ -635,24 +635,6 @@
       "side": "home",
       "strength": 0.694,
       "context": "Cote home: 3.20 -> 2.80 (+12.5%)"
-    },
-    {
-      "event_id": "401842735",
-      "date": "2026-05-30T13:00Z",
-      "sport": "football",
-      "league_code": "allsvenskan",
-      "league_name": "Allsvenskan",
-      "home": "GAIS",
-      "away": "Kalmar FF",
-      "match": "GAIS - Kalmar FF",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "home",
-      "strength": 0.678,
-      "context": "Cote home: 2.05 -> 1.80 (+12.2%)"
     },
     {
       "event_id": "401861401",
@@ -692,6 +674,24 @@
     }
   ],
   "active_watch": [
+    {
+      "event_id": "401861400",
+      "date": "2026-05-30T10:00Z",
+      "sport": "football",
+      "league_code": "chn.1",
+      "league_name": "Chinese Super League",
+      "home": "Qingdao West Coast",
+      "away": "Shanghai Shenhua",
+      "match": "Qingdao West Coast - Shanghai Shenhua",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.648,
+      "context": "Cote away: 3.00 -> 2.65 (+11.7%)"
+    },
     {
       "event_id": "401873671",
       "date": "2026-05-31T05:00Z",
@@ -765,22 +765,22 @@
       "context": "Cote away: 9.50 -> 8.50 (+10.5%)"
     },
     {
-      "event_id": "401873668",
-      "date": "2026-05-30T08:00Z",
-      "sport": "football",
-      "league_code": "jleague",
-      "league_name": "J-League",
-      "home": "V-Varen Nagasaki",
-      "away": "Mito Hollyhock",
-      "match": "V-Varen Nagasaki - Mito Hollyhock",
+      "event_id": "401856949",
+      "date": "2026-05-30T17:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Toronto Tempo",
+      "away": "Seattle Storm",
+      "match": "Toronto Tempo - Seattle Storm",
       "quality": "watch",
       "quality_reason": "Signal rare present mais intensite moyenne",
       "type": "market_move",
       "direction": "steam",
       "team": null,
-      "side": "home",
-      "strength": 0.579,
-      "context": "Cote home: 2.40 -> 2.15 (+10.4%)"
+      "side": "away",
+      "strength": 0.575,
+      "context": "Cote away: 2.90 -> 2.60 (+10.3%)"
     },
     {
       "event_id": "401861402",
@@ -799,24 +799,6 @@
       "side": "home",
       "strength": 0.575,
       "context": "Cote home: 2.90 -> 2.60 (+10.3%)"
-    },
-    {
-      "event_id": "401861400",
-      "date": "2026-05-30T10:00Z",
-      "sport": "football",
-      "league_code": "chn.1",
-      "league_name": "Chinese Super League",
-      "home": "Qingdao West Coast",
-      "away": "Shanghai Shenhua",
-      "match": "Qingdao West Coast - Shanghai Shenhua",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.565,
-      "context": "Cote away: 2.95 -> 2.65 (+10.2%)"
     },
     {
       "event_id": "748982",
