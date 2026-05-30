@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-05-30T17:34:41Z",
+  "generated_at": "2026-05-30T18:43:52Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815558",
-      "kickoff": "2026-05-30T18:10Z",
-      "league": "MLB",
-      "match": "Detroit Tigers at Chicago White Sox",
-      "home": "Chicago White Sox",
-      "away": "Detroit Tigers",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Chicago White Sox",
-          "pitcher": "Anthony Kay",
-          "label": "Anthony Kay moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.5452,
-          "fair_odds": 1.83,
-          "expected_strikeouts": 4.32,
-          "projected_ip": 5.79,
-          "inputs": {
-            "k9": 6.71,
-            "era": 3.96,
-            "whip": 1.39,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Chicago White Sox",
-          "pitcher": "Anthony Kay",
-          "label": "Anthony Kay concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5378,
-          "fair_odds": 1.86,
-          "expected_hr_allowed": 0.772,
-          "projected_ip": 5.79,
-          "inputs": {
-            "hr9": 1.2,
-            "era": 3.96,
-            "whip": 1.39
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Detroit Tigers",
-          "pitcher": "Framber Valdez",
-          "label": "Framber Valdez plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.5113,
-          "fair_odds": 1.96,
-          "expected_strikeouts": 4.55,
-          "projected_ip": 5.55,
-          "inputs": {
-            "k9": 7.38,
-            "era": 4.28,
-            "whip": 1.33,
-            "hand": "L"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Detroit Tigers",
-          "pitcher": "Framber Valdez",
-          "label": "Framber Valdez ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5779,
-          "fair_odds": 1.73,
-          "expected_hr_allowed": 0.548,
-          "projected_ip": 5.55,
-          "inputs": {
-            "hr9": 0.89,
-            "era": 4.28,
-            "whip": 1.33
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815554",
       "kickoff": "2026-05-30T20:05Z",
@@ -2356,7 +2274,7 @@
       ]
     }
   ],
-  "props": 114,
+  "props": 110,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"

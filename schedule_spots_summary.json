@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-05-30T17:34:43Z",
+  "generated_at": "2026-05-30T18:43:54Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 30,
+    "active_events": 29,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 36,
+      "lookahead": 34,
       "back_to_back_travel": 20,
       "travel_extreme": 9,
       "schedule_congestion": 4
     },
     "by_decision": {
-      "abstain": 9,
+      "abstain": 8,
       "lean_home": 21
     },
     "lean_home": 21,
     "lean_away": 0,
-    "abstain": 9,
+    "abstain": 8,
     "monitor": 0
   },
   "active": [
@@ -134,58 +134,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.8
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815558",
-      "source_event_ids": [
-        "401815558"
-      ],
-      "kickoff": "2026-05-30T18:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Chicago White Sox",
-      "away": "Detroit Tigers",
-      "match": "Chicago White Sox - Detroit Tigers",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Chicago White Sox 0.15, Detroit Tigers 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
-        "home_fade": 0.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Detroit Tigers (-0.10)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
           }
         ]
       }
