@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-05-30T16:19:40Z",
+  "generated_at": "2026-05-30T17:34:43Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 35,
+    "active_events": 36,
     "actionable": 27,
     "watch": 0,
-    "risk": 8,
+    "risk": 9,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 22,
       "back_to_back_travel": 20,
       "travel_extreme": 9,
       "signal_conflict": 6,
-      "market_uncertain": 8
+      "market_uncertain": 9
     },
     "by_quality": {
       "actionable": 27,
-      "risk": 8
+      "risk": 9
     }
   },
   "active_actionable": [
@@ -511,6 +511,24 @@
   ],
   "active_watch": [],
   "active_risk": [
+    {
+      "event_id": "175562",
+      "date": "2026-06-01T04:00Z",
+      "sport": "tennis",
+      "league_code": "rolandgarros",
+      "league_name": "Roland Garros",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 12.1%"
+    },
     {
       "event_id": "401873672",
       "date": "2026-06-06T05:00Z",
