@@ -1,27 +1,45 @@
 {
-  "generated_at": "2026-05-31T15:44:52Z",
+  "generated_at": "2026-05-31T16:47:36Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 28,
-    "actionable": 18,
+    "active_events": 27,
+    "actionable": 17,
     "watch": 0,
     "risk": 10,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 14,
+      "injury_imbalance": 13,
       "back_to_back_travel": 11,
       "travel_extreme": 6,
       "signal_conflict": 2,
       "market_uncertain": 10
     },
     "by_quality": {
-      "actionable": 18,
+      "actionable": 17,
       "risk": 10
     }
   },
   "active_actionable": [
+    {
+      "event_id": "401815569",
+      "date": "2026-05-31T17:35Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Pittsburgh Pirates",
+      "away": "Minnesota Twins",
+      "match": "Pittsburgh Pirates - Minnesota Twins",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Minnesota Twins",
+      "side": null,
+      "strength": 1.0,
+      "context": "Absences severes 3-8"
+    },
     {
       "event_id": "401815570",
       "date": "2026-05-31T17:35Z",
@@ -92,7 +110,7 @@
       "team": "New York Mets",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 13-7"
+      "context": "Absences severes 13-8"
     },
     {
       "event_id": "401815575",
@@ -219,42 +237,6 @@
       "side": "away",
       "strength": 0.914,
       "context": "2 match dans les 48h + 1522 km de voyage"
-    },
-    {
-      "event_id": "401815569",
-      "date": "2026-05-31T17:35Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Pittsburgh Pirates",
-      "away": "Minnesota Twins",
-      "match": "Pittsburgh Pirates - Minnesota Twins",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Minnesota Twins",
-      "side": "away",
-      "strength": 0.849,
-      "context": "2 match dans les 48h + 1194 km de voyage"
-    },
-    {
-      "event_id": "401815571",
-      "date": "2026-05-31T16:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Baltimore Orioles",
-      "away": "Toronto Blue Jays",
-      "match": "Baltimore Orioles - Toronto Blue Jays",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Toronto Blue Jays",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 10-14"
     },
     {
       "event_id": "401856953",
