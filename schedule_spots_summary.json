@@ -1,22 +1,22 @@
 {
-  "generated_at": "2026-05-31T20:00:02Z",
+  "generated_at": "2026-05-31T20:55:40Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 8,
+    "active_events": 6,
     "expired_sample": 0,
     "by_type": {
-      "back_to_back_travel": 4,
-      "travel_extreme": 4,
       "lookahead": 10,
+      "travel_extreme": 3,
+      "back_to_back_travel": 2,
       "schedule_congestion": 2
     },
     "by_decision": {
       "abstain": 3,
-      "lean_home": 5
+      "lean_home": 3
     },
-    "lean_home": 5,
+    "lean_home": 3,
     "lean_away": 0,
     "abstain": 3,
     "monitor": 0
@@ -274,65 +274,6 @@
       }
     },
     {
-      "event_id": "401815579",
-      "source_event_ids": [
-        "401815579"
-      ],
-      "kickoff": "2026-05-31T20:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Los Angeles Dodgers",
-      "away": "Philadelphia Phillies",
-      "match": "Los Angeles Dodgers - Philadelphia Phillies",
-      "decision": "lean_home",
-      "net_team": "Los Angeles Dodgers",
-      "reason": "Philadelphia Phillies plus penalise par calendrier/voyage (1.89 vs 0.00)",
-      "pressure_score": 1.894,
-      "home_fade": 0.0,
-      "away_fade": 1.894,
-      "travel_score": 1.894,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "travel_extreme": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "Deplacement estime 3842 km, decalage ~2.9h",
-        "2 match dans les 48h + 3842 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.337,
-        "away_score": -1.544,
-        "home_fade": 1.0,
-        "away_fade": 1.894,
-        "reason": "Direction nette: Los Angeles Dodgers (-0.34)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.894
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401874173",
       "source_event_ids": [
         "401874173"
@@ -441,57 +382,6 @@
             "type": "travel_extreme",
             "direction": "fade",
             "strength": 0.759
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815577",
-      "source_event_ids": [
-        "401815577"
-      ],
-      "kickoff": "2026-05-31T20:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Seattle Mariners",
-      "away": "Arizona Diamondbacks",
-      "match": "Seattle Mariners - Arizona Diamondbacks",
-      "decision": "lean_home",
-      "net_team": "Seattle Mariners",
-      "reason": "Arizona Diamondbacks plus penalise par calendrier/voyage (0.97 vs 0.00)",
-      "pressure_score": 0.969,
-      "home_fade": 0.0,
-      "away_fade": 0.969,
-      "travel_score": 0.969,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "2 match dans les 48h + 1793 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.689,
-        "away_score": -1.969,
-        "home_fade": 0.0,
-        "away_fade": 1.969,
-        "reason": "Direction nette: Seattle Mariners (+0.69)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.969
           }
         ]
       }
