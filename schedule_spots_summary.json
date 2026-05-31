@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-31T10:04:31Z",
+  "generated_at": "2026-05-31T11:26:34Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -248,7 +248,7 @@
       },
       "contexts": [
         "Deplacement estime 3842 km, decalage ~2.9h",
-        "2 match dans les 48h + 3842 km de voyage"
+        "1 match dans les 48h + 3842 km de voyage"
       ],
       "global_resolution": {
         "status": "net",
@@ -484,11 +484,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.168,
-        "away_score": -0.856,
-        "home_fade": 0.15,
-        "away_fade": 0.909,
-        "reason": "Direction nette: Carolina Hurricanes (+0.17)",
+        "home_score": -0.482,
+        "away_score": -1.506,
+        "home_fade": 1.15,
+        "away_fade": 1.909,
+        "reason": "Direction nette: Carolina Hurricanes (-0.48)",
         "detail": [
           {
             "side": "home",
@@ -503,61 +503,22 @@
             "strength": 0.15
           },
           {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.759
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815577",
-      "source_event_ids": [
-        "401815577"
-      ],
-      "kickoff": "2026-05-31T20:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Seattle Mariners",
-      "away": "Arizona Diamondbacks",
-      "match": "Seattle Mariners - Arizona Diamondbacks",
-      "decision": "lean_home",
-      "net_team": "Seattle Mariners",
-      "reason": "Arizona Diamondbacks plus penalise par calendrier/voyage (0.97 vs 0.00)",
-      "pressure_score": 0.969,
-      "home_fade": 0.0,
-      "away_fade": 0.969,
-      "travel_score": 0.969,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "2 match dans les 48h + 1793 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.689,
-        "away_score": -1.969,
-        "home_fade": 0.0,
-        "away_fade": 1.969,
-        "reason": "Direction nette: Seattle Mariners (+0.69)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
             "strength": 1.0
           },
           {
             "side": "away",
-            "type": "back_to_back_travel",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "travel_extreme",
             "direction": "fade",
-            "strength": 0.969
+            "strength": 0.759
           }
         ]
       }
@@ -665,52 +626,52 @@
       }
     },
     {
-      "event_id": "401815576",
+      "event_id": "401815577",
       "source_event_ids": [
-        "401815576"
+        "401815577"
       ],
-      "kickoff": "2026-05-31T19:10Z",
+      "kickoff": "2026-05-31T20:10Z",
       "sport": "baseball",
       "league_code": "mlb",
       "league_name": "MLB",
-      "home": "Colorado Rockies",
-      "away": "San Francisco Giants",
-      "match": "Colorado Rockies - San Francisco Giants",
+      "home": "Seattle Mariners",
+      "away": "Arizona Diamondbacks",
+      "match": "Seattle Mariners - Arizona Diamondbacks",
       "decision": "lean_home",
-      "net_team": "Colorado Rockies",
-      "reason": "San Francisco Giants plus penalise par calendrier/voyage (0.91 vs 0.00)",
-      "pressure_score": 0.914,
+      "net_team": "Seattle Mariners",
+      "reason": "Arizona Diamondbacks plus penalise par calendrier/voyage (0.89 vs 0.00)",
+      "pressure_score": 0.889,
       "home_fade": 0.0,
-      "away_fade": 0.914,
-      "travel_score": 0.914,
+      "away_fade": 0.889,
+      "travel_score": 0.889,
       "lookahead_score": 0,
       "congestion_score": 0,
       "types": {
         "back_to_back_travel": 1
       },
       "contexts": [
-        "2 match dans les 48h + 1522 km de voyage"
+        "1 match dans les 48h + 1793 km de voyage"
       ],
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": -0.08,
-        "away_score": -0.774,
-        "home_fade": 0.4,
-        "away_fade": 0.914,
-        "reason": "Direction nette: Colorado Rockies (-0.08)",
+        "home_score": 0.661,
+        "away_score": -1.889,
+        "home_fade": 0.0,
+        "away_fade": 1.889,
+        "reason": "Direction nette: Seattle Mariners (+0.66)",
         "detail": [
           {
-            "side": "home",
+            "side": "away",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.4
+            "strength": 1.0
           },
           {
             "side": "away",
             "type": "back_to_back_travel",
             "direction": "fade",
-            "strength": 0.914
+            "strength": 0.889
           }
         ]
       }
@@ -762,6 +723,57 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.849
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815576",
+      "source_event_ids": [
+        "401815576"
+      ],
+      "kickoff": "2026-05-31T19:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Colorado Rockies",
+      "away": "San Francisco Giants",
+      "match": "Colorado Rockies - San Francisco Giants",
+      "decision": "lean_home",
+      "net_team": "Colorado Rockies",
+      "reason": "San Francisco Giants plus penalise par calendrier/voyage (0.83 vs 0.00)",
+      "pressure_score": 0.834,
+      "home_fade": 0.0,
+      "away_fade": 0.834,
+      "travel_score": 0.834,
+      "lookahead_score": 0,
+      "congestion_score": 0,
+      "types": {
+        "back_to_back_travel": 1
+      },
+      "contexts": [
+        "1 match dans les 48h + 1522 km de voyage"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": -0.108,
+        "away_score": -0.694,
+        "home_fade": 0.4,
+        "away_fade": 0.834,
+        "reason": "Direction nette: Colorado Rockies (-0.11)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.4
+          },
+          {
+            "side": "away",
+            "type": "back_to_back_travel",
+            "direction": "fade",
+            "strength": 0.834
           }
         ]
       }
