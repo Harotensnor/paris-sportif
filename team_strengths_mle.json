@@ -1,107 +1,113 @@
 {
-  "generated_at": "2026-05-31T12:56:38Z",
+  "generated_at": "2026-05-31T14:26:18Z",
   "method": "Full Bivariate Poisson MLE Dixon-Coles. Coordinate-descent avec golden-section search 1D. Pure Python (pas de scipy).",
   "min_matches_per_league": 40,
   "min_matches_per_team": 5,
   "n_leagues_fit": 6,
   "leagues": {
     "chn.1": {
-      "n_matches": 48,
-      "n_teams": 15,
-      "gamma": 0.5327,
-      "rho": 0.0177,
-      "log_lik": -140.47,
+      "n_matches": 50,
+      "n_teams": 16,
+      "gamma": 0.5112,
+      "rho": -0.0098,
+      "log_lik": -144.74,
       "iterations": 3,
       "teams": {
         "Beijing Guoan": {
-          "alpha": 0.3881,
-          "beta": -0.3445,
+          "alpha": 0.4302,
+          "beta": -0.3688,
           "rank_off": 1,
-          "rank_def": 3
+          "rank_def": 2
         },
         "Chengdu Rongcheng": {
-          "alpha": 0.3486,
-          "beta": 0.6981,
+          "alpha": 0.342,
+          "beta": 0.6888,
           "rank_off": 3,
-          "rank_def": 15
+          "rank_def": 16
         },
         "Chongqing Tonglianglong": {
-          "alpha": -0.7033,
-          "beta": 0.4032,
-          "rank_off": 15,
-          "rank_def": 13
+          "alpha": -0.6669,
+          "beta": 0.3881,
+          "rank_off": 16,
+          "rank_def": 14
         },
         "Dalian Yingbo": {
-          "alpha": -0.3689,
-          "beta": -0.3294,
-          "rank_off": 13,
-          "rank_def": 4
+          "alpha": -0.4846,
+          "beta": -0.211,
+          "rank_off": 15,
+          "rank_def": 6
         },
         "Henan Songshan Longmen": {
-          "alpha": -0.0345,
-          "beta": 0.2058,
+          "alpha": -0.0319,
+          "beta": 0.1966,
           "rank_off": 11,
-          "rank_def": 11
+          "rank_def": 12
         },
         "Liaoning Tieren": {
-          "alpha": 0.3788,
-          "beta": -0.0101,
+          "alpha": 0.3814,
+          "beta": -0.0252,
           "rank_off": 2,
           "rank_def": 8
         },
         "Qingdao Hainiu": {
-          "alpha": 0.236,
-          "beta": 0.1176,
+          "alpha": 0.263,
+          "beta": 0.0839,
           "rank_off": 4,
-          "rank_def": 10
+          "rank_def": 11
         },
         "Qingdao West Coast": {
-          "alpha": 0.0293,
-          "beta": 0.0143,
+          "alpha": 0.0564,
+          "beta": -0.0008,
           "rank_off": 8,
-          "rank_def": 9
+          "rank_def": 10
         },
         "Shandong Taishan": {
-          "alpha": 0.0293,
-          "beta": -0.5418,
+          "alpha": 0.0413,
+          "beta": -0.5511,
           "rank_off": 9,
           "rank_def": 1
         },
         "Shanghai Port": {
-          "alpha": 0.048,
-          "beta": 0.2209,
+          "alpha": 0.0657,
+          "beta": 0.2059,
           "rank_off": 7,
-          "rank_def": 12
+          "rank_def": 13
         },
         "Shanghai Shenhua": {
-          "alpha": 0.2209,
-          "beta": -0.2168,
+          "alpha": 0.2479,
+          "beta": -0.2318,
           "rank_off": 5,
-          "rank_def": 6
+          "rank_def": 5
         },
         "Shenzhen Xinpengcheng": {
-          "alpha": -0.4629,
-          "beta": 0.6098,
+          "alpha": -0.4359,
+          "beta": 0.6041,
           "rank_off": 14,
-          "rank_def": 14
+          "rank_def": 15
         },
-        "Wuhan Three Towns": {
-          "alpha": 0.0049,
-          "beta": -0.3689,
+        "Tianjin Jinmen Tiger": {
+          "alpha": -0.0226,
+          "beta": -0.0646,
           "rank_off": 10,
-          "rank_def": 2
-        },
-        "Yunnan Yukun": {
-          "alpha": -0.1924,
-          "beta": -0.1285,
-          "rank_off": 12,
           "rank_def": 7
         },
+        "Wuhan Three Towns": {
+          "alpha": -0.0864,
+          "beta": -0.3538,
+          "rank_off": 12,
+          "rank_def": 3
+        },
+        "Yunnan Yukun": {
+          "alpha": -0.2048,
+          "beta": -0.0252,
+          "rank_off": 13,
+          "rank_def": 9
+        },
         "Zhejiang Professional FC": {
-          "alpha": 0.0781,
-          "beta": -0.3294,
+          "alpha": 0.1052,
+          "beta": -0.3351,
           "rank_off": 6,
-          "rank_def": 5
+          "rank_def": 4
         }
       }
     },

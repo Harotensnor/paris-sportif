@@ -1,65 +1,27 @@
 {
-  "generated_at": "2026-05-31T12:56:15Z",
+  "generated_at": "2026-05-31T14:25:52Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 33,
-    "actionable": 22,
-    "watch": 1,
+    "active_events": 28,
+    "actionable": 18,
+    "watch": 0,
     "risk": 10,
     "expired_sample": 0,
     "by_type": {
-      "market_move": 5,
-      "injury_imbalance": 13,
+      "injury_imbalance": 14,
       "back_to_back_travel": 11,
       "travel_extreme": 6,
       "signal_conflict": 2,
       "market_uncertain": 10
     },
     "by_quality": {
-      "actionable": 22,
-      "watch": 1,
+      "actionable": 18,
       "risk": 10
     }
   },
   "active_actionable": [
-    {
-      "event_id": "748984",
-      "date": "2026-05-31T16:30Z",
-      "sport": "football",
-      "league_code": "laliga2",
-      "league_name": "La Liga 2",
-      "home": "Almería",
-      "away": "Real Valladolid",
-      "match": "Almería - Real Valladolid",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 1.0,
-      "context": "Cote away: 7.50 -> 6.00 (+20.0%)"
-    },
-    {
-      "event_id": "748976",
-      "date": "2026-05-31T16:30Z",
-      "sport": "football",
-      "league_code": "laliga2",
-      "league_name": "La Liga 2",
-      "home": "Castellón",
-      "away": "Eibar",
-      "match": "Castellón - Eibar",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 1.0,
-      "context": "Cote away: 5.50 -> 4.50 (+18.2%)"
-    },
     {
       "event_id": "401815570",
       "date": "2026-05-31T17:35Z",
@@ -241,6 +203,24 @@
       "context": "1 match dans les 48h + 3262 km de voyage"
     },
     {
+      "event_id": "401815576",
+      "date": "2026-05-31T19:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Colorado Rockies",
+      "away": "San Francisco Giants",
+      "match": "Colorado Rockies - San Francisco Giants",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "San Francisco Giants",
+      "side": "away",
+      "strength": 0.914,
+      "context": "2 match dans les 48h + 1522 km de voyage"
+    },
+    {
       "event_id": "401815569",
       "date": "2026-05-31T17:35Z",
       "sport": "baseball",
@@ -257,24 +237,6 @@
       "side": "away",
       "strength": 0.849,
       "context": "2 match dans les 48h + 1194 km de voyage"
-    },
-    {
-      "event_id": "401815576",
-      "date": "2026-05-31T19:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Colorado Rockies",
-      "away": "San Francisco Giants",
-      "match": "Colorado Rockies - San Francisco Giants",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "San Francisco Giants",
-      "side": "away",
-      "strength": 0.834,
-      "context": "1 match dans les 48h + 1522 km de voyage"
     },
     {
       "event_id": "401815571",
@@ -367,24 +329,6 @@
       "context": "Absences severes 14-10"
     },
     {
-      "event_id": "748985",
-      "date": "2026-05-31T16:30Z",
-      "sport": "football",
-      "league_code": "laliga2",
-      "league_name": "La Liga 2",
-      "home": "Racing Santander",
-      "away": "Cádiz",
-      "match": "Racing Santander - Cádiz",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "draw",
-      "strength": 0.778,
-      "context": "Cote draw: 5.00 -> 4.30 (+14.0%)"
-    },
-    {
       "event_id": "401874171",
       "date": "2026-06-03T00:00Z",
       "sport": "hockey",
@@ -401,46 +345,9 @@
       "side": "away",
       "strength": 0.759,
       "context": "Deplacement estime 3262 km, decalage ~2.4h"
-    },
-    {
-      "event_id": "175778",
-      "date": "2026-05-31T13:30Z",
-      "sport": "tennis",
-      "league_code": "rolandgarros",
-      "league_name": "Roland Garros",
-      "home": "",
-      "away": "",
-      "match": "? - ?",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "away",
-      "strength": 0.675,
-      "context": "Cote away: 10.70 -> 12.00 (-12.1%)"
     }
   ],
-  "active_watch": [
-    {
-      "event_id": "748983",
-      "date": "2026-05-31T16:30Z",
-      "sport": "football",
-      "league_code": "laliga2",
-      "league_name": "La Liga 2",
-      "home": "Deportivo La Coruña",
-      "away": "Las Palmas",
-      "match": "Deportivo La Coruña - Las Palmas",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.505,
-      "context": "Cote away: 2.20 -> 2.00 (+9.1%)"
-    }
-  ],
+  "active_watch": [],
   "active_risk": [
     {
       "event_id": "401873672",
