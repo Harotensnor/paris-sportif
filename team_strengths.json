@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-05-31T18:53:50Z",
+  "generated_at": "2026-05-31T20:00:34Z",
   "method": "Maher (1982) Poisson regression simplifiée. alpha_off = goals_for / expected_gf · beta_def = goals_against / expected_ga · normalisé par moyennes ligue home/away.",
   "min_matches_per_league": 40,
   "min_matches_per_team": 5,
-  "n_leagues_with_strengths": 6,
+  "n_leagues_with_strengths": 7,
   "leagues": {
     "chn.1": {
       "league_avg_home": 1.82,
@@ -359,6 +359,69 @@
           "n_matches": 6,
           "gf_avg": 1.67,
           "ga_avg": 1.83
+        }
+      }
+    },
+    "esp.2": {
+      "league_avg_home": 1.38,
+      "league_avg_away": 1.49,
+      "n_matches": 45,
+      "teams": {
+        "Real Sociedad II": {
+          "alpha_off": 0.692,
+          "beta_def": 0.984,
+          "n_matches": 5,
+          "gf_avg": 1.0,
+          "ga_avg": 1.4
+        },
+        "Burgos": {
+          "alpha_off": 0.422,
+          "beta_def": 0.138,
+          "n_matches": 5,
+          "gf_avg": 0.6,
+          "ga_avg": 0.2
+        },
+        "Deportivo La Coruña": {
+          "alpha_off": 0.984,
+          "beta_def": 0.692,
+          "n_matches": 5,
+          "gf_avg": 1.4,
+          "ga_avg": 1.0
+        },
+        "Castellón": {
+          "alpha_off": 1.125,
+          "beta_def": 0.969,
+          "n_matches": 5,
+          "gf_avg": 1.6,
+          "ga_avg": 1.4
+        },
+        "Almería": {
+          "alpha_off": 1.406,
+          "beta_def": 0.831,
+          "n_matches": 5,
+          "gf_avg": 2.0,
+          "ga_avg": 1.2
+        },
+        "FC Andorra": {
+          "alpha_off": 0.692,
+          "beta_def": 0.844,
+          "n_matches": 5,
+          "gf_avg": 1.0,
+          "ga_avg": 1.2
+        },
+        "Ceuta": {
+          "alpha_off": 0.844,
+          "beta_def": 0.831,
+          "n_matches": 5,
+          "gf_avg": 1.2,
+          "ga_avg": 1.2
+        },
+        "Cádiz": {
+          "alpha_off": 0.692,
+          "beta_def": 1.406,
+          "n_matches": 5,
+          "gf_avg": 1.0,
+          "ga_avg": 2.0
         }
       }
     },

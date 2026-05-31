@@ -1,22 +1,22 @@
 {
-  "generated_at": "2026-05-31T18:53:17Z",
+  "generated_at": "2026-05-31T20:00:02Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 9,
+    "active_events": 8,
     "expired_sample": 0,
     "by_type": {
-      "back_to_back_travel": 5,
+      "back_to_back_travel": 4,
       "travel_extreme": 4,
       "lookahead": 10,
       "schedule_congestion": 2
     },
     "by_decision": {
       "abstain": 3,
-      "lean_home": 6
+      "lean_home": 5
     },
-    "lean_home": 6,
+    "lean_home": 5,
     "lean_away": 0,
     "abstain": 3,
     "monitor": 0
@@ -492,57 +492,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.969
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815576",
-      "source_event_ids": [
-        "401815576"
-      ],
-      "kickoff": "2026-05-31T19:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Colorado Rockies",
-      "away": "San Francisco Giants",
-      "match": "Colorado Rockies - San Francisco Giants",
-      "decision": "lean_home",
-      "net_team": "Colorado Rockies",
-      "reason": "San Francisco Giants plus penalise par calendrier/voyage (0.91 vs 0.00)",
-      "pressure_score": 0.914,
-      "home_fade": 0.0,
-      "away_fade": 0.914,
-      "travel_score": 0.914,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "2 match dans les 48h + 1522 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.08,
-        "away_score": -0.774,
-        "home_fade": 0.4,
-        "away_fade": 0.914,
-        "reason": "Direction nette: Colorado Rockies (-0.08)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.914
           }
         ]
       }
