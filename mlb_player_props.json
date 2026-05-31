@@ -1,218 +1,8 @@
 {
-  "generated_at": "2026-05-31T01:39:25Z",
+  "generated_at": "2026-05-31T03:36:58Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815563",
-      "kickoff": "2026-05-31T02:05Z",
-      "league": "MLB",
-      "match": "New York Yankees at Athletics Athletics",
-      "home": "Athletics",
-      "away": "New York Yankees",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "New York Yankees",
-          "pitcher": "Will Warren",
-          "label": "Will Warren plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.5809,
-          "fair_odds": 1.72,
-          "expected_strikeouts": 5.89,
-          "projected_ip": 5.28,
-          "inputs": {
-            "k9": 10.03,
-            "era": 3.55,
-            "whip": 1.17,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "New York Yankees",
-          "pitcher": "Will Warren",
-          "label": "Will Warren ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5306,
-          "fair_odds": 1.88,
-          "expected_hr_allowed": 0.634,
-          "projected_ip": 5.28,
-          "inputs": {
-            "hr9": 1.08,
-            "era": 3.55,
-            "whip": 1.17
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401815562",
-      "kickoff": "2026-05-31T02:10Z",
-      "league": "MLB",
-      "match": "Arizona Diamondbacks at Seattle Mariners",
-      "home": "Seattle Mariners",
-      "away": "Arizona Diamondbacks",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Seattle Mariners",
-          "pitcher": "Bryce Miller",
-          "label": "Bryce Miller plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.5591,
-          "fair_odds": 1.79,
-          "expected_strikeouts": 5.78,
-          "projected_ip": 6.6,
-          "inputs": {
-            "k9": 7.88,
-            "era": 2.25,
-            "whip": 1.0,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Seattle Mariners",
-          "pitcher": "Bryce Miller",
-          "label": "Bryce Miller concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5634,
-          "fair_odds": 1.78,
-          "expected_hr_allowed": 0.829,
-          "projected_ip": 6.6,
-          "inputs": {
-            "hr9": 1.13,
-            "era": 2.25,
-            "whip": 1.0
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Arizona Diamondbacks",
-          "pitcher": "Merrill Kelly",
-          "label": "Merrill Kelly plus de 3,5 strikeouts",
-          "line": 3.5,
-          "pick": "over",
-          "probability": 0.5961,
-          "fair_odds": 1.68,
-          "expected_strikeouts": 3.87,
-          "projected_ip": 6.0,
-          "inputs": {
-            "k9": 5.81,
-            "era": 5.25,
-            "whip": 1.42,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Arizona Diamondbacks",
-          "pitcher": "Merrill Kelly",
-          "label": "Merrill Kelly concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6321,
-          "fair_odds": 1.58,
-          "expected_hr_allowed": 1.0,
-          "projected_ip": 6.0,
-          "inputs": {
-            "hr9": 1.5,
-            "era": 5.25,
-            "whip": 1.42
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401815564",
-      "kickoff": "2026-05-31T02:10Z",
-      "league": "MLB",
-      "match": "Philadelphia Phillies at Los Angeles Dodgers",
-      "home": "Los Angeles Dodgers",
-      "away": "Philadelphia Phillies",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Los Angeles Dodgers",
-          "pitcher": "Yoshinobu Yamamoto",
-          "label": "Yoshinobu Yamamoto plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.584,
-          "fair_odds": 1.71,
-          "expected_strikeouts": 5.9,
-          "projected_ip": 6.4,
-          "inputs": {
-            "k9": 8.3,
-            "era": 3.09,
-            "whip": 0.98,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Los Angeles Dodgers",
-          "pitcher": "Yoshinobu Yamamoto",
-          "label": "Yoshinobu Yamamoto concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5947,
-          "fair_odds": 1.68,
-          "expected_hr_allowed": 0.903,
-          "projected_ip": 6.4,
-          "inputs": {
-            "hr9": 1.27,
-            "era": 3.09,
-            "whip": 0.98
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Philadelphia Phillies",
-          "pitcher": "Andrew Painter",
-          "label": "Andrew Painter moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.5135,
-          "fair_odds": 1.95,
-          "expected_strikeouts": 4.44,
-          "projected_ip": 5.56,
-          "inputs": {
-            "k9": 7.2,
-            "era": 5.4,
-            "whip": 1.46,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Philadelphia Phillies",
-          "pitcher": "Andrew Painter",
-          "label": "Andrew Painter concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5406,
-          "fair_odds": 1.85,
-          "expected_hr_allowed": 0.778,
-          "projected_ip": 5.56,
-          "inputs": {
-            "hr9": 1.26,
-            "era": 5.4,
-            "whip": 1.46
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815571",
       "kickoff": "2026-05-31T16:15Z",
@@ -256,6 +46,42 @@
             "whip": 1.47
           },
           "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Toronto Blue Jays",
+          "pitcher": "Spencer Miles",
+          "label": "Spencer Miles moins de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "under",
+          "probability": 0.5333,
+          "fair_odds": 1.88,
+          "expected_strikeouts": 6.34,
+          "projected_ip": 6.6,
+          "inputs": {
+            "k9": 8.64,
+            "era": 2.16,
+            "whip": 1.02,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Toronto Blue Jays",
+          "pitcher": "Spencer Miles",
+          "label": "Spencer Miles ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.673,
+          "fair_odds": 1.49,
+          "expected_hr_allowed": 0.396,
+          "projected_ip": 6.6,
+          "inputs": {
+            "hr9": 0.54,
+            "era": 2.16,
+            "whip": 1.02
+          },
+          "side": "away"
         }
       ]
     },
@@ -1372,7 +1198,7 @@
       ]
     }
   ],
-  "props": 66,
+  "props": 58,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
