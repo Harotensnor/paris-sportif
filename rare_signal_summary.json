@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-05-31T21:46:18Z",
+  "generated_at": "2026-05-31T22:42:22Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 18,
-    "actionable": 8,
-    "watch": 0,
+    "actionable": 7,
+    "watch": 1,
     "risk": 10,
     "expired_sample": 0,
     "by_type": {
@@ -16,7 +16,8 @@
       "market_uncertain": 10
     },
     "by_quality": {
-      "actionable": 8,
+      "actionable": 7,
+      "watch": 1,
       "risk": 10
     }
   },
@@ -74,24 +75,6 @@
       "side": "away",
       "strength": 1.0,
       "context": "1 match dans les 48h + 3262 km de voyage"
-    },
-    {
-      "event_id": "401856953",
-      "date": "2026-06-02T00:00Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Dallas Wings",
-      "away": "Seattle Storm",
-      "match": "Dallas Wings - Seattle Storm",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Seattle Storm",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 0-4"
     },
     {
       "event_id": "401815628",
@@ -166,7 +149,26 @@
       "context": "Deplacement estime 3262 km, decalage ~2.4h"
     }
   ],
-  "active_watch": [],
+  "active_watch": [
+    {
+      "event_id": "401856953",
+      "date": "2026-06-02T00:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Dallas Wings",
+      "away": "Seattle Storm",
+      "match": "Dallas Wings - Seattle Storm",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Seattle Storm",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 1-4"
+    }
+  ],
   "active_risk": [
     {
       "event_id": "401873672",

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-31T21:46:47Z",
+  "generated_at": "2026-05-31T22:43:01Z",
   "method": "Dixon-Coles MLE grid search (ρ ∈ [-0.30, 0.10] step 0.005), λ_h, λ_a fixés à moyenne empirique par ligue. CI 95% via LR test.",
   "min_matches": 40,
   "default_rho": -0.13,
@@ -414,17 +414,17 @@
       "lambda_a": 1.172
     },
     "esp.2": {
-      "n": 45,
-      "rho_measured": 0.005,
+      "n": 46,
+      "rho_measured": 0.045,
       "rho_literature": -0.12,
       "rho_used": -0.12,
       "source": "literature_fallback",
-      "reason": "CI trop large (0.400) ou fit nul",
-      "log_lik": -133.08,
-      "ci_lo": -0.3,
+      "reason": "CI trop large (0.365) ou fit nul",
+      "log_lik": -135.56,
+      "ci_lo": -0.265,
       "ci_hi": 0.1,
-      "lambda_h": 1.378,
-      "lambda_a": 1.489
+      "lambda_h": 1.37,
+      "lambda_a": 1.457
     },
     "ettannorra": {
       "n": 1,
@@ -634,12 +634,12 @@
       "lambda_a": 1.254
     },
     "laliga2": {
-      "n": 8,
+      "n": 7,
       "rho_measured": null,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "n=8 < 40"
+      "reason": "n=7 < 40"
     },
     "liga2promotionround": {
       "n": 2,
