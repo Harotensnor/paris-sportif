@@ -1,22 +1,22 @@
 {
-  "generated_at": "2026-05-31T16:47:36Z",
+  "generated_at": "2026-05-31T17:48:30Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 15,
+    "active_events": 13,
     "expired_sample": 0,
     "by_type": {
-      "back_to_back_travel": 11,
-      "travel_extreme": 6,
+      "travel_extreme": 5,
+      "back_to_back_travel": 9,
       "lookahead": 10,
       "schedule_congestion": 2
     },
     "by_decision": {
       "abstain": 3,
-      "lean_home": 12
+      "lean_home": 10
     },
-    "lean_home": 12,
+    "lean_home": 10,
     "lean_away": 0,
     "abstain": 3,
     "monitor": 0
@@ -322,65 +322,6 @@
             "type": "travel_extreme",
             "direction": "fade",
             "strength": 0.894
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815570",
-      "source_event_ids": [
-        "401815570"
-      ],
-      "kickoff": "2026-05-31T17:35Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Washington Nationals",
-      "away": "San Diego Padres",
-      "match": "Washington Nationals - San Diego Padres",
-      "decision": "lean_home",
-      "net_team": "Washington Nationals",
-      "reason": "San Diego Padres plus penalise par calendrier/voyage (1.85 vs 0.00)",
-      "pressure_score": 1.85,
-      "home_fade": 0.0,
-      "away_fade": 1.85,
-      "travel_score": 1.85,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "travel_extreme": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "Deplacement estime 3656 km, decalage ~2.7h",
-        "2 match dans les 48h + 3656 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.858,
-        "away_score": -2.45,
-        "home_fade": 0.0,
-        "away_fade": 2.45,
-        "reason": "Direction nette: Washington Nationals (+0.86)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.85
           },
           {
             "side": "away",
@@ -763,57 +704,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.914
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815569",
-      "source_event_ids": [
-        "401815569"
-      ],
-      "kickoff": "2026-05-31T17:35Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Pittsburgh Pirates",
-      "away": "Minnesota Twins",
-      "match": "Pittsburgh Pirates - Minnesota Twins",
-      "decision": "lean_home",
-      "net_team": "Pittsburgh Pirates",
-      "reason": "Minnesota Twins plus penalise par calendrier/voyage (0.85 vs 0.00)",
-      "pressure_score": 0.849,
-      "home_fade": 0.0,
-      "away_fade": 0.849,
-      "travel_score": 0.849,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "2 match dans les 48h + 1194 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.647,
-        "away_score": -1.849,
-        "home_fade": 0.0,
-        "away_fade": 1.849,
-        "reason": "Direction nette: Pittsburgh Pirates (+0.65)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.849
           }
         ]
       }

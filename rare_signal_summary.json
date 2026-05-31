@@ -1,63 +1,27 @@
 {
-  "generated_at": "2026-05-31T16:47:36Z",
+  "generated_at": "2026-05-31T17:48:30Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 27,
-    "actionable": 17,
+    "active_events": 25,
+    "actionable": 15,
     "watch": 0,
     "risk": 10,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 13,
-      "back_to_back_travel": 11,
-      "travel_extreme": 6,
+      "injury_imbalance": 11,
+      "travel_extreme": 5,
+      "back_to_back_travel": 9,
       "signal_conflict": 2,
       "market_uncertain": 10
     },
     "by_quality": {
-      "actionable": 17,
+      "actionable": 15,
       "risk": 10
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401815569",
-      "date": "2026-05-31T17:35Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Pittsburgh Pirates",
-      "away": "Minnesota Twins",
-      "match": "Pittsburgh Pirates - Minnesota Twins",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Minnesota Twins",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 3-8"
-    },
-    {
-      "event_id": "401815570",
-      "date": "2026-05-31T17:35Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Washington Nationals",
-      "away": "San Diego Padres",
-      "match": "Washington Nationals - San Diego Padres",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "San Diego Padres",
-      "side": "away",
-      "strength": 1.0,
-      "context": "2 match dans les 48h + 3656 km de voyage"
-    },
     {
       "event_id": "401815565",
       "date": "2026-05-31T17:40Z",
@@ -128,7 +92,7 @@
       "team": "Houston Astros",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 12-7"
+      "context": "Absences severes 12-6"
     },
     {
       "event_id": "401815577",
