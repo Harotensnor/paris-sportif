@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-31T22:42:22Z",
+  "generated_at": "2026-05-31T23:44:22Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -359,11 +359,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.168,
-        "away_score": -0.856,
-        "home_fade": 0.15,
-        "away_fade": 0.909,
-        "reason": "Direction nette: Carolina Hurricanes (+0.17)",
+        "home_score": -0.482,
+        "away_score": -1.506,
+        "home_fade": 1.15,
+        "away_fade": 1.909,
+        "reason": "Direction nette: Carolina Hurricanes (-0.48)",
         "detail": [
           {
             "side": "home",
@@ -376,6 +376,18 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           },
           {
             "side": "away",
