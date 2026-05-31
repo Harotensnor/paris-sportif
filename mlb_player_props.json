@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-31T03:36:58Z",
+  "generated_at": "2026-05-31T07:36:44Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -915,6 +915,42 @@
       "props": [
         {
           "market": "pitcher_strikeouts",
+          "team": "Athletics",
+          "pitcher": "Jacob Lopez",
+          "label": "Jacob Lopez plus de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "over",
+          "probability": 0.5905,
+          "fair_odds": 1.69,
+          "expected_strikeouts": 3.85,
+          "projected_ip": 5.36,
+          "inputs": {
+            "k9": 6.47,
+            "era": 5.73,
+            "whip": 1.77,
+            "hand": "L"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Athletics",
+          "pitcher": "Jacob Lopez",
+          "label": "Jacob Lopez concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.7012,
+          "fair_odds": 1.43,
+          "expected_hr_allowed": 1.208,
+          "projected_ip": 5.36,
+          "inputs": {
+            "hr9": 2.03,
+            "era": 5.73,
+            "whip": 1.77
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
           "team": "New York Yankees",
           "pitcher": "Will Warren",
           "label": "Will Warren plus de 5,5 strikeouts",
@@ -1198,7 +1234,7 @@
       ]
     }
   ],
-  "props": 58,
+  "props": 60,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
