@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-01T15:47:44Z",
+  "generated_at": "2026-06-01T20:08:07Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -53,11 +53,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.046,
-        "away_score": -1.034,
+        "home_score": 0.116,
+        "away_score": -1.234,
         "home_fade": 0.36,
-        "away_fade": 1.16,
-        "reason": "Direction nette: Arizona Diamondbacks (+0.05)",
+        "away_fade": 1.36,
+        "reason": "Direction nette: Arizona Diamondbacks (+0.12)",
         "detail": [
           {
             "side": "home",
@@ -75,7 +75,7 @@
             "side": "away",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.8
+            "strength": 1.0
           }
         ]
       }
@@ -111,11 +111,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.085,
-        "away_score": -0.995,
+        "home_score": 0.015,
+        "away_score": -0.795,
         "home_fade": 0.3,
-        "away_fade": 1.1,
-        "reason": "Direction nette: Tampa Bay Rays (+0.09)",
+        "away_fade": 0.9,
+        "reason": "Direction nette: Tampa Bay Rays (+0.01)",
         "detail": [
           {
             "side": "home",
@@ -133,7 +133,7 @@
             "side": "away",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.8
+            "strength": 0.6
           }
         ]
       }
@@ -169,11 +169,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": -0.055,
-        "away_score": -0.595,
+        "home_score": 0.015,
+        "away_score": -0.795,
         "home_fade": 0.3,
-        "away_fade": 0.7,
-        "reason": "Direction nette: Washington Nationals (-0.06)",
+        "away_fade": 0.9,
+        "reason": "Direction nette: Washington Nationals (+0.01)",
         "detail": [
           {
             "side": "home",
@@ -191,7 +191,7 @@
             "side": "away",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.4
+            "strength": 0.6
           }
         ]
       }
@@ -225,13 +225,13 @@
         "2 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.595,
-        "away_score": -0.055,
-        "home_fade": 0.7,
-        "away_fade": 0.3,
-        "reason": "Direction nette: Kansas City Royals (-0.06)",
+        "status": "mixed",
+        "net_side": null,
+        "home_score": 0.386,
+        "away_score": -0.985,
+        "home_fade": 0.9,
+        "away_fade": 1.3,
+        "reason": "Signaux mitigés: avantage net trop faible (Cincinnati Reds +0.39, Kansas City Royals -0.99)",
         "detail": [
           {
             "side": "home",
@@ -249,7 +249,19 @@
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.4
+            "strength": 0.6
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.831
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           }
         ]
       }
@@ -459,11 +471,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.085,
-        "away_score": -0.995,
+        "home_score": 0.155,
+        "away_score": -1.195,
         "home_fade": 0.3,
-        "away_fade": 1.1,
-        "reason": "Direction nette: Arizona Diamondbacks (+0.09)",
+        "away_fade": 1.3,
+        "reason": "Direction nette: Arizona Diamondbacks (+0.15)",
         "detail": [
           {
             "side": "home",
@@ -481,7 +493,7 @@
             "side": "away",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.8
+            "strength": 1.0
           }
         ]
       }
@@ -517,11 +529,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": -0.11,
-        "away_score": -1.19,
+        "home_score": -0.04,
+        "away_score": -1.39,
         "home_fade": 0.6,
-        "away_fade": 1.4,
-        "reason": "Direction nette: Arizona Diamondbacks (-0.11)",
+        "away_fade": 1.6,
+        "reason": "Direction nette: Arizona Diamondbacks (-0.04)",
         "detail": [
           {
             "side": "home",
@@ -539,7 +551,7 @@
             "side": "away",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.8
+            "strength": 1.0
           }
         ]
       }
@@ -685,11 +697,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.183,
-        "away_score": -0.898,
+        "home_score": 0.252,
+        "away_score": -1.097,
         "home_fade": 0.15,
-        "away_fade": 0.95,
-        "reason": "Direction nette: Arizona Diamondbacks (+0.18)",
+        "away_fade": 1.15,
+        "reason": "Direction nette: Arizona Diamondbacks (+0.25)",
         "detail": [
           {
             "side": "home",
@@ -707,7 +719,7 @@
             "side": "away",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.8
+            "strength": 1.0
           }
         ]
       }
@@ -1405,11 +1417,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.481,
-        "away_score": -1.752,
+        "home_score": 0.411,
+        "away_score": -1.552,
         "home_fade": 0.15,
-        "away_fade": 1.804,
-        "reason": "Direction nette: Tampa Bay Rays (+0.48)",
+        "away_fade": 1.604,
+        "reason": "Direction nette: Tampa Bay Rays (+0.41)",
         "detail": [
           {
             "side": "home",
@@ -1427,7 +1439,7 @@
             "side": "away",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.8
+            "strength": 0.6
           },
           {
             "side": "away",
@@ -1471,11 +1483,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.332,
-        "away_score": -1.325,
+        "home_score": 0.402,
+        "away_score": -1.525,
         "home_fade": 0.15,
-        "away_fade": 1.377,
-        "reason": "Direction nette: Washington Nationals (+0.33)",
+        "away_fade": 1.577,
+        "reason": "Direction nette: Washington Nationals (+0.40)",
         "detail": [
           {
             "side": "home",
@@ -1493,7 +1505,7 @@
             "side": "away",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.4
+            "strength": 0.6
           },
           {
             "side": "away",
@@ -1729,11 +1741,11 @@
       "global_resolution": {
         "status": "abstain",
         "net_side": null,
-        "home_score": -0.252,
-        "away_score": -0.66,
-        "home_fade": 0.55,
+        "home_score": -0.452,
+        "away_score": -0.59,
+        "home_fade": 0.75,
         "away_fade": 0.852,
-        "reason": "Signaux opposes: Cincinnati Reds fade 0.55, Kansas City Royals fade 0.85 -> prudence",
+        "reason": "Signaux opposes: Cincinnati Reds fade 0.75, Kansas City Royals fade 0.85 -> prudence",
         "detail": [
           {
             "side": "home",
@@ -1751,7 +1763,7 @@
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.4
+            "strength": 0.6
           },
           {
             "side": "away",
@@ -1792,17 +1804,17 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.607,
-        "away_score": -1.734,
+        "home_score": 0.537,
+        "away_score": -1.534,
         "home_fade": 0.0,
-        "away_fade": 1.734,
-        "reason": "Direction nette: Tampa Bay Rays (+0.61)",
+        "away_fade": 1.534,
+        "reason": "Direction nette: Tampa Bay Rays (+0.54)",
         "detail": [
           {
             "side": "away",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.8
+            "strength": 0.6
           },
           {
             "side": "away",
@@ -1843,17 +1855,17 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.458,
-        "away_score": -1.307,
+        "home_score": 0.528,
+        "away_score": -1.507,
         "home_fade": 0.0,
-        "away_fade": 1.307,
-        "reason": "Direction nette: Washington Nationals (+0.46)",
+        "away_fade": 1.507,
+        "reason": "Direction nette: Washington Nationals (+0.53)",
         "detail": [
           {
             "side": "away",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.4
+            "strength": 0.6
           },
           {
             "side": "away",
@@ -1994,19 +2006,19 @@
         "2 match dans les 48h + 861 km de voyage"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.126,
-        "away_score": -0.642,
-        "home_fade": 0.4,
+        "status": "abstain",
+        "net_side": null,
+        "home_score": -0.326,
+        "away_score": -0.572,
+        "home_fade": 0.6,
         "away_fade": 0.782,
-        "reason": "Direction nette: Cincinnati Reds (-0.13)",
+        "reason": "Signaux opposes: Cincinnati Reds fade 0.60, Kansas City Royals fade 0.78 -> prudence",
         "detail": [
           {
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.4
+            "strength": 0.6
           },
           {
             "side": "away",
