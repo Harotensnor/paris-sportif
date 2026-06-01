@@ -1,47 +1,28 @@
 {
-  "generated_at": "2026-06-01T20:08:07Z",
+  "generated_at": "2026-06-01T22:36:26Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 39,
-    "actionable": 31,
-    "watch": 3,
-    "risk": 5,
+    "active_events": 40,
+    "actionable": 29,
+    "watch": 5,
+    "risk": 6,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 31,
-      "market_move": 2,
-      "signal_conflict": 3,
       "travel_extreme": 10,
       "back_to_back_travel": 17,
-      "market_uncertain": 5
+      "signal_conflict": 2,
+      "market_uncertain": 6
     },
     "by_quality": {
-      "watch": 3,
-      "actionable": 31,
-      "risk": 5
+      "watch": 5,
+      "actionable": 29,
+      "risk": 6
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401815581",
-      "date": "2026-06-01T23:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Cincinnati Reds",
-      "away": "Kansas City Royals",
-      "match": "Cincinnati Reds - Kansas City Royals",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "away",
-      "strength": 1.0,
-      "context": "Cote away: 2.10 -> 2.55 (-21.4%)"
-    },
     {
       "event_id": "401815583",
       "date": "2026-06-01T23:40Z",
@@ -61,6 +42,24 @@
       "context": "Absences severes 8-14"
     },
     {
+      "event_id": "401815584",
+      "date": "2026-06-01T23:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Milwaukee Brewers",
+      "away": "San Francisco Giants",
+      "match": "Milwaukee Brewers - San Francisco Giants",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "San Francisco Giants",
+      "side": null,
+      "strength": 1.0,
+      "context": "Absences severes 6-11"
+    },
+    {
       "event_id": "401815585",
       "date": "2026-06-01T23:45Z",
       "sport": "baseball",
@@ -76,7 +75,7 @@
       "team": "Texas Rangers",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 3-10"
+      "context": "Absences severes 3-11"
     },
     {
       "event_id": "401815586",
@@ -161,12 +160,12 @@
       "match": "Milwaukee Brewers - San Francisco Giants",
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
+      "type": "injury_imbalance",
       "direction": "fade",
       "team": "San Francisco Giants",
-      "side": "away",
+      "side": null,
       "strength": 1.0,
-      "context": "1 match dans les 48h + 2951 km de voyage"
+      "context": "Absences severes 6-11"
     },
     {
       "event_id": "401815600",
@@ -184,7 +183,7 @@
       "team": "Texas Rangers",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 3-10"
+      "context": "Absences severes 3-11"
     },
     {
       "event_id": "401815601",
@@ -287,12 +286,12 @@
       "match": "Milwaukee Brewers - San Francisco Giants",
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
+      "type": "injury_imbalance",
       "direction": "fade",
       "team": "San Francisco Giants",
-      "side": "away",
+      "side": null,
       "strength": 1.0,
-      "context": "2 match dans les 48h + 2951 km de voyage"
+      "context": "Absences severes 6-11"
     },
     {
       "event_id": "401815615",
@@ -310,7 +309,7 @@
       "team": "Texas Rangers",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 3-10"
+      "context": "Absences severes 3-11"
     },
     {
       "event_id": "401815616",
@@ -359,12 +358,12 @@
       "match": "Milwaukee Brewers - San Francisco Giants",
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
+      "type": "injury_imbalance",
       "direction": "fade",
       "team": "San Francisco Giants",
-      "side": "away",
+      "side": null,
       "strength": 1.0,
-      "context": "2 match dans les 48h + 2951 km de voyage"
+      "context": "Absences severes 6-11"
     },
     {
       "event_id": "401874172",
@@ -493,42 +492,6 @@
       "context": "1 match dans les 48h + 1487 km de voyage"
     },
     {
-      "event_id": "401815584",
-      "date": "2026-06-01T23:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Milwaukee Brewers",
-      "away": "San Francisco Giants",
-      "match": "Milwaukee Brewers - San Francisco Giants",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "San Francisco Giants",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 6-10"
-    },
-    {
-      "event_id": "401856956",
-      "date": "2026-06-02T23:30Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Washington Mystics",
-      "away": "Chicago Sky",
-      "match": "Washington Mystics - Chicago Sky",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Chicago Sky",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 0-4"
-    },
-    {
       "event_id": "401815607",
       "date": "2026-06-03T23:10Z",
       "sport": "baseball",
@@ -621,6 +584,24 @@
       "context": "Absences severes 6-9"
     },
     {
+      "event_id": "401815581",
+      "date": "2026-06-01T23:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Cincinnati Reds",
+      "away": "Kansas City Royals",
+      "match": "Cincinnati Reds - Kansas City Royals",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Cincinnati Reds",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 10-7"
+    },
+    {
       "event_id": "401856953",
       "date": "2026-06-02T00:00Z",
       "sport": "basketball",
@@ -634,6 +615,24 @@
       "type": "injury_imbalance",
       "direction": "fade",
       "team": "Seattle Storm",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 1-4"
+    },
+    {
+      "event_id": "401856956",
+      "date": "2026-06-02T23:30Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Washington Mystics",
+      "away": "Chicago Sky",
+      "match": "Washington Mystics - Chicago Sky",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Chicago Sky",
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 1-4"
@@ -729,6 +728,24 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 19.8%"
+    },
+    {
+      "event_id": "401874276",
+      "date": "2026-06-07T19:00Z",
+      "sport": "football",
+      "league_code": "laliga2",
+      "league_name": "La Liga 2",
+      "home": "Las Palmas",
+      "away": "Málaga",
+      "match": "Las Palmas - Málaga",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.8%"
     }
   ],
   "expired_sample": []

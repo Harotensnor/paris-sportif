@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-01T20:08:06Z",
+  "generated_at": "2026-06-01T22:36:24Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -178,18 +178,18 @@
         {
           "market": "pitcher_strikeouts",
           "team": "Cincinnati Reds",
-          "pitcher": "Chase Burns",
-          "label": "Chase Burns plus de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "over",
-          "probability": 0.504,
-          "fair_odds": 1.98,
-          "expected_strikeouts": 6.52,
-          "projected_ip": 5.83,
+          "pitcher": "Lyon Richardson",
+          "label": "Lyon Richardson moins de 7,5 strikeouts",
+          "line": 7.5,
+          "pick": "under",
+          "probability": 0.557,
+          "fair_odds": 1.8,
+          "expected_strikeouts": 7.2,
+          "projected_ip": 4.8,
           "inputs": {
-            "k9": 10.07,
-            "era": 1.96,
-            "whip": 0.96,
+            "k9": 13.5,
+            "era": 13.5,
+            "whip": 1.5,
             "hand": "R"
           },
           "side": "home"
@@ -197,17 +197,17 @@
         {
           "market": "pitcher_home_run_allowed",
           "team": "Cincinnati Reds",
-          "pitcher": "Chase Burns",
-          "label": "Chase Burns concède au moins 1 home run",
+          "pitcher": "Lyon Richardson",
+          "label": "Lyon Richardson concède au moins 1 home run",
           "pick": "yes",
-          "probability": 0.5158,
-          "fair_odds": 1.94,
-          "expected_hr_allowed": 0.725,
-          "projected_ip": 5.83,
+          "probability": 0.9993,
+          "fair_odds": 1.01,
+          "expected_hr_allowed": 7.2,
+          "projected_ip": 4.8,
           "inputs": {
-            "hr9": 1.12,
-            "era": 1.96,
-            "whip": 0.96
+            "hr9": 13.5,
+            "era": 13.5,
+            "whip": 1.5
           },
           "side": "home"
         },
@@ -292,6 +292,42 @@
             "whip": 0.93
           },
           "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Chicago White Sox",
+          "pitcher": "David Sandlin",
+          "label": "David Sandlin moins de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "under",
+          "probability": 0.6257,
+          "fair_odds": 1.6,
+          "expected_strikeouts": 4.0,
+          "projected_ip": 6.0,
+          "inputs": {
+            "k9": 6.0,
+            "era": 1.5,
+            "whip": 0.17,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Chicago White Sox",
+          "pitcher": "David Sandlin",
+          "label": "David Sandlin concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.6321,
+          "fair_odds": 1.58,
+          "expected_hr_allowed": 1.0,
+          "projected_ip": 6.0,
+          "inputs": {
+            "hr9": 1.5,
+            "era": 1.5,
+            "whip": 0.17
+          },
+          "side": "away"
         }
       ]
     },
@@ -1910,7 +1946,7 @@
       ]
     }
   ],
-  "props": 92,
+  "props": 94,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
