@@ -1,14 +1,14 @@
 {
-  "generated_at": "2026-06-01T09:08:27Z",
-  "calculated_at": "2026-06-01T09:08:27Z",
+  "generated_at": "2026-06-01T15:36:32Z",
+  "calculated_at": "2026-06-01T15:36:32Z",
   "source_of_truth": "data.js",
-  "data_generated_at": "2026-06-01T09:07:20.216238Z",
+  "data_generated_at": "2026-06-01T15:35:35.785943Z",
   "data_today_field": "2026-06-01",
   "events": {
-    "total": 73,
-    "upcoming": 63,
-    "winamax_available": 73,
-    "winamax_exact": 73,
+    "total": 69,
+    "upcoming": 59,
+    "winamax_available": 69,
+    "winamax_exact": 69,
     "winamax_exact_ratio": 1.0,
     "markets_more_than_1n2": 0,
     "form_l10": 35,
@@ -42,9 +42,9 @@
     }
   },
   "winamax_markets": {
-    "matches": 305,
+    "matches": 340,
     "detailed_market_matches": 91,
-    "detailed_ratio_vs_exact": 1.2466,
+    "detailed_ratio_vs_exact": 1.3188,
     "gap_to_50pct_exact": 0,
     "recommended_detail_fetch_cap": 90,
     "detail_by_sport": {
@@ -73,7 +73,7 @@
         "detailed_ratio": 0.0
       },
       "tennis": {
-        "exact": 12,
+        "exact": 8,
         "detailed": 0,
         "families": {},
         "detailed_ratio": 0.0
@@ -82,15 +82,17 @@
     "market_family_counts": {}
   },
   "backtest": {
-    "overall_roi_pct": 4.57,
-    "overall_brier": 0.2472,
+    "overall_roi_pct": -1.52,
+    "overall_brier": 0.2347,
     "by_sport_roi_pct": {
-      "baseball": 0.01,
-      "basketball": 13.57,
-      "football": 8.73,
+      "baseball": 2.7,
+      "basketball": 18.66,
+      "football": -10.35,
       "hockey": 9.67
     },
-    "cold_sports": []
+    "cold_sports": [
+      "football"
+    ]
   },
   "health": {
     "status": "warning",
