@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-05-31T23:44:22Z",
+  "generated_at": "2026-06-01T02:02:04Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 6,
+    "active_events": 8,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 10,
-      "travel_extreme": 3,
+      "lookahead": 12,
+      "travel_extreme": 4,
       "back_to_back_travel": 2,
       "schedule_congestion": 2
     },
     "by_decision": {
-      "abstain": 3,
-      "lean_home": 3
+      "abstain": 4,
+      "lean_home": 4
     },
-    "lean_home": 3,
+    "lean_home": 4,
     "lean_away": 0,
-    "abstain": 3,
+    "abstain": 4,
     "monitor": 0
   },
   "active": [
@@ -159,6 +159,58 @@
         "401859963"
       ],
       "kickoff": "2026-06-04T00:30Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "San Antonio Spurs",
+      "away": "New York Knicks",
+      "match": "San Antonio Spurs - New York Knicks",
+      "decision": "abstain",
+      "net_team": null,
+      "reason": "Fatigue/agenda des deux cotes: San Antonio Spurs 0.15, New York Knicks 0.15",
+      "pressure_score": 0.667,
+      "home_fade": 0.15,
+      "away_fade": 0.15,
+      "travel_score": 0,
+      "lookahead_score": 0.667,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 2
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours",
+        "1 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "away",
+        "home_score": -0.098,
+        "away_score": -0.098,
+        "home_fade": 0.15,
+        "away_fade": 0.15,
+        "reason": "Direction nette: New York Knicks (-0.10)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401859964",
+      "source_event_ids": [
+        "401859964"
+      ],
+      "kickoff": "2026-06-06T00:30Z",
       "sport": "basketball",
       "league_code": "nba",
       "league_name": "NBA",
@@ -359,11 +411,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": -0.482,
-        "away_score": -1.506,
-        "home_fade": 1.15,
-        "away_fade": 1.909,
-        "reason": "Direction nette: Carolina Hurricanes (-0.48)",
+        "home_score": 0.168,
+        "away_score": -0.856,
+        "home_fade": 0.15,
+        "away_fade": 0.909,
+        "reason": "Direction nette: Carolina Hurricanes (+0.17)",
         "detail": [
           {
             "side": "home",
@@ -378,22 +430,61 @@
             "strength": 0.15
           },
           {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
             "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
+            "type": "travel_extreme",
+            "direction": "fade",
+            "strength": 0.759
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815680",
+      "source_event_ids": [
+        "401815680"
+      ],
+      "kickoff": "2026-06-09T01:45Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "San Francisco Giants",
+      "away": "Washington Nationals",
+      "match": "San Francisco Giants - Washington Nationals",
+      "decision": "lean_home",
+      "net_team": "San Francisco Giants",
+      "reason": "Washington Nationals plus penalise par calendrier/voyage (0.91 vs 0.00)",
+      "pressure_score": 0.911,
+      "home_fade": 0.0,
+      "away_fade": 0.911,
+      "travel_score": 0.911,
+      "lookahead_score": 0,
+      "congestion_score": 0,
+      "types": {
+        "travel_extreme": 1
+      },
+      "contexts": [
+        "Deplacement estime 3919 km, decalage ~3.0h"
+      ],
+      "global_resolution": {
+        "status": "abstain",
+        "net_side": null,
+        "home_score": -0.481,
+        "away_score": -0.631,
+        "home_fade": 0.8,
+        "away_fade": 0.911,
+        "reason": "Signaux opposes: San Francisco Giants fade 0.80, Washington Nationals fade 0.91 -> prudence",
+        "detail": [
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.8
           },
           {
             "side": "away",
             "type": "travel_extreme",
             "direction": "fade",
-            "strength": 0.759
+            "strength": 0.911
           }
         ]
       }
