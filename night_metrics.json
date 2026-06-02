@@ -1,21 +1,21 @@
 {
-  "generated_at": "2026-06-02T08:29:14Z",
-  "calculated_at": "2026-06-02T08:29:14Z",
+  "generated_at": "2026-06-02T12:19:54Z",
+  "calculated_at": "2026-06-02T12:19:54Z",
   "source_of_truth": "data.js",
-  "data_generated_at": "2026-06-02T08:28:02.419296Z",
+  "data_generated_at": "2026-06-02T12:18:00.662972Z",
   "data_today_field": "2026-06-02",
   "events": {
-    "total": 86,
-    "upcoming": 75,
-    "winamax_available": 86,
-    "winamax_exact": 86,
+    "total": 85,
+    "upcoming": 74,
+    "winamax_available": 85,
+    "winamax_exact": 85,
     "winamax_exact_ratio": 1.0,
     "markets_more_than_1n2": 0,
     "form_l10": 56,
     "h2h": 0,
-    "lineups": 39,
+    "lineups": 41,
     "football_lineups": 0,
-    "starter_signals": 39,
+    "starter_signals": 41,
     "clubelo": 3,
     "weather": 11,
     "injuries": 62,
@@ -25,7 +25,7 @@
     "referee_signal": 0,
     "fd_calibration": 0,
     "fd_closing_odds": 0,
-    "xg": 3,
+    "xg": 0,
     "smart_money": 2
   },
   "signal_health": {
@@ -42,9 +42,9 @@
     }
   },
   "winamax_markets": {
-    "matches": 366,
+    "matches": 348,
     "detailed_market_matches": 91,
-    "detailed_ratio_vs_exact": 1.0581,
+    "detailed_ratio_vs_exact": 1.0706,
     "gap_to_50pct_exact": 0,
     "recommended_detail_fetch_cap": 90,
     "detail_by_sport": {
@@ -73,7 +73,7 @@
         "detailed_ratio": 0.0
       },
       "tennis": {
-        "exact": 8,
+        "exact": 7,
         "detailed": 0,
         "families": {},
         "detailed_ratio": 0.0
@@ -82,21 +82,19 @@
     "market_family_counts": {}
   },
   "backtest": {
-    "overall_roi_pct": -1.52,
-    "overall_brier": 0.2347,
+    "overall_roi_pct": 2.48,
+    "overall_brier": 0.2377,
     "by_sport_roi_pct": {
       "baseball": 2.7,
       "basketball": 18.66,
-      "football": -10.35,
+      "football": -0.41,
       "hockey": 9.67
     },
-    "cold_sports": [
-      "football"
-    ]
+    "cold_sports": []
   },
   "health": {
     "status": "warning",
-    "warnings": 9,
+    "warnings": 8,
     "pipeline_drift": "warn"
   }
 }
