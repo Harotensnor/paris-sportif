@@ -1,22 +1,22 @@
 {
-  "generated_at": "2026-06-03T18:35:18Z",
+  "generated_at": "2026-06-03T21:38:18Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 29,
+    "active_events": 28,
     "expired_sample": 0,
     "by_type": {
-      "travel_extreme": 10,
-      "back_to_back_travel": 14,
       "lookahead": 34,
+      "travel_extreme": 9,
+      "back_to_back_travel": 13,
       "schedule_congestion": 14
     },
     "by_decision": {
       "abstain": 14,
-      "lean_home": 15
+      "lean_home": 14
     },
-    "lean_home": 15,
+    "lean_home": 14,
     "lean_away": 0,
     "abstain": 14,
     "monitor": 0
@@ -1316,65 +1316,6 @@
             "type": "travel_extreme",
             "direction": "fade",
             "strength": 0.759
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815618",
-      "source_event_ids": [
-        "401815618"
-      ],
-      "kickoff": "2026-06-03T19:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Seattle Mariners",
-      "away": "New York Mets",
-      "match": "Seattle Mariners - New York Mets",
-      "decision": "lean_home",
-      "net_team": "Seattle Mariners",
-      "reason": "New York Mets plus penalise par calendrier/voyage (1.90 vs 0.00)",
-      "pressure_score": 1.901,
-      "home_fade": 0.0,
-      "away_fade": 1.901,
-      "travel_score": 1.901,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "travel_extreme": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "Deplacement estime 3875 km, decalage ~3.2h",
-        "2 match dans les 48h + 3875 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 1.015,
-        "away_score": -2.901,
-        "home_fade": 0.0,
-        "away_fade": 2.901,
-        "reason": "Direction nette: Seattle Mariners (+1.02)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.901
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 1.0
           }
         ]
       }

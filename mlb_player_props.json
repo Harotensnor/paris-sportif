@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-06-03T18:35:17Z",
+  "generated_at": "2026-06-03T21:38:17Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815618",
-      "kickoff": "2026-06-03T19:40Z",
-      "league": "MLB",
-      "match": "New York Mets at Seattle Mariners",
-      "home": "Seattle Mariners",
-      "away": "New York Mets",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Seattle Mariners",
-          "pitcher": "George Kirby",
-          "label": "George Kirby plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.5958,
-          "fair_odds": 1.68,
-          "expected_strikeouts": 4.92,
-          "projected_ip": 6.17,
-          "inputs": {
-            "k9": 7.18,
-            "era": 3.77,
-            "whip": 1.22,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Seattle Mariners",
-          "pitcher": "George Kirby",
-          "label": "George Kirby ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5586,
-          "fair_odds": 1.79,
-          "expected_hr_allowed": 0.582,
-          "projected_ip": 6.17,
-          "inputs": {
-            "hr9": 0.85,
-            "era": 3.77,
-            "whip": 1.22
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "New York Mets",
-          "pitcher": "Freddy Peralta",
-          "label": "Freddy Peralta plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.5354,
-          "fair_odds": 1.87,
-          "expected_strikeouts": 5.67,
-          "projected_ip": 5.5,
-          "inputs": {
-            "k9": 9.27,
-            "era": 3.55,
-            "whip": 1.3,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "New York Mets",
-          "pitcher": "Freddy Peralta",
-          "label": "Freddy Peralta ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5137,
-          "fair_odds": 1.95,
-          "expected_hr_allowed": 0.666,
-          "projected_ip": 5.5,
-          "inputs": {
-            "hr9": 1.09,
-            "era": 3.55,
-            "whip": 1.3
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815609",
       "kickoff": "2026-06-03T22:40Z",
@@ -1136,7 +1054,7 @@
       ]
     }
   ],
-  "props": 54,
+  "props": 50,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
