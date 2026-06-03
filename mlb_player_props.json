@@ -1,336 +1,8 @@
 {
-  "generated_at": "2026-06-03T21:38:17Z",
+  "generated_at": "2026-06-03T23:22:05Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815609",
-      "kickoff": "2026-06-03T22:40Z",
-      "league": "MLB",
-      "match": "San Diego Padres at Philadelphia Phillies",
-      "home": "Philadelphia Phillies",
-      "away": "San Diego Padres",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Philadelphia Phillies",
-          "pitcher": "Cristopher Sánchez",
-          "label": "Cristopher Sánchez plus de 7,5 strikeouts",
-          "line": 7.5,
-          "pick": "over",
-          "probability": 0.5716,
-          "fair_odds": 1.75,
-          "expected_strikeouts": 7.9,
-          "projected_ip": 6.59,
-          "inputs": {
-            "k9": 10.78,
-            "era": 1.47,
-            "whip": 1.12,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Philadelphia Phillies",
-          "pitcher": "Cristopher Sánchez",
-          "label": "Cristopher Sánchez ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.7796,
-          "fair_odds": 1.28,
-          "expected_hr_allowed": 0.249,
-          "projected_ip": 6.59,
-          "inputs": {
-            "hr9": 0.34,
-            "era": 1.47,
-            "whip": 1.12
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "San Diego Padres",
-          "pitcher": "Walker Buehler",
-          "label": "Walker Buehler plus de 3,5 strikeouts",
-          "line": 3.5,
-          "pick": "over",
-          "probability": 0.5961,
-          "fair_odds": 1.68,
-          "expected_strikeouts": 3.87,
-          "projected_ip": 4.65,
-          "inputs": {
-            "k9": 7.49,
-            "era": 4.88,
-            "whip": 1.32,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "San Diego Padres",
-          "pitcher": "Walker Buehler",
-          "label": "Walker Buehler ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6963,
-          "fair_odds": 1.44,
-          "expected_hr_allowed": 0.362,
-          "projected_ip": 4.65,
-          "inputs": {
-            "hr9": 0.7,
-            "era": 4.88,
-            "whip": 1.32
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401815604",
-      "kickoff": "2026-06-03T22:45Z",
-      "league": "MLB",
-      "match": "Baltimore Orioles at Boston Red Sox",
-      "home": "Boston Red Sox",
-      "away": "Baltimore Orioles",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Boston Red Sox",
-          "pitcher": "Payton Tolle",
-          "label": "Payton Tolle plus de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "over",
-          "probability": 0.5074,
-          "fair_odds": 1.97,
-          "expected_strikeouts": 6.54,
-          "projected_ip": 5.87,
-          "inputs": {
-            "k9": 10.02,
-            "era": 2.61,
-            "whip": 0.9,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Boston Red Sox",
-          "pitcher": "Payton Tolle",
-          "label": "Payton Tolle ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6544,
-          "fair_odds": 1.53,
-          "expected_hr_allowed": 0.424,
-          "projected_ip": 5.87,
-          "inputs": {
-            "hr9": 0.65,
-            "era": 2.61,
-            "whip": 0.9
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Baltimore Orioles",
-          "pitcher": "Chris Bassitt",
-          "label": "Chris Bassitt plus de 3,5 strikeouts",
-          "line": 3.5,
-          "pick": "over",
-          "probability": 0.6225,
-          "fair_odds": 1.61,
-          "expected_strikeouts": 3.99,
-          "projected_ip": 5.9,
-          "inputs": {
-            "k9": 6.08,
-            "era": 5.06,
-            "whip": 1.58,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Baltimore Orioles",
-          "pitcher": "Chris Bassitt",
-          "label": "Chris Bassitt ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5766,
-          "fair_odds": 1.73,
-          "expected_hr_allowed": 0.551,
-          "projected_ip": 5.9,
-          "inputs": {
-            "hr9": 0.84,
-            "era": 5.06,
-            "whip": 1.58
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401815605",
-      "kickoff": "2026-06-03T23:05Z",
-      "league": "MLB",
-      "match": "Cleveland Guardians at New York Yankees",
-      "home": "New York Yankees",
-      "away": "Cleveland Guardians",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "New York Yankees",
-          "pitcher": "Gerrit Cole",
-          "label": "Gerrit Cole plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.5596,
-          "fair_odds": 1.79,
-          "expected_strikeouts": 5.78,
-          "projected_ip": 6.1,
-          "inputs": {
-            "k9": 8.53,
-            "era": 0.0,
-            "whip": 0.71,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "New York Yankees",
-          "pitcher": "Gerrit Cole",
-          "label": "Gerrit Cole ne concède pas de home run",
-          "pick": "no",
-          "probability": 1.0,
-          "fair_odds": 1.01,
-          "expected_hr_allowed": 0.0,
-          "projected_ip": 6.1,
-          "inputs": {
-            "hr9": 0.0,
-            "era": 0.0,
-            "whip": 0.71
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Cleveland Guardians",
-          "pitcher": "Gavin Williams",
-          "label": "Gavin Williams moins de 7,5 strikeouts",
-          "line": 7.5,
-          "pick": "under",
-          "probability": 0.5351,
-          "fair_odds": 1.87,
-          "expected_strikeouts": 7.31,
-          "projected_ip": 6.34,
-          "inputs": {
-            "k9": 10.38,
-            "era": 3.07,
-            "whip": 1.09,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Cleveland Guardians",
-          "pitcher": "Gavin Williams",
-          "label": "Gavin Williams concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5262,
-          "fair_odds": 1.9,
-          "expected_hr_allowed": 0.747,
-          "projected_ip": 6.34,
-          "inputs": {
-            "hr9": 1.06,
-            "era": 3.07,
-            "whip": 1.09
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401815607",
-      "kickoff": "2026-06-03T23:10Z",
-      "league": "MLB",
-      "match": "Kansas City Royals at Cincinnati Reds",
-      "home": "Cincinnati Reds",
-      "away": "Kansas City Royals",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Cincinnati Reds",
-          "pitcher": "Chase Burns",
-          "label": "Chase Burns plus de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "over",
-          "probability": 0.504,
-          "fair_odds": 1.98,
-          "expected_strikeouts": 6.52,
-          "projected_ip": 5.83,
-          "inputs": {
-            "k9": 10.07,
-            "era": 1.96,
-            "whip": 0.96,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Cincinnati Reds",
-          "pitcher": "Chase Burns",
-          "label": "Chase Burns concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5158,
-          "fair_odds": 1.94,
-          "expected_hr_allowed": 0.725,
-          "projected_ip": 5.83,
-          "inputs": {
-            "hr9": 1.12,
-            "era": 1.96,
-            "whip": 0.96
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Kansas City Royals",
-          "pitcher": "Stephen Kolek",
-          "label": "Stephen Kolek plus de 3,5 strikeouts",
-          "line": 3.5,
-          "pick": "over",
-          "probability": 0.5789,
-          "fair_odds": 1.73,
-          "expected_strikeouts": 3.8,
-          "projected_ip": 6.2,
-          "inputs": {
-            "k9": 5.52,
-            "era": 3.48,
-            "whip": 0.94,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Kansas City Royals",
-          "pitcher": "Stephen Kolek",
-          "label": "Stephen Kolek concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5503,
-          "fair_odds": 1.82,
-          "expected_hr_allowed": 0.799,
-          "projected_ip": 6.2,
-          "inputs": {
-            "hr9": 1.16,
-            "era": 3.48,
-            "whip": 0.94
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815610",
       "kickoff": "2026-06-03T23:15Z",
@@ -343,17 +15,17 @@
           "market": "pitcher_strikeouts",
           "team": "Atlanta Braves",
           "pitcher": "Grant Holmes",
-          "label": "Grant Holmes plus de 4,5 strikeouts",
+          "label": "Grant Holmes moins de 4,5 strikeouts",
           "line": 4.5,
-          "pick": "over",
-          "probability": 0.5739,
-          "fair_odds": 1.74,
-          "expected_strikeouts": 4.82,
-          "projected_ip": 5.18,
+          "pick": "under",
+          "probability": 0.5201,
+          "fair_odds": 1.92,
+          "expected_strikeouts": 4.42,
+          "projected_ip": 4.75,
           "inputs": {
             "k9": 8.37,
             "era": 3.95,
-            "whip": 1.33,
+            "whip": 1.37,
             "hand": "R"
           },
           "side": "home"
@@ -364,14 +36,14 @@
           "pitcher": "Grant Holmes",
           "label": "Grant Holmes concède au moins 1 home run",
           "pick": "yes",
-          "probability": 0.6328,
-          "fair_odds": 1.58,
-          "expected_hr_allowed": 1.002,
-          "projected_ip": 5.18,
+          "probability": 0.6008,
+          "fair_odds": 1.66,
+          "expected_hr_allowed": 0.918,
+          "projected_ip": 4.75,
           "inputs": {
             "hr9": 1.74,
             "era": 3.95,
-            "whip": 1.33
+            "whip": 1.37
           },
           "side": "home"
         },
@@ -421,6 +93,42 @@
       "home": "Milwaukee Brewers",
       "away": "San Francisco Giants",
       "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Milwaukee Brewers",
+          "pitcher": "Robert Gasser",
+          "label": "Robert Gasser moins de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "under",
+          "probability": 0.5272,
+          "fair_odds": 1.9,
+          "expected_strikeouts": 3.4,
+          "projected_ip": 4.05,
+          "inputs": {
+            "k9": 7.56,
+            "era": 6.48,
+            "whip": 1.56,
+            "hand": "L"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Milwaukee Brewers",
+          "pitcher": "Robert Gasser",
+          "label": "Robert Gasser ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6151,
+          "fair_odds": 1.63,
+          "expected_hr_allowed": 0.486,
+          "projected_ip": 4.05,
+          "inputs": {
+            "hr9": 1.08,
+            "era": 6.48,
+            "whip": 1.56
+          },
+          "side": "home"
+        },
         {
           "market": "pitcher_strikeouts",
           "team": "San Francisco Giants",
@@ -584,6 +292,42 @@
             "whip": 1.07
           },
           "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Athletics",
+          "pitcher": "J.T. Ginn",
+          "label": "J.T. Ginn moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.5768,
+          "fair_odds": 1.73,
+          "expected_strikeouts": 5.16,
+          "projected_ip": 5.92,
+          "inputs": {
+            "k9": 7.84,
+            "era": 2.87,
+            "whip": 1.14,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Athletics",
+          "pitcher": "J.T. Ginn",
+          "label": "J.T. Ginn ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5496,
+          "fair_odds": 1.82,
+          "expected_hr_allowed": 0.599,
+          "projected_ip": 5.92,
+          "inputs": {
+            "hr9": 0.91,
+            "era": 2.87,
+            "whip": 1.14
+          },
+          "side": "away"
         }
       ]
     },
@@ -971,6 +715,42 @@
       "props": [
         {
           "market": "pitcher_strikeouts",
+          "team": "Milwaukee Brewers",
+          "pitcher": "Coleman Crow",
+          "label": "Coleman Crow plus de 2,5 strikeouts",
+          "line": 2.5,
+          "pick": "over",
+          "probability": 0.5383,
+          "fair_odds": 1.86,
+          "expected_strikeouts": 2.62,
+          "projected_ip": 4.7,
+          "inputs": {
+            "k9": 5.02,
+            "era": 3.14,
+            "whip": 0.98,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Milwaukee Brewers",
+          "pitcher": "Coleman Crow",
+          "label": "Coleman Crow ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.7196,
+          "fair_odds": 1.39,
+          "expected_hr_allowed": 0.329,
+          "projected_ip": 4.7,
+          "inputs": {
+            "hr9": 0.63,
+            "era": 3.14,
+            "whip": 0.98
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
           "team": "San Francisco Giants",
           "pitcher": "Adrian Houser",
           "label": "Adrian Houser moins de 3,5 strikeouts",
@@ -1054,7 +834,7 @@
       ]
     }
   ],
-  "props": 50,
+  "props": 40,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
