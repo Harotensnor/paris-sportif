@@ -1,15 +1,34 @@
 {
-  "generated_at": "2026-06-03T14:23:30Z",
+  "generated_at": "2026-06-03T18:35:18Z",
   "source": "data.js event.smart_money derived from odds_history",
-  "status": "watch",
+  "status": "ok",
   "summary": {
-    "active": 0,
-    "expired_sample": 2,
+    "active": 1,
+    "expired_sample": 3,
     "by_type": {
-      "balanced_steam": 2
+      "balanced_steam": 2,
+      "favorite_steam": 1,
+      "underdog_steam": 1
     }
   },
-  "active": [],
+  "active": [
+    {
+      "event_id": "401856959",
+      "kickoff": "2026-06-03T23:30Z",
+      "sport": "basketball",
+      "league": "wnba",
+      "match": "Toronto Tempo at New York Liberty",
+      "side": "away",
+      "pick_key": "2",
+      "type": "underdog_steam",
+      "reason": "Cote outsider compressee de 12.5%",
+      "odd_open": 4.4,
+      "odd_latest": 3.85,
+      "odd_drop_pct": 12.5,
+      "confidence": 0.932,
+      "snapshots": 5
+    }
+  ],
   "expired_sample": [
     {
       "event_id": "401815581",
@@ -41,6 +60,22 @@
       "odd_latest": 2.19,
       "odd_drop_pct": 9.13,
       "confidence": 0.886,
+      "snapshots": 7
+    },
+    {
+      "event_id": "401815599",
+      "kickoff": "2026-06-02T23:40Z",
+      "sport": "baseball",
+      "league": "mlb",
+      "match": "San Francisco Giants at Milwaukee Brewers",
+      "side": "home",
+      "pick_key": "1",
+      "type": "favorite_steam",
+      "reason": "Favori confirme par mouvement de cote 9.5%",
+      "odd_open": 1.518,
+      "odd_latest": 1.375,
+      "odd_drop_pct": 9.46,
+      "confidence": 0.895,
       "snapshots": 7
     }
   ]
