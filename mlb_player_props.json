@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-03T08:55:48Z",
+  "generated_at": "2026-06-03T13:17:10Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -588,18 +588,18 @@
         {
           "market": "pitcher_strikeouts",
           "team": "Cincinnati Reds",
-          "pitcher": "Chris Paddack",
-          "label": "Chris Paddack moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.5172,
-          "fair_odds": 1.93,
-          "expected_strikeouts": 4.43,
-          "projected_ip": 5.03,
+          "pitcher": "Chase Burns",
+          "label": "Chase Burns plus de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "over",
+          "probability": 0.504,
+          "fair_odds": 1.98,
+          "expected_strikeouts": 6.52,
+          "projected_ip": 5.83,
           "inputs": {
-            "k9": 7.92,
-            "era": 7.63,
-            "whip": 1.66,
+            "k9": 10.07,
+            "era": 1.96,
+            "whip": 0.96,
             "hand": "R"
           },
           "side": "home"
@@ -607,17 +607,17 @@
         {
           "market": "pitcher_home_run_allowed",
           "team": "Cincinnati Reds",
-          "pitcher": "Chris Paddack",
-          "label": "Chris Paddack concède au moins 1 home run",
+          "pitcher": "Chase Burns",
+          "label": "Chase Burns concède au moins 1 home run",
           "pick": "yes",
-          "probability": 0.6263,
-          "fair_odds": 1.6,
-          "expected_hr_allowed": 0.984,
-          "projected_ip": 5.03,
+          "probability": 0.5158,
+          "fair_odds": 1.94,
+          "expected_hr_allowed": 0.725,
+          "projected_ip": 5.83,
           "inputs": {
-            "hr9": 1.76,
-            "era": 7.63,
-            "whip": 1.66
+            "hr9": 1.12,
+            "era": 1.96,
+            "whip": 0.96
           },
           "side": "home"
         },
@@ -1122,6 +1122,42 @@
             "whip": 0.85
           },
           "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "San Diego Padres",
+          "pitcher": "Lucas Giolito",
+          "label": "Lucas Giolito moins de 2,5 strikeouts",
+          "line": 2.5,
+          "pick": "under",
+          "probability": 0.6915,
+          "fair_odds": 1.45,
+          "expected_strikeouts": 1.92,
+          "projected_ip": 4.07,
+          "inputs": {
+            "k9": 4.26,
+            "era": 4.97,
+            "whip": 1.74,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "San Diego Padres",
+          "pitcher": "Lucas Giolito",
+          "label": "Lucas Giolito ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5264,
+          "fair_odds": 1.9,
+          "expected_hr_allowed": 0.642,
+          "projected_ip": 4.07,
+          "inputs": {
+            "hr9": 1.42,
+            "era": 4.97,
+            "whip": 1.74
+          },
+          "side": "away"
         }
       ]
     },
@@ -1346,7 +1382,7 @@
       ]
     }
   ],
-  "props": 64,
+  "props": 66,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
