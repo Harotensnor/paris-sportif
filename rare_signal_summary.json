@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-06-04T08:10:46Z",
+  "generated_at": "2026-06-04T11:26:58Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 18,
+    "active_events": 21,
     "actionable": 10,
     "watch": 5,
-    "risk": 3,
+    "risk": 6,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 11,
       "travel_extreme": 6,
       "back_to_back_travel": 7,
-      "market_uncertain": 2,
-      "signal_conflict": 1
+      "market_uncertain": 4,
+      "signal_conflict": 2
     },
     "by_quality": {
       "actionable": 10,
       "watch": 5,
-      "risk": 3
+      "risk": 6
     }
   },
   "active_actionable": [
@@ -334,6 +334,42 @@
       "context": "marge bookmaker anormale 19.8%"
     },
     {
+      "event_id": "401874276",
+      "date": "2026-06-07T19:00Z",
+      "sport": "football",
+      "league_code": "laliga2",
+      "league_name": "La Liga 2",
+      "home": "Las Palmas",
+      "away": "Málaga",
+      "match": "Las Palmas - Málaga",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.3%"
+    },
+    {
+      "event_id": "401874277",
+      "date": "2026-06-10T19:00Z",
+      "sport": "football",
+      "league_code": "laliga2",
+      "league_name": "La Liga 2",
+      "home": "Málaga",
+      "away": "Las Palmas",
+      "match": "Málaga - Las Palmas",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.3%"
+    },
+    {
       "event_id": "401815667",
       "date": "2026-06-07T18:10Z",
       "sport": "baseball",
@@ -350,6 +386,24 @@
       "side": null,
       "strength": 0.45,
       "context": "Signaux opposes: Minnesota Twins fade 0.60, Kansas City Royals fade 0.60 -> prudence"
+    },
+    {
+      "event_id": "401859966",
+      "date": "2026-06-11T00:30Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "New York Knicks",
+      "away": "San Antonio Spurs",
+      "match": "New York Knicks - San Antonio Spurs",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "signal_conflict",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.45,
+      "context": "Signaux opposes: New York Knicks fade 0.60, San Antonio Spurs fade 0.60 -> prudence"
     }
   ],
   "expired_sample": []

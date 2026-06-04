@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-06-04T08:10:46Z",
+  "generated_at": "2026-06-04T11:26:58Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 17,
+    "active_events": 20,
     "expired_sample": 0,
     "by_type": {
       "travel_extreme": 7,
       "back_to_back_travel": 7,
-      "lookahead": 20,
-      "schedule_congestion": 12
+      "lookahead": 24,
+      "schedule_congestion": 14
     },
     "by_decision": {
-      "abstain": 9,
+      "abstain": 12,
       "lean_home": 8
     },
     "lean_home": 8,
     "lean_away": 0,
-    "abstain": 9,
+    "abstain": 12,
     "monitor": 0
   },
   "active": [
@@ -383,6 +383,110 @@
       }
     },
     {
+      "event_id": "401859966",
+      "source_event_ids": [
+        "401859966"
+      ],
+      "kickoff": "2026-06-11T00:30Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "New York Knicks",
+      "away": "San Antonio Spurs",
+      "match": "New York Knicks - San Antonio Spurs",
+      "decision": "abstain",
+      "net_team": null,
+      "reason": "Fatigue/agenda des deux cotes: New York Knicks 0.60, San Antonio Spurs 0.60",
+      "pressure_score": 1.2,
+      "home_fade": 0.6,
+      "away_fade": 0.6,
+      "travel_score": 0,
+      "lookahead_score": 0,
+      "congestion_score": 1.2,
+      "types": {
+        "schedule_congestion": 2
+      },
+      "contexts": [
+        "3 matchs sur les 7 derniers jours",
+        "3 matchs sur les 7 derniers jours"
+      ],
+      "global_resolution": {
+        "status": "abstain",
+        "net_side": null,
+        "home_score": -0.39,
+        "away_score": -0.39,
+        "home_fade": 0.6,
+        "away_fade": 0.6,
+        "reason": "Signaux opposes: New York Knicks fade 0.60, San Antonio Spurs fade 0.60 -> prudence",
+        "detail": [
+          {
+            "side": "home",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "away",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401859964",
+      "source_event_ids": [
+        "401859964"
+      ],
+      "kickoff": "2026-06-06T00:30Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "San Antonio Spurs",
+      "away": "New York Knicks",
+      "match": "San Antonio Spurs - New York Knicks",
+      "decision": "abstain",
+      "net_team": null,
+      "reason": "Fatigue/agenda des deux cotes: San Antonio Spurs 0.15, New York Knicks 0.15",
+      "pressure_score": 0.667,
+      "home_fade": 0.15,
+      "away_fade": 0.15,
+      "travel_score": 0,
+      "lookahead_score": 0.667,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 2
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours",
+        "1 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "away",
+        "home_score": -0.098,
+        "away_score": -0.098,
+        "home_fade": 0.15,
+        "away_fade": 0.15,
+        "reason": "Direction nette: New York Knicks (-0.10)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          }
+        ]
+      }
+    },
+    {
       "event_id": "401815652",
       "source_event_ids": [
         "401815652"
@@ -522,6 +626,58 @@
         "home_fade": 0.15,
         "away_fade": 0.15,
         "reason": "Direction nette: Málaga (-0.10)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401859965",
+      "source_event_ids": [
+        "401859965"
+      ],
+      "kickoff": "2026-06-09T00:30Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "New York Knicks",
+      "away": "San Antonio Spurs",
+      "match": "New York Knicks - San Antonio Spurs",
+      "decision": "abstain",
+      "net_team": null,
+      "reason": "Fatigue/agenda des deux cotes: New York Knicks 0.15, San Antonio Spurs 0.15",
+      "pressure_score": 0.667,
+      "home_fade": 0.15,
+      "away_fade": 0.15,
+      "travel_score": 0,
+      "lookahead_score": 0.667,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 2
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours",
+        "1 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "away",
+        "home_score": -0.098,
+        "away_score": -0.098,
+        "home_fade": 0.15,
+        "away_fade": 0.15,
+        "reason": "Direction nette: San Antonio Spurs (-0.10)",
         "detail": [
           {
             "side": "home",
