@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-06-04T02:03:15Z",
+  "generated_at": "2026-06-04T03:45:39Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 21,
-    "actionable": 9,
+    "active_events": 18,
+    "actionable": 10,
     "watch": 5,
-    "risk": 7,
+    "risk": 3,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 10,
+      "injury_imbalance": 11,
       "travel_extreme": 6,
       "back_to_back_travel": 7,
-      "market_uncertain": 6,
+      "market_uncertain": 2,
       "signal_conflict": 1
     },
     "by_quality": {
-      "actionable": 9,
+      "actionable": 10,
       "watch": 5,
-      "risk": 7
+      "risk": 3
     }
   },
   "active_actionable": [
@@ -130,6 +130,24 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 10-15"
+    },
+    {
+      "event_id": "401856963",
+      "date": "2026-06-05T23:30Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Chicago Sky",
+      "away": "Connecticut Sun",
+      "match": "Chicago Sky - Connecticut Sun",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Chicago Sky",
+      "side": null,
+      "strength": 1.0,
+      "context": "Absences severes 5-0"
     },
     {
       "event_id": "401874173",
@@ -280,78 +298,6 @@
   ],
   "active_risk": [
     {
-      "event_id": "401873673",
-      "date": "2026-06-06T05:00Z",
-      "sport": "football",
-      "league_code": "jleague",
-      "league_name": "J-League",
-      "home": "JEF United Ichihara-Chiba",
-      "away": "Avispa Fukuoka",
-      "match": "JEF United Ichihara-Chiba - Avispa Fukuoka",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.4%"
-    },
-    {
-      "event_id": "401873694",
-      "date": "2026-06-06T05:00Z",
-      "sport": "football",
-      "league_code": "jleague",
-      "league_name": "J-League",
-      "home": "Kashima Antlers",
-      "away": "Vissel Kobe",
-      "match": "Kashima Antlers - Vissel Kobe",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.3%"
-    },
-    {
-      "event_id": "401873695",
-      "date": "2026-06-06T06:00Z",
-      "sport": "football",
-      "league_code": "jleague",
-      "league_name": "J-League",
-      "home": "Machida Zelvia",
-      "away": "Nagoya Grampus",
-      "match": "Machida Zelvia - Nagoya Grampus",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.8%"
-    },
-    {
-      "event_id": "401873696",
-      "date": "2026-06-06T06:00Z",
-      "sport": "football",
-      "league_code": "jleague",
-      "league_name": "J-League",
-      "home": "Mito Hollyhock",
-      "away": "V-Varen Nagasaki",
-      "match": "Mito Hollyhock - V-Varen Nagasaki",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.9%"
-    },
-    {
       "event_id": "401873698",
       "date": "2026-06-06T07:00Z",
       "sport": "football",
@@ -388,14 +334,14 @@
       "context": "marge bookmaker anormale 19.8%"
     },
     {
-      "event_id": "401859966",
-      "date": "2026-06-11T00:30Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "New York Knicks",
-      "away": "San Antonio Spurs",
-      "match": "New York Knicks - San Antonio Spurs",
+      "event_id": "401815667",
+      "date": "2026-06-07T18:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Minnesota Twins",
+      "away": "Kansas City Royals",
+      "match": "Minnesota Twins - Kansas City Royals",
       "quality": "risk",
       "quality_reason": "Signal de prudence, pas une opportunite directe",
       "type": "signal_conflict",
@@ -403,7 +349,7 @@
       "team": null,
       "side": null,
       "strength": 0.45,
-      "context": "Signaux opposes: New York Knicks fade 0.60, San Antonio Spurs fade 0.60 -> prudence"
+      "context": "Signaux opposes: Minnesota Twins fade 0.60, Kansas City Royals fade 0.60 -> prudence"
     }
   ],
   "expired_sample": []

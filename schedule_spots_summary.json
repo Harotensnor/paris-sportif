@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-06-04T02:03:15Z",
+  "generated_at": "2026-06-04T03:45:39Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 16,
+    "active_events": 17,
     "expired_sample": 0,
     "by_type": {
       "travel_extreme": 7,
       "back_to_back_travel": 7,
-      "lookahead": 18,
+      "lookahead": 20,
       "schedule_congestion": 12
     },
     "by_decision": {
-      "abstain": 8,
+      "abstain": 9,
       "lean_home": 8
     },
     "lean_home": 8,
     "lean_away": 0,
-    "abstain": 8,
+    "abstain": 9,
     "monitor": 0
   },
   "active": [
@@ -169,6 +169,58 @@
       }
     },
     {
+      "event_id": "401815624",
+      "source_event_ids": [
+        "401815624"
+      ],
+      "kickoff": "2026-06-04T23:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Minnesota Twins",
+      "away": "Kansas City Royals",
+      "match": "Minnesota Twins - Kansas City Royals",
+      "decision": "abstain",
+      "net_team": null,
+      "reason": "Fatigue/agenda des deux cotes: Minnesota Twins 0.36, Kansas City Royals 0.36",
+      "pressure_score": 1.6,
+      "home_fade": 0.36,
+      "away_fade": 0.36,
+      "travel_score": 0,
+      "lookahead_score": 1.6,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 2
+      },
+      "contexts": [
+        "3 match important/proche dans les 3 jours",
+        "3 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "away",
+        "home_score": -0.234,
+        "away_score": -0.234,
+        "home_fade": 0.36,
+        "away_fade": 0.36,
+        "reason": "Direction nette: Kansas City Royals (-0.23)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.36
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.36
+          }
+        ]
+      }
+    },
+    {
       "event_id": "401815700",
       "source_event_ids": [
         "401815700"
@@ -227,20 +279,72 @@
       }
     },
     {
-      "event_id": "401859966",
+      "event_id": "401815637",
       "source_event_ids": [
-        "401859966"
+        "401815637"
       ],
-      "kickoff": "2026-06-11T00:30Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "New York Knicks",
-      "away": "San Antonio Spurs",
-      "match": "New York Knicks - San Antonio Spurs",
+      "kickoff": "2026-06-06T00:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Minnesota Twins",
+      "away": "Kansas City Royals",
+      "match": "Minnesota Twins - Kansas City Royals",
       "decision": "abstain",
       "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: New York Knicks 0.60, San Antonio Spurs 0.60",
+      "reason": "Fatigue/agenda des deux cotes: Minnesota Twins 0.30, Kansas City Royals 0.30",
+      "pressure_score": 1.333,
+      "home_fade": 0.3,
+      "away_fade": 0.3,
+      "travel_score": 0,
+      "lookahead_score": 1.333,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 2
+      },
+      "contexts": [
+        "2 match important/proche dans les 3 jours",
+        "2 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "away",
+        "home_score": -0.195,
+        "away_score": -0.195,
+        "home_fade": 0.3,
+        "away_fade": 0.3,
+        "reason": "Direction nette: Kansas City Royals (-0.20)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.3
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.3
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815667",
+      "source_event_ids": [
+        "401815667"
+      ],
+      "kickoff": "2026-06-07T18:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Minnesota Twins",
+      "away": "Kansas City Royals",
+      "match": "Minnesota Twins - Kansas City Royals",
+      "decision": "abstain",
+      "net_team": null,
+      "reason": "Fatigue/agenda des deux cotes: Minnesota Twins 0.60, Kansas City Royals 0.60",
       "pressure_score": 1.2,
       "home_fade": 0.6,
       "away_fade": 0.6,
@@ -261,7 +365,7 @@
         "away_score": -0.39,
         "home_fade": 0.6,
         "away_fade": 0.6,
-        "reason": "Signaux opposes: New York Knicks fade 0.60, San Antonio Spurs fade 0.60 -> prudence",
+        "reason": "Signaux opposes: Minnesota Twins fade 0.60, Kansas City Royals fade 0.60 -> prudence",
         "detail": [
           {
             "side": "home",
@@ -279,20 +383,20 @@
       }
     },
     {
-      "event_id": "401859964",
+      "event_id": "401815652",
       "source_event_ids": [
-        "401859964"
+        "401815652"
       ],
-      "kickoff": "2026-06-06T00:30Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "San Antonio Spurs",
-      "away": "New York Knicks",
-      "match": "San Antonio Spurs - New York Knicks",
+      "kickoff": "2026-06-06T18:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Minnesota Twins",
+      "away": "Kansas City Royals",
+      "match": "Minnesota Twins - Kansas City Royals",
       "decision": "abstain",
       "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: San Antonio Spurs 0.15, New York Knicks 0.15",
+      "reason": "Fatigue/agenda des deux cotes: Minnesota Twins 0.15, Kansas City Royals 0.15",
       "pressure_score": 0.667,
       "home_fade": 0.15,
       "away_fade": 0.15,
@@ -313,7 +417,7 @@
         "away_score": -0.098,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: New York Knicks (-0.10)",
+        "reason": "Direction nette: Kansas City Royals (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -418,58 +522,6 @@
         "home_fade": 0.15,
         "away_fade": 0.15,
         "reason": "Direction nette: Málaga (-0.10)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401859965",
-      "source_event_ids": [
-        "401859965"
-      ],
-      "kickoff": "2026-06-09T00:30Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "New York Knicks",
-      "away": "San Antonio Spurs",
-      "match": "New York Knicks - San Antonio Spurs",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: New York Knicks 0.15, San Antonio Spurs 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
-        "home_fade": 0.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: San Antonio Spurs (-0.10)",
         "detail": [
           {
             "side": "home",
