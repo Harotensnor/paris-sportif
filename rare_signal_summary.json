@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-06-05T12:33:02Z",
+  "generated_at": "2026-06-05T15:36:59Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 48,
-    "actionable": 42,
+    "actionable": 43,
     "watch": 1,
-    "risk": 5,
+    "risk": 4,
     "expired_sample": 0,
     "by_type": {
       "travel_extreme": 16,
       "injury_imbalance": 37,
       "signal_conflict": 10,
       "back_to_back_travel": 16,
-      "market_uncertain": 5
+      "market_uncertain": 2
     },
     "by_quality": {
-      "actionable": 42,
+      "actionable": 43,
       "watch": 1,
-      "risk": 5
+      "risk": 4
     }
   },
   "active_actionable": [
@@ -129,7 +129,7 @@
       "team": "Texas Rangers",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 11-2"
+      "context": "Absences severes 10-2"
     },
     {
       "event_id": "401815639",
@@ -309,7 +309,7 @@
       "team": "Texas Rangers",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 11-2"
+      "context": "Absences severes 10-2"
     },
     {
       "event_id": "401874173",
@@ -489,7 +489,7 @@
       "team": "Texas Rangers",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 11-2"
+      "context": "Absences severes 10-2"
     },
     {
       "event_id": "401815669",
@@ -744,6 +744,24 @@
       "context": "Absences severes 11-7"
     },
     {
+      "event_id": "401874174",
+      "date": "2026-06-10T00:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Vegas Golden Knights",
+      "away": "Carolina Hurricanes",
+      "match": "Vegas Golden Knights - Carolina Hurricanes",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "travel_extreme",
+      "direction": "fade",
+      "team": "Carolina Hurricanes",
+      "side": "away",
+      "strength": 0.759,
+      "context": "Deplacement estime 3262 km, decalage ~2.4h"
+    },
+    {
       "event_id": "401815638",
       "date": "2026-06-05T18:20Z",
       "sport": "baseball",
@@ -810,24 +828,6 @@
       "home": "Las Palmas",
       "away": "Málaga",
       "match": "Las Palmas - Málaga",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.3%"
-    },
-    {
-      "event_id": "401874174",
-      "date": "2026-06-10T00:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Vegas Golden Knights",
-      "away": "Carolina Hurricanes",
-      "match": "Vegas Golden Knights - Carolina Hurricanes",
       "quality": "risk",
       "quality_reason": "Signal de prudence, pas une opportunite directe",
       "type": "market_uncertain",
