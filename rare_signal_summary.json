@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-06-05T19:20:45Z",
+  "generated_at": "2026-06-05T21:00:04Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 46,
-    "actionable": 42,
-    "watch": 0,
+    "actionable": 39,
+    "watch": 3,
     "risk": 4,
     "expired_sample": 0,
     "by_type": {
@@ -17,7 +17,8 @@
       "market_uncertain": 2
     },
     "by_quality": {
-      "actionable": 42,
+      "actionable": 39,
+      "watch": 3,
       "risk": 4
     }
   },
@@ -128,7 +129,7 @@
       "team": "Texas Rangers",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 10-2"
+      "context": "Absences severes 9-2"
     },
     {
       "event_id": "401815639",
@@ -308,7 +309,7 @@
       "team": "Texas Rangers",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 10-2"
+      "context": "Absences severes 9-2"
     },
     {
       "event_id": "401874173",
@@ -488,7 +489,7 @@
       "team": "Texas Rangers",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 10-2"
+      "context": "Absences severes 9-2"
     },
     {
       "event_id": "401815669",
@@ -635,24 +636,6 @@
       "context": "Absences severes 14-10"
     },
     {
-      "event_id": "401815634",
-      "date": "2026-06-06T00:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Houston Astros",
-      "away": "Athletics",
-      "match": "Houston Astros - Athletics",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Houston Astros",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 11-7"
-    },
-    {
       "event_id": "401815642",
       "date": "2026-06-06T01:40Z",
       "sport": "baseball",
@@ -689,24 +672,6 @@
       "context": "Absences severes 14-10"
     },
     {
-      "event_id": "401815649",
-      "date": "2026-06-06T20:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Houston Astros",
-      "away": "Athletics",
-      "match": "Houston Astros - Athletics",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Houston Astros",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 11-7"
-    },
-    {
       "event_id": "401815658",
       "date": "2026-06-07T17:37Z",
       "sport": "baseball",
@@ -723,24 +688,6 @@
       "side": null,
       "strength": 0.8,
       "context": "Absences severes 14-10"
-    },
-    {
-      "event_id": "401815664",
-      "date": "2026-06-07T18:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Houston Astros",
-      "away": "Athletics",
-      "match": "Houston Astros - Athletics",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Houston Astros",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 11-7"
     },
     {
       "event_id": "401874174",
@@ -779,7 +726,62 @@
       "context": "Deplacement estime 2980 km, decalage ~2.3h"
     }
   ],
-  "active_watch": [],
+  "active_watch": [
+    {
+      "event_id": "401815634",
+      "date": "2026-06-06T00:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Houston Astros",
+      "away": "Athletics",
+      "match": "Houston Astros - Athletics",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Houston Astros",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 10-7"
+    },
+    {
+      "event_id": "401815649",
+      "date": "2026-06-06T20:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Houston Astros",
+      "away": "Athletics",
+      "match": "Houston Astros - Athletics",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Houston Astros",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 10-7"
+    },
+    {
+      "event_id": "401815664",
+      "date": "2026-06-07T18:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Houston Astros",
+      "away": "Athletics",
+      "match": "Houston Astros - Athletics",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Houston Astros",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 10-7"
+    }
+  ],
   "active_risk": [
     {
       "event_id": "401874276",
