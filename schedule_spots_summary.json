@@ -1,22 +1,22 @@
 {
-  "generated_at": "2026-06-06T16:45:42Z",
+  "generated_at": "2026-06-06T17:51:15Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 32,
+    "active_events": 31,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 44,
-      "travel_extreme": 13,
-      "back_to_back_travel": 17,
+      "lookahead": 42,
+      "travel_extreme": 12,
+      "back_to_back_travel": 16,
       "schedule_congestion": 4
     },
     "by_decision": {
       "abstain": 13,
-      "lean_home": 19
+      "lean_home": 18
     },
-    "lean_home": 19,
+    "lean_home": 18,
     "lean_away": 0,
     "abstain": 13,
     "monitor": 0
@@ -1014,80 +1014,6 @@
             "type": "travel_extreme",
             "direction": "fade",
             "strength": 0.741
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815647",
-      "source_event_ids": [
-        "401815647"
-      ],
-      "kickoff": "2026-06-06T17:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Detroit Tigers",
-      "away": "Seattle Mariners",
-      "match": "Detroit Tigers - Seattle Mariners",
-      "decision": "lean_home",
-      "net_team": "Detroit Tigers",
-      "reason": "Seattle Mariners plus penalise par calendrier/voyage (1.87 vs 0.15)",
-      "pressure_score": 2.39,
-      "home_fade": 0.15,
-      "away_fade": 1.873,
-      "travel_score": 1.723,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2,
-        "travel_extreme": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours",
-        "Deplacement estime 3111 km, decalage ~2.6h",
-        "1 match dans les 48h + 3111 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.494,
-        "away_score": -1.471,
-        "home_fade": 1.15,
-        "away_fade": 1.873,
-        "reason": "Direction nette: Detroit Tigers (-0.49)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.723
           },
           {
             "side": "away",
