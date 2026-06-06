@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-06T11:16:20Z",
+  "generated_at": "2026-06-06T12:20:12Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -424,36 +424,36 @@
         {
           "market": "pitcher_strikeouts",
           "team": "Chicago White Sox",
-          "pitcher": "Sean Burke",
-          "label": "Sean Burke plus de 5,5 strikeouts",
-          "line": 5.5,
+          "pitcher": "Brandon Eisert",
+          "label": "Brandon Eisert plus de 6,5 strikeouts",
+          "line": 6.5,
           "pick": "over",
-          "probability": 0.5997,
-          "fair_odds": 1.67,
-          "expected_strikeouts": 5.98,
-          "projected_ip": 6.51,
+          "probability": 0.5541,
+          "fair_odds": 1.8,
+          "expected_strikeouts": 6.78,
+          "projected_ip": 6.6,
           "inputs": {
-            "k9": 8.27,
-            "era": 3.72,
-            "whip": 1.13,
-            "hand": "R"
+            "k9": 9.24,
+            "era": 3.55,
+            "whip": 1.26,
+            "hand": "L"
           },
           "side": "away"
         },
         {
           "market": "pitcher_home_run_allowed",
           "team": "Chicago White Sox",
-          "pitcher": "Sean Burke",
-          "label": "Sean Burke ne concède pas de home run",
+          "pitcher": "Brandon Eisert",
+          "label": "Brandon Eisert ne concède pas de home run",
           "pick": "no",
-          "probability": 0.6071,
-          "fair_odds": 1.65,
-          "expected_hr_allowed": 0.499,
-          "projected_ip": 6.51,
+          "probability": 0.5941,
+          "fair_odds": 1.68,
+          "expected_hr_allowed": 0.521,
+          "projected_ip": 6.6,
           "inputs": {
-            "hr9": 0.69,
-            "era": 3.72,
-            "whip": 1.13
+            "hr9": 0.71,
+            "era": 3.55,
+            "whip": 1.26
           },
           "side": "away"
         }
@@ -549,6 +549,42 @@
       "home": "Miami Marlins",
       "away": "Tampa Bay Rays",
       "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Miami Marlins",
+          "pitcher": "Lake Bachar",
+          "label": "Lake Bachar moins de 7,5 strikeouts",
+          "line": 7.5,
+          "pick": "under",
+          "probability": 0.5245,
+          "fair_odds": 1.91,
+          "expected_strikeouts": 7.37,
+          "projected_ip": 6.6,
+          "inputs": {
+            "k9": 10.05,
+            "era": 3.45,
+            "whip": 0.96,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Miami Marlins",
+          "pitcher": "Lake Bachar",
+          "label": "Lake Bachar concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.6522,
+          "fair_odds": 1.53,
+          "expected_hr_allowed": 1.056,
+          "projected_ip": 6.6,
+          "inputs": {
+            "hr9": 1.44,
+            "era": 3.45,
+            "whip": 0.96
+          },
+          "side": "home"
+        },
         {
           "market": "pitcher_strikeouts",
           "team": "Tampa Bay Rays",
@@ -2202,7 +2238,7 @@
       ]
     }
   ],
-  "props": 106,
+  "props": 108,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
