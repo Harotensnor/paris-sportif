@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-06-06T18:58:06Z",
+  "generated_at": "2026-06-06T20:07:10Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815643",
-      "kickoff": "2026-06-06T19:07Z",
-      "league": "MLB",
-      "match": "Baltimore Orioles at Toronto Blue Jays",
-      "home": "Toronto Blue Jays",
-      "away": "Baltimore Orioles",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Toronto Blue Jays",
-          "pitcher": "Braydon Fisher",
-          "label": "Braydon Fisher plus de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "over",
-          "probability": 0.5442,
-          "fair_odds": 1.84,
-          "expected_strikeouts": 6.72,
-          "projected_ip": 6.6,
-          "inputs": {
-            "k9": 9.17,
-            "era": 2.62,
-            "whip": 0.93,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Toronto Blue Jays",
-          "pitcher": "Braydon Fisher",
-          "label": "Braydon Fisher ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5603,
-          "fair_odds": 1.78,
-          "expected_hr_allowed": 0.579,
-          "projected_ip": 6.6,
-          "inputs": {
-            "hr9": 0.79,
-            "era": 2.62,
-            "whip": 0.93
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Baltimore Orioles",
-          "pitcher": "Kyle Bradish",
-          "label": "Kyle Bradish moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.5231,
-          "fair_odds": 1.91,
-          "expected_strikeouts": 5.39,
-          "projected_ip": 5.42,
-          "inputs": {
-            "k9": 8.95,
-            "era": 3.44,
-            "whip": 1.42,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Baltimore Orioles",
-          "pitcher": "Kyle Bradish",
-          "label": "Kyle Bradish ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5606,
-          "fair_odds": 1.78,
-          "expected_hr_allowed": 0.579,
-          "projected_ip": 5.42,
-          "inputs": {
-            "hr9": 0.96,
-            "era": 3.44,
-            "whip": 1.42
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815645",
       "kickoff": "2026-06-06T20:05Z",
@@ -1946,7 +1864,7 @@
       ]
     }
   ],
-  "props": 94,
+  "props": 90,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
