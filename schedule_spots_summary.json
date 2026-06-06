@@ -1,311 +1,27 @@
 {
-  "generated_at": "2026-06-05T23:39:14Z",
+  "generated_at": "2026-06-06T01:34:03Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 40,
+    "active_events": 35,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 58,
-      "travel_extreme": 14,
-      "back_to_back_travel": 16,
-      "schedule_congestion": 6
+      "lookahead": 50,
+      "travel_extreme": 15,
+      "back_to_back_travel": 17,
+      "schedule_congestion": 4
     },
     "by_decision": {
-      "abstain": 20,
-      "lean_home": 20
+      "abstain": 14,
+      "lean_home": 21
     },
-    "lean_home": 20,
+    "lean_home": 21,
     "lean_away": 0,
-    "abstain": 20,
+    "abstain": 14,
     "monitor": 0
   },
   "active": [
-    {
-      "event_id": "401815634",
-      "source_event_ids": [
-        "401815634"
-      ],
-      "kickoff": "2026-06-06T00:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Houston Astros",
-      "away": "Athletics",
-      "match": "Houston Astros - Athletics",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Houston Astros 0.30, Athletics 0.30",
-      "pressure_score": 1.333,
-      "home_fade": 0.3,
-      "away_fade": 0.3,
-      "travel_score": 0,
-      "lookahead_score": 1.333,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "2 match important/proche dans les 3 jours",
-        "2 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.795,
-        "away_score": 0.015,
-        "home_fade": 0.9,
-        "away_fade": 0.3,
-        "reason": "Direction nette: Athletics (+0.01)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.6
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815635",
-      "source_event_ids": [
-        "401815635"
-      ],
-      "kickoff": "2026-06-06T00:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "St. Louis Cardinals",
-      "away": "Cincinnati Reds",
-      "match": "St. Louis Cardinals - Cincinnati Reds",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: St. Louis Cardinals 0.30, Cincinnati Reds 0.30",
-      "pressure_score": 1.333,
-      "home_fade": 0.3,
-      "away_fade": 0.3,
-      "travel_score": 0,
-      "lookahead_score": 1.333,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "2 match important/proche dans les 3 jours",
-        "2 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.155,
-        "away_score": -1.195,
-        "home_fade": 0.3,
-        "away_fade": 1.3,
-        "reason": "Direction nette: St. Louis Cardinals (+0.15)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815636",
-      "source_event_ids": [
-        "401815636"
-      ],
-      "kickoff": "2026-06-06T00:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Texas Rangers",
-      "away": "Cleveland Guardians",
-      "match": "Texas Rangers - Cleveland Guardians",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Texas Rangers 0.30, Cleveland Guardians 0.30",
-      "pressure_score": 1.333,
-      "home_fade": 0.3,
-      "away_fade": 0.3,
-      "travel_score": 0,
-      "lookahead_score": 1.333,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "2 match important/proche dans les 3 jours",
-        "2 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -1.195,
-        "away_score": 0.155,
-        "home_fade": 1.3,
-        "away_fade": 0.3,
-        "reason": "Direction nette: Cleveland Guardians (+0.15)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815637",
-      "source_event_ids": [
-        "401815637"
-      ],
-      "kickoff": "2026-06-06T00:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Minnesota Twins",
-      "away": "Kansas City Royals",
-      "match": "Minnesota Twins - Kansas City Royals",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Minnesota Twins 0.30, Kansas City Royals 0.30",
-      "pressure_score": 1.333,
-      "home_fade": 0.3,
-      "away_fade": 0.3,
-      "travel_score": 0,
-      "lookahead_score": 1.333,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "2 match important/proche dans les 3 jours",
-        "2 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.195,
-        "away_score": -0.195,
-        "home_fade": 0.3,
-        "away_fade": 0.3,
-        "reason": "Direction nette: Kansas City Royals (-0.20)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815639",
-      "source_event_ids": [
-        "401815639"
-      ],
-      "kickoff": "2026-06-06T00:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Colorado Rockies",
-      "away": "Milwaukee Brewers",
-      "match": "Colorado Rockies - Milwaukee Brewers",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Colorado Rockies 0.30, Milwaukee Brewers 0.30",
-      "pressure_score": 1.333,
-      "home_fade": 0.3,
-      "away_fade": 0.3,
-      "travel_score": 0,
-      "lookahead_score": 1.333,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "2 match important/proche dans les 3 jours",
-        "2 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.995,
-        "away_score": 0.085,
-        "home_fade": 1.1,
-        "away_fade": 0.3,
-        "reason": "Direction nette: Milwaukee Brewers (+0.09)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.8
-          }
-        ]
-      }
-    },
     {
       "event_id": "401815640",
       "source_event_ids": [
@@ -412,110 +128,6 @@
             "type": "schedule_congestion",
             "direction": "fade",
             "strength": 0.6
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401859966",
-      "source_event_ids": [
-        "401859966"
-      ],
-      "kickoff": "2026-06-11T00:30Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "New York Knicks",
-      "away": "San Antonio Spurs",
-      "match": "New York Knicks - San Antonio Spurs",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: New York Knicks 0.60, San Antonio Spurs 0.60",
-      "pressure_score": 1.2,
-      "home_fade": 0.6,
-      "away_fade": 0.6,
-      "travel_score": 0,
-      "lookahead_score": 0,
-      "congestion_score": 1.2,
-      "types": {
-        "schedule_congestion": 2
-      },
-      "contexts": [
-        "3 matchs sur les 7 derniers jours",
-        "3 matchs sur les 7 derniers jours"
-      ],
-      "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.39,
-        "away_score": -0.39,
-        "home_fade": 0.6,
-        "away_fade": 0.6,
-        "reason": "Signaux opposes: New York Knicks fade 0.60, San Antonio Spurs fade 0.60 -> prudence",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401859964",
-      "source_event_ids": [
-        "401859964"
-      ],
-      "kickoff": "2026-06-06T00:30Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "San Antonio Spurs",
-      "away": "New York Knicks",
-      "match": "San Antonio Spurs - New York Knicks",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: San Antonio Spurs 0.15, New York Knicks 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
-        "home_fade": 0.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: New York Knicks (-0.10)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
           }
         ]
       }
@@ -1088,6 +700,58 @@
         "401859965"
       ],
       "kickoff": "2026-06-09T00:30Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "New York Knicks",
+      "away": "San Antonio Spurs",
+      "match": "New York Knicks - San Antonio Spurs",
+      "decision": "abstain",
+      "net_team": null,
+      "reason": "Fatigue/agenda des deux cotes: New York Knicks 0.15, San Antonio Spurs 0.15",
+      "pressure_score": 0.667,
+      "home_fade": 0.15,
+      "away_fade": 0.15,
+      "travel_score": 0,
+      "lookahead_score": 0.667,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 2
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours",
+        "1 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "away",
+        "home_score": -0.098,
+        "away_score": -0.098,
+        "home_fade": 0.15,
+        "away_fade": 0.15,
+        "reason": "Direction nette: San Antonio Spurs (-0.10)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401859966",
+      "source_event_ids": [
+        "401859966"
+      ],
+      "kickoff": "2026-06-11T00:30Z",
       "sport": "basketball",
       "league_code": "nba",
       "league_name": "NBA",
@@ -1935,6 +1599,65 @@
       }
     },
     {
+      "event_id": "401815746",
+      "source_event_ids": [
+        "401815746"
+      ],
+      "kickoff": "2026-06-14T02:05Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "San Francisco Giants",
+      "away": "Chicago Cubs",
+      "match": "San Francisco Giants - Chicago Cubs",
+      "decision": "lean_home",
+      "net_team": "San Francisco Giants",
+      "reason": "Chicago Cubs plus penalise par calendrier/voyage (1.69 vs 0.00)",
+      "pressure_score": 1.693,
+      "home_fade": 0.0,
+      "away_fade": 1.693,
+      "travel_score": 1.693,
+      "lookahead_score": 0,
+      "congestion_score": 0,
+      "types": {
+        "travel_extreme": 1,
+        "back_to_back_travel": 1
+      },
+      "contexts": [
+        "Deplacement estime 2980 km, decalage ~2.3h",
+        "1 match dans les 48h + 2980 km de voyage"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": -0.007,
+        "away_score": -1.483,
+        "home_fade": 0.6,
+        "away_fade": 1.693,
+        "reason": "Direction nette: San Francisco Giants (-0.01)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "away",
+            "type": "travel_extreme",
+            "direction": "fade",
+            "strength": 0.693
+          },
+          {
+            "side": "away",
+            "type": "back_to_back_travel",
+            "direction": "fade",
+            "strength": 1.0
+          }
+        ]
+      }
+    },
+    {
       "event_id": "401815651",
       "source_event_ids": [
         "401815651"
@@ -2033,11 +1756,11 @@
       "global_resolution": {
         "status": "abstain",
         "net_side": null,
-        "home_score": -0.61,
-        "away_score": -0.64,
-        "home_fade": 0.95,
+        "home_score": -0.81,
+        "away_score": -0.57,
+        "home_fade": 1.15,
         "away_fade": 0.973,
-        "reason": "Signaux opposes: Colorado Rockies fade 0.95, Milwaukee Brewers fade 0.97 -> prudence",
+        "reason": "Signaux opposes: Colorado Rockies fade 1.15, Milwaukee Brewers fade 0.97 -> prudence",
         "detail": [
           {
             "side": "home",
@@ -2055,7 +1778,7 @@
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.8
+            "strength": 1.0
           },
           {
             "side": "away",
@@ -2193,6 +1916,72 @@
       }
     },
     {
+      "event_id": "401815731",
+      "source_event_ids": [
+        "401815731"
+      ],
+      "kickoff": "2026-06-13T02:15Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "San Francisco Giants",
+      "away": "Chicago Cubs",
+      "match": "San Francisco Giants - Chicago Cubs",
+      "decision": "lean_home",
+      "net_team": "San Francisco Giants",
+      "reason": "Chicago Cubs plus penalise par calendrier/voyage (0.84 vs 0.15)",
+      "pressure_score": 1.36,
+      "home_fade": 0.15,
+      "away_fade": 0.843,
+      "travel_score": 0.693,
+      "lookahead_score": 0.667,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 2,
+        "travel_extreme": 1
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours",
+        "1 match important/proche dans les 3 jours",
+        "Deplacement estime 2980 km, decalage ~2.3h"
+      ],
+      "global_resolution": {
+        "status": "abstain",
+        "net_side": null,
+        "home_score": -0.455,
+        "away_score": -0.58,
+        "home_fade": 0.75,
+        "away_fade": 0.843,
+        "reason": "Signaux opposes: San Francisco Giants fade 0.75, Chicago Cubs fade 0.84 -> prudence",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "away",
+            "type": "travel_extreme",
+            "direction": "fade",
+            "strength": 0.693
+          }
+        ]
+      }
+    },
+    {
       "event_id": "401815666",
       "source_event_ids": [
         "401815666"
@@ -2273,17 +2062,17 @@
       "global_resolution": {
         "status": "abstain",
         "net_side": null,
-        "home_score": -0.484,
-        "away_score": -0.623,
-        "home_fade": 0.8,
+        "home_score": -0.684,
+        "away_score": -0.553,
+        "home_fade": 1.0,
         "away_fade": 0.903,
-        "reason": "Signaux opposes: Colorado Rockies fade 0.80, Milwaukee Brewers fade 0.90 -> prudence",
+        "reason": "Signaux opposes: Colorado Rockies fade 1.00, Milwaukee Brewers fade 0.90 -> prudence",
         "detail": [
           {
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.8
+            "strength": 1.0
           },
           {
             "side": "away",
@@ -2341,57 +2130,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.776
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815731",
-      "source_event_ids": [
-        "401815731"
-      ],
-      "kickoff": "2026-06-13T02:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Francisco Giants",
-      "away": "Chicago Cubs",
-      "match": "San Francisco Giants - Chicago Cubs",
-      "decision": "lean_home",
-      "net_team": "San Francisco Giants",
-      "reason": "Chicago Cubs plus penalise par calendrier/voyage (0.69 vs 0.00)",
-      "pressure_score": 0.693,
-      "home_fade": 0.0,
-      "away_fade": 0.693,
-      "travel_score": 0.693,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "travel_extreme": 1
-      },
-      "contexts": [
-        "Deplacement estime 2980 km, decalage ~2.3h"
-      ],
-      "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.357,
-        "away_score": -0.483,
-        "home_fade": 0.6,
-        "away_fade": 0.693,
-        "reason": "Signaux opposes: San Francisco Giants fade 0.60, Chicago Cubs fade 0.69 -> prudence",
-        "detail": [
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.693
           }
         ]
       }

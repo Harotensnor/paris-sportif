@@ -1,382 +1,8 @@
 {
-  "generated_at": "2026-06-05T23:39:13Z",
+  "generated_at": "2026-06-06T01:34:02Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815634",
-      "kickoff": "2026-06-06T00:10Z",
-      "league": "MLB",
-      "match": "Athletics Athletics at Houston Astros",
-      "home": "Houston Astros",
-      "away": "Athletics",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Houston Astros",
-          "pitcher": "Tatsuya Imai",
-          "label": "Tatsuya Imai plus de 3,5 strikeouts",
-          "line": 3.5,
-          "pick": "over",
-          "probability": 0.6183,
-          "fair_odds": 1.62,
-          "expected_strikeouts": 3.97,
-          "projected_ip": 4.16,
-          "inputs": {
-            "k9": 8.59,
-            "era": 5.52,
-            "whip": 1.36,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Houston Astros",
-          "pitcher": "Tatsuya Imai",
-          "label": "Tatsuya Imai concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5067,
-          "fair_odds": 1.97,
-          "expected_hr_allowed": 0.707,
-          "projected_ip": 4.16,
-          "inputs": {
-            "hr9": 1.53,
-            "era": 5.52,
-            "whip": 1.36
-          },
-          "side": "home"
-        }
-      ]
-    },
-    {
-      "event_id": "401815635",
-      "kickoff": "2026-06-06T00:15Z",
-      "league": "MLB",
-      "match": "Cincinnati Reds at St. Louis Cardinals",
-      "home": "St. Louis Cardinals",
-      "away": "Cincinnati Reds",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "St. Louis Cardinals",
-          "pitcher": "Matthew Liberatore",
-          "label": "Matthew Liberatore plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.5579,
-          "fair_odds": 1.79,
-          "expected_strikeouts": 4.75,
-          "projected_ip": 5.17,
-          "inputs": {
-            "k9": 8.27,
-            "era": 4.35,
-            "whip": 1.5,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "St. Louis Cardinals",
-          "pitcher": "Matthew Liberatore",
-          "label": "Matthew Liberatore concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.565,
-          "fair_odds": 1.77,
-          "expected_hr_allowed": 0.832,
-          "projected_ip": 5.17,
-          "inputs": {
-            "hr9": 1.45,
-            "era": 4.35,
-            "whip": 1.5
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Cincinnati Reds",
-          "pitcher": "Nick Lodolo",
-          "label": "Nick Lodolo moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.5423,
-          "fair_odds": 1.84,
-          "expected_strikeouts": 4.33,
-          "projected_ip": 5.44,
-          "inputs": {
-            "k9": 7.16,
-            "era": 5.2,
-            "whip": 1.37,
-            "hand": "L"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Cincinnati Reds",
-          "pitcher": "Nick Lodolo",
-          "label": "Nick Lodolo concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.748,
-          "fair_odds": 1.34,
-          "expected_hr_allowed": 1.378,
-          "projected_ip": 5.44,
-          "inputs": {
-            "hr9": 2.28,
-            "era": 5.2,
-            "whip": 1.37
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401815636",
-      "kickoff": "2026-06-06T00:15Z",
-      "league": "MLB",
-      "match": "Cleveland Guardians at Texas Rangers",
-      "home": "Texas Rangers",
-      "away": "Cleveland Guardians",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Texas Rangers",
-          "pitcher": "Jack Leiter",
-          "label": "Jack Leiter moins de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "under",
-          "probability": 0.5729,
-          "fair_odds": 1.75,
-          "expected_strikeouts": 6.14,
-          "projected_ip": 5.51,
-          "inputs": {
-            "k9": 10.04,
-            "era": 4.34,
-            "whip": 1.33,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Texas Rangers",
-          "pitcher": "Jack Leiter",
-          "label": "Jack Leiter concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5261,
-          "fair_odds": 1.9,
-          "expected_hr_allowed": 0.747,
-          "projected_ip": 5.51,
-          "inputs": {
-            "hr9": 1.22,
-            "era": 4.34,
-            "whip": 1.33
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Cleveland Guardians",
-          "pitcher": "Tanner Bibee",
-          "label": "Tanner Bibee plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.528,
-          "fair_odds": 1.89,
-          "expected_strikeouts": 4.62,
-          "projected_ip": 5.31,
-          "inputs": {
-            "k9": 7.83,
-            "era": 4.57,
-            "whip": 1.3,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Cleveland Guardians",
-          "pitcher": "Tanner Bibee",
-          "label": "Tanner Bibee concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6331,
-          "fair_odds": 1.58,
-          "expected_hr_allowed": 1.003,
-          "projected_ip": 5.31,
-          "inputs": {
-            "hr9": 1.7,
-            "era": 4.57,
-            "whip": 1.3
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401815637",
-      "kickoff": "2026-06-06T00:15Z",
-      "league": "MLB",
-      "match": "Kansas City Royals at Minnesota Twins",
-      "home": "Minnesota Twins",
-      "away": "Kansas City Royals",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Minnesota Twins",
-          "pitcher": "Joe Ryan",
-          "label": "Joe Ryan moins de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "under",
-          "probability": 0.5912,
-          "fair_odds": 1.69,
-          "expected_strikeouts": 6.06,
-          "projected_ip": 5.39,
-          "inputs": {
-            "k9": 10.11,
-            "era": 3.2,
-            "whip": 0.97,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Minnesota Twins",
-          "pitcher": "Joe Ryan",
-          "label": "Joe Ryan ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6304,
-          "fair_odds": 1.59,
-          "expected_hr_allowed": 0.461,
-          "projected_ip": 5.39,
-          "inputs": {
-            "hr9": 0.77,
-            "era": 3.2,
-            "whip": 0.97
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Kansas City Royals",
-          "pitcher": "Luinder Avila",
-          "label": "Luinder Avila moins de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "under",
-          "probability": 0.5484,
-          "fair_odds": 1.82,
-          "expected_strikeouts": 6.26,
-          "projected_ip": 6.6,
-          "inputs": {
-            "k9": 8.54,
-            "era": 4.44,
-            "whip": 1.71,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Kansas City Royals",
-          "pitcher": "Luinder Avila",
-          "label": "Luinder Avila ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6073,
-          "fair_odds": 1.65,
-          "expected_hr_allowed": 0.499,
-          "projected_ip": 6.6,
-          "inputs": {
-            "hr9": 0.68,
-            "era": 4.44,
-            "whip": 1.71
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401815639",
-      "kickoff": "2026-06-06T00:40Z",
-      "league": "MLB",
-      "match": "Milwaukee Brewers at Colorado Rockies",
-      "home": "Colorado Rockies",
-      "away": "Milwaukee Brewers",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Colorado Rockies",
-          "pitcher": "Tanner Gordon",
-          "label": "Tanner Gordon plus de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "over",
-          "probability": 0.5083,
-          "fair_odds": 1.97,
-          "expected_strikeouts": 6.54,
-          "projected_ip": 6.6,
-          "inputs": {
-            "k9": 8.92,
-            "era": 6.37,
-            "whip": 1.56,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Colorado Rockies",
-          "pitcher": "Tanner Gordon",
-          "label": "Tanner Gordon concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6744,
-          "fair_odds": 1.48,
-          "expected_hr_allowed": 1.122,
-          "projected_ip": 6.6,
-          "inputs": {
-            "hr9": 1.53,
-            "era": 6.37,
-            "whip": 1.56
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Milwaukee Brewers",
-          "pitcher": "Jacob Misiorowski",
-          "label": "Jacob Misiorowski plus de 8,5 strikeouts",
-          "line": 8.5,
-          "pick": "over",
-          "probability": 0.5846,
-          "fair_odds": 1.71,
-          "expected_strikeouts": 9.0,
-          "projected_ip": 5.92,
-          "inputs": {
-            "k9": 13.69,
-            "era": 1.65,
-            "whip": 0.79,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Milwaukee Brewers",
-          "pitcher": "Jacob Misiorowski",
-          "label": "Jacob Misiorowski ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.7151,
-          "fair_odds": 1.4,
-          "expected_hr_allowed": 0.335,
-          "projected_ip": 5.92,
-          "inputs": {
-            "hr9": 0.51,
-            "era": 1.65,
-            "whip": 0.79
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815641",
       "kickoff": "2026-06-06T01:40Z",
@@ -584,6 +210,42 @@
             "whip": 1.0
           },
           "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Los Angeles Angels",
+          "pitcher": "Jack Kochanowicz",
+          "label": "Jack Kochanowicz plus de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "over",
+          "probability": 0.5791,
+          "fair_odds": 1.73,
+          "expected_strikeouts": 3.8,
+          "projected_ip": 5.27,
+          "inputs": {
+            "k9": 6.5,
+            "era": 5.23,
+            "whip": 1.48,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Los Angeles Angels",
+          "pitcher": "Jack Kochanowicz",
+          "label": "Jack Kochanowicz ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6081,
+          "fair_odds": 1.64,
+          "expected_hr_allowed": 0.497,
+          "projected_ip": 5.27,
+          "inputs": {
+            "hr9": 0.85,
+            "era": 5.23,
+            "whip": 1.48
+          },
+          "side": "away"
         }
       ]
     },
@@ -1588,6 +1250,42 @@
             "whip": 1.16
           },
           "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Los Angeles Angels",
+          "pitcher": "José Soriano",
+          "label": "José Soriano plus de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "over",
+          "probability": 0.5082,
+          "fair_odds": 1.97,
+          "expected_strikeouts": 6.54,
+          "projected_ip": 5.85,
+          "inputs": {
+            "k9": 10.07,
+            "era": 2.72,
+            "whip": 1.21,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Los Angeles Angels",
+          "pitcher": "José Soriano",
+          "label": "José Soriano ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5832,
+          "fair_odds": 1.71,
+          "expected_hr_allowed": 0.539,
+          "projected_ip": 5.85,
+          "inputs": {
+            "hr9": 0.83,
+            "era": 2.72,
+            "whip": 1.21
+          },
+          "side": "away"
         }
       ]
     },
@@ -1858,8 +1556,8 @@
           "projected_ip": 4.75,
           "inputs": {
             "k9": 8.68,
-            "era": 4.89,
-            "whip": 1.51,
+            "era": 5.05,
+            "whip": 1.53,
             "hand": "R"
           },
           "side": "away"
@@ -1876,8 +1574,8 @@
           "projected_ip": 4.75,
           "inputs": {
             "hr9": 1.26,
-            "era": 4.89,
-            "whip": 1.51
+            "era": 5.05,
+            "whip": 1.53
           },
           "side": "away"
         }
@@ -2664,6 +2362,42 @@
             "whip": 1.16
           },
           "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Los Angeles Angels",
+          "pitcher": "José Soriano",
+          "label": "José Soriano plus de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "over",
+          "probability": 0.5082,
+          "fair_odds": 1.97,
+          "expected_strikeouts": 6.54,
+          "projected_ip": 5.85,
+          "inputs": {
+            "k9": 10.07,
+            "era": 2.72,
+            "whip": 1.21,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Los Angeles Angels",
+          "pitcher": "José Soriano",
+          "label": "José Soriano ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5832,
+          "fair_odds": 1.71,
+          "expected_hr_allowed": 0.539,
+          "projected_ip": 5.85,
+          "inputs": {
+            "hr9": 0.83,
+            "era": 2.72,
+            "whip": 1.21
+          },
+          "side": "away"
         }
       ]
     },
@@ -2714,7 +2448,7 @@
       ]
     }
   ],
-  "props": 130,
+  "props": 118,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
