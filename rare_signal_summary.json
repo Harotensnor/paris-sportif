@@ -1,24 +1,25 @@
 {
-  "generated_at": "2026-06-06T14:13:08Z",
+  "generated_at": "2026-06-06T15:40:23Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 33,
+    "active_events": 34,
     "actionable": 29,
     "watch": 3,
-    "risk": 1,
+    "risk": 2,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 29,
       "travel_extreme": 13,
       "back_to_back_travel": 17,
-      "signal_conflict": 8
+      "signal_conflict": 8,
+      "market_uncertain": 3
     },
     "by_quality": {
       "actionable": 29,
       "watch": 3,
-      "risk": 1
+      "risk": 2
     }
   },
   "active_actionable": [
@@ -602,6 +603,24 @@
     }
   ],
   "active_risk": [
+    {
+      "event_id": "177029",
+      "date": "2026-06-08T04:00Z",
+      "sport": "tennis",
+      "league_code": "bossopen",
+      "league_name": "Boss Open",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 12.1%"
+    },
     {
       "event_id": "401815667",
       "date": "2026-06-07T18:10Z",
