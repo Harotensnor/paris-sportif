@@ -1,85 +1,27 @@
 {
-  "generated_at": "2026-06-06T01:34:03Z",
+  "generated_at": "2026-06-06T02:55:09Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 35,
+    "active_events": 32,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 50,
-      "travel_extreme": 15,
+      "lookahead": 44,
+      "travel_extreme": 13,
       "back_to_back_travel": 17,
       "schedule_congestion": 4
     },
     "by_decision": {
-      "abstain": 14,
-      "lean_home": 21
+      "abstain": 13,
+      "lean_home": 19
     },
-    "lean_home": 21,
+    "lean_home": 19,
     "lean_away": 0,
-    "abstain": 14,
+    "abstain": 13,
     "monitor": 0
   },
   "active": [
-    {
-      "event_id": "401815640",
-      "source_event_ids": [
-        "401815640"
-      ],
-      "kickoff": "2026-06-06T02:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Los Angeles Dodgers",
-      "away": "Los Angeles Angels",
-      "match": "Los Angeles Dodgers - Los Angeles Angels",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Los Angeles Dodgers 0.30, Los Angeles Angels 0.30",
-      "pressure_score": 1.333,
-      "home_fade": 0.3,
-      "away_fade": 0.3,
-      "travel_score": 0,
-      "lookahead_score": 1.333,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "2 match important/proche dans les 3 jours",
-        "2 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -1.195,
-        "away_score": 0.155,
-        "home_fade": 1.3,
-        "away_fade": 0.3,
-        "reason": "Direction nette: Los Angeles Angels (+0.15)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
     {
       "event_id": "401815667",
       "source_event_ids": [
@@ -1226,138 +1168,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815641",
-      "source_event_ids": [
-        "401815641"
-      ],
-      "kickoff": "2026-06-06T01:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Diego Padres",
-      "away": "New York Mets",
-      "match": "San Diego Padres - New York Mets",
-      "decision": "lean_home",
-      "net_team": "San Diego Padres",
-      "reason": "New York Mets plus penalise par calendrier/voyage (1.21 vs 0.30)",
-      "pressure_score": 2.245,
-      "home_fade": 0.3,
-      "away_fade": 1.212,
-      "travel_score": 0.912,
-      "lookahead_score": 1.333,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2,
-        "travel_extreme": 1
-      },
-      "contexts": [
-        "2 match important/proche dans les 3 jours",
-        "2 match important/proche dans les 3 jours",
-        "Deplacement estime 3921 km, decalage ~2.9h"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.334,
-        "away_score": -1.707,
-        "home_fade": 0.3,
-        "away_fade": 1.812,
-        "reason": "Direction nette: San Diego Padres (+0.33)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.912
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815642",
-      "source_event_ids": [
-        "401815642"
-      ],
-      "kickoff": "2026-06-06T01:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Arizona Diamondbacks",
-      "away": "Washington Nationals",
-      "match": "Arizona Diamondbacks - Washington Nationals",
-      "decision": "lean_home",
-      "net_team": "Arizona Diamondbacks",
-      "reason": "Washington Nationals plus penalise par calendrier/voyage (1.04 vs 0.30)",
-      "pressure_score": 2.074,
-      "home_fade": 0.3,
-      "away_fade": 1.041,
-      "travel_score": 0.741,
-      "lookahead_score": 1.333,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2,
-        "travel_extreme": 1
-      },
-      "contexts": [
-        "2 match important/proche dans les 3 jours",
-        "2 match important/proche dans les 3 jours",
-        "Deplacement estime 3185 km, decalage ~2.3h"
-      ],
-      "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.736,
-        "away_score": -0.656,
-        "home_fade": 1.1,
-        "away_fade": 1.041,
-        "reason": "Signaux opposes: Arizona Diamondbacks fade 1.10, Washington Nationals fade 1.04 -> prudence",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.8
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.741
           }
         ]
       }
