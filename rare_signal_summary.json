@@ -1,25 +1,24 @@
 {
-  "generated_at": "2026-06-06T12:20:14Z",
+  "generated_at": "2026-06-06T14:13:08Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 35,
+    "active_events": 33,
     "actionable": 29,
     "watch": 3,
-    "risk": 3,
+    "risk": 1,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 29,
       "travel_extreme": 13,
       "back_to_back_travel": 17,
-      "signal_conflict": 8,
-      "market_uncertain": 2
+      "signal_conflict": 8
     },
     "by_quality": {
       "actionable": 29,
       "watch": 3,
-      "risk": 3
+      "risk": 1
     }
   },
   "active_actionable": [
@@ -603,42 +602,6 @@
     }
   ],
   "active_risk": [
-    {
-      "event_id": "401874276",
-      "date": "2026-06-07T19:00Z",
-      "sport": "football",
-      "league_code": "laliga2",
-      "league_name": "La Liga 2",
-      "home": "Las Palmas",
-      "away": "Málaga",
-      "match": "Las Palmas - Málaga",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.3%"
-    },
-    {
-      "event_id": "401874277",
-      "date": "2026-06-10T19:00Z",
-      "sport": "football",
-      "league_code": "laliga2",
-      "league_name": "La Liga 2",
-      "home": "Málaga",
-      "away": "Las Palmas",
-      "match": "Málaga - Las Palmas",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.3%"
-    },
     {
       "event_id": "401815667",
       "date": "2026-06-07T18:10Z",
