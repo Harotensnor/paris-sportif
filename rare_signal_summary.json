@@ -1,28 +1,47 @@
 {
-  "generated_at": "2026-06-06T02:55:09Z",
+  "generated_at": "2026-06-06T06:31:59Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 34,
-    "actionable": 29,
+    "active_events": 37,
+    "actionable": 30,
     "watch": 2,
-    "risk": 3,
+    "risk": 5,
     "expired_sample": 0,
     "by_type": {
+      "market_move": 8,
       "injury_imbalance": 28,
       "travel_extreme": 13,
-      "back_to_back_travel": 17,
-      "signal_conflict": 8,
-      "market_uncertain": 2
+      "signal_conflict": 9,
+      "back_to_back_travel": 11,
+      "market_uncertain": 5
     },
     "by_quality": {
-      "actionable": 29,
+      "actionable": 30,
       "watch": 2,
-      "risk": 3
+      "risk": 5
     }
   },
   "active_actionable": [
+    {
+      "event_id": "401873697",
+      "date": "2026-06-06T07:00Z",
+      "sport": "football",
+      "league_code": "jleague",
+      "league_name": "J-League",
+      "home": "Tokyo Verdy 1969",
+      "away": "Gamba Osaka",
+      "match": "Tokyo Verdy 1969 - Gamba Osaka",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 30.00 -> 60.00 (-100.0%)"
+    },
     {
       "event_id": "401815647",
       "date": "2026-06-06T17:10Z",
@@ -114,24 +133,6 @@
       "context": "Absences severes 9-3"
     },
     {
-      "event_id": "401815657",
-      "date": "2026-06-06T20:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Arizona Diamondbacks",
-      "away": "Washington Nationals",
-      "match": "Arizona Diamondbacks - Washington Nationals",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Washington Nationals",
-      "side": "away",
-      "strength": 1.0,
-      "context": "1 match dans les 48h + 3185 km de voyage"
-    },
-    {
       "event_id": "401815644",
       "date": "2026-06-06T23:35Z",
       "sport": "baseball",
@@ -186,24 +187,6 @@
       "context": "1 match dans les 48h + 3262 km de voyage"
     },
     {
-      "event_id": "401815654",
-      "date": "2026-06-07T01:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Colorado Rockies",
-      "away": "Milwaukee Brewers",
-      "match": "Colorado Rockies - Milwaukee Brewers",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Colorado Rockies",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 13-8"
-    },
-    {
       "event_id": "401815655",
       "date": "2026-06-07T02:10Z",
       "sport": "baseball",
@@ -220,24 +203,6 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 15-7"
-    },
-    {
-      "event_id": "401815656",
-      "date": "2026-06-07T02:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Diego Padres",
-      "away": "New York Mets",
-      "match": "San Diego Padres - New York Mets",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "New York Mets",
-      "side": "away",
-      "strength": 1.0,
-      "context": "1 match dans les 48h + 3921 km de voyage"
     },
     {
       "event_id": "401815659",
@@ -348,24 +313,6 @@
       "context": "Absences severes 9-2"
     },
     {
-      "event_id": "401815669",
-      "date": "2026-06-07T19:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Colorado Rockies",
-      "away": "Milwaukee Brewers",
-      "match": "Colorado Rockies - Milwaukee Brewers",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Colorado Rockies",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 13-8"
-    },
-    {
       "event_id": "401815672",
       "date": "2026-06-07T19:15Z",
       "sport": "baseball",
@@ -381,7 +328,7 @@
       "team": "Washington Nationals",
       "side": "away",
       "strength": 1.0,
-      "context": "2 match dans les 48h + 3185 km de voyage"
+      "context": "1 match dans les 48h + 3185 km de voyage"
     },
     {
       "event_id": "401815670",
@@ -417,7 +364,7 @@
       "team": "New York Mets",
       "side": "away",
       "strength": 1.0,
-      "context": "2 match dans les 48h + 3921 km de voyage"
+      "context": "1 match dans les 48h + 3921 km de voyage"
     },
     {
       "event_id": "401815668",
@@ -474,6 +421,42 @@
       "context": "1 match dans les 48h + 2980 km de voyage"
     },
     {
+      "event_id": "401815656",
+      "date": "2026-06-07T02:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "San Diego Padres",
+      "away": "New York Mets",
+      "match": "San Diego Padres - New York Mets",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "travel_extreme",
+      "direction": "fade",
+      "team": "New York Mets",
+      "side": "away",
+      "strength": 0.912,
+      "context": "Deplacement estime 3921 km, decalage ~2.9h"
+    },
+    {
+      "event_id": "401815669",
+      "date": "2026-06-07T19:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Colorado Rockies",
+      "away": "Milwaukee Brewers",
+      "match": "Colorado Rockies - Milwaukee Brewers",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Milwaukee Brewers",
+      "side": "away",
+      "strength": 0.823,
+      "context": "1 match dans les 48h + 1463 km de voyage"
+    },
+    {
       "event_id": "401815643",
       "date": "2026-06-06T19:07Z",
       "sport": "baseball",
@@ -490,6 +473,42 @@
       "side": null,
       "strength": 0.8,
       "context": "Absences severes 14-10"
+    },
+    {
+      "event_id": "401815657",
+      "date": "2026-06-06T20:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Arizona Diamondbacks",
+      "away": "Washington Nationals",
+      "match": "Arizona Diamondbacks - Washington Nationals",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Arizona Diamondbacks",
+      "side": null,
+      "strength": 0.8,
+      "context": "Absences severes 10-6"
+    },
+    {
+      "event_id": "401815654",
+      "date": "2026-06-07T01:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Colorado Rockies",
+      "away": "Milwaukee Brewers",
+      "match": "Colorado Rockies - Milwaukee Brewers",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Colorado Rockies",
+      "side": null,
+      "strength": 0.8,
+      "context": "Absences severes 13-9"
     },
     {
       "event_id": "401815658",
@@ -604,6 +623,24 @@
       "context": "marge bookmaker anormale 18.3%"
     },
     {
+      "event_id": "401859965",
+      "date": "2026-06-09T00:30Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "New York Knicks",
+      "away": "San Antonio Spurs",
+      "match": "New York Knicks - San Antonio Spurs",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "home et away montent ensemble (+8.6% / +10.5%)"
+    },
+    {
       "event_id": "401874277",
       "date": "2026-06-10T19:00Z",
       "sport": "football",
@@ -622,22 +659,40 @@
       "context": "marge bookmaker anormale 18.3%"
     },
     {
-      "event_id": "401815667",
-      "date": "2026-06-07T18:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Minnesota Twins",
-      "away": "Kansas City Royals",
-      "match": "Minnesota Twins - Kansas City Royals",
+      "event_id": "401859966",
+      "date": "2026-06-11T00:30Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "New York Knicks",
+      "away": "San Antonio Spurs",
+      "match": "New York Knicks - San Antonio Spurs",
       "quality": "risk",
       "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "signal_conflict",
+      "type": "market_uncertain",
       "direction": "abstain",
       "team": null,
       "side": null,
-      "strength": 0.45,
-      "context": "Signaux opposes: Minnesota Twins fade 0.60, Kansas City Royals fade 0.60 -> prudence"
+      "strength": 0.85,
+      "context": "home et away montent ensemble (+8.6% / +10.5%)"
+    },
+    {
+      "event_id": "401859967",
+      "date": "2026-06-14T00:30Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "San Antonio Spurs",
+      "away": "New York Knicks",
+      "match": "San Antonio Spurs - New York Knicks",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "home et away montent ensemble (+10.5% / +8.6%)"
     }
   ],
   "expired_sample": []
