@@ -1,24 +1,25 @@
 {
-  "generated_at": "2026-06-07T22:34:05Z",
+  "generated_at": "2026-06-07T23:39:42Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 18,
-    "actionable": 16,
-    "watch": 0,
-    "risk": 2,
+    "active_events": 32,
+    "actionable": 27,
+    "watch": 2,
+    "risk": 3,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 10,
-      "travel_extreme": 10,
-      "back_to_back_travel": 7,
-      "market_uncertain": 6,
-      "signal_conflict": 1
+      "injury_imbalance": 19,
+      "travel_extreme": 20,
+      "back_to_back_travel": 15,
+      "signal_conflict": 5,
+      "market_uncertain": 4
     },
     "by_quality": {
-      "actionable": 16,
-      "risk": 2
+      "actionable": 27,
+      "risk": 3,
+      "watch": 2
     }
   },
   "active_actionable": [
@@ -77,22 +78,40 @@
       "context": "Absences severes 14-1"
     },
     {
-      "event_id": "401815677",
-      "date": "2026-06-09T01:40Z",
+      "event_id": "401815680",
+      "date": "2026-06-09T01:45Z",
       "sport": "baseball",
       "league_code": "mlb",
       "league_name": "MLB",
-      "home": "San Diego Padres",
-      "away": "Cincinnati Reds",
-      "match": "San Diego Padres - Cincinnati Reds",
+      "home": "San Francisco Giants",
+      "away": "Washington Nationals",
+      "match": "San Francisco Giants - Washington Nationals",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "San Francisco Giants",
+      "side": null,
+      "strength": 1.0,
+      "context": "Absences severes 12-6"
+    },
+    {
+      "event_id": "401815687",
+      "date": "2026-06-09T22:35Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Baltimore Orioles",
+      "away": "Seattle Mariners",
+      "match": "Baltimore Orioles - Seattle Mariners",
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
       "type": "back_to_back_travel",
       "direction": "fade",
-      "team": "Cincinnati Reds",
+      "team": "Seattle Mariners",
       "side": "away",
       "strength": 1.0,
-      "context": "1 match dans les 48h + 3008 km de voyage"
+      "context": "1 match dans les 48h + 3747 km de voyage"
     },
     {
       "event_id": "401815685",
@@ -149,6 +168,24 @@
       "context": "1 match dans les 48h + 3008 km de voyage"
     },
     {
+      "event_id": "401815695",
+      "date": "2026-06-10T01:45Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "San Francisco Giants",
+      "away": "Washington Nationals",
+      "match": "San Francisco Giants - Washington Nationals",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "San Francisco Giants",
+      "side": null,
+      "strength": 1.0,
+      "context": "Absences severes 12-6"
+    },
+    {
       "event_id": "401815700",
       "date": "2026-06-10T17:10Z",
       "sport": "baseball",
@@ -165,6 +202,24 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 2-7"
+    },
+    {
+      "event_id": "401815710",
+      "date": "2026-06-10T19:45Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "San Francisco Giants",
+      "away": "Washington Nationals",
+      "match": "San Francisco Giants - Washington Nationals",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "San Francisco Giants",
+      "side": null,
+      "strength": 1.0,
+      "context": "Absences severes 12-6"
     },
     {
       "event_id": "401815707",
@@ -185,6 +240,24 @@
       "context": "2 match dans les 48h + 3008 km de voyage"
     },
     {
+      "event_id": "401815702",
+      "date": "2026-06-10T22:35Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Baltimore Orioles",
+      "away": "Seattle Mariners",
+      "match": "Baltimore Orioles - Seattle Mariners",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Seattle Mariners",
+      "side": "away",
+      "strength": 1.0,
+      "context": "2 match dans les 48h + 3747 km de voyage"
+    },
+    {
       "event_id": "401815701",
       "date": "2026-06-10T23:07Z",
       "sport": "baseball",
@@ -201,6 +274,42 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 14-1"
+    },
+    {
+      "event_id": "401815708",
+      "date": "2026-06-11T01:38Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Los Angeles Angels",
+      "away": "Houston Astros",
+      "match": "Los Angeles Angels - Houston Astros",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Houston Astros",
+      "side": "away",
+      "strength": 1.0,
+      "context": "2 match dans les 48h + 2172 km de voyage"
+    },
+    {
+      "event_id": "401815714",
+      "date": "2026-06-11T23:00Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Baltimore Orioles",
+      "away": "Seattle Mariners",
+      "match": "Baltimore Orioles - Seattle Mariners",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Seattle Mariners",
+      "side": "away",
+      "strength": 1.0,
+      "context": "1 match dans les 48h + 3747 km de voyage"
     },
     {
       "event_id": "401874175",
@@ -257,6 +366,78 @@
       "context": "2 match dans les 48h + 2980 km de voyage"
     },
     {
+      "event_id": "401815697",
+      "date": "2026-06-10T17:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Tampa Bay Rays",
+      "away": "Boston Red Sox",
+      "match": "Tampa Bay Rays - Boston Red Sox",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Boston Red Sox",
+      "side": "away",
+      "strength": 0.996,
+      "context": "2 match dans les 48h + 1928 km de voyage"
+    },
+    {
+      "event_id": "401815693",
+      "date": "2026-06-10T01:38Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Los Angeles Angels",
+      "away": "Houston Astros",
+      "match": "Los Angeles Angels - Houston Astros",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Houston Astros",
+      "side": "away",
+      "strength": 0.964,
+      "context": "1 match dans les 48h + 2172 km de voyage"
+    },
+    {
+      "event_id": "401815682",
+      "date": "2026-06-09T22:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Tampa Bay Rays",
+      "away": "Boston Red Sox",
+      "match": "Tampa Bay Rays - Boston Red Sox",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Boston Red Sox",
+      "side": "away",
+      "strength": 0.916,
+      "context": "1 match dans les 48h + 1928 km de voyage"
+    },
+    {
+      "event_id": "401815676",
+      "date": "2026-06-08T22:35Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Baltimore Orioles",
+      "away": "Seattle Mariners",
+      "match": "Baltimore Orioles - Seattle Mariners",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "travel_extreme",
+      "direction": "fade",
+      "team": "Seattle Mariners",
+      "side": "away",
+      "strength": 0.871,
+      "context": "Deplacement estime 3747 km, decalage ~3.0h"
+    },
+    {
       "event_id": "401874174",
       "date": "2026-06-10T00:00Z",
       "sport": "hockey",
@@ -293,6 +474,24 @@
       "context": "Deplacement estime 3262 km, decalage ~2.4h"
     },
     {
+      "event_id": "401815677",
+      "date": "2026-06-09T01:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "San Diego Padres",
+      "away": "Cincinnati Reds",
+      "match": "San Diego Padres - Cincinnati Reds",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "travel_extreme",
+      "direction": "fade",
+      "team": "Cincinnati Reds",
+      "side": "away",
+      "strength": 0.7,
+      "context": "Deplacement estime 3008 km, decalage ~2.2h"
+    },
+    {
       "event_id": "401815731",
       "date": "2026-06-13T02:15Z",
       "sport": "baseball",
@@ -311,10 +510,47 @@
       "context": "Deplacement estime 2980 km, decalage ~2.3h"
     }
   ],
-  "active_watch": [],
+  "active_watch": [
+    {
+      "event_id": "401856975",
+      "date": "2026-06-09T23:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Chicago Sky",
+      "away": "Atlanta Dream",
+      "match": "Chicago Sky - Atlanta Dream",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Chicago Sky",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 5-2"
+    },
+    {
+      "event_id": "401856976",
+      "date": "2026-06-10T00:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Minnesota Lynx",
+      "away": "Dallas Wings",
+      "match": "Minnesota Lynx - Dallas Wings",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Minnesota Lynx",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 4-1"
+    }
+  ],
   "active_risk": [
     {
-      "event_id": "177092",
+      "event_id": "177808",
       "date": "2026-06-09T04:00Z",
       "sport": "tennis",
       "league_code": "libemaopen",
@@ -329,7 +565,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 12.1%"
+      "context": "marge bookmaker anormale 12.3%"
     },
     {
       "event_id": "177029",
@@ -348,6 +584,24 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 12.1%"
+    },
+    {
+      "event_id": "401815678",
+      "date": "2026-06-09T01:38Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Los Angeles Angels",
+      "away": "Houston Astros",
+      "match": "Los Angeles Angels - Houston Astros",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "signal_conflict",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.618,
+      "context": "Signaux opposes: Los Angeles Angels fade 0.90, Houston Astros fade 0.81 -> prudence"
     }
   ],
   "expired_sample": []
