@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-06-07T18:54:48Z",
+  "generated_at": "2026-06-07T20:05:52Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 25,
+    "active_events": 22,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 32,
-      "back_to_back_travel": 10,
-      "travel_extreme": 12,
+      "lookahead": 29,
+      "travel_extreme": 11,
+      "back_to_back_travel": 8,
       "schedule_congestion": 26
     },
     "by_decision": {
-      "abstain": 12,
-      "lean_home": 13
+      "abstain": 11,
+      "lean_home": 11
     },
-    "lean_home": 13,
+    "lean_home": 11,
     "lean_away": 0,
-    "abstain": 12,
+    "abstain": 11,
     "monitor": 0
   },
   "active": [
@@ -630,58 +630,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.4
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401874276",
-      "source_event_ids": [
-        "401874276"
-      ],
-      "kickoff": "2026-06-07T19:00Z",
-      "sport": "football",
-      "league_code": "laliga2",
-      "league_name": "La Liga 2",
-      "home": "Las Palmas",
-      "away": "Málaga",
-      "match": "Las Palmas - Málaga",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Las Palmas 0.15, Málaga 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
-        "home_fade": 0.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Málaga (-0.10)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
           }
         ]
       }
@@ -1370,65 +1318,6 @@
       }
     },
     {
-      "event_id": "401815672",
-      "source_event_ids": [
-        "401815672"
-      ],
-      "kickoff": "2026-06-07T19:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Arizona Diamondbacks",
-      "away": "Washington Nationals",
-      "match": "Arizona Diamondbacks - Washington Nationals",
-      "decision": "lean_home",
-      "net_team": "Arizona Diamondbacks",
-      "reason": "Washington Nationals plus penalise par calendrier/voyage (1.74 vs 0.00)",
-      "pressure_score": 1.741,
-      "home_fade": 0.0,
-      "away_fade": 1.741,
-      "travel_score": 1.741,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "travel_extreme": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "Deplacement estime 3185 km, decalage ~2.3h",
-        "2 match dans les 48h + 3185 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.191,
-        "away_score": -1.461,
-        "home_fade": 0.8,
-        "away_fade": 1.741,
-        "reason": "Direction nette: Arizona Diamondbacks (-0.19)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.8
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.741
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401815668",
       "source_event_ids": [
         "401815668"
@@ -1483,65 +1372,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815669",
-      "source_event_ids": [
-        "401815669"
-      ],
-      "kickoff": "2026-06-07T19:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Colorado Rockies",
-      "away": "Milwaukee Brewers",
-      "match": "Colorado Rockies - Milwaukee Brewers",
-      "decision": "lean_home",
-      "net_team": "Colorado Rockies",
-      "reason": "Milwaukee Brewers plus penalise par calendrier/voyage (1.20 vs 0.00)",
-      "pressure_score": 1.569,
-      "home_fade": 0.0,
-      "away_fade": 1.203,
-      "travel_score": 0.903,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "2 match important/proche dans les 3 jours",
-        "2 match dans les 48h + 1463 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.379,
-        "away_score": -0.923,
-        "home_fade": 0.8,
-        "away_fade": 1.203,
-        "reason": "Direction nette: Colorado Rockies (-0.38)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.8
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.903
           }
         ]
       }

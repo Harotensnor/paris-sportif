@@ -1,46 +1,27 @@
 {
-  "generated_at": "2026-06-07T18:54:49Z",
+  "generated_at": "2026-06-07T20:05:52Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 23,
-    "actionable": 20,
-    "watch": 1,
+    "active_events": 20,
+    "actionable": 18,
+    "watch": 0,
     "risk": 2,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 15,
-      "back_to_back_travel": 10,
-      "travel_extreme": 12,
+      "injury_imbalance": 12,
+      "travel_extreme": 11,
+      "back_to_back_travel": 8,
       "market_uncertain": 6,
       "signal_conflict": 1
     },
     "by_quality": {
-      "watch": 1,
-      "actionable": 20,
+      "actionable": 18,
       "risk": 2
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401815672",
-      "date": "2026-06-07T19:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Arizona Diamondbacks",
-      "away": "Washington Nationals",
-      "match": "Arizona Diamondbacks - Washington Nationals",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Washington Nationals",
-      "side": "away",
-      "strength": 1.0,
-      "context": "2 match dans les 48h + 3185 km de voyage"
-    },
     {
       "event_id": "401815670",
       "date": "2026-06-07T20:10Z",
@@ -312,24 +293,6 @@
       "context": "2 match dans les 48h + 2980 km de voyage"
     },
     {
-      "event_id": "401815669",
-      "date": "2026-06-07T19:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Colorado Rockies",
-      "away": "Milwaukee Brewers",
-      "match": "Colorado Rockies - Milwaukee Brewers",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Milwaukee Brewers",
-      "side": "away",
-      "strength": 0.903,
-      "context": "2 match dans les 48h + 1463 km de voyage"
-    },
-    {
       "event_id": "401874174",
       "date": "2026-06-10T00:00Z",
       "sport": "hockey",
@@ -384,26 +347,7 @@
       "context": "Deplacement estime 2980 km, decalage ~2.3h"
     }
   ],
-  "active_watch": [
-    {
-      "event_id": "401856970",
-      "date": "2026-06-07T19:00Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Toronto Tempo",
-      "away": "Chicago Sky",
-      "match": "Toronto Tempo - Chicago Sky",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Chicago Sky",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 2-5"
-    }
-  ],
+  "active_watch": [],
   "active_risk": [
     {
       "event_id": "177092",
