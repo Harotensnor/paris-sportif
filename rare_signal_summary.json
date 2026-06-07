@@ -1,64 +1,28 @@
 {
-  "generated_at": "2026-06-07T00:21:47Z",
+  "generated_at": "2026-06-07T03:40:12Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 24,
-    "actionable": 21,
+    "active_events": 21,
+    "actionable": 18,
     "watch": 1,
     "risk": 2,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 19,
-      "back_to_back_travel": 12,
-      "signal_conflict": 5,
-      "travel_extreme": 11,
+      "injury_imbalance": 16,
+      "back_to_back_travel": 10,
+      "signal_conflict": 4,
+      "travel_extreme": 10,
       "market_uncertain": 7
     },
     "by_quality": {
-      "actionable": 21,
+      "actionable": 18,
       "watch": 1,
       "risk": 2
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401815655",
-      "date": "2026-06-07T02:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Los Angeles Dodgers",
-      "away": "Los Angeles Angels",
-      "match": "Los Angeles Dodgers - Los Angeles Angels",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Los Angeles Dodgers",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 15-8"
-    },
-    {
-      "event_id": "401815656",
-      "date": "2026-06-07T02:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Diego Padres",
-      "away": "New York Mets",
-      "match": "San Diego Padres - New York Mets",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "New York Mets",
-      "side": "away",
-      "strength": 1.0,
-      "context": "1 match dans les 48h + 3921 km de voyage"
-    },
     {
       "event_id": "401815659",
       "date": "2026-06-07T17:35Z",
@@ -310,24 +274,6 @@
       "side": "away",
       "strength": 0.903,
       "context": "2 match dans les 48h + 1463 km de voyage"
-    },
-    {
-      "event_id": "401815654",
-      "date": "2026-06-07T01:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Colorado Rockies",
-      "away": "Milwaukee Brewers",
-      "match": "Colorado Rockies - Milwaukee Brewers",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Milwaukee Brewers",
-      "side": "away",
-      "strength": 0.823,
-      "context": "1 match dans les 48h + 1463 km de voyage"
     },
     {
       "event_id": "401815658",
