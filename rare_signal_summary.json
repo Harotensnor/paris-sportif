@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-06-07T11:44:52Z",
+  "generated_at": "2026-06-07T13:10:47Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 25,
+    "active_events": 22,
     "actionable": 16,
-    "watch": 4,
+    "watch": 1,
     "risk": 5,
     "expired_sample": 0,
     "by_type": {
@@ -14,12 +14,11 @@
       "back_to_back_travel": 10,
       "signal_conflict": 4,
       "travel_extreme": 10,
-      "market_move": 4,
       "market_uncertain": 10
     },
     "by_quality": {
       "actionable": 16,
-      "watch": 4,
+      "watch": 1,
       "risk": 5
     }
   },
@@ -184,7 +183,7 @@
       "team": "New York Mets",
       "side": "away",
       "strength": 1.0,
-      "context": "1 match dans les 48h + 3921 km de voyage"
+      "context": "2 match dans les 48h + 3921 km de voyage"
     },
     {
       "event_id": "401815668",
@@ -273,8 +272,8 @@
       "direction": "fade",
       "team": "Milwaukee Brewers",
       "side": "away",
-      "strength": 0.823,
-      "context": "1 match dans les 48h + 1463 km de voyage"
+      "strength": 0.903,
+      "context": "2 match dans les 48h + 1463 km de voyage"
     },
     {
       "event_id": "401815658",
@@ -315,24 +314,6 @@
   ],
   "active_watch": [
     {
-      "event_id": "401874276",
-      "date": "2026-06-07T19:00Z",
-      "sport": "football",
-      "league_code": "laliga2",
-      "league_name": "La Liga 2",
-      "home": "Las Palmas",
-      "away": "Málaga",
-      "match": "Las Palmas - Málaga",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "home",
-      "strength": 0.617,
-      "context": "Cote home: 2.25 -> 2.00 (+11.1%)"
-    },
-    {
       "event_id": "401815664",
       "date": "2026-06-07T18:10Z",
       "sport": "baseball",
@@ -349,42 +330,6 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 10-7"
-    },
-    {
-      "event_id": "401856971",
-      "date": "2026-06-07T23:00Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Los Angeles Sparks",
-      "away": "Portland Fire",
-      "match": "Los Angeles Sparks - Portland Fire",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.483,
-      "context": "Cote away: 3.45 -> 3.15 (+8.7%)"
-    },
-    {
-      "event_id": "401856970",
-      "date": "2026-06-07T19:00Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Toronto Tempo",
-      "away": "Chicago Sky",
-      "match": "Toronto Tempo - Chicago Sky",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.471,
-      "context": "Cote away: 2.24 -> 2.05 (+8.5%)"
     }
   ],
   "active_risk": [
@@ -407,11 +352,11 @@
       "context": "marge bookmaker anormale 12.0%"
     },
     {
-      "event_id": "177050",
+      "event_id": "177092",
       "date": "2026-06-09T04:00Z",
       "sport": "tennis",
-      "league_code": "bossopen",
-      "league_name": "Boss Open",
+      "league_code": "libemaopen",
+      "league_name": "Libéma Open",
       "home": "",
       "away": "",
       "match": "? - ?",
@@ -425,11 +370,11 @@
       "context": "marge bookmaker anormale 12.1%"
     },
     {
-      "event_id": "177092",
+      "event_id": "177050",
       "date": "2026-06-09T04:00Z",
       "sport": "tennis",
-      "league_code": "libemaopen",
-      "league_name": "Libéma Open",
+      "league_code": "bossopen",
+      "league_name": "Boss Open",
       "home": "",
       "away": "",
       "match": "? - ?",
