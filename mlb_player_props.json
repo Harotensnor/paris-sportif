@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-07T16:13:18Z",
+  "generated_at": "2026-06-07T17:41:32Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -1150,9 +1150,255 @@
           "side": "away"
         }
       ]
+    },
+    {
+      "event_id": "401815674",
+      "kickoff": "2026-06-08T22:40Z",
+      "league": "MLB",
+      "match": "New York Yankees at Cleveland Guardians",
+      "home": "Cleveland Guardians",
+      "away": "New York Yankees",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Cleveland Guardians",
+          "pitcher": "Gavin Williams",
+          "label": "Gavin Williams moins de 7,5 strikeouts",
+          "line": 7.5,
+          "pick": "under",
+          "probability": 0.5589,
+          "fair_odds": 1.79,
+          "expected_strikeouts": 7.19,
+          "projected_ip": 6.25,
+          "inputs": {
+            "k9": 10.36,
+            "era": 3.2,
+            "whip": 1.08,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Cleveland Guardians",
+          "pitcher": "Gavin Williams",
+          "label": "Gavin Williams concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5682,
+          "fair_odds": 1.76,
+          "expected_hr_allowed": 0.84,
+          "projected_ip": 6.25,
+          "inputs": {
+            "hr9": 1.21,
+            "era": 3.2,
+            "whip": 1.08
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "New York Yankees",
+          "pitcher": "Will Warren",
+          "label": "Will Warren plus de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "over",
+          "probability": 0.5656,
+          "fair_odds": 1.77,
+          "expected_strikeouts": 5.81,
+          "projected_ip": 5.34,
+          "inputs": {
+            "k9": 9.79,
+            "era": 3.22,
+            "whip": 1.2,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "New York Yankees",
+          "pitcher": "Will Warren",
+          "label": "Will Warren ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.559,
+          "fair_odds": 1.79,
+          "expected_hr_allowed": 0.582,
+          "projected_ip": 5.34,
+          "inputs": {
+            "hr9": 0.98,
+            "era": 3.22,
+            "whip": 1.2
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815677",
+      "kickoff": "2026-06-09T01:40Z",
+      "league": "MLB",
+      "match": "Cincinnati Reds at San Diego Padres",
+      "home": "San Diego Padres",
+      "away": "Cincinnati Reds",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "San Diego Padres",
+          "pitcher": "Lucas Giolito",
+          "label": "Lucas Giolito plus de 2,5 strikeouts",
+          "line": 2.5,
+          "pick": "over",
+          "probability": 0.554,
+          "fair_odds": 1.81,
+          "expected_strikeouts": 2.67,
+          "projected_ip": 4.05,
+          "inputs": {
+            "k9": 5.94,
+            "era": 4.86,
+            "whip": 1.74,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "San Diego Padres",
+          "pitcher": "Lucas Giolito",
+          "label": "Lucas Giolito concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5176,
+          "fair_odds": 1.93,
+          "expected_hr_allowed": 0.729,
+          "projected_ip": 4.05,
+          "inputs": {
+            "hr9": 1.62,
+            "era": 4.86,
+            "whip": 1.74
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Cincinnati Reds",
+          "pitcher": "Chase Burns",
+          "label": "Chase Burns plus de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "over",
+          "probability": 0.5442,
+          "fair_odds": 1.84,
+          "expected_strikeouts": 6.72,
+          "projected_ip": 5.84,
+          "inputs": {
+            "k9": 10.36,
+            "era": 2.05,
+            "whip": 0.95,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Cincinnati Reds",
+          "pitcher": "Chase Burns",
+          "label": "Chase Burns concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5259,
+          "fair_odds": 1.9,
+          "expected_hr_allowed": 0.746,
+          "projected_ip": 5.84,
+          "inputs": {
+            "hr9": 1.15,
+            "era": 2.05,
+            "whip": 0.95
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815679",
+      "kickoff": "2026-06-09T02:05Z",
+      "league": "MLB",
+      "match": "Milwaukee Brewers at Athletics Athletics",
+      "home": "Athletics",
+      "away": "Milwaukee Brewers",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Athletics",
+          "pitcher": "J.T. Ginn",
+          "label": "J.T. Ginn moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.519,
+          "fair_odds": 1.93,
+          "expected_strikeouts": 5.41,
+          "projected_ip": 5.93,
+          "inputs": {
+            "k9": 8.22,
+            "era": 2.74,
+            "whip": 1.08,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Athletics",
+          "pitcher": "J.T. Ginn",
+          "label": "J.T. Ginn ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5314,
+          "fair_odds": 1.88,
+          "expected_hr_allowed": 0.632,
+          "projected_ip": 5.93,
+          "inputs": {
+            "hr9": 0.96,
+            "era": 2.74,
+            "whip": 1.08
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Milwaukee Brewers",
+          "pitcher": "Robert Gasser",
+          "label": "Robert Gasser plus de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "over",
+          "probability": 0.6095,
+          "fair_odds": 1.64,
+          "expected_strikeouts": 3.93,
+          "projected_ip": 4.37,
+          "inputs": {
+            "k9": 8.1,
+            "era": 4.73,
+            "whip": 1.43,
+            "hand": "L"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Milwaukee Brewers",
+          "pitcher": "Robert Gasser",
+          "label": "Robert Gasser ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5194,
+          "fair_odds": 1.93,
+          "expected_hr_allowed": 0.655,
+          "projected_ip": 4.37,
+          "inputs": {
+            "hr9": 1.35,
+            "era": 4.73,
+            "whip": 1.43
+          },
+          "side": "away"
+        }
+      ]
     }
   ],
-  "props": 56,
+  "props": 68,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
