@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-07T07:46:00Z",
+  "generated_at": "2026-06-07T10:19:14Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -52,12 +52,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
+        "net_side": "home",
+        "home_score": 0.52,
         "away_score": -0.098,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Málaga (-0.10)",
+        "reason": "Direction nette: Las Palmas (+0.52)",
         "detail": [
           {
             "side": "home",
@@ -70,6 +70,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.617
           }
         ]
       }
@@ -487,7 +493,7 @@
       },
       "contexts": [
         "Deplacement estime 3921 km, decalage ~2.9h",
-        "2 match dans les 48h + 3921 km de voyage"
+        "1 match dans les 48h + 3921 km de voyage"
       ],
       "global_resolution": {
         "status": "net",
@@ -729,11 +735,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.168,
-        "away_score": -0.856,
-        "home_fade": 0.15,
-        "away_fade": 0.909,
-        "reason": "Direction nette: Vegas Golden Knights (+0.17)",
+        "home_score": -0.471,
+        "away_score": -1.232,
+        "home_fade": 1.028,
+        "away_fade": 1.592,
+        "reason": "Direction nette: Vegas Golden Knights (-0.47)",
         "detail": [
           {
             "side": "home",
@@ -746,6 +752,18 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 0.878
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 0.683
           },
           {
             "side": "away",
@@ -770,27 +788,27 @@
       "match": "Texas Rangers - Cleveland Guardians",
       "decision": "lean_home",
       "net_team": "Texas Rangers",
-      "reason": "Cleveland Guardians plus penalise par calendrier/voyage (0.94 vs 0.00)",
-      "pressure_score": 0.944,
+      "reason": "Cleveland Guardians plus penalise par calendrier/voyage (0.86 vs 0.00)",
+      "pressure_score": 0.864,
       "home_fade": 0.0,
-      "away_fade": 0.944,
-      "travel_score": 0.944,
+      "away_fade": 0.864,
+      "travel_score": 0.864,
       "lookahead_score": 0,
       "congestion_score": 0,
       "types": {
         "back_to_back_travel": 1
       },
       "contexts": [
-        "2 match dans les 48h + 1672 km de voyage"
+        "1 match dans les 48h + 1672 km de voyage"
       ],
       "global_resolution": {
         "status": "abstain",
         "net_side": null,
-        "home_score": -0.669,
-        "away_score": -0.594,
+        "home_score": -0.697,
+        "away_score": -0.514,
         "home_fade": 1.0,
-        "away_fade": 0.944,
-        "reason": "Signaux opposes: Texas Rangers fade 1.00, Cleveland Guardians fade 0.94 -> prudence",
+        "away_fade": 0.864,
+        "reason": "Signaux opposes: Texas Rangers fade 1.00, Cleveland Guardians fade 0.86 -> prudence",
         "detail": [
           {
             "side": "home",
@@ -802,7 +820,7 @@
             "side": "away",
             "type": "back_to_back_travel",
             "direction": "fade",
-            "strength": 0.944
+            "strength": 0.864
           }
         ]
       }
@@ -821,27 +839,27 @@
       "match": "Colorado Rockies - Milwaukee Brewers",
       "decision": "lean_home",
       "net_team": "Colorado Rockies",
-      "reason": "Milwaukee Brewers plus penalise par calendrier/voyage (0.90 vs 0.00)",
-      "pressure_score": 0.903,
+      "reason": "Milwaukee Brewers plus penalise par calendrier/voyage (0.82 vs 0.00)",
+      "pressure_score": 0.823,
       "home_fade": 0.0,
-      "away_fade": 0.903,
-      "travel_score": 0.903,
+      "away_fade": 0.823,
+      "travel_score": 0.823,
       "lookahead_score": 0,
       "congestion_score": 0,
       "types": {
         "back_to_back_travel": 1
       },
       "contexts": [
-        "2 match dans les 48h + 1463 km de voyage"
+        "1 match dans les 48h + 1463 km de voyage"
       ],
       "global_resolution": {
         "status": "abstain",
         "net_side": null,
-        "home_score": -0.484,
-        "away_score": -0.623,
+        "home_score": -0.512,
+        "away_score": -0.543,
         "home_fade": 0.8,
-        "away_fade": 0.903,
-        "reason": "Signaux opposes: Colorado Rockies fade 0.80, Milwaukee Brewers fade 0.90 -> prudence",
+        "away_fade": 0.823,
+        "reason": "Signaux opposes: Colorado Rockies fade 0.80, Milwaukee Brewers fade 0.82 -> prudence",
         "detail": [
           {
             "side": "home",
@@ -853,7 +871,7 @@
             "side": "away",
             "type": "back_to_back_travel",
             "direction": "fade",
-            "strength": 0.903
+            "strength": 0.823
           }
         ]
       }
