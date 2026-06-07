@@ -1,22 +1,22 @@
 {
-  "generated_at": "2026-06-07T20:05:52Z",
+  "generated_at": "2026-06-07T21:22:41Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 22,
+    "active_events": 21,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 29,
-      "travel_extreme": 11,
-      "back_to_back_travel": 8,
-      "schedule_congestion": 26
+      "travel_extreme": 10,
+      "back_to_back_travel": 7,
+      "schedule_congestion": 26,
+      "lookahead": 28
     },
     "by_decision": {
       "abstain": 11,
-      "lean_home": 11
+      "lean_home": 10
     },
-    "lean_home": 11,
+    "lean_home": 10,
     "lean_away": 0,
     "abstain": 11,
     "monitor": 0
@@ -1032,73 +1032,6 @@
             "type": "travel_extreme",
             "direction": "fade",
             "strength": 0.693
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815671",
-      "source_event_ids": [
-        "401815671"
-      ],
-      "kickoff": "2026-06-07T20:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Diego Padres",
-      "away": "New York Mets",
-      "match": "San Diego Padres - New York Mets",
-      "decision": "lean_home",
-      "net_team": "San Diego Padres",
-      "reason": "New York Mets plus penalise par calendrier/voyage (1.91 vs 0.36)",
-      "pressure_score": 2.712,
-      "home_fade": 0.36,
-      "away_fade": 1.912,
-      "travel_score": 1.912,
-      "lookahead_score": 0.8,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 1,
-        "travel_extreme": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "3 match important/proche dans les 3 jours",
-        "Deplacement estime 3921 km, decalage ~2.9h",
-        "2 match dans les 48h + 3921 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.519,
-        "away_score": -2.386,
-        "home_fade": 0.36,
-        "away_fade": 2.512,
-        "reason": "Direction nette: San Diego Padres (+0.52)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.36
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.912
           },
           {
             "side": "away",
