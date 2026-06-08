@@ -1,24 +1,23 @@
 {
-  "generated_at": "2026-06-08T13:59:55Z",
+  "generated_at": "2026-06-08T17:21:02Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 30,
+    "active_events": 27,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 47,
-      "travel_extreme": 22,
-      "back_to_back_travel": 14,
-      "schedule_congestion": 8
+      "lookahead": 42,
+      "travel_extreme": 19,
+      "back_to_back_travel": 12,
+      "schedule_congestion": 2
     },
     "by_decision": {
       "abstain": 8,
-      "lean_home": 21,
-      "lean_away": 1
+      "lean_home": 19
     },
-    "lean_home": 21,
-    "lean_away": 1,
+    "lean_home": 19,
+    "lean_away": 0,
     "abstain": 8,
     "monitor": 0
   },
@@ -476,161 +475,6 @@
       }
     },
     {
-      "event_id": "401815746",
-      "source_event_ids": [
-        "401815746"
-      ],
-      "kickoff": "2026-06-14T02:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Francisco Giants",
-      "away": "Chicago Cubs",
-      "match": "San Francisco Giants - Chicago Cubs",
-      "decision": "lean_home",
-      "net_team": "San Francisco Giants",
-      "reason": "Chicago Cubs plus penalise par calendrier/voyage (1.84 vs 1.15)",
-      "pressure_score": 3.36,
-      "home_fade": 1.15,
-      "away_fade": 1.843,
-      "travel_score": 1.693,
-      "lookahead_score": 0.667,
-      "congestion_score": 1.0,
-      "types": {
-        "schedule_congestion": 1,
-        "lookahead": 2,
-        "travel_extreme": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "5 matchs sur les 7 derniers jours",
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours",
-        "Deplacement estime 2980 km, decalage ~2.3h"
-      ],
-      "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.905,
-        "away_score": -1.3,
-        "home_fade": 1.55,
-        "away_fade": 1.843,
-        "reason": "Signaux opposes: San Francisco Giants fade 1.55, Chicago Cubs fade 1.84 -> prudence",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.693
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815761",
-      "source_event_ids": [
-        "401815761"
-      ],
-      "kickoff": "2026-06-14T19:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Francisco Giants",
-      "away": "Chicago Cubs",
-      "match": "San Francisco Giants - Chicago Cubs",
-      "decision": "lean_home",
-      "net_team": "San Francisco Giants",
-      "reason": "Chicago Cubs plus penalise par calendrier/voyage (2.29 vs 1.00)",
-      "pressure_score": 3.293,
-      "home_fade": 1.0,
-      "away_fade": 2.293,
-      "travel_score": 1.693,
-      "lookahead_score": 0,
-      "congestion_score": 1.6,
-      "types": {
-        "schedule_congestion": 2,
-        "travel_extreme": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "6 matchs sur les 7 derniers jours",
-        "3 matchs sur les 7 derniers jours",
-        "Deplacement estime 2980 km, decalage ~2.3h",
-        "2 match dans les 48h + 2980 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.597,
-        "away_score": -1.803,
-        "home_fade": 1.4,
-        "away_fade": 2.293,
-        "reason": "Direction nette: San Francisco Giants (-0.60)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.693
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401815687",
       "source_event_ids": [
         "401815687"
@@ -694,87 +538,6 @@
             "type": "travel_extreme",
             "direction": "fade",
             "strength": 0.871
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815695",
-      "source_event_ids": [
-        "401815695"
-      ],
-      "kickoff": "2026-06-10T01:45Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Francisco Giants",
-      "away": "Washington Nationals",
-      "match": "San Francisco Giants - Washington Nationals",
-      "decision": "lean_home",
-      "net_team": "San Francisco Giants",
-      "reason": "Washington Nationals plus penalise par calendrier/voyage (2.06 vs 0.75)",
-      "pressure_score": 3.178,
-      "home_fade": 0.75,
-      "away_fade": 2.061,
-      "travel_score": 1.911,
-      "lookahead_score": 0.667,
-      "congestion_score": 0.6,
-      "types": {
-        "schedule_congestion": 1,
-        "lookahead": 2,
-        "travel_extreme": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "3 matchs sur les 7 derniers jours",
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours",
-        "Deplacement estime 3919 km, decalage ~3.0h"
-      ],
-      "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -1.028,
-        "away_score": -1.449,
-        "home_fade": 1.75,
-        "away_fade": 2.061,
-        "reason": "Signaux opposes: San Francisco Giants fade 1.75, Washington Nationals fade 2.06 -> prudence",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.911
           },
           {
             "side": "away",
@@ -860,11 +623,11 @@
       }
     },
     {
-      "event_id": "401815710",
+      "event_id": "401815695",
       "source_event_ids": [
-        "401815710"
+        "401815695"
       ],
-      "kickoff": "2026-06-10T19:45Z",
+      "kickoff": "2026-06-10T01:45Z",
       "sport": "baseball",
       "league_code": "mlb",
       "league_name": "MLB",
@@ -873,42 +636,41 @@
       "match": "San Francisco Giants - Washington Nationals",
       "decision": "lean_home",
       "net_team": "San Francisco Giants",
-      "reason": "Washington Nationals plus penalise par calendrier/voyage (1.91 vs 0.95)",
-      "pressure_score": 3.045,
-      "home_fade": 0.95,
-      "away_fade": 1.911,
+      "reason": "Washington Nationals plus penalise par calendrier/voyage (2.06 vs 0.15)",
+      "pressure_score": 2.578,
+      "home_fade": 0.15,
+      "away_fade": 2.061,
       "travel_score": 1.911,
-      "lookahead_score": 0.333,
-      "congestion_score": 0.8,
+      "lookahead_score": 0.667,
+      "congestion_score": 0,
       "types": {
-        "schedule_congestion": 1,
-        "lookahead": 1,
+        "lookahead": 2,
         "travel_extreme": 1,
         "back_to_back_travel": 1
       },
       "contexts": [
-        "4 matchs sur les 7 derniers jours",
+        "1 match important/proche dans les 3 jours",
         "1 match important/proche dans les 3 jours",
         "Deplacement estime 3919 km, decalage ~3.0h",
-        "2 match dans les 48h + 3919 km de voyage"
+        "1 match dans les 48h + 3919 km de voyage"
       ],
       "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -1.281,
-        "away_score": -1.229,
-        "home_fade": 1.95,
-        "away_fade": 1.911,
-        "reason": "Signaux opposes: San Francisco Giants fade 1.95, Washington Nationals fade 1.91 -> prudence",
+        "status": "net",
+        "net_side": "home",
+        "home_score": -0.428,
+        "away_score": -1.659,
+        "home_fade": 1.15,
+        "away_fade": 2.061,
+        "reason": "Direction nette: San Francisco Giants (-0.43)",
         "detail": [
           {
             "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.8
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
           },
           {
-            "side": "home",
+            "side": "away",
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
@@ -930,80 +692,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815731",
-      "source_event_ids": [
-        "401815731"
-      ],
-      "kickoff": "2026-06-13T02:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Francisco Giants",
-      "away": "Chicago Cubs",
-      "match": "San Francisco Giants - Chicago Cubs",
-      "decision": "lean_away",
-      "net_team": "Chicago Cubs",
-      "reason": "San Francisco Giants plus penalise par calendrier/voyage (1.30 vs 0.99)",
-      "pressure_score": 3.026,
-      "home_fade": 1.3,
-      "away_fade": 0.993,
-      "travel_score": 0.693,
-      "lookahead_score": 1.333,
-      "congestion_score": 1.0,
-      "types": {
-        "schedule_congestion": 1,
-        "lookahead": 2,
-        "travel_extreme": 1
-      },
-      "contexts": [
-        "5 matchs sur les 7 derniers jours",
-        "2 match important/proche dans les 3 jours",
-        "2 match important/proche dans les 3 jours",
-        "Deplacement estime 2980 km, decalage ~2.3h"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -1.352,
-        "away_score": -0.398,
-        "home_fade": 1.7,
-        "away_fade": 0.993,
-        "reason": "Direction nette: Chicago Cubs (-0.40)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.693
           }
         ]
       }
@@ -1548,6 +1236,65 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.916
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815710",
+      "source_event_ids": [
+        "401815710"
+      ],
+      "kickoff": "2026-06-10T19:45Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "San Francisco Giants",
+      "away": "Washington Nationals",
+      "match": "San Francisco Giants - Washington Nationals",
+      "decision": "lean_home",
+      "net_team": "San Francisco Giants",
+      "reason": "Washington Nationals plus penalise par calendrier/voyage (1.91 vs 0.00)",
+      "pressure_score": 1.911,
+      "home_fade": 0.0,
+      "away_fade": 1.911,
+      "travel_score": 1.911,
+      "lookahead_score": 0,
+      "congestion_score": 0,
+      "types": {
+        "travel_extreme": 1,
+        "back_to_back_travel": 1
+      },
+      "contexts": [
+        "Deplacement estime 3919 km, decalage ~3.0h",
+        "2 match dans les 48h + 3919 km de voyage"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": -0.331,
+        "away_score": -1.561,
+        "home_fade": 1.0,
+        "away_fade": 1.911,
+        "reason": "Direction nette: San Francisco Giants (-0.33)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "travel_extreme",
+            "direction": "fade",
+            "strength": 0.911
+          },
+          {
+            "side": "away",
+            "type": "back_to_back_travel",
+            "direction": "fade",
+            "strength": 1.0
           }
         ]
       }

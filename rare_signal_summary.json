@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-06-08T13:59:55Z",
+  "generated_at": "2026-06-08T17:21:02Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 32,
-    "actionable": 26,
+    "active_events": 28,
+    "actionable": 23,
     "watch": 4,
-    "risk": 2,
+    "risk": 1,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 16,
-      "travel_extreme": 19,
-      "signal_conflict": 5,
-      "market_uncertain": 6,
-      "back_to_back_travel": 14
+      "travel_extreme": 16,
+      "signal_conflict": 2,
+      "market_uncertain": 1,
+      "back_to_back_travel": 12
     },
     "by_quality": {
-      "actionable": 26,
+      "actionable": 23,
       "watch": 4,
-      "risk": 2
+      "risk": 1
     }
   },
   "active_actionable": [
@@ -312,42 +312,6 @@
       "context": "1 match dans les 48h + 3262 km de voyage"
     },
     {
-      "event_id": "401815746",
-      "date": "2026-06-14T02:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Francisco Giants",
-      "away": "Chicago Cubs",
-      "match": "San Francisco Giants - Chicago Cubs",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Chicago Cubs",
-      "side": "away",
-      "strength": 1.0,
-      "context": "1 match dans les 48h + 2980 km de voyage"
-    },
-    {
-      "event_id": "401815761",
-      "date": "2026-06-14T19:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Francisco Giants",
-      "away": "Chicago Cubs",
-      "match": "San Francisco Giants - Chicago Cubs",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Chicago Cubs",
-      "side": "away",
-      "strength": 1.0,
-      "context": "2 match dans les 48h + 2980 km de voyage"
-    },
-    {
       "event_id": "401815697",
       "date": "2026-06-10T17:10Z",
       "sport": "baseball",
@@ -472,24 +436,6 @@
       "side": "away",
       "strength": 0.7,
       "context": "Deplacement estime 3008 km, decalage ~2.2h"
-    },
-    {
-      "event_id": "401815731",
-      "date": "2026-06-13T02:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Francisco Giants",
-      "away": "Chicago Cubs",
-      "match": "San Francisco Giants - Chicago Cubs",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "travel_extreme",
-      "direction": "fade",
-      "team": "Chicago Cubs",
-      "side": "away",
-      "strength": 0.693,
-      "context": "Deplacement estime 2980 km, decalage ~2.3h"
     }
   ],
   "active_watch": [
@@ -568,11 +514,11 @@
   ],
   "active_risk": [
     {
-      "event_id": "177082",
+      "event_id": "177864",
       "date": "2026-06-09T04:00Z",
       "sport": "tennis",
-      "league_code": "libemaopen",
-      "league_name": "Libéma Open",
+      "league_code": "thehsbcchampionships",
+      "league_name": "The HSBC Championships",
       "home": "",
       "away": "",
       "match": "? - ?",
@@ -583,25 +529,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 12.0%"
-    },
-    {
-      "event_id": "177035",
-      "date": "2026-06-09T09:00Z",
-      "sport": "tennis",
-      "league_code": "bossopen",
-      "league_name": "Boss Open",
-      "home": "",
-      "away": "",
-      "match": "? - ?",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 12.3%"
+      "context": "marge bookmaker anormale 12.1%"
     }
   ],
   "expired_sample": []
