@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-06-08T22:55:03Z",
+  "generated_at": "2026-06-08T23:57:37Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815675",
-      "kickoff": "2026-06-08T23:07Z",
-      "league": "MLB",
-      "match": "Philadelphia Phillies at Toronto Blue Jays",
-      "home": "Toronto Blue Jays",
-      "away": "Philadelphia Phillies",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Toronto Blue Jays",
-          "pitcher": "Patrick Corbin",
-          "label": "Patrick Corbin moins de 3,5 strikeouts",
-          "line": 3.5,
-          "pick": "under",
-          "probability": 0.5419,
-          "fair_odds": 1.85,
-          "expected_strikeouts": 3.35,
-          "projected_ip": 4.92,
-          "inputs": {
-            "k9": 6.13,
-            "era": 3.98,
-            "whip": 1.38,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Toronto Blue Jays",
-          "pitcher": "Patrick Corbin",
-          "label": "Patrick Corbin ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5822,
-          "fair_odds": 1.72,
-          "expected_hr_allowed": 0.541,
-          "projected_ip": 4.92,
-          "inputs": {
-            "hr9": 0.99,
-            "era": 3.98,
-            "whip": 1.38
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Philadelphia Phillies",
-          "pitcher": "Cristopher Sánchez",
-          "label": "Cristopher Sánchez plus de 7,5 strikeouts",
-          "line": 7.5,
-          "pick": "over",
-          "probability": 0.5682,
-          "fair_odds": 1.76,
-          "expected_strikeouts": 7.88,
-          "projected_ip": 6.6,
-          "inputs": {
-            "k9": 10.74,
-            "era": 1.46,
-            "whip": 1.09,
-            "hand": "L"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Philadelphia Phillies",
-          "pitcher": "Cristopher Sánchez",
-          "label": "Cristopher Sánchez ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.7967,
-          "fair_odds": 1.26,
-          "expected_hr_allowed": 0.227,
-          "projected_ip": 6.6,
-          "inputs": {
-            "hr9": 0.31,
-            "era": 1.46,
-            "whip": 1.09
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815678",
       "kickoff": "2026-06-09T01:38Z",
@@ -2412,7 +2330,7 @@
       ]
     }
   ],
-  "props": 116,
+  "props": 112,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
