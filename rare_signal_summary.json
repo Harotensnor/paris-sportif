@@ -1,16 +1,16 @@
 {
-  "generated_at": "2026-06-08T17:21:02Z",
+  "generated_at": "2026-06-08T19:39:29Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 28,
+    "active_events": 27,
     "actionable": 23,
-    "watch": 4,
+    "watch": 3,
     "risk": 1,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 16,
+      "injury_imbalance": 15,
       "travel_extreme": 16,
       "signal_conflict": 2,
       "market_uncertain": 1,
@@ -18,11 +18,29 @@
     },
     "by_quality": {
       "actionable": 23,
-      "watch": 4,
+      "watch": 3,
       "risk": 1
     }
   },
   "active_actionable": [
+    {
+      "event_id": "401815676",
+      "date": "2026-06-08T22:35Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Baltimore Orioles",
+      "away": "Seattle Mariners",
+      "match": "Baltimore Orioles - Seattle Mariners",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Baltimore Orioles",
+      "side": null,
+      "strength": 1.0,
+      "context": "Absences severes 11-6"
+    },
     {
       "event_id": "401815674",
       "date": "2026-06-08T22:40Z",
@@ -88,12 +106,12 @@
       "match": "Baltimore Orioles - Seattle Mariners",
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
+      "type": "injury_imbalance",
       "direction": "fade",
-      "team": "Seattle Mariners",
-      "side": "away",
+      "team": "Baltimore Orioles",
+      "side": null,
       "strength": 1.0,
-      "context": "1 match dans les 48h + 3747 km de voyage"
+      "context": "Absences severes 11-6"
     },
     {
       "event_id": "401815685",
@@ -232,12 +250,12 @@
       "match": "Baltimore Orioles - Seattle Mariners",
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
+      "type": "injury_imbalance",
       "direction": "fade",
-      "team": "Seattle Mariners",
-      "side": "away",
+      "team": "Baltimore Orioles",
+      "side": null,
       "strength": 1.0,
-      "context": "2 match dans les 48h + 3747 km de voyage"
+      "context": "Absences severes 11-6"
     },
     {
       "event_id": "401815701",
@@ -286,12 +304,12 @@
       "match": "Baltimore Orioles - Seattle Mariners",
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
+      "type": "injury_imbalance",
       "direction": "fade",
-      "team": "Seattle Mariners",
-      "side": "away",
+      "team": "Baltimore Orioles",
+      "side": null,
       "strength": 1.0,
-      "context": "1 match dans les 48h + 3747 km de voyage"
+      "context": "Absences severes 11-6"
     },
     {
       "event_id": "401874175",
@@ -366,24 +384,6 @@
       "context": "1 match dans les 48h + 1928 km de voyage"
     },
     {
-      "event_id": "401815676",
-      "date": "2026-06-08T22:35Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Baltimore Orioles",
-      "away": "Seattle Mariners",
-      "match": "Baltimore Orioles - Seattle Mariners",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "travel_extreme",
-      "direction": "fade",
-      "team": "Seattle Mariners",
-      "side": "away",
-      "strength": 0.871,
-      "context": "Deplacement estime 3747 km, decalage ~3.0h"
-    },
-    {
       "event_id": "401874174",
       "date": "2026-06-10T00:00Z",
       "sport": "hockey",
@@ -439,24 +439,6 @@
     }
   ],
   "active_watch": [
-    {
-      "event_id": "401856974",
-      "date": "2026-06-09T02:00Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Las Vegas Aces",
-      "away": "Seattle Storm",
-      "match": "Las Vegas Aces - Seattle Storm",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Seattle Storm",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 1-4"
-    },
     {
       "event_id": "401856975",
       "date": "2026-06-09T23:00Z",
