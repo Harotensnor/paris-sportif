@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-08T19:39:29Z",
+  "generated_at": "2026-06-08T21:26:52Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
@@ -23,24 +23,6 @@
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401815676",
-      "date": "2026-06-08T22:35Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Baltimore Orioles",
-      "away": "Seattle Mariners",
-      "match": "Baltimore Orioles - Seattle Mariners",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Baltimore Orioles",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 11-6"
-    },
     {
       "event_id": "401815674",
       "date": "2026-06-08T22:40Z",
@@ -75,7 +57,7 @@
       "team": "Toronto Blue Jays",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 14-1"
+      "context": "Absences severes 13-1"
     },
     {
       "event_id": "401815680",
@@ -106,12 +88,12 @@
       "match": "Baltimore Orioles - Seattle Mariners",
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
+      "type": "back_to_back_travel",
       "direction": "fade",
-      "team": "Baltimore Orioles",
-      "side": null,
+      "team": "Seattle Mariners",
+      "side": "away",
       "strength": 1.0,
-      "context": "Absences severes 11-6"
+      "context": "1 match dans les 48h + 3747 km de voyage"
     },
     {
       "event_id": "401815685",
@@ -147,7 +129,7 @@
       "team": "Toronto Blue Jays",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 14-1"
+      "context": "Absences severes 13-1"
     },
     {
       "event_id": "401815692",
@@ -250,12 +232,12 @@
       "match": "Baltimore Orioles - Seattle Mariners",
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
+      "type": "back_to_back_travel",
       "direction": "fade",
-      "team": "Baltimore Orioles",
-      "side": null,
+      "team": "Seattle Mariners",
+      "side": "away",
       "strength": 1.0,
-      "context": "Absences severes 11-6"
+      "context": "2 match dans les 48h + 3747 km de voyage"
     },
     {
       "event_id": "401815701",
@@ -273,7 +255,7 @@
       "team": "Toronto Blue Jays",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 14-1"
+      "context": "Absences severes 13-1"
     },
     {
       "event_id": "401815708",
@@ -304,12 +286,12 @@
       "match": "Baltimore Orioles - Seattle Mariners",
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
+      "type": "back_to_back_travel",
       "direction": "fade",
-      "team": "Baltimore Orioles",
-      "side": null,
+      "team": "Seattle Mariners",
+      "side": "away",
       "strength": 1.0,
-      "context": "Absences severes 11-6"
+      "context": "1 match dans les 48h + 3747 km de voyage"
     },
     {
       "event_id": "401874175",
@@ -382,6 +364,24 @@
       "side": "away",
       "strength": 0.916,
       "context": "1 match dans les 48h + 1928 km de voyage"
+    },
+    {
+      "event_id": "401815676",
+      "date": "2026-06-08T22:35Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Baltimore Orioles",
+      "away": "Seattle Mariners",
+      "match": "Baltimore Orioles - Seattle Mariners",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "travel_extreme",
+      "direction": "fade",
+      "team": "Seattle Mariners",
+      "side": "away",
+      "strength": 0.871,
+      "context": "Deplacement estime 3747 km, decalage ~3.0h"
     },
     {
       "event_id": "401874174",
@@ -497,7 +497,7 @@
   "active_risk": [
     {
       "event_id": "177864",
-      "date": "2026-06-09T04:00Z",
+      "date": "2026-06-09T13:00Z",
       "sport": "tennis",
       "league_code": "thehsbcchampionships",
       "league_name": "The HSBC Championships",
