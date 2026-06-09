@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-06-09T15:40:33Z",
+  "generated_at": "2026-06-09T17:38:15Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 45,
+    "active_events": 46,
     "actionable": 39,
     "watch": 5,
-    "risk": 1,
+    "risk": 2,
     "expired_sample": 0,
     "by_type": {
-      "market_uncertain": 1,
       "injury_imbalance": 32,
       "travel_extreme": 19,
       "back_to_back_travel": 23,
+      "market_uncertain": 2,
       "signal_conflict": 6
     },
     "by_quality": {
-      "risk": 1,
       "actionable": 39,
-      "watch": 5
+      "watch": 5,
+      "risk": 2
     }
   },
   "active_actionable": [
@@ -820,11 +820,11 @@
   ],
   "active_risk": [
     {
-      "event_id": "177852",
-      "date": "2026-06-09T15:35Z",
+      "event_id": "177808",
+      "date": "2026-06-10T04:00Z",
       "sport": "tennis",
-      "league_code": "thehsbcchampionships",
-      "league_name": "The HSBC Championships",
+      "league_code": "libemaopen",
+      "league_name": "Libéma Open",
       "home": "",
       "away": "",
       "match": "? - ?",
@@ -835,7 +835,25 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 13.5%"
+      "context": "marge bookmaker anormale 12.1%"
+    },
+    {
+      "event_id": "177076",
+      "date": "2026-06-10T14:55Z",
+      "sport": "tennis",
+      "league_code": "libemaopen",
+      "league_name": "Libéma Open",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 12.3%"
     }
   ],
   "expired_sample": []
