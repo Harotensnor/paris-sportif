@@ -1,23 +1,24 @@
 {
-  "generated_at": "2026-06-09T19:37:04Z",
+  "generated_at": "2026-06-09T21:23:21Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 44,
-    "actionable": 39,
-    "watch": 5,
-    "risk": 0,
+    "active_events": 42,
+    "actionable": 41,
+    "watch": 0,
+    "risk": 1,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 32,
+      "injury_imbalance": 29,
       "travel_extreme": 19,
       "back_to_back_travel": 23,
-      "signal_conflict": 6
+      "signal_conflict": 6,
+      "market_uncertain": 1
     },
     "by_quality": {
-      "actionable": 39,
-      "watch": 5
+      "actionable": 41,
+      "risk": 1
     }
   },
   "active_actionable": [
@@ -91,7 +92,7 @@
       "team": "Toronto Blue Jays",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 13-1"
+      "context": "Absences severes 12-1"
     },
     {
       "event_id": "401815688",
@@ -289,7 +290,7 @@
       "team": "Toronto Blue Jays",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 13-1"
+      "context": "Absences severes 12-1"
     },
     {
       "event_id": "401815703",
@@ -598,6 +599,24 @@
       "context": "Absences severes 12-8"
     },
     {
+      "event_id": "401815691",
+      "date": "2026-06-10T00:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Colorado Rockies",
+      "away": "Chicago Cubs",
+      "match": "Colorado Rockies - Chicago Cubs",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Colorado Rockies",
+      "side": null,
+      "strength": 0.8,
+      "context": "Absences severes 14-10"
+    },
+    {
       "event_id": "401815694",
       "date": "2026-06-10T02:05Z",
       "sport": "baseball",
@@ -670,6 +689,24 @@
       "context": "Absences severes 12-8"
     },
     {
+      "event_id": "401815767",
+      "date": "2026-06-16T00:05Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Chicago Cubs",
+      "away": "Colorado Rockies",
+      "match": "Chicago Cubs - Colorado Rockies",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Colorado Rockies",
+      "side": null,
+      "strength": 0.8,
+      "context": "Absences severes 10-14"
+    },
+    {
       "event_id": "401874174",
       "date": "2026-06-10T00:00Z",
       "sport": "hockey",
@@ -724,98 +761,26 @@
       "context": "Deplacement estime 3181 km, decalage ~2.1h"
     }
   ],
-  "active_watch": [
+  "active_watch": [],
+  "active_risk": [
     {
-      "event_id": "401815690",
-      "date": "2026-06-09T23:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Kansas City Royals",
-      "away": "Texas Rangers",
-      "match": "Kansas City Royals - Texas Rangers",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Texas Rangers",
+      "event_id": "177803",
+      "date": "2026-06-11T04:00Z",
+      "sport": "tennis",
+      "league_code": "libemaopen",
+      "league_name": "Libéma Open",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
       "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 7-10"
-    },
-    {
-      "event_id": "401815691",
-      "date": "2026-06-10T00:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Colorado Rockies",
-      "away": "Chicago Cubs",
-      "match": "Colorado Rockies - Chicago Cubs",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Colorado Rockies",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 13-10"
-    },
-    {
-      "event_id": "401815705",
-      "date": "2026-06-10T23:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Kansas City Royals",
-      "away": "Texas Rangers",
-      "match": "Kansas City Royals - Texas Rangers",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Texas Rangers",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 7-10"
-    },
-    {
-      "event_id": "401815717",
-      "date": "2026-06-11T18:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Kansas City Royals",
-      "away": "Texas Rangers",
-      "match": "Kansas City Royals - Texas Rangers",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Texas Rangers",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 7-10"
-    },
-    {
-      "event_id": "401815767",
-      "date": "2026-06-16T00:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Chicago Cubs",
-      "away": "Colorado Rockies",
-      "match": "Chicago Cubs - Colorado Rockies",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Colorado Rockies",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 10-13"
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 12.1%"
     }
   ],
-  "active_risk": [],
   "expired_sample": []
 }
