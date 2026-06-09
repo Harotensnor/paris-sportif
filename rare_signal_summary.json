@@ -1,46 +1,28 @@
 {
-  "generated_at": "2026-06-09T01:49:05Z",
+  "generated_at": "2026-06-09T02:54:54Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 48,
-    "actionable": 39,
-    "watch": 8,
+    "active_events": 45,
+    "actionable": 37,
+    "watch": 7,
     "risk": 1,
     "expired_sample": 0,
     "by_type": {
-      "travel_extreme": 21,
-      "injury_imbalance": 34,
-      "signal_conflict": 7,
+      "injury_imbalance": 32,
+      "travel_extreme": 19,
       "back_to_back_travel": 23,
-      "market_uncertain": 2
+      "market_uncertain": 2,
+      "signal_conflict": 6
     },
     "by_quality": {
-      "actionable": 39,
-      "watch": 8,
+      "actionable": 37,
+      "watch": 7,
       "risk": 1
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401815680",
-      "date": "2026-06-09T01:45Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Francisco Giants",
-      "away": "Washington Nationals",
-      "match": "San Francisco Giants - Washington Nationals",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "San Francisco Giants",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 12-6"
-    },
     {
       "event_id": "401815687",
       "date": "2026-06-09T22:35Z",
@@ -706,45 +688,9 @@
       "side": "away",
       "strength": 0.74,
       "context": "Deplacement estime 3181 km, decalage ~2.1h"
-    },
-    {
-      "event_id": "401815677",
-      "date": "2026-06-09T01:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Diego Padres",
-      "away": "Cincinnati Reds",
-      "match": "San Diego Padres - Cincinnati Reds",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "travel_extreme",
-      "direction": "fade",
-      "team": "Cincinnati Reds",
-      "side": "away",
-      "strength": 0.7,
-      "context": "Deplacement estime 3008 km, decalage ~2.2h"
     }
   ],
   "active_watch": [
-    {
-      "event_id": "401815679",
-      "date": "2026-06-09T02:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Athletics",
-      "away": "Milwaukee Brewers",
-      "match": "Athletics - Milwaukee Brewers",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Milwaukee Brewers",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 6-9"
-    },
     {
       "event_id": "401815690",
       "date": "2026-06-09T23:40Z",
