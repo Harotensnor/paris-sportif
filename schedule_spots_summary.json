@@ -1,27 +1,100 @@
 {
-  "generated_at": "2026-06-08T23:57:38Z",
+  "generated_at": "2026-06-09T01:49:05Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 43,
+    "active_events": 44,
     "expired_sample": 0,
     "by_type": {
       "lookahead": 62,
       "travel_extreme": 23,
-      "back_to_back_travel": 22,
-      "schedule_congestion": 4
+      "back_to_back_travel": 23,
+      "schedule_congestion": 6
     },
     "by_decision": {
       "abstain": 14,
-      "lean_home": 29
+      "lean_home": 30
     },
-    "lean_home": 29,
+    "lean_home": 30,
     "lean_away": 0,
     "abstain": 14,
     "monitor": 0
   },
   "active": [
+    {
+      "event_id": "401815767",
+      "source_event_ids": [
+        "401815767"
+      ],
+      "kickoff": "2026-06-16T00:05Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Chicago Cubs",
+      "away": "Colorado Rockies",
+      "match": "Chicago Cubs - Colorado Rockies",
+      "decision": "abstain",
+      "net_team": null,
+      "reason": "Fatigue/agenda des deux cotes: Chicago Cubs 0.75, Colorado Rockies 0.75",
+      "pressure_score": 1.867,
+      "home_fade": 0.75,
+      "away_fade": 0.75,
+      "travel_score": 0,
+      "lookahead_score": 0.667,
+      "congestion_score": 1.2,
+      "types": {
+        "schedule_congestion": 2,
+        "lookahead": 2
+      },
+      "contexts": [
+        "3 matchs sur les 7 derniers jours",
+        "1 match important/proche dans les 3 jours",
+        "3 matchs sur les 7 derniers jours",
+        "1 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": -0.278,
+        "away_score": -1.088,
+        "home_fade": 0.75,
+        "away_fade": 1.35,
+        "reason": "Direction nette: Chicago Cubs (-0.28)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.6
+          }
+        ]
+      }
+    },
     {
       "event_id": "401815679",
       "source_event_ids": [
@@ -371,116 +444,6 @@
       }
     },
     {
-      "event_id": "401815767",
-      "source_event_ids": [
-        "401815767"
-      ],
-      "kickoff": "2026-06-16T00:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Chicago Cubs",
-      "away": "Colorado Rockies",
-      "match": "Chicago Cubs - Colorado Rockies",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Chicago Cubs 0.60, Colorado Rockies 0.60",
-      "pressure_score": 1.2,
-      "home_fade": 0.6,
-      "away_fade": 0.6,
-      "travel_score": 0,
-      "lookahead_score": 0,
-      "congestion_score": 1.2,
-      "types": {
-        "schedule_congestion": 2
-      },
-      "contexts": [
-        "3 matchs sur les 7 derniers jours",
-        "3 matchs sur les 7 derniers jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.18,
-        "away_score": -0.99,
-        "home_fade": 0.6,
-        "away_fade": 1.2,
-        "reason": "Direction nette: Chicago Cubs (-0.18)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.6
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401859965",
-      "source_event_ids": [
-        "401859965"
-      ],
-      "kickoff": "2026-06-09T00:30Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "New York Knicks",
-      "away": "San Antonio Spurs",
-      "match": "New York Knicks - San Antonio Spurs",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: New York Knicks 0.15, San Antonio Spurs 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
-        "home_fade": 0.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: San Antonio Spurs (-0.10)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401815685",
       "source_event_ids": [
         "401815685"
@@ -806,6 +769,58 @@
         "home_fade": 0.15,
         "away_fade": 0.15,
         "reason": "Direction nette: San Antonio Spurs (-0.10)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401859967",
+      "source_event_ids": [
+        "401859967"
+      ],
+      "kickoff": "2026-06-14T00:30Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "San Antonio Spurs",
+      "away": "New York Knicks",
+      "match": "San Antonio Spurs - New York Knicks",
+      "decision": "abstain",
+      "net_team": null,
+      "reason": "Fatigue/agenda des deux cotes: San Antonio Spurs 0.15, New York Knicks 0.15",
+      "pressure_score": 0.667,
+      "home_fade": 0.15,
+      "away_fade": 0.15,
+      "travel_score": 0,
+      "lookahead_score": 0.667,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 2
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours",
+        "1 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "away",
+        "home_score": -0.098,
+        "away_score": -0.098,
+        "home_fade": 0.15,
+        "away_fade": 0.15,
+        "reason": "Direction nette: New York Knicks (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -1256,6 +1271,72 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 1.0
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815781",
+      "source_event_ids": [
+        "401815781"
+      ],
+      "kickoff": "2026-06-17T00:05Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Chicago Cubs",
+      "away": "Colorado Rockies",
+      "match": "Chicago Cubs - Colorado Rockies",
+      "decision": "lean_home",
+      "net_team": "Chicago Cubs",
+      "reason": "Colorado Rockies plus penalise par calendrier/voyage (1.63 vs 0.80)",
+      "pressure_score": 2.425,
+      "home_fade": 0.8,
+      "away_fade": 1.625,
+      "travel_score": 0.825,
+      "lookahead_score": 0,
+      "congestion_score": 1.6,
+      "types": {
+        "schedule_congestion": 2,
+        "back_to_back_travel": 1
+      },
+      "contexts": [
+        "4 matchs sur les 7 derniers jours",
+        "4 matchs sur les 7 derniers jours",
+        "1 match dans les 48h + 1476 km de voyage"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": -0.021,
+        "away_score": -1.945,
+        "home_fade": 0.8,
+        "away_fade": 2.225,
+        "reason": "Direction nette: Chicago Cubs (-0.02)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.8
+          },
+          {
+            "side": "away",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.8
+          },
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "away",
+            "type": "back_to_back_travel",
+            "direction": "fade",
+            "strength": 0.825
           }
         ]
       }
@@ -1845,66 +1926,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815678",
-      "source_event_ids": [
-        "401815678"
-      ],
-      "kickoff": "2026-06-09T01:38Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Los Angeles Angels",
-      "away": "Houston Astros",
-      "match": "Los Angeles Angels - Houston Astros",
-      "decision": "lean_home",
-      "net_team": "Los Angeles Angels",
-      "reason": "Houston Astros plus penalise par calendrier/voyage (0.81 vs 0.30)",
-      "pressure_score": 1.838,
-      "home_fade": 0.3,
-      "away_fade": 0.805,
-      "travel_score": 0.505,
-      "lookahead_score": 1.333,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2,
-        "travel_extreme": 1
-      },
-      "contexts": [
-        "2 match important/proche dans les 3 jours",
-        "2 match important/proche dans les 3 jours",
-        "Deplacement estime 2172 km, decalage ~1.5h"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.018,
-        "away_score": -0.7,
-        "home_fade": 0.3,
-        "away_fade": 0.805,
-        "reason": "Direction nette: Los Angeles Angels (-0.02)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.505
           }
         ]
       }
@@ -2542,6 +2563,57 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.893
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815786",
+      "source_event_ids": [
+        "401815786"
+      ],
+      "kickoff": "2026-06-17T01:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Seattle Mariners",
+      "away": "Baltimore Orioles",
+      "match": "Seattle Mariners - Baltimore Orioles",
+      "decision": "lean_home",
+      "net_team": "Seattle Mariners",
+      "reason": "Baltimore Orioles plus penalise par calendrier/voyage (0.87 vs 0.00)",
+      "pressure_score": 0.871,
+      "home_fade": 0.0,
+      "away_fade": 0.871,
+      "travel_score": 0.871,
+      "lookahead_score": 0,
+      "congestion_score": 0,
+      "types": {
+        "travel_extreme": 1
+      },
+      "contexts": [
+        "Deplacement estime 3747 km, decalage ~3.0h"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": 0.585,
+        "away_score": -1.671,
+        "home_fade": 0.0,
+        "away_fade": 1.671,
+        "reason": "Direction nette: Seattle Mariners (+0.58)",
+        "detail": [
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.8
+          },
+          {
+            "side": "away",
+            "type": "travel_extreme",
+            "direction": "fade",
+            "strength": 0.871
           }
         ]
       }
