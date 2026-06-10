@@ -1,22 +1,22 @@
 {
-  "generated_at": "2026-06-10T19:10:42Z",
+  "generated_at": "2026-06-10T21:29:11Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 27,
+    "active_events": 25,
     "expired_sample": 0,
     "by_type": {
-      "travel_extreme": 14,
-      "back_to_back_travel": 19,
       "lookahead": 30,
+      "travel_extreme": 12,
+      "back_to_back_travel": 17,
       "schedule_congestion": 8
     },
     "by_decision": {
       "abstain": 5,
-      "lean_home": 22
+      "lean_home": 20
     },
-    "lean_home": 22,
+    "lean_home": 20,
     "lean_away": 0,
     "abstain": 5,
     "monitor": 0
@@ -126,11 +126,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.698,
-        "away_score": 0.112,
-        "home_fade": 0.75,
+        "home_score": -0.898,
+        "away_score": 0.183,
+        "home_fade": 0.95,
         "away_fade": 0.15,
-        "reason": "Direction nette: Atlanta Braves (+0.11)",
+        "reason": "Direction nette: Atlanta Braves (+0.18)",
         "detail": [
           {
             "side": "home",
@@ -148,7 +148,7 @@
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.6
+            "strength": 0.8
           }
         ]
       }
@@ -183,12 +183,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "home",
-        "home_score": 0.043,
-        "away_score": -0.498,
+        "net_side": "away",
+        "home_score": -0.098,
+        "away_score": -0.098,
         "home_fade": 0.15,
-        "away_fade": 0.55,
-        "reason": "Direction nette: Kansas City Royals (+0.04)",
+        "away_fade": 0.15,
+        "reason": "Direction nette: Texas Rangers (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -201,12 +201,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
           }
         ]
       }
@@ -820,65 +814,6 @@
       }
     },
     {
-      "event_id": "401815710",
-      "source_event_ids": [
-        "401815710"
-      ],
-      "kickoff": "2026-06-10T19:45Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Francisco Giants",
-      "away": "Washington Nationals",
-      "match": "San Francisco Giants - Washington Nationals",
-      "decision": "lean_home",
-      "net_team": "San Francisco Giants",
-      "reason": "Washington Nationals plus penalise par calendrier/voyage (1.91 vs 0.00)",
-      "pressure_score": 1.911,
-      "home_fade": 0.0,
-      "away_fade": 1.911,
-      "travel_score": 1.911,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "travel_extreme": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "Deplacement estime 3919 km, decalage ~3.0h",
-        "2 match dans les 48h + 3919 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.331,
-        "away_score": -1.561,
-        "home_fade": 1.0,
-        "away_fade": 1.911,
-        "reason": "Direction nette: San Francisco Giants (-0.33)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.911
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401815800",
       "source_event_ids": [
         "401815800"
@@ -1039,59 +974,6 @@
             "type": "travel_extreme",
             "direction": "fade",
             "strength": 0.74
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815707",
-      "source_event_ids": [
-        "401815707"
-      ],
-      "kickoff": "2026-06-10T20:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Diego Padres",
-      "away": "Cincinnati Reds",
-      "match": "San Diego Padres - Cincinnati Reds",
-      "decision": "lean_home",
-      "net_team": "San Diego Padres",
-      "reason": "Cincinnati Reds plus penalise par calendrier/voyage (1.70 vs 0.00)",
-      "pressure_score": 1.7,
-      "home_fade": 0.0,
-      "away_fade": 1.7,
-      "travel_score": 1.7,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "travel_extreme": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "Deplacement estime 3008 km, decalage ~2.2h",
-        "2 match dans les 48h + 3008 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.595,
-        "away_score": -1.7,
-        "home_fade": 0.0,
-        "away_fade": 1.7,
-        "reason": "Direction nette: San Diego Padres (+0.59)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.7
           },
           {
             "side": "away",
