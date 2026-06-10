@@ -1,46 +1,28 @@
 {
-  "generated_at": "2026-06-10T12:50:43Z",
+  "generated_at": "2026-06-10T19:10:42Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 32,
-    "actionable": 29,
-    "watch": 1,
-    "risk": 2,
+    "active_events": 29,
+    "actionable": 25,
+    "watch": 3,
+    "risk": 1,
     "expired_sample": 0,
     "by_type": {
-      "back_to_back_travel": 20,
-      "injury_imbalance": 22,
+      "injury_imbalance": 21,
       "travel_extreme": 14,
+      "back_to_back_travel": 19,
       "signal_conflict": 6,
-      "market_uncertain": 2
+      "market_uncertain": 1
     },
     "by_quality": {
-      "actionable": 29,
-      "risk": 2,
-      "watch": 1
+      "actionable": 25,
+      "watch": 3,
+      "risk": 1
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401815700",
-      "date": "2026-06-10T17:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Cleveland Guardians",
-      "away": "New York Yankees",
-      "match": "Cleveland Guardians - New York Yankees",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "New York Yankees",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 2-7"
-    },
     {
       "event_id": "401815710",
       "date": "2026-06-10T19:45Z",
@@ -57,7 +39,7 @@
       "team": "San Francisco Giants",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 12-6"
+      "context": "Absences severes 11-6"
     },
     {
       "event_id": "401815707",
@@ -147,7 +129,7 @@
       "team": "Toronto Blue Jays",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 12-1"
+      "context": "Absences severes 12-2"
     },
     {
       "event_id": "401815703",
@@ -166,24 +148,6 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 12-2"
-    },
-    {
-      "event_id": "401815704",
-      "date": "2026-06-10T23:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Chicago White Sox",
-      "away": "Atlanta Braves",
-      "match": "Chicago White Sox - Atlanta Braves",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Chicago White Sox",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 14-9"
     },
     {
       "event_id": "401815706",
@@ -312,24 +276,6 @@
       "context": "1 match dans les 48h + 3747 km de voyage"
     },
     {
-      "event_id": "401815716",
-      "date": "2026-06-11T23:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Chicago White Sox",
-      "away": "Atlanta Braves",
-      "match": "Chicago White Sox - Atlanta Braves",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Chicago White Sox",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 14-9"
-    },
-    {
       "event_id": "401874175",
       "date": "2026-06-12T00:00Z",
       "sport": "hockey",
@@ -418,24 +364,6 @@
       "side": "away",
       "strength": 1.0,
       "context": "1 match dans les 48h + 3747 km de voyage"
-    },
-    {
-      "event_id": "401815697",
-      "date": "2026-06-10T17:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Tampa Bay Rays",
-      "away": "Boston Red Sox",
-      "match": "Tampa Bay Rays - Boston Red Sox",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Boston Red Sox",
-      "side": "away",
-      "strength": 0.996,
-      "context": "2 match dans les 48h + 1928 km de voyage"
     },
     {
       "event_id": "401815786",
@@ -548,6 +476,24 @@
   ],
   "active_watch": [
     {
+      "event_id": "401815704",
+      "date": "2026-06-10T23:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Chicago White Sox",
+      "away": "Atlanta Braves",
+      "match": "Chicago White Sox - Atlanta Braves",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Chicago White Sox",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 14-11"
+    },
+    {
       "event_id": "401856980",
       "date": "2026-06-11T23:00Z",
       "sport": "basketball",
@@ -564,30 +510,30 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 2-5"
+    },
+    {
+      "event_id": "401815716",
+      "date": "2026-06-11T23:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Chicago White Sox",
+      "away": "Atlanta Braves",
+      "match": "Chicago White Sox - Atlanta Braves",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Chicago White Sox",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 14-11"
     }
   ],
   "active_risk": [
     {
-      "event_id": "177056",
-      "date": "2026-06-11T04:00Z",
-      "sport": "tennis",
-      "league_code": "bossopen",
-      "league_name": "Boss Open",
-      "home": "",
-      "away": "",
-      "match": "? - ?",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 12.1%"
-    },
-    {
-      "event_id": "177803",
-      "date": "2026-06-11T04:00Z",
+      "event_id": "177807",
+      "date": "2026-06-11T10:30Z",
       "sport": "tennis",
       "league_code": "libemaopen",
       "league_name": "Libéma Open",
@@ -601,7 +547,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 12.1%"
+      "context": "marge bookmaker anormale 12.6%"
     }
   ],
   "expired_sample": []

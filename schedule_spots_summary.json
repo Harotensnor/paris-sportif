@@ -1,22 +1,22 @@
 {
-  "generated_at": "2026-06-10T12:50:43Z",
+  "generated_at": "2026-06-10T19:10:42Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 28,
+    "active_events": 27,
     "expired_sample": 0,
     "by_type": {
-      "travel_extreme": 15,
-      "back_to_back_travel": 20,
+      "travel_extreme": 14,
+      "back_to_back_travel": 19,
       "lookahead": 30,
       "schedule_congestion": 8
     },
     "by_decision": {
       "abstain": 5,
-      "lean_home": 23
+      "lean_home": 22
     },
-    "lean_home": 23,
+    "lean_home": 22,
     "lean_away": 0,
     "abstain": 5,
     "monitor": 0
@@ -126,11 +126,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -1.097,
-        "away_score": 0.252,
-        "home_fade": 1.15,
+        "home_score": -0.698,
+        "away_score": 0.112,
+        "home_fade": 0.75,
         "away_fade": 0.15,
-        "reason": "Direction nette: Atlanta Braves (+0.25)",
+        "reason": "Direction nette: Atlanta Braves (+0.11)",
         "detail": [
           {
             "side": "home",
@@ -148,7 +148,7 @@
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 1.0
+            "strength": 0.6
           }
         ]
       }
@@ -1349,59 +1349,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.813
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815697",
-      "source_event_ids": [
-        "401815697"
-      ],
-      "kickoff": "2026-06-10T17:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Tampa Bay Rays",
-      "away": "Boston Red Sox",
-      "match": "Tampa Bay Rays - Boston Red Sox",
-      "decision": "lean_home",
-      "net_team": "Tampa Bay Rays",
-      "reason": "Boston Red Sox plus penalise par calendrier/voyage (1.44 vs 0.00)",
-      "pressure_score": 1.444,
-      "home_fade": 0.0,
-      "away_fade": 1.444,
-      "travel_score": 1.444,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "travel_extreme": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "Deplacement estime 1928 km, decalage ~0.8h",
-        "2 match dans les 48h + 1928 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.505,
-        "away_score": -1.444,
-        "home_fade": 0.0,
-        "away_fade": 1.444,
-        "reason": "Direction nette: Tampa Bay Rays (+0.51)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.448
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.996
           }
         ]
       }
