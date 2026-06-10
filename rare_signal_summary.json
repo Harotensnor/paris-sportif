@@ -1,82 +1,28 @@
 {
-  "generated_at": "2026-06-10T21:29:11Z",
+  "generated_at": "2026-06-10T23:07:52Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 27,
-    "actionable": 25,
+    "active_events": 23,
+    "actionable": 21,
     "watch": 1,
     "risk": 1,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 20,
-      "travel_extreme": 12,
-      "back_to_back_travel": 17,
-      "signal_conflict": 6,
+      "injury_imbalance": 17,
+      "back_to_back_travel": 13,
+      "signal_conflict": 5,
+      "travel_extreme": 9,
       "market_uncertain": 1
     },
     "by_quality": {
-      "actionable": 25,
+      "actionable": 21,
       "risk": 1,
       "watch": 1
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401815702",
-      "date": "2026-06-10T22:35Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Baltimore Orioles",
-      "away": "Seattle Mariners",
-      "match": "Baltimore Orioles - Seattle Mariners",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Seattle Mariners",
-      "side": "away",
-      "strength": 1.0,
-      "context": "2 match dans les 48h + 3747 km de voyage"
-    },
-    {
-      "event_id": "401815696",
-      "date": "2026-06-10T22:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Miami Marlins",
-      "away": "Arizona Diamondbacks",
-      "match": "Miami Marlins - Arizona Diamondbacks",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Arizona Diamondbacks",
-      "side": "away",
-      "strength": 1.0,
-      "context": "1 match dans les 48h + 3181 km de voyage"
-    },
-    {
-      "event_id": "401815698",
-      "date": "2026-06-10T22:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Pittsburgh Pirates",
-      "away": "Los Angeles Dodgers",
-      "match": "Pittsburgh Pirates - Los Angeles Dodgers",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Los Angeles Dodgers",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 3-16"
-    },
     {
       "event_id": "401815701",
       "date": "2026-06-10T23:07Z",
@@ -219,7 +165,7 @@
       "team": "Los Angeles Dodgers",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 3-16"
+      "context": "Absences severes 4-16"
     },
     {
       "event_id": "401815714",
@@ -346,24 +292,6 @@
       "side": "away",
       "strength": 0.871,
       "context": "Deplacement estime 3747 km, decalage ~3.0h"
-    },
-    {
-      "event_id": "401815699",
-      "date": "2026-06-10T22:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Detroit Tigers",
-      "away": "Minnesota Twins",
-      "match": "Detroit Tigers - Minnesota Twins",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Detroit Tigers",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 12-8"
     },
     {
       "event_id": "401815704",
