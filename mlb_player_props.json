@@ -1,336 +1,8 @@
 {
-  "generated_at": "2026-06-09T22:55:52Z",
+  "generated_at": "2026-06-10T00:05:20Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815686",
-      "kickoff": "2026-06-09T23:07Z",
-      "league": "MLB",
-      "match": "Philadelphia Phillies at Toronto Blue Jays",
-      "home": "Toronto Blue Jays",
-      "away": "Philadelphia Phillies",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Toronto Blue Jays",
-          "pitcher": "Dylan Cease",
-          "label": "Dylan Cease moins de 8,5 strikeouts",
-          "line": 8.5,
-          "pick": "under",
-          "probability": 0.5246,
-          "fair_odds": 1.91,
-          "expected_strikeouts": 8.36,
-          "projected_ip": 5.64,
-          "inputs": {
-            "k9": 13.35,
-            "era": 3.05,
-            "whip": 1.21,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Toronto Blue Jays",
-          "pitcher": "Dylan Cease",
-          "label": "Dylan Cease ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6331,
-          "fair_odds": 1.58,
-          "expected_hr_allowed": 0.457,
-          "projected_ip": 5.64,
-          "inputs": {
-            "hr9": 0.73,
-            "era": 3.05,
-            "whip": 1.21
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Philadelphia Phillies",
-          "pitcher": "Zack Wheeler",
-          "label": "Zack Wheeler plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.593,
-          "fair_odds": 1.69,
-          "expected_strikeouts": 5.95,
-          "projected_ip": 6.28,
-          "inputs": {
-            "k9": 8.53,
-            "era": 2.31,
-            "whip": 0.83,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Philadelphia Phillies",
-          "pitcher": "Zack Wheeler",
-          "label": "Zack Wheeler concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5258,
-          "fair_odds": 1.9,
-          "expected_hr_allowed": 0.746,
-          "projected_ip": 6.28,
-          "inputs": {
-            "hr9": 1.07,
-            "era": 2.31,
-            "whip": 0.83
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401815688",
-      "kickoff": "2026-06-09T23:10Z",
-      "league": "MLB",
-      "match": "St. Louis Cardinals at New York Mets",
-      "home": "New York Mets",
-      "away": "St. Louis Cardinals",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "New York Mets",
-          "pitcher": "Freddy Peralta",
-          "label": "Freddy Peralta plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.5412,
-          "fair_odds": 1.85,
-          "expected_strikeouts": 5.69,
-          "projected_ip": 5.54,
-          "inputs": {
-            "k9": 9.25,
-            "era": 3.63,
-            "whip": 1.32,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "New York Mets",
-          "pitcher": "Freddy Peralta",
-          "label": "Freddy Peralta concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5011,
-          "fair_odds": 2.0,
-          "expected_hr_allowed": 0.695,
-          "projected_ip": 5.54,
-          "inputs": {
-            "hr9": 1.13,
-            "era": 3.63,
-            "whip": 1.32
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "St. Louis Cardinals",
-          "pitcher": "Dustin May",
-          "label": "Dustin May plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.6055,
-          "fair_odds": 1.65,
-          "expected_strikeouts": 4.96,
-          "projected_ip": 5.52,
-          "inputs": {
-            "k9": 8.1,
-            "era": 4.59,
-            "whip": 1.29,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "St. Louis Cardinals",
-          "pitcher": "Dustin May",
-          "label": "Dustin May ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6632,
-          "fair_odds": 1.51,
-          "expected_hr_allowed": 0.411,
-          "projected_ip": 5.52,
-          "inputs": {
-            "hr9": 0.67,
-            "era": 4.59,
-            "whip": 1.29
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401815689",
-      "kickoff": "2026-06-09T23:40Z",
-      "league": "MLB",
-      "match": "Atlanta Braves at Chicago White Sox",
-      "home": "Chicago White Sox",
-      "away": "Atlanta Braves",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Chicago White Sox",
-          "pitcher": "Erick Fedde",
-          "label": "Erick Fedde moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.6077,
-          "fair_odds": 1.65,
-          "expected_strikeouts": 4.07,
-          "projected_ip": 6.6,
-          "inputs": {
-            "k9": 5.55,
-            "era": 4.94,
-            "whip": 1.41,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Chicago White Sox",
-          "pitcher": "Erick Fedde",
-          "label": "Erick Fedde concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.771,
-          "fair_odds": 1.3,
-          "expected_hr_allowed": 1.474,
-          "projected_ip": 6.6,
-          "inputs": {
-            "hr9": 2.01,
-            "era": 4.94,
-            "whip": 1.41
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Atlanta Braves",
-          "pitcher": "Grant Holmes",
-          "label": "Grant Holmes plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.5581,
-          "fair_odds": 1.79,
-          "expected_strikeouts": 4.75,
-          "projected_ip": 5.25,
-          "inputs": {
-            "k9": 8.14,
-            "era": 3.86,
-            "whip": 1.32,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Atlanta Braves",
-          "pitcher": "Grant Holmes",
-          "label": "Grant Holmes concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6312,
-          "fair_odds": 1.58,
-          "expected_hr_allowed": 0.997,
-          "projected_ip": 5.25,
-          "inputs": {
-            "hr9": 1.71,
-            "era": 3.86,
-            "whip": 1.32
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401815690",
-      "kickoff": "2026-06-09T23:40Z",
-      "league": "MLB",
-      "match": "Texas Rangers at Kansas City Royals",
-      "home": "Kansas City Royals",
-      "away": "Texas Rangers",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Kansas City Royals",
-          "pitcher": "Stephen Kolek",
-          "label": "Stephen Kolek moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.5008,
-          "fair_odds": 2.0,
-          "expected_strikeouts": 4.5,
-          "projected_ip": 6.33,
-          "inputs": {
-            "k9": 6.39,
-            "era": 3.32,
-            "whip": 0.97,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Kansas City Royals",
-          "pitcher": "Stephen Kolek",
-          "label": "Stephen Kolek concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5641,
-          "fair_odds": 1.77,
-          "expected_hr_allowed": 0.83,
-          "projected_ip": 6.33,
-          "inputs": {
-            "hr9": 1.18,
-            "era": 3.32,
-            "whip": 0.97
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Texas Rangers",
-          "pitcher": "Nathan Eovaldi",
-          "label": "Nathan Eovaldi moins de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "under",
-          "probability": 0.5763,
-          "fair_odds": 1.74,
-          "expected_strikeouts": 6.13,
-          "projected_ip": 6.18,
-          "inputs": {
-            "k9": 8.92,
-            "era": 4.1,
-            "whip": 1.18,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Texas Rangers",
-          "pitcher": "Nathan Eovaldi",
-          "label": "Nathan Eovaldi concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6869,
-          "fair_odds": 1.46,
-          "expected_hr_allowed": 1.161,
-          "projected_ip": 6.18,
-          "inputs": {
-            "hr9": 1.69,
-            "era": 4.1,
-            "whip": 1.18
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815691",
       "kickoff": "2026-06-10T00:40Z",
@@ -1673,6 +1345,42 @@
       "props": [
         {
           "market": "pitcher_strikeouts",
+          "team": "Miami Marlins",
+          "pitcher": "Tyler Phillips",
+          "label": "Tyler Phillips moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.5032,
+          "fair_odds": 1.99,
+          "expected_strikeouts": 5.49,
+          "projected_ip": 6.6,
+          "inputs": {
+            "k9": 7.48,
+            "era": 2.08,
+            "whip": 1.36,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Miami Marlins",
+          "pitcher": "Tyler Phillips",
+          "label": "Tyler Phillips ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.7349,
+          "fair_odds": 1.36,
+          "expected_hr_allowed": 0.308,
+          "projected_ip": 6.6,
+          "inputs": {
+            "hr9": 0.42,
+            "era": 2.08,
+            "whip": 1.36
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
           "team": "Arizona Diamondbacks",
           "pitcher": "Merrill Kelly",
           "label": "Merrill Kelly plus de 3,5 strikeouts",
@@ -2212,7 +1920,7 @@
       ]
     }
   ],
-  "props": 106,
+  "props": 92,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
