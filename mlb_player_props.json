@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-10T11:39:16Z",
+  "generated_at": "2026-06-10T12:50:41Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -46,6 +46,42 @@
             "whip": 0.92
           },
           "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Boston Red Sox",
+          "pitcher": "Jake Bennett",
+          "label": "Jake Bennett moins de 2,5 strikeouts",
+          "line": 2.5,
+          "pick": "under",
+          "probability": 0.6829,
+          "fair_odds": 1.46,
+          "expected_strikeouts": 1.95,
+          "projected_ip": 5.05,
+          "inputs": {
+            "k9": 3.48,
+            "era": 4.35,
+            "whip": 1.45,
+            "hand": "L"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Boston Red Sox",
+          "pitcher": "Jake Bennett",
+          "label": "Jake Bennett ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6138,
+          "fair_odds": 1.63,
+          "expected_hr_allowed": 0.488,
+          "projected_ip": 5.05,
+          "inputs": {
+            "hr9": 0.87,
+            "era": 4.35,
+            "whip": 1.45
+          },
+          "side": "away"
         }
       ]
     },
@@ -680,18 +716,18 @@
         {
           "market": "pitcher_strikeouts",
           "team": "New York Mets",
-          "pitcher": "Christian Scott",
-          "label": "Christian Scott moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.5841,
-          "fair_odds": 1.71,
-          "expected_strikeouts": 5.12,
-          "projected_ip": 4.5,
+          "pitcher": "Austin Warren",
+          "label": "Austin Warren plus de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "over",
+          "probability": 0.5582,
+          "fair_odds": 1.79,
+          "expected_strikeouts": 6.8,
+          "projected_ip": 6.6,
           "inputs": {
-            "k9": 10.25,
-            "era": 2.5,
-            "whip": 1.31,
+            "k9": 9.27,
+            "era": 2.01,
+            "whip": 1.12,
             "hand": "R"
           },
           "side": "home"
@@ -699,17 +735,17 @@
         {
           "market": "pitcher_home_run_allowed",
           "team": "New York Mets",
-          "pitcher": "Christian Scott",
-          "label": "Christian Scott ne concède pas de home run",
+          "pitcher": "Austin Warren",
+          "label": "Austin Warren ne concède pas de home run",
           "pick": "no",
-          "probability": 0.8825,
-          "fair_odds": 1.13,
-          "expected_hr_allowed": 0.125,
-          "projected_ip": 4.5,
+          "probability": 0.5521,
+          "fair_odds": 1.81,
+          "expected_hr_allowed": 0.594,
+          "projected_ip": 6.6,
           "inputs": {
-            "hr9": 0.25,
-            "era": 2.5,
-            "whip": 1.31
+            "hr9": 0.81,
+            "era": 2.01,
+            "whip": 1.12
           },
           "side": "home"
         },
@@ -1135,6 +1171,42 @@
       "props": [
         {
           "market": "pitcher_strikeouts",
+          "team": "New York Mets",
+          "pitcher": "Christian Scott",
+          "label": "Christian Scott moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.5841,
+          "fair_odds": 1.71,
+          "expected_strikeouts": 5.12,
+          "projected_ip": 4.5,
+          "inputs": {
+            "k9": 10.25,
+            "era": 2.5,
+            "whip": 1.31,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "New York Mets",
+          "pitcher": "Christian Scott",
+          "label": "Christian Scott ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.8825,
+          "fair_odds": 1.13,
+          "expected_hr_allowed": 0.125,
+          "projected_ip": 4.5,
+          "inputs": {
+            "hr9": 0.25,
+            "era": 2.5,
+            "whip": 1.31
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
           "team": "St. Louis Cardinals",
           "pitcher": "Hunter Dobbins",
           "label": "Hunter Dobbins moins de 7,5 strikeouts",
@@ -1546,7 +1618,7 @@
       ]
     }
   ],
-  "props": 74,
+  "props": 78,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
