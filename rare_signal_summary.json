@@ -1,62 +1,28 @@
 {
-  "generated_at": "2026-06-11T13:51:26Z",
+  "generated_at": "2026-06-11T17:29:23Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 17,
-    "actionable": 16,
+    "active_events": 15,
+    "actionable": 13,
     "watch": 1,
-    "risk": 0,
+    "risk": 1,
     "expired_sample": 0,
     "by_type": {
-      "travel_extreme": 9,
-      "back_to_back_travel": 11,
-      "injury_imbalance": 13,
-      "signal_conflict": 3
+      "injury_imbalance": 11,
+      "back_to_back_travel": 8,
+      "signal_conflict": 1,
+      "travel_extreme": 8,
+      "market_uncertain": 1
     },
     "by_quality": {
-      "actionable": 16,
-      "watch": 1
+      "actionable": 13,
+      "watch": 1,
+      "risk": 1
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401815711",
-      "date": "2026-06-11T17:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Miami Marlins",
-      "away": "Arizona Diamondbacks",
-      "match": "Miami Marlins - Arizona Diamondbacks",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Arizona Diamondbacks",
-      "side": "away",
-      "strength": 1.0,
-      "context": "2 match dans les 48h + 3181 km de voyage"
-    },
-    {
-      "event_id": "401815715",
-      "date": "2026-06-11T17:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "New York Mets",
-      "away": "St. Louis Cardinals",
-      "match": "New York Mets - St. Louis Cardinals",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "New York Mets",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 12-2"
-    },
     {
       "event_id": "401815718",
       "date": "2026-06-11T19:10Z",
@@ -238,24 +204,6 @@
       "context": "Deplacement estime 3747 km, decalage ~3.0h"
     },
     {
-      "event_id": "401815713",
-      "date": "2026-06-11T17:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Detroit Tigers",
-      "away": "Minnesota Twins",
-      "match": "Detroit Tigers - Minnesota Twins",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Detroit Tigers",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 12-8"
-    },
-    {
       "event_id": "401815716",
       "date": "2026-06-11T23:40Z",
       "sport": "baseball",
@@ -330,6 +278,25 @@
       "context": "Absences severes 0-3"
     }
   ],
-  "active_risk": [],
+  "active_risk": [
+    {
+      "event_id": "401875797",
+      "date": "2026-06-14T19:00Z",
+      "sport": "football",
+      "league_code": "laliga2",
+      "league_name": "La Liga 2",
+      "home": "Málaga",
+      "away": "Almería",
+      "match": "Málaga - Almería",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 19.0%"
+    }
+  ],
   "expired_sample": []
 }
