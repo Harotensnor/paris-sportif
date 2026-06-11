@@ -1,64 +1,28 @@
 {
-  "generated_at": "2026-06-11T21:57:14Z",
+  "generated_at": "2026-06-11T23:15:20Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 53,
-    "actionable": 49,
-    "watch": 2,
-    "risk": 2,
+    "active_events": 47,
+    "actionable": 43,
+    "watch": 1,
+    "risk": 3,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 30,
-      "travel_extreme": 26,
-      "back_to_back_travel": 32,
+      "travel_extreme": 24,
+      "back_to_back_travel": 26,
       "market_uncertain": 2,
+      "injury_imbalance": 24,
       "signal_conflict": 4
     },
     "by_quality": {
-      "actionable": 49,
-      "watch": 2,
-      "risk": 2
+      "actionable": 43,
+      "risk": 3,
+      "watch": 1
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401815712",
-      "date": "2026-06-11T22:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Pittsburgh Pirates",
-      "away": "Los Angeles Dodgers",
-      "match": "Pittsburgh Pirates - Los Angeles Dodgers",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Los Angeles Dodgers",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 4-16"
-    },
-    {
-      "event_id": "401815714",
-      "date": "2026-06-11T23:00Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Baltimore Orioles",
-      "away": "Seattle Mariners",
-      "match": "Baltimore Orioles - Seattle Mariners",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Seattle Mariners",
-      "side": "away",
-      "strength": 1.0,
-      "context": "1 match dans les 48h + 3747 km de voyage"
-    },
     {
       "event_id": "401874175",
       "date": "2026-06-12T00:00Z",
@@ -130,24 +94,6 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 2-12"
-    },
-    {
-      "event_id": "401815726",
-      "date": "2026-06-12T23:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Boston Red Sox",
-      "away": "Texas Rangers",
-      "match": "Boston Red Sox - Texas Rangers",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Texas Rangers",
-      "side": "away",
-      "strength": 1.0,
-      "context": "2 match dans les 48h + 2514 km de voyage"
     },
     {
       "event_id": "401815729",
@@ -564,24 +510,6 @@
       "context": "1 match dans les 48h + 2514 km de voyage"
     },
     {
-      "event_id": "401815767",
-      "date": "2026-06-16T00:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Chicago Cubs",
-      "away": "Colorado Rockies",
-      "match": "Chicago Cubs - Colorado Rockies",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Colorado Rockies",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 9-14"
-    },
-    {
       "event_id": "401815773",
       "date": "2026-06-16T02:00Z",
       "sport": "baseball",
@@ -598,24 +526,6 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 16-11"
-    },
-    {
-      "event_id": "401815781",
-      "date": "2026-06-17T00:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Chicago Cubs",
-      "away": "Colorado Rockies",
-      "match": "Chicago Cubs - Colorado Rockies",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Colorado Rockies",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 9-14"
     },
     {
       "event_id": "401815788",
@@ -652,24 +562,6 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 16-11"
-    },
-    {
-      "event_id": "401815796",
-      "date": "2026-06-18T00:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Chicago Cubs",
-      "away": "Colorado Rockies",
-      "match": "Chicago Cubs - Colorado Rockies",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Colorado Rockies",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 9-14"
     },
     {
       "event_id": "401815800",
@@ -908,24 +800,6 @@
   ],
   "active_watch": [
     {
-      "event_id": "401815716",
-      "date": "2026-06-11T23:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Chicago White Sox",
-      "away": "Atlanta Braves",
-      "match": "Chicago White Sox - Atlanta Braves",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Chicago White Sox",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 14-11"
-    },
-    {
       "event_id": "401815719",
       "date": "2026-06-12T23:10Z",
       "sport": "baseball",
@@ -980,6 +854,24 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.5%"
+    },
+    {
+      "event_id": "401815726",
+      "date": "2026-06-12T23:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Boston Red Sox",
+      "away": "Texas Rangers",
+      "match": "Boston Red Sox - Texas Rangers",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "signal_conflict",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.64,
+      "context": "Signaux opposes: Boston Red Sox fade 0.70, Texas Rangers fade 0.88 -> prudence"
     }
   ],
   "expired_sample": []
