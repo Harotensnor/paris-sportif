@@ -1,22 +1,22 @@
 {
-  "generated_at": "2026-06-11T01:35:55Z",
+  "generated_at": "2026-06-11T03:43:28Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 17,
+    "active_events": 16,
     "expired_sample": 0,
     "by_type": {
-      "travel_extreme": 10,
-      "back_to_back_travel": 12,
+      "travel_extreme": 9,
+      "back_to_back_travel": 11,
       "lookahead": 14,
       "schedule_congestion": 8
     },
     "by_decision": {
       "abstain": 2,
-      "lean_home": 15
+      "lean_home": 14
     },
-    "lean_home": 15,
+    "lean_home": 14,
     "lean_away": 0,
     "abstain": 2,
     "monitor": 0
@@ -742,59 +742,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815708",
-      "source_event_ids": [
-        "401815708"
-      ],
-      "kickoff": "2026-06-11T01:38Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Los Angeles Angels",
-      "away": "Houston Astros",
-      "match": "Los Angeles Angels - Houston Astros",
-      "decision": "lean_home",
-      "net_team": "Los Angeles Angels",
-      "reason": "Houston Astros plus penalise par calendrier/voyage (1.47 vs 0.00)",
-      "pressure_score": 1.469,
-      "home_fade": 0.0,
-      "away_fade": 1.469,
-      "travel_score": 1.469,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "travel_extreme": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "Deplacement estime 2172 km, decalage ~1.5h",
-        "1 match dans les 48h + 2172 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.514,
-        "away_score": -1.469,
-        "home_fade": 0.0,
-        "away_fade": 1.469,
-        "reason": "Direction nette: Los Angeles Angels (+0.51)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.505
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.964
           }
         ]
       }
