@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-12T20:23:42Z",
+  "generated_at": "2026-06-12T22:05:10Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -587,6 +587,42 @@
       "props": [
         {
           "market": "pitcher_strikeouts",
+          "team": "Toronto Blue Jays",
+          "pitcher": "Trey Yesavage",
+          "label": "Trey Yesavage moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.5134,
+          "fair_odds": 1.95,
+          "expected_strikeouts": 5.44,
+          "projected_ip": 5.28,
+          "inputs": {
+            "k9": 9.28,
+            "era": 3.16,
+            "whip": 1.17,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Toronto Blue Jays",
+          "pitcher": "Trey Yesavage",
+          "label": "Trey Yesavage ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.7818,
+          "fair_odds": 1.28,
+          "expected_hr_allowed": 0.246,
+          "projected_ip": 5.28,
+          "inputs": {
+            "hr9": 0.42,
+            "era": 3.16,
+            "whip": 1.17
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
           "team": "New York Yankees",
           "pitcher": "Ryan Weathers",
           "label": "Ryan Weathers plus de 6,5 strikeouts",
@@ -752,36 +788,36 @@
         {
           "market": "pitcher_strikeouts",
           "team": "Philadelphia Phillies",
-          "pitcher": "Andrew Painter",
-          "label": "Andrew Painter moins de 4,5 strikeouts",
-          "line": 4.5,
+          "pitcher": "Tanner Banks",
+          "label": "Tanner Banks moins de 5,5 strikeouts",
+          "line": 5.5,
           "pick": "under",
-          "probability": 0.5565,
-          "fair_odds": 1.8,
-          "expected_strikeouts": 4.27,
-          "projected_ip": 5.27,
+          "probability": 0.505,
+          "fair_odds": 1.98,
+          "expected_strikeouts": 5.48,
+          "projected_ip": 4.8,
           "inputs": {
-            "k9": 7.29,
-            "era": 6.21,
-            "whip": 1.57,
-            "hand": "R"
+            "k9": 10.27,
+            "era": 6.08,
+            "whip": 1.9,
+            "hand": "L"
           },
           "side": "away"
         },
         {
           "market": "pitcher_home_run_allowed",
           "team": "Philadelphia Phillies",
-          "pitcher": "Andrew Painter",
-          "label": "Andrew Painter concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6328,
-          "fair_odds": 1.58,
-          "expected_hr_allowed": 1.002,
-          "projected_ip": 5.27,
+          "pitcher": "Tanner Banks",
+          "label": "Tanner Banks ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.8166,
+          "fair_odds": 1.22,
+          "expected_hr_allowed": 0.203,
+          "projected_ip": 4.8,
           "inputs": {
-            "hr9": 1.71,
-            "era": 6.21,
-            "whip": 1.57
+            "hr9": 0.38,
+            "era": 6.08,
+            "whip": 1.9
           },
           "side": "away"
         }
@@ -1251,6 +1287,42 @@
       "home": "Toronto Blue Jays",
       "away": "New York Yankees",
       "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Toronto Blue Jays",
+          "pitcher": "Kevin Gausman",
+          "label": "Kevin Gausman plus de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "over",
+          "probability": 0.5311,
+          "fair_odds": 1.88,
+          "expected_strikeouts": 5.64,
+          "projected_ip": 5.71,
+          "inputs": {
+            "k9": 8.89,
+            "era": 3.6,
+            "whip": 1.09,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Toronto Blue Jays",
+          "pitcher": "Kevin Gausman",
+          "label": "Kevin Gausman ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5266,
+          "fair_odds": 1.9,
+          "expected_hr_allowed": 0.641,
+          "projected_ip": 5.71,
+          "inputs": {
+            "hr9": 1.01,
+            "era": 3.6,
+            "whip": 1.09
+          },
+          "side": "home"
+        },
         {
           "market": "pitcher_strikeouts",
           "team": "New York Yankees",
@@ -2457,6 +2529,42 @@
       "props": [
         {
           "market": "pitcher_strikeouts",
+          "team": "Toronto Blue Jays",
+          "pitcher": "Patrick Corbin",
+          "label": "Patrick Corbin moins de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "under",
+          "probability": 0.5503,
+          "fair_odds": 1.82,
+          "expected_strikeouts": 3.32,
+          "projected_ip": 4.76,
+          "inputs": {
+            "k9": 6.28,
+            "era": 4.55,
+            "whip": 1.45,
+            "hand": "L"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Toronto Blue Jays",
+          "pitcher": "Patrick Corbin",
+          "label": "Patrick Corbin ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.559,
+          "fair_odds": 1.79,
+          "expected_hr_allowed": 0.582,
+          "projected_ip": 4.76,
+          "inputs": {
+            "hr9": 1.1,
+            "era": 4.55,
+            "whip": 1.45
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
           "team": "New York Yankees",
           "pitcher": "Will Warren",
           "label": "Will Warren plus de 5,5 strikeouts",
@@ -2468,8 +2576,8 @@
           "projected_ip": 5.25,
           "inputs": {
             "k9": 9.83,
-            "era": 3.28,
-            "whip": 1.19,
+            "era": 3.41,
+            "whip": 1.21,
             "hand": "R"
           },
           "side": "away"
@@ -2486,8 +2594,8 @@
           "projected_ip": 5.25,
           "inputs": {
             "hr9": 0.92,
-            "era": 3.28,
-            "whip": 1.19
+            "era": 3.41,
+            "whip": 1.21
           },
           "side": "away"
         }
@@ -2654,6 +2762,52 @@
             "whip": 1.05
           },
           "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815751",
+      "kickoff": "2026-06-14T17:40Z",
+      "league": "MLB",
+      "match": "Detroit Tigers at Cleveland Guardians",
+      "home": "Cleveland Guardians",
+      "away": "Detroit Tigers",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Cleveland Guardians",
+          "pitcher": "Gavin Williams",
+          "label": "Gavin Williams moins de 7,5 strikeouts",
+          "line": 7.5,
+          "pick": "under",
+          "probability": 0.5893,
+          "fair_odds": 1.7,
+          "expected_strikeouts": 7.03,
+          "projected_ip": 6.16,
+          "inputs": {
+            "k9": 10.28,
+            "era": 3.32,
+            "whip": 1.1,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Cleveland Guardians",
+          "pitcher": "Gavin Williams",
+          "label": "Gavin Williams concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.6029,
+          "fair_odds": 1.66,
+          "expected_hr_allowed": 0.924,
+          "projected_ip": 6.16,
+          "inputs": {
+            "hr9": 1.35,
+            "era": 3.32,
+            "whip": 1.1
+          },
+          "side": "home"
         }
       ]
     },
@@ -3232,7 +3386,7 @@
       ]
     }
   ],
-  "props": 156,
+  "props": 164,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
