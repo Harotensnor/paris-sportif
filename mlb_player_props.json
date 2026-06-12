@@ -1,54 +1,8 @@
 {
-  "generated_at": "2026-06-11T23:15:19Z",
+  "generated_at": "2026-06-12T01:41:44Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815716",
-      "kickoff": "2026-06-11T23:40Z",
-      "league": "MLB",
-      "match": "Atlanta Braves at Chicago White Sox",
-      "home": "Chicago White Sox",
-      "away": "Atlanta Braves",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Atlanta Braves",
-          "pitcher": "Martín Pérez",
-          "label": "Martín Pérez moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.5724,
-          "fair_odds": 1.75,
-          "expected_strikeouts": 5.18,
-          "projected_ip": 6.24,
-          "inputs": {
-            "k9": 7.46,
-            "era": 3.02,
-            "whip": 1.06,
-            "hand": "L"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Atlanta Braves",
-          "pitcher": "Martín Pérez",
-          "label": "Martín Pérez ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5173,
-          "fair_odds": 1.93,
-          "expected_hr_allowed": 0.659,
-          "projected_ip": 6.24,
-          "inputs": {
-            "hr9": 0.95,
-            "era": 3.02,
-            "whip": 1.06
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815725",
       "kickoff": "2026-06-12T22:45Z",
@@ -178,98 +132,6 @@
       ]
     },
     {
-      "event_id": "401815719",
-      "kickoff": "2026-06-12T23:10Z",
-      "league": "MLB",
-      "match": "Arizona Diamondbacks at Cincinnati Reds",
-      "home": "Cincinnati Reds",
-      "away": "Arizona Diamondbacks",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Cincinnati Reds",
-          "pitcher": "Nick Lodolo",
-          "label": "Nick Lodolo moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.5978,
-          "fair_odds": 1.67,
-          "expected_strikeouts": 4.11,
-          "projected_ip": 5.37,
-          "inputs": {
-            "k9": 6.89,
-            "era": 5.51,
-            "whip": 1.5,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Cincinnati Reds",
-          "pitcher": "Nick Lodolo",
-          "label": "Nick Lodolo concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.7307,
-          "fair_odds": 1.37,
-          "expected_hr_allowed": 1.312,
-          "projected_ip": 5.37,
-          "inputs": {
-            "hr9": 2.2,
-            "era": 5.51,
-            "whip": 1.5
-          },
-          "side": "home"
-        }
-      ]
-    },
-    {
-      "event_id": "401815720",
-      "kickoff": "2026-06-12T23:10Z",
-      "league": "MLB",
-      "match": "Atlanta Braves at New York Mets",
-      "home": "New York Mets",
-      "away": "Atlanta Braves",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "New York Mets",
-          "pitcher": "Nolan McLean",
-          "label": "Nolan McLean moins de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "under",
-          "probability": 0.5436,
-          "fair_odds": 1.84,
-          "expected_strikeouts": 6.29,
-          "projected_ip": 5.55,
-          "inputs": {
-            "k9": 10.2,
-            "era": 3.98,
-            "whip": 1.11,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "New York Mets",
-          "pitcher": "Nolan McLean",
-          "label": "Nolan McLean ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.54,
-          "fair_odds": 1.85,
-          "expected_hr_allowed": 0.616,
-          "projected_ip": 5.55,
-          "inputs": {
-            "hr9": 1.0,
-            "era": 3.98,
-            "whip": 1.11
-          },
-          "side": "home"
-        }
-      ]
-    },
-    {
       "event_id": "401815721",
       "kickoff": "2026-06-12T23:10Z",
       "league": "MLB",
@@ -358,6 +220,144 @@
             "whip": 1.24
           },
           "side": "home"
+        }
+      ]
+    },
+    {
+      "event_id": "401815719",
+      "kickoff": "2026-06-12T23:15Z",
+      "league": "MLB",
+      "match": "Arizona Diamondbacks at Cincinnati Reds",
+      "home": "Cincinnati Reds",
+      "away": "Arizona Diamondbacks",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Cincinnati Reds",
+          "pitcher": "Nick Lodolo",
+          "label": "Nick Lodolo moins de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "under",
+          "probability": 0.5978,
+          "fair_odds": 1.67,
+          "expected_strikeouts": 4.11,
+          "projected_ip": 5.37,
+          "inputs": {
+            "k9": 6.89,
+            "era": 5.51,
+            "whip": 1.5,
+            "hand": "L"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Cincinnati Reds",
+          "pitcher": "Nick Lodolo",
+          "label": "Nick Lodolo concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.7307,
+          "fair_odds": 1.37,
+          "expected_hr_allowed": 1.312,
+          "projected_ip": 5.37,
+          "inputs": {
+            "hr9": 2.2,
+            "era": 5.51,
+            "whip": 1.5
+          },
+          "side": "home"
+        }
+      ]
+    },
+    {
+      "event_id": "401815720",
+      "kickoff": "2026-06-12T23:15Z",
+      "league": "MLB",
+      "match": "Atlanta Braves at New York Mets",
+      "home": "New York Mets",
+      "away": "Atlanta Braves",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "New York Mets",
+          "pitcher": "Nolan McLean",
+          "label": "Nolan McLean moins de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "under",
+          "probability": 0.5436,
+          "fair_odds": 1.84,
+          "expected_strikeouts": 6.29,
+          "projected_ip": 5.55,
+          "inputs": {
+            "k9": 10.2,
+            "era": 3.98,
+            "whip": 1.11,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "New York Mets",
+          "pitcher": "Nolan McLean",
+          "label": "Nolan McLean ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.54,
+          "fair_odds": 1.85,
+          "expected_hr_allowed": 0.616,
+          "projected_ip": 5.55,
+          "inputs": {
+            "hr9": 1.0,
+            "era": 3.98,
+            "whip": 1.11
+          },
+          "side": "home"
+        }
+      ]
+    },
+    {
+      "event_id": "401815723",
+      "kickoff": "2026-06-12T23:37Z",
+      "league": "MLB",
+      "match": "New York Yankees at Toronto Blue Jays",
+      "home": "Toronto Blue Jays",
+      "away": "New York Yankees",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "New York Yankees",
+          "pitcher": "Ryan Weathers",
+          "label": "Ryan Weathers plus de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "over",
+          "probability": 0.517,
+          "fair_odds": 1.93,
+          "expected_strikeouts": 6.59,
+          "projected_ip": 5.83,
+          "inputs": {
+            "k9": 10.16,
+            "era": 3.86,
+            "whip": 1.16,
+            "hand": "L"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "New York Yankees",
+          "pitcher": "Ryan Weathers",
+          "label": "Ryan Weathers concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.6612,
+          "fair_odds": 1.51,
+          "expected_hr_allowed": 1.082,
+          "projected_ip": 5.83,
+          "inputs": {
+            "hr9": 1.67,
+            "era": 3.86,
+            "whip": 1.16
+          },
+          "side": "away"
         }
       ]
     },
@@ -668,6 +668,52 @@
             "hr9": 1.49,
             "era": 4.48,
             "whip": 1.51
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815738",
+      "kickoff": "2026-06-13T19:07Z",
+      "league": "MLB",
+      "match": "New York Yankees at Toronto Blue Jays",
+      "home": "Toronto Blue Jays",
+      "away": "New York Yankees",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "New York Yankees",
+          "pitcher": "Cam Schlittler",
+          "label": "Cam Schlittler moins de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "under",
+          "probability": 0.5287,
+          "fair_odds": 1.89,
+          "expected_strikeouts": 6.36,
+          "projected_ip": 5.86,
+          "inputs": {
+            "k9": 9.77,
+            "era": 1.87,
+            "whip": 0.87,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "New York Yankees",
+          "pitcher": "Cam Schlittler",
+          "label": "Cam Schlittler ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.751,
+          "fair_odds": 1.33,
+          "expected_hr_allowed": 0.286,
+          "projected_ip": 5.86,
+          "inputs": {
+            "hr9": 0.44,
+            "era": 1.87,
+            "whip": 0.87
           },
           "side": "away"
         }
@@ -1068,7 +1114,7 @@
       ]
     }
   ],
-  "props": 48,
+  "props": 50,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
