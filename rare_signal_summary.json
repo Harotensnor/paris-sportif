@@ -1,23 +1,23 @@
 {
-  "generated_at": "2026-06-12T01:41:45Z",
+  "generated_at": "2026-06-12T03:43:18Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 53,
-    "actionable": 46,
+    "active_events": 50,
+    "actionable": 43,
     "watch": 4,
     "risk": 3,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 30,
-      "travel_extreme": 26,
-      "back_to_back_travel": 26,
+      "injury_imbalance": 27,
+      "travel_extreme": 23,
       "signal_conflict": 4,
+      "back_to_back_travel": 23,
       "market_uncertain": 1
     },
     "by_quality": {
-      "actionable": 46,
+      "actionable": 43,
       "risk": 3,
       "watch": 4
     }
@@ -40,24 +40,6 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 4-9"
-    },
-    {
-      "event_id": "401815725",
-      "date": "2026-06-12T22:45Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Washington Nationals",
-      "away": "Seattle Mariners",
-      "match": "Washington Nationals - Seattle Mariners",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Seattle Mariners",
-      "side": "away",
-      "strength": 1.0,
-      "context": "1 match dans les 48h + 3740 km de voyage"
     },
     {
       "event_id": "401815721",
@@ -237,7 +219,7 @@
       "team": "Seattle Mariners",
       "side": "away",
       "strength": 1.0,
-      "context": "2 match dans les 48h + 3740 km de voyage"
+      "context": "1 match dans les 48h + 3740 km de voyage"
     },
     {
       "event_id": "401815734",
@@ -636,58 +618,22 @@
       "context": "Absences severes 16-11"
     },
     {
-      "event_id": "401815800",
-      "date": "2026-06-18T01:40Z",
+      "event_id": "401815725",
+      "date": "2026-06-12T22:45Z",
       "sport": "baseball",
       "league_code": "mlb",
       "league_name": "MLB",
-      "home": "Seattle Mariners",
-      "away": "Baltimore Orioles",
-      "match": "Seattle Mariners - Baltimore Orioles",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Baltimore Orioles",
-      "side": "away",
-      "strength": 1.0,
-      "context": "1 match dans les 48h + 3747 km de voyage"
-    },
-    {
-      "event_id": "401815811",
-      "date": "2026-06-18T20:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Seattle Mariners",
-      "away": "Baltimore Orioles",
-      "match": "Seattle Mariners - Baltimore Orioles",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Baltimore Orioles",
-      "side": "away",
-      "strength": 1.0,
-      "context": "2 match dans les 48h + 3747 km de voyage"
-    },
-    {
-      "event_id": "401815786",
-      "date": "2026-06-17T01:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Seattle Mariners",
-      "away": "Baltimore Orioles",
-      "match": "Seattle Mariners - Baltimore Orioles",
+      "home": "Washington Nationals",
+      "away": "Seattle Mariners",
+      "match": "Washington Nationals - Seattle Mariners",
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
       "type": "travel_extreme",
       "direction": "fade",
-      "team": "Baltimore Orioles",
+      "team": "Seattle Mariners",
       "side": "away",
-      "strength": 0.871,
-      "context": "Deplacement estime 3747 km, decalage ~3.0h"
+      "strength": 0.87,
+      "context": "Deplacement estime 3740 km, decalage ~3.0h"
     },
     {
       "event_id": "401815724",
