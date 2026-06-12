@@ -1,23 +1,24 @@
 {
-  "generated_at": "2026-06-12T18:06:52Z",
+  "generated_at": "2026-06-12T20:23:43Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 50,
+    "active_events": 51,
     "actionable": 44,
     "watch": 4,
-    "risk": 2,
+    "risk": 3,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 28,
       "travel_extreme": 23,
       "signal_conflict": 4,
+      "market_uncertain": 1,
       "back_to_back_travel": 23
     },
     "by_quality": {
       "actionable": 44,
-      "risk": 2,
+      "risk": 3,
       "watch": 4
     }
   },
@@ -92,7 +93,7 @@
       "team": "Milwaukee Brewers",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 10-2"
+      "context": "Absences severes 10-3"
     },
     {
       "event_id": "401815730",
@@ -290,7 +291,7 @@
       "team": "Milwaukee Brewers",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 10-2"
+      "context": "Absences severes 10-3"
     },
     {
       "event_id": "401815746",
@@ -470,7 +471,7 @@
       "team": "Milwaukee Brewers",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 10-2"
+      "context": "Absences severes 10-3"
     },
     {
       "event_id": "401815760",
@@ -890,6 +891,24 @@
     }
   ],
   "active_risk": [
+    {
+      "event_id": "177094",
+      "date": "2026-06-13T10:30Z",
+      "sport": "tennis",
+      "league_code": "libemaopen",
+      "league_name": "Libéma Open",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 12.5%"
+    },
     {
       "event_id": "401815731",
       "date": "2026-06-13T02:15Z",

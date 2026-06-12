@@ -1,22 +1,22 @@
 {
-  "generated_at": "2026-06-12T18:06:54Z",
-  "calculated_at": "2026-06-12T18:06:54Z",
+  "generated_at": "2026-06-12T20:23:45Z",
+  "calculated_at": "2026-06-12T20:23:45Z",
   "source_of_truth": "data.js",
   "data_age_min": 1,
   "data_file_age_min": 0,
   "sources": {
     "winamax_catalog": {
       "age_min": 2,
-      "tournaments": 90,
-      "matches": 423
+      "tournaments": 84,
+      "matches": 385
     },
     "winamax_markets": {
       "age_min": 0,
-      "matches_with_odds": 393,
-      "matches_detailed": 85,
-      "details_ratio_pct": 21.6,
+      "matches_with_odds": 357,
+      "matches_detailed": 83,
+      "details_ratio_pct": 23.2,
       "last_run_delta": 0,
-      "last_run_limit": 1000
+      "last_run_limit": 400
     },
     "injuries_soccer": {
       "age_min": 2,
@@ -42,7 +42,7 @@
       "events": 3476
     },
     "referees_soccer": {
-      "age_min": 2,
+      "age_min": 1,
       "events": 106,
       "status": "retained_existing_referees"
     },
@@ -73,20 +73,20 @@
       "sports": 4
     },
     "h2h_extended": {
-      "age_min": 2,
-      "events": 57,
+      "age_min": 1,
+      "events": 59,
       "events_with_meetings": 27,
       "meetings": 93,
-      "coverage_pct": 47.4,
-      "empty_events": 30,
-      "sports": 4,
+      "coverage_pct": 45.8,
+      "empty_events": 32,
+      "sports": 5,
       "by_sport": {
         "baseball": {
-          "events": 47,
+          "events": 48,
           "events_with_meetings": 21,
           "meetings": 72,
           "sources": {
-            "espn_summary_empty": 26,
+            "espn_summary_empty": 27,
             "seasonseries": 21
           }
         },
@@ -97,6 +97,14 @@
           "sources": {
             "seasonseries": 5,
             "espn_summary_empty": 3
+          }
+        },
+        "tennis": {
+          "events": 1,
+          "events_with_meetings": 0,
+          "meetings": 0,
+          "sources": {
+            "espn_summary_empty": 1
           }
         },
         "football": {
@@ -211,7 +219,7 @@
     },
     "team_priors": {
       "age_min": 2,
-      "teams": 4402,
+      "teams": 4404,
       "leagues": 380,
       "decay_k": 0.05,
       "max_matches": 20
@@ -320,18 +328,19 @@
       "age_min": 2,
       "insights": 6,
       "events_today": 10,
-      "events_next_36h": 41,
+      "events_next_36h": 40,
       "sources_loaded": 8
     },
     "detected_angles": {
       "age_min": 0,
-      "events": 53,
-      "angles": 165,
+      "events": 55,
+      "angles": 170,
       "by_type": {
         "lookahead": 72,
-        "injury_imbalance": 37,
+        "injury_imbalance": 41,
         "travel_extreme": 23,
         "signal_conflict": 4,
+        "market_uncertain": 1,
         "back_to_back_travel": 23,
         "schedule_congestion": 6
       }
@@ -346,20 +355,21 @@
     },
     "rare_signals": {
       "age_min": 0,
-      "signals": 78,
+      "signals": 79,
       "by_type": {
         "injury_imbalance": 28,
         "travel_extreme": 23,
         "signal_conflict": 4,
+        "market_uncertain": 1,
         "back_to_back_travel": 23
       }
     },
     "rare_signal_summary": {
       "age_min": 0,
-      "active": 50,
+      "active": 51,
       "actionable": 44,
       "watch": 4,
-      "risk": 2,
+      "risk": 3,
       "status": "ok"
     },
     "timing_edges": {
@@ -371,10 +381,10 @@
     },
     "injuries_multisport": {
       "age_min": 2,
-      "teams": 128,
+      "teams": 131,
       "sports": 4,
-      "injuries": 735,
-      "severe": 528
+      "injuries": 761,
+      "severe": 562
     },
     "thesportsdb_meta": {
       "age_min": 2,
@@ -399,8 +409,8 @@
     },
     "public_team_profiles": {
       "age_min": 0,
-      "teams": 926,
-      "upcoming": 54,
+      "teams": 932,
+      "upcoming": 60,
       "availability": 64,
       "deep_context": 0
     },
@@ -438,7 +448,7 @@
     },
     "tennis_challenger_watchlist": {
       "age_min": 0,
-      "bookable": 10,
+      "bookable": 6,
       "watchlist": 40,
       "itf": 692,
       "challenger_like": 92,
@@ -460,7 +470,7 @@
     },
     "boosted_odds": {
       "age_min": 0,
-      "matches_scanned": 393,
+      "matches_scanned": 357,
       "boosts": 0,
       "status": "no_explicit_boosts"
     },
@@ -540,7 +550,7 @@
     "referees_soccer": {
       "script": "scripts/fetch_referees_soccer.py",
       "output": "referees_soccer.json",
-      "age_min": 2,
+      "age_min": 1,
       "threshold_min": 480,
       "fast_red_min": null,
       "status": "ok"
@@ -588,7 +598,7 @@
     "h2h_extended": {
       "script": "h2h_extended.json",
       "output": "h2h_extended.json",
-      "age_min": 2,
+      "age_min": 1,
       "threshold_min": 60,
       "fast_red_min": null,
       "status": "ok"
@@ -1051,13 +1061,13 @@
   ],
   "overall": "warning",
   "quality_checks": {
-    "data_generated_at": "2026-06-12T18:05:20.980739Z",
+    "data_generated_at": "2026-06-12T20:22:38.757013Z",
     "truth_scope": "all_events",
-    "all_winamax_available": 74,
-    "all_winamax_exact": 74,
+    "all_winamax_available": 70,
+    "all_winamax_exact": 70,
     "all_winamax_exact_ratio": 1.0,
     "quality_scope": "upcoming_uncompleted_events",
-    "total_events": 74,
+    "total_events": 70,
     "upcoming_events": 67,
     "winamax_available": 67,
     "winamax_exact": 67,
@@ -1073,16 +1083,6 @@
     "events_with_xg": 0,
     "winamax_coverage": {
       "by_sport": {
-        "tennis": {
-          "upcoming": 6,
-          "available": 6,
-          "exact": 6,
-          "detailed": 0,
-          "tournament_only": 0,
-          "missing": 0,
-          "exact_ratio": 1.0,
-          "detailed_ratio": 0.0
-        },
         "baseball": {
           "upcoming": 48,
           "available": 48,
@@ -1097,6 +1097,16 @@
           "upcoming": 9,
           "available": 9,
           "exact": 9,
+          "detailed": 0,
+          "tournament_only": 0,
+          "missing": 0,
+          "exact_ratio": 1.0,
+          "detailed_ratio": 0.0
+        },
+        "tennis": {
+          "upcoming": 6,
+          "available": 6,
+          "exact": 6,
           "detailed": 0,
           "tournament_only": 0,
           "missing": 0,
@@ -1130,9 +1140,9 @@
   "data_truth": {
     "source_of_truth": "data.js",
     "scope": "all_events",
-    "data_generated_at": "2026-06-12T18:05:20.980739Z",
-    "winamax_available": 74,
-    "winamax_exact": 74,
+    "data_generated_at": "2026-06-12T20:22:38.757013Z",
+    "winamax_available": 70,
+    "winamax_exact": 70,
     "winamax_exact_ratio": 1.0,
     "quality_scope": "upcoming_uncompleted_events",
     "upcoming_winamax_available": 67,
@@ -1143,34 +1153,34 @@
     "status": "degraded",
     "schema_version": 2,
     "sources_validated": 11,
-    "sources_ok": 6,
-    "sources_warning": 5,
+    "sources_ok": 7,
+    "sources_warning": 4,
     "sources_critical": 0,
-    "quarantine_records": 7,
-    "anomalies_emitted": 5
+    "quarantine_records": 6,
+    "anomalies_emitted": 4
   },
   "source_health": {
-    "generated_at": "2026-06-12T18:06:53Z",
+    "generated_at": "2026-06-12T20:23:45Z",
     "sources_total": 11,
-    "sources_ok": 6,
-    "sources_warning": 5,
+    "sources_ok": 7,
+    "sources_warning": 4,
     "sources_critical": 0,
-    "source_health_avg": 89.2,
+    "source_health_avg": 89.9,
     "source_health_min": 56,
     "by_source": {
       "winamax_catalog": {
-        "score": 92,
-        "status": "warning",
-        "items": 423,
-        "age_min": 3,
+        "score": 100,
+        "status": "ok",
+        "items": 385,
+        "age_min": 2,
         "sla_min": 15,
-        "issues": 2
+        "issues": 1
       },
       "winamax_markets": {
         "score": 84,
         "status": "warning",
-        "items": 393,
-        "age_min": 0,
+        "items": 357,
+        "age_min": 1,
         "sla_min": 15,
         "issues": 3
       },
@@ -1202,7 +1212,7 @@
         "score": 100,
         "status": "ok",
         "items": 3476,
-        "age_min": 2,
+        "age_min": 1,
         "sla_min": 60,
         "issues": 1
       },
@@ -1210,7 +1220,7 @@
         "score": 56,
         "status": "warning",
         "items": 16,
-        "age_min": 3,
+        "age_min": 2,
         "sla_min": 300,
         "issues": 2
       },
@@ -1218,7 +1228,7 @@
         "score": 100,
         "status": "ok",
         "items": 616,
-        "age_min": 3,
+        "age_min": 2,
         "sla_min": 1440,
         "issues": 1
       },
@@ -1226,15 +1236,15 @@
         "score": 92,
         "status": "warning",
         "items": 1941,
-        "age_min": 3,
+        "age_min": 2,
         "sla_min": 30,
         "issues": 2
       },
       "team_priors": {
         "score": 100,
         "status": "ok",
-        "items": 4402,
-        "age_min": 3,
+        "items": 4404,
+        "age_min": 2,
         "sla_min": 1440,
         "issues": 1
       },
@@ -1242,7 +1252,7 @@
         "score": 100,
         "status": "ok",
         "items": 3,
-        "age_min": 3,
+        "age_min": 2,
         "sla_min": 1440,
         "issues": 1
       }
@@ -1250,12 +1260,12 @@
   },
   "observability": {
     "pipeline_traces": {
-      "generated_at": "2026-06-12T18:06:53Z",
+      "generated_at": "2026-06-12T20:23:45Z",
       "runs_observed": 99,
       "by_status": {
-        "warning": 69,
+        "warning": 67,
         "critical": 1,
-        "ok": 29
+        "ok": 31
       },
       "by_script": {
         "data_integrity_monitor.py": {
@@ -1268,14 +1278,14 @@
     }
   },
   "data_lineage": {
-    "generated_at": "2026-06-12T18:06:53Z",
+    "generated_at": "2026-06-12T20:23:45Z",
     "status": "ok",
-    "events": 74,
+    "events": 70,
     "events_missing_inline_lineage": 0,
     "coverage_pct": 100.0,
     "source_counts": {
-      "espn": 74,
-      "winamax": 74,
+      "espn": 70,
+      "winamax": 70,
       "injuries": 61,
       "clubelo": 1,
       "weather": 1
@@ -1302,56 +1312,62 @@
         ]
       },
       {
-        "event_id": "177870",
-        "sport": "tennis",
-        "league": "thehsbcchampionships",
+        "event_id": "401815722",
+        "sport": "baseball",
+        "league": "mlb",
         "lineage": [
           "espn",
+          "injuries",
           "winamax"
         ]
       },
       {
-        "event_id": "177871",
-        "sport": "tennis",
-        "league": "thehsbcchampionships",
+        "event_id": "401815725",
+        "sport": "baseball",
+        "league": "mlb",
         "lineage": [
           "espn",
+          "injuries",
           "winamax"
         ]
       },
       {
-        "event_id": "177042",
-        "sport": "tennis",
-        "league": "bossopen",
+        "event_id": "401815724",
+        "sport": "baseball",
+        "league": "mlb",
         "lineage": [
           "espn",
+          "injuries",
           "winamax"
         ]
       },
       {
-        "event_id": "177034",
-        "sport": "tennis",
-        "league": "bossopen",
+        "event_id": "401815721",
+        "sport": "baseball",
+        "league": "mlb",
         "lineage": [
           "espn",
+          "injuries",
           "winamax"
         ]
       },
       {
-        "event_id": "177827",
-        "sport": "tennis",
-        "league": "libemaopen",
+        "event_id": "401815726",
+        "sport": "baseball",
+        "league": "mlb",
         "lineage": [
           "espn",
+          "injuries",
           "winamax"
         ]
       },
       {
-        "event_id": "177094",
-        "sport": "tennis",
-        "league": "libemaopen",
+        "event_id": "401815719",
+        "sport": "baseball",
+        "league": "mlb",
         "lineage": [
           "espn",
+          "injuries",
           "winamax"
         ]
       }
@@ -1367,7 +1383,7 @@
     "data": {
       "status": "degraded",
       "sources_validated": 11,
-      "quarantine_records": 7,
+      "quarantine_records": 6,
       "lineage_coverage_pct": 100.0
     },
     "model": {
