@@ -1,22 +1,22 @@
 {
-  "generated_at": "2026-06-13T22:51:13Z",
+  "generated_at": "2026-06-13T23:51:55Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 23,
+    "active_events": 21,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 22,
-      "back_to_back_travel": 17,
+      "lookahead": 18,
       "travel_extreme": 13,
+      "back_to_back_travel": 15,
       "schedule_congestion": 6
     },
     "by_decision": {
       "abstain": 3,
-      "lean_home": 20
+      "lean_home": 18
     },
-    "lean_home": 20,
+    "lean_home": 18,
     "lean_away": 0,
     "abstain": 3,
     "monitor": 0
@@ -980,138 +980,6 @@
             "type": "travel_extreme",
             "direction": "fade",
             "strength": 0.759
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815744",
-      "source_event_ids": [
-        "401815744"
-      ],
-      "kickoff": "2026-06-13T23:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Milwaukee Brewers",
-      "away": "Philadelphia Phillies",
-      "match": "Milwaukee Brewers - Philadelphia Phillies",
-      "decision": "lean_home",
-      "net_team": "Milwaukee Brewers",
-      "reason": "Philadelphia Phillies plus penalise par calendrier/voyage (0.90 vs 0.15)",
-      "pressure_score": 1.421,
-      "home_fade": 0.15,
-      "away_fade": 0.904,
-      "travel_score": 0.754,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours",
-        "1 match dans les 48h + 1121 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.834,
-        "away_score": -0.502,
-        "home_fade": 1.15,
-        "away_fade": 0.904,
-        "reason": "Signaux opposes: Milwaukee Brewers fade 1.15, Philadelphia Phillies fade 0.90 -> prudence",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.754
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815742",
-      "source_event_ids": [
-        "401815742"
-      ],
-      "kickoff": "2026-06-13T23:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Kansas City Royals",
-      "away": "Houston Astros",
-      "match": "Kansas City Royals - Houston Astros",
-      "decision": "lean_home",
-      "net_team": "Kansas City Royals",
-      "reason": "Houston Astros plus penalise par calendrier/voyage (0.89 vs 0.15)",
-      "pressure_score": 1.404,
-      "home_fade": 0.15,
-      "away_fade": 0.887,
-      "travel_score": 0.737,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours",
-        "1 match dans les 48h + 1037 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.371,
-        "away_score": -1.435,
-        "home_fade": 0.15,
-        "away_fade": 1.487,
-        "reason": "Direction nette: Kansas City Royals (+0.37)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.737
           }
         ]
       }

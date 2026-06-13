@@ -1,46 +1,28 @@
 {
-  "generated_at": "2026-06-13T22:51:13Z",
+  "generated_at": "2026-06-13T23:51:55Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 26,
-    "actionable": 24,
-    "watch": 1,
+    "active_events": 25,
+    "actionable": 22,
+    "watch": 2,
     "risk": 1,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 14,
-      "back_to_back_travel": 17,
-      "signal_conflict": 2,
+      "injury_imbalance": 13,
       "travel_extreme": 13,
+      "back_to_back_travel": 15,
+      "signal_conflict": 1,
       "market_uncertain": 2
     },
     "by_quality": {
-      "actionable": 24,
-      "watch": 1,
+      "watch": 2,
+      "actionable": 22,
       "risk": 1
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401815744",
-      "date": "2026-06-13T23:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Milwaukee Brewers",
-      "away": "Philadelphia Phillies",
-      "match": "Milwaukee Brewers - Philadelphia Phillies",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Milwaukee Brewers",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 11-3"
-    },
     {
       "event_id": "401815746",
       "date": "2026-06-14T02:05Z",
@@ -183,7 +165,7 @@
       "team": "Detroit Tigers",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 2-11"
+      "context": "Absences severes 3-11"
     },
     {
       "event_id": "401815759",
@@ -436,27 +418,27 @@
       "side": "away",
       "strength": 0.759,
       "context": "Deplacement estime 3262 km, decalage ~2.4h"
-    },
-    {
-      "event_id": "401815742",
-      "date": "2026-06-13T23:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Kansas City Royals",
-      "away": "Houston Astros",
-      "match": "Kansas City Royals - Houston Astros",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Houston Astros",
-      "side": "away",
-      "strength": 0.737,
-      "context": "1 match dans les 48h + 1037 km de voyage"
     }
   ],
   "active_watch": [
+    {
+      "event_id": "401856987",
+      "date": "2026-06-14T00:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Las Vegas Aces",
+      "away": "Minnesota Lynx",
+      "match": "Las Vegas Aces - Minnesota Lynx",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Minnesota Lynx",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 1-4"
+    },
     {
       "event_id": "401815758",
       "date": "2026-06-14T18:10Z",
