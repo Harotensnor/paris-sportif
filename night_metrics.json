@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-06-13T13:15:39Z",
-  "calculated_at": "2026-06-13T13:15:39Z",
+  "generated_at": "2026-06-13T15:10:43Z",
+  "calculated_at": "2026-06-13T15:10:43Z",
   "source_of_truth": "data.js",
-  "data_generated_at": "2026-06-13T13:14:39.211569Z",
+  "data_generated_at": "2026-06-13T15:09:42.809397Z",
   "data_today_field": "2026-06-13",
   "events": {
-    "total": 53,
-    "upcoming": 49,
-    "winamax_available": 53,
-    "winamax_exact": 53,
+    "total": 71,
+    "upcoming": 50,
+    "winamax_available": 71,
+    "winamax_exact": 71,
     "winamax_exact_ratio": 1.0,
     "markets_more_than_1n2": 0,
-    "form_l10": 39,
-    "h2h": 18,
-    "lineups": 33,
+    "form_l10": 54,
+    "h2h": 0,
+    "lineups": 38,
     "football_lineups": 0,
-    "starter_signals": 33,
+    "starter_signals": 38,
     "clubelo": 2,
     "weather": 1,
-    "injuries": 43,
+    "injuries": 61,
     "referee": 0,
     "referee_named": 0,
     "referee_context": 0,
@@ -26,7 +26,7 @@
     "fd_calibration": 0,
     "fd_closing_odds": 0,
     "xg": 1,
-    "smart_money": 0
+    "smart_money": 1
   },
   "signal_health": {
     "referee": {
@@ -36,7 +36,7 @@
       "note": "referee is effective coverage: named referee or referee_context usable by the model."
     },
     "smart_money": {
-      "events": 0,
+      "events": 1,
       "status": "rare_event",
       "note": "Smart money is intentionally rare; low count is OK when odds movement does not confirm a strong signal."
     }
@@ -44,7 +44,7 @@
   "winamax_markets": {
     "matches": 339,
     "detailed_market_matches": 79,
-    "detailed_ratio_vs_exact": 1.4906,
+    "detailed_ratio_vs_exact": 1.1127,
     "gap_to_50pct_exact": 0,
     "recommended_detail_fetch_cap": 90,
     "detail_by_sport": {
@@ -55,7 +55,7 @@
         "detailed_ratio": 0.0
       },
       "basketball": {
-        "exact": 7,
+        "exact": 10,
         "detailed": 0,
         "families": {},
         "detailed_ratio": 0.0
@@ -73,7 +73,7 @@
         "detailed_ratio": 0.0
       },
       "tennis": {
-        "exact": 3,
+        "exact": 1,
         "detailed": 0,
         "families": {},
         "detailed_ratio": 0.0
@@ -94,7 +94,7 @@
   },
   "health": {
     "status": "warning",
-    "warnings": 10,
+    "warnings": 9,
     "pipeline_drift": "warn"
   }
 }
