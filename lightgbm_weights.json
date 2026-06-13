@@ -1,12 +1,12 @@
 {
   "schema": "paris-sportif.learned_weights.v1",
-  "generated_at": "2026-06-13T07:12:35Z",
+  "generated_at": "2026-06-13T10:09:06Z",
   "status": "row_level_table_detected_training_pending",
   "reason": "No backtest_training_rows.jsonl row-level feature table yet; exported conservative weights from backtest_report_v2 aggregates.",
   "runtime_dependency": "none",
   "source": {
     "report": "backtest_report_v2.json",
-    "report_generated_at": "2026-06-12T08:14:52Z",
+    "report_generated_at": "2026-06-13T07:38:08Z",
     "n_events": 303,
     "training_rows": "backtest_training_rows.jsonl",
     "training_rows_found": true,
@@ -30,10 +30,10 @@
       },
       "basketball": {
         "n": 16,
-        "roi_pct": -5.45,
-        "win_rate": 0.625,
-        "brier": 0.2206,
-        "weight": -0.00148,
+        "roi_pct": 5.43,
+        "win_rate": 0.6875,
+        "brier": 0.2174,
+        "weight": 0.00517,
         "status": "watch"
       },
       "football": {
@@ -168,10 +168,10 @@
       },
       "nba": {
         "n": 7,
-        "roi_pct": -30.51,
-        "win_rate": 0.4286,
-        "brier": 0.259,
-        "weight": -0.00284,
+        "roi_pct": -5.64,
+        "win_rate": 0.5714,
+        "brier": 0.2515,
+        "weight": -0.00143,
         "status": "watch"
       },
       "nhl": {
@@ -210,10 +210,10 @@
     "by_tier": {
       "skip": {
         "n": 302,
-        "roi_pct": -1.71,
-        "win_rate": 0.553,
-        "brier": 0.2414,
-        "weight": -0.00545,
+        "roi_pct": -1.13,
+        "win_rate": 0.5563,
+        "brier": 0.2413,
+        "weight": -0.00255,
         "status": "neutral"
       },
       "standard": {

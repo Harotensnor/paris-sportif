@@ -1,26 +1,26 @@
 {
-  "generated_at": "2026-06-13T07:12:36Z",
+  "generated_at": "2026-06-13T10:09:07Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 38,
+    "active_events": 37,
     "actionable": 31,
-    "watch": 6,
+    "watch": 5,
     "risk": 1,
     "expired_sample": 0,
     "by_type": {
       "market_uncertain": 2,
       "injury_imbalance": 19,
       "travel_extreme": 17,
-      "market_move": 9,
-      "signal_conflict": 5,
+      "signal_conflict": 3,
+      "market_move": 4,
       "back_to_back_travel": 13
     },
     "by_quality": {
       "risk": 1,
       "actionable": 31,
-      "watch": 6
+      "watch": 5
     }
   },
   "active_actionable": [
@@ -77,24 +77,6 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 4-9"
-    },
-    {
-      "event_id": "401815735",
-      "date": "2026-06-13T20:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "New York Mets",
-      "away": "Atlanta Braves",
-      "match": "New York Mets - Atlanta Braves",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 1.89 -> 1.01 (+46.6%)"
     },
     {
       "event_id": "401815736",
@@ -439,6 +421,24 @@
       "context": "Absences severes 16-11"
     },
     {
+      "event_id": "401856986",
+      "date": "2026-06-13T22:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Connecticut Sun",
+      "away": "Indiana Fever",
+      "match": "Connecticut Sun - Indiana Fever",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 0.899,
+      "context": "Cote home: 5.25 -> 4.40 (+16.2%)"
+    },
+    {
       "event_id": "401815740",
       "date": "2026-06-13T20:05Z",
       "sport": "baseball",
@@ -473,24 +473,6 @@
       "side": "away",
       "strength": 0.858,
       "context": "Deplacement estime 3688 km, decalage ~2.7h"
-    },
-    {
-      "event_id": "401856986",
-      "date": "2026-06-13T22:00Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Connecticut Sun",
-      "away": "Indiana Fever",
-      "match": "Connecticut Sun - Indiana Fever",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "home",
-      "strength": 0.794,
-      "context": "Cote home: 5.25 -> 4.50 (+14.3%)"
     },
     {
       "event_id": "401815748",
@@ -565,6 +547,24 @@
       "context": "1 match dans les 48h + 1037 km de voyage"
     },
     {
+      "event_id": "401875797",
+      "date": "2026-06-14T19:00Z",
+      "sport": "football",
+      "league_code": "laliga2",
+      "league_name": "La Liga 2",
+      "home": "Málaga",
+      "away": "Almería",
+      "match": "Málaga - Almería",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 0.725,
+      "context": "Cote home: 2.30 -> 2.00 (+13.0%)"
+    },
+    {
       "event_id": "401815746",
       "date": "2026-06-14T02:05Z",
       "sport": "baseball",
@@ -584,24 +584,6 @@
     }
   ],
   "active_watch": [
-    {
-      "event_id": "401875797",
-      "date": "2026-06-14T19:00Z",
-      "sport": "football",
-      "league_code": "laliga2",
-      "league_name": "La Liga 2",
-      "home": "Málaga",
-      "away": "Almería",
-      "match": "Málaga - Almería",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "home",
-      "strength": 0.604,
-      "context": "Cote home: 2.30 -> 2.05 (+10.9%)"
-    },
     {
       "event_id": "401815743",
       "date": "2026-06-13T20:10Z",
