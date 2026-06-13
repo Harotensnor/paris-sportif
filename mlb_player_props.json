@@ -1,218 +1,8 @@
 {
-  "generated_at": "2026-06-13T01:38:02Z",
+  "generated_at": "2026-06-13T03:30:40Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815733",
-      "kickoff": "2026-06-13T01:38Z",
-      "league": "MLB",
-      "match": "Tampa Bay Rays at Los Angeles Angels",
-      "home": "Los Angeles Angels",
-      "away": "Tampa Bay Rays",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Tampa Bay Rays",
-          "pitcher": "Griffin Jax",
-          "label": "Griffin Jax plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.5003,
-          "fair_odds": 2.0,
-          "expected_strikeouts": 4.5,
-          "projected_ip": 4.88,
-          "inputs": {
-            "k9": 8.31,
-            "era": 4.15,
-            "whip": 1.41,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Tampa Bay Rays",
-          "pitcher": "Griffin Jax",
-          "label": "Griffin Jax concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5842,
-          "fair_odds": 1.71,
-          "expected_hr_allowed": 0.878,
-          "projected_ip": 4.88,
-          "inputs": {
-            "hr9": 1.62,
-            "era": 4.15,
-            "whip": 1.41
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401815732",
-      "kickoff": "2026-06-13T02:05Z",
-      "league": "MLB",
-      "match": "Colorado Rockies at Athletics Athletics",
-      "home": "Athletics",
-      "away": "Colorado Rockies",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Athletics",
-          "pitcher": "Jeffrey Springs",
-          "label": "Jeffrey Springs moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.5,
-          "fair_odds": 2.0,
-          "expected_strikeouts": 4.5,
-          "projected_ip": 5.36,
-          "inputs": {
-            "k9": 7.56,
-            "era": 4.68,
-            "whip": 1.29,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Athletics",
-          "pitcher": "Jeffrey Springs",
-          "label": "Jeffrey Springs concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6811,
-          "fair_odds": 1.47,
-          "expected_hr_allowed": 1.143,
-          "projected_ip": 5.36,
-          "inputs": {
-            "hr9": 1.92,
-            "era": 4.68,
-            "whip": 1.29
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Colorado Rockies",
-          "pitcher": "Kyle Freeland",
-          "label": "Kyle Freeland moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.6025,
-          "fair_odds": 1.66,
-          "expected_strikeouts": 4.09,
-          "projected_ip": 4.82,
-          "inputs": {
-            "k9": 7.64,
-            "era": 7.81,
-            "whip": 1.7,
-            "hand": "L"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Colorado Rockies",
-          "pitcher": "Kyle Freeland",
-          "label": "Kyle Freeland concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6937,
-          "fair_odds": 1.44,
-          "expected_hr_allowed": 1.183,
-          "projected_ip": 4.82,
-          "inputs": {
-            "hr9": 2.21,
-            "era": 7.81,
-            "whip": 1.7
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401815731",
-      "kickoff": "2026-06-13T02:15Z",
-      "league": "MLB",
-      "match": "Chicago Cubs at San Francisco Giants",
-      "home": "San Francisco Giants",
-      "away": "Chicago Cubs",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "San Francisco Giants",
-          "pitcher": "Trevor McDonald",
-          "label": "Trevor McDonald moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.5473,
-          "fair_odds": 1.83,
-          "expected_strikeouts": 5.29,
-          "projected_ip": 5.57,
-          "inputs": {
-            "k9": 8.54,
-            "era": 4.15,
-            "whip": 1.18,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "San Francisco Giants",
-          "pitcher": "Trevor McDonald",
-          "label": "Trevor McDonald ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6524,
-          "fair_odds": 1.53,
-          "expected_hr_allowed": 0.427,
-          "projected_ip": 5.57,
-          "inputs": {
-            "hr9": 0.69,
-            "era": 4.15,
-            "whip": 1.18
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Chicago Cubs",
-          "pitcher": "Ben Brown",
-          "label": "Ben Brown plus de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "over",
-          "probability": 0.5428,
-          "fair_odds": 1.84,
-          "expected_strikeouts": 6.72,
-          "projected_ip": 6.6,
-          "inputs": {
-            "k9": 9.16,
-            "era": 1.74,
-            "whip": 0.88,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Chicago Cubs",
-          "pitcher": "Ben Brown",
-          "label": "Ben Brown ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.8893,
-          "fair_odds": 1.12,
-          "expected_hr_allowed": 0.117,
-          "projected_ip": 6.6,
-          "inputs": {
-            "hr9": 0.16,
-            "era": 1.74,
-            "whip": 0.88
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815745",
       "kickoff": "2026-06-13T18:10Z",
@@ -374,6 +164,52 @@
             "whip": 0.87
           },
           "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815737",
+      "kickoff": "2026-06-13T20:05Z",
+      "league": "MLB",
+      "match": "Miami Marlins at Pittsburgh Pirates",
+      "home": "Pittsburgh Pirates",
+      "away": "Miami Marlins",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Pittsburgh Pirates",
+          "pitcher": "Bubba Chandler",
+          "label": "Bubba Chandler moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.5792,
+          "fair_odds": 1.73,
+          "expected_strikeouts": 5.15,
+          "projected_ip": 5.17,
+          "inputs": {
+            "k9": 8.95,
+            "era": 4.91,
+            "whip": 1.44,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Pittsburgh Pirates",
+          "pitcher": "Bubba Chandler",
+          "label": "Bubba Chandler ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5132,
+          "fair_odds": 1.95,
+          "expected_hr_allowed": 0.667,
+          "projected_ip": 5.17,
+          "inputs": {
+            "hr9": 1.16,
+            "era": 4.91,
+            "whip": 1.44
+          },
+          "side": "home"
         }
       ]
     },
@@ -1238,6 +1074,88 @@
             "hr9": 1.58,
             "era": 4.08,
             "whip": 1.29
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815752",
+      "kickoff": "2026-06-14T16:15Z",
+      "league": "MLB",
+      "match": "Miami Marlins at Pittsburgh Pirates",
+      "home": "Pittsburgh Pirates",
+      "away": "Miami Marlins",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Pittsburgh Pirates",
+          "pitcher": "Paul Skenes",
+          "label": "Paul Skenes moins de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "under",
+          "probability": 0.5289,
+          "fair_odds": 1.89,
+          "expected_strikeouts": 6.36,
+          "projected_ip": 5.43,
+          "inputs": {
+            "k9": 10.54,
+            "era": 2.84,
+            "whip": 0.93,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Pittsburgh Pirates",
+          "pitcher": "Paul Skenes",
+          "label": "Paul Skenes ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6516,
+          "fair_odds": 1.53,
+          "expected_hr_allowed": 0.428,
+          "projected_ip": 5.43,
+          "inputs": {
+            "hr9": 0.71,
+            "era": 2.84,
+            "whip": 0.93
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Miami Marlins",
+          "pitcher": "Max Meyer",
+          "label": "Max Meyer moins de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "under",
+          "probability": 0.573,
+          "fair_odds": 1.75,
+          "expected_strikeouts": 6.14,
+          "projected_ip": 5.64,
+          "inputs": {
+            "k9": 9.8,
+            "era": 2.85,
+            "whip": 1.09,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Miami Marlins",
+          "pitcher": "Max Meyer",
+          "label": "Max Meyer ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6056,
+          "fair_odds": 1.65,
+          "expected_hr_allowed": 0.502,
+          "projected_ip": 5.64,
+          "inputs": {
+            "hr9": 0.8,
+            "era": 2.85,
+            "whip": 1.09
           },
           "side": "away"
         }
@@ -2274,7 +2192,7 @@
       ]
     }
   ],
-  "props": 110,
+  "props": 106,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
