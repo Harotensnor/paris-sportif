@@ -1,25 +1,22 @@
 {
-  "generated_at": "2026-06-13T10:09:07Z",
+  "generated_at": "2026-06-13T11:47:18Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 37,
-    "actionable": 31,
+    "active_events": 34,
+    "actionable": 29,
     "watch": 5,
-    "risk": 1,
+    "risk": 0,
     "expired_sample": 0,
     "by_type": {
-      "market_uncertain": 2,
       "injury_imbalance": 19,
       "travel_extreme": 17,
       "signal_conflict": 3,
-      "market_move": 4,
       "back_to_back_travel": 13
     },
     "by_quality": {
-      "risk": 1,
-      "actionable": 31,
+      "actionable": 29,
       "watch": 5
     }
   },
@@ -349,24 +346,6 @@
       "context": "1 match dans les 48h + 2514 km de voyage"
     },
     {
-      "event_id": "401874176",
-      "date": "2026-06-15T00:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Vegas Golden Knights",
-      "away": "Carolina Hurricanes",
-      "match": "Vegas Golden Knights - Carolina Hurricanes",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 1.95 -> 2.45 (-25.5%)"
-    },
-    {
       "event_id": "401815773",
       "date": "2026-06-16T02:00Z",
       "sport": "baseball",
@@ -419,24 +398,6 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 16-11"
-    },
-    {
-      "event_id": "401856986",
-      "date": "2026-06-13T22:00Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Connecticut Sun",
-      "away": "Indiana Fever",
-      "match": "Connecticut Sun - Indiana Fever",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "home",
-      "strength": 0.899,
-      "context": "Cote home: 5.25 -> 4.40 (+16.2%)"
     },
     {
       "event_id": "401815740",
@@ -511,6 +472,24 @@
       "context": "1 match dans les 48h + 1209 km de voyage"
     },
     {
+      "event_id": "401874176",
+      "date": "2026-06-15T00:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Vegas Golden Knights",
+      "away": "Carolina Hurricanes",
+      "match": "Vegas Golden Knights - Carolina Hurricanes",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "travel_extreme",
+      "direction": "fade",
+      "team": "Carolina Hurricanes",
+      "side": "away",
+      "strength": 0.759,
+      "context": "Deplacement estime 3262 km, decalage ~2.4h"
+    },
+    {
       "event_id": "401874177",
       "date": "2026-06-18T00:00Z",
       "sport": "hockey",
@@ -545,24 +524,6 @@
       "side": "away",
       "strength": 0.737,
       "context": "1 match dans les 48h + 1037 km de voyage"
-    },
-    {
-      "event_id": "401875797",
-      "date": "2026-06-14T19:00Z",
-      "sport": "football",
-      "league_code": "laliga2",
-      "league_name": "La Liga 2",
-      "home": "Málaga",
-      "away": "Almería",
-      "match": "Málaga - Almería",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "home",
-      "strength": 0.725,
-      "context": "Cote home: 2.30 -> 2.00 (+13.0%)"
     },
     {
       "event_id": "401815746",
@@ -675,25 +636,6 @@
       "context": "Deplacement estime 2514 km, decalage ~1.7h"
     }
   ],
-  "active_risk": [
-    {
-      "event_id": "177094",
-      "date": "2026-06-13T10:30Z",
-      "sport": "tennis",
-      "league_code": "libemaopen",
-      "league_name": "Libéma Open",
-      "home": "",
-      "away": "",
-      "match": "? - ?",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 12.5%"
-    }
-  ],
+  "active_risk": [],
   "expired_sample": []
 }

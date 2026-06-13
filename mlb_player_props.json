@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-13T10:09:06Z",
+  "generated_at": "2026-06-13T11:47:17Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -210,6 +210,42 @@
             "whip": 1.44
           },
           "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Miami Marlins",
+          "pitcher": "Lake Bachar",
+          "label": "Lake Bachar moins de 7,5 strikeouts",
+          "line": 7.5,
+          "pick": "under",
+          "probability": 0.5092,
+          "fair_odds": 1.96,
+          "expected_strikeouts": 7.45,
+          "projected_ip": 6.6,
+          "inputs": {
+            "k9": 10.16,
+            "era": 2.97,
+            "whip": 0.91,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Miami Marlins",
+          "pitcher": "Lake Bachar",
+          "label": "Lake Bachar concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5972,
+          "fair_odds": 1.67,
+          "expected_hr_allowed": 0.909,
+          "projected_ip": 6.6,
+          "inputs": {
+            "hr9": 1.24,
+            "era": 2.97,
+            "whip": 0.91
+          },
+          "side": "away"
         }
       ]
     },
@@ -1008,36 +1044,36 @@
         {
           "market": "pitcher_strikeouts",
           "team": "Athletics",
-          "pitcher": "J.T. Ginn",
-          "label": "J.T. Ginn moins de 5,5 strikeouts",
-          "line": 5.5,
+          "pitcher": "Jeffrey Springs",
+          "label": "Jeffrey Springs moins de 4,5 strikeouts",
+          "line": 4.5,
           "pick": "under",
-          "probability": 0.5224,
-          "fair_odds": 1.91,
-          "expected_strikeouts": 5.4,
-          "projected_ip": 5.92,
+          "probability": 0.5,
+          "fair_odds": 2.0,
+          "expected_strikeouts": 4.5,
+          "projected_ip": 5.36,
           "inputs": {
-            "k9": 8.2,
-            "era": 3.15,
-            "whip": 1.15,
-            "hand": "R"
+            "k9": 7.56,
+            "era": 4.68,
+            "whip": 1.29,
+            "hand": "L"
           },
           "side": "home"
         },
         {
           "market": "pitcher_home_run_allowed",
           "team": "Athletics",
-          "pitcher": "J.T. Ginn",
-          "label": "J.T. Ginn ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5143,
-          "fair_odds": 1.94,
-          "expected_hr_allowed": 0.665,
-          "projected_ip": 5.92,
+          "pitcher": "Jeffrey Springs",
+          "label": "Jeffrey Springs concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.6811,
+          "fair_odds": 1.47,
+          "expected_hr_allowed": 1.143,
+          "projected_ip": 5.36,
           "inputs": {
-            "hr9": 1.01,
-            "era": 3.15,
-            "whip": 1.15
+            "hr9": 1.92,
+            "era": 4.68,
+            "whip": 1.29
           },
           "side": "home"
         },
@@ -1076,6 +1112,52 @@
             "whip": 1.29
           },
           "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815748",
+      "kickoff": "2026-06-14T02:07Z",
+      "league": "MLB",
+      "match": "Tampa Bay Rays at Los Angeles Angels",
+      "home": "Los Angeles Angels",
+      "away": "Tampa Bay Rays",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Los Angeles Angels",
+          "pitcher": "Grayson Rodriguez",
+          "label": "Grayson Rodriguez plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.5128,
+          "fair_odds": 1.95,
+          "expected_strikeouts": 4.55,
+          "projected_ip": 4.62,
+          "inputs": {
+            "k9": 8.87,
+            "era": 8.1,
+            "whip": 1.8,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Los Angeles Angels",
+          "pitcher": "Grayson Rodriguez",
+          "label": "Grayson Rodriguez concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5464,
+          "fair_odds": 1.83,
+          "expected_hr_allowed": 0.791,
+          "projected_ip": 4.62,
+          "inputs": {
+            "hr9": 1.54,
+            "era": 8.1,
+            "whip": 1.8
+          },
+          "side": "home"
         }
       ]
     },
@@ -1614,6 +1696,42 @@
             "whip": 1.1
           },
           "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Detroit Tigers",
+          "pitcher": "Casey Mize",
+          "label": "Casey Mize moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.5242,
+          "fair_odds": 1.91,
+          "expected_strikeouts": 5.39,
+          "projected_ip": 5.24,
+          "inputs": {
+            "k9": 9.25,
+            "era": 2.27,
+            "whip": 0.97,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Detroit Tigers",
+          "pitcher": "Casey Mize",
+          "label": "Casey Mize ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.8014,
+          "fair_odds": 1.25,
+          "expected_hr_allowed": 0.221,
+          "projected_ip": 5.24,
+          "inputs": {
+            "hr9": 0.38,
+            "era": 2.27,
+            "whip": 0.97
+          },
+          "side": "away"
         }
       ]
     },
@@ -1956,36 +2074,36 @@
         {
           "market": "pitcher_strikeouts",
           "team": "Athletics",
-          "pitcher": "J.T. Ginn",
-          "label": "J.T. Ginn moins de 5,5 strikeouts",
-          "line": 5.5,
+          "pitcher": "Jeffrey Springs",
+          "label": "Jeffrey Springs moins de 4,5 strikeouts",
+          "line": 4.5,
           "pick": "under",
-          "probability": 0.5224,
-          "fair_odds": 1.91,
-          "expected_strikeouts": 5.4,
-          "projected_ip": 5.92,
+          "probability": 0.5,
+          "fair_odds": 2.0,
+          "expected_strikeouts": 4.5,
+          "projected_ip": 5.36,
           "inputs": {
-            "k9": 8.2,
-            "era": 3.15,
-            "whip": 1.15,
-            "hand": "R"
+            "k9": 7.56,
+            "era": 4.68,
+            "whip": 1.29,
+            "hand": "L"
           },
           "side": "home"
         },
         {
           "market": "pitcher_home_run_allowed",
           "team": "Athletics",
-          "pitcher": "J.T. Ginn",
-          "label": "J.T. Ginn ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5143,
-          "fair_odds": 1.94,
-          "expected_hr_allowed": 0.665,
-          "projected_ip": 5.92,
+          "pitcher": "Jeffrey Springs",
+          "label": "Jeffrey Springs concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.6811,
+          "fair_odds": 1.47,
+          "expected_hr_allowed": 1.143,
+          "projected_ip": 5.36,
           "inputs": {
-            "hr9": 1.01,
-            "era": 3.15,
-            "whip": 1.15
+            "hr9": 1.92,
+            "era": 4.68,
+            "whip": 1.29
           },
           "side": "home"
         },
@@ -2110,6 +2228,52 @@
       ]
     },
     {
+      "event_id": "401815763",
+      "kickoff": "2026-06-14T20:07Z",
+      "league": "MLB",
+      "match": "Tampa Bay Rays at Los Angeles Angels",
+      "home": "Los Angeles Angels",
+      "away": "Tampa Bay Rays",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Los Angeles Angels",
+          "pitcher": "Grayson Rodriguez",
+          "label": "Grayson Rodriguez plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.5128,
+          "fair_odds": 1.95,
+          "expected_strikeouts": 4.55,
+          "projected_ip": 4.62,
+          "inputs": {
+            "k9": 8.87,
+            "era": 8.1,
+            "whip": 1.8,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Los Angeles Angels",
+          "pitcher": "Grayson Rodriguez",
+          "label": "Grayson Rodriguez concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5464,
+          "fair_odds": 1.83,
+          "expected_hr_allowed": 0.791,
+          "projected_ip": 4.62,
+          "inputs": {
+            "hr9": 1.54,
+            "era": 8.1,
+            "whip": 1.8
+          },
+          "side": "home"
+        }
+      ]
+    },
+    {
       "event_id": "401815756",
       "kickoff": "2026-06-14T23:20Z",
       "league": "MLB",
@@ -2192,7 +2356,7 @@
       ]
     }
   ],
-  "props": 106,
+  "props": 114,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
