@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-06-13T17:58:27Z",
+  "generated_at": "2026-06-13T19:12:37Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815745",
-      "kickoff": "2026-06-13T18:10Z",
-      "league": "MLB",
-      "match": "St. Louis Cardinals at Minnesota Twins",
-      "home": "Minnesota Twins",
-      "away": "St. Louis Cardinals",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Minnesota Twins",
-          "pitcher": "Connor Prielipp",
-          "label": "Connor Prielipp moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.525,
-          "fair_odds": 1.9,
-          "expected_strikeouts": 5.39,
-          "projected_ip": 4.8,
-          "inputs": {
-            "k9": 10.1,
-            "era": 5.15,
-            "whip": 1.33,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Minnesota Twins",
-          "pitcher": "Connor Prielipp",
-          "label": "Connor Prielipp ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6458,
-          "fair_odds": 1.55,
-          "expected_hr_allowed": 0.437,
-          "projected_ip": 4.8,
-          "inputs": {
-            "hr9": 0.82,
-            "era": 5.15,
-            "whip": 1.33
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "St. Louis Cardinals",
-          "pitcher": "Matthew Liberatore",
-          "label": "Matthew Liberatore plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.542,
-          "fair_odds": 1.85,
-          "expected_strikeouts": 4.68,
-          "projected_ip": 5.08,
-          "inputs": {
-            "k9": 8.28,
-            "era": 4.48,
-            "whip": 1.51,
-            "hand": "L"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "St. Louis Cardinals",
-          "pitcher": "Matthew Liberatore",
-          "label": "Matthew Liberatore concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5691,
-          "fair_odds": 1.76,
-          "expected_hr_allowed": 0.842,
-          "projected_ip": 5.08,
-          "inputs": {
-            "hr9": 1.49,
-            "era": 4.48,
-            "whip": 1.51
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815738",
       "kickoff": "2026-06-13T19:07Z",
@@ -2356,7 +2274,7 @@
       ]
     }
   ],
-  "props": 114,
+  "props": 110,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"

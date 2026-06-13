@@ -1,85 +1,27 @@
 {
-  "generated_at": "2026-06-13T17:58:28Z",
+  "generated_at": "2026-06-13T19:12:38Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 33,
+    "active_events": 32,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 42,
+      "lookahead": 40,
       "back_to_back_travel": 23,
       "travel_extreme": 17,
       "schedule_congestion": 6
     },
     "by_decision": {
-      "abstain": 6,
+      "abstain": 5,
       "lean_home": 27
     },
     "lean_home": 27,
     "lean_away": 0,
-    "abstain": 6,
+    "abstain": 5,
     "monitor": 0
   },
   "active": [
-    {
-      "event_id": "401815745",
-      "source_event_ids": [
-        "401815745"
-      ],
-      "kickoff": "2026-06-13T18:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Minnesota Twins",
-      "away": "St. Louis Cardinals",
-      "match": "Minnesota Twins - St. Louis Cardinals",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Minnesota Twins 0.15, St. Louis Cardinals 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -1.097,
-        "away_score": 0.252,
-        "home_fade": 1.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: St. Louis Cardinals (+0.25)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
     {
       "event_id": "401815738",
       "source_event_ids": [
@@ -1409,11 +1351,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.552,
-        "away_score": -1.954,
+        "home_score": 0.482,
+        "away_score": -1.754,
         "home_fade": 0.15,
-        "away_fade": 2.006,
-        "reason": "Direction nette: Pittsburgh Pirates (+0.55)",
+        "away_fade": 1.806,
+        "reason": "Direction nette: Pittsburgh Pirates (+0.48)",
         "detail": [
           {
             "side": "home",
@@ -1431,7 +1373,7 @@
             "side": "away",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 1.0
+            "strength": 0.8
           },
           {
             "side": "away",
@@ -1782,17 +1724,17 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.678,
-        "away_score": -1.936,
+        "home_score": 0.608,
+        "away_score": -1.736,
         "home_fade": 0.0,
-        "away_fade": 1.936,
-        "reason": "Direction nette: Pittsburgh Pirates (+0.68)",
+        "away_fade": 1.736,
+        "reason": "Direction nette: Pittsburgh Pirates (+0.61)",
         "detail": [
           {
             "side": "away",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 1.0
+            "strength": 0.8
           },
           {
             "side": "away",
