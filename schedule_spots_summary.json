@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-13T21:51:56Z",
+  "generated_at": "2026-06-13T22:51:13Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -467,11 +467,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.583,
-        "away_score": -2.042,
-        "home_fade": 0.15,
+        "home_score": 0.183,
+        "away_score": -1.902,
+        "home_fade": 0.55,
         "away_fade": 2.094,
-        "reason": "Direction nette: Los Angeles Angels (+0.58)",
+        "reason": "Direction nette: Los Angeles Angels (+0.18)",
         "detail": [
           {
             "side": "home",
@@ -484,6 +484,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.3
+          },
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.4
           },
           {
             "side": "away",
@@ -534,17 +540,23 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.754,
-        "away_score": -2.154,
-        "home_fade": 0.0,
+        "home_score": 0.354,
+        "away_score": -2.014,
+        "home_fade": 0.4,
         "away_fade": 2.154,
-        "reason": "Direction nette: Los Angeles Angels (+0.75)",
+        "reason": "Direction nette: Los Angeles Angels (+0.35)",
         "detail": [
           {
             "side": "away",
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.36
+          },
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.4
           },
           {
             "side": "away",
