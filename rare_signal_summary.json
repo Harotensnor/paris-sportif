@@ -1,82 +1,28 @@
 {
-  "generated_at": "2026-06-14T02:06:24Z",
+  "generated_at": "2026-06-14T03:46:31Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 24,
-    "actionable": 22,
-    "watch": 1,
-    "risk": 1,
+    "actionable": 19,
+    "watch": 2,
+    "risk": 3,
     "expired_sample": 0,
     "by_type": {
-      "travel_extreme": 13,
-      "back_to_back_travel": 15,
       "injury_imbalance": 12,
+      "back_to_back_travel": 13,
+      "travel_extreme": 11,
       "signal_conflict": 1,
-      "market_uncertain": 2
+      "market_uncertain": 6
     },
     "by_quality": {
-      "actionable": 22,
-      "watch": 1,
-      "risk": 1
+      "actionable": 19,
+      "watch": 2,
+      "risk": 3
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401815746",
-      "date": "2026-06-14T02:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Francisco Giants",
-      "away": "Chicago Cubs",
-      "match": "San Francisco Giants - Chicago Cubs",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Chicago Cubs",
-      "side": "away",
-      "strength": 1.0,
-      "context": "1 match dans les 48h + 2980 km de voyage"
-    },
-    {
-      "event_id": "401815747",
-      "date": "2026-06-14T02:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Athletics",
-      "away": "Colorado Rockies",
-      "match": "Athletics - Colorado Rockies",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Colorado Rockies",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 6-14"
-    },
-    {
-      "event_id": "401815748",
-      "date": "2026-06-14T02:07Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Los Angeles Angels",
-      "away": "Tampa Bay Rays",
-      "match": "Los Angeles Angels - Tampa Bay Rays",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Tampa Bay Rays",
-      "side": "away",
-      "strength": 1.0,
-      "context": "1 match dans les 48h + 3414 km de voyage"
-    },
     {
       "event_id": "401815754",
       "date": "2026-06-14T17:35Z",
@@ -438,9 +384,45 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 13-16"
+    },
+    {
+      "event_id": "401856993",
+      "date": "2026-06-16T00:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Minnesota Lynx",
+      "away": "Portland Fire",
+      "match": "Minnesota Lynx - Portland Fire",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Minnesota Lynx",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 4-1"
     }
   ],
   "active_risk": [
+    {
+      "event_id": "177167",
+      "date": "2026-06-15T04:00Z",
+      "sport": "tennis",
+      "league_code": "terrawortmannopen",
+      "league_name": "Terra Wortmann Open",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 12.5%"
+    },
     {
       "event_id": "177141",
       "date": "2026-06-15T04:00Z",
@@ -458,6 +440,24 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 12.0%"
+    },
+    {
+      "event_id": "178001",
+      "date": "2026-06-15T04:00Z",
+      "sport": "tennis",
+      "league_code": "lexusnottinghamopen",
+      "league_name": "Lexus Nottingham Open",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 12.1%"
     }
   ],
   "expired_sample": []
