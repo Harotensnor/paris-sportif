@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-06-14T15:22:20Z",
+  "generated_at": "2026-06-14T16:51:51Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815752",
-      "kickoff": "2026-06-14T16:15Z",
-      "league": "MLB",
-      "match": "Miami Marlins at Pittsburgh Pirates",
-      "home": "Pittsburgh Pirates",
-      "away": "Miami Marlins",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Pittsburgh Pirates",
-          "pitcher": "Paul Skenes",
-          "label": "Paul Skenes moins de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "under",
-          "probability": 0.5289,
-          "fair_odds": 1.89,
-          "expected_strikeouts": 6.36,
-          "projected_ip": 5.43,
-          "inputs": {
-            "k9": 10.54,
-            "era": 2.84,
-            "whip": 0.93,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Pittsburgh Pirates",
-          "pitcher": "Paul Skenes",
-          "label": "Paul Skenes ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6516,
-          "fair_odds": 1.53,
-          "expected_hr_allowed": 0.428,
-          "projected_ip": 5.43,
-          "inputs": {
-            "hr9": 0.71,
-            "era": 2.84,
-            "whip": 0.93
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Miami Marlins",
-          "pitcher": "Max Meyer",
-          "label": "Max Meyer moins de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "under",
-          "probability": 0.573,
-          "fair_odds": 1.75,
-          "expected_strikeouts": 6.14,
-          "projected_ip": 5.64,
-          "inputs": {
-            "k9": 9.8,
-            "era": 2.85,
-            "whip": 1.09,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Miami Marlins",
-          "pitcher": "Max Meyer",
-          "label": "Max Meyer ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6056,
-          "fair_odds": 1.65,
-          "expected_hr_allowed": 0.502,
-          "projected_ip": 5.64,
-          "inputs": {
-            "hr9": 0.8,
-            "era": 2.85,
-            "whip": 1.09
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815754",
       "kickoff": "2026-06-14T17:35Z",
@@ -178,36 +96,36 @@
         {
           "market": "pitcher_strikeouts",
           "team": "Washington Nationals",
-          "pitcher": "Miles Mikolas",
-          "label": "Miles Mikolas moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.5964,
-          "fair_odds": 1.68,
-          "expected_strikeouts": 4.11,
-          "projected_ip": 6.6,
+          "pitcher": "PJ Poulin",
+          "label": "PJ Poulin plus de 2,5 strikeouts",
+          "line": 2.5,
+          "pick": "over",
+          "probability": 0.5147,
+          "fair_odds": 1.94,
+          "expected_strikeouts": 2.55,
+          "projected_ip": 3.59,
           "inputs": {
-            "k9": 5.61,
-            "era": 5.9,
-            "whip": 1.34,
-            "hand": "R"
+            "k9": 6.39,
+            "era": 3.2,
+            "whip": 1.46,
+            "hand": "L"
           },
           "side": "home"
         },
         {
           "market": "pitcher_home_run_allowed",
           "team": "Washington Nationals",
-          "pitcher": "Miles Mikolas",
-          "label": "Miles Mikolas concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.7809,
-          "fair_odds": 1.28,
-          "expected_hr_allowed": 1.518,
-          "projected_ip": 6.6,
+          "pitcher": "PJ Poulin",
+          "label": "PJ Poulin ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5679,
+          "fair_odds": 1.76,
+          "expected_hr_allowed": 0.566,
+          "projected_ip": 3.59,
           "inputs": {
-            "hr9": 2.07,
-            "era": 5.9,
-            "whip": 1.34
+            "hr9": 1.42,
+            "era": 3.2,
+            "whip": 1.46
           },
           "side": "home"
         },
@@ -670,36 +588,36 @@
         {
           "market": "pitcher_strikeouts",
           "team": "Chicago White Sox",
-          "pitcher": "Erick Fedde",
-          "label": "Erick Fedde moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.5833,
-          "fair_odds": 1.71,
-          "expected_strikeouts": 4.17,
+          "pitcher": "Bryan Hudson",
+          "label": "Bryan Hudson plus de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "over",
+          "probability": 0.5591,
+          "fair_odds": 1.79,
+          "expected_strikeouts": 5.78,
           "projected_ip": 6.6,
           "inputs": {
-            "k9": 5.68,
-            "era": 4.69,
-            "whip": 1.39,
-            "hand": "R"
+            "k9": 7.88,
+            "era": 2.25,
+            "whip": 1.28,
+            "hand": "L"
           },
           "side": "home"
         },
         {
           "market": "pitcher_home_run_allowed",
           "team": "Chicago White Sox",
-          "pitcher": "Erick Fedde",
-          "label": "Erick Fedde concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.7676,
-          "fair_odds": 1.3,
-          "expected_hr_allowed": 1.459,
+          "pitcher": "Bryan Hudson",
+          "label": "Bryan Hudson ne concède pas de home run",
+          "pick": "no",
+          "probability": 1.0,
+          "fair_odds": 1.01,
+          "expected_hr_allowed": 0.0,
           "projected_ip": 6.6,
           "inputs": {
-            "hr9": 1.99,
-            "era": 4.69,
-            "whip": 1.39
+            "hr9": 0.0,
+            "era": 2.25,
+            "whip": 1.28
           },
           "side": "home"
         },
@@ -1234,7 +1152,7 @@
       ]
     }
   ],
-  "props": 60,
+  "props": 56,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"

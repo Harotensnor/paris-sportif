@@ -1,22 +1,22 @@
 {
-  "generated_at": "2026-06-14T15:22:21Z",
+  "generated_at": "2026-06-14T16:51:52Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 17,
+    "active_events": 16,
     "expired_sample": 0,
     "by_type": {
-      "back_to_back_travel": 13,
       "travel_extreme": 11,
+      "back_to_back_travel": 12,
       "lookahead": 9,
       "schedule_congestion": 6
     },
     "by_decision": {
-      "lean_home": 16,
+      "lean_home": 15,
       "lean_away": 1
     },
-    "lean_home": 16,
+    "lean_home": 15,
     "lean_away": 1,
     "abstain": 0,
     "monitor": 0
@@ -670,57 +670,6 @@
             "type": "travel_extreme",
             "direction": "fade",
             "strength": 0.759
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815752",
-      "source_event_ids": [
-        "401815752"
-      ],
-      "kickoff": "2026-06-14T16:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Pittsburgh Pirates",
-      "away": "Miami Marlins",
-      "match": "Pittsburgh Pirates - Miami Marlins",
-      "decision": "lean_home",
-      "net_team": "Pittsburgh Pirates",
-      "reason": "Miami Marlins plus penalise par calendrier/voyage (0.94 vs 0.00)",
-      "pressure_score": 0.936,
-      "home_fade": 0.0,
-      "away_fade": 0.936,
-      "travel_score": 0.936,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "2 match dans les 48h + 1631 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.608,
-        "away_score": -1.736,
-        "home_fade": 0.0,
-        "away_fade": 1.736,
-        "reason": "Direction nette: Pittsburgh Pirates (+0.61)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.8
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.936
           }
         ]
       }

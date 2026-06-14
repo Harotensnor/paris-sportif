@@ -1,23 +1,23 @@
 {
-  "generated_at": "2026-06-14T15:22:21Z",
+  "generated_at": "2026-06-14T16:51:52Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 23,
-    "actionable": 19,
+    "active_events": 22,
+    "actionable": 18,
     "watch": 2,
     "risk": 2,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 11,
-      "back_to_back_travel": 13,
       "travel_extreme": 11,
+      "back_to_back_travel": 12,
+      "injury_imbalance": 10,
       "signal_conflict": 1,
       "market_uncertain": 2
     },
     "by_quality": {
-      "actionable": 19,
+      "actionable": 18,
       "watch": 2,
       "risk": 2
     }
@@ -165,7 +165,7 @@
       "team": "Colorado Rockies",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 6-14"
+      "context": "Absences severes 6-13"
     },
     {
       "event_id": "401815761",
@@ -274,24 +274,6 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 16-10"
-    },
-    {
-      "event_id": "401815752",
-      "date": "2026-06-14T16:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Pittsburgh Pirates",
-      "away": "Miami Marlins",
-      "match": "Pittsburgh Pirates - Miami Marlins",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Miami Marlins",
-      "side": "away",
-      "strength": 0.936,
-      "context": "2 match dans les 48h + 1631 km de voyage"
     },
     {
       "event_id": "401815750",
@@ -406,24 +388,6 @@
   ],
   "active_risk": [
     {
-      "event_id": "177141",
-      "date": "2026-06-15T04:00Z",
-      "sport": "tennis",
-      "league_code": "hsbcchampionships",
-      "league_name": "HSBC Championships",
-      "home": "",
-      "away": "",
-      "match": "? - ?",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 12.1%"
-    },
-    {
       "event_id": "177170",
       "date": "2026-06-16T04:00Z",
       "sport": "tennis",
@@ -440,6 +404,24 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 12.2%"
+    },
+    {
+      "event_id": "177141",
+      "date": "2026-06-16T04:00Z",
+      "sport": "tennis",
+      "league_code": "hsbcchampionships",
+      "league_name": "HSBC Championships",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 12.1%"
     }
   ],
   "expired_sample": []
