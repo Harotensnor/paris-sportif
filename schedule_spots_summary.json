@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-14T22:01:17Z",
+  "generated_at": "2026-06-14T23:14:02Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -10,7 +10,7 @@
       "travel_extreme": 6,
       "back_to_back_travel": 4,
       "lookahead": 6,
-      "schedule_congestion": 6
+      "schedule_congestion": 5
     },
     "by_decision": {
       "lean_home": 6
@@ -22,11 +22,11 @@
   },
   "active": [
     {
-      "event_id": "401815773",
+      "event_id": "401815788",
       "source_event_ids": [
-        "401815773"
+        "401815788"
       ],
-      "kickoff": "2026-06-16T02:00Z",
+      "kickoff": "2026-06-17T02:10Z",
       "sport": "baseball",
       "league_code": "mlb",
       "league_name": "MLB",
@@ -35,13 +35,13 @@
       "match": "Los Angeles Dodgers - Tampa Bay Rays",
       "decision": "lean_home",
       "net_team": "Los Angeles Dodgers",
-      "reason": "Tampa Bay Rays plus penalise par calendrier/voyage (2.70 vs 0.90)",
-      "pressure_score": 4.335,
-      "home_fade": 0.9,
-      "away_fade": 2.702,
+      "reason": "Tampa Bay Rays plus penalise par calendrier/voyage (2.55 vs 0.95)",
+      "pressure_score": 3.869,
+      "home_fade": 0.95,
+      "away_fade": 2.552,
       "travel_score": 1.802,
-      "lookahead_score": 1.333,
-      "congestion_score": 1.2,
+      "lookahead_score": 0.667,
+      "congestion_score": 1.4,
       "types": {
         "schedule_congestion": 2,
         "lookahead": 2,
@@ -49,31 +49,31 @@
         "back_to_back_travel": 1
       },
       "contexts": [
+        "4 matchs sur les 7 derniers jours",
+        "1 match important/proche dans les 3 jours",
         "3 matchs sur les 7 derniers jours",
-        "2 match important/proche dans les 3 jours",
-        "3 matchs sur les 7 derniers jours",
-        "2 match important/proche dans les 3 jours"
+        "1 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": -0.954,
-        "away_score": -2.037,
-        "home_fade": 1.9,
-        "away_fade": 2.702,
-        "reason": "Direction nette: Los Angeles Dodgers (-0.95)",
+        "home_score": -1.057,
+        "away_score": -1.869,
+        "home_fade": 1.95,
+        "away_fade": 2.552,
+        "reason": "Direction nette: Los Angeles Dodgers (-1.06)",
         "detail": [
           {
             "side": "home",
             "type": "schedule_congestion",
             "direction": "fade",
-            "strength": 0.6
+            "strength": 0.8
           },
           {
             "side": "home",
             "type": "lookahead",
             "direction": "caution",
-            "strength": 0.3
+            "strength": 0.15
           },
           {
             "side": "away",
@@ -85,7 +85,7 @@
             "side": "away",
             "type": "lookahead",
             "direction": "caution",
-            "strength": 0.3
+            "strength": 0.15
           },
           {
             "side": "home",
@@ -109,11 +109,11 @@
       }
     },
     {
-      "event_id": "401815788",
+      "event_id": "401815773",
       "source_event_ids": [
-        "401815788"
+        "401815773"
       ],
-      "kickoff": "2026-06-17T02:10Z",
+      "kickoff": "2026-06-16T02:00Z",
       "sport": "baseball",
       "league_code": "mlb",
       "league_name": "MLB",
@@ -122,57 +122,51 @@
       "match": "Los Angeles Dodgers - Tampa Bay Rays",
       "decision": "lean_home",
       "net_team": "Los Angeles Dodgers",
-      "reason": "Tampa Bay Rays plus penalise par calendrier/voyage (2.75 vs 0.95)",
-      "pressure_score": 4.069,
-      "home_fade": 0.95,
-      "away_fade": 2.752,
+      "reason": "Tampa Bay Rays plus penalise par calendrier/voyage (2.10 vs 0.90)",
+      "pressure_score": 3.735,
+      "home_fade": 0.9,
+      "away_fade": 2.102,
       "travel_score": 1.802,
-      "lookahead_score": 0.667,
-      "congestion_score": 1.6,
+      "lookahead_score": 1.333,
+      "congestion_score": 0.6,
       "types": {
-        "schedule_congestion": 2,
+        "schedule_congestion": 1,
         "lookahead": 2,
         "travel_extreme": 1,
         "back_to_back_travel": 1
       },
       "contexts": [
-        "4 matchs sur les 7 derniers jours",
-        "1 match important/proche dans les 3 jours",
-        "4 matchs sur les 7 derniers jours",
-        "1 match important/proche dans les 3 jours"
+        "3 matchs sur les 7 derniers jours",
+        "2 match important/proche dans les 3 jours",
+        "2 match important/proche dans les 3 jours",
+        "Deplacement estime 3448 km, decalage ~2.4h"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.987,
-        "away_score": -2.069,
-        "home_fade": 1.95,
-        "away_fade": 2.752,
-        "reason": "Direction nette: Los Angeles Dodgers (-0.99)",
+        "status": "abstain",
+        "net_side": null,
+        "home_score": -1.164,
+        "away_score": -1.437,
+        "home_fade": 1.9,
+        "away_fade": 2.102,
+        "reason": "Signaux opposes: Los Angeles Dodgers fade 1.90, Tampa Bay Rays fade 2.10 -> prudence",
         "detail": [
           {
             "side": "home",
             "type": "schedule_congestion",
             "direction": "fade",
-            "strength": 0.8
+            "strength": 0.6
           },
           {
             "side": "home",
             "type": "lookahead",
             "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.8
+            "strength": 0.3
           },
           {
             "side": "away",
             "type": "lookahead",
             "direction": "caution",
-            "strength": 0.15
+            "strength": 0.3
           },
           {
             "side": "home",
@@ -209,13 +203,13 @@
       "match": "Los Angeles Dodgers - Tampa Bay Rays",
       "decision": "lean_home",
       "net_team": "Los Angeles Dodgers",
-      "reason": "Tampa Bay Rays plus penalise par calendrier/voyage (2.80 vs 1.00)",
-      "pressure_score": 3.802,
+      "reason": "Tampa Bay Rays plus penalise par calendrier/voyage (2.60 vs 1.00)",
+      "pressure_score": 3.602,
       "home_fade": 1.0,
-      "away_fade": 2.802,
+      "away_fade": 2.602,
       "travel_score": 1.802,
       "lookahead_score": 0,
-      "congestion_score": 2.0,
+      "congestion_score": 1.8,
       "types": {
         "schedule_congestion": 2,
         "travel_extreme": 1,
@@ -223,18 +217,18 @@
       },
       "contexts": [
         "5 matchs sur les 7 derniers jours",
-        "5 matchs sur les 7 derniers jours",
+        "4 matchs sur les 7 derniers jours",
         "Deplacement estime 3448 km, decalage ~2.4h",
         "2 match dans les 48h + 3448 km de voyage"
       ],
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": -1.019,
-        "away_score": -2.102,
+        "home_score": -1.089,
+        "away_score": -1.902,
         "home_fade": 2.0,
-        "away_fade": 2.802,
-        "reason": "Direction nette: Los Angeles Dodgers (-1.02)",
+        "away_fade": 2.602,
+        "reason": "Direction nette: Los Angeles Dodgers (-1.09)",
         "detail": [
           {
             "side": "home",
@@ -246,7 +240,7 @@
             "side": "away",
             "type": "schedule_congestion",
             "direction": "fade",
-            "strength": 1.0
+            "strength": 0.8
           },
           {
             "side": "home",
@@ -355,11 +349,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.168,
-        "away_score": -0.856,
-        "home_fade": 0.15,
-        "away_fade": 0.909,
-        "reason": "Direction nette: Vegas Golden Knights (+0.17)",
+        "home_score": -0.482,
+        "away_score": -1.506,
+        "home_fade": 1.15,
+        "away_fade": 1.909,
+        "reason": "Direction nette: Vegas Golden Knights (-0.48)",
         "detail": [
           {
             "side": "home",
@@ -372,6 +366,18 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           },
           {
             "side": "away",

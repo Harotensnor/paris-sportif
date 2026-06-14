@@ -1,22 +1,25 @@
 {
-  "generated_at": "2026-06-14T22:01:17Z",
+  "generated_at": "2026-06-14T23:14:02Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 9,
-    "actionable": 7,
-    "watch": 0,
+    "actionable": 6,
+    "watch": 1,
     "risk": 2,
     "expired_sample": 0,
     "by_type": {
       "travel_extreme": 6,
       "back_to_back_travel": 4,
+      "market_uncertain": 3,
+      "market_move": 2,
       "injury_imbalance": 4,
-      "market_uncertain": 2
+      "signal_conflict": 1
     },
     "by_quality": {
-      "actionable": 7,
+      "actionable": 6,
+      "watch": 1,
       "risk": 2
     }
   },
@@ -38,6 +41,24 @@
       "side": "away",
       "strength": 1.0,
       "context": "1 match dans les 48h + 2514 km de voyage"
+    },
+    {
+      "event_id": "401874176",
+      "date": "2026-06-15T00:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Vegas Golden Knights",
+      "away": "Carolina Hurricanes",
+      "match": "Vegas Golden Knights - Carolina Hurricanes",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 1.95 -> 2.45 (-25.5%)"
     },
     {
       "event_id": "401815773",
@@ -94,42 +115,6 @@
       "context": "Absences severes 16-10"
     },
     {
-      "event_id": "401856993",
-      "date": "2026-06-16T00:00Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Minnesota Lynx",
-      "away": "Portland Fire",
-      "match": "Minnesota Lynx - Portland Fire",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Minnesota Lynx",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 4-0"
-    },
-    {
-      "event_id": "401874176",
-      "date": "2026-06-15T00:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Vegas Golden Knights",
-      "away": "Carolina Hurricanes",
-      "match": "Vegas Golden Knights - Carolina Hurricanes",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "travel_extreme",
-      "direction": "fade",
-      "team": "Carolina Hurricanes",
-      "side": "away",
-      "strength": 0.759,
-      "context": "Deplacement estime 3262 km, decalage ~2.4h"
-    },
-    {
       "event_id": "401874177",
       "date": "2026-06-18T00:00Z",
       "sport": "hockey",
@@ -148,7 +133,26 @@
       "context": "Deplacement estime 3262 km, decalage ~2.4h"
     }
   ],
-  "active_watch": [],
+  "active_watch": [
+    {
+      "event_id": "401856993",
+      "date": "2026-06-16T00:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Minnesota Lynx",
+      "away": "Portland Fire",
+      "match": "Minnesota Lynx - Portland Fire",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Minnesota Lynx",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 3-0"
+    }
+  ],
   "active_risk": [
     {
       "event_id": "177170",
