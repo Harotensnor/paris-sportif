@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-06-14T19:51:41Z",
+  "generated_at": "2026-06-14T20:55:30Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815763",
-      "kickoff": "2026-06-14T20:07Z",
-      "league": "MLB",
-      "match": "Tampa Bay Rays at Los Angeles Angels",
-      "home": "Los Angeles Angels",
-      "away": "Tampa Bay Rays",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Los Angeles Angels",
-          "pitcher": "Grayson Rodriguez",
-          "label": "Grayson Rodriguez plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.5128,
-          "fair_odds": 1.95,
-          "expected_strikeouts": 4.55,
-          "projected_ip": 4.62,
-          "inputs": {
-            "k9": 8.87,
-            "era": 8.1,
-            "whip": 1.8,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Los Angeles Angels",
-          "pitcher": "Grayson Rodriguez",
-          "label": "Grayson Rodriguez concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5464,
-          "fair_odds": 1.83,
-          "expected_hr_allowed": 0.791,
-          "projected_ip": 4.62,
-          "inputs": {
-            "hr9": 1.54,
-            "era": 8.1,
-            "whip": 1.8
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Tampa Bay Rays",
-          "pitcher": "Casey Legumina",
-          "label": "Casey Legumina plus de 3,5 strikeouts",
-          "line": 3.5,
-          "pick": "over",
-          "probability": 0.5083,
-          "fair_odds": 1.97,
-          "expected_strikeouts": 3.53,
-          "projected_ip": 4.8,
-          "inputs": {
-            "k9": 6.62,
-            "era": 2.04,
-            "whip": 1.08,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Tampa Bay Rays",
-          "pitcher": "Casey Legumina",
-          "label": "Casey Legumina ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5804,
-          "fair_odds": 1.72,
-          "expected_hr_allowed": 0.544,
-          "projected_ip": 4.8,
-          "inputs": {
-            "hr9": 1.02,
-            "era": 2.04,
-            "whip": 1.08
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815756",
       "kickoff": "2026-06-14T23:20Z",
@@ -214,7 +132,7 @@
       ]
     }
   ],
-  "props": 10,
+  "props": 6,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
