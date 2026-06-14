@@ -1,22 +1,23 @@
 {
-  "generated_at": "2026-06-14T08:07:13Z",
+  "generated_at": "2026-06-14T11:09:36Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 16,
+    "active_events": 17,
     "expired_sample": 0,
     "by_type": {
       "back_to_back_travel": 13,
       "travel_extreme": 11,
-      "lookahead": 8,
+      "lookahead": 9,
       "schedule_congestion": 6
     },
     "by_decision": {
-      "lean_home": 16
+      "lean_home": 16,
+      "lean_away": 1
     },
     "lean_home": 16,
-    "lean_away": 0,
+    "lean_away": 1,
     "abstain": 0,
     "monitor": 0
   },
@@ -963,6 +964,51 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.6
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401856991",
+      "source_event_ids": [
+        "401856991"
+      ],
+      "kickoff": "2026-06-14T19:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Toronto Tempo",
+      "away": "Atlanta Dream",
+      "match": "Toronto Tempo - Atlanta Dream",
+      "decision": "lean_away",
+      "net_team": "Atlanta Dream",
+      "reason": "Toronto Tempo plus penalise par calendrier/voyage (0.15 vs 0.00)",
+      "pressure_score": 0.333,
+      "home_fade": 0.15,
+      "away_fade": 0.0,
+      "travel_score": 0,
+      "lookahead_score": 0.333,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 1
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "away",
+        "home_score": -0.15,
+        "away_score": 0.052,
+        "home_fade": 0.15,
+        "away_fade": 0.0,
+        "reason": "Direction nette: Atlanta Dream (+0.05)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
           }
         ]
       }
