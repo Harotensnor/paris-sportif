@@ -1,254 +1,8 @@
 {
-  "generated_at": "2026-06-15T22:04:00Z",
+  "generated_at": "2026-06-15T23:50:13Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815765",
-      "kickoff": "2026-06-15T22:40Z",
-      "league": "MLB",
-      "match": "Miami Marlins at Philadelphia Phillies",
-      "home": "Philadelphia Phillies",
-      "away": "Miami Marlins",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Philadelphia Phillies",
-          "pitcher": "Zack Wheeler",
-          "label": "Zack Wheeler plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.572,
-          "fair_odds": 1.75,
-          "expected_strikeouts": 5.84,
-          "projected_ip": 6.24,
-          "inputs": {
-            "k9": 8.42,
-            "era": 2.22,
-            "whip": 0.85,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Philadelphia Phillies",
-          "pitcher": "Zack Wheeler",
-          "label": "Zack Wheeler concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5371,
-          "fair_odds": 1.86,
-          "expected_hr_allowed": 0.77,
-          "projected_ip": 6.24,
-          "inputs": {
-            "hr9": 1.11,
-            "era": 2.22,
-            "whip": 0.85
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Miami Marlins",
-          "pitcher": "Ryan Gusto",
-          "label": "Ryan Gusto plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.5,
-          "fair_odds": 2.0,
-          "expected_strikeouts": 4.5,
-          "projected_ip": 4.5,
-          "inputs": {
-            "k9": 9.0,
-            "era": 6.0,
-            "whip": 1.44,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Miami Marlins",
-          "pitcher": "Ryan Gusto",
-          "label": "Ryan Gusto ne concède pas de home run",
-          "pick": "no",
-          "probability": 1.0,
-          "fair_odds": 1.01,
-          "expected_hr_allowed": 0.0,
-          "projected_ip": 4.5,
-          "inputs": {
-            "hr9": 0.0,
-            "era": 6.0,
-            "whip": 1.44
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401815764",
-      "kickoff": "2026-06-15T22:45Z",
-      "league": "MLB",
-      "match": "Kansas City Royals at Washington Nationals",
-      "home": "Washington Nationals",
-      "away": "Kansas City Royals",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Washington Nationals",
-          "pitcher": "Andrew Alvarez",
-          "label": "Andrew Alvarez moins de 7,5 strikeouts",
-          "line": 7.5,
-          "pick": "under",
-          "probability": 0.5851,
-          "fair_odds": 1.71,
-          "expected_strikeouts": 7.05,
-          "projected_ip": 6.6,
-          "inputs": {
-            "k9": 9.62,
-            "era": 3.7,
-            "whip": 1.44,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Washington Nationals",
-          "pitcher": "Andrew Alvarez",
-          "label": "Andrew Alvarez ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5812,
-          "fair_odds": 1.72,
-          "expected_hr_allowed": 0.543,
-          "projected_ip": 6.6,
-          "inputs": {
-            "hr9": 0.74,
-            "era": 3.7,
-            "whip": 1.44
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Kansas City Royals",
-          "pitcher": "Mitch Spence",
-          "label": "Mitch Spence plus de 3,5 strikeouts",
-          "line": 3.5,
-          "pick": "over",
-          "probability": 0.5269,
-          "fair_odds": 1.9,
-          "expected_strikeouts": 3.6,
-          "projected_ip": 4.8,
-          "inputs": {
-            "k9": 6.75,
-            "era": 13.5,
-            "whip": 2.25,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Kansas City Royals",
-          "pitcher": "Mitch Spence",
-          "label": "Mitch Spence concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6988,
-          "fair_odds": 1.43,
-          "expected_hr_allowed": 1.2,
-          "projected_ip": 4.8,
-          "inputs": {
-            "hr9": 2.25,
-            "era": 13.5,
-            "whip": 2.25
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401815766",
-      "kickoff": "2026-06-15T23:10Z",
-      "league": "MLB",
-      "match": "New York Mets at Cincinnati Reds",
-      "home": "Cincinnati Reds",
-      "away": "New York Mets",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Cincinnati Reds",
-          "pitcher": "Chase Burns",
-          "label": "Chase Burns plus de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "over",
-          "probability": 0.5451,
-          "fair_odds": 1.83,
-          "expected_strikeouts": 6.73,
-          "projected_ip": 5.78,
-          "inputs": {
-            "k9": 10.47,
-            "era": 2.14,
-            "whip": 0.99,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Cincinnati Reds",
-          "pitcher": "Chase Burns",
-          "label": "Chase Burns ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5027,
-          "fair_odds": 1.99,
-          "expected_hr_allowed": 0.688,
-          "projected_ip": 5.78,
-          "inputs": {
-            "hr9": 1.07,
-            "era": 2.14,
-            "whip": 0.99
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "New York Mets",
-          "pitcher": "Tobias Myers",
-          "label": "Tobias Myers moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.5788,
-          "fair_odds": 1.73,
-          "expected_strikeouts": 5.15,
-          "projected_ip": 6.6,
-          "inputs": {
-            "k9": 7.02,
-            "era": 4.05,
-            "whip": 1.08,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "New York Mets",
-          "pitcher": "Tobias Myers",
-          "label": "Tobias Myers concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6952,
-          "fair_odds": 1.44,
-          "expected_hr_allowed": 1.188,
-          "projected_ip": 6.6,
-          "inputs": {
-            "hr9": 1.62,
-            "era": 4.05,
-            "whip": 1.08
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815770",
       "kickoff": "2026-06-15T23:45Z",
@@ -261,17 +15,17 @@
           "market": "pitcher_strikeouts",
           "team": "St. Louis Cardinals",
           "pitcher": "Dustin May",
-          "label": "Dustin May moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.6032,
-          "fair_odds": 1.66,
-          "expected_strikeouts": 5.04,
-          "projected_ip": 5.55,
+          "label": "Dustin May plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.5627,
+          "fair_odds": 1.78,
+          "expected_strikeouts": 4.77,
+          "projected_ip": 5.22,
           "inputs": {
-            "k9": 8.17,
-            "era": 4.21,
-            "whip": 1.25,
+            "k9": 8.22,
+            "era": 4.17,
+            "whip": 1.24,
             "hand": "R"
           },
           "side": "home"
@@ -282,14 +36,14 @@
           "pitcher": "Dustin May",
           "label": "Dustin May ne concède pas de home run",
           "pick": "no",
-          "probability": 0.6821,
-          "fair_odds": 1.47,
-          "expected_hr_allowed": 0.383,
-          "projected_ip": 5.55,
+          "probability": 0.7019,
+          "fair_odds": 1.42,
+          "expected_hr_allowed": 0.354,
+          "projected_ip": 5.22,
           "inputs": {
-            "hr9": 0.62,
-            "era": 4.21,
-            "whip": 1.25
+            "hr9": 0.61,
+            "era": 4.17,
+            "whip": 1.24
           },
           "side": "home"
         },
@@ -1112,6 +866,42 @@
             "whip": 1.64
           },
           "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "New York Mets",
+          "pitcher": "Kodai Senga",
+          "label": "Kodai Senga plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.5238,
+          "fair_odds": 1.91,
+          "expected_strikeouts": 4.6,
+          "projected_ip": 4.0,
+          "inputs": {
+            "k9": 10.35,
+            "era": 9.0,
+            "whip": 1.95,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "New York Mets",
+          "pitcher": "Kodai Senga",
+          "label": "Kodai Senga concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.6321,
+          "fair_odds": 1.58,
+          "expected_hr_allowed": 1.0,
+          "projected_ip": 4.0,
+          "inputs": {
+            "hr9": 2.25,
+            "era": 9.0,
+            "whip": 1.95
+          },
+          "side": "away"
         }
       ]
     },
@@ -1615,6 +1405,42 @@
       "home": "Seattle Mariners",
       "away": "Baltimore Orioles",
       "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Seattle Mariners",
+          "pitcher": "George Kirby",
+          "label": "George Kirby moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.5473,
+          "fair_odds": 1.83,
+          "expected_strikeouts": 5.29,
+          "projected_ip": 6.0,
+          "inputs": {
+            "k9": 7.93,
+            "era": 4.07,
+            "whip": 1.31,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Seattle Mariners",
+          "pitcher": "George Kirby",
+          "label": "George Kirby ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5636,
+          "fair_odds": 1.77,
+          "expected_hr_allowed": 0.573,
+          "projected_ip": 6.0,
+          "inputs": {
+            "hr9": 0.86,
+            "era": 4.07,
+            "whip": 1.31
+          },
+          "side": "home"
+        },
         {
           "market": "pitcher_strikeouts",
           "team": "Baltimore Orioles",
@@ -2602,7 +2428,7 @@
       ]
     }
   ],
-  "props": 126,
+  "props": 118,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
