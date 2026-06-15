@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-15T15:37:48Z",
+  "generated_at": "2026-06-15T19:32:51Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -292,6 +292,42 @@
             "whip": 1.25
           },
           "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "San Diego Padres",
+          "pitcher": "Wandy Peralta",
+          "label": "Wandy Peralta moins de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "under",
+          "probability": 0.5435,
+          "fair_odds": 1.84,
+          "expected_strikeouts": 3.34,
+          "projected_ip": 4.8,
+          "inputs": {
+            "k9": 6.27,
+            "era": 2.18,
+            "whip": 1.42,
+            "hand": "L"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "San Diego Padres",
+          "pitcher": "Wandy Peralta",
+          "label": "Wandy Peralta ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6458,
+          "fair_odds": 1.55,
+          "expected_hr_allowed": 0.437,
+          "projected_ip": 4.8,
+          "inputs": {
+            "hr9": 0.82,
+            "era": 2.18,
+            "whip": 1.42
+          },
+          "side": "away"
         }
       ]
     },
@@ -952,6 +988,88 @@
       ]
     },
     {
+      "event_id": "401815774",
+      "kickoff": "2026-06-16T23:05Z",
+      "league": "MLB",
+      "match": "Chicago White Sox at New York Yankees",
+      "home": "New York Yankees",
+      "away": "Chicago White Sox",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "New York Yankees",
+          "pitcher": "Gerrit Cole",
+          "label": "Gerrit Cole moins de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "under",
+          "probability": 0.5005,
+          "fair_odds": 2.0,
+          "expected_strikeouts": 4.5,
+          "projected_ip": 5.5,
+          "inputs": {
+            "k9": 7.36,
+            "era": 2.45,
+            "whip": 1.05,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "New York Yankees",
+          "pitcher": "Gerrit Cole",
+          "label": "Gerrit Cole concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5284,
+          "fair_odds": 1.89,
+          "expected_hr_allowed": 0.752,
+          "projected_ip": 5.5,
+          "inputs": {
+            "hr9": 1.23,
+            "era": 2.45,
+            "whip": 1.05
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Chicago White Sox",
+          "pitcher": "Davis Martin",
+          "label": "Davis Martin moins de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "under",
+          "probability": 0.5904,
+          "fair_odds": 1.69,
+          "expected_strikeouts": 6.06,
+          "projected_ip": 6.01,
+          "inputs": {
+            "k9": 9.08,
+            "era": 2.41,
+            "whip": 1.1,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Chicago White Sox",
+          "pitcher": "Davis Martin",
+          "label": "Davis Martin ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.797,
+          "fair_odds": 1.25,
+          "expected_hr_allowed": 0.227,
+          "projected_ip": 6.01,
+          "inputs": {
+            "hr9": 0.34,
+            "era": 2.41,
+            "whip": 1.1
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
       "event_id": "401815777",
       "kickoff": "2026-06-16T23:10Z",
       "league": "MLB",
@@ -994,40 +1112,168 @@
             "whip": 1.64
           },
           "side": "home"
+        }
+      ]
+    },
+    {
+      "event_id": "401815778",
+      "kickoff": "2026-06-16T23:15Z",
+      "league": "MLB",
+      "match": "San Francisco Giants at Atlanta Braves",
+      "home": "Atlanta Braves",
+      "away": "San Francisco Giants",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Atlanta Braves",
+          "pitcher": "Grant Holmes",
+          "label": "Grant Holmes plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.5023,
+          "fair_odds": 1.99,
+          "expected_strikeouts": 4.51,
+          "projected_ip": 5.09,
+          "inputs": {
+            "k9": 7.97,
+            "era": 4.05,
+            "whip": 1.34,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Atlanta Braves",
+          "pitcher": "Grant Holmes",
+          "label": "Grant Holmes concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.6285,
+          "fair_odds": 1.59,
+          "expected_hr_allowed": 0.99,
+          "projected_ip": 5.09,
+          "inputs": {
+            "hr9": 1.75,
+            "era": 4.05,
+            "whip": 1.34
+          },
+          "side": "home"
         },
         {
           "market": "pitcher_strikeouts",
-          "team": "New York Mets",
-          "pitcher": "Christian Scott",
-          "label": "Christian Scott moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.5757,
-          "fair_odds": 1.74,
-          "expected_strikeouts": 5.16,
-          "projected_ip": 4.47,
+          "team": "San Francisco Giants",
+          "pitcher": "Adrian Houser",
+          "label": "Adrian Houser plus de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "over",
+          "probability": 0.5106,
+          "fair_odds": 1.96,
+          "expected_strikeouts": 3.54,
+          "projected_ip": 5.0,
           "inputs": {
-            "k9": 10.4,
-            "era": 3.1,
-            "whip": 1.35,
+            "k9": 6.37,
+            "era": 5.54,
+            "whip": 1.54,
             "hand": "R"
           },
           "side": "away"
         },
         {
           "market": "pitcher_home_run_allowed",
-          "team": "New York Mets",
-          "pitcher": "Christian Scott",
-          "label": "Christian Scott ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6429,
-          "fair_odds": 1.56,
-          "expected_hr_allowed": 0.442,
-          "projected_ip": 4.47,
+          "team": "San Francisco Giants",
+          "pitcher": "Adrian Houser",
+          "label": "Adrian Houser concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5702,
+          "fair_odds": 1.75,
+          "expected_hr_allowed": 0.844,
+          "projected_ip": 5.0,
           "inputs": {
-            "hr9": 0.89,
-            "era": 3.1,
-            "whip": 1.35
+            "hr9": 1.52,
+            "era": 5.54,
+            "whip": 1.54
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815780",
+      "kickoff": "2026-06-16T23:40Z",
+      "league": "MLB",
+      "match": "Cleveland Guardians at Milwaukee Brewers",
+      "home": "Milwaukee Brewers",
+      "away": "Cleveland Guardians",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Milwaukee Brewers",
+          "pitcher": "Robert Gasser",
+          "label": "Robert Gasser plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.545,
+          "fair_odds": 1.83,
+          "expected_strikeouts": 4.69,
+          "projected_ip": 4.53,
+          "inputs": {
+            "k9": 9.33,
+            "era": 6.38,
+            "whip": 1.58,
+            "hand": "L"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Milwaukee Brewers",
+          "pitcher": "Robert Gasser",
+          "label": "Robert Gasser concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.7731,
+          "fair_odds": 1.29,
+          "expected_hr_allowed": 1.483,
+          "projected_ip": 4.53,
+          "inputs": {
+            "hr9": 2.95,
+            "era": 6.38,
+            "whip": 1.58
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Cleveland Guardians",
+          "pitcher": "Slade Cecconi",
+          "label": "Slade Cecconi moins de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "under",
+          "probability": 0.5412,
+          "fair_odds": 1.85,
+          "expected_strikeouts": 4.33,
+          "projected_ip": 5.16,
+          "inputs": {
+            "k9": 7.56,
+            "era": 4.83,
+            "whip": 1.44,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Cleveland Guardians",
+          "pitcher": "Slade Cecconi",
+          "label": "Slade Cecconi concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5086,
+          "fair_odds": 1.97,
+          "expected_hr_allowed": 0.711,
+          "projected_ip": 5.16,
+          "inputs": {
+            "hr9": 1.24,
+            "era": 4.83,
+            "whip": 1.44
           },
           "side": "away"
         }
@@ -1356,6 +1602,52 @@
             "hr9": 0.53,
             "era": 2.12,
             "whip": 1.29
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815786",
+      "kickoff": "2026-06-17T01:40Z",
+      "league": "MLB",
+      "match": "Baltimore Orioles at Seattle Mariners",
+      "home": "Seattle Mariners",
+      "away": "Baltimore Orioles",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Baltimore Orioles",
+          "pitcher": "Kyle Bradish",
+          "label": "Kyle Bradish moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.5674,
+          "fair_odds": 1.76,
+          "expected_strikeouts": 5.2,
+          "projected_ip": 5.22,
+          "inputs": {
+            "k9": 8.96,
+            "era": 4.3,
+            "whip": 1.57,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Baltimore Orioles",
+          "pitcher": "Kyle Bradish",
+          "label": "Kyle Bradish concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5431,
+          "fair_odds": 1.84,
+          "expected_hr_allowed": 0.783,
+          "projected_ip": 5.22,
+          "inputs": {
+            "hr9": 1.35,
+            "era": 4.3,
+            "whip": 1.57
           },
           "side": "away"
         }
@@ -2062,9 +2354,255 @@
           "side": "away"
         }
       ]
+    },
+    {
+      "event_id": "401815789",
+      "kickoff": "2026-06-17T23:05Z",
+      "league": "MLB",
+      "match": "Chicago White Sox at New York Yankees",
+      "home": "New York Yankees",
+      "away": "Chicago White Sox",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "New York Yankees",
+          "pitcher": "Carlos Rodón",
+          "label": "Carlos Rodón plus de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "over",
+          "probability": 0.5356,
+          "fair_odds": 1.87,
+          "expected_strikeouts": 5.67,
+          "projected_ip": 5.17,
+          "inputs": {
+            "k9": 9.87,
+            "era": 3.19,
+            "whip": 1.19,
+            "hand": "L"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "New York Yankees",
+          "pitcher": "Carlos Rodón",
+          "label": "Carlos Rodón ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.7168,
+          "fair_odds": 1.4,
+          "expected_hr_allowed": 0.333,
+          "projected_ip": 5.17,
+          "inputs": {
+            "hr9": 0.58,
+            "era": 3.19,
+            "whip": 1.19
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Chicago White Sox",
+          "pitcher": "Anthony Kay",
+          "label": "Anthony Kay moins de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "under",
+          "probability": 0.5242,
+          "fair_odds": 1.91,
+          "expected_strikeouts": 4.4,
+          "projected_ip": 5.51,
+          "inputs": {
+            "k9": 7.19,
+            "era": 4.34,
+            "whip": 1.42,
+            "hand": "L"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Chicago White Sox",
+          "pitcher": "Anthony Kay",
+          "label": "Anthony Kay concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.565,
+          "fair_odds": 1.77,
+          "expected_hr_allowed": 0.832,
+          "projected_ip": 5.51,
+          "inputs": {
+            "hr9": 1.36,
+            "era": 4.34,
+            "whip": 1.42
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815793",
+      "kickoff": "2026-06-17T23:15Z",
+      "league": "MLB",
+      "match": "San Francisco Giants at Atlanta Braves",
+      "home": "Atlanta Braves",
+      "away": "San Francisco Giants",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Atlanta Braves",
+          "pitcher": "JR Ritchie",
+          "label": "JR Ritchie moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.5851,
+          "fair_odds": 1.71,
+          "expected_strikeouts": 5.12,
+          "projected_ip": 6.04,
+          "inputs": {
+            "k9": 7.63,
+            "era": 3.82,
+            "whip": 1.34,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Atlanta Braves",
+          "pitcher": "JR Ritchie",
+          "label": "JR Ritchie concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.544,
+          "fair_odds": 1.84,
+          "expected_hr_allowed": 0.785,
+          "projected_ip": 6.04,
+          "inputs": {
+            "hr9": 1.17,
+            "era": 3.82,
+            "whip": 1.34
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "San Francisco Giants",
+          "pitcher": "Robbie Ray",
+          "label": "Robbie Ray plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.5469,
+          "fair_odds": 1.83,
+          "expected_strikeouts": 4.7,
+          "projected_ip": 5.22,
+          "inputs": {
+            "k9": 8.1,
+            "era": 4.42,
+            "whip": 1.39,
+            "hand": "L"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "San Francisco Giants",
+          "pitcher": "Robbie Ray",
+          "label": "Robbie Ray concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.6313,
+          "fair_odds": 1.58,
+          "expected_hr_allowed": 0.998,
+          "projected_ip": 5.22,
+          "inputs": {
+            "hr9": 1.72,
+            "era": 4.42,
+            "whip": 1.39
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815795",
+      "kickoff": "2026-06-17T23:40Z",
+      "league": "MLB",
+      "match": "Cleveland Guardians at Milwaukee Brewers",
+      "home": "Milwaukee Brewers",
+      "away": "Cleveland Guardians",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Milwaukee Brewers",
+          "pitcher": "Brandon Sproat",
+          "label": "Brandon Sproat moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.5711,
+          "fair_odds": 1.75,
+          "expected_strikeouts": 5.18,
+          "projected_ip": 5.45,
+          "inputs": {
+            "k9": 8.55,
+            "era": 5.7,
+            "whip": 1.48,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Milwaukee Brewers",
+          "pitcher": "Brandon Sproat",
+          "label": "Brandon Sproat concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.6641,
+          "fair_odds": 1.51,
+          "expected_hr_allowed": 1.091,
+          "projected_ip": 5.45,
+          "inputs": {
+            "hr9": 1.8,
+            "era": 5.7,
+            "whip": 1.48
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Cleveland Guardians",
+          "pitcher": "Gavin Williams",
+          "label": "Gavin Williams moins de 7,5 strikeouts",
+          "line": 7.5,
+          "pick": "under",
+          "probability": 0.5893,
+          "fair_odds": 1.7,
+          "expected_strikeouts": 7.03,
+          "projected_ip": 6.16,
+          "inputs": {
+            "k9": 10.28,
+            "era": 3.32,
+            "whip": 1.1,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Cleveland Guardians",
+          "pitcher": "Gavin Williams",
+          "label": "Gavin Williams concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.6029,
+          "fair_odds": 1.66,
+          "expected_hr_allowed": 0.924,
+          "projected_ip": 6.16,
+          "inputs": {
+            "hr9": 1.35,
+            "era": 3.32,
+            "whip": 1.1
+          },
+          "side": "away"
+        }
+      ]
     }
   ],
-  "props": 100,
+  "props": 126,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
