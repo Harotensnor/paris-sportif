@@ -1,24 +1,23 @@
 {
-  "generated_at": "2026-06-15T10:34:08Z",
+  "generated_at": "2026-06-15T15:37:49Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 26,
-    "actionable": 19,
+    "active_events": 30,
+    "actionable": 25,
     "watch": 5,
-    "risk": 2,
+    "risk": 0,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 20,
-      "travel_extreme": 3,
-      "back_to_back_travel": 15,
-      "market_uncertain": 5
+      "injury_imbalance": 26,
+      "travel_extreme": 6,
+      "back_to_back_travel": 19,
+      "signal_conflict": 2
     },
     "by_quality": {
-      "actionable": 19,
-      "watch": 5,
-      "risk": 2
+      "actionable": 25,
+      "watch": 5
     }
   },
   "active_actionable": [
@@ -39,6 +38,24 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 3-9"
+    },
+    {
+      "event_id": "401815770",
+      "date": "2026-06-15T23:45Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "St. Louis Cardinals",
+      "away": "San Diego Padres",
+      "match": "St. Louis Cardinals - San Diego Padres",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "San Diego Padres",
+      "side": null,
+      "strength": 1.0,
+      "context": "Absences severes 2-12"
     },
     {
       "event_id": "401815773",
@@ -77,6 +94,24 @@
       "context": "Absences severes 3-9"
     },
     {
+      "event_id": "401815784",
+      "date": "2026-06-16T23:45Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "St. Louis Cardinals",
+      "away": "San Diego Padres",
+      "match": "St. Louis Cardinals - San Diego Padres",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "San Diego Padres",
+      "side": null,
+      "strength": 1.0,
+      "context": "Absences severes 2-12"
+    },
+    {
       "event_id": "401815788",
       "date": "2026-06-17T02:10Z",
       "sport": "baseball",
@@ -111,6 +146,24 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 3-9"
+    },
+    {
+      "event_id": "401815798",
+      "date": "2026-06-17T18:15Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "St. Louis Cardinals",
+      "away": "San Diego Padres",
+      "match": "St. Louis Cardinals - San Diego Padres",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "San Diego Padres",
+      "side": null,
+      "strength": 1.0,
+      "context": "Absences severes 2-12"
     },
     {
       "event_id": "401815802",
@@ -239,6 +292,42 @@
       "context": "1 match dans les 48h + 1476 km de voyage"
     },
     {
+      "event_id": "401815783",
+      "date": "2026-06-17T00:05Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Texas Rangers",
+      "away": "Minnesota Twins",
+      "match": "Texas Rangers - Minnesota Twins",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Minnesota Twins",
+      "side": "away",
+      "strength": 0.81,
+      "context": "1 match dans les 48h + 1399 km de voyage"
+    },
+    {
+      "event_id": "401815808",
+      "date": "2026-06-18T18:35Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Texas Rangers",
+      "away": "Minnesota Twins",
+      "match": "Texas Rangers - Minnesota Twins",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Minnesota Twins",
+      "side": "away",
+      "strength": 0.81,
+      "context": "1 match dans les 48h + 1399 km de voyage"
+    },
+    {
       "event_id": "401815764",
       "date": "2026-06-15T22:45Z",
       "sport": "baseball",
@@ -291,6 +380,24 @@
       "side": null,
       "strength": 0.8,
       "context": "Absences severes 9-13"
+    },
+    {
+      "event_id": "401815769",
+      "date": "2026-06-16T00:05Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Texas Rangers",
+      "away": "Minnesota Twins",
+      "match": "Texas Rangers - Minnesota Twins",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Texas Rangers",
+      "side": null,
+      "strength": 0.8,
+      "context": "Absences severes 12-8"
     },
     {
       "event_id": "401815777",
@@ -457,43 +564,6 @@
       "context": "Absences severes 4-1"
     }
   ],
-  "active_risk": [
-    {
-      "event_id": "177170",
-      "date": "2026-06-16T04:00Z",
-      "sport": "tennis",
-      "league_code": "terrawortmannopen",
-      "league_name": "Terra Wortmann Open",
-      "home": "",
-      "away": "",
-      "match": "? - ?",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 12.2%"
-    },
-    {
-      "event_id": "177141",
-      "date": "2026-06-16T04:00Z",
-      "sport": "tennis",
-      "league_code": "hsbcchampionships",
-      "league_name": "HSBC Championships",
-      "home": "",
-      "away": "",
-      "match": "? - ?",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 12.1%"
-    }
-  ],
+  "active_risk": [],
   "expired_sample": []
 }

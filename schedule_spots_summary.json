@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-06-15T10:34:08Z",
+  "generated_at": "2026-06-15T15:37:49Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 26,
+    "active_events": 32,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 37,
-      "travel_extreme": 3,
-      "back_to_back_travel": 15,
+      "lookahead": 45,
+      "travel_extreme": 6,
+      "back_to_back_travel": 19,
       "schedule_congestion": 7
     },
     "by_decision": {
-      "abstain": 8,
-      "lean_home": 18
+      "abstain": 9,
+      "lean_home": 23
     },
-    "lean_home": 18,
+    "lean_home": 23,
     "lean_away": 0,
-    "abstain": 8,
+    "abstain": 9,
     "monitor": 0
   },
   "active": [
@@ -247,6 +247,64 @@
           },
           {
             "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.8
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815769",
+      "source_event_ids": [
+        "401815769"
+      ],
+      "kickoff": "2026-06-16T00:05Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Texas Rangers",
+      "away": "Minnesota Twins",
+      "match": "Texas Rangers - Minnesota Twins",
+      "decision": "abstain",
+      "net_team": null,
+      "reason": "Fatigue/agenda des deux cotes: Texas Rangers 0.30, Minnesota Twins 0.30",
+      "pressure_score": 1.333,
+      "home_fade": 0.3,
+      "away_fade": 0.3,
+      "travel_score": 0,
+      "lookahead_score": 1.333,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 2
+      },
+      "contexts": [
+        "2 match important/proche dans les 3 jours",
+        "2 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "away",
+        "home_score": -0.995,
+        "away_score": 0.085,
+        "home_fade": 1.1,
+        "away_fade": 0.3,
+        "reason": "Direction nette: Minnesota Twins (+0.09)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.3
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.3
+          },
+          {
+            "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.8
@@ -691,6 +749,80 @@
       }
     },
     {
+      "event_id": "401815784",
+      "source_event_ids": [
+        "401815784"
+      ],
+      "kickoff": "2026-06-16T23:45Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "St. Louis Cardinals",
+      "away": "San Diego Padres",
+      "match": "St. Louis Cardinals - San Diego Padres",
+      "decision": "lean_home",
+      "net_team": "St. Louis Cardinals",
+      "reason": "San Diego Padres plus penalise par calendrier/voyage (1.73 vs 0.15)",
+      "pressure_score": 2.251,
+      "home_fade": 0.15,
+      "away_fade": 1.734,
+      "travel_score": 1.584,
+      "lookahead_score": 0.667,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 2,
+        "travel_extreme": 1,
+        "back_to_back_travel": 1
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours",
+        "1 match important/proche dans les 3 jours",
+        "Deplacement estime 2513 km, decalage ~1.8h",
+        "1 match dans les 48h + 2513 km de voyage"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": 0.807,
+        "away_score": -2.682,
+        "home_fade": 0.15,
+        "away_fade": 2.734,
+        "reason": "Direction nette: St. Louis Cardinals (+0.81)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "travel_extreme",
+            "direction": "fade",
+            "strength": 0.584
+          },
+          {
+            "side": "away",
+            "type": "back_to_back_travel",
+            "direction": "fade",
+            "strength": 1.0
+          }
+        ]
+      }
+    },
+    {
       "event_id": "401815826",
       "source_event_ids": [
         "401815826"
@@ -831,6 +963,72 @@
       }
     },
     {
+      "event_id": "401815770",
+      "source_event_ids": [
+        "401815770"
+      ],
+      "kickoff": "2026-06-15T23:45Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "St. Louis Cardinals",
+      "away": "San Diego Padres",
+      "match": "St. Louis Cardinals - San Diego Padres",
+      "decision": "lean_home",
+      "net_team": "St. Louis Cardinals",
+      "reason": "San Diego Padres plus penalise par calendrier/voyage (0.88 vs 0.30)",
+      "pressure_score": 1.918,
+      "home_fade": 0.3,
+      "away_fade": 0.884,
+      "travel_score": 0.584,
+      "lookahead_score": 1.333,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 2,
+        "travel_extreme": 1
+      },
+      "contexts": [
+        "2 match important/proche dans les 3 jours",
+        "2 match important/proche dans les 3 jours",
+        "Deplacement estime 2513 km, decalage ~1.8h"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": 0.36,
+        "away_score": -1.779,
+        "home_fade": 0.3,
+        "away_fade": 1.884,
+        "reason": "Direction nette: St. Louis Cardinals (+0.36)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.3
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.3
+          },
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "travel_extreme",
+            "direction": "fade",
+            "strength": 0.584
+          }
+        ]
+      }
+    },
+    {
       "event_id": "401815840",
       "source_event_ids": [
         "401815840"
@@ -951,6 +1149,65 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.715
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815798",
+      "source_event_ids": [
+        "401815798"
+      ],
+      "kickoff": "2026-06-17T18:15Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "St. Louis Cardinals",
+      "away": "San Diego Padres",
+      "match": "St. Louis Cardinals - San Diego Padres",
+      "decision": "lean_home",
+      "net_team": "St. Louis Cardinals",
+      "reason": "San Diego Padres plus penalise par calendrier/voyage (1.58 vs 0.00)",
+      "pressure_score": 1.584,
+      "home_fade": 0.0,
+      "away_fade": 1.584,
+      "travel_score": 1.584,
+      "lookahead_score": 0,
+      "congestion_score": 0,
+      "types": {
+        "travel_extreme": 1,
+        "back_to_back_travel": 1
+      },
+      "contexts": [
+        "Deplacement estime 2513 km, decalage ~1.8h",
+        "2 match dans les 48h + 2513 km de voyage"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": 0.905,
+        "away_score": -2.584,
+        "home_fade": 0.0,
+        "away_fade": 2.584,
+        "reason": "Direction nette: St. Louis Cardinals (+0.90)",
+        "detail": [
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "travel_extreme",
+            "direction": "fade",
+            "strength": 0.584
+          },
+          {
+            "side": "away",
+            "type": "back_to_back_travel",
+            "direction": "fade",
+            "strength": 1.0
           }
         ]
       }
@@ -1209,6 +1466,72 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.825
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815783",
+      "source_event_ids": [
+        "401815783"
+      ],
+      "kickoff": "2026-06-17T00:05Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Texas Rangers",
+      "away": "Minnesota Twins",
+      "match": "Texas Rangers - Minnesota Twins",
+      "decision": "lean_home",
+      "net_team": "Texas Rangers",
+      "reason": "Minnesota Twins plus penalise par calendrier/voyage (0.96 vs 0.15)",
+      "pressure_score": 1.476,
+      "home_fade": 0.15,
+      "away_fade": 0.96,
+      "travel_score": 0.81,
+      "lookahead_score": 0.667,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 2,
+        "back_to_back_travel": 1
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours",
+        "1 match important/proche dans les 3 jours",
+        "1 match dans les 48h + 1399 km de voyage"
+      ],
+      "global_resolution": {
+        "status": "abstain",
+        "net_side": null,
+        "home_score": -0.614,
+        "away_score": -0.627,
+        "home_fade": 0.95,
+        "away_fade": 0.96,
+        "reason": "Signaux opposes: Texas Rangers fade 0.95, Minnesota Twins fade 0.96 -> prudence",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.8
+          },
+          {
+            "side": "away",
+            "type": "back_to_back_travel",
+            "direction": "fade",
+            "strength": 0.81
           }
         ]
       }
@@ -1532,6 +1855,57 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.905
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815808",
+      "source_event_ids": [
+        "401815808"
+      ],
+      "kickoff": "2026-06-18T18:35Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Texas Rangers",
+      "away": "Minnesota Twins",
+      "match": "Texas Rangers - Minnesota Twins",
+      "decision": "lean_home",
+      "net_team": "Texas Rangers",
+      "reason": "Minnesota Twins plus penalise par calendrier/voyage (0.81 vs 0.00)",
+      "pressure_score": 0.81,
+      "home_fade": 0.0,
+      "away_fade": 0.81,
+      "travel_score": 0.81,
+      "lookahead_score": 0,
+      "congestion_score": 0,
+      "types": {
+        "back_to_back_travel": 1
+      },
+      "contexts": [
+        "1 match dans les 48h + 1399 km de voyage"
+      ],
+      "global_resolution": {
+        "status": "abstain",
+        "net_side": null,
+        "home_score": -0.517,
+        "away_score": -0.53,
+        "home_fade": 0.8,
+        "away_fade": 0.81,
+        "reason": "Signaux opposes: Texas Rangers fade 0.80, Minnesota Twins fade 0.81 -> prudence",
+        "detail": [
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.8
+          },
+          {
+            "side": "away",
+            "type": "back_to_back_travel",
+            "direction": "fade",
+            "strength": 0.81
           }
         ]
       }
