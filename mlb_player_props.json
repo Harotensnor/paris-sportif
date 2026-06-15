@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-06-14T23:14:01Z",
+  "generated_at": "2026-06-15T00:26:07Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815756",
-      "kickoff": "2026-06-14T23:20Z",
-      "league": "MLB",
-      "match": "Texas Rangers at Boston Red Sox",
-      "home": "Boston Red Sox",
-      "away": "Texas Rangers",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Boston Red Sox",
-          "pitcher": "Connelly Early",
-          "label": "Connelly Early moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.5421,
-          "fair_odds": 1.84,
-          "expected_strikeouts": 5.31,
-          "projected_ip": 5.46,
-          "inputs": {
-            "k9": 8.75,
-            "era": 3.3,
-            "whip": 1.23,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Boston Red Sox",
-          "pitcher": "Connelly Early",
-          "label": "Connelly Early concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6024,
-          "fair_odds": 1.66,
-          "expected_hr_allowed": 0.922,
-          "projected_ip": 5.46,
-          "inputs": {
-            "hr9": 1.52,
-            "era": 3.3,
-            "whip": 1.23
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Texas Rangers",
-          "pitcher": "Nathan Eovaldi",
-          "label": "Nathan Eovaldi plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.5852,
-          "fair_odds": 1.71,
-          "expected_strikeouts": 5.91,
-          "projected_ip": 6.16,
-          "inputs": {
-            "k9": 8.63,
-            "era": 4.26,
-            "whip": 1.18,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Texas Rangers",
-          "pitcher": "Nathan Eovaldi",
-          "label": "Nathan Eovaldi concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6834,
-          "fair_odds": 1.46,
-          "expected_hr_allowed": 1.15,
-          "projected_ip": 6.16,
-          "inputs": {
-            "hr9": 1.68,
-            "era": 4.26,
-            "whip": 1.18
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815773",
       "kickoff": "2026-06-16T02:00Z",
@@ -132,7 +50,7 @@
       ]
     }
   ],
-  "props": 6,
+  "props": 2,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
