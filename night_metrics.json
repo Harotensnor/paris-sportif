@@ -1,21 +1,21 @@
 {
-  "generated_at": "2026-06-16T09:26:29Z",
-  "calculated_at": "2026-06-16T09:26:29Z",
+  "generated_at": "2026-06-16T14:32:04Z",
+  "calculated_at": "2026-06-16T14:32:04Z",
   "source_of_truth": "data.js",
-  "data_generated_at": "2026-06-16T09:25:34.775555Z",
+  "data_generated_at": "2026-06-16T14:30:57.281616Z",
   "data_today_field": "2026-06-16",
   "events": {
-    "total": 109,
-    "upcoming": 96,
-    "winamax_available": 109,
-    "winamax_exact": 109,
+    "total": 107,
+    "upcoming": 76,
+    "winamax_available": 107,
+    "winamax_exact": 107,
     "winamax_exact_ratio": 1.0,
     "markets_more_than_1n2": 0,
     "form_l10": 53,
     "h2h": 0,
-    "lineups": 35,
+    "lineups": 38,
     "football_lineups": 0,
-    "starter_signals": 35,
+    "starter_signals": 38,
     "clubelo": 2,
     "weather": 2,
     "injuries": 60,
@@ -26,7 +26,7 @@
     "fd_calibration": 0,
     "fd_closing_odds": 0,
     "xg": 0,
-    "smart_money": 0
+    "smart_money": 1
   },
   "signal_health": {
     "referee": {
@@ -36,7 +36,7 @@
       "note": "referee is effective coverage: named referee or referee_context usable by the model."
     },
     "smart_money": {
-      "events": 0,
+      "events": 1,
       "status": "rare_event",
       "note": "Smart money is intentionally rare; low count is OK when odds movement does not confirm a strong signal."
     }
@@ -44,8 +44,8 @@
   "winamax_markets": {
     "matches": 372,
     "detailed_market_matches": 47,
-    "detailed_ratio_vs_exact": 0.4312,
-    "gap_to_50pct_exact": 0.0688,
+    "detailed_ratio_vs_exact": 0.4393,
+    "gap_to_50pct_exact": 0.0607,
     "recommended_detail_fetch_cap": 150,
     "detail_by_sport": {
       "baseball": {
@@ -67,7 +67,7 @@
         "detailed_ratio": 0.0
       },
       "tennis": {
-        "exact": 45,
+        "exact": 25,
         "detailed": 0,
         "families": {},
         "detailed_ratio": 0.0
@@ -88,7 +88,7 @@
   },
   "health": {
     "status": "warning",
-    "warnings": 11,
+    "warnings": 10,
     "pipeline_drift": "warn"
   }
 }
