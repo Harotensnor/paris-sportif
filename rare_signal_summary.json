@@ -1,25 +1,24 @@
 {
-  "generated_at": "2026-06-16T18:50:47Z",
+  "generated_at": "2026-06-16T21:38:02Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 39,
-    "actionable": 32,
-    "watch": 4,
+    "actionable": 35,
+    "watch": 1,
     "risk": 3,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 26,
+      "injury_imbalance": 24,
+      "back_to_back_travel": 24,
       "travel_extreme": 12,
-      "signal_conflict": 4,
-      "back_to_back_travel": 16,
-      "market_move": 2,
+      "signal_conflict": 3,
       "market_uncertain": 2
     },
     "by_quality": {
-      "actionable": 32,
-      "watch": 4,
+      "actionable": 35,
+      "watch": 1,
       "risk": 3
     }
   },
@@ -40,7 +39,7 @@
       "team": "Miami Marlins",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 3-9"
+      "context": "Absences severes 4-9"
     },
     {
       "event_id": "401815774",
@@ -76,7 +75,7 @@
       "team": "Milwaukee Brewers",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 11-2"
+      "context": "Absences severes 11-3"
     },
     {
       "event_id": "401815784",
@@ -148,7 +147,7 @@
       "team": "Miami Marlins",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 3-9"
+      "context": "Absences severes 4-9"
     },
     {
       "event_id": "401815798",
@@ -256,7 +255,7 @@
       "team": "Milwaukee Brewers",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 11-2"
+      "context": "Absences severes 11-3"
     },
     {
       "event_id": "401815800",
@@ -292,7 +291,7 @@
       "team": "Milwaukee Brewers",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 11-2"
+      "context": "Absences severes 11-3"
     },
     {
       "event_id": "401815811",
@@ -381,6 +380,60 @@
       "direction": "fade",
       "team": "Detroit Tigers",
       "side": "away",
+      "strength": 0.966,
+      "context": "2 match dans les 48h + 1780 km de voyage"
+    },
+    {
+      "event_id": "401815790",
+      "date": "2026-06-17T17:05Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Washington Nationals",
+      "away": "Kansas City Royals",
+      "match": "Washington Nationals - Kansas City Royals",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Kansas City Royals",
+      "side": "away",
+      "strength": 0.912,
+      "context": "2 match dans les 48h + 1509 km de voyage"
+    },
+    {
+      "event_id": "401815796",
+      "date": "2026-06-18T00:05Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Chicago Cubs",
+      "away": "Colorado Rockies",
+      "match": "Chicago Cubs - Colorado Rockies",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Colorado Rockies",
+      "side": "away",
+      "strength": 0.905,
+      "context": "2 match dans les 48h + 1476 km de voyage"
+    },
+    {
+      "event_id": "401815782",
+      "date": "2026-06-17T00:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Houston Astros",
+      "away": "Detroit Tigers",
+      "match": "Houston Astros - Detroit Tigers",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Detroit Tigers",
+      "side": "away",
       "strength": 0.886,
       "context": "1 match dans les 48h + 1780 km de voyage"
     },
@@ -403,8 +456,8 @@
       "context": "Deplacement estime 3747 km, decalage ~3.0h"
     },
     {
-      "event_id": "401815790",
-      "date": "2026-06-17T17:05Z",
+      "event_id": "401815775",
+      "date": "2026-06-16T22:45Z",
       "sport": "baseball",
       "league_code": "mlb",
       "league_name": "MLB",
@@ -421,8 +474,8 @@
       "context": "1 match dans les 48h + 1509 km de voyage"
     },
     {
-      "event_id": "401815796",
-      "date": "2026-06-18T00:05Z",
+      "event_id": "401815781",
+      "date": "2026-06-17T00:05Z",
       "sport": "baseball",
       "league_code": "mlb",
       "league_name": "MLB",
@@ -437,6 +490,24 @@
       "side": "away",
       "strength": 0.825,
       "context": "1 match dans les 48h + 1476 km de voyage"
+    },
+    {
+      "event_id": "401815783",
+      "date": "2026-06-17T00:05Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Texas Rangers",
+      "away": "Minnesota Twins",
+      "match": "Texas Rangers - Minnesota Twins",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Minnesota Twins",
+      "side": "away",
+      "strength": 0.81,
+      "context": "1 match dans les 48h + 1399 km de voyage"
     },
     {
       "event_id": "401815808",
@@ -457,42 +528,6 @@
       "context": "1 match dans les 48h + 1399 km de voyage"
     },
     {
-      "event_id": "401815775",
-      "date": "2026-06-16T22:45Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Washington Nationals",
-      "away": "Kansas City Royals",
-      "match": "Washington Nationals - Kansas City Royals",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Kansas City Royals",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 6-10"
-    },
-    {
-      "event_id": "401815783",
-      "date": "2026-06-17T00:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Texas Rangers",
-      "away": "Minnesota Twins",
-      "match": "Texas Rangers - Minnesota Twins",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Texas Rangers",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 12-8"
-    },
-    {
       "event_id": "401815778",
       "date": "2026-06-16T23:15Z",
       "sport": "baseball",
@@ -509,6 +544,24 @@
       "side": "away",
       "strength": 0.796,
       "context": "Deplacement estime 3422 km, decalage ~2.5h"
+    },
+    {
+      "event_id": "401815792",
+      "date": "2026-06-17T16:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Cincinnati Reds",
+      "away": "New York Mets",
+      "match": "Cincinnati Reds - New York Mets",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "New York Mets",
+      "side": "away",
+      "strength": 0.795,
+      "context": "2 match dans les 48h + 927 km de voyage"
     },
     {
       "event_id": "401815840",
@@ -547,8 +600,8 @@
       "context": "1 match dans les 48h + 1159 km de voyage"
     },
     {
-      "event_id": "401815792",
-      "date": "2026-06-17T16:40Z",
+      "event_id": "401815777",
+      "date": "2026-06-16T23:10Z",
       "sport": "baseball",
       "league_code": "mlb",
       "league_name": "MLB",
@@ -603,42 +656,6 @@
   ],
   "active_watch": [
     {
-      "event_id": "401815777",
-      "date": "2026-06-16T23:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Cincinnati Reds",
-      "away": "New York Mets",
-      "match": "Cincinnati Reds - New York Mets",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "New York Mets",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 8-11"
-    },
-    {
-      "event_id": "401815781",
-      "date": "2026-06-17T00:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Chicago Cubs",
-      "away": "Colorado Rockies",
-      "match": "Chicago Cubs - Colorado Rockies",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Colorado Rockies",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 9-12"
-    },
-    {
       "event_id": "401856997",
       "date": "2026-06-18T00:00Z",
       "sport": "basketball",
@@ -655,24 +672,6 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 4-1"
-    },
-    {
-      "event_id": "401856999",
-      "date": "2026-06-18T02:00Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Los Angeles Sparks",
-      "away": "Minnesota Lynx",
-      "match": "Los Angeles Sparks - Minnesota Lynx",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "home",
-      "strength": 0.505,
-      "context": "Cote home: 2.20 -> 2.40 (-9.1%)"
     }
   ],
   "active_risk": [
@@ -713,22 +712,22 @@
       "context": "marge bookmaker anormale 12.5%"
     },
     {
-      "event_id": "401815813",
-      "date": "2026-06-19T23:05Z",
+      "event_id": "401815854",
+      "date": "2026-06-22T23:10Z",
       "sport": "baseball",
       "league_code": "mlb",
       "league_name": "MLB",
-      "home": "New York Yankees",
-      "away": "Cincinnati Reds",
-      "match": "New York Yankees - Cincinnati Reds",
+      "home": "New York Mets",
+      "away": "Chicago Cubs",
+      "match": "New York Mets - Chicago Cubs",
       "quality": "risk",
       "quality_reason": "Signal de prudence, pas une opportunite directe",
       "type": "signal_conflict",
       "direction": "abstain",
       "team": null,
       "side": null,
-      "strength": 0.655,
-      "context": "Signaux opposes: New York Yankees fade 0.90, Cincinnati Reds fade 0.70 -> prudence"
+      "strength": 0.488,
+      "context": "Signaux opposes: New York Mets fade 0.75, Chicago Cubs fade 0.75 -> prudence"
     }
   ],
   "expired_sample": []
