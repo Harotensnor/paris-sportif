@@ -1,64 +1,28 @@
 {
-  "generated_at": "2026-06-17T00:26:22Z",
+  "generated_at": "2026-06-17T03:54:59Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 32,
-    "actionable": 27,
-    "watch": 1,
+    "active_events": 28,
+    "actionable": 22,
+    "watch": 2,
     "risk": 4,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 17,
-      "travel_extreme": 11,
-      "back_to_back_travel": 19,
-      "market_uncertain": 3,
-      "signal_conflict": 2
+      "injury_imbalance": 13,
+      "back_to_back_travel": 16,
+      "travel_extreme": 8,
+      "market_uncertain": 4,
+      "signal_conflict": 1
     },
     "by_quality": {
-      "actionable": 27,
-      "watch": 1,
+      "actionable": 22,
+      "watch": 2,
       "risk": 4
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401815785",
-      "date": "2026-06-17T01:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Arizona Diamondbacks",
-      "away": "Los Angeles Angels",
-      "match": "Arizona Diamondbacks - Los Angeles Angels",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Los Angeles Angels",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 8-13"
-    },
-    {
-      "event_id": "401815788",
-      "date": "2026-06-17T02:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Los Angeles Dodgers",
-      "away": "Tampa Bay Rays",
-      "match": "Los Angeles Dodgers - Tampa Bay Rays",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Los Angeles Dodgers",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 15-10"
-    },
     {
       "event_id": "401815791",
       "date": "2026-06-17T17:05Z",
@@ -76,24 +40,6 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 4-9"
-    },
-    {
-      "event_id": "401815798",
-      "date": "2026-06-17T18:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "St. Louis Cardinals",
-      "away": "San Diego Padres",
-      "match": "St. Louis Cardinals - San Diego Padres",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "San Diego Padres",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 2-12"
     },
     {
       "event_id": "401815802",
@@ -366,24 +312,6 @@
       "context": "2 match dans les 48h + 1476 km de voyage"
     },
     {
-      "event_id": "401815786",
-      "date": "2026-06-17T01:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Seattle Mariners",
-      "away": "Baltimore Orioles",
-      "match": "Seattle Mariners - Baltimore Orioles",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "travel_extreme",
-      "direction": "fade",
-      "team": "Baltimore Orioles",
-      "side": "away",
-      "strength": 0.871,
-      "context": "Deplacement estime 3747 km, decalage ~3.0h"
-    },
-    {
       "event_id": "401815882",
       "date": "2026-06-24T23:10Z",
       "sport": "baseball",
@@ -400,24 +328,6 @@
       "side": "away",
       "strength": 0.842,
       "context": "2 match dans les 48h + 1159 km de voyage"
-    },
-    {
-      "event_id": "401815808",
-      "date": "2026-06-18T18:35Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Texas Rangers",
-      "away": "Minnesota Twins",
-      "match": "Texas Rangers - Minnesota Twins",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Minnesota Twins",
-      "side": "away",
-      "strength": 0.81,
-      "context": "1 match dans les 48h + 1399 km de voyage"
     },
     {
       "event_id": "401815792",
@@ -528,9 +438,45 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 3-0"
+    },
+    {
+      "event_id": "401857001",
+      "date": "2026-06-18T02:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Portland Fire",
+      "away": "Seattle Storm",
+      "match": "Portland Fire - Seattle Storm",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Seattle Storm",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 0-3"
     }
   ],
   "active_risk": [
+    {
+      "event_id": "177137",
+      "date": "2026-06-18T04:00Z",
+      "sport": "tennis",
+      "league_code": "hsbcchampionships",
+      "league_name": "HSBC Championships",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 12.1%"
+    },
     {
       "event_id": "178051",
       "date": "2026-06-18T04:00Z",
@@ -566,24 +512,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 12.1%"
-    },
-    {
-      "event_id": "177140",
-      "date": "2026-06-18T04:00Z",
-      "sport": "tennis",
-      "league_code": "hsbcchampionships",
-      "league_name": "HSBC Championships",
-      "home": "",
-      "away": "",
-      "match": "? - ?",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 12.3%"
     },
     {
       "event_id": "401815854",
