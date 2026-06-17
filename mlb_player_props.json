@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-17T13:36:56Z",
+  "generated_at": "2026-06-17T16:49:50Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -15,17 +15,17 @@
           "market": "pitcher_strikeouts",
           "team": "Cincinnati Reds",
           "pitcher": "Nick Lodolo",
-          "label": "Nick Lodolo moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.5521,
-          "fair_odds": 1.81,
-          "expected_strikeouts": 4.29,
-          "projected_ip": 5.43,
+          "label": "Nick Lodolo plus de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "over",
+          "probability": 0.5653,
+          "fair_odds": 1.77,
+          "expected_strikeouts": 3.75,
+          "projected_ip": 4.88,
           "inputs": {
-            "k9": 7.11,
-            "era": 5.21,
-            "whip": 1.45,
+            "k9": 6.92,
+            "era": 5.08,
+            "whip": 1.44,
             "hand": "L"
           },
           "side": "home"
@@ -36,14 +36,14 @@
           "pitcher": "Nick Lodolo",
           "label": "Nick Lodolo concède au moins 1 home run",
           "pick": "yes",
-          "probability": 0.6802,
-          "fair_odds": 1.47,
-          "expected_hr_allowed": 1.14,
-          "projected_ip": 5.43,
+          "probability": 0.6329,
+          "fair_odds": 1.58,
+          "expected_hr_allowed": 1.002,
+          "projected_ip": 4.88,
           "inputs": {
-            "hr9": 1.89,
-            "era": 5.21,
-            "whip": 1.45
+            "hr9": 1.85,
+            "era": 5.08,
+            "whip": 1.44
           },
           "side": "home"
         },
@@ -51,17 +51,17 @@
           "market": "pitcher_strikeouts",
           "team": "New York Mets",
           "pitcher": "Nolan McLean",
-          "label": "Nolan McLean moins de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "under",
-          "probability": 0.547,
-          "fair_odds": 1.83,
-          "expected_strikeouts": 6.27,
-          "projected_ip": 5.44,
+          "label": "Nolan McLean plus de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "over",
+          "probability": 0.5697,
+          "fair_odds": 1.76,
+          "expected_strikeouts": 5.83,
+          "projected_ip": 5.08,
           "inputs": {
-            "k9": 10.38,
-            "era": 4.01,
-            "whip": 1.14,
+            "k9": 10.33,
+            "era": 3.99,
+            "whip": 1.13,
             "hand": "R"
           },
           "side": "away"
@@ -72,14 +72,14 @@
           "pitcher": "Nolan McLean",
           "label": "Nolan McLean ne concède pas de home run",
           "pick": "no",
-          "probability": 0.5668,
-          "fair_odds": 1.76,
-          "expected_hr_allowed": 0.568,
-          "projected_ip": 5.44,
+          "probability": 0.5883,
+          "fair_odds": 1.7,
+          "expected_hr_allowed": 0.531,
+          "projected_ip": 5.08,
           "inputs": {
             "hr9": 0.94,
-            "era": 4.01,
-            "whip": 1.14
+            "era": 3.99,
+            "whip": 1.13
           },
           "side": "away"
         }
@@ -374,6 +374,42 @@
             "whip": 1.59
           },
           "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "San Diego Padres",
+          "pitcher": "Bradgley Rodriguez",
+          "label": "Bradgley Rodriguez moins de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "under",
+          "probability": 0.5743,
+          "fair_odds": 1.74,
+          "expected_strikeouts": 6.14,
+          "projected_ip": 6.6,
+          "inputs": {
+            "k9": 8.37,
+            "era": 2.16,
+            "whip": 1.2,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "San Diego Padres",
+          "pitcher": "Bradgley Rodriguez",
+          "label": "Bradgley Rodriguez ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.8204,
+          "fair_odds": 1.22,
+          "expected_hr_allowed": 0.198,
+          "projected_ip": 6.6,
+          "inputs": {
+            "hr9": 0.27,
+            "era": 2.16,
+            "whip": 1.2
+          },
+          "side": "away"
         }
       ]
     },
@@ -1372,7 +1408,7 @@
       ]
     }
   ],
-  "props": 66,
+  "props": 68,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
