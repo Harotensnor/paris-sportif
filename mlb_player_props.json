@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-17T03:54:58Z",
+  "generated_at": "2026-06-17T09:03:55Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -189,7 +189,7 @@
           "inputs": {
             "k9": 7.14,
             "era": 6.43,
-            "whip": 1.57,
+            "whip": 1.59,
             "hand": "R"
           },
           "side": "home"
@@ -207,7 +207,7 @@
           "inputs": {
             "hr9": 1.71,
             "era": 6.43,
-            "whip": 1.57
+            "whip": 1.59
           },
           "side": "home"
         },
@@ -328,6 +328,52 @@
             "whip": 0.97
           },
           "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815798",
+      "kickoff": "2026-06-17T18:15Z",
+      "league": "MLB",
+      "match": "San Diego Padres at St. Louis Cardinals",
+      "home": "St. Louis Cardinals",
+      "away": "San Diego Padres",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "St. Louis Cardinals",
+          "pitcher": "Kyle Leahy",
+          "label": "Kyle Leahy plus de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "over",
+          "probability": 0.6254,
+          "fair_odds": 1.6,
+          "expected_strikeouts": 4.0,
+          "projected_ip": 4.92,
+          "inputs": {
+            "k9": 7.31,
+            "era": 4.64,
+            "whip": 1.59,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "St. Louis Cardinals",
+          "pitcher": "Kyle Leahy",
+          "label": "Kyle Leahy concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5008,
+          "fair_odds": 2.0,
+          "expected_hr_allowed": 0.695,
+          "projected_ip": 4.92,
+          "inputs": {
+            "hr9": 1.27,
+            "era": 4.64,
+            "whip": 1.59
+          },
+          "side": "home"
         }
       ]
     },
@@ -538,6 +584,42 @@
             "whip": 1.5
           },
           "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Toronto Blue Jays",
+          "pitcher": "Max Scherzer",
+          "label": "Max Scherzer moins de 2,5 strikeouts",
+          "line": 2.5,
+          "pick": "under",
+          "probability": 0.5552,
+          "fair_odds": 1.8,
+          "expected_strikeouts": 2.33,
+          "projected_ip": 3.67,
+          "inputs": {
+            "k9": 5.73,
+            "era": 10.23,
+            "whip": 1.73,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Toronto Blue Jays",
+          "pitcher": "Max Scherzer",
+          "label": "Max Scherzer concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.7767,
+          "fair_odds": 1.29,
+          "expected_hr_allowed": 1.499,
+          "projected_ip": 3.67,
+          "inputs": {
+            "hr9": 3.68,
+            "era": 10.23,
+            "whip": 1.73
+          },
+          "side": "away"
         }
       ]
     },
@@ -666,42 +748,6 @@
             "whip": 1.34
           },
           "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "San Francisco Giants",
-          "pitcher": "Robbie Ray",
-          "label": "Robbie Ray plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.5469,
-          "fair_odds": 1.83,
-          "expected_strikeouts": 4.7,
-          "projected_ip": 5.22,
-          "inputs": {
-            "k9": 8.1,
-            "era": 4.42,
-            "whip": 1.39,
-            "hand": "L"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "San Francisco Giants",
-          "pitcher": "Robbie Ray",
-          "label": "Robbie Ray concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6313,
-          "fair_odds": 1.58,
-          "expected_hr_allowed": 0.998,
-          "projected_ip": 5.22,
-          "inputs": {
-            "hr9": 1.72,
-            "era": 4.42,
-            "whip": 1.39
-          },
-          "side": "away"
         }
       ]
     },
@@ -797,6 +843,42 @@
       "props": [
         {
           "market": "pitcher_strikeouts",
+          "team": "Seattle Mariners",
+          "pitcher": "Bryan Woo",
+          "label": "Bryan Woo plus de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "over",
+          "probability": 0.5306,
+          "fair_odds": 1.88,
+          "expected_strikeouts": 5.64,
+          "projected_ip": 5.86,
+          "inputs": {
+            "k9": 8.67,
+            "era": 4.28,
+            "whip": 1.04,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Seattle Mariners",
+          "pitcher": "Bryan Woo",
+          "label": "Bryan Woo ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.525,
+          "fair_odds": 1.9,
+          "expected_hr_allowed": 0.644,
+          "projected_ip": 5.86,
+          "inputs": {
+            "hr9": 0.99,
+            "era": 4.28,
+            "whip": 1.04
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
           "team": "Baltimore Orioles",
           "pitcher": "Shane Baz",
           "label": "Shane Baz plus de 4,5 strikeouts",
@@ -876,6 +958,42 @@
             "whip": 1.2
           },
           "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Toronto Blue Jays",
+          "pitcher": "Trey Yesavage",
+          "label": "Trey Yesavage moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.5741,
+          "fair_odds": 1.74,
+          "expected_strikeouts": 5.17,
+          "projected_ip": 5.24,
+          "inputs": {
+            "k9": 8.87,
+            "era": 3.78,
+            "whip": 1.26,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Toronto Blue Jays",
+          "pitcher": "Trey Yesavage",
+          "label": "Trey Yesavage ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.7174,
+          "fair_odds": 1.39,
+          "expected_hr_allowed": 0.332,
+          "projected_ip": 5.24,
+          "inputs": {
+            "hr9": 0.57,
+            "era": 3.78,
+            "whip": 1.26
+          },
+          "side": "away"
         }
       ]
     },
@@ -969,6 +1087,42 @@
       "home": "Seattle Mariners",
       "away": "Baltimore Orioles",
       "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Seattle Mariners",
+          "pitcher": "Bryan Woo",
+          "label": "Bryan Woo plus de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "over",
+          "probability": 0.5306,
+          "fair_odds": 1.88,
+          "expected_strikeouts": 5.64,
+          "projected_ip": 5.86,
+          "inputs": {
+            "k9": 8.67,
+            "era": 4.28,
+            "whip": 1.04,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Seattle Mariners",
+          "pitcher": "Bryan Woo",
+          "label": "Bryan Woo ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.525,
+          "fair_odds": 1.9,
+          "expected_hr_allowed": 0.644,
+          "projected_ip": 5.86,
+          "inputs": {
+            "hr9": 0.99,
+            "era": 4.28,
+            "whip": 1.04
+          },
+          "side": "home"
+        },
         {
           "market": "pitcher_strikeouts",
           "team": "Baltimore Orioles",
@@ -1170,9 +1324,55 @@
           "side": "away"
         }
       ]
+    },
+    {
+      "event_id": "401815813",
+      "kickoff": "2026-06-19T23:05Z",
+      "league": "MLB",
+      "match": "Cincinnati Reds at New York Yankees",
+      "home": "New York Yankees",
+      "away": "Cincinnati Reds",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Cincinnati Reds",
+          "pitcher": "Rhett Lowder",
+          "label": "Rhett Lowder plus de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "over",
+          "probability": 0.5537,
+          "fair_odds": 1.81,
+          "expected_strikeouts": 3.7,
+          "projected_ip": 4.7,
+          "inputs": {
+            "k9": 7.09,
+            "era": 4.6,
+            "whip": 1.43,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Cincinnati Reds",
+          "pitcher": "Rhett Lowder",
+          "label": "Rhett Lowder ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.7425,
+          "fair_odds": 1.35,
+          "expected_hr_allowed": 0.298,
+          "projected_ip": 4.7,
+          "inputs": {
+            "hr9": 0.57,
+            "era": 4.6,
+            "whip": 1.43
+          },
+          "side": "away"
+        }
+      ]
     }
   ],
-  "props": 56,
+  "props": 66,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"

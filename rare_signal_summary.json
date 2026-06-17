@@ -1,23 +1,23 @@
 {
-  "generated_at": "2026-06-17T03:54:59Z",
+  "generated_at": "2026-06-17T09:03:56Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 28,
-    "actionable": 22,
+    "active_events": 29,
+    "actionable": 23,
     "watch": 2,
     "risk": 4,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 13,
-      "back_to_back_travel": 16,
-      "travel_extreme": 8,
-      "market_uncertain": 4,
+      "injury_imbalance": 14,
+      "back_to_back_travel": 17,
+      "travel_extreme": 9,
+      "market_uncertain": 5,
       "signal_conflict": 1
     },
     "by_quality": {
-      "actionable": 22,
+      "actionable": 23,
       "watch": 2,
       "risk": 4
     }
@@ -40,6 +40,24 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 4-9"
+    },
+    {
+      "event_id": "401815798",
+      "date": "2026-06-17T18:15Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "St. Louis Cardinals",
+      "away": "San Diego Padres",
+      "match": "St. Louis Cardinals - San Diego Padres",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "San Diego Padres",
+      "side": null,
+      "strength": 1.0,
+      "context": "Absences severes 2-12"
     },
     {
       "event_id": "401815802",
@@ -460,6 +478,24 @@
   ],
   "active_risk": [
     {
+      "event_id": "177188",
+      "date": "2026-06-18T04:00Z",
+      "sport": "tennis",
+      "league_code": "terrawortmannopen",
+      "league_name": "Terra Wortmann Open",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 12.1%"
+    },
+    {
       "event_id": "177137",
       "date": "2026-06-18T04:00Z",
       "sport": "tennis",
@@ -476,24 +512,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 12.1%"
-    },
-    {
-      "event_id": "178051",
-      "date": "2026-06-18T04:00Z",
-      "sport": "tennis",
-      "league_code": "vandapharmaceuticals",
-      "league_name": "VANDA Pharmaceuticals Berlin Tennis Open",
-      "home": "",
-      "away": "",
-      "match": "? - ?",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 12.0%"
     },
     {
       "event_id": "177989",
