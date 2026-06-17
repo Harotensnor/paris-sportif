@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-06-17T21:22:48Z",
+  "generated_at": "2026-06-17T22:56:02Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815794",
-      "kickoff": "2026-06-17T22:45Z",
-      "league": "MLB",
-      "match": "Toronto Blue Jays at Boston Red Sox",
-      "home": "Boston Red Sox",
-      "away": "Toronto Blue Jays",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Boston Red Sox",
-          "pitcher": "Jake Bennett",
-          "label": "Jake Bennett plus de 2,5 strikeouts",
-          "line": 2.5,
-          "pick": "over",
-          "probability": 0.5405,
-          "fair_odds": 1.85,
-          "expected_strikeouts": 2.63,
-          "projected_ip": 5.03,
-          "inputs": {
-            "k9": 4.7,
-            "era": 5.28,
-            "whip": 1.5,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Boston Red Sox",
-          "pitcher": "Jake Bennett",
-          "label": "Jake Bennett ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.719,
-          "fair_odds": 1.39,
-          "expected_hr_allowed": 0.33,
-          "projected_ip": 5.03,
-          "inputs": {
-            "hr9": 0.59,
-            "era": 5.28,
-            "whip": 1.5
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Toronto Blue Jays",
-          "pitcher": "Max Scherzer",
-          "label": "Max Scherzer moins de 2,5 strikeouts",
-          "line": 2.5,
-          "pick": "under",
-          "probability": 0.5552,
-          "fair_odds": 1.8,
-          "expected_strikeouts": 2.33,
-          "projected_ip": 3.67,
-          "inputs": {
-            "k9": 5.73,
-            "era": 10.23,
-            "whip": 1.73,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Toronto Blue Jays",
-          "pitcher": "Max Scherzer",
-          "label": "Max Scherzer concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.7767,
-          "fair_odds": 1.29,
-          "expected_hr_allowed": 1.499,
-          "projected_ip": 3.67,
-          "inputs": {
-            "hr9": 3.68,
-            "era": 10.23,
-            "whip": 1.73
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815789",
       "kickoff": "2026-06-17T23:05Z",
@@ -834,7 +752,7 @@
       ]
     }
   ],
-  "props": 40,
+  "props": 36,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"

@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-06-17T21:22:48Z",
+  "generated_at": "2026-06-17T22:56:03Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 19,
+    "active_events": 18,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 25,
+      "lookahead": 23,
       "travel_extreme": 7,
       "back_to_back_travel": 11,
       "schedule_congestion": 14
     },
     "by_decision": {
-      "abstain": 5,
+      "abstain": 4,
       "lean_home": 12,
       "lean_away": 2
     },
     "lean_home": 12,
     "lean_away": 2,
-    "abstain": 5,
+    "abstain": 4,
     "monitor": 0
   },
   "active": [
@@ -159,58 +159,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.3
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815794",
-      "source_event_ids": [
-        "401815794"
-      ],
-      "kickoff": "2026-06-17T22:45Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Boston Red Sox",
-      "away": "Toronto Blue Jays",
-      "match": "Boston Red Sox - Toronto Blue Jays",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Boston Red Sox 0.15, Toronto Blue Jays 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
-        "home_fade": 0.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Toronto Blue Jays (-0.10)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
           }
         ]
       }
@@ -1168,18 +1116,12 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.457,
-        "away_score": -1.305,
+        "home_score": 0.317,
+        "away_score": -0.905,
         "home_fade": 0.0,
-        "away_fade": 1.305,
-        "reason": "Direction nette: Chicago Cubs (+0.46)",
+        "away_fade": 0.905,
+        "reason": "Direction nette: Chicago Cubs (+0.32)",
         "detail": [
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
-          },
           {
             "side": "away",
             "type": "back_to_back_travel",
