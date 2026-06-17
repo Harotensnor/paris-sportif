@@ -1,23 +1,23 @@
 {
-  "generated_at": "2026-06-17T19:15:24Z",
+  "generated_at": "2026-06-17T21:22:48Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 20,
+    "active_events": 19,
     "expired_sample": 0,
     "by_type": {
-      "travel_extreme": 8,
-      "back_to_back_travel": 12,
       "lookahead": 25,
+      "travel_extreme": 7,
+      "back_to_back_travel": 11,
       "schedule_congestion": 14
     },
     "by_decision": {
       "abstain": 5,
-      "lean_home": 13,
+      "lean_home": 12,
       "lean_away": 2
     },
-    "lean_home": 13,
+    "lean_home": 12,
     "lean_away": 2,
     "abstain": 5,
     "monitor": 0
@@ -303,12 +303,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
+        "net_side": "home",
+        "home_score": 0.043,
+        "away_score": -0.498,
         "home_fade": 0.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Atlanta Dream (-0.10)",
+        "away_fade": 0.55,
+        "reason": "Direction nette: Indiana Fever (+0.04)",
         "detail": [
           {
             "side": "home",
@@ -321,6 +321,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.4
           }
         ]
       }
@@ -809,11 +815,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.671,
-        "away_score": -2.293,
+        "home_score": 0.531,
+        "away_score": -1.893,
         "home_fade": 0.15,
-        "away_fade": 2.346,
-        "reason": "Direction nette: Atlanta Braves (+0.67)",
+        "away_fade": 1.946,
+        "reason": "Direction nette: Atlanta Braves (+0.53)",
         "detail": [
           {
             "side": "home",
@@ -826,12 +832,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
           },
           {
             "side": "away",
@@ -975,65 +975,6 @@
       }
     },
     {
-      "event_id": "401815802",
-      "source_event_ids": [
-        "401815802"
-      ],
-      "kickoff": "2026-06-17T19:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Los Angeles Dodgers",
-      "away": "Tampa Bay Rays",
-      "match": "Los Angeles Dodgers - Tampa Bay Rays",
-      "decision": "lean_home",
-      "net_team": "Los Angeles Dodgers",
-      "reason": "Tampa Bay Rays plus penalise par calendrier/voyage (1.80 vs 0.00)",
-      "pressure_score": 1.802,
-      "home_fade": 0.0,
-      "away_fade": 1.802,
-      "travel_score": 1.802,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "travel_extreme": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "Deplacement estime 3448 km, decalage ~2.4h",
-        "2 match dans les 48h + 3448 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.369,
-        "away_score": -1.452,
-        "home_fade": 1.0,
-        "away_fade": 1.802,
-        "reason": "Direction nette: Los Angeles Dodgers (-0.37)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.802
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401815805",
       "source_event_ids": [
         "401815805"
@@ -1065,18 +1006,12 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.769,
-        "away_score": -2.196,
+        "home_score": 0.629,
+        "away_score": -1.796,
         "home_fade": 0.0,
-        "away_fade": 2.196,
-        "reason": "Direction nette: Atlanta Braves (+0.77)",
+        "away_fade": 1.796,
+        "reason": "Direction nette: Atlanta Braves (+0.63)",
         "detail": [
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
-          },
           {
             "side": "away",
             "type": "travel_extreme",
