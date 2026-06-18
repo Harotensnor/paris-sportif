@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-06-18T00:07:05Z",
+  "generated_at": "2026-06-18T03:41:58Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815800",
-      "kickoff": "2026-06-18T01:40Z",
-      "league": "MLB",
-      "match": "Baltimore Orioles at Seattle Mariners",
-      "home": "Seattle Mariners",
-      "away": "Baltimore Orioles",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Seattle Mariners",
-          "pitcher": "Bryan Woo",
-          "label": "Bryan Woo plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.5306,
-          "fair_odds": 1.88,
-          "expected_strikeouts": 5.64,
-          "projected_ip": 5.86,
-          "inputs": {
-            "k9": 8.67,
-            "era": 4.28,
-            "whip": 1.04,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Seattle Mariners",
-          "pitcher": "Bryan Woo",
-          "label": "Bryan Woo ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.525,
-          "fair_odds": 1.9,
-          "expected_hr_allowed": 0.644,
-          "projected_ip": 5.86,
-          "inputs": {
-            "hr9": 0.99,
-            "era": 4.28,
-            "whip": 1.04
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Baltimore Orioles",
-          "pitcher": "Shane Baz",
-          "label": "Shane Baz plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.566,
-          "fair_odds": 1.77,
-          "expected_strikeouts": 4.78,
-          "projected_ip": 5.86,
-          "inputs": {
-            "k9": 7.35,
-            "era": 4.06,
-            "whip": 1.39,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Baltimore Orioles",
-          "pitcher": "Shane Baz",
-          "label": "Shane Baz ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.564,
-          "fair_odds": 1.77,
-          "expected_hr_allowed": 0.573,
-          "projected_ip": 5.86,
-          "inputs": {
-            "hr9": 0.88,
-            "era": 4.06,
-            "whip": 1.39
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815806",
       "kickoff": "2026-06-18T17:35Z",
@@ -542,7 +460,7 @@
       ]
     }
   ],
-  "props": 26,
+  "props": 22,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"

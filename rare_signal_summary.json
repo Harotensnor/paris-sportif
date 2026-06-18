@@ -1,46 +1,27 @@
 {
-  "generated_at": "2026-06-18T00:07:06Z",
+  "generated_at": "2026-06-18T03:41:59Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 18,
-    "actionable": 15,
-    "watch": 1,
+    "active_events": 15,
+    "actionable": 13,
+    "watch": 0,
     "risk": 2,
     "expired_sample": 0,
     "by_type": {
-      "back_to_back_travel": 11,
-      "injury_imbalance": 6,
-      "travel_extreme": 6,
       "market_uncertain": 1,
+      "injury_imbalance": 4,
+      "travel_extreme": 5,
+      "back_to_back_travel": 9,
       "signal_conflict": 1
     },
     "by_quality": {
-      "actionable": 15,
-      "watch": 1,
-      "risk": 2
+      "risk": 2,
+      "actionable": 13
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401815800",
-      "date": "2026-06-18T01:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Seattle Mariners",
-      "away": "Baltimore Orioles",
-      "match": "Seattle Mariners - Baltimore Orioles",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Baltimore Orioles",
-      "side": "away",
-      "strength": 1.0,
-      "context": "1 match dans les 48h + 3747 km de voyage"
-    },
     {
       "event_id": "401815807",
       "date": "2026-06-18T18:10Z",
@@ -204,24 +185,6 @@
       "context": "2 match dans les 48h + 1159 km de voyage"
     },
     {
-      "event_id": "401815796",
-      "date": "2026-06-18T00:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Chicago Cubs",
-      "away": "Colorado Rockies",
-      "match": "Chicago Cubs - Colorado Rockies",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Colorado Rockies",
-      "side": "away",
-      "strength": 0.825,
-      "context": "1 match dans les 48h + 1476 km de voyage"
-    },
-    {
       "event_id": "401815840",
       "date": "2026-06-21T17:35Z",
       "sport": "baseball",
@@ -294,26 +257,7 @@
       "context": "Deplacement estime 3028 km, decalage ~2.2h"
     }
   ],
-  "active_watch": [
-    {
-      "event_id": "401857001",
-      "date": "2026-06-18T02:00Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Portland Fire",
-      "away": "Seattle Storm",
-      "match": "Portland Fire - Seattle Storm",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Seattle Storm",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 0-3"
-    }
-  ],
+  "active_watch": [],
   "active_risk": [
     {
       "event_id": "177989",
