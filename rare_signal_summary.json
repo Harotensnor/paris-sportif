@@ -1,45 +1,28 @@
 {
-  "generated_at": "2026-06-18T21:09:07Z",
+  "generated_at": "2026-06-18T23:03:38Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 39,
-    "actionable": 38,
-    "watch": 0,
-    "risk": 1,
+    "active_events": 41,
+    "actionable": 37,
+    "watch": 1,
+    "risk": 3,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 27,
-      "back_to_back_travel": 23,
+      "injury_imbalance": 29,
+      "signal_conflict": 8,
       "travel_extreme": 15,
-      "market_uncertain": 1,
-      "signal_conflict": 4
+      "back_to_back_travel": 22,
+      "market_uncertain": 1
     },
     "by_quality": {
-      "actionable": 38,
-      "risk": 1
+      "actionable": 37,
+      "risk": 3,
+      "watch": 1
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401815804",
-      "date": "2026-06-18T22:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Philadelphia Phillies",
-      "away": "New York Mets",
-      "match": "Philadelphia Phillies - New York Mets",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "New York Mets",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 4-11"
-    },
     {
       "event_id": "401815803",
       "date": "2026-06-18T23:05Z",
@@ -92,7 +75,7 @@
       "team": "Los Angeles Angels",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 5-12"
+      "context": "Absences severes 5-13"
     },
     {
       "event_id": "401815817",
@@ -164,7 +147,7 @@
       "team": "Los Angeles Angels",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 5-12"
+      "context": "Absences severes 5-13"
     },
     {
       "event_id": "401815823",
@@ -272,7 +255,7 @@
       "team": "Los Angeles Angels",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 5-12"
+      "context": "Absences severes 5-13"
     },
     {
       "event_id": "401814478",
@@ -398,7 +381,7 @@
       "team": "Los Angeles Angels",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 5-12"
+      "context": "Absences severes 5-13"
     },
     {
       "event_id": "401815851",
@@ -545,24 +528,6 @@
       "context": "2 match dans les 48h + 1875 km de voyage"
     },
     {
-      "event_id": "401815824",
-      "date": "2026-06-20T01:45Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Arizona Diamondbacks",
-      "away": "Minnesota Twins",
-      "match": "Arizona Diamondbacks - Minnesota Twins",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Minnesota Twins",
-      "side": "away",
-      "strength": 0.941,
-      "context": "1 match dans les 48h + 2057 km de voyage"
-    },
-    {
       "event_id": "401815838",
       "date": "2026-06-21T02:10Z",
       "sport": "baseball",
@@ -689,6 +654,64 @@
       "context": "Absences severes 10-6"
     },
     {
+      "event_id": "401815840",
+      "date": "2026-06-21T17:35Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "New York Yankees",
+      "away": "Cincinnati Reds",
+      "match": "New York Yankees - Cincinnati Reds",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Cincinnati Reds",
+      "side": "away",
+      "strength": 0.794,
+      "context": "2 match dans les 48h + 921 km de voyage"
+    },
+    {
+      "event_id": "401815826",
+      "date": "2026-06-20T17:35Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "New York Yankees",
+      "away": "Cincinnati Reds",
+      "match": "New York Yankees - Cincinnati Reds",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Cincinnati Reds",
+      "side": "away",
+      "strength": 0.714,
+      "context": "1 match dans les 48h + 921 km de voyage"
+    }
+  ],
+  "active_watch": [
+    {
+      "event_id": "401815824",
+      "date": "2026-06-20T01:45Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Arizona Diamondbacks",
+      "away": "Minnesota Twins",
+      "match": "Arizona Diamondbacks - Minnesota Twins",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "travel_extreme",
+      "direction": "fade",
+      "team": "Minnesota Twins",
+      "side": "away",
+      "strength": 0.478,
+      "context": "Deplacement estime 2057 km, decalage ~1.3h"
+    }
+  ],
+  "active_risk": [
+    {
       "event_id": "401815867",
       "date": "2026-06-23T23:10Z",
       "sport": "baseball",
@@ -697,18 +720,15 @@
       "home": "New York Mets",
       "away": "Chicago Cubs",
       "match": "New York Mets - Chicago Cubs",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Chicago Cubs",
-      "side": "away",
-      "strength": 0.762,
-      "context": "1 match dans les 48h + 1159 km de voyage"
-    }
-  ],
-  "active_watch": [],
-  "active_risk": [
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "signal_conflict",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.928,
+      "context": "Signaux opposes: New York Mets fade 1.30, Chicago Cubs fade 1.06 -> prudence"
+    },
     {
       "event_id": "401876811",
       "date": "2026-06-20T19:00Z",
@@ -726,6 +746,24 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.4%"
+    },
+    {
+      "event_id": "401815813",
+      "date": "2026-06-19T23:05Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "New York Yankees",
+      "away": "Cincinnati Reds",
+      "match": "New York Yankees - Cincinnati Reds",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "signal_conflict",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.655,
+      "context": "Signaux opposes: New York Yankees fade 0.90, Cincinnati Reds fade 0.70 -> prudence"
     }
   ],
   "expired_sample": []
