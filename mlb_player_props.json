@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-18T08:28:35Z",
+  "generated_at": "2026-06-18T12:04:03Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -458,9 +458,55 @@
           "side": "away"
         }
       ]
+    },
+    {
+      "event_id": "401815826",
+      "kickoff": "2026-06-20T17:35Z",
+      "league": "MLB",
+      "match": "Cincinnati Reds at New York Yankees",
+      "home": "New York Yankees",
+      "away": "Cincinnati Reds",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Cincinnati Reds",
+          "pitcher": "Andrew Abbott",
+          "label": "Andrew Abbott plus de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "over",
+          "probability": 0.5887,
+          "fair_odds": 1.7,
+          "expected_strikeouts": 3.84,
+          "projected_ip": 5.28,
+          "inputs": {
+            "k9": 6.55,
+            "era": 3.95,
+            "whip": 1.41,
+            "hand": "L"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Cincinnati Reds",
+          "pitcher": "Andrew Abbott",
+          "label": "Andrew Abbott concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5169,
+          "fair_odds": 1.93,
+          "expected_hr_allowed": 0.727,
+          "projected_ip": 5.28,
+          "inputs": {
+            "hr9": 1.24,
+            "era": 3.95,
+            "whip": 1.41
+          },
+          "side": "away"
+        }
+      ]
     }
   ],
-  "props": 22,
+  "props": 24,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"

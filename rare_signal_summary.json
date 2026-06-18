@@ -1,24 +1,23 @@
 {
-  "generated_at": "2026-06-18T08:28:36Z",
+  "generated_at": "2026-06-18T12:04:04Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 15,
+    "active_events": 14,
     "actionable": 13,
     "watch": 0,
-    "risk": 2,
+    "risk": 1,
     "expired_sample": 0,
     "by_type": {
-      "market_uncertain": 1,
       "injury_imbalance": 4,
       "travel_extreme": 5,
       "back_to_back_travel": 9,
       "signal_conflict": 1
     },
     "by_quality": {
-      "risk": 2,
-      "actionable": 13
+      "actionable": 13,
+      "risk": 1
     }
   },
   "active_actionable": [
@@ -259,24 +258,6 @@
   ],
   "active_watch": [],
   "active_risk": [
-    {
-      "event_id": "177989",
-      "date": "2026-06-18T10:00Z",
-      "sport": "tennis",
-      "league_code": "lexusnottinghamopen",
-      "league_name": "Lexus Nottingham Open",
-      "home": "",
-      "away": "",
-      "match": "? - ?",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 12.1%"
-    },
     {
       "event_id": "401815813",
       "date": "2026-06-19T23:05Z",

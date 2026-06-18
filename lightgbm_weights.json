@@ -1,13 +1,13 @@
 {
   "schema": "paris-sportif.learned_weights.v1",
-  "generated_at": "2026-06-18T08:28:35Z",
+  "generated_at": "2026-06-18T12:04:03Z",
   "status": "row_level_table_detected_training_pending",
   "reason": "No backtest_training_rows.jsonl row-level feature table yet; exported conservative weights from backtest_report_v2 aggregates.",
   "runtime_dependency": "none",
   "source": {
     "report": "backtest_report_v2.json",
-    "report_generated_at": "2026-06-17T08:52:27Z",
-    "n_events": 361,
+    "report_generated_at": "2026-06-18T08:28:57Z",
+    "n_events": 382,
     "training_rows": "backtest_training_rows.jsonl",
     "training_rows_found": true,
     "training_rows_count": 68
@@ -21,11 +21,11 @@
   "weights": {
     "by_sport": {
       "baseball": {
-        "n": 267,
-        "roi_pct": -3.05,
-        "win_rate": 0.5655,
-        "brier": 0.2436,
-        "weight": -0.01109,
+        "n": 288,
+        "roi_pct": -2.17,
+        "win_rate": 0.5694,
+        "brier": 0.2433,
+        "weight": -0.00673,
         "status": "neutral"
       },
       "basketball": {
@@ -167,11 +167,11 @@
         "status": "watch"
       },
       "mlb": {
-        "n": 267,
-        "roi_pct": -3.05,
-        "win_rate": 0.5655,
-        "brier": 0.2436,
-        "weight": -0.01109,
+        "n": 288,
+        "roi_pct": -2.17,
+        "win_rate": 0.5694,
+        "brier": 0.2433,
+        "weight": -0.00673,
         "status": "neutral"
       },
       "nba": {
@@ -217,19 +217,19 @@
     },
     "by_tier": {
       "skip": {
-        "n": 357,
-        "roi_pct": -0.64,
-        "win_rate": 0.563,
+        "n": 371,
+        "roi_pct": -0.31,
+        "win_rate": 0.566,
         "brier": 0.2406,
-        "weight": 0.00039,
+        "weight": 0.00212,
         "status": "neutral"
       },
       "standard": {
-        "n": 4,
-        "roi_pct": -56.62,
-        "win_rate": 0.25,
-        "brier": 0.2472,
-        "weight": -0.00153,
+        "n": 11,
+        "roi_pct": -13.79,
+        "win_rate": 0.4545,
+        "brier": 0.2389,
+        "weight": -0.00375,
         "status": "watch"
       },
       "big_bet": {
