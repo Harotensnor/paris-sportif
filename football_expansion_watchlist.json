@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-18T23:03:38Z",
+  "generated_at": "2026-06-19T01:47:59Z",
   "source": "data.js bookable feed + sofascore_events source feed",
   "status": "ok",
   "categories": {
@@ -221,9 +221,17 @@
     },
     "J7_asie_latam": {
       "label": "Asie / Amérique latine",
-      "bookable": 0,
+      "bookable": 1,
       "source": 66,
       "samples": [
+        {
+          "event_id": "401861404",
+          "source": "winamax_exact",
+          "kickoff": "2026-06-26T11:35Z",
+          "match": "Yunnan Yukun at Qingdao Hainiu",
+          "league": "Chinese Super League",
+          "code": "chn.1"
+        },
         {
           "event_id": "sofa_15832759",
           "source": "sofascore_watch",
@@ -279,22 +287,14 @@
           "match": "Independiente Santa Fe vs Corinthians",
           "league": "CONMEBOL Libertadores, Group E",
           "code": "conmebol.libertadores"
-        },
-        {
-          "event_id": "sofa_15832803",
-          "source": "sofascore_watch",
-          "kickoff": "2026-05-05T22:00Z",
-          "match": "Club Sporting Cristal vs Palmeiras",
-          "league": "CONMEBOL Libertadores, Group F",
-          "code": "conmebol.libertadores"
         }
       ],
-      "status": "watch"
+      "status": "ok"
     }
   },
   "summary": {
-    "bookable_total": 0,
+    "bookable_total": 1,
     "source_total": 141,
-    "ok_categories": 0
+    "ok_categories": 1
   }
 }
