@@ -1,24 +1,25 @@
 {
-  "generated_at": "2026-06-19T04:06:31Z",
+  "generated_at": "2026-06-19T09:13:57Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 36,
-    "actionable": 32,
-    "watch": 2,
+    "active_events": 42,
+    "actionable": 34,
+    "watch": 6,
     "risk": 2,
     "expired_sample": 0,
     "by_type": {
+      "market_move": 10,
+      "signal_conflict": 9,
       "injury_imbalance": 25,
       "travel_extreme": 15,
-      "signal_conflict": 5,
       "back_to_back_travel": 21,
       "market_uncertain": 2
     },
     "by_quality": {
-      "actionable": 32,
-      "watch": 2,
+      "watch": 6,
+      "actionable": 34,
       "risk": 2
     }
   },
@@ -492,6 +493,24 @@
       "context": "2 match dans les 48h + 1341 km de voyage"
     },
     {
+      "event_id": "401857004",
+      "date": "2026-06-19T23:30Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "New York Liberty",
+      "away": "Washington Mystics",
+      "match": "New York Liberty - Washington Mystics",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.864,
+      "context": "Cote away: 6.75 -> 5.70 (+15.6%)"
+    },
+    {
       "event_id": "401815841",
       "date": "2026-06-21T17:35Z",
       "sport": "baseball",
@@ -582,6 +601,24 @@
       "context": "1 match dans les 48h + 1061 km de voyage"
     },
     {
+      "event_id": "401815813",
+      "date": "2026-06-19T23:05Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "New York Yankees",
+      "away": "Cincinnati Reds",
+      "match": "New York Yankees - Cincinnati Reds",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.728,
+      "context": "Cote away: 3.28 -> 2.85 (+13.1%)"
+    },
+    {
       "event_id": "401815826",
       "date": "2026-06-20T17:35Z",
       "sport": "baseball",
@@ -602,6 +639,42 @@
   ],
   "active_watch": [
     {
+      "event_id": "401815814",
+      "date": "2026-06-19T23:15Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Atlanta Braves",
+      "away": "Milwaukee Brewers",
+      "match": "Atlanta Braves - Milwaukee Brewers",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 0.622,
+      "context": "Cote home: 2.59 -> 2.30 (+11.2%)"
+    },
+    {
+      "event_id": "401857006",
+      "date": "2026-06-20T17:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Atlanta Dream",
+      "away": "Indiana Fever",
+      "match": "Atlanta Dream - Indiana Fever",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.61,
+      "context": "Cote away: 2.64 -> 2.35 (+11.0%)"
+    },
+    {
       "event_id": "401857008",
       "date": "2026-06-21T00:00Z",
       "sport": "basketball",
@@ -620,6 +693,24 @@
       "context": "Absences severes 1-4"
     },
     {
+      "event_id": "401815812",
+      "date": "2026-06-19T22:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Detroit Tigers",
+      "away": "Chicago White Sox",
+      "match": "Detroit Tigers - Chicago White Sox",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.514,
+      "context": "Cote away: 2.92 -> 2.65 (+9.2%)"
+    },
+    {
       "event_id": "401815824",
       "date": "2026-06-20T01:45Z",
       "sport": "baseball",
@@ -636,6 +727,24 @@
       "side": "away",
       "strength": 0.478,
       "context": "Deplacement estime 2057 km, decalage ~1.3h"
+    },
+    {
+      "event_id": "401857005",
+      "date": "2026-06-20T02:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Golden State Valkyries",
+      "away": "Minnesota Lynx",
+      "match": "Golden State Valkyries - Minnesota Lynx",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 0.471,
+      "context": "Cote home: 2.24 -> 2.05 (+8.5%)"
     }
   ],
   "active_risk": [

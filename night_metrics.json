@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-06-19T04:06:32Z",
-  "calculated_at": "2026-06-19T04:06:32Z",
+  "generated_at": "2026-06-19T09:13:58Z",
+  "calculated_at": "2026-06-19T09:13:58Z",
   "source_of_truth": "data.js",
-  "data_generated_at": "2026-06-19T04:04:39.770794Z",
+  "data_generated_at": "2026-06-19T09:12:56.634519Z",
   "data_today_field": "2026-06-19",
   "events": {
-    "total": 99,
-    "upcoming": 87,
-    "winamax_available": 99,
-    "winamax_exact": 73,
-    "winamax_exact_ratio": 0.7374,
+    "total": 96,
+    "upcoming": 86,
+    "winamax_available": 96,
+    "winamax_exact": 70,
+    "winamax_exact_ratio": 0.7292,
     "markets_more_than_1n2": 0,
-    "form_l10": 46,
-    "h2h": 0,
-    "lineups": 38,
+    "form_l10": 44,
+    "h2h": 23,
+    "lineups": 37,
     "football_lineups": 0,
-    "starter_signals": 38,
+    "starter_signals": 37,
     "clubelo": 1,
     "weather": 1,
-    "injuries": 52,
+    "injuries": 49,
     "referee": 0,
     "referee_named": 0,
     "referee_context": 0,
@@ -26,7 +26,7 @@
     "fd_calibration": 0,
     "fd_closing_odds": 0,
     "xg": 1,
-    "smart_money": 1
+    "smart_money": 0
   },
   "signal_health": {
     "referee": {
@@ -36,7 +36,7 @@
       "note": "referee is effective coverage: named referee or referee_context usable by the model."
     },
     "smart_money": {
-      "events": 1,
+      "events": 0,
       "status": "rare_event",
       "note": "Smart money is intentionally rare; low count is OK when odds movement does not confirm a strong signal."
     }
@@ -44,12 +44,12 @@
   "winamax_markets": {
     "matches": 331,
     "detailed_market_matches": 39,
-    "detailed_ratio_vs_exact": 0.5342,
+    "detailed_ratio_vs_exact": 0.5571,
     "gap_to_50pct_exact": 0,
     "recommended_detail_fetch_cap": 90,
     "detail_by_sport": {
       "baseball": {
-        "exact": 44,
+        "exact": 43,
         "detailed": 0,
         "families": {},
         "detailed_ratio": 0.0
@@ -82,11 +82,11 @@
     "market_family_counts": {}
   },
   "backtest": {
-    "overall_roi_pct": -0.69,
-    "overall_brier": 0.2406,
+    "overall_roi_pct": 0.36,
+    "overall_brier": 0.2385,
     "by_sport_roi_pct": {
-      "baseball": -2.17,
-      "basketball": 7.58,
+      "baseball": -1.71,
+      "basketball": 17.66,
       "football": -0.05,
       "hockey": 28.48
     },
@@ -94,7 +94,7 @@
   },
   "health": {
     "status": "warning",
-    "warnings": 10,
+    "warnings": 11,
     "pipeline_drift": "warn"
   }
 }
