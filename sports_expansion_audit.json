@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-19T01:47:59Z",
+  "generated_at": "2026-06-19T04:06:30Z",
   "source": "local data.js + sports sidecars",
   "status": "ok",
   "sections": {
@@ -16,23 +16,34 @@
       "bookable_tennis_events": 16
     },
     "J3_nhl_playoffs": {
-      "data_events": 0,
+      "data_events": 3,
       "sofascore_events": 3,
-      "samples": [],
+      "samples": [
+        {
+          "event": "Colorado Avalanche vs Minnesota Wild",
+          "league": "NHL, Playoffs",
+          "code": "nhl.playoffs"
+        },
+        {
+          "event": "Buffalo Sabres vs Montréal Canadiens",
+          "league": "NHL, Playoffs",
+          "code": "nhl.playoffs"
+        },
+        {
+          "event": "Vegas Golden Knights vs Anaheim Ducks",
+          "league": "NHL, Playoffs",
+          "code": "nhl.playoffs"
+        }
+      ],
       "derived_events": 0,
       "derived_markets": 0
     },
     "J4_baseball_major_props_pool": {
-      "data_events": 45,
+      "data_events": 47,
       "sofascore_events": 46,
       "samples": [
         {
           "event": "New York Mets at Cincinnati Reds",
-          "league": "MLB",
-          "code": "mlb"
-        },
-        {
-          "event": "New York Mets at Philadelphia Phillies",
           "league": "MLB",
           "code": "mlb"
         },
@@ -47,14 +58,19 @@
           "code": "mlb"
         },
         {
+          "event": "Toronto Blue Jays at Chicago Cubs",
+          "league": "MLB",
+          "code": "mlb"
+        },
+        {
           "event": "Chicago White Sox at Detroit Tigers",
           "league": "MLB",
           "code": "mlb"
         }
       ],
       "pitcher_records": 77,
-      "player_prop_events": 34,
-      "player_props": 118
+      "player_prop_events": 37,
+      "player_props": 132
     },
     "J5_football_tier2": {
       "data_events": 0,
