@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-06-19T20:03:34Z",
+  "generated_at": "2026-06-19T21:14:37Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 36,
-    "actionable": 31,
+    "active_events": 41,
+    "actionable": 37,
     "watch": 3,
-    "risk": 2,
+    "risk": 1,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 25,
-      "travel_extreme": 15,
+      "travel_extreme": 18,
+      "injury_imbalance": 28,
       "signal_conflict": 5,
-      "back_to_back_travel": 21,
-      "market_uncertain": 2
+      "back_to_back_travel": 23,
+      "market_uncertain": 1
     },
     "by_quality": {
+      "actionable": 37,
       "watch": 3,
-      "actionable": 31,
-      "risk": 2
+      "risk": 1
     }
   },
   "active_actionable": [
@@ -39,7 +39,7 @@
       "team": "Houston Astros",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 10-4"
+      "context": "Absences severes 10-3"
     },
     {
       "event_id": "401815819",
@@ -132,6 +132,42 @@
       "context": "Absences severes 7-12"
     },
     {
+      "event_id": "401815829",
+      "date": "2026-06-20T20:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Miami Marlins",
+      "away": "San Francisco Giants",
+      "match": "Miami Marlins - San Francisco Giants",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "San Francisco Giants",
+      "side": "away",
+      "strength": 1.0,
+      "context": "1 match dans les 48h + 4164 km de voyage"
+    },
+    {
+      "event_id": "401815828",
+      "date": "2026-06-20T23:15Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Philadelphia Phillies",
+      "away": "New York Mets",
+      "match": "Philadelphia Phillies - New York Mets",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "New York Mets",
+      "side": null,
+      "strength": 1.0,
+      "context": "Absences severes 4-11"
+    },
+    {
       "event_id": "401815831",
       "date": "2026-06-20T23:15Z",
       "sport": "baseball",
@@ -147,7 +183,7 @@
       "team": "Houston Astros",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 10-4"
+      "context": "Absences severes 10-3"
     },
     {
       "event_id": "401815834",
@@ -222,6 +258,24 @@
       "context": "Absences severes 15-10"
     },
     {
+      "event_id": "401815843",
+      "date": "2026-06-21T17:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Miami Marlins",
+      "away": "San Francisco Giants",
+      "match": "Miami Marlins - San Francisco Giants",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "San Francisco Giants",
+      "side": "away",
+      "strength": 1.0,
+      "context": "2 match dans les 48h + 4164 km de voyage"
+    },
+    {
       "event_id": "401815845",
       "date": "2026-06-21T18:10Z",
       "sport": "baseball",
@@ -237,7 +291,7 @@
       "team": "Houston Astros",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 10-4"
+      "context": "Absences severes 10-3"
     },
     {
       "event_id": "401815847",
@@ -348,6 +402,24 @@
       "context": "Absences severes 7-12"
     },
     {
+      "event_id": "401815842",
+      "date": "2026-06-21T23:20Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Philadelphia Phillies",
+      "away": "New York Mets",
+      "match": "Philadelphia Phillies - New York Mets",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "New York Mets",
+      "side": null,
+      "strength": 1.0,
+      "context": "Absences severes 4-11"
+    },
+    {
       "event_id": "401815866",
       "date": "2026-06-23T01:38Z",
       "sport": "baseball",
@@ -402,6 +474,24 @@
       "context": "2 match dans les 48h + 3704 km de voyage"
     },
     {
+      "event_id": "401815910",
+      "date": "2026-06-26T23:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "New York Mets",
+      "away": "Philadelphia Phillies",
+      "match": "New York Mets - Philadelphia Phillies",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "New York Mets",
+      "side": null,
+      "strength": 1.0,
+      "context": "Absences severes 11-4"
+    },
+    {
       "event_id": "401815918",
       "date": "2026-06-27T01:38Z",
       "sport": "baseball",
@@ -436,6 +526,24 @@
       "side": "away",
       "strength": 0.985,
       "context": "2 match dans les 48h + 1875 km de voyage"
+    },
+    {
+      "event_id": "401815815",
+      "date": "2026-06-19T23:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Miami Marlins",
+      "away": "San Francisco Giants",
+      "match": "Miami Marlins - San Francisco Giants",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "travel_extreme",
+      "direction": "fade",
+      "team": "San Francisco Giants",
+      "side": "away",
+      "strength": 0.968,
+      "context": "Deplacement estime 4164 km, decalage ~2.8h"
     },
     {
       "event_id": "401815838",
@@ -639,24 +747,6 @@
     }
   ],
   "active_risk": [
-    {
-      "event_id": "401876811",
-      "date": "2026-06-20T19:00Z",
-      "sport": "football",
-      "league_code": "laliga2",
-      "league_name": "La Liga 2",
-      "home": "Almería",
-      "away": "Málaga",
-      "match": "Almería - Málaga",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.4%"
-    },
     {
       "event_id": "401861404",
       "date": "2026-06-26T11:35Z",

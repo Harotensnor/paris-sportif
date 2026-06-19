@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-06-19T20:03:34Z",
+  "generated_at": "2026-06-19T21:14:37Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 38,
+    "active_events": 43,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 55,
-      "travel_extreme": 18,
-      "back_to_back_travel": 21,
-      "schedule_congestion": 11
+      "lookahead": 61,
+      "travel_extreme": 21,
+      "back_to_back_travel": 23,
+      "schedule_congestion": 12
     },
     "by_decision": {
-      "abstain": 9,
-      "lean_home": 28,
+      "abstain": 10,
+      "lean_home": 32,
       "lean_away": 1
     },
-    "lean_home": 28,
+    "lean_home": 32,
     "lean_away": 1,
-    "abstain": 9,
+    "abstain": 10,
     "monitor": 0
   },
   "active": [
@@ -540,6 +540,64 @@
       }
     },
     {
+      "event_id": "401815828",
+      "source_event_ids": [
+        "401815828"
+      ],
+      "kickoff": "2026-06-20T23:15Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Philadelphia Phillies",
+      "away": "New York Mets",
+      "match": "Philadelphia Phillies - New York Mets",
+      "decision": "abstain",
+      "net_team": null,
+      "reason": "Fatigue/agenda des deux cotes: Philadelphia Phillies 0.15, New York Mets 0.15",
+      "pressure_score": 0.667,
+      "home_fade": 0.15,
+      "away_fade": 0.15,
+      "travel_score": 0,
+      "lookahead_score": 0.667,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 2
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours",
+        "1 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": 0.252,
+        "away_score": -1.097,
+        "home_fade": 0.15,
+        "away_fade": 1.15,
+        "reason": "Direction nette: Philadelphia Phillies (+0.25)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 1.0
+          }
+        ]
+      }
+    },
+    {
       "event_id": "401815881",
       "source_event_ids": [
         "401815881"
@@ -936,6 +994,80 @@
       }
     },
     {
+      "event_id": "401815829",
+      "source_event_ids": [
+        "401815829"
+      ],
+      "kickoff": "2026-06-20T20:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Miami Marlins",
+      "away": "San Francisco Giants",
+      "match": "Miami Marlins - San Francisco Giants",
+      "decision": "lean_home",
+      "net_team": "Miami Marlins",
+      "reason": "San Francisco Giants plus penalise par calendrier/voyage (2.12 vs 0.15)",
+      "pressure_score": 2.635,
+      "home_fade": 0.15,
+      "away_fade": 2.118,
+      "travel_score": 1.968,
+      "lookahead_score": 0.667,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 2,
+        "travel_extreme": 1,
+        "back_to_back_travel": 1
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours",
+        "1 match important/proche dans les 3 jours",
+        "Deplacement estime 4164 km, decalage ~2.8h",
+        "1 match dans les 48h + 4164 km de voyage"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": 0.731,
+        "away_score": -2.466,
+        "home_fade": 0.15,
+        "away_fade": 2.518,
+        "reason": "Direction nette: Miami Marlins (+0.73)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.4
+          },
+          {
+            "side": "away",
+            "type": "travel_extreme",
+            "direction": "fade",
+            "strength": 0.968
+          },
+          {
+            "side": "away",
+            "type": "back_to_back_travel",
+            "direction": "fade",
+            "strength": 1.0
+          }
+        ]
+      }
+    },
+    {
       "event_id": "401814478",
       "source_event_ids": [
         "401814478"
@@ -1071,6 +1203,72 @@
             "type": "travel_extreme",
             "direction": "fade",
             "strength": 0.866
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815815",
+      "source_event_ids": [
+        "401815815"
+      ],
+      "kickoff": "2026-06-19T23:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Miami Marlins",
+      "away": "San Francisco Giants",
+      "match": "Miami Marlins - San Francisco Giants",
+      "decision": "lean_home",
+      "net_team": "Miami Marlins",
+      "reason": "San Francisco Giants plus penalise par calendrier/voyage (1.27 vs 0.30)",
+      "pressure_score": 2.302,
+      "home_fade": 0.3,
+      "away_fade": 1.268,
+      "travel_score": 0.968,
+      "lookahead_score": 1.333,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 2,
+        "travel_extreme": 1
+      },
+      "contexts": [
+        "2 match important/proche dans les 3 jours",
+        "2 match important/proche dans les 3 jours",
+        "Deplacement estime 4164 km, decalage ~2.8h"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": 0.284,
+        "away_score": -1.563,
+        "home_fade": 0.3,
+        "away_fade": 1.668,
+        "reason": "Direction nette: Miami Marlins (+0.28)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.3
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.3
+          },
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.4
+          },
+          {
+            "side": "away",
+            "type": "travel_extreme",
+            "direction": "fade",
+            "strength": 0.968
           }
         ]
       }
@@ -1347,6 +1545,65 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.905
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815843",
+      "source_event_ids": [
+        "401815843"
+      ],
+      "kickoff": "2026-06-21T17:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Miami Marlins",
+      "away": "San Francisco Giants",
+      "match": "Miami Marlins - San Francisco Giants",
+      "decision": "lean_home",
+      "net_team": "Miami Marlins",
+      "reason": "San Francisco Giants plus penalise par calendrier/voyage (1.97 vs 0.00)",
+      "pressure_score": 1.968,
+      "home_fade": 0.0,
+      "away_fade": 1.968,
+      "travel_score": 1.968,
+      "lookahead_score": 0,
+      "congestion_score": 0,
+      "types": {
+        "travel_extreme": 1,
+        "back_to_back_travel": 1
+      },
+      "contexts": [
+        "Deplacement estime 4164 km, decalage ~2.8h",
+        "2 match dans les 48h + 4164 km de voyage"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": 0.829,
+        "away_score": -2.368,
+        "home_fade": 0.0,
+        "away_fade": 2.368,
+        "reason": "Direction nette: Miami Marlins (+0.83)",
+        "detail": [
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.4
+          },
+          {
+            "side": "away",
+            "type": "travel_extreme",
+            "direction": "fade",
+            "strength": 0.968
+          },
+          {
+            "side": "away",
+            "type": "back_to_back_travel",
+            "direction": "fade",
+            "strength": 1.0
           }
         ]
       }
@@ -2403,6 +2660,57 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.822
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815842",
+      "source_event_ids": [
+        "401815842"
+      ],
+      "kickoff": "2026-06-21T23:20Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Philadelphia Phillies",
+      "away": "New York Mets",
+      "match": "Philadelphia Phillies - New York Mets",
+      "decision": "lean_home",
+      "net_team": "Philadelphia Phillies",
+      "reason": "New York Mets plus penalise par calendrier/voyage (0.60 vs 0.00)",
+      "pressure_score": 0.6,
+      "home_fade": 0.0,
+      "away_fade": 0.6,
+      "travel_score": 0,
+      "lookahead_score": 0,
+      "congestion_score": 0.6,
+      "types": {
+        "schedule_congestion": 1
+      },
+      "contexts": [
+        "3 matchs sur les 7 derniers jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": 0.56,
+        "away_score": -1.6,
+        "home_fade": 0.0,
+        "away_fade": 1.6,
+        "reason": "Direction nette: Philadelphia Phillies (+0.56)",
+        "detail": [
+          {
+            "side": "away",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 1.0
           }
         ]
       }
