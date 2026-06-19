@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-06-19T18:11:13Z",
+  "generated_at": "2026-06-19T20:03:34Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 36,
-    "actionable": 32,
-    "watch": 2,
+    "actionable": 31,
+    "watch": 3,
     "risk": 2,
     "expired_sample": 0,
     "by_type": {
@@ -17,8 +17,8 @@
       "market_uncertain": 2
     },
     "by_quality": {
-      "actionable": 32,
-      "watch": 2,
+      "watch": 3,
+      "actionable": 31,
       "risk": 2
     }
   },
@@ -57,7 +57,7 @@
       "team": "Kansas City Royals",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 10-2"
+      "context": "Absences severes 9-2"
     },
     {
       "event_id": "401815821",
@@ -255,7 +255,7 @@
       "team": "Kansas City Royals",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 10-2"
+      "context": "Absences severes 9-2"
     },
     {
       "event_id": "401815849",
@@ -510,24 +510,6 @@
       "context": "2 match dans les 48h + 1061 km de voyage"
     },
     {
-      "event_id": "401815816",
-      "date": "2026-06-19T23:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Tampa Bay Rays",
-      "away": "Washington Nationals",
-      "match": "Tampa Bay Rays - Washington Nationals",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Tampa Bay Rays",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 10-6"
-    },
-    {
       "event_id": "401815830",
       "date": "2026-06-20T20:10Z",
       "sport": "baseball",
@@ -538,12 +520,12 @@
       "match": "Tampa Bay Rays - Washington Nationals",
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
+      "type": "back_to_back_travel",
       "direction": "fade",
-      "team": "Tampa Bay Rays",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 10-6"
+      "team": "Washington Nationals",
+      "side": "away",
+      "strength": 0.798,
+      "context": "1 match dans les 48h + 1341 km de voyage"
     },
     {
       "event_id": "401815840",
@@ -601,6 +583,24 @@
     }
   ],
   "active_watch": [
+    {
+      "event_id": "401815816",
+      "date": "2026-06-19T23:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Tampa Bay Rays",
+      "away": "Washington Nationals",
+      "match": "Tampa Bay Rays - Washington Nationals",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Tampa Bay Rays",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 9-6"
+    },
     {
       "event_id": "401857008",
       "date": "2026-06-21T00:00Z",

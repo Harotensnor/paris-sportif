@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-06-19T18:11:12Z",
+  "generated_at": "2026-06-19T20:03:33Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815820",
-      "kickoff": "2026-06-19T18:20Z",
-      "league": "MLB",
-      "match": "Toronto Blue Jays at Chicago Cubs",
-      "home": "Chicago Cubs",
-      "away": "Toronto Blue Jays",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Chicago Cubs",
-          "pitcher": "Ben Brown",
-          "label": "Ben Brown moins de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "under",
-          "probability": 0.502,
-          "fair_odds": 1.99,
-          "expected_strikeouts": 6.49,
-          "projected_ip": 6.6,
-          "inputs": {
-            "k9": 8.85,
-            "era": 1.74,
-            "whip": 0.97,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Chicago Cubs",
-          "pitcher": "Ben Brown",
-          "label": "Ben Brown ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.8958,
-          "fair_odds": 1.12,
-          "expected_hr_allowed": 0.11,
-          "projected_ip": 6.6,
-          "inputs": {
-            "hr9": 0.15,
-            "era": 1.74,
-            "whip": 0.97
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Toronto Blue Jays",
-          "pitcher": "Kevin Gausman",
-          "label": "Kevin Gausman plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.5502,
-          "fair_odds": 1.82,
-          "expected_strikeouts": 5.74,
-          "projected_ip": 5.8,
-          "inputs": {
-            "k9": 8.9,
-            "era": 3.41,
-            "whip": 1.03,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Toronto Blue Jays",
-          "pitcher": "Kevin Gausman",
-          "label": "Kevin Gausman ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5149,
-          "fair_odds": 1.94,
-          "expected_hr_allowed": 0.664,
-          "projected_ip": 5.8,
-          "inputs": {
-            "hr9": 1.03,
-            "era": 3.41,
-            "whip": 1.03
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815812",
       "kickoff": "2026-06-19T22:40Z",
@@ -132,36 +50,36 @@
         {
           "market": "pitcher_strikeouts",
           "team": "Chicago White Sox",
-          "pitcher": "Erick Fedde",
-          "label": "Erick Fedde moins de 4,5 strikeouts",
-          "line": 4.5,
+          "pitcher": "Brandon Eisert",
+          "label": "Brandon Eisert moins de 6,5 strikeouts",
+          "line": 6.5,
           "pick": "under",
-          "probability": 0.5244,
-          "fair_odds": 1.91,
-          "expected_strikeouts": 4.4,
-          "projected_ip": 6.6,
+          "probability": 0.5705,
+          "fair_odds": 1.75,
+          "expected_strikeouts": 6.16,
+          "projected_ip": 5.4,
           "inputs": {
-            "k9": 6.0,
-            "era": 4.5,
-            "whip": 1.41,
-            "hand": "R"
+            "k9": 10.26,
+            "era": 4.86,
+            "whip": 1.38,
+            "hand": "L"
           },
           "side": "away"
         },
         {
           "market": "pitcher_home_run_allowed",
           "team": "Chicago White Sox",
-          "pitcher": "Erick Fedde",
-          "label": "Erick Fedde concède au moins 1 home run",
+          "pitcher": "Brandon Eisert",
+          "label": "Brandon Eisert concède au moins 1 home run",
           "pick": "yes",
-          "probability": 0.7536,
-          "fair_odds": 1.33,
-          "expected_hr_allowed": 1.401,
-          "projected_ip": 6.6,
+          "probability": 0.6217,
+          "fair_odds": 1.61,
+          "expected_hr_allowed": 0.972,
+          "projected_ip": 5.4,
           "inputs": {
-            "hr9": 1.91,
-            "era": 4.5,
-            "whip": 1.41
+            "hr9": 1.62,
+            "era": 4.86,
+            "whip": 1.38
           },
           "side": "away"
         }
@@ -296,36 +214,36 @@
         {
           "market": "pitcher_strikeouts",
           "team": "Washington Nationals",
-          "pitcher": "Cade Cavalli",
-          "label": "Cade Cavalli moins de 5,5 strikeouts",
-          "line": 5.5,
+          "pitcher": "PJ Poulin",
+          "label": "PJ Poulin moins de 2,5 strikeouts",
+          "line": 2.5,
           "pick": "under",
-          "probability": 0.5299,
-          "fair_odds": 1.89,
-          "expected_strikeouts": 5.36,
-          "projected_ip": 4.95,
+          "probability": 0.591,
+          "fair_odds": 1.69,
+          "expected_strikeouts": 2.23,
+          "projected_ip": 3.39,
           "inputs": {
-            "k9": 9.76,
-            "era": 3.98,
-            "whip": 1.39,
-            "hand": "R"
+            "k9": 5.93,
+            "era": 3.29,
+            "whip": 1.5,
+            "hand": "L"
           },
           "side": "away"
         },
         {
           "market": "pitcher_home_run_allowed",
           "team": "Washington Nationals",
-          "pitcher": "Cade Cavalli",
-          "label": "Cade Cavalli ne concède pas de home run",
+          "pitcher": "PJ Poulin",
+          "label": "PJ Poulin ne concède pas de home run",
           "pick": "no",
-          "probability": 0.6732,
-          "fair_odds": 1.49,
-          "expected_hr_allowed": 0.396,
-          "projected_ip": 4.95,
+          "probability": 0.6085,
+          "fair_odds": 1.64,
+          "expected_hr_allowed": 0.497,
+          "projected_ip": 3.39,
           "inputs": {
-            "hr9": 0.72,
-            "era": 3.98,
-            "whip": 1.39
+            "hr9": 1.32,
+            "era": 3.29,
+            "whip": 1.5
           },
           "side": "away"
         }
@@ -1746,52 +1664,6 @@
       ]
     },
     {
-      "event_id": "401815838",
-      "kickoff": "2026-06-21T02:10Z",
-      "league": "MLB",
-      "match": "Minnesota Twins at Arizona Diamondbacks",
-      "home": "Arizona Diamondbacks",
-      "away": "Minnesota Twins",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Arizona Diamondbacks",
-          "pitcher": "Ryne Nelson",
-          "label": "Ryne Nelson moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.5938,
-          "fair_odds": 1.68,
-          "expected_strikeouts": 4.12,
-          "projected_ip": 5.54,
-          "inputs": {
-            "k9": 6.7,
-            "era": 4.97,
-            "whip": 1.24,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Arizona Diamondbacks",
-          "pitcher": "Ryne Nelson",
-          "label": "Ryne Nelson concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.697,
-          "fair_odds": 1.43,
-          "expected_hr_allowed": 1.194,
-          "projected_ip": 5.54,
-          "inputs": {
-            "hr9": 1.94,
-            "era": 4.97,
-            "whip": 1.24
-          },
-          "side": "home"
-        }
-      ]
-    },
-    {
       "event_id": "401815840",
       "kickoff": "2026-06-21T17:35Z",
       "league": "MLB",
@@ -1966,18 +1838,18 @@
         {
           "market": "pitcher_strikeouts",
           "team": "Detroit Tigers",
-          "pitcher": "Justin Verlander",
-          "label": "Justin Verlander moins de 2,5 strikeouts",
-          "line": 2.5,
-          "pick": "under",
-          "probability": 0.9217,
-          "fair_odds": 1.08,
-          "expected_strikeouts": 0.87,
-          "projected_ip": 3.2,
+          "pitcher": "Keider Montero",
+          "label": "Keider Montero plus de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "over",
+          "probability": 0.5838,
+          "fair_odds": 1.71,
+          "expected_strikeouts": 3.82,
+          "projected_ip": 5.63,
           "inputs": {
-            "k9": 2.45,
-            "era": 12.27,
-            "whip": 2.18,
+            "k9": 6.11,
+            "era": 3.67,
+            "whip": 1.02,
             "hand": "R"
           },
           "side": "home"
@@ -1985,17 +1857,17 @@
         {
           "market": "pitcher_home_run_allowed",
           "team": "Detroit Tigers",
-          "pitcher": "Justin Verlander",
-          "label": "Justin Verlander concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5815,
-          "fair_odds": 1.72,
-          "expected_hr_allowed": 0.871,
-          "projected_ip": 3.2,
+          "pitcher": "Keider Montero",
+          "label": "Keider Montero ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5417,
+          "fair_odds": 1.85,
+          "expected_hr_allowed": 0.613,
+          "projected_ip": 5.63,
           "inputs": {
-            "hr9": 2.45,
-            "era": 12.27,
-            "whip": 2.18
+            "hr9": 0.98,
+            "era": 3.67,
+            "whip": 1.02
           },
           "side": "home"
         },
@@ -2494,52 +2366,6 @@
       ]
     },
     {
-      "event_id": "401815853",
-      "kickoff": "2026-06-21T19:15Z",
-      "league": "MLB",
-      "match": "Minnesota Twins at Arizona Diamondbacks",
-      "home": "Arizona Diamondbacks",
-      "away": "Minnesota Twins",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Arizona Diamondbacks",
-          "pitcher": "Ryne Nelson",
-          "label": "Ryne Nelson moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.5938,
-          "fair_odds": 1.68,
-          "expected_strikeouts": 4.12,
-          "projected_ip": 5.54,
-          "inputs": {
-            "k9": 6.7,
-            "era": 4.97,
-            "whip": 1.24,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Arizona Diamondbacks",
-          "pitcher": "Ryne Nelson",
-          "label": "Ryne Nelson concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.697,
-          "fair_odds": 1.43,
-          "expected_hr_allowed": 1.194,
-          "projected_ip": 5.54,
-          "inputs": {
-            "hr9": 1.94,
-            "era": 4.97,
-            "whip": 1.24
-          },
-          "side": "home"
-        }
-      ]
-    },
-    {
       "event_id": "401815850",
       "kickoff": "2026-06-21T20:05Z",
       "league": "MLB",
@@ -2750,7 +2576,7 @@
       ]
     }
   ],
-  "props": 132,
+  "props": 124,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
