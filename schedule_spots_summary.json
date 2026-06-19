@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-19T09:13:57Z",
+  "generated_at": "2026-06-19T12:56:50Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -168,13 +168,13 @@
         "2 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "mixed",
-        "net_side": null,
+        "status": "net",
+        "net_side": "home",
         "home_score": -0.055,
-        "away_score": -0.081,
+        "away_score": -0.595,
         "home_fade": 0.3,
         "away_fade": 0.7,
-        "reason": "Signaux mitigés: avantage net trop faible (Detroit Tigers -0.06, Chicago White Sox -0.08)",
+        "reason": "Direction nette: Detroit Tigers (-0.06)",
         "detail": [
           {
             "side": "home",
@@ -193,12 +193,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.4
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.514
           }
         ]
       }
@@ -235,10 +229,10 @@
         "status": "mixed",
         "net_side": null,
         "home_score": -0.055,
-        "away_score": 0.133,
+        "away_score": 0.148,
         "home_fade": 0.3,
         "away_fade": 0.7,
-        "reason": "Signaux mitigés: avantage net trop faible (New York Yankees -0.06, Cincinnati Reds +0.13)",
+        "reason": "Signaux mitigés: avantage net trop faible (New York Yankees -0.06, Cincinnati Reds +0.15)",
         "detail": [
           {
             "side": "home",
@@ -262,7 +256,7 @@
             "side": "away",
             "type": "market_move",
             "direction": "steam",
-            "strength": 0.728
+            "strength": 0.743
           }
         ]
       }
@@ -356,11 +350,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.427,
+        "home_score": 0.408,
         "away_score": -0.195,
         "home_fade": 0.3,
         "away_fade": 0.3,
-        "reason": "Direction nette: Atlanta Braves (+0.43)",
+        "reason": "Direction nette: Atlanta Braves (+0.41)",
         "detail": [
           {
             "side": "home",
@@ -378,7 +372,7 @@
             "side": "home",
             "type": "market_move",
             "direction": "steam",
-            "strength": 0.622
+            "strength": 0.603
           }
         ]
       }
