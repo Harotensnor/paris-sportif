@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-20T20:58:24Z",
+  "generated_at": "2026-06-20T22:02:48Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -470,18 +470,18 @@
         {
           "market": "pitcher_strikeouts",
           "team": "New York Yankees",
-          "pitcher": "Gerrit Cole",
-          "label": "Gerrit Cole plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.5691,
-          "fair_odds": 1.76,
-          "expected_strikeouts": 4.8,
-          "projected_ip": 5.6,
+          "pitcher": "Elmer Rodríguez",
+          "label": "Elmer Rodríguez moins de 2,5 strikeouts",
+          "line": 2.5,
+          "pick": "under",
+          "probability": 0.6687,
+          "fair_odds": 1.5,
+          "expected_strikeouts": 2.0,
+          "projected_ip": 4.33,
           "inputs": {
-            "k9": 7.71,
-            "era": 2.57,
-            "whip": 1.0,
+            "k9": 4.15,
+            "era": 4.15,
+            "whip": 1.85,
             "hand": "R"
           },
           "side": "home"
@@ -489,17 +489,17 @@
         {
           "market": "pitcher_home_run_allowed",
           "team": "New York Yankees",
-          "pitcher": "Gerrit Cole",
-          "label": "Gerrit Cole concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5519,
-          "fair_odds": 1.81,
-          "expected_hr_allowed": 0.803,
-          "projected_ip": 5.6,
+          "pitcher": "Elmer Rodríguez",
+          "label": "Elmer Rodríguez ne concède pas de home run",
+          "pick": "no",
+          "probability": 1.0,
+          "fair_odds": 1.01,
+          "expected_hr_allowed": 0.0,
+          "projected_ip": 4.33,
           "inputs": {
-            "hr9": 1.29,
-            "era": 2.57,
-            "whip": 1.0
+            "hr9": 0.0,
+            "era": 4.15,
+            "whip": 1.85
           },
           "side": "home"
         },

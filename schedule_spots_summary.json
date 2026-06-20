@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-20T20:58:25Z",
+  "generated_at": "2026-06-20T22:02:48Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -849,11 +849,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.399,
-        "away_score": -1.517,
-        "home_fade": 0.15,
+        "home_score": -0.201,
+        "away_score": -1.307,
+        "home_fade": 0.75,
         "away_fade": 1.57,
-        "reason": "Direction nette: Arizona Diamondbacks (+0.40)",
+        "reason": "Direction nette: Arizona Diamondbacks (-0.20)",
         "detail": [
           {
             "side": "home",
@@ -866,6 +866,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.6
           },
           {
             "side": "away",
@@ -1275,12 +1281,18 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.517,
-        "away_score": -1.478,
-        "home_fade": 0.0,
+        "home_score": -0.083,
+        "away_score": -1.268,
+        "home_fade": 0.6,
         "away_fade": 1.478,
-        "reason": "Direction nette: Arizona Diamondbacks (+0.52)",
+        "reason": "Direction nette: Arizona Diamondbacks (-0.08)",
         "detail": [
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.6
+          },
           {
             "side": "away",
             "type": "travel_extreme",
