@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-20T07:13:43Z",
+  "generated_at": "2026-06-20T10:16:38Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -454,6 +454,52 @@
             "hr9": 0.84,
             "era": 4.64,
             "whip": 1.29
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815830",
+      "kickoff": "2026-06-20T20:10Z",
+      "league": "MLB",
+      "match": "Washington Nationals at Tampa Bay Rays",
+      "home": "Tampa Bay Rays",
+      "away": "Washington Nationals",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Washington Nationals",
+          "pitcher": "Cade Cavalli",
+          "label": "Cade Cavalli moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.5299,
+          "fair_odds": 1.89,
+          "expected_strikeouts": 5.36,
+          "projected_ip": 4.95,
+          "inputs": {
+            "k9": 9.76,
+            "era": 3.98,
+            "whip": 1.39,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Washington Nationals",
+          "pitcher": "Cade Cavalli",
+          "label": "Cade Cavalli ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6732,
+          "fair_odds": 1.49,
+          "expected_hr_allowed": 0.396,
+          "projected_ip": 4.95,
+          "inputs": {
+            "hr9": 0.72,
+            "era": 3.98,
+            "whip": 1.39
           },
           "side": "away"
         }
@@ -1792,7 +1838,7 @@
       ]
     }
   ],
-  "props": 86,
+  "props": 88,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
