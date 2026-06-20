@@ -1,336 +1,8 @@
 {
-  "generated_at": "2026-06-20T19:48:31Z",
+  "generated_at": "2026-06-20T20:58:24Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815832",
-      "kickoff": "2026-06-20T20:05Z",
-      "league": "MLB",
-      "match": "San Diego Padres at Texas Rangers",
-      "home": "Texas Rangers",
-      "away": "San Diego Padres",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Texas Rangers",
-          "pitcher": "MacKenzie Gore",
-          "label": "MacKenzie Gore plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.5493,
-          "fair_odds": 1.82,
-          "expected_strikeouts": 5.73,
-          "projected_ip": 5.2,
-          "inputs": {
-            "k9": 9.92,
-            "era": 4.27,
-            "whip": 1.31,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Texas Rangers",
-          "pitcher": "MacKenzie Gore",
-          "label": "MacKenzie Gore ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5877,
-          "fair_odds": 1.7,
-          "expected_hr_allowed": 0.532,
-          "projected_ip": 5.2,
-          "inputs": {
-            "hr9": 0.92,
-            "era": 4.27,
-            "whip": 1.31
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "San Diego Padres",
-          "pitcher": "Walker Buehler",
-          "label": "Walker Buehler moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.593,
-          "fair_odds": 1.69,
-          "expected_strikeouts": 4.13,
-          "projected_ip": 4.79,
-          "inputs": {
-            "k9": 7.75,
-            "era": 4.14,
-            "whip": 1.34,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "San Diego Padres",
-          "pitcher": "Walker Buehler",
-          "label": "Walker Buehler ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6999,
-          "fair_odds": 1.43,
-          "expected_hr_allowed": 0.357,
-          "projected_ip": 4.79,
-          "inputs": {
-            "hr9": 0.67,
-            "era": 4.14,
-            "whip": 1.34
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401815827",
-      "kickoff": "2026-06-20T20:10Z",
-      "league": "MLB",
-      "match": "Milwaukee Brewers at Atlanta Braves",
-      "home": "Atlanta Braves",
-      "away": "Milwaukee Brewers",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Atlanta Braves",
-          "pitcher": "Chris Sale",
-          "label": "Chris Sale moins de 7,5 strikeouts",
-          "line": 7.5,
-          "pick": "under",
-          "probability": 0.5849,
-          "fair_odds": 1.71,
-          "expected_strikeouts": 7.06,
-          "projected_ip": 6.01,
-          "inputs": {
-            "k9": 10.57,
-            "era": 2.3,
-            "whip": 1.05,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Atlanta Braves",
-          "pitcher": "Chris Sale",
-          "label": "Chris Sale ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6309,
-          "fair_odds": 1.59,
-          "expected_hr_allowed": 0.461,
-          "projected_ip": 6.01,
-          "inputs": {
-            "hr9": 0.69,
-            "era": 2.3,
-            "whip": 1.05
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Milwaukee Brewers",
-          "pitcher": "Kyle Harrison",
-          "label": "Kyle Harrison moins de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "under",
-          "probability": 0.5806,
-          "fair_odds": 1.72,
-          "expected_strikeouts": 6.11,
-          "projected_ip": 5.02,
-          "inputs": {
-            "k9": 10.96,
-            "era": 2.47,
-            "whip": 1.1,
-            "hand": "L"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Milwaukee Brewers",
-          "pitcher": "Kyle Harrison",
-          "label": "Kyle Harrison ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5857,
-          "fair_odds": 1.71,
-          "expected_hr_allowed": 0.535,
-          "projected_ip": 5.02,
-          "inputs": {
-            "hr9": 0.96,
-            "era": 2.47,
-            "whip": 1.1
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401815829",
-      "kickoff": "2026-06-20T20:10Z",
-      "league": "MLB",
-      "match": "San Francisco Giants at Miami Marlins",
-      "home": "Miami Marlins",
-      "away": "San Francisco Giants",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Miami Marlins",
-          "pitcher": "Max Meyer",
-          "label": "Max Meyer moins de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "under",
-          "probability": 0.5337,
-          "fair_odds": 1.87,
-          "expected_strikeouts": 6.33,
-          "projected_ip": 5.67,
-          "inputs": {
-            "k9": 10.06,
-            "era": 2.75,
-            "whip": 1.12,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Miami Marlins",
-          "pitcher": "Max Meyer",
-          "label": "Max Meyer ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6276,
-          "fair_odds": 1.59,
-          "expected_hr_allowed": 0.466,
-          "projected_ip": 5.67,
-          "inputs": {
-            "hr9": 0.74,
-            "era": 2.75,
-            "whip": 1.12
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "San Francisco Giants",
-          "pitcher": "Trevor McDonald",
-          "label": "Trevor McDonald moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.5967,
-          "fair_odds": 1.68,
-          "expected_strikeouts": 5.07,
-          "projected_ip": 5.28,
-          "inputs": {
-            "k9": 8.65,
-            "era": 4.64,
-            "whip": 1.29,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "San Francisco Giants",
-          "pitcher": "Trevor McDonald",
-          "label": "Trevor McDonald ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6112,
-          "fair_odds": 1.64,
-          "expected_hr_allowed": 0.492,
-          "projected_ip": 5.28,
-          "inputs": {
-            "hr9": 0.84,
-            "era": 4.64,
-            "whip": 1.29
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401815830",
-      "kickoff": "2026-06-20T20:10Z",
-      "league": "MLB",
-      "match": "Washington Nationals at Tampa Bay Rays",
-      "home": "Tampa Bay Rays",
-      "away": "Washington Nationals",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Tampa Bay Rays",
-          "pitcher": "Ian Seymour",
-          "label": "Ian Seymour moins de 7,5 strikeouts",
-          "line": 7.5,
-          "pick": "under",
-          "probability": 0.5837,
-          "fair_odds": 1.71,
-          "expected_strikeouts": 7.06,
-          "projected_ip": 6.6,
-          "inputs": {
-            "k9": 9.63,
-            "era": 4.93,
-            "whip": 1.28,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Tampa Bay Rays",
-          "pitcher": "Ian Seymour",
-          "label": "Ian Seymour concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6444,
-          "fair_odds": 1.55,
-          "expected_hr_allowed": 1.034,
-          "projected_ip": 6.6,
-          "inputs": {
-            "hr9": 1.41,
-            "era": 4.93,
-            "whip": 1.28
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Washington Nationals",
-          "pitcher": "Cade Cavalli",
-          "label": "Cade Cavalli moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.5299,
-          "fair_odds": 1.89,
-          "expected_strikeouts": 5.36,
-          "projected_ip": 4.95,
-          "inputs": {
-            "k9": 9.76,
-            "era": 3.98,
-            "whip": 1.39,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Washington Nationals",
-          "pitcher": "Cade Cavalli",
-          "label": "Cade Cavalli ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6732,
-          "fair_odds": 1.49,
-          "expected_hr_allowed": 0.396,
-          "projected_ip": 4.95,
-          "inputs": {
-            "hr9": 0.72,
-            "era": 3.98,
-            "whip": 1.39
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815828",
       "kickoff": "2026-06-20T23:15Z",
@@ -1280,6 +952,88 @@
       ]
     },
     {
+      "event_id": "401815847",
+      "kickoff": "2026-06-21T18:10Z",
+      "league": "MLB",
+      "match": "St. Louis Cardinals at Kansas City Royals",
+      "home": "Kansas City Royals",
+      "away": "St. Louis Cardinals",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Kansas City Royals",
+          "pitcher": "Stephen Kolek",
+          "label": "Stephen Kolek moins de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "under",
+          "probability": 0.5667,
+          "fair_odds": 1.76,
+          "expected_strikeouts": 4.23,
+          "projected_ip": 6.26,
+          "inputs": {
+            "k9": 6.08,
+            "era": 2.68,
+            "whip": 1.03,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Kansas City Royals",
+          "pitcher": "Stephen Kolek",
+          "label": "Stephen Kolek ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5383,
+          "fair_odds": 1.86,
+          "expected_hr_allowed": 0.619,
+          "projected_ip": 6.26,
+          "inputs": {
+            "hr9": 0.89,
+            "era": 2.68,
+            "whip": 1.03
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "St. Louis Cardinals",
+          "pitcher": "Dustin May",
+          "label": "Dustin May moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.5377,
+          "fair_odds": 1.86,
+          "expected_strikeouts": 5.33,
+          "projected_ip": 5.8,
+          "inputs": {
+            "k9": 8.27,
+            "era": 3.75,
+            "whip": 1.14,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "St. Louis Cardinals",
+          "pitcher": "Dustin May",
+          "label": "Dustin May ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.7016,
+          "fair_odds": 1.43,
+          "expected_hr_allowed": 0.354,
+          "projected_ip": 5.8,
+          "inputs": {
+            "hr9": 0.55,
+            "era": 3.75,
+            "whip": 1.14
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
       "event_id": "401815848",
       "kickoff": "2026-06-21T18:20Z",
       "league": "MLB",
@@ -1700,7 +1454,7 @@
       ]
     }
   ],
-  "props": 82,
+  "props": 70,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"

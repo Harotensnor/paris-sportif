@@ -1,46 +1,28 @@
 {
-  "generated_at": "2026-06-20T19:48:32Z",
+  "generated_at": "2026-06-20T20:58:25Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 41,
-    "actionable": 30,
+    "active_events": 38,
+    "actionable": 27,
     "watch": 2,
     "risk": 9,
     "expired_sample": 0,
     "by_type": {
-      "back_to_back_travel": 22,
-      "travel_extreme": 13,
       "injury_imbalance": 23,
-      "signal_conflict": 4,
-      "market_uncertain": 10
+      "back_to_back_travel": 18,
+      "signal_conflict": 3,
+      "travel_extreme": 12,
+      "market_uncertain": 12
     },
     "by_quality": {
-      "actionable": 30,
+      "actionable": 27,
       "watch": 2,
       "risk": 9
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401815829",
-      "date": "2026-06-20T20:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Miami Marlins",
-      "away": "San Francisco Giants",
-      "match": "Miami Marlins - San Francisco Giants",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "San Francisco Giants",
-      "side": "away",
-      "strength": 1.0,
-      "context": "1 match dans les 48h + 4164 km de voyage"
-    },
     {
       "event_id": "401815828",
       "date": "2026-06-20T23:15Z",
@@ -184,6 +166,24 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 10-3"
+    },
+    {
+      "event_id": "401815847",
+      "date": "2026-06-21T18:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Kansas City Royals",
+      "away": "St. Louis Cardinals",
+      "match": "Kansas City Royals - St. Louis Cardinals",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Kansas City Royals",
+      "side": null,
+      "strength": 1.0,
+      "context": "Absences severes 9-2"
     },
     {
       "event_id": "401815849",
@@ -456,24 +456,6 @@
       "context": "1 match dans les 48h + 2057 km de voyage"
     },
     {
-      "event_id": "401815832",
-      "date": "2026-06-20T20:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Texas Rangers",
-      "away": "San Diego Padres",
-      "match": "Texas Rangers - San Diego Padres",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "San Diego Padres",
-      "side": "away",
-      "strength": 0.905,
-      "context": "1 match dans les 48h + 1875 km de voyage"
-    },
-    {
       "event_id": "401815844",
       "date": "2026-06-21T17:40Z",
       "sport": "baseball",
@@ -510,24 +492,6 @@
       "context": "2 match dans les 48h + 1061 km de voyage"
     },
     {
-      "event_id": "401815830",
-      "date": "2026-06-20T20:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Tampa Bay Rays",
-      "away": "Washington Nationals",
-      "match": "Tampa Bay Rays - Washington Nationals",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Washington Nationals",
-      "side": "away",
-      "strength": 0.798,
-      "context": "1 match dans les 48h + 1341 km de voyage"
-    },
-    {
       "event_id": "401815840",
       "date": "2026-06-21T17:35Z",
       "sport": "baseball",
@@ -544,24 +508,6 @@
       "side": "away",
       "strength": 0.794,
       "context": "2 match dans les 48h + 921 km de voyage"
-    },
-    {
-      "event_id": "401815827",
-      "date": "2026-06-20T20:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Atlanta Braves",
-      "away": "Milwaukee Brewers",
-      "match": "Atlanta Braves - Milwaukee Brewers",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Milwaukee Brewers",
-      "side": "away",
-      "strength": 0.742,
-      "context": "1 match dans les 48h + 1061 km de voyage"
     }
   ],
   "active_watch": [
@@ -604,7 +550,7 @@
   ],
   "active_risk": [
     {
-      "event_id": "177232",
+      "event_id": "177222",
       "date": "2026-06-22T04:00Z",
       "sport": "tennis",
       "league_code": "lexuseastbourneopen",
@@ -619,7 +565,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 12.3%"
+      "context": "marge bookmaker anormale 12.5%"
     },
     {
       "event_id": "177273",
@@ -637,14 +583,14 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 12.1%"
+      "context": "marge bookmaker anormale 12.6%"
     },
     {
-      "event_id": "178092",
-      "date": "2026-06-22T04:00Z",
+      "event_id": "178127",
+      "date": "2026-06-23T04:00Z",
       "sport": "tennis",
-      "league_code": "badhomburgopenpowere",
-      "league_name": "Bad Homburg Open powered by Solarwatt",
+      "league_code": "lexuseastbourneopen",
+      "league_name": "Lexus Eastbourne Open",
       "home": "",
       "away": "",
       "match": "? - ?",
