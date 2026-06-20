@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-06-20T13:16:16Z",
+  "generated_at": "2026-06-20T15:15:43Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 40,
+    "active_events": 39,
     "actionable": 31,
     "watch": 2,
-    "risk": 7,
+    "risk": 6,
     "expired_sample": 0,
     "by_type": {
-      "market_uncertain": 7,
       "back_to_back_travel": 23,
       "travel_extreme": 13,
       "injury_imbalance": 23,
-      "signal_conflict": 4
+      "signal_conflict": 4,
+      "market_uncertain": 6
     },
     "by_quality": {
-      "risk": 7,
       "actionable": 31,
-      "watch": 2
+      "watch": 2,
+      "risk": 6
     }
   },
   "active_actionable": [
@@ -621,24 +621,6 @@
     }
   ],
   "active_risk": [
-    {
-      "event_id": "177211",
-      "date": "2026-06-20T13:10Z",
-      "sport": "tennis",
-      "league_code": "terrawortmannopen",
-      "league_name": "Terra Wortmann Open",
-      "home": "",
-      "away": "",
-      "match": "? - ?",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 13.4%"
-    },
     {
       "event_id": "401861404",
       "date": "2026-06-26T11:35Z",
