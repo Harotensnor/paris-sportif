@@ -1,46 +1,28 @@
 {
-  "generated_at": "2026-06-19T23:15:36Z",
+  "generated_at": "2026-06-20T00:21:22Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 40,
+    "active_events": 44,
     "actionable": 37,
-    "watch": 2,
-    "risk": 1,
+    "watch": 1,
+    "risk": 6,
     "expired_sample": 0,
     "by_type": {
-      "travel_extreme": 18,
       "injury_imbalance": 27,
+      "travel_extreme": 17,
       "signal_conflict": 5,
       "back_to_back_travel": 23,
-      "market_uncertain": 1
+      "market_uncertain": 6
     },
     "by_quality": {
       "actionable": 37,
-      "watch": 2,
-      "risk": 1
+      "watch": 1,
+      "risk": 6
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401815817",
-      "date": "2026-06-20T00:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Houston Astros",
-      "away": "Cleveland Guardians",
-      "match": "Houston Astros - Cleveland Guardians",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Houston Astros",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 10-3"
-    },
     {
       "event_id": "401815819",
       "date": "2026-06-20T00:15Z",
@@ -93,7 +75,7 @@
       "team": "Los Angeles Angels",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 5-13"
+      "context": "Absences severes 6-13"
     },
     {
       "event_id": "401815823",
@@ -219,7 +201,7 @@
       "team": "Los Angeles Angels",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 5-13"
+      "context": "Absences severes 6-13"
     },
     {
       "event_id": "401814478",
@@ -363,7 +345,7 @@
       "team": "Los Angeles Angels",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 5-13"
+      "context": "Absences severes 6-13"
     },
     {
       "event_id": "401815851",
@@ -507,7 +489,43 @@
       "team": "Los Angeles Angels",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 13-5"
+      "context": "Absences severes 13-6"
+    },
+    {
+      "event_id": "401815925",
+      "date": "2026-06-27T20:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "New York Mets",
+      "away": "Philadelphia Phillies",
+      "match": "New York Mets - Philadelphia Phillies",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "New York Mets",
+      "side": null,
+      "strength": 1.0,
+      "context": "Absences severes 11-4"
+    },
+    {
+      "event_id": "401815933",
+      "date": "2026-06-28T01:38Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Los Angeles Angels",
+      "away": "Athletics",
+      "match": "Los Angeles Angels - Athletics",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Los Angeles Angels",
+      "side": null,
+      "strength": 1.0,
+      "context": "Absences severes 13-6"
     },
     {
       "event_id": "401815846",
@@ -526,24 +544,6 @@
       "side": "away",
       "strength": 0.985,
       "context": "2 match dans les 48h + 1875 km de voyage"
-    },
-    {
-      "event_id": "401815815",
-      "date": "2026-06-19T23:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Miami Marlins",
-      "away": "San Francisco Giants",
-      "match": "Miami Marlins - San Francisco Giants",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "travel_extreme",
-      "direction": "fade",
-      "team": "San Francisco Giants",
-      "side": "away",
-      "strength": 0.968,
-      "context": "Deplacement estime 4164 km, decalage ~2.8h"
     },
     {
       "event_id": "401815838",
@@ -692,24 +692,6 @@
   ],
   "active_watch": [
     {
-      "event_id": "401815816",
-      "date": "2026-06-19T23:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Tampa Bay Rays",
-      "away": "Washington Nationals",
-      "match": "Tampa Bay Rays - Washington Nationals",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Tampa Bay Rays",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 9-6"
-    },
-    {
       "event_id": "401815824",
       "date": "2026-06-20T01:45Z",
       "sport": "baseball",
@@ -745,7 +727,97 @@
       "team": null,
       "side": null,
       "strength": 0.85,
+      "context": "marge bookmaker anormale 19.2%"
+    },
+    {
+      "event_id": "401861545",
+      "date": "2026-06-27T11:00Z",
+      "sport": "football",
+      "league_code": "chn.1",
+      "league_name": "Chinese Super League",
+      "home": "Liaoning Tieren",
+      "away": "Shandong Taishan",
+      "match": "Liaoning Tieren - Shandong Taishan",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 19.7%"
+    },
+    {
+      "event_id": "401861405",
+      "date": "2026-06-27T11:35Z",
+      "sport": "football",
+      "league_code": "chn.1",
+      "league_name": "Chinese Super League",
+      "home": "Henan Songshan Longmen",
+      "away": "Shanghai Port",
+      "match": "Henan Songshan Longmen - Shanghai Port",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 19.0%"
+    },
+    {
+      "event_id": "401861406",
+      "date": "2026-06-27T11:35Z",
+      "sport": "football",
+      "league_code": "chn.1",
+      "league_name": "Chinese Super League",
+      "home": "Shenzhen Xinpengcheng",
+      "away": "Chengdu Rongcheng",
+      "match": "Shenzhen Xinpengcheng - Chengdu Rongcheng",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 19.0%"
+    },
+    {
+      "event_id": "401861407",
+      "date": "2026-06-27T12:00Z",
+      "sport": "football",
+      "league_code": "chn.1",
+      "league_name": "Chinese Super League",
+      "home": "Beijing Guoan",
+      "away": "Wuhan Three Towns",
+      "match": "Beijing Guoan - Wuhan Three Towns",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
       "context": "marge bookmaker anormale 18.7%"
+    },
+    {
+      "event_id": "401861546",
+      "date": "2026-06-27T12:00Z",
+      "sport": "football",
+      "league_code": "chn.1",
+      "league_name": "Chinese Super League",
+      "home": "Chongqing Tonglianglong",
+      "away": "Tianjin Jinmen Tiger",
+      "match": "Chongqing Tonglianglong - Tianjin Jinmen Tiger",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.4%"
     }
   ],
   "expired_sample": []
