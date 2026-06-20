@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-06-20T18:04:18Z",
+  "generated_at": "2026-06-20T19:48:31Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815833",
-      "kickoff": "2026-06-20T18:20Z",
-      "league": "MLB",
-      "match": "Toronto Blue Jays at Chicago Cubs",
-      "home": "Chicago Cubs",
-      "away": "Toronto Blue Jays",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Chicago Cubs",
-          "pitcher": "Colin Rea",
-          "label": "Colin Rea plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.6116,
-          "fair_odds": 1.64,
-          "expected_strikeouts": 4.99,
-          "projected_ip": 6.6,
-          "inputs": {
-            "k9": 6.81,
-            "era": 5.35,
-            "whip": 1.46,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Chicago Cubs",
-          "pitcher": "Colin Rea",
-          "label": "Colin Rea concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6572,
-          "fair_odds": 1.52,
-          "expected_hr_allowed": 1.071,
-          "projected_ip": 6.6,
-          "inputs": {
-            "hr9": 1.46,
-            "era": 5.35,
-            "whip": 1.46
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Toronto Blue Jays",
-          "pitcher": "Patrick Corbin",
-          "label": "Patrick Corbin moins de 3,5 strikeouts",
-          "line": 3.5,
-          "pick": "under",
-          "probability": 0.5546,
-          "fair_odds": 1.8,
-          "expected_strikeouts": 3.31,
-          "projected_ip": 4.69,
-          "inputs": {
-            "k9": 6.34,
-            "era": 4.57,
-            "whip": 1.48,
-            "hand": "L"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Toronto Blue Jays",
-          "pitcher": "Patrick Corbin",
-          "label": "Patrick Corbin ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5845,
-          "fair_odds": 1.71,
-          "expected_hr_allowed": 0.537,
-          "projected_ip": 4.69,
-          "inputs": {
-            "hr9": 1.03,
-            "era": 4.57,
-            "whip": 1.48
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815832",
       "kickoff": "2026-06-20T20:05Z",
@@ -1782,7 +1700,7 @@
       ]
     }
   ],
-  "props": 86,
+  "props": 82,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
