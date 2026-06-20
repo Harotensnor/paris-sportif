@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-20T11:52:24Z",
+  "generated_at": "2026-06-20T13:16:16Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -1326,6 +1326,88 @@
       ]
     },
     {
+      "event_id": "401815844",
+      "kickoff": "2026-06-21T17:40Z",
+      "league": "MLB",
+      "match": "Washington Nationals at Tampa Bay Rays",
+      "home": "Tampa Bay Rays",
+      "away": "Washington Nationals",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Tampa Bay Rays",
+          "pitcher": "Nick Martinez",
+          "label": "Nick Martinez plus de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "over",
+          "probability": 0.519,
+          "fair_odds": 1.93,
+          "expected_strikeouts": 3.57,
+          "projected_ip": 5.93,
+          "inputs": {
+            "k9": 5.42,
+            "era": 2.6,
+            "whip": 1.16,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Tampa Bay Rays",
+          "pitcher": "Nick Martinez",
+          "label": "Nick Martinez ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6061,
+          "fair_odds": 1.65,
+          "expected_hr_allowed": 0.501,
+          "projected_ip": 5.93,
+          "inputs": {
+            "hr9": 0.76,
+            "era": 2.6,
+            "whip": 1.16
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Washington Nationals",
+          "pitcher": "Andrew Alvarez",
+          "label": "Andrew Alvarez moins de 7,5 strikeouts",
+          "line": 7.5,
+          "pick": "under",
+          "probability": 0.5525,
+          "fair_odds": 1.81,
+          "expected_strikeouts": 7.22,
+          "projected_ip": 6.6,
+          "inputs": {
+            "k9": 9.85,
+            "era": 3.49,
+            "whip": 1.45,
+            "hand": "L"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Washington Nationals",
+          "pitcher": "Andrew Alvarez",
+          "label": "Andrew Alvarez ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6254,
+          "fair_odds": 1.6,
+          "expected_hr_allowed": 0.469,
+          "projected_ip": 6.6,
+          "inputs": {
+            "hr9": 0.64,
+            "era": 3.49,
+            "whip": 1.45
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
       "event_id": "401815845",
       "kickoff": "2026-06-21T18:10Z",
       "league": "MLB",
@@ -1874,7 +1956,7 @@
       ]
     }
   ],
-  "props": 90,
+  "props": 94,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
