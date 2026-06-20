@@ -1,136 +1,8 @@
 {
-  "generated_at": "2026-06-20T16:52:27Z",
+  "generated_at": "2026-06-20T18:04:18Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815825",
-      "kickoff": "2026-06-20T17:10Z",
-      "league": "MLB",
-      "match": "Chicago White Sox at Detroit Tigers",
-      "home": "Detroit Tigers",
-      "away": "Chicago White Sox",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Detroit Tigers",
-          "pitcher": "Troy Melton",
-          "label": "Troy Melton moins de 3,5 strikeouts",
-          "line": 3.5,
-          "pick": "under",
-          "probability": 0.5174,
-          "fair_odds": 1.93,
-          "expected_strikeouts": 3.44,
-          "projected_ip": 6.3,
-          "inputs": {
-            "k9": 4.91,
-            "era": 2.81,
-            "whip": 1.01,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Detroit Tigers",
-          "pitcher": "Troy Melton",
-          "label": "Troy Melton concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.7062,
-          "fair_odds": 1.42,
-          "expected_hr_allowed": 1.225,
-          "projected_ip": 6.3,
-          "inputs": {
-            "hr9": 1.75,
-            "era": 2.81,
-            "whip": 1.01
-          },
-          "side": "home"
-        }
-      ]
-    },
-    {
-      "event_id": "401815826",
-      "kickoff": "2026-06-20T17:35Z",
-      "league": "MLB",
-      "match": "Cincinnati Reds at New York Yankees",
-      "home": "New York Yankees",
-      "away": "Cincinnati Reds",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "New York Yankees",
-          "pitcher": "Will Warren",
-          "label": "Will Warren moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.5238,
-          "fair_odds": 1.91,
-          "expected_strikeouts": 5.39,
-          "projected_ip": 5.16,
-          "inputs": {
-            "k9": 9.41,
-            "era": 3.47,
-            "whip": 1.29,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "New York Yankees",
-          "pitcher": "Will Warren",
-          "label": "Will Warren ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6074,
-          "fair_odds": 1.65,
-          "expected_hr_allowed": 0.499,
-          "projected_ip": 5.16,
-          "inputs": {
-            "hr9": 0.87,
-            "era": 3.47,
-            "whip": 1.29
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Cincinnati Reds",
-          "pitcher": "Andrew Abbott",
-          "label": "Andrew Abbott plus de 3,5 strikeouts",
-          "line": 3.5,
-          "pick": "over",
-          "probability": 0.5887,
-          "fair_odds": 1.7,
-          "expected_strikeouts": 3.84,
-          "projected_ip": 5.28,
-          "inputs": {
-            "k9": 6.55,
-            "era": 3.95,
-            "whip": 1.41,
-            "hand": "L"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Cincinnati Reds",
-          "pitcher": "Andrew Abbott",
-          "label": "Andrew Abbott concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5169,
-          "fair_odds": 1.93,
-          "expected_hr_allowed": 0.727,
-          "projected_ip": 5.28,
-          "inputs": {
-            "hr9": 1.24,
-            "era": 3.95,
-            "whip": 1.41
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815833",
       "kickoff": "2026-06-20T18:20Z",
@@ -224,36 +96,36 @@
         {
           "market": "pitcher_strikeouts",
           "team": "Texas Rangers",
-          "pitcher": "Nathan Eovaldi",
-          "label": "Nathan Eovaldi plus de 5,5 strikeouts",
+          "pitcher": "MacKenzie Gore",
+          "label": "MacKenzie Gore plus de 5,5 strikeouts",
           "line": 5.5,
           "pick": "over",
-          "probability": 0.5857,
-          "fair_odds": 1.71,
-          "expected_strikeouts": 5.91,
-          "projected_ip": 6.22,
+          "probability": 0.5493,
+          "fair_odds": 1.82,
+          "expected_strikeouts": 5.73,
+          "projected_ip": 5.2,
           "inputs": {
-            "k9": 8.55,
-            "era": 4.23,
-            "whip": 1.17,
-            "hand": "R"
+            "k9": 9.92,
+            "era": 4.27,
+            "whip": 1.31,
+            "hand": "L"
           },
           "side": "home"
         },
         {
           "market": "pitcher_home_run_allowed",
           "team": "Texas Rangers",
-          "pitcher": "Nathan Eovaldi",
-          "label": "Nathan Eovaldi concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.7017,
-          "fair_odds": 1.43,
-          "expected_hr_allowed": 1.21,
-          "projected_ip": 6.22,
+          "pitcher": "MacKenzie Gore",
+          "label": "MacKenzie Gore ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5877,
+          "fair_odds": 1.7,
+          "expected_hr_allowed": 0.532,
+          "projected_ip": 5.2,
           "inputs": {
-            "hr9": 1.75,
-            "era": 4.23,
-            "whip": 1.17
+            "hr9": 0.92,
+            "era": 4.27,
+            "whip": 1.31
           },
           "side": "home"
         },
@@ -1572,52 +1444,6 @@
       ]
     },
     {
-      "event_id": "401815846",
-      "kickoff": "2026-06-21T18:35Z",
-      "league": "MLB",
-      "match": "San Diego Padres at Texas Rangers",
-      "home": "Texas Rangers",
-      "away": "San Diego Padres",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Texas Rangers",
-          "pitcher": "MacKenzie Gore",
-          "label": "MacKenzie Gore plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.5493,
-          "fair_odds": 1.82,
-          "expected_strikeouts": 5.73,
-          "projected_ip": 5.2,
-          "inputs": {
-            "k9": 9.92,
-            "era": 4.27,
-            "whip": 1.31,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Texas Rangers",
-          "pitcher": "MacKenzie Gore",
-          "label": "MacKenzie Gore ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5877,
-          "fair_odds": 1.7,
-          "expected_hr_allowed": 0.532,
-          "projected_ip": 5.2,
-          "inputs": {
-            "hr9": 0.92,
-            "era": 4.27,
-            "whip": 1.31
-          },
-          "side": "home"
-        }
-      ]
-    },
-    {
       "event_id": "401815849",
       "kickoff": "2026-06-21T19:10Z",
       "league": "MLB",
@@ -1956,7 +1782,7 @@
       ]
     }
   ],
-  "props": 94,
+  "props": 86,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"

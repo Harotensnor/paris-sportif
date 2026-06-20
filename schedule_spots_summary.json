@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-06-20T16:52:28Z",
+  "generated_at": "2026-06-20T18:04:19Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 32,
+    "active_events": 30,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 39,
-      "back_to_back_travel": 23,
+      "lookahead": 35,
       "travel_extreme": 15,
+      "back_to_back_travel": 22,
       "schedule_congestion": 14
     },
     "by_decision": {
-      "abstain": 5,
-      "lean_home": 25,
+      "abstain": 4,
+      "lean_home": 24,
       "lean_away": 2
     },
-    "lean_home": 25,
+    "lean_home": 24,
     "lean_away": 2,
-    "abstain": 5,
+    "abstain": 4,
     "monitor": 0
   },
   "active": [
@@ -77,64 +77,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815825",
-      "source_event_ids": [
-        "401815825"
-      ],
-      "kickoff": "2026-06-20T17:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Detroit Tigers",
-      "away": "Chicago White Sox",
-      "match": "Detroit Tigers - Chicago White Sox",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Detroit Tigers 0.15, Chicago White Sox 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.043,
-        "away_score": -0.498,
-        "home_fade": 0.15,
-        "away_fade": 0.55,
-        "reason": "Direction nette: Detroit Tigers (+0.04)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
           }
         ]
       }
@@ -738,11 +680,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.731,
-        "away_score": -2.466,
+        "home_score": 0.591,
+        "away_score": -2.066,
         "home_fade": 0.15,
-        "away_fade": 2.518,
-        "reason": "Direction nette: Miami Marlins (+0.73)",
+        "away_fade": 2.118,
+        "reason": "Direction nette: Miami Marlins (+0.59)",
         "detail": [
           {
             "side": "home",
@@ -755,12 +697,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
           },
           {
             "side": "away",
@@ -1166,18 +1102,12 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.829,
-        "away_score": -2.368,
+        "home_score": 0.689,
+        "away_score": -1.968,
         "home_fade": 0.0,
-        "away_fade": 2.368,
-        "reason": "Direction nette: Miami Marlins (+0.83)",
+        "away_fade": 1.968,
+        "reason": "Direction nette: Miami Marlins (+0.69)",
         "detail": [
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
-          },
           {
             "side": "away",
             "type": "travel_extreme",
@@ -1729,72 +1659,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.742
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815826",
-      "source_event_ids": [
-        "401815826"
-      ],
-      "kickoff": "2026-06-20T17:35Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "New York Yankees",
-      "away": "Cincinnati Reds",
-      "match": "New York Yankees - Cincinnati Reds",
-      "decision": "lean_home",
-      "net_team": "New York Yankees",
-      "reason": "Cincinnati Reds plus penalise par calendrier/voyage (0.86 vs 0.15)",
-      "pressure_score": 1.381,
-      "home_fade": 0.15,
-      "away_fade": 0.864,
-      "travel_score": 0.714,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours",
-        "1 match dans les 48h + 921 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.293,
-        "away_score": -1.212,
-        "home_fade": 0.15,
-        "away_fade": 1.264,
-        "reason": "Direction nette: New York Yankees (+0.29)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.714
           }
         ]
       }
