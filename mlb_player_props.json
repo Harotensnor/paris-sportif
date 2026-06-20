@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-20T10:16:38Z",
+  "generated_at": "2026-06-20T11:52:24Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -467,6 +467,42 @@
       "home": "Tampa Bay Rays",
       "away": "Washington Nationals",
       "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Tampa Bay Rays",
+          "pitcher": "Ian Seymour",
+          "label": "Ian Seymour moins de 7,5 strikeouts",
+          "line": 7.5,
+          "pick": "under",
+          "probability": 0.5837,
+          "fair_odds": 1.71,
+          "expected_strikeouts": 7.06,
+          "projected_ip": 6.6,
+          "inputs": {
+            "k9": 9.63,
+            "era": 4.93,
+            "whip": 1.28,
+            "hand": "L"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Tampa Bay Rays",
+          "pitcher": "Ian Seymour",
+          "label": "Ian Seymour concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.6444,
+          "fair_odds": 1.55,
+          "expected_hr_allowed": 1.034,
+          "projected_ip": 6.6,
+          "inputs": {
+            "hr9": 1.41,
+            "era": 4.93,
+            "whip": 1.28
+          },
+          "side": "home"
+        },
         {
           "market": "pitcher_strikeouts",
           "team": "Washington Nationals",
@@ -1838,7 +1874,7 @@
       ]
     }
   ],
-  "props": 88,
+  "props": 90,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
