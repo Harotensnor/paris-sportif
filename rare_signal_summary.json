@@ -1,45 +1,29 @@
 {
-  "generated_at": "2026-06-20T03:28:14Z",
+  "generated_at": "2026-06-20T07:13:44Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 35,
-    "actionable": 29,
-    "watch": 0,
-    "risk": 6,
+    "active_events": 34,
+    "actionable": 28,
+    "watch": 1,
+    "risk": 5,
     "expired_sample": 0,
     "by_type": {
-      "back_to_back_travel": 21,
+      "market_move": 4,
       "travel_extreme": 13,
       "injury_imbalance": 19,
       "signal_conflict": 2,
+      "back_to_back_travel": 12,
       "market_uncertain": 6
     },
     "by_quality": {
-      "actionable": 29,
-      "risk": 6
+      "actionable": 28,
+      "watch": 1,
+      "risk": 5
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401815829",
-      "date": "2026-06-20T20:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Miami Marlins",
-      "away": "San Francisco Giants",
-      "match": "Miami Marlins - San Francisco Giants",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "San Francisco Giants",
-      "side": "away",
-      "strength": 1.0,
-      "context": "1 match dans les 48h + 4164 km de voyage"
-    },
     {
       "event_id": "401815828",
       "date": "2026-06-20T23:15Z",
@@ -164,7 +148,7 @@
       "team": "San Francisco Giants",
       "side": "away",
       "strength": 1.0,
-      "context": "2 match dans les 48h + 4164 km de voyage"
+      "context": "1 match dans les 48h + 4164 km de voyage"
     },
     {
       "event_id": "401815845",
@@ -201,24 +185,6 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 11-4"
-    },
-    {
-      "event_id": "401815853",
-      "date": "2026-06-21T19:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Arizona Diamondbacks",
-      "away": "Minnesota Twins",
-      "match": "Arizona Diamondbacks - Minnesota Twins",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Minnesota Twins",
-      "side": "away",
-      "strength": 1.0,
-      "context": "2 match dans les 48h + 2057 km de voyage"
     },
     {
       "event_id": "401815850",
@@ -347,6 +313,24 @@
       "context": "2 match dans les 48h + 3704 km de voyage"
     },
     {
+      "event_id": "401861404",
+      "date": "2026-06-26T11:35Z",
+      "sport": "football",
+      "league_code": "chn.1",
+      "league_name": "Chinese Super League",
+      "home": "Qingdao Hainiu",
+      "away": "Yunnan Yukun",
+      "match": "Qingdao Hainiu - Yunnan Yukun",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 2.75 -> 2.25 (+18.2%)"
+    },
+    {
       "event_id": "401815910",
       "date": "2026-06-26T23:10Z",
       "sport": "baseball",
@@ -419,26 +403,26 @@
       "context": "Absences severes 13-6"
     },
     {
-      "event_id": "401815846",
-      "date": "2026-06-21T18:35Z",
+      "event_id": "401815829",
+      "date": "2026-06-20T20:10Z",
       "sport": "baseball",
       "league_code": "mlb",
       "league_name": "MLB",
-      "home": "Texas Rangers",
-      "away": "San Diego Padres",
-      "match": "Texas Rangers - San Diego Padres",
+      "home": "Miami Marlins",
+      "away": "San Francisco Giants",
+      "match": "Miami Marlins - San Francisco Giants",
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
+      "type": "travel_extreme",
       "direction": "fade",
-      "team": "San Diego Padres",
+      "team": "San Francisco Giants",
       "side": "away",
-      "strength": 0.985,
-      "context": "2 match dans les 48h + 1875 km de voyage"
+      "strength": 0.968,
+      "context": "Deplacement estime 4164 km, decalage ~2.8h"
     },
     {
-      "event_id": "401815838",
-      "date": "2026-06-21T02:10Z",
+      "event_id": "401815853",
+      "date": "2026-06-21T19:15Z",
       "sport": "baseball",
       "league_code": "mlb",
       "league_name": "MLB",
@@ -455,8 +439,8 @@
       "context": "1 match dans les 48h + 2057 km de voyage"
     },
     {
-      "event_id": "401815832",
-      "date": "2026-06-20T20:05Z",
+      "event_id": "401815846",
+      "date": "2026-06-21T18:35Z",
       "sport": "baseball",
       "league_code": "mlb",
       "league_name": "MLB",
@@ -473,44 +457,44 @@
       "context": "1 match dans les 48h + 1875 km de voyage"
     },
     {
+      "event_id": "401857008",
+      "date": "2026-06-21T00:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Dallas Wings",
+      "away": "Chicago Sky",
+      "match": "Dallas Wings - Chicago Sky",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.904,
+      "context": "Cote away: 4.30 -> 3.60 (+16.3%)"
+    },
+    {
+      "event_id": "401876811",
+      "date": "2026-06-20T19:00Z",
+      "sport": "football",
+      "league_code": "laliga2",
+      "league_name": "La Liga 2",
+      "home": "Almería",
+      "away": "Málaga",
+      "match": "Almería - Málaga",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.805,
+      "context": "Cote away: 3.45 -> 2.95 (+14.5%)"
+    },
+    {
       "event_id": "401815841",
       "date": "2026-06-21T17:35Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Atlanta Braves",
-      "away": "Milwaukee Brewers",
-      "match": "Atlanta Braves - Milwaukee Brewers",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Milwaukee Brewers",
-      "side": "away",
-      "strength": 0.822,
-      "context": "2 match dans les 48h + 1061 km de voyage"
-    },
-    {
-      "event_id": "401815840",
-      "date": "2026-06-21T17:35Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "New York Yankees",
-      "away": "Cincinnati Reds",
-      "match": "New York Yankees - Cincinnati Reds",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Cincinnati Reds",
-      "side": "away",
-      "strength": 0.794,
-      "context": "2 match dans les 48h + 921 km de voyage"
-    },
-    {
-      "event_id": "401815827",
-      "date": "2026-06-20T20:10Z",
       "sport": "baseball",
       "league_code": "mlb",
       "league_name": "MLB",
@@ -527,8 +511,8 @@
       "context": "1 match dans les 48h + 1061 km de voyage"
     },
     {
-      "event_id": "401815826",
-      "date": "2026-06-20T17:35Z",
+      "event_id": "401815840",
+      "date": "2026-06-21T17:35Z",
       "sport": "baseball",
       "league_code": "mlb",
       "league_name": "MLB",
@@ -545,26 +529,27 @@
       "context": "1 match dans les 48h + 921 km de voyage"
     }
   ],
-  "active_watch": [],
-  "active_risk": [
+  "active_watch": [
     {
-      "event_id": "401861404",
-      "date": "2026-06-26T11:35Z",
-      "sport": "football",
-      "league_code": "chn.1",
-      "league_name": "Chinese Super League",
-      "home": "Qingdao Hainiu",
-      "away": "Yunnan Yukun",
-      "match": "Qingdao Hainiu - Yunnan Yukun",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 19.2%"
-    },
+      "event_id": "401815838",
+      "date": "2026-06-21T02:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Arizona Diamondbacks",
+      "away": "Minnesota Twins",
+      "match": "Arizona Diamondbacks - Minnesota Twins",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "travel_extreme",
+      "direction": "fade",
+      "team": "Minnesota Twins",
+      "side": "away",
+      "strength": 0.478,
+      "context": "Deplacement estime 2057 km, decalage ~1.3h"
+    }
+  ],
+  "active_risk": [
     {
       "event_id": "401861545",
       "date": "2026-06-27T11:00Z",
