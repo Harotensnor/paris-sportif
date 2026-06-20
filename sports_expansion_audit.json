@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-20T00:21:21Z",
+  "generated_at": "2026-06-20T03:28:14Z",
   "source": "local data.js + sports sidecars",
   "status": "ok",
   "sections": {
@@ -16,23 +16,34 @@
       "bookable_tennis_events": 8
     },
     "J3_nhl_playoffs": {
-      "data_events": 0,
+      "data_events": 3,
       "sofascore_events": 3,
-      "samples": [],
+      "samples": [
+        {
+          "event": "Colorado Avalanche vs Minnesota Wild",
+          "league": "NHL, Playoffs",
+          "code": "nhl.playoffs"
+        },
+        {
+          "event": "Buffalo Sabres vs Montréal Canadiens",
+          "league": "NHL, Playoffs",
+          "code": "nhl.playoffs"
+        },
+        {
+          "event": "Vegas Golden Knights vs Anaheim Ducks",
+          "league": "NHL, Playoffs",
+          "code": "nhl.playoffs"
+        }
+      ],
       "derived_events": 0,
       "derived_markets": 0
     },
     "J4_baseball_major_props_pool": {
-      "data_events": 55,
+      "data_events": 49,
       "sofascore_events": 46,
       "samples": [
         {
           "event": "New York Mets at Philadelphia Phillies",
-          "league": "MLB",
-          "code": "mlb"
-        },
-        {
-          "event": "St. Louis Cardinals at Kansas City Royals",
           "league": "MLB",
           "code": "mlb"
         },
@@ -50,11 +61,16 @@
           "event": "Chicago White Sox at Detroit Tigers",
           "league": "MLB",
           "code": "mlb"
+        },
+        {
+          "event": "Cincinnati Reds at New York Yankees",
+          "league": "MLB",
+          "code": "mlb"
         }
       ],
       "pitcher_records": 54,
-      "player_prop_events": 32,
-      "player_props": 114
+      "player_prop_events": 24,
+      "player_props": 86
     },
     "J5_football_tier2": {
       "data_events": 0,
