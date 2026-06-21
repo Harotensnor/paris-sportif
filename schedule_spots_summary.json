@@ -1,23 +1,23 @@
 {
-  "generated_at": "2026-06-21T03:57:54Z",
+  "generated_at": "2026-06-21T08:31:26Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 21,
+    "active_events": 20,
     "expired_sample": 0,
     "by_type": {
-      "back_to_back_travel": 13,
-      "travel_extreme": 9,
+      "back_to_back_travel": 12,
+      "travel_extreme": 8,
       "lookahead": 17,
       "schedule_congestion": 16
     },
     "by_decision": {
       "abstain": 4,
-      "lean_home": 14,
+      "lean_home": 13,
       "lean_away": 3
     },
-    "lean_home": 14,
+    "lean_home": 13,
     "lean_away": 3,
     "abstain": 4,
     "monitor": 0
@@ -951,65 +951,6 @@
             "type": "travel_extreme",
             "direction": "fade",
             "strength": 0.493
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815853",
-      "source_event_ids": [
-        "401815853"
-      ],
-      "kickoff": "2026-06-21T19:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Arizona Diamondbacks",
-      "away": "Minnesota Twins",
-      "match": "Arizona Diamondbacks - Minnesota Twins",
-      "decision": "lean_home",
-      "net_team": "Arizona Diamondbacks",
-      "reason": "Minnesota Twins plus penalise par calendrier/voyage (1.48 vs 0.00)",
-      "pressure_score": 1.478,
-      "home_fade": 0.0,
-      "away_fade": 1.478,
-      "travel_score": 1.478,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "travel_extreme": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "Deplacement estime 2057 km, decalage ~1.3h",
-        "2 match dans les 48h + 2057 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.083,
-        "away_score": -1.268,
-        "home_fade": 0.6,
-        "away_fade": 1.478,
-        "reason": "Direction nette: Arizona Diamondbacks (-0.08)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.478
           },
           {
             "side": "away",
