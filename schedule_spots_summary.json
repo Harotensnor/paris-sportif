@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-21T20:46:36Z",
+  "generated_at": "2026-06-21T22:05:09Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -8,18 +8,18 @@
     "expired_sample": 0,
     "by_type": {
       "lookahead": 63,
-      "back_to_back_travel": 25,
-      "schedule_congestion": 47,
-      "travel_extreme": 19
+      "travel_extreme": 19,
+      "schedule_congestion": 31,
+      "back_to_back_travel": 22
     },
     "by_decision": {
-      "abstain": 10,
-      "lean_home": 24,
+      "abstain": 11,
+      "lean_home": 23,
       "lean_away": 7
     },
-    "lean_home": 24,
+    "lean_home": 23,
     "lean_away": 7,
-    "abstain": 10,
+    "abstain": 11,
     "monitor": 0
   },
   "active": [
@@ -155,6 +155,58 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.762
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815856",
+      "source_event_ids": [
+        "401815856"
+      ],
+      "kickoff": "2026-06-22T22:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Tampa Bay Rays",
+      "away": "Kansas City Royals",
+      "match": "Tampa Bay Rays - Kansas City Royals",
+      "decision": "abstain",
+      "net_team": null,
+      "reason": "Fatigue/agenda des deux cotes: Tampa Bay Rays 0.36, Kansas City Royals 0.36",
+      "pressure_score": 1.6,
+      "home_fade": 0.36,
+      "away_fade": 0.36,
+      "travel_score": 0,
+      "lookahead_score": 1.6,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 2
+      },
+      "contexts": [
+        "3 match important/proche dans les 3 jours",
+        "3 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "away",
+        "home_score": -0.234,
+        "away_score": -0.234,
+        "home_fade": 0.36,
+        "away_fade": 0.36,
+        "reason": "Direction nette: Kansas City Royals (-0.23)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.36
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.36
           }
         ]
       }
@@ -415,12 +467,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
+        "net_side": "home",
+        "home_score": 0.112,
+        "away_score": -0.698,
         "home_fade": 0.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Phoenix Mercury (-0.10)",
+        "away_fade": 0.75,
+        "reason": "Direction nette: Indiana Fever (+0.11)",
         "detail": [
           {
             "side": "home",
@@ -433,6 +485,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.6
           }
         ]
       }
@@ -880,40 +938,34 @@
       "match": "Colorado Rockies - Boston Red Sox",
       "decision": "lean_home",
       "net_team": "Colorado Rockies",
-      "reason": "Boston Red Sox plus penalise par calendrier/voyage (2.56 vs 0.90)",
-      "pressure_score": 4.193,
-      "home_fade": 0.9,
+      "reason": "Boston Red Sox plus penalise par calendrier/voyage (2.56 vs 0.30)",
+      "pressure_score": 3.593,
+      "home_fade": 0.3,
       "away_fade": 2.56,
       "travel_score": 1.66,
       "lookahead_score": 1.333,
-      "congestion_score": 1.2,
+      "congestion_score": 0.6,
       "types": {
-        "schedule_congestion": 2,
         "lookahead": 2,
+        "schedule_congestion": 1,
         "travel_extreme": 1,
         "back_to_back_travel": 1
       },
       "contexts": [
-        "3 matchs sur les 7 derniers jours",
         "2 match important/proche dans les 3 jours",
         "3 matchs sur les 7 derniers jours",
-        "2 match important/proche dans les 3 jours"
+        "2 match important/proche dans les 3 jours",
+        "Deplacement estime 2838 km, decalage ~2.3h"
       ],
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": -0.004,
-        "away_score": -2.245,
-        "home_fade": 0.9,
+        "home_score": 0.596,
+        "away_score": -2.455,
+        "home_fade": 0.3,
         "away_fade": 2.56,
-        "reason": "Direction nette: Colorado Rockies (-0.00)",
+        "reason": "Direction nette: Colorado Rockies (+0.60)",
         "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
           {
             "side": "home",
             "type": "lookahead",
@@ -948,93 +1000,6 @@
       }
     },
     {
-      "event_id": "401815875",
-      "source_event_ids": [
-        "401815875"
-      ],
-      "kickoff": "2026-06-23T23:45Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "St. Louis Cardinals",
-      "away": "Arizona Diamondbacks",
-      "match": "St. Louis Cardinals - Arizona Diamondbacks",
-      "decision": "lean_home",
-      "net_team": "St. Louis Cardinals",
-      "reason": "Arizona Diamondbacks plus penalise par calendrier/voyage (2.51 vs 0.90)",
-      "pressure_score": 4.147,
-      "home_fade": 0.9,
-      "away_fade": 2.514,
-      "travel_score": 1.414,
-      "lookahead_score": 1.333,
-      "congestion_score": 1.4,
-      "types": {
-        "schedule_congestion": 2,
-        "lookahead": 2,
-        "travel_extreme": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "3 matchs sur les 7 derniers jours",
-        "2 match important/proche dans les 3 jours",
-        "4 matchs sur les 7 derniers jours",
-        "2 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.33,
-        "away_score": -3.199,
-        "home_fade": 0.9,
-        "away_fade": 3.514,
-        "reason": "Direction nette: St. Louis Cardinals (+0.33)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.8
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.475
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.939
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401815863",
       "source_event_ids": [
         "401815863"
@@ -1048,40 +1013,34 @@
       "match": "Minnesota Twins - Los Angeles Dodgers",
       "decision": "lean_home",
       "net_team": "Minnesota Twins",
-      "reason": "Los Angeles Dodgers plus penalise par calendrier/voyage (2.47 vs 0.90)",
-      "pressure_score": 4.102,
-      "home_fade": 0.9,
+      "reason": "Los Angeles Dodgers plus penalise par calendrier/voyage (2.47 vs 0.30)",
+      "pressure_score": 3.502,
+      "home_fade": 0.3,
       "away_fade": 2.469,
       "travel_score": 1.569,
       "lookahead_score": 1.333,
-      "congestion_score": 1.2,
+      "congestion_score": 0.6,
       "types": {
-        "schedule_congestion": 2,
         "lookahead": 2,
+        "schedule_congestion": 1,
         "travel_extreme": 1,
         "back_to_back_travel": 1
       },
       "contexts": [
-        "3 matchs sur les 7 derniers jours",
         "2 match important/proche dans les 3 jours",
         "3 matchs sur les 7 derniers jours",
-        "2 match important/proche dans les 3 jours"
+        "2 match important/proche dans les 3 jours",
+        "Deplacement estime 2446 km, decalage ~1.7h"
       ],
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.314,
-        "away_score": -3.154,
-        "home_fade": 0.9,
+        "home_score": 0.914,
+        "away_score": -3.364,
+        "home_fade": 0.3,
         "away_fade": 3.469,
-        "reason": "Direction nette: Minnesota Twins (+0.31)",
+        "reason": "Direction nette: Minnesota Twins (+0.91)",
         "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
           {
             "side": "home",
             "type": "lookahead",
@@ -1122,93 +1081,6 @@
       }
     },
     {
-      "event_id": "401815890",
-      "source_event_ids": [
-        "401815890"
-      ],
-      "kickoff": "2026-06-24T23:45Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "St. Louis Cardinals",
-      "away": "Arizona Diamondbacks",
-      "match": "St. Louis Cardinals - Arizona Diamondbacks",
-      "decision": "lean_home",
-      "net_team": "St. Louis Cardinals",
-      "reason": "Arizona Diamondbacks plus penalise par calendrier/voyage (2.63 vs 0.95)",
-      "pressure_score": 3.942,
-      "home_fade": 0.95,
-      "away_fade": 2.625,
-      "travel_score": 1.475,
-      "lookahead_score": 0.667,
-      "congestion_score": 1.8,
-      "types": {
-        "schedule_congestion": 2,
-        "lookahead": 2,
-        "travel_extreme": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "4 matchs sur les 7 derniers jours",
-        "1 match important/proche dans les 3 jours",
-        "5 matchs sur les 7 derniers jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.319,
-        "away_score": -3.293,
-        "home_fade": 0.95,
-        "away_fade": 3.625,
-        "reason": "Direction nette: St. Louis Cardinals (+0.32)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.8
-          },
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.475
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401815878",
       "source_event_ids": [
         "401815878"
@@ -1222,40 +1094,34 @@
       "match": "Colorado Rockies - Boston Red Sox",
       "decision": "lean_home",
       "net_team": "Colorado Rockies",
-      "reason": "Boston Red Sox plus penalise par calendrier/voyage (2.61 vs 0.95)",
-      "pressure_score": 3.927,
-      "home_fade": 0.95,
+      "reason": "Boston Red Sox plus penalise par calendrier/voyage (2.61 vs 0.15)",
+      "pressure_score": 3.127,
+      "home_fade": 0.15,
       "away_fade": 2.61,
       "travel_score": 1.66,
       "lookahead_score": 0.667,
-      "congestion_score": 1.6,
+      "congestion_score": 0.8,
       "types": {
-        "schedule_congestion": 2,
         "lookahead": 2,
+        "schedule_congestion": 1,
         "travel_extreme": 1,
         "back_to_back_travel": 1
       },
       "contexts": [
-        "4 matchs sur les 7 derniers jours",
         "1 match important/proche dans les 3 jours",
         "4 matchs sur les 7 derniers jours",
-        "1 match important/proche dans les 3 jours"
+        "1 match important/proche dans les 3 jours",
+        "Deplacement estime 2838 km, decalage ~2.3h"
       ],
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": -0.036,
-        "away_score": -2.278,
-        "home_fade": 0.95,
+        "home_score": 0.764,
+        "away_score": -2.558,
+        "home_fade": 0.15,
         "away_fade": 2.61,
-        "reason": "Direction nette: Colorado Rockies (-0.04)",
+        "reason": "Direction nette: Colorado Rockies (+0.76)",
         "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.8
-          },
           {
             "side": "home",
             "type": "lookahead",
@@ -1303,40 +1169,34 @@
       "match": "Minnesota Twins - Los Angeles Dodgers",
       "decision": "lean_home",
       "net_team": "Minnesota Twins",
-      "reason": "Los Angeles Dodgers plus penalise par calendrier/voyage (2.52 vs 0.95)",
-      "pressure_score": 3.835,
-      "home_fade": 0.95,
+      "reason": "Los Angeles Dodgers plus penalise par calendrier/voyage (2.52 vs 0.15)",
+      "pressure_score": 3.035,
+      "home_fade": 0.15,
       "away_fade": 2.519,
       "travel_score": 1.569,
       "lookahead_score": 0.667,
-      "congestion_score": 1.6,
+      "congestion_score": 0.8,
       "types": {
-        "schedule_congestion": 2,
         "lookahead": 2,
+        "schedule_congestion": 1,
         "travel_extreme": 1,
         "back_to_back_travel": 1
       },
       "contexts": [
-        "4 matchs sur les 7 derniers jours",
         "1 match important/proche dans les 3 jours",
         "4 matchs sur les 7 derniers jours",
-        "1 match important/proche dans les 3 jours"
+        "1 match important/proche dans les 3 jours",
+        "Deplacement estime 2446 km, decalage ~1.7h"
       ],
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.282,
-        "away_score": -3.186,
-        "home_fade": 0.95,
+        "home_score": 1.082,
+        "away_score": -3.466,
+        "home_fade": 0.15,
         "away_fade": 3.519,
-        "reason": "Direction nette: Minnesota Twins (+0.28)",
+        "reason": "Direction nette: Minnesota Twins (+1.08)",
         "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.8
-          },
           {
             "side": "home",
             "type": "lookahead",
@@ -1372,384 +1232,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815861",
-      "source_event_ids": [
-        "401815861"
-      ],
-      "kickoff": "2026-06-22T23:45Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "St. Louis Cardinals",
-      "away": "Arizona Diamondbacks",
-      "match": "St. Louis Cardinals - Arizona Diamondbacks",
-      "decision": "lean_home",
-      "net_team": "St. Louis Cardinals",
-      "reason": "Arizona Diamondbacks plus penalise par calendrier/voyage (2.44 vs 0.36)",
-      "pressure_score": 3.675,
-      "home_fade": 0.36,
-      "away_fade": 2.435,
-      "travel_score": 1.475,
-      "lookahead_score": 1.6,
-      "congestion_score": 0.6,
-      "types": {
-        "lookahead": 2,
-        "schedule_congestion": 1,
-        "travel_extreme": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "3 match important/proche dans les 3 jours",
-        "3 matchs sur les 7 derniers jours",
-        "3 match important/proche dans les 3 jours",
-        "Deplacement estime 2044 km, decalage ~1.5h"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.842,
-        "away_score": -3.309,
-        "home_fade": 0.36,
-        "away_fade": 3.435,
-        "reason": "Direction nette: St. Louis Cardinals (+0.84)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.36
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.36
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.475
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815893",
-      "source_event_ids": [
-        "401815893"
-      ],
-      "kickoff": "2026-06-24T19:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Colorado Rockies",
-      "away": "Boston Red Sox",
-      "match": "Colorado Rockies - Boston Red Sox",
-      "decision": "lean_home",
-      "net_team": "Colorado Rockies",
-      "reason": "Boston Red Sox plus penalise par calendrier/voyage (2.66 vs 1.00)",
-      "pressure_score": 3.66,
-      "home_fade": 1.0,
-      "away_fade": 2.66,
-      "travel_score": 1.66,
-      "lookahead_score": 0,
-      "congestion_score": 2.0,
-      "types": {
-        "schedule_congestion": 2,
-        "travel_extreme": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "5 matchs sur les 7 derniers jours",
-        "5 matchs sur les 7 derniers jours",
-        "Deplacement estime 2838 km, decalage ~2.3h",
-        "2 match dans les 48h + 2838 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.069,
-        "away_score": -2.31,
-        "home_fade": 1.0,
-        "away_fade": 2.66,
-        "reason": "Direction nette: Colorado Rockies (-0.07)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.66
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815892",
-      "source_event_ids": [
-        "401815892"
-      ],
-      "kickoff": "2026-06-24T23:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Minnesota Twins",
-      "away": "Los Angeles Dodgers",
-      "match": "Minnesota Twins - Los Angeles Dodgers",
-      "decision": "lean_home",
-      "net_team": "Minnesota Twins",
-      "reason": "Los Angeles Dodgers plus penalise par calendrier/voyage (2.57 vs 1.00)",
-      "pressure_score": 3.569,
-      "home_fade": 1.0,
-      "away_fade": 2.569,
-      "travel_score": 1.569,
-      "lookahead_score": 0,
-      "congestion_score": 2.0,
-      "types": {
-        "schedule_congestion": 2,
-        "travel_extreme": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "5 matchs sur les 7 derniers jours",
-        "5 matchs sur les 7 derniers jours",
-        "Deplacement estime 2446 km, decalage ~1.7h",
-        "2 match dans les 48h + 2446 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.249,
-        "away_score": -3.219,
-        "home_fade": 1.0,
-        "away_fade": 3.569,
-        "reason": "Direction nette: Minnesota Twins (+0.25)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.569
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815904",
-      "source_event_ids": [
-        "401815904"
-      ],
-      "kickoff": "2026-06-25T23:45Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "St. Louis Cardinals",
-      "away": "Arizona Diamondbacks",
-      "match": "St. Louis Cardinals - Arizona Diamondbacks",
-      "decision": "lean_home",
-      "net_team": "St. Louis Cardinals",
-      "reason": "Arizona Diamondbacks plus penalise par calendrier/voyage (2.48 vs 1.00)",
-      "pressure_score": 3.475,
-      "home_fade": 1.0,
-      "away_fade": 2.475,
-      "travel_score": 1.475,
-      "lookahead_score": 0,
-      "congestion_score": 2.0,
-      "types": {
-        "schedule_congestion": 2,
-        "travel_extreme": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "5 matchs sur les 7 derniers jours",
-        "6 matchs sur les 7 derniers jours",
-        "Deplacement estime 2044 km, decalage ~1.5h",
-        "2 match dans les 48h + 2044 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.216,
-        "away_score": -3.125,
-        "home_fade": 1.0,
-        "away_fade": 3.475,
-        "reason": "Direction nette: St. Louis Cardinals (+0.22)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.475
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815860",
-      "source_event_ids": [
-        "401815860"
-      ],
-      "kickoff": "2026-06-22T22:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Miami Marlins",
-      "away": "Texas Rangers",
-      "match": "Miami Marlins - Texas Rangers",
-      "decision": "lean_home",
-      "net_team": "Miami Marlins",
-      "reason": "Texas Rangers plus penalise par calendrier/voyage (2.21 vs 0.30)",
-      "pressure_score": 3.245,
-      "home_fade": 0.3,
-      "away_fade": 2.212,
-      "travel_score": 1.312,
-      "lookahead_score": 1.333,
-      "congestion_score": 0.6,
-      "types": {
-        "lookahead": 2,
-        "schedule_congestion": 1,
-        "travel_extreme": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "2 match important/proche dans les 3 jours",
-        "3 matchs sur les 7 derniers jours",
-        "2 match important/proche dans les 3 jours",
-        "Deplacement estime 1807 km, decalage ~1.1h"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.754,
-        "away_score": -2.907,
-        "home_fade": 0.3,
-        "away_fade": 3.012,
-        "reason": "Direction nette: Miami Marlins (+0.75)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.8
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.42
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.891
           }
         ]
       }
@@ -1828,155 +1310,6 @@
       }
     },
     {
-      "event_id": "401815869",
-      "source_event_ids": [
-        "401815869"
-      ],
-      "kickoff": "2026-06-23T22:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Tampa Bay Rays",
-      "away": "Kansas City Royals",
-      "match": "Tampa Bay Rays - Kansas City Royals",
-      "decision": "lean_home",
-      "net_team": "Tampa Bay Rays",
-      "reason": "Kansas City Royals plus penalise par calendrier/voyage (1.76 vs 0.30)",
-      "pressure_score": 2.796,
-      "home_fade": 0.3,
-      "away_fade": 1.763,
-      "travel_score": 0.863,
-      "lookahead_score": 1.333,
-      "congestion_score": 0.6,
-      "types": {
-        "lookahead": 2,
-        "schedule_congestion": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "2 match important/proche dans les 3 jours",
-        "3 matchs sur les 7 derniers jours",
-        "2 match important/proche dans les 3 jours",
-        "1 match dans les 48h + 1664 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.317,
-        "away_score": -1.658,
-        "home_fade": 0.3,
-        "away_fade": 1.763,
-        "reason": "Direction nette: Tampa Bay Rays (+0.32)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.863
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815874",
-      "source_event_ids": [
-        "401815874"
-      ],
-      "kickoff": "2026-06-23T22:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Miami Marlins",
-      "away": "Texas Rangers",
-      "match": "Miami Marlins - Texas Rangers",
-      "decision": "lean_home",
-      "net_team": "Miami Marlins",
-      "reason": "Texas Rangers plus penalise par calendrier/voyage (2.26 vs 0.15)",
-      "pressure_score": 2.778,
-      "home_fade": 0.15,
-      "away_fade": 2.262,
-      "travel_score": 1.312,
-      "lookahead_score": 0.667,
-      "congestion_score": 0.8,
-      "types": {
-        "lookahead": 2,
-        "schedule_congestion": 1,
-        "travel_extreme": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "4 matchs sur les 7 derniers jours",
-        "1 match important/proche dans les 3 jours",
-        "Deplacement estime 1807 km, decalage ~1.1h"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.922,
-        "away_score": -3.009,
-        "home_fade": 0.15,
-        "away_fade": 3.062,
-        "reason": "Direction nette: Miami Marlins (+0.92)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.8
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.8
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.42
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.891
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401815882",
       "source_event_ids": [
         "401815882"
@@ -2045,43 +1378,119 @@
       }
     },
     {
-      "event_id": "401815899",
+      "event_id": "401815875",
       "source_event_ids": [
-        "401815899"
+        "401815875"
       ],
-      "kickoff": "2026-06-25T16:10Z",
+      "kickoff": "2026-06-23T23:45Z",
       "sport": "baseball",
       "league_code": "mlb",
       "league_name": "MLB",
-      "home": "Tampa Bay Rays",
-      "away": "Kansas City Royals",
-      "match": "Tampa Bay Rays - Kansas City Royals",
+      "home": "St. Louis Cardinals",
+      "away": "Arizona Diamondbacks",
+      "match": "St. Louis Cardinals - Arizona Diamondbacks",
       "decision": "lean_home",
-      "net_team": "Tampa Bay Rays",
-      "reason": "Kansas City Royals plus penalise par calendrier/voyage (1.94 vs 0.60)",
-      "pressure_score": 2.543,
-      "home_fade": 0.6,
-      "away_fade": 1.943,
-      "travel_score": 0.943,
-      "lookahead_score": 0,
-      "congestion_score": 1.6,
+      "net_team": "St. Louis Cardinals",
+      "reason": "Arizona Diamondbacks plus penalise par calendrier/voyage (1.71 vs 0.30)",
+      "pressure_score": 2.747,
+      "home_fade": 0.3,
+      "away_fade": 1.714,
+      "travel_score": 1.414,
+      "lookahead_score": 1.333,
+      "congestion_score": 0,
       "types": {
-        "schedule_congestion": 2,
+        "lookahead": 2,
+        "travel_extreme": 1,
         "back_to_back_travel": 1
       },
       "contexts": [
-        "3 matchs sur les 7 derniers jours",
-        "5 matchs sur les 7 derniers jours",
-        "2 match dans les 48h + 1664 km de voyage"
+        "2 match important/proche dans les 3 jours",
+        "2 match important/proche dans les 3 jours",
+        "Deplacement estime 2044 km, decalage ~1.5h",
+        "1 match dans les 48h + 2044 km de voyage"
       ],
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.08,
-        "away_score": -1.733,
+        "home_score": 0.65,
+        "away_score": -2.609,
+        "home_fade": 0.3,
+        "away_fade": 2.714,
+        "reason": "Direction nette: St. Louis Cardinals (+0.65)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.3
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.3
+          },
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "travel_extreme",
+            "direction": "fade",
+            "strength": 0.475
+          },
+          {
+            "side": "away",
+            "type": "back_to_back_travel",
+            "direction": "fade",
+            "strength": 0.939
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815904",
+      "source_event_ids": [
+        "401815904"
+      ],
+      "kickoff": "2026-06-25T23:45Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "St. Louis Cardinals",
+      "away": "Arizona Diamondbacks",
+      "match": "St. Louis Cardinals - Arizona Diamondbacks",
+      "decision": "lean_home",
+      "net_team": "St. Louis Cardinals",
+      "reason": "Arizona Diamondbacks plus penalise par calendrier/voyage (2.08 vs 0.60)",
+      "pressure_score": 2.675,
+      "home_fade": 0.6,
+      "away_fade": 2.075,
+      "travel_score": 1.475,
+      "lookahead_score": 0,
+      "congestion_score": 1.2,
+      "types": {
+        "schedule_congestion": 2,
+        "travel_extreme": 1,
+        "back_to_back_travel": 1
+      },
+      "contexts": [
+        "3 matchs sur les 7 derniers jours",
+        "3 matchs sur les 7 derniers jours",
+        "Deplacement estime 2044 km, decalage ~1.5h",
+        "2 match dans les 48h + 2044 km de voyage"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": 0.476,
+        "away_score": -2.865,
         "home_fade": 0.6,
-        "away_fade": 1.943,
-        "reason": "Direction nette: Tampa Bay Rays (+0.08)",
+        "away_fade": 3.075,
+        "reason": "Direction nette: St. Louis Cardinals (+0.48)",
         "detail": [
           {
             "side": "home",
@@ -2093,164 +1502,48 @@
             "side": "away",
             "type": "schedule_congestion",
             "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
             "strength": 1.0
           },
           {
             "side": "away",
-            "type": "back_to_back_travel",
+            "type": "travel_extreme",
             "direction": "fade",
-            "strength": 0.943
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815856",
-      "source_event_ids": [
-        "401815856"
-      ],
-      "kickoff": "2026-06-22T22:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Tampa Bay Rays",
-      "away": "Kansas City Royals",
-      "match": "Tampa Bay Rays - Kansas City Royals",
-      "decision": "lean_home",
-      "net_team": "Tampa Bay Rays",
-      "reason": "Kansas City Royals plus penalise par calendrier/voyage (1.22 vs 0.36)",
-      "pressure_score": 2.463,
-      "home_fade": 0.36,
-      "away_fade": 1.223,
-      "travel_score": 0.863,
-      "lookahead_score": 1.6,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "3 match important/proche dans les 3 jours",
-        "3 match important/proche dans les 3 jours",
-        "1 match dans les 48h + 1664 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.068,
-        "away_score": -1.097,
-        "home_fade": 0.36,
-        "away_fade": 1.223,
-        "reason": "Direction nette: Tampa Bay Rays (+0.07)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.36
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.36
+            "strength": 0.475
           },
           {
             "side": "away",
             "type": "back_to_back_travel",
             "direction": "fade",
-            "strength": 0.863
+            "strength": 1.0
           }
         ]
       }
     },
     {
-      "event_id": "401815884",
+      "event_id": "401815893",
       "source_event_ids": [
-        "401815884"
+        "401815893"
       ],
-      "kickoff": "2026-06-24T22:40Z",
+      "kickoff": "2026-06-24T19:10Z",
       "sport": "baseball",
       "league_code": "mlb",
       "league_name": "MLB",
-      "home": "Tampa Bay Rays",
-      "away": "Kansas City Royals",
-      "match": "Tampa Bay Rays - Kansas City Royals",
+      "home": "Colorado Rockies",
+      "away": "Boston Red Sox",
+      "match": "Colorado Rockies - Boston Red Sox",
       "decision": "lean_home",
-      "net_team": "Tampa Bay Rays",
-      "reason": "Kansas City Royals plus penalise par calendrier/voyage (1.89 vs 0.15)",
-      "pressure_score": 2.409,
-      "home_fade": 0.15,
-      "away_fade": 1.893,
-      "travel_score": 0.943,
-      "lookahead_score": 0.667,
-      "congestion_score": 0.8,
-      "types": {
-        "lookahead": 2,
-        "schedule_congestion": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "4 matchs sur les 7 derniers jours",
-        "1 match important/proche dans les 3 jours",
-        "2 match dans les 48h + 1664 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.512,
-        "away_score": -1.84,
-        "home_fade": 0.15,
-        "away_fade": 1.893,
-        "reason": "Direction nette: Tampa Bay Rays (+0.51)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.8
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.943
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815889",
-      "source_event_ids": [
-        "401815889"
-      ],
-      "kickoff": "2026-06-24T16:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Miami Marlins",
-      "away": "Texas Rangers",
-      "match": "Miami Marlins - Texas Rangers",
-      "decision": "lean_home",
-      "net_team": "Miami Marlins",
-      "reason": "Texas Rangers plus penalise par calendrier/voyage (2.39 vs 0.00)",
-      "pressure_score": 2.392,
+      "net_team": "Colorado Rockies",
+      "reason": "Boston Red Sox plus penalise par calendrier/voyage (2.66 vs 0.00)",
+      "pressure_score": 2.66,
       "home_fade": 0.0,
-      "away_fade": 2.392,
-      "travel_score": 1.392,
+      "away_fade": 2.66,
+      "travel_score": 1.66,
       "lookahead_score": 0,
       "congestion_score": 1.0,
       "types": {
@@ -2260,17 +1553,78 @@
       },
       "contexts": [
         "5 matchs sur les 7 derniers jours",
-        "Deplacement estime 1807 km, decalage ~1.1h",
-        "2 match dans les 48h + 1807 km de voyage"
+        "Deplacement estime 2838 km, decalage ~2.3h",
+        "2 match dans les 48h + 2838 km de voyage"
       ],
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 1.117,
-        "away_score": -3.192,
+        "home_score": 0.931,
+        "away_score": -2.66,
         "home_fade": 0.0,
-        "away_fade": 3.192,
-        "reason": "Direction nette: Miami Marlins (+1.12)",
+        "away_fade": 2.66,
+        "reason": "Direction nette: Colorado Rockies (+0.93)",
+        "detail": [
+          {
+            "side": "away",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "travel_extreme",
+            "direction": "fade",
+            "strength": 0.66
+          },
+          {
+            "side": "away",
+            "type": "back_to_back_travel",
+            "direction": "fade",
+            "strength": 1.0
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815892",
+      "source_event_ids": [
+        "401815892"
+      ],
+      "kickoff": "2026-06-24T23:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Minnesota Twins",
+      "away": "Los Angeles Dodgers",
+      "match": "Minnesota Twins - Los Angeles Dodgers",
+      "decision": "lean_home",
+      "net_team": "Minnesota Twins",
+      "reason": "Los Angeles Dodgers plus penalise par calendrier/voyage (2.57 vs 0.00)",
+      "pressure_score": 2.569,
+      "home_fade": 0.0,
+      "away_fade": 2.569,
+      "travel_score": 1.569,
+      "lookahead_score": 0,
+      "congestion_score": 1.0,
+      "types": {
+        "schedule_congestion": 1,
+        "travel_extreme": 1,
+        "back_to_back_travel": 1
+      },
+      "contexts": [
+        "5 matchs sur les 7 derniers jours",
+        "Deplacement estime 2446 km, decalage ~1.7h",
+        "2 match dans les 48h + 2446 km de voyage"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": 1.249,
+        "away_score": -3.569,
+        "home_fade": 0.0,
+        "away_fade": 3.569,
+        "reason": "Direction nette: Minnesota Twins (+1.25)",
         "detail": [
           {
             "side": "away",
@@ -2282,19 +1636,19 @@
             "side": "away",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.8
+            "strength": 1.0
           },
           {
             "side": "away",
             "type": "travel_extreme",
             "direction": "fade",
-            "strength": 0.42
+            "strength": 0.569
           },
           {
             "side": "away",
             "type": "back_to_back_travel",
             "direction": "fade",
-            "strength": 0.971
+            "strength": 1.0
           }
         ]
       }
@@ -2512,6 +1866,200 @@
       }
     },
     {
+      "event_id": "401815869",
+      "source_event_ids": [
+        "401815869"
+      ],
+      "kickoff": "2026-06-23T22:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Tampa Bay Rays",
+      "away": "Kansas City Royals",
+      "match": "Tampa Bay Rays - Kansas City Royals",
+      "decision": "lean_home",
+      "net_team": "Tampa Bay Rays",
+      "reason": "Kansas City Royals plus penalise par calendrier/voyage (1.16 vs 0.30)",
+      "pressure_score": 2.196,
+      "home_fade": 0.3,
+      "away_fade": 1.163,
+      "travel_score": 0.863,
+      "lookahead_score": 1.333,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 2,
+        "back_to_back_travel": 1
+      },
+      "contexts": [
+        "2 match important/proche dans les 3 jours",
+        "2 match important/proche dans les 3 jours",
+        "1 match dans les 48h + 1664 km de voyage"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": 0.107,
+        "away_score": -1.058,
+        "home_fade": 0.3,
+        "away_fade": 1.163,
+        "reason": "Direction nette: Tampa Bay Rays (+0.11)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.3
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.3
+          },
+          {
+            "side": "away",
+            "type": "back_to_back_travel",
+            "direction": "fade",
+            "strength": 0.863
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815899",
+      "source_event_ids": [
+        "401815899"
+      ],
+      "kickoff": "2026-06-25T16:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Tampa Bay Rays",
+      "away": "Kansas City Royals",
+      "match": "Tampa Bay Rays - Kansas City Royals",
+      "decision": "lean_home",
+      "net_team": "Tampa Bay Rays",
+      "reason": "Kansas City Royals plus penalise par calendrier/voyage (1.54 vs 0.60)",
+      "pressure_score": 2.143,
+      "home_fade": 0.6,
+      "away_fade": 1.543,
+      "travel_score": 0.943,
+      "lookahead_score": 0,
+      "congestion_score": 1.2,
+      "types": {
+        "schedule_congestion": 2,
+        "back_to_back_travel": 1
+      },
+      "contexts": [
+        "3 matchs sur les 7 derniers jours",
+        "3 matchs sur les 7 derniers jours",
+        "2 match dans les 48h + 1664 km de voyage"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": -0.06,
+        "away_score": -1.333,
+        "home_fade": 0.6,
+        "away_fade": 1.543,
+        "reason": "Direction nette: Tampa Bay Rays (-0.06)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "away",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "away",
+            "type": "back_to_back_travel",
+            "direction": "fade",
+            "strength": 0.943
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815890",
+      "source_event_ids": [
+        "401815890"
+      ],
+      "kickoff": "2026-06-24T23:45Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "St. Louis Cardinals",
+      "away": "Arizona Diamondbacks",
+      "match": "St. Louis Cardinals - Arizona Diamondbacks",
+      "decision": "lean_home",
+      "net_team": "St. Louis Cardinals",
+      "reason": "Arizona Diamondbacks plus penalise par calendrier/voyage (1.63 vs 0.15)",
+      "pressure_score": 2.142,
+      "home_fade": 0.15,
+      "away_fade": 1.625,
+      "travel_score": 1.475,
+      "lookahead_score": 0.667,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 2,
+        "travel_extreme": 1,
+        "back_to_back_travel": 1
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours",
+        "1 match important/proche dans les 3 jours",
+        "Deplacement estime 2044 km, decalage ~1.5h",
+        "2 match dans les 48h + 2044 km de voyage"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": 0.769,
+        "away_score": -2.573,
+        "home_fade": 0.15,
+        "away_fade": 2.625,
+        "reason": "Direction nette: St. Louis Cardinals (+0.77)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "travel_extreme",
+            "direction": "fade",
+            "strength": 0.475
+          },
+          {
+            "side": "away",
+            "type": "back_to_back_travel",
+            "direction": "fade",
+            "strength": 1.0
+          }
+        ]
+      }
+    },
+    {
       "event_id": "401815868",
       "source_event_ids": [
         "401815868"
@@ -2580,6 +2128,146 @@
       }
     },
     {
+      "event_id": "401815861",
+      "source_event_ids": [
+        "401815861"
+      ],
+      "kickoff": "2026-06-22T23:45Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "St. Louis Cardinals",
+      "away": "Arizona Diamondbacks",
+      "match": "St. Louis Cardinals - Arizona Diamondbacks",
+      "decision": "lean_home",
+      "net_team": "St. Louis Cardinals",
+      "reason": "Arizona Diamondbacks plus penalise par calendrier/voyage (0.84 vs 0.36)",
+      "pressure_score": 2.075,
+      "home_fade": 0.36,
+      "away_fade": 0.835,
+      "travel_score": 0.475,
+      "lookahead_score": 1.6,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 2,
+        "travel_extreme": 1
+      },
+      "contexts": [
+        "3 match important/proche dans les 3 jours",
+        "3 match important/proche dans les 3 jours",
+        "Deplacement estime 2044 km, decalage ~1.5h"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": 0.282,
+        "away_score": -1.709,
+        "home_fade": 0.36,
+        "away_fade": 1.835,
+        "reason": "Direction nette: St. Louis Cardinals (+0.28)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.36
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.36
+          },
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "travel_extreme",
+            "direction": "fade",
+            "strength": 0.475
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815874",
+      "source_event_ids": [
+        "401815874"
+      ],
+      "kickoff": "2026-06-23T22:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Miami Marlins",
+      "away": "Texas Rangers",
+      "match": "Miami Marlins - Texas Rangers",
+      "decision": "lean_home",
+      "net_team": "Miami Marlins",
+      "reason": "Texas Rangers plus penalise par calendrier/voyage (1.46 vs 0.15)",
+      "pressure_score": 1.978,
+      "home_fade": 0.15,
+      "away_fade": 1.462,
+      "travel_score": 1.312,
+      "lookahead_score": 0.667,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 2,
+        "travel_extreme": 1,
+        "back_to_back_travel": 1
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours",
+        "1 match important/proche dans les 3 jours",
+        "Deplacement estime 1807 km, decalage ~1.1h",
+        "1 match dans les 48h + 1807 km de voyage"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": 0.642,
+        "away_score": -2.209,
+        "home_fade": 0.15,
+        "away_fade": 2.262,
+        "reason": "Direction nette: Miami Marlins (+0.64)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.8
+          },
+          {
+            "side": "away",
+            "type": "travel_extreme",
+            "direction": "fade",
+            "strength": 0.42
+          },
+          {
+            "side": "away",
+            "type": "back_to_back_travel",
+            "direction": "fade",
+            "strength": 0.891
+          }
+        ]
+      }
+    },
+    {
       "event_id": "401815855",
       "source_event_ids": [
         "401815855"
@@ -2635,6 +2323,132 @@
             "type": "travel_extreme",
             "direction": "fade",
             "strength": 0.487
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815860",
+      "source_event_ids": [
+        "401815860"
+      ],
+      "kickoff": "2026-06-22T22:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Miami Marlins",
+      "away": "Texas Rangers",
+      "match": "Miami Marlins - Texas Rangers",
+      "decision": "lean_home",
+      "net_team": "Miami Marlins",
+      "reason": "Texas Rangers plus penalise par calendrier/voyage (0.72 vs 0.30)",
+      "pressure_score": 1.754,
+      "home_fade": 0.3,
+      "away_fade": 0.72,
+      "travel_score": 0.42,
+      "lookahead_score": 1.333,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 2,
+        "travel_extreme": 1
+      },
+      "contexts": [
+        "2 match important/proche dans les 3 jours",
+        "2 match important/proche dans les 3 jours",
+        "Deplacement estime 1807 km, decalage ~1.1h"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": 0.232,
+        "away_score": -1.415,
+        "home_fade": 0.3,
+        "away_fade": 1.52,
+        "reason": "Direction nette: Miami Marlins (+0.23)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.3
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.3
+          },
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.8
+          },
+          {
+            "side": "away",
+            "type": "travel_extreme",
+            "direction": "fade",
+            "strength": 0.42
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815884",
+      "source_event_ids": [
+        "401815884"
+      ],
+      "kickoff": "2026-06-24T22:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Tampa Bay Rays",
+      "away": "Kansas City Royals",
+      "match": "Tampa Bay Rays - Kansas City Royals",
+      "decision": "lean_home",
+      "net_team": "Tampa Bay Rays",
+      "reason": "Kansas City Royals plus penalise par calendrier/voyage (1.09 vs 0.15)",
+      "pressure_score": 1.609,
+      "home_fade": 0.15,
+      "away_fade": 1.093,
+      "travel_score": 0.943,
+      "lookahead_score": 0.667,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 2,
+        "back_to_back_travel": 1
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours",
+        "1 match important/proche dans les 3 jours",
+        "2 match dans les 48h + 1664 km de voyage"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": 0.232,
+        "away_score": -1.04,
+        "home_fade": 0.15,
+        "away_fade": 1.093,
+        "reason": "Direction nette: Tampa Bay Rays (+0.23)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "back_to_back_travel",
+            "direction": "fade",
+            "strength": 0.943
           }
         ]
       }
@@ -2804,6 +2618,65 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 1.0
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815889",
+      "source_event_ids": [
+        "401815889"
+      ],
+      "kickoff": "2026-06-24T16:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Miami Marlins",
+      "away": "Texas Rangers",
+      "match": "Miami Marlins - Texas Rangers",
+      "decision": "lean_home",
+      "net_team": "Miami Marlins",
+      "reason": "Texas Rangers plus penalise par calendrier/voyage (1.39 vs 0.00)",
+      "pressure_score": 1.392,
+      "home_fade": 0.0,
+      "away_fade": 1.392,
+      "travel_score": 1.392,
+      "lookahead_score": 0,
+      "congestion_score": 0,
+      "types": {
+        "travel_extreme": 1,
+        "back_to_back_travel": 1
+      },
+      "contexts": [
+        "Deplacement estime 1807 km, decalage ~1.1h",
+        "2 match dans les 48h + 1807 km de voyage"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": 0.767,
+        "away_score": -2.192,
+        "home_fade": 0.0,
+        "away_fade": 2.192,
+        "reason": "Direction nette: Miami Marlins (+0.77)",
+        "detail": [
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.8
+          },
+          {
+            "side": "away",
+            "type": "travel_extreme",
+            "direction": "fade",
+            "strength": 0.42
+          },
+          {
+            "side": "away",
+            "type": "back_to_back_travel",
+            "direction": "fade",
+            "strength": 0.971
           }
         ]
       }

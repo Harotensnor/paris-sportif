@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-06-21T20:46:36Z",
+  "generated_at": "2026-06-21T22:05:09Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 54,
-    "actionable": 37,
+    "active_events": 55,
+    "actionable": 38,
     "watch": 6,
     "risk": 11,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 28,
-      "back_to_back_travel": 25,
+      "injury_imbalance": 30,
       "travel_extreme": 16,
-      "market_uncertain": 14,
+      "back_to_back_travel": 22,
+      "market_uncertain": 15,
       "signal_conflict": 3
     },
     "by_quality": {
+      "actionable": 38,
       "watch": 6,
-      "actionable": 37,
       "risk": 11
     }
   },
@@ -582,24 +582,6 @@
       "context": "2 match dans les 48h + 1664 km de voyage"
     },
     {
-      "event_id": "401815860",
-      "date": "2026-06-22T22:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Miami Marlins",
-      "away": "Texas Rangers",
-      "match": "Miami Marlins - Texas Rangers",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Texas Rangers",
-      "side": "away",
-      "strength": 0.891,
-      "context": "1 match dans les 48h + 1807 km de voyage"
-    },
-    {
       "event_id": "401815874",
       "date": "2026-06-23T22:40Z",
       "sport": "baseball",
@@ -616,24 +598,6 @@
       "side": "away",
       "strength": 0.891,
       "context": "1 match dans les 48h + 1807 km de voyage"
-    },
-    {
-      "event_id": "401815856",
-      "date": "2026-06-22T22:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Tampa Bay Rays",
-      "away": "Kansas City Royals",
-      "match": "Tampa Bay Rays - Kansas City Royals",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Kansas City Royals",
-      "side": "away",
-      "strength": 0.863,
-      "context": "1 match dans les 48h + 1664 km de voyage"
     },
     {
       "event_id": "401815869",
@@ -672,6 +636,60 @@
       "context": "2 match dans les 48h + 1159 km de voyage"
     },
     {
+      "event_id": "401857010",
+      "date": "2026-06-21T22:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Minnesota Lynx",
+      "away": "Washington Mystics",
+      "match": "Minnesota Lynx - Washington Mystics",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Minnesota Lynx",
+      "side": null,
+      "strength": 0.8,
+      "context": "Absences severes 5-1"
+    },
+    {
+      "event_id": "401815860",
+      "date": "2026-06-22T22:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Miami Marlins",
+      "away": "Texas Rangers",
+      "match": "Miami Marlins - Texas Rangers",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Texas Rangers",
+      "side": null,
+      "strength": 0.8,
+      "context": "Absences severes 9-13"
+    },
+    {
+      "event_id": "401857018",
+      "date": "2026-06-24T23:30Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Washington Mystics",
+      "away": "Minnesota Lynx",
+      "match": "Washington Mystics - Minnesota Lynx",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Minnesota Lynx",
+      "side": null,
+      "strength": 0.8,
+      "context": "Absences severes 1-5"
+    },
+    {
       "event_id": "401815867",
       "date": "2026-06-23T23:10Z",
       "sport": "baseball",
@@ -692,24 +710,6 @@
   ],
   "active_watch": [
     {
-      "event_id": "401857010",
-      "date": "2026-06-21T22:00Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Minnesota Lynx",
-      "away": "Washington Mystics",
-      "match": "Minnesota Lynx - Washington Mystics",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Minnesota Lynx",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 3-0"
-    },
-    {
       "event_id": "401815857",
       "date": "2026-06-22T23:10Z",
       "sport": "baseball",
@@ -726,6 +726,24 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 8-11"
+    },
+    {
+      "event_id": "401857014",
+      "date": "2026-06-23T00:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Indiana Fever",
+      "away": "Phoenix Mercury",
+      "match": "Indiana Fever - Phoenix Mercury",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Phoenix Mercury",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 0-3"
     },
     {
       "event_id": "401815870",
@@ -764,19 +782,19 @@
       "context": "Absences severes 8-11"
     },
     {
-      "event_id": "401857018",
+      "event_id": "401857017",
       "date": "2026-06-24T23:30Z",
       "sport": "basketball",
       "league_code": "wnba",
       "league_name": "WNBA",
-      "home": "Washington Mystics",
-      "away": "Minnesota Lynx",
-      "match": "Washington Mystics - Minnesota Lynx",
+      "home": "Indiana Fever",
+      "away": "Phoenix Mercury",
+      "match": "Indiana Fever - Phoenix Mercury",
       "quality": "watch",
       "quality_reason": "Signal rare present mais intensite moyenne",
       "type": "injury_imbalance",
       "direction": "fade",
-      "team": "Minnesota Lynx",
+      "team": "Phoenix Mercury",
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 0-3"
@@ -835,7 +853,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 12.6%"
+      "context": "marge bookmaker anormale 12.3%"
     },
     {
       "event_id": "177283",
