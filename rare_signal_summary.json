@@ -1,64 +1,28 @@
 {
-  "generated_at": "2026-06-20T23:11:44Z",
+  "generated_at": "2026-06-21T00:22:00Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 38,
+    "active_events": 40,
     "actionable": 27,
     "watch": 2,
-    "risk": 9,
+    "risk": 11,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 25,
-      "back_to_back_travel": 18,
-      "signal_conflict": 3,
       "travel_extreme": 12,
-      "market_uncertain": 12
+      "back_to_back_travel": 17,
+      "signal_conflict": 2,
+      "market_uncertain": 14
     },
     "by_quality": {
       "actionable": 27,
       "watch": 2,
-      "risk": 9
+      "risk": 11
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401815828",
-      "date": "2026-06-20T23:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Philadelphia Phillies",
-      "away": "New York Mets",
-      "match": "Philadelphia Phillies - New York Mets",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "New York Mets",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 4-11"
-    },
-    {
-      "event_id": "401815831",
-      "date": "2026-06-20T23:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Houston Astros",
-      "away": "Cleveland Guardians",
-      "match": "Houston Astros - Cleveland Guardians",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Houston Astros",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 10-3"
-    },
     {
       "event_id": "401815834",
       "date": "2026-06-21T01:10Z",
@@ -111,7 +75,7 @@
       "team": "Boston Red Sox",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 7-12"
+      "context": "Absences severes 7-13"
     },
     {
       "event_id": "401815836",
@@ -273,7 +237,7 @@
       "team": "Boston Red Sox",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 7-12"
+      "context": "Absences severes 7-13"
     },
     {
       "event_id": "401815842",
@@ -404,6 +368,42 @@
     {
       "event_id": "401815933",
       "date": "2026-06-28T01:38Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Los Angeles Angels",
+      "away": "Athletics",
+      "match": "Los Angeles Angels - Athletics",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Los Angeles Angels",
+      "side": null,
+      "strength": 1.0,
+      "context": "Absences severes 13-7"
+    },
+    {
+      "event_id": "401815940",
+      "date": "2026-06-28T17:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "New York Mets",
+      "away": "Philadelphia Phillies",
+      "match": "New York Mets - Philadelphia Phillies",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "New York Mets",
+      "side": null,
+      "strength": 1.0,
+      "context": "Absences severes 11-4"
+    },
+    {
+      "event_id": "401815948",
+      "date": "2026-06-28T19:15Z",
       "sport": "baseball",
       "league_code": "mlb",
       "league_name": "MLB",
@@ -710,6 +710,42 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.7%"
+    },
+    {
+      "event_id": "401861408",
+      "date": "2026-06-28T10:00Z",
+      "sport": "football",
+      "league_code": "chn.1",
+      "league_name": "Chinese Super League",
+      "home": "Qingdao West Coast",
+      "away": "Zhejiang Professional FC",
+      "match": "Qingdao West Coast - Zhejiang Professional FC",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 19.2%"
+    },
+    {
+      "event_id": "401861409",
+      "date": "2026-06-28T11:00Z",
+      "sport": "football",
+      "league_code": "chn.1",
+      "league_name": "Chinese Super League",
+      "home": "Dalian Yingbo",
+      "away": "Shanghai Shenhua",
+      "match": "Dalian Yingbo - Shanghai Shenhua",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 19.3%"
     }
   ],
   "expired_sample": []
