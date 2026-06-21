@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-21T14:29:48Z",
+  "generated_at": "2026-06-21T16:16:35Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -764,12 +764,18 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.689,
-        "away_score": -1.968,
+        "home_score": 0.829,
+        "away_score": -2.368,
         "home_fade": 0.0,
-        "away_fade": 1.968,
-        "reason": "Direction nette: Miami Marlins (+0.69)",
+        "away_fade": 2.368,
+        "reason": "Direction nette: Miami Marlins (+0.83)",
         "detail": [
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.4
+          },
           {
             "side": "away",
             "type": "travel_extreme",
