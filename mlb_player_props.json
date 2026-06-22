@@ -1,254 +1,8 @@
 {
-  "generated_at": "2026-06-22T21:29:48Z",
+  "generated_at": "2026-06-22T23:01:54Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815858",
-      "kickoff": "2026-06-22T22:10Z",
-      "league": "MLB",
-      "match": "New York Yankees at Detroit Tigers",
-      "home": "Detroit Tigers",
-      "away": "New York Yankees",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Detroit Tigers",
-          "pitcher": "Framber Valdez",
-          "label": "Framber Valdez moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.5137,
-          "fair_odds": 1.95,
-          "expected_strikeouts": 4.44,
-          "projected_ip": 5.55,
-          "inputs": {
-            "k9": 7.21,
-            "era": 4.09,
-            "whip": 1.35,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Detroit Tigers",
-          "pitcher": "Framber Valdez",
-          "label": "Framber Valdez ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.55,
-          "fair_odds": 1.82,
-          "expected_hr_allowed": 0.598,
-          "projected_ip": 5.55,
-          "inputs": {
-            "hr9": 0.97,
-            "era": 4.09,
-            "whip": 1.35
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "New York Yankees",
-          "pitcher": "Gerrit Cole",
-          "label": "Gerrit Cole plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.5691,
-          "fair_odds": 1.76,
-          "expected_strikeouts": 4.8,
-          "projected_ip": 5.6,
-          "inputs": {
-            "k9": 7.71,
-            "era": 2.57,
-            "whip": 1.0,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "New York Yankees",
-          "pitcher": "Gerrit Cole",
-          "label": "Gerrit Cole concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5519,
-          "fair_odds": 1.81,
-          "expected_hr_allowed": 0.803,
-          "projected_ip": 5.6,
-          "inputs": {
-            "hr9": 1.29,
-            "era": 2.57,
-            "whip": 1.0
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401815856",
-      "kickoff": "2026-06-22T22:40Z",
-      "league": "MLB",
-      "match": "Kansas City Royals at Tampa Bay Rays",
-      "home": "Tampa Bay Rays",
-      "away": "Kansas City Royals",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Tampa Bay Rays",
-          "pitcher": "Drew Rasmussen",
-          "label": "Drew Rasmussen moins de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "under",
-          "probability": 0.6032,
-          "fair_odds": 1.66,
-          "expected_strikeouts": 6.0,
-          "projected_ip": 5.71,
-          "inputs": {
-            "k9": 9.45,
-            "era": 2.59,
-            "whip": 0.88,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Tampa Bay Rays",
-          "pitcher": "Drew Rasmussen",
-          "label": "Drew Rasmussen ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5266,
-          "fair_odds": 1.9,
-          "expected_hr_allowed": 0.641,
-          "projected_ip": 5.71,
-          "inputs": {
-            "hr9": 1.01,
-            "era": 2.59,
-            "whip": 0.88
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Kansas City Royals",
-          "pitcher": "Michael Wacha",
-          "label": "Michael Wacha plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.5691,
-          "fair_odds": 1.76,
-          "expected_strikeouts": 4.8,
-          "projected_ip": 6.27,
-          "inputs": {
-            "k9": 6.89,
-            "era": 3.64,
-            "whip": 1.17,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Kansas City Royals",
-          "pitcher": "Michael Wacha",
-          "label": "Michael Wacha ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5125,
-          "fair_odds": 1.95,
-          "expected_hr_allowed": 0.668,
-          "projected_ip": 6.27,
-          "inputs": {
-            "hr9": 0.96,
-            "era": 3.64,
-            "whip": 1.17
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401815860",
-      "kickoff": "2026-06-22T22:40Z",
-      "league": "MLB",
-      "match": "Texas Rangers at Miami Marlins",
-      "home": "Miami Marlins",
-      "away": "Texas Rangers",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Miami Marlins",
-          "pitcher": "Tyler Phillips",
-          "label": "Tyler Phillips plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.5377,
-          "fair_odds": 1.86,
-          "expected_strikeouts": 5.68,
-          "projected_ip": 6.6,
-          "inputs": {
-            "k9": 7.74,
-            "era": 3.1,
-            "whip": 1.38,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Miami Marlins",
-          "pitcher": "Tyler Phillips",
-          "label": "Tyler Phillips ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5322,
-          "fair_odds": 1.88,
-          "expected_hr_allowed": 0.631,
-          "projected_ip": 6.6,
-          "inputs": {
-            "hr9": 0.86,
-            "era": 3.1,
-            "whip": 1.38
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Texas Rangers",
-          "pitcher": "Tyler Alexander",
-          "label": "Tyler Alexander moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.6125,
-          "fair_odds": 1.63,
-          "expected_strikeouts": 5.0,
-          "projected_ip": 6.6,
-          "inputs": {
-            "k9": 6.82,
-            "era": 2.97,
-            "whip": 1.48,
-            "hand": "L"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Texas Rangers",
-          "pitcher": "Tyler Alexander",
-          "label": "Tyler Alexander ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6488,
-          "fair_odds": 1.54,
-          "expected_hr_allowed": 0.433,
-          "projected_ip": 6.6,
-          "inputs": {
-            "hr9": 0.59,
-            "era": 2.97,
-            "whip": 1.48
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815855",
       "kickoff": "2026-06-22T23:07Z",
@@ -828,6 +582,52 @@
             "hr9": 0.81,
             "era": 4.04,
             "whip": 1.36
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815865",
+      "kickoff": "2026-06-23T02:00Z",
+      "league": "MLB",
+      "match": "Atlanta Braves at San Diego Padres",
+      "home": "San Diego Padres",
+      "away": "Atlanta Braves",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Atlanta Braves",
+          "pitcher": "JR Ritchie",
+          "label": "JR Ritchie plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.599,
+          "fair_odds": 1.67,
+          "expected_strikeouts": 4.93,
+          "projected_ip": 5.87,
+          "inputs": {
+            "k9": 7.57,
+            "era": 4.54,
+            "whip": 1.37,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Atlanta Braves",
+          "pitcher": "JR Ritchie",
+          "label": "JR Ritchie concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.6846,
+          "fair_odds": 1.46,
+          "expected_hr_allowed": 1.154,
+          "projected_ip": 5.87,
+          "inputs": {
+            "hr9": 1.77,
+            "era": 4.54,
+            "whip": 1.37
           },
           "side": "away"
         }
@@ -2386,7 +2186,7 @@
       ]
     }
   ],
-  "props": 114,
+  "props": 104,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
