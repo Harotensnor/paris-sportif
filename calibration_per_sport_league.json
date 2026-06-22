@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-21T08:19:56Z",
+  "generated_at": "2026-06-22T09:37:06Z",
   "schema": "calibration_per_sport_league_v1",
   "top5_leagues": [
     "eng.1",
@@ -10,54 +10,54 @@
   ],
   "groups": {
     "baseball:all": {
-      "n": 320,
-      "wins": 185,
-      "losses": 135,
-      "win_rate": 0.578125,
+      "n": 330,
+      "wins": 188,
+      "losses": 142,
+      "win_rate": 0.5696969696969697,
       "win_rate_ci": [
-        0.5234,
-        0.631
+        0.5158,
+        0.622
       ],
-      "flat_pnl": -3.83,
-      "flat_roi_pct": -1.2,
+      "flat_pnl": -9.25,
+      "flat_roi_pct": -2.8,
       "flat_roi_ci_pct": [
-        -10.6,
-        8.56
+        -12.42,
+        6.51
       ],
-      "kelly_pnl": -10.44,
-      "brier": 0.2426,
-      "logloss": 0.6779,
-      "avg_cote": 1.72,
-      "avg_pick_prob": 0.554,
-      "avg_edge_pct": -3.06,
-      "avg_ev_pct": -5.17,
+      "kelly_pnl": -0.79,
+      "brier": 0.2431,
+      "logloss": 0.6787,
+      "avg_cote": 1.71,
+      "avg_pick_prob": 0.555,
+      "avg_edge_pct": -3.17,
+      "avg_ev_pct": -5.38,
       "avg_clv_pct": 0.01,
-      "n_with_clv": 309
+      "n_with_clv": 319
     },
     "basketball:all": {
-      "n": 27,
-      "wins": 22,
+      "n": 28,
+      "wins": 23,
       "losses": 5,
-      "win_rate": 0.8148148148148148,
+      "win_rate": 0.8214285714285714,
       "win_rate_ci": [
-        0.633,
-        0.9182
+        0.6441,
+        0.9212
       ],
-      "flat_pnl": 6.0,
-      "flat_roi_pct": 22.2,
+      "flat_pnl": 6.57,
+      "flat_roi_pct": 23.45,
       "flat_roi_ci_pct": [
-        -2.24,
-        44.14
+        -1.6,
+        43.54
       ],
       "kelly_pnl": 0.0,
-      "brier": 0.1793,
-      "logloss": 0.5405,
+      "brier": 0.1799,
+      "logloss": 0.5421,
       "avg_cote": 1.51,
-      "avg_pick_prob": 0.638,
-      "avg_edge_pct": -3.76,
-      "avg_ev_pct": -5.58,
+      "avg_pick_prob": 0.635,
+      "avg_edge_pct": -3.91,
+      "avg_ev_pct": -5.83,
       "avg_clv_pct": 0.13,
-      "n_with_clv": 27
+      "n_with_clv": 28
     },
     "football:other": {
       "n": 63,
@@ -74,7 +74,7 @@
         -31.65,
         26.3
       ],
-      "kelly_pnl": -1.24,
+      "kelly_pnl": -1.37,
       "brier": 0.2369,
       "logloss": 0.666,
       "avg_cote": 2.27,
@@ -99,7 +99,7 @@
         -77.95,
         39.93
       ],
-      "kelly_pnl": -1.94,
+      "kelly_pnl": -2.15,
       "brier": 0.2468,
       "logloss": 0.687,
       "avg_cote": 1.87,
@@ -269,37 +269,37 @@
         "bin": 4,
         "lo": 0.4,
         "hi": 0.5,
-        "n": 16,
+        "n": 15,
         "prob_mean": 0.497,
-        "win_rate": 0.688,
-        "gap": 0.19
+        "win_rate": 0.733,
+        "gap": 0.236
       },
       {
         "bin": 5,
         "lo": 0.5,
         "hi": 0.6,
-        "n": 254,
-        "prob_mean": 0.541,
-        "win_rate": 0.551,
-        "gap": 0.01
+        "n": 261,
+        "prob_mean": 0.542,
+        "win_rate": 0.533,
+        "gap": -0.009
       },
       {
         "bin": 6,
         "lo": 0.6,
         "hi": 0.7,
-        "n": 47,
+        "n": 50,
         "prob_mean": 0.632,
-        "win_rate": 0.66,
-        "gap": 0.028
+        "win_rate": 0.68,
+        "gap": 0.048
       },
       {
         "bin": 7,
         "lo": 0.7,
         "hi": 0.8,
-        "n": 3,
-        "prob_mean": 0.73,
+        "n": 4,
+        "prob_mean": 0.723,
         "win_rate": 1.0,
-        "gap": 0.27
+        "gap": 0.277
       },
       {
         "bin": 8,
@@ -342,18 +342,18 @@
     "baseball:all": [
       {
         "predicted": 0.497,
-        "actual": 0.5593,
-        "n": 270
+        "actual": 0.5435,
+        "n": 276
       },
       {
-        "predicted": 0.5414,
-        "actual": 0.5593,
-        "n": 270
+        "predicted": 0.5417,
+        "actual": 0.5435,
+        "n": 276
       },
       {
-        "predicted": 0.6319,
-        "actual": 0.6596,
-        "n": 47
+        "predicted": 0.6317,
+        "actual": 0.68,
+        "n": 50
       }
     ]
   }
