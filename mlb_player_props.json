@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-06-21T23:24:06Z",
+  "generated_at": "2026-06-22T01:46:16Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815842",
-      "kickoff": "2026-06-21T23:20Z",
-      "league": "MLB",
-      "match": "New York Mets at Philadelphia Phillies",
-      "home": "Philadelphia Phillies",
-      "away": "New York Mets",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Philadelphia Phillies",
-          "pitcher": "Zack Wheeler",
-          "label": "Zack Wheeler moins de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "under",
-          "probability": 0.5716,
-          "fair_odds": 1.75,
-          "expected_strikeouts": 6.15,
-          "projected_ip": 6.22,
-          "inputs": {
-            "k9": 8.9,
-            "era": 2.01,
-            "whip": 0.85,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Philadelphia Phillies",
-          "pitcher": "Zack Wheeler",
-          "label": "Zack Wheeler concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5024,
-          "fair_odds": 1.99,
-          "expected_hr_allowed": 0.698,
-          "projected_ip": 6.22,
-          "inputs": {
-            "hr9": 1.01,
-            "era": 2.01,
-            "whip": 0.85
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "New York Mets",
-          "pitcher": "David Peterson",
-          "label": "David Peterson plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.6001,
-          "fair_odds": 1.67,
-          "expected_strikeouts": 5.98,
-          "projected_ip": 6.6,
-          "inputs": {
-            "k9": 8.16,
-            "era": 5.91,
-            "whip": 1.63,
-            "hand": "L"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "New York Mets",
-          "pitcher": "David Peterson",
-          "label": "David Peterson ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5985,
-          "fair_odds": 1.67,
-          "expected_hr_allowed": 0.513,
-          "projected_ip": 6.6,
-          "inputs": {
-            "hr9": 0.7,
-            "era": 5.91,
-            "whip": 1.63
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815858",
       "kickoff": "2026-06-22T22:10Z",
@@ -1510,7 +1428,7 @@
       ]
     }
   ],
-  "props": 72,
+  "props": 68,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"

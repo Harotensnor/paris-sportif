@@ -1,46 +1,28 @@
 {
-  "generated_at": "2026-06-21T23:24:06Z",
+  "generated_at": "2026-06-22T01:46:17Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 54,
-    "actionable": 37,
-    "watch": 6,
+    "active_events": 56,
+    "actionable": 38,
+    "watch": 7,
     "risk": 11,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 29,
+      "injury_imbalance": 31,
       "travel_extreme": 16,
       "back_to_back_travel": 22,
       "market_uncertain": 15,
       "signal_conflict": 3
     },
     "by_quality": {
-      "actionable": 37,
-      "watch": 6,
+      "actionable": 38,
+      "watch": 7,
       "risk": 11
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401815842",
-      "date": "2026-06-21T23:20Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Philadelphia Phillies",
-      "away": "New York Mets",
-      "match": "Philadelphia Phillies - New York Mets",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "New York Mets",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 4-11"
-    },
     {
       "event_id": "401815858",
       "date": "2026-06-22T22:10Z",
@@ -510,6 +492,42 @@
       "context": "Absences severes 13-7"
     },
     {
+      "event_id": "401815952",
+      "date": "2026-06-29T23:05Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "New York Yankees",
+      "away": "Detroit Tigers",
+      "match": "New York Yankees - Detroit Tigers",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Detroit Tigers",
+      "side": null,
+      "strength": 1.0,
+      "context": "Absences severes 5-12"
+    },
+    {
+      "event_id": "401815962",
+      "date": "2026-06-30T01:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Athletics",
+      "away": "Los Angeles Dodgers",
+      "match": "Athletics - Los Angeles Dodgers",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Los Angeles Dodgers",
+      "side": null,
+      "strength": 1.0,
+      "context": "Absences severes 7-16"
+    },
+    {
       "event_id": "401815889",
       "date": "2026-06-24T16:10Z",
       "sport": "baseball",
@@ -780,6 +798,24 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 0-3"
+    },
+    {
+      "event_id": "401815957",
+      "date": "2026-06-29T23:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Milwaukee Brewers",
+      "away": "Cincinnati Reds",
+      "match": "Milwaukee Brewers - Cincinnati Reds",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Milwaukee Brewers",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 11-8"
     },
     {
       "event_id": "401815855",
