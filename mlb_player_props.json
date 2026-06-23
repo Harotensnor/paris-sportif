@@ -1,54 +1,8 @@
 {
-  "generated_at": "2026-06-23T19:25:53Z",
+  "generated_at": "2026-06-23T21:12:31Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815868",
-      "kickoff": "2026-06-23T20:07Z",
-      "league": "MLB",
-      "match": "Houston Astros at Toronto Blue Jays",
-      "home": "Toronto Blue Jays",
-      "away": "Houston Astros",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Houston Astros",
-          "pitcher": "Peter Lambert",
-          "label": "Peter Lambert moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.5499,
-          "fair_odds": 1.82,
-          "expected_strikeouts": 5.28,
-          "projected_ip": 5.82,
-          "inputs": {
-            "k9": 8.16,
-            "era": 3.23,
-            "whip": 1.11,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Houston Astros",
-          "pitcher": "Peter Lambert",
-          "label": "Peter Lambert ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.581,
-          "fair_odds": 1.72,
-          "expected_hr_allowed": 0.543,
-          "projected_ip": 5.82,
-          "inputs": {
-            "hr9": 0.84,
-            "era": 3.23,
-            "whip": 1.11
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815869",
       "kickoff": "2026-06-23T22:40Z",
@@ -2648,7 +2602,7 @@
       ]
     }
   ],
-  "props": 128,
+  "props": 126,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"

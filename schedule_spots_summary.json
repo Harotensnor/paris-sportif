@@ -1,23 +1,23 @@
 {
-  "generated_at": "2026-06-23T19:25:54Z",
+  "generated_at": "2026-06-23T21:12:31Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 41,
+    "active_events": 40,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 58,
-      "travel_extreme": 21,
-      "back_to_back_travel": 26,
+      "lookahead": 56,
+      "back_to_back_travel": 25,
+      "travel_extreme": 20,
       "schedule_congestion": 18
     },
     "by_decision": {
       "abstain": 11,
-      "lean_home": 28,
+      "lean_home": 27,
       "lean_away": 2
     },
-    "lean_home": 28,
+    "lean_home": 27,
     "lean_away": 2,
     "abstain": 11,
     "monitor": 0
@@ -2034,80 +2034,6 @@
             "type": "travel_extreme",
             "direction": "fade",
             "strength": 0.798
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815868",
-      "source_event_ids": [
-        "401815868"
-      ],
-      "kickoff": "2026-06-23T20:07Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Toronto Blue Jays",
-      "away": "Houston Astros",
-      "match": "Toronto Blue Jays - Houston Astros",
-      "decision": "lean_home",
-      "net_team": "Toronto Blue Jays",
-      "reason": "Houston Astros plus penalise par calendrier/voyage (1.59 vs 0.15)",
-      "pressure_score": 2.102,
-      "home_fade": 0.15,
-      "away_fade": 1.585,
-      "travel_score": 1.435,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2,
-        "travel_extreme": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours",
-        "Deplacement estime 2092 km, decalage ~1.1h",
-        "1 match dans les 48h + 2092 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.545,
-        "away_score": -1.933,
-        "home_fade": 0.15,
-        "away_fade": 1.985,
-        "reason": "Direction nette: Toronto Blue Jays (+0.54)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.487
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.948
           }
         ]
       }
