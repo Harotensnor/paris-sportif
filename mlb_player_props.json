@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-23T12:29:38Z",
+  "generated_at": "2026-06-23T15:33:21Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -338,6 +338,42 @@
             "whip": 1.24
           },
           "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Texas Rangers",
+          "pitcher": "Cal Quantrill",
+          "label": "Cal Quantrill moins de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "under",
+          "probability": 0.6118,
+          "fair_odds": 1.63,
+          "expected_strikeouts": 3.11,
+          "projected_ip": 4.8,
+          "inputs": {
+            "k9": 5.83,
+            "era": 3.68,
+            "whip": 1.26,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Texas Rangers",
+          "pitcher": "Cal Quantrill",
+          "label": "Cal Quantrill ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6122,
+          "fair_odds": 1.63,
+          "expected_hr_allowed": 0.491,
+          "projected_ip": 4.8,
+          "inputs": {
+            "hr9": 0.92,
+            "era": 3.68,
+            "whip": 1.26
+          },
+          "side": "away"
         }
       ]
     },
@@ -680,36 +716,36 @@
         {
           "market": "pitcher_strikeouts",
           "team": "Minnesota Twins",
-          "pitcher": "Joe Ryan",
-          "label": "Joe Ryan moins de 6,5 strikeouts",
+          "pitcher": "Kendry Rojas",
+          "label": "Kendry Rojas moins de 6,5 strikeouts",
           "line": 6.5,
           "pick": "under",
-          "probability": 0.5677,
-          "fair_odds": 1.76,
-          "expected_strikeouts": 6.17,
-          "projected_ip": 5.44,
+          "probability": 0.5109,
+          "fair_odds": 1.96,
+          "expected_strikeouts": 6.45,
+          "projected_ip": 6.6,
           "inputs": {
-            "k9": 10.2,
-            "era": 2.99,
-            "whip": 1.0,
-            "hand": "R"
+            "k9": 8.79,
+            "era": 1.26,
+            "whip": 1.47,
+            "hand": "L"
           },
           "side": "home"
         },
         {
           "market": "pitcher_home_run_allowed",
           "team": "Minnesota Twins",
-          "pitcher": "Joe Ryan",
-          "label": "Joe Ryan ne concède pas de home run",
+          "pitcher": "Kendry Rojas",
+          "label": "Kendry Rojas ne concède pas de home run",
           "pick": "no",
-          "probability": 0.609,
-          "fair_odds": 1.64,
-          "expected_hr_allowed": 0.496,
-          "projected_ip": 5.44,
+          "probability": 1.0,
+          "fair_odds": 1.01,
+          "expected_hr_allowed": 0.0,
+          "projected_ip": 6.6,
           "inputs": {
-            "hr9": 0.82,
-            "era": 2.99,
-            "whip": 1.0
+            "hr9": 0.0,
+            "era": 1.26,
+            "whip": 1.47
           },
           "side": "home"
         },
@@ -1007,6 +1043,42 @@
       "props": [
         {
           "market": "pitcher_strikeouts",
+          "team": "San Diego Padres",
+          "pitcher": "Randy Vásquez",
+          "label": "Randy Vásquez plus de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "over",
+          "probability": 0.6052,
+          "fair_odds": 1.65,
+          "expected_strikeouts": 3.91,
+          "projected_ip": 5.15,
+          "inputs": {
+            "k9": 6.84,
+            "era": 4.17,
+            "whip": 1.4,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "San Diego Padres",
+          "pitcher": "Randy Vásquez",
+          "label": "Randy Vásquez concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5163,
+          "fair_odds": 1.94,
+          "expected_hr_allowed": 0.726,
+          "projected_ip": 5.15,
+          "inputs": {
+            "hr9": 1.27,
+            "era": 4.17,
+            "whip": 1.4
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
           "team": "Atlanta Braves",
           "pitcher": "Martín Pérez",
           "label": "Martín Pérez moins de 5,5 strikeouts",
@@ -1120,6 +1192,52 @@
             "hr9": 0.0,
             "era": 2.37,
             "whip": 0.99
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815889",
+      "kickoff": "2026-06-24T16:10Z",
+      "league": "MLB",
+      "match": "Texas Rangers at Miami Marlins",
+      "home": "Miami Marlins",
+      "away": "Texas Rangers",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Texas Rangers",
+          "pitcher": "Jacob deGrom",
+          "label": "Jacob deGrom moins de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "under",
+          "probability": 0.5006,
+          "fair_odds": 2.0,
+          "expected_strikeouts": 6.5,
+          "projected_ip": 5.48,
+          "inputs": {
+            "k9": 10.67,
+            "era": 3.59,
+            "whip": 1.03,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Texas Rangers",
+          "pitcher": "Jacob deGrom",
+          "label": "Jacob deGrom concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.6293,
+          "fair_odds": 1.59,
+          "expected_hr_allowed": 0.992,
+          "projected_ip": 5.48,
+          "inputs": {
+            "hr9": 1.63,
+            "era": 3.59,
+            "whip": 1.03
           },
           "side": "away"
         }
@@ -2402,6 +2520,52 @@
       ]
     },
     {
+      "event_id": "401815897",
+      "kickoff": "2026-06-25T23:10Z",
+      "league": "MLB",
+      "match": "Chicago Cubs at New York Mets",
+      "home": "New York Mets",
+      "away": "Chicago Cubs",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "New York Mets",
+          "pitcher": "Freddy Peralta",
+          "label": "Freddy Peralta moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.5762,
+          "fair_odds": 1.74,
+          "expected_strikeouts": 5.16,
+          "projected_ip": 5.33,
+          "inputs": {
+            "k9": 8.72,
+            "era": 4.83,
+            "whip": 1.39,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "New York Mets",
+          "pitcher": "Freddy Peralta",
+          "label": "Freddy Peralta concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5255,
+          "fair_odds": 1.9,
+          "expected_hr_allowed": 0.746,
+          "projected_ip": 5.33,
+          "inputs": {
+            "hr9": 1.26,
+            "era": 4.83,
+            "whip": 1.39
+          },
+          "side": "home"
+        }
+      ]
+    },
+    {
       "event_id": "401815904",
       "kickoff": "2026-06-25T23:45Z",
       "league": "MLB",
@@ -2484,7 +2648,7 @@
       ]
     }
   ],
-  "props": 120,
+  "props": 128,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
