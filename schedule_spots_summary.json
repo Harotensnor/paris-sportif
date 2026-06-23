@@ -1,23 +1,23 @@
 {
-  "generated_at": "2026-06-23T03:00:17Z",
+  "generated_at": "2026-06-23T06:54:18Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 32,
+    "active_events": 33,
     "expired_sample": 0,
     "by_type": {
       "lookahead": 46,
-      "travel_extreme": 19,
+      "travel_extreme": 20,
       "back_to_back_travel": 13,
       "schedule_congestion": 5
     },
     "by_decision": {
       "abstain": 9,
-      "lean_home": 21,
+      "lean_home": 22,
       "lean_away": 2
     },
-    "lean_home": 21,
+    "lean_home": 22,
     "lean_away": 2,
     "abstain": 9,
     "monitor": 0
@@ -348,13 +348,13 @@
         "1 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": 0.253,
-        "away_score": -0.747,
+        "status": "net",
+        "net_side": "away",
+        "home_score": -1.097,
+        "away_score": 0.252,
         "home_fade": 1.15,
-        "away_fade": 1.15,
-        "reason": "Signaux opposes: Chicago White Sox fade 1.15, Cleveland Guardians fade 1.15 -> prudence",
+        "away_fade": 0.15,
+        "reason": "Direction nette: Cleveland Guardians (+0.25)",
         "detail": [
           {
             "side": "home",
@@ -372,18 +372,6 @@
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
             "strength": 1.0
           }
         ]
@@ -1159,11 +1147,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.649,
-        "away_score": -2.606,
+        "home_score": 1.22,
+        "away_score": -2.234,
         "home_fade": 0.3,
-        "away_fade": 2.711,
-        "reason": "Direction nette: St. Louis Cardinals (+0.65)",
+        "away_fade": 2.339,
+        "reason": "Direction nette: St. Louis Cardinals (+1.22)",
         "detail": [
           {
             "side": "home",
@@ -1184,10 +1172,16 @@
             "strength": 1.0
           },
           {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.701
+          },
+          {
             "side": "away",
             "type": "market_move",
             "direction": "drift",
-            "strength": 0.936
+            "strength": 0.564
           },
           {
             "side": "away",
@@ -2015,6 +2009,63 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.6
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815874",
+      "source_event_ids": [
+        "401815874"
+      ],
+      "kickoff": "2026-06-23T22:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Miami Marlins",
+      "away": "Texas Rangers",
+      "match": "Miami Marlins - Texas Rangers",
+      "decision": "lean_home",
+      "net_team": "Miami Marlins",
+      "reason": "Texas Rangers plus penalise par calendrier/voyage (0.42 vs 0.00)",
+      "pressure_score": 0.42,
+      "home_fade": 0.0,
+      "away_fade": 0.42,
+      "travel_score": 0.42,
+      "lookahead_score": 0,
+      "congestion_score": 0,
+      "types": {
+        "travel_extreme": 1
+      },
+      "contexts": [
+        "Deplacement estime 1807 km, decalage ~1.1h"
+      ],
+      "global_resolution": {
+        "status": "mixed",
+        "net_side": null,
+        "home_score": 0.427,
+        "away_score": -0.759,
+        "home_fade": 0.0,
+        "away_fade": 1.22,
+        "reason": "Signaux mitigés: avantage net trop faible (Miami Marlins +0.43, Texas Rangers -0.76)",
+        "detail": [
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.8
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.461
+          },
+          {
+            "side": "away",
+            "type": "travel_extreme",
+            "direction": "fade",
+            "strength": 0.42
           }
         ]
       }

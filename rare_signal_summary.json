@@ -1,47 +1,29 @@
 {
-  "generated_at": "2026-06-23T03:00:17Z",
+  "generated_at": "2026-06-23T06:54:18Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 50,
-    "actionable": 29,
-    "watch": 15,
+    "active_events": 48,
+    "actionable": 28,
+    "watch": 14,
     "risk": 6,
     "expired_sample": 0,
     "by_type": {
-      "market_move": 21,
       "travel_extreme": 19,
-      "injury_imbalance": 27,
+      "injury_imbalance": 28,
+      "market_move": 17,
       "signal_conflict": 3,
       "market_uncertain": 11,
       "back_to_back_travel": 13
     },
     "by_quality": {
-      "watch": 15,
-      "actionable": 29,
+      "watch": 14,
+      "actionable": 28,
       "risk": 6
     }
   },
   "active_actionable": [
-    {
-      "event_id": "179986",
-      "date": "2026-06-23T13:00Z",
-      "sport": "tennis",
-      "league_code": "wimbledon",
-      "league_name": "Wimbledon",
-      "home": "",
-      "away": "",
-      "match": "? - ?",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 8.50 -> 6.75 (+20.6%)"
-    },
     {
       "event_id": "401815871",
       "date": "2026-06-23T22:40Z",
@@ -403,6 +385,24 @@
       "context": "2 match dans les 48h + 1664 km de voyage"
     },
     {
+      "event_id": "401815867",
+      "date": "2026-06-23T23:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "New York Mets",
+      "away": "Chicago Cubs",
+      "match": "New York Mets - Chicago Cubs",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.889,
+      "context": "Cote away: 2.00 -> 1.68 (+16.0%)"
+    },
+    {
       "event_id": "401815884",
       "date": "2026-06-24T22:40Z",
       "sport": "baseball",
@@ -439,22 +439,22 @@
       "context": "Deplacement estime 3704 km, decalage ~2.8h"
     },
     {
-      "event_id": "401815867",
-      "date": "2026-06-23T23:10Z",
+      "event_id": "401815874",
+      "date": "2026-06-23T22:40Z",
       "sport": "baseball",
       "league_code": "mlb",
       "league_name": "MLB",
-      "home": "New York Mets",
-      "away": "Chicago Cubs",
-      "match": "New York Mets - Chicago Cubs",
+      "home": "Miami Marlins",
+      "away": "Texas Rangers",
+      "match": "Miami Marlins - Texas Rangers",
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.842,
-      "context": "Cote away: 1.98 -> 1.68 (+15.2%)"
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Texas Rangers",
+      "side": null,
+      "strength": 0.8,
+      "context": "Absences severes 9-13"
     },
     {
       "event_id": "401815873",
@@ -509,24 +509,6 @@
       "side": "away",
       "strength": 0.704,
       "context": "Deplacement estime 3028 km, decalage ~2.2h"
-    },
-    {
-      "event_id": "178134",
-      "date": "2026-06-23T11:30Z",
-      "sport": "tennis",
-      "league_code": "lexuseastbourneopen",
-      "league_name": "Lexus Eastbourne Open",
-      "home": "",
-      "away": "",
-      "match": "? - ?",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.679,
-      "context": "Cote away: 4.50 -> 3.95 (+12.2%)"
     },
     {
       "event_id": "401815878",
@@ -781,24 +763,6 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 10-7"
-    },
-    {
-      "event_id": "178093",
-      "date": "2026-06-23T09:30Z",
-      "sport": "tennis",
-      "league_code": "badhomburgopenpowere",
-      "league_name": "Bad Homburg Open powered by Solarwatt",
-      "home": "",
-      "away": "",
-      "match": "? - ?",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.514,
-      "context": "Cote away: 2.70 -> 2.45 (+9.3%)"
     },
     {
       "event_id": "401815868",
