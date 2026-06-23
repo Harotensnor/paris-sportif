@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-23T15:33:22Z",
+  "generated_at": "2026-06-23T17:28:45Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -2061,11 +2061,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.405,
-        "away_score": -1.533,
+        "home_score": 0.545,
+        "away_score": -1.933,
         "home_fade": 0.15,
-        "away_fade": 1.585,
-        "reason": "Direction nette: Toronto Blue Jays (+0.40)",
+        "away_fade": 1.985,
+        "reason": "Direction nette: Toronto Blue Jays (+0.54)",
         "detail": [
           {
             "side": "home",
@@ -2078,6 +2078,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.4
           },
           {
             "side": "away",
@@ -2439,12 +2445,18 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.52,
-        "away_score": -1.487,
+        "home_score": 0.66,
+        "away_score": -1.887,
         "home_fade": 0.0,
-        "away_fade": 1.487,
-        "reason": "Direction nette: Toronto Blue Jays (+0.52)",
+        "away_fade": 1.887,
+        "reason": "Direction nette: Toronto Blue Jays (+0.66)",
         "detail": [
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.4
+          },
           {
             "side": "away",
             "type": "travel_extreme",
