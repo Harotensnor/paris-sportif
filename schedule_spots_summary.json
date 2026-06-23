@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-23T06:54:18Z",
+  "generated_at": "2026-06-23T10:38:42Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -1147,11 +1147,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 1.22,
-        "away_score": -2.234,
+        "home_score": 1.15,
+        "away_score": -2.468,
         "home_fade": 0.3,
-        "away_fade": 2.339,
-        "reason": "Direction nette: St. Louis Cardinals (+1.22)",
+        "away_fade": 2.573,
+        "reason": "Direction nette: St. Louis Cardinals (+1.15)",
         "detail": [
           {
             "side": "home",
@@ -1175,13 +1175,13 @@
             "side": "home",
             "type": "market_move",
             "direction": "steam",
-            "strength": 0.701
+            "strength": 0.549
           },
           {
             "side": "away",
             "type": "market_move",
             "direction": "drift",
-            "strength": 0.564
+            "strength": 0.798
           },
           {
             "side": "away",
@@ -2041,25 +2041,19 @@
         "Deplacement estime 1807 km, decalage ~1.1h"
       ],
       "global_resolution": {
-        "status": "mixed",
-        "net_side": null,
+        "status": "net",
+        "net_side": "home",
         "home_score": 0.427,
-        "away_score": -0.759,
+        "away_score": -1.22,
         "home_fade": 0.0,
         "away_fade": 1.22,
-        "reason": "Signaux mitigés: avantage net trop faible (Miami Marlins +0.43, Texas Rangers -0.76)",
+        "reason": "Direction nette: Miami Marlins (+0.43)",
         "detail": [
           {
             "side": "away",
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.8
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.461
           },
           {
             "side": "away",
