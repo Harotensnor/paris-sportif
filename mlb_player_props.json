@@ -1,172 +1,8 @@
 {
-  "generated_at": "2026-06-24T19:04:17Z",
+  "generated_at": "2026-06-24T20:52:13Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815893",
-      "kickoff": "2026-06-24T19:10Z",
-      "league": "MLB",
-      "match": "Boston Red Sox at Colorado Rockies",
-      "home": "Colorado Rockies",
-      "away": "Boston Red Sox",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Colorado Rockies",
-          "pitcher": "Kyle Freeland",
-          "label": "Kyle Freeland moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.5285,
-          "fair_odds": 1.89,
-          "expected_strikeouts": 4.38,
-          "projected_ip": 5.08,
-          "inputs": {
-            "k9": 7.77,
-            "era": 7.36,
-            "whip": 1.58,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Colorado Rockies",
-          "pitcher": "Kyle Freeland",
-          "label": "Kyle Freeland concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6595,
-          "fair_odds": 1.52,
-          "expected_hr_allowed": 1.077,
-          "projected_ip": 5.08,
-          "inputs": {
-            "hr9": 1.91,
-            "era": 7.36,
-            "whip": 1.58
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Boston Red Sox",
-          "pitcher": "Ranger Suarez",
-          "label": "Ranger Suarez moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.5394,
-          "fair_odds": 1.85,
-          "expected_strikeouts": 5.32,
-          "projected_ip": 5.44,
-          "inputs": {
-            "k9": 8.8,
-            "era": 2.93,
-            "whip": 1.12,
-            "hand": "L"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Boston Red Sox",
-          "pitcher": "Ranger Suarez",
-          "label": "Ranger Suarez ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.7526,
-          "fair_odds": 1.33,
-          "expected_hr_allowed": 0.284,
-          "projected_ip": 5.44,
-          "inputs": {
-            "hr9": 0.47,
-            "era": 2.93,
-            "whip": 1.12
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401815896",
-      "kickoff": "2026-06-24T20:07Z",
-      "league": "MLB",
-      "match": "Baltimore Orioles at Los Angeles Angels",
-      "home": "Los Angeles Angels",
-      "away": "Baltimore Orioles",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Los Angeles Angels",
-          "pitcher": "José Soriano",
-          "label": "José Soriano moins de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "under",
-          "probability": 0.5766,
-          "fair_odds": 1.73,
-          "expected_strikeouts": 6.13,
-          "projected_ip": 5.75,
-          "inputs": {
-            "k9": 9.59,
-            "era": 3.03,
-            "whip": 1.27,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Los Angeles Angels",
-          "pitcher": "José Soriano",
-          "label": "José Soriano ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5347,
-          "fair_odds": 1.87,
-          "expected_hr_allowed": 0.626,
-          "projected_ip": 5.75,
-          "inputs": {
-            "hr9": 0.98,
-            "era": 3.03,
-            "whip": 1.27
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Baltimore Orioles",
-          "pitcher": "Trey Gibson",
-          "label": "Trey Gibson plus de 3,5 strikeouts",
-          "line": 3.5,
-          "pick": "over",
-          "probability": 0.6182,
-          "fair_odds": 1.62,
-          "expected_strikeouts": 3.97,
-          "projected_ip": 5.22,
-          "inputs": {
-            "k9": 6.84,
-            "era": 5.81,
-            "whip": 1.71,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Baltimore Orioles",
-          "pitcher": "Trey Gibson",
-          "label": "Trey Gibson concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5482,
-          "fair_odds": 1.82,
-          "expected_hr_allowed": 0.795,
-          "projected_ip": 5.22,
-          "inputs": {
-            "hr9": 1.37,
-            "era": 5.81,
-            "whip": 1.71
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815884",
       "kickoff": "2026-06-24T22:40Z",
@@ -421,42 +257,6 @@
       "home": "Washington Nationals",
       "away": "Philadelphia Phillies",
       "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Washington Nationals",
-          "pitcher": "Miles Mikolas",
-          "label": "Miles Mikolas plus de 3,5 strikeouts",
-          "line": 3.5,
-          "pick": "over",
-          "probability": 0.5869,
-          "fair_odds": 1.7,
-          "expected_strikeouts": 3.84,
-          "projected_ip": 6.6,
-          "inputs": {
-            "k9": 5.23,
-            "era": 5.47,
-            "whip": 1.28,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Washington Nationals",
-          "pitcher": "Miles Mikolas",
-          "label": "Miles Mikolas concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.7607,
-          "fair_odds": 1.31,
-          "expected_hr_allowed": 1.43,
-          "projected_ip": 6.6,
-          "inputs": {
-            "hr9": 1.95,
-            "era": 5.47,
-            "whip": 1.28
-          },
-          "side": "home"
-        },
         {
           "market": "pitcher_strikeouts",
           "team": "Philadelphia Phillies",
@@ -1444,7 +1244,7 @@
       ]
     }
   ],
-  "props": 70,
+  "props": 60,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"

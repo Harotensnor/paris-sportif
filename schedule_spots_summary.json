@@ -1,23 +1,23 @@
 {
-  "generated_at": "2026-06-24T19:04:17Z",
+  "generated_at": "2026-06-24T20:52:13Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 29,
+    "active_events": 27,
     "expired_sample": 0,
     "by_type": {
-      "travel_extreme": 12,
-      "back_to_back_travel": 16,
       "lookahead": 32,
+      "back_to_back_travel": 14,
+      "travel_extreme": 10,
       "schedule_congestion": 18
     },
     "by_decision": {
       "abstain": 10,
-      "lean_home": 17,
+      "lean_home": 15,
       "lean_away": 2
     },
-    "lean_home": 17,
+    "lean_home": 15,
     "lean_away": 2,
     "abstain": 10,
     "monitor": 0
@@ -855,11 +855,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": -0.039,
-        "away_score": -1.769,
+        "home_score": 0.031,
+        "away_score": -1.969,
         "home_fade": 0.75,
-        "away_fade": 2.032,
-        "reason": "Direction nette: New York Mets (-0.04)",
+        "away_fade": 2.232,
+        "reason": "Direction nette: New York Mets (+0.03)",
         "detail": [
           {
             "side": "home",
@@ -889,7 +889,7 @@
             "side": "away",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.4
+            "strength": 0.6
           },
           {
             "side": "away",
@@ -1007,11 +1007,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": -0.071,
-        "away_score": -1.802,
+        "home_score": -0.001,
+        "away_score": -2.002,
         "home_fade": 0.8,
-        "away_fade": 2.082,
-        "reason": "Direction nette: New York Mets (-0.07)",
+        "away_fade": 2.282,
+        "reason": "Direction nette: New York Mets (-0.00)",
         "detail": [
           {
             "side": "home",
@@ -1029,7 +1029,7 @@
             "side": "away",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.4
+            "strength": 0.6
           },
           {
             "side": "away",
@@ -1322,59 +1322,6 @@
       }
     },
     {
-      "event_id": "401815896",
-      "source_event_ids": [
-        "401815896"
-      ],
-      "kickoff": "2026-06-24T20:07Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Los Angeles Angels",
-      "away": "Baltimore Orioles",
-      "match": "Los Angeles Angels - Baltimore Orioles",
-      "decision": "lean_home",
-      "net_team": "Los Angeles Angels",
-      "reason": "Baltimore Orioles plus penalise par calendrier/voyage (1.86 vs 0.00)",
-      "pressure_score": 1.861,
-      "home_fade": 0.0,
-      "away_fade": 1.861,
-      "travel_score": 1.861,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "travel_extreme": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "Deplacement estime 3704 km, decalage ~2.8h",
-        "2 match dans les 48h + 3704 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.651,
-        "away_score": -1.861,
-        "home_fade": 0.0,
-        "away_fade": 1.861,
-        "reason": "Direction nette: Los Angeles Angels (+0.65)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.861
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401815902",
       "source_event_ids": [
         "401815902"
@@ -1423,59 +1370,6 @@
             "type": "travel_extreme",
             "direction": "fade",
             "strength": 0.798
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815893",
-      "source_event_ids": [
-        "401815893"
-      ],
-      "kickoff": "2026-06-24T19:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Colorado Rockies",
-      "away": "Boston Red Sox",
-      "match": "Colorado Rockies - Boston Red Sox",
-      "decision": "lean_home",
-      "net_team": "Colorado Rockies",
-      "reason": "Boston Red Sox plus penalise par calendrier/voyage (1.66 vs 0.00)",
-      "pressure_score": 1.66,
-      "home_fade": 0.0,
-      "away_fade": 1.66,
-      "travel_score": 1.66,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "travel_extreme": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "Deplacement estime 2838 km, decalage ~2.3h",
-        "2 match dans les 48h + 2838 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.581,
-        "away_score": -1.66,
-        "home_fade": 0.0,
-        "away_fade": 1.66,
-        "reason": "Direction nette: Colorado Rockies (+0.58)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.66
           },
           {
             "side": "away",
