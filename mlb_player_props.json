@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-24T03:00:24Z",
+  "generated_at": "2026-06-24T06:53:24Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -1362,52 +1362,6 @@
       ]
     },
     {
-      "event_id": "401815897",
-      "kickoff": "2026-06-25T23:10Z",
-      "league": "MLB",
-      "match": "Chicago Cubs at New York Mets",
-      "home": "New York Mets",
-      "away": "Chicago Cubs",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "New York Mets",
-          "pitcher": "Freddy Peralta",
-          "label": "Freddy Peralta moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.5762,
-          "fair_odds": 1.74,
-          "expected_strikeouts": 5.16,
-          "projected_ip": 5.33,
-          "inputs": {
-            "k9": 8.72,
-            "era": 4.83,
-            "whip": 1.39,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "New York Mets",
-          "pitcher": "Freddy Peralta",
-          "label": "Freddy Peralta concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5255,
-          "fair_odds": 1.9,
-          "expected_hr_allowed": 0.746,
-          "projected_ip": 5.33,
-          "inputs": {
-            "hr9": 1.26,
-            "era": 4.83,
-            "whip": 1.39
-          },
-          "side": "home"
-        }
-      ]
-    },
-    {
       "event_id": "401815904",
       "kickoff": "2026-06-25T23:45Z",
       "league": "MLB",
@@ -1490,7 +1444,7 @@
       ]
     }
   ],
-  "props": 72,
+  "props": 70,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
