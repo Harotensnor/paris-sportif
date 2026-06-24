@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-06-24T15:09:28Z",
+  "generated_at": "2026-06-24T17:16:45Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815889",
-      "kickoff": "2026-06-24T16:10Z",
-      "league": "MLB",
-      "match": "Texas Rangers at Miami Marlins",
-      "home": "Miami Marlins",
-      "away": "Texas Rangers",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Miami Marlins",
-          "pitcher": "Eury Pérez",
-          "label": "Eury Pérez plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.5945,
-          "fair_odds": 1.68,
-          "expected_strikeouts": 5.96,
-          "projected_ip": 5.18,
-          "inputs": {
-            "k9": 10.34,
-            "era": 4.6,
-            "whip": 1.26,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Miami Marlins",
-          "pitcher": "Eury Pérez",
-          "label": "Eury Pérez concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5975,
-          "fair_odds": 1.67,
-          "expected_hr_allowed": 0.91,
-          "projected_ip": 5.18,
-          "inputs": {
-            "hr9": 1.58,
-            "era": 4.6,
-            "whip": 1.26
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Texas Rangers",
-          "pitcher": "Jacob deGrom",
-          "label": "Jacob deGrom moins de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "under",
-          "probability": 0.5006,
-          "fair_odds": 2.0,
-          "expected_strikeouts": 6.5,
-          "projected_ip": 5.48,
-          "inputs": {
-            "k9": 10.67,
-            "era": 3.59,
-            "whip": 1.03,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Texas Rangers",
-          "pitcher": "Jacob deGrom",
-          "label": "Jacob deGrom concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6293,
-          "fair_odds": 1.59,
-          "expected_hr_allowed": 0.992,
-          "projected_ip": 5.48,
-          "inputs": {
-            "hr9": 1.63,
-            "era": 3.59,
-            "whip": 1.03
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815891",
       "kickoff": "2026-06-24T18:10Z",
@@ -1362,6 +1280,52 @@
       ]
     },
     {
+      "event_id": "401815897",
+      "kickoff": "2026-06-25T23:10Z",
+      "league": "MLB",
+      "match": "Chicago Cubs at New York Mets",
+      "home": "New York Mets",
+      "away": "Chicago Cubs",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "New York Mets",
+          "pitcher": "Freddy Peralta",
+          "label": "Freddy Peralta moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.5762,
+          "fair_odds": 1.74,
+          "expected_strikeouts": 5.16,
+          "projected_ip": 5.33,
+          "inputs": {
+            "k9": 8.72,
+            "era": 4.83,
+            "whip": 1.39,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "New York Mets",
+          "pitcher": "Freddy Peralta",
+          "label": "Freddy Peralta concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5255,
+          "fair_odds": 1.9,
+          "expected_hr_allowed": 0.746,
+          "projected_ip": 5.33,
+          "inputs": {
+            "hr9": 1.26,
+            "era": 4.83,
+            "whip": 1.39
+          },
+          "side": "home"
+        }
+      ]
+    },
+    {
       "event_id": "401815904",
       "kickoff": "2026-06-25T23:45Z",
       "league": "MLB",
@@ -1444,7 +1408,7 @@
       ]
     }
   ],
-  "props": 70,
+  "props": 68,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"

@@ -1,45 +1,27 @@
 {
-  "generated_at": "2026-06-24T15:09:28Z",
+  "generated_at": "2026-06-24T17:16:46Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 39,
-    "actionable": 25,
-    "watch": 8,
-    "risk": 6,
+    "active_events": 40,
+    "actionable": 28,
+    "watch": 7,
+    "risk": 5,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 21,
-      "back_to_back_travel": 15,
+      "back_to_back_travel": 17,
+      "injury_imbalance": 20,
       "travel_extreme": 12,
-      "market_uncertain": 6
+      "market_uncertain": 5
     },
     "by_quality": {
-      "actionable": 25,
-      "watch": 8,
-      "risk": 6
+      "actionable": 28,
+      "watch": 7,
+      "risk": 5
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401815889",
-      "date": "2026-06-24T16:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Miami Marlins",
-      "away": "Texas Rangers",
-      "match": "Miami Marlins - Texas Rangers",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Texas Rangers",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 8-13"
-    },
     {
       "event_id": "401815891",
       "date": "2026-06-24T18:10Z",
@@ -110,7 +92,7 @@
       "team": "Detroit Tigers",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 12-5"
+      "context": "Absences severes 12-6"
     },
     {
       "event_id": "401815888",
@@ -290,7 +272,7 @@
       "team": "Detroit Tigers",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 5-12"
+      "context": "Absences severes 6-12"
     },
     {
       "event_id": "401815965",
@@ -308,7 +290,7 @@
       "team": "Detroit Tigers",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 5-12"
+      "context": "Absences severes 6-12"
     },
     {
       "event_id": "401815980",
@@ -326,7 +308,7 @@
       "team": "Detroit Tigers",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 5-12"
+      "context": "Absences severes 6-12"
     },
     {
       "event_id": "401815884",
@@ -365,6 +347,42 @@
       "context": "2 match dans les 48h + 1664 km de voyage"
     },
     {
+      "event_id": "401815882",
+      "date": "2026-06-24T23:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "New York Mets",
+      "away": "Chicago Cubs",
+      "match": "New York Mets - Chicago Cubs",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Chicago Cubs",
+      "side": "away",
+      "strength": 0.882,
+      "context": "3 match dans les 48h + 1159 km de voyage"
+    },
+    {
+      "event_id": "401815897",
+      "date": "2026-06-25T23:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "New York Mets",
+      "away": "Chicago Cubs",
+      "match": "New York Mets - Chicago Cubs",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Chicago Cubs",
+      "side": "away",
+      "strength": 0.882,
+      "context": "3 match dans les 48h + 1159 km de voyage"
+    },
+    {
       "event_id": "401815989",
       "date": "2026-07-01T23:40Z",
       "sport": "baseball",
@@ -383,6 +401,24 @@
       "context": "1 match dans les 48h + 1664 km de voyage"
     },
     {
+      "event_id": "401879401",
+      "date": "2026-06-24T17:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "New York Mets",
+      "away": "Chicago Cubs",
+      "match": "New York Mets - Chicago Cubs",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Chicago Cubs",
+      "side": "away",
+      "strength": 0.842,
+      "context": "2 match dans les 48h + 1159 km de voyage"
+    },
+    {
       "event_id": "401815885",
       "date": "2026-06-24T23:10Z",
       "sport": "baseball",
@@ -399,6 +435,24 @@
       "side": null,
       "strength": 0.8,
       "context": "Absences severes 6-10"
+    },
+    {
+      "event_id": "401857017",
+      "date": "2026-06-24T23:30Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Indiana Fever",
+      "away": "Phoenix Mercury",
+      "match": "Indiana Fever - Phoenix Mercury",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Phoenix Mercury",
+      "side": null,
+      "strength": 0.8,
+      "context": "Absences severes 0-4"
     },
     {
       "event_id": "401815957",
@@ -491,24 +545,6 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 6-3"
-    },
-    {
-      "event_id": "401857017",
-      "date": "2026-06-24T23:30Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Indiana Fever",
-      "away": "Phoenix Mercury",
-      "match": "Indiana Fever - Phoenix Mercury",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Phoenix Mercury",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 0-3"
     },
     {
       "event_id": "401857018",
@@ -655,24 +691,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.3%"
-    },
-    {
-      "event_id": "401861406",
-      "date": "2026-06-27T11:35Z",
-      "sport": "football",
-      "league_code": "chn.1",
-      "league_name": "Chinese Super League",
-      "home": "Shenzhen Xinpengcheng",
-      "away": "Chengdu Rongcheng",
-      "match": "Shenzhen Xinpengcheng - Chengdu Rongcheng",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.2%"
     },
     {
       "event_id": "401861546",
