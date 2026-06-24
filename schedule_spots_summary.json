@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-24T10:24:02Z",
+  "generated_at": "2026-06-24T12:15:08Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -343,12 +343,12 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
+        "net_side": "home",
+        "home_score": 0.408,
         "away_score": -0.098,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Atlanta Dream (-0.10)",
+        "reason": "Direction nette: Golden State Valkyries (+0.41)",
         "detail": [
           {
             "side": "home",
@@ -361,6 +361,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.505
           }
         ]
       }
