@@ -1,28 +1,45 @@
 {
-  "generated_at": "2026-06-24T12:15:08Z",
+  "generated_at": "2026-06-24T15:09:28Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 40,
+    "active_events": 39,
     "actionable": 25,
-    "watch": 9,
+    "watch": 8,
     "risk": 6,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 21,
-      "back_to_back_travel": 14,
+      "back_to_back_travel": 15,
       "travel_extreme": 12,
-      "market_move": 1,
       "market_uncertain": 6
     },
     "by_quality": {
       "actionable": 25,
-      "watch": 9,
+      "watch": 8,
       "risk": 6
     }
   },
   "active_actionable": [
+    {
+      "event_id": "401815889",
+      "date": "2026-06-24T16:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Miami Marlins",
+      "away": "Texas Rangers",
+      "match": "Miami Marlins - Texas Rangers",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Texas Rangers",
+      "side": null,
+      "strength": 1.0,
+      "context": "Absences severes 8-13"
+    },
     {
       "event_id": "401815891",
       "date": "2026-06-24T18:10Z",
@@ -57,7 +74,7 @@
       "team": "Boston Red Sox",
       "side": "away",
       "strength": 1.0,
-      "context": "1 match dans les 48h + 2838 km de voyage"
+      "context": "2 match dans les 48h + 2838 km de voyage"
     },
     {
       "event_id": "401815896",
@@ -75,7 +92,7 @@
       "team": "Baltimore Orioles",
       "side": "away",
       "strength": 1.0,
-      "context": "1 match dans les 48h + 3704 km de voyage"
+      "context": "2 match dans les 48h + 3704 km de voyage"
     },
     {
       "event_id": "401815886",
@@ -94,6 +111,24 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 12-5"
+    },
+    {
+      "event_id": "401815888",
+      "date": "2026-06-24T22:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Pittsburgh Pirates",
+      "away": "Seattle Mariners",
+      "match": "Pittsburgh Pirates - Seattle Mariners",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Seattle Mariners",
+      "side": "away",
+      "strength": 1.0,
+      "context": "1 match dans les 48h + 3431 km de voyage"
     },
     {
       "event_id": "401815883",
@@ -165,7 +200,7 @@
       "team": "Atlanta Braves",
       "side": "away",
       "strength": 1.0,
-      "context": "1 match dans les 48h + 3028 km de voyage"
+      "context": "2 match dans les 48h + 3028 km de voyage"
     },
     {
       "event_id": "401815902",
@@ -183,7 +218,7 @@
       "team": "Seattle Mariners",
       "side": "away",
       "strength": 1.0,
-      "context": "1 match dans les 48h + 3431 km de voyage"
+      "context": "2 match dans les 48h + 3431 km de voyage"
     },
     {
       "event_id": "401815904",
@@ -294,24 +329,6 @@
       "context": "Absences severes 5-12"
     },
     {
-      "event_id": "401815889",
-      "date": "2026-06-24T16:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Miami Marlins",
-      "away": "Texas Rangers",
-      "match": "Miami Marlins - Texas Rangers",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Texas Rangers",
-      "side": "away",
-      "strength": 0.891,
-      "context": "1 match dans les 48h + 1807 km de voyage"
-    },
-    {
       "event_id": "401815884",
       "date": "2026-06-24T22:40Z",
       "sport": "baseball",
@@ -326,8 +343,8 @@
       "direction": "fade",
       "team": "Kansas City Royals",
       "side": "away",
-      "strength": 0.863,
-      "context": "1 match dans les 48h + 1664 km de voyage"
+      "strength": 0.943,
+      "context": "2 match dans les 48h + 1664 km de voyage"
     },
     {
       "event_id": "401815899",
@@ -344,8 +361,8 @@
       "direction": "fade",
       "team": "Kansas City Royals",
       "side": "away",
-      "strength": 0.863,
-      "context": "1 match dans les 48h + 1664 km de voyage"
+      "strength": 0.943,
+      "context": "2 match dans les 48h + 1664 km de voyage"
     },
     {
       "event_id": "401815989",
@@ -436,24 +453,6 @@
       "side": null,
       "strength": 0.8,
       "context": "Absences severes 10-6"
-    },
-    {
-      "event_id": "401815888",
-      "date": "2026-06-24T22:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Pittsburgh Pirates",
-      "away": "Seattle Mariners",
-      "match": "Pittsburgh Pirates - Seattle Mariners",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "travel_extreme",
-      "direction": "fade",
-      "team": "Seattle Mariners",
-      "side": "away",
-      "strength": 0.798,
-      "context": "Deplacement estime 3431 km, decalage ~2.8h"
     },
     {
       "event_id": "401815919",
@@ -618,24 +617,6 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 3-0"
-    },
-    {
-      "event_id": "401857020",
-      "date": "2026-06-25T02:00Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Golden State Valkyries",
-      "away": "Atlanta Dream",
-      "match": "Golden State Valkyries - Atlanta Dream",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "home",
-      "strength": 0.505,
-      "context": "Cote home: 2.20 -> 2.00 (+9.1%)"
     }
   ],
   "active_risk": [
