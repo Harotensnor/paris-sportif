@@ -1,63 +1,27 @@
 {
-  "generated_at": "2026-06-24T22:04:32Z",
+  "generated_at": "2026-06-24T23:13:20Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 36,
-    "actionable": 24,
-    "watch": 7,
+    "active_events": 30,
+    "actionable": 21,
+    "watch": 4,
     "risk": 5,
     "expired_sample": 0,
     "by_type": {
-      "back_to_back_travel": 14,
-      "injury_imbalance": 19,
-      "travel_extreme": 10,
+      "travel_extreme": 9,
+      "back_to_back_travel": 12,
+      "injury_imbalance": 15,
       "market_uncertain": 5
     },
     "by_quality": {
-      "actionable": 24,
-      "watch": 7,
+      "actionable": 21,
+      "watch": 4,
       "risk": 5
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401815886",
-      "date": "2026-06-24T22:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Detroit Tigers",
-      "away": "New York Yankees",
-      "match": "Detroit Tigers - New York Yankees",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Detroit Tigers",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 12-6"
-    },
-    {
-      "event_id": "401815888",
-      "date": "2026-06-24T22:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Pittsburgh Pirates",
-      "away": "Seattle Mariners",
-      "match": "Pittsburgh Pirates - Seattle Mariners",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Seattle Mariners",
-      "side": "away",
-      "strength": 1.0,
-      "context": "1 match dans les 48h + 3431 km de voyage"
-    },
     {
       "event_id": "401815883",
       "date": "2026-06-24T23:07Z",
@@ -257,24 +221,6 @@
       "context": "Absences severes 6-12"
     },
     {
-      "event_id": "401815884",
-      "date": "2026-06-24T22:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Tampa Bay Rays",
-      "away": "Kansas City Royals",
-      "match": "Tampa Bay Rays - Kansas City Royals",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Kansas City Royals",
-      "side": "away",
-      "strength": 0.943,
-      "context": "2 match dans les 48h + 1664 km de voyage"
-    },
-    {
       "event_id": "401815899",
       "date": "2026-06-25T16:10Z",
       "sport": "baseball",
@@ -365,22 +311,22 @@
       "context": "Absences severes 6-10"
     },
     {
-      "event_id": "401857017",
+      "event_id": "401857018",
       "date": "2026-06-24T23:30Z",
       "sport": "basketball",
       "league_code": "wnba",
       "league_name": "WNBA",
-      "home": "Indiana Fever",
-      "away": "Phoenix Mercury",
-      "match": "Indiana Fever - Phoenix Mercury",
+      "home": "Washington Mystics",
+      "away": "Minnesota Lynx",
+      "match": "Washington Mystics - Minnesota Lynx",
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
       "type": "injury_imbalance",
       "direction": "fade",
-      "team": "Phoenix Mercury",
+      "team": "Minnesota Lynx",
       "side": null,
       "strength": 0.8,
-      "context": "Absences severes 0-4"
+      "context": "Absences severes 1-5"
     },
     {
       "event_id": "401815957",
@@ -457,40 +403,22 @@
   ],
   "active_watch": [
     {
-      "event_id": "401815887",
-      "date": "2026-06-24T22:45Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Washington Nationals",
-      "away": "Philadelphia Phillies",
-      "match": "Washington Nationals - Philadelphia Phillies",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Washington Nationals",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 6-3"
-    },
-    {
-      "event_id": "401857018",
+      "event_id": "401857017",
       "date": "2026-06-24T23:30Z",
       "sport": "basketball",
       "league_code": "wnba",
       "league_name": "WNBA",
-      "home": "Washington Mystics",
-      "away": "Minnesota Lynx",
-      "match": "Washington Mystics - Minnesota Lynx",
+      "home": "Indiana Fever",
+      "away": "Phoenix Mercury",
+      "match": "Indiana Fever - Phoenix Mercury",
       "quality": "watch",
       "quality_reason": "Signal rare present mais intensite moyenne",
       "type": "injury_imbalance",
       "direction": "fade",
-      "team": "Minnesota Lynx",
+      "team": "Phoenix Mercury",
       "side": null,
       "strength": 0.6,
-      "context": "Absences severes 0-3"
+      "context": "Absences severes 2-5"
     },
     {
       "event_id": "401857019",
@@ -508,43 +436,7 @@
       "team": "Chicago Sky",
       "side": null,
       "strength": 0.6,
-      "context": "Absences severes 3-0"
-    },
-    {
-      "event_id": "401815894",
-      "date": "2026-06-25T01:45Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Francisco Giants",
-      "away": "Athletics",
-      "match": "San Francisco Giants - Athletics",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "San Francisco Giants",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 10-7"
-    },
-    {
-      "event_id": "401815905",
-      "date": "2026-06-25T19:45Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Francisco Giants",
-      "away": "Athletics",
-      "match": "San Francisco Giants - Athletics",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "San Francisco Giants",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 10-7"
+      "context": "Absences severes 4-1"
     },
     {
       "event_id": "401815901",
@@ -580,7 +472,7 @@
       "team": "Chicago Sky",
       "side": null,
       "strength": 0.6,
-      "context": "Absences severes 3-0"
+      "context": "Absences severes 4-1"
     }
   ],
   "active_risk": [
