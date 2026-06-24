@@ -1,23 +1,23 @@
 {
-  "generated_at": "2026-06-24T17:16:46Z",
+  "generated_at": "2026-06-24T19:04:17Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 30,
+    "active_events": 29,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 34,
-      "back_to_back_travel": 17,
       "travel_extreme": 12,
+      "back_to_back_travel": 16,
+      "lookahead": 32,
       "schedule_congestion": 18
     },
     "by_decision": {
       "abstain": 10,
-      "lean_home": 18,
+      "lean_home": 17,
       "lean_away": 2
     },
-    "lean_home": 18,
+    "lean_home": 17,
     "lean_away": 2,
     "abstain": 10,
     "monitor": 0
@@ -1115,72 +1115,6 @@
       }
     },
     {
-      "event_id": "401879401",
-      "source_event_ids": [
-        "401879401"
-      ],
-      "kickoff": "2026-06-24T17:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "New York Mets",
-      "away": "Chicago Cubs",
-      "match": "New York Mets - Chicago Cubs",
-      "decision": "lean_home",
-      "net_team": "New York Mets",
-      "reason": "Chicago Cubs plus penalise par calendrier/voyage (1.14 vs 0.30)",
-      "pressure_score": 2.175,
-      "home_fade": 0.3,
-      "away_fade": 1.142,
-      "travel_score": 0.842,
-      "lookahead_score": 1.333,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "2 match important/proche dans les 3 jours",
-        "2 match important/proche dans les 3 jours",
-        "2 match dans les 48h + 1159 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.24,
-        "away_score": -1.437,
-        "home_fade": 0.3,
-        "away_fade": 1.542,
-        "reason": "Direction nette: New York Mets (+0.24)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.842
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401815899",
       "source_event_ids": [
         "401815899"
@@ -1354,17 +1288,23 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.649,
-        "away_score": -1.854,
-        "home_fade": 0.0,
+        "home_score": 0.249,
+        "away_score": -1.714,
+        "home_fade": 0.4,
         "away_fade": 1.854,
-        "reason": "Direction nette: San Diego Padres (+0.65)",
+        "reason": "Direction nette: San Diego Padres (+0.25)",
         "detail": [
           {
             "side": "away",
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.4
           },
           {
             "side": "away",
