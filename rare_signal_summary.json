@@ -1,45 +1,27 @@
 {
-  "generated_at": "2026-06-25T15:12:21Z",
+  "generated_at": "2026-06-25T17:24:29Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 22,
-    "actionable": 17,
+    "active_events": 20,
+    "actionable": 15,
     "watch": 2,
     "risk": 3,
     "expired_sample": 0,
     "by_type": {
-      "back_to_back_travel": 12,
-      "travel_extreme": 6,
       "injury_imbalance": 11,
+      "travel_extreme": 5,
+      "back_to_back_travel": 10,
       "market_uncertain": 3
     },
     "by_quality": {
-      "actionable": 17,
       "watch": 2,
+      "actionable": 15,
       "risk": 3
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401815902",
-      "date": "2026-06-25T16:35Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Pittsburgh Pirates",
-      "away": "Seattle Mariners",
-      "match": "Pittsburgh Pirates - Seattle Mariners",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Seattle Mariners",
-      "side": "away",
-      "strength": 1.0,
-      "context": "2 match dans les 48h + 3431 km de voyage"
-    },
     {
       "event_id": "401815900",
       "date": "2026-06-25T23:10Z",
@@ -201,24 +183,6 @@
       "side": "away",
       "strength": 0.966,
       "context": "2 match dans les 48h + 1780 km de voyage"
-    },
-    {
-      "event_id": "401815899",
-      "date": "2026-06-25T16:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Tampa Bay Rays",
-      "away": "Kansas City Royals",
-      "match": "Tampa Bay Rays - Kansas City Royals",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Kansas City Royals",
-      "side": "away",
-      "strength": 0.943,
-      "context": "2 match dans les 48h + 1664 km de voyage"
     },
     {
       "event_id": "401815998",
