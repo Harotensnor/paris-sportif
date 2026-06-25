@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-25T12:12:53Z",
+  "generated_at": "2026-06-25T15:12:21Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -10,7 +10,7 @@
       "back_to_back_travel": 12,
       "travel_extreme": 6,
       "lookahead": 22,
-      "schedule_congestion": 6
+      "schedule_congestion": 8
     },
     "by_decision": {
       "abstain": 6,
@@ -103,13 +103,13 @@
         "2 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "mixed",
-        "net_side": null,
-        "home_score": -0.741,
+        "status": "net",
+        "net_side": "away",
+        "home_score": -1.195,
         "away_score": 0.155,
         "home_fade": 1.3,
         "away_fade": 0.3,
-        "reason": "Signaux mitigés: avantage net trop faible (Boston Red Sox -0.74, New York Yankees +0.15)",
+        "reason": "Direction nette: New York Yankees (+0.15)",
         "detail": [
           {
             "side": "home",
@@ -128,12 +128,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 1.0
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.454
           }
         ]
       }
@@ -227,11 +221,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.595,
-        "away_score": -0.055,
-        "home_fade": 0.7,
+        "home_score": -0.195,
+        "away_score": -0.195,
+        "home_fade": 0.3,
         "away_fade": 0.3,
-        "reason": "Direction nette: Tampa Bay Rays (-0.06)",
+        "reason": "Direction nette: Tampa Bay Rays (-0.20)",
         "detail": [
           {
             "side": "home",
@@ -244,12 +238,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.3
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
           }
         ]
       }
@@ -713,6 +701,72 @@
       }
     },
     {
+      "event_id": "401815897",
+      "source_event_ids": [
+        "401815897"
+      ],
+      "kickoff": "2026-06-25T23:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "New York Mets",
+      "away": "Chicago Cubs",
+      "match": "New York Mets - Chicago Cubs",
+      "decision": "lean_home",
+      "net_team": "New York Mets",
+      "reason": "Chicago Cubs plus penalise par calendrier/voyage (1.48 vs 0.60)",
+      "pressure_score": 2.082,
+      "home_fade": 0.6,
+      "away_fade": 1.482,
+      "travel_score": 0.882,
+      "lookahead_score": 0,
+      "congestion_score": 1.2,
+      "types": {
+        "schedule_congestion": 2,
+        "back_to_back_travel": 1
+      },
+      "contexts": [
+        "3 matchs sur les 7 derniers jours",
+        "3 matchs sur les 7 derniers jours",
+        "3 match dans les 48h + 1159 km de voyage"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": 0.059,
+        "away_score": -1.672,
+        "home_fade": 0.6,
+        "away_fade": 1.882,
+        "reason": "Direction nette: New York Mets (+0.06)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "away",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.4
+          },
+          {
+            "side": "away",
+            "type": "back_to_back_travel",
+            "direction": "fade",
+            "strength": 0.882
+          }
+        ]
+      }
+    },
+    {
       "event_id": "401815903",
       "source_event_ids": [
         "401815903"
@@ -805,23 +859,17 @@
       },
       "contexts": [
         "Deplacement estime 3431 km, decalage ~2.8h",
-        "1 match dans les 48h + 3431 km de voyage"
+        "2 match dans les 48h + 3431 km de voyage"
       ],
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.769,
-        "away_score": -2.198,
+        "home_score": 0.629,
+        "away_score": -1.798,
         "home_fade": 0.0,
-        "away_fade": 2.198,
-        "reason": "Direction nette: Pittsburgh Pirates (+0.77)",
+        "away_fade": 1.798,
+        "reason": "Direction nette: Pittsburgh Pirates (+0.63)",
         "detail": [
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
-          },
           {
             "side": "away",
             "type": "travel_extreme",
@@ -930,11 +978,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": -0.196,
-        "away_score": -0.82,
-        "home_fade": 0.55,
+        "home_score": 0.204,
+        "away_score": -0.96,
+        "home_fade": 0.15,
         "away_fade": 1.013,
-        "reason": "Direction nette: Kansas City Royals (-0.20)",
+        "reason": "Direction nette: Kansas City Royals (+0.20)",
         "detail": [
           {
             "side": "home",
@@ -947,12 +995,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
           },
           {
             "side": "away",
@@ -977,11 +1019,11 @@
       "match": "St. Louis Cardinals - Arizona Diamondbacks",
       "decision": "lean_home",
       "net_team": "St. Louis Cardinals",
-      "reason": "Arizona Diamondbacks plus penalise par calendrier/voyage (1.41 vs 0.00)",
-      "pressure_score": 1.414,
+      "reason": "Arizona Diamondbacks plus penalise par calendrier/voyage (1.48 vs 0.00)",
+      "pressure_score": 1.475,
       "home_fade": 0.0,
-      "away_fade": 1.414,
-      "travel_score": 1.414,
+      "away_fade": 1.475,
+      "travel_score": 1.475,
       "lookahead_score": 0,
       "congestion_score": 0,
       "types": {
@@ -990,16 +1032,16 @@
       },
       "contexts": [
         "Deplacement estime 2044 km, decalage ~1.5h",
-        "1 match dans les 48h + 2044 km de voyage"
+        "2 match dans les 48h + 2044 km de voyage"
       ],
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.845,
-        "away_score": -2.414,
+        "home_score": 0.866,
+        "away_score": -2.475,
         "home_fade": 0.0,
-        "away_fade": 2.414,
-        "reason": "Direction nette: St. Louis Cardinals (+0.84)",
+        "away_fade": 2.475,
+        "reason": "Direction nette: St. Louis Cardinals (+0.87)",
         "detail": [
           {
             "side": "away",
@@ -1017,7 +1059,52 @@
             "side": "away",
             "type": "back_to_back_travel",
             "direction": "fade",
-            "strength": 0.939
+            "strength": 1.0
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815899",
+      "source_event_ids": [
+        "401815899"
+      ],
+      "kickoff": "2026-06-25T16:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Tampa Bay Rays",
+      "away": "Kansas City Royals",
+      "match": "Tampa Bay Rays - Kansas City Royals",
+      "decision": "lean_home",
+      "net_team": "Tampa Bay Rays",
+      "reason": "Kansas City Royals plus penalise par calendrier/voyage (0.94 vs 0.00)",
+      "pressure_score": 0.943,
+      "home_fade": 0.0,
+      "away_fade": 0.943,
+      "travel_score": 0.943,
+      "lookahead_score": 0,
+      "congestion_score": 0,
+      "types": {
+        "back_to_back_travel": 1
+      },
+      "contexts": [
+        "2 match dans les 48h + 1664 km de voyage"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": 0.33,
+        "away_score": -0.943,
+        "home_fade": 0.0,
+        "away_fade": 0.943,
+        "reason": "Direction nette: Tampa Bay Rays (+0.33)",
+        "detail": [
+          {
+            "side": "away",
+            "type": "back_to_back_travel",
+            "direction": "fade",
+            "strength": 0.943
           }
         ]
       }
@@ -1052,125 +1139,17 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": -0.07,
-        "away_score": -0.803,
-        "home_fade": 0.4,
+        "home_score": 0.33,
+        "away_score": -0.943,
+        "home_fade": 0.0,
         "away_fade": 0.943,
-        "reason": "Direction nette: Kansas City Royals (-0.07)",
+        "reason": "Direction nette: Kansas City Royals (+0.33)",
         "detail": [
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
-          },
           {
             "side": "away",
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.943
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815899",
-      "source_event_ids": [
-        "401815899"
-      ],
-      "kickoff": "2026-06-25T16:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Tampa Bay Rays",
-      "away": "Kansas City Royals",
-      "match": "Tampa Bay Rays - Kansas City Royals",
-      "decision": "lean_home",
-      "net_team": "Tampa Bay Rays",
-      "reason": "Kansas City Royals plus penalise par calendrier/voyage (0.86 vs 0.00)",
-      "pressure_score": 0.863,
-      "home_fade": 0.0,
-      "away_fade": 0.863,
-      "travel_score": 0.863,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "1 match dans les 48h + 1664 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.442,
-        "away_score": -1.263,
-        "home_fade": 0.0,
-        "away_fade": 1.263,
-        "reason": "Direction nette: Tampa Bay Rays (+0.44)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.863
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815897",
-      "source_event_ids": [
-        "401815897"
-      ],
-      "kickoff": "2026-06-25T23:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "New York Mets",
-      "away": "Chicago Cubs",
-      "match": "New York Mets - Chicago Cubs",
-      "decision": "lean_home",
-      "net_team": "New York Mets",
-      "reason": "Chicago Cubs plus penalise par calendrier/voyage (0.84 vs 0.00)",
-      "pressure_score": 0.842,
-      "home_fade": 0.0,
-      "away_fade": 0.842,
-      "travel_score": 0.842,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "2 match dans les 48h + 1159 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.435,
-        "away_score": -1.242,
-        "home_fade": 0.0,
-        "away_fade": 1.242,
-        "reason": "Direction nette: New York Mets (+0.43)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.842
           }
         ]
       }

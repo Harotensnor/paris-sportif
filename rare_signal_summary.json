@@ -1,25 +1,23 @@
 {
-  "generated_at": "2026-06-25T12:12:53Z",
+  "generated_at": "2026-06-25T15:12:21Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 24,
-    "actionable": 18,
-    "watch": 3,
+    "active_events": 22,
+    "actionable": 17,
+    "watch": 2,
     "risk": 3,
     "expired_sample": 0,
     "by_type": {
       "back_to_back_travel": 12,
       "travel_extreme": 6,
       "injury_imbalance": 11,
-      "market_move": 4,
-      "signal_conflict": 2,
       "market_uncertain": 3
     },
     "by_quality": {
-      "actionable": 18,
-      "watch": 3,
+      "actionable": 17,
+      "watch": 2,
       "risk": 3
     }
   },
@@ -40,7 +38,7 @@
       "team": "Seattle Mariners",
       "side": "away",
       "strength": 1.0,
-      "context": "1 match dans les 48h + 3431 km de voyage"
+      "context": "2 match dans les 48h + 3431 km de voyage"
     },
     {
       "event_id": "401815900",
@@ -205,6 +203,24 @@
       "context": "2 match dans les 48h + 1780 km de voyage"
     },
     {
+      "event_id": "401815899",
+      "date": "2026-06-25T16:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Tampa Bay Rays",
+      "away": "Kansas City Royals",
+      "match": "Tampa Bay Rays - Kansas City Royals",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Kansas City Royals",
+      "side": "away",
+      "strength": 0.943,
+      "context": "2 match dans les 48h + 1664 km de voyage"
+    },
+    {
       "event_id": "401815998",
       "date": "2026-07-02T23:40Z",
       "sport": "baseball",
@@ -259,22 +275,22 @@
       "context": "1 match dans les 48h + 1780 km de voyage"
     },
     {
-      "event_id": "401815899",
-      "date": "2026-06-25T16:10Z",
+      "event_id": "401815897",
+      "date": "2026-06-25T23:10Z",
       "sport": "baseball",
       "league_code": "mlb",
       "league_name": "MLB",
-      "home": "Tampa Bay Rays",
-      "away": "Kansas City Royals",
-      "match": "Tampa Bay Rays - Kansas City Royals",
+      "home": "New York Mets",
+      "away": "Chicago Cubs",
+      "match": "New York Mets - Chicago Cubs",
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
       "type": "back_to_back_travel",
       "direction": "fade",
-      "team": "Kansas City Royals",
+      "team": "Chicago Cubs",
       "side": "away",
-      "strength": 0.863,
-      "context": "1 match dans les 48h + 1664 km de voyage"
+      "strength": 0.882,
+      "context": "3 match dans les 48h + 1159 km de voyage"
     },
     {
       "event_id": "401815989",
@@ -293,42 +309,6 @@
       "side": "away",
       "strength": 0.863,
       "context": "1 match dans les 48h + 1664 km de voyage"
-    },
-    {
-      "event_id": "401815897",
-      "date": "2026-06-25T23:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "New York Mets",
-      "away": "Chicago Cubs",
-      "match": "New York Mets - Chicago Cubs",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Chicago Cubs",
-      "side": "away",
-      "strength": 0.842,
-      "context": "2 match dans les 48h + 1159 km de voyage"
-    },
-    {
-      "event_id": "401857022",
-      "date": "2026-06-26T02:00Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Las Vegas Aces",
-      "away": "Dallas Wings",
-      "match": "Las Vegas Aces - Dallas Wings",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.82,
-      "context": "Cote away: 3.05 -> 2.60 (+14.8%)"
     },
     {
       "event_id": "401815903",
@@ -350,24 +330,6 @@
     }
   ],
   "active_watch": [
-    {
-      "event_id": "401857026",
-      "date": "2026-06-27T02:00Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Golden State Valkyries",
-      "away": "Atlanta Dream",
-      "match": "Golden State Valkyries - Atlanta Dream",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "home",
-      "strength": 0.625,
-      "context": "Cote home: 1.60 -> 1.78 (-11.2%)"
-    },
     {
       "event_id": "401815901",
       "date": "2026-06-25T22:45Z",
