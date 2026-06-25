@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-06-25T19:21:52Z",
+  "generated_at": "2026-06-25T21:06:09Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815905",
-      "kickoff": "2026-06-25T19:45Z",
-      "league": "MLB",
-      "match": "Athletics Athletics at San Francisco Giants",
-      "home": "San Francisco Giants",
-      "away": "Athletics",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "San Francisco Giants",
-          "pitcher": "Landen Roupp",
-          "label": "Landen Roupp plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.5867,
-          "fair_odds": 1.7,
-          "expected_strikeouts": 5.92,
-          "projected_ip": 5.34,
-          "inputs": {
-            "k9": 9.97,
-            "era": 4.15,
-            "whip": 1.29,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "San Francisco Giants",
-          "pitcher": "Landen Roupp",
-          "label": "Landen Roupp ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.7173,
-          "fair_odds": 1.39,
-          "expected_hr_allowed": 0.332,
-          "projected_ip": 5.34,
-          "inputs": {
-            "hr9": 0.56,
-            "era": 4.15,
-            "whip": 1.29
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Athletics",
-          "pitcher": "Jeffrey Springs",
-          "label": "Jeffrey Springs moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.506,
-          "fair_odds": 1.98,
-          "expected_strikeouts": 4.48,
-          "projected_ip": 5.14,
-          "inputs": {
-            "k9": 7.84,
-            "era": 5.55,
-            "whip": 1.35,
-            "hand": "L"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Athletics",
-          "pitcher": "Jeffrey Springs",
-          "label": "Jeffrey Springs concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.7294,
-          "fair_odds": 1.37,
-          "expected_hr_allowed": 1.307,
-          "projected_ip": 5.14,
-          "inputs": {
-            "hr9": 2.29,
-            "era": 5.55,
-            "whip": 1.35
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815898",
       "kickoff": "2026-06-25T22:40Z",
@@ -998,7 +916,7 @@
       ]
     }
   ],
-  "props": 48,
+  "props": 44,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"

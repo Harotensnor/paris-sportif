@@ -1,22 +1,22 @@
 {
-  "generated_at": "2026-06-25T19:21:53Z",
+  "generated_at": "2026-06-25T21:06:09Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 16,
+    "active_events": 17,
     "actionable": 13,
-    "watch": 1,
+    "watch": 2,
     "risk": 2,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 10,
+      "injury_imbalance": 11,
       "travel_extreme": 5,
       "back_to_back_travel": 8,
       "market_uncertain": 2
     },
     "by_quality": {
-      "watch": 1,
+      "watch": 2,
       "actionable": 13,
       "risk": 2
     }
@@ -275,6 +275,24 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 6-3"
+    },
+    {
+      "event_id": "401857024",
+      "date": "2026-06-26T23:30Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Connecticut Sun",
+      "away": "Washington Mystics",
+      "match": "Connecticut Sun - Washington Mystics",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Connecticut Sun",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 3-0"
     }
   ],
   "active_risk": [

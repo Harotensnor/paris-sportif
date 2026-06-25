@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-25T19:21:53Z",
+  "generated_at": "2026-06-25T21:06:09Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -53,11 +53,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.234,
-        "away_score": -0.234,
-        "home_fade": 0.36,
+        "home_score": -0.634,
+        "away_score": -0.094,
+        "home_fade": 0.76,
         "away_fade": 0.36,
-        "reason": "Direction nette: Houston Astros (-0.23)",
+        "reason": "Direction nette: Houston Astros (-0.09)",
         "detail": [
           {
             "side": "home",
@@ -70,6 +70,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.36
+          },
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.4
           }
         ]
       }
@@ -487,11 +493,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.115,
-        "away_score": -1.081,
-        "home_fade": 0.3,
+        "home_score": -0.285,
+        "away_score": -0.941,
+        "home_fade": 0.7,
         "away_fade": 1.186,
-        "reason": "Direction nette: Detroit Tigers (+0.12)",
+        "reason": "Direction nette: Detroit Tigers (-0.28)",
         "detail": [
           {
             "side": "home",
@@ -504,6 +510,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.3
+          },
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.4
           },
           {
             "side": "away",
@@ -547,11 +559,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": -0.052,
-        "away_score": -1.356,
-        "home_fade": 0.6,
+        "home_score": -0.452,
+        "away_score": -1.216,
+        "home_fade": 1.0,
         "away_fade": 1.566,
-        "reason": "Direction nette: Detroit Tigers (-0.05)",
+        "reason": "Direction nette: Detroit Tigers (-0.45)",
         "detail": [
           {
             "side": "home",
@@ -564,6 +576,12 @@
             "type": "schedule_congestion",
             "direction": "fade",
             "strength": 0.6
+          },
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.4
           },
           {
             "side": "away",
@@ -681,11 +699,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.059,
-        "away_score": -1.672,
+        "home_score": -0.081,
+        "away_score": -1.272,
         "home_fade": 0.6,
-        "away_fade": 1.882,
-        "reason": "Direction nette: New York Mets (+0.06)",
+        "away_fade": 1.482,
+        "reason": "Direction nette: New York Mets (-0.08)",
         "detail": [
           {
             "side": "home",
@@ -698,12 +716,6 @@
             "type": "schedule_congestion",
             "direction": "fade",
             "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
           },
           {
             "side": "away",
@@ -813,11 +825,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.241,
-        "away_score": -1.063,
-        "home_fade": 0.15,
+        "home_score": -0.159,
+        "away_score": -0.923,
+        "home_fade": 0.55,
         "away_fade": 1.116,
-        "reason": "Direction nette: Detroit Tigers (+0.24)",
+        "reason": "Direction nette: Detroit Tigers (-0.16)",
         "detail": [
           {
             "side": "home",
@@ -830,6 +842,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.4
           },
           {
             "side": "away",
