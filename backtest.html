@@ -4,14 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Backtest — Performance vérifiable du modèle Paris-Sportif</title>
-<meta name="description" content="Performance réelle du modèle Paris-Sportif sur 447 pari(s) réglé(s) : WR 56.2%, ROI flat -2.6%, Brier 0.2404, Kelly -10.9u. Backtest hebdo via vrai predictMatch(). Tableaux par tier, sport, ligue, cote, calibration.">
+<meta name="description" content="Performance réelle du modèle Paris-Sportif sur 464 pari(s) réglé(s) : WR 56.2%, ROI flat -2.6%, Brier 0.2415, Kelly -6.7u. Backtest hebdo via vrai predictMatch(). Tableaux par tier, sport, ligue, cote, calibration.">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://harotensnor.github.io/paris-sportif/backtest.html">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Backtest — Performance vérifiable du modèle Paris-Sportif">
-<meta property="og:description" content="WR 56.2% · ROI flat -2.6% · Brier 0.2404 · 447 pari(s) · backtest hebdo">
+<meta property="og:description" content="WR 56.2% · ROI flat -2.6% · Brier 0.2415 · 464 pari(s) · backtest hebdo">
 <meta property="og:url" content="https://harotensnor.github.io/paris-sportif/backtest.html">
 <meta property="og:image" content="https://harotensnor.github.io/paris-sportif/og-backtest.png">
 <meta name="twitter:card" content="summary_large_image">
@@ -35,11 +35,11 @@
     {
       "@type": "Dataset",
       "name": "Paris-Sportif backtest model performance",
-      "description": "Performance vérifiée du modèle predictMatch sur 447 pari(s) réglé(s) (2026-05-24T15:00Z → 2026-06-23T20:07Z). WR 56.2%, ROI flat -2.6%, Brier 0.2404.",
+      "description": "Performance vérifiée du modèle predictMatch sur 464 pari(s) réglé(s) (2026-05-24T15:00Z → 2026-06-24T19:10Z). WR 56.2%, ROI flat -2.6%, Brier 0.2415.",
       "url": "https://harotensnor.github.io/paris-sportif/backtest.html",
       "creator": { "@id": "https://harotensnor.github.io/paris-sportif/#org" },
-      "datePublished": "2026-06-24T07:30:25Z",
-      "dateModified": "2026-06-24T07:30:25Z",
+      "datePublished": "2026-06-25T07:31:56Z",
+      "dateModified": "2026-06-25T07:31:56Z",
       "license": "https://github.com/Harotensnor/paris-sportif/blob/main/LICENSE",
       "distribution": [
         { "@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": "https://harotensnor.github.io/paris-sportif/backtest_report_v2.json" },
@@ -196,8 +196,8 @@
   <p class="lead">Historique des paris réglés, par fiabilité, sport, bucket de cote et calibration. Les chiffres sont utiles pour diagnostiquer le modèle, pas pour promettre un résultat futur.</p>
 
   <div class="meta-box">
-    📅 Fenêtre : <b>2026-05-24T15:00Z</b> → <b>2026-06-23T20:07Z</b><br>
-    🔄 Régénéré : <b>2026-06-24 07:30 UTC</b><br>
+    📅 Fenêtre : <b>2026-05-24T15:00Z</b> → <b>2026-06-24T19:10Z</b><br>
+    🔄 Régénéré : <b>2026-06-25 07:31 UTC</b><br>
     📦 Sources brutes : <a href="backtest_report_v2.json">backtest_report_v2.json</a> · <a href="backtest_report_v2.md">.md</a> · <a href="results_archive.jsonl">results_archive.jsonl</a>
   </div>
 
@@ -206,49 +206,49 @@
     <div class="kpi-strip">
       <div class="kpi-card">
         <div class="kpi-label">Paris réglés</div>
-        <div class="kpi-value">447</div>
-        <div class="kpi-sub">251 gagnés · 196 perdus</div>
+        <div class="kpi-value">464</div>
+        <div class="kpi-sub">261 gagnés · 203 perdus</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-label">Win rate</div>
         <div class="kpi-value pos">56.2%</div>
-        <div class="kpi-sub">cote moy. 1.78 · prob moy. 54.9%</div>
+        <div class="kpi-sub">cote moy. 1.77 · prob moy. 55.0%</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-label">ROI flat</div>
         <div class="kpi-value neu">-2.6%</div>
-        <div class="kpi-sub">P&amp;L -11.81u · mise plate 1u/pari</div>
+        <div class="kpi-sub">P&amp;L -12.13u · mise plate 1u/pari</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-label">Kelly 0.25× (cap 10%)</div>
-        <div class="kpi-value neg">-10.94u</div>
-        <div class="kpi-sub">Bankroll 100u → 89.06u</div>
+        <div class="kpi-value neg">-6.73u</div>
+        <div class="kpi-sub">Bankroll 100u → 93.27u</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-label">Brier score</div>
-        <div class="kpi-value neu">0.2404</div>
+        <div class="kpi-value neu">0.2415</div>
         <div class="kpi-sub">0 = parfait · 0.25 = pile/face</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-label">Log-loss</div>
-        <div class="kpi-value">0.6735</div>
+        <div class="kpi-value">0.6764</div>
         <div class="kpi-sub">Plus bas = mieux calibré</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-label">CLV moyen</div>
-        <div class="kpi-value neg">-0.15%</div>
-        <div class="kpi-sub" title="Closing Line Value : (notre cote / cote close) - 1. Positif = on a battu le marché.">375 picks · vs cote close</div>
+        <div class="kpi-value neg">-0.50%</div>
+        <div class="kpi-sub" title="Closing Line Value : (notre cote / cote close) - 1. Positif = on a battu le marché.">391 picks · vs cote close</div>
       </div>
     </div>
 
   <h2 id="tier">🏷️ Par tier de fiabilité <span class="subtle">— ce que vaut la jauge</span></h2>
-  <table><thead><tr><th>Tier</th><th>N</th><th>WR</th><th>ROI flat</th><th>P&amp;L flat</th><th>P&amp;L Kelly</th><th>Brier</th><th>CLV moy.</th></tr></thead><tbody><tr><td><b>🔒 Sûr</b></td><td>0</td><td><span class="neg">0%</span></td><td><span class="neu">+0.0%</span></td><td>—</td><td>+0.00u</td><td>0.000</td><td>—</td></tr><tr><td><b>✅ Standard</b></td><td>3</td><td><span class="neg">33%</span></td><td><span class="neg">-40.7%</span></td><td>-1.22u</td><td>-6.23u</td><td>0.271</td><td><span class="pos" title="3 picks avec closing odds">+12.34%</span></td></tr><tr><td><b>⚠️ Confiance basse</b></td><td>0</td><td><span class="neg">0%</span></td><td><span class="neu">+0.0%</span></td><td>—</td><td>+0.00u</td><td>0.000</td><td>—</td></tr><tr><td><b>🚫 Refusé</b></td><td>444</td><td><span class="pos">56%</span></td><td><span class="neu">-2.4%</span></td><td>-10.59u</td><td>-4.70u</td><td>0.240</td><td><span class="neg" title="372 picks avec closing odds">-0.25%</span></td></tr></tbody></table>
+  <table><thead><tr><th>Tier</th><th>N</th><th>WR</th><th>ROI flat</th><th>P&amp;L flat</th><th>P&amp;L Kelly</th><th>Brier</th><th>CLV moy.</th></tr></thead><tbody><tr><td><b>🔒 Sûr</b></td><td>0</td><td><span class="neg">0%</span></td><td><span class="neu">+0.0%</span></td><td>—</td><td>+0.00u</td><td>0.000</td><td>—</td></tr><tr><td><b>✅ Standard</b></td><td>2</td><td><span class="neg">0%</span></td><td><span class="neg">-100.0%</span></td><td>-2.00u</td><td>-2.18u</td><td>0.321</td><td><span class="neg" title="2 picks avec closing odds">-9.73%</span></td></tr><tr><td><b>⚠️ Confiance basse</b></td><td>0</td><td><span class="neg">0%</span></td><td><span class="neu">+0.0%</span></td><td>—</td><td>+0.00u</td><td>0.000</td><td>—</td></tr><tr><td><b>🚫 Refusé</b></td><td>462</td><td><span class="pos">56%</span></td><td><span class="neu">-2.2%</span></td><td>-10.13u</td><td>-4.55u</td><td>0.241</td><td><span class="neg" title="389 picks avec closing odds">-0.45%</span></td></tr></tbody></table>
 
   <h2 id="sport">🏆 Par sport <span class="subtle">— où le modèle gagne, où il perd</span></h2>
-  <table><thead><tr><th>Sport</th><th>N</th><th>WR</th><th>ROI flat</th><th>P&amp;L flat</th><th>P&amp;L Kelly</th><th>Brier</th></tr></thead><tbody><tr><td><b>⚾ Baseball</b></td><td>339</td><td><span class="pos">56%</span></td><td><span class="neu">-4.5%</span></td><td>-15.36u</td><td>-7.66u</td><td>0.245</td></tr><tr><td><b>⚽ Foot</b></td><td>69</td><td><span class="neg">45%</span></td><td><span class="neg">-5.2%</span></td><td>-3.58u</td><td>-3.27u</td><td>0.238</td></tr><tr><td><b>🏀 Basket</b></td><td>31</td><td><span class="pos">77%</span></td><td><span class="pos">+15.7%</span></td><td>+4.86u</td><td>+0.00u</td><td>0.202</td></tr><tr><td><b>🏒 Hockey</b></td><td>8</td><td><span class="pos">75%</span></td><td><span class="pos">+28.5%</span></td><td>+2.28u</td><td>+0.00u</td><td>0.234</td></tr></tbody></table>
+  <table><thead><tr><th>Sport</th><th>N</th><th>WR</th><th>ROI flat</th><th>P&amp;L flat</th><th>P&amp;L Kelly</th><th>Brier</th></tr></thead><tbody><tr><td><b>⚾ Baseball</b></td><td>356</td><td><span class="pos">56%</span></td><td><span class="neu">-4.4%</span></td><td>-15.73u</td><td>-3.30u</td><td>0.246</td></tr><tr><td><b>⚽ Foot</b></td><td>69</td><td><span class="neg">45%</span></td><td><span class="neg">-5.2%</span></td><td>-3.58u</td><td>-3.43u</td><td>0.238</td></tr><tr><td><b>🏀 Basket</b></td><td>31</td><td><span class="pos">77%</span></td><td><span class="pos">+15.8%</span></td><td>+4.90u</td><td>+0.00u</td><td>0.202</td></tr><tr><td><b>🏒 Hockey</b></td><td>8</td><td><span class="pos">75%</span></td><td><span class="pos">+28.5%</span></td><td>+2.28u</td><td>+0.00u</td><td>0.234</td></tr></tbody></table>
 
   <h2 id="bucket">💸 Par bucket de cote <span class="subtle">— gros favori vs outsider</span></h2>
-  <table><thead><tr><th>Bucket de cote</th><th>N</th><th>WR</th><th>ROI flat</th><th>Brier</th></tr></thead><tbody><tr><td>💎 Gros favori (cote ≤ 1.40)</td><td>51</td><td><span class="pos">71%</span></td><td><span class="neu">-2.6%</span></td><td>0.201</td></tr><tr><td>📊 Favori (1.40 < cote ≤ 1.85)</td><td>355</td><td><span class="pos">56%</span></td><td><span class="neu">-2.9%</span></td><td>0.246</td></tr><tr><td>⚖️ Pile/face (1.85 < cote ≤ 2.50)</td><td>26</td><td><span class="neg">38%</span></td><td><span class="neg">-15.4%</span></td><td>0.237</td></tr><tr><td>🎲 Outsider (cote > 2.50)</td><td>15</td><td><span class="neg">40%</span></td><td><span class="pos">+24.7%</span></td><td>0.238</td></tr></tbody></table>
+  <table><thead><tr><th>Bucket de cote</th><th>N</th><th>WR</th><th>ROI flat</th><th>Brier</th></tr></thead><tbody><tr><td>💎 Gros favori (cote ≤ 1.40)</td><td>54</td><td><span class="pos">69%</span></td><td><span class="neg">-5.9%</span></td><td>0.214</td></tr><tr><td>📊 Favori (1.40 < cote ≤ 1.85)</td><td>370</td><td><span class="pos">56%</span></td><td><span class="neu">-2.6%</span></td><td>0.246</td></tr><tr><td>⚖️ Pile/face (1.85 < cote ≤ 2.50)</td><td>25</td><td><span class="neg">40%</span></td><td><span class="neg">-12.0%</span></td><td>0.234</td></tr><tr><td>🎲 Outsider (cote > 2.50)</td><td>15</td><td><span class="neg">40%</span></td><td><span class="pos">+24.7%</span></td><td>0.238</td></tr></tbody></table>
 
   <h2 id="benchmarks">🆚 Vs benchmarks marché <span class="subtle">— le modèle bat-il les heuristiques simples ?</span></h2>
   <table>
@@ -262,8 +262,8 @@
         </tr>
       </thead>
       <tbody><tr style="background:rgba(167,139,250,.08);">
-      <td><b>🤖 Modèle predictMatch</b><br><span style="font-size:11px;color:#a3a3aa;">447 pari(s) réglé(s)</span></td>
-      <td style="text-align:right;">447</td>
+      <td><b>🤖 Modèle predictMatch</b><br><span style="font-size:11px;color:#a3a3aa;">464 pari(s) réglé(s)</span></td>
+      <td style="text-align:right;">464</td>
       <td style="text-align:right;">56.2%</td>
       <td style="text-align:right;color:#f87171;font-weight:700;">-2.6%</td>
       <td style="text-align:right;"><span style="color:#a3a3aa;">référence</span></td>
@@ -296,7 +296,7 @@
       <td style="text-align:right;">16</td>
       <td style="text-align:right;">68.8%</td>
       <td style="text-align:right;color:#34d399;">+7.9%</td>
-      <td style="text-align:right;color:#f87171;font-weight:600;">-10.6pt</td>
+      <td style="text-align:right;color:#f87171;font-weight:600;">-10.5pt</td>
     </tr></tbody>
     </table>
     <p style="font-size:12px;color:#a3a3aa;margin-top:8px;">
@@ -312,7 +312,7 @@
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px;">
       <div style="padding:12px 14px;background:#0c0c0f;border:1px solid rgba(255,255,255,.08);border-radius:8px;">
         <div style="font-size:11px;color:#a3a3aa;text-transform:uppercase;letter-spacing:.5px;">En cours</div>
-        <div style="font-size:15px;margin-top:4px;"><span style="color:#f87171;font-weight:700;">❄️ 2 défaites d'affilée</span></div>
+        <div style="font-size:15px;margin-top:4px;"><span style="color:#f87171;font-weight:700;">❄️ 1 défaite d'affilée</span></div>
       </div>
       <div style="padding:12px 14px;background:#0c0c0f;border:1px solid rgba(52,211,153,.25);border-radius:8px;">
         <div style="font-size:11px;color:#a3a3aa;text-transform:uppercase;letter-spacing:.5px;">Plus longue série gagnante</div>
@@ -451,11 +451,11 @@
     
     <div style="margin:0 0 14px;padding:8px 12px;background:rgba(255,255,255,.02);border:1px solid var(--border, rgba(255,255,255,.08));border-radius:8px;display:flex;align-items:center;gap:12px;">
       <span style="font-size:10.5px;color:#a3a3aa;text-transform:uppercase;letter-spacing:.5px;font-weight:700;">Cumul</span>
-      <svg viewBox="0 0 480 60" style="flex:1;height:60px;display:block;" xmlns="http://www.w3.org/2000/svg" aria-label="Cumul P&amp;L flat sur 8 pari(s)">
-        <path d="M 4 56 L 4.0,4.0 L 71.4,11.4 L 138.9,18.9 L 206.3,26.3 L 273.7,33.7 L 341.1,41.1 L 408.6,48.6 L 476.0,56.0 L 476 56 Z" fill="#f8717122" stroke="none"/>
-        <polyline points="4.0,4.0 71.4,11.4 138.9,18.9 206.3,26.3 273.7,33.7 341.1,41.1 408.6,48.6 476.0,56.0" fill="none" stroke="#f87171" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+      <svg viewBox="0 0 480 60" style="flex:1;height:60px;display:block;" xmlns="http://www.w3.org/2000/svg" aria-label="Cumul P&amp;L flat sur 9 pari(s)">
+        <path d="M 4 56 L 4.0,4.0 L 63.0,10.5 L 122.0,17.0 L 181.0,23.5 L 240.0,30.0 L 299.0,36.5 L 358.0,43.0 L 417.0,49.5 L 476.0,56.0 L 476 56 Z" fill="#f8717122" stroke="none"/>
+        <polyline points="4.0,4.0 63.0,10.5 122.0,17.0 181.0,23.5 240.0,30.0 299.0,36.5 358.0,43.0 417.0,49.5 476.0,56.0" fill="none" stroke="#f87171" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
       </svg>
-      <span style="font-size:14px;font-weight:800;color:#f87171;font-variant-numeric:tabular-nums;">-8.00u</span>
+      <span style="font-size:14px;font-weight:800;color:#f87171;font-variant-numeric:tabular-nums;">-9.00u</span>
     </div>
     <table>
       <thead>
@@ -474,6 +474,20 @@
       <td style="text-align:right;">1 (Domicile)</td>
       <td style="text-align:right;color:#fbbf24;font-weight:600;">86%</td>
       <td style="text-align:right;font-variant-numeric:tabular-nums;">@1.10</td>
+      <td style="text-align:right;font-size:11px;color:#a3a3aa;">🤔 Refusé</td>
+    </tr><tr>
+      <td><span style="font-size:14px;">⚾</span> <b>Seattle Mariners at Pittsburgh Pirates</b></td>
+      <td style="text-align:right;font-size:11px;color:#a3a3aa;">2026-06-23</td>
+      <td style="text-align:right;">1 (Domicile)</td>
+      <td style="text-align:right;color:#fbbf24;font-weight:600;">83%</td>
+      <td style="text-align:right;font-variant-numeric:tabular-nums;">@1.05</td>
+      <td style="text-align:right;font-size:11px;color:#a3a3aa;">🤔 Refusé</td>
+    </tr><tr>
+      <td><span style="font-size:14px;">⚾</span> <b>Kansas City Royals at Tampa Bay Rays</b></td>
+      <td style="text-align:right;font-size:11px;color:#a3a3aa;">2026-06-23</td>
+      <td style="text-align:right;">1 (Domicile)</td>
+      <td style="text-align:right;color:#fbbf24;font-weight:600;">79%</td>
+      <td style="text-align:right;font-variant-numeric:tabular-nums;">@1.07</td>
       <td style="text-align:right;font-size:11px;color:#a3a3aa;">🤔 Refusé</td>
     </tr><tr>
       <td><span style="font-size:14px;">⚽</span> <b>Cagliari at AC Milan</b></td>
@@ -504,13 +518,6 @@
       <td style="text-align:right;font-variant-numeric:tabular-nums;">@1.42</td>
       <td style="text-align:right;font-size:11px;color:#a3a3aa;">🤔 Refusé</td>
     </tr><tr>
-      <td><span style="font-size:14px;">⚾</span> <b>Kansas City Royals at Tampa Bay Rays</b></td>
-      <td style="text-align:right;font-size:11px;color:#a3a3aa;">2026-06-22</td>
-      <td style="text-align:right;">1 (Domicile)</td>
-      <td style="text-align:right;color:#fbbf24;font-weight:600;">65%</td>
-      <td style="text-align:right;font-variant-numeric:tabular-nums;">@1.62</td>
-      <td style="text-align:right;font-size:11px;color:#a3a3aa;">🤔 Refusé</td>
-    </tr><tr>
       <td><span style="font-size:14px;">🏀</span> <b>New York Liberty at Los Angeles Sparks</b></td>
       <td style="text-align:right;font-size:11px;color:#a3a3aa;">2026-06-22</td>
       <td style="text-align:right;">2 (Extérieur)</td>
@@ -533,13 +540,13 @@
   <h2 id="calibration">📊 Calibration probabiliste <span class="subtle">— quand on dit 70%, on gagne 70% ?</span></h2>
   <p style="font-size:13px;color:#a3a3aa;margin:0 0 12px;">Plus le <b>gap</b> est proche de 0, mieux le modèle est calibré.
   <code>+pp</code> = modèle sous-estime · <code>-pp</code> = modèle sur-estime.</p>
-  <table><thead><tr><th>Bin probabilité</th><th>N</th><th>Prob moyenne</th><th>WR observé</th><th>Gap</th></tr></thead><tbody><tr><td>[0.3–0.4]</td><td>22</td><td>36.4%</td><td>27.3%</td><td><span class="neu">-9.2pp</span></td></tr><tr><td>[0.4–0.5]</td><td>38</td><td>46.7%</td><td>63.2%</td><td><span class="neu">+16.5pp</span></td></tr><tr><td>[0.5–0.6]</td><td>303</td><td>54.3%</td><td>54.1%</td><td><span class="neu">-0.1pp</span></td></tr><tr><td>[0.6–0.7]</td><td>70</td><td>63.5%</td><td>62.9%</td><td><span class="neu">-0.7pp</span></td></tr><tr><td>[0.7–0.8]</td><td>11</td><td>73.3%</td><td>100.0%</td><td><span class="neu">+26.7pp</span></td></tr><tr><td>[0.8–0.9]</td><td>3</td><td>85.2%</td><td>66.7%</td><td><span class="neu">-18.6pp</span></td></tr></tbody></table>
+  <table><thead><tr><th>Bin probabilité</th><th>N</th><th>Prob moyenne</th><th>WR observé</th><th>Gap</th></tr></thead><tbody><tr><td>[0.3–0.4]</td><td>22</td><td>36.4%</td><td>27.3%</td><td><span class="neu">-9.2pp</span></td></tr><tr><td>[0.4–0.5]</td><td>41</td><td>46.9%</td><td>63.4%</td><td><span class="neu">+16.5pp</span></td></tr><tr><td>[0.5–0.6]</td><td>311</td><td>54.3%</td><td>54.7%</td><td><span class="neu">+0.4pp</span></td></tr><tr><td>[0.6–0.7]</td><td>73</td><td>63.4%</td><td>61.6%</td><td><span class="neu">-1.7pp</span></td></tr><tr><td>[0.7–0.8]</td><td>13</td><td>73.7%</td><td>92.3%</td><td><span class="neu">+18.7pp</span></td></tr><tr><td>[0.8–0.9]</td><td>4</td><td>84.7%</td><td>50.0%</td><td><span class="neu">-34.7pp</span></td></tr></tbody></table>
 
   <h2 id="leagues">🏟️ Top ligues par volume</h2>
-  <table><thead><tr><th>Ligue</th><th>N</th><th>WR</th><th>ROI flat</th><th>Brier</th></tr></thead><tbody><tr><td><code>mlb</code></td><td>339</td><td><span class="pos">56%</span></td><td><span class="neu">-4.5%</span></td><td>0.245</td></tr><tr><td><code>wnba</code></td><td>24</td><td><span class="pos">83%</span></td><td><span class="pos">+21.9%</span></td><td>0.187</td></tr><tr><td><code>jpn.1</code></td><td>17</td><td><span class="neu">47%</span></td><td><span class="pos">+17.6%</span></td><td>0.277</td></tr><tr><td><code>eliteserien</code></td><td>10</td><td><span class="neu">50%</span></td><td><span class="pos">+6.1%</span></td><td>0.254</td></tr><tr><td><code>esp.2</code></td><td>9</td><td><span class="pos">67%</span></td><td><span class="pos">+7.3%</span></td><td>0.183</td></tr><tr><td><code>nhl</code></td><td>8</td><td><span class="pos">75%</span></td><td><span class="pos">+28.5%</span></td><td>0.234</td></tr><tr><td><code>nba</code></td><td>7</td><td><span class="pos">57%</span></td><td><span class="neg">-5.6%</span></td><td>0.252</td></tr><tr><td><code>allsvenskan</code></td><td>6</td><td><span class="neg">17%</span></td><td><span class="neg">-46.7%</span></td><td>0.217</td></tr><tr><td><code>laliga2</code></td><td>6</td><td><span class="neg">17%</span></td><td><span class="neg">-66.7%</span></td><td>0.191</td></tr><tr><td><code>ita.1</code></td><td>5</td><td><span class="pos">60%</span></td><td><span class="neu">-4.8%</span></td><td>0.274</td></tr><tr><td><code>chn.1</code></td><td>4</td><td><span class="neu">50%</span></td><td><span class="pos">+28.8%</span></td><td>0.231</td></tr><tr><td><code>chi.1</code></td><td>2</td><td><span class="neg">0%</span></td><td><span class="neg">-100.0%</span></td><td>0.223</td></tr></tbody></table>
+  <table><thead><tr><th>Ligue</th><th>N</th><th>WR</th><th>ROI flat</th><th>Brier</th></tr></thead><tbody><tr><td><code>mlb</code></td><td>356</td><td><span class="pos">56%</span></td><td><span class="neu">-4.4%</span></td><td>0.246</td></tr><tr><td><code>wnba</code></td><td>24</td><td><span class="pos">83%</span></td><td><span class="pos">+22.1%</span></td><td>0.187</td></tr><tr><td><code>jpn.1</code></td><td>17</td><td><span class="neu">47%</span></td><td><span class="pos">+17.6%</span></td><td>0.277</td></tr><tr><td><code>eliteserien</code></td><td>10</td><td><span class="neu">50%</span></td><td><span class="pos">+6.1%</span></td><td>0.254</td></tr><tr><td><code>esp.2</code></td><td>9</td><td><span class="pos">67%</span></td><td><span class="pos">+7.3%</span></td><td>0.183</td></tr><tr><td><code>nhl</code></td><td>8</td><td><span class="pos">75%</span></td><td><span class="pos">+28.5%</span></td><td>0.234</td></tr><tr><td><code>nba</code></td><td>7</td><td><span class="pos">57%</span></td><td><span class="neg">-5.6%</span></td><td>0.252</td></tr><tr><td><code>allsvenskan</code></td><td>6</td><td><span class="neg">17%</span></td><td><span class="neg">-46.7%</span></td><td>0.217</td></tr><tr><td><code>laliga2</code></td><td>6</td><td><span class="neg">17%</span></td><td><span class="neg">-66.7%</span></td><td>0.191</td></tr><tr><td><code>ita.1</code></td><td>5</td><td><span class="pos">60%</span></td><td><span class="neu">-4.8%</span></td><td>0.274</td></tr><tr><td><code>chn.1</code></td><td>4</td><td><span class="neu">50%</span></td><td><span class="pos">+28.8%</span></td><td>0.231</td></tr><tr><td><code>chi.1</code></td><td>2</td><td><span class="neg">0%</span></td><td><span class="neg">-100.0%</span></td><td>0.223</td></tr></tbody></table>
 
   <div class="danger-banner">
-    <strong>⚠️ Petite n.</strong> 447 pari(s) restent insuffisants pour conclure définitivement
+    <strong>⚠️ Petite n.</strong> 464 pari(s) restent insuffisants pour conclure définitivement
     sur les sous-segments (sport, ligue, bucket de cote). Il faut typiquement <b>≥150 paris</b> par
     catégorie pour qu'un ROI ait du sens. Avant ça, c'est de la variance. Voir <a href="methodologie.html#biais">méthodologie · biais &amp; limites</a>.
   </div>

@@ -1,25 +1,24 @@
 {
-  "generated_at": "2026-06-25T06:51:57Z",
+  "generated_at": "2026-06-25T10:00:48Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 27,
+    "active_events": 19,
     "expired_sample": 0,
     "by_type": {
-      "back_to_back_travel": 14,
-      "travel_extreme": 9,
-      "lookahead": 33,
-      "schedule_congestion": 11
+      "back_to_back_travel": 12,
+      "travel_extreme": 6,
+      "lookahead": 22,
+      "schedule_congestion": 6
     },
     "by_decision": {
-      "abstain": 10,
-      "lean_home": 16,
-      "lean_away": 1
+      "abstain": 6,
+      "lean_home": 13
     },
-    "lean_home": 16,
-    "lean_away": 1,
-    "abstain": 10,
+    "lean_home": 13,
+    "lean_away": 0,
+    "abstain": 6,
     "monitor": 0
   },
   "active": [
@@ -76,76 +75,6 @@
       }
     },
     {
-      "event_id": "401815957",
-      "source_event_ids": [
-        "401815957"
-      ],
-      "kickoff": "2026-06-29T23:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Milwaukee Brewers",
-      "away": "Cincinnati Reds",
-      "match": "Milwaukee Brewers - Cincinnati Reds",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Milwaukee Brewers 0.36, Cincinnati Reds 0.36",
-      "pressure_score": 1.6,
-      "home_fade": 0.36,
-      "away_fade": 0.36,
-      "travel_score": 0,
-      "lookahead_score": 1.6,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "3 match important/proche dans les 3 jours",
-        "3 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": 0.316,
-        "away_score": -0.954,
-        "home_fade": 1.16,
-        "away_fade": 1.36,
-        "reason": "Signaux opposes: Milwaukee Brewers fade 1.16, Cincinnati Reds fade 1.36 -> prudence",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.36
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.36
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.8
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401815900",
       "source_event_ids": [
         "401815900"
@@ -176,11 +105,11 @@
       "global_resolution": {
         "status": "mixed",
         "net_side": null,
-        "home_score": -0.628,
+        "home_score": -0.741,
         "away_score": 0.155,
         "home_fade": 1.3,
         "away_fade": 0.3,
-        "reason": "Signaux mitigés: avantage net trop faible (Boston Red Sox -0.63, New York Yankees +0.15)",
+        "reason": "Signaux mitigés: avantage net trop faible (Boston Red Sox -0.74, New York Yankees +0.15)",
         "detail": [
           {
             "side": "home",
@@ -204,7 +133,7 @@
             "side": "home",
             "type": "market_move",
             "direction": "steam",
-            "strength": 0.567
+            "strength": 0.454
           }
         ]
       }
@@ -268,76 +197,6 @@
       }
     },
     {
-      "event_id": "401815971",
-      "source_event_ids": [
-        "401815971"
-      ],
-      "kickoff": "2026-06-30T23:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Milwaukee Brewers",
-      "away": "Cincinnati Reds",
-      "match": "Milwaukee Brewers - Cincinnati Reds",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Milwaukee Brewers 0.30, Cincinnati Reds 0.30",
-      "pressure_score": 1.333,
-      "home_fade": 0.3,
-      "away_fade": 0.3,
-      "travel_score": 0,
-      "lookahead_score": 1.333,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "2 match important/proche dans les 3 jours",
-        "2 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": 0.355,
-        "away_score": -0.915,
-        "home_fade": 1.1,
-        "away_fade": 1.3,
-        "reason": "Signaux opposes: Milwaukee Brewers fade 1.10, Cincinnati Reds fade 1.30 -> prudence",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.8
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401815974",
       "source_event_ids": [
         "401815974"
@@ -368,11 +227,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -1.595,
-        "away_score": 1.295,
-        "home_fade": 1.7,
+        "home_score": -0.595,
+        "away_score": -0.055,
+        "home_fade": 0.7,
         "away_fade": 0.3,
-        "reason": "Direction nette: Tampa Bay Rays (+1.29)",
+        "reason": "Direction nette: Tampa Bay Rays (-0.06)",
         "detail": [
           {
             "side": "home",
@@ -391,18 +250,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.4
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 1.0
           }
         ]
       }
@@ -466,76 +313,6 @@
       }
     },
     {
-      "event_id": "401815996",
-      "source_event_ids": [
-        "401815996"
-      ],
-      "kickoff": "2026-07-02T18:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Milwaukee Brewers",
-      "away": "Cincinnati Reds",
-      "match": "Milwaukee Brewers - Cincinnati Reds",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Milwaukee Brewers 0.60, Cincinnati Reds 0.60",
-      "pressure_score": 1.2,
-      "home_fade": 0.6,
-      "away_fade": 0.6,
-      "travel_score": 0,
-      "lookahead_score": 0,
-      "congestion_score": 1.2,
-      "types": {
-        "schedule_congestion": 2
-      },
-      "contexts": [
-        "3 matchs sur les 7 derniers jours",
-        "3 matchs sur les 7 derniers jours"
-      ],
-      "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": 0.16,
-        "away_score": -1.11,
-        "home_fade": 1.4,
-        "away_fade": 1.6,
-        "reason": "Signaux opposes: Milwaukee Brewers fade 1.40, Cincinnati Reds fade 1.60 -> prudence",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.8
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401815924",
       "source_event_ids": [
         "401815924"
@@ -587,243 +364,6 @@
           {
             "side": "home",
             "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815986",
-      "source_event_ids": [
-        "401815986"
-      ],
-      "kickoff": "2026-07-02T00:00Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Milwaukee Brewers",
-      "away": "Cincinnati Reds",
-      "match": "Milwaukee Brewers - Cincinnati Reds",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Milwaukee Brewers 0.15, Cincinnati Reds 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": 0.452,
-        "away_score": -0.817,
-        "home_fade": 0.95,
-        "away_fade": 1.15,
-        "reason": "Signaux opposes: Milwaukee Brewers fade 0.95, Cincinnati Reds fade 1.15 -> prudence",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.8
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815949",
-      "source_event_ids": [
-        "401815949"
-      ],
-      "kickoff": "2026-06-28T20:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Francisco Giants",
-      "away": "Atlanta Braves",
-      "match": "San Francisco Giants - Atlanta Braves",
-      "decision": "lean_home",
-      "net_team": "San Francisco Giants",
-      "reason": "Atlanta Braves plus penalise par calendrier/voyage (2.40 vs 0.80)",
-      "pressure_score": 3.196,
-      "home_fade": 0.8,
-      "away_fade": 2.396,
-      "travel_score": 1.796,
-      "lookahead_score": 0,
-      "congestion_score": 1.4,
-      "types": {
-        "schedule_congestion": 2,
-        "travel_extreme": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "4 matchs sur les 7 derniers jours",
-        "3 matchs sur les 7 derniers jours",
-        "Deplacement estime 3422 km, decalage ~2.5h",
-        "2 match dans les 48h + 3422 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "mixed",
-        "net_side": null,
-        "home_score": -0.961,
-        "away_score": -0.766,
-        "home_fade": 1.8,
-        "away_fade": 2.396,
-        "reason": "Signaux mitigés: avantage net trop faible (San Francisco Giants -0.96, Atlanta Braves -0.77)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.8
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.796
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815934",
-      "source_event_ids": [
-        "401815934"
-      ],
-      "kickoff": "2026-06-28T01:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Francisco Giants",
-      "away": "Atlanta Braves",
-      "match": "San Francisco Giants - Atlanta Braves",
-      "decision": "lean_home",
-      "net_team": "San Francisco Giants",
-      "reason": "Atlanta Braves plus penalise par calendrier/voyage (1.95 vs 0.75)",
-      "pressure_score": 3.063,
-      "home_fade": 0.75,
-      "away_fade": 1.946,
-      "travel_score": 1.796,
-      "lookahead_score": 0.667,
-      "congestion_score": 0.6,
-      "types": {
-        "schedule_congestion": 1,
-        "lookahead": 2,
-        "travel_extreme": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "3 matchs sur les 7 derniers jours",
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours",
-        "Deplacement estime 3422 km, decalage ~2.5h"
-      ],
-      "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -1.069,
-        "away_score": -0.333,
-        "home_fade": 1.75,
-        "away_fade": 1.946,
-        "reason": "Signaux opposes: San Francisco Giants fade 1.75, Atlanta Braves fade 1.95 -> prudence",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.796
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 1.0
           }
@@ -1099,78 +639,6 @@
       }
     },
     {
-      "event_id": "401815919",
-      "source_event_ids": [
-        "401815919"
-      ],
-      "kickoff": "2026-06-27T02:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Francisco Giants",
-      "away": "Atlanta Braves",
-      "match": "San Francisco Giants - Atlanta Braves",
-      "decision": "lean_home",
-      "net_team": "San Francisco Giants",
-      "reason": "Atlanta Braves plus penalise par calendrier/voyage (1.10 vs 0.30)",
-      "pressure_score": 2.129,
-      "home_fade": 0.3,
-      "away_fade": 1.096,
-      "travel_score": 0.796,
-      "lookahead_score": 1.333,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2,
-        "travel_extreme": 1
-      },
-      "contexts": [
-        "2 match important/proche dans les 3 jours",
-        "2 match important/proche dans les 3 jours",
-        "Deplacement estime 3422 km, decalage ~2.5h"
-      ],
-      "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.916,
-        "away_score": 0.359,
-        "home_fade": 1.3,
-        "away_fade": 1.096,
-        "reason": "Signaux opposes: San Francisco Giants fade 1.30, Atlanta Braves fade 1.10 -> prudence",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.796
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401815927",
       "source_event_ids": [
         "401815927"
@@ -1275,13 +743,13 @@
         "Deplacement estime 1957 km, decalage ~1.2h"
       ],
       "global_resolution": {
-        "status": "mixed",
-        "net_side": null,
+        "status": "net",
+        "net_side": "home",
         "home_score": 0.205,
-        "away_score": -1.006,
+        "away_score": -1.489,
         "home_fade": 0.36,
         "away_fade": 1.615,
-        "reason": "Signaux mitigés: avantage net trop faible (Toronto Blue Jays +0.21, Texas Rangers -1.01)",
+        "reason": "Direction nette: Toronto Blue Jays (+0.21)",
         "detail": [
           {
             "side": "home",
@@ -1300,12 +768,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.8
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.483
           },
           {
             "side": "away",
@@ -1348,29 +810,17 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 2.119,
-        "away_score": -3.198,
+        "home_score": 0.769,
+        "away_score": -2.198,
         "home_fade": 0.0,
-        "away_fade": 3.198,
-        "reason": "Direction nette: Pittsburgh Pirates (+2.12)",
+        "away_fade": 2.198,
+        "reason": "Direction nette: Pittsburgh Pirates (+0.77)",
         "detail": [
           {
             "side": "away",
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.4
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
           },
           {
             "side": "away",
@@ -1478,13 +928,13 @@
         "1 match dans les 48h + 1664 km de voyage"
       ],
       "global_resolution": {
-        "status": "mixed",
-        "net_side": null,
-        "home_score": -1.196,
-        "away_score": 0.53,
-        "home_fade": 1.55,
+        "status": "net",
+        "net_side": "home",
+        "home_score": -0.196,
+        "away_score": -0.82,
+        "home_fade": 0.55,
         "away_fade": 1.013,
-        "reason": "Signaux mitigés: avantage net trop faible (Kansas City Royals -1.20, Tampa Bay Rays +0.53)",
+        "reason": "Direction nette: Kansas City Royals (-0.20)",
         "detail": [
           {
             "side": "home",
@@ -1503,18 +953,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.4
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 1.0
           },
           {
             "side": "away",
@@ -1612,31 +1050,19 @@
         "2 match dans les 48h + 1664 km de voyage"
       ],
       "global_resolution": {
-        "status": "mixed",
-        "net_side": null,
-        "home_score": -1.07,
-        "away_score": 0.547,
-        "home_fade": 1.4,
+        "status": "net",
+        "net_side": "home",
+        "home_score": -0.07,
+        "away_score": -0.803,
+        "home_fade": 0.4,
         "away_fade": 0.943,
-        "reason": "Signaux mitigés: avantage net trop faible (Kansas City Royals -1.07, Tampa Bay Rays +0.55)",
+        "reason": "Direction nette: Kansas City Royals (-0.07)",
         "detail": [
           {
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.4
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 1.0
           },
           {
             "side": "away",
@@ -1677,29 +1103,17 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 1.792,
-        "away_score": -2.263,
+        "home_score": 0.442,
+        "away_score": -1.263,
         "home_fade": 0.0,
-        "away_fade": 2.263,
-        "reason": "Direction nette: Tampa Bay Rays (+1.79)",
+        "away_fade": 1.263,
+        "reason": "Direction nette: Tampa Bay Rays (+0.44)",
         "detail": [
           {
             "side": "away",
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.4
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
           },
           {
             "side": "away",
@@ -1757,69 +1171,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.842
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815905",
-      "source_event_ids": [
-        "401815905"
-      ],
-      "kickoff": "2026-06-25T19:45Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Francisco Giants",
-      "away": "Athletics",
-      "match": "San Francisco Giants - Athletics",
-      "decision": "lean_away",
-      "net_team": "Athletics",
-      "reason": "San Francisco Giants plus penalise par calendrier/voyage (0.30 vs 0.00)",
-      "pressure_score": 0.667,
-      "home_fade": 0.3,
-      "away_fade": 0.0,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 1
-      },
-      "contexts": [
-        "2 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -1.31,
-        "away_score": 1.237,
-        "home_fade": 1.31,
-        "away_fade": 0.0,
-        "reason": "Direction nette: Athletics (+1.24)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 0.61
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.779
           }
         ]
       }
