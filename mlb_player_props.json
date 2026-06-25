@@ -1,382 +1,8 @@
 {
-  "generated_at": "2026-06-24T23:13:19Z",
+  "generated_at": "2026-06-25T00:23:45Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815883",
-      "kickoff": "2026-06-24T23:07Z",
-      "league": "MLB",
-      "match": "Houston Astros at Toronto Blue Jays",
-      "home": "Toronto Blue Jays",
-      "away": "Houston Astros",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Toronto Blue Jays",
-          "pitcher": "Trey Yesavage",
-          "label": "Trey Yesavage moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.5447,
-          "fair_odds": 1.84,
-          "expected_strikeouts": 5.3,
-          "projected_ip": 5.5,
-          "inputs": {
-            "k9": 8.67,
-            "era": 3.76,
-            "whip": 1.16,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Toronto Blue Jays",
-          "pitcher": "Trey Yesavage",
-          "label": "Trey Yesavage ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6059,
-          "fair_odds": 1.65,
-          "expected_hr_allowed": 0.501,
-          "projected_ip": 5.5,
-          "inputs": {
-            "hr9": 0.82,
-            "era": 3.76,
-            "whip": 1.16
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Houston Astros",
-          "pitcher": "Mike Burrows",
-          "label": "Mike Burrows plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.5475,
-          "fair_odds": 1.83,
-          "expected_strikeouts": 4.7,
-          "projected_ip": 5.65,
-          "inputs": {
-            "k9": 7.49,
-            "era": 5.79,
-            "whip": 1.58,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Houston Astros",
-          "pitcher": "Mike Burrows",
-          "label": "Mike Burrows concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.7221,
-          "fair_odds": 1.38,
-          "expected_hr_allowed": 1.281,
-          "projected_ip": 5.65,
-          "inputs": {
-            "hr9": 2.04,
-            "era": 5.79,
-            "whip": 1.58
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401815882",
-      "kickoff": "2026-06-24T23:10Z",
-      "league": "MLB",
-      "match": "Chicago Cubs at New York Mets",
-      "home": "New York Mets",
-      "away": "Chicago Cubs",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "New York Mets",
-          "pitcher": "Sean Manaea",
-          "label": "Sean Manaea plus de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "over",
-          "probability": 0.5596,
-          "fair_odds": 1.79,
-          "expected_strikeouts": 6.81,
-          "projected_ip": 6.6,
-          "inputs": {
-            "k9": 9.28,
-            "era": 4.64,
-            "whip": 1.34,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "New York Mets",
-          "pitcher": "Sean Manaea",
-          "label": "Sean Manaea concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5162,
-          "fair_odds": 1.94,
-          "expected_hr_allowed": 0.726,
-          "projected_ip": 6.6,
-          "inputs": {
-            "hr9": 0.99,
-            "era": 4.64,
-            "whip": 1.34
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Chicago Cubs",
-          "pitcher": "Shota Imanaga",
-          "label": "Shota Imanaga plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.5147,
-          "fair_odds": 1.94,
-          "expected_strikeouts": 5.57,
-          "projected_ip": 5.75,
-          "inputs": {
-            "k9": 8.72,
-            "era": 4.26,
-            "whip": 1.06,
-            "hand": "L"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Chicago Cubs",
-          "pitcher": "Shota Imanaga",
-          "label": "Shota Imanaga concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.677,
-          "fair_odds": 1.48,
-          "expected_hr_allowed": 1.13,
-          "projected_ip": 5.75,
-          "inputs": {
-            "hr9": 1.77,
-            "era": 4.26,
-            "whip": 1.06
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401815885",
-      "kickoff": "2026-06-24T23:10Z",
-      "league": "MLB",
-      "match": "Milwaukee Brewers at Cincinnati Reds",
-      "home": "Cincinnati Reds",
-      "away": "Milwaukee Brewers",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Cincinnati Reds",
-          "pitcher": "Rhett Lowder",
-          "label": "Rhett Lowder plus de 3,5 strikeouts",
-          "line": 3.5,
-          "pick": "over",
-          "probability": 0.5781,
-          "fair_odds": 1.73,
-          "expected_strikeouts": 3.8,
-          "projected_ip": 4.74,
-          "inputs": {
-            "k9": 7.22,
-            "era": 4.82,
-            "whip": 1.45,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Cincinnati Reds",
-          "pitcher": "Rhett Lowder",
-          "label": "Rhett Lowder ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.636,
-          "fair_odds": 1.57,
-          "expected_hr_allowed": 0.453,
-          "projected_ip": 4.74,
-          "inputs": {
-            "hr9": 0.86,
-            "era": 4.82,
-            "whip": 1.45
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Milwaukee Brewers",
-          "pitcher": "Shane Drohan",
-          "label": "Shane Drohan plus de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "over",
-          "probability": 0.5009,
-          "fair_odds": 2.0,
-          "expected_strikeouts": 6.5,
-          "projected_ip": 6.6,
-          "inputs": {
-            "k9": 8.87,
-            "era": 3.4,
-            "whip": 1.17,
-            "hand": "L"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Milwaukee Brewers",
-          "pitcher": "Shane Drohan",
-          "label": "Shane Drohan ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5727,
-          "fair_odds": 1.75,
-          "expected_hr_allowed": 0.557,
-          "projected_ip": 6.6,
-          "inputs": {
-            "hr9": 0.76,
-            "era": 3.4,
-            "whip": 1.17
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401815892",
-      "kickoff": "2026-06-24T23:40Z",
-      "league": "MLB",
-      "match": "Los Angeles Dodgers at Minnesota Twins",
-      "home": "Minnesota Twins",
-      "away": "Los Angeles Dodgers",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Minnesota Twins",
-          "pitcher": "Joe Ryan",
-          "label": "Joe Ryan moins de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "under",
-          "probability": 0.5677,
-          "fair_odds": 1.76,
-          "expected_strikeouts": 6.17,
-          "projected_ip": 5.44,
-          "inputs": {
-            "k9": 10.2,
-            "era": 2.99,
-            "whip": 1.0,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Minnesota Twins",
-          "pitcher": "Joe Ryan",
-          "label": "Joe Ryan ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.609,
-          "fair_odds": 1.64,
-          "expected_hr_allowed": 0.496,
-          "projected_ip": 5.44,
-          "inputs": {
-            "hr9": 0.82,
-            "era": 2.99,
-            "whip": 1.0
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Los Angeles Dodgers",
-          "pitcher": "Shohei Ohtani",
-          "label": "Shohei Ohtani moins de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "under",
-          "probability": 0.5082,
-          "fair_odds": 1.97,
-          "expected_strikeouts": 6.46,
-          "projected_ip": 6.1,
-          "inputs": {
-            "k9": 9.53,
-            "era": 1.47,
-            "whip": 0.88,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Los Angeles Dodgers",
-          "pitcher": "Shohei Ohtani",
-          "label": "Shohei Ohtani ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.7782,
-          "fair_odds": 1.29,
-          "expected_hr_allowed": 0.251,
-          "projected_ip": 6.1,
-          "inputs": {
-            "hr9": 0.37,
-            "era": 1.47,
-            "whip": 0.88
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401815890",
-      "kickoff": "2026-06-24T23:45Z",
-      "league": "MLB",
-      "match": "Arizona Diamondbacks at St. Louis Cardinals",
-      "home": "St. Louis Cardinals",
-      "away": "Arizona Diamondbacks",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "St. Louis Cardinals",
-          "pitcher": "Matthew Liberatore",
-          "label": "Matthew Liberatore moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.5111,
-          "fair_odds": 1.96,
-          "expected_strikeouts": 4.45,
-          "projected_ip": 4.81,
-          "inputs": {
-            "k9": 8.34,
-            "era": 5.23,
-            "whip": 1.56,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "St. Louis Cardinals",
-          "pitcher": "Matthew Liberatore",
-          "label": "Matthew Liberatore concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6316,
-          "fair_odds": 1.58,
-          "expected_hr_allowed": 0.999,
-          "projected_ip": 4.81,
-          "inputs": {
-            "hr9": 1.87,
-            "era": 5.23,
-            "whip": 1.56
-          },
-          "side": "home"
-        }
-      ]
-    },
     {
       "event_id": "401815894",
       "kickoff": "2026-06-25T01:45Z",
@@ -706,6 +332,52 @@
       ]
     },
     {
+      "event_id": "401815898",
+      "kickoff": "2026-06-25T22:40Z",
+      "league": "MLB",
+      "match": "Houston Astros at Detroit Tigers",
+      "home": "Detroit Tigers",
+      "away": "Houston Astros",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Detroit Tigers",
+          "pitcher": "Troy Melton",
+          "label": "Troy Melton plus de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "over",
+          "probability": 0.5642,
+          "fair_odds": 1.77,
+          "expected_strikeouts": 3.74,
+          "projected_ip": 6.24,
+          "inputs": {
+            "k9": 5.4,
+            "era": 2.56,
+            "whip": 0.95,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Detroit Tigers",
+          "pitcher": "Troy Melton",
+          "label": "Troy Melton concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.6944,
+          "fair_odds": 1.44,
+          "expected_hr_allowed": 1.186,
+          "projected_ip": 6.24,
+          "inputs": {
+            "hr9": 1.71,
+            "era": 2.56,
+            "whip": 0.95
+          },
+          "side": "home"
+        }
+      ]
+    },
+    {
       "event_id": "401815901",
       "kickoff": "2026-06-25T22:45Z",
       "league": "MLB",
@@ -782,6 +454,88 @@
             "hr9": 0.6,
             "era": 1.8,
             "whip": 1.09
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815903",
+      "kickoff": "2026-06-25T23:07Z",
+      "league": "MLB",
+      "match": "Texas Rangers at Toronto Blue Jays",
+      "home": "Toronto Blue Jays",
+      "away": "Texas Rangers",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Toronto Blue Jays",
+          "pitcher": "Kevin Gausman",
+          "label": "Kevin Gausman plus de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "over",
+          "probability": 0.5136,
+          "fair_odds": 1.95,
+          "expected_strikeouts": 5.56,
+          "projected_ip": 5.56,
+          "inputs": {
+            "k9": 9.0,
+            "era": 4.04,
+            "whip": 1.13,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Toronto Blue Jays",
+          "pitcher": "Kevin Gausman",
+          "label": "Kevin Gausman ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5036,
+          "fair_odds": 1.99,
+          "expected_hr_allowed": 0.686,
+          "projected_ip": 5.56,
+          "inputs": {
+            "hr9": 1.11,
+            "era": 4.04,
+            "whip": 1.13
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Texas Rangers",
+          "pitcher": "MacKenzie Gore",
+          "label": "MacKenzie Gore plus de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "over",
+          "probability": 0.5535,
+          "fair_odds": 1.81,
+          "expected_strikeouts": 5.75,
+          "projected_ip": 5.25,
+          "inputs": {
+            "k9": 9.86,
+            "era": 4.07,
+            "whip": 1.3,
+            "hand": "L"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Texas Rangers",
+          "pitcher": "MacKenzie Gore",
+          "label": "MacKenzie Gore ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6055,
+          "fair_odds": 1.65,
+          "expected_hr_allowed": 0.502,
+          "projected_ip": 5.25,
+          "inputs": {
+            "hr9": 0.86,
+            "era": 4.07,
+            "whip": 1.3
           },
           "side": "away"
         }
@@ -870,6 +624,88 @@
       ]
     },
     {
+      "event_id": "401815900",
+      "kickoff": "2026-06-25T23:10Z",
+      "league": "MLB",
+      "match": "New York Yankees at Boston Red Sox",
+      "home": "Boston Red Sox",
+      "away": "New York Yankees",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Boston Red Sox",
+          "pitcher": "Connelly Early",
+          "label": "Connelly Early moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.5581,
+          "fair_odds": 1.79,
+          "expected_strikeouts": 5.24,
+          "projected_ip": 5.41,
+          "inputs": {
+            "k9": 8.71,
+            "era": 3.64,
+            "whip": 1.27,
+            "hand": "L"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Boston Red Sox",
+          "pitcher": "Connelly Early",
+          "label": "Connelly Early concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.604,
+          "fair_odds": 1.66,
+          "expected_hr_allowed": 0.926,
+          "projected_ip": 5.41,
+          "inputs": {
+            "hr9": 1.54,
+            "era": 3.64,
+            "whip": 1.27
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "New York Yankees",
+          "pitcher": "Cam Schlittler",
+          "label": "Cam Schlittler plus de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "over",
+          "probability": 0.5615,
+          "fair_odds": 1.78,
+          "expected_strikeouts": 6.81,
+          "projected_ip": 5.94,
+          "inputs": {
+            "k9": 10.33,
+            "era": 1.71,
+            "whip": 0.89,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "New York Yankees",
+          "pitcher": "Cam Schlittler",
+          "label": "Cam Schlittler ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.7334,
+          "fair_odds": 1.36,
+          "expected_hr_allowed": 0.31,
+          "projected_ip": 5.94,
+          "inputs": {
+            "hr9": 0.47,
+            "era": 1.71,
+            "whip": 0.89
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
       "event_id": "401815904",
       "kickoff": "2026-06-25T23:45Z",
       "league": "MLB",
@@ -950,9 +786,219 @@
           "side": "away"
         }
       ]
+    },
+    {
+      "event_id": "401815908",
+      "kickoff": "2026-06-26T22:40Z",
+      "league": "MLB",
+      "match": "Houston Astros at Detroit Tigers",
+      "home": "Detroit Tigers",
+      "away": "Houston Astros",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Detroit Tigers",
+          "pitcher": "Keider Montero",
+          "label": "Keider Montero plus de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "over",
+          "probability": 0.5687,
+          "fair_odds": 1.76,
+          "expected_strikeouts": 3.76,
+          "projected_ip": 5.73,
+          "inputs": {
+            "k9": 5.91,
+            "era": 3.68,
+            "whip": 1.0,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Detroit Tigers",
+          "pitcher": "Keider Montero",
+          "label": "Keider Montero ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5291,
+          "fair_odds": 1.89,
+          "expected_hr_allowed": 0.637,
+          "projected_ip": 5.73,
+          "inputs": {
+            "hr9": 1.0,
+            "era": 3.68,
+            "whip": 1.0
+          },
+          "side": "home"
+        }
+      ]
+    },
+    {
+      "event_id": "401815912",
+      "kickoff": "2026-06-26T23:07Z",
+      "league": "MLB",
+      "match": "Texas Rangers at Toronto Blue Jays",
+      "home": "Toronto Blue Jays",
+      "away": "Texas Rangers",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Toronto Blue Jays",
+          "pitcher": "Patrick Corbin",
+          "label": "Patrick Corbin moins de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "under",
+          "probability": 0.5469,
+          "fair_odds": 1.83,
+          "expected_strikeouts": 3.33,
+          "projected_ip": 4.59,
+          "inputs": {
+            "k9": 6.54,
+            "era": 4.73,
+            "whip": 1.53,
+            "hand": "L"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Toronto Blue Jays",
+          "pitcher": "Patrick Corbin",
+          "label": "Patrick Corbin ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.568,
+          "fair_odds": 1.76,
+          "expected_hr_allowed": 0.566,
+          "projected_ip": 4.59,
+          "inputs": {
+            "hr9": 1.11,
+            "era": 4.73,
+            "whip": 1.53
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Texas Rangers",
+          "pitcher": "Nathan Eovaldi",
+          "label": "Nathan Eovaldi moins de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "under",
+          "probability": 0.5787,
+          "fair_odds": 1.73,
+          "expected_strikeouts": 6.12,
+          "projected_ip": 6.21,
+          "inputs": {
+            "k9": 8.87,
+            "era": 4.24,
+            "whip": 1.18,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Texas Rangers",
+          "pitcher": "Nathan Eovaldi",
+          "label": "Nathan Eovaldi concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.6773,
+          "fair_odds": 1.48,
+          "expected_hr_allowed": 1.131,
+          "projected_ip": 6.21,
+          "inputs": {
+            "hr9": 1.64,
+            "era": 4.24,
+            "whip": 1.18
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815909",
+      "kickoff": "2026-06-26T23:10Z",
+      "league": "MLB",
+      "match": "New York Yankees at Boston Red Sox",
+      "home": "Boston Red Sox",
+      "away": "New York Yankees",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Boston Red Sox",
+          "pitcher": "Payton Tolle",
+          "label": "Payton Tolle plus de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "over",
+          "probability": 0.5245,
+          "fair_odds": 1.91,
+          "expected_strikeouts": 5.61,
+          "projected_ip": 5.83,
+          "inputs": {
+            "k9": 8.67,
+            "era": 3.08,
+            "whip": 1.09,
+            "hand": "L"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Boston Red Sox",
+          "pitcher": "Payton Tolle",
+          "label": "Payton Tolle ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5805,
+          "fair_odds": 1.72,
+          "expected_hr_allowed": 0.544,
+          "projected_ip": 5.83,
+          "inputs": {
+            "hr9": 0.84,
+            "era": 3.08,
+            "whip": 1.09
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "New York Yankees",
+          "pitcher": "Will Warren",
+          "label": "Will Warren plus de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "over",
+          "probability": 0.5179,
+          "fair_odds": 1.93,
+          "expected_strikeouts": 5.58,
+          "projected_ip": 5.21,
+          "inputs": {
+            "k9": 9.65,
+            "era": 3.45,
+            "whip": 1.33,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "New York Yankees",
+          "pitcher": "Will Warren",
+          "label": "Will Warren ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5873,
+          "fair_odds": 1.7,
+          "expected_hr_allowed": 0.532,
+          "projected_ip": 5.21,
+          "inputs": {
+            "hr9": 0.92,
+            "era": 3.45,
+            "whip": 1.33
+          },
+          "side": "away"
+        }
+      ]
     }
   ],
-  "props": 46,
+  "props": 48,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
