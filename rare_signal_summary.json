@@ -1,22 +1,22 @@
 {
-  "generated_at": "2026-06-25T21:06:09Z",
+  "generated_at": "2026-06-25T22:41:52Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 17,
+    "active_events": 18,
     "actionable": 13,
-    "watch": 2,
+    "watch": 3,
     "risk": 2,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 11,
+      "injury_imbalance": 12,
       "travel_extreme": 5,
       "back_to_back_travel": 8,
       "market_uncertain": 2
     },
     "by_quality": {
-      "watch": 2,
+      "watch": 3,
       "actionable": 13,
       "risk": 2
     }
@@ -290,6 +290,24 @@
       "type": "injury_imbalance",
       "direction": "fade",
       "team": "Connecticut Sun",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 3-0"
+    },
+    {
+      "event_id": "401857025",
+      "date": "2026-06-26T23:30Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Chicago Sky",
+      "away": "Portland Fire",
+      "match": "Chicago Sky - Portland Fire",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Chicago Sky",
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 3-0"
