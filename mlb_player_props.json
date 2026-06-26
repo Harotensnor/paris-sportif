@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-26T10:28:56Z",
+  "generated_at": "2026-06-26T12:06:40Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -890,6 +890,52 @@
       ]
     },
     {
+      "event_id": "401815919",
+      "kickoff": "2026-06-27T02:15Z",
+      "league": "MLB",
+      "match": "Atlanta Braves at San Francisco Giants",
+      "home": "San Francisco Giants",
+      "away": "Atlanta Braves",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Atlanta Braves",
+          "pitcher": "Bryce Elder",
+          "label": "Bryce Elder plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.5944,
+          "fair_odds": 1.68,
+          "expected_strikeouts": 4.91,
+          "projected_ip": 5.89,
+          "inputs": {
+            "k9": 7.51,
+            "era": 3.71,
+            "whip": 1.21,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Atlanta Braves",
+          "pitcher": "Bryce Elder",
+          "label": "Bryce Elder ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5372,
+          "fair_odds": 1.86,
+          "expected_hr_allowed": 0.621,
+          "projected_ip": 5.89,
+          "inputs": {
+            "hr9": 0.95,
+            "era": 3.71,
+            "whip": 1.21
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
       "event_id": "401815924",
       "kickoff": "2026-06-27T17:00Z",
       "league": "MLB",
@@ -1064,7 +1110,7 @@
       ]
     }
   ],
-  "props": 50,
+  "props": 52,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
