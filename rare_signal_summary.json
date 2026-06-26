@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-26T07:08:53Z",
+  "generated_at": "2026-06-26T10:28:56Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
@@ -12,6 +12,8 @@
     "by_type": {
       "injury_imbalance": 15,
       "travel_extreme": 5,
+      "market_move": 1,
+      "signal_conflict": 1,
       "back_to_back_travel": 4,
       "market_uncertain": 3
     },
@@ -323,12 +325,12 @@
       "match": "Connecticut Sun - Washington Mystics",
       "quality": "watch",
       "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Connecticut Sun",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 3-0"
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 0.617,
+      "context": "Cote home: 2.70 -> 2.40 (+11.1%)"
     },
     {
       "event_id": "401857025",
