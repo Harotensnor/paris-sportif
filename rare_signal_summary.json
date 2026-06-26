@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-06-26T21:40:30Z",
+  "generated_at": "2026-06-26T22:51:13Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 44,
-    "actionable": 36,
-    "watch": 5,
-    "risk": 3,
+    "active_events": 50,
+    "actionable": 40,
+    "watch": 6,
+    "risk": 4,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 32,
-      "back_to_back_travel": 16,
+      "injury_imbalance": 38,
       "travel_extreme": 12,
-      "market_uncertain": 60
+      "back_to_back_travel": 15,
+      "market_uncertain": 39
     },
     "by_quality": {
-      "watch": 5,
-      "actionable": 36,
-      "risk": 3
+      "actionable": 40,
+      "watch": 6,
+      "risk": 4
     }
   },
   "active_actionable": [
@@ -437,6 +437,60 @@
       "context": "Absences severes 14-6"
     },
     {
+      "event_id": "401815962",
+      "date": "2026-06-30T01:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Athletics",
+      "away": "Los Angeles Dodgers",
+      "match": "Athletics - Los Angeles Dodgers",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Los Angeles Dodgers",
+      "side": null,
+      "strength": 1.0,
+      "context": "Absences severes 8-15"
+    },
+    {
+      "event_id": "401815977",
+      "date": "2026-07-01T01:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Athletics",
+      "away": "Los Angeles Dodgers",
+      "match": "Athletics - Los Angeles Dodgers",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Los Angeles Dodgers",
+      "side": null,
+      "strength": 1.0,
+      "context": "Absences severes 8-15"
+    },
+    {
+      "event_id": "401815991",
+      "date": "2026-07-02T01:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Athletics",
+      "away": "Los Angeles Dodgers",
+      "match": "Athletics - Los Angeles Dodgers",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Los Angeles Dodgers",
+      "side": null,
+      "strength": 1.0,
+      "context": "Absences severes 8-15"
+    },
+    {
       "event_id": "401815923",
       "date": "2026-06-27T17:10Z",
       "sport": "baseball",
@@ -489,24 +543,6 @@
       "side": "away",
       "strength": 0.921,
       "context": "1 match dans les 48h + 1957 km de voyage"
-    },
-    {
-      "event_id": "401815908",
-      "date": "2026-06-26T22:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Detroit Tigers",
-      "away": "Houston Astros",
-      "match": "Detroit Tigers - Houston Astros",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Houston Astros",
-      "side": "away",
-      "strength": 0.886,
-      "context": "1 match dans les 48h + 1780 km de voyage"
     },
     {
       "event_id": "401815918",
@@ -617,6 +653,42 @@
       "context": "Absences severes 11-15"
     },
     {
+      "event_id": "401816001",
+      "date": "2026-07-03T02:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Los Angeles Dodgers",
+      "away": "San Diego Padres",
+      "match": "Los Angeles Dodgers - San Diego Padres",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Los Angeles Dodgers",
+      "side": null,
+      "strength": 0.8,
+      "context": "Absences severes 15-11"
+    },
+    {
+      "event_id": "401816013",
+      "date": "2026-07-04T02:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Los Angeles Dodgers",
+      "away": "San Diego Padres",
+      "match": "Los Angeles Dodgers - San Diego Padres",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Los Angeles Dodgers",
+      "side": null,
+      "strength": 0.8,
+      "context": "Absences severes 15-11"
+    },
+    {
       "event_id": "401815919",
       "date": "2026-06-27T02:15Z",
       "sport": "baseball",
@@ -673,24 +745,6 @@
   ],
   "active_watch": [
     {
-      "event_id": "401815907",
-      "date": "2026-06-26T22:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Pittsburgh Pirates",
-      "away": "Cincinnati Reds",
-      "match": "Pittsburgh Pirates - Cincinnati Reds",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Cincinnati Reds",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 4-7"
-    },
-    {
       "event_id": "401857024",
       "date": "2026-06-26T23:30Z",
       "sport": "basketball",
@@ -709,22 +763,22 @@
       "context": "Absences severes 3-0"
     },
     {
-      "event_id": "401857025",
-      "date": "2026-06-26T23:30Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Chicago Sky",
-      "away": "Portland Fire",
-      "match": "Chicago Sky - Portland Fire",
+      "event_id": "401815914",
+      "date": "2026-06-26T23:45Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Milwaukee Brewers",
+      "away": "Chicago Cubs",
+      "match": "Milwaukee Brewers - Chicago Cubs",
       "quality": "watch",
       "quality_reason": "Signal rare present mais intensite moyenne",
       "type": "injury_imbalance",
       "direction": "fade",
-      "team": "Chicago Sky",
+      "team": "Chicago Cubs",
       "side": null,
       "strength": 0.6,
-      "context": "Absences severes 3-0"
+      "context": "Absences severes 9-12"
     },
     {
       "event_id": "401815922",
@@ -745,6 +799,24 @@
       "context": "Absences severes 4-7"
     },
     {
+      "event_id": "401815929",
+      "date": "2026-06-27T23:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Milwaukee Brewers",
+      "away": "Chicago Cubs",
+      "match": "Milwaukee Brewers - Chicago Cubs",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Chicago Cubs",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 9-12"
+    },
+    {
       "event_id": "401815937",
       "date": "2026-06-28T17:35Z",
       "sport": "baseball",
@@ -761,6 +833,24 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 4-7"
+    },
+    {
+      "event_id": "401815944",
+      "date": "2026-06-28T18:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Milwaukee Brewers",
+      "away": "Chicago Cubs",
+      "match": "Milwaukee Brewers - Chicago Cubs",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Chicago Cubs",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 9-12"
     }
   ],
   "active_risk": [
@@ -816,7 +906,25 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 12.9%"
+      "context": "marge bookmaker anormale 12.6%"
+    },
+    {
+      "event_id": "401842745",
+      "date": "2026-07-03T17:00Z",
+      "sport": "football",
+      "league_code": "allsvenskan",
+      "league_name": "Allsvenskan",
+      "home": "IK Sirius",
+      "away": "Mjällby AIF",
+      "match": "IK Sirius - Mjällby AIF",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.7%"
     }
   ],
   "expired_sample": []
