@@ -1,8 +1,90 @@
 {
-  "generated_at": "2026-06-26T03:29:07Z",
+  "generated_at": "2026-06-26T07:08:52Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
+    {
+      "event_id": "401815907",
+      "kickoff": "2026-06-26T22:40Z",
+      "league": "MLB",
+      "match": "Cincinnati Reds at Pittsburgh Pirates",
+      "home": "Pittsburgh Pirates",
+      "away": "Cincinnati Reds",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Pittsburgh Pirates",
+          "pitcher": "Paul Skenes",
+          "label": "Paul Skenes plus de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "over",
+          "probability": 0.5367,
+          "fair_odds": 1.86,
+          "expected_strikeouts": 6.69,
+          "projected_ip": 5.5,
+          "inputs": {
+            "k9": 10.94,
+            "era": 2.86,
+            "whip": 0.93,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Pittsburgh Pirates",
+          "pitcher": "Paul Skenes",
+          "label": "Paul Skenes ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5699,
+          "fair_odds": 1.75,
+          "expected_hr_allowed": 0.562,
+          "projected_ip": 5.5,
+          "inputs": {
+            "hr9": 0.92,
+            "era": 2.86,
+            "whip": 0.93
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Cincinnati Reds",
+          "pitcher": "Andrew Abbott",
+          "label": "Andrew Abbott plus de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "over",
+          "probability": 0.6202,
+          "fair_odds": 1.61,
+          "expected_strikeouts": 3.98,
+          "projected_ip": 5.26,
+          "inputs": {
+            "k9": 6.8,
+            "era": 3.83,
+            "whip": 1.42,
+            "hand": "L"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Cincinnati Reds",
+          "pitcher": "Andrew Abbott",
+          "label": "Andrew Abbott concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5269,
+          "fair_odds": 1.9,
+          "expected_hr_allowed": 0.748,
+          "projected_ip": 5.26,
+          "inputs": {
+            "hr9": 1.28,
+            "era": 3.83,
+            "whip": 1.42
+          },
+          "side": "away"
+        }
+      ]
+    },
     {
       "event_id": "401815908",
       "kickoff": "2026-06-26T22:40Z",
@@ -80,6 +162,88 @@
             "hr9": 0.78,
             "era": 3.13,
             "whip": 1.2
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815913",
+      "kickoff": "2026-06-26T23:05Z",
+      "league": "MLB",
+      "match": "Washington Nationals at Baltimore Orioles",
+      "home": "Baltimore Orioles",
+      "away": "Washington Nationals",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Baltimore Orioles",
+          "pitcher": "Trevor Rogers",
+          "label": "Trevor Rogers plus de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "over",
+          "probability": 0.5925,
+          "fair_odds": 1.69,
+          "expected_strikeouts": 3.86,
+          "projected_ip": 5.21,
+          "inputs": {
+            "k9": 6.66,
+            "era": 5.3,
+            "whip": 1.36,
+            "hand": "L"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Baltimore Orioles",
+          "pitcher": "Trevor Rogers",
+          "label": "Trevor Rogers ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5257,
+          "fair_odds": 1.9,
+          "expected_hr_allowed": 0.643,
+          "projected_ip": 5.21,
+          "inputs": {
+            "hr9": 1.11,
+            "era": 5.3,
+            "whip": 1.36
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Washington Nationals",
+          "pitcher": "Andrew Alvarez",
+          "label": "Andrew Alvarez plus de 7,5 strikeouts",
+          "line": 7.5,
+          "pick": "over",
+          "probability": 0.5099,
+          "fair_odds": 1.96,
+          "expected_strikeouts": 7.55,
+          "projected_ip": 6.6,
+          "inputs": {
+            "k9": 10.3,
+            "era": 3.34,
+            "whip": 1.39,
+            "hand": "L"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Washington Nationals",
+          "pitcher": "Andrew Alvarez",
+          "label": "Andrew Alvarez ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6632,
+          "fair_odds": 1.51,
+          "expected_hr_allowed": 0.411,
+          "projected_ip": 6.6,
+          "inputs": {
+            "hr9": 0.56,
+            "era": 3.34,
+            "whip": 1.39
           },
           "side": "away"
         }
@@ -168,6 +332,52 @@
       ]
     },
     {
+      "event_id": "401815906",
+      "kickoff": "2026-06-26T23:10Z",
+      "league": "MLB",
+      "match": "Arizona Diamondbacks at Tampa Bay Rays",
+      "home": "Tampa Bay Rays",
+      "away": "Arizona Diamondbacks",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Tampa Bay Rays",
+          "pitcher": "Nick Martinez",
+          "label": "Nick Martinez plus de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "over",
+          "probability": 0.5441,
+          "fair_odds": 1.84,
+          "expected_strikeouts": 3.67,
+          "projected_ip": 5.93,
+          "inputs": {
+            "k9": 5.56,
+            "era": 2.73,
+            "whip": 1.16,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Tampa Bay Rays",
+          "pitcher": "Nick Martinez",
+          "label": "Nick Martinez ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5863,
+          "fair_odds": 1.71,
+          "expected_hr_allowed": 0.534,
+          "projected_ip": 5.93,
+          "inputs": {
+            "hr9": 0.81,
+            "era": 2.73,
+            "whip": 1.16
+          },
+          "side": "home"
+        }
+      ]
+    },
+    {
       "event_id": "401815909",
       "kickoff": "2026-06-26T23:10Z",
       "league": "MLB",
@@ -244,6 +454,436 @@
             "hr9": 0.92,
             "era": 3.45,
             "whip": 1.33
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815910",
+      "kickoff": "2026-06-26T23:10Z",
+      "league": "MLB",
+      "match": "Philadelphia Phillies at New York Mets",
+      "home": "New York Mets",
+      "away": "Philadelphia Phillies",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Philadelphia Phillies",
+          "pitcher": "Zack Wheeler",
+          "label": "Zack Wheeler moins de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "under",
+          "probability": 0.5504,
+          "fair_odds": 1.82,
+          "expected_strikeouts": 6.25,
+          "projected_ip": 6.19,
+          "inputs": {
+            "k9": 9.09,
+            "era": 2.11,
+            "whip": 0.88,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Philadelphia Phillies",
+          "pitcher": "Zack Wheeler",
+          "label": "Zack Wheeler concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5144,
+          "fair_odds": 1.94,
+          "expected_hr_allowed": 0.722,
+          "projected_ip": 6.19,
+          "inputs": {
+            "hr9": 1.05,
+            "era": 2.11,
+            "whip": 0.88
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815911",
+      "kickoff": "2026-06-26T23:10Z",
+      "league": "MLB",
+      "match": "Seattle Mariners at Cleveland Guardians",
+      "home": "Cleveland Guardians",
+      "away": "Seattle Mariners",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Cleveland Guardians",
+          "pitcher": "Joey Cantillo",
+          "label": "Joey Cantillo plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.5585,
+          "fair_odds": 1.79,
+          "expected_strikeouts": 4.75,
+          "projected_ip": 5.0,
+          "inputs": {
+            "k9": 8.55,
+            "era": 4.05,
+            "whip": 1.4,
+            "hand": "L"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Cleveland Guardians",
+          "pitcher": "Joey Cantillo",
+          "label": "Joey Cantillo ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5021,
+          "fair_odds": 1.99,
+          "expected_hr_allowed": 0.689,
+          "projected_ip": 5.0,
+          "inputs": {
+            "hr9": 1.24,
+            "era": 4.05,
+            "whip": 1.4
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Seattle Mariners",
+          "pitcher": "Luis Castillo",
+          "label": "Luis Castillo plus de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "over",
+          "probability": 0.5456,
+          "fair_odds": 1.83,
+          "expected_strikeouts": 5.71,
+          "projected_ip": 5.85,
+          "inputs": {
+            "k9": 8.79,
+            "era": 5.22,
+            "whip": 1.4,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Seattle Mariners",
+          "pitcher": "Luis Castillo",
+          "label": "Luis Castillo concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5265,
+          "fair_odds": 1.9,
+          "expected_hr_allowed": 0.748,
+          "projected_ip": 5.85,
+          "inputs": {
+            "hr9": 1.15,
+            "era": 5.22,
+            "whip": 1.4
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815914",
+      "kickoff": "2026-06-26T23:45Z",
+      "league": "MLB",
+      "match": "Chicago Cubs at Milwaukee Brewers",
+      "home": "Milwaukee Brewers",
+      "away": "Chicago Cubs",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Milwaukee Brewers",
+          "pitcher": "Jacob Misiorowski",
+          "label": "Jacob Misiorowski moins de 9,5 strikeouts",
+          "line": 9.5,
+          "pick": "under",
+          "probability": 0.551,
+          "fair_odds": 1.81,
+          "expected_strikeouts": 9.2,
+          "projected_ip": 6.2,
+          "inputs": {
+            "k9": 13.35,
+            "era": 1.45,
+            "whip": 0.75,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Milwaukee Brewers",
+          "pitcher": "Jacob Misiorowski",
+          "label": "Jacob Misiorowski ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.7644,
+          "fair_odds": 1.31,
+          "expected_hr_allowed": 0.269,
+          "projected_ip": 6.2,
+          "inputs": {
+            "hr9": 0.39,
+            "era": 1.45,
+            "whip": 0.75
+          },
+          "side": "home"
+        }
+      ]
+    },
+    {
+      "event_id": "401815915",
+      "kickoff": "2026-06-27T00:10Z",
+      "league": "MLB",
+      "match": "Colorado Rockies at Minnesota Twins",
+      "home": "Minnesota Twins",
+      "away": "Colorado Rockies",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Minnesota Twins",
+          "pitcher": "Mike Paredes",
+          "label": "Mike Paredes plus de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "over",
+          "probability": 0.5349,
+          "fair_odds": 1.87,
+          "expected_strikeouts": 3.63,
+          "projected_ip": 6.6,
+          "inputs": {
+            "k9": 4.95,
+            "era": 4.05,
+            "whip": 1.2,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Minnesota Twins",
+          "pitcher": "Mike Paredes",
+          "label": "Mike Paredes ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5169,
+          "fair_odds": 1.93,
+          "expected_hr_allowed": 0.66,
+          "projected_ip": 6.6,
+          "inputs": {
+            "hr9": 0.9,
+            "era": 4.05,
+            "whip": 1.2
+          },
+          "side": "home"
+        }
+      ]
+    },
+    {
+      "event_id": "401815917",
+      "kickoff": "2026-06-27T00:15Z",
+      "league": "MLB",
+      "match": "Miami Marlins at St. Louis Cardinals",
+      "home": "St. Louis Cardinals",
+      "away": "Miami Marlins",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "St. Louis Cardinals",
+          "pitcher": "Andre Pallante",
+          "label": "Andre Pallante moins de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "under",
+          "probability": 0.5633,
+          "fair_odds": 1.78,
+          "expected_strikeouts": 4.24,
+          "projected_ip": 5.48,
+          "inputs": {
+            "k9": 6.97,
+            "era": 3.59,
+            "whip": 1.19,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "St. Louis Cardinals",
+          "pitcher": "Andre Pallante",
+          "label": "Andre Pallante ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5506,
+          "fair_odds": 1.82,
+          "expected_hr_allowed": 0.597,
+          "projected_ip": 5.48,
+          "inputs": {
+            "hr9": 0.98,
+            "era": 3.59,
+            "whip": 1.19
+          },
+          "side": "home"
+        }
+      ]
+    },
+    {
+      "event_id": "401815918",
+      "kickoff": "2026-06-27T01:38Z",
+      "league": "MLB",
+      "match": "Athletics Athletics at Los Angeles Angels",
+      "home": "Los Angeles Angels",
+      "away": "Athletics",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Los Angeles Angels",
+          "pitcher": "Reid Detmers",
+          "label": "Reid Detmers plus de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "over",
+          "probability": 0.5003,
+          "fair_odds": 2.0,
+          "expected_strikeouts": 6.5,
+          "projected_ip": 5.88,
+          "inputs": {
+            "k9": 9.96,
+            "era": 3.93,
+            "whip": 1.05,
+            "hand": "L"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Los Angeles Angels",
+          "pitcher": "Reid Detmers",
+          "label": "Reid Detmers ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6457,
+          "fair_odds": 1.55,
+          "expected_hr_allowed": 0.437,
+          "projected_ip": 5.88,
+          "inputs": {
+            "hr9": 0.67,
+            "era": 3.93,
+            "whip": 1.05
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Athletics",
+          "pitcher": "Jack Perkins",
+          "label": "Jack Perkins moins de 8,5 strikeouts",
+          "line": 8.5,
+          "pick": "under",
+          "probability": 0.5576,
+          "fair_odds": 1.79,
+          "expected_strikeouts": 8.18,
+          "projected_ip": 6.6,
+          "inputs": {
+            "k9": 11.15,
+            "era": 6.26,
+            "whip": 1.37,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Athletics",
+          "pitcher": "Jack Perkins",
+          "label": "Jack Perkins concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.576,
+          "fair_odds": 1.74,
+          "expected_hr_allowed": 0.858,
+          "projected_ip": 6.6,
+          "inputs": {
+            "hr9": 1.17,
+            "era": 6.26,
+            "whip": 1.37
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815920",
+      "kickoff": "2026-06-27T01:45Z",
+      "league": "MLB",
+      "match": "Los Angeles Dodgers at San Diego Padres",
+      "home": "San Diego Padres",
+      "away": "Los Angeles Dodgers",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "San Diego Padres",
+          "pitcher": "Randy Vásquez",
+          "label": "Randy Vásquez plus de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "over",
+          "probability": 0.6052,
+          "fair_odds": 1.65,
+          "expected_strikeouts": 3.91,
+          "projected_ip": 5.15,
+          "inputs": {
+            "k9": 6.84,
+            "era": 4.17,
+            "whip": 1.4,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "San Diego Padres",
+          "pitcher": "Randy Vásquez",
+          "label": "Randy Vásquez concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5163,
+          "fair_odds": 1.94,
+          "expected_hr_allowed": 0.726,
+          "projected_ip": 5.15,
+          "inputs": {
+            "hr9": 1.27,
+            "era": 4.17,
+            "whip": 1.4
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Los Angeles Dodgers",
+          "pitcher": "Yoshinobu Yamamoto",
+          "label": "Yoshinobu Yamamoto moins de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "under",
+          "probability": 0.5804,
+          "fair_odds": 1.72,
+          "expected_strikeouts": 6.11,
+          "projected_ip": 6.51,
+          "inputs": {
+            "k9": 8.44,
+            "era": 2.65,
+            "whip": 0.87,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Los Angeles Dodgers",
+          "pitcher": "Yoshinobu Yamamoto",
+          "label": "Yoshinobu Yamamoto concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.508,
+          "fair_odds": 1.97,
+          "expected_hr_allowed": 0.709,
+          "projected_ip": 6.51,
+          "inputs": {
+            "hr9": 0.98,
+            "era": 2.65,
+            "whip": 0.87
           },
           "side": "away"
         }
@@ -424,7 +1064,7 @@
       ]
     }
   ],
-  "props": 20,
+  "props": 50,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
