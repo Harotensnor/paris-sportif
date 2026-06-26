@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-26T14:44:12Z",
+  "generated_at": "2026-06-26T16:36:14Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -374,6 +374,42 @@
             "whip": 1.16
           },
           "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Arizona Diamondbacks",
+          "pitcher": "Zac Gallen",
+          "label": "Zac Gallen moins de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "under",
+          "probability": 0.5768,
+          "fair_odds": 1.73,
+          "expected_strikeouts": 3.23,
+          "projected_ip": 4.95,
+          "inputs": {
+            "k9": 5.87,
+            "era": 6.1,
+            "whip": 1.63,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Arizona Diamondbacks",
+          "pitcher": "Zac Gallen",
+          "label": "Zac Gallen concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5545,
+          "fair_odds": 1.8,
+          "expected_hr_allowed": 0.808,
+          "projected_ip": 4.95,
+          "inputs": {
+            "hr9": 1.47,
+            "era": 6.1,
+            "whip": 1.63
+          },
+          "side": "away"
         }
       ]
     },
@@ -630,6 +666,42 @@
             "whip": 0.75
           },
           "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Chicago Cubs",
+          "pitcher": "Colin Rea",
+          "label": "Colin Rea plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.5916,
+          "fair_odds": 1.69,
+          "expected_strikeouts": 4.9,
+          "projected_ip": 6.59,
+          "inputs": {
+            "k9": 6.69,
+            "era": 4.99,
+            "whip": 1.4,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Chicago Cubs",
+          "pitcher": "Colin Rea",
+          "label": "Colin Rea concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.6307,
+          "fair_odds": 1.59,
+          "expected_hr_allowed": 0.996,
+          "projected_ip": 6.59,
+          "inputs": {
+            "hr9": 1.36,
+            "era": 4.99,
+            "whip": 1.4
+          },
+          "side": "away"
         }
       ]
     },
@@ -674,52 +746,6 @@
             "hr9": 0.9,
             "era": 4.05,
             "whip": 1.2
-          },
-          "side": "home"
-        }
-      ]
-    },
-    {
-      "event_id": "401815917",
-      "kickoff": "2026-06-27T00:15Z",
-      "league": "MLB",
-      "match": "Miami Marlins at St. Louis Cardinals",
-      "home": "St. Louis Cardinals",
-      "away": "Miami Marlins",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "St. Louis Cardinals",
-          "pitcher": "Andre Pallante",
-          "label": "Andre Pallante moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.5633,
-          "fair_odds": 1.78,
-          "expected_strikeouts": 4.24,
-          "projected_ip": 5.48,
-          "inputs": {
-            "k9": 6.97,
-            "era": 3.59,
-            "whip": 1.19,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "St. Louis Cardinals",
-          "pitcher": "Andre Pallante",
-          "label": "Andre Pallante ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5506,
-          "fair_odds": 1.82,
-          "expected_hr_allowed": 0.597,
-          "projected_ip": 5.48,
-          "inputs": {
-            "hr9": 0.98,
-            "era": 3.59,
-            "whip": 1.19
           },
           "side": "home"
         }
@@ -1108,9 +1134,137 @@
           "side": "home"
         }
       ]
+    },
+    {
+      "event_id": "401815942",
+      "kickoff": "2026-06-28T17:37Z",
+      "league": "MLB",
+      "match": "Texas Rangers at Toronto Blue Jays",
+      "home": "Toronto Blue Jays",
+      "away": "Texas Rangers",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Toronto Blue Jays",
+          "pitcher": "Shane Bieber",
+          "label": "Shane Bieber moins de 2,5 strikeouts",
+          "line": 2.5,
+          "pick": "under",
+          "probability": 0.744,
+          "fair_odds": 1.34,
+          "expected_strikeouts": 1.75,
+          "projected_ip": 3.2,
+          "inputs": {
+            "k9": 4.91,
+            "era": 9.82,
+            "whip": 2.45,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Toronto Blue Jays",
+          "pitcher": "Shane Bieber",
+          "label": "Shane Bieber concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.927,
+          "fair_odds": 1.08,
+          "expected_hr_allowed": 2.617,
+          "projected_ip": 3.2,
+          "inputs": {
+            "hr9": 7.36,
+            "era": 9.82,
+            "whip": 2.45
+          },
+          "side": "home"
+        }
+      ]
+    },
+    {
+      "event_id": "401815939",
+      "kickoff": "2026-06-28T23:20Z",
+      "league": "MLB",
+      "match": "New York Yankees at Boston Red Sox",
+      "home": "Boston Red Sox",
+      "away": "New York Yankees",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Boston Red Sox",
+          "pitcher": "Sonny Gray",
+          "label": "Sonny Gray plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.5468,
+          "fair_odds": 1.83,
+          "expected_strikeouts": 4.7,
+          "projected_ip": 5.44,
+          "inputs": {
+            "k9": 7.78,
+            "era": 2.95,
+            "whip": 1.19,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Boston Red Sox",
+          "pitcher": "Sonny Gray",
+          "label": "Sonny Gray ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5272,
+          "fair_odds": 1.9,
+          "expected_hr_allowed": 0.64,
+          "projected_ip": 5.44,
+          "inputs": {
+            "hr9": 1.06,
+            "era": 2.95,
+            "whip": 1.19
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "New York Yankees",
+          "pitcher": "Carlos Rodón",
+          "label": "Carlos Rodón plus de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "over",
+          "probability": 0.5469,
+          "fair_odds": 1.83,
+          "expected_strikeouts": 5.72,
+          "projected_ip": 5.14,
+          "inputs": {
+            "k9": 10.02,
+            "era": 3.7,
+            "whip": 1.28,
+            "hand": "L"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "New York Yankees",
+          "pitcher": "Carlos Rodón",
+          "label": "Carlos Rodón ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.69,
+          "fair_odds": 1.45,
+          "expected_hr_allowed": 0.371,
+          "projected_ip": 5.14,
+          "inputs": {
+            "hr9": 0.65,
+            "era": 3.7,
+            "whip": 1.28
+          },
+          "side": "away"
+        }
+      ]
     }
   ],
-  "props": 52,
+  "props": 60,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
