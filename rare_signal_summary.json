@@ -1,25 +1,24 @@
 {
-  "generated_at": "2026-06-26T12:06:40Z",
+  "generated_at": "2026-06-26T14:44:13Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 23,
+    "active_events": 24,
     "actionable": 17,
-    "watch": 2,
+    "watch": 3,
     "risk": 4,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 15,
       "travel_extreme": 6,
-      "market_move": 1,
-      "signal_conflict": 1,
+      "market_move": 2,
       "back_to_back_travel": 4,
-      "market_uncertain": 4
+      "market_uncertain": 67
     },
     "by_quality": {
       "actionable": 17,
-      "watch": 2,
+      "watch": 3,
       "risk": 4
     }
   },
@@ -343,12 +342,12 @@
       "match": "Connecticut Sun - Washington Mystics",
       "quality": "watch",
       "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "home",
-      "strength": 0.617,
-      "context": "Cote home: 2.70 -> 2.40 (+11.1%)"
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Connecticut Sun",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 3-0"
     },
     {
       "event_id": "401857025",
@@ -367,6 +366,24 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 3-0"
+    },
+    {
+      "event_id": "401861406",
+      "date": "2026-06-27T11:35Z",
+      "sport": "football",
+      "league_code": "chn.1",
+      "league_name": "Chinese Super League",
+      "home": "Shenzhen Xinpengcheng",
+      "away": "Chengdu Rongcheng",
+      "match": "Shenzhen Xinpengcheng - Chengdu Rongcheng",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 0.45,
+      "context": "Cote home: 3.70 -> 4.00 (-8.1%)"
     }
   ],
   "active_risk": [
@@ -407,7 +424,7 @@
       "context": "marge bookmaker anormale 18.4%"
     },
     {
-      "event_id": "177587",
+      "event_id": "177305",
       "date": "2026-06-29T04:00Z",
       "sport": "tennis",
       "league_code": "wimbledon",
@@ -422,7 +439,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 12.0%"
+      "context": "marge bookmaker anormale 12.9%"
     },
     {
       "event_id": "401842745",
