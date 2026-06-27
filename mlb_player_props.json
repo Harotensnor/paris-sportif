@@ -1,172 +1,8 @@
 {
-  "generated_at": "2026-06-27T18:55:29Z",
+  "generated_at": "2026-06-27T20:02:58Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815927",
-      "kickoff": "2026-06-27T19:07Z",
-      "league": "MLB",
-      "match": "Texas Rangers at Toronto Blue Jays",
-      "home": "Toronto Blue Jays",
-      "away": "Texas Rangers",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Toronto Blue Jays",
-          "pitcher": "Dylan Cease",
-          "label": "Dylan Cease moins de 8,5 strikeouts",
-          "line": 8.5,
-          "pick": "under",
-          "probability": 0.5214,
-          "fair_odds": 1.92,
-          "expected_strikeouts": 8.38,
-          "projected_ip": 5.59,
-          "inputs": {
-            "k9": 13.5,
-            "era": 2.75,
-            "whip": 1.19,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Toronto Blue Jays",
-          "pitcher": "Dylan Cease",
-          "label": "Dylan Cease ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.702,
-          "fair_odds": 1.42,
-          "expected_hr_allowed": 0.354,
-          "projected_ip": 5.59,
-          "inputs": {
-            "hr9": 0.57,
-            "era": 2.75,
-            "whip": 1.19
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Texas Rangers",
-          "pitcher": "Cal Quantrill",
-          "label": "Cal Quantrill moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.5721,
-          "fair_odds": 1.75,
-          "expected_strikeouts": 4.21,
-          "projected_ip": 6.6,
-          "inputs": {
-            "k9": 5.74,
-            "era": 3.73,
-            "whip": 1.28,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Texas Rangers",
-          "pitcher": "Cal Quantrill",
-          "label": "Cal Quantrill concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5697,
-          "fair_odds": 1.76,
-          "expected_hr_allowed": 0.843,
-          "projected_ip": 6.6,
-          "inputs": {
-            "hr9": 1.15,
-            "era": 3.73,
-            "whip": 1.28
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401815922",
-      "kickoff": "2026-06-27T20:05Z",
-      "league": "MLB",
-      "match": "Cincinnati Reds at Pittsburgh Pirates",
-      "home": "Pittsburgh Pirates",
-      "away": "Cincinnati Reds",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Pittsburgh Pirates",
-          "pitcher": "Jared Jones",
-          "label": "Jared Jones moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.5861,
-          "fair_odds": 1.71,
-          "expected_strikeouts": 4.15,
-          "projected_ip": 4.02,
-          "inputs": {
-            "k9": 9.3,
-            "era": 5.75,
-            "whip": 1.52,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Pittsburgh Pirates",
-          "pitcher": "Jared Jones",
-          "label": "Jared Jones concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5464,
-          "fair_odds": 1.83,
-          "expected_hr_allowed": 0.791,
-          "projected_ip": 4.02,
-          "inputs": {
-            "hr9": 1.77,
-            "era": 5.75,
-            "whip": 1.52
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Cincinnati Reds",
-          "pitcher": "Chase Burns",
-          "label": "Chase Burns plus de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "over",
-          "probability": 0.5521,
-          "fair_odds": 1.81,
-          "expected_strikeouts": 6.77,
-          "projected_ip": 5.68,
-          "inputs": {
-            "k9": 10.72,
-            "era": 2.0,
-            "whip": 1.05,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Cincinnati Reds",
-          "pitcher": "Chase Burns",
-          "label": "Chase Burns ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5155,
-          "fair_odds": 1.94,
-          "expected_hr_allowed": 0.663,
-          "projected_ip": 5.68,
-          "inputs": {
-            "hr9": 1.05,
-            "era": 2.0,
-            "whip": 1.05
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815925",
       "kickoff": "2026-06-27T20:10Z",
@@ -326,6 +162,88 @@
             "hr9": 0.89,
             "era": 3.48,
             "whip": 1.16
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815922",
+      "kickoff": "2026-06-27T20:40Z",
+      "league": "MLB",
+      "match": "Cincinnati Reds at Pittsburgh Pirates",
+      "home": "Pittsburgh Pirates",
+      "away": "Cincinnati Reds",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Pittsburgh Pirates",
+          "pitcher": "Jared Jones",
+          "label": "Jared Jones moins de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "under",
+          "probability": 0.5861,
+          "fair_odds": 1.71,
+          "expected_strikeouts": 4.15,
+          "projected_ip": 4.02,
+          "inputs": {
+            "k9": 9.3,
+            "era": 5.75,
+            "whip": 1.52,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Pittsburgh Pirates",
+          "pitcher": "Jared Jones",
+          "label": "Jared Jones concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5464,
+          "fair_odds": 1.83,
+          "expected_hr_allowed": 0.791,
+          "projected_ip": 4.02,
+          "inputs": {
+            "hr9": 1.77,
+            "era": 5.75,
+            "whip": 1.52
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Cincinnati Reds",
+          "pitcher": "Chase Burns",
+          "label": "Chase Burns plus de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "over",
+          "probability": 0.5521,
+          "fair_odds": 1.81,
+          "expected_strikeouts": 6.77,
+          "projected_ip": 5.68,
+          "inputs": {
+            "k9": 10.72,
+            "era": 2.0,
+            "whip": 1.05,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Cincinnati Reds",
+          "pitcher": "Chase Burns",
+          "label": "Chase Burns ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5155,
+          "fair_odds": 1.94,
+          "expected_hr_allowed": 0.663,
+          "projected_ip": 5.68,
+          "inputs": {
+            "hr9": 1.05,
+            "era": 2.0,
+            "whip": 1.05
           },
           "side": "away"
         }
@@ -2120,7 +2038,7 @@
       ]
     }
   ],
-  "props": 102,
+  "props": 98,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"

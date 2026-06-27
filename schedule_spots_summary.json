@@ -1,23 +1,23 @@
 {
-  "generated_at": "2026-06-27T18:55:29Z",
+  "generated_at": "2026-06-27T20:02:59Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 29,
+    "active_events": 28,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 37,
-      "travel_extreme": 8,
-      "back_to_back_travel": 13,
+      "lookahead": 35,
+      "travel_extreme": 7,
+      "back_to_back_travel": 12,
       "schedule_congestion": 18
     },
     "by_decision": {
       "abstain": 7,
       "lean_away": 3,
-      "lean_home": 19
+      "lean_home": 18
     },
-    "lean_home": 19,
+    "lean_home": 18,
     "lean_away": 3,
     "abstain": 7,
     "monitor": 0
@@ -155,64 +155,6 @@
       }
     },
     {
-      "event_id": "401815922",
-      "source_event_ids": [
-        "401815922"
-      ],
-      "kickoff": "2026-06-27T20:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Pittsburgh Pirates",
-      "away": "Cincinnati Reds",
-      "match": "Pittsburgh Pirates - Cincinnati Reds",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Pittsburgh Pirates 0.15, Cincinnati Reds 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.112,
-        "away_score": -0.698,
-        "home_fade": 0.15,
-        "away_fade": 0.75,
-        "reason": "Direction nette: Pittsburgh Pirates (+0.11)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.6
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401815925",
       "source_event_ids": [
         "401815925"
@@ -324,6 +266,64 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.4
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815922",
+      "source_event_ids": [
+        "401815922"
+      ],
+      "kickoff": "2026-06-27T20:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Pittsburgh Pirates",
+      "away": "Cincinnati Reds",
+      "match": "Pittsburgh Pirates - Cincinnati Reds",
+      "decision": "abstain",
+      "net_team": null,
+      "reason": "Fatigue/agenda des deux cotes: Pittsburgh Pirates 0.15, Cincinnati Reds 0.15",
+      "pressure_score": 0.667,
+      "home_fade": 0.15,
+      "away_fade": 0.15,
+      "travel_score": 0,
+      "lookahead_score": 0.667,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 2
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours",
+        "1 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": 0.112,
+        "away_score": -0.698,
+        "home_fade": 0.15,
+        "away_fade": 0.75,
+        "reason": "Direction nette: Pittsburgh Pirates (+0.11)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.6
           }
         ]
       }
@@ -1075,80 +1075,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.966
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815927",
-      "source_event_ids": [
-        "401815927"
-      ],
-      "kickoff": "2026-06-27T19:07Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Toronto Blue Jays",
-      "away": "Texas Rangers",
-      "match": "Toronto Blue Jays - Texas Rangers",
-      "decision": "lean_home",
-      "net_team": "Toronto Blue Jays",
-      "reason": "Texas Rangers plus penalise par calendrier/voyage (1.61 vs 0.15)",
-      "pressure_score": 2.122,
-      "home_fade": 0.15,
-      "away_fade": 1.605,
-      "travel_score": 1.455,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2,
-        "travel_extreme": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours",
-        "Deplacement estime 1957 km, decalage ~1.2h",
-        "2 match dans les 48h + 1957 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.622,
-        "away_score": -2.153,
-        "home_fade": 0.15,
-        "away_fade": 2.205,
-        "reason": "Direction nette: Toronto Blue Jays (+0.62)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.455
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 1.0
           }
         ]
       }
