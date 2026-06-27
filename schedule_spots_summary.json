@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-06-27T16:46:41Z",
+  "generated_at": "2026-06-27T17:48:05Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 31,
+    "active_events": 29,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 41,
-      "back_to_back_travel": 14,
+      "lookahead": 37,
       "travel_extreme": 8,
+      "back_to_back_travel": 13,
       "schedule_congestion": 18
     },
     "by_decision": {
-      "abstain": 8,
+      "abstain": 7,
       "lean_away": 3,
-      "lean_home": 20
+      "lean_home": 19
     },
-    "lean_home": 20,
+    "lean_home": 19,
     "lean_away": 3,
-    "abstain": 8,
+    "abstain": 7,
     "monitor": 0
   },
   "active": [
@@ -144,64 +144,6 @@
             "type": "schedule_congestion",
             "direction": "fade",
             "strength": 0.6
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815924",
-      "source_event_ids": [
-        "401815924"
-      ],
-      "kickoff": "2026-06-27T17:00Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Boston Red Sox",
-      "away": "New York Yankees",
-      "match": "Boston Red Sox - New York Yankees",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Boston Red Sox 0.15, New York Yankees 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -1.097,
-        "away_score": 0.252,
-        "home_fade": 1.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: New York Yankees (+0.25)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
           },
           {
             "side": "home",
@@ -1372,72 +1314,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815923",
-      "source_event_ids": [
-        "401815923"
-      ],
-      "kickoff": "2026-06-27T17:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Detroit Tigers",
-      "away": "Houston Astros",
-      "match": "Detroit Tigers - Houston Astros",
-      "decision": "lean_home",
-      "net_team": "Detroit Tigers",
-      "reason": "Houston Astros plus penalise par calendrier/voyage (1.12 vs 0.15)",
-      "pressure_score": 1.633,
-      "home_fade": 0.15,
-      "away_fade": 1.116,
-      "travel_score": 0.966,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours",
-        "2 match dans les 48h + 1780 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.159,
-        "away_score": -0.923,
-        "home_fade": 0.55,
-        "away_fade": 1.116,
-        "reason": "Direction nette: Detroit Tigers (-0.16)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.966
           }
         ]
       }

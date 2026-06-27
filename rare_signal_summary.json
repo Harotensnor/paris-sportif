@@ -1,45 +1,27 @@
 {
-  "generated_at": "2026-06-27T16:46:41Z",
+  "generated_at": "2026-06-27T17:48:05Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 42,
-    "actionable": 30,
+    "active_events": 40,
+    "actionable": 28,
     "watch": 4,
     "risk": 8,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 28,
-      "back_to_back_travel": 14,
+      "injury_imbalance": 27,
       "travel_extreme": 8,
+      "back_to_back_travel": 13,
       "market_uncertain": 18
     },
     "by_quality": {
-      "actionable": 30,
+      "actionable": 28,
       "watch": 4,
       "risk": 8
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401815924",
-      "date": "2026-06-27T17:00Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Boston Red Sox",
-      "away": "New York Yankees",
-      "match": "Boston Red Sox - New York Yankees",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Boston Red Sox",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 14-6"
-    },
     {
       "event_id": "401815927",
       "date": "2026-06-27T19:07Z",
@@ -399,24 +381,6 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 8-15"
-    },
-    {
-      "event_id": "401815923",
-      "date": "2026-06-27T17:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Detroit Tigers",
-      "away": "Houston Astros",
-      "match": "Detroit Tigers - Houston Astros",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Houston Astros",
-      "side": "away",
-      "strength": 0.966,
-      "context": "2 match dans les 48h + 1780 km de voyage"
     },
     {
       "event_id": "401815938",
