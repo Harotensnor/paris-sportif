@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-27T11:08:33Z",
+  "generated_at": "2026-06-27T11:19:42Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -210,6 +210,42 @@
             "whip": 1.19
           },
           "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Texas Rangers",
+          "pitcher": "Cal Quantrill",
+          "label": "Cal Quantrill moins de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "under",
+          "probability": 0.5721,
+          "fair_odds": 1.75,
+          "expected_strikeouts": 4.21,
+          "projected_ip": 6.6,
+          "inputs": {
+            "k9": 5.74,
+            "era": 3.73,
+            "whip": 1.28,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Texas Rangers",
+          "pitcher": "Cal Quantrill",
+          "label": "Cal Quantrill concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5697,
+          "fair_odds": 1.76,
+          "expected_hr_allowed": 0.843,
+          "projected_ip": 6.6,
+          "inputs": {
+            "hr9": 1.15,
+            "era": 3.73,
+            "whip": 1.28
+          },
+          "side": "away"
         }
       ]
     },
@@ -303,6 +339,42 @@
       "home": "New York Mets",
       "away": "Philadelphia Phillies",
       "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "New York Mets",
+          "pitcher": "Christian Scott",
+          "label": "Christian Scott moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.5757,
+          "fair_odds": 1.74,
+          "expected_strikeouts": 5.16,
+          "projected_ip": 4.47,
+          "inputs": {
+            "k9": 10.4,
+            "era": 3.1,
+            "whip": 1.35,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "New York Mets",
+          "pitcher": "Christian Scott",
+          "label": "Christian Scott ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6429,
+          "fair_odds": 1.56,
+          "expected_hr_allowed": 0.442,
+          "projected_ip": 4.47,
+          "inputs": {
+            "hr9": 0.89,
+            "era": 3.1,
+            "whip": 1.35
+          },
+          "side": "home"
+        },
         {
           "market": "pitcher_strikeouts",
           "team": "Philadelphia Phillies",
@@ -431,6 +503,42 @@
       "home": "Tampa Bay Rays",
       "away": "Arizona Diamondbacks",
       "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Tampa Bay Rays",
+          "pitcher": "Cole Sulser",
+          "label": "Cole Sulser plus de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "over",
+          "probability": 0.5734,
+          "fair_odds": 1.74,
+          "expected_strikeouts": 6.88,
+          "projected_ip": 6.6,
+          "inputs": {
+            "k9": 9.38,
+            "era": 5.4,
+            "whip": 1.55,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Tampa Bay Rays",
+          "pitcher": "Cole Sulser",
+          "label": "Cole Sulser concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5666,
+          "fair_odds": 1.77,
+          "expected_hr_allowed": 0.836,
+          "projected_ip": 6.6,
+          "inputs": {
+            "hr9": 1.14,
+            "era": 5.4,
+            "whip": 1.55
+          },
+          "side": "home"
+        },
         {
           "market": "pitcher_strikeouts",
           "team": "Arizona Diamondbacks",
@@ -792,6 +900,88 @@
             "hr9": 1.54,
             "era": 7.11,
             "whip": 1.83
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815932",
+      "kickoff": "2026-06-27T23:15Z",
+      "league": "MLB",
+      "match": "Miami Marlins at St. Louis Cardinals",
+      "home": "St. Louis Cardinals",
+      "away": "Miami Marlins",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "St. Louis Cardinals",
+          "pitcher": "Andre Pallante",
+          "label": "Andre Pallante moins de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "under",
+          "probability": 0.5633,
+          "fair_odds": 1.78,
+          "expected_strikeouts": 4.24,
+          "projected_ip": 5.48,
+          "inputs": {
+            "k9": 6.97,
+            "era": 3.59,
+            "whip": 1.19,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "St. Louis Cardinals",
+          "pitcher": "Andre Pallante",
+          "label": "Andre Pallante ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5506,
+          "fair_odds": 1.82,
+          "expected_hr_allowed": 0.597,
+          "projected_ip": 5.48,
+          "inputs": {
+            "hr9": 0.98,
+            "era": 3.59,
+            "whip": 1.19
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Miami Marlins",
+          "pitcher": "Ryan Gusto",
+          "label": "Ryan Gusto moins de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "under",
+          "probability": 0.6257,
+          "fair_odds": 1.6,
+          "expected_strikeouts": 4.0,
+          "projected_ip": 4.5,
+          "inputs": {
+            "k9": 8.0,
+            "era": 6.0,
+            "whip": 1.61,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Miami Marlins",
+          "pitcher": "Ryan Gusto",
+          "label": "Ryan Gusto ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6065,
+          "fair_odds": 1.65,
+          "expected_hr_allowed": 0.5,
+          "projected_ip": 4.5,
+          "inputs": {
+            "hr9": 1.0,
+            "era": 6.0,
+            "whip": 1.61
           },
           "side": "away"
         }
@@ -1684,6 +1874,52 @@
       ]
     },
     {
+      "event_id": "401815947",
+      "kickoff": "2026-06-28T18:15Z",
+      "league": "MLB",
+      "match": "Miami Marlins at St. Louis Cardinals",
+      "home": "St. Louis Cardinals",
+      "away": "Miami Marlins",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "St. Louis Cardinals",
+          "pitcher": "Kyle Leahy",
+          "label": "Kyle Leahy moins de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "under",
+          "probability": 0.5947,
+          "fair_odds": 1.68,
+          "expected_strikeouts": 4.12,
+          "projected_ip": 5.07,
+          "inputs": {
+            "k9": 7.31,
+            "era": 4.24,
+            "whip": 1.51,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "St. Louis Cardinals",
+          "pitcher": "Kyle Leahy",
+          "label": "Kyle Leahy ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5502,
+          "fair_odds": 1.82,
+          "expected_hr_allowed": 0.598,
+          "projected_ip": 5.07,
+          "inputs": {
+            "hr9": 1.06,
+            "era": 4.24,
+            "whip": 1.51
+          },
+          "side": "home"
+        }
+      ]
+    },
+    {
       "event_id": "401815948",
       "kickoff": "2026-06-28T19:15Z",
       "league": "MLB",
@@ -1976,7 +2212,7 @@
       ]
     }
   ],
-  "props": 94,
+  "props": 106,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
