@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-27T06:31:07Z",
+  "generated_at": "2026-06-27T09:15:57Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
@@ -10,7 +10,7 @@
     "risk": 4,
     "expired_sample": 0,
     "by_type": {
-      "market_move": 12,
+      "market_move": 13,
       "signal_conflict": 3,
       "injury_imbalance": 28,
       "back_to_back_travel": 9,
@@ -24,6 +24,24 @@
     }
   },
   "active_actionable": [
+    {
+      "event_id": "401861406",
+      "date": "2026-06-27T11:35Z",
+      "sport": "football",
+      "league_code": "chn.1",
+      "league_name": "Chinese Super League",
+      "home": "Shenzhen Xinpengcheng",
+      "away": "Chengdu Rongcheng",
+      "match": "Shenzhen Xinpengcheng - Chengdu Rongcheng",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 4.90 -> 4.00 (+18.4%)"
+    },
     {
       "event_id": "401861407",
       "date": "2026-06-27T12:00Z",
@@ -581,24 +599,6 @@
       "side": "away",
       "strength": 0.756,
       "context": "Deplacement estime 3253 km, decalage ~2.7h"
-    },
-    {
-      "event_id": "401861406",
-      "date": "2026-06-27T11:35Z",
-      "sport": "football",
-      "league_code": "chn.1",
-      "league_name": "Chinese Super League",
-      "home": "Shenzhen Xinpengcheng",
-      "away": "Chengdu Rongcheng",
-      "match": "Shenzhen Xinpengcheng - Chengdu Rongcheng",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "home",
-      "strength": 0.725,
-      "context": "Cote home: 4.60 -> 4.00 (+13.0%)"
     },
     {
       "event_id": "401815921",

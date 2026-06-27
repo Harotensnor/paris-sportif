@@ -1,13 +1,13 @@
 {
   "schema": "paris-sportif.learned_weights.v1",
-  "generated_at": "2026-06-27T06:31:07Z",
+  "generated_at": "2026-06-27T09:15:57Z",
   "status": "row_level_table_detected_training_pending",
   "reason": "No backtest_training_rows.jsonl row-level feature table yet; exported conservative weights from backtest_report_v2 aggregates.",
   "runtime_dependency": "none",
   "source": {
     "report": "backtest_report_v2.json",
-    "report_generated_at": "2026-06-26T07:40:23Z",
-    "n_events": 472,
+    "report_generated_at": "2026-06-27T06:44:47Z",
+    "n_events": 477,
     "training_rows": "backtest_training_rows.jsonl",
     "training_rows_found": true,
     "training_rows_count": 6
@@ -21,28 +21,28 @@
   "weights": {
     "by_sport": {
       "baseball": {
-        "n": 362,
-        "roi_pct": -3.86,
-        "win_rate": 0.5635,
-        "brier": 0.2434,
-        "weight": -0.01484,
-        "status": "neutral"
+        "n": 366,
+        "roi_pct": -4.36,
+        "win_rate": 0.5601,
+        "brier": 0.2442,
+        "weight": -0.01759,
+        "status": "deprioritize"
       },
       "basketball": {
         "n": 33,
-        "roi_pct": 18.95,
-        "win_rate": 0.7879,
-        "brier": 0.2046,
-        "weight": 0.01483,
+        "roi_pct": 13.61,
+        "win_rate": 0.7576,
+        "brier": 0.2031,
+        "weight": 0.01494,
         "status": "neutral"
       },
       "football": {
-        "n": 69,
-        "roi_pct": -5.19,
-        "win_rate": 0.4493,
-        "brier": 0.2378,
-        "weight": -0.01633,
-        "status": "deprioritize"
+        "n": 70,
+        "roi_pct": -2.54,
+        "win_rate": 0.4571,
+        "brier": 0.2391,
+        "weight": -0.00945,
+        "status": "neutral"
       },
       "hockey": {
         "n": 8,
@@ -87,11 +87,11 @@
         "status": "watch"
       },
       "chn.1": {
-        "n": 4,
-        "roi_pct": 28.75,
-        "win_rate": 0.5,
-        "brier": 0.231,
-        "weight": 0.00123,
+        "n": 5,
+        "roi_pct": 59.0,
+        "win_rate": 0.6,
+        "brier": 0.2516,
+        "weight": 0.00163,
         "status": "watch"
       },
       "conferenceleague": {
@@ -167,12 +167,12 @@
         "status": "watch"
       },
       "mlb": {
-        "n": 362,
-        "roi_pct": -3.86,
-        "win_rate": 0.5635,
-        "brier": 0.2434,
-        "weight": -0.01484,
-        "status": "neutral"
+        "n": 366,
+        "roi_pct": -4.36,
+        "win_rate": 0.5601,
+        "brier": 0.2442,
+        "weight": -0.01759,
+        "status": "deprioritize"
       },
       "nba": {
         "n": 7,
@@ -208,21 +208,29 @@
       },
       "wnba": {
         "n": 26,
-        "roi_pct": 25.57,
-        "win_rate": 0.8462,
-        "brier": 0.1919,
-        "weight": 0.01245,
+        "roi_pct": 18.79,
+        "win_rate": 0.8077,
+        "brier": 0.1901,
+        "weight": 0.01256,
         "status": "watch"
       }
     },
     "by_tier": {
       "skip": {
-        "n": 472,
-        "roi_pct": -1.91,
-        "win_rate": 0.5657,
-        "brier": 0.2397,
-        "weight": -0.00486,
+        "n": 476,
+        "roi_pct": -2.1,
+        "win_rate": 0.563,
+        "brier": 0.2401,
+        "weight": -0.00604,
         "status": "neutral"
+      },
+      "standard": {
+        "n": 1,
+        "roi_pct": -100.0,
+        "win_rate": 0.0,
+        "brier": 0.4022,
+        "weight": -0.00054,
+        "status": "watch"
       },
       "big_bet": {
         "n": 0,
@@ -233,14 +241,6 @@
         "status": "watch"
       },
       "lock": {
-        "n": 0,
-        "roi_pct": 0.0,
-        "win_rate": 0.0,
-        "brier": 0.0,
-        "weight": 0.0,
-        "status": "watch"
-      },
-      "standard": {
         "n": 0,
         "roi_pct": 0.0,
         "win_rate": 0.0,
