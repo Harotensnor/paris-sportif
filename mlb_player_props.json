@@ -1,172 +1,8 @@
 {
-  "generated_at": "2026-06-27T22:15:41Z",
+  "generated_at": "2026-06-27T23:19:16Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815921",
-      "kickoff": "2026-06-27T22:10Z",
-      "league": "MLB",
-      "match": "Arizona Diamondbacks at Tampa Bay Rays",
-      "home": "Tampa Bay Rays",
-      "away": "Arizona Diamondbacks",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Tampa Bay Rays",
-          "pitcher": "Cole Sulser",
-          "label": "Cole Sulser plus de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "over",
-          "probability": 0.5734,
-          "fair_odds": 1.74,
-          "expected_strikeouts": 6.88,
-          "projected_ip": 6.6,
-          "inputs": {
-            "k9": 9.38,
-            "era": 5.4,
-            "whip": 1.55,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Tampa Bay Rays",
-          "pitcher": "Cole Sulser",
-          "label": "Cole Sulser concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5666,
-          "fair_odds": 1.77,
-          "expected_hr_allowed": 0.836,
-          "projected_ip": 6.6,
-          "inputs": {
-            "hr9": 1.14,
-            "era": 5.4,
-            "whip": 1.55
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Arizona Diamondbacks",
-          "pitcher": "Jose Cabrera",
-          "label": "Jose Cabrera moins de 3,5 strikeouts",
-          "line": 3.5,
-          "pick": "under",
-          "probability": 0.6443,
-          "fair_odds": 1.55,
-          "expected_strikeouts": 3.0,
-          "projected_ip": 5.0,
-          "inputs": {
-            "k9": 5.4,
-            "era": 0.0,
-            "whip": 0.6,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Arizona Diamondbacks",
-          "pitcher": "Jose Cabrera",
-          "label": "Jose Cabrera ne concède pas de home run",
-          "pick": "no",
-          "probability": 1.0,
-          "fair_odds": 1.01,
-          "expected_hr_allowed": 0.0,
-          "projected_ip": 5.0,
-          "inputs": {
-            "hr9": 0.0,
-            "era": 0.0,
-            "whip": 0.6
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401815928",
-      "kickoff": "2026-06-27T23:05Z",
-      "league": "MLB",
-      "match": "Washington Nationals at Baltimore Orioles",
-      "home": "Baltimore Orioles",
-      "away": "Washington Nationals",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Baltimore Orioles",
-          "pitcher": "Brandon Young",
-          "label": "Brandon Young moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.6078,
-          "fair_odds": 1.65,
-          "expected_strikeouts": 4.07,
-          "projected_ip": 5.59,
-          "inputs": {
-            "k9": 6.55,
-            "era": 3.07,
-            "whip": 1.26,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Baltimore Orioles",
-          "pitcher": "Brandon Young",
-          "label": "Brandon Young ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6083,
-          "fair_odds": 1.64,
-          "expected_hr_allowed": 0.497,
-          "projected_ip": 5.59,
-          "inputs": {
-            "hr9": 0.8,
-            "era": 3.07,
-            "whip": 1.26
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Washington Nationals",
-          "pitcher": "Foster Griffin",
-          "label": "Foster Griffin plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.5105,
-          "fair_odds": 1.96,
-          "expected_strikeouts": 5.55,
-          "projected_ip": 5.69,
-          "inputs": {
-            "k9": 8.77,
-            "era": 3.15,
-            "whip": 1.06,
-            "hand": "L"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Washington Nationals",
-          "pitcher": "Foster Griffin",
-          "label": "Foster Griffin concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.632,
-          "fair_odds": 1.58,
-          "expected_hr_allowed": 1.0,
-          "projected_ip": 5.69,
-          "inputs": {
-            "hr9": 1.58,
-            "era": 3.15,
-            "whip": 1.06
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815926",
       "kickoff": "2026-06-27T23:10Z",
@@ -179,17 +15,17 @@
           "market": "pitcher_strikeouts",
           "team": "Cleveland Guardians",
           "pitcher": "Slade Cecconi",
-          "label": "Slade Cecconi moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.597,
+          "label": "Slade Cecconi plus de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "over",
+          "probability": 0.5956,
           "fair_odds": 1.68,
-          "expected_strikeouts": 4.11,
-          "projected_ip": 5.26,
+          "expected_strikeouts": 3.87,
+          "projected_ip": 5.01,
           "inputs": {
-            "k9": 7.04,
-            "era": 4.48,
-            "whip": 1.4,
+            "k9": 6.96,
+            "era": 4.43,
+            "whip": 1.39,
             "hand": "R"
           },
           "side": "home"
@@ -200,14 +36,14 @@
           "pitcher": "Slade Cecconi",
           "label": "Slade Cecconi concède au moins 1 home run",
           "pick": "yes",
-          "probability": 0.5265,
-          "fair_odds": 1.9,
-          "expected_hr_allowed": 0.748,
-          "projected_ip": 5.26,
+          "probability": 0.5066,
+          "fair_odds": 1.97,
+          "expected_hr_allowed": 0.706,
+          "projected_ip": 5.01,
           "inputs": {
-            "hr9": 1.28,
-            "era": 4.48,
-            "whip": 1.4
+            "hr9": 1.27,
+            "era": 4.43,
+            "whip": 1.39
           },
           "side": "home"
         },
@@ -261,17 +97,17 @@
           "market": "pitcher_strikeouts",
           "team": "Milwaukee Brewers",
           "pitcher": "Kyle Harrison",
-          "label": "Kyle Harrison moins de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "under",
-          "probability": 0.5578,
-          "fair_odds": 1.79,
-          "expected_strikeouts": 6.22,
-          "projected_ip": 5.14,
+          "label": "Kyle Harrison plus de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "over",
+          "probability": 0.577,
+          "fair_odds": 1.73,
+          "expected_strikeouts": 5.87,
+          "projected_ip": 4.87,
           "inputs": {
-            "k9": 10.88,
-            "era": 2.5,
-            "whip": 1.06,
+            "k9": 10.85,
+            "era": 2.47,
+            "whip": 1.04,
             "hand": "L"
           },
           "side": "home"
@@ -282,14 +118,14 @@
           "pitcher": "Kyle Harrison",
           "label": "Kyle Harrison ne concède pas de home run",
           "pick": "no",
-          "probability": 0.5647,
-          "fair_odds": 1.77,
-          "expected_hr_allowed": 0.571,
-          "projected_ip": 5.14,
+          "probability": 0.5855,
+          "fair_odds": 1.71,
+          "expected_hr_allowed": 0.535,
+          "projected_ip": 4.87,
           "inputs": {
-            "hr9": 1.0,
-            "era": 2.5,
-            "whip": 1.06
+            "hr9": 0.99,
+            "era": 2.47,
+            "whip": 1.04
           },
           "side": "home"
         },
@@ -343,17 +179,17 @@
           "market": "pitcher_strikeouts",
           "team": "Minnesota Twins",
           "pitcher": "Mike Paredes",
-          "label": "Mike Paredes plus de 3,5 strikeouts",
-          "line": 3.5,
+          "label": "Mike Paredes plus de 2,5 strikeouts",
+          "line": 2.5,
           "pick": "over",
-          "probability": 0.5349,
-          "fair_odds": 1.87,
-          "expected_strikeouts": 3.63,
-          "projected_ip": 6.6,
+          "probability": 0.5584,
+          "fair_odds": 1.79,
+          "expected_strikeouts": 2.69,
+          "projected_ip": 5.05,
           "inputs": {
-            "k9": 4.95,
-            "era": 4.05,
-            "whip": 1.2,
+            "k9": 4.79,
+            "era": 4.35,
+            "whip": 1.21,
             "hand": "R"
           },
           "side": "home"
@@ -362,16 +198,16 @@
           "market": "pitcher_home_run_allowed",
           "team": "Minnesota Twins",
           "pitcher": "Mike Paredes",
-          "label": "Mike Paredes ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5169,
-          "fair_odds": 1.93,
-          "expected_hr_allowed": 0.66,
-          "projected_ip": 6.6,
+          "label": "Mike Paredes concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5205,
+          "fair_odds": 1.92,
+          "expected_hr_allowed": 0.735,
+          "projected_ip": 5.05,
           "inputs": {
-            "hr9": 0.9,
-            "era": 4.05,
-            "whip": 1.2
+            "hr9": 1.31,
+            "era": 4.35,
+            "whip": 1.21
           },
           "side": "home"
         },
@@ -428,14 +264,14 @@
           "label": "Andre Pallante moins de 4,5 strikeouts",
           "line": 4.5,
           "pick": "under",
-          "probability": 0.5633,
-          "fair_odds": 1.78,
-          "expected_strikeouts": 4.24,
-          "projected_ip": 5.48,
+          "probability": 0.6093,
+          "fair_odds": 1.64,
+          "expected_strikeouts": 4.06,
+          "projected_ip": 5.19,
           "inputs": {
-            "k9": 6.97,
-            "era": 3.59,
-            "whip": 1.19,
+            "k9": 7.05,
+            "era": 3.58,
+            "whip": 1.18,
             "hand": "R"
           },
           "side": "home"
@@ -446,14 +282,14 @@
           "pitcher": "Andre Pallante",
           "label": "Andre Pallante ne concède pas de home run",
           "pick": "no",
-          "probability": 0.5506,
-          "fair_odds": 1.82,
-          "expected_hr_allowed": 0.597,
-          "projected_ip": 5.48,
+          "probability": 0.5684,
+          "fair_odds": 1.76,
+          "expected_hr_allowed": 0.565,
+          "projected_ip": 5.19,
           "inputs": {
             "hr9": 0.98,
-            "era": 3.59,
-            "whip": 1.19
+            "era": 3.58,
+            "whip": 1.18
           },
           "side": "home"
         },
@@ -1792,7 +1628,7 @@
       ]
     }
   ],
-  "props": 86,
+  "props": 78,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
