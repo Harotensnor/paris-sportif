@@ -1,254 +1,8 @@
 {
-  "generated_at": "2026-06-27T20:02:58Z",
+  "generated_at": "2026-06-27T21:06:14Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815925",
-      "kickoff": "2026-06-27T20:10Z",
-      "league": "MLB",
-      "match": "Philadelphia Phillies at New York Mets",
-      "home": "New York Mets",
-      "away": "Philadelphia Phillies",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "New York Mets",
-          "pitcher": "Christian Scott",
-          "label": "Christian Scott moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.5757,
-          "fair_odds": 1.74,
-          "expected_strikeouts": 5.16,
-          "projected_ip": 4.47,
-          "inputs": {
-            "k9": 10.4,
-            "era": 3.1,
-            "whip": 1.35,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "New York Mets",
-          "pitcher": "Christian Scott",
-          "label": "Christian Scott ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6429,
-          "fair_odds": 1.56,
-          "expected_hr_allowed": 0.442,
-          "projected_ip": 4.47,
-          "inputs": {
-            "hr9": 0.89,
-            "era": 3.1,
-            "whip": 1.35
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Philadelphia Phillies",
-          "pitcher": "Tim Mayza",
-          "label": "Tim Mayza plus de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "over",
-          "probability": 0.5083,
-          "fair_odds": 1.97,
-          "expected_strikeouts": 6.54,
-          "projected_ip": 6.6,
-          "inputs": {
-            "k9": 8.92,
-            "era": 3.06,
-            "whip": 0.99,
-            "hand": "L"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Philadelphia Phillies",
-          "pitcher": "Tim Mayza",
-          "label": "Tim Mayza concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5267,
-          "fair_odds": 1.9,
-          "expected_hr_allowed": 0.748,
-          "projected_ip": 6.6,
-          "inputs": {
-            "hr9": 1.02,
-            "era": 3.06,
-            "whip": 0.99
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401815931",
-      "kickoff": "2026-06-27T20:10Z",
-      "league": "MLB",
-      "match": "Kansas City Royals at Chicago White Sox",
-      "home": "Chicago White Sox",
-      "away": "Kansas City Royals",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Chicago White Sox",
-          "pitcher": "Davis Martin",
-          "label": "Davis Martin plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.5569,
-          "fair_odds": 1.8,
-          "expected_strikeouts": 5.77,
-          "projected_ip": 5.81,
-          "inputs": {
-            "k9": 8.93,
-            "era": 3.18,
-            "whip": 1.2,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Chicago White Sox",
-          "pitcher": "Davis Martin",
-          "label": "Davis Martin ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.67,
-          "fair_odds": 1.49,
-          "expected_hr_allowed": 0.4,
-          "projected_ip": 5.81,
-          "inputs": {
-            "hr9": 0.62,
-            "era": 3.18,
-            "whip": 1.2
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Kansas City Royals",
-          "pitcher": "Michael Wacha",
-          "label": "Michael Wacha plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.5722,
-          "fair_odds": 1.75,
-          "expected_strikeouts": 4.81,
-          "projected_ip": 6.31,
-          "inputs": {
-            "k9": 6.86,
-            "era": 3.48,
-            "whip": 1.16,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Kansas City Royals",
-          "pitcher": "Michael Wacha",
-          "label": "Michael Wacha ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5357,
-          "fair_odds": 1.87,
-          "expected_hr_allowed": 0.624,
-          "projected_ip": 6.31,
-          "inputs": {
-            "hr9": 0.89,
-            "era": 3.48,
-            "whip": 1.16
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401815922",
-      "kickoff": "2026-06-27T20:40Z",
-      "league": "MLB",
-      "match": "Cincinnati Reds at Pittsburgh Pirates",
-      "home": "Pittsburgh Pirates",
-      "away": "Cincinnati Reds",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Pittsburgh Pirates",
-          "pitcher": "Jared Jones",
-          "label": "Jared Jones moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.5861,
-          "fair_odds": 1.71,
-          "expected_strikeouts": 4.15,
-          "projected_ip": 4.02,
-          "inputs": {
-            "k9": 9.3,
-            "era": 5.75,
-            "whip": 1.52,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Pittsburgh Pirates",
-          "pitcher": "Jared Jones",
-          "label": "Jared Jones concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5464,
-          "fair_odds": 1.83,
-          "expected_hr_allowed": 0.791,
-          "projected_ip": 4.02,
-          "inputs": {
-            "hr9": 1.77,
-            "era": 5.75,
-            "whip": 1.52
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Cincinnati Reds",
-          "pitcher": "Chase Burns",
-          "label": "Chase Burns plus de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "over",
-          "probability": 0.5521,
-          "fair_odds": 1.81,
-          "expected_strikeouts": 6.77,
-          "projected_ip": 5.68,
-          "inputs": {
-            "k9": 10.72,
-            "era": 2.0,
-            "whip": 1.05,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Cincinnati Reds",
-          "pitcher": "Chase Burns",
-          "label": "Chase Burns ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5155,
-          "fair_odds": 1.94,
-          "expected_hr_allowed": 0.663,
-          "projected_ip": 5.68,
-          "inputs": {
-            "hr9": 1.05,
-            "era": 2.0,
-            "whip": 1.05
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815921",
       "kickoff": "2026-06-27T22:10Z",
@@ -1454,18 +1208,18 @@
         {
           "market": "pitcher_strikeouts",
           "team": "Seattle Mariners",
-          "pitcher": "George Kirby",
-          "label": "George Kirby moins de 5,5 strikeouts",
+          "pitcher": "Emerson Hancock",
+          "label": "Emerson Hancock moins de 5,5 strikeouts",
           "line": 5.5,
           "pick": "under",
-          "probability": 0.5549,
-          "fair_odds": 1.8,
-          "expected_strikeouts": 5.25,
-          "projected_ip": 6.0,
+          "probability": 0.5215,
+          "fair_odds": 1.92,
+          "expected_strikeouts": 5.4,
+          "projected_ip": 5.67,
           "inputs": {
-            "k9": 7.88,
-            "era": 3.94,
-            "whip": 1.34,
+            "k9": 8.58,
+            "era": 3.6,
+            "whip": 1.02,
             "hand": "R"
           },
           "side": "away"
@@ -1473,17 +1227,17 @@
         {
           "market": "pitcher_home_run_allowed",
           "team": "Seattle Mariners",
-          "pitcher": "George Kirby",
-          "label": "George Kirby ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5712,
-          "fair_odds": 1.75,
-          "expected_hr_allowed": 0.56,
-          "projected_ip": 6.0,
+          "pitcher": "Emerson Hancock",
+          "label": "Emerson Hancock concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5505,
+          "fair_odds": 1.82,
+          "expected_hr_allowed": 0.8,
+          "projected_ip": 5.67,
           "inputs": {
-            "hr9": 0.84,
-            "era": 3.94,
-            "whip": 1.34
+            "hr9": 1.27,
+            "era": 3.6,
+            "whip": 1.02
           },
           "side": "away"
         }
@@ -2038,7 +1792,7 @@
       ]
     }
   ],
-  "props": 98,
+  "props": 86,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"

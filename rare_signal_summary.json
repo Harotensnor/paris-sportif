@@ -1,45 +1,27 @@
 {
-  "generated_at": "2026-06-27T20:02:59Z",
+  "generated_at": "2026-06-27T21:06:14Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 39,
-    "actionable": 27,
-    "watch": 4,
+    "active_events": 37,
+    "actionable": 26,
+    "watch": 3,
     "risk": 8,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 26,
       "travel_extreme": 7,
       "back_to_back_travel": 12,
+      "injury_imbalance": 24,
       "market_uncertain": 18
     },
     "by_quality": {
-      "actionable": 27,
-      "watch": 4,
+      "actionable": 26,
+      "watch": 3,
       "risk": 8
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401815925",
-      "date": "2026-06-27T20:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "New York Mets",
-      "away": "Philadelphia Phillies",
-      "match": "New York Mets - Philadelphia Phillies",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "New York Mets",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 9-3"
-    },
     {
       "event_id": "401815921",
       "date": "2026-06-27T22:10Z",
@@ -510,24 +492,6 @@
     }
   ],
   "active_watch": [
-    {
-      "event_id": "401815922",
-      "date": "2026-06-27T20:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Pittsburgh Pirates",
-      "away": "Cincinnati Reds",
-      "match": "Pittsburgh Pirates - Cincinnati Reds",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Cincinnati Reds",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 4-7"
-    },
     {
       "event_id": "401815929",
       "date": "2026-06-27T23:10Z",
