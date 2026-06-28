@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-06-28T22:45:21Z",
+  "generated_at": "2026-06-28T23:48:56Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815939",
-      "kickoff": "2026-06-28T23:20Z",
-      "league": "MLB",
-      "match": "New York Yankees at Boston Red Sox",
-      "home": "Boston Red Sox",
-      "away": "New York Yankees",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Boston Red Sox",
-          "pitcher": "Sonny Gray",
-          "label": "Sonny Gray plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.5468,
-          "fair_odds": 1.83,
-          "expected_strikeouts": 4.7,
-          "projected_ip": 5.44,
-          "inputs": {
-            "k9": 7.78,
-            "era": 2.95,
-            "whip": 1.19,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Boston Red Sox",
-          "pitcher": "Sonny Gray",
-          "label": "Sonny Gray ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5272,
-          "fair_odds": 1.9,
-          "expected_hr_allowed": 0.64,
-          "projected_ip": 5.44,
-          "inputs": {
-            "hr9": 1.06,
-            "era": 2.95,
-            "whip": 1.19
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "New York Yankees",
-          "pitcher": "Carlos Rodón",
-          "label": "Carlos Rodón plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.5469,
-          "fair_odds": 1.83,
-          "expected_strikeouts": 5.72,
-          "projected_ip": 5.14,
-          "inputs": {
-            "k9": 10.02,
-            "era": 3.7,
-            "whip": 1.28,
-            "hand": "L"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "New York Yankees",
-          "pitcher": "Carlos Rodón",
-          "label": "Carlos Rodón ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.69,
-          "fair_odds": 1.45,
-          "expected_hr_allowed": 0.371,
-          "projected_ip": 5.14,
-          "inputs": {
-            "hr9": 0.65,
-            "era": 3.7,
-            "whip": 1.28
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815962",
       "kickoff": "2026-06-30T01:40Z",
@@ -168,7 +86,7 @@
       ]
     }
   ],
-  "props": 8,
+  "props": 4,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
