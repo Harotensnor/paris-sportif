@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-06-28T07:43:46Z",
+  "generated_at": "2026-06-28T10:19:08Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 28,
-    "actionable": 19,
+    "actionable": 20,
     "watch": 1,
-    "risk": 8,
+    "risk": 7,
     "expired_sample": 0,
     "by_type": {
-      "market_uncertain": 8,
-      "injury_imbalance": 17,
+      "injury_imbalance": 18,
       "travel_extreme": 4,
-      "back_to_back_travel": 7
+      "back_to_back_travel": 7,
+      "market_uncertain": 7
     },
     "by_quality": {
-      "risk": 8,
       "watch": 1,
-      "actionable": 19
+      "actionable": 20,
+      "risk": 7
     }
   },
   "active_actionable": [
@@ -56,7 +56,25 @@
       "team": "Arizona Diamondbacks",
       "side": "away",
       "strength": 1.0,
-      "context": "2 match dans les 48h + 2875 km de voyage"
+      "context": "1 match dans les 48h + 2875 km de voyage"
+    },
+    {
+      "event_id": "401815940",
+      "date": "2026-06-28T17:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "New York Mets",
+      "away": "Philadelphia Phillies",
+      "match": "New York Mets - Philadelphia Phillies",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "New York Mets",
+      "side": null,
+      "strength": 1.0,
+      "context": "Absences severes 9-3"
     },
     {
       "event_id": "401815941",
@@ -74,7 +92,7 @@
       "team": "Seattle Mariners",
       "side": "away",
       "strength": 1.0,
-      "context": "2 match dans les 48h + 3253 km de voyage"
+      "context": "1 match dans les 48h + 3253 km de voyage"
     },
     {
       "event_id": "401815945",
@@ -128,7 +146,7 @@
       "team": "Atlanta Braves",
       "side": "away",
       "strength": 1.0,
-      "context": "2 match dans les 48h + 3422 km de voyage"
+      "context": "1 match dans les 48h + 3422 km de voyage"
     },
     {
       "event_id": "401815939",
@@ -386,24 +404,6 @@
     }
   ],
   "active_risk": [
-    {
-      "event_id": "177243",
-      "date": "2026-06-28T10:00Z",
-      "sport": "tennis",
-      "league_code": "lexuseastbourneopen",
-      "league_name": "Lexus Eastbourne Open",
-      "home": "",
-      "away": "",
-      "match": "? - ?",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 12.3%"
-    },
     {
       "event_id": "401861547",
       "date": "2026-07-04T11:00Z",

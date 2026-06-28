@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-28T07:43:45Z",
+  "generated_at": "2026-06-28T10:19:08Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -10,19 +10,92 @@
       "travel_extreme": 4,
       "back_to_back_travel": 7,
       "lookahead": 13,
-      "schedule_congestion": 14
+      "schedule_congestion": 10
     },
     "by_decision": {
-      "abstain": 1,
+      "abstain": 2,
       "lean_away": 4,
-      "lean_home": 11
+      "lean_home": 10
     },
-    "lean_home": 11,
+    "lean_home": 10,
     "lean_away": 4,
-    "abstain": 1,
+    "abstain": 2,
     "monitor": 0
   },
   "active": [
+    {
+      "event_id": "401815977",
+      "source_event_ids": [
+        "401815977"
+      ],
+      "kickoff": "2026-07-01T01:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Athletics",
+      "away": "Los Angeles Dodgers",
+      "match": "Athletics - Los Angeles Dodgers",
+      "decision": "abstain",
+      "net_team": null,
+      "reason": "Fatigue/agenda des deux cotes: Athletics 0.75, Los Angeles Dodgers 0.90",
+      "pressure_score": 2.2,
+      "home_fade": 0.75,
+      "away_fade": 0.9,
+      "travel_score": 0,
+      "lookahead_score": 1.0,
+      "congestion_score": 1.2,
+      "types": {
+        "schedule_congestion": 2,
+        "lookahead": 2
+      },
+      "contexts": [
+        "3 matchs sur les 7 derniers jours",
+        "1 match important/proche dans les 3 jours",
+        "3 matchs sur les 7 derniers jours",
+        "2 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": -0.085,
+        "away_score": -1.637,
+        "home_fade": 0.75,
+        "away_fade": 1.9,
+        "reason": "Direction nette: Athletics (-0.09)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.3
+          },
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 1.0
+          }
+        ]
+      }
+    },
     {
       "event_id": "401815962",
       "source_event_ids": [
@@ -37,49 +110,34 @@
       "match": "Athletics - Los Angeles Dodgers",
       "decision": "abstain",
       "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Athletics 0.90, Los Angeles Dodgers 0.90",
-      "pressure_score": 2.533,
-      "home_fade": 0.9,
-      "away_fade": 0.9,
+      "reason": "Fatigue/agenda des deux cotes: Athletics 0.30, Los Angeles Dodgers 0.30",
+      "pressure_score": 1.333,
+      "home_fade": 0.3,
+      "away_fade": 0.3,
       "travel_score": 0,
       "lookahead_score": 1.333,
-      "congestion_score": 1.2,
+      "congestion_score": 0,
       "types": {
-        "schedule_congestion": 2,
         "lookahead": 2
       },
       "contexts": [
-        "3 matchs sur les 7 derniers jours",
         "2 match important/proche dans les 3 jours",
-        "3 matchs sur les 7 derniers jours",
         "2 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": -0.235,
-        "away_score": -1.585,
-        "home_fade": 0.9,
-        "away_fade": 1.9,
-        "reason": "Direction nette: Athletics (-0.23)",
+        "home_score": 0.155,
+        "away_score": -1.195,
+        "home_fade": 0.3,
+        "away_fade": 1.3,
+        "reason": "Direction nette: Athletics (+0.15)",
         "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
           {
             "side": "home",
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
           },
           {
             "side": "away",
@@ -110,31 +168,30 @@
       "match": "Los Angeles Dodgers - San Diego Padres",
       "decision": "lean_away",
       "net_team": "San Diego Padres",
-      "reason": "Los Angeles Dodgers plus penalise par calendrier/voyage (1.36 vs 0.96)",
-      "pressure_score": 3.2,
+      "reason": "Los Angeles Dodgers plus penalise par calendrier/voyage (1.36 vs 0.36)",
+      "pressure_score": 2.6,
       "home_fade": 1.36,
-      "away_fade": 0.96,
+      "away_fade": 0.36,
       "travel_score": 0,
       "lookahead_score": 1.6,
-      "congestion_score": 1.6,
+      "congestion_score": 1.0,
       "types": {
-        "schedule_congestion": 2,
+        "schedule_congestion": 1,
         "lookahead": 2
       },
       "contexts": [
-        "6 matchs sur les 7 derniers jours",
+        "5 matchs sur les 7 derniers jours",
         "3 match important/proche dans les 3 jours",
-        "3 matchs sur les 7 derniers jours",
         "3 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -1.824,
-        "away_score": -0.204,
+        "home_score": -2.034,
+        "away_score": 0.396,
         "home_fade": 2.16,
-        "away_fade": 0.96,
-        "reason": "Direction nette: San Diego Padres (-0.20)",
+        "away_fade": 0.36,
+        "reason": "Direction nette: San Diego Padres (+0.40)",
         "detail": [
           {
             "side": "home",
@@ -147,12 +204,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.36
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
           },
           {
             "side": "away",
@@ -183,31 +234,30 @@
       "match": "Los Angeles Dodgers - San Diego Padres",
       "decision": "lean_away",
       "net_team": "San Diego Padres",
-      "reason": "Los Angeles Dodgers plus penalise par calendrier/voyage (1.30 vs 0.90)",
-      "pressure_score": 2.933,
+      "reason": "Los Angeles Dodgers plus penalise par calendrier/voyage (1.30 vs 0.30)",
+      "pressure_score": 2.333,
       "home_fade": 1.3,
-      "away_fade": 0.9,
+      "away_fade": 0.3,
       "travel_score": 0,
       "lookahead_score": 1.333,
-      "congestion_score": 1.6,
+      "congestion_score": 1.0,
       "types": {
-        "schedule_congestion": 2,
+        "schedule_congestion": 1,
         "lookahead": 2
       },
       "contexts": [
-        "6 matchs sur les 7 derniers jours",
+        "5 matchs sur les 7 derniers jours",
         "2 match important/proche dans les 3 jours",
-        "3 matchs sur les 7 derniers jours",
         "2 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -1.785,
-        "away_score": -0.165,
+        "home_score": -1.995,
+        "away_score": 0.435,
         "home_fade": 2.1,
-        "away_fade": 0.9,
-        "reason": "Direction nette: San Diego Padres (-0.16)",
+        "away_fade": 0.3,
+        "reason": "Direction nette: San Diego Padres (+0.43)",
         "detail": [
           {
             "side": "home",
@@ -220,12 +270,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
           },
           {
             "side": "away",
@@ -256,109 +300,36 @@
       "match": "Athletics - Los Angeles Dodgers",
       "decision": "lean_home",
       "net_team": "Athletics",
-      "reason": "Los Angeles Dodgers plus penalise par calendrier/voyage (1.30 vs 1.00)",
-      "pressure_score": 2.667,
-      "home_fade": 1.0,
-      "away_fade": 1.3,
+      "reason": "Los Angeles Dodgers plus penalise par calendrier/voyage (1.10 vs 0.80)",
+      "pressure_score": 2.267,
+      "home_fade": 0.8,
+      "away_fade": 1.1,
       "travel_score": 0,
       "lookahead_score": 0.667,
-      "congestion_score": 2.0,
+      "congestion_score": 1.6,
       "types": {
         "schedule_congestion": 2,
         "lookahead": 1
       },
       "contexts": [
-        "5 matchs sur les 7 derniers jours",
-        "5 matchs sur les 7 derniers jours",
-        "2 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.195,
-        "away_score": -1.95,
-        "home_fade": 1.0,
-        "away_fade": 2.3,
-        "reason": "Direction nette: Athletics (-0.20)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815977",
-      "source_event_ids": [
-        "401815977"
-      ],
-      "kickoff": "2026-07-01T01:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Athletics",
-      "away": "Los Angeles Dodgers",
-      "match": "Athletics - Los Angeles Dodgers",
-      "decision": "lean_home",
-      "net_team": "Athletics",
-      "reason": "Los Angeles Dodgers plus penalise par calendrier/voyage (1.10 vs 0.95)",
-      "pressure_score": 2.6,
-      "home_fade": 0.95,
-      "away_fade": 1.1,
-      "travel_score": 0,
-      "lookahead_score": 1.0,
-      "congestion_score": 1.6,
-      "types": {
-        "schedule_congestion": 2,
-        "lookahead": 2
-      },
-      "contexts": [
         "4 matchs sur les 7 derniers jours",
-        "1 match important/proche dans les 3 jours",
         "4 matchs sur les 7 derniers jours",
         "2 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": -0.215,
-        "away_score": -1.768,
-        "home_fade": 0.95,
+        "home_score": -0.065,
+        "away_score": -1.82,
+        "home_fade": 0.8,
         "away_fade": 2.1,
-        "reason": "Direction nette: Athletics (-0.22)",
+        "reason": "Direction nette: Athletics (-0.07)",
         "detail": [
           {
             "side": "home",
             "type": "schedule_congestion",
             "direction": "fade",
             "strength": 0.8
-          },
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
           },
           {
             "side": "away",
@@ -481,7 +452,7 @@
       },
       "contexts": [
         "Deplacement estime 3422 km, decalage ~2.5h",
-        "2 match dans les 48h + 3422 km de voyage"
+        "1 match dans les 48h + 3422 km de voyage"
       ],
       "global_resolution": {
         "status": "net",
@@ -534,7 +505,7 @@
       },
       "contexts": [
         "Deplacement estime 3253 km, decalage ~2.7h",
-        "2 match dans les 48h + 3253 km de voyage"
+        "1 match dans les 48h + 3253 km de voyage"
       ],
       "global_resolution": {
         "status": "net",
@@ -593,7 +564,7 @@
       },
       "contexts": [
         "Deplacement estime 2875 km, decalage ~2.0h",
-        "2 match dans les 48h + 2875 km de voyage"
+        "1 match dans les 48h + 2875 km de voyage"
       ],
       "global_resolution": {
         "status": "net",
@@ -801,27 +772,27 @@
       "match": "St. Louis Cardinals - Miami Marlins",
       "decision": "lean_home",
       "net_team": "St. Louis Cardinals",
-      "reason": "Miami Marlins plus penalise par calendrier/voyage (0.95 vs 0.00)",
-      "pressure_score": 0.951,
+      "reason": "Miami Marlins plus penalise par calendrier/voyage (0.87 vs 0.00)",
+      "pressure_score": 0.871,
       "home_fade": 0.0,
-      "away_fade": 0.951,
-      "travel_score": 0.951,
+      "away_fade": 0.871,
+      "travel_score": 0.871,
       "lookahead_score": 0,
       "congestion_score": 0,
       "types": {
         "back_to_back_travel": 1
       },
       "contexts": [
-        "2 match dans les 48h + 1706 km de voyage"
+        "1 match dans les 48h + 1706 km de voyage"
       ],
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.683,
-        "away_score": -1.951,
+        "home_score": 0.655,
+        "away_score": -1.871,
         "home_fade": 0.0,
-        "away_fade": 1.951,
-        "reason": "Direction nette: St. Louis Cardinals (+0.68)",
+        "away_fade": 1.871,
+        "reason": "Direction nette: St. Louis Cardinals (+0.65)",
         "detail": [
           {
             "side": "away",
@@ -833,7 +804,7 @@
             "side": "away",
             "type": "back_to_back_travel",
             "direction": "fade",
-            "strength": 0.951
+            "strength": 0.871
           }
         ]
       }
@@ -852,27 +823,27 @@
       "match": "Minnesota Twins - Colorado Rockies",
       "decision": "lean_home",
       "net_team": "Minnesota Twins",
-      "reason": "Colorado Rockies plus penalise par calendrier/voyage (0.83 vs 0.00)",
-      "pressure_score": 0.835,
+      "reason": "Colorado Rockies plus penalise par calendrier/voyage (0.75 vs 0.00)",
+      "pressure_score": 0.755,
       "home_fade": 0.0,
-      "away_fade": 0.835,
-      "travel_score": 0.835,
+      "away_fade": 0.755,
+      "travel_score": 0.755,
       "lookahead_score": 0,
       "congestion_score": 0,
       "types": {
         "back_to_back_travel": 1
       },
       "contexts": [
-        "2 match dans les 48h + 1123 km de voyage"
+        "1 match dans les 48h + 1123 km de voyage"
       ],
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.642,
-        "away_score": -1.835,
+        "home_score": 0.614,
+        "away_score": -1.755,
         "home_fade": 0.0,
-        "away_fade": 1.835,
-        "reason": "Direction nette: Minnesota Twins (+0.64)",
+        "away_fade": 1.755,
+        "reason": "Direction nette: Minnesota Twins (+0.61)",
         "detail": [
           {
             "side": "away",
@@ -884,7 +855,7 @@
             "side": "away",
             "type": "back_to_back_travel",
             "direction": "fade",
-            "strength": 0.835
+            "strength": 0.755
           }
         ]
       }
