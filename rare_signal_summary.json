@@ -1,44 +1,24 @@
 {
-  "generated_at": "2026-06-28T19:44:32Z",
+  "generated_at": "2026-06-28T20:48:21Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 21,
-    "actionable": 10,
+    "active_events": 19,
+    "actionable": 8,
     "watch": 0,
     "risk": 11,
     "expired_sample": 0,
     "by_type": {
-      "travel_extreme": 1,
-      "back_to_back_travel": 1,
-      "injury_imbalance": 9,
+      "injury_imbalance": 8,
       "market_uncertain": 11
     },
     "by_quality": {
-      "actionable": 10,
+      "actionable": 8,
       "risk": 11
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401815949",
-      "date": "2026-06-28T20:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Francisco Giants",
-      "away": "Atlanta Braves",
-      "match": "San Francisco Giants - Atlanta Braves",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Atlanta Braves",
-      "side": "away",
-      "strength": 1.0,
-      "context": "2 match dans les 48h + 3422 km de voyage"
-    },
     {
       "event_id": "401815939",
       "date": "2026-06-28T23:20Z",
@@ -110,24 +90,6 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 8-15"
-    },
-    {
-      "event_id": "401815950",
-      "date": "2026-06-28T20:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Diego Padres",
-      "away": "Los Angeles Dodgers",
-      "match": "San Diego Padres - Los Angeles Dodgers",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Los Angeles Dodgers",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 11-15"
     },
     {
       "event_id": "401816001",

@@ -1,23 +1,21 @@
 {
-  "generated_at": "2026-06-28T19:44:32Z",
+  "generated_at": "2026-06-28T20:48:21Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 9,
+    "active_events": 7,
     "expired_sample": 0,
     "by_type": {
-      "travel_extreme": 1,
-      "back_to_back_travel": 1,
-      "lookahead": 12,
-      "schedule_congestion": 14
+      "schedule_congestion": 14,
+      "lookahead": 11
     },
     "by_decision": {
       "abstain": 1,
       "lean_away": 4,
-      "lean_home": 4
+      "lean_home": 2
     },
-    "lean_home": 4,
+    "lean_home": 2,
     "lean_away": 4,
     "abstain": 1,
     "monitor": 0
@@ -455,59 +453,6 @@
       }
     },
     {
-      "event_id": "401815949",
-      "source_event_ids": [
-        "401815949"
-      ],
-      "kickoff": "2026-06-28T20:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Francisco Giants",
-      "away": "Atlanta Braves",
-      "match": "San Francisco Giants - Atlanta Braves",
-      "decision": "lean_home",
-      "net_team": "San Francisco Giants",
-      "reason": "Atlanta Braves plus penalise par calendrier/voyage (1.80 vs 0.00)",
-      "pressure_score": 1.796,
-      "home_fade": 0.0,
-      "away_fade": 1.796,
-      "travel_score": 1.796,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "travel_extreme": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "Deplacement estime 3422 km, decalage ~2.5h",
-        "2 match dans les 48h + 3422 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.629,
-        "away_score": -1.796,
-        "home_fade": 0.0,
-        "away_fade": 1.796,
-        "reason": "Direction nette: San Francisco Giants (+0.63)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.796
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401816043",
       "source_event_ids": [
         "401816043"
@@ -558,57 +503,6 @@
           },
           {
             "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.8
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815950",
-      "source_event_ids": [
-        "401815950"
-      ],
-      "kickoff": "2026-06-28T20:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Diego Padres",
-      "away": "Los Angeles Dodgers",
-      "match": "San Diego Padres - Los Angeles Dodgers",
-      "decision": "lean_home",
-      "net_team": "San Diego Padres",
-      "reason": "Los Angeles Dodgers plus penalise par calendrier/voyage (0.30 vs 0.00)",
-      "pressure_score": 0.667,
-      "home_fade": 0.0,
-      "away_fade": 0.3,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 1
-      },
-      "contexts": [
-        "2 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.385,
-        "away_score": -1.1,
-        "home_fade": 0.0,
-        "away_fade": 1.1,
-        "reason": "Direction nette: San Diego Padres (+0.39)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.8
