@@ -1,25 +1,24 @@
 {
-  "generated_at": "2026-06-28T11:33:05Z",
+  "generated_at": "2026-06-28T12:59:19Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 29,
+    "active_events": 31,
     "actionable": 20,
-    "watch": 2,
-    "risk": 7,
+    "watch": 1,
+    "risk": 10,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 18,
       "travel_extreme": 4,
       "back_to_back_travel": 7,
-      "market_move": 1,
-      "market_uncertain": 7
+      "market_uncertain": 10
     },
     "by_quality": {
-      "watch": 2,
+      "watch": 1,
       "actionable": 20,
-      "risk": 7
+      "risk": 10
     }
   },
   "active_actionable": [
@@ -57,7 +56,7 @@
       "team": "Arizona Diamondbacks",
       "side": "away",
       "strength": 1.0,
-      "context": "1 match dans les 48h + 2875 km de voyage"
+      "context": "2 match dans les 48h + 2875 km de voyage"
     },
     {
       "event_id": "401815940",
@@ -93,7 +92,7 @@
       "team": "Seattle Mariners",
       "side": "away",
       "strength": 1.0,
-      "context": "1 match dans les 48h + 3253 km de voyage"
+      "context": "2 match dans les 48h + 3253 km de voyage"
     },
     {
       "event_id": "401815945",
@@ -147,7 +146,7 @@
       "team": "Atlanta Braves",
       "side": "away",
       "strength": 1.0,
-      "context": "1 match dans les 48h + 3422 km de voyage"
+      "context": "2 match dans les 48h + 3422 km de voyage"
     },
     {
       "event_id": "401815939",
@@ -402,24 +401,6 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 4-7"
-    },
-    {
-      "event_id": "401857032",
-      "date": "2026-06-28T20:00Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Chicago Sky",
-      "away": "Las Vegas Aces",
-      "match": "Chicago Sky - Las Vegas Aces",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "home",
-      "strength": 0.556,
-      "context": "Cote home: 3.50 -> 3.15 (+10.0%)"
     }
   ],
   "active_risk": [
@@ -460,6 +441,24 @@
       "context": "marge bookmaker anormale 18.9%"
     },
     {
+      "event_id": "401861413",
+      "date": "2026-07-04T11:35Z",
+      "sport": "football",
+      "league_code": "chn.1",
+      "league_name": "Chinese Super League",
+      "home": "Dalian Yingbo",
+      "away": "Wuhan Three Towns",
+      "match": "Dalian Yingbo - Wuhan Three Towns",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.7%"
+    },
+    {
       "event_id": "401861414",
       "date": "2026-07-04T12:00Z",
       "sport": "football",
@@ -494,6 +493,42 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.8%"
+    },
+    {
+      "event_id": "401861415",
+      "date": "2026-07-05T11:00Z",
+      "sport": "football",
+      "league_code": "chn.1",
+      "league_name": "Chinese Super League",
+      "home": "Qingdao Hainiu",
+      "away": "Chengdu Rongcheng",
+      "match": "Qingdao Hainiu - Chengdu Rongcheng",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.3%"
+    },
+    {
+      "event_id": "401861416",
+      "date": "2026-07-05T11:35Z",
+      "sport": "football",
+      "league_code": "chn.1",
+      "league_name": "Chinese Super League",
+      "home": "Shanghai Shenhua",
+      "away": "Zhejiang Professional FC",
+      "match": "Shanghai Shenhua - Zhejiang Professional FC",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 19.0%"
     },
     {
       "event_id": "401842739",
