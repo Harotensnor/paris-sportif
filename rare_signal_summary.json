@@ -1,45 +1,27 @@
 {
-  "generated_at": "2026-06-28T00:18:06Z",
+  "generated_at": "2026-06-28T03:37:33Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 31,
-    "actionable": 22,
+    "active_events": 28,
+    "actionable": 19,
     "watch": 1,
     "risk": 8,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 19,
-      "travel_extreme": 5,
-      "back_to_back_travel": 8,
-      "market_uncertain": 8
+      "market_uncertain": 8,
+      "injury_imbalance": 17,
+      "travel_extreme": 4,
+      "back_to_back_travel": 7
     },
     "by_quality": {
-      "actionable": 22,
       "risk": 8,
-      "watch": 1
+      "watch": 1,
+      "actionable": 19
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401815934",
-      "date": "2026-06-28T01:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Francisco Giants",
-      "away": "Atlanta Braves",
-      "match": "San Francisco Giants - Atlanta Braves",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Atlanta Braves",
-      "side": "away",
-      "strength": 1.0,
-      "context": "1 match dans les 48h + 3422 km de voyage"
-    },
     {
       "event_id": "401815942",
       "date": "2026-06-28T17:37Z",
@@ -237,42 +219,6 @@
       "side": "away",
       "strength": 0.966,
       "context": "2 match dans les 48h + 1780 km de voyage"
-    },
-    {
-      "event_id": "401815935",
-      "date": "2026-06-28T00:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Diego Padres",
-      "away": "Los Angeles Dodgers",
-      "match": "San Diego Padres - Los Angeles Dodgers",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Los Angeles Dodgers",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 11-15"
-    },
-    {
-      "event_id": "401815933",
-      "date": "2026-06-28T01:38Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Los Angeles Angels",
-      "away": "Athletics",
-      "match": "Los Angeles Angels - Athletics",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Los Angeles Angels",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 12-8"
     },
     {
       "event_id": "401815943",

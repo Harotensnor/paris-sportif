@@ -1,254 +1,8 @@
 {
-  "generated_at": "2026-06-28T00:18:05Z",
+  "generated_at": "2026-06-28T03:37:32Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815935",
-      "kickoff": "2026-06-28T00:40Z",
-      "league": "MLB",
-      "match": "Los Angeles Dodgers at San Diego Padres",
-      "home": "San Diego Padres",
-      "away": "Los Angeles Dodgers",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "San Diego Padres",
-          "pitcher": "Michael King",
-          "label": "Michael King plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.5861,
-          "fair_odds": 1.71,
-          "expected_strikeouts": 4.87,
-          "projected_ip": 5.75,
-          "inputs": {
-            "k9": 7.63,
-            "era": 3.33,
-            "whip": 1.16,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "San Diego Padres",
-          "pitcher": "Michael King",
-          "label": "Michael King ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5347,
-          "fair_odds": 1.87,
-          "expected_hr_allowed": 0.626,
-          "projected_ip": 5.75,
-          "inputs": {
-            "hr9": 0.98,
-            "era": 3.33,
-            "whip": 1.16
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Los Angeles Dodgers",
-          "pitcher": "Emmet Sheehan",
-          "label": "Emmet Sheehan moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.5238,
-          "fair_odds": 1.91,
-          "expected_strikeouts": 5.39,
-          "projected_ip": 4.8,
-          "inputs": {
-            "k9": 10.11,
-            "era": 5.32,
-            "whip": 1.3,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Los Angeles Dodgers",
-          "pitcher": "Emmet Sheehan",
-          "label": "Emmet Sheehan concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6292,
-          "fair_odds": 1.59,
-          "expected_hr_allowed": 0.992,
-          "projected_ip": 4.8,
-          "inputs": {
-            "hr9": 1.86,
-            "era": 5.32,
-            "whip": 1.3
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401815934",
-      "kickoff": "2026-06-28T01:05Z",
-      "league": "MLB",
-      "match": "Atlanta Braves at San Francisco Giants",
-      "home": "San Francisco Giants",
-      "away": "Atlanta Braves",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "San Francisco Giants",
-          "pitcher": "Robbie Ray",
-          "label": "Robbie Ray moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.5437,
-          "fair_odds": 1.84,
-          "expected_strikeouts": 5.3,
-          "projected_ip": 5.81,
-          "inputs": {
-            "k9": 8.21,
-            "era": 3.7,
-            "whip": 1.28,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "San Francisco Giants",
-          "pitcher": "Robbie Ray",
-          "label": "Robbie Ray concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6055,
-          "fair_odds": 1.65,
-          "expected_hr_allowed": 0.93,
-          "projected_ip": 5.81,
-          "inputs": {
-            "hr9": 1.44,
-            "era": 3.7,
-            "whip": 1.28
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Atlanta Braves",
-          "pitcher": "Chris Sale",
-          "label": "Chris Sale moins de 7,5 strikeouts",
-          "line": 7.5,
-          "pick": "under",
-          "probability": 0.5815,
-          "fair_odds": 1.72,
-          "expected_strikeouts": 7.07,
-          "projected_ip": 6.0,
-          "inputs": {
-            "k9": 10.61,
-            "era": 2.14,
-            "whip": 1.05,
-            "hand": "L"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Atlanta Braves",
-          "pitcher": "Chris Sale",
-          "label": "Chris Sale ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6527,
-          "fair_odds": 1.53,
-          "expected_hr_allowed": 0.427,
-          "projected_ip": 6.0,
-          "inputs": {
-            "hr9": 0.64,
-            "era": 2.14,
-            "whip": 1.05
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401815933",
-      "kickoff": "2026-06-28T01:38Z",
-      "league": "MLB",
-      "match": "Athletics Athletics at Los Angeles Angels",
-      "home": "Los Angeles Angels",
-      "away": "Athletics",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Los Angeles Angels",
-          "pitcher": "Sam Aldegheri",
-          "label": "Sam Aldegheri plus de 3,5 strikeouts",
-          "line": 3.5,
-          "pick": "over",
-          "probability": 0.6085,
-          "fair_odds": 1.64,
-          "expected_strikeouts": 3.93,
-          "projected_ip": 6.05,
-          "inputs": {
-            "k9": 5.84,
-            "era": 5.47,
-            "whip": 1.5,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Los Angeles Angels",
-          "pitcher": "Sam Aldegheri",
-          "label": "Sam Aldegheri concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6252,
-          "fair_odds": 1.6,
-          "expected_hr_allowed": 0.981,
-          "projected_ip": 6.05,
-          "inputs": {
-            "hr9": 1.46,
-            "era": 5.47,
-            "whip": 1.5
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Athletics",
-          "pitcher": "Aaron Civale",
-          "label": "Aaron Civale plus de 3,5 strikeouts",
-          "line": 3.5,
-          "pick": "over",
-          "probability": 0.5038,
-          "fair_odds": 1.98,
-          "expected_strikeouts": 3.51,
-          "projected_ip": 4.78,
-          "inputs": {
-            "k9": 6.61,
-            "era": 4.88,
-            "whip": 1.58,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Athletics",
-          "pitcher": "Aaron Civale",
-          "label": "Aaron Civale concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.63,
-          "fair_odds": 1.59,
-          "expected_hr_allowed": 0.994,
-          "projected_ip": 4.78,
-          "inputs": {
-            "hr9": 1.87,
-            "era": 4.88,
-            "whip": 1.58
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815937",
       "kickoff": "2026-06-28T17:35Z",
@@ -784,6 +538,42 @@
             "whip": 0.89
           },
           "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Chicago Cubs",
+          "pitcher": "Ryan Rolison",
+          "label": "Ryan Rolison moins de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "under",
+          "probability": 0.5094,
+          "fair_odds": 1.96,
+          "expected_strikeouts": 6.45,
+          "projected_ip": 6.6,
+          "inputs": {
+            "k9": 8.8,
+            "era": 1.82,
+            "whip": 1.11,
+            "hand": "L"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Chicago Cubs",
+          "pitcher": "Ryan Rolison",
+          "label": "Ryan Rolison ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5131,
+          "fair_odds": 1.95,
+          "expected_hr_allowed": 0.667,
+          "projected_ip": 6.6,
+          "inputs": {
+            "hr9": 0.91,
+            "era": 1.82,
+            "whip": 1.11
+          },
+          "side": "away"
         }
       ]
     },
@@ -994,6 +784,42 @@
             "whip": 1.51
           },
           "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Miami Marlins",
+          "pitcher": "Tyler Phillips",
+          "label": "Tyler Phillips plus de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "over",
+          "probability": 0.5096,
+          "fair_odds": 1.96,
+          "expected_strikeouts": 5.54,
+          "projected_ip": 6.6,
+          "inputs": {
+            "k9": 7.56,
+            "era": 3.09,
+            "whip": 1.37,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Miami Marlins",
+          "pitcher": "Tyler Phillips",
+          "label": "Tyler Phillips ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5056,
+          "fair_odds": 1.98,
+          "expected_hr_allowed": 0.682,
+          "projected_ip": 6.6,
+          "inputs": {
+            "hr9": 0.93,
+            "era": 3.09,
+            "whip": 1.37
+          },
+          "side": "away"
         }
       ]
     },
@@ -1326,7 +1152,7 @@
       ]
     }
   ],
-  "props": 64,
+  "props": 56,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
