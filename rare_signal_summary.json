@@ -1,23 +1,22 @@
 {
-  "generated_at": "2026-06-28T14:45:54Z",
+  "generated_at": "2026-06-28T16:01:03Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 32,
+    "active_events": 31,
     "actionable": 20,
-    "watch": 1,
+    "watch": 0,
     "risk": 11,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 18,
+      "injury_imbalance": 17,
       "travel_extreme": 4,
       "back_to_back_travel": 7,
       "market_uncertain": 11
     },
     "by_quality": {
       "actionable": 20,
-      "watch": 1,
       "risk": 11
     }
   },
@@ -383,26 +382,7 @@
       "context": "Absences severes 15-11"
     }
   ],
-  "active_watch": [
-    {
-      "event_id": "401815943",
-      "date": "2026-06-28T17:35Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Baltimore Orioles",
-      "away": "Washington Nationals",
-      "match": "Baltimore Orioles - Washington Nationals",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Baltimore Orioles",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 9-6"
-    }
-  ],
+  "active_watch": [],
   "active_risk": [
     {
       "event_id": "401861547",
@@ -438,7 +418,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.3%"
+      "context": "marge bookmaker anormale 18.8%"
     },
     {
       "event_id": "401861412",
@@ -546,7 +526,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.2%"
+      "context": "marge bookmaker anormale 19.1%"
     },
     {
       "event_id": "401842739",
