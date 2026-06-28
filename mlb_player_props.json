@@ -1,336 +1,8 @@
 {
-  "generated_at": "2026-06-27T23:19:16Z",
+  "generated_at": "2026-06-28T00:18:05Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815926",
-      "kickoff": "2026-06-27T23:10Z",
-      "league": "MLB",
-      "match": "Seattle Mariners at Cleveland Guardians",
-      "home": "Cleveland Guardians",
-      "away": "Seattle Mariners",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Cleveland Guardians",
-          "pitcher": "Slade Cecconi",
-          "label": "Slade Cecconi plus de 3,5 strikeouts",
-          "line": 3.5,
-          "pick": "over",
-          "probability": 0.5956,
-          "fair_odds": 1.68,
-          "expected_strikeouts": 3.87,
-          "projected_ip": 5.01,
-          "inputs": {
-            "k9": 6.96,
-            "era": 4.43,
-            "whip": 1.39,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Cleveland Guardians",
-          "pitcher": "Slade Cecconi",
-          "label": "Slade Cecconi concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5066,
-          "fair_odds": 1.97,
-          "expected_hr_allowed": 0.706,
-          "projected_ip": 5.01,
-          "inputs": {
-            "hr9": 1.27,
-            "era": 4.43,
-            "whip": 1.39
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Seattle Mariners",
-          "pitcher": "Logan Gilbert",
-          "label": "Logan Gilbert moins de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "under",
-          "probability": 0.5507,
-          "fair_odds": 1.82,
-          "expected_strikeouts": 6.25,
-          "projected_ip": 5.81,
-          "inputs": {
-            "k9": 9.68,
-            "era": 3.29,
-            "whip": 1.01,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Seattle Mariners",
-          "pitcher": "Logan Gilbert",
-          "label": "Logan Gilbert concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5818,
-          "fair_odds": 1.72,
-          "expected_hr_allowed": 0.872,
-          "projected_ip": 5.81,
-          "inputs": {
-            "hr9": 1.35,
-            "era": 3.29,
-            "whip": 1.01
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401815929",
-      "kickoff": "2026-06-27T23:10Z",
-      "league": "MLB",
-      "match": "Chicago Cubs at Milwaukee Brewers",
-      "home": "Milwaukee Brewers",
-      "away": "Chicago Cubs",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Milwaukee Brewers",
-          "pitcher": "Kyle Harrison",
-          "label": "Kyle Harrison plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.577,
-          "fair_odds": 1.73,
-          "expected_strikeouts": 5.87,
-          "projected_ip": 4.87,
-          "inputs": {
-            "k9": 10.85,
-            "era": 2.47,
-            "whip": 1.04,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Milwaukee Brewers",
-          "pitcher": "Kyle Harrison",
-          "label": "Kyle Harrison ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5855,
-          "fair_odds": 1.71,
-          "expected_hr_allowed": 0.535,
-          "projected_ip": 4.87,
-          "inputs": {
-            "hr9": 0.99,
-            "era": 2.47,
-            "whip": 1.04
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Chicago Cubs",
-          "pitcher": "David Peterson",
-          "label": "David Peterson moins de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "under",
-          "probability": 0.5789,
-          "fair_odds": 1.73,
-          "expected_strikeouts": 6.12,
-          "projected_ip": 6.6,
-          "inputs": {
-            "k9": 8.34,
-            "era": 6.09,
-            "whip": 1.65,
-            "hand": "L"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Chicago Cubs",
-          "pitcher": "David Peterson",
-          "label": "David Peterson ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5603,
-          "fair_odds": 1.78,
-          "expected_hr_allowed": 0.579,
-          "projected_ip": 6.6,
-          "inputs": {
-            "hr9": 0.79,
-            "era": 6.09,
-            "whip": 1.65
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401815930",
-      "kickoff": "2026-06-27T23:10Z",
-      "league": "MLB",
-      "match": "Colorado Rockies at Minnesota Twins",
-      "home": "Minnesota Twins",
-      "away": "Colorado Rockies",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Minnesota Twins",
-          "pitcher": "Mike Paredes",
-          "label": "Mike Paredes plus de 2,5 strikeouts",
-          "line": 2.5,
-          "pick": "over",
-          "probability": 0.5584,
-          "fair_odds": 1.79,
-          "expected_strikeouts": 2.69,
-          "projected_ip": 5.05,
-          "inputs": {
-            "k9": 4.79,
-            "era": 4.35,
-            "whip": 1.21,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Minnesota Twins",
-          "pitcher": "Mike Paredes",
-          "label": "Mike Paredes concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5205,
-          "fair_odds": 1.92,
-          "expected_hr_allowed": 0.735,
-          "projected_ip": 5.05,
-          "inputs": {
-            "hr9": 1.31,
-            "era": 4.35,
-            "whip": 1.21
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Colorado Rockies",
-          "pitcher": "Michael Lorenzen",
-          "label": "Michael Lorenzen moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.6092,
-          "fair_odds": 1.64,
-          "expected_strikeouts": 4.06,
-          "projected_ip": 4.75,
-          "inputs": {
-            "k9": 7.7,
-            "era": 7.11,
-            "whip": 1.83,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Colorado Rockies",
-          "pitcher": "Michael Lorenzen",
-          "label": "Michael Lorenzen concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5564,
-          "fair_odds": 1.8,
-          "expected_hr_allowed": 0.813,
-          "projected_ip": 4.75,
-          "inputs": {
-            "hr9": 1.54,
-            "era": 7.11,
-            "whip": 1.83
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401815932",
-      "kickoff": "2026-06-27T23:15Z",
-      "league": "MLB",
-      "match": "Miami Marlins at St. Louis Cardinals",
-      "home": "St. Louis Cardinals",
-      "away": "Miami Marlins",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "St. Louis Cardinals",
-          "pitcher": "Andre Pallante",
-          "label": "Andre Pallante moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.6093,
-          "fair_odds": 1.64,
-          "expected_strikeouts": 4.06,
-          "projected_ip": 5.19,
-          "inputs": {
-            "k9": 7.05,
-            "era": 3.58,
-            "whip": 1.18,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "St. Louis Cardinals",
-          "pitcher": "Andre Pallante",
-          "label": "Andre Pallante ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5684,
-          "fair_odds": 1.76,
-          "expected_hr_allowed": 0.565,
-          "projected_ip": 5.19,
-          "inputs": {
-            "hr9": 0.98,
-            "era": 3.58,
-            "whip": 1.18
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Miami Marlins",
-          "pitcher": "Ryan Gusto",
-          "label": "Ryan Gusto moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.6257,
-          "fair_odds": 1.6,
-          "expected_strikeouts": 4.0,
-          "projected_ip": 4.5,
-          "inputs": {
-            "k9": 8.0,
-            "era": 6.0,
-            "whip": 1.61,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Miami Marlins",
-          "pitcher": "Ryan Gusto",
-          "label": "Ryan Gusto ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6065,
-          "fair_odds": 1.65,
-          "expected_hr_allowed": 0.5,
-          "projected_ip": 4.5,
-          "inputs": {
-            "hr9": 1.0,
-            "era": 6.0,
-            "whip": 1.61
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815935",
       "kickoff": "2026-06-28T00:40Z",
@@ -503,6 +175,42 @@
       "home": "Los Angeles Angels",
       "away": "Athletics",
       "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Los Angeles Angels",
+          "pitcher": "Sam Aldegheri",
+          "label": "Sam Aldegheri plus de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "over",
+          "probability": 0.6085,
+          "fair_odds": 1.64,
+          "expected_strikeouts": 3.93,
+          "projected_ip": 6.05,
+          "inputs": {
+            "k9": 5.84,
+            "era": 5.47,
+            "whip": 1.5,
+            "hand": "L"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Los Angeles Angels",
+          "pitcher": "Sam Aldegheri",
+          "label": "Sam Aldegheri concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.6252,
+          "fair_odds": 1.6,
+          "expected_hr_allowed": 0.981,
+          "projected_ip": 6.05,
+          "inputs": {
+            "hr9": 1.46,
+            "era": 5.47,
+            "whip": 1.5
+          },
+          "side": "home"
+        },
         {
           "market": "pitcher_strikeouts",
           "team": "Athletics",
@@ -952,52 +660,6 @@
       ]
     },
     {
-      "event_id": "401815940",
-      "kickoff": "2026-06-28T17:40Z",
-      "league": "MLB",
-      "match": "Philadelphia Phillies at New York Mets",
-      "home": "New York Mets",
-      "away": "Philadelphia Phillies",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Philadelphia Phillies",
-          "pitcher": "Jesús Luzardo",
-          "label": "Jesús Luzardo plus de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "over",
-          "probability": 0.5693,
-          "fair_odds": 1.76,
-          "expected_strikeouts": 6.86,
-          "projected_ip": 5.76,
-          "inputs": {
-            "k9": 10.72,
-            "era": 4.0,
-            "whip": 1.3,
-            "hand": "L"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Philadelphia Phillies",
-          "pitcher": "Jesús Luzardo",
-          "label": "Jesús Luzardo ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5696,
-          "fair_odds": 1.76,
-          "expected_hr_allowed": 0.563,
-          "projected_ip": 5.76,
-          "inputs": {
-            "hr9": 0.88,
-            "era": 4.0,
-            "whip": 1.3
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
       "event_id": "401815941",
       "kickoff": "2026-06-28T17:40Z",
       "league": "MLB",
@@ -1345,6 +1007,42 @@
       "props": [
         {
           "market": "pitcher_strikeouts",
+          "team": "Los Angeles Angels",
+          "pitcher": "Sam Aldegheri",
+          "label": "Sam Aldegheri plus de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "over",
+          "probability": 0.6085,
+          "fair_odds": 1.64,
+          "expected_strikeouts": 3.93,
+          "projected_ip": 6.05,
+          "inputs": {
+            "k9": 5.84,
+            "era": 5.47,
+            "whip": 1.5,
+            "hand": "L"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Los Angeles Angels",
+          "pitcher": "Sam Aldegheri",
+          "label": "Sam Aldegheri concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.6252,
+          "fair_odds": 1.6,
+          "expected_hr_allowed": 0.981,
+          "projected_ip": 6.05,
+          "inputs": {
+            "hr9": 1.46,
+            "era": 5.47,
+            "whip": 1.5
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
           "team": "Athletics",
           "pitcher": "Aaron Civale",
           "label": "Aaron Civale plus de 3,5 strikeouts",
@@ -1628,7 +1326,7 @@
       ]
     }
   ],
-  "props": 78,
+  "props": 64,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
