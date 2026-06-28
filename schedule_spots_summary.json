@@ -1,23 +1,23 @@
 {
-  "generated_at": "2026-06-28T18:08:16Z",
+  "generated_at": "2026-06-28T19:44:32Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 12,
+    "active_events": 9,
     "expired_sample": 0,
     "by_type": {
-      "back_to_back_travel": 3,
-      "lookahead": 13,
       "travel_extreme": 1,
+      "back_to_back_travel": 1,
+      "lookahead": 12,
       "schedule_congestion": 14
     },
     "by_decision": {
       "abstain": 1,
       "lean_away": 4,
-      "lean_home": 7
+      "lean_home": 4
     },
-    "lean_home": 7,
+    "lean_home": 4,
     "lean_away": 4,
     "abstain": 1,
     "monitor": 0
@@ -555,159 +555,6 @@
             "type": "schedule_congestion",
             "direction": "fade",
             "strength": 0.6
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.8
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815947",
-      "source_event_ids": [
-        "401815947"
-      ],
-      "kickoff": "2026-06-28T18:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "St. Louis Cardinals",
-      "away": "Miami Marlins",
-      "match": "St. Louis Cardinals - Miami Marlins",
-      "decision": "lean_home",
-      "net_team": "St. Louis Cardinals",
-      "reason": "Miami Marlins plus penalise par calendrier/voyage (0.95 vs 0.00)",
-      "pressure_score": 0.951,
-      "home_fade": 0.0,
-      "away_fade": 0.951,
-      "travel_score": 0.951,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "2 match dans les 48h + 1706 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.683,
-        "away_score": -1.951,
-        "home_fade": 0.0,
-        "away_fade": 1.951,
-        "reason": "Direction nette: St. Louis Cardinals (+0.68)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.951
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815945",
-      "source_event_ids": [
-        "401815945"
-      ],
-      "kickoff": "2026-06-28T18:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Minnesota Twins",
-      "away": "Colorado Rockies",
-      "match": "Minnesota Twins - Colorado Rockies",
-      "decision": "lean_home",
-      "net_team": "Minnesota Twins",
-      "reason": "Colorado Rockies plus penalise par calendrier/voyage (0.83 vs 0.00)",
-      "pressure_score": 0.835,
-      "home_fade": 0.0,
-      "away_fade": 0.835,
-      "travel_score": 0.835,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "2 match dans les 48h + 1123 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.572,
-        "away_score": -1.635,
-        "home_fade": 0.0,
-        "away_fade": 1.635,
-        "reason": "Direction nette: Minnesota Twins (+0.57)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.8
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.835
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815948",
-      "source_event_ids": [
-        "401815948"
-      ],
-      "kickoff": "2026-06-28T19:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Los Angeles Angels",
-      "away": "Athletics",
-      "match": "Los Angeles Angels - Athletics",
-      "decision": "lean_home",
-      "net_team": "Los Angeles Angels",
-      "reason": "Athletics plus penalise par calendrier/voyage (0.30 vs 0.00)",
-      "pressure_score": 0.667,
-      "home_fade": 0.0,
-      "away_fade": 0.3,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 1
-      },
-      "contexts": [
-        "2 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.695,
-        "away_score": -0.02,
-        "home_fade": 0.8,
-        "away_fade": 0.3,
-        "reason": "Direction nette: Athletics (-0.02)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
           },
           {
             "side": "home",
