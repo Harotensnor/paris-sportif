@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-06-28T12:59:19Z",
+  "generated_at": "2026-06-28T14:45:54Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 31,
+    "active_events": 32,
     "actionable": 20,
     "watch": 1,
-    "risk": 10,
+    "risk": 11,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 18,
       "travel_extreme": 4,
       "back_to_back_travel": 7,
-      "market_uncertain": 10
+      "market_uncertain": 11
     },
     "by_quality": {
-      "watch": 1,
       "actionable": 20,
-      "risk": 10
+      "watch": 1,
+      "risk": 11
     }
   },
   "active_actionable": [
@@ -239,22 +239,22 @@
       "context": "2 match dans les 48h + 1780 km de voyage"
     },
     {
-      "event_id": "401815943",
+      "event_id": "401815937",
       "date": "2026-06-28T17:35Z",
       "sport": "baseball",
       "league_code": "mlb",
       "league_name": "MLB",
-      "home": "Baltimore Orioles",
-      "away": "Washington Nationals",
-      "match": "Baltimore Orioles - Washington Nationals",
+      "home": "Pittsburgh Pirates",
+      "away": "Cincinnati Reds",
+      "match": "Pittsburgh Pirates - Cincinnati Reds",
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
       "type": "injury_imbalance",
       "direction": "fade",
-      "team": "Baltimore Orioles",
+      "team": "Cincinnati Reds",
       "side": null,
       "strength": 0.8,
-      "context": "Absences severes 10-6"
+      "context": "Absences severes 4-8"
     },
     {
       "event_id": "401815944",
@@ -385,22 +385,22 @@
   ],
   "active_watch": [
     {
-      "event_id": "401815937",
+      "event_id": "401815943",
       "date": "2026-06-28T17:35Z",
       "sport": "baseball",
       "league_code": "mlb",
       "league_name": "MLB",
-      "home": "Pittsburgh Pirates",
-      "away": "Cincinnati Reds",
-      "match": "Pittsburgh Pirates - Cincinnati Reds",
+      "home": "Baltimore Orioles",
+      "away": "Washington Nationals",
+      "match": "Baltimore Orioles - Washington Nationals",
       "quality": "watch",
       "quality_reason": "Signal rare present mais intensite moyenne",
       "type": "injury_imbalance",
       "direction": "fade",
-      "team": "Cincinnati Reds",
+      "team": "Baltimore Orioles",
       "side": null,
       "strength": 0.6,
-      "context": "Absences severes 4-7"
+      "context": "Absences severes 9-6"
     }
   ],
   "active_risk": [
@@ -421,6 +421,24 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.8%"
+    },
+    {
+      "event_id": "401861411",
+      "date": "2026-07-04T11:00Z",
+      "sport": "football",
+      "league_code": "chn.1",
+      "league_name": "Chinese Super League",
+      "home": "Qingdao West Coast",
+      "away": "Shanghai Port",
+      "match": "Qingdao West Coast - Shanghai Port",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.3%"
     },
     {
       "event_id": "401861412",
@@ -528,7 +546,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 19.0%"
+      "context": "marge bookmaker anormale 18.2%"
     },
     {
       "event_id": "401842739",
