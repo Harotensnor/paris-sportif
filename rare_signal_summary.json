@@ -1,22 +1,23 @@
 {
-  "generated_at": "2026-06-28T10:19:08Z",
+  "generated_at": "2026-06-28T11:33:05Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 28,
+    "active_events": 29,
     "actionable": 20,
-    "watch": 1,
+    "watch": 2,
     "risk": 7,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 18,
       "travel_extreme": 4,
       "back_to_back_travel": 7,
+      "market_move": 1,
       "market_uncertain": 7
     },
     "by_quality": {
-      "watch": 1,
+      "watch": 2,
       "actionable": 20,
       "risk": 7
     }
@@ -401,6 +402,24 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 4-7"
+    },
+    {
+      "event_id": "401857032",
+      "date": "2026-06-28T20:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Chicago Sky",
+      "away": "Las Vegas Aces",
+      "match": "Chicago Sky - Las Vegas Aces",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 0.556,
+      "context": "Cote home: 3.50 -> 3.15 (+10.0%)"
     }
   ],
   "active_risk": [
