@@ -1,21 +1,23 @@
 {
-  "generated_at": "2026-06-28T21:47:33Z",
+  "generated_at": "2026-06-28T22:45:22Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 19,
+    "active_events": 17,
     "actionable": 8,
     "watch": 0,
-    "risk": 11,
+    "risk": 9,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 8,
-      "market_uncertain": 11
+      "market_move": 3,
+      "signal_conflict": 3,
+      "market_uncertain": 9
     },
     "by_quality": {
       "actionable": 8,
-      "risk": 11
+      "risk": 9
     }
   },
   "active_actionable": [
@@ -167,24 +169,6 @@
   "active_watch": [],
   "active_risk": [
     {
-      "event_id": "401861547",
-      "date": "2026-07-04T11:00Z",
-      "sport": "football",
-      "league_code": "chn.1",
-      "league_name": "Chinese Super League",
-      "home": "Liaoning Tieren",
-      "away": "Chongqing Tonglianglong",
-      "match": "Liaoning Tieren - Chongqing Tonglianglong",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.8%"
-    },
-    {
       "event_id": "401861411",
       "date": "2026-07-04T11:00Z",
       "sport": "football",
@@ -237,24 +221,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.7%"
-    },
-    {
-      "event_id": "401861414",
-      "date": "2026-07-04T12:00Z",
-      "sport": "football",
-      "league_code": "chn.1",
-      "league_name": "Chinese Super League",
-      "home": "Tianjin Jinmen Tiger",
-      "away": "Shenzhen Xinpengcheng",
-      "match": "Tianjin Jinmen Tiger - Shenzhen Xinpengcheng",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.3%"
     },
     {
       "event_id": "401842743",
