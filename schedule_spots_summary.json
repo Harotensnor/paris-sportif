@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-29T18:56:36Z",
+  "generated_at": "2026-06-29T20:46:52Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -214,13 +214,13 @@
         "2 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "home",
+        "status": "mixed",
+        "net_side": null,
         "home_score": 0.155,
-        "away_score": -1.195,
+        "away_score": -0.712,
         "home_fade": 0.3,
         "away_fade": 1.3,
-        "reason": "Direction nette: Cleveland Guardians (+0.15)",
+        "reason": "Signaux mitigés: avantage net trop faible (Cleveland Guardians +0.15, Texas Rangers -0.71)",
         "detail": [
           {
             "side": "home",
@@ -239,6 +239,12 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.483
           }
         ]
       }
@@ -442,11 +448,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.795,
-        "away_score": 0.015,
-        "home_fade": 0.9,
+        "home_score": -0.595,
+        "away_score": -0.055,
+        "home_fade": 0.7,
         "away_fade": 0.3,
-        "reason": "Direction nette: Minnesota Twins (+0.01)",
+        "reason": "Direction nette: Minnesota Twins (-0.06)",
         "detail": [
           {
             "side": "home",
@@ -464,7 +470,7 @@
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.6
+            "strength": 0.4
           }
         ]
       }
@@ -1300,11 +1306,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.079,
-        "away_score": -1.605,
-        "home_fade": 0.55,
+        "home_score": -0.321,
+        "away_score": -1.465,
+        "home_fade": 0.95,
         "away_fade": 1.798,
-        "reason": "Direction nette: Chicago Cubs (+0.08)",
+        "reason": "Direction nette: Chicago Cubs (-0.32)",
         "detail": [
           {
             "side": "home",
@@ -1322,7 +1328,7 @@
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.4
+            "strength": 0.8
           },
           {
             "side": "away",
@@ -1446,7 +1452,7 @@
       "global_resolution": {
         "status": "abstain",
         "net_side": null,
-        "home_score": -0.608,
+        "home_score": -0.16,
         "away_score": -0.669,
         "home_fade": 0.96,
         "away_fade": 1.005,
@@ -1469,6 +1475,12 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.6
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.448
           },
           {
             "side": "away",
@@ -1652,11 +1664,11 @@
       "global_resolution": {
         "status": "abstain",
         "net_side": null,
-        "home_score": -0.368,
-        "away_score": -0.703,
-        "home_fade": 0.7,
+        "home_score": -0.768,
+        "away_score": -0.563,
+        "home_fade": 1.1,
         "away_fade": 0.948,
-        "reason": "Signaux opposes: Chicago Cubs fade 0.70, San Diego Padres fade 0.95 -> prudence",
+        "reason": "Signaux opposes: Chicago Cubs fade 1.10, San Diego Padres fade 0.95 -> prudence",
         "detail": [
           {
             "side": "home",
@@ -1674,7 +1686,7 @@
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.4
+            "strength": 0.8
           },
           {
             "side": "away",
@@ -1717,17 +1729,17 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.177,
-        "away_score": -1.508,
-        "home_fade": 0.4,
+        "home_score": -0.223,
+        "away_score": -1.368,
+        "home_fade": 0.8,
         "away_fade": 1.648,
-        "reason": "Direction nette: Chicago Cubs (+0.18)",
+        "reason": "Direction nette: Chicago Cubs (-0.22)",
         "detail": [
           {
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.4
+            "strength": 0.8
           },
           {
             "side": "away",
@@ -1834,13 +1846,13 @@
         "1 match dans les 48h + 1703 km de voyage"
       ],
       "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.393,
-        "away_score": -0.758,
-        "home_fade": 0.75,
+        "status": "net",
+        "net_side": "home",
+        "home_score": -0.193,
+        "away_score": -0.828,
+        "home_fade": 0.55,
         "away_fade": 1.021,
-        "reason": "Signaux opposes: Houston Astros fade 0.75, Minnesota Twins fade 1.02 -> prudence",
+        "reason": "Direction nette: Houston Astros (-0.19)",
         "detail": [
           {
             "side": "home",
@@ -1858,7 +1870,7 @@
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.6
+            "strength": 0.4
           },
           {
             "side": "away",
@@ -2091,17 +2103,17 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": -0.267,
-        "away_score": -0.741,
-        "home_fade": 0.6,
+        "home_score": -0.067,
+        "away_score": -0.811,
+        "home_fade": 0.4,
         "away_fade": 0.951,
-        "reason": "Direction nette: Houston Astros (-0.27)",
+        "reason": "Direction nette: Houston Astros (-0.07)",
         "detail": [
           {
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.6
+            "strength": 0.4
           },
           {
             "side": "away",
