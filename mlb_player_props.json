@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-29T20:46:52Z",
+  "generated_at": "2026-06-29T22:03:44Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -749,42 +749,6 @@
       "home": "Colorado Rockies",
       "away": "Miami Marlins",
       "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Colorado Rockies",
-          "pitcher": "Kyle Freeland",
-          "label": "Kyle Freeland moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.5343,
-          "fair_odds": 1.87,
-          "expected_strikeouts": 4.36,
-          "projected_ip": 5.14,
-          "inputs": {
-            "k9": 7.63,
-            "era": 7.5,
-            "whip": 1.61,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Colorado Rockies",
-          "pitcher": "Kyle Freeland",
-          "label": "Kyle Freeland concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6811,
-          "fair_odds": 1.47,
-          "expected_hr_allowed": 1.143,
-          "projected_ip": 5.14,
-          "inputs": {
-            "hr9": 2.0,
-            "era": 7.5,
-            "whip": 1.61
-          },
-          "side": "home"
-        },
         {
           "market": "pitcher_strikeouts",
           "team": "Miami Marlins",
@@ -1782,36 +1746,36 @@
         {
           "market": "pitcher_strikeouts",
           "team": "Colorado Rockies",
-          "pitcher": "Tomoyuki Sugano",
-          "label": "Tomoyuki Sugano plus de 2,5 strikeouts",
-          "line": 2.5,
-          "pick": "over",
-          "probability": 0.6419,
-          "fair_odds": 1.56,
-          "expected_strikeouts": 2.99,
-          "projected_ip": 5.26,
+          "pitcher": "Kyle Freeland",
+          "label": "Kyle Freeland moins de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "under",
+          "probability": 0.5343,
+          "fair_odds": 1.87,
+          "expected_strikeouts": 4.36,
+          "projected_ip": 5.14,
           "inputs": {
-            "k9": 5.12,
-            "era": 4.8,
-            "whip": 1.32,
-            "hand": "R"
+            "k9": 7.63,
+            "era": 7.5,
+            "whip": 1.61,
+            "hand": "L"
           },
           "side": "home"
         },
         {
           "market": "pitcher_home_run_allowed",
           "team": "Colorado Rockies",
-          "pitcher": "Tomoyuki Sugano",
-          "label": "Tomoyuki Sugano concède au moins 1 home run",
+          "pitcher": "Kyle Freeland",
+          "label": "Kyle Freeland concède au moins 1 home run",
           "pick": "yes",
-          "probability": 0.6316,
-          "fair_odds": 1.58,
-          "expected_hr_allowed": 0.999,
-          "projected_ip": 5.26,
+          "probability": 0.6811,
+          "fair_odds": 1.47,
+          "expected_hr_allowed": 1.143,
+          "projected_ip": 5.14,
           "inputs": {
-            "hr9": 1.71,
-            "era": 4.8,
-            "whip": 1.32
+            "hr9": 2.0,
+            "era": 7.5,
+            "whip": 1.61
           },
           "side": "home"
         },
@@ -2510,7 +2474,7 @@
       ]
     }
   ],
-  "props": 122,
+  "props": 120,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
