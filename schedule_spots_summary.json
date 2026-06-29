@@ -1,20 +1,22 @@
 {
-  "generated_at": "2026-06-28T23:48:57Z",
+  "generated_at": "2026-06-29T01:57:36Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 3,
+    "active_events": 4,
     "expired_sample": 0,
     "by_type": {
+      "back_to_back_travel": 1,
       "lookahead": 4,
       "schedule_congestion": 2
     },
     "by_decision": {
       "abstain": 1,
-      "lean_away": 2
+      "lean_away": 2,
+      "lean_home": 1
     },
-    "lean_home": 0,
+    "lean_home": 1,
     "lean_away": 2,
     "abstain": 1,
     "monitor": 0
@@ -49,13 +51,13 @@
         "2 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "mixed",
-        "net_side": null,
+        "status": "net",
+        "net_side": "home",
         "home_score": 0.155,
-        "away_score": -0.465,
+        "away_score": -1.195,
         "home_fade": 0.3,
         "away_fade": 1.3,
-        "reason": "Signaux mitigés: avantage net trop faible (Athletics +0.15, Los Angeles Dodgers -0.47)",
+        "reason": "Direction nette: Athletics (+0.15)",
         "detail": [
           {
             "side": "home",
@@ -74,12 +76,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.73
           }
         ]
       }
@@ -152,6 +148,63 @@
             "type": "market_move",
             "direction": "steam",
             "strength": 0.73
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401815961",
+      "source_event_ids": [
+        "401815961"
+      ],
+      "kickoff": "2026-06-30T01:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Seattle Mariners",
+      "away": "Los Angeles Angels",
+      "match": "Seattle Mariners - Los Angeles Angels",
+      "decision": "lean_home",
+      "net_team": "Seattle Mariners",
+      "reason": "Los Angeles Angels plus penalise par calendrier/voyage (0.85 vs 0.00)",
+      "pressure_score": 0.846,
+      "home_fade": 0.0,
+      "away_fade": 0.846,
+      "travel_score": 0.846,
+      "lookahead_score": 0,
+      "congestion_score": 0,
+      "types": {
+        "back_to_back_travel": 1
+      },
+      "contexts": [
+        "1 match dans les 48h + 1578 km de voyage"
+      ],
+      "global_resolution": {
+        "status": "mixed",
+        "net_side": null,
+        "home_score": 0.646,
+        "away_score": -1.215,
+        "home_fade": 0.0,
+        "away_fade": 1.846,
+        "reason": "Signaux mitigés: avantage net trop faible (Seattle Mariners +0.65, Los Angeles Angels -1.22)",
+        "detail": [
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.63
+          },
+          {
+            "side": "away",
+            "type": "back_to_back_travel",
+            "direction": "fade",
+            "strength": 0.846
           }
         ]
       }
