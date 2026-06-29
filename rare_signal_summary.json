@@ -1,27 +1,46 @@
 {
-  "generated_at": "2026-06-29T08:38:42Z",
+  "generated_at": "2026-06-29T12:52:57Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 32,
-    "actionable": 19,
+    "active_events": 42,
+    "actionable": 27,
     "watch": 1,
-    "risk": 12,
+    "risk": 14,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 18,
-      "back_to_back_travel": 7,
-      "signal_conflict": 5,
+      "injury_imbalance": 25,
+      "travel_extreme": 7,
+      "signal_conflict": 6,
+      "back_to_back_travel": 14,
       "market_uncertain": 10
     },
     "by_quality": {
-      "actionable": 19,
-      "watch": 1,
-      "risk": 12
+      "actionable": 27,
+      "risk": 14,
+      "watch": 1
     }
   },
   "active_actionable": [
+    {
+      "event_id": "401815955",
+      "date": "2026-06-29T23:00Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Cleveland Guardians",
+      "away": "Texas Rangers",
+      "match": "Cleveland Guardians - Texas Rangers",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Texas Rangers",
+      "side": null,
+      "strength": 1.0,
+      "context": "Absences severes 2-13"
+    },
     {
       "event_id": "401815952",
       "date": "2026-06-29T23:05Z",
@@ -95,6 +114,24 @@
       "context": "Absences severes 8-15"
     },
     {
+      "event_id": "401815969",
+      "date": "2026-06-30T22:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Cleveland Guardians",
+      "away": "Texas Rangers",
+      "match": "Cleveland Guardians - Texas Rangers",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Texas Rangers",
+      "side": null,
+      "strength": 1.0,
+      "context": "Absences severes 2-13"
+    },
+    {
       "event_id": "401815965",
       "date": "2026-06-30T23:05Z",
       "sport": "baseball",
@@ -129,6 +166,42 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 13-6"
+    },
+    {
+      "event_id": "401815973",
+      "date": "2026-07-01T00:05Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Chicago Cubs",
+      "away": "San Diego Padres",
+      "match": "Chicago Cubs - San Diego Padres",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "San Diego Padres",
+      "side": "away",
+      "strength": 1.0,
+      "context": "1 match dans les 48h + 2786 km de voyage"
+    },
+    {
+      "event_id": "401815975",
+      "date": "2026-07-01T00:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Colorado Rockies",
+      "away": "Miami Marlins",
+      "match": "Colorado Rockies - Miami Marlins",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Miami Marlins",
+      "side": "away",
+      "strength": 1.0,
+      "context": "1 match dans les 48h + 2774 km de voyage"
     },
     {
       "event_id": "401815976",
@@ -167,6 +240,24 @@
       "context": "Absences severes 8-15"
     },
     {
+      "event_id": "401815984",
+      "date": "2026-07-01T17:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Cleveland Guardians",
+      "away": "Texas Rangers",
+      "match": "Cleveland Guardians - Texas Rangers",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Texas Rangers",
+      "side": null,
+      "strength": 1.0,
+      "context": "Absences severes 2-13"
+    },
+    {
       "event_id": "401815980",
       "date": "2026-07-01T17:35Z",
       "sport": "baseball",
@@ -203,6 +294,42 @@
       "context": "Absences severes 13-6"
     },
     {
+      "event_id": "401815988",
+      "date": "2026-07-01T18:20Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Chicago Cubs",
+      "away": "San Diego Padres",
+      "match": "Chicago Cubs - San Diego Padres",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "San Diego Padres",
+      "side": "away",
+      "strength": 1.0,
+      "context": "2 match dans les 48h + 2786 km de voyage"
+    },
+    {
+      "event_id": "401815990",
+      "date": "2026-07-02T00:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Colorado Rockies",
+      "away": "Miami Marlins",
+      "match": "Colorado Rockies - Miami Marlins",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Miami Marlins",
+      "side": "away",
+      "strength": 1.0,
+      "context": "2 match dans les 48h + 2774 km de voyage"
+    },
+    {
       "event_id": "401815991",
       "date": "2026-07-02T01:40Z",
       "sport": "baseball",
@@ -219,6 +346,24 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 8-15"
+    },
+    {
+      "event_id": "401815999",
+      "date": "2026-07-02T19:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Colorado Rockies",
+      "away": "Miami Marlins",
+      "match": "Colorado Rockies - Miami Marlins",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Miami Marlins",
+      "side": "away",
+      "strength": 1.0,
+      "context": "2 match dans les 48h + 2774 km de voyage"
     },
     {
       "event_id": "401816000",
@@ -474,7 +619,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.3%"
+      "context": "marge bookmaker anormale 18.4%"
     },
     {
       "event_id": "401861416",
@@ -492,7 +637,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 19.1%"
+      "context": "marge bookmaker anormale 18.8%"
     },
     {
       "event_id": "401842739",
@@ -564,7 +709,43 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.3%"
+      "context": "marge bookmaker anormale 18.9%"
+    },
+    {
+      "event_id": "401815959",
+      "date": "2026-06-30T00:05Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Chicago Cubs",
+      "away": "San Diego Padres",
+      "match": "Chicago Cubs - San Diego Padres",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "signal_conflict",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.703,
+      "context": "Signaux opposes: Chicago Cubs fade 0.70, San Diego Padres fade 0.95 -> prudence"
+    },
+    {
+      "event_id": "401815960",
+      "date": "2026-06-30T00:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Colorado Rockies",
+      "away": "Miami Marlins",
+      "match": "Colorado Rockies - Miami Marlins",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "signal_conflict",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.669,
+      "context": "Signaux opposes: Colorado Rockies fade 0.96, Miami Marlins fade 1.01 -> prudence"
     },
     {
       "event_id": "401815994",

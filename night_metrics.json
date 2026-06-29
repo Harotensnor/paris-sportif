@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-06-29T08:38:42Z",
-  "calculated_at": "2026-06-29T08:38:42Z",
+  "generated_at": "2026-06-29T12:52:58Z",
+  "calculated_at": "2026-06-29T12:52:58Z",
   "source_of_truth": "data.js",
-  "data_generated_at": "2026-06-29T08:37:04.768392Z",
+  "data_generated_at": "2026-06-29T12:50:47.842524Z",
   "data_today_field": "2026-06-29",
   "events": {
-    "total": 207,
-    "upcoming": 191,
-    "winamax_available": 207,
-    "winamax_exact": 179,
-    "winamax_exact_ratio": 0.8647,
+    "total": 211,
+    "upcoming": 198,
+    "winamax_available": 211,
+    "winamax_exact": 180,
+    "winamax_exact_ratio": 0.8531,
     "markets_more_than_1n2": 0,
-    "form_l10": 45,
+    "form_l10": 53,
     "h2h": 0,
-    "lineups": 19,
+    "lineups": 31,
     "football_lineups": 0,
-    "starter_signals": 19,
+    "starter_signals": 31,
     "clubelo": 0,
     "weather": 13,
-    "injuries": 38,
+    "injuries": 51,
     "referee": 0,
     "referee_named": 0,
     "referee_context": 0,
@@ -42,14 +42,20 @@
     }
   },
   "winamax_markets": {
-    "matches": 461,
+    "matches": 491,
     "detailed_market_matches": 21,
-    "detailed_ratio_vs_exact": 0.1173,
-    "gap_to_50pct_exact": 0.3827,
+    "detailed_ratio_vs_exact": 0.1167,
+    "gap_to_50pct_exact": 0.3833,
     "recommended_detail_fetch_cap": 220,
     "detail_by_sport": {
       "baseball": {
-        "exact": 33,
+        "exact": 43,
+        "detailed": 0,
+        "families": {},
+        "detailed_ratio": 0.0
+      },
+      "basketball": {
+        "exact": 5,
         "detailed": 0,
         "families": {},
         "detailed_ratio": 0.0
@@ -67,7 +73,7 @@
         "detailed_ratio": 0
       },
       "tennis": {
-        "exact": 125,
+        "exact": 117,
         "detailed": 0,
         "families": {},
         "detailed_ratio": 0.0
@@ -76,12 +82,12 @@
     "market_family_counts": {}
   },
   "backtest": {
-    "overall_roi_pct": -1.91,
-    "overall_brier": 0.2419,
+    "overall_roi_pct": -1.01,
+    "overall_brier": 0.241,
     "by_sport_roi_pct": {
       "baseball": -5.59,
-      "basketball": 9.23,
-      "football": 9.69,
+      "basketball": 19.97,
+      "football": 11.8,
       "hockey": 28.48
     },
     "cold_sports": []
