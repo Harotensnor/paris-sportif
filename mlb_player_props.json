@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-29T01:57:35Z",
+  "generated_at": "2026-06-29T03:42:14Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -786,9 +786,501 @@
           "side": "away"
         }
       ]
+    },
+    {
+      "event_id": "401815964",
+      "kickoff": "2026-06-30T22:35Z",
+      "league": "MLB",
+      "match": "Chicago White Sox at Baltimore Orioles",
+      "home": "Baltimore Orioles",
+      "away": "Chicago White Sox",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Baltimore Orioles",
+          "pitcher": "Trey Gibson",
+          "label": "Trey Gibson moins de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "under",
+          "probability": 0.5908,
+          "fair_odds": 1.69,
+          "expected_strikeouts": 4.14,
+          "projected_ip": 5.02,
+          "inputs": {
+            "k9": 7.42,
+            "era": 5.64,
+            "whip": 1.65,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Baltimore Orioles",
+          "pitcher": "Trey Gibson",
+          "label": "Trey Gibson concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5617,
+          "fair_odds": 1.78,
+          "expected_hr_allowed": 0.825,
+          "projected_ip": 5.02,
+          "inputs": {
+            "hr9": 1.48,
+            "era": 5.64,
+            "whip": 1.65
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Chicago White Sox",
+          "pitcher": "Erick Fedde",
+          "label": "Erick Fedde moins de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "under",
+          "probability": 0.519,
+          "fair_odds": 1.93,
+          "expected_strikeouts": 4.42,
+          "projected_ip": 6.6,
+          "inputs": {
+            "k9": 6.03,
+            "era": 4.34,
+            "whip": 1.42,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Chicago White Sox",
+          "pitcher": "Erick Fedde",
+          "label": "Erick Fedde concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.7104,
+          "fair_odds": 1.41,
+          "expected_hr_allowed": 1.239,
+          "projected_ip": 6.6,
+          "inputs": {
+            "hr9": 1.69,
+            "era": 4.34,
+            "whip": 1.42
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815967",
+      "kickoff": "2026-06-30T22:40Z",
+      "league": "MLB",
+      "match": "Pittsburgh Pirates at Philadelphia Phillies",
+      "home": "Philadelphia Phillies",
+      "away": "Pittsburgh Pirates",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Philadelphia Phillies",
+          "pitcher": "Cristopher Sánchez",
+          "label": "Cristopher Sánchez moins de 7,5 strikeouts",
+          "line": 7.5,
+          "pick": "under",
+          "probability": 0.5056,
+          "fair_odds": 1.98,
+          "expected_strikeouts": 7.47,
+          "projected_ip": 6.47,
+          "inputs": {
+            "k9": 10.39,
+            "era": 2.13,
+            "whip": 1.11,
+            "hand": "L"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Philadelphia Phillies",
+          "pitcher": "Cristopher Sánchez",
+          "label": "Cristopher Sánchez ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6267,
+          "fair_odds": 1.6,
+          "expected_hr_allowed": 0.467,
+          "projected_ip": 6.47,
+          "inputs": {
+            "hr9": 0.65,
+            "era": 2.13,
+            "whip": 1.11
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Pittsburgh Pirates",
+          "pitcher": "Bubba Chandler",
+          "label": "Bubba Chandler plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.581,
+          "fair_odds": 1.72,
+          "expected_strikeouts": 4.85,
+          "projected_ip": 5.27,
+          "inputs": {
+            "k9": 8.28,
+            "era": 4.42,
+            "whip": 1.39,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Pittsburgh Pirates",
+          "pitcher": "Bubba Chandler",
+          "label": "Bubba Chandler ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5501,
+          "fair_odds": 1.82,
+          "expected_hr_allowed": 0.598,
+          "projected_ip": 5.27,
+          "inputs": {
+            "hr9": 1.02,
+            "era": 4.42,
+            "whip": 1.39
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815965",
+      "kickoff": "2026-06-30T23:05Z",
+      "league": "MLB",
+      "match": "Detroit Tigers at New York Yankees",
+      "home": "New York Yankees",
+      "away": "Detroit Tigers",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "New York Yankees",
+          "pitcher": "Cam Schlittler",
+          "label": "Cam Schlittler plus de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "over",
+          "probability": 0.585,
+          "fair_odds": 1.71,
+          "expected_strikeouts": 6.94,
+          "projected_ip": 5.88,
+          "inputs": {
+            "k9": 10.62,
+            "era": 1.62,
+            "whip": 0.92,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "New York Yankees",
+          "pitcher": "Cam Schlittler",
+          "label": "Cam Schlittler ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.7026,
+          "fair_odds": 1.42,
+          "expected_hr_allowed": 0.353,
+          "projected_ip": 5.88,
+          "inputs": {
+            "hr9": 0.54,
+            "era": 1.62,
+            "whip": 0.92
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Detroit Tigers",
+          "pitcher": "Tarik Skubal",
+          "label": "Tarik Skubal plus de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "over",
+          "probability": 0.5103,
+          "fair_odds": 1.96,
+          "expected_strikeouts": 6.55,
+          "projected_ip": 5.92,
+          "inputs": {
+            "k9": 9.96,
+            "era": 3.32,
+            "whip": 0.99,
+            "hand": "L"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Detroit Tigers",
+          "pitcher": "Tarik Skubal",
+          "label": "Tarik Skubal concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5488,
+          "fair_odds": 1.82,
+          "expected_hr_allowed": 0.796,
+          "projected_ip": 5.92,
+          "inputs": {
+            "hr9": 1.21,
+            "era": 3.32,
+            "whip": 0.99
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815966",
+      "kickoff": "2026-06-30T23:07Z",
+      "league": "MLB",
+      "match": "New York Mets at Toronto Blue Jays",
+      "home": "Toronto Blue Jays",
+      "away": "New York Mets",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Toronto Blue Jays",
+          "pitcher": "Kevin Gausman",
+          "label": "Kevin Gausman moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.5065,
+          "fair_odds": 1.97,
+          "expected_strikeouts": 5.47,
+          "projected_ip": 5.59,
+          "inputs": {
+            "k9": 8.81,
+            "era": 4.36,
+            "whip": 1.19,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Toronto Blue Jays",
+          "pitcher": "Kevin Gausman",
+          "label": "Kevin Gausman concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5621,
+          "fair_odds": 1.78,
+          "expected_hr_allowed": 0.826,
+          "projected_ip": 5.59,
+          "inputs": {
+            "hr9": 1.33,
+            "era": 4.36,
+            "whip": 1.19
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "New York Mets",
+          "pitcher": "Nolan McLean",
+          "label": "Nolan McLean plus de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "over",
+          "probability": 0.5215,
+          "fair_odds": 1.92,
+          "expected_strikeouts": 6.61,
+          "projected_ip": 5.57,
+          "inputs": {
+            "k9": 10.68,
+            "era": 4.03,
+            "whip": 1.12,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "New York Mets",
+          "pitcher": "Nolan McLean",
+          "label": "Nolan McLean ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5353,
+          "fair_odds": 1.87,
+          "expected_hr_allowed": 0.625,
+          "projected_ip": 5.57,
+          "inputs": {
+            "hr9": 1.01,
+            "era": 4.03,
+            "whip": 1.12
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815970",
+      "kickoff": "2026-06-30T23:10Z",
+      "league": "MLB",
+      "match": "Washington Nationals at Boston Red Sox",
+      "home": "Boston Red Sox",
+      "away": "Washington Nationals",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Boston Red Sox",
+          "pitcher": "Connelly Early",
+          "label": "Connelly Early moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.507,
+          "fair_odds": 1.97,
+          "expected_strikeouts": 5.47,
+          "projected_ip": 5.45,
+          "inputs": {
+            "k9": 9.03,
+            "era": 3.59,
+            "whip": 1.25,
+            "hand": "L"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Boston Red Sox",
+          "pitcher": "Connelly Early",
+          "label": "Connelly Early concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.6065,
+          "fair_odds": 1.65,
+          "expected_hr_allowed": 0.933,
+          "projected_ip": 5.45,
+          "inputs": {
+            "hr9": 1.54,
+            "era": 3.59,
+            "whip": 1.25
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Washington Nationals",
+          "pitcher": "Cade Cavalli",
+          "label": "Cade Cavalli moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.5625,
+          "fair_odds": 1.78,
+          "expected_strikeouts": 5.22,
+          "projected_ip": 4.89,
+          "inputs": {
+            "k9": 9.61,
+            "era": 4.0,
+            "whip": 1.43,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Washington Nationals",
+          "pitcher": "Cade Cavalli",
+          "label": "Cade Cavalli ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6618,
+          "fair_odds": 1.51,
+          "expected_hr_allowed": 0.413,
+          "projected_ip": 4.89,
+          "inputs": {
+            "hr9": 0.76,
+            "era": 4.0,
+            "whip": 1.43
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815971",
+      "kickoff": "2026-06-30T23:40Z",
+      "league": "MLB",
+      "match": "Cincinnati Reds at Milwaukee Brewers",
+      "home": "Milwaukee Brewers",
+      "away": "Cincinnati Reds",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Milwaukee Brewers",
+          "pitcher": "Brandon Sproat",
+          "label": "Brandon Sproat plus de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "over",
+          "probability": 0.5168,
+          "fair_odds": 1.94,
+          "expected_strikeouts": 5.58,
+          "projected_ip": 5.32,
+          "inputs": {
+            "k9": 9.43,
+            "era": 5.43,
+            "whip": 1.35,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Milwaukee Brewers",
+          "pitcher": "Brandon Sproat",
+          "label": "Brandon Sproat concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.6298,
+          "fair_odds": 1.59,
+          "expected_hr_allowed": 0.994,
+          "projected_ip": 5.32,
+          "inputs": {
+            "hr9": 1.68,
+            "era": 5.43,
+            "whip": 1.35
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Cincinnati Reds",
+          "pitcher": "Rhett Lowder",
+          "label": "Rhett Lowder moins de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "under",
+          "probability": 0.6255,
+          "fair_odds": 1.6,
+          "expected_strikeouts": 4.0,
+          "projected_ip": 4.83,
+          "inputs": {
+            "k9": 7.45,
+            "era": 4.81,
+            "whip": 1.47,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Cincinnati Reds",
+          "pitcher": "Rhett Lowder",
+          "label": "Rhett Lowder ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5569,
+          "fair_odds": 1.8,
+          "expected_hr_allowed": 0.585,
+          "projected_ip": 4.83,
+          "inputs": {
+            "hr9": 1.09,
+            "era": 4.81,
+            "whip": 1.47
+          },
+          "side": "away"
+        }
+      ]
     }
   ],
-  "props": 38,
+  "props": 62,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
