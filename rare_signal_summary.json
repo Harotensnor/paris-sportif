@@ -1,46 +1,28 @@
 {
-  "generated_at": "2026-06-30T00:02:47Z",
+  "generated_at": "2026-06-30T03:28:55Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 40,
-    "actionable": 27,
+    "active_events": 37,
+    "actionable": 25,
     "watch": 3,
-    "risk": 10,
+    "risk": 9,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 25,
-      "travel_extreme": 7,
-      "signal_conflict": 6,
-      "back_to_back_travel": 16,
-      "market_uncertain": 8
+      "injury_imbalance": 22,
+      "back_to_back_travel": 15,
+      "travel_extreme": 5,
+      "market_uncertain": 8,
+      "signal_conflict": 3
     },
     "by_quality": {
-      "actionable": 27,
-      "risk": 10,
-      "watch": 3
+      "watch": 3,
+      "actionable": 25,
+      "risk": 9
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401815961",
-      "date": "2026-06-30T01:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Seattle Mariners",
-      "away": "Los Angeles Angels",
-      "match": "Seattle Mariners - Los Angeles Angels",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Los Angeles Angels",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 7-12"
-    },
     {
       "event_id": "401815969",
       "date": "2026-06-30T22:40Z",
@@ -330,6 +312,24 @@
       "context": "Absences severes 7-12"
     },
     {
+      "event_id": "401816055",
+      "date": "2026-07-07T22:35Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Baltimore Orioles",
+      "away": "Chicago Cubs",
+      "match": "Baltimore Orioles - Chicago Cubs",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Chicago Cubs",
+      "side": null,
+      "strength": 1.0,
+      "context": "Absences severes 9-15"
+    },
+    {
       "event_id": "401815987",
       "date": "2026-07-02T00:10Z",
       "sport": "baseball",
@@ -418,42 +418,6 @@
       "side": "away",
       "strength": 0.82,
       "context": "2 match dans les 48h + 1049 km de voyage"
-    },
-    {
-      "event_id": "401815959",
-      "date": "2026-06-30T00:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Chicago Cubs",
-      "away": "San Diego Padres",
-      "match": "Chicago Cubs - San Diego Padres",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Chicago Cubs",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 15-11"
-    },
-    {
-      "event_id": "401815962",
-      "date": "2026-06-30T01:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Athletics",
-      "away": "Los Angeles Dodgers",
-      "match": "Athletics - Los Angeles Dodgers",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Los Angeles Dodgers",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 10-14"
     },
     {
       "event_id": "401815977",
@@ -692,24 +656,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.9%"
-    },
-    {
-      "event_id": "401815960",
-      "date": "2026-06-30T00:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Colorado Rockies",
-      "away": "Miami Marlins",
-      "match": "Colorado Rockies - Miami Marlins",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "signal_conflict",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.669,
-      "context": "Signaux opposes: Colorado Rockies fade 0.96, Miami Marlins fade 1.01 -> prudence"
     },
     {
       "event_id": "401815994",
