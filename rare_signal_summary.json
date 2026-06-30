@@ -1,46 +1,28 @@
 {
-  "generated_at": "2026-06-30T21:53:17Z",
+  "generated_at": "2026-06-30T23:01:38Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 38,
-    "actionable": 25,
-    "watch": 3,
+    "active_events": 36,
+    "actionable": 24,
+    "watch": 2,
     "risk": 10,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 22,
-      "back_to_back_travel": 15,
+      "injury_imbalance": 17,
       "travel_extreme": 5,
+      "back_to_back_travel": 14,
       "market_uncertain": 11,
       "signal_conflict": 3
     },
     "by_quality": {
-      "watch": 3,
-      "actionable": 25,
-      "risk": 10
+      "actionable": 24,
+      "risk": 10,
+      "watch": 2
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401815969",
-      "date": "2026-06-30T22:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Cleveland Guardians",
-      "away": "Texas Rangers",
-      "match": "Cleveland Guardians - Texas Rangers",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Texas Rangers",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 2-13"
-    },
     {
       "event_id": "401815965",
       "date": "2026-06-30T23:05Z",
@@ -475,24 +457,6 @@
     }
   ],
   "active_watch": [
-    {
-      "event_id": "401815964",
-      "date": "2026-06-30T22:35Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Baltimore Orioles",
-      "away": "Chicago White Sox",
-      "match": "Baltimore Orioles - Chicago White Sox",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Chicago White Sox",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 9-12"
-    },
     {
       "event_id": "401815979",
       "date": "2026-07-01T16:35Z",
