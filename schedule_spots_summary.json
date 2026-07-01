@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-01T19:17:50Z",
+  "generated_at": "2026-07-01T20:56:56Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -1091,11 +1091,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.204,
-        "away_score": -0.96,
-        "home_fade": 0.15,
+        "home_score": -0.196,
+        "away_score": -0.82,
+        "home_fade": 0.55,
         "away_fade": 1.013,
-        "reason": "Direction nette: Kansas City Royals (+0.20)",
+        "reason": "Direction nette: Kansas City Royals (-0.20)",
         "detail": [
           {
             "side": "home",
@@ -1108,6 +1108,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.4
           },
           {
             "side": "away",
@@ -1259,12 +1265,18 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.33,
-        "away_score": -0.943,
-        "home_fade": 0.0,
+        "home_score": -0.07,
+        "away_score": -0.803,
+        "home_fade": 0.4,
         "away_fade": 0.943,
-        "reason": "Direction nette: Kansas City Royals (+0.33)",
+        "reason": "Direction nette: Kansas City Royals (-0.07)",
         "detail": [
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.4
+          },
           {
             "side": "away",
             "type": "back_to_back_travel",
