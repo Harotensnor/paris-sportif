@@ -1,23 +1,23 @@
 {
-  "generated_at": "2026-07-01T15:19:52Z",
+  "generated_at": "2026-07-01T17:26:34Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 18,
+    "active_events": 17,
     "expired_sample": 0,
     "by_type": {
-      "back_to_back_travel": 9,
       "travel_extreme": 3,
+      "back_to_back_travel": 8,
       "lookahead": 17,
       "schedule_congestion": 8
     },
     "by_decision": {
       "abstain": 6,
-      "lean_home": 11,
+      "lean_home": 10,
       "lean_away": 1
     },
-    "lean_home": 11,
+    "lean_home": 10,
     "lean_away": 1,
     "abstain": 6,
     "monitor": 0
@@ -781,57 +781,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.951
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815984",
-      "source_event_ids": [
-        "401815984"
-      ],
-      "kickoff": "2026-07-01T17:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Cleveland Guardians",
-      "away": "Texas Rangers",
-      "match": "Cleveland Guardians - Texas Rangers",
-      "decision": "lean_home",
-      "net_team": "Cleveland Guardians",
-      "reason": "Texas Rangers plus penalise par calendrier/voyage (0.94 vs 0.00)",
-      "pressure_score": 0.944,
-      "home_fade": 0.0,
-      "away_fade": 0.944,
-      "travel_score": 0.944,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "2 match dans les 48h + 1672 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.681,
-        "away_score": -1.944,
-        "home_fade": 0.0,
-        "away_fade": 1.944,
-        "reason": "Direction nette: Cleveland Guardians (+0.68)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.944
           }
         ]
       }

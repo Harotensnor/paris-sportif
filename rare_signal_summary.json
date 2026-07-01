@@ -1,46 +1,28 @@
 {
-  "generated_at": "2026-07-01T15:19:52Z",
+  "generated_at": "2026-07-01T17:26:34Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 28,
-    "actionable": 15,
-    "watch": 2,
+    "active_events": 26,
+    "actionable": 14,
+    "watch": 1,
     "risk": 11,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 11,
-      "back_to_back_travel": 9,
+      "injury_imbalance": 9,
       "travel_extreme": 3,
+      "back_to_back_travel": 8,
       "market_uncertain": 10,
       "signal_conflict": 2
     },
     "by_quality": {
-      "watch": 2,
-      "actionable": 15,
-      "risk": 11
+      "actionable": 14,
+      "risk": 11,
+      "watch": 1
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401815984",
-      "date": "2026-07-01T17:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Cleveland Guardians",
-      "away": "Texas Rangers",
-      "match": "Cleveland Guardians - Texas Rangers",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Texas Rangers",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 2-13"
-    },
     {
       "event_id": "401815980",
       "date": "2026-07-01T17:35Z",
@@ -57,7 +39,7 @@
       "team": "Detroit Tigers",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 6-11"
+      "context": "Absences severes 6-12"
     },
     {
       "event_id": "401815985",
@@ -295,24 +277,6 @@
     }
   ],
   "active_watch": [
-    {
-      "event_id": "401815979",
-      "date": "2026-07-01T16:35Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Baltimore Orioles",
-      "away": "Chicago White Sox",
-      "match": "Baltimore Orioles - Chicago White Sox",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Chicago White Sox",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 8-11"
-    },
     {
       "event_id": "401857037",
       "date": "2026-07-03T23:30Z",
