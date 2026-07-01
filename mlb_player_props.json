@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-01T12:28:52Z",
+  "generated_at": "2026-07-01T15:19:52Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -11,6 +11,42 @@
       "home": "Baltimore Orioles",
       "away": "Chicago White Sox",
       "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Baltimore Orioles",
+          "pitcher": "Dean Kremer",
+          "label": "Dean Kremer plus de 7,5 strikeouts",
+          "line": 7.5,
+          "pick": "over",
+          "probability": 0.5896,
+          "fair_odds": 1.7,
+          "expected_strikeouts": 8.0,
+          "projected_ip": 5.5,
+          "inputs": {
+            "k9": 13.09,
+            "era": 4.09,
+            "whip": 0.91,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Baltimore Orioles",
+          "pitcher": "Dean Kremer",
+          "label": "Dean Kremer concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.8644,
+          "fair_odds": 1.16,
+          "expected_hr_allowed": 1.998,
+          "projected_ip": 5.5,
+          "inputs": {
+            "hr9": 3.27,
+            "era": 4.09,
+            "whip": 0.91
+          },
+          "side": "home"
+        },
         {
           "market": "pitcher_strikeouts",
           "team": "Chicago White Sox",
@@ -385,6 +421,42 @@
       "home": "Toronto Blue Jays",
       "away": "New York Mets",
       "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Toronto Blue Jays",
+          "pitcher": "Braydon Fisher",
+          "label": "Braydon Fisher moins de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "under",
+          "probability": 0.5408,
+          "fair_odds": 1.85,
+          "expected_strikeouts": 6.3,
+          "projected_ip": 6.6,
+          "inputs": {
+            "k9": 8.59,
+            "era": 3.48,
+            "whip": 1.14,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Toronto Blue Jays",
+          "pitcher": "Braydon Fisher",
+          "label": "Braydon Fisher concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5942,
+          "fair_odds": 1.68,
+          "expected_hr_allowed": 0.902,
+          "projected_ip": 6.6,
+          "inputs": {
+            "hr9": 1.23,
+            "era": 3.48,
+            "whip": 1.14
+          },
+          "side": "home"
+        },
         {
           "market": "pitcher_strikeouts",
           "team": "New York Mets",
@@ -1054,7 +1126,7 @@
       ]
     }
   ],
-  "props": 50,
+  "props": 54,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
