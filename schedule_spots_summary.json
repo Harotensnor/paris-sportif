@@ -1,23 +1,23 @@
 {
-  "generated_at": "2026-07-01T03:37:19Z",
+  "generated_at": "2026-07-01T08:00:32Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 19,
+    "active_events": 18,
     "expired_sample": 0,
     "by_type": {
-      "back_to_back_travel": 10,
+      "back_to_back_travel": 9,
       "travel_extreme": 3,
       "lookahead": 17,
       "schedule_congestion": 8
     },
     "by_decision": {
       "abstain": 6,
-      "lean_home": 12,
+      "lean_home": 11,
       "lean_away": 1
     },
-    "lean_home": 12,
+    "lean_home": 11,
     "lean_away": 1,
     "abstain": 6,
     "monitor": 0
@@ -877,57 +877,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.943
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401816000",
-      "source_event_ids": [
-        "401816000"
-      ],
-      "kickoff": "2026-07-03T01:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Seattle Mariners",
-      "away": "Los Angeles Angels",
-      "match": "Seattle Mariners - Los Angeles Angels",
-      "decision": "lean_home",
-      "net_team": "Seattle Mariners",
-      "reason": "Los Angeles Angels plus penalise par calendrier/voyage (0.85 vs 0.00)",
-      "pressure_score": 0.846,
-      "home_fade": 0.0,
-      "away_fade": 0.846,
-      "travel_score": 0.846,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "1 match dans les 48h + 1578 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.646,
-        "away_score": -1.846,
-        "home_fade": 0.0,
-        "away_fade": 1.846,
-        "reason": "Direction nette: Seattle Mariners (+0.65)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.846
           }
         ]
       }
