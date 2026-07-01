@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-07-01T20:56:56Z",
+  "generated_at": "2026-07-01T22:12:19Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 29,
-    "actionable": 19,
-    "watch": 1,
+    "actionable": 18,
+    "watch": 2,
     "risk": 9,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 11,
+      "injury_imbalance": 12,
       "back_to_back_travel": 11,
       "travel_extreme": 2,
       "market_uncertain": 7,
       "signal_conflict": 2
     },
     "by_quality": {
-      "actionable": 19,
-      "risk": 9,
-      "watch": 1
+      "actionable": 18,
+      "watch": 2,
+      "risk": 9
     }
   },
   "active_actionable": [
@@ -346,7 +346,9 @@
       "side": "away",
       "strength": 0.82,
       "context": "2 match dans les 48h + 1049 km de voyage"
-    },
+    }
+  ],
+  "active_watch": [
     {
       "event_id": "401815991",
       "date": "2026-07-02T01:40Z",
@@ -356,17 +358,15 @@
       "home": "Athletics",
       "away": "Los Angeles Dodgers",
       "match": "Athletics - Los Angeles Dodgers",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
       "type": "injury_imbalance",
       "direction": "fade",
       "team": "Los Angeles Dodgers",
       "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 10-14"
-    }
-  ],
-  "active_watch": [
+      "strength": 0.6,
+      "context": "Absences severes 11-14"
+    },
     {
       "event_id": "401857037",
       "date": "2026-07-03T23:30Z",
