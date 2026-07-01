@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-07-01T22:12:19Z",
+  "generated_at": "2026-07-01T23:42:17Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 24,
+    "active_events": 22,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 27,
+      "lookahead": 23,
       "back_to_back_travel": 11,
       "travel_extreme": 2,
       "schedule_congestion": 22
     },
     "by_decision": {
-      "abstain": 10,
+      "abstain": 8,
       "lean_home": 13,
       "lean_away": 1
     },
     "lean_home": 13,
     "lean_away": 1,
-    "abstain": 10,
+    "abstain": 8,
     "monitor": 0
   },
   "active": [
@@ -400,116 +400,6 @@
             "type": "schedule_congestion",
             "direction": "fade",
             "strength": 0.6
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815982",
-      "source_event_ids": [
-        "401815982"
-      ],
-      "kickoff": "2026-07-01T22:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Philadelphia Phillies",
-      "away": "Pittsburgh Pirates",
-      "match": "Philadelphia Phillies - Pittsburgh Pirates",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Philadelphia Phillies 0.15, Pittsburgh Pirates 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
-        "home_fade": 0.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Pittsburgh Pirates (-0.10)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815983",
-      "source_event_ids": [
-        "401815983"
-      ],
-      "kickoff": "2026-07-01T23:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Atlanta Braves",
-      "away": "St. Louis Cardinals",
-      "match": "Atlanta Braves - St. Louis Cardinals",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Atlanta Braves 0.15, St. Louis Cardinals 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -1.097,
-        "away_score": 0.252,
-        "home_fade": 1.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: St. Louis Cardinals (+0.25)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
           }
         ]
       }
