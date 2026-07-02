@@ -1,23 +1,22 @@
 {
-  "generated_at": "2026-07-02T20:46:20Z",
+  "generated_at": "2026-07-02T21:52:50Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 25,
+    "active_events": 24,
     "actionable": 22,
-    "watch": 1,
+    "watch": 0,
     "risk": 2,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 13,
+      "injury_imbalance": 12,
       "back_to_back_travel": 12,
       "signal_conflict": 7,
       "travel_extreme": 3
     },
     "by_quality": {
       "actionable": 22,
-      "watch": 1,
       "risk": 2
     }
   },
@@ -419,26 +418,7 @@
       "context": "1 match dans les 48h + 1209 km de voyage"
     }
   ],
-  "active_watch": [
-    {
-      "event_id": "401857037",
-      "date": "2026-07-03T23:30Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "New York Liberty",
-      "away": "Minnesota Lynx",
-      "match": "New York Liberty - Minnesota Lynx",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Minnesota Lynx",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 1-4"
-    }
-  ],
+  "active_watch": [],
   "active_risk": [
     {
       "event_id": "401816047",
