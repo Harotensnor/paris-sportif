@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-07-02T16:14:54Z",
+  "generated_at": "2026-07-02T18:03:41Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815994",
-      "kickoff": "2026-07-02T16:35Z",
-      "league": "MLB",
-      "match": "Pittsburgh Pirates at Philadelphia Phillies",
-      "home": "Philadelphia Phillies",
-      "away": "Pittsburgh Pirates",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Philadelphia Phillies",
-          "pitcher": "Alan Rangel",
-          "label": "Alan Rangel moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.567,
-          "fair_odds": 1.76,
-          "expected_strikeouts": 5.2,
-          "projected_ip": 4.8,
-          "inputs": {
-            "k9": 9.75,
-            "era": 4.5,
-            "whip": 1.17,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Philadelphia Phillies",
-          "pitcher": "Alan Rangel",
-          "label": "Alan Rangel ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6703,
-          "fair_odds": 1.49,
-          "expected_hr_allowed": 0.4,
-          "projected_ip": 4.8,
-          "inputs": {
-            "hr9": 0.75,
-            "era": 4.5,
-            "whip": 1.17
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Pittsburgh Pirates",
-          "pitcher": "Jared Jones",
-          "label": "Jared Jones moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.5829,
-          "fair_odds": 1.72,
-          "expected_strikeouts": 4.17,
-          "projected_ip": 4.17,
-          "inputs": {
-            "k9": 9.0,
-            "era": 5.76,
-            "whip": 1.44,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Pittsburgh Pirates",
-          "pitcher": "Jared Jones",
-          "label": "Jared Jones concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5654,
-          "fair_odds": 1.77,
-          "expected_hr_allowed": 0.833,
-          "projected_ip": 4.17,
-          "inputs": {
-            "hr9": 1.8,
-            "era": 5.76,
-            "whip": 1.44
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815996",
       "kickoff": "2026-07-02T18:10Z",
@@ -906,7 +824,7 @@
       ]
     }
   ],
-  "props": 44,
+  "props": 40,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
