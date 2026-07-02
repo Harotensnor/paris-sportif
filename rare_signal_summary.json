@@ -1,26 +1,24 @@
 {
-  "generated_at": "2026-07-02T11:59:57Z",
+  "generated_at": "2026-07-02T12:03:27Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 24,
-    "actionable": 11,
-    "watch": 6,
-    "risk": 7,
+    "active_events": 23,
+    "actionable": 10,
+    "watch": 5,
+    "risk": 8,
     "expired_sample": 0,
     "by_type": {
       "market_uncertain": 8,
       "travel_extreme": 1,
       "back_to_back_travel": 5,
-      "injury_imbalance": 11,
-      "market_move": 3,
-      "signal_conflict": 1
+      "injury_imbalance": 11
     },
     "by_quality": {
-      "risk": 7,
-      "actionable": 11,
-      "watch": 6
+      "risk": 8,
+      "actionable": 10,
+      "watch": 5
     }
   },
   "active_actionable": [
@@ -40,7 +38,7 @@
       "team": "Miami Marlins",
       "side": "away",
       "strength": 1.0,
-      "context": "1 match dans les 48h + 2774 km de voyage"
+      "context": "2 match dans les 48h + 2774 km de voyage"
     },
     {
       "event_id": "401815993",
@@ -165,8 +163,8 @@
       "direction": "fade",
       "team": "Tampa Bay Rays",
       "side": "away",
-      "strength": 0.863,
-      "context": "1 match dans les 48h + 1664 km de voyage"
+      "strength": 0.943,
+      "context": "2 match dans les 48h + 1664 km de voyage"
     },
     {
       "event_id": "401816020",
@@ -203,24 +201,6 @@
       "side": "away",
       "strength": 0.856,
       "context": "1 match dans les 48h + 1629 km de voyage"
-    },
-    {
-      "event_id": "401857035",
-      "date": "2026-07-03T00:00Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Connecticut Sun",
-      "away": "Dallas Wings",
-      "match": "Connecticut Sun - Dallas Wings",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "home",
-      "strength": 0.722,
-      "context": "Cote home: 3.85 -> 3.35 (+13.0%)"
     }
   ],
   "active_watch": [
@@ -313,30 +293,30 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 14-11"
-    },
-    {
-      "event_id": "401857034",
-      "date": "2026-07-02T23:30Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Washington Mystics",
-      "away": "Atlanta Dream",
-      "match": "Washington Mystics - Atlanta Dream",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "home",
-      "strength": 0.498,
-      "context": "Cote home: 3.35 -> 3.05 (+9.0%)"
     }
   ],
   "active_risk": [
     {
+      "event_id": "177394",
+      "date": "2026-07-02T12:10Z",
+      "sport": "tennis",
+      "league_code": "wimbledon",
+      "league_name": "Wimbledon",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 12.5%"
+    },
+    {
       "event_id": "177388",
-      "date": "2026-07-02T12:00Z",
+      "date": "2026-07-02T12:20Z",
       "sport": "tennis",
       "league_code": "wimbledon",
       "league_name": "Wimbledon",

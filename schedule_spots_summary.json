@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-02T11:59:57Z",
+  "generated_at": "2026-07-02T12:03:27Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -572,7 +572,7 @@
       },
       "contexts": [
         "Deplacement estime 2774 km, decalage ~1.7h",
-        "1 match dans les 48h + 2774 km de voyage"
+        "2 match dans les 48h + 2774 km de voyage"
       ],
       "global_resolution": {
         "status": "net",
@@ -684,27 +684,27 @@
       "match": "Kansas City Royals - Tampa Bay Rays",
       "decision": "lean_home",
       "net_team": "Kansas City Royals",
-      "reason": "Tampa Bay Rays plus penalise par calendrier/voyage (0.86 vs 0.00)",
-      "pressure_score": 0.863,
+      "reason": "Tampa Bay Rays plus penalise par calendrier/voyage (0.94 vs 0.00)",
+      "pressure_score": 0.943,
       "home_fade": 0.0,
-      "away_fade": 0.863,
-      "travel_score": 0.863,
+      "away_fade": 0.943,
+      "travel_score": 0.943,
       "lookahead_score": 0,
       "congestion_score": 0,
       "types": {
         "back_to_back_travel": 1
       },
       "contexts": [
-        "1 match dans les 48h + 1664 km de voyage"
+        "2 match dans les 48h + 1664 km de voyage"
       ],
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": -0.098,
-        "away_score": -0.723,
+        "home_score": -0.07,
+        "away_score": -0.803,
         "home_fade": 0.4,
-        "away_fade": 0.863,
-        "reason": "Direction nette: Kansas City Royals (-0.10)",
+        "away_fade": 0.943,
+        "reason": "Direction nette: Kansas City Royals (-0.07)",
         "detail": [
           {
             "side": "home",
@@ -716,7 +716,7 @@
             "side": "away",
             "type": "back_to_back_travel",
             "direction": "fade",
-            "strength": 0.863
+            "strength": 0.943
           }
         ]
       }
@@ -800,25 +800,19 @@
         "1 match dans les 48h + 1578 km de voyage"
       ],
       "global_resolution": {
-        "status": "mixed",
-        "net_side": null,
+        "status": "net",
+        "net_side": "home",
         "home_score": 0.646,
-        "away_score": -1.386,
+        "away_score": -1.846,
         "home_fade": 0.0,
         "away_fade": 1.846,
-        "reason": "Signaux mitigés: avantage net trop faible (Seattle Mariners +0.65, Los Angeles Angels -1.39)",
+        "reason": "Direction nette: Seattle Mariners (+0.65)",
         "detail": [
           {
             "side": "away",
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.46
           },
           {
             "side": "away",
