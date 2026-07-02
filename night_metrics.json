@@ -1,15 +1,15 @@
 {
-  "generated_at": "2026-07-02T12:03:27Z",
-  "calculated_at": "2026-07-02T12:03:27Z",
+  "generated_at": "2026-07-02T14:09:10Z",
+  "calculated_at": "2026-07-02T14:09:10Z",
   "source_of_truth": "data.js",
-  "data_generated_at": "2026-07-02T12:01:33.754844Z",
+  "data_generated_at": "2026-07-02T14:07:45.645741Z",
   "data_today_field": "2026-07-02",
   "events": {
-    "total": 122,
-    "upcoming": 101,
-    "winamax_available": 122,
-    "winamax_exact": 94,
-    "winamax_exact_ratio": 0.7705,
+    "total": 115,
+    "upcoming": 95,
+    "winamax_available": 115,
+    "winamax_exact": 88,
+    "winamax_exact_ratio": 0.7652,
     "markets_more_than_1n2": 0,
     "form_l10": 36,
     "h2h": 0,
@@ -26,7 +26,7 @@
     "fd_calibration": 0,
     "fd_closing_odds": 0,
     "xg": 8,
-    "smart_money": 0
+    "smart_money": 1
   },
   "signal_health": {
     "referee": {
@@ -36,16 +36,16 @@
       "note": "referee is effective coverage: named referee or referee_context usable by the model."
     },
     "smart_money": {
-      "events": 0,
+      "events": 1,
       "status": "rare_event",
       "note": "Smart money is intentionally rare; low count is OK when odds movement does not confirm a strong signal."
     }
   },
   "winamax_markets": {
-    "matches": 478,
+    "matches": 462,
     "detailed_market_matches": 21,
-    "detailed_ratio_vs_exact": 0.2234,
-    "gap_to_50pct_exact": 0.2766,
+    "detailed_ratio_vs_exact": 0.2386,
+    "gap_to_50pct_exact": 0.2614,
     "recommended_detail_fetch_cap": 220,
     "detail_by_sport": {
       "baseball": {
@@ -73,7 +73,7 @@
         "detailed_ratio": 0
       },
       "tennis": {
-        "exact": 44,
+        "exact": 38,
         "detailed": 0,
         "families": {},
         "detailed_ratio": 0.0
@@ -94,7 +94,7 @@
   },
   "health": {
     "status": "warning",
-    "warnings": 11,
+    "warnings": 10,
     "pipeline_drift": "warn"
   }
 }
