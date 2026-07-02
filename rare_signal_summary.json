@@ -1,44 +1,28 @@
 {
-  "generated_at": "2026-07-02T22:51:11Z",
+  "generated_at": "2026-07-02T23:50:13Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 24,
-    "actionable": 22,
-    "watch": 0,
-    "risk": 2,
-    "expired_sample": 0,
+    "active_events": 30,
+    "actionable": 26,
+    "watch": 1,
+    "risk": 3,
+    "expired_sample": 1,
     "by_type": {
-      "injury_imbalance": 12,
-      "back_to_back_travel": 12,
-      "signal_conflict": 7,
-      "travel_extreme": 3
+      "back_to_back_travel": 18,
+      "injury_imbalance": 13,
+      "travel_extreme": 6,
+      "market_uncertain": 1,
+      "signal_conflict": 4
     },
     "by_quality": {
-      "actionable": 22,
-      "risk": 2
+      "actionable": 26,
+      "watch": 1,
+      "risk": 3
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401815995",
-      "date": "2026-07-02T23:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Atlanta Braves",
-      "away": "St. Louis Cardinals",
-      "match": "Atlanta Braves - St. Louis Cardinals",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Atlanta Braves",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 10-1"
-    },
     {
       "event_id": "401816000",
       "date": "2026-07-03T01:40Z",
@@ -92,6 +76,24 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 2-11"
+    },
+    {
+      "event_id": "401816029",
+      "date": "2026-07-04T20:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Seattle Mariners",
+      "away": "Toronto Blue Jays",
+      "match": "Seattle Mariners - Toronto Blue Jays",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Toronto Blue Jays",
+      "side": "away",
+      "strength": 1.0,
+      "context": "1 match dans les 48h + 3325 km de voyage"
     },
     {
       "event_id": "401816016",
@@ -184,22 +186,22 @@
       "context": "2 match dans les 48h + 2347 km de voyage"
     },
     {
-      "event_id": "401816012",
-      "date": "2026-07-04T01:45Z",
+      "event_id": "401816044",
+      "date": "2026-07-05T21:00Z",
       "sport": "baseball",
       "league_code": "mlb",
       "league_name": "MLB",
-      "home": "Arizona Diamondbacks",
-      "away": "Milwaukee Brewers",
-      "match": "Arizona Diamondbacks - Milwaukee Brewers",
+      "home": "Seattle Mariners",
+      "away": "Toronto Blue Jays",
+      "match": "Seattle Mariners - Toronto Blue Jays",
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
       "type": "back_to_back_travel",
       "direction": "fade",
-      "team": "Milwaukee Brewers",
+      "team": "Toronto Blue Jays",
       "side": "away",
-      "strength": 0.999,
-      "context": "1 match dans les 48h + 2347 km de voyage"
+      "strength": 1.0,
+      "context": "2 match dans les 48h + 3325 km de voyage"
     },
     {
       "event_id": "401816027",
@@ -220,24 +222,6 @@
       "context": "1 match dans les 48h + 2347 km de voyage"
     },
     {
-      "event_id": "401815998",
-      "date": "2026-07-02T23:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Kansas City Royals",
-      "away": "Tampa Bay Rays",
-      "match": "Kansas City Royals - Tampa Bay Rays",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Tampa Bay Rays",
-      "side": "away",
-      "strength": 0.943,
-      "context": "2 match dans les 48h + 1664 km de voyage"
-    },
-    {
       "event_id": "401816032",
       "date": "2026-07-05T17:35Z",
       "sport": "baseball",
@@ -254,6 +238,60 @@
       "side": "away",
       "strength": 0.938,
       "context": "2 match dans les 48h + 1638 km de voyage"
+    },
+    {
+      "event_id": "401816039",
+      "date": "2026-07-05T20:00Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Colorado Rockies",
+      "away": "San Francisco Giants",
+      "match": "Colorado Rockies - San Francisco Giants",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "San Francisco Giants",
+      "side": "away",
+      "strength": 0.914,
+      "context": "2 match dans les 48h + 1522 km de voyage"
+    },
+    {
+      "event_id": "401816023",
+      "date": "2026-07-04T23:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Houston Astros",
+      "away": "Tampa Bay Rays",
+      "match": "Houston Astros - Tampa Bay Rays",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Tampa Bay Rays",
+      "side": "away",
+      "strength": 0.861,
+      "context": "2 match dans les 48h + 1257 km de voyage"
+    },
+    {
+      "event_id": "401816038",
+      "date": "2026-07-05T19:30Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Houston Astros",
+      "away": "Tampa Bay Rays",
+      "match": "Houston Astros - Tampa Bay Rays",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Tampa Bay Rays",
+      "side": "away",
+      "strength": 0.861,
+      "context": "2 match dans les 48h + 1257 km de voyage"
     },
     {
       "event_id": "401816017",
@@ -328,22 +366,22 @@
       "context": "2 match dans les 48h + 1209 km de voyage"
     },
     {
-      "event_id": "401857034",
-      "date": "2026-07-02T23:30Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Washington Mystics",
-      "away": "Atlanta Dream",
-      "match": "Washington Mystics - Atlanta Dream",
+      "event_id": "401816024",
+      "date": "2026-07-05T00:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Colorado Rockies",
+      "away": "San Francisco Giants",
+      "match": "Colorado Rockies - San Francisco Giants",
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
+      "type": "back_to_back_travel",
       "direction": "fade",
-      "team": "Atlanta Dream",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 0-4"
+      "team": "San Francisco Giants",
+      "side": "away",
+      "strength": 0.834,
+      "context": "1 match dans les 48h + 1522 km de voyage"
     },
     {
       "event_id": "401816006",
@@ -400,6 +438,42 @@
       "context": "Absences severes 8-4"
     },
     {
+      "event_id": "401816008",
+      "date": "2026-07-04T00:15Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Houston Astros",
+      "away": "Tampa Bay Rays",
+      "match": "Houston Astros - Tampa Bay Rays",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Tampa Bay Rays",
+      "side": "away",
+      "strength": 0.781,
+      "context": "1 match dans les 48h + 1257 km de voyage"
+    },
+    {
+      "event_id": "401816014",
+      "date": "2026-07-04T02:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Seattle Mariners",
+      "away": "Toronto Blue Jays",
+      "match": "Seattle Mariners - Toronto Blue Jays",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "travel_extreme",
+      "direction": "fade",
+      "team": "Toronto Blue Jays",
+      "side": "away",
+      "strength": 0.773,
+      "context": "Deplacement estime 3325 km, decalage ~2.9h"
+    },
+    {
       "event_id": "401816018",
       "date": "2026-07-05T00:08Z",
       "sport": "baseball",
@@ -418,7 +492,26 @@
       "context": "1 match dans les 48h + 1209 km de voyage"
     }
   ],
-  "active_watch": [],
+  "active_watch": [
+    {
+      "event_id": "401816012",
+      "date": "2026-07-04T01:45Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Arizona Diamondbacks",
+      "away": "Milwaukee Brewers",
+      "match": "Arizona Diamondbacks - Milwaukee Brewers",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "travel_extreme",
+      "direction": "fade",
+      "team": "Milwaukee Brewers",
+      "side": "away",
+      "strength": 0.546,
+      "context": "Deplacement estime 2347 km, decalage ~1.6h"
+    }
+  ],
   "active_risk": [
     {
       "event_id": "401816047",
@@ -439,23 +532,60 @@
       "context": "Signaux opposes: Atlanta Braves fade 1.40, New York Mets fade 1.45 -> prudence"
     },
     {
-      "event_id": "401816011",
-      "date": "2026-07-04T01:40Z",
+      "event_id": "177691",
+      "date": "2026-07-04T04:00Z",
+      "sport": "tennis",
+      "league_code": "wimbledon",
+      "league_name": "Wimbledon",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 12.2%"
+    },
+    {
+      "event_id": "401816095",
+      "date": "2026-07-10T01:45Z",
       "sport": "baseball",
       "league_code": "mlb",
       "league_name": "MLB",
-      "home": "Athletics",
-      "away": "Miami Marlins",
-      "match": "Athletics - Miami Marlins",
+      "home": "San Francisco Giants",
+      "away": "Colorado Rockies",
+      "match": "San Francisco Giants - Colorado Rockies",
       "quality": "risk",
       "quality_reason": "Signal de prudence, pas une opportunite directe",
       "type": "signal_conflict",
       "direction": "abstain",
       "team": null,
       "side": null,
-      "strength": 0.655,
-      "context": "Signaux opposes: Athletics fade 0.70, Miami Marlins fade 0.90 -> prudence"
+      "strength": 0.45,
+      "context": "Signaux opposes: San Francisco Giants fade 0.60, Colorado Rockies fade 0.60 -> prudence"
     }
   ],
-  "expired_sample": []
+  "expired_sample": [
+    {
+      "event_id": "401815998",
+      "date": "2026-07-02T23:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Kansas City Royals",
+      "away": "Tampa Bay Rays",
+      "match": "Kansas City Royals - Tampa Bay Rays",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Tampa Bay Rays",
+      "side": "away",
+      "strength": 0.943,
+      "context": "2 match dans les 48h + 1664 km de voyage"
+    }
+  ]
 }

@@ -1,172 +1,8 @@
 {
-  "generated_at": "2026-07-02T22:51:11Z",
+  "generated_at": "2026-07-02T23:50:13Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815995",
-      "kickoff": "2026-07-02T23:15Z",
-      "league": "MLB",
-      "match": "St. Louis Cardinals at Atlanta Braves",
-      "home": "Atlanta Braves",
-      "away": "St. Louis Cardinals",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Atlanta Braves",
-          "pitcher": "Hurston Waldrep",
-          "label": "Hurston Waldrep moins de 7,5 strikeouts",
-          "line": 7.5,
-          "pick": "under",
-          "probability": 0.557,
-          "fair_odds": 1.8,
-          "expected_strikeouts": 7.2,
-          "projected_ip": 4.8,
-          "inputs": {
-            "k9": 13.5,
-            "era": 0.0,
-            "whip": 3.0,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Atlanta Braves",
-          "pitcher": "Hurston Waldrep",
-          "label": "Hurston Waldrep ne concède pas de home run",
-          "pick": "no",
-          "probability": 1.0,
-          "fair_odds": 1.01,
-          "expected_hr_allowed": 0.0,
-          "projected_ip": 4.8,
-          "inputs": {
-            "hr9": 0.0,
-            "era": 0.0,
-            "whip": 3.0
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "St. Louis Cardinals",
-          "pitcher": "Dustin May",
-          "label": "Dustin May moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.5891,
-          "fair_odds": 1.7,
-          "expected_strikeouts": 5.1,
-          "projected_ip": 5.55,
-          "inputs": {
-            "k9": 8.28,
-            "era": 4.3,
-            "whip": 1.2,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "St. Louis Cardinals",
-          "pitcher": "Dustin May",
-          "label": "Dustin May ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6299,
-          "fair_odds": 1.59,
-          "expected_hr_allowed": 0.462,
-          "projected_ip": 5.55,
-          "inputs": {
-            "hr9": 0.75,
-            "era": 4.3,
-            "whip": 1.2
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401815998",
-      "kickoff": "2026-07-02T23:40Z",
-      "league": "MLB",
-      "match": "Tampa Bay Rays at Kansas City Royals",
-      "home": "Kansas City Royals",
-      "away": "Tampa Bay Rays",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Kansas City Royals",
-          "pitcher": "Stephen Kolek",
-          "label": "Stephen Kolek plus de 3,5 strikeouts",
-          "line": 3.5,
-          "pick": "over",
-          "probability": 0.572,
-          "fair_odds": 1.75,
-          "expected_strikeouts": 3.77,
-          "projected_ip": 5.78,
-          "inputs": {
-            "k9": 5.88,
-            "era": 4.15,
-            "whip": 1.19,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Kansas City Royals",
-          "pitcher": "Stephen Kolek",
-          "label": "Stephen Kolek concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5877,
-          "fair_odds": 1.7,
-          "expected_hr_allowed": 0.886,
-          "projected_ip": 5.78,
-          "inputs": {
-            "hr9": 1.38,
-            "era": 4.15,
-            "whip": 1.19
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Tampa Bay Rays",
-          "pitcher": "Ian Seymour",
-          "label": "Ian Seymour plus de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "over",
-          "probability": 0.5707,
-          "fair_odds": 1.75,
-          "expected_strikeouts": 6.86,
-          "projected_ip": 6.6,
-          "inputs": {
-            "k9": 9.36,
-            "era": 4.32,
-            "whip": 1.14,
-            "hand": "L"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Tampa Bay Rays",
-          "pitcher": "Ian Seymour",
-          "label": "Ian Seymour concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6031,
-          "fair_odds": 1.66,
-          "expected_hr_allowed": 0.924,
-          "projected_ip": 6.6,
-          "inputs": {
-            "hr9": 1.26,
-            "era": 4.32,
-            "whip": 1.14
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401816001",
       "kickoff": "2026-07-03T02:10Z",
@@ -742,6 +578,98 @@
       ]
     },
     {
+      "event_id": "401816009",
+      "kickoff": "2026-07-04T00:10Z",
+      "league": "MLB",
+      "match": "San Francisco Giants at Colorado Rockies",
+      "home": "Colorado Rockies",
+      "away": "San Francisco Giants",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Colorado Rockies",
+          "pitcher": "Tomoyuki Sugano",
+          "label": "Tomoyuki Sugano plus de 2,5 strikeouts",
+          "line": 2.5,
+          "pick": "over",
+          "probability": 0.6419,
+          "fair_odds": 1.56,
+          "expected_strikeouts": 2.99,
+          "projected_ip": 5.26,
+          "inputs": {
+            "k9": 5.12,
+            "era": 4.8,
+            "whip": 1.32,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Colorado Rockies",
+          "pitcher": "Tomoyuki Sugano",
+          "label": "Tomoyuki Sugano concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.6316,
+          "fair_odds": 1.58,
+          "expected_hr_allowed": 0.999,
+          "projected_ip": 5.26,
+          "inputs": {
+            "hr9": 1.71,
+            "era": 4.8,
+            "whip": 1.32
+          },
+          "side": "home"
+        }
+      ]
+    },
+    {
+      "event_id": "401816008",
+      "kickoff": "2026-07-04T00:15Z",
+      "league": "MLB",
+      "match": "Tampa Bay Rays at Houston Astros",
+      "home": "Houston Astros",
+      "away": "Tampa Bay Rays",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Houston Astros",
+          "pitcher": "Hunter Brown",
+          "label": "Hunter Brown moins de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "under",
+          "probability": 0.5321,
+          "fair_odds": 1.88,
+          "expected_strikeouts": 6.34,
+          "projected_ip": 5.02,
+          "inputs": {
+            "k9": 11.37,
+            "era": 1.78,
+            "whip": 1.18,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Houston Astros",
+          "pitcher": "Hunter Brown",
+          "label": "Hunter Brown ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.673,
+          "fair_odds": 1.49,
+          "expected_hr_allowed": 0.396,
+          "projected_ip": 5.02,
+          "inputs": {
+            "hr9": 0.71,
+            "era": 1.78,
+            "whip": 1.18
+          },
+          "side": "home"
+        }
+      ]
+    },
+    {
       "event_id": "401816011",
       "kickoff": "2026-07-04T01:40Z",
       "league": "MLB",
@@ -982,6 +910,88 @@
             "hr9": 1.53,
             "era": 7.09,
             "whip": 1.66
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401816014",
+      "kickoff": "2026-07-04T02:10Z",
+      "league": "MLB",
+      "match": "Toronto Blue Jays at Seattle Mariners",
+      "home": "Seattle Mariners",
+      "away": "Toronto Blue Jays",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Seattle Mariners",
+          "pitcher": "Logan Gilbert",
+          "label": "Logan Gilbert moins de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "under",
+          "probability": 0.5419,
+          "fair_odds": 1.85,
+          "expected_strikeouts": 6.29,
+          "projected_ip": 5.88,
+          "inputs": {
+            "k9": 9.63,
+            "era": 3.42,
+            "whip": 1.01,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Seattle Mariners",
+          "pitcher": "Logan Gilbert",
+          "label": "Logan Gilbert concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5611,
+          "fair_odds": 1.78,
+          "expected_hr_allowed": 0.824,
+          "projected_ip": 5.88,
+          "inputs": {
+            "hr9": 1.26,
+            "era": 3.42,
+            "whip": 1.01
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Toronto Blue Jays",
+          "pitcher": "Shane Bieber",
+          "label": "Shane Bieber moins de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "under",
+          "probability": 0.6443,
+          "fair_odds": 1.55,
+          "expected_strikeouts": 3.0,
+          "projected_ip": 4.5,
+          "inputs": {
+            "k9": 6.0,
+            "era": 6.0,
+            "whip": 2.0,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Toronto Blue Jays",
+          "pitcher": "Shane Bieber",
+          "label": "Shane Bieber concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.8647,
+          "fair_odds": 1.16,
+          "expected_hr_allowed": 2.0,
+          "projected_ip": 4.5,
+          "inputs": {
+            "hr9": 4.0,
+            "era": 6.0,
+            "whip": 2.0
           },
           "side": "away"
         }
@@ -1234,6 +1244,88 @@
       ]
     },
     {
+      "event_id": "401816029",
+      "kickoff": "2026-07-04T20:10Z",
+      "league": "MLB",
+      "match": "Toronto Blue Jays at Seattle Mariners",
+      "home": "Seattle Mariners",
+      "away": "Toronto Blue Jays",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Seattle Mariners",
+          "pitcher": "Logan Gilbert",
+          "label": "Logan Gilbert moins de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "under",
+          "probability": 0.5419,
+          "fair_odds": 1.85,
+          "expected_strikeouts": 6.29,
+          "projected_ip": 5.88,
+          "inputs": {
+            "k9": 9.63,
+            "era": 3.42,
+            "whip": 1.01,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Seattle Mariners",
+          "pitcher": "Logan Gilbert",
+          "label": "Logan Gilbert concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5611,
+          "fair_odds": 1.78,
+          "expected_hr_allowed": 0.824,
+          "projected_ip": 5.88,
+          "inputs": {
+            "hr9": 1.26,
+            "era": 3.42,
+            "whip": 1.01
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Toronto Blue Jays",
+          "pitcher": "Shane Bieber",
+          "label": "Shane Bieber moins de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "under",
+          "probability": 0.6443,
+          "fair_odds": 1.55,
+          "expected_strikeouts": 3.0,
+          "projected_ip": 4.5,
+          "inputs": {
+            "k9": 6.0,
+            "era": 6.0,
+            "whip": 2.0,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Toronto Blue Jays",
+          "pitcher": "Shane Bieber",
+          "label": "Shane Bieber concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.8647,
+          "fair_odds": 1.16,
+          "expected_hr_allowed": 2.0,
+          "projected_ip": 4.5,
+          "inputs": {
+            "hr9": 4.0,
+            "era": 6.0,
+            "whip": 2.0
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
       "event_id": "401816015",
       "kickoff": "2026-07-04T23:10Z",
       "league": "MLB",
@@ -1360,9 +1452,55 @@
           "side": "away"
         }
       ]
+    },
+    {
+      "event_id": "401816023",
+      "kickoff": "2026-07-04T23:10Z",
+      "league": "MLB",
+      "match": "Tampa Bay Rays at Houston Astros",
+      "home": "Houston Astros",
+      "away": "Tampa Bay Rays",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Houston Astros",
+          "pitcher": "Hunter Brown",
+          "label": "Hunter Brown moins de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "under",
+          "probability": 0.5321,
+          "fair_odds": 1.88,
+          "expected_strikeouts": 6.34,
+          "projected_ip": 5.02,
+          "inputs": {
+            "k9": 11.37,
+            "era": 1.78,
+            "whip": 1.18,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Houston Astros",
+          "pitcher": "Hunter Brown",
+          "label": "Hunter Brown ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.673,
+          "fair_odds": 1.49,
+          "expected_hr_allowed": 0.396,
+          "projected_ip": 5.02,
+          "inputs": {
+            "hr9": 0.71,
+            "era": 1.78,
+            "whip": 1.18
+          },
+          "side": "home"
+        }
+      ]
     }
   ],
-  "props": 66,
+  "props": 72,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
