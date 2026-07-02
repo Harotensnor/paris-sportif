@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-07-02T21:52:50Z",
+  "generated_at": "2026-07-02T22:51:11Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 37,
+    "active_events": 36,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 49,
+      "lookahead": 47,
       "back_to_back_travel": 12,
       "schedule_congestion": 24,
       "travel_extreme": 3
     },
     "by_decision": {
-      "abstain": 13,
+      "abstain": 12,
       "lean_home": 19,
       "lean_away": 5
     },
     "lean_home": 19,
     "lean_away": 5,
-    "abstain": 13,
+    "abstain": 12,
     "monitor": 0
   },
   "active": [
@@ -167,64 +167,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.852
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815993",
-      "source_event_ids": [
-        "401815993"
-      ],
-      "kickoff": "2026-07-02T22:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Cleveland Guardians",
-      "away": "Chicago White Sox",
-      "match": "Cleveland Guardians - Chicago White Sox",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Cleveland Guardians 0.36, Chicago White Sox 0.36",
-      "pressure_score": 1.6,
-      "home_fade": 0.36,
-      "away_fade": 0.36,
-      "travel_score": 0,
-      "lookahead_score": 1.6,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "3 match important/proche dans les 3 jours",
-        "3 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.116,
-        "away_score": -1.234,
-        "home_fade": 0.36,
-        "away_fade": 1.36,
-        "reason": "Direction nette: Cleveland Guardians (+0.12)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.36
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.36
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
           }
         ]
       }

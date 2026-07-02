@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-07-02T21:52:49Z",
+  "generated_at": "2026-07-02T22:51:11Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401815993",
-      "kickoff": "2026-07-02T22:40Z",
-      "league": "MLB",
-      "match": "Chicago White Sox at Cleveland Guardians",
-      "home": "Cleveland Guardians",
-      "away": "Chicago White Sox",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Cleveland Guardians",
-          "pitcher": "Slade Cecconi",
-          "label": "Slade Cecconi moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.5988,
-          "fair_odds": 1.67,
-          "expected_strikeouts": 4.1,
-          "projected_ip": 5.3,
-          "inputs": {
-            "k9": 6.97,
-            "era": 4.18,
-            "whip": 1.36,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Cleveland Guardians",
-          "pitcher": "Slade Cecconi",
-          "label": "Slade Cecconi concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5067,
-          "fair_odds": 1.97,
-          "expected_hr_allowed": 0.707,
-          "projected_ip": 5.3,
-          "inputs": {
-            "hr9": 1.2,
-            "era": 4.18,
-            "whip": 1.36
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Chicago White Sox",
-          "pitcher": "Davis Martin",
-          "label": "Davis Martin plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.527,
-          "fair_odds": 1.9,
-          "expected_strikeouts": 5.63,
-          "projected_ip": 5.81,
-          "inputs": {
-            "k9": 8.71,
-            "era": 3.0,
-            "whip": 1.18,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Chicago White Sox",
-          "pitcher": "Davis Martin",
-          "label": "Davis Martin ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6876,
-          "fair_odds": 1.45,
-          "expected_hr_allowed": 0.375,
-          "projected_ip": 5.81,
-          "inputs": {
-            "hr9": 0.58,
-            "era": 3.0,
-            "whip": 1.18
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401815995",
       "kickoff": "2026-07-02T23:15Z",
@@ -1444,7 +1362,7 @@
       ]
     }
   ],
-  "props": 70,
+  "props": 66,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
