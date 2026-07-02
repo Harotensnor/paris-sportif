@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-02T19:37:18Z",
+  "generated_at": "2026-07-02T20:46:20Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -56,13 +56,13 @@
         "1 match dans les 48h + 1209 km de voyage"
       ],
       "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.725,
-        "away_score": -0.687,
-        "home_fade": 1.1,
+        "status": "net",
+        "net_side": "away",
+        "home_score": -1.125,
+        "away_score": -0.547,
+        "home_fade": 1.5,
         "away_fade": 1.072,
-        "reason": "Signaux opposes: Atlanta Braves fade 1.10, New York Mets fade 1.07 -> prudence",
+        "reason": "Direction nette: New York Mets (-0.55)",
         "detail": [
           {
             "side": "home",
@@ -81,6 +81,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.3
+          },
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.4
           },
           {
             "side": "away",
@@ -124,13 +130,13 @@
         "2 match dans les 48h + 1209 km de voyage"
       ],
       "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.799,
-        "away_score": -0.599,
-        "home_fade": 1.15,
+        "status": "net",
+        "net_side": "away",
+        "home_score": -1.199,
+        "away_score": -0.459,
+        "home_fade": 1.55,
         "away_fade": 1.002,
-        "reason": "Signaux opposes: Atlanta Braves fade 1.15, New York Mets fade 1.00 -> prudence",
+        "reason": "Direction nette: New York Mets (-0.46)",
         "detail": [
           {
             "side": "home",
@@ -149,6 +155,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.4
           },
           {
             "side": "away",
@@ -306,11 +318,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.834,
-        "away_score": -0.024,
-        "home_fade": 0.96,
+        "home_score": -0.634,
+        "away_score": -0.094,
+        "home_fade": 0.76,
         "away_fade": 0.36,
-        "reason": "Direction nette: San Diego Padres (-0.02)",
+        "reason": "Direction nette: San Diego Padres (-0.09)",
         "detail": [
           {
             "side": "home",
@@ -328,7 +340,7 @@
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.6
+            "strength": 0.4
           }
         ]
       }
@@ -364,11 +376,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.595,
-        "away_score": -0.055,
-        "home_fade": 0.7,
+        "home_score": -0.195,
+        "away_score": -0.195,
+        "home_fade": 0.3,
         "away_fade": 0.3,
-        "reason": "Direction nette: Detroit Tigers (-0.06)",
+        "reason": "Direction nette: Detroit Tigers (-0.20)",
         "detail": [
           {
             "side": "home",
@@ -381,12 +393,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.3
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
           }
         ]
       }
@@ -538,11 +544,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.795,
-        "away_score": 0.015,
-        "home_fade": 0.9,
+        "home_score": -0.595,
+        "away_score": -0.055,
+        "home_fade": 0.7,
         "away_fade": 0.3,
-        "reason": "Direction nette: San Diego Padres (+0.01)",
+        "reason": "Direction nette: San Diego Padres (-0.06)",
         "detail": [
           {
             "side": "home",
@@ -560,7 +566,7 @@
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.6
+            "strength": 0.4
           }
         ]
       }
@@ -654,11 +660,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.99,
-        "away_score": -0.18,
-        "home_fade": 1.2,
+        "home_score": -0.79,
+        "away_score": -0.25,
+        "home_fade": 1.0,
         "away_fade": 0.6,
-        "reason": "Direction nette: San Diego Padres (-0.18)",
+        "reason": "Direction nette: San Diego Padres (-0.25)",
         "detail": [
           {
             "side": "home",
@@ -676,7 +682,7 @@
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.6
+            "strength": 0.4
           }
         ]
       }
@@ -770,11 +776,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.698,
-        "away_score": 0.112,
-        "home_fade": 0.75,
+        "home_score": -0.498,
+        "away_score": 0.043,
+        "home_fade": 0.55,
         "away_fade": 0.15,
-        "reason": "Direction nette: San Diego Padres (+0.11)",
+        "reason": "Direction nette: San Diego Padres (+0.04)",
         "detail": [
           {
             "side": "home",
@@ -792,7 +798,7 @@
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.6
+            "strength": 0.4
           }
         ]
       }
@@ -1039,13 +1045,13 @@
         "2 match dans les 48h + 1209 km de voyage"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.492,
-        "away_score": -1.102,
-        "home_fade": 1.0,
+        "status": "abstain",
+        "net_side": null,
+        "home_score": -0.892,
+        "away_score": -0.962,
+        "home_fade": 1.4,
         "away_fade": 1.452,
-        "reason": "Direction nette: Atlanta Braves (-0.49)",
+        "reason": "Signaux opposes: Atlanta Braves fade 1.40, New York Mets fade 1.45 -> prudence",
         "detail": [
           {
             "side": "home",
@@ -1058,6 +1064,12 @@
             "type": "schedule_congestion",
             "direction": "fade",
             "strength": 0.6
+          },
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.4
           },
           {
             "side": "away",
@@ -1101,11 +1113,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.834,
-        "away_score": -0.024,
-        "home_fade": 0.96,
+        "home_score": -1.234,
+        "away_score": 0.116,
+        "home_fade": 1.36,
         "away_fade": 0.36,
-        "reason": "Direction nette: New York Mets (-0.02)",
+        "reason": "Direction nette: New York Mets (+0.12)",
         "detail": [
           {
             "side": "home",
@@ -1124,6 +1136,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.36
+          },
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.4
           }
         ]
       }
@@ -1353,11 +1371,11 @@
       "global_resolution": {
         "status": "abstain",
         "net_side": null,
-        "home_score": -0.585,
-        "away_score": -0.585,
-        "home_fade": 0.9,
+        "home_score": -0.385,
+        "away_score": -0.655,
+        "home_fade": 0.7,
         "away_fade": 0.9,
-        "reason": "Signaux opposes: Athletics fade 0.90, Miami Marlins fade 0.90 -> prudence",
+        "reason": "Signaux opposes: Athletics fade 0.70, Miami Marlins fade 0.90 -> prudence",
         "detail": [
           {
             "side": "home",
@@ -1381,7 +1399,7 @@
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.6
+            "strength": 0.4
           }
         ]
       }
@@ -1485,11 +1503,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": -0.198,
-        "away_score": -0.813,
-        "home_fade": 0.55,
+        "home_score": 0.202,
+        "away_score": -0.953,
+        "home_fade": 0.15,
         "away_fade": 1.006,
-        "reason": "Direction nette: Texas Rangers (-0.20)",
+        "reason": "Direction nette: Texas Rangers (+0.20)",
         "detail": [
           {
             "side": "home",
@@ -1502,12 +1520,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
           },
           {
             "side": "away",
@@ -1741,13 +1753,13 @@
         "1 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.417,
-        "away_score": -0.688,
-        "home_fade": 0.75,
+        "status": "net",
+        "net_side": "home",
+        "home_score": -0.218,
+        "away_score": -0.758,
+        "home_fade": 0.55,
         "away_fade": 0.95,
-        "reason": "Signaux opposes: Athletics fade 0.75, Miami Marlins fade 0.95 -> prudence",
+        "reason": "Direction nette: Athletics (-0.22)",
         "detail": [
           {
             "side": "home",
@@ -1771,7 +1783,7 @@
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.6
+            "strength": 0.4
           }
         ]
       }
@@ -1953,11 +1965,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": -0.25,
-        "away_score": -0.79,
-        "home_fade": 0.6,
+        "home_score": -0.05,
+        "away_score": -0.86,
+        "home_fade": 0.4,
         "away_fade": 1.0,
-        "reason": "Direction nette: Athletics (-0.25)",
+        "reason": "Direction nette: Athletics (-0.05)",
         "detail": [
           {
             "side": "away",
@@ -1969,7 +1981,7 @@
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.6
+            "strength": 0.4
           }
         ]
       }
@@ -2106,18 +2118,12 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": -0.1,
-        "away_score": -0.716,
-        "home_fade": 0.4,
+        "home_score": 0.3,
+        "away_score": -0.856,
+        "home_fade": 0.0,
         "away_fade": 0.856,
-        "reason": "Direction nette: Texas Rangers (-0.10)",
+        "reason": "Direction nette: Texas Rangers (+0.30)",
         "detail": [
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
-          },
           {
             "side": "away",
             "type": "back_to_back_travel",
