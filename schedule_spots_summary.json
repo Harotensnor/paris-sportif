@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-07-02T01:38:14Z",
+  "generated_at": "2026-07-02T03:00:41Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 21,
+    "active_events": 19,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 25,
-      "back_to_back_travel": 6,
       "travel_extreme": 1,
-      "schedule_congestion": 12
+      "back_to_back_travel": 5,
+      "lookahead": 24,
+      "schedule_congestion": 10
     },
     "by_decision": {
-      "abstain": 7,
-      "lean_away": 7,
-      "lean_home": 7
+      "abstain": 8,
+      "lean_away": 6,
+      "lean_home": 5
     },
-    "lean_home": 7,
-    "lean_away": 7,
-    "abstain": 7,
+    "lean_home": 5,
+    "lean_away": 6,
+    "abstain": 8,
     "monitor": 0
   },
   "active": [
@@ -37,36 +37,36 @@
       "match": "Los Angeles Dodgers - San Diego Padres",
       "decision": "abstain",
       "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Los Angeles Dodgers 1.00, San Diego Padres 0.90",
-      "pressure_score": 2.267,
-      "home_fade": 1.0,
+      "reason": "Fatigue/agenda des deux cotes: Los Angeles Dodgers 0.80, San Diego Padres 0.90",
+      "pressure_score": 2.067,
+      "home_fade": 0.8,
       "away_fade": 0.9,
       "travel_score": 0,
       "lookahead_score": 0.667,
-      "congestion_score": 1.6,
+      "congestion_score": 1.4,
       "types": {
         "schedule_congestion": 2,
         "lookahead": 1
       },
       "contexts": [
-        "5 matchs sur les 7 derniers jours",
+        "4 matchs sur les 7 derniers jours",
         "3 matchs sur les 7 derniers jours",
         "2 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -1.285,
-        "away_score": -0.34,
-        "home_fade": 1.6,
+        "home_score": -1.085,
+        "away_score": -0.41,
+        "home_fade": 1.4,
         "away_fade": 0.9,
-        "reason": "Direction nette: San Diego Padres (-0.34)",
+        "reason": "Direction nette: San Diego Padres (-0.41)",
         "detail": [
           {
             "side": "home",
             "type": "schedule_congestion",
             "direction": "fade",
-            "strength": 1.0
+            "strength": 0.8
           },
           {
             "side": "away",
@@ -189,6 +189,64 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.36
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.36
+          },
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.6
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401816013",
+      "source_event_ids": [
+        "401816013"
+      ],
+      "kickoff": "2026-07-04T02:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Los Angeles Dodgers",
+      "away": "San Diego Padres",
+      "match": "Los Angeles Dodgers - San Diego Padres",
+      "decision": "abstain",
+      "net_team": null,
+      "reason": "Fatigue/agenda des deux cotes: Los Angeles Dodgers 0.30, San Diego Padres 0.36",
+      "pressure_score": 1.467,
+      "home_fade": 0.3,
+      "away_fade": 0.36,
+      "travel_score": 0,
+      "lookahead_score": 1.467,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 2
+      },
+      "contexts": [
+        "2 match important/proche dans les 3 jours",
+        "3 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "away",
+        "home_score": -0.774,
+        "away_score": -0.045,
+        "home_fade": 0.9,
+        "away_fade": 0.36,
+        "reason": "Direction nette: San Diego Padres (-0.05)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.3
           },
           {
             "side": "away",
@@ -438,73 +496,6 @@
       }
     },
     {
-      "event_id": "401816065",
-      "source_event_ids": [
-        "401816065"
-      ],
-      "kickoff": "2026-07-08T01:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Diego Padres",
-      "away": "Arizona Diamondbacks",
-      "match": "San Diego Padres - Arizona Diamondbacks",
-      "decision": "lean_away",
-      "net_team": "Arizona Diamondbacks",
-      "reason": "San Diego Padres plus penalise par calendrier/voyage (1.30 vs 0.90)",
-      "pressure_score": 2.933,
-      "home_fade": 1.3,
-      "away_fade": 0.9,
-      "travel_score": 0,
-      "lookahead_score": 1.333,
-      "congestion_score": 1.6,
-      "types": {
-        "schedule_congestion": 2,
-        "lookahead": 2
-      },
-      "contexts": [
-        "5 matchs sur les 7 derniers jours",
-        "2 match important/proche dans les 3 jours",
-        "3 matchs sur les 7 derniers jours",
-        "2 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.985,
-        "away_score": -0.445,
-        "home_fade": 1.3,
-        "away_fade": 0.9,
-        "reason": "Direction nette: Arizona Diamondbacks (-0.44)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401816050",
       "source_event_ids": [
         "401816050"
@@ -535,13 +526,13 @@
         "3 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -1.034,
-        "away_score": 0.046,
+        "status": "abstain",
+        "net_side": null,
+        "home_score": 0.316,
+        "away_score": -0.954,
         "home_fade": 1.16,
-        "away_fade": 0.36,
-        "reason": "Direction nette: Arizona Diamondbacks (+0.05)",
+        "away_fade": 1.36,
+        "reason": "Signaux opposes: San Diego Padres fade 1.16, Arizona Diamondbacks fade 1.36 -> prudence",
         "detail": [
           {
             "side": "home",
@@ -560,54 +551,66 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.36
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           }
         ]
       }
     },
     {
-      "event_id": "401816013",
+      "event_id": "401816065",
       "source_event_ids": [
-        "401816013"
+        "401816065"
       ],
-      "kickoff": "2026-07-04T02:10Z",
+      "kickoff": "2026-07-08T01:40Z",
       "sport": "baseball",
       "league_code": "mlb",
       "league_name": "MLB",
-      "home": "Los Angeles Dodgers",
-      "away": "San Diego Padres",
-      "match": "Los Angeles Dodgers - San Diego Padres",
+      "home": "San Diego Padres",
+      "away": "Arizona Diamondbacks",
+      "match": "San Diego Padres - Arizona Diamondbacks",
       "decision": "lean_away",
-      "net_team": "San Diego Padres",
-      "reason": "Los Angeles Dodgers plus penalise par calendrier/voyage (0.90 vs 0.36)",
-      "pressure_score": 2.067,
-      "home_fade": 0.9,
-      "away_fade": 0.36,
+      "net_team": "Arizona Diamondbacks",
+      "reason": "San Diego Padres plus penalise par calendrier/voyage (1.30 vs 0.30)",
+      "pressure_score": 2.333,
+      "home_fade": 1.3,
+      "away_fade": 0.3,
       "travel_score": 0,
-      "lookahead_score": 1.467,
-      "congestion_score": 0.6,
+      "lookahead_score": 1.333,
+      "congestion_score": 1.0,
       "types": {
         "schedule_congestion": 1,
         "lookahead": 2
       },
       "contexts": [
-        "3 matchs sur les 7 derniers jours",
+        "5 matchs sur les 7 derniers jours",
         "2 match important/proche dans les 3 jours",
-        "3 match important/proche dans les 3 jours"
+        "2 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -1.374,
-        "away_score": 0.165,
-        "home_fade": 1.5,
-        "away_fade": 0.36,
-        "reason": "Direction nette: San Diego Padres (+0.16)",
+        "status": "abstain",
+        "net_side": null,
+        "home_score": 0.155,
+        "away_score": -0.845,
+        "home_fade": 1.3,
+        "away_fade": 1.3,
+        "reason": "Signaux opposes: San Diego Padres fade 1.30, Arizona Diamondbacks fade 1.30 -> prudence",
         "detail": [
           {
             "side": "home",
             "type": "schedule_congestion",
             "direction": "fade",
-            "strength": 0.6
+            "strength": 1.0
           },
           {
             "side": "home",
@@ -619,13 +622,19 @@
             "side": "away",
             "type": "lookahead",
             "direction": "caution",
-            "strength": 0.36
+            "strength": 0.3
           },
           {
             "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.6
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           }
         ]
       }
@@ -644,36 +653,36 @@
       "match": "Los Angeles Dodgers - San Diego Padres",
       "decision": "lean_away",
       "net_team": "San Diego Padres",
-      "reason": "Los Angeles Dodgers plus penalise par calendrier/voyage (0.95 vs 0.36)",
-      "pressure_score": 1.933,
-      "home_fade": 0.95,
+      "reason": "Los Angeles Dodgers plus penalise par calendrier/voyage (0.75 vs 0.36)",
+      "pressure_score": 1.733,
+      "home_fade": 0.75,
       "away_fade": 0.36,
       "travel_score": 0,
       "lookahead_score": 1.133,
-      "congestion_score": 0.8,
+      "congestion_score": 0.6,
       "types": {
         "schedule_congestion": 1,
         "lookahead": 2
       },
       "contexts": [
-        "4 matchs sur les 7 derniers jours",
+        "3 matchs sur les 7 derniers jours",
         "1 match important/proche dans les 3 jours",
         "3 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -1.424,
-        "away_score": 0.182,
-        "home_fade": 1.55,
+        "home_score": -1.224,
+        "away_score": 0.112,
+        "home_fade": 1.35,
         "away_fade": 0.36,
-        "reason": "Direction nette: San Diego Padres (+0.18)",
+        "reason": "Direction nette: San Diego Padres (+0.11)",
         "detail": [
           {
             "side": "home",
             "type": "schedule_congestion",
             "direction": "fade",
-            "strength": 0.8
+            "strength": 0.6
           },
           {
             "side": "home",
@@ -727,13 +736,13 @@
         "1 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -1.097,
-        "away_score": 0.252,
+        "status": "abstain",
+        "net_side": null,
+        "home_score": 0.253,
+        "away_score": -0.747,
         "home_fade": 1.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Arizona Diamondbacks (+0.25)",
+        "away_fade": 1.15,
+        "reason": "Signaux opposes: San Diego Padres fade 1.15, Arizona Diamondbacks fade 1.15 -> prudence",
         "detail": [
           {
             "side": "home",
@@ -752,6 +761,18 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           }
         ]
       }
@@ -783,7 +804,7 @@
       },
       "contexts": [
         "Deplacement estime 2774 km, decalage ~1.7h",
-        "2 match dans les 48h + 2774 km de voyage"
+        "1 match dans les 48h + 2774 km de voyage"
       ],
       "global_resolution": {
         "status": "net",
@@ -844,13 +865,13 @@
         "3 matchs sur les 7 derniers jours"
       ],
       "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.79,
-        "away_score": -0.25,
+        "status": "mixed",
+        "net_side": null,
+        "home_score": 0.56,
+        "away_score": -1.25,
         "home_fade": 1.0,
-        "away_fade": 0.6,
-        "reason": "Direction nette: Arizona Diamondbacks (-0.25)",
+        "away_fade": 1.6,
+        "reason": "Signaux mitigés: avantage net trop faible (San Diego Padres +0.56, Arizona Diamondbacks -1.25)",
         "detail": [
           {
             "side": "home",
@@ -863,6 +884,18 @@
             "type": "schedule_congestion",
             "direction": "fade",
             "strength": 0.6
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
           }
         ]
       }
@@ -947,27 +980,27 @@
       "match": "Kansas City Royals - Tampa Bay Rays",
       "decision": "lean_home",
       "net_team": "Kansas City Royals",
-      "reason": "Tampa Bay Rays plus penalise par calendrier/voyage (0.94 vs 0.00)",
-      "pressure_score": 0.943,
+      "reason": "Tampa Bay Rays plus penalise par calendrier/voyage (0.86 vs 0.00)",
+      "pressure_score": 0.863,
       "home_fade": 0.0,
-      "away_fade": 0.943,
-      "travel_score": 0.943,
+      "away_fade": 0.863,
+      "travel_score": 0.863,
       "lookahead_score": 0,
       "congestion_score": 0,
       "types": {
         "back_to_back_travel": 1
       },
       "contexts": [
-        "2 match dans les 48h + 1664 km de voyage"
+        "1 match dans les 48h + 1664 km de voyage"
       ],
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": -0.07,
-        "away_score": -0.803,
+        "home_score": -0.098,
+        "away_score": -0.723,
         "home_fade": 0.4,
-        "away_fade": 0.943,
-        "reason": "Direction nette: Kansas City Royals (-0.07)",
+        "away_fade": 0.863,
+        "reason": "Direction nette: Kansas City Royals (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -979,7 +1012,7 @@
             "side": "away",
             "type": "back_to_back_travel",
             "direction": "fade",
-            "strength": 0.943
+            "strength": 0.863
           }
         ]
       }
@@ -1082,102 +1115,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.846
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815992",
-      "source_event_ids": [
-        "401815992"
-      ],
-      "kickoff": "2026-07-02T01:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Arizona Diamondbacks",
-      "away": "San Francisco Giants",
-      "match": "Arizona Diamondbacks - San Francisco Giants",
-      "decision": "lean_home",
-      "net_team": "Arizona Diamondbacks",
-      "reason": "San Francisco Giants plus penalise par calendrier/voyage (0.74 vs 0.00)",
-      "pressure_score": 0.74,
-      "home_fade": 0.0,
-      "away_fade": 0.74,
-      "travel_score": 0.74,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "1 match dans les 48h + 1049 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.259,
-        "away_score": -0.74,
-        "home_fade": 0.0,
-        "away_fade": 0.74,
-        "reason": "Direction nette: Arizona Diamondbacks (+0.26)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.74
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401815991",
-      "source_event_ids": [
-        "401815991"
-      ],
-      "kickoff": "2026-07-02T01:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Athletics",
-      "away": "Los Angeles Dodgers",
-      "match": "Athletics - Los Angeles Dodgers",
-      "decision": "lean_home",
-      "net_team": "Athletics",
-      "reason": "Los Angeles Dodgers plus penalise par calendrier/voyage (0.30 vs 0.00)",
-      "pressure_score": 0.667,
-      "home_fade": 0.0,
-      "away_fade": 0.3,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 1
-      },
-      "contexts": [
-        "2 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.315,
-        "away_score": -0.9,
-        "home_fade": 0.0,
-        "away_fade": 0.9,
-        "reason": "Direction nette: Athletics (+0.31)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.6
           }
         ]
       }
