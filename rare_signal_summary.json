@@ -1,17 +1,17 @@
 {
-  "generated_at": "2026-07-02T03:00:41Z",
+  "generated_at": "2026-07-02T06:47:04Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 28,
+    "active_events": 30,
     "actionable": 15,
-    "watch": 5,
+    "watch": 7,
     "risk": 8,
     "expired_sample": 0,
     "by_type": {
       "market_uncertain": 8,
-      "market_move": 9,
+      "market_move": 12,
       "travel_extreme": 1,
       "back_to_back_travel": 5,
       "injury_imbalance": 11,
@@ -20,7 +20,7 @@
     "by_quality": {
       "risk": 8,
       "actionable": 15,
-      "watch": 5
+      "watch": 7
     }
   },
   "active_actionable": [
@@ -36,11 +36,11 @@
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
       "type": "market_move",
-      "direction": "drift",
+      "direction": "steam",
       "team": null,
-      "side": "away",
+      "side": "home",
       "strength": 1.0,
-      "context": "Cote away: 7.50 -> 21.00 (-180.0%)"
+      "context": "Cote home: 1.50 -> 1.02 (+32.1%)"
     },
     {
       "event_id": "401815999",
@@ -385,6 +385,42 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 14-11"
+    },
+    {
+      "event_id": "401857034",
+      "date": "2026-07-02T23:30Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Washington Mystics",
+      "away": "Atlanta Dream",
+      "match": "Washington Mystics - Atlanta Dream",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 0.498,
+      "context": "Cote home: 3.35 -> 3.05 (+9.0%)"
+    },
+    {
+      "event_id": "401857036",
+      "date": "2026-07-03T02:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Phoenix Mercury",
+      "away": "Seattle Storm",
+      "match": "Phoenix Mercury - Seattle Storm",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.494,
+      "context": "Cote away: 2.36 -> 2.15 (+8.9%)"
     }
   ],
   "active_risk": [

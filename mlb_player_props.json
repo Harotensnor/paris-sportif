@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-02T03:00:41Z",
+  "generated_at": "2026-07-02T06:47:03Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -210,6 +210,42 @@
             "whip": 1.79
           },
           "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Miami Marlins",
+          "pitcher": "Ryan Gusto",
+          "label": "Ryan Gusto plus de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "over",
+          "probability": 0.6159,
+          "fair_odds": 1.62,
+          "expected_strikeouts": 3.96,
+          "projected_ip": 4.22,
+          "inputs": {
+            "k9": 8.44,
+            "era": 5.06,
+            "whip": 1.55,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Miami Marlins",
+          "pitcher": "Ryan Gusto",
+          "label": "Ryan Gusto ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6744,
+          "fair_odds": 1.48,
+          "expected_hr_allowed": 0.394,
+          "projected_ip": 4.22,
+          "inputs": {
+            "hr9": 0.84,
+            "era": 5.06,
+            "whip": 1.55
+          },
+          "side": "away"
         }
       ]
     },
@@ -305,6 +341,42 @@
       "props": [
         {
           "market": "pitcher_strikeouts",
+          "team": "Atlanta Braves",
+          "pitcher": "Hurston Waldrep",
+          "label": "Hurston Waldrep moins de 7,5 strikeouts",
+          "line": 7.5,
+          "pick": "under",
+          "probability": 0.557,
+          "fair_odds": 1.8,
+          "expected_strikeouts": 7.2,
+          "projected_ip": 4.8,
+          "inputs": {
+            "k9": 13.5,
+            "era": 0.0,
+            "whip": 3.0,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Atlanta Braves",
+          "pitcher": "Hurston Waldrep",
+          "label": "Hurston Waldrep ne concède pas de home run",
+          "pick": "no",
+          "probability": 1.0,
+          "fair_odds": 1.01,
+          "expected_hr_allowed": 0.0,
+          "projected_ip": 4.8,
+          "inputs": {
+            "hr9": 0.0,
+            "era": 0.0,
+            "whip": 3.0
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
           "team": "St. Louis Cardinals",
           "pitcher": "Dustin May",
           "label": "Dustin May moins de 5,5 strikeouts",
@@ -336,6 +408,88 @@
             "hr9": 0.75,
             "era": 4.3,
             "whip": 1.2
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401815998",
+      "kickoff": "2026-07-02T23:40Z",
+      "league": "MLB",
+      "match": "Tampa Bay Rays at Kansas City Royals",
+      "home": "Kansas City Royals",
+      "away": "Tampa Bay Rays",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Kansas City Royals",
+          "pitcher": "Stephen Kolek",
+          "label": "Stephen Kolek plus de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "over",
+          "probability": 0.572,
+          "fair_odds": 1.75,
+          "expected_strikeouts": 3.77,
+          "projected_ip": 5.78,
+          "inputs": {
+            "k9": 5.88,
+            "era": 4.15,
+            "whip": 1.19,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Kansas City Royals",
+          "pitcher": "Stephen Kolek",
+          "label": "Stephen Kolek concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5877,
+          "fair_odds": 1.7,
+          "expected_hr_allowed": 0.886,
+          "projected_ip": 5.78,
+          "inputs": {
+            "hr9": 1.38,
+            "era": 4.15,
+            "whip": 1.19
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Tampa Bay Rays",
+          "pitcher": "Ian Seymour",
+          "label": "Ian Seymour plus de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "over",
+          "probability": 0.5707,
+          "fair_odds": 1.75,
+          "expected_strikeouts": 6.86,
+          "projected_ip": 6.6,
+          "inputs": {
+            "k9": 9.36,
+            "era": 4.32,
+            "whip": 1.14,
+            "hand": "L"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Tampa Bay Rays",
+          "pitcher": "Ian Seymour",
+          "label": "Ian Seymour concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.6031,
+          "fair_odds": 1.66,
+          "expected_hr_allowed": 0.924,
+          "projected_ip": 6.6,
+          "inputs": {
+            "hr9": 1.26,
+            "era": 4.32,
+            "whip": 1.14
           },
           "side": "away"
         }
@@ -384,6 +538,42 @@
             "whip": 0.9
           },
           "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "San Diego Padres",
+          "pitcher": "Michael King",
+          "label": "Michael King plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.5846,
+          "fair_odds": 1.71,
+          "expected_strikeouts": 4.87,
+          "projected_ip": 5.65,
+          "inputs": {
+            "k9": 7.75,
+            "era": 3.55,
+            "whip": 1.18,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "San Diego Padres",
+          "pitcher": "Michael King",
+          "label": "Michael King ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5576,
+          "fair_odds": 1.79,
+          "expected_hr_allowed": 0.584,
+          "projected_ip": 5.65,
+          "inputs": {
+            "hr9": 0.93,
+            "era": 3.55,
+            "whip": 1.18
+          },
+          "side": "away"
         }
       ]
     },
@@ -468,9 +658,255 @@
           "side": "away"
         }
       ]
+    },
+    {
+      "event_id": "401816013",
+      "kickoff": "2026-07-04T02:10Z",
+      "league": "MLB",
+      "match": "San Diego Padres at Los Angeles Dodgers",
+      "home": "Los Angeles Dodgers",
+      "away": "San Diego Padres",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Los Angeles Dodgers",
+          "pitcher": "Yoshinobu Yamamoto",
+          "label": "Yoshinobu Yamamoto plus de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "over",
+          "probability": 0.5972,
+          "fair_odds": 1.67,
+          "expected_strikeouts": 5.97,
+          "projected_ip": 6.48,
+          "inputs": {
+            "k9": 8.29,
+            "era": 2.67,
+            "whip": 0.89,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Los Angeles Dodgers",
+          "pitcher": "Yoshinobu Yamamoto",
+          "label": "Yoshinobu Yamamoto concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5167,
+          "fair_odds": 1.94,
+          "expected_hr_allowed": 0.727,
+          "projected_ip": 6.48,
+          "inputs": {
+            "hr9": 1.01,
+            "era": 2.67,
+            "whip": 0.89
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "San Diego Padres",
+          "pitcher": "Griffin Canning",
+          "label": "Griffin Canning moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.5871,
+          "fair_odds": 1.7,
+          "expected_strikeouts": 5.11,
+          "projected_ip": 5.22,
+          "inputs": {
+            "k9": 8.81,
+            "era": 7.09,
+            "whip": 1.66,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "San Diego Padres",
+          "pitcher": "Griffin Canning",
+          "label": "Griffin Canning concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5884,
+          "fair_odds": 1.7,
+          "expected_hr_allowed": 0.888,
+          "projected_ip": 5.22,
+          "inputs": {
+            "hr9": 1.53,
+            "era": 7.09,
+            "whip": 1.66
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401816020",
+      "kickoff": "2026-07-04T20:05Z",
+      "league": "MLB",
+      "match": "Detroit Tigers at Texas Rangers",
+      "home": "Texas Rangers",
+      "away": "Detroit Tigers",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Texas Rangers",
+          "pitcher": "Kumar Rocker",
+          "label": "Kumar Rocker moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.6121,
+          "fair_odds": 1.63,
+          "expected_strikeouts": 5.0,
+          "projected_ip": 5.71,
+          "inputs": {
+            "k9": 7.88,
+            "era": 3.83,
+            "whip": 1.34,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Texas Rangers",
+          "pitcher": "Kumar Rocker",
+          "label": "Kumar Rocker ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5647,
+          "fair_odds": 1.77,
+          "expected_hr_allowed": 0.571,
+          "projected_ip": 5.71,
+          "inputs": {
+            "hr9": 0.9,
+            "era": 3.83,
+            "whip": 1.34
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Detroit Tigers",
+          "pitcher": "Jack Flaherty",
+          "label": "Jack Flaherty moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.5217,
+          "fair_odds": 1.92,
+          "expected_strikeouts": 5.4,
+          "projected_ip": 4.39,
+          "inputs": {
+            "k9": 11.08,
+            "era": 4.97,
+            "whip": 1.53,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Detroit Tigers",
+          "pitcher": "Jack Flaherty",
+          "label": "Jack Flaherty ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6082,
+          "fair_odds": 1.64,
+          "expected_hr_allowed": 0.497,
+          "projected_ip": 4.39,
+          "inputs": {
+            "hr9": 1.02,
+            "era": 4.97,
+            "whip": 1.53
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401816016",
+      "kickoff": "2026-07-04T23:10Z",
+      "league": "MLB",
+      "match": "Chicago White Sox at Cleveland Guardians",
+      "home": "Cleveland Guardians",
+      "away": "Chicago White Sox",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Cleveland Guardians",
+          "pitcher": "Parker Messick",
+          "label": "Parker Messick moins de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "under",
+          "probability": 0.5534,
+          "fair_odds": 1.81,
+          "expected_strikeouts": 6.24,
+          "projected_ip": 5.94,
+          "inputs": {
+            "k9": 9.45,
+            "era": 2.85,
+            "whip": 1.06,
+            "hand": "L"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Cleveland Guardians",
+          "pitcher": "Parker Messick",
+          "label": "Parker Messick ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5897,
+          "fair_odds": 1.7,
+          "expected_hr_allowed": 0.528,
+          "projected_ip": 5.94,
+          "inputs": {
+            "hr9": 0.8,
+            "era": 2.85,
+            "whip": 1.06
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Chicago White Sox",
+          "pitcher": "Sean Burke",
+          "label": "Sean Burke plus de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "over",
+          "probability": 0.5527,
+          "fair_odds": 1.81,
+          "expected_strikeouts": 6.77,
+          "projected_ip": 6.6,
+          "inputs": {
+            "k9": 9.23,
+            "era": 3.69,
+            "whip": 1.22,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Chicago White Sox",
+          "pitcher": "Sean Burke",
+          "label": "Sean Burke concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5437,
+          "fair_odds": 1.84,
+          "expected_hr_allowed": 0.785,
+          "projected_ip": 6.6,
+          "inputs": {
+            "hr9": 1.07,
+            "era": 3.69,
+            "whip": 1.22
+          },
+          "side": "away"
+        }
+      ]
     }
   ],
-  "props": 22,
+  "props": 44,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
