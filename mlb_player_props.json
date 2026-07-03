@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-07-03T19:56:06Z",
+  "generated_at": "2026-07-03T20:51:38Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401816007",
-      "kickoff": "2026-07-03T20:05Z",
-      "league": "MLB",
-      "match": "St. Louis Cardinals at Chicago Cubs",
-      "home": "Chicago Cubs",
-      "away": "St. Louis Cardinals",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Chicago Cubs",
-          "pitcher": "David Peterson",
-          "label": "David Peterson moins de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "under",
-          "probability": 0.5789,
-          "fair_odds": 1.73,
-          "expected_strikeouts": 6.12,
-          "projected_ip": 6.6,
-          "inputs": {
-            "k9": 8.34,
-            "era": 6.09,
-            "whip": 1.65,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Chicago Cubs",
-          "pitcher": "David Peterson",
-          "label": "David Peterson ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5603,
-          "fair_odds": 1.78,
-          "expected_hr_allowed": 0.579,
-          "projected_ip": 6.6,
-          "inputs": {
-            "hr9": 0.79,
-            "era": 6.09,
-            "whip": 1.65
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "St. Louis Cardinals",
-          "pitcher": "Andre Pallante",
-          "label": "Andre Pallante moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.5647,
-          "fair_odds": 1.77,
-          "expected_strikeouts": 4.24,
-          "projected_ip": 5.57,
-          "inputs": {
-            "k9": 6.85,
-            "era": 3.83,
-            "whip": 1.23,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "St. Louis Cardinals",
-          "pitcher": "Andre Pallante",
-          "label": "Andre Pallante ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5695,
-          "fair_odds": 1.76,
-          "expected_hr_allowed": 0.563,
-          "projected_ip": 5.57,
-          "inputs": {
-            "hr9": 0.91,
-            "era": 3.83,
-            "whip": 1.23
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401816006",
       "kickoff": "2026-07-03T22:45Z",
@@ -1125,42 +1043,6 @@
       "props": [
         {
           "market": "pitcher_strikeouts",
-          "team": "New York Yankees",
-          "pitcher": "Carlos Rodón",
-          "label": "Carlos Rodón plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.5528,
-          "fair_odds": 1.81,
-          "expected_strikeouts": 5.75,
-          "projected_ip": 5.12,
-          "inputs": {
-            "k9": 10.1,
-            "era": 3.3,
-            "whip": 1.25,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "New York Yankees",
-          "pitcher": "Carlos Rodón",
-          "label": "Carlos Rodón ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.7189,
-          "fair_odds": 1.39,
-          "expected_hr_allowed": 0.33,
-          "projected_ip": 5.12,
-          "inputs": {
-            "hr9": 0.58,
-            "era": 3.3,
-            "whip": 1.25
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
           "team": "Minnesota Twins",
           "pitcher": "Zebby Matthews",
           "label": "Zebby Matthews moins de 5,5 strikeouts",
@@ -1192,6 +1074,88 @@
             "hr9": 1.76,
             "era": 4.15,
             "whip": 1.14
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401816020",
+      "kickoff": "2026-07-04T20:05Z",
+      "league": "MLB",
+      "match": "Detroit Tigers at Texas Rangers",
+      "home": "Texas Rangers",
+      "away": "Detroit Tigers",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Texas Rangers",
+          "pitcher": "Kumar Rocker",
+          "label": "Kumar Rocker moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.6121,
+          "fair_odds": 1.63,
+          "expected_strikeouts": 5.0,
+          "projected_ip": 5.71,
+          "inputs": {
+            "k9": 7.88,
+            "era": 3.83,
+            "whip": 1.34,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Texas Rangers",
+          "pitcher": "Kumar Rocker",
+          "label": "Kumar Rocker ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5647,
+          "fair_odds": 1.77,
+          "expected_hr_allowed": 0.571,
+          "projected_ip": 5.71,
+          "inputs": {
+            "hr9": 0.9,
+            "era": 3.83,
+            "whip": 1.34
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Detroit Tigers",
+          "pitcher": "Jack Flaherty",
+          "label": "Jack Flaherty moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.5217,
+          "fair_odds": 1.92,
+          "expected_strikeouts": 5.4,
+          "projected_ip": 4.39,
+          "inputs": {
+            "k9": 11.08,
+            "era": 4.97,
+            "whip": 1.53,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Detroit Tigers",
+          "pitcher": "Jack Flaherty",
+          "label": "Jack Flaherty ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6082,
+          "fair_odds": 1.64,
+          "expected_hr_allowed": 0.497,
+          "projected_ip": 4.39,
+          "inputs": {
+            "hr9": 1.02,
+            "era": 4.97,
+            "whip": 1.53
           },
           "side": "away"
         }
@@ -1648,6 +1612,88 @@
             "hr9": 1.85,
             "era": 5.33,
             "whip": 1.55
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401816021",
+      "kickoff": "2026-07-05T00:10Z",
+      "league": "MLB",
+      "match": "Philadelphia Phillies at Kansas City Royals",
+      "home": "Kansas City Royals",
+      "away": "Philadelphia Phillies",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Kansas City Royals",
+          "pitcher": "Luinder Avila",
+          "label": "Luinder Avila moins de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "under",
+          "probability": 0.5866,
+          "fair_odds": 1.7,
+          "expected_strikeouts": 6.08,
+          "projected_ip": 6.6,
+          "inputs": {
+            "k9": 8.29,
+            "era": 5.4,
+            "whip": 1.67,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Kansas City Royals",
+          "pitcher": "Luinder Avila",
+          "label": "Luinder Avila concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5054,
+          "fair_odds": 1.98,
+          "expected_hr_allowed": 0.704,
+          "projected_ip": 6.6,
+          "inputs": {
+            "hr9": 0.96,
+            "era": 5.4,
+            "whip": 1.67
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Philadelphia Phillies",
+          "pitcher": "Aaron Nola",
+          "label": "Aaron Nola moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.586,
+          "fair_odds": 1.71,
+          "expected_strikeouts": 5.12,
+          "projected_ip": 5.0,
+          "inputs": {
+            "k9": 9.21,
+            "era": 6.04,
+            "whip": 1.49,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Philadelphia Phillies",
+          "pitcher": "Aaron Nola",
+          "label": "Aaron Nola concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.6726,
+          "fair_odds": 1.49,
+          "expected_hr_allowed": 1.117,
+          "projected_ip": 5.0,
+          "inputs": {
+            "hr9": 2.01,
+            "era": 6.04,
+            "whip": 1.49
           },
           "side": "away"
         }
@@ -2520,6 +2566,170 @@
       ]
     },
     {
+      "event_id": "401816036",
+      "kickoff": "2026-07-05T19:00Z",
+      "league": "MLB",
+      "match": "Philadelphia Phillies at Kansas City Royals",
+      "home": "Kansas City Royals",
+      "away": "Philadelphia Phillies",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Kansas City Royals",
+          "pitcher": "Luinder Avila",
+          "label": "Luinder Avila moins de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "under",
+          "probability": 0.5866,
+          "fair_odds": 1.7,
+          "expected_strikeouts": 6.08,
+          "projected_ip": 6.6,
+          "inputs": {
+            "k9": 8.29,
+            "era": 5.4,
+            "whip": 1.67,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Kansas City Royals",
+          "pitcher": "Luinder Avila",
+          "label": "Luinder Avila concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5054,
+          "fair_odds": 1.98,
+          "expected_hr_allowed": 0.704,
+          "projected_ip": 6.6,
+          "inputs": {
+            "hr9": 0.96,
+            "era": 5.4,
+            "whip": 1.67
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Philadelphia Phillies",
+          "pitcher": "Aaron Nola",
+          "label": "Aaron Nola moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.586,
+          "fair_odds": 1.71,
+          "expected_strikeouts": 5.12,
+          "projected_ip": 5.0,
+          "inputs": {
+            "k9": 9.21,
+            "era": 6.04,
+            "whip": 1.49,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Philadelphia Phillies",
+          "pitcher": "Aaron Nola",
+          "label": "Aaron Nola concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.6726,
+          "fair_odds": 1.49,
+          "expected_hr_allowed": 1.117,
+          "projected_ip": 5.0,
+          "inputs": {
+            "hr9": 2.01,
+            "era": 6.04,
+            "whip": 1.49
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401816035",
+      "kickoff": "2026-07-05T19:30Z",
+      "league": "MLB",
+      "match": "Detroit Tigers at Texas Rangers",
+      "home": "Texas Rangers",
+      "away": "Detroit Tigers",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Texas Rangers",
+          "pitcher": "Cal Quantrill",
+          "label": "Cal Quantrill plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.5405,
+          "fair_odds": 1.85,
+          "expected_strikeouts": 4.67,
+          "projected_ip": 6.6,
+          "inputs": {
+            "k9": 6.37,
+            "era": 3.31,
+            "whip": 1.22,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Texas Rangers",
+          "pitcher": "Cal Quantrill",
+          "label": "Cal Quantrill concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5267,
+          "fair_odds": 1.9,
+          "expected_hr_allowed": 0.748,
+          "projected_ip": 6.6,
+          "inputs": {
+            "hr9": 1.02,
+            "era": 3.31,
+            "whip": 1.22
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Detroit Tigers",
+          "pitcher": "Casey Mize",
+          "label": "Casey Mize plus de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "over",
+          "probability": 0.5363,
+          "fair_odds": 1.86,
+          "expected_strikeouts": 5.67,
+          "projected_ip": 5.42,
+          "inputs": {
+            "k9": 9.42,
+            "era": 2.63,
+            "whip": 0.97,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Detroit Tigers",
+          "pitcher": "Casey Mize",
+          "label": "Casey Mize ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.7182,
+          "fair_odds": 1.39,
+          "expected_hr_allowed": 0.331,
+          "projected_ip": 5.42,
+          "inputs": {
+            "hr9": 0.55,
+            "era": 2.63,
+            "whip": 0.97
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
       "event_id": "401816038",
       "kickoff": "2026-07-05T19:30Z",
       "league": "MLB",
@@ -2940,7 +3150,7 @@
       ]
     }
   ],
-  "props": 142,
+  "props": 152,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-03T19:56:06Z",
+  "generated_at": "2026-07-03T20:51:38Z",
   "source": "local data.js + sports sidecars",
   "status": "ok",
   "sections": {
@@ -13,7 +13,7 @@
       "sofascore_events": 692,
       "samples": [],
       "watchlist_events": 40,
-      "bookable_tennis_events": 28
+      "bookable_tennis_events": 23
     },
     "J3_nhl_playoffs": {
       "data_events": 3,
@@ -39,11 +39,16 @@
       "derived_markets": 0
     },
     "J4_baseball_major_props_pool": {
-      "data_events": 45,
+      "data_events": 51,
       "sofascore_events": 46,
       "samples": [
         {
           "event": "Chicago White Sox at Cleveland Guardians",
+          "league": "MLB",
+          "code": "mlb"
+        },
+        {
+          "event": "Detroit Tigers at Texas Rangers",
           "league": "MLB",
           "code": "mlb"
         },
@@ -61,16 +66,11 @@
           "event": "Pittsburgh Pirates at Washington Nationals",
           "league": "MLB",
           "code": "mlb"
-        },
-        {
-          "event": "Minnesota Twins at New York Yankees",
-          "league": "MLB",
-          "code": "mlb"
         }
       ],
       "pitcher_records": 82,
-      "player_prop_events": 38,
-      "player_props": 142
+      "player_prop_events": 41,
+      "player_props": 152
     },
     "J5_football_tier2": {
       "data_events": 0,
@@ -83,14 +83,9 @@
       "samples": []
     },
     "J7_asie_latam": {
-      "data_events": 8,
+      "data_events": 7,
       "sofascore_events": 66,
       "samples": [
-        {
-          "event": "Henan at Yunnan Yukun",
-          "league": "Chinese Super League",
-          "code": "chn.1"
-        },
         {
           "event": "Chongqing Tonglianglong at Liaoning Tieren",
           "league": "Chinese Super League",
@@ -108,6 +103,11 @@
         },
         {
           "event": "Wuhan Three Towns at Dalian Yingbo",
+          "league": "Chinese Super League",
+          "code": "chn.1"
+        },
+        {
+          "event": "Shenzhen Xinpengcheng at Tianjin Jinmen Tiger",
           "league": "Chinese Super League",
           "code": "chn.1"
         }
