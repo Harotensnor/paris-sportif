@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-03T21:50:37Z",
+  "generated_at": "2026-07-03T22:46:30Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -610,10 +610,10 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.595,
-        "away_score": -0.055,
+        "away_score": 0.466,
         "home_fade": 0.7,
         "away_fade": 0.3,
-        "reason": "Direction nette: San Diego Padres (-0.06)",
+        "reason": "Direction nette: San Diego Padres (+0.47)",
         "detail": [
           {
             "side": "home",
@@ -632,6 +632,12 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.4
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.521
           }
         ]
       }
@@ -1221,11 +1227,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.733,
-        "away_score": -2.471,
+        "home_score": 0.663,
+        "away_score": -2.271,
         "home_fade": 0.15,
-        "away_fade": 2.523,
-        "reason": "Direction nette: Seattle Mariners (+0.73)",
+        "away_fade": 2.323,
+        "reason": "Direction nette: Seattle Mariners (+0.66)",
         "detail": [
           {
             "side": "home",
@@ -1243,7 +1249,7 @@
             "side": "away",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.6
+            "strength": 0.4
           },
           {
             "side": "away",
@@ -1293,11 +1299,11 @@
       "global_resolution": {
         "status": "abstain",
         "net_side": null,
-        "home_score": -0.611,
-        "away_score": 0.104,
-        "home_fade": 1.054,
+        "home_score": -0.665,
+        "away_score": 0.123,
+        "home_fade": 1.108,
         "away_fade": 1.265,
-        "reason": "Signaux opposes: Los Angeles Angels fade 1.05, Boston Red Sox fade 1.27 -> prudence",
+        "reason": "Signaux opposes: Los Angeles Angels fade 1.11, Boston Red Sox fade 1.27 -> prudence",
         "detail": [
           {
             "side": "home",
@@ -1315,7 +1321,7 @@
             "side": "home",
             "type": "market_move",
             "direction": "drift",
-            "strength": 0.754
+            "strength": 0.808
           },
           {
             "side": "away",
@@ -1433,11 +1439,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 1.636,
-        "away_score": -2.568,
+        "home_score": 1.566,
+        "away_score": -2.368,
         "home_fade": 0.3,
-        "away_fade": 2.673,
-        "reason": "Direction nette: Seattle Mariners (+1.64)",
+        "away_fade": 2.473,
+        "reason": "Direction nette: Seattle Mariners (+1.57)",
         "detail": [
           {
             "side": "home",
@@ -1455,7 +1461,7 @@
             "side": "away",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.6
+            "strength": 0.4
           },
           {
             "side": "home",
@@ -1803,17 +1809,17 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.831,
-        "away_score": -2.373,
+        "home_score": 0.761,
+        "away_score": -2.173,
         "home_fade": 0.0,
-        "away_fade": 2.373,
-        "reason": "Direction nette: Seattle Mariners (+0.83)",
+        "away_fade": 2.173,
+        "reason": "Direction nette: Seattle Mariners (+0.76)",
         "detail": [
           {
             "side": "away",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.6
+            "strength": 0.4
           },
           {
             "side": "away",
@@ -2463,22 +2469,16 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.15,
-        "away_score": 0.558,
+        "away_score": 0.052,
         "home_fade": 0.15,
         "away_fade": 0.0,
-        "reason": "Direction nette: Chicago Sky (+0.56)",
+        "reason": "Direction nette: Chicago Sky (+0.05)",
         "detail": [
           {
             "side": "home",
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.505
           }
         ]
       }
