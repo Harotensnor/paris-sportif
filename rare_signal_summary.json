@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-07-03T11:57:16Z",
+  "generated_at": "2026-07-03T11:59:45Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 31,
-    "actionable": 27,
+    "active_events": 32,
+    "actionable": 28,
     "watch": 2,
     "risk": 2,
     "expired_sample": 0,
@@ -18,8 +18,8 @@
       "signal_conflict": 1
     },
     "by_quality": {
+      "actionable": 28,
       "watch": 2,
-      "actionable": 27,
       "risk": 2
     }
   },
@@ -295,6 +295,24 @@
       "context": "2 match dans les 48h + 1522 km de voyage"
     },
     {
+      "event_id": "401842745",
+      "date": "2026-07-03T17:00Z",
+      "sport": "football",
+      "league_code": "allsvenskan",
+      "league_name": "Allsvenskan",
+      "home": "IK Sirius",
+      "away": "Mjällby AIF",
+      "match": "IK Sirius - Mjällby AIF",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.899,
+      "context": "Cote away: 5.25 -> 4.40 (+16.2%)"
+    },
+    {
       "event_id": "401816038",
       "date": "2026-07-05T19:30Z",
       "sport": "baseball",
@@ -531,27 +549,27 @@
       "context": "Deplacement estime 2347 km, decalage ~1.6h"
     },
     {
-      "event_id": "177467",
-      "date": "2026-07-03T13:30Z",
-      "sport": "tennis",
-      "league_code": "wimbledon",
-      "league_name": "Wimbledon",
-      "home": "",
-      "away": "",
-      "match": "? - ?",
+      "event_id": "401857037",
+      "date": "2026-07-03T23:30Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "New York Liberty",
+      "away": "Minnesota Lynx",
+      "match": "New York Liberty - Minnesota Lynx",
       "quality": "watch",
       "quality_reason": "Signal rare present mais intensite moyenne",
       "type": "market_move",
-      "direction": "drift",
+      "direction": "steam",
       "team": null,
-      "side": "away",
-      "strength": 0.463,
-      "context": "Cote away: 2.40 -> 2.60 (-8.3%)"
+      "side": "home",
+      "strength": 0.467,
+      "context": "Cote home: 2.14 -> 1.96 (+8.4%)"
     }
   ],
   "active_risk": [
     {
-      "event_id": "177691",
+      "event_id": "177477",
       "date": "2026-07-04T04:00Z",
       "sport": "tennis",
       "league_code": "wimbledon",
@@ -566,7 +584,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 12.2%"
+      "context": "marge bookmaker anormale 12.5%"
     },
     {
       "event_id": "401816095",
