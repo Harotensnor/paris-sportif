@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-07-03T09:39:59Z",
+  "generated_at": "2026-07-03T11:57:16Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 39,
+    "active_events": 37,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 59,
+      "lookahead": 57,
       "travel_extreme": 9,
-      "back_to_back_travel": 17,
+      "back_to_back_travel": 16,
       "schedule_congestion": 6
     },
     "by_decision": {
-      "abstain": 18,
-      "lean_home": 20,
+      "abstain": 17,
+      "lean_home": 19,
       "lean_away": 1
     },
-    "lean_home": 20,
+    "lean_home": 19,
     "lean_away": 1,
-    "abstain": 18,
+    "abstain": 17,
     "monitor": 0
   },
   "active": [
@@ -403,13 +403,13 @@
         "2 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
-        "status": "mixed",
-        "net_side": null,
+        "status": "net",
+        "net_side": "home",
         "home_score": 0.155,
-        "away_score": -0.662,
+        "away_score": -1.195,
         "home_fade": 0.3,
         "away_fade": 1.3,
-        "reason": "Signaux mitigés: avantage net trop faible (Cleveland Guardians +0.15, Chicago White Sox -0.66)",
+        "reason": "Direction nette: Cleveland Guardians (+0.15)",
         "detail": [
           {
             "side": "home",
@@ -428,12 +428,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.533
           }
         ]
       }
@@ -638,10 +632,10 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.595,
-        "away_score": 0.658,
+        "away_score": -0.055,
         "home_fade": 0.7,
         "away_fade": 0.3,
-        "reason": "Direction nette: San Diego Padres (+0.66)",
+        "reason": "Direction nette: San Diego Padres (-0.06)",
         "detail": [
           {
             "side": "home",
@@ -660,12 +654,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.4
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.713
           }
         ]
       }
@@ -724,58 +712,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.8
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401816020",
-      "source_event_ids": [
-        "401816020"
-      ],
-      "kickoff": "2026-07-04T20:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Texas Rangers",
-      "away": "Detroit Tigers",
-      "match": "Texas Rangers - Detroit Tigers",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Texas Rangers 0.15, Detroit Tigers 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
-        "home_fade": 0.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Detroit Tigers (-0.10)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
           }
         ]
       }
@@ -1367,11 +1303,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.738,
+        "home_score": 0.286,
         "away_score": -1.568,
         "home_fade": 0.3,
         "away_fade": 1.673,
-        "reason": "Direction nette: Seattle Mariners (+0.74)",
+        "reason": "Direction nette: Seattle Mariners (+0.29)",
         "detail": [
           {
             "side": "home",
@@ -1390,12 +1326,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.6
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.452
           },
           {
             "side": "away",
@@ -2224,51 +2154,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.861
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401816035",
-      "source_event_ids": [
-        "401816035"
-      ],
-      "kickoff": "2026-07-05T19:30Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Texas Rangers",
-      "away": "Detroit Tigers",
-      "match": "Texas Rangers - Detroit Tigers",
-      "decision": "lean_home",
-      "net_team": "Texas Rangers",
-      "reason": "Detroit Tigers plus penalise par calendrier/voyage (0.86 vs 0.00)",
-      "pressure_score": 0.856,
-      "home_fade": 0.0,
-      "away_fade": 0.856,
-      "travel_score": 0.856,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "1 match dans les 48h + 1629 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.3,
-        "away_score": -0.856,
-        "home_fade": 0.0,
-        "away_fade": 0.856,
-        "reason": "Direction nette: Texas Rangers (+0.30)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.856
           }
         ]
       }
