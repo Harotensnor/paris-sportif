@@ -1,102 +1,28 @@
 {
-  "generated_at": "2026-07-03T01:21:42Z",
+  "generated_at": "2026-07-03T02:45:21Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 45,
+    "active_events": 41,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 63,
-      "back_to_back_travel": 19,
+      "lookahead": 59,
       "travel_extreme": 9,
-      "schedule_congestion": 19
+      "back_to_back_travel": 18,
+      "schedule_congestion": 12
     },
     "by_decision": {
-      "abstain": 20,
-      "lean_home": 24,
+      "abstain": 19,
+      "lean_home": 21,
       "lean_away": 1
     },
-    "lean_home": 24,
+    "lean_home": 21,
     "lean_away": 1,
-    "abstain": 20,
+    "abstain": 19,
     "monitor": 0
   },
   "active": [
-    {
-      "event_id": "401816033",
-      "source_event_ids": [
-        "401816033"
-      ],
-      "kickoff": "2026-07-05T16:30Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Atlanta Braves",
-      "away": "New York Mets",
-      "match": "Atlanta Braves - New York Mets",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Atlanta Braves 0.95, New York Mets 1.00",
-      "pressure_score": 2.318,
-      "home_fade": 0.95,
-      "away_fade": 1.002,
-      "travel_score": 0.852,
-      "lookahead_score": 0.667,
-      "congestion_score": 0.8,
-      "types": {
-        "schedule_congestion": 1,
-        "lookahead": 2,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "4 matchs sur les 7 derniers jours",
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours",
-        "2 match dans les 48h + 1209 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.999,
-        "away_score": -0.529,
-        "home_fade": 1.35,
-        "away_fade": 1.002,
-        "reason": "Signaux opposes: Atlanta Braves fade 1.35, New York Mets fade 1.00 -> prudence",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.8
-          },
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.852
-          }
-        ]
-      }
-    },
     {
       "event_id": "401816095",
       "source_event_ids": [
@@ -160,122 +86,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401816000",
-      "source_event_ids": [
-        "401816000"
-      ],
-      "kickoff": "2026-07-03T01:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Seattle Mariners",
-      "away": "Los Angeles Angels",
-      "match": "Seattle Mariners - Los Angeles Angels",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Seattle Mariners 0.36, Los Angeles Angels 0.36",
-      "pressure_score": 1.6,
-      "home_fade": 0.36,
-      "away_fade": 0.36,
-      "travel_score": 0,
-      "lookahead_score": 1.6,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "3 match important/proche dans les 3 jours",
-        "3 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.116,
-        "away_score": -1.234,
-        "home_fade": 0.36,
-        "away_fade": 1.36,
-        "reason": "Direction nette: Seattle Mariners (+0.12)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.36
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.36
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401816001",
-      "source_event_ids": [
-        "401816001"
-      ],
-      "kickoff": "2026-07-03T02:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Los Angeles Dodgers",
-      "away": "San Diego Padres",
-      "match": "Los Angeles Dodgers - San Diego Padres",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Los Angeles Dodgers 0.36, San Diego Padres 0.36",
-      "pressure_score": 1.6,
-      "home_fade": 0.36,
-      "away_fade": 0.36,
-      "travel_score": 0,
-      "lookahead_score": 1.6,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "3 match important/proche dans les 3 jours",
-        "3 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.634,
-        "away_score": -0.094,
-        "home_fade": 0.76,
-        "away_fade": 0.36,
-        "reason": "Direction nette: San Diego Padres (-0.09)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.36
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.36
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
           }
         ]
       }
@@ -670,6 +480,64 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.3
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401816008",
+      "source_event_ids": [
+        "401816008"
+      ],
+      "kickoff": "2026-07-04T00:15Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Houston Astros",
+      "away": "Tampa Bay Rays",
+      "match": "Houston Astros - Tampa Bay Rays",
+      "decision": "abstain",
+      "net_team": null,
+      "reason": "Fatigue/agenda des deux cotes: Houston Astros 0.30, Tampa Bay Rays 0.30",
+      "pressure_score": 1.333,
+      "home_fade": 0.3,
+      "away_fade": 0.3,
+      "travel_score": 0,
+      "lookahead_score": 1.333,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 2
+      },
+      "contexts": [
+        "2 match important/proche dans les 3 jours",
+        "2 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "away",
+        "home_score": -0.595,
+        "away_score": -0.055,
+        "home_fade": 0.7,
+        "away_fade": 0.3,
+        "reason": "Direction nette: Tampa Bay Rays (-0.06)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.3
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.3
+          },
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.4
           }
         ]
       }
@@ -1075,6 +943,64 @@
       }
     },
     {
+      "event_id": "401816022",
+      "source_event_ids": [
+        "401816022"
+      ],
+      "kickoff": "2026-07-05T00:08Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Chicago Cubs",
+      "away": "St. Louis Cardinals",
+      "match": "Chicago Cubs - St. Louis Cardinals",
+      "decision": "abstain",
+      "net_team": null,
+      "reason": "Fatigue/agenda des deux cotes: Chicago Cubs 0.15, St. Louis Cardinals 0.15",
+      "pressure_score": 0.667,
+      "home_fade": 0.15,
+      "away_fade": 0.15,
+      "travel_score": 0,
+      "lookahead_score": 0.667,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 2
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours",
+        "1 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "away",
+        "home_score": -1.097,
+        "away_score": 0.252,
+        "home_fade": 1.15,
+        "away_fade": 0.15,
+        "reason": "Direction nette: St. Louis Cardinals (+0.25)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 1.0
+          }
+        ]
+      }
+    },
+    {
       "event_id": "401816026",
       "source_event_ids": [
         "401816026"
@@ -1186,80 +1112,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.4
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401816018",
-      "source_event_ids": [
-        "401816018"
-      ],
-      "kickoff": "2026-07-05T00:08Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Atlanta Braves",
-      "away": "New York Mets",
-      "match": "Atlanta Braves - New York Mets",
-      "decision": "lean_home",
-      "net_team": "Atlanta Braves",
-      "reason": "New York Mets plus penalise par calendrier/voyage (1.07 vs 0.90)",
-      "pressure_score": 2.705,
-      "home_fade": 0.9,
-      "away_fade": 1.072,
-      "travel_score": 0.772,
-      "lookahead_score": 1.333,
-      "congestion_score": 0.6,
-      "types": {
-        "schedule_congestion": 1,
-        "lookahead": 2,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "3 matchs sur les 7 derniers jours",
-        "2 match important/proche dans les 3 jours",
-        "2 match important/proche dans les 3 jours",
-        "1 match dans les 48h + 1209 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.925,
-        "away_score": -0.617,
-        "home_fade": 1.3,
-        "away_fade": 1.072,
-        "reason": "Signaux opposes: Atlanta Braves fade 1.30, New York Mets fade 1.07 -> prudence",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.772
           }
         ]
       }
@@ -1389,72 +1241,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401816047",
-      "source_event_ids": [
-        "401816047"
-      ],
-      "kickoff": "2026-07-06T23:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Atlanta Braves",
-      "away": "New York Mets",
-      "match": "Atlanta Braves - New York Mets",
-      "decision": "lean_home",
-      "net_team": "Atlanta Braves",
-      "reason": "New York Mets plus penalise par calendrier/voyage (1.45 vs 1.00)",
-      "pressure_score": 2.452,
-      "home_fade": 1.0,
-      "away_fade": 1.452,
-      "travel_score": 0.852,
-      "lookahead_score": 0,
-      "congestion_score": 1.6,
-      "types": {
-        "schedule_congestion": 2,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "5 matchs sur les 7 derniers jours",
-        "3 matchs sur les 7 derniers jours",
-        "2 match dans les 48h + 1209 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.892,
-        "away_score": -0.962,
-        "home_fade": 1.4,
-        "away_fade": 1.452,
-        "reason": "Signaux opposes: Atlanta Braves fade 1.40, New York Mets fade 1.45 -> prudence",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.852
           }
         ]
       }
@@ -1729,146 +1515,6 @@
       }
     },
     {
-      "event_id": "401816023",
-      "source_event_ids": [
-        "401816023"
-      ],
-      "kickoff": "2026-07-04T23:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Houston Astros",
-      "away": "Tampa Bay Rays",
-      "match": "Houston Astros - Tampa Bay Rays",
-      "decision": "lean_home",
-      "net_team": "Houston Astros",
-      "reason": "Tampa Bay Rays plus penalise par calendrier/voyage (1.61 vs 0.15)",
-      "pressure_score": 2.128,
-      "home_fade": 0.15,
-      "away_fade": 1.611,
-      "travel_score": 0.861,
-      "lookahead_score": 0.667,
-      "congestion_score": 0.6,
-      "types": {
-        "lookahead": 2,
-        "schedule_congestion": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "3 matchs sur les 7 derniers jours",
-        "1 match important/proche dans les 3 jours",
-        "2 match dans les 48h + 1257 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.014,
-        "away_score": -1.419,
-        "home_fade": 0.55,
-        "away_fade": 1.611,
-        "reason": "Direction nette: Houston Astros (+0.01)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.861
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401816008",
-      "source_event_ids": [
-        "401816008"
-      ],
-      "kickoff": "2026-07-04T00:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Houston Astros",
-      "away": "Tampa Bay Rays",
-      "match": "Houston Astros - Tampa Bay Rays",
-      "decision": "lean_home",
-      "net_team": "Houston Astros",
-      "reason": "Tampa Bay Rays plus penalise par calendrier/voyage (1.08 vs 0.30)",
-      "pressure_score": 2.115,
-      "home_fade": 0.3,
-      "away_fade": 1.081,
-      "travel_score": 0.781,
-      "lookahead_score": 1.333,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "2 match important/proche dans les 3 jours",
-        "2 match important/proche dans les 3 jours",
-        "1 match dans les 48h + 1257 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.322,
-        "away_score": -0.836,
-        "home_fade": 0.7,
-        "away_fade": 1.081,
-        "reason": "Direction nette: Houston Astros (-0.32)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.781
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401816014",
       "source_event_ids": [
         "401816014"
@@ -1930,6 +1576,138 @@
             "type": "travel_extreme",
             "direction": "fade",
             "strength": 0.773
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401816018",
+      "source_event_ids": [
+        "401816018"
+      ],
+      "kickoff": "2026-07-05T00:08Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Atlanta Braves",
+      "away": "New York Mets",
+      "match": "Atlanta Braves - New York Mets",
+      "decision": "lean_home",
+      "net_team": "Atlanta Braves",
+      "reason": "New York Mets plus penalise par calendrier/voyage (1.07 vs 0.30)",
+      "pressure_score": 2.105,
+      "home_fade": 0.3,
+      "away_fade": 1.072,
+      "travel_score": 0.772,
+      "lookahead_score": 1.333,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 2,
+        "back_to_back_travel": 1
+      },
+      "contexts": [
+        "2 match important/proche dans les 3 jours",
+        "2 match important/proche dans les 3 jours",
+        "1 match dans les 48h + 1209 km de voyage"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": -0.325,
+        "away_score": -0.827,
+        "home_fade": 0.7,
+        "away_fade": 1.072,
+        "reason": "Direction nette: Atlanta Braves (-0.32)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.3
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.3
+          },
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.4
+          },
+          {
+            "side": "away",
+            "type": "back_to_back_travel",
+            "direction": "fade",
+            "strength": 0.772
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401816047",
+      "source_event_ids": [
+        "401816047"
+      ],
+      "kickoff": "2026-07-06T23:15Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Atlanta Braves",
+      "away": "New York Mets",
+      "match": "Atlanta Braves - New York Mets",
+      "decision": "lean_home",
+      "net_team": "Atlanta Braves",
+      "reason": "New York Mets plus penalise par calendrier/voyage (1.45 vs 0.60)",
+      "pressure_score": 2.052,
+      "home_fade": 0.6,
+      "away_fade": 1.452,
+      "travel_score": 0.852,
+      "lookahead_score": 0,
+      "congestion_score": 1.2,
+      "types": {
+        "schedule_congestion": 2,
+        "back_to_back_travel": 1
+      },
+      "contexts": [
+        "3 matchs sur les 7 derniers jours",
+        "3 matchs sur les 7 derniers jours",
+        "2 match dans les 48h + 1209 km de voyage"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": -0.492,
+        "away_score": -1.102,
+        "home_fade": 1.0,
+        "away_fade": 1.452,
+        "reason": "Direction nette: Atlanta Braves (-0.49)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "away",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.4
+          },
+          {
+            "side": "away",
+            "type": "back_to_back_travel",
+            "direction": "fade",
+            "strength": 0.852
           }
         ]
       }
@@ -2050,65 +1828,6 @@
             "type": "travel_extreme",
             "direction": "fade",
             "strength": 0.546
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401816038",
-      "source_event_ids": [
-        "401816038"
-      ],
-      "kickoff": "2026-07-05T19:30Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Houston Astros",
-      "away": "Tampa Bay Rays",
-      "match": "Houston Astros - Tampa Bay Rays",
-      "decision": "lean_home",
-      "net_team": "Houston Astros",
-      "reason": "Tampa Bay Rays plus penalise par calendrier/voyage (1.66 vs 0.00)",
-      "pressure_score": 1.661,
-      "home_fade": 0.0,
-      "away_fade": 1.661,
-      "travel_score": 0.861,
-      "lookahead_score": 0,
-      "congestion_score": 0.8,
-      "types": {
-        "schedule_congestion": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "4 matchs sur les 7 derniers jours",
-        "2 match dans les 48h + 1257 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.181,
-        "away_score": -1.521,
-        "home_fade": 0.4,
-        "away_fade": 1.661,
-        "reason": "Direction nette: Houston Astros (+0.18)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.8
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.861
           }
         ]
       }
@@ -2293,6 +2012,72 @@
       }
     },
     {
+      "event_id": "401816033",
+      "source_event_ids": [
+        "401816033"
+      ],
+      "kickoff": "2026-07-05T16:30Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Atlanta Braves",
+      "away": "New York Mets",
+      "match": "Atlanta Braves - New York Mets",
+      "decision": "lean_home",
+      "net_team": "Atlanta Braves",
+      "reason": "New York Mets plus penalise par calendrier/voyage (1.00 vs 0.15)",
+      "pressure_score": 1.518,
+      "home_fade": 0.15,
+      "away_fade": 1.002,
+      "travel_score": 0.852,
+      "lookahead_score": 0.667,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 2,
+        "back_to_back_travel": 1
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours",
+        "1 match important/proche dans les 3 jours",
+        "2 match dans les 48h + 1209 km de voyage"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": -0.199,
+        "away_score": -0.809,
+        "home_fade": 0.55,
+        "away_fade": 1.002,
+        "reason": "Direction nette: Atlanta Braves (-0.20)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.4
+          },
+          {
+            "side": "away",
+            "type": "back_to_back_travel",
+            "direction": "fade",
+            "strength": 0.852
+          }
+        ]
+      }
+    },
+    {
       "event_id": "401816024",
       "source_event_ids": [
         "401816024"
@@ -2353,55 +2138,49 @@
       }
     },
     {
-      "event_id": "401816022",
+      "event_id": "401816023",
       "source_event_ids": [
-        "401816022"
+        "401816023"
       ],
-      "kickoff": "2026-07-05T00:08Z",
+      "kickoff": "2026-07-04T23:10Z",
       "sport": "baseball",
       "league_code": "mlb",
       "league_name": "MLB",
-      "home": "Chicago Cubs",
-      "away": "St. Louis Cardinals",
-      "match": "Chicago Cubs - St. Louis Cardinals",
+      "home": "Houston Astros",
+      "away": "Tampa Bay Rays",
+      "match": "Houston Astros - Tampa Bay Rays",
       "decision": "lean_home",
-      "net_team": "Chicago Cubs",
-      "reason": "St. Louis Cardinals plus penalise par calendrier/voyage (0.75 vs 0.15)",
-      "pressure_score": 1.267,
+      "net_team": "Houston Astros",
+      "reason": "Tampa Bay Rays plus penalise par calendrier/voyage (0.93 vs 0.15)",
+      "pressure_score": 1.448,
       "home_fade": 0.15,
-      "away_fade": 0.75,
-      "travel_score": 0,
+      "away_fade": 0.931,
+      "travel_score": 0.781,
       "lookahead_score": 0.667,
-      "congestion_score": 0.6,
+      "congestion_score": 0,
       "types": {
         "lookahead": 2,
-        "schedule_congestion": 1
+        "back_to_back_travel": 1
       },
       "contexts": [
         "1 match important/proche dans les 3 jours",
-        "3 matchs sur les 7 derniers jours",
-        "1 match important/proche dans les 3 jours"
+        "1 match important/proche dans les 3 jours",
+        "1 match dans les 48h + 1257 km de voyage"
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "away",
-        "home_score": -0.887,
-        "away_score": -0.348,
-        "home_fade": 1.15,
-        "away_fade": 0.75,
-        "reason": "Direction nette: St. Louis Cardinals (-0.35)",
+        "net_side": "home",
+        "home_score": -0.224,
+        "away_score": -0.739,
+        "home_fade": 0.55,
+        "away_fade": 0.931,
+        "reason": "Direction nette: Houston Astros (-0.22)",
         "detail": [
           {
             "side": "home",
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
           },
           {
             "side": "away",
@@ -2413,7 +2192,13 @@
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 1.0
+            "strength": 0.4
+          },
+          {
+            "side": "away",
+            "type": "back_to_back_travel",
+            "direction": "fade",
+            "strength": 0.781
           }
         ]
       }
@@ -2515,6 +2300,57 @@
       }
     },
     {
+      "event_id": "401816038",
+      "source_event_ids": [
+        "401816038"
+      ],
+      "kickoff": "2026-07-05T19:30Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Houston Astros",
+      "away": "Tampa Bay Rays",
+      "match": "Houston Astros - Tampa Bay Rays",
+      "decision": "lean_home",
+      "net_team": "Houston Astros",
+      "reason": "Tampa Bay Rays plus penalise par calendrier/voyage (0.86 vs 0.00)",
+      "pressure_score": 0.861,
+      "home_fade": 0.0,
+      "away_fade": 0.861,
+      "travel_score": 0.861,
+      "lookahead_score": 0,
+      "congestion_score": 0,
+      "types": {
+        "back_to_back_travel": 1
+      },
+      "contexts": [
+        "2 match dans les 48h + 1257 km de voyage"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": -0.099,
+        "away_score": -0.721,
+        "home_fade": 0.4,
+        "away_fade": 0.861,
+        "reason": "Direction nette: Houston Astros (-0.10)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.4
+          },
+          {
+            "side": "away",
+            "type": "back_to_back_travel",
+            "direction": "fade",
+            "strength": 0.861
+          }
+        ]
+      }
+    },
+    {
       "event_id": "401816035",
       "source_event_ids": [
         "401816035"
@@ -2555,108 +2391,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.856
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401816037",
-      "source_event_ids": [
-        "401816037"
-      ],
-      "kickoff": "2026-07-05T18:30Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Chicago Cubs",
-      "away": "St. Louis Cardinals",
-      "match": "Chicago Cubs - St. Louis Cardinals",
-      "decision": "lean_home",
-      "net_team": "Chicago Cubs",
-      "reason": "St. Louis Cardinals plus penalise par calendrier/voyage (0.80 vs 0.00)",
-      "pressure_score": 0.8,
-      "home_fade": 0.0,
-      "away_fade": 0.8,
-      "travel_score": 0,
-      "lookahead_score": 0,
-      "congestion_score": 0.8,
-      "types": {
-        "schedule_congestion": 1
-      },
-      "contexts": [
-        "4 matchs sur les 7 derniers jours"
-      ],
-      "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.72,
-        "away_score": -0.45,
-        "home_fade": 1.0,
-        "away_fade": 0.8,
-        "reason": "Signaux opposes: Chicago Cubs fade 1.00, St. Louis Cardinals fade 0.80 -> prudence",
-        "detail": [
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.8
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401816106",
-      "source_event_ids": [
-        "401816106"
-      ],
-      "kickoff": "2026-07-11T00:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "St. Louis Cardinals",
-      "away": "Atlanta Braves",
-      "match": "St. Louis Cardinals - Atlanta Braves",
-      "decision": "lean_home",
-      "net_team": "St. Louis Cardinals",
-      "reason": "Atlanta Braves plus penalise par calendrier/voyage (0.60 vs 0.00)",
-      "pressure_score": 0.6,
-      "home_fade": 0.0,
-      "away_fade": 0.6,
-      "travel_score": 0,
-      "lookahead_score": 0,
-      "congestion_score": 0.6,
-      "types": {
-        "schedule_congestion": 1
-      },
-      "contexts": [
-        "3 matchs sur les 7 derniers jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.56,
-        "away_score": -1.6,
-        "home_fade": 0.0,
-        "away_fade": 1.6,
-        "reason": "Direction nette: St. Louis Cardinals (+0.56)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
           }
         ]
       }

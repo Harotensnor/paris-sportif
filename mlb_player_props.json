@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-07-03T01:21:41Z",
+  "generated_at": "2026-07-03T02:45:20Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401816001",
-      "kickoff": "2026-07-03T02:10Z",
-      "league": "MLB",
-      "match": "San Diego Padres at Los Angeles Dodgers",
-      "home": "Los Angeles Dodgers",
-      "away": "San Diego Padres",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Los Angeles Dodgers",
-          "pitcher": "Shohei Ohtani",
-          "label": "Shohei Ohtani plus de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "over",
-          "probability": 0.5159,
-          "fair_odds": 1.94,
-          "expected_strikeouts": 6.58,
-          "projected_ip": 6.09,
-          "inputs": {
-            "k9": 9.72,
-            "era": 1.58,
-            "whip": 0.9,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Los Angeles Dodgers",
-          "pitcher": "Shohei Ohtani",
-          "label": "Shohei Ohtani ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.7944,
-          "fair_odds": 1.26,
-          "expected_hr_allowed": 0.23,
-          "projected_ip": 6.09,
-          "inputs": {
-            "hr9": 0.34,
-            "era": 1.58,
-            "whip": 0.9
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "San Diego Padres",
-          "pitcher": "Michael King",
-          "label": "Michael King plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.5846,
-          "fair_odds": 1.71,
-          "expected_strikeouts": 4.87,
-          "projected_ip": 5.65,
-          "inputs": {
-            "k9": 7.75,
-            "era": 3.55,
-            "whip": 1.18,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "San Diego Padres",
-          "pitcher": "Michael King",
-          "label": "Michael King ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5576,
-          "fair_odds": 1.79,
-          "expected_hr_allowed": 0.584,
-          "projected_ip": 5.65,
-          "inputs": {
-            "hr9": 0.93,
-            "era": 3.55,
-            "whip": 1.18
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401816007",
       "kickoff": "2026-07-03T20:05Z",
@@ -3186,7 +3104,7 @@
       ]
     }
   ],
-  "props": 154,
+  "props": 150,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
