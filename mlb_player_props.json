@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-04T02:46:12Z",
+  "generated_at": "2026-07-04T06:03:27Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -93,6 +93,42 @@
       "home": "New York Yankees",
       "away": "Minnesota Twins",
       "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "New York Yankees",
+          "pitcher": "Brendan Beck",
+          "label": "Brendan Beck moins de 2,5 strikeouts",
+          "line": 2.5,
+          "pick": "under",
+          "probability": 0.7831,
+          "fair_odds": 1.28,
+          "expected_strikeouts": 1.6,
+          "projected_ip": 4.8,
+          "inputs": {
+            "k9": 3.0,
+            "era": 6.0,
+            "whip": 1.67,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "New York Yankees",
+          "pitcher": "Brendan Beck",
+          "label": "Brendan Beck concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.7981,
+          "fair_odds": 1.25,
+          "expected_hr_allowed": 1.6,
+          "projected_ip": 4.8,
+          "inputs": {
+            "hr9": 3.0,
+            "era": 6.0,
+            "whip": 1.67
+          },
+          "side": "home"
+        },
         {
           "market": "pitcher_strikeouts",
           "team": "Minnesota Twins",
@@ -2366,7 +2402,7 @@
       ]
     }
   ],
-  "props": 114,
+  "props": 116,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
