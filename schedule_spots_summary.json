@@ -1,22 +1,22 @@
 {
-  "generated_at": "2026-07-04T19:38:47Z",
+  "generated_at": "2026-07-04T20:34:28Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 29,
+    "active_events": 27,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 34,
-      "back_to_back_travel": 20,
-      "travel_extreme": 6,
+      "lookahead": 30,
+      "back_to_back_travel": 18,
+      "travel_extreme": 5,
       "schedule_congestion": 12
     },
     "by_decision": {
       "abstain": 9,
-      "lean_home": 20
+      "lean_home": 18
     },
-    "lean_home": 20,
+    "lean_home": 18,
     "lean_away": 0,
     "abstain": 9,
     "monitor": 0
@@ -738,80 +738,6 @@
       }
     },
     {
-      "event_id": "401816029",
-      "source_event_ids": [
-        "401816029"
-      ],
-      "kickoff": "2026-07-04T20:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Seattle Mariners",
-      "away": "Toronto Blue Jays",
-      "match": "Seattle Mariners - Toronto Blue Jays",
-      "decision": "lean_home",
-      "net_team": "Seattle Mariners",
-      "reason": "Toronto Blue Jays plus penalise par calendrier/voyage (1.92 vs 0.15)",
-      "pressure_score": 2.44,
-      "home_fade": 0.15,
-      "away_fade": 1.923,
-      "travel_score": 1.773,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2,
-        "travel_extreme": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours",
-        "Deplacement estime 3325 km, decalage ~2.9h",
-        "1 match dans les 48h + 3325 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.663,
-        "away_score": -2.271,
-        "home_fade": 0.15,
-        "away_fade": 2.323,
-        "reason": "Direction nette: Seattle Mariners (+0.66)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.773
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401816027",
       "source_event_ids": [
         "401816027"
@@ -1226,66 +1152,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.861
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401816020",
-      "source_event_ids": [
-        "401816020"
-      ],
-      "kickoff": "2026-07-04T20:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Texas Rangers",
-      "away": "Detroit Tigers",
-      "match": "Texas Rangers - Detroit Tigers",
-      "decision": "lean_home",
-      "net_team": "Texas Rangers",
-      "reason": "Detroit Tigers plus penalise par calendrier/voyage (1.01 vs 0.15)",
-      "pressure_score": 1.523,
-      "home_fade": 0.15,
-      "away_fade": 1.006,
-      "travel_score": 0.856,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours",
-        "1 match dans les 48h + 1629 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.202,
-        "away_score": -0.953,
-        "home_fade": 0.15,
-        "away_fade": 1.006,
-        "reason": "Direction nette: Texas Rangers (+0.20)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.856
           }
         ]
       }

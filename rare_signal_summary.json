@@ -1,46 +1,28 @@
 {
-  "generated_at": "2026-07-04T19:38:47Z",
+  "generated_at": "2026-07-04T20:34:28Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 36,
-    "actionable": 25,
+    "active_events": 34,
+    "actionable": 23,
     "watch": 2,
     "risk": 9,
     "expired_sample": 0,
     "by_type": {
-      "back_to_back_travel": 20,
-      "travel_extreme": 6,
       "injury_imbalance": 10,
+      "back_to_back_travel": 18,
+      "travel_extreme": 5,
       "signal_conflict": 4,
       "market_uncertain": 7
     },
     "by_quality": {
-      "actionable": 25,
       "watch": 2,
+      "actionable": 23,
       "risk": 9
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401816029",
-      "date": "2026-07-04T20:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Seattle Mariners",
-      "away": "Toronto Blue Jays",
-      "match": "Seattle Mariners - Toronto Blue Jays",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Toronto Blue Jays",
-      "side": "away",
-      "strength": 1.0,
-      "context": "1 match dans les 48h + 3325 km de voyage"
-    },
     {
       "event_id": "401816016",
       "date": "2026-07-04T23:10Z",
@@ -328,24 +310,6 @@
       "side": "away",
       "strength": 0.861,
       "context": "2 match dans les 48h + 1257 km de voyage"
-    },
-    {
-      "event_id": "401816020",
-      "date": "2026-07-04T20:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Texas Rangers",
-      "away": "Detroit Tigers",
-      "match": "Texas Rangers - Detroit Tigers",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Detroit Tigers",
-      "side": "away",
-      "strength": 0.856,
-      "context": "1 match dans les 48h + 1629 km de voyage"
     },
     {
       "event_id": "401816035",
