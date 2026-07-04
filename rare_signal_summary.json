@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-07-04T17:21:06Z",
+  "generated_at": "2026-07-04T18:16:31Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 35,
-    "actionable": 26,
-    "watch": 3,
-    "risk": 6,
+    "actionable": 25,
+    "watch": 2,
+    "risk": 8,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 12,
-      "back_to_back_travel": 21,
+      "back_to_back_travel": 20,
       "travel_extreme": 6,
-      "market_uncertain": 4,
-      "signal_conflict": 4
+      "injury_imbalance": 10,
+      "signal_conflict": 4,
+      "market_uncertain": 6
     },
     "by_quality": {
-      "actionable": 26,
-      "watch": 3,
-      "risk": 6
+      "actionable": 25,
+      "watch": 2,
+      "risk": 8
     }
   },
   "active_actionable": [
@@ -330,24 +330,6 @@
       "context": "2 match dans les 48h + 1257 km de voyage"
     },
     {
-      "event_id": "401816017",
-      "date": "2026-07-04T17:35Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "New York Yankees",
-      "away": "Minnesota Twins",
-      "match": "New York Yankees - Minnesota Twins",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Minnesota Twins",
-      "side": "away",
-      "strength": 0.858,
-      "context": "1 match dans les 48h + 1638 km de voyage"
-    },
-    {
       "event_id": "401816020",
       "date": "2026-07-04T20:05Z",
       "sport": "baseball",
@@ -512,24 +494,6 @@
       "context": "Absences severes 6-9"
     },
     {
-      "event_id": "401816034",
-      "date": "2026-07-05T17:00Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Washington Nationals",
-      "away": "Pittsburgh Pirates",
-      "match": "Washington Nationals - Pittsburgh Pirates",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Washington Nationals",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 8-5"
-    },
-    {
       "event_id": "401816030",
       "date": "2026-07-05T17:05Z",
       "sport": "baseball",
@@ -550,14 +514,14 @@
   ],
   "active_risk": [
     {
-      "event_id": "177700",
-      "date": "2026-07-05T11:30Z",
-      "sport": "tennis",
-      "league_code": "wimbledon",
-      "league_name": "Wimbledon",
-      "home": "",
-      "away": "",
-      "match": "? - ?",
+      "event_id": "401861417",
+      "date": "2026-07-10T11:35Z",
+      "sport": "football",
+      "league_code": "chn.1",
+      "league_name": "Chinese Super League",
+      "home": "Shandong Taishan",
+      "away": "Yunnan Yukun",
+      "match": "Shandong Taishan - Yunnan Yukun",
       "quality": "risk",
       "quality_reason": "Signal de prudence, pas une opportunite directe",
       "type": "market_uncertain",
@@ -565,7 +529,43 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 12.3%"
+      "context": "marge bookmaker anormale 18.3%"
+    },
+    {
+      "event_id": "401861418",
+      "date": "2026-07-11T11:00Z",
+      "sport": "football",
+      "league_code": "chn.1",
+      "league_name": "Chinese Super League",
+      "home": "Wuhan Three Towns",
+      "away": "Henan",
+      "match": "Wuhan Three Towns - Henan",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 19.3%"
+    },
+    {
+      "event_id": "401861421",
+      "date": "2026-07-11T11:35Z",
+      "sport": "football",
+      "league_code": "chn.1",
+      "league_name": "Chinese Super League",
+      "home": "Shenzhen Xinpengcheng",
+      "away": "Qingdao West Coast",
+      "match": "Shenzhen Xinpengcheng - Qingdao West Coast",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.8%"
     },
     {
       "event_id": "401873906",

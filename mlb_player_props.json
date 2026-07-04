@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-07-04T17:21:05Z",
+  "generated_at": "2026-07-04T18:16:30Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401816017",
-      "kickoff": "2026-07-04T17:35Z",
-      "league": "MLB",
-      "match": "Minnesota Twins at New York Yankees",
-      "home": "New York Yankees",
-      "away": "Minnesota Twins",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "New York Yankees",
-          "pitcher": "Brendan Beck",
-          "label": "Brendan Beck moins de 2,5 strikeouts",
-          "line": 2.5,
-          "pick": "under",
-          "probability": 0.7831,
-          "fair_odds": 1.28,
-          "expected_strikeouts": 1.6,
-          "projected_ip": 4.8,
-          "inputs": {
-            "k9": 3.0,
-            "era": 6.0,
-            "whip": 1.67,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "New York Yankees",
-          "pitcher": "Brendan Beck",
-          "label": "Brendan Beck concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.7981,
-          "fair_odds": 1.25,
-          "expected_hr_allowed": 1.6,
-          "projected_ip": 4.8,
-          "inputs": {
-            "hr9": 3.0,
-            "era": 6.0,
-            "whip": 1.67
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Minnesota Twins",
-          "pitcher": "Zebby Matthews",
-          "label": "Zebby Matthews moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.592,
-          "fair_odds": 1.69,
-          "expected_strikeouts": 5.09,
-          "projected_ip": 6.23,
-          "inputs": {
-            "k9": 7.35,
-            "era": 4.15,
-            "whip": 1.14,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Minnesota Twins",
-          "pitcher": "Zebby Matthews",
-          "label": "Zebby Matthews concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.7045,
-          "fair_odds": 1.42,
-          "expected_hr_allowed": 1.219,
-          "projected_ip": 6.23,
-          "inputs": {
-            "hr9": 1.76,
-            "era": 4.15,
-            "whip": 1.14
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401816020",
       "kickoff": "2026-07-04T20:05Z",
@@ -1156,88 +1074,6 @@
             "hr9": 0.94,
             "era": 3.78,
             "whip": 1.12
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401816034",
-      "kickoff": "2026-07-05T17:00Z",
-      "league": "MLB",
-      "match": "Pittsburgh Pirates at Washington Nationals",
-      "home": "Washington Nationals",
-      "away": "Pittsburgh Pirates",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Washington Nationals",
-          "pitcher": "Miles Mikolas",
-          "label": "Miles Mikolas plus de 3,5 strikeouts",
-          "line": 3.5,
-          "pick": "over",
-          "probability": 0.5482,
-          "fair_odds": 1.82,
-          "expected_strikeouts": 3.68,
-          "projected_ip": 6.6,
-          "inputs": {
-            "k9": 5.02,
-            "era": 5.44,
-            "whip": 1.29,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Washington Nationals",
-          "pitcher": "Miles Mikolas",
-          "label": "Miles Mikolas concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.7554,
-          "fair_odds": 1.32,
-          "expected_hr_allowed": 1.408,
-          "projected_ip": 6.6,
-          "inputs": {
-            "hr9": 1.92,
-            "era": 5.44,
-            "whip": 1.29
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Pittsburgh Pirates",
-          "pitcher": "Bubba Chandler",
-          "label": "Bubba Chandler plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.5939,
-          "fair_odds": 1.68,
-          "expected_strikeouts": 4.91,
-          "projected_ip": 5.33,
-          "inputs": {
-            "k9": 8.3,
-            "era": 4.62,
-            "whip": 1.39,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Pittsburgh Pirates",
-          "pitcher": "Bubba Chandler",
-          "label": "Bubba Chandler ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.57,
-          "fair_odds": 1.75,
-          "expected_hr_allowed": 0.562,
-          "projected_ip": 5.33,
-          "inputs": {
-            "hr9": 0.95,
-            "era": 4.62,
-            "whip": 1.39
           },
           "side": "away"
         }
@@ -2320,7 +2156,7 @@
       ]
     }
   ],
-  "props": 112,
+  "props": 104,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
