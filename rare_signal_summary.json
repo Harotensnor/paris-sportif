@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-07-04T18:16:31Z",
+  "generated_at": "2026-07-04T19:38:47Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 35,
+    "active_events": 36,
     "actionable": 25,
     "watch": 2,
-    "risk": 8,
+    "risk": 9,
     "expired_sample": 0,
     "by_type": {
       "back_to_back_travel": 20,
       "travel_extreme": 6,
       "injury_imbalance": 10,
       "signal_conflict": 4,
-      "market_uncertain": 6
+      "market_uncertain": 7
     },
     "by_quality": {
       "actionable": 25,
       "watch": 2,
-      "risk": 8
+      "risk": 9
     }
   },
   "active_actionable": [
@@ -513,6 +513,24 @@
     }
   ],
   "active_risk": [
+    {
+      "event_id": "177704",
+      "date": "2026-07-06T04:00Z",
+      "sport": "tennis",
+      "league_code": "wimbledon",
+      "league_name": "Wimbledon",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 12.6%"
+    },
     {
       "event_id": "401861417",
       "date": "2026-07-10T11:35Z",
