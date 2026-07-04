@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-04T12:20:21Z",
+  "generated_at": "2026-07-04T14:03:52Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -14,36 +14,36 @@
         {
           "market": "pitcher_strikeouts",
           "team": "Washington Nationals",
-          "pitcher": "Zack Littell",
-          "label": "Zack Littell moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.6152,
-          "fair_odds": 1.63,
-          "expected_strikeouts": 4.04,
-          "projected_ip": 6.6,
+          "pitcher": "Carson Palmquist",
+          "label": "Carson Palmquist plus de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "over",
+          "probability": 0.5747,
+          "fair_odds": 1.74,
+          "expected_strikeouts": 3.79,
+          "projected_ip": 4.1,
           "inputs": {
-            "k9": 5.51,
-            "era": 5.29,
-            "whip": 1.35,
-            "hand": "R"
+            "k9": 8.31,
+            "era": 2.08,
+            "whip": 1.15,
+            "hand": "L"
           },
           "side": "home"
         },
         {
           "market": "pitcher_home_run_allowed",
           "team": "Washington Nationals",
-          "pitcher": "Zack Littell",
-          "label": "Zack Littell concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.8378,
-          "fair_odds": 1.19,
-          "expected_hr_allowed": 1.819,
-          "projected_ip": 6.6,
+          "pitcher": "Carson Palmquist",
+          "label": "Carson Palmquist ne concède pas de home run",
+          "pick": "no",
+          "probability": 1.0,
+          "fair_odds": 1.01,
+          "expected_hr_allowed": 0.0,
+          "projected_ip": 4.1,
           "inputs": {
-            "hr9": 2.48,
-            "era": 5.29,
-            "whip": 1.35
+            "hr9": 0.0,
+            "era": 2.08,
+            "whip": 1.15
           },
           "side": "home"
         },
