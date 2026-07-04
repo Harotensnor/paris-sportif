@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-04T16:16:00Z",
+  "generated_at": "2026-07-04T17:21:05Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -96,18 +96,18 @@
         {
           "market": "pitcher_strikeouts",
           "team": "Texas Rangers",
-          "pitcher": "Kumar Rocker",
-          "label": "Kumar Rocker moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.6121,
-          "fair_odds": 1.63,
-          "expected_strikeouts": 5.0,
-          "projected_ip": 5.71,
+          "pitcher": "Cal Quantrill",
+          "label": "Cal Quantrill plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.5405,
+          "fair_odds": 1.85,
+          "expected_strikeouts": 4.67,
+          "projected_ip": 6.6,
           "inputs": {
-            "k9": 7.88,
-            "era": 3.83,
-            "whip": 1.34,
+            "k9": 6.37,
+            "era": 3.31,
+            "whip": 1.22,
             "hand": "R"
           },
           "side": "home"
@@ -115,17 +115,17 @@
         {
           "market": "pitcher_home_run_allowed",
           "team": "Texas Rangers",
-          "pitcher": "Kumar Rocker",
-          "label": "Kumar Rocker ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5647,
-          "fair_odds": 1.77,
-          "expected_hr_allowed": 0.571,
-          "projected_ip": 5.71,
+          "pitcher": "Cal Quantrill",
+          "label": "Cal Quantrill concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5267,
+          "fair_odds": 1.9,
+          "expected_hr_allowed": 0.748,
+          "projected_ip": 6.6,
           "inputs": {
-            "hr9": 0.9,
-            "era": 3.83,
-            "whip": 1.34
+            "hr9": 1.02,
+            "era": 3.31,
+            "whip": 1.22
           },
           "side": "home"
         },
@@ -1664,18 +1664,18 @@
         {
           "market": "pitcher_strikeouts",
           "team": "Texas Rangers",
-          "pitcher": "Cal Quantrill",
-          "label": "Cal Quantrill plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.5405,
-          "fair_odds": 1.85,
-          "expected_strikeouts": 4.67,
-          "projected_ip": 6.6,
+          "pitcher": "Kumar Rocker",
+          "label": "Kumar Rocker moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.6121,
+          "fair_odds": 1.63,
+          "expected_strikeouts": 5.0,
+          "projected_ip": 5.71,
           "inputs": {
-            "k9": 6.37,
-            "era": 3.31,
-            "whip": 1.22,
+            "k9": 7.88,
+            "era": 3.83,
+            "whip": 1.34,
             "hand": "R"
           },
           "side": "home"
@@ -1683,17 +1683,17 @@
         {
           "market": "pitcher_home_run_allowed",
           "team": "Texas Rangers",
-          "pitcher": "Cal Quantrill",
-          "label": "Cal Quantrill concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5267,
-          "fair_odds": 1.9,
-          "expected_hr_allowed": 0.748,
-          "projected_ip": 6.6,
+          "pitcher": "Kumar Rocker",
+          "label": "Kumar Rocker ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5647,
+          "fair_odds": 1.77,
+          "expected_hr_allowed": 0.571,
+          "projected_ip": 5.71,
           "inputs": {
-            "hr9": 1.02,
-            "era": 3.31,
-            "whip": 1.22
+            "hr9": 0.9,
+            "era": 3.83,
+            "whip": 1.34
           },
           "side": "home"
         },
