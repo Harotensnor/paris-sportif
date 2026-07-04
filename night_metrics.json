@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-07-04T06:03:28Z",
-  "calculated_at": "2026-07-04T06:03:28Z",
+  "generated_at": "2026-07-04T08:52:05Z",
+  "calculated_at": "2026-07-04T08:52:05Z",
   "source_of_truth": "data.js",
-  "data_generated_at": "2026-07-04T06:01:39.719061Z",
+  "data_generated_at": "2026-07-04T08:50:28.148481Z",
   "data_today_field": "2026-07-04",
   "events": {
-    "total": 123,
+    "total": 111,
     "upcoming": 98,
-    "winamax_available": 123,
-    "winamax_exact": 96,
-    "winamax_exact_ratio": 0.7805,
+    "winamax_available": 111,
+    "winamax_exact": 84,
+    "winamax_exact_ratio": 0.7568,
     "markets_more_than_1n2": 0,
-    "form_l10": 58,
-    "h2h": 0,
-    "lineups": 38,
+    "form_l10": 46,
+    "h2h": 39,
+    "lineups": 31,
     "football_lineups": 0,
-    "starter_signals": 38,
+    "starter_signals": 31,
     "clubelo": 3,
     "weather": 12,
-    "injuries": 56,
+    "injuries": 44,
     "referee": 0,
     "referee_named": 0,
     "referee_context": 0,
@@ -26,7 +26,7 @@
     "fd_calibration": 0,
     "fd_closing_odds": 0,
     "xg": 7,
-    "smart_money": 3
+    "smart_money": 2
   },
   "signal_health": {
     "referee": {
@@ -36,7 +36,7 @@
       "note": "referee is effective coverage: named referee or referee_context usable by the model."
     },
     "smart_money": {
-      "events": 3,
+      "events": 2,
       "status": "rare_event",
       "note": "Smart money is intentionally rare; low count is OK when odds movement does not confirm a strong signal."
     }
@@ -44,9 +44,9 @@
   "winamax_markets": {
     "matches": 439,
     "detailed_market_matches": 21,
-    "detailed_ratio_vs_exact": 0.2188,
-    "gap_to_50pct_exact": 0.2812,
-    "recommended_detail_fetch_cap": 220,
+    "detailed_ratio_vs_exact": 0.25,
+    "gap_to_50pct_exact": 0.25,
+    "recommended_detail_fetch_cap": 150,
     "detail_by_sport": {
       "baseball": {
         "exact": 35,
@@ -82,12 +82,12 @@
     "market_family_counts": {}
   },
   "backtest": {
-    "overall_roi_pct": 0.86,
-    "overall_brier": 0.2404,
+    "overall_roi_pct": 0.98,
+    "overall_brier": 0.2395,
     "by_sport_roi_pct": {
-      "baseball": -3.13,
+      "baseball": -2.15,
       "basketball": 17.29,
-      "football": 14.34,
+      "football": 9.36,
       "hockey": 46.83
     },
     "cold_sports": []
