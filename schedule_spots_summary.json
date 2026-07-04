@@ -1,24 +1,25 @@
 {
-  "generated_at": "2026-07-04T22:29:47Z",
+  "generated_at": "2026-07-04T23:31:51Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 27,
+    "active_events": 26,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 30,
-      "back_to_back_travel": 18,
+      "lookahead": 27,
+      "back_to_back_travel": 17,
       "travel_extreme": 5,
       "schedule_congestion": 12
     },
     "by_decision": {
-      "abstain": 9,
-      "lean_home": 18
+      "abstain": 8,
+      "lean_home": 17,
+      "lean_away": 1
     },
-    "lean_home": 18,
-    "lean_away": 0,
-    "abstain": 9,
+    "lean_home": 17,
+    "lean_away": 1,
+    "abstain": 8,
     "monitor": 0
   },
   "active": [
@@ -258,122 +259,6 @@
       }
     },
     {
-      "event_id": "401816015",
-      "source_event_ids": [
-        "401816015"
-      ],
-      "kickoff": "2026-07-04T23:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Cincinnati Reds",
-      "away": "Baltimore Orioles",
-      "match": "Cincinnati Reds - Baltimore Orioles",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Cincinnati Reds 0.15, Baltimore Orioles 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.112,
-        "away_score": -0.698,
-        "home_fade": 0.15,
-        "away_fade": 0.75,
-        "reason": "Direction nette: Cincinnati Reds (+0.11)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.6
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401816016",
-      "source_event_ids": [
-        "401816016"
-      ],
-      "kickoff": "2026-07-04T23:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Cleveland Guardians",
-      "away": "Chicago White Sox",
-      "match": "Cleveland Guardians - Chicago White Sox",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Cleveland Guardians 0.15, Chicago White Sox 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.252,
-        "away_score": -1.097,
-        "home_fade": 0.15,
-        "away_fade": 1.15,
-        "reason": "Direction nette: Cleveland Guardians (+0.25)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401816022",
       "source_event_ids": [
         "401816022"
@@ -519,6 +404,58 @@
         "home_fade": 0.15,
         "away_fade": 0.15,
         "reason": "Direction nette: San Diego Padres (-0.10)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401857044",
+      "source_event_ids": [
+        "401857044"
+      ],
+      "kickoff": "2026-07-07T00:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Minnesota Lynx",
+      "away": "Connecticut Sun",
+      "match": "Minnesota Lynx - Connecticut Sun",
+      "decision": "abstain",
+      "net_team": null,
+      "reason": "Fatigue/agenda des deux cotes: Minnesota Lynx 0.15, Connecticut Sun 0.15",
+      "pressure_score": 0.667,
+      "home_fade": 0.15,
+      "away_fade": 0.15,
+      "travel_score": 0,
+      "lookahead_score": 0.667,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 2
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours",
+        "1 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "away",
+        "home_score": -0.098,
+        "away_score": -0.098,
+        "home_fade": 0.15,
+        "away_fade": 0.15,
+        "reason": "Direction nette: Connecticut Sun (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -1277,66 +1214,6 @@
       }
     },
     {
-      "event_id": "401816023",
-      "source_event_ids": [
-        "401816023"
-      ],
-      "kickoff": "2026-07-04T23:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Houston Astros",
-      "away": "Tampa Bay Rays",
-      "match": "Houston Astros - Tampa Bay Rays",
-      "decision": "lean_home",
-      "net_team": "Houston Astros",
-      "reason": "Tampa Bay Rays plus penalise par calendrier/voyage (0.93 vs 0.15)",
-      "pressure_score": 1.448,
-      "home_fade": 0.15,
-      "away_fade": 0.931,
-      "travel_score": 0.781,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours",
-        "1 match dans les 48h + 1257 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.176,
-        "away_score": -0.879,
-        "home_fade": 0.15,
-        "away_fade": 0.931,
-        "reason": "Direction nette: Houston Astros (+0.18)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.781
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401816049",
       "source_event_ids": [
         "401816049"
@@ -1569,6 +1446,51 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.856
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401857040",
+      "source_event_ids": [
+        "401857040"
+      ],
+      "kickoff": "2026-07-05T01:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Seattle Storm",
+      "away": "Portland Fire",
+      "match": "Seattle Storm - Portland Fire",
+      "decision": "lean_away",
+      "net_team": "Portland Fire",
+      "reason": "Seattle Storm plus penalise par calendrier/voyage (0.15 vs 0.00)",
+      "pressure_score": 0.333,
+      "home_fade": 0.15,
+      "away_fade": 0.0,
+      "travel_score": 0,
+      "lookahead_score": 0.333,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 1
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "away",
+        "home_score": -0.15,
+        "away_score": 0.052,
+        "home_fade": 0.15,
+        "away_fade": 0.0,
+        "reason": "Direction nette: Portland Fire (+0.05)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
           }
         ]
       }

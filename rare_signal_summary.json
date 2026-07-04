@@ -1,46 +1,28 @@
 {
-  "generated_at": "2026-07-04T22:29:47Z",
+  "generated_at": "2026-07-04T23:31:51Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 34,
-    "actionable": 23,
-    "watch": 2,
+    "active_events": 31,
+    "actionable": 21,
+    "watch": 1,
     "risk": 9,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 10,
-      "back_to_back_travel": 18,
+      "back_to_back_travel": 17,
+      "injury_imbalance": 8,
       "travel_extreme": 5,
       "signal_conflict": 4,
-      "market_uncertain": 7
+      "market_uncertain": 8
     },
     "by_quality": {
-      "watch": 2,
-      "actionable": 23,
+      "actionable": 21,
+      "watch": 1,
       "risk": 9
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401816016",
-      "date": "2026-07-04T23:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Cleveland Guardians",
-      "away": "Chicago White Sox",
-      "match": "Cleveland Guardians - Chicago White Sox",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Chicago White Sox",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 2-11"
-    },
     {
       "event_id": "401816022",
       "date": "2026-07-05T00:08Z",
@@ -402,24 +384,6 @@
       "context": "1 match dans les 48h + 1522 km de voyage"
     },
     {
-      "event_id": "401816023",
-      "date": "2026-07-04T23:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Houston Astros",
-      "away": "Tampa Bay Rays",
-      "match": "Houston Astros - Tampa Bay Rays",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Tampa Bay Rays",
-      "side": "away",
-      "strength": 0.781,
-      "context": "1 match dans les 48h + 1257 km de voyage"
-    },
-    {
       "event_id": "401816018",
       "date": "2026-07-05T00:08Z",
       "sport": "baseball",
@@ -439,24 +403,6 @@
     }
   ],
   "active_watch": [
-    {
-      "event_id": "401816015",
-      "date": "2026-07-04T23:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Cincinnati Reds",
-      "away": "Baltimore Orioles",
-      "match": "Cincinnati Reds - Baltimore Orioles",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Baltimore Orioles",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 6-9"
-    },
     {
       "event_id": "401816030",
       "date": "2026-07-05T17:05Z",
@@ -478,7 +424,7 @@
   ],
   "active_risk": [
     {
-      "event_id": "177704",
+      "event_id": "177481",
       "date": "2026-07-06T04:00Z",
       "sport": "tennis",
       "league_code": "wimbledon",
@@ -493,7 +439,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 12.6%"
+      "context": "marge bookmaker anormale 12.3%"
     },
     {
       "event_id": "401861417",
