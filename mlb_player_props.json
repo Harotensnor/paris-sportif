@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-07-05T15:41:52Z",
+  "generated_at": "2026-07-05T16:41:43Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401816033",
-      "kickoff": "2026-07-05T16:30Z",
-      "league": "MLB",
-      "match": "New York Mets at Atlanta Braves",
-      "home": "Atlanta Braves",
-      "away": "New York Mets",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Atlanta Braves",
-          "pitcher": "Martín Pérez",
-          "label": "Martín Pérez plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.5453,
-          "fair_odds": 1.83,
-          "expected_strikeouts": 4.69,
-          "projected_ip": 5.92,
-          "inputs": {
-            "k9": 7.13,
-            "era": 3.27,
-            "whip": 1.16,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Atlanta Braves",
-          "pitcher": "Martín Pérez",
-          "label": "Martín Pérez ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5011,
-          "fair_odds": 2.0,
-          "expected_hr_allowed": 0.691,
-          "projected_ip": 5.92,
-          "inputs": {
-            "hr9": 1.05,
-            "era": 3.27,
-            "whip": 1.16
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "New York Mets",
-          "pitcher": "Nolan McLean",
-          "label": "Nolan McLean plus de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "over",
-          "probability": 0.5262,
-          "fair_odds": 1.9,
-          "expected_strikeouts": 6.63,
-          "projected_ip": 5.59,
-          "inputs": {
-            "k9": 10.67,
-            "era": 3.78,
-            "whip": 1.12,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "New York Mets",
-          "pitcher": "Nolan McLean",
-          "label": "Nolan McLean ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5575,
-          "fair_odds": 1.79,
-          "expected_hr_allowed": 0.584,
-          "projected_ip": 5.59,
-          "inputs": {
-            "hr9": 0.94,
-            "era": 3.78,
-            "whip": 1.12
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401816034",
       "kickoff": "2026-07-05T17:00Z",
@@ -1280,7 +1198,7 @@
       ]
     }
   ],
-  "props": 62,
+  "props": 58,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"

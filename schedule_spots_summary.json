@@ -1,22 +1,22 @@
 {
-  "generated_at": "2026-07-05T15:41:52Z",
+  "generated_at": "2026-07-05T16:41:44Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 16,
+    "active_events": 15,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 12,
-      "back_to_back_travel": 14,
+      "back_to_back_travel": 13,
+      "lookahead": 10,
       "travel_extreme": 3,
       "schedule_congestion": 10
     },
     "by_decision": {
       "abstain": 2,
-      "lean_home": 14
+      "lean_home": 13
     },
-    "lean_home": 14,
+    "lean_home": 13,
     "lean_away": 0,
     "abstain": 2,
     "monitor": 0
@@ -636,66 +636,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.861
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401816033",
-      "source_event_ids": [
-        "401816033"
-      ],
-      "kickoff": "2026-07-05T16:30Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Atlanta Braves",
-      "away": "New York Mets",
-      "match": "Atlanta Braves - New York Mets",
-      "decision": "lean_home",
-      "net_team": "Atlanta Braves",
-      "reason": "New York Mets plus penalise par calendrier/voyage (1.00 vs 0.15)",
-      "pressure_score": 1.518,
-      "home_fade": 0.15,
-      "away_fade": 1.002,
-      "travel_score": 0.852,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours",
-        "2 match dans les 48h + 1209 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.201,
-        "away_score": -0.949,
-        "home_fade": 0.15,
-        "away_fade": 1.002,
-        "reason": "Direction nette: Atlanta Braves (+0.20)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.852
           }
         ]
       }
