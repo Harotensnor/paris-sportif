@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-05T21:46:08Z",
+  "generated_at": "2026-07-05T22:41:08Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -168,6 +168,170 @@
       ]
     },
     {
+      "event_id": "401816046",
+      "kickoff": "2026-07-06T22:40Z",
+      "league": "MLB",
+      "match": "New York Yankees at Tampa Bay Rays",
+      "home": "Tampa Bay Rays",
+      "away": "New York Yankees",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Tampa Bay Rays",
+          "pitcher": "Griffin Jax",
+          "label": "Griffin Jax plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.5771,
+          "fair_odds": 1.73,
+          "expected_strikeouts": 4.83,
+          "projected_ip": 5.0,
+          "inputs": {
+            "k9": 8.7,
+            "era": 3.45,
+            "whip": 1.27,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Tampa Bay Rays",
+          "pitcher": "Griffin Jax",
+          "label": "Griffin Jax concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.6002,
+          "fair_odds": 1.67,
+          "expected_hr_allowed": 0.917,
+          "projected_ip": 5.0,
+          "inputs": {
+            "hr9": 1.65,
+            "era": 3.45,
+            "whip": 1.27
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "New York Yankees",
+          "pitcher": "Cam Schlittler",
+          "label": "Cam Schlittler plus de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "over",
+          "probability": 0.5644,
+          "fair_odds": 1.77,
+          "expected_strikeouts": 6.83,
+          "projected_ip": 5.78,
+          "inputs": {
+            "k9": 10.64,
+            "era": 2.08,
+            "whip": 0.96,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "New York Yankees",
+          "pitcher": "Cam Schlittler",
+          "label": "Cam Schlittler ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5721,
+          "fair_odds": 1.75,
+          "expected_hr_allowed": 0.559,
+          "projected_ip": 5.78,
+          "inputs": {
+            "hr9": 0.87,
+            "era": 2.08,
+            "whip": 0.96
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401816045",
+      "kickoff": "2026-07-06T22:45Z",
+      "league": "MLB",
+      "match": "Houston Astros at Washington Nationals",
+      "home": "Washington Nationals",
+      "away": "Houston Astros",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Washington Nationals",
+          "pitcher": "Miles Mikolas",
+          "label": "Miles Mikolas plus de 3,5 strikeouts",
+          "line": 3.5,
+          "pick": "over",
+          "probability": 0.5482,
+          "fair_odds": 1.82,
+          "expected_strikeouts": 3.68,
+          "projected_ip": 6.6,
+          "inputs": {
+            "k9": 5.02,
+            "era": 5.44,
+            "whip": 1.29,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Washington Nationals",
+          "pitcher": "Miles Mikolas",
+          "label": "Miles Mikolas concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.7554,
+          "fair_odds": 1.32,
+          "expected_hr_allowed": 1.408,
+          "projected_ip": 6.6,
+          "inputs": {
+            "hr9": 1.92,
+            "era": 5.44,
+            "whip": 1.29
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Houston Astros",
+          "pitcher": "Mike Burrows",
+          "label": "Mike Burrows moins de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "under",
+          "probability": 0.5033,
+          "fair_odds": 1.99,
+          "expected_strikeouts": 4.49,
+          "projected_ip": 5.63,
+          "inputs": {
+            "k9": 7.17,
+            "era": 5.58,
+            "whip": 1.51,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Houston Astros",
+          "pitcher": "Mike Burrows",
+          "label": "Mike Burrows concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.6935,
+          "fair_odds": 1.44,
+          "expected_hr_allowed": 1.183,
+          "projected_ip": 5.63,
+          "inputs": {
+            "hr9": 1.89,
+            "era": 5.58,
+            "whip": 1.51
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
       "event_id": "401816047",
       "kickoff": "2026-07-06T23:15Z",
       "league": "MLB",
@@ -248,9 +412,357 @@
           "side": "away"
         }
       ]
+    },
+    {
+      "event_id": "401816048",
+      "kickoff": "2026-07-06T23:45Z",
+      "league": "MLB",
+      "match": "Milwaukee Brewers at St. Louis Cardinals",
+      "home": "St. Louis Cardinals",
+      "away": "Milwaukee Brewers",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "St. Louis Cardinals",
+          "pitcher": "Dustin May",
+          "label": "Dustin May plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.5827,
+          "fair_odds": 1.72,
+          "expected_strikeouts": 4.86,
+          "projected_ip": 5.26,
+          "inputs": {
+            "k9": 8.32,
+            "era": 4.8,
+            "whip": 1.27,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "St. Louis Cardinals",
+          "pitcher": "Dustin May",
+          "label": "Dustin May ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6453,
+          "fair_odds": 1.55,
+          "expected_hr_allowed": 0.438,
+          "projected_ip": 5.26,
+          "inputs": {
+            "hr9": 0.75,
+            "era": 4.8,
+            "whip": 1.27
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Milwaukee Brewers",
+          "pitcher": "Shane Drohan",
+          "label": "Shane Drohan plus de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "over",
+          "probability": 0.5499,
+          "fair_odds": 1.82,
+          "expected_strikeouts": 6.75,
+          "projected_ip": 6.6,
+          "inputs": {
+            "k9": 9.21,
+            "era": 3.12,
+            "whip": 1.23,
+            "hand": "L"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Milwaukee Brewers",
+          "pitcher": "Shane Drohan",
+          "label": "Shane Drohan ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5644,
+          "fair_odds": 1.77,
+          "expected_hr_allowed": 0.572,
+          "projected_ip": 6.6,
+          "inputs": {
+            "hr9": 0.78,
+            "era": 3.12,
+            "whip": 1.23
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401816052",
+      "kickoff": "2026-07-07T01:45Z",
+      "league": "MLB",
+      "match": "Toronto Blue Jays at San Francisco Giants",
+      "home": "San Francisco Giants",
+      "away": "Toronto Blue Jays",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "San Francisco Giants",
+          "pitcher": "Trevor McDonald",
+          "label": "Trevor McDonald plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.5103,
+          "fair_odds": 1.96,
+          "expected_strikeouts": 4.54,
+          "projected_ip": 5.18,
+          "inputs": {
+            "k9": 7.89,
+            "era": 4.42,
+            "whip": 1.23,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "San Francisco Giants",
+          "pitcher": "Trevor McDonald",
+          "label": "Trevor McDonald ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6958,
+          "fair_odds": 1.44,
+          "expected_hr_allowed": 0.363,
+          "projected_ip": 5.18,
+          "inputs": {
+            "hr9": 0.63,
+            "era": 4.42,
+            "whip": 1.23
+          },
+          "side": "home"
+        }
+      ]
+    },
+    {
+      "event_id": "401871790",
+      "kickoff": "2026-07-07T18:15Z",
+      "league": "MLB",
+      "match": "Milwaukee Brewers at St. Louis Cardinals",
+      "home": "St. Louis Cardinals",
+      "away": "Milwaukee Brewers",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Milwaukee Brewers",
+          "pitcher": "Jacob Misiorowski",
+          "label": "Jacob Misiorowski moins de 9,5 strikeouts",
+          "line": 9.5,
+          "pick": "under",
+          "probability": 0.5545,
+          "fair_odds": 1.8,
+          "expected_strikeouts": 9.18,
+          "projected_ip": 6.12,
+          "inputs": {
+            "k9": 13.5,
+            "era": 1.47,
+            "whip": 0.78,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Milwaukee Brewers",
+          "pitcher": "Jacob Misiorowski",
+          "label": "Jacob Misiorowski ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6606,
+          "fair_odds": 1.51,
+          "expected_hr_allowed": 0.415,
+          "projected_ip": 6.12,
+          "inputs": {
+            "hr9": 0.61,
+            "era": 1.47,
+            "whip": 0.78
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401816058",
+      "kickoff": "2026-07-07T22:40Z",
+      "league": "MLB",
+      "match": "New York Yankees at Tampa Bay Rays",
+      "home": "Tampa Bay Rays",
+      "away": "New York Yankees",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "New York Yankees",
+          "pitcher": "Will Warren",
+          "label": "Will Warren moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.5353,
+          "fair_odds": 1.87,
+          "expected_strikeouts": 5.34,
+          "projected_ip": 5.24,
+          "inputs": {
+            "k9": 9.17,
+            "era": 3.73,
+            "whip": 1.33,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "New York Yankees",
+          "pitcher": "Will Warren",
+          "label": "Will Warren ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5553,
+          "fair_odds": 1.8,
+          "expected_hr_allowed": 0.588,
+          "projected_ip": 5.24,
+          "inputs": {
+            "hr9": 1.01,
+            "era": 3.73,
+            "whip": 1.33
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401816056",
+      "kickoff": "2026-07-07T22:45Z",
+      "league": "MLB",
+      "match": "Houston Astros at Washington Nationals",
+      "home": "Washington Nationals",
+      "away": "Houston Astros",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Washington Nationals",
+          "pitcher": "Andrew Alvarez",
+          "label": "Andrew Alvarez plus de 7,5 strikeouts",
+          "line": 7.5,
+          "pick": "over",
+          "probability": 0.5301,
+          "fair_odds": 1.89,
+          "expected_strikeouts": 7.66,
+          "projected_ip": 6.6,
+          "inputs": {
+            "k9": 10.45,
+            "era": 3.05,
+            "whip": 1.38,
+            "hand": "L"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Washington Nationals",
+          "pitcher": "Andrew Alvarez",
+          "label": "Andrew Alvarez ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.7242,
+          "fair_odds": 1.38,
+          "expected_hr_allowed": 0.323,
+          "projected_ip": 6.6,
+          "inputs": {
+            "hr9": 0.44,
+            "era": 3.05,
+            "whip": 1.38
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Houston Astros",
+          "pitcher": "Tatsuya Imai",
+          "label": "Tatsuya Imai plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.6075,
+          "fair_odds": 1.65,
+          "expected_strikeouts": 4.97,
+          "projected_ip": 4.01,
+          "inputs": {
+            "k9": 11.17,
+            "era": 6.14,
+            "whip": 1.47,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Houston Astros",
+          "pitcher": "Tatsuya Imai",
+          "label": "Tatsuya Imai ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.515,
+          "fair_odds": 1.94,
+          "expected_hr_allowed": 0.664,
+          "projected_ip": 4.01,
+          "inputs": {
+            "hr9": 1.49,
+            "era": 6.14,
+            "whip": 1.47
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401816064",
+      "kickoff": "2026-07-07T23:45Z",
+      "league": "MLB",
+      "match": "Milwaukee Brewers at St. Louis Cardinals",
+      "home": "St. Louis Cardinals",
+      "away": "Milwaukee Brewers",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Milwaukee Brewers",
+          "pitcher": "Jacob Misiorowski",
+          "label": "Jacob Misiorowski moins de 9,5 strikeouts",
+          "line": 9.5,
+          "pick": "under",
+          "probability": 0.5545,
+          "fair_odds": 1.8,
+          "expected_strikeouts": 9.18,
+          "projected_ip": 6.12,
+          "inputs": {
+            "k9": 13.5,
+            "era": 1.47,
+            "whip": 0.78,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Milwaukee Brewers",
+          "pitcher": "Jacob Misiorowski",
+          "label": "Jacob Misiorowski ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6606,
+          "fair_odds": 1.51,
+          "expected_hr_allowed": 0.415,
+          "projected_ip": 6.12,
+          "inputs": {
+            "hr9": 0.61,
+            "era": 1.47,
+            "whip": 0.78
+          },
+          "side": "away"
+        }
+      ]
     }
   ],
-  "props": 12,
+  "props": 36,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
