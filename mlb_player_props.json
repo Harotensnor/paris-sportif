@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-07-05T22:41:08Z",
+  "generated_at": "2026-07-05T23:42:42Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401816043",
-      "kickoff": "2026-07-05T23:20Z",
-      "league": "MLB",
-      "match": "San Diego Padres at Los Angeles Dodgers",
-      "home": "Los Angeles Dodgers",
-      "away": "San Diego Padres",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Los Angeles Dodgers",
-          "pitcher": "Emmet Sheehan",
-          "label": "Emmet Sheehan moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.53,
-          "fair_odds": 1.89,
-          "expected_strikeouts": 5.36,
-          "projected_ip": 4.81,
-          "inputs": {
-            "k9": 10.03,
-            "era": 5.08,
-            "whip": 1.27,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Los Angeles Dodgers",
-          "pitcher": "Emmet Sheehan",
-          "label": "Emmet Sheehan concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6302,
-          "fair_odds": 1.59,
-          "expected_hr_allowed": 0.995,
-          "projected_ip": 4.81,
-          "inputs": {
-            "hr9": 1.86,
-            "era": 5.08,
-            "whip": 1.27
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "San Diego Padres",
-          "pitcher": "JP Sears",
-          "label": "JP Sears moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.5246,
-          "fair_odds": 1.91,
-          "expected_strikeouts": 4.4,
-          "projected_ip": 5.05,
-          "inputs": {
-            "k9": 7.84,
-            "era": 6.97,
-            "whip": 1.74,
-            "hand": "L"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "San Diego Padres",
-          "pitcher": "JP Sears",
-          "label": "JP Sears concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.8581,
-          "fair_odds": 1.17,
-          "expected_hr_allowed": 1.953,
-          "projected_ip": 5.05,
-          "inputs": {
-            "hr9": 3.48,
-            "era": 6.97,
-            "whip": 1.74
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401816049",
       "kickoff": "2026-07-06T18:10Z",
@@ -762,7 +680,7 @@
       ]
     }
   ],
-  "props": 36,
+  "props": 32,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"

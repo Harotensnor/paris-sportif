@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-07-05T22:41:09Z",
+  "generated_at": "2026-07-05T23:42:42Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 42,
-    "actionable": 22,
+    "active_events": 40,
+    "actionable": 19,
     "watch": 2,
-    "risk": 18,
+    "risk": 19,
     "expired_sample": 0,
     "by_type": {
       "travel_extreme": 10,
-      "back_to_back_travel": 16,
+      "back_to_back_travel": 12,
       "injury_imbalance": 11,
       "signal_conflict": 4,
-      "market_uncertain": 17
+      "market_uncertain": 18
     },
     "by_quality": {
-      "actionable": 22,
+      "actionable": 19,
       "watch": 2,
-      "risk": 18
+      "risk": 19
     }
   },
   "active_actionable": [
@@ -76,24 +76,6 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 1-11"
-    },
-    {
-      "event_id": "401816052",
-      "date": "2026-07-07T01:45Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Francisco Giants",
-      "away": "Toronto Blue Jays",
-      "match": "San Francisco Giants - Toronto Blue Jays",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Toronto Blue Jays",
-      "side": "away",
-      "strength": 1.0,
-      "context": "1 match dans les 48h + 3641 km de voyage"
     },
     {
       "event_id": "401871790",
@@ -294,42 +276,6 @@
       "context": "1 match dans les 48h + 1961 km de voyage"
     },
     {
-      "event_id": "401816124",
-      "date": "2026-07-11T20:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Francisco Giants",
-      "away": "Colorado Rockies",
-      "match": "San Francisco Giants - Colorado Rockies",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Colorado Rockies",
-      "side": "away",
-      "strength": 0.914,
-      "context": "2 match dans les 48h + 1522 km de voyage"
-    },
-    {
-      "event_id": "401816139",
-      "date": "2026-07-12T20:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Francisco Giants",
-      "away": "Colorado Rockies",
-      "match": "San Francisco Giants - Colorado Rockies",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Colorado Rockies",
-      "side": "away",
-      "strength": 0.914,
-      "context": "2 match dans les 48h + 1522 km de voyage"
-    },
-    {
       "event_id": "401816058",
       "date": "2026-07-07T22:40Z",
       "sport": "baseball",
@@ -366,22 +312,22 @@
       "context": "2 match dans les 48h + 1209 km de voyage"
     },
     {
-      "event_id": "401816109",
-      "date": "2026-07-11T02:15Z",
+      "event_id": "401816052",
+      "date": "2026-07-07T01:45Z",
       "sport": "baseball",
       "league_code": "mlb",
       "league_name": "MLB",
       "home": "San Francisco Giants",
-      "away": "Colorado Rockies",
-      "match": "San Francisco Giants - Colorado Rockies",
+      "away": "Toronto Blue Jays",
+      "match": "San Francisco Giants - Toronto Blue Jays",
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
+      "type": "travel_extreme",
       "direction": "fade",
-      "team": "Colorado Rockies",
+      "team": "Toronto Blue Jays",
       "side": "away",
-      "strength": 0.834,
-      "context": "1 match dans les 48h + 1522 km de voyage"
+      "strength": 0.847,
+      "context": "Deplacement estime 3641 km, decalage ~2.9h"
     },
     {
       "event_id": "401816110",
@@ -782,6 +728,24 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.9%"
+    },
+    {
+      "event_id": "401857063",
+      "date": "2026-07-13T01:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Las Vegas Aces",
+      "away": "Indiana Fever",
+      "match": "Las Vegas Aces - Indiana Fever",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 13.7%"
     }
   ],
   "expired_sample": []
