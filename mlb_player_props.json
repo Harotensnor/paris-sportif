@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-07-05T20:51:28Z",
+  "generated_at": "2026-07-05T21:46:08Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401816044",
-      "kickoff": "2026-07-05T21:00Z",
-      "league": "MLB",
-      "match": "Toronto Blue Jays at Seattle Mariners",
-      "home": "Seattle Mariners",
-      "away": "Toronto Blue Jays",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Seattle Mariners",
-          "pitcher": "Emerson Hancock",
-          "label": "Emerson Hancock moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.5193,
-          "fair_odds": 1.93,
-          "expected_strikeouts": 5.41,
-          "projected_ip": 5.64,
-          "inputs": {
-            "k9": 8.64,
-            "era": 3.47,
-            "whip": 1.05,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Seattle Mariners",
-          "pitcher": "Emerson Hancock",
-          "label": "Emerson Hancock concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5255,
-          "fair_odds": 1.9,
-          "expected_hr_allowed": 0.745,
-          "projected_ip": 5.64,
-          "inputs": {
-            "hr9": 1.19,
-            "era": 3.47,
-            "whip": 1.05
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Toronto Blue Jays",
-          "pitcher": "Trey Yesavage",
-          "label": "Trey Yesavage moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.5982,
-          "fair_odds": 1.67,
-          "expected_strikeouts": 5.06,
-          "projected_ip": 5.59,
-          "inputs": {
-            "k9": 8.15,
-            "era": 3.34,
-            "whip": 1.1,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Toronto Blue Jays",
-          "pitcher": "Trey Yesavage",
-          "label": "Trey Yesavage ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6083,
-          "fair_odds": 1.64,
-          "expected_hr_allowed": 0.497,
-          "projected_ip": 5.59,
-          "inputs": {
-            "hr9": 0.8,
-            "era": 3.34,
-            "whip": 1.1
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401816043",
       "kickoff": "2026-07-05T23:20Z",
@@ -332,7 +250,7 @@
       ]
     }
   ],
-  "props": 16,
+  "props": 12,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"

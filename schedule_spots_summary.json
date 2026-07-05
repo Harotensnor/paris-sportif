@@ -1,22 +1,22 @@
 {
-  "generated_at": "2026-07-05T20:51:29Z",
+  "generated_at": "2026-07-05T21:46:09Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 9,
+    "active_events": 8,
     "expired_sample": 0,
     "by_type": {
-      "travel_extreme": 2,
-      "back_to_back_travel": 7,
+      "travel_extreme": 1,
+      "back_to_back_travel": 6,
       "schedule_congestion": 10,
       "lookahead": 8
     },
     "by_decision": {
       "abstain": 2,
-      "lean_home": 7
+      "lean_home": 6
     },
-    "lean_home": 7,
+    "lean_home": 6,
     "lean_away": 0,
     "abstain": 2,
     "monitor": 0
@@ -452,65 +452,6 @@
             "type": "travel_extreme",
             "direction": "fade",
             "strength": 0.965
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401816044",
-      "source_event_ids": [
-        "401816044"
-      ],
-      "kickoff": "2026-07-05T21:00Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Seattle Mariners",
-      "away": "Toronto Blue Jays",
-      "match": "Seattle Mariners - Toronto Blue Jays",
-      "decision": "lean_home",
-      "net_team": "Seattle Mariners",
-      "reason": "Toronto Blue Jays plus penalise par calendrier/voyage (1.77 vs 0.00)",
-      "pressure_score": 1.773,
-      "home_fade": 0.0,
-      "away_fade": 1.773,
-      "travel_score": 1.773,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "travel_extreme": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "Deplacement estime 3325 km, decalage ~2.9h",
-        "2 match dans les 48h + 3325 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.761,
-        "away_score": -2.173,
-        "home_fade": 0.0,
-        "away_fade": 2.173,
-        "reason": "Direction nette: Seattle Mariners (+0.76)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.773
           },
           {
             "side": "away",

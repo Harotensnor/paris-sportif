@@ -1,45 +1,28 @@
 {
-  "generated_at": "2026-07-05T20:51:29Z",
+  "generated_at": "2026-07-05T21:46:09Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 25,
-    "actionable": 7,
-    "watch": 0,
+    "actionable": 6,
+    "watch": 1,
     "risk": 18,
     "expired_sample": 0,
     "by_type": {
-      "travel_extreme": 2,
-      "back_to_back_travel": 7,
-      "injury_imbalance": 1,
+      "travel_extreme": 1,
+      "back_to_back_travel": 6,
+      "injury_imbalance": 2,
       "signal_conflict": 2,
       "market_uncertain": 17
     },
     "by_quality": {
-      "actionable": 7,
+      "actionable": 6,
+      "watch": 1,
       "risk": 18
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401816044",
-      "date": "2026-07-05T21:00Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Seattle Mariners",
-      "away": "Toronto Blue Jays",
-      "match": "Seattle Mariners - Toronto Blue Jays",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Toronto Blue Jays",
-      "side": "away",
-      "strength": 1.0,
-      "context": "2 match dans les 48h + 3325 km de voyage"
-    },
     {
       "event_id": "401816040",
       "date": "2026-07-06T01:30Z",
@@ -149,7 +132,26 @@
       "context": "1 match dans les 48h + 1522 km de voyage"
     }
   ],
-  "active_watch": [],
+  "active_watch": [
+    {
+      "event_id": "401857043",
+      "date": "2026-07-06T23:30Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Washington Mystics",
+      "away": "Golden State Valkyries",
+      "match": "Washington Mystics - Golden State Valkyries",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Golden State Valkyries",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 0-3"
+    }
+  ],
   "active_risk": [
     {
       "event_id": "401861417",
