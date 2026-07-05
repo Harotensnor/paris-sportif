@@ -1,22 +1,22 @@
 {
-  "generated_at": "2026-07-05T17:43:59Z",
+  "generated_at": "2026-07-05T18:45:00Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 15,
+    "active_events": 14,
     "expired_sample": 0,
     "by_type": {
-      "back_to_back_travel": 13,
       "lookahead": 10,
+      "back_to_back_travel": 12,
       "travel_extreme": 3,
       "schedule_congestion": 10
     },
     "by_decision": {
       "abstain": 2,
-      "lean_home": 13
+      "lean_home": 12
     },
-    "lean_home": 13,
+    "lean_home": 12,
     "lean_away": 0,
     "abstain": 2,
     "monitor": 0
@@ -687,57 +687,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.941
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401816032",
-      "source_event_ids": [
-        "401816032"
-      ],
-      "kickoff": "2026-07-05T17:35Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "New York Yankees",
-      "away": "Minnesota Twins",
-      "match": "New York Yankees - Minnesota Twins",
-      "decision": "lean_home",
-      "net_team": "New York Yankees",
-      "reason": "Minnesota Twins plus penalise par calendrier/voyage (0.94 vs 0.00)",
-      "pressure_score": 0.938,
-      "home_fade": 0.0,
-      "away_fade": 0.938,
-      "travel_score": 0.938,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "2 match dans les 48h + 1638 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.538,
-        "away_score": -1.538,
-        "home_fade": 0.0,
-        "away_fade": 1.538,
-        "reason": "Direction nette: New York Yankees (+0.54)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.938
           }
         ]
       }

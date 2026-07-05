@@ -1,64 +1,27 @@
 {
-  "generated_at": "2026-07-05T17:43:59Z",
+  "generated_at": "2026-07-05T18:45:00Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 35,
-    "actionable": 15,
-    "watch": 2,
+    "active_events": 30,
+    "actionable": 12,
+    "watch": 0,
     "risk": 18,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 7,
-      "back_to_back_travel": 13,
+      "injury_imbalance": 2,
+      "back_to_back_travel": 12,
       "signal_conflict": 3,
       "travel_extreme": 3,
       "market_uncertain": 17
     },
     "by_quality": {
-      "actionable": 15,
-      "watch": 2,
+      "actionable": 12,
       "risk": 18
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401816031",
-      "date": "2026-07-05T18:00Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Cleveland Guardians",
-      "away": "Chicago White Sox",
-      "match": "Cleveland Guardians - Chicago White Sox",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Chicago White Sox",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 2-11"
-    },
-    {
-      "event_id": "401816037",
-      "date": "2026-07-05T18:30Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Chicago Cubs",
-      "away": "St. Louis Cardinals",
-      "match": "Chicago Cubs - St. Louis Cardinals",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Chicago Cubs",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 15-1"
-    },
     {
       "event_id": "401816036",
       "date": "2026-07-05T19:00Z",
@@ -148,24 +111,6 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 11-3"
-    },
-    {
-      "event_id": "401816032",
-      "date": "2026-07-05T17:35Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "New York Yankees",
-      "away": "Minnesota Twins",
-      "match": "New York Yankees - Minnesota Twins",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Minnesota Twins",
-      "side": "away",
-      "strength": 0.938,
-      "context": "2 match dans les 48h + 1638 km de voyage"
     },
     {
       "event_id": "401816039",
@@ -294,44 +239,7 @@
       "context": "1 match dans les 48h + 1522 km de voyage"
     }
   ],
-  "active_watch": [
-    {
-      "event_id": "401857041",
-      "date": "2026-07-05T19:00Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Toronto Tempo",
-      "away": "Dallas Wings",
-      "match": "Toronto Tempo - Dallas Wings",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Toronto Tempo",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 3-0"
-    },
-    {
-      "event_id": "401857055",
-      "date": "2026-07-10T23:30Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Toronto Tempo",
-      "away": "Dallas Wings",
-      "match": "Toronto Tempo - Dallas Wings",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Toronto Tempo",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 3-0"
-    }
-  ],
+  "active_watch": [],
   "active_risk": [
     {
       "event_id": "401861417",
