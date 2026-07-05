@@ -1,25 +1,24 @@
 {
-  "generated_at": "2026-07-04T23:31:51Z",
+  "generated_at": "2026-07-05T01:16:28Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 26,
+    "active_events": 20,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 27,
-      "back_to_back_travel": 17,
+      "lookahead": 20,
       "travel_extreme": 5,
-      "schedule_congestion": 12
+      "back_to_back_travel": 16,
+      "schedule_congestion": 10
     },
     "by_decision": {
-      "abstain": 8,
-      "lean_home": 17,
-      "lean_away": 1
+      "abstain": 4,
+      "lean_home": 16
     },
-    "lean_home": 17,
-    "lean_away": 1,
-    "abstain": 8,
+    "lean_home": 16,
+    "lean_away": 0,
+    "abstain": 4,
     "monitor": 0
   },
   "active": [
@@ -37,12 +36,12 @@
       "match": "San Francisco Giants - Colorado Rockies",
       "decision": "abstain",
       "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: San Francisco Giants 0.90, Colorado Rockies 0.90",
-      "pressure_score": 2.533,
-      "home_fade": 0.9,
-      "away_fade": 0.9,
+      "reason": "Fatigue/agenda des deux cotes: San Francisco Giants 0.96, Colorado Rockies 0.96",
+      "pressure_score": 2.8,
+      "home_fade": 0.96,
+      "away_fade": 0.96,
       "travel_score": 0,
-      "lookahead_score": 1.333,
+      "lookahead_score": 1.6,
       "congestion_score": 1.2,
       "types": {
         "schedule_congestion": 2,
@@ -50,18 +49,18 @@
       },
       "contexts": [
         "3 matchs sur les 7 derniers jours",
-        "2 match important/proche dans les 3 jours",
+        "3 match important/proche dans les 3 jours",
         "3 matchs sur les 7 derniers jours",
-        "2 match important/proche dans les 3 jours"
+        "3 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
         "status": "abstain",
         "net_side": null,
-        "home_score": -0.585,
-        "away_score": -0.585,
-        "home_fade": 0.9,
-        "away_fade": 0.9,
-        "reason": "Signaux opposes: San Francisco Giants fade 0.90, Colorado Rockies fade 0.90 -> prudence",
+        "home_score": -0.624,
+        "away_score": -0.624,
+        "home_fade": 0.96,
+        "away_fade": 0.96,
+        "reason": "Signaux opposes: San Francisco Giants fade 0.96, Colorado Rockies fade 0.96 -> prudence",
         "detail": [
           {
             "side": "home",
@@ -73,7 +72,7 @@
             "side": "home",
             "type": "lookahead",
             "direction": "caution",
-            "strength": 0.3
+            "strength": 0.36
           },
           {
             "side": "away",
@@ -85,233 +84,7 @@
             "side": "away",
             "type": "lookahead",
             "direction": "caution",
-            "strength": 0.3
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401816021",
-      "source_event_ids": [
-        "401816021"
-      ],
-      "kickoff": "2026-07-05T00:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Kansas City Royals",
-      "away": "Philadelphia Phillies",
-      "match": "Kansas City Royals - Philadelphia Phillies",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Kansas City Royals 0.30, Philadelphia Phillies 0.30",
-      "pressure_score": 1.333,
-      "home_fade": 0.3,
-      "away_fade": 0.3,
-      "travel_score": 0,
-      "lookahead_score": 1.333,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "2 match important/proche dans les 3 jours",
-        "2 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -1.195,
-        "away_score": 0.155,
-        "home_fade": 1.3,
-        "away_fade": 0.3,
-        "reason": "Direction nette: Philadelphia Phillies (+0.15)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401816031",
-      "source_event_ids": [
-        "401816031"
-      ],
-      "kickoff": "2026-07-05T18:00Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Cleveland Guardians",
-      "away": "Chicago White Sox",
-      "match": "Cleveland Guardians - Chicago White Sox",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Cleveland Guardians 0.60, Chicago White Sox 0.60",
-      "pressure_score": 1.2,
-      "home_fade": 0.6,
-      "away_fade": 0.6,
-      "travel_score": 0,
-      "lookahead_score": 0,
-      "congestion_score": 1.2,
-      "types": {
-        "schedule_congestion": 2
-      },
-      "contexts": [
-        "3 matchs sur les 7 derniers jours",
-        "3 matchs sur les 7 derniers jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.04,
-        "away_score": -1.39,
-        "home_fade": 0.6,
-        "away_fade": 1.6,
-        "reason": "Direction nette: Cleveland Guardians (-0.04)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401816043",
-      "source_event_ids": [
-        "401816043"
-      ],
-      "kickoff": "2026-07-05T23:20Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Los Angeles Dodgers",
-      "away": "San Diego Padres",
-      "match": "Los Angeles Dodgers - San Diego Padres",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Los Angeles Dodgers 0.60, San Diego Padres 0.60",
-      "pressure_score": 1.2,
-      "home_fade": 0.6,
-      "away_fade": 0.6,
-      "travel_score": 0,
-      "lookahead_score": 0,
-      "congestion_score": 1.2,
-      "types": {
-        "schedule_congestion": 2
-      },
-      "contexts": [
-        "3 matchs sur les 7 derniers jours",
-        "3 matchs sur les 7 derniers jours"
-      ],
-      "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.39,
-        "away_score": -0.39,
-        "home_fade": 0.6,
-        "away_fade": 0.6,
-        "reason": "Signaux opposes: Los Angeles Dodgers fade 0.60, San Diego Padres fade 0.60 -> prudence",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401816022",
-      "source_event_ids": [
-        "401816022"
-      ],
-      "kickoff": "2026-07-05T00:08Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Chicago Cubs",
-      "away": "St. Louis Cardinals",
-      "match": "Chicago Cubs - St. Louis Cardinals",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Chicago Cubs 0.15, St. Louis Cardinals 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -1.097,
-        "away_score": 0.252,
-        "home_fade": 1.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: St. Louis Cardinals (+0.25)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
+            "strength": 0.36
           }
         ]
       }
@@ -486,12 +259,12 @@
       "match": "San Francisco Giants - Colorado Rockies",
       "decision": "lean_home",
       "net_team": "San Francisco Giants",
-      "reason": "Colorado Rockies plus penalise par calendrier/voyage (1.58 vs 0.75)",
-      "pressure_score": 2.701,
-      "home_fade": 0.75,
-      "away_fade": 1.584,
+      "reason": "Colorado Rockies plus penalise par calendrier/voyage (1.73 vs 0.90)",
+      "pressure_score": 3.368,
+      "home_fade": 0.9,
+      "away_fade": 1.734,
       "travel_score": 0.834,
-      "lookahead_score": 0.667,
+      "lookahead_score": 1.333,
       "congestion_score": 1.2,
       "types": {
         "schedule_congestion": 2,
@@ -500,18 +273,18 @@
       },
       "contexts": [
         "3 matchs sur les 7 derniers jours",
-        "1 match important/proche dans les 3 jours",
+        "2 match important/proche dans les 3 jours",
         "3 matchs sur les 7 derniers jours",
-        "1 match important/proche dans les 3 jours"
+        "2 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": -0.195,
-        "away_score": -1.322,
-        "home_fade": 0.75,
-        "away_fade": 1.584,
-        "reason": "Direction nette: San Francisco Giants (-0.20)",
+        "home_score": -0.293,
+        "away_score": -1.419,
+        "home_fade": 0.9,
+        "away_fade": 1.734,
+        "reason": "Direction nette: San Francisco Giants (-0.29)",
         "detail": [
           {
             "side": "home",
@@ -523,7 +296,7 @@
             "side": "home",
             "type": "lookahead",
             "direction": "caution",
-            "strength": 0.15
+            "strength": 0.3
           },
           {
             "side": "away",
@@ -535,13 +308,87 @@
             "side": "away",
             "type": "lookahead",
             "direction": "caution",
-            "strength": 0.15
+            "strength": 0.3
           },
           {
             "side": "away",
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.834
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401816124",
+      "source_event_ids": [
+        "401816124"
+      ],
+      "kickoff": "2026-07-11T20:05Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "San Francisco Giants",
+      "away": "Colorado Rockies",
+      "match": "San Francisco Giants - Colorado Rockies",
+      "decision": "lean_home",
+      "net_team": "San Francisco Giants",
+      "reason": "Colorado Rockies plus penalise par calendrier/voyage (1.86 vs 0.95)",
+      "pressure_score": 3.181,
+      "home_fade": 0.95,
+      "away_fade": 1.864,
+      "travel_score": 0.914,
+      "lookahead_score": 0.667,
+      "congestion_score": 1.6,
+      "types": {
+        "schedule_congestion": 2,
+        "lookahead": 2,
+        "back_to_back_travel": 1
+      },
+      "contexts": [
+        "4 matchs sur les 7 derniers jours",
+        "1 match important/proche dans les 3 jours",
+        "4 matchs sur les 7 derniers jours",
+        "1 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": -0.297,
+        "away_score": -1.532,
+        "home_fade": 0.95,
+        "away_fade": 1.864,
+        "reason": "Direction nette: San Francisco Giants (-0.30)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.8
+          },
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.8
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "back_to_back_travel",
+            "direction": "fade",
+            "strength": 0.914
           }
         ]
       }
@@ -615,66 +462,6 @@
       }
     },
     {
-      "event_id": "401816124",
-      "source_event_ids": [
-        "401816124"
-      ],
-      "kickoff": "2026-07-11T20:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Francisco Giants",
-      "away": "Colorado Rockies",
-      "match": "San Francisco Giants - Colorado Rockies",
-      "decision": "lean_home",
-      "net_team": "San Francisco Giants",
-      "reason": "Colorado Rockies plus penalise par calendrier/voyage (1.71 vs 0.80)",
-      "pressure_score": 2.514,
-      "home_fade": 0.8,
-      "away_fade": 1.714,
-      "travel_score": 0.914,
-      "lookahead_score": 0,
-      "congestion_score": 1.6,
-      "types": {
-        "schedule_congestion": 2,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "4 matchs sur les 7 derniers jours",
-        "4 matchs sur les 7 derniers jours",
-        "2 match dans les 48h + 1522 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.2,
-        "away_score": -1.434,
-        "home_fade": 0.8,
-        "away_fade": 1.714,
-        "reason": "Direction nette: San Francisco Giants (-0.20)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.8
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.8
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.914
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401816027",
       "source_event_ids": [
         "401816027"
@@ -743,61 +530,61 @@
       }
     },
     {
-      "event_id": "401816018",
+      "event_id": "401816139",
       "source_event_ids": [
-        "401816018"
+        "401816139"
       ],
-      "kickoff": "2026-07-05T00:08Z",
+      "kickoff": "2026-07-12T20:05Z",
       "sport": "baseball",
       "league_code": "mlb",
       "league_name": "MLB",
-      "home": "Atlanta Braves",
-      "away": "New York Mets",
-      "match": "Atlanta Braves - New York Mets",
+      "home": "San Francisco Giants",
+      "away": "Colorado Rockies",
+      "match": "San Francisco Giants - Colorado Rockies",
       "decision": "lean_home",
-      "net_team": "Atlanta Braves",
-      "reason": "New York Mets plus penalise par calendrier/voyage (1.07 vs 0.30)",
-      "pressure_score": 2.105,
-      "home_fade": 0.3,
-      "away_fade": 1.072,
-      "travel_score": 0.772,
-      "lookahead_score": 1.333,
-      "congestion_score": 0,
+      "net_team": "San Francisco Giants",
+      "reason": "Colorado Rockies plus penalise par calendrier/voyage (1.51 vs 0.60)",
+      "pressure_score": 2.114,
+      "home_fade": 0.6,
+      "away_fade": 1.514,
+      "travel_score": 0.914,
+      "lookahead_score": 0,
+      "congestion_score": 1.2,
       "types": {
-        "lookahead": 2,
+        "schedule_congestion": 2,
         "back_to_back_travel": 1
       },
       "contexts": [
-        "2 match important/proche dans les 3 jours",
-        "2 match important/proche dans les 3 jours",
-        "1 match dans les 48h + 1209 km de voyage"
+        "3 matchs sur les 7 derniers jours",
+        "3 matchs sur les 7 derniers jours",
+        "2 match dans les 48h + 1522 km de voyage"
       ],
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.075,
-        "away_score": -0.967,
-        "home_fade": 0.3,
-        "away_fade": 1.072,
-        "reason": "Direction nette: Atlanta Braves (+0.08)",
+        "home_score": -0.07,
+        "away_score": -1.304,
+        "home_fade": 0.6,
+        "away_fade": 1.514,
+        "reason": "Direction nette: San Francisco Giants (-0.07)",
         "detail": [
           {
             "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
           },
           {
             "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
+            "type": "schedule_congestion",
+            "direction": "fade",
+            "strength": 0.6
           },
           {
             "side": "away",
             "type": "back_to_back_travel",
             "direction": "fade",
-            "strength": 0.772
+            "strength": 0.914
           }
         ]
       }
@@ -1154,66 +941,6 @@
       }
     },
     {
-      "event_id": "401816024",
-      "source_event_ids": [
-        "401816024"
-      ],
-      "kickoff": "2026-07-05T00:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Colorado Rockies",
-      "away": "San Francisco Giants",
-      "match": "Colorado Rockies - San Francisco Giants",
-      "decision": "lean_home",
-      "net_team": "Colorado Rockies",
-      "reason": "San Francisco Giants plus penalise par calendrier/voyage (0.98 vs 0.15)",
-      "pressure_score": 1.501,
-      "home_fade": 0.15,
-      "away_fade": 0.984,
-      "travel_score": 0.834,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours",
-        "1 match dans les 48h + 1522 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.195,
-        "away_score": -0.932,
-        "home_fade": 0.15,
-        "away_fade": 0.984,
-        "reason": "Direction nette: Colorado Rockies (+0.19)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.834
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401816049",
       "source_event_ids": [
         "401816049"
@@ -1446,51 +1173,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.856
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401857040",
-      "source_event_ids": [
-        "401857040"
-      ],
-      "kickoff": "2026-07-05T01:00Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Seattle Storm",
-      "away": "Portland Fire",
-      "match": "Seattle Storm - Portland Fire",
-      "decision": "lean_away",
-      "net_team": "Portland Fire",
-      "reason": "Seattle Storm plus penalise par calendrier/voyage (0.15 vs 0.00)",
-      "pressure_score": 0.333,
-      "home_fade": 0.15,
-      "away_fade": 0.0,
-      "travel_score": 0,
-      "lookahead_score": 0.333,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 1
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.15,
-        "away_score": 0.052,
-        "home_fade": 0.15,
-        "away_fade": 0.0,
-        "reason": "Direction nette: Portland Fire (+0.05)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
           }
         ]
       }

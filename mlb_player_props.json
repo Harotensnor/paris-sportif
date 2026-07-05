@@ -1,300 +1,8 @@
 {
-  "generated_at": "2026-07-04T23:31:50Z",
+  "generated_at": "2026-07-05T01:16:28Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401816018",
-      "kickoff": "2026-07-05T00:08Z",
-      "league": "MLB",
-      "match": "New York Mets at Atlanta Braves",
-      "home": "Atlanta Braves",
-      "away": "New York Mets",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Atlanta Braves",
-          "pitcher": "Martín Pérez",
-          "label": "Martín Pérez plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.5453,
-          "fair_odds": 1.83,
-          "expected_strikeouts": 4.69,
-          "projected_ip": 5.92,
-          "inputs": {
-            "k9": 7.13,
-            "era": 3.27,
-            "whip": 1.16,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Atlanta Braves",
-          "pitcher": "Martín Pérez",
-          "label": "Martín Pérez ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5011,
-          "fair_odds": 2.0,
-          "expected_hr_allowed": 0.691,
-          "projected_ip": 5.92,
-          "inputs": {
-            "hr9": 1.05,
-            "era": 3.27,
-            "whip": 1.16
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "New York Mets",
-          "pitcher": "Nolan McLean",
-          "label": "Nolan McLean plus de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "over",
-          "probability": 0.5262,
-          "fair_odds": 1.9,
-          "expected_strikeouts": 6.63,
-          "projected_ip": 5.59,
-          "inputs": {
-            "k9": 10.67,
-            "era": 3.78,
-            "whip": 1.12,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "New York Mets",
-          "pitcher": "Nolan McLean",
-          "label": "Nolan McLean ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5575,
-          "fair_odds": 1.79,
-          "expected_hr_allowed": 0.584,
-          "projected_ip": 5.59,
-          "inputs": {
-            "hr9": 0.94,
-            "era": 3.78,
-            "whip": 1.12
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401816022",
-      "kickoff": "2026-07-05T00:08Z",
-      "league": "MLB",
-      "match": "St. Louis Cardinals at Chicago Cubs",
-      "home": "Chicago Cubs",
-      "away": "St. Louis Cardinals",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Chicago Cubs",
-          "pitcher": "Javier Assad",
-          "label": "Javier Assad plus de 3,5 strikeouts",
-          "line": 3.5,
-          "pick": "over",
-          "probability": 0.6165,
-          "fair_odds": 1.62,
-          "expected_strikeouts": 3.96,
-          "projected_ip": 6.6,
-          "inputs": {
-            "k9": 5.4,
-            "era": 4.53,
-            "whip": 1.12,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Chicago Cubs",
-          "pitcher": "Javier Assad",
-          "label": "Javier Assad concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.7208,
-          "fair_odds": 1.39,
-          "expected_hr_allowed": 1.276,
-          "projected_ip": 6.6,
-          "inputs": {
-            "hr9": 1.74,
-            "era": 4.53,
-            "whip": 1.12
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "St. Louis Cardinals",
-          "pitcher": "Matthew Liberatore",
-          "label": "Matthew Liberatore plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.5286,
-          "fair_odds": 1.89,
-          "expected_strikeouts": 4.62,
-          "projected_ip": 4.84,
-          "inputs": {
-            "k9": 8.6,
-            "era": 5.33,
-            "whip": 1.55,
-            "hand": "L"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "St. Louis Cardinals",
-          "pitcher": "Matthew Liberatore",
-          "label": "Matthew Liberatore concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6299,
-          "fair_odds": 1.59,
-          "expected_hr_allowed": 0.994,
-          "projected_ip": 4.84,
-          "inputs": {
-            "hr9": 1.85,
-            "era": 5.33,
-            "whip": 1.55
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401816021",
-      "kickoff": "2026-07-05T00:10Z",
-      "league": "MLB",
-      "match": "Philadelphia Phillies at Kansas City Royals",
-      "home": "Kansas City Royals",
-      "away": "Philadelphia Phillies",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Kansas City Royals",
-          "pitcher": "Luinder Avila",
-          "label": "Luinder Avila moins de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "under",
-          "probability": 0.5866,
-          "fair_odds": 1.7,
-          "expected_strikeouts": 6.08,
-          "projected_ip": 6.6,
-          "inputs": {
-            "k9": 8.29,
-            "era": 5.4,
-            "whip": 1.67,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Kansas City Royals",
-          "pitcher": "Luinder Avila",
-          "label": "Luinder Avila concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5054,
-          "fair_odds": 1.98,
-          "expected_hr_allowed": 0.704,
-          "projected_ip": 6.6,
-          "inputs": {
-            "hr9": 0.96,
-            "era": 5.4,
-            "whip": 1.67
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Philadelphia Phillies",
-          "pitcher": "Aaron Nola",
-          "label": "Aaron Nola moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.586,
-          "fair_odds": 1.71,
-          "expected_strikeouts": 5.12,
-          "projected_ip": 5.0,
-          "inputs": {
-            "k9": 9.21,
-            "era": 6.04,
-            "whip": 1.49,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Philadelphia Phillies",
-          "pitcher": "Aaron Nola",
-          "label": "Aaron Nola concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6726,
-          "fair_odds": 1.49,
-          "expected_hr_allowed": 1.117,
-          "projected_ip": 5.0,
-          "inputs": {
-            "hr9": 2.01,
-            "era": 6.04,
-            "whip": 1.49
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401816024",
-      "kickoff": "2026-07-05T00:10Z",
-      "league": "MLB",
-      "match": "San Francisco Giants at Colorado Rockies",
-      "home": "Colorado Rockies",
-      "away": "San Francisco Giants",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Colorado Rockies",
-          "pitcher": "Tanner Gordon",
-          "label": "Tanner Gordon moins de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "under",
-          "probability": 0.5243,
-          "fair_odds": 1.91,
-          "expected_strikeouts": 6.38,
-          "projected_ip": 6.6,
-          "inputs": {
-            "k9": 8.7,
-            "era": 6.69,
-            "whip": 1.59,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Colorado Rockies",
-          "pitcher": "Tanner Gordon",
-          "label": "Tanner Gordon concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6815,
-          "fair_odds": 1.47,
-          "expected_hr_allowed": 1.144,
-          "projected_ip": 6.6,
-          "inputs": {
-            "hr9": 1.56,
-            "era": 6.69,
-            "whip": 1.59
-          },
-          "side": "home"
-        }
-      ]
-    },
     {
       "event_id": "401816025",
       "kickoff": "2026-07-05T01:38Z",
@@ -700,6 +408,88 @@
             "hr9": 0.94,
             "era": 3.78,
             "whip": 1.12
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401816034",
+      "kickoff": "2026-07-05T17:00Z",
+      "league": "MLB",
+      "match": "Pittsburgh Pirates at Washington Nationals",
+      "home": "Washington Nationals",
+      "away": "Pittsburgh Pirates",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Washington Nationals",
+          "pitcher": "Cade Cavalli",
+          "label": "Cade Cavalli plus de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "over",
+          "probability": 0.5324,
+          "fair_odds": 1.88,
+          "expected_strikeouts": 5.65,
+          "projected_ip": 5.01,
+          "inputs": {
+            "k9": 10.16,
+            "era": 3.69,
+            "whip": 1.33,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Washington Nationals",
+          "pitcher": "Cade Cavalli",
+          "label": "Cade Cavalli ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6775,
+          "fair_odds": 1.48,
+          "expected_hr_allowed": 0.389,
+          "projected_ip": 5.01,
+          "inputs": {
+            "hr9": 0.7,
+            "era": 3.69,
+            "whip": 1.33
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Pittsburgh Pirates",
+          "pitcher": "Bubba Chandler",
+          "label": "Bubba Chandler plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.5939,
+          "fair_odds": 1.68,
+          "expected_strikeouts": 4.91,
+          "projected_ip": 5.33,
+          "inputs": {
+            "k9": 8.3,
+            "era": 4.62,
+            "whip": 1.39,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Pittsburgh Pirates",
+          "pitcher": "Bubba Chandler",
+          "label": "Bubba Chandler ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.57,
+          "fair_odds": 1.75,
+          "expected_hr_allowed": 0.562,
+          "projected_ip": 5.33,
+          "inputs": {
+            "hr9": 0.95,
+            "era": 4.62,
+            "whip": 1.39
           },
           "side": "away"
         }
@@ -1782,7 +1572,7 @@
       ]
     }
   ],
-  "props": 86,
+  "props": 76,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
