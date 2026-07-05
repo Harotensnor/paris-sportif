@@ -1,22 +1,22 @@
 {
-  "generated_at": "2026-07-05T18:45:00Z",
+  "generated_at": "2026-07-05T19:59:17Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 14,
+    "active_events": 11,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 10,
-      "back_to_back_travel": 12,
+      "back_to_back_travel": 9,
       "travel_extreme": 3,
-      "schedule_congestion": 10
+      "schedule_congestion": 10,
+      "lookahead": 8
     },
     "by_decision": {
       "abstain": 2,
-      "lean_home": 12
+      "lean_home": 9
     },
-    "lean_home": 12,
+    "lean_home": 9,
     "lean_away": 0,
     "abstain": 2,
     "monitor": 0
@@ -575,72 +575,6 @@
       }
     },
     {
-      "event_id": "401816036",
-      "source_event_ids": [
-        "401816036"
-      ],
-      "kickoff": "2026-07-05T19:00Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Kansas City Royals",
-      "away": "Philadelphia Phillies",
-      "match": "Kansas City Royals - Philadelphia Phillies",
-      "decision": "lean_home",
-      "net_team": "Kansas City Royals",
-      "reason": "Philadelphia Phillies plus penalise par calendrier/voyage (1.01 vs 0.15)",
-      "pressure_score": 1.528,
-      "home_fade": 0.15,
-      "away_fade": 1.011,
-      "travel_score": 0.861,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours",
-        "1 match dans les 48h + 1657 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.796,
-        "away_score": -0.609,
-        "home_fade": 1.15,
-        "away_fade": 1.011,
-        "reason": "Signaux opposes: Kansas City Royals fade 1.15, Philadelphia Phillies fade 1.01 -> prudence",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.861
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401816049",
       "source_event_ids": [
         "401816049"
@@ -732,96 +666,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.914
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401816038",
-      "source_event_ids": [
-        "401816038"
-      ],
-      "kickoff": "2026-07-05T19:30Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Houston Astros",
-      "away": "Tampa Bay Rays",
-      "match": "Houston Astros - Tampa Bay Rays",
-      "decision": "lean_home",
-      "net_team": "Houston Astros",
-      "reason": "Tampa Bay Rays plus penalise par calendrier/voyage (0.86 vs 0.00)",
-      "pressure_score": 0.861,
-      "home_fade": 0.0,
-      "away_fade": 0.861,
-      "travel_score": 0.861,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "2 match dans les 48h + 1257 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.301,
-        "away_score": -0.861,
-        "home_fade": 0.0,
-        "away_fade": 0.861,
-        "reason": "Direction nette: Houston Astros (+0.30)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.861
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401816035",
-      "source_event_ids": [
-        "401816035"
-      ],
-      "kickoff": "2026-07-05T19:30Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Texas Rangers",
-      "away": "Detroit Tigers",
-      "match": "Texas Rangers - Detroit Tigers",
-      "decision": "lean_home",
-      "net_team": "Texas Rangers",
-      "reason": "Detroit Tigers plus penalise par calendrier/voyage (0.86 vs 0.00)",
-      "pressure_score": 0.856,
-      "home_fade": 0.0,
-      "away_fade": 0.856,
-      "travel_score": 0.856,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "1 match dans les 48h + 1629 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.3,
-        "away_score": -0.856,
-        "home_fade": 0.0,
-        "away_fade": 0.856,
-        "reason": "Direction nette: Texas Rangers (+0.30)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.856
           }
         ]
       }

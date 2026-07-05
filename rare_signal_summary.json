@@ -1,45 +1,27 @@
 {
-  "generated_at": "2026-07-05T18:45:00Z",
+  "generated_at": "2026-07-05T19:59:17Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 30,
-    "actionable": 12,
+    "active_events": 27,
+    "actionable": 9,
     "watch": 0,
     "risk": 18,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 2,
-      "back_to_back_travel": 12,
-      "signal_conflict": 3,
+      "back_to_back_travel": 9,
       "travel_extreme": 3,
+      "injury_imbalance": 1,
+      "signal_conflict": 2,
       "market_uncertain": 17
     },
     "by_quality": {
-      "actionable": 12,
+      "actionable": 9,
       "risk": 18
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401816036",
-      "date": "2026-07-05T19:00Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Kansas City Royals",
-      "away": "Philadelphia Phillies",
-      "match": "Kansas City Royals - Philadelphia Phillies",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Kansas City Royals",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 11-3"
-    },
     {
       "event_id": "401816042",
       "date": "2026-07-05T20:00Z",
@@ -165,42 +147,6 @@
       "side": "away",
       "strength": 0.914,
       "context": "2 match dans les 48h + 1522 km de voyage"
-    },
-    {
-      "event_id": "401816038",
-      "date": "2026-07-05T19:30Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Houston Astros",
-      "away": "Tampa Bay Rays",
-      "match": "Houston Astros - Tampa Bay Rays",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Tampa Bay Rays",
-      "side": "away",
-      "strength": 0.861,
-      "context": "2 match dans les 48h + 1257 km de voyage"
-    },
-    {
-      "event_id": "401816035",
-      "date": "2026-07-05T19:30Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Texas Rangers",
-      "away": "Detroit Tigers",
-      "match": "Texas Rangers - Detroit Tigers",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Detroit Tigers",
-      "side": "away",
-      "strength": 0.856,
-      "context": "1 match dans les 48h + 1629 km de voyage"
     },
     {
       "event_id": "401816047",
