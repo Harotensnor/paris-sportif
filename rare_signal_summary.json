@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-07-05T14:21:52Z",
+  "generated_at": "2026-07-05T15:41:52Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 36,
+    "active_events": 38,
     "actionable": 16,
-    "watch": 2,
+    "watch": 4,
     "risk": 18,
     "expired_sample": 0,
     "by_type": {
       "back_to_back_travel": 14,
-      "injury_imbalance": 7,
+      "injury_imbalance": 9,
       "signal_conflict": 3,
       "travel_extreme": 3,
       "market_uncertain": 17
     },
     "by_quality": {
       "actionable": 16,
-      "watch": 2,
+      "watch": 4,
       "risk": 18
     }
   },
@@ -348,6 +348,42 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 6-9"
+    },
+    {
+      "event_id": "401857041",
+      "date": "2026-07-05T19:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Toronto Tempo",
+      "away": "Dallas Wings",
+      "match": "Toronto Tempo - Dallas Wings",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Toronto Tempo",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 3-0"
+    },
+    {
+      "event_id": "401857055",
+      "date": "2026-07-10T23:30Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Toronto Tempo",
+      "away": "Dallas Wings",
+      "match": "Toronto Tempo - Dallas Wings",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Toronto Tempo",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 3-0"
     }
   ],
   "active_risk": [
@@ -529,7 +565,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.3%"
+      "context": "marge bookmaker anormale 19.0%"
     },
     {
       "event_id": "401842748",
@@ -601,7 +637,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.7%"
+      "context": "marge bookmaker anormale 18.5%"
     },
     {
       "event_id": "401843376",
