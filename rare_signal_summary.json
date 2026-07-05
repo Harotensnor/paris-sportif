@@ -1,45 +1,27 @@
 {
-  "generated_at": "2026-07-05T19:59:17Z",
+  "generated_at": "2026-07-05T20:51:29Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 27,
-    "actionable": 9,
+    "active_events": 25,
+    "actionable": 7,
     "watch": 0,
     "risk": 18,
     "expired_sample": 0,
     "by_type": {
-      "back_to_back_travel": 9,
-      "travel_extreme": 3,
+      "travel_extreme": 2,
+      "back_to_back_travel": 7,
       "injury_imbalance": 1,
       "signal_conflict": 2,
       "market_uncertain": 17
     },
     "by_quality": {
-      "actionable": 9,
+      "actionable": 7,
       "risk": 18
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401816042",
-      "date": "2026-07-05T20:00Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Arizona Diamondbacks",
-      "away": "Milwaukee Brewers",
-      "match": "Arizona Diamondbacks - Milwaukee Brewers",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Milwaukee Brewers",
-      "side": "away",
-      "strength": 1.0,
-      "context": "2 match dans les 48h + 2347 km de voyage"
-    },
     {
       "event_id": "401816044",
       "date": "2026-07-05T21:00Z",
@@ -93,24 +75,6 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 11-3"
-    },
-    {
-      "event_id": "401816039",
-      "date": "2026-07-05T20:00Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Colorado Rockies",
-      "away": "San Francisco Giants",
-      "match": "Colorado Rockies - San Francisco Giants",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "San Francisco Giants",
-      "side": "away",
-      "strength": 0.914,
-      "context": "2 match dans les 48h + 1522 km de voyage"
     },
     {
       "event_id": "401816124",
