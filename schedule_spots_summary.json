@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-06T07:13:45Z",
+  "generated_at": "2026-07-06T11:45:54Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -586,10 +586,10 @@
         "status": "net",
         "net_side": "away",
         "home_score": -0.098,
-        "away_score": -0.098,
+        "away_score": 0.771,
         "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Connecticut Sun (-0.10)",
+        "reason": "Direction nette: Connecticut Sun (+0.77)",
         "detail": [
           {
             "side": "home",
@@ -602,6 +602,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 0.868
           }
         ]
       }

@@ -1,18 +1,18 @@
 {
-  "generated_at": "2026-07-06T07:13:45Z",
-  "calculated_at": "2026-07-06T07:13:45Z",
+  "generated_at": "2026-07-06T11:45:54Z",
+  "calculated_at": "2026-07-06T11:45:54Z",
   "source_of_truth": "data.js",
-  "data_generated_at": "2026-07-06T07:12:24.753333Z",
+  "data_generated_at": "2026-07-06T11:44:46.189625Z",
   "data_today_field": "2026-07-06",
   "events": {
-    "total": 100,
-    "upcoming": 88,
-    "winamax_available": 100,
-    "winamax_exact": 74,
-    "winamax_exact_ratio": 0.74,
+    "total": 99,
+    "upcoming": 87,
+    "winamax_available": 99,
+    "winamax_exact": 73,
+    "winamax_exact_ratio": 0.7374,
     "markets_more_than_1n2": 0,
     "form_l10": 39,
-    "h2h": 26,
+    "h2h": 30,
     "lineups": 16,
     "football_lineups": 0,
     "starter_signals": 16,
@@ -26,7 +26,7 @@
     "fd_calibration": 0,
     "fd_closing_odds": 0,
     "xg": 8,
-    "smart_money": 0
+    "smart_money": 1
   },
   "signal_health": {
     "referee": {
@@ -36,16 +36,16 @@
       "note": "referee is effective coverage: named referee or referee_context usable by the model."
     },
     "smart_money": {
-      "events": 0,
+      "events": 1,
       "status": "rare_event",
       "note": "Smart money is intentionally rare; low count is OK when odds movement does not confirm a strong signal."
     }
   },
   "winamax_markets": {
-    "matches": 407,
+    "matches": 424,
     "detailed_market_matches": 20,
-    "detailed_ratio_vs_exact": 0.2703,
-    "gap_to_50pct_exact": 0.2297,
+    "detailed_ratio_vs_exact": 0.274,
+    "gap_to_50pct_exact": 0.226,
     "recommended_detail_fetch_cap": 150,
     "detail_by_sport": {
       "baseball": {
@@ -73,7 +73,7 @@
         "detailed_ratio": 0
       },
       "tennis": {
-        "exact": 12,
+        "exact": 11,
         "detailed": 0,
         "families": {},
         "detailed_ratio": 0.0
@@ -82,19 +82,19 @@
     "market_family_counts": {}
   },
   "backtest": {
-    "overall_roi_pct": 1.39,
-    "overall_brier": 0.2385,
+    "overall_roi_pct": 0.67,
+    "overall_brier": 0.2398,
     "by_sport_roi_pct": {
-      "baseball": -2.17,
-      "basketball": 17.29,
-      "football": 12.21,
+      "baseball": -2.9,
+      "basketball": 13.84,
+      "football": 13.25,
       "hockey": 46.83
     },
     "cold_sports": []
   },
   "health": {
     "status": "warning",
-    "warnings": 11,
+    "warnings": 10,
     "pipeline_drift": "warn"
   }
 }
