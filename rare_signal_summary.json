@@ -1,17 +1,16 @@
 {
-  "generated_at": "2026-07-06T13:39:44Z",
+  "generated_at": "2026-07-06T16:43:27Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 43,
-    "actionable": 21,
-    "watch": 4,
+    "active_events": 39,
+    "actionable": 19,
+    "watch": 2,
     "risk": 18,
     "expired_sample": 0,
     "by_type": {
-      "market_move": 4,
-      "injury_imbalance": 11,
+      "injury_imbalance": 10,
       "back_to_back_travel": 13,
       "signal_conflict": 5,
       "travel_extreme": 9,
@@ -19,8 +18,8 @@
       "weather_extreme": 1
     },
     "by_quality": {
-      "watch": 4,
-      "actionable": 21,
+      "actionable": 19,
+      "watch": 2,
       "risk": 18
     }
   },
@@ -366,25 +365,9 @@
       "side": "away",
       "strength": 0.797,
       "context": "1 match dans les 48h + 1334 km de voyage"
-    },
-    {
-      "event_id": "401857044",
-      "date": "2026-07-07T00:00Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Minnesota Lynx",
-      "away": "Connecticut Sun",
-      "match": "Minnesota Lynx - Connecticut Sun",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.717,
-      "context": "Cote away: 7.75 -> 6.75 (+12.9%)"
-    },
+    }
+  ],
+  "active_watch": [
     {
       "event_id": "401861419",
       "date": "2026-07-11T11:00Z",
@@ -394,70 +377,14 @@
       "home": "Zhejiang Professional FC",
       "away": "Qingdao Hainiu",
       "match": "Zhejiang Professional FC - Qingdao Hainiu",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
       "type": "weather_extreme",
       "direction": "under_goals",
       "team": null,
       "side": null,
-      "strength": 0.66,
-      "context": "Meteo dure: vent 40 km/h, pluie 6.3 mm"
-    }
-  ],
-  "active_watch": [
-    {
-      "event_id": "401857043",
-      "date": "2026-07-06T23:30Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Washington Mystics",
-      "away": "Golden State Valkyries",
-      "match": "Washington Mystics - Golden State Valkyries",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Golden State Valkyries",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 0-3"
-    },
-    {
-      "event_id": "401816051",
-      "date": "2026-07-07T02:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Los Angeles Dodgers",
-      "away": "Colorado Rockies",
-      "match": "Los Angeles Dodgers - Colorado Rockies",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.54,
-      "context": "Cote away: 2.88 -> 2.60 (+9.7%)"
-    },
-    {
-      "event_id": "401842744",
-      "date": "2026-07-06T17:00Z",
-      "sport": "football",
-      "league_code": "allsvenskan",
-      "league_name": "Allsvenskan",
-      "home": "IF Brommapojkarna",
-      "away": "GAIS",
-      "match": "IF Brommapojkarna - GAIS",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.473,
-      "context": "Cote away: 2.35 -> 2.15 (+8.5%)"
+      "strength": 0.607,
+      "context": "Meteo dure: vent 36 km/h, pluie 2.0 mm"
     },
     {
       "event_id": "401816045",
