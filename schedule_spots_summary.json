@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-07-06T21:53:27Z",
+  "generated_at": "2026-07-06T22:53:11Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 27,
+    "active_events": 26,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 40,
+      "lookahead": 38,
       "travel_extreme": 9,
       "back_to_back_travel": 12,
       "schedule_congestion": 14
     },
     "by_decision": {
-      "abstain": 10,
+      "abstain": 9,
       "lean_home": 15,
       "lean_away": 2
     },
     "lean_home": 15,
     "lean_away": 2,
-    "abstain": 10,
+    "abstain": 9,
     "monitor": 0
   },
   "active": [
@@ -92,64 +92,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401816046",
-      "source_event_ids": [
-        "401816046"
-      ],
-      "kickoff": "2026-07-06T22:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Tampa Bay Rays",
-      "away": "New York Yankees",
-      "match": "Tampa Bay Rays - New York Yankees",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Tampa Bay Rays 0.36, New York Yankees 0.36",
-      "pressure_score": 1.6,
-      "home_fade": 0.36,
-      "away_fade": 0.36,
-      "travel_score": 0,
-      "lookahead_score": 1.6,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "3 match important/proche dans les 3 jours",
-        "3 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -1.034,
-        "away_score": 0.046,
-        "home_fade": 1.16,
-        "away_fade": 0.36,
-        "reason": "Direction nette: New York Yankees (+0.05)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.36
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.36
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.8
           }
         ]
       }
@@ -243,11 +185,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.634,
-        "away_score": -0.094,
-        "home_fade": 0.76,
+        "home_score": -0.834,
+        "away_score": -0.024,
+        "home_fade": 0.96,
         "away_fade": 0.36,
-        "reason": "Direction nette: Arizona Diamondbacks (-0.09)",
+        "reason": "Direction nette: Arizona Diamondbacks (-0.02)",
         "detail": [
           {
             "side": "home",
@@ -265,7 +207,7 @@
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.4
+            "strength": 0.6
           }
         ]
       }
@@ -417,11 +359,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.655,
-        "away_score": -0.034,
-        "home_fade": 0.76,
+        "home_score": -0.855,
+        "away_score": 0.036,
+        "home_fade": 0.96,
         "away_fade": 0.3,
-        "reason": "Direction nette: Arizona Diamondbacks (-0.03)",
+        "reason": "Direction nette: Arizona Diamondbacks (+0.04)",
         "detail": [
           {
             "side": "home",
@@ -439,7 +381,7 @@
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.4
+            "strength": 0.6
           }
         ]
       }
@@ -1275,11 +1217,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -1.15,
-        "away_score": -0.124,
-        "home_fade": 1.36,
+        "home_score": -1.35,
+        "away_score": -0.054,
+        "home_fade": 1.56,
         "away_fade": 0.6,
-        "reason": "Direction nette: Arizona Diamondbacks (-0.12)",
+        "reason": "Direction nette: Arizona Diamondbacks (-0.05)",
         "detail": [
           {
             "side": "home",
@@ -1303,7 +1245,7 @@
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.4
+            "strength": 0.6
           }
         ]
       }
@@ -1578,11 +1520,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.708,
-        "away_score": 0.116,
-        "home_fade": 0.76,
+        "home_score": -0.907,
+        "away_score": 0.186,
+        "home_fade": 0.96,
         "away_fade": 0.15,
-        "reason": "Direction nette: Arizona Diamondbacks (+0.12)",
+        "reason": "Direction nette: Arizona Diamondbacks (+0.19)",
         "detail": [
           {
             "side": "home",
@@ -1600,7 +1542,7 @@
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.4
+            "strength": 0.6
           }
         ]
       }

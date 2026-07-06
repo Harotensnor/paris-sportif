@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-07-06T21:53:27Z",
+  "generated_at": "2026-07-06T22:53:10Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401816046",
-      "kickoff": "2026-07-06T22:40Z",
-      "league": "MLB",
-      "match": "New York Yankees at Tampa Bay Rays",
-      "home": "Tampa Bay Rays",
-      "away": "New York Yankees",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Tampa Bay Rays",
-          "pitcher": "Griffin Jax",
-          "label": "Griffin Jax plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.5771,
-          "fair_odds": 1.73,
-          "expected_strikeouts": 4.83,
-          "projected_ip": 5.0,
-          "inputs": {
-            "k9": 8.7,
-            "era": 3.45,
-            "whip": 1.27,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Tampa Bay Rays",
-          "pitcher": "Griffin Jax",
-          "label": "Griffin Jax concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6002,
-          "fair_odds": 1.67,
-          "expected_hr_allowed": 0.917,
-          "projected_ip": 5.0,
-          "inputs": {
-            "hr9": 1.65,
-            "era": 3.45,
-            "whip": 1.27
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "New York Yankees",
-          "pitcher": "Cam Schlittler",
-          "label": "Cam Schlittler plus de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "over",
-          "probability": 0.5644,
-          "fair_odds": 1.77,
-          "expected_strikeouts": 6.83,
-          "projected_ip": 5.78,
-          "inputs": {
-            "k9": 10.64,
-            "era": 2.08,
-            "whip": 0.96,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "New York Yankees",
-          "pitcher": "Cam Schlittler",
-          "label": "Cam Schlittler ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5721,
-          "fair_odds": 1.75,
-          "expected_hr_allowed": 0.559,
-          "projected_ip": 5.78,
-          "inputs": {
-            "hr9": 0.87,
-            "era": 2.08,
-            "whip": 0.96
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401816045",
       "kickoff": "2026-07-06T22:45Z",
@@ -1264,7 +1182,7 @@
       ]
     }
   ],
-  "props": 60,
+  "props": 56,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
