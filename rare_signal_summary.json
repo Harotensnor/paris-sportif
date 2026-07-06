@@ -1,46 +1,28 @@
 {
-  "generated_at": "2026-07-06T01:22:52Z",
+  "generated_at": "2026-07-06T02:57:49Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 41,
-    "actionable": 20,
+    "active_events": 40,
+    "actionable": 19,
     "watch": 2,
     "risk": 19,
     "expired_sample": 0,
     "by_type": {
-      "travel_extreme": 10,
-      "back_to_back_travel": 14,
       "injury_imbalance": 11,
-      "signal_conflict": 7,
+      "back_to_back_travel": 13,
+      "signal_conflict": 5,
+      "travel_extreme": 9,
       "market_uncertain": 17
     },
     "by_quality": {
-      "actionable": 20,
+      "actionable": 19,
       "watch": 2,
       "risk": 19
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401816040",
-      "date": "2026-07-06T01:30Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Los Angeles Angels",
-      "away": "Boston Red Sox",
-      "match": "Los Angeles Angels - Boston Red Sox",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Boston Red Sox",
-      "side": "away",
-      "strength": 1.0,
-      "context": "1 match dans les 48h + 4150 km de voyage"
-    },
     {
       "event_id": "401816049",
       "date": "2026-07-06T18:10Z",
@@ -457,7 +439,7 @@
       "team": null,
       "side": null,
       "strength": 1.0,
-      "context": "Signaux opposes: San Diego Padres fade 1.70, Toronto Blue Jays fade 1.71 -> prudence"
+      "context": "Signaux opposes: San Diego Padres fade 1.50, Toronto Blue Jays fade 1.71 -> prudence"
     },
     {
       "event_id": "401861417",
