@@ -1,23 +1,23 @@
 {
-  "generated_at": "2026-07-06T16:43:27Z",
+  "generated_at": "2026-07-06T18:32:15Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 28,
+    "active_events": 27,
     "expired_sample": 0,
     "by_type": {
-      "back_to_back_travel": 13,
       "lookahead": 40,
       "travel_extreme": 9,
+      "back_to_back_travel": 12,
       "schedule_congestion": 14
     },
     "by_decision": {
       "abstain": 10,
-      "lean_home": 16,
+      "lean_home": 15,
       "lean_away": 2
     },
-    "lean_home": 16,
+    "lean_home": 15,
     "lean_away": 2,
     "abstain": 10,
     "monitor": 0
@@ -585,11 +585,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.498,
-        "away_score": 0.043,
-        "home_fade": 0.55,
+        "home_score": -0.698,
+        "away_score": 0.112,
+        "home_fade": 0.75,
         "away_fade": 0.15,
-        "reason": "Direction nette: Connecticut Sun (+0.04)",
+        "reason": "Direction nette: Connecticut Sun (+0.11)",
         "detail": [
           {
             "side": "home",
@@ -607,7 +607,7 @@
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.4
+            "strength": 0.6
           }
         ]
       }
@@ -1601,57 +1601,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.4
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401816049",
-      "source_event_ids": [
-        "401816049"
-      ],
-      "kickoff": "2026-07-06T18:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Kansas City Royals",
-      "away": "Philadelphia Phillies",
-      "match": "Kansas City Royals - Philadelphia Phillies",
-      "decision": "lean_home",
-      "net_team": "Kansas City Royals",
-      "reason": "Philadelphia Phillies plus penalise par calendrier/voyage (0.94 vs 0.00)",
-      "pressure_score": 0.941,
-      "home_fade": 0.0,
-      "away_fade": 0.941,
-      "travel_score": 0.941,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "2 match dans les 48h + 1657 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.671,
-        "away_score": -0.591,
-        "home_fade": 1.0,
-        "away_fade": 0.941,
-        "reason": "Signaux opposes: Kansas City Royals fade 1.00, Philadelphia Phillies fade 0.94 -> prudence",
-        "detail": [
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.941
           }
         ]
       }
