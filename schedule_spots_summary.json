@@ -1,23 +1,23 @@
 {
-  "generated_at": "2026-07-06T22:53:11Z",
+  "generated_at": "2026-07-06T23:53:01Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 26,
+    "active_events": 24,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 38,
-      "travel_extreme": 9,
-      "back_to_back_travel": 12,
+      "lookahead": 36,
+      "travel_extreme": 8,
+      "back_to_back_travel": 11,
       "schedule_congestion": 14
     },
     "by_decision": {
       "abstain": 9,
-      "lean_home": 15,
+      "lean_home": 13,
       "lean_away": 2
     },
-    "lean_home": 15,
+    "lean_home": 13,
     "lean_away": 2,
     "abstain": 9,
     "monitor": 0
@@ -527,11 +527,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.698,
-        "away_score": 0.112,
-        "home_fade": 0.75,
+        "home_score": -0.098,
+        "away_score": -0.098,
+        "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Connecticut Sun (+0.11)",
+        "reason": "Direction nette: Connecticut Sun (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -544,12 +544,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.6
           }
         ]
       }
@@ -1251,66 +1245,6 @@
       }
     },
     {
-      "event_id": "401816045",
-      "source_event_ids": [
-        "401816045"
-      ],
-      "kickoff": "2026-07-06T22:45Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Washington Nationals",
-      "away": "Houston Astros",
-      "match": "Washington Nationals - Houston Astros",
-      "decision": "lean_home",
-      "net_team": "Washington Nationals",
-      "reason": "Houston Astros plus penalise par calendrier/voyage (0.76 vs 0.30)",
-      "pressure_score": 1.789,
-      "home_fade": 0.3,
-      "away_fade": 0.756,
-      "travel_score": 0.456,
-      "lookahead_score": 1.333,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2,
-        "travel_extreme": 1
-      },
-      "contexts": [
-        "2 match important/proche dans les 3 jours",
-        "2 match important/proche dans les 3 jours",
-        "Deplacement estime 1961 km, decalage ~1.2h"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.035,
-        "away_score": -0.651,
-        "home_fade": 0.3,
-        "away_fade": 0.756,
-        "reason": "Direction nette: Washington Nationals (-0.04)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.456
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401816073",
       "source_event_ids": [
         "401816073"
@@ -1588,57 +1522,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.877
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401816047",
-      "source_event_ids": [
-        "401816047"
-      ],
-      "kickoff": "2026-07-06T23:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Atlanta Braves",
-      "away": "New York Mets",
-      "match": "Atlanta Braves - New York Mets",
-      "decision": "lean_home",
-      "net_team": "Atlanta Braves",
-      "reason": "New York Mets plus penalise par calendrier/voyage (0.85 vs 0.00)",
-      "pressure_score": 0.852,
-      "home_fade": 0.0,
-      "away_fade": 0.852,
-      "travel_score": 0.852,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "2 match dans les 48h + 1209 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.102,
-        "away_score": -0.712,
-        "home_fade": 0.4,
-        "away_fade": 0.852,
-        "reason": "Direction nette: Atlanta Braves (-0.10)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.852
           }
         ]
       }
