@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-07-06T23:53:01Z",
+  "generated_at": "2026-07-07T01:29:47Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401816048",
-      "kickoff": "2026-07-06T23:45Z",
-      "league": "MLB",
-      "match": "Milwaukee Brewers at St. Louis Cardinals",
-      "home": "St. Louis Cardinals",
-      "away": "Milwaukee Brewers",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "St. Louis Cardinals",
-          "pitcher": "Dustin May",
-          "label": "Dustin May plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.5827,
-          "fair_odds": 1.72,
-          "expected_strikeouts": 4.86,
-          "projected_ip": 5.26,
-          "inputs": {
-            "k9": 8.32,
-            "era": 4.8,
-            "whip": 1.27,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "St. Louis Cardinals",
-          "pitcher": "Dustin May",
-          "label": "Dustin May ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6453,
-          "fair_odds": 1.55,
-          "expected_hr_allowed": 0.438,
-          "projected_ip": 5.26,
-          "inputs": {
-            "hr9": 0.75,
-            "era": 4.8,
-            "whip": 1.27
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Milwaukee Brewers",
-          "pitcher": "Shane Drohan",
-          "label": "Shane Drohan plus de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "over",
-          "probability": 0.5499,
-          "fair_odds": 1.82,
-          "expected_strikeouts": 6.75,
-          "projected_ip": 6.6,
-          "inputs": {
-            "k9": 9.21,
-            "era": 3.12,
-            "whip": 1.23,
-            "hand": "L"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Milwaukee Brewers",
-          "pitcher": "Shane Drohan",
-          "label": "Shane Drohan ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5644,
-          "fair_odds": 1.77,
-          "expected_hr_allowed": 0.572,
-          "projected_ip": 6.6,
-          "inputs": {
-            "hr9": 0.78,
-            "era": 3.12,
-            "whip": 1.23
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401816050",
       "kickoff": "2026-07-07T01:40Z",
@@ -306,6 +224,216 @@
       ]
     },
     {
+      "event_id": "401816055",
+      "kickoff": "2026-07-07T22:35Z",
+      "league": "MLB",
+      "match": "Chicago Cubs at Baltimore Orioles",
+      "home": "Baltimore Orioles",
+      "away": "Chicago Cubs",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Baltimore Orioles",
+          "pitcher": "Shane Baz",
+          "label": "Shane Baz moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.5861,
+          "fair_odds": 1.71,
+          "expected_strikeouts": 5.12,
+          "projected_ip": 5.94,
+          "inputs": {
+            "k9": 7.75,
+            "era": 4.19,
+            "whip": 1.37,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Baltimore Orioles",
+          "pitcher": "Shane Baz",
+          "label": "Shane Baz ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5897,
+          "fair_odds": 1.7,
+          "expected_hr_allowed": 0.528,
+          "projected_ip": 5.94,
+          "inputs": {
+            "hr9": 0.8,
+            "era": 4.19,
+            "whip": 1.37
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Chicago Cubs",
+          "pitcher": "Matthew Boyd",
+          "label": "Matthew Boyd moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.5643,
+          "fair_odds": 1.77,
+          "expected_strikeouts": 5.21,
+          "projected_ip": 4.74,
+          "inputs": {
+            "k9": 9.89,
+            "era": 5.08,
+            "whip": 1.4,
+            "hand": "L"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Chicago Cubs",
+          "pitcher": "Matthew Boyd",
+          "label": "Matthew Boyd ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.569,
+          "fair_odds": 1.76,
+          "expected_hr_allowed": 0.564,
+          "projected_ip": 4.74,
+          "inputs": {
+            "hr9": 1.07,
+            "era": 5.08,
+            "whip": 1.4
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401816053",
+      "kickoff": "2026-07-07T22:40Z",
+      "league": "MLB",
+      "match": "Athletics Athletics at Detroit Tigers",
+      "home": "Detroit Tigers",
+      "away": "Athletics",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Detroit Tigers",
+          "pitcher": "Tarik Skubal",
+          "label": "Tarik Skubal plus de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "over",
+          "probability": 0.553,
+          "fair_odds": 1.81,
+          "expected_strikeouts": 6.77,
+          "projected_ip": 5.93,
+          "inputs": {
+            "k9": 10.28,
+            "era": 3.15,
+            "whip": 0.91,
+            "hand": "L"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Detroit Tigers",
+          "pitcher": "Tarik Skubal",
+          "label": "Tarik Skubal concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5552,
+          "fair_odds": 1.8,
+          "expected_hr_allowed": 0.81,
+          "projected_ip": 5.93,
+          "inputs": {
+            "hr9": 1.23,
+            "era": 3.15,
+            "whip": 0.91
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Athletics",
+          "pitcher": "J.T. Ginn",
+          "label": "J.T. Ginn moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.5892,
+          "fair_odds": 1.7,
+          "expected_strikeouts": 5.1,
+          "projected_ip": 5.89,
+          "inputs": {
+            "k9": 7.8,
+            "era": 3.04,
+            "whip": 1.23,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Athletics",
+          "pitcher": "J.T. Ginn",
+          "label": "J.T. Ginn ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5372,
+          "fair_odds": 1.86,
+          "expected_hr_allowed": 0.621,
+          "projected_ip": 5.89,
+          "inputs": {
+            "hr9": 0.95,
+            "era": 3.04,
+            "whip": 1.23
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401816054",
+      "kickoff": "2026-07-07T22:40Z",
+      "league": "MLB",
+      "match": "Atlanta Braves at Pittsburgh Pirates",
+      "home": "Pittsburgh Pirates",
+      "away": "Atlanta Braves",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Pittsburgh Pirates",
+          "pitcher": "Paul Skenes",
+          "label": "Paul Skenes plus de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "over",
+          "probability": 0.5219,
+          "fair_odds": 1.92,
+          "expected_strikeouts": 6.61,
+          "projected_ip": 5.39,
+          "inputs": {
+            "k9": 11.04,
+            "era": 3.62,
+            "whip": 1.01,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Pittsburgh Pirates",
+          "pitcher": "Paul Skenes",
+          "label": "Paul Skenes ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5429,
+          "fair_odds": 1.84,
+          "expected_hr_allowed": 0.611,
+          "projected_ip": 5.39,
+          "inputs": {
+            "hr9": 1.02,
+            "era": 3.62,
+            "whip": 1.01
+          },
+          "side": "home"
+        }
+      ]
+    },
+    {
       "event_id": "401816058",
       "kickoff": "2026-07-07T22:40Z",
       "league": "MLB",
@@ -348,6 +476,52 @@
             "whip": 1.33
           },
           "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401816060",
+      "kickoff": "2026-07-07T22:40Z",
+      "league": "MLB",
+      "match": "Seattle Mariners at Miami Marlins",
+      "home": "Miami Marlins",
+      "away": "Seattle Mariners",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Miami Marlins",
+          "pitcher": "Max Meyer",
+          "label": "Max Meyer moins de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "under",
+          "probability": 0.5563,
+          "fair_odds": 1.8,
+          "expected_strikeouts": 6.22,
+          "projected_ip": 5.72,
+          "inputs": {
+            "k9": 9.79,
+            "era": 2.53,
+            "whip": 1.11,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Miami Marlins",
+          "pitcher": "Max Meyer",
+          "label": "Max Meyer ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5751,
+          "fair_odds": 1.74,
+          "expected_hr_allowed": 0.553,
+          "projected_ip": 5.72,
+          "inputs": {
+            "hr9": 0.87,
+            "era": 2.53,
+            "whip": 1.11
+          },
+          "side": "home"
         }
       ]
     },
@@ -434,6 +608,216 @@
       ]
     },
     {
+      "event_id": "401816057",
+      "kickoff": "2026-07-07T23:10Z",
+      "league": "MLB",
+      "match": "Kansas City Royals at New York Mets",
+      "home": "New York Mets",
+      "away": "Kansas City Royals",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Kansas City Royals",
+          "pitcher": "Seth Lugo",
+          "label": "Seth Lugo moins de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "under",
+          "probability": 0.5098,
+          "fair_odds": 1.96,
+          "expected_strikeouts": 4.46,
+          "projected_ip": 5.65,
+          "inputs": {
+            "k9": 7.1,
+            "era": 4.2,
+            "whip": 1.38,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Kansas City Royals",
+          "pitcher": "Seth Lugo",
+          "label": "Seth Lugo concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5051,
+          "fair_odds": 1.98,
+          "expected_hr_allowed": 0.703,
+          "projected_ip": 5.65,
+          "inputs": {
+            "hr9": 1.12,
+            "era": 4.2,
+            "whip": 1.38
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401816062",
+      "kickoff": "2026-07-07T23:40Z",
+      "league": "MLB",
+      "match": "Boston Red Sox at Chicago White Sox",
+      "home": "Chicago White Sox",
+      "away": "Boston Red Sox",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Chicago White Sox",
+          "pitcher": "Noah Schultz",
+          "label": "Noah Schultz moins de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "under",
+          "probability": 0.5137,
+          "fair_odds": 1.95,
+          "expected_strikeouts": 4.44,
+          "projected_ip": 4.78,
+          "inputs": {
+            "k9": 8.37,
+            "era": 5.86,
+            "whip": 1.35,
+            "hand": "L"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Chicago White Sox",
+          "pitcher": "Noah Schultz",
+          "label": "Noah Schultz ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5727,
+          "fair_odds": 1.75,
+          "expected_hr_allowed": 0.557,
+          "projected_ip": 4.78,
+          "inputs": {
+            "hr9": 1.05,
+            "era": 5.86,
+            "whip": 1.35
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Boston Red Sox",
+          "pitcher": "Payton Tolle",
+          "label": "Payton Tolle plus de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "over",
+          "probability": 0.5374,
+          "fair_odds": 1.86,
+          "expected_strikeouts": 5.67,
+          "projected_ip": 5.7,
+          "inputs": {
+            "k9": 8.96,
+            "era": 3.39,
+            "whip": 1.12,
+            "hand": "L"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Boston Red Sox",
+          "pitcher": "Payton Tolle",
+          "label": "Payton Tolle ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.541,
+          "fair_odds": 1.85,
+          "expected_hr_allowed": 0.614,
+          "projected_ip": 5.7,
+          "inputs": {
+            "hr9": 0.97,
+            "era": 3.39,
+            "whip": 1.12
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401816063",
+      "kickoff": "2026-07-07T23:40Z",
+      "league": "MLB",
+      "match": "Cleveland Guardians at Minnesota Twins",
+      "home": "Minnesota Twins",
+      "away": "Cleveland Guardians",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Minnesota Twins",
+          "pitcher": "Taj Bradley",
+          "label": "Taj Bradley moins de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "under",
+          "probability": 0.5326,
+          "fair_odds": 1.88,
+          "expected_strikeouts": 6.34,
+          "projected_ip": 5.51,
+          "inputs": {
+            "k9": 10.35,
+            "era": 3.86,
+            "whip": 1.29,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Minnesota Twins",
+          "pitcher": "Taj Bradley",
+          "label": "Taj Bradley concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5263,
+          "fair_odds": 1.9,
+          "expected_hr_allowed": 0.747,
+          "projected_ip": 5.51,
+          "inputs": {
+            "hr9": 1.22,
+            "era": 3.86,
+            "whip": 1.29
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Cleveland Guardians",
+          "pitcher": "Joey Cantillo",
+          "label": "Joey Cantillo plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.6009,
+          "fair_odds": 1.66,
+          "expected_strikeouts": 4.94,
+          "projected_ip": 5.06,
+          "inputs": {
+            "k9": 8.8,
+            "era": 3.86,
+            "whip": 1.36,
+            "hand": "L"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Cleveland Guardians",
+          "pitcher": "Joey Cantillo",
+          "label": "Joey Cantillo ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5125,
+          "fair_odds": 1.95,
+          "expected_hr_allowed": 0.668,
+          "projected_ip": 5.06,
+          "inputs": {
+            "hr9": 1.19,
+            "era": 3.86,
+            "whip": 1.36
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
       "event_id": "401816064",
       "kickoff": "2026-07-07T23:45Z",
       "league": "MLB",
@@ -474,6 +858,88 @@
             "hr9": 0.61,
             "era": 1.47,
             "whip": 0.78
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401816061",
+      "kickoff": "2026-07-08T00:05Z",
+      "league": "MLB",
+      "match": "Los Angeles Angels at Texas Rangers",
+      "home": "Texas Rangers",
+      "away": "Los Angeles Angels",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Texas Rangers",
+          "pitcher": "MacKenzie Gore",
+          "label": "MacKenzie Gore plus de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "over",
+          "probability": 0.5589,
+          "fair_odds": 1.79,
+          "expected_strikeouts": 5.78,
+          "projected_ip": 5.33,
+          "inputs": {
+            "k9": 9.75,
+            "era": 4.31,
+            "whip": 1.27,
+            "hand": "L"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Texas Rangers",
+          "pitcher": "MacKenzie Gore",
+          "label": "MacKenzie Gore ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6079,
+          "fair_odds": 1.65,
+          "expected_hr_allowed": 0.498,
+          "projected_ip": 5.33,
+          "inputs": {
+            "hr9": 0.84,
+            "era": 4.31,
+            "whip": 1.27
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Los Angeles Angels",
+          "pitcher": "Walbert Ureña",
+          "label": "Walbert Ureña moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.5349,
+          "fair_odds": 1.87,
+          "expected_strikeouts": 5.34,
+          "projected_ip": 5.51,
+          "inputs": {
+            "k9": 8.73,
+            "era": 3.03,
+            "whip": 1.31,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Los Angeles Angels",
+          "pitcher": "Walbert Ureña",
+          "label": "Walbert Ureña ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.7012,
+          "fair_odds": 1.43,
+          "expected_hr_allowed": 0.355,
+          "projected_ip": 5.51,
+          "inputs": {
+            "hr9": 0.58,
+            "era": 3.03,
+            "whip": 1.31
           },
           "side": "away"
         }
@@ -808,6 +1274,216 @@
       ]
     },
     {
+      "event_id": "401816070",
+      "kickoff": "2026-07-08T22:35Z",
+      "league": "MLB",
+      "match": "Chicago Cubs at Baltimore Orioles",
+      "home": "Baltimore Orioles",
+      "away": "Chicago Cubs",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Baltimore Orioles",
+          "pitcher": "Dean Kremer",
+          "label": "Dean Kremer plus de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "over",
+          "probability": 0.5332,
+          "fair_odds": 1.88,
+          "expected_strikeouts": 6.67,
+          "projected_ip": 5.67,
+          "inputs": {
+            "k9": 10.59,
+            "era": 3.18,
+            "whip": 0.88,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Baltimore Orioles",
+          "pitcher": "Dean Kremer",
+          "label": "Dean Kremer concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.8115,
+          "fair_odds": 1.23,
+          "expected_hr_allowed": 1.669,
+          "projected_ip": 5.67,
+          "inputs": {
+            "hr9": 2.65,
+            "era": 3.18,
+            "whip": 0.88
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Chicago Cubs",
+          "pitcher": "Colin Rea",
+          "label": "Colin Rea plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.5794,
+          "fair_odds": 1.73,
+          "expected_strikeouts": 4.84,
+          "projected_ip": 6.36,
+          "inputs": {
+            "k9": 6.85,
+            "era": 4.74,
+            "whip": 1.43,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Chicago Cubs",
+          "pitcher": "Colin Rea",
+          "label": "Colin Rea concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.604,
+          "fair_odds": 1.66,
+          "expected_hr_allowed": 0.926,
+          "projected_ip": 6.36,
+          "inputs": {
+            "hr9": 1.31,
+            "era": 4.74,
+            "whip": 1.43
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401816068",
+      "kickoff": "2026-07-08T22:40Z",
+      "league": "MLB",
+      "match": "Athletics Athletics at Detroit Tigers",
+      "home": "Detroit Tigers",
+      "away": "Athletics",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Detroit Tigers",
+          "pitcher": "Troy Melton",
+          "label": "Troy Melton plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.5178,
+          "fair_odds": 1.93,
+          "expected_strikeouts": 4.57,
+          "projected_ip": 6.29,
+          "inputs": {
+            "k9": 6.55,
+            "era": 2.05,
+            "whip": 0.8,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Detroit Tigers",
+          "pitcher": "Troy Melton",
+          "label": "Troy Melton concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.6317,
+          "fair_odds": 1.58,
+          "expected_hr_allowed": 0.999,
+          "projected_ip": 6.29,
+          "inputs": {
+            "hr9": 1.43,
+            "era": 2.05,
+            "whip": 0.8
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Athletics",
+          "pitcher": "Jeffrey Springs",
+          "label": "Jeffrey Springs moins de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "under",
+          "probability": 0.5168,
+          "fair_odds": 1.94,
+          "expected_strikeouts": 4.43,
+          "projected_ip": 5.17,
+          "inputs": {
+            "k9": 7.71,
+            "era": 5.79,
+            "whip": 1.38,
+            "hand": "L"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Athletics",
+          "pitcher": "Jeffrey Springs",
+          "label": "Jeffrey Springs concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.7349,
+          "fair_odds": 1.36,
+          "expected_hr_allowed": 1.328,
+          "projected_ip": 5.17,
+          "inputs": {
+            "hr9": 2.31,
+            "era": 5.79,
+            "whip": 1.38
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401816069",
+      "kickoff": "2026-07-08T22:40Z",
+      "league": "MLB",
+      "match": "Atlanta Braves at Pittsburgh Pirates",
+      "home": "Pittsburgh Pirates",
+      "away": "Atlanta Braves",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Pittsburgh Pirates",
+          "pitcher": "Jared Jones",
+          "label": "Jared Jones moins de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "under",
+          "probability": 0.5174,
+          "fair_odds": 1.93,
+          "expected_strikeouts": 4.43,
+          "projected_ip": 4.14,
+          "inputs": {
+            "k9": 9.62,
+            "era": 5.28,
+            "whip": 1.38,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Pittsburgh Pirates",
+          "pitcher": "Jared Jones",
+          "label": "Jared Jones concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5101,
+          "fair_odds": 1.96,
+          "expected_hr_allowed": 0.713,
+          "projected_ip": 4.14,
+          "inputs": {
+            "hr9": 1.55,
+            "era": 5.28,
+            "whip": 1.38
+          },
+          "side": "home"
+        }
+      ]
+    },
+    {
       "event_id": "401816073",
       "kickoff": "2026-07-08T22:40Z",
       "league": "MLB",
@@ -972,6 +1648,216 @@
       ]
     },
     {
+      "event_id": "401816072",
+      "kickoff": "2026-07-08T23:10Z",
+      "league": "MLB",
+      "match": "Kansas City Royals at New York Mets",
+      "home": "New York Mets",
+      "away": "Kansas City Royals",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "New York Mets",
+          "pitcher": "Christian Scott",
+          "label": "Christian Scott moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.51,
+          "fair_odds": 1.96,
+          "expected_strikeouts": 5.45,
+          "projected_ip": 4.45,
+          "inputs": {
+            "k9": 11.02,
+            "era": 3.49,
+            "whip": 1.35,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "New York Mets",
+          "pitcher": "Christian Scott",
+          "label": "Christian Scott ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5281,
+          "fair_odds": 1.89,
+          "expected_hr_allowed": 0.638,
+          "projected_ip": 4.45,
+          "inputs": {
+            "hr9": 1.29,
+            "era": 3.49,
+            "whip": 1.35
+          },
+          "side": "home"
+        }
+      ]
+    },
+    {
+      "event_id": "401816077",
+      "kickoff": "2026-07-08T23:40Z",
+      "league": "MLB",
+      "match": "Boston Red Sox at Chicago White Sox",
+      "home": "Chicago White Sox",
+      "away": "Boston Red Sox",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Chicago White Sox",
+          "pitcher": "Davis Martin",
+          "label": "Davis Martin moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.5483,
+          "fair_odds": 1.82,
+          "expected_strikeouts": 5.28,
+          "projected_ip": 5.65,
+          "inputs": {
+            "k9": 8.41,
+            "era": 3.08,
+            "whip": 1.26,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Chicago White Sox",
+          "pitcher": "Davis Martin",
+          "label": "Davis Martin ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.7035,
+          "fair_odds": 1.42,
+          "expected_hr_allowed": 0.352,
+          "projected_ip": 5.65,
+          "inputs": {
+            "hr9": 0.56,
+            "era": 3.08,
+            "whip": 1.26
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Boston Red Sox",
+          "pitcher": "Jake Bennett",
+          "label": "Jake Bennett moins de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "under",
+          "probability": 0.53,
+          "fair_odds": 1.89,
+          "expected_strikeouts": 4.38,
+          "projected_ip": 5.74,
+          "inputs": {
+            "k9": 6.86,
+            "era": 3.1,
+            "whip": 0.98,
+            "hand": "L"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Boston Red Sox",
+          "pitcher": "Jake Bennett",
+          "label": "Jake Bennett ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6563,
+          "fair_odds": 1.52,
+          "expected_hr_allowed": 0.421,
+          "projected_ip": 5.74,
+          "inputs": {
+            "hr9": 0.66,
+            "era": 3.1,
+            "whip": 0.98
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401816078",
+      "kickoff": "2026-07-08T23:40Z",
+      "league": "MLB",
+      "match": "Cleveland Guardians at Minnesota Twins",
+      "home": "Minnesota Twins",
+      "away": "Cleveland Guardians",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Minnesota Twins",
+          "pitcher": "Connor Prielipp",
+          "label": "Connor Prielipp moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.527,
+          "fair_odds": 1.9,
+          "expected_strikeouts": 5.38,
+          "projected_ip": 5.1,
+          "inputs": {
+            "k9": 9.49,
+            "era": 4.96,
+            "whip": 1.38,
+            "hand": "L"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Minnesota Twins",
+          "pitcher": "Connor Prielipp",
+          "label": "Connor Prielipp ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6073,
+          "fair_odds": 1.65,
+          "expected_hr_allowed": 0.499,
+          "projected_ip": 5.1,
+          "inputs": {
+            "hr9": 0.88,
+            "era": 4.96,
+            "whip": 1.38
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Cleveland Guardians",
+          "pitcher": "Slade Cecconi",
+          "label": "Slade Cecconi moins de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "under",
+          "probability": 0.6142,
+          "fair_odds": 1.63,
+          "expected_strikeouts": 4.04,
+          "projected_ip": 5.28,
+          "inputs": {
+            "k9": 6.89,
+            "era": 4.44,
+            "whip": 1.4,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Cleveland Guardians",
+          "pitcher": "Slade Cecconi",
+          "label": "Slade Cecconi concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5142,
+          "fair_odds": 1.94,
+          "expected_hr_allowed": 0.722,
+          "projected_ip": 5.28,
+          "inputs": {
+            "hr9": 1.23,
+            "era": 4.44,
+            "whip": 1.4
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
       "event_id": "401816079",
       "kickoff": "2026-07-08T23:45Z",
       "league": "MLB",
@@ -1018,7 +1904,7 @@
       ]
     }
   ],
-  "props": 48,
+  "props": 90,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
