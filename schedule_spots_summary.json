@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-07-07T17:29:54Z",
+  "generated_at": "2026-07-07T19:22:09Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 41,
+    "active_events": 40,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 58,
+      "lookahead": 56,
       "back_to_back_travel": 24,
       "travel_extreme": 13,
       "schedule_congestion": 18
     },
     "by_decision": {
-      "abstain": 12,
+      "abstain": 11,
       "lean_home": 27,
       "lean_away": 2
     },
     "lean_home": 27,
     "lean_away": 2,
-    "abstain": 12,
+    "abstain": 11,
     "monitor": 0
   },
   "active": [
@@ -86,64 +86,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401871790",
-      "source_event_ids": [
-        "401871790"
-      ],
-      "kickoff": "2026-07-07T18:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "St. Louis Cardinals",
-      "away": "Milwaukee Brewers",
-      "match": "St. Louis Cardinals - Milwaukee Brewers",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: St. Louis Cardinals 0.36, Milwaukee Brewers 0.36",
-      "pressure_score": 1.6,
-      "home_fade": 0.36,
-      "away_fade": 0.36,
-      "travel_score": 0,
-      "lookahead_score": 1.6,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "3 match important/proche dans les 3 jours",
-        "3 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.116,
-        "away_score": -1.234,
-        "home_fade": 0.36,
-        "away_fade": 1.36,
-        "reason": "Direction nette: St. Louis Cardinals (+0.12)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.36
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.36
           },
           {
             "side": "away",
