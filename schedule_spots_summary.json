@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-07-07T01:29:47Z",
+  "generated_at": "2026-07-07T02:52:30Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 44,
+    "active_events": 41,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 64,
-      "travel_extreme": 14,
+      "lookahead": 58,
       "back_to_back_travel": 24,
+      "travel_extreme": 13,
       "schedule_congestion": 18
     },
     "by_decision": {
-      "abstain": 14,
-      "lean_home": 28,
+      "abstain": 12,
+      "lean_home": 27,
       "lean_away": 2
     },
-    "lean_home": 28,
+    "lean_home": 27,
     "lean_away": 2,
-    "abstain": 14,
+    "abstain": 12,
     "monitor": 0
   },
   "active": [
@@ -92,64 +92,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401816050",
-      "source_event_ids": [
-        "401816050"
-      ],
-      "kickoff": "2026-07-07T01:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Diego Padres",
-      "away": "Arizona Diamondbacks",
-      "match": "San Diego Padres - Arizona Diamondbacks",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: San Diego Padres 0.36, Arizona Diamondbacks 0.36",
-      "pressure_score": 1.6,
-      "home_fade": 0.36,
-      "away_fade": 0.36,
-      "travel_score": 0,
-      "lookahead_score": 1.6,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "3 match important/proche dans les 3 jours",
-        "3 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.834,
-        "away_score": -0.024,
-        "home_fade": 0.96,
-        "away_fade": 0.36,
-        "reason": "Direction nette: Arizona Diamondbacks (-0.02)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.36
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.36
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.6
           }
         ]
       }
@@ -324,58 +266,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.6
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401816051",
-      "source_event_ids": [
-        "401816051"
-      ],
-      "kickoff": "2026-07-07T02:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Los Angeles Dodgers",
-      "away": "Colorado Rockies",
-      "match": "Los Angeles Dodgers - Colorado Rockies",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Los Angeles Dodgers 0.30, Colorado Rockies 0.30",
-      "pressure_score": 1.333,
-      "home_fade": 0.3,
-      "away_fade": 0.3,
-      "travel_score": 0,
-      "lookahead_score": 1.333,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "2 match important/proche dans les 3 jours",
-        "2 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.195,
-        "away_score": -0.195,
-        "home_fade": 0.3,
-        "away_fade": 0.3,
-        "reason": "Direction nette: Colorado Rockies (-0.20)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
           }
         ]
       }
@@ -1331,66 +1221,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.861
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401816052",
-      "source_event_ids": [
-        "401816052"
-      ],
-      "kickoff": "2026-07-07T01:45Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Francisco Giants",
-      "away": "Toronto Blue Jays",
-      "match": "San Francisco Giants - Toronto Blue Jays",
-      "decision": "lean_home",
-      "net_team": "San Francisco Giants",
-      "reason": "Toronto Blue Jays plus penalise par calendrier/voyage (1.15 vs 0.30)",
-      "pressure_score": 2.18,
-      "home_fade": 0.3,
-      "away_fade": 1.147,
-      "travel_score": 0.847,
-      "lookahead_score": 1.333,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2,
-        "travel_extreme": 1
-      },
-      "contexts": [
-        "2 match important/proche dans les 3 jours",
-        "2 match important/proche dans les 3 jours",
-        "Deplacement estime 3641 km, decalage ~2.9h"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.101,
-        "away_score": -1.042,
-        "home_fade": 0.3,
-        "away_fade": 1.147,
-        "reason": "Direction nette: San Francisco Giants (+0.10)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.847
           }
         ]
       }

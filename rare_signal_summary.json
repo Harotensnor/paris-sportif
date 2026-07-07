@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-07-07T01:29:47Z",
+  "generated_at": "2026-07-07T02:52:30Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 56,
-    "actionable": 34,
-    "watch": 5,
+    "active_events": 54,
+    "actionable": 33,
+    "watch": 4,
     "risk": 17,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 26,
-      "travel_extreme": 11,
+      "injury_imbalance": 25,
       "back_to_back_travel": 24,
       "signal_conflict": 6,
+      "travel_extreme": 10,
       "market_uncertain": 16
     },
     "by_quality": {
-      "watch": 5,
-      "actionable": 34,
+      "actionable": 33,
+      "watch": 4,
       "risk": 17
     }
   },
@@ -600,24 +600,6 @@
       "context": "1 match dans les 48h + 1657 km de voyage"
     },
     {
-      "event_id": "401816052",
-      "date": "2026-07-07T01:45Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Francisco Giants",
-      "away": "Toronto Blue Jays",
-      "match": "San Francisco Giants - Toronto Blue Jays",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "travel_extreme",
-      "direction": "fade",
-      "team": "Toronto Blue Jays",
-      "side": "away",
-      "strength": 0.847,
-      "context": "Deplacement estime 3641 km, decalage ~2.9h"
-    },
-    {
       "event_id": "401816066",
       "date": "2026-07-08T02:10Z",
       "sport": "baseball",
@@ -637,24 +619,6 @@
     }
   ],
   "active_watch": [
-    {
-      "event_id": "401816050",
-      "date": "2026-07-07T01:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Diego Padres",
-      "away": "Arizona Diamondbacks",
-      "match": "San Diego Padres - Arizona Diamondbacks",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "San Diego Padres",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 12-9"
-    },
     {
       "event_id": "401816057",
       "date": "2026-07-07T23:10Z",
