@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-08T20:00:34Z",
+  "generated_at": "2026-07-08T21:04:47Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -538,6 +538,42 @@
             "whip": 1.08
           },
           "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Philadelphia Phillies",
+          "pitcher": "Alan Rangel",
+          "label": "Alan Rangel moins de 7,5 strikeouts",
+          "line": 7.5,
+          "pick": "under",
+          "probability": 0.5936,
+          "fair_odds": 1.68,
+          "expected_strikeouts": 7.01,
+          "projected_ip": 6.6,
+          "inputs": {
+            "k9": 9.56,
+            "era": 3.38,
+            "whip": 1.31,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Philadelphia Phillies",
+          "pitcher": "Alan Rangel",
+          "label": "Alan Rangel ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6632,
+          "fair_odds": 1.51,
+          "expected_hr_allowed": 0.411,
+          "projected_ip": 6.6,
+          "inputs": {
+            "hr9": 0.56,
+            "era": 3.38,
+            "whip": 1.31
+          },
+          "side": "away"
         }
       ]
     },
@@ -1136,8 +1172,8 @@
           "projected_ip": 6.6,
           "inputs": {
             "k9": 9.0,
-            "era": 5.16,
-            "whip": 1.37,
+            "era": 4.76,
+            "whip": 1.35,
             "hand": "L"
           },
           "side": "home"
@@ -1154,8 +1190,8 @@
           "projected_ip": 6.6,
           "inputs": {
             "hr9": 1.06,
-            "era": 5.16,
-            "whip": 1.37
+            "era": 4.76,
+            "whip": 1.35
           },
           "side": "home"
         },
@@ -1746,7 +1782,7 @@
       ]
     }
   ],
-  "props": 84,
+  "props": 86,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
