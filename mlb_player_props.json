@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-08T10:22:03Z",
+  "generated_at": "2026-07-08T11:42:52Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -538,6 +538,98 @@
             "whip": 1.23
           },
           "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401816074",
+      "kickoff": "2026-07-08T23:00Z",
+      "league": "MLB",
+      "match": "Philadelphia Phillies at Cincinnati Reds",
+      "home": "Cincinnati Reds",
+      "away": "Philadelphia Phillies",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Cincinnati Reds",
+          "pitcher": "Chase Burns",
+          "label": "Chase Burns plus de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "over",
+          "probability": 0.557,
+          "fair_odds": 1.8,
+          "expected_strikeouts": 6.79,
+          "projected_ip": 5.72,
+          "inputs": {
+            "k9": 10.69,
+            "era": 2.4,
+            "whip": 1.08,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Cincinnati Reds",
+          "pitcher": "Chase Burns",
+          "label": "Chase Burns concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.506,
+          "fair_odds": 1.98,
+          "expected_hr_allowed": 0.705,
+          "projected_ip": 5.72,
+          "inputs": {
+            "hr9": 1.11,
+            "era": 2.4,
+            "whip": 1.08
+          },
+          "side": "home"
+        }
+      ]
+    },
+    {
+      "event_id": "401816072",
+      "kickoff": "2026-07-08T23:10Z",
+      "league": "MLB",
+      "match": "Kansas City Royals at New York Mets",
+      "home": "New York Mets",
+      "away": "Kansas City Royals",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "New York Mets",
+          "pitcher": "Christian Scott",
+          "label": "Christian Scott moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.51,
+          "fair_odds": 1.96,
+          "expected_strikeouts": 5.45,
+          "projected_ip": 4.45,
+          "inputs": {
+            "k9": 11.02,
+            "era": 3.49,
+            "whip": 1.35,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "New York Mets",
+          "pitcher": "Christian Scott",
+          "label": "Christian Scott ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5281,
+          "fair_odds": 1.89,
+          "expected_hr_allowed": 0.638,
+          "projected_ip": 4.45,
+          "inputs": {
+            "hr9": 1.29,
+            "era": 3.49,
+            "whip": 1.35
+          },
+          "side": "home"
         }
       ]
     },
@@ -1464,7 +1556,7 @@
       ]
     }
   ],
-  "props": 70,
+  "props": 74,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
