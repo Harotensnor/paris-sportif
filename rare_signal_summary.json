@@ -1,46 +1,28 @@
 {
-  "generated_at": "2026-07-08T18:22:59Z",
+  "generated_at": "2026-07-08T20:00:34Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 38,
-    "actionable": 24,
+    "active_events": 37,
+    "actionable": 23,
     "watch": 3,
     "risk": 11,
     "expired_sample": 0,
     "by_type": {
-      "travel_extreme": 7,
-      "back_to_back_travel": 21,
       "injury_imbalance": 19,
+      "back_to_back_travel": 20,
       "signal_conflict": 7,
+      "travel_extreme": 6,
       "market_uncertain": 9
     },
     "by_quality": {
-      "actionable": 24,
+      "actionable": 23,
       "watch": 3,
       "risk": 11
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401816082",
-      "date": "2026-07-08T19:45Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Francisco Giants",
-      "away": "Toronto Blue Jays",
-      "match": "San Francisco Giants - Toronto Blue Jays",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Toronto Blue Jays",
-      "side": "away",
-      "strength": 1.0,
-      "context": "2 match dans les 48h + 3641 km de voyage"
-    },
     {
       "event_id": "401816070",
       "date": "2026-07-08T22:35Z",
@@ -75,7 +57,7 @@
       "team": "Detroit Tigers",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 12-6"
+      "context": "Absences severes 12-5"
     },
     {
       "event_id": "401816075",
@@ -201,7 +183,7 @@
       "team": "Detroit Tigers",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 12-6"
+      "context": "Absences severes 12-5"
     },
     {
       "event_id": "401816089",
@@ -384,24 +366,6 @@
       "context": "2 match dans les 48h + 1334 km de voyage"
     },
     {
-      "event_id": "401816069",
-      "date": "2026-07-08T22:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Pittsburgh Pirates",
-      "away": "Atlanta Braves",
-      "match": "Pittsburgh Pirates - Atlanta Braves",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Atlanta Braves",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 6-10"
-    },
-    {
       "event_id": "401816084",
       "date": "2026-07-09T16:35Z",
       "sport": "baseball",
@@ -412,12 +376,12 @@
       "match": "Pittsburgh Pirates - Atlanta Braves",
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
+      "type": "back_to_back_travel",
       "direction": "fade",
       "team": "Atlanta Braves",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 6-10"
+      "side": "away",
+      "strength": 0.776,
+      "context": "2 match dans les 48h + 829 km de voyage"
     },
     {
       "event_id": "401816088",
@@ -436,6 +400,24 @@
       "side": "away",
       "strength": 0.771,
       "context": "2 match dans les 48h + 806 km de voyage"
+    },
+    {
+      "event_id": "401816069",
+      "date": "2026-07-08T22:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Pittsburgh Pirates",
+      "away": "Atlanta Braves",
+      "match": "Pittsburgh Pirates - Atlanta Braves",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Atlanta Braves",
+      "side": "away",
+      "strength": 0.696,
+      "context": "1 match dans les 48h + 829 km de voyage"
     },
     {
       "event_id": "401816074",

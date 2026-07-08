@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-07-08T18:22:58Z",
+  "generated_at": "2026-07-08T20:00:34Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401816082",
-      "kickoff": "2026-07-08T19:45Z",
-      "league": "MLB",
-      "match": "Toronto Blue Jays at San Francisco Giants",
-      "home": "San Francisco Giants",
-      "away": "Toronto Blue Jays",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "San Francisco Giants",
-          "pitcher": "Logan Webb",
-          "label": "Logan Webb moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.5702,
-          "fair_odds": 1.75,
-          "expected_strikeouts": 5.19,
-          "projected_ip": 6.21,
-          "inputs": {
-            "k9": 7.52,
-            "era": 3.66,
-            "whip": 1.17,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "San Francisco Giants",
-          "pitcher": "Logan Webb",
-          "label": "Logan Webb ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6257,
-          "fair_odds": 1.6,
-          "expected_hr_allowed": 0.469,
-          "projected_ip": 6.21,
-          "inputs": {
-            "hr9": 0.68,
-            "era": 3.66,
-            "whip": 1.17
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Toronto Blue Jays",
-          "pitcher": "Dylan Cease",
-          "label": "Dylan Cease plus de 8,5 strikeouts",
-          "line": 8.5,
-          "pick": "over",
-          "probability": 0.5071,
-          "fair_odds": 1.97,
-          "expected_strikeouts": 8.54,
-          "projected_ip": 5.63,
-          "inputs": {
-            "k9": 13.65,
-            "era": 2.79,
-            "whip": 1.18,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Toronto Blue Jays",
-          "pitcher": "Dylan Cease",
-          "label": "Dylan Cease ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.7314,
-          "fair_odds": 1.37,
-          "expected_hr_allowed": 0.313,
-          "projected_ip": 5.63,
-          "inputs": {
-            "hr9": 0.5,
-            "era": 2.79,
-            "whip": 1.18
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401816070",
       "kickoff": "2026-07-08T22:35Z",
@@ -1828,7 +1746,7 @@
       ]
     }
   ],
-  "props": 88,
+  "props": 84,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
