@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-08T17:03:40Z",
-  "calculated_at": "2026-07-08T17:03:40Z",
+  "generated_at": "2026-07-08T18:23:00Z",
+  "calculated_at": "2026-07-08T18:23:00Z",
   "source_of_truth": "data.js",
   "data_age_min": 1,
   "data_file_age_min": 0,
@@ -16,7 +16,7 @@
       "matches_detailed": 20,
       "details_ratio_pct": 4.8,
       "last_run_delta": 0,
-      "last_run_limit": 1000
+      "last_run_limit": 400
     },
     "injuries_soccer": {
       "age_min": 2,
@@ -42,7 +42,7 @@
       "events": 4300
     },
     "referees_soccer": {
-      "age_min": 2,
+      "age_min": 1,
       "events": 106,
       "status": "retained_existing_referees"
     },
@@ -73,7 +73,7 @@
       "sports": 4
     },
     "h2h_extended": {
-      "age_min": 2,
+      "age_min": 1,
       "events": 56,
       "events_with_meetings": 39,
       "meetings": 133,
@@ -313,7 +313,7 @@
       "age_min": 2,
       "insights": 7,
       "events_today": 18,
-      "events_next_36h": 34,
+      "events_next_36h": 35,
       "sources_loaded": 8
     },
     "detected_angles": {
@@ -359,8 +359,8 @@
     },
     "timing_edges": {
       "age_min": 0,
-      "events": 0,
-      "bet_now": 0,
+      "events": 1,
+      "bet_now": 1,
       "wait": 0,
       "price_shortening": 0
     },
@@ -468,10 +468,10 @@
     },
     "clv_history": {
       "age_min": 2,
-      "matches": 808,
-      "observations": 1709,
+      "matches": 804,
+      "observations": 1701,
       "mean_clv_pct": -0.04,
-      "positive_clv_rate": 42.9,
+      "positive_clv_rate": 42.8,
       "sample_status": "validated"
     }
   },
@@ -535,7 +535,7 @@
     "referees_soccer": {
       "script": "scripts/fetch_referees_soccer.py",
       "output": "referees_soccer.json",
-      "age_min": 2,
+      "age_min": 1,
       "threshold_min": 480,
       "fast_red_min": null,
       "status": "ok"
@@ -583,7 +583,7 @@
     "h2h_extended": {
       "script": "h2h_extended.json",
       "output": "h2h_extended.json",
-      "age_min": 2,
+      "age_min": 1,
       "threshold_min": 60,
       "fast_red_min": null,
       "status": "ok"
@@ -1046,7 +1046,7 @@
   ],
   "overall": "warning",
   "quality_checks": {
-    "data_generated_at": "2026-07-08T17:02:06.419712Z",
+    "data_generated_at": "2026-07-08T18:21:47.952039Z",
     "truth_scope": "all_events",
     "all_winamax_available": 113,
     "all_winamax_exact": 87,
@@ -1127,7 +1127,7 @@
   "data_truth": {
     "source_of_truth": "data.js",
     "scope": "all_events",
-    "data_generated_at": "2026-07-08T17:02:06.419712Z",
+    "data_generated_at": "2026-07-08T18:21:47.952039Z",
     "winamax_available": 113,
     "winamax_exact": 87,
     "winamax_exact_ratio": 0.7699,
@@ -1147,7 +1147,7 @@
     "anomalies_emitted": 4
   },
   "source_health": {
-    "generated_at": "2026-07-08T17:03:40Z",
+    "generated_at": "2026-07-08T18:23:00Z",
     "sources_total": 11,
     "sources_ok": 6,
     "sources_warning": 5,
@@ -1167,7 +1167,7 @@
         "score": 92,
         "status": "warning",
         "items": 417,
-        "age_min": 0,
+        "age_min": 1,
         "sla_min": 15,
         "issues": 2
       },
@@ -1175,7 +1175,7 @@
         "score": 57,
         "status": "warning",
         "items": 0,
-        "age_min": 2,
+        "age_min": 3,
         "sla_min": 180,
         "issues": 2
       },
@@ -1183,7 +1183,7 @@
         "score": 100,
         "status": "ok",
         "items": 97,
-        "age_min": 2,
+        "age_min": 3,
         "sla_min": 180,
         "issues": 1
       },
@@ -1191,7 +1191,7 @@
         "score": 100,
         "status": "ok",
         "items": 106,
-        "age_min": 3,
+        "age_min": 2,
         "sla_min": 180,
         "issues": 1
       },
@@ -1199,7 +1199,7 @@
         "score": 100,
         "status": "ok",
         "items": 4300,
-        "age_min": 2,
+        "age_min": 1,
         "sla_min": 60,
         "issues": 1
       },
@@ -1247,7 +1247,7 @@
   },
   "observability": {
     "pipeline_traces": {
-      "generated_at": "2026-07-08T17:03:40Z",
+      "generated_at": "2026-07-08T18:23:00Z",
       "runs_observed": 99,
       "by_status": {
         "warning": 69,
@@ -1265,7 +1265,7 @@
     }
   },
   "data_lineage": {
-    "generated_at": "2026-07-08T17:03:40Z",
+    "generated_at": "2026-07-08T18:23:00Z",
     "status": "ok",
     "events": 113,
     "events_missing_inline_lineage": 0,
