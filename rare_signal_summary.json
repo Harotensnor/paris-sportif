@@ -1,64 +1,28 @@
 {
-  "generated_at": "2026-07-07T23:16:07Z",
+  "generated_at": "2026-07-08T00:12:57Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 47,
-    "actionable": 29,
-    "watch": 4,
+    "active_events": 43,
+    "actionable": 26,
+    "watch": 3,
     "risk": 14,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 23,
+      "injury_imbalance": 19,
       "travel_extreme": 8,
       "back_to_back_travel": 23,
       "signal_conflict": 7,
       "market_uncertain": 12
     },
     "by_quality": {
-      "actionable": 29,
-      "watch": 4,
+      "watch": 3,
+      "actionable": 26,
       "risk": 14
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401816063",
-      "date": "2026-07-07T23:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Minnesota Twins",
-      "away": "Cleveland Guardians",
-      "match": "Minnesota Twins - Cleveland Guardians",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Minnesota Twins",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 9-2"
-    },
-    {
-      "event_id": "401816064",
-      "date": "2026-07-07T23:45Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "St. Louis Cardinals",
-      "away": "Milwaukee Brewers",
-      "match": "St. Louis Cardinals - Milwaukee Brewers",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Milwaukee Brewers",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 2-12"
-    },
     {
       "event_id": "401816067",
       "date": "2026-07-08T01:45Z",
@@ -438,24 +402,6 @@
       "context": "2 match dans les 48h + 1334 km de voyage"
     },
     {
-      "event_id": "401816057",
-      "date": "2026-07-07T23:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "New York Mets",
-      "away": "Kansas City Royals",
-      "match": "New York Mets - Kansas City Royals",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Kansas City Royals",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 7-11"
-    },
-    {
       "event_id": "401816069",
       "date": "2026-07-08T22:40Z",
       "sport": "baseball",
@@ -547,24 +493,6 @@
     }
   ],
   "active_watch": [
-    {
-      "event_id": "401816059",
-      "date": "2026-07-07T23:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Cincinnati Reds",
-      "away": "Philadelphia Phillies",
-      "match": "Cincinnati Reds - Philadelphia Phillies",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Cincinnati Reds",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 6-3"
-    },
     {
       "event_id": "401816065",
       "date": "2026-07-08T01:40Z",
