@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-07-08T00:12:57Z",
+  "generated_at": "2026-07-08T02:30:04Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 32,
+    "active_events": 28,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 38,
-      "travel_extreme": 11,
-      "back_to_back_travel": 23,
+      "lookahead": 30,
+      "travel_extreme": 9,
+      "back_to_back_travel": 21,
       "schedule_congestion": 14
     },
     "by_decision": {
-      "abstain": 5,
-      "lean_home": 25,
+      "abstain": 4,
+      "lean_home": 22,
       "lean_away": 2
     },
-    "lean_home": 25,
+    "lean_home": 22,
     "lean_away": 2,
-    "abstain": 5,
+    "abstain": 4,
     "monitor": 0
   },
   "active": [
@@ -150,64 +150,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401816065",
-      "source_event_ids": [
-        "401816065"
-      ],
-      "kickoff": "2026-07-08T01:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Diego Padres",
-      "away": "Arizona Diamondbacks",
-      "match": "San Diego Padres - Arizona Diamondbacks",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: San Diego Padres 0.36, Arizona Diamondbacks 0.30",
-      "pressure_score": 1.467,
-      "home_fade": 0.36,
-      "away_fade": 0.3,
-      "travel_score": 0,
-      "lookahead_score": 1.467,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "3 match important/proche dans les 3 jours",
-        "2 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.855,
-        "away_score": 0.036,
-        "home_fade": 0.96,
-        "away_fade": 0.3,
-        "reason": "Direction nette: Arizona Diamondbacks (+0.04)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.36
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.6
           }
         ]
       }
@@ -559,74 +501,6 @@
             "type": "travel_extreme",
             "direction": "fade",
             "strength": 0.81
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401816067",
-      "source_event_ids": [
-        "401816067"
-      ],
-      "kickoff": "2026-07-08T01:45Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Francisco Giants",
-      "away": "Toronto Blue Jays",
-      "match": "San Francisco Giants - Toronto Blue Jays",
-      "decision": "lean_home",
-      "net_team": "San Francisco Giants",
-      "reason": "Toronto Blue Jays plus penalise par calendrier/voyage (2.15 vs 0.15)",
-      "pressure_score": 2.847,
-      "home_fade": 0.15,
-      "away_fade": 2.147,
-      "travel_score": 1.847,
-      "lookahead_score": 1.0,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2,
-        "travel_extreme": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "2 match important/proche dans les 3 jours",
-        "Deplacement estime 3641 km, decalage ~2.9h",
-        "1 match dans les 48h + 3641 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.601,
-        "away_score": -2.094,
-        "home_fade": 0.15,
-        "away_fade": 2.147,
-        "reason": "Direction nette: San Francisco Giants (+0.60)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.847
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 1.0
           }
         ]
       }
@@ -1014,66 +888,6 @@
       }
     },
     {
-      "event_id": "401816061",
-      "source_event_ids": [
-        "401816061"
-      ],
-      "kickoff": "2026-07-08T00:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Texas Rangers",
-      "away": "Los Angeles Angels",
-      "match": "Texas Rangers - Los Angeles Angels",
-      "decision": "lean_home",
-      "net_team": "Texas Rangers",
-      "reason": "Los Angeles Angels plus penalise par calendrier/voyage (0.75 vs 0.30)",
-      "pressure_score": 1.783,
-      "home_fade": 0.3,
-      "away_fade": 0.75,
-      "travel_score": 0.45,
-      "lookahead_score": 1.333,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2,
-        "travel_extreme": 1
-      },
-      "contexts": [
-        "2 match important/proche dans les 3 jours",
-        "2 match important/proche dans les 3 jours",
-        "Deplacement estime 1934 km, decalage ~1.4h"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.038,
-        "away_score": -0.645,
-        "home_fade": 0.3,
-        "away_fade": 0.75,
-        "reason": "Direction nette: Texas Rangers (-0.04)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.3
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.45
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401816073",
       "source_event_ids": [
         "401816073"
@@ -1201,66 +1015,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.883
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401816066",
-      "source_event_ids": [
-        "401816066"
-      ],
-      "kickoff": "2026-07-08T02:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Los Angeles Dodgers",
-      "away": "Colorado Rockies",
-      "match": "Los Angeles Dodgers - Colorado Rockies",
-      "decision": "lean_home",
-      "net_team": "Los Angeles Dodgers",
-      "reason": "Colorado Rockies plus penalise par calendrier/voyage (0.95 vs 0.15)",
-      "pressure_score": 1.464,
-      "home_fade": 0.15,
-      "away_fade": 0.947,
-      "travel_score": 0.797,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours",
-        "1 match dans les 48h + 1334 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.181,
-        "away_score": -0.894,
-        "home_fade": 0.15,
-        "away_fade": 0.947,
-        "reason": "Direction nette: Los Angeles Dodgers (+0.18)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.797
           }
         ]
       }
