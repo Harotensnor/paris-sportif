@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-08T13:16:00Z",
+  "generated_at": "2026-07-08T15:35:49Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -423,6 +423,42 @@
       "props": [
         {
           "market": "pitcher_strikeouts",
+          "team": "Miami Marlins",
+          "pitcher": "Tyler Phillips",
+          "label": "Tyler Phillips plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.607,
+          "fair_odds": 1.65,
+          "expected_strikeouts": 4.97,
+          "projected_ip": 6.6,
+          "inputs": {
+            "k9": 6.78,
+            "era": 3.52,
+            "whip": 1.38,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Miami Marlins",
+          "pitcher": "Tyler Phillips",
+          "label": "Tyler Phillips concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.5336,
+          "fair_odds": 1.87,
+          "expected_hr_allowed": 0.763,
+          "projected_ip": 6.6,
+          "inputs": {
+            "hr9": 1.04,
+            "era": 3.52,
+            "whip": 1.38
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
           "team": "Seattle Mariners",
           "pitcher": "George Kirby",
           "label": "George Kirby moins de 5,5 strikeouts",
@@ -630,6 +666,42 @@
             "whip": 1.35
           },
           "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Kansas City Royals",
+          "pitcher": "Steven Cruz",
+          "label": "Steven Cruz plus de 8,5 strikeouts",
+          "line": 8.5,
+          "pick": "over",
+          "probability": 0.5203,
+          "fair_odds": 1.92,
+          "expected_strikeouts": 8.62,
+          "projected_ip": 6.6,
+          "inputs": {
+            "k9": 11.75,
+            "era": 5.08,
+            "whip": 1.45,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Kansas City Royals",
+          "pitcher": "Steven Cruz",
+          "label": "Steven Cruz concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.8447,
+          "fair_odds": 1.18,
+          "expected_hr_allowed": 1.863,
+          "projected_ip": 6.6,
+          "inputs": {
+            "hr9": 2.54,
+            "era": 5.08,
+            "whip": 1.45
+          },
+          "side": "away"
         }
       ]
     },
@@ -1716,11 +1788,47 @@
             "whip": 1.22
           },
           "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Milwaukee Brewers",
+          "pitcher": "Logan Henderson",
+          "label": "Logan Henderson moins de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "under",
+          "probability": 0.6031,
+          "fair_odds": 1.66,
+          "expected_strikeouts": 6.0,
+          "projected_ip": 4.6,
+          "inputs": {
+            "k9": 11.74,
+            "era": 2.74,
+            "whip": 1.04,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Milwaukee Brewers",
+          "pitcher": "Logan Henderson",
+          "label": "Logan Henderson ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6712,
+          "fair_odds": 1.49,
+          "expected_hr_allowed": 0.399,
+          "projected_ip": 4.6,
+          "inputs": {
+            "hr9": 0.78,
+            "era": 2.74,
+            "whip": 1.04
+          },
+          "side": "away"
         }
       ]
     }
   ],
-  "props": 82,
+  "props": 88,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
