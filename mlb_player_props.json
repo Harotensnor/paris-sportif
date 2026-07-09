@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-07-09T01:12:19Z",
+  "generated_at": "2026-07-09T02:44:40Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401816080",
-      "kickoff": "2026-07-09T02:00Z",
-      "league": "MLB",
-      "match": "Arizona Diamondbacks at San Diego Padres",
-      "home": "San Diego Padres",
-      "away": "Arizona Diamondbacks",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "San Diego Padres",
-          "pitcher": "Griffin Canning",
-          "label": "Griffin Canning plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.5116,
-          "fair_odds": 1.95,
-          "expected_strikeouts": 5.55,
-          "projected_ip": 5.67,
-          "inputs": {
-            "k9": 8.82,
-            "era": 6.71,
-            "whip": 1.61,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "San Diego Padres",
-          "pitcher": "Griffin Canning",
-          "label": "Griffin Canning concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5884,
-          "fair_odds": 1.7,
-          "expected_hr_allowed": 0.888,
-          "projected_ip": 5.67,
-          "inputs": {
-            "hr9": 1.41,
-            "era": 6.71,
-            "whip": 1.61
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Arizona Diamondbacks",
-          "pitcher": "Merrill Kelly",
-          "label": "Merrill Kelly plus de 3,5 strikeouts",
-          "line": 3.5,
-          "pick": "over",
-          "probability": 0.5032,
-          "fair_odds": 1.99,
-          "expected_strikeouts": 3.51,
-          "projected_ip": 5.75,
-          "inputs": {
-            "k9": 5.5,
-            "era": 5.71,
-            "whip": 1.56,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Arizona Diamondbacks",
-          "pitcher": "Merrill Kelly",
-          "label": "Merrill Kelly concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.7157,
-          "fair_odds": 1.4,
-          "expected_hr_allowed": 1.258,
-          "projected_ip": 5.75,
-          "inputs": {
-            "hr9": 1.97,
-            "era": 5.71,
-            "whip": 1.56
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401816084",
       "kickoff": "2026-07-09T16:35Z",
@@ -250,48 +168,84 @@
       ]
     },
     {
-      "event_id": "401816087",
-      "kickoff": "2026-07-09T17:10Z",
+      "event_id": "401816085",
+      "kickoff": "2026-07-09T17:35Z",
       "league": "MLB",
-      "match": "New York Yankees at Tampa Bay Rays",
-      "home": "Tampa Bay Rays",
-      "away": "New York Yankees",
+      "match": "Chicago Cubs at Baltimore Orioles",
+      "home": "Baltimore Orioles",
+      "away": "Chicago Cubs",
       "props": [
         {
           "market": "pitcher_strikeouts",
-          "team": "Tampa Bay Rays",
-          "pitcher": "Drew Rasmussen",
-          "label": "Drew Rasmussen plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.532,
-          "fair_odds": 1.88,
-          "expected_strikeouts": 5.65,
-          "projected_ip": 5.71,
+          "team": "Baltimore Orioles",
+          "pitcher": "Trevor Rogers",
+          "label": "Trevor Rogers moins de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "under",
+          "probability": 0.612,
+          "fair_odds": 1.63,
+          "expected_strikeouts": 4.05,
+          "projected_ip": 5.26,
           "inputs": {
-            "k9": 8.91,
-            "era": 2.78,
-            "whip": 0.9,
-            "hand": "R"
+            "k9": 6.94,
+            "era": 4.7,
+            "whip": 1.32,
+            "hand": "L"
           },
           "side": "home"
         },
         {
           "market": "pitcher_home_run_allowed",
-          "team": "Tampa Bay Rays",
-          "pitcher": "Drew Rasmussen",
-          "label": "Drew Rasmussen ne concède pas de home run",
+          "team": "Baltimore Orioles",
+          "pitcher": "Trevor Rogers",
+          "label": "Trevor Rogers ne concède pas de home run",
           "pick": "no",
-          "probability": 0.5238,
-          "fair_odds": 1.91,
-          "expected_hr_allowed": 0.647,
-          "projected_ip": 5.71,
+          "probability": 0.5708,
+          "fair_odds": 1.75,
+          "expected_hr_allowed": 0.561,
+          "projected_ip": 5.26,
           "inputs": {
-            "hr9": 1.02,
-            "era": 2.78,
-            "whip": 0.9
+            "hr9": 0.96,
+            "era": 4.7,
+            "whip": 1.32
           },
           "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Chicago Cubs",
+          "pitcher": "David Peterson",
+          "label": "David Peterson moins de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "under",
+          "probability": 0.5789,
+          "fair_odds": 1.73,
+          "expected_strikeouts": 6.12,
+          "projected_ip": 6.6,
+          "inputs": {
+            "k9": 8.34,
+            "era": 6.09,
+            "whip": 1.65,
+            "hand": "L"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Chicago Cubs",
+          "pitcher": "David Peterson",
+          "label": "David Peterson ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5603,
+          "fair_odds": 1.78,
+          "expected_hr_allowed": 0.579,
+          "projected_ip": 6.6,
+          "inputs": {
+            "hr9": 0.79,
+            "era": 6.09,
+            "whip": 1.65
+          },
+          "side": "away"
         }
       ]
     },
@@ -420,88 +374,6 @@
             "whip": 1.39
           },
           "side": "home"
-        }
-      ]
-    },
-    {
-      "event_id": "401816085",
-      "kickoff": "2026-07-09T22:35Z",
-      "league": "MLB",
-      "match": "Chicago Cubs at Baltimore Orioles",
-      "home": "Baltimore Orioles",
-      "away": "Chicago Cubs",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Baltimore Orioles",
-          "pitcher": "Trevor Rogers",
-          "label": "Trevor Rogers moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.612,
-          "fair_odds": 1.63,
-          "expected_strikeouts": 4.05,
-          "projected_ip": 5.26,
-          "inputs": {
-            "k9": 6.94,
-            "era": 4.7,
-            "whip": 1.32,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Baltimore Orioles",
-          "pitcher": "Trevor Rogers",
-          "label": "Trevor Rogers ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5708,
-          "fair_odds": 1.75,
-          "expected_hr_allowed": 0.561,
-          "projected_ip": 5.26,
-          "inputs": {
-            "hr9": 0.96,
-            "era": 4.7,
-            "whip": 1.32
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Chicago Cubs",
-          "pitcher": "David Peterson",
-          "label": "David Peterson moins de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "under",
-          "probability": 0.5789,
-          "fair_odds": 1.73,
-          "expected_strikeouts": 6.12,
-          "projected_ip": 6.6,
-          "inputs": {
-            "k9": 8.34,
-            "era": 6.09,
-            "whip": 1.65,
-            "hand": "L"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Chicago Cubs",
-          "pitcher": "David Peterson",
-          "label": "David Peterson ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5603,
-          "fair_odds": 1.78,
-          "expected_hr_allowed": 0.579,
-          "projected_ip": 6.6,
-          "inputs": {
-            "hr9": 0.79,
-            "era": 6.09,
-            "whip": 1.65
-          },
-          "side": "away"
         }
       ]
     },
@@ -834,7 +706,7 @@
       ]
     }
   ],
-  "props": 40,
+  "props": 34,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"

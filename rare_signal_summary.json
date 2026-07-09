@@ -1,27 +1,46 @@
 {
-  "generated_at": "2026-07-09T01:12:20Z",
+  "generated_at": "2026-07-09T02:44:40Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 27,
-    "actionable": 16,
-    "watch": 0,
-    "risk": 11,
+    "active_events": 21,
+    "actionable": 11,
+    "watch": 1,
+    "risk": 9,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 13,
-      "back_to_back_travel": 11,
-      "signal_conflict": 3,
-      "travel_extreme": 4,
-      "market_uncertain": 11
+      "injury_imbalance": 10,
+      "back_to_back_travel": 7,
+      "signal_conflict": 2,
+      "travel_extreme": 1,
+      "market_uncertain": 9
     },
     "by_quality": {
-      "actionable": 16,
-      "risk": 11
+      "actionable": 11,
+      "watch": 1,
+      "risk": 9
     }
   },
   "active_actionable": [
+    {
+      "event_id": "401816085",
+      "date": "2026-07-09T17:35Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Baltimore Orioles",
+      "away": "Chicago Cubs",
+      "match": "Baltimore Orioles - Chicago Cubs",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Chicago Cubs",
+      "side": null,
+      "strength": 1.0,
+      "context": "Absences severes 9-15"
+    },
     {
       "event_id": "401816092",
       "date": "2026-07-09T17:40Z",
@@ -39,24 +58,6 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 10-2"
-    },
-    {
-      "event_id": "401816085",
-      "date": "2026-07-09T22:35Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Baltimore Orioles",
-      "away": "Chicago Cubs",
-      "match": "Baltimore Orioles - Chicago Cubs",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Chicago Cubs",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 9-15"
     },
     {
       "event_id": "401816083",
@@ -113,40 +114,22 @@
       "context": "Absences severes 2-12"
     },
     {
-      "event_id": "401816125",
-      "date": "2026-07-12T00:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Diego Padres",
-      "away": "Toronto Blue Jays",
-      "match": "San Diego Padres - Toronto Blue Jays",
+      "event_id": "401857055",
+      "date": "2026-07-10T23:30Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Toronto Tempo",
+      "away": "Dallas Wings",
+      "match": "Toronto Tempo - Dallas Wings",
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
+      "type": "injury_imbalance",
       "direction": "fade",
-      "team": "Toronto Blue Jays",
-      "side": "away",
+      "team": "Toronto Tempo",
+      "side": null,
       "strength": 1.0,
-      "context": "1 match dans les 48h + 3483 km de voyage"
-    },
-    {
-      "event_id": "401816140",
-      "date": "2026-07-12T20:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Diego Padres",
-      "away": "Toronto Blue Jays",
-      "match": "San Diego Padres - Toronto Blue Jays",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Toronto Blue Jays",
-      "side": "away",
-      "strength": 1.0,
-      "context": "2 match dans les 48h + 3483 km de voyage"
+      "context": "Absences severes 5-0"
     },
     {
       "event_id": "401816090",
@@ -185,60 +168,6 @@
       "context": "2 match dans les 48h + 1766 km de voyage"
     },
     {
-      "event_id": "401816087",
-      "date": "2026-07-09T17:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Tampa Bay Rays",
-      "away": "New York Yankees",
-      "match": "Tampa Bay Rays - New York Yankees",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "New York Yankees",
-      "side": "away",
-      "strength": 0.941,
-      "context": "2 match dans les 48h + 1657 km de voyage"
-    },
-    {
-      "event_id": "401816110",
-      "date": "2026-07-11T01:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Diego Padres",
-      "away": "Toronto Blue Jays",
-      "match": "San Diego Padres - Toronto Blue Jays",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "travel_extreme",
-      "direction": "fade",
-      "team": "Toronto Blue Jays",
-      "side": "away",
-      "strength": 0.81,
-      "context": "Deplacement estime 3483 km, decalage ~2.5h"
-    },
-    {
-      "event_id": "401816080",
-      "date": "2026-07-09T02:00Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Diego Padres",
-      "away": "Arizona Diamondbacks",
-      "match": "San Diego Padres - Arizona Diamondbacks",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "San Diego Padres",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 13-9"
-    },
-    {
       "event_id": "401816094",
       "date": "2026-07-10T01:40Z",
       "sport": "baseball",
@@ -255,24 +184,6 @@
       "side": null,
       "strength": 0.8,
       "context": "Absences severes 13-9"
-    },
-    {
-      "event_id": "401816081",
-      "date": "2026-07-09T02:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Los Angeles Dodgers",
-      "away": "Colorado Rockies",
-      "match": "Los Angeles Dodgers - Colorado Rockies",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Colorado Rockies",
-      "side": "away",
-      "strength": 0.797,
-      "context": "1 match dans les 48h + 1334 km de voyage"
     },
     {
       "event_id": "401816084",
@@ -311,7 +222,26 @@
       "context": "2 match dans les 48h + 806 km de voyage"
     }
   ],
-  "active_watch": [],
+  "active_watch": [
+    {
+      "event_id": "401857056",
+      "date": "2026-07-11T02:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Los Angeles Sparks",
+      "away": "Chicago Sky",
+      "match": "Los Angeles Sparks - Chicago Sky",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Chicago Sky",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 2-5"
+    }
+  ],
   "active_risk": [
     {
       "event_id": "401861418",
@@ -348,24 +278,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.5%"
-    },
-    {
-      "event_id": "401873909",
-      "date": "2026-07-11T16:00Z",
-      "sport": "football",
-      "league_code": "eliteserien",
-      "league_name": "Eliteserien",
-      "home": "Tromso",
-      "away": "Vålerenga",
-      "match": "Tromso - Vålerenga",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.2%"
     },
     {
       "event_id": "401861291",
@@ -455,25 +367,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.8%"
-    },
-    {
-      "event_id": "401843374",
-      "date": "2026-07-12T17:15Z",
-      "sport": "football",
-      "league_code": "eliteserien",
-      "league_name": "Eliteserien",
-      "home": "Sarpsborg FK",
-      "away": "Viking FK",
-      "match": "Sarpsborg FK - Viking FK",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.9%"
+      "context": "marge bookmaker anormale 18.5%"
     },
     {
       "event_id": "401877045",
