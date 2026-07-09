@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-09T02:44:40Z",
+  "generated_at": "2026-07-09T06:31:34Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
@@ -14,6 +14,7 @@
       "back_to_back_travel": 7,
       "signal_conflict": 2,
       "travel_extreme": 1,
+      "market_move": 3,
       "market_uncertain": 9
     },
     "by_quality": {
@@ -132,6 +133,24 @@
       "context": "Absences severes 5-0"
     },
     {
+      "event_id": "401816094",
+      "date": "2026-07-10T01:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "San Diego Padres",
+      "away": "Arizona Diamondbacks",
+      "match": "San Diego Padres - Arizona Diamondbacks",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "home",
+      "strength": 0.98,
+      "context": "Cote home: 1.70 -> 2.00 (-17.6%)"
+    },
+    {
       "event_id": "401816090",
       "date": "2026-07-10T00:05Z",
       "sport": "baseball",
@@ -146,8 +165,8 @@
       "direction": "fade",
       "team": "Los Angeles Angels",
       "side": "away",
-      "strength": 0.997,
-      "context": "2 match dans les 48h + 1934 km de voyage"
+      "strength": 0.917,
+      "context": "1 match dans les 48h + 1934 km de voyage"
     },
     {
       "event_id": "401816086",
@@ -164,26 +183,8 @@
       "direction": "fade",
       "team": "Kansas City Royals",
       "side": "away",
-      "strength": 0.963,
-      "context": "2 match dans les 48h + 1766 km de voyage"
-    },
-    {
-      "event_id": "401816094",
-      "date": "2026-07-10T01:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Diego Padres",
-      "away": "Arizona Diamondbacks",
-      "match": "San Diego Padres - Arizona Diamondbacks",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "San Diego Padres",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 13-9"
+      "strength": 0.883,
+      "context": "1 match dans les 48h + 1766 km de voyage"
     },
     {
       "event_id": "401816084",
@@ -200,8 +201,8 @@
       "direction": "fade",
       "team": "Atlanta Braves",
       "side": "away",
-      "strength": 0.776,
-      "context": "2 match dans les 48h + 829 km de voyage"
+      "strength": 0.696,
+      "context": "1 match dans les 48h + 829 km de voyage"
     },
     {
       "event_id": "401816088",
@@ -218,8 +219,8 @@
       "direction": "fade",
       "team": "Philadelphia Phillies",
       "side": "away",
-      "strength": 0.771,
-      "context": "2 match dans les 48h + 806 km de voyage"
+      "strength": 0.691,
+      "context": "1 match dans les 48h + 806 km de voyage"
     }
   ],
   "active_watch": [
