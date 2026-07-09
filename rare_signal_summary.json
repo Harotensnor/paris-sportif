@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-07-09T06:31:34Z",
+  "generated_at": "2026-07-09T10:06:30Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 21,
-    "actionable": 11,
-    "watch": 1,
+    "active_events": 23,
+    "actionable": 12,
+    "watch": 2,
     "risk": 9,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 10,
+      "injury_imbalance": 11,
       "back_to_back_travel": 7,
       "signal_conflict": 2,
       "travel_extreme": 1,
-      "market_move": 3,
-      "market_uncertain": 9
+      "market_uncertain": 9,
+      "weather_extreme": 1
     },
     "by_quality": {
-      "actionable": 11,
-      "watch": 1,
+      "actionable": 12,
+      "watch": 2,
       "risk": 9
     }
   },
@@ -133,24 +133,6 @@
       "context": "Absences severes 5-0"
     },
     {
-      "event_id": "401816094",
-      "date": "2026-07-10T01:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Diego Padres",
-      "away": "Arizona Diamondbacks",
-      "match": "San Diego Padres - Arizona Diamondbacks",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "home",
-      "strength": 0.98,
-      "context": "Cote home: 1.70 -> 2.00 (-17.6%)"
-    },
-    {
       "event_id": "401816090",
       "date": "2026-07-10T00:05Z",
       "sport": "baseball",
@@ -185,6 +167,42 @@
       "side": "away",
       "strength": 0.883,
       "context": "1 match dans les 48h + 1766 km de voyage"
+    },
+    {
+      "event_id": "401816087",
+      "date": "2026-07-09T17:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Tampa Bay Rays",
+      "away": "New York Yankees",
+      "match": "Tampa Bay Rays - New York Yankees",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Tampa Bay Rays",
+      "side": null,
+      "strength": 0.8,
+      "context": "Absences severes 9-5"
+    },
+    {
+      "event_id": "401816094",
+      "date": "2026-07-10T01:40Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "San Diego Padres",
+      "away": "Arizona Diamondbacks",
+      "match": "San Diego Padres - Arizona Diamondbacks",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "San Diego Padres",
+      "side": null,
+      "strength": 0.8,
+      "context": "Absences severes 13-9"
     },
     {
       "event_id": "401816084",
@@ -241,6 +259,24 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 2-5"
+    },
+    {
+      "event_id": "401861419",
+      "date": "2026-07-11T11:00Z",
+      "sport": "football",
+      "league_code": "chn.1",
+      "league_name": "Chinese Super League",
+      "home": "Zhejiang Professional FC",
+      "away": "Qingdao Hainiu",
+      "match": "Zhejiang Professional FC - Qingdao Hainiu",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "weather_extreme",
+      "direction": "under_goals",
+      "team": null,
+      "side": null,
+      "strength": 0.595,
+      "context": "Meteo dure: vent 36 km/h, pluie 4.8 mm"
     }
   ],
   "active_risk": [
@@ -404,7 +440,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 19.5%"
+      "context": "marge bookmaker anormale 18.9%"
     }
   ],
   "expired_sample": []

@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-07-09T06:31:35Z",
-  "calculated_at": "2026-07-09T06:31:35Z",
+  "generated_at": "2026-07-09T10:06:30Z",
+  "calculated_at": "2026-07-09T10:06:30Z",
   "source_of_truth": "data.js",
-  "data_generated_at": "2026-07-09T06:30:27.192655Z",
+  "data_generated_at": "2026-07-09T10:05:37.038578Z",
   "data_today_field": "2026-07-09",
   "events": {
-    "total": 83,
-    "upcoming": 63,
-    "winamax_available": 83,
-    "winamax_exact": 57,
-    "winamax_exact_ratio": 0.6867,
+    "total": 84,
+    "upcoming": 64,
+    "winamax_available": 84,
+    "winamax_exact": 58,
+    "winamax_exact_ratio": 0.6905,
     "markets_more_than_1n2": 0,
-    "form_l10": 31,
-    "h2h": 23,
-    "lineups": 11,
+    "form_l10": 33,
+    "h2h": 26,
+    "lineups": 13,
     "football_lineups": 0,
-    "starter_signals": 11,
+    "starter_signals": 13,
     "clubelo": 3,
     "weather": 17,
-    "injuries": 28,
+    "injuries": 31,
     "referee": 0,
     "referee_named": 0,
     "referee_context": 0,
@@ -26,7 +26,7 @@
     "fd_calibration": 0,
     "fd_closing_odds": 0,
     "xg": 8,
-    "smart_money": 2
+    "smart_money": 3
   },
   "signal_health": {
     "referee": {
@@ -36,26 +36,26 @@
       "note": "referee is effective coverage: named referee or referee_context usable by the model."
     },
     "smart_money": {
-      "events": 2,
+      "events": 3,
       "status": "rare_event",
       "note": "Smart money is intentionally rare; low count is OK when odds movement does not confirm a strong signal."
     }
   },
   "winamax_markets": {
-    "matches": 415,
+    "matches": 418,
     "detailed_market_matches": 20,
-    "detailed_ratio_vs_exact": 0.3509,
-    "gap_to_50pct_exact": 0.1491,
+    "detailed_ratio_vs_exact": 0.3448,
+    "gap_to_50pct_exact": 0.1552,
     "recommended_detail_fetch_cap": 150,
     "detail_by_sport": {
       "baseball": {
-        "exact": 13,
+        "exact": 15,
         "detailed": 0,
         "families": {},
         "detailed_ratio": 0.0
       },
       "basketball": {
-        "exact": 5,
+        "exact": 6,
         "detailed": 0,
         "families": {},
         "detailed_ratio": 0.0
@@ -73,7 +73,7 @@
         "detailed_ratio": 0
       },
       "tennis": {
-        "exact": 4,
+        "exact": 2,
         "detailed": 0,
         "families": {},
         "detailed_ratio": 0.0
@@ -82,10 +82,10 @@
     "market_family_counts": {}
   },
   "backtest": {
-    "overall_roi_pct": 0.53,
-    "overall_brier": 0.2401,
+    "overall_roi_pct": 0.13,
+    "overall_brier": 0.2413,
     "by_sport_roi_pct": {
-      "baseball": -2.36,
+      "baseball": -2.77,
       "basketball": 7.52,
       "football": 12.44,
       "hockey": 46.83

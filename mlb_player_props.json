@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-09T06:31:34Z",
+  "generated_at": "2026-07-09T10:06:29Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -164,6 +164,52 @@
             "whip": 1.16
           },
           "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401816087",
+      "kickoff": "2026-07-09T17:10Z",
+      "league": "MLB",
+      "match": "New York Yankees at Tampa Bay Rays",
+      "home": "Tampa Bay Rays",
+      "away": "New York Yankees",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Tampa Bay Rays",
+          "pitcher": "Drew Rasmussen",
+          "label": "Drew Rasmussen plus de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "over",
+          "probability": 0.532,
+          "fair_odds": 1.88,
+          "expected_strikeouts": 5.65,
+          "projected_ip": 5.71,
+          "inputs": {
+            "k9": 8.91,
+            "era": 2.78,
+            "whip": 0.9,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Tampa Bay Rays",
+          "pitcher": "Drew Rasmussen",
+          "label": "Drew Rasmussen ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5238,
+          "fair_odds": 1.91,
+          "expected_hr_allowed": 0.647,
+          "projected_ip": 5.71,
+          "inputs": {
+            "hr9": 1.02,
+            "era": 2.78,
+            "whip": 0.9
+          },
+          "side": "home"
         }
       ]
     },
@@ -704,9 +750,55 @@
           "side": "away"
         }
       ]
+    },
+    {
+      "event_id": "401816095",
+      "kickoff": "2026-07-10T01:45Z",
+      "league": "MLB",
+      "match": "Colorado Rockies at San Francisco Giants",
+      "home": "San Francisco Giants",
+      "away": "Colorado Rockies",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Colorado Rockies",
+          "pitcher": "Tanner Gordon",
+          "label": "Tanner Gordon plus de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "over",
+          "probability": 0.5386,
+          "fair_odds": 1.86,
+          "expected_strikeouts": 6.7,
+          "projected_ip": 6.6,
+          "inputs": {
+            "k9": 9.13,
+            "era": 6.95,
+            "whip": 1.59,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Colorado Rockies",
+          "pitcher": "Tanner Gordon",
+          "label": "Tanner Gordon concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.7978,
+          "fair_odds": 1.25,
+          "expected_hr_allowed": 1.599,
+          "projected_ip": 6.6,
+          "inputs": {
+            "hr9": 2.18,
+            "era": 6.95,
+            "whip": 1.59
+          },
+          "side": "away"
+        }
+      ]
     }
   ],
-  "props": 34,
+  "props": 38,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
