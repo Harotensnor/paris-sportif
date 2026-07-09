@@ -1,218 +1,8 @@
 {
-  "generated_at": "2026-07-09T15:40:33Z",
+  "generated_at": "2026-07-09T17:33:26Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401816084",
-      "kickoff": "2026-07-09T16:35Z",
-      "league": "MLB",
-      "match": "Atlanta Braves at Pittsburgh Pirates",
-      "home": "Pittsburgh Pirates",
-      "away": "Atlanta Braves",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Pittsburgh Pirates",
-          "pitcher": "Mitch Keller",
-          "label": "Mitch Keller moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.5992,
-          "fair_odds": 1.67,
-          "expected_strikeouts": 4.1,
-          "projected_ip": 5.56,
-          "inputs": {
-            "k9": 6.64,
-            "era": 5.02,
-            "whip": 1.31,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Pittsburgh Pirates",
-          "pitcher": "Mitch Keller",
-          "label": "Mitch Keller ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5131,
-          "fair_odds": 1.95,
-          "expected_hr_allowed": 0.667,
-          "projected_ip": 5.56,
-          "inputs": {
-            "hr9": 1.08,
-            "era": 5.02,
-            "whip": 1.31
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Atlanta Braves",
-          "pitcher": "Bryce Elder",
-          "label": "Bryce Elder plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.5826,
-          "fair_odds": 1.72,
-          "expected_strikeouts": 4.86,
-          "projected_ip": 5.78,
-          "inputs": {
-            "k9": 7.57,
-            "era": 4.01,
-            "whip": 1.23,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Atlanta Braves",
-          "pitcher": "Bryce Elder",
-          "label": "Bryce Elder concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5032,
-          "fair_odds": 1.99,
-          "expected_hr_allowed": 0.7,
-          "projected_ip": 5.78,
-          "inputs": {
-            "hr9": 1.09,
-            "era": 4.01,
-            "whip": 1.23
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401816086",
-      "kickoff": "2026-07-09T17:10Z",
-      "league": "MLB",
-      "match": "Kansas City Royals at New York Mets",
-      "home": "New York Mets",
-      "away": "Kansas City Royals",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "New York Mets",
-          "pitcher": "Sean Manaea",
-          "label": "Sean Manaea plus de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "over",
-          "probability": 0.5199,
-          "fair_odds": 1.92,
-          "expected_strikeouts": 6.6,
-          "projected_ip": 6.6,
-          "inputs": {
-            "k9": 9.0,
-            "era": 4.76,
-            "whip": 1.35,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "New York Mets",
-          "pitcher": "Sean Manaea",
-          "label": "Sean Manaea concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5404,
-          "fair_odds": 1.85,
-          "expected_hr_allowed": 0.777,
-          "projected_ip": 6.6,
-          "inputs": {
-            "hr9": 1.06,
-            "era": 4.76,
-            "whip": 1.35
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Kansas City Royals",
-          "pitcher": "Michael Wacha",
-          "label": "Michael Wacha moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.6052,
-          "fair_odds": 1.65,
-          "expected_strikeouts": 5.03,
-          "projected_ip": 6.34,
-          "inputs": {
-            "k9": 7.14,
-            "era": 3.45,
-            "whip": 1.16,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Kansas City Royals",
-          "pitcher": "Michael Wacha",
-          "label": "Michael Wacha concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5128,
-          "fair_odds": 1.95,
-          "expected_hr_allowed": 0.719,
-          "projected_ip": 6.34,
-          "inputs": {
-            "hr9": 1.02,
-            "era": 3.45,
-            "whip": 1.16
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401816087",
-      "kickoff": "2026-07-09T17:10Z",
-      "league": "MLB",
-      "match": "New York Yankees at Tampa Bay Rays",
-      "home": "Tampa Bay Rays",
-      "away": "New York Yankees",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Tampa Bay Rays",
-          "pitcher": "Drew Rasmussen",
-          "label": "Drew Rasmussen plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.532,
-          "fair_odds": 1.88,
-          "expected_strikeouts": 5.65,
-          "projected_ip": 5.71,
-          "inputs": {
-            "k9": 8.91,
-            "era": 2.78,
-            "whip": 0.9,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Tampa Bay Rays",
-          "pitcher": "Drew Rasmussen",
-          "label": "Drew Rasmussen ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5238,
-          "fair_odds": 1.91,
-          "expected_hr_allowed": 0.647,
-          "projected_ip": 5.71,
-          "inputs": {
-            "hr9": 1.02,
-            "era": 2.78,
-            "whip": 0.9
-          },
-          "side": "home"
-        }
-      ]
-    },
     {
       "event_id": "401816085",
       "kickoff": "2026-07-09T17:30Z",
@@ -796,9 +586,101 @@
           "side": "away"
         }
       ]
+    },
+    {
+      "event_id": "401816109",
+      "kickoff": "2026-07-11T02:15Z",
+      "league": "MLB",
+      "match": "Colorado Rockies at San Francisco Giants",
+      "home": "San Francisco Giants",
+      "away": "Colorado Rockies",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Colorado Rockies",
+          "pitcher": "Kyle Freeland",
+          "label": "Kyle Freeland moins de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "under",
+          "probability": 0.5309,
+          "fair_odds": 1.88,
+          "expected_strikeouts": 4.37,
+          "projected_ip": 5.12,
+          "inputs": {
+            "k9": 7.68,
+            "era": 7.46,
+            "whip": 1.61,
+            "hand": "L"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Colorado Rockies",
+          "pitcher": "Kyle Freeland",
+          "label": "Kyle Freeland concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.6552,
+          "fair_odds": 1.53,
+          "expected_hr_allowed": 1.065,
+          "projected_ip": 5.12,
+          "inputs": {
+            "hr9": 1.87,
+            "era": 7.46,
+            "whip": 1.61
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401816124",
+      "kickoff": "2026-07-11T20:05Z",
+      "league": "MLB",
+      "match": "Colorado Rockies at San Francisco Giants",
+      "home": "San Francisco Giants",
+      "away": "Colorado Rockies",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Colorado Rockies",
+          "pitcher": "Kyle Freeland",
+          "label": "Kyle Freeland moins de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "under",
+          "probability": 0.5309,
+          "fair_odds": 1.88,
+          "expected_strikeouts": 4.37,
+          "projected_ip": 5.12,
+          "inputs": {
+            "k9": 7.68,
+            "era": 7.46,
+            "whip": 1.61,
+            "hand": "L"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Colorado Rockies",
+          "pitcher": "Kyle Freeland",
+          "label": "Kyle Freeland concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.6552,
+          "fair_odds": 1.53,
+          "expected_hr_allowed": 1.065,
+          "projected_ip": 5.12,
+          "inputs": {
+            "hr9": 1.87,
+            "era": 7.46,
+            "whip": 1.61
+          },
+          "side": "away"
+        }
+      ]
     }
   ],
-  "props": 38,
+  "props": 32,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"

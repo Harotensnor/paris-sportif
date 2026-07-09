@@ -1,22 +1,22 @@
 {
-  "generated_at": "2026-07-09T15:40:34Z",
+  "generated_at": "2026-07-09T17:33:26Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 13,
+    "active_events": 10,
     "expired_sample": 0,
     "by_type": {
-      "back_to_back_travel": 11,
+      "back_to_back_travel": 8,
       "travel_extreme": 2,
       "schedule_congestion": 4,
       "lookahead": 6
     },
     "by_decision": {
       "abstain": 2,
-      "lean_home": 11
+      "lean_home": 8
     },
-    "lean_home": 11,
+    "lean_home": 8,
     "lean_away": 0,
     "abstain": 2,
     "monitor": 0
@@ -419,108 +419,6 @@
       }
     },
     {
-      "event_id": "401816086",
-      "source_event_ids": [
-        "401816086"
-      ],
-      "kickoff": "2026-07-09T17:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "New York Mets",
-      "away": "Kansas City Royals",
-      "match": "New York Mets - Kansas City Royals",
-      "decision": "lean_home",
-      "net_team": "New York Mets",
-      "reason": "Kansas City Royals plus penalise par calendrier/voyage (0.96 vs 0.00)",
-      "pressure_score": 0.963,
-      "home_fade": 0.0,
-      "away_fade": 0.963,
-      "travel_score": 0.963,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "2 match dans les 48h + 1766 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.547,
-        "away_score": -1.563,
-        "home_fade": 0.0,
-        "away_fade": 1.563,
-        "reason": "Direction nette: New York Mets (+0.55)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.963
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401816087",
-      "source_event_ids": [
-        "401816087"
-      ],
-      "kickoff": "2026-07-09T17:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Tampa Bay Rays",
-      "away": "New York Yankees",
-      "match": "Tampa Bay Rays - New York Yankees",
-      "decision": "lean_home",
-      "net_team": "Tampa Bay Rays",
-      "reason": "New York Yankees plus penalise par calendrier/voyage (0.94 vs 0.00)",
-      "pressure_score": 0.941,
-      "home_fade": 0.0,
-      "away_fade": 0.941,
-      "travel_score": 0.941,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "2 match dans les 48h + 1657 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.471,
-        "away_score": -0.661,
-        "home_fade": 0.8,
-        "away_fade": 0.941,
-        "reason": "Signaux opposes: Tampa Bay Rays fade 0.80, New York Yankees fade 0.94 -> prudence",
-        "detail": [
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.8
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.941
-          }
-        ]
-      }
-    },
-    {
       "event_id": "401816092",
       "source_event_ids": [
         "401816092"
@@ -618,57 +516,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.805
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401816084",
-      "source_event_ids": [
-        "401816084"
-      ],
-      "kickoff": "2026-07-09T16:35Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Pittsburgh Pirates",
-      "away": "Atlanta Braves",
-      "match": "Pittsburgh Pirates - Atlanta Braves",
-      "decision": "lean_home",
-      "net_team": "Pittsburgh Pirates",
-      "reason": "Atlanta Braves plus penalise par calendrier/voyage (0.78 vs 0.00)",
-      "pressure_score": 0.776,
-      "home_fade": 0.0,
-      "away_fade": 0.776,
-      "travel_score": 0.776,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "2 match dans les 48h + 829 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.482,
-        "away_score": -1.376,
-        "home_fade": 0.0,
-        "away_fade": 1.376,
-        "reason": "Direction nette: Pittsburgh Pirates (+0.48)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.776
           }
         ]
       }
