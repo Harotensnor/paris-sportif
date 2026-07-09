@@ -1,32 +1,31 @@
 {
-  "generated_at": "2026-07-09T12:25:20Z",
+  "generated_at": "2026-07-09T15:40:34Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 24,
-    "actionable": 13,
-    "watch": 2,
+    "active_events": 25,
+    "actionable": 15,
+    "watch": 1,
     "risk": 9,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 11,
-      "back_to_back_travel": 7,
-      "signal_conflict": 2,
+      "back_to_back_travel": 11,
+      "signal_conflict": 3,
       "travel_extreme": 1,
-      "market_move": 2,
       "market_uncertain": 9
     },
     "by_quality": {
-      "actionable": 13,
-      "watch": 2,
+      "actionable": 15,
+      "watch": 1,
       "risk": 9
     }
   },
   "active_actionable": [
     {
       "event_id": "401816085",
-      "date": "2026-07-09T17:35Z",
+      "date": "2026-07-09T17:30Z",
       "sport": "baseball",
       "league_code": "mlb",
       "league_name": "MLB",
@@ -147,8 +146,8 @@
       "direction": "fade",
       "team": "Los Angeles Angels",
       "side": "away",
-      "strength": 0.917,
-      "context": "1 match dans les 48h + 1934 km de voyage"
+      "strength": 0.997,
+      "context": "2 match dans les 48h + 1934 km de voyage"
     },
     {
       "event_id": "401816086",
@@ -165,8 +164,8 @@
       "direction": "fade",
       "team": "Kansas City Royals",
       "side": "away",
-      "strength": 0.883,
-      "context": "1 match dans les 48h + 1766 km de voyage"
+      "strength": 0.963,
+      "context": "2 match dans les 48h + 1766 km de voyage"
     },
     {
       "event_id": "401816087",
@@ -179,12 +178,66 @@
       "match": "Tampa Bay Rays - New York Yankees",
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
+      "type": "back_to_back_travel",
       "direction": "fade",
-      "team": "Tampa Bay Rays",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 9-5"
+      "team": "New York Yankees",
+      "side": "away",
+      "strength": 0.941,
+      "context": "2 match dans les 48h + 1657 km de voyage"
+    },
+    {
+      "event_id": "401816124",
+      "date": "2026-07-11T20:05Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "San Francisco Giants",
+      "away": "Colorado Rockies",
+      "match": "San Francisco Giants - Colorado Rockies",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Colorado Rockies",
+      "side": "away",
+      "strength": 0.914,
+      "context": "2 match dans les 48h + 1522 km de voyage"
+    },
+    {
+      "event_id": "401816139",
+      "date": "2026-07-12T20:05Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "San Francisco Giants",
+      "away": "Colorado Rockies",
+      "match": "San Francisco Giants - Colorado Rockies",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Colorado Rockies",
+      "side": "away",
+      "strength": 0.914,
+      "context": "2 match dans les 48h + 1522 km de voyage"
+    },
+    {
+      "event_id": "401816109",
+      "date": "2026-07-11T02:15Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "San Francisco Giants",
+      "away": "Colorado Rockies",
+      "match": "San Francisco Giants - Colorado Rockies",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "back_to_back_travel",
+      "direction": "fade",
+      "team": "Colorado Rockies",
+      "side": "away",
+      "strength": 0.834,
+      "context": "1 match dans les 48h + 1522 km de voyage"
     },
     {
       "event_id": "401816094",
@@ -205,24 +258,6 @@
       "context": "Absences severes 13-9"
     },
     {
-      "event_id": "401857051",
-      "date": "2026-07-10T00:00Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Atlanta Dream",
-      "away": "Seattle Storm",
-      "match": "Atlanta Dream - Seattle Storm",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.794,
-      "context": "Cote away: 5.25 -> 4.50 (+14.3%)"
-    },
-    {
       "event_id": "401816084",
       "date": "2026-07-09T16:35Z",
       "sport": "baseball",
@@ -237,8 +272,8 @@
       "direction": "fade",
       "team": "Atlanta Braves",
       "side": "away",
-      "strength": 0.696,
-      "context": "1 match dans les 48h + 829 km de voyage"
+      "strength": 0.776,
+      "context": "2 match dans les 48h + 829 km de voyage"
     },
     {
       "event_id": "401816088",
@@ -255,8 +290,8 @@
       "direction": "fade",
       "team": "Philadelphia Phillies",
       "side": "away",
-      "strength": 0.691,
-      "context": "1 match dans les 48h + 806 km de voyage"
+      "strength": 0.771,
+      "context": "2 match dans les 48h + 806 km de voyage"
     }
   ],
   "active_watch": [
@@ -277,24 +312,6 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 2-5"
-    },
-    {
-      "event_id": "401857053",
-      "date": "2026-07-10T02:00Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Portland Fire",
-      "away": "Las Vegas Aces",
-      "match": "Portland Fire - Las Vegas Aces",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "home",
-      "strength": 0.595,
-      "context": "Cote home: 4.20 -> 3.75 (+10.7%)"
     }
   ],
   "active_risk": [
