@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-10T21:16:42Z",
+  "generated_at": "2026-07-10T22:18:33Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -578,88 +578,6 @@
       ]
     },
     {
-      "event_id": "401816096",
-      "kickoff": "2026-07-10T23:15Z",
-      "league": "MLB",
-      "match": "Boston Red Sox at New York Mets",
-      "home": "New York Mets",
-      "away": "Boston Red Sox",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "New York Mets",
-          "pitcher": "Nolan McLean",
-          "label": "Nolan McLean plus de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "over",
-          "probability": 0.5081,
-          "fair_odds": 1.97,
-          "expected_strikeouts": 6.54,
-          "projected_ip": 5.62,
-          "inputs": {
-            "k9": 10.48,
-            "era": 3.73,
-            "whip": 1.12,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "New York Mets",
-          "pitcher": "Nolan McLean",
-          "label": "Nolan McLean ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5738,
-          "fair_odds": 1.74,
-          "expected_hr_allowed": 0.555,
-          "projected_ip": 5.62,
-          "inputs": {
-            "hr9": 0.89,
-            "era": 3.73,
-            "whip": 1.12
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Boston Red Sox",
-          "pitcher": "Sonny Gray",
-          "label": "Sonny Gray moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.5903,
-          "fair_odds": 1.69,
-          "expected_strikeouts": 5.1,
-          "projected_ip": 5.58,
-          "inputs": {
-            "k9": 8.23,
-            "era": 2.61,
-            "whip": 1.1,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Boston Red Sox",
-          "pitcher": "Sonny Gray",
-          "label": "Sonny Gray ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5382,
-          "fair_odds": 1.86,
-          "expected_hr_allowed": 0.619,
-          "projected_ip": 5.58,
-          "inputs": {
-            "hr9": 1.0,
-            "era": 2.61,
-            "whip": 1.1
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
       "event_id": "401816105",
       "kickoff": "2026-07-10T23:40Z",
       "league": "MLB",
@@ -736,6 +654,88 @@
             "hr9": 1.84,
             "era": 7.04,
             "whip": 1.84
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
+      "event_id": "401816096",
+      "kickoff": "2026-07-10T23:50Z",
+      "league": "MLB",
+      "match": "Boston Red Sox at New York Mets",
+      "home": "New York Mets",
+      "away": "Boston Red Sox",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "New York Mets",
+          "pitcher": "Nolan McLean",
+          "label": "Nolan McLean plus de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "over",
+          "probability": 0.5081,
+          "fair_odds": 1.97,
+          "expected_strikeouts": 6.54,
+          "projected_ip": 5.62,
+          "inputs": {
+            "k9": 10.48,
+            "era": 3.73,
+            "whip": 1.12,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "New York Mets",
+          "pitcher": "Nolan McLean",
+          "label": "Nolan McLean ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5738,
+          "fair_odds": 1.74,
+          "expected_hr_allowed": 0.555,
+          "projected_ip": 5.62,
+          "inputs": {
+            "hr9": 0.89,
+            "era": 3.73,
+            "whip": 1.12
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Boston Red Sox",
+          "pitcher": "Sonny Gray",
+          "label": "Sonny Gray moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.5903,
+          "fair_odds": 1.69,
+          "expected_strikeouts": 5.1,
+          "projected_ip": 5.58,
+          "inputs": {
+            "k9": 8.23,
+            "era": 2.61,
+            "whip": 1.1,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Boston Red Sox",
+          "pitcher": "Sonny Gray",
+          "label": "Sonny Gray ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5382,
+          "fair_odds": 1.86,
+          "expected_hr_allowed": 0.619,
+          "projected_ip": 5.58,
+          "inputs": {
+            "hr9": 1.0,
+            "era": 2.61,
+            "whip": 1.1
           },
           "side": "away"
         }
@@ -2566,6 +2566,52 @@
       ]
     },
     {
+      "event_id": "401816126",
+      "kickoff": "2026-07-12T17:40Z",
+      "league": "MLB",
+      "match": "Boston Red Sox at New York Mets",
+      "home": "New York Mets",
+      "away": "Boston Red Sox",
+      "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Boston Red Sox",
+          "pitcher": "Payton Tolle",
+          "label": "Payton Tolle plus de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "over",
+          "probability": 0.5419,
+          "fair_odds": 1.85,
+          "expected_strikeouts": 5.7,
+          "projected_ip": 5.72,
+          "inputs": {
+            "k9": 8.96,
+            "era": 3.14,
+            "whip": 1.07,
+            "hand": "L"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Boston Red Sox",
+          "pitcher": "Payton Tolle",
+          "label": "Payton Tolle ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5643,
+          "fair_odds": 1.77,
+          "expected_hr_allowed": 0.572,
+          "projected_ip": 5.72,
+          "inputs": {
+            "hr9": 0.9,
+            "era": 3.14,
+            "whip": 1.07
+          },
+          "side": "away"
+        }
+      ]
+    },
+    {
       "event_id": "401816127",
       "kickoff": "2026-07-12T17:40Z",
       "league": "MLB",
@@ -3314,7 +3360,7 @@
       ]
     }
   ],
-  "props": 160,
+  "props": 162,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
