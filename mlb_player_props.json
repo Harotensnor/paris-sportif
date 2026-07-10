@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-10T06:31:53Z",
+  "generated_at": "2026-07-10T10:04:27Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -749,6 +749,42 @@
       "home": "Texas Rangers",
       "away": "Houston Astros",
       "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Texas Rangers",
+          "pitcher": "Kumar Rocker",
+          "label": "Kumar Rocker plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.5962,
+          "fair_odds": 1.68,
+          "expected_strikeouts": 4.92,
+          "projected_ip": 5.61,
+          "inputs": {
+            "k9": 7.9,
+            "era": 3.95,
+            "whip": 1.34,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Texas Rangers",
+          "pitcher": "Kumar Rocker",
+          "label": "Kumar Rocker ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5499,
+          "fair_odds": 1.82,
+          "expected_hr_allowed": 0.598,
+          "projected_ip": 5.61,
+          "inputs": {
+            "hr9": 0.96,
+            "era": 3.95,
+            "whip": 1.34
+          },
+          "side": "home"
+        },
         {
           "market": "pitcher_strikeouts",
           "team": "Houston Astros",
@@ -1917,6 +1953,42 @@
       "home": "Texas Rangers",
       "away": "Houston Astros",
       "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Texas Rangers",
+          "pitcher": "Kumar Rocker",
+          "label": "Kumar Rocker plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.5962,
+          "fair_odds": 1.68,
+          "expected_strikeouts": 4.92,
+          "projected_ip": 5.61,
+          "inputs": {
+            "k9": 7.9,
+            "era": 3.95,
+            "whip": 1.34,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Texas Rangers",
+          "pitcher": "Kumar Rocker",
+          "label": "Kumar Rocker ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5499,
+          "fair_odds": 1.82,
+          "expected_hr_allowed": 0.598,
+          "projected_ip": 5.61,
+          "inputs": {
+            "hr9": 0.96,
+            "era": 3.95,
+            "whip": 1.34
+          },
+          "side": "home"
+        },
         {
           "market": "pitcher_strikeouts",
           "team": "Houston Astros",
@@ -3242,7 +3314,7 @@
       ]
     }
   ],
-  "props": 156,
+  "props": 160,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
