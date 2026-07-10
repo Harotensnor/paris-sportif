@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-07-10T17:06:59Z",
+  "generated_at": "2026-07-10T18:40:21Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 55,
-    "actionable": 36,
+    "active_events": 56,
+    "actionable": 35,
     "watch": 10,
-    "risk": 9,
+    "risk": 11,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 35,
+      "injury_imbalance": 34,
       "travel_extreme": 9,
       "signal_conflict": 4,
       "back_to_back_travel": 13,
-      "market_uncertain": 9
+      "market_uncertain": 11
     },
     "by_quality": {
-      "actionable": 36,
+      "actionable": 35,
       "watch": 10,
-      "risk": 9
+      "risk": 11
     }
   },
   "active_actionable": [
@@ -564,24 +564,6 @@
       "context": "Absences severes 9-5"
     },
     {
-      "event_id": "401857054",
-      "date": "2026-07-10T23:30Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Connecticut Sun",
-      "away": "Golden State Valkyries",
-      "match": "Connecticut Sun - Golden State Valkyries",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Connecticut Sun",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 5-1"
-    },
-    {
       "event_id": "401857055",
       "date": "2026-07-10T23:30Z",
       "sport": "basketball",
@@ -954,6 +936,42 @@
       "home": "Tijuana",
       "away": "Tigres UANL",
       "match": "Tijuana - Tigres UANL",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.9%"
+    },
+    {
+      "event_id": "401842759",
+      "date": "2026-07-17T17:00Z",
+      "sport": "football",
+      "league_code": "allsvenskan",
+      "league_name": "Allsvenskan",
+      "home": "IFK Göteborg",
+      "away": "IF Brommapojkarna",
+      "match": "IFK Göteborg - IF Brommapojkarna",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.5%"
+    },
+    {
+      "event_id": "401842757",
+      "date": "2026-07-17T17:00Z",
+      "sport": "football",
+      "league_code": "allsvenskan",
+      "league_name": "Allsvenskan",
+      "home": "Mjällby AIF",
+      "away": "Västerås SK",
+      "match": "Mjällby AIF - Västerås SK",
       "quality": "risk",
       "quality_reason": "Signal de prudence, pas une opportunite directe",
       "type": "market_uncertain",
