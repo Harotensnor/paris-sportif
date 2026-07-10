@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-10T15:06:29Z",
-  "calculated_at": "2026-07-10T15:06:29Z",
+  "generated_at": "2026-07-10T17:07:00Z",
+  "calculated_at": "2026-07-10T17:07:00Z",
   "source_of_truth": "data.js",
   "data_age_min": 1,
   "data_file_age_min": 0,
@@ -47,13 +47,13 @@
       "status": "retained_existing_referees"
     },
     "xg_team_stats": {
-      "age_min": 2,
+      "age_min": 3,
       "teams": 112,
       "leagues": 6,
       "source": "understat"
     },
     "fbref_xg": {
-      "age_min": 2,
+      "age_min": 3,
       "teams": 112,
       "leagues": 6,
       "source": "understat_compat"
@@ -197,9 +197,9 @@
     },
     "picks_history_summary": {
       "age_min": 3,
-      "total": 8690,
-      "settled": 8657,
-      "pending": 33,
+      "total": 8691,
+      "settled": 8660,
+      "pending": 31,
       "days": 80
     },
     "team_priors": {
@@ -313,7 +313,7 @@
       "age_min": 3,
       "insights": 7,
       "events_today": 4,
-      "events_next_36h": 46,
+      "events_next_36h": 47,
       "sources_loaded": 8
     },
     "detected_angles": {
@@ -359,17 +359,17 @@
     },
     "timing_edges": {
       "age_min": 0,
-      "events": 1,
-      "bet_now": 1,
+      "events": 0,
+      "bet_now": 0,
       "wait": 0,
       "price_shortening": 0
     },
     "injuries_multisport": {
-      "age_min": 2,
-      "teams": 131,
+      "age_min": 3,
+      "teams": 128,
       "sports": 4,
-      "injuries": 681,
-      "severe": 442
+      "injuries": 650,
+      "severe": 413
     },
     "thesportsdb_meta": {
       "age_min": 3,
@@ -394,8 +394,8 @@
     },
     "public_team_profiles": {
       "age_min": 0,
-      "teams": 986,
-      "upcoming": 96,
+      "teams": 984,
+      "upcoming": 94,
       "availability": 62,
       "deep_context": 0
     },
@@ -471,7 +471,7 @@
       "matches": 834,
       "observations": 1763,
       "mean_clv_pct": -0.04,
-      "positive_clv_rate": 42.8,
+      "positive_clv_rate": 42.9,
       "sample_status": "validated"
     }
   },
@@ -543,7 +543,7 @@
     "xg_team_stats": {
       "script": "scripts/fetch_understat_xg.py",
       "output": "xg_team_stats.json",
-      "age_min": 2,
+      "age_min": 3,
       "threshold_min": 360,
       "fast_red_min": null,
       "status": "ok"
@@ -551,7 +551,7 @@
     "fbref_xg": {
       "script": "scripts/fetch_understat_xg.py",
       "output": "fbref_xg.json",
-      "age_min": 2,
+      "age_min": 3,
       "threshold_min": 360,
       "fast_red_min": null,
       "status": "ok"
@@ -879,7 +879,7 @@
     "injuries_multisport": {
       "script": "scripts/fetch_injuries.py",
       "output": "injuries_multisport.json",
-      "age_min": 2,
+      "age_min": 3,
       "threshold_min": 60,
       "fast_red_min": null,
       "status": "ok"
@@ -1046,7 +1046,7 @@
   ],
   "overall": "warning",
   "quality_checks": {
-    "data_generated_at": "2026-07-10T15:04:47.798846Z",
+    "data_generated_at": "2026-07-10T17:05:22.886828Z",
     "truth_scope": "all_events",
     "all_winamax_available": 85,
     "all_winamax_exact": 82,
@@ -1117,7 +1117,7 @@
   "data_truth": {
     "source_of_truth": "data.js",
     "scope": "all_events",
-    "data_generated_at": "2026-07-10T15:04:47.798846Z",
+    "data_generated_at": "2026-07-10T17:05:22.886828Z",
     "winamax_available": 85,
     "winamax_exact": 82,
     "winamax_exact_ratio": 0.9647,
@@ -1137,7 +1137,7 @@
     "anomalies_emitted": 3
   },
   "source_health": {
-    "generated_at": "2026-07-10T15:06:29Z",
+    "generated_at": "2026-07-10T17:07:00Z",
     "sources_total": 11,
     "sources_ok": 6,
     "sources_warning": 5,
@@ -1237,7 +1237,7 @@
   },
   "observability": {
     "pipeline_traces": {
-      "generated_at": "2026-07-10T15:06:29Z",
+      "generated_at": "2026-07-10T17:07:00Z",
       "runs_observed": 99,
       "by_status": {
         "warning": 69,
@@ -1255,7 +1255,7 @@
     }
   },
   "data_lineage": {
-    "generated_at": "2026-07-10T15:06:29Z",
+    "generated_at": "2026-07-10T17:07:00Z",
     "status": "ok",
     "events": 85,
     "events_missing_inline_lineage": 0,
