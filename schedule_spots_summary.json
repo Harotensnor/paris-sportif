@@ -1,138 +1,28 @@
 {
-  "generated_at": "2026-07-10T01:13:59Z",
+  "generated_at": "2026-07-10T02:48:18Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 44,
+    "active_events": 42,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 64,
+      "lookahead": 60,
       "travel_extreme": 9,
       "back_to_back_travel": 15,
       "schedule_congestion": 24
     },
     "by_decision": {
-      "abstain": 16,
+      "abstain": 14,
       "lean_home": 22,
       "lean_away": 6
     },
     "lean_home": 22,
     "lean_away": 6,
-    "abstain": 16,
+    "abstain": 14,
     "monitor": 0
   },
   "active": [
-    {
-      "event_id": "401816094",
-      "source_event_ids": [
-        "401816094"
-      ],
-      "kickoff": "2026-07-10T01:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Diego Padres",
-      "away": "Arizona Diamondbacks",
-      "match": "San Diego Padres - Arizona Diamondbacks",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: San Diego Padres 0.36, Arizona Diamondbacks 0.36",
-      "pressure_score": 1.6,
-      "home_fade": 0.36,
-      "away_fade": 0.36,
-      "travel_score": 0,
-      "lookahead_score": 1.6,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "3 match important/proche dans les 3 jours",
-        "3 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -1.034,
-        "away_score": 0.046,
-        "home_fade": 1.16,
-        "away_fade": 0.36,
-        "reason": "Direction nette: Arizona Diamondbacks (+0.05)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.36
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.36
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.8
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401816095",
-      "source_event_ids": [
-        "401816095"
-      ],
-      "kickoff": "2026-07-10T01:45Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Francisco Giants",
-      "away": "Colorado Rockies",
-      "match": "San Francisco Giants - Colorado Rockies",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: San Francisco Giants 0.36, Colorado Rockies 0.36",
-      "pressure_score": 1.6,
-      "home_fade": 0.36,
-      "away_fade": 0.36,
-      "travel_score": 0,
-      "lookahead_score": 1.6,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "3 match important/proche dans les 3 jours",
-        "3 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.234,
-        "away_score": -0.234,
-        "home_fade": 0.36,
-        "away_fade": 0.36,
-        "reason": "Direction nette: Colorado Rockies (-0.23)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.36
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.36
-          }
-        ]
-      }
-    },
     {
       "event_id": "401816100",
       "source_event_ids": [
