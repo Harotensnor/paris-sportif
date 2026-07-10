@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-07-10T10:04:27Z",
+  "generated_at": "2026-07-10T12:20:14Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 58,
-    "actionable": 37,
-    "watch": 9,
-    "risk": 12,
+    "active_events": 55,
+    "actionable": 36,
+    "watch": 10,
+    "risk": 9,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 35,
       "travel_extreme": 9,
-      "back_to_back_travel": 15,
-      "signal_conflict": 7,
-      "market_uncertain": 12
+      "signal_conflict": 4,
+      "back_to_back_travel": 13,
+      "market_uncertain": 9
     },
     "by_quality": {
-      "actionable": 37,
-      "watch": 9,
-      "risk": 12
+      "actionable": 36,
+      "watch": 10,
+      "risk": 9
     }
   },
   "active_actionable": [
@@ -78,24 +78,6 @@
       "context": "Absences severes 8-3"
     },
     {
-      "event_id": "401816103",
-      "date": "2026-07-10T23:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Tampa Bay Rays",
-      "away": "Seattle Mariners",
-      "match": "Tampa Bay Rays - Seattle Mariners",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Seattle Mariners",
-      "side": "away",
-      "strength": 1.0,
-      "context": "1 match dans les 48h + 4065 km de voyage"
-    },
-    {
       "event_id": "401816105",
       "date": "2026-07-10T23:40Z",
       "sport": "baseball",
@@ -112,24 +94,6 @@
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 11-5"
-    },
-    {
-      "event_id": "401816104",
-      "date": "2026-07-11T00:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Minnesota Twins",
-      "away": "Los Angeles Angels",
-      "match": "Minnesota Twins - Los Angeles Angels",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Los Angeles Angels",
-      "side": "away",
-      "strength": 1.0,
-      "context": "1 match dans les 48h + 2438 km de voyage"
     },
     {
       "event_id": "401816106",
@@ -165,7 +129,7 @@
       "team": "Los Angeles Angels",
       "side": "away",
       "strength": 1.0,
-      "context": "2 match dans les 48h + 2438 km de voyage"
+      "context": "1 match dans les 48h + 2438 km de voyage"
     },
     {
       "event_id": "401816120",
@@ -219,7 +183,7 @@
       "team": "Seattle Mariners",
       "side": "away",
       "strength": 1.0,
-      "context": "2 match dans les 48h + 4065 km de voyage"
+      "context": "1 match dans les 48h + 4065 km de voyage"
     },
     {
       "event_id": "401816117",
@@ -436,6 +400,24 @@
       "side": "away",
       "strength": 1.0,
       "context": "2 match dans les 48h + 3483 km de voyage"
+    },
+    {
+      "event_id": "401816103",
+      "date": "2026-07-10T23:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Tampa Bay Rays",
+      "away": "Seattle Mariners",
+      "match": "Tampa Bay Rays - Seattle Mariners",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "travel_extreme",
+      "direction": "fade",
+      "team": "Seattle Mariners",
+      "side": "away",
+      "strength": 0.945,
+      "context": "Deplacement estime 4065 km, decalage ~2.6h"
     },
     {
       "event_id": "401816129",
@@ -852,63 +834,27 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 12-9"
+    },
+    {
+      "event_id": "401816104",
+      "date": "2026-07-11T00:10Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Minnesota Twins",
+      "away": "Los Angeles Angels",
+      "match": "Minnesota Twins - Los Angeles Angels",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "travel_extreme",
+      "direction": "fade",
+      "team": "Los Angeles Angels",
+      "side": "away",
+      "strength": 0.567,
+      "context": "Deplacement estime 2438 km, decalage ~1.6h"
     }
   ],
   "active_risk": [
-    {
-      "event_id": "401861418",
-      "date": "2026-07-11T11:00Z",
-      "sport": "football",
-      "league_code": "chn.1",
-      "league_name": "Chinese Super League",
-      "home": "Wuhan Three Towns",
-      "away": "Henan",
-      "match": "Wuhan Three Towns - Henan",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.1%"
-    },
-    {
-      "event_id": "401861421",
-      "date": "2026-07-11T11:35Z",
-      "sport": "football",
-      "league_code": "chn.1",
-      "league_name": "Chinese Super League",
-      "home": "Shenzhen Xinpengcheng",
-      "away": "Qingdao West Coast",
-      "match": "Shenzhen Xinpengcheng - Qingdao West Coast",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.5%"
-    },
-    {
-      "event_id": "401861291",
-      "date": "2026-07-12T11:00Z",
-      "sport": "football",
-      "league_code": "chn.1",
-      "league_name": "Chinese Super League",
-      "home": "Tianjin Jinmen Tiger",
-      "away": "Liaoning Tieren",
-      "match": "Tianjin Jinmen Tiger - Liaoning Tieren",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.3%"
-    },
     {
       "event_id": "401842748",
       "date": "2026-07-12T12:00Z",
@@ -997,7 +943,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.5%"
+      "context": "marge bookmaker anormale 19.0%"
     },
     {
       "event_id": "401877044",
@@ -1069,7 +1015,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.7%"
+      "context": "marge bookmaker anormale 18.6%"
     }
   ],
   "expired_sample": []
