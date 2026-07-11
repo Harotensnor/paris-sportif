@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-11T10:55:50Z",
+  "generated_at": "2026-07-11T11:41:13Z",
   "source": "data.js bookable feed + sofascore_events source feed",
   "status": "ok",
   "categories": {
@@ -221,9 +221,17 @@
     },
     "J7_asie_latam": {
       "label": "Asie / Amérique latine",
-      "bookable": 3,
+      "bookable": 5,
       "source": 66,
       "samples": [
+        {
+          "event_id": "401861420",
+          "source": "winamax_exact",
+          "kickoff": "2026-07-11T11:35Z",
+          "match": "Beijing Guoan at Shanghai Shenhua",
+          "league": "Chinese Super League",
+          "code": "chn.1"
+        },
         {
           "event_id": "401861421",
           "source": "winamax_exact",
@@ -245,6 +253,14 @@
           "source": "winamax_exact",
           "kickoff": "2026-07-14T11:35Z",
           "match": "Qingdao Hainiu at Zhejiang Professional FC",
+          "league": "Chinese Super League",
+          "code": "chn.1"
+        },
+        {
+          "event_id": "401861292",
+          "source": "winamax_exact",
+          "kickoff": "2026-07-17T11:35Z",
+          "match": "Liaoning Tieren at Beijing Guoan",
           "league": "Chinese Super League",
           "code": "chn.1"
         },
@@ -271,29 +287,13 @@
           "match": "Deportivo La Guaira vs Bolívar",
           "league": "CONMEBOL Libertadores, Group C",
           "code": "conmebol.libertadores"
-        },
-        {
-          "event_id": "sofa_15832805",
-          "source": "sofascore_watch",
-          "kickoff": "2026-05-07T00:30Z",
-          "match": "Independiente Rivadavia vs Fluminense",
-          "league": "CONMEBOL Libertadores, Group C",
-          "code": "conmebol.libertadores"
-        },
-        {
-          "event_id": "sofa_15832840",
-          "source": "sofascore_watch",
-          "kickoff": "2026-05-06T00:00Z",
-          "match": "Barcelona SC Guayaquil vs Boca Juniors",
-          "league": "CONMEBOL Libertadores, Group D",
-          "code": "conmebol.libertadores"
         }
       ],
       "status": "ok"
     }
   },
   "summary": {
-    "bookable_total": 3,
+    "bookable_total": 5,
     "source_total": 141,
     "ok_categories": 1
   }

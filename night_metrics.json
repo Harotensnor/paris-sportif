@@ -1,32 +1,32 @@
 {
-  "generated_at": "2026-07-11T10:55:51Z",
-  "calculated_at": "2026-07-11T10:55:51Z",
+  "generated_at": "2026-07-11T11:41:13Z",
+  "calculated_at": "2026-07-11T11:41:13Z",
   "source_of_truth": "data.js",
-  "data_generated_at": "2026-07-11T10:54:59.257497Z",
+  "data_generated_at": "2026-07-11T11:40:02.267352Z",
   "data_today_field": "2026-07-11",
   "events": {
-    "total": 66,
-    "upcoming": 65,
-    "winamax_available": 66,
-    "winamax_exact": 66,
-    "winamax_exact_ratio": 1.0,
+    "total": 83,
+    "upcoming": 68,
+    "winamax_available": 83,
+    "winamax_exact": 82,
+    "winamax_exact_ratio": 0.988,
     "markets_more_than_1n2": 0,
-    "form_l10": 35,
-    "h2h": 16,
-    "lineups": 31,
+    "form_l10": 52,
+    "h2h": 0,
+    "lineups": 36,
     "football_lineups": 0,
-    "starter_signals": 31,
+    "starter_signals": 36,
     "clubelo": 3,
-    "weather": 18,
-    "injuries": 35,
+    "weather": 19,
+    "injuries": 50,
     "referee": 0,
     "referee_named": 0,
     "referee_context": 0,
     "referee_signal": 0,
     "fd_calibration": 0,
     "fd_closing_odds": 0,
-    "xg": 4,
-    "smart_money": 0
+    "xg": 6,
+    "smart_money": 2
   },
   "signal_health": {
     "referee": {
@@ -36,20 +36,20 @@
       "note": "referee is effective coverage: named referee or referee_context usable by the model."
     },
     "smart_money": {
-      "events": 0,
+      "events": 2,
       "status": "rare_event",
       "note": "Smart money is intentionally rare; low count is OK when odds movement does not confirm a strong signal."
     }
   },
   "winamax_markets": {
-    "matches": 441,
+    "matches": 440,
     "detailed_market_matches": 20,
-    "detailed_ratio_vs_exact": 0.303,
-    "gap_to_50pct_exact": 0.197,
-    "recommended_detail_fetch_cap": 150,
+    "detailed_ratio_vs_exact": 0.2439,
+    "gap_to_50pct_exact": 0.2561,
+    "recommended_detail_fetch_cap": 220,
     "detail_by_sport": {
       "baseball": {
-        "exact": 33,
+        "exact": 34,
         "detailed": 0,
         "families": {},
         "detailed_ratio": 0.0
@@ -61,7 +61,7 @@
         "detailed_ratio": 0.0
       },
       "football": {
-        "exact": 27,
+        "exact": 29,
         "detailed": 0,
         "families": {},
         "detailed_ratio": 0.0
@@ -88,7 +88,7 @@
   },
   "health": {
     "status": "warning",
-    "warnings": 11,
+    "warnings": 10,
     "pipeline_drift": "warn"
   }
 }
