@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-07-11T18:05:31Z",
+  "generated_at": "2026-07-11T19:19:39Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 22,
+    "active_events": 20,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 30,
-      "travel_extreme": 6,
-      "back_to_back_travel": 12,
+      "lookahead": 26,
+      "back_to_back_travel": 11,
+      "travel_extreme": 5,
       "schedule_congestion": 4
     },
     "by_decision": {
-      "abstain": 10,
-      "lean_home": 12
+      "abstain": 9,
+      "lean_home": 11
     },
-    "lean_home": 12,
+    "lean_home": 11,
     "lean_away": 0,
-    "abstain": 10,
+    "abstain": 9,
     "monitor": 0
   },
   "active": [
@@ -76,64 +76,6 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401816120",
-      "source_event_ids": [
-        "401816120"
-      ],
-      "kickoff": "2026-07-11T18:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Chicago White Sox",
-      "away": "Athletics",
-      "match": "Chicago White Sox - Athletics",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Chicago White Sox 0.15, Athletics 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.698,
-        "away_score": 0.112,
-        "home_fade": 0.75,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Athletics (+0.11)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.6
           }
         ]
       }
@@ -734,74 +676,6 @@
             "type": "travel_extreme",
             "direction": "fade",
             "strength": 0.81
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401816119",
-      "source_event_ids": [
-        "401816119"
-      ],
-      "kickoff": "2026-07-11T18:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Minnesota Twins",
-      "away": "Los Angeles Angels",
-      "match": "Minnesota Twins - Los Angeles Angels",
-      "decision": "lean_home",
-      "net_team": "Minnesota Twins",
-      "reason": "Los Angeles Angels plus penalise par calendrier/voyage (1.72 vs 0.15)",
-      "pressure_score": 2.234,
-      "home_fade": 0.15,
-      "away_fade": 1.717,
-      "travel_score": 1.567,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2,
-        "travel_extreme": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours",
-        "Deplacement estime 2438 km, decalage ~1.6h",
-        "1 match dans les 48h + 2438 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.451,
-        "away_score": -1.665,
-        "home_fade": 0.15,
-        "away_fade": 1.717,
-        "reason": "Direction nette: Minnesota Twins (+0.45)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.567
           },
           {
             "side": "away",
