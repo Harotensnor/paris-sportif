@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-07-11T15:08:35Z",
+  "generated_at": "2026-07-11T16:07:39Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 49,
+    "active_events": 50,
     "actionable": 25,
     "watch": 6,
-    "risk": 18,
+    "risk": 19,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 23,
       "travel_extreme": 6,
       "back_to_back_travel": 12,
       "signal_conflict": 2,
-      "market_uncertain": 18
+      "market_uncertain": 20
     },
     "by_quality": {
       "actionable": 25,
       "watch": 6,
-      "risk": 18
+      "risk": 19
     }
   },
   "active_actionable": [
@@ -620,6 +620,24 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.5%"
+    },
+    {
+      "event_id": "178743",
+      "date": "2026-07-13T04:00Z",
+      "sport": "tennis",
+      "league_code": "efgswissopengstaad",
+      "league_name": "EFG Swiss Open Gstaad",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 12.1%"
     },
     {
       "event_id": "401877045",
