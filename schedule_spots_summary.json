@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-11T21:05:10Z",
+  "generated_at": "2026-07-11T21:57:57Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -405,11 +405,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": -0.064,
-        "away_score": -1.697,
-        "home_fade": 0.75,
+        "home_score": 0.136,
+        "away_score": -1.767,
+        "home_fade": 0.55,
         "away_fade": 1.96,
-        "reason": "Direction nette: San Diego Padres (-0.06)",
+        "reason": "Direction nette: San Diego Padres (+0.14)",
         "detail": [
           {
             "side": "home",
@@ -427,7 +427,7 @@
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.6
+            "strength": 0.4
           },
           {
             "side": "away",
@@ -589,17 +589,17 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.033,
-        "away_score": -1.6,
-        "home_fade": 0.6,
+        "home_score": 0.233,
+        "away_score": -1.67,
+        "home_fade": 0.4,
         "away_fade": 1.81,
-        "reason": "Direction nette: San Diego Padres (+0.03)",
+        "reason": "Direction nette: San Diego Padres (+0.23)",
         "detail": [
           {
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.6
+            "strength": 0.4
           },
           {
             "side": "away",
@@ -702,11 +702,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.196,
-        "away_score": -0.935,
+        "home_score": 0.336,
+        "away_score": -1.335,
         "home_fade": 0.15,
-        "away_fade": 0.987,
-        "reason": "Direction nette: Baltimore Orioles (+0.20)",
+        "away_fade": 1.387,
+        "reason": "Direction nette: Baltimore Orioles (+0.34)",
         "detail": [
           {
             "side": "home",
@@ -719,6 +719,12 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.4
           },
           {
             "side": "away",
@@ -810,12 +816,18 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.321,
-        "away_score": -0.917,
+        "home_score": 0.461,
+        "away_score": -1.317,
         "home_fade": 0.0,
-        "away_fade": 0.917,
-        "reason": "Direction nette: Baltimore Orioles (+0.32)",
+        "away_fade": 1.317,
+        "reason": "Direction nette: Baltimore Orioles (+0.46)",
         "detail": [
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.4
+          },
           {
             "side": "away",
             "type": "back_to_back_travel",
