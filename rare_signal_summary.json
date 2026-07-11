@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-07-11T02:28:01Z",
+  "generated_at": "2026-07-11T05:27:50Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 47,
+    "active_events": 48,
     "actionable": 25,
-    "watch": 6,
+    "watch": 7,
     "risk": 16,
     "expired_sample": 0,
     "by_type": {
@@ -14,11 +14,12 @@
       "travel_extreme": 6,
       "back_to_back_travel": 12,
       "signal_conflict": 2,
+      "weather_extreme": 1,
       "market_uncertain": 16
     },
     "by_quality": {
       "actionable": 25,
-      "watch": 6,
+      "watch": 7,
       "risk": 16
     }
   },
@@ -582,6 +583,24 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 12-9"
+    },
+    {
+      "event_id": "401842749",
+      "date": "2026-07-12T12:00Z",
+      "sport": "football",
+      "league_code": "allsvenskan",
+      "league_name": "Allsvenskan",
+      "home": "Hammarby IF",
+      "away": "Kalmar FF",
+      "match": "Hammarby IF - Kalmar FF",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "weather_extreme",
+      "direction": "under_goals",
+      "team": null,
+      "side": null,
+      "strength": 0.515,
+      "context": "Meteo dure: vent 17 km/h, pluie 10.3 mm"
     }
   ],
   "active_risk": [
