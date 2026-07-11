@@ -1,46 +1,28 @@
 {
-  "generated_at": "2026-07-11T00:10:29Z",
+  "generated_at": "2026-07-11T02:28:01Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 51,
-    "actionable": 28,
-    "watch": 8,
-    "risk": 15,
+    "active_events": 47,
+    "actionable": 25,
+    "watch": 6,
+    "risk": 16,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 26,
-      "travel_extreme": 8,
-      "signal_conflict": 3,
-      "back_to_back_travel": 13,
-      "market_uncertain": 15
+      "injury_imbalance": 24,
+      "travel_extreme": 6,
+      "back_to_back_travel": 12,
+      "signal_conflict": 2,
+      "market_uncertain": 16
     },
     "by_quality": {
-      "actionable": 28,
-      "watch": 8,
-      "risk": 15
+      "actionable": 25,
+      "watch": 6,
+      "risk": 16
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401816106",
-      "date": "2026-07-11T00:15Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "St. Louis Cardinals",
-      "away": "Atlanta Braves",
-      "match": "St. Louis Cardinals - Atlanta Braves",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Atlanta Braves",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 2-10"
-    },
     {
       "event_id": "401816119",
       "date": "2026-07-11T18:10Z",
@@ -366,58 +348,22 @@
       "context": "1 match dans les 48h + 1537 km de voyage"
     },
     {
-      "event_id": "401816109",
-      "date": "2026-07-11T02:15Z",
+      "event_id": "401889917",
+      "date": "2026-07-11T16:05Z",
       "sport": "baseball",
       "league_code": "mlb",
       "league_name": "MLB",
-      "home": "San Francisco Giants",
-      "away": "Colorado Rockies",
-      "match": "San Francisco Giants - Colorado Rockies",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Colorado Rockies",
-      "side": "away",
-      "strength": 0.834,
-      "context": "1 match dans les 48h + 1522 km de voyage"
-    },
-    {
-      "event_id": "401816110",
-      "date": "2026-07-11T01:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Diego Padres",
-      "away": "Toronto Blue Jays",
-      "match": "San Diego Padres - Toronto Blue Jays",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "travel_extreme",
-      "direction": "fade",
-      "team": "Toronto Blue Jays",
-      "side": "away",
-      "strength": 0.81,
-      "context": "Deplacement estime 3483 km, decalage ~2.5h"
-    },
-    {
-      "event_id": "401816107",
-      "date": "2026-07-11T00:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Texas Rangers",
-      "away": "Houston Astros",
-      "match": "Texas Rangers - Houston Astros",
+      "home": "Pittsburgh Pirates",
+      "away": "Milwaukee Brewers",
+      "match": "Pittsburgh Pirates - Milwaukee Brewers",
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
       "type": "injury_imbalance",
       "direction": "fade",
-      "team": "Texas Rangers",
+      "team": "Milwaukee Brewers",
       "side": null,
       "strength": 0.8,
-      "context": "Absences severes 11-7"
+      "context": "Absences severes 7-11"
     },
     {
       "event_id": "401816115",
@@ -530,24 +476,6 @@
   ],
   "active_watch": [
     {
-      "event_id": "401816108",
-      "date": "2026-07-11T02:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Los Angeles Dodgers",
-      "away": "Arizona Diamondbacks",
-      "match": "Los Angeles Dodgers - Arizona Diamondbacks",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Los Angeles Dodgers",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 12-9"
-    },
-    {
       "event_id": "401816120",
       "date": "2026-07-11T18:10Z",
       "sport": "baseball",
@@ -654,24 +582,6 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 12-9"
-    },
-    {
-      "event_id": "401816104",
-      "date": "2026-07-11T00:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Minnesota Twins",
-      "away": "Los Angeles Angels",
-      "match": "Minnesota Twins - Los Angeles Angels",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "travel_extreme",
-      "direction": "fade",
-      "team": "Los Angeles Angels",
-      "side": "away",
-      "strength": 0.567,
-      "context": "Deplacement estime 2438 km, decalage ~1.6h"
     }
   ],
   "active_risk": [
@@ -820,6 +730,24 @@
       "context": "marge bookmaker anormale 18.9%"
     },
     {
+      "event_id": "401857075",
+      "date": "2026-07-17T23:30Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Chicago Sky",
+      "away": "Los Angeles Sparks",
+      "match": "Chicago Sky - Los Angeles Sparks",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 13.3%"
+    },
+    {
       "event_id": "401877043",
       "date": "2026-07-18T01:00Z",
       "sport": "football",
@@ -835,7 +763,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 18.7%"
+      "context": "marge bookmaker anormale 18.5%"
     },
     {
       "event_id": "401877042",
