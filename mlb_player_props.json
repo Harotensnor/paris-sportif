@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-07-11T16:07:39Z",
+  "generated_at": "2026-07-11T17:11:12Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401889917",
-      "kickoff": "2026-07-11T16:05Z",
-      "league": "MLB",
-      "match": "Milwaukee Brewers at Pittsburgh Pirates",
-      "home": "Pittsburgh Pirates",
-      "away": "Milwaukee Brewers",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Pittsburgh Pirates",
-          "pitcher": "Bubba Chandler",
-          "label": "Bubba Chandler plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.5293,
-          "fair_odds": 1.89,
-          "expected_strikeouts": 4.62,
-          "projected_ip": 5.25,
-          "inputs": {
-            "k9": 7.93,
-            "era": 4.82,
-            "whip": 1.44,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Pittsburgh Pirates",
-          "pitcher": "Bubba Chandler",
-          "label": "Bubba Chandler ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5582,
-          "fair_odds": 1.79,
-          "expected_hr_allowed": 0.583,
-          "projected_ip": 5.25,
-          "inputs": {
-            "hr9": 1.0,
-            "era": 4.82,
-            "whip": 1.44
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Milwaukee Brewers",
-          "pitcher": "Shane Drohan",
-          "label": "Shane Drohan moins de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "under",
-          "probability": 0.5363,
-          "fair_odds": 1.86,
-          "expected_strikeouts": 6.32,
-          "projected_ip": 6.6,
-          "inputs": {
-            "k9": 8.62,
-            "era": 2.97,
-            "whip": 1.24,
-            "hand": "L"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Milwaukee Brewers",
-          "pitcher": "Shane Drohan",
-          "label": "Shane Drohan ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5941,
-          "fair_odds": 1.68,
-          "expected_hr_allowed": 0.521,
-          "projected_ip": 6.6,
-          "inputs": {
-            "hr9": 0.71,
-            "era": 2.97,
-            "whip": 1.24
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401816119",
       "kickoff": "2026-07-11T18:10Z",
@@ -2320,7 +2238,7 @@
       ]
     }
   ],
-  "props": 112,
+  "props": 108,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
