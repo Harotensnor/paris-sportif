@@ -1,16 +1,16 @@
 {
-  "generated_at": "2026-07-11T10:34:28Z",
+  "generated_at": "2026-07-11T10:55:51Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 51,
+    "active_events": 52,
     "actionable": 27,
-    "watch": 10,
+    "watch": 11,
     "risk": 14,
     "expired_sample": 0,
     "by_type": {
-      "market_move": 12,
+      "market_move": 15,
       "signal_conflict": 3,
       "injury_imbalance": 23,
       "travel_extreme": 6,
@@ -18,7 +18,7 @@
       "market_uncertain": 14
     },
     "by_quality": {
-      "watch": 10,
+      "watch": 11,
       "actionable": 27,
       "risk": 14
     }
@@ -221,6 +221,24 @@
       "side": "away",
       "strength": 1.0,
       "context": "1 match dans les 48h + 3483 km de voyage"
+    },
+    {
+      "event_id": "401861290",
+      "date": "2026-07-11T12:00Z",
+      "sport": "football",
+      "league_code": "chn.1",
+      "league_name": "Chinese Super League",
+      "home": "Chengdu Rongcheng",
+      "away": "Chongqing Tonglianglong",
+      "match": "Chengdu Rongcheng - Chongqing Tonglianglong",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.98,
+      "context": "Cote away: 8.50 -> 7.00 (+17.6%)"
     },
     {
       "event_id": "401816118",
@@ -457,24 +475,6 @@
       "context": "Cote home: 5.25 -> 4.50 (+14.3%)"
     },
     {
-      "event_id": "401861290",
-      "date": "2026-07-11T12:00Z",
-      "sport": "football",
-      "league_code": "chn.1",
-      "league_name": "Chinese Super League",
-      "home": "Chengdu Rongcheng",
-      "away": "Chongqing Tonglianglong",
-      "match": "Chengdu Rongcheng - Chongqing Tonglianglong",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.694,
-      "context": "Cote away: 8.00 -> 7.00 (+12.5%)"
-    },
-    {
       "event_id": "401873909",
       "date": "2026-07-11T16:00Z",
       "sport": "football",
@@ -512,6 +512,24 @@
     }
   ],
   "active_watch": [
+    {
+      "event_id": "401861421",
+      "date": "2026-07-11T11:35Z",
+      "sport": "football",
+      "league_code": "chn.1",
+      "league_name": "Chinese Super League",
+      "home": "Shenzhen Xinpengcheng",
+      "away": "Qingdao West Coast",
+      "match": "Shenzhen Xinpengcheng - Qingdao West Coast",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.617,
+      "context": "Cote away: 3.15 -> 2.80 (+11.1%)"
+    },
     {
       "event_id": "401816120",
       "date": "2026-07-11T18:10Z",
