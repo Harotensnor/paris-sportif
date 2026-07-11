@@ -1,336 +1,8 @@
 {
-  "generated_at": "2026-07-11T22:39:49Z",
+  "generated_at": "2026-07-11T23:35:52Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401816114",
-      "kickoff": "2026-07-11T23:05Z",
-      "league": "MLB",
-      "match": "Kansas City Royals at Baltimore Orioles",
-      "home": "Baltimore Orioles",
-      "away": "Kansas City Royals",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Baltimore Orioles",
-          "pitcher": "Kyle Bradish",
-          "label": "Kyle Bradish plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.5184,
-          "fair_odds": 1.93,
-          "expected_strikeouts": 5.59,
-          "projected_ip": 5.57,
-          "inputs": {
-            "k9": 9.03,
-            "era": 3.75,
-            "whip": 1.4,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Baltimore Orioles",
-          "pitcher": "Kyle Bradish",
-          "label": "Kyle Bradish ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5159,
-          "fair_odds": 1.94,
-          "expected_hr_allowed": 0.662,
-          "projected_ip": 5.57,
-          "inputs": {
-            "hr9": 1.07,
-            "era": 3.75,
-            "whip": 1.4
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Kansas City Royals",
-          "pitcher": "Noah Cameron",
-          "label": "Noah Cameron plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.5688,
-          "fair_odds": 1.76,
-          "expected_strikeouts": 4.8,
-          "projected_ip": 5.19,
-          "inputs": {
-            "k9": 8.32,
-            "era": 4.77,
-            "whip": 1.45,
-            "hand": "L"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Kansas City Royals",
-          "pitcher": "Noah Cameron",
-          "label": "Noah Cameron ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5554,
-          "fair_odds": 1.8,
-          "expected_hr_allowed": 0.588,
-          "projected_ip": 5.19,
-          "inputs": {
-            "hr9": 1.02,
-            "era": 4.77,
-            "whip": 1.45
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401816122",
-      "kickoff": "2026-07-11T23:05Z",
-      "league": "MLB",
-      "match": "Houston Astros at Texas Rangers",
-      "home": "Texas Rangers",
-      "away": "Houston Astros",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Texas Rangers",
-          "pitcher": "Kumar Rocker",
-          "label": "Kumar Rocker plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.5962,
-          "fair_odds": 1.68,
-          "expected_strikeouts": 4.92,
-          "projected_ip": 5.61,
-          "inputs": {
-            "k9": 7.9,
-            "era": 3.95,
-            "whip": 1.34,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Texas Rangers",
-          "pitcher": "Kumar Rocker",
-          "label": "Kumar Rocker ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5499,
-          "fair_odds": 1.82,
-          "expected_hr_allowed": 0.598,
-          "projected_ip": 5.61,
-          "inputs": {
-            "hr9": 0.96,
-            "era": 3.95,
-            "whip": 1.34
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Houston Astros",
-          "pitcher": "Peter Lambert",
-          "label": "Peter Lambert moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.5468,
-          "fair_odds": 1.83,
-          "expected_strikeouts": 5.29,
-          "projected_ip": 5.71,
-          "inputs": {
-            "k9": 8.33,
-            "era": 3.26,
-            "whip": 1.15,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Houston Astros",
-          "pitcher": "Peter Lambert",
-          "label": "Peter Lambert concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.512,
-          "fair_odds": 1.95,
-          "expected_hr_allowed": 0.717,
-          "projected_ip": 5.71,
-          "inputs": {
-            "hr9": 1.13,
-            "era": 3.26,
-            "whip": 1.15
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401816112",
-      "kickoff": "2026-07-11T23:10Z",
-      "league": "MLB",
-      "match": "Chicago Cubs at Cincinnati Reds",
-      "home": "Cincinnati Reds",
-      "away": "Chicago Cubs",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Cincinnati Reds",
-          "pitcher": "Nick Lodolo",
-          "label": "Nick Lodolo moins de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "under",
-          "probability": 0.5876,
-          "fair_odds": 1.7,
-          "expected_strikeouts": 4.15,
-          "projected_ip": 5.2,
-          "inputs": {
-            "k9": 7.18,
-            "era": 4.68,
-            "whip": 1.46,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Cincinnati Reds",
-          "pitcher": "Nick Lodolo",
-          "label": "Nick Lodolo concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5143,
-          "fair_odds": 1.94,
-          "expected_hr_allowed": 0.722,
-          "projected_ip": 5.2,
-          "inputs": {
-            "hr9": 1.25,
-            "era": 4.68,
-            "whip": 1.46
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Chicago Cubs",
-          "pitcher": "Javier Assad",
-          "label": "Javier Assad plus de 3,5 strikeouts",
-          "line": 3.5,
-          "pick": "over",
-          "probability": 0.594,
-          "fair_odds": 1.68,
-          "expected_strikeouts": 3.86,
-          "projected_ip": 6.6,
-          "inputs": {
-            "k9": 5.27,
-            "era": 4.15,
-            "whip": 1.1,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Chicago Cubs",
-          "pitcher": "Javier Assad",
-          "label": "Javier Assad concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6907,
-          "fair_odds": 1.45,
-          "expected_hr_allowed": 1.173,
-          "projected_ip": 6.6,
-          "inputs": {
-            "hr9": 1.6,
-            "era": 4.15,
-            "whip": 1.1
-          },
-          "side": "away"
-        }
-      ]
-    },
-    {
-      "event_id": "401816121",
-      "kickoff": "2026-07-11T23:15Z",
-      "league": "MLB",
-      "match": "Atlanta Braves at St. Louis Cardinals",
-      "home": "St. Louis Cardinals",
-      "away": "Atlanta Braves",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "St. Louis Cardinals",
-          "pitcher": "Matthew Liberatore",
-          "label": "Matthew Liberatore plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.5077,
-          "fair_odds": 1.97,
-          "expected_strikeouts": 4.53,
-          "projected_ip": 4.84,
-          "inputs": {
-            "k9": 8.42,
-            "era": 5.34,
-            "whip": 1.53,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "St. Louis Cardinals",
-          "pitcher": "Matthew Liberatore",
-          "label": "Matthew Liberatore concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6101,
-          "fair_odds": 1.64,
-          "expected_hr_allowed": 0.942,
-          "projected_ip": 4.84,
-          "inputs": {
-            "hr9": 1.75,
-            "era": 5.34,
-            "whip": 1.53
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Atlanta Braves",
-          "pitcher": "Reynaldo López",
-          "label": "Reynaldo López plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.5915,
-          "fair_odds": 1.69,
-          "expected_strikeouts": 5.94,
-          "projected_ip": 6.6,
-          "inputs": {
-            "k9": 8.1,
-            "era": 3.18,
-            "whip": 1.27,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Atlanta Braves",
-          "pitcher": "Reynaldo López",
-          "label": "Reynaldo López concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5569,
-          "fair_odds": 1.8,
-          "expected_hr_allowed": 0.814,
-          "projected_ip": 6.6,
-          "inputs": {
-            "hr9": 1.11,
-            "era": 3.18,
-            "whip": 1.27
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401816125",
       "kickoff": "2026-07-12T00:40Z",
@@ -841,6 +513,42 @@
       "home": "Miami Marlins",
       "away": "Cleveland Guardians",
       "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Miami Marlins",
+          "pitcher": "Tyler Phillips",
+          "label": "Tyler Phillips plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.5929,
+          "fair_odds": 1.69,
+          "expected_strikeouts": 4.91,
+          "projected_ip": 6.6,
+          "inputs": {
+            "k9": 6.69,
+            "era": 3.28,
+            "whip": 1.36,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Miami Marlins",
+          "pitcher": "Tyler Phillips",
+          "label": "Tyler Phillips concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.509,
+          "fair_odds": 1.96,
+          "expected_hr_allowed": 0.711,
+          "projected_ip": 6.6,
+          "inputs": {
+            "hr9": 0.97,
+            "era": 3.28,
+            "whip": 1.36
+          },
+          "side": "home"
+        },
         {
           "market": "pitcher_strikeouts",
           "team": "Cleveland Guardians",
@@ -1536,7 +1244,7 @@
       ]
     }
   ],
-  "props": 74,
+  "props": 60,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
