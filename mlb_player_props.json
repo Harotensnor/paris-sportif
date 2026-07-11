@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-11T09:09:05Z",
+  "generated_at": "2026-07-11T10:34:27Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
@@ -128,6 +128,42 @@
             "whip": 1.04
           },
           "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Los Angeles Angels",
+          "pitcher": "Ryan Johnson",
+          "label": "Ryan Johnson plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.5603,
+          "fair_odds": 1.78,
+          "expected_strikeouts": 4.76,
+          "projected_ip": 5.62,
+          "inputs": {
+            "k9": 7.62,
+            "era": 6.99,
+            "whip": 1.55,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Los Angeles Angels",
+          "pitcher": "Ryan Johnson",
+          "label": "Ryan Johnson concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.7953,
+          "fair_odds": 1.26,
+          "expected_hr_allowed": 1.586,
+          "projected_ip": 5.62,
+          "inputs": {
+            "hr9": 2.54,
+            "era": 6.99,
+            "whip": 1.55
+          },
+          "side": "away"
         }
       ]
     },
@@ -142,36 +178,36 @@
         {
           "market": "pitcher_strikeouts",
           "team": "Chicago White Sox",
-          "pitcher": "Erick Fedde",
-          "label": "Erick Fedde moins de 4,5 strikeouts",
-          "line": 4.5,
+          "pitcher": "Bryan Hudson",
+          "label": "Bryan Hudson moins de 6,5 strikeouts",
+          "line": 6.5,
           "pick": "under",
-          "probability": 0.5172,
-          "fair_odds": 1.93,
-          "expected_strikeouts": 4.43,
+          "probability": 0.5124,
+          "fair_odds": 1.95,
+          "expected_strikeouts": 6.44,
           "projected_ip": 6.6,
           "inputs": {
-            "k9": 6.04,
-            "era": 4.34,
-            "whip": 1.45,
-            "hand": "R"
+            "k9": 8.78,
+            "era": 2.25,
+            "whip": 1.3,
+            "hand": "L"
           },
           "side": "home"
         },
         {
           "market": "pitcher_home_run_allowed",
           "team": "Chicago White Sox",
-          "pitcher": "Erick Fedde",
-          "label": "Erick Fedde concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6884,
-          "fair_odds": 1.45,
-          "expected_hr_allowed": 1.166,
+          "pitcher": "Bryan Hudson",
+          "label": "Bryan Hudson ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.8448,
+          "fair_odds": 1.18,
+          "expected_hr_allowed": 0.169,
           "projected_ip": 6.6,
           "inputs": {
-            "hr9": 1.59,
-            "era": 4.34,
-            "whip": 1.45
+            "hr9": 0.23,
+            "era": 2.25,
+            "whip": 1.3
           },
           "side": "home"
         },
@@ -1834,6 +1870,42 @@
             "whip": 1.22
           },
           "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
+          "team": "Los Angeles Angels",
+          "pitcher": "José Soriano",
+          "label": "José Soriano moins de 6,5 strikeouts",
+          "line": 6.5,
+          "pick": "under",
+          "probability": 0.5927,
+          "fair_odds": 1.69,
+          "expected_strikeouts": 6.05,
+          "projected_ip": 5.58,
+          "inputs": {
+            "k9": 9.76,
+            "era": 3.4,
+            "whip": 1.28,
+            "hand": "R"
+          },
+          "side": "away"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Los Angeles Angels",
+          "pitcher": "José Soriano",
+          "label": "José Soriano ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.5314,
+          "fair_odds": 1.88,
+          "expected_hr_allowed": 0.632,
+          "projected_ip": 5.58,
+          "inputs": {
+            "hr9": 1.02,
+            "era": 3.4,
+            "whip": 1.28
+          },
+          "side": "away"
         }
       ]
     },
@@ -2248,7 +2320,7 @@
       ]
     }
   ],
-  "props": 108,
+  "props": 112,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
