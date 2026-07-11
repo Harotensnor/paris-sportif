@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-07-11T21:57:57Z",
+  "generated_at": "2026-07-11T22:39:49Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401816117",
-      "kickoff": "2026-07-11T22:10Z",
-      "league": "MLB",
-      "match": "Philadelphia Phillies at Detroit Tigers",
-      "home": "Detroit Tigers",
-      "away": "Philadelphia Phillies",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Detroit Tigers",
-          "pitcher": "Casey Mize",
-          "label": "Casey Mize plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.5003,
-          "fair_odds": 2.0,
-          "expected_strikeouts": 5.5,
-          "projected_ip": 5.48,
-          "inputs": {
-            "k9": 9.04,
-            "era": 2.64,
-            "whip": 0.98,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Detroit Tigers",
-          "pitcher": "Casey Mize",
-          "label": "Casey Mize ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6816,
-          "fair_odds": 1.47,
-          "expected_hr_allowed": 0.383,
-          "projected_ip": 5.48,
-          "inputs": {
-            "hr9": 0.63,
-            "era": 2.64,
-            "whip": 0.98
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Philadelphia Phillies",
-          "pitcher": "Cristopher Sánchez",
-          "label": "Cristopher Sánchez moins de 7,5 strikeouts",
-          "line": 7.5,
-          "pick": "under",
-          "probability": 0.5572,
-          "fair_odds": 1.79,
-          "expected_strikeouts": 7.2,
-          "projected_ip": 6.32,
-          "inputs": {
-            "k9": 10.25,
-            "era": 2.62,
-            "whip": 1.16,
-            "hand": "L"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Philadelphia Phillies",
-          "pitcher": "Cristopher Sánchez",
-          "label": "Cristopher Sánchez ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5622,
-          "fair_odds": 1.78,
-          "expected_hr_allowed": 0.576,
-          "projected_ip": 6.32,
-          "inputs": {
-            "hr9": 0.82,
-            "era": 2.62,
-            "whip": 1.16
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401816114",
       "kickoff": "2026-07-11T23:05Z",
@@ -1618,7 +1536,7 @@
       ]
     }
   ],
-  "props": 78,
+  "props": 74,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"

@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-07-11T21:57:57Z",
+  "generated_at": "2026-07-11T22:39:50Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 14,
+    "active_events": 13,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 14,
+      "lookahead": 12,
       "back_to_back_travel": 8,
       "travel_extreme": 4,
       "schedule_congestion": 4
     },
     "by_decision": {
-      "abstain": 6,
+      "abstain": 5,
       "lean_home": 8
     },
     "lean_home": 8,
     "lean_away": 0,
-    "abstain": 6,
+    "abstain": 5,
     "monitor": 0
   },
   "active": [
@@ -73,64 +73,6 @@
           },
           {
             "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401816117",
-      "source_event_ids": [
-        "401816117"
-      ],
-      "kickoff": "2026-07-11T22:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Detroit Tigers",
-      "away": "Philadelphia Phillies",
-      "match": "Detroit Tigers - Philadelphia Phillies",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Detroit Tigers 0.15, Philadelphia Phillies 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -1.097,
-        "away_score": 0.252,
-        "home_fade": 1.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Philadelphia Phillies (+0.25)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 1.0
@@ -343,11 +285,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.698,
-        "away_score": 0.112,
-        "home_fade": 0.75,
+        "home_score": -0.498,
+        "away_score": 0.043,
+        "home_fade": 0.55,
         "away_fade": 0.15,
-        "reason": "Direction nette: Arizona Diamondbacks (+0.11)",
+        "reason": "Direction nette: Arizona Diamondbacks (+0.04)",
         "detail": [
           {
             "side": "home",
@@ -365,7 +307,7 @@
             "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.6
+            "strength": 0.4
           }
         ]
       }
