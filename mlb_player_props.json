@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-07-12T15:42:49Z",
+  "generated_at": "2026-07-12T16:34:38Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401816130",
-      "kickoff": "2026-07-12T16:15Z",
-      "league": "MLB",
-      "match": "Milwaukee Brewers at Pittsburgh Pirates",
-      "home": "Pittsburgh Pirates",
-      "away": "Milwaukee Brewers",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Pittsburgh Pirates",
-          "pitcher": "Paul Skenes",
-          "label": "Paul Skenes moins de 6,5 strikeouts",
-          "line": 6.5,
-          "pick": "under",
-          "probability": 0.505,
-          "fair_odds": 1.98,
-          "expected_strikeouts": 6.48,
-          "projected_ip": 5.42,
-          "inputs": {
-            "k9": 10.75,
-            "era": 3.58,
-            "whip": 1.04,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Pittsburgh Pirates",
-          "pitcher": "Paul Skenes",
-          "label": "Paul Skenes ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5609,
-          "fair_odds": 1.78,
-          "expected_hr_allowed": 0.578,
-          "projected_ip": 5.42,
-          "inputs": {
-            "hr9": 0.96,
-            "era": 3.58,
-            "whip": 1.04
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Milwaukee Brewers",
-          "pitcher": "Robert Gasser",
-          "label": "Robert Gasser plus de 4,5 strikeouts",
-          "line": 4.5,
-          "pick": "over",
-          "probability": 0.6075,
-          "fair_odds": 1.65,
-          "expected_strikeouts": 4.97,
-          "projected_ip": 5.39,
-          "inputs": {
-            "k9": 8.31,
-            "era": 4.15,
-            "whip": 1.18,
-            "hand": "L"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Milwaukee Brewers",
-          "pitcher": "Robert Gasser",
-          "label": "Robert Gasser concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6298,
-          "fair_odds": 1.59,
-          "expected_hr_allowed": 0.994,
-          "projected_ip": 5.39,
-          "inputs": {
-            "hr9": 1.66,
-            "era": 4.15,
-            "whip": 1.18
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401816129",
       "kickoff": "2026-07-12T17:35Z",
@@ -870,36 +788,36 @@
         {
           "market": "pitcher_strikeouts",
           "team": "Atlanta Braves",
-          "pitcher": "JR Ritchie",
-          "label": "JR Ritchie moins de 6,5 strikeouts",
-          "line": 6.5,
+          "pitcher": "Danny Young",
+          "label": "Danny Young moins de 4,5 strikeouts",
+          "line": 4.5,
           "pick": "under",
-          "probability": 0.6032,
-          "fair_odds": 1.66,
-          "expected_strikeouts": 6.0,
-          "projected_ip": 6.43,
+          "probability": 0.5442,
+          "fair_odds": 1.84,
+          "expected_strikeouts": 4.32,
+          "projected_ip": 4.8,
           "inputs": {
-            "k9": 8.4,
-            "era": 4.6,
-            "whip": 1.47,
-            "hand": "R"
+            "k9": 8.1,
+            "era": 2.7,
+            "whip": 0.9,
+            "hand": "L"
           },
           "side": "away"
         },
         {
           "market": "pitcher_home_run_allowed",
           "team": "Atlanta Braves",
-          "pitcher": "JR Ritchie",
-          "label": "JR Ritchie concède au moins 1 home run",
+          "pitcher": "Danny Young",
+          "label": "Danny Young concède au moins 1 home run",
           "pick": "yes",
-          "probability": 0.6321,
-          "fair_odds": 1.58,
-          "expected_hr_allowed": 1.0,
-          "projected_ip": 6.43,
+          "probability": 0.7631,
+          "fair_odds": 1.31,
+          "expected_hr_allowed": 1.44,
+          "projected_ip": 4.8,
           "inputs": {
-            "hr9": 1.4,
-            "era": 4.6,
-            "whip": 1.47
+            "hr9": 2.7,
+            "era": 2.7,
+            "whip": 0.9
           },
           "side": "away"
         }
@@ -1234,7 +1152,7 @@
       ]
     }
   ],
-  "props": 60,
+  "props": 56,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"
