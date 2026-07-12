@@ -1,24 +1,46 @@
 {
-  "generated_at": "2026-07-12T22:12:06Z",
+  "generated_at": "2026-07-12T23:06:42Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
-  "status": "watch",
+  "status": "ok",
   "summary": {
     "active_events": 22,
-    "actionable": 0,
-    "watch": 2,
+    "actionable": 1,
+    "watch": 1,
     "risk": 20,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 2,
+      "market_move": 2,
+      "signal_conflict": 1,
+      "injury_imbalance": 1,
       "market_uncertain": 23
     },
     "by_quality": {
-      "watch": 2,
+      "watch": 1,
+      "actionable": 1,
       "risk": 20
     }
   },
-  "active_actionable": [],
+  "active_actionable": [
+    {
+      "event_id": "401857063",
+      "date": "2026-07-13T01:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Las Vegas Aces",
+      "away": "Indiana Fever",
+      "match": "Las Vegas Aces - Indiana Fever",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.862,
+      "context": "Cote away: 2.90 -> 2.45 (+15.5%)"
+    }
+  ],
   "active_watch": [
     {
       "event_id": "401857062",
@@ -31,30 +53,12 @@
       "match": "Dallas Wings - Chicago Sky",
       "quality": "watch",
       "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Chicago Sky",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 0-3"
-    },
-    {
-      "event_id": "401857063",
-      "date": "2026-07-13T01:00Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Las Vegas Aces",
-      "away": "Indiana Fever",
-      "match": "Las Vegas Aces - Indiana Fever",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Las Vegas Aces",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 3-0"
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.604,
+      "context": "Cote away: 4.60 -> 4.10 (+10.9%)"
     }
   ],
   "active_risk": [
