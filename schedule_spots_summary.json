@@ -1,77 +1,24 @@
 {
-  "generated_at": "2026-07-12T17:37:20Z",
+  "generated_at": "2026-07-12T18:33:33Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 6,
+    "active_events": 2,
     "expired_sample": 0,
     "by_type": {
-      "back_to_back_travel": 6,
-      "travel_extreme": 3
+      "back_to_back_travel": 2,
+      "travel_extreme": 1
     },
     "by_decision": {
-      "lean_home": 6
+      "lean_home": 2
     },
-    "lean_home": 6,
+    "lean_home": 2,
     "lean_away": 0,
     "abstain": 0,
     "monitor": 0
   },
   "active": [
-    {
-      "event_id": "401816133",
-      "source_event_ids": [
-        "401816133"
-      ],
-      "kickoff": "2026-07-12T17:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Tampa Bay Rays",
-      "away": "Seattle Mariners",
-      "match": "Tampa Bay Rays - Seattle Mariners",
-      "decision": "lean_home",
-      "net_team": "Tampa Bay Rays",
-      "reason": "Seattle Mariners plus penalise par calendrier/voyage (1.95 vs 0.00)",
-      "pressure_score": 1.945,
-      "home_fade": 0.0,
-      "away_fade": 1.945,
-      "travel_score": 1.945,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "travel_extreme": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "Deplacement estime 4065 km, decalage ~2.6h",
-        "2 match dans les 48h + 4065 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.681,
-        "away_score": -1.945,
-        "home_fade": 0.0,
-        "away_fade": 1.945,
-        "reason": "Direction nette: Tampa Bay Rays (+0.68)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.945
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
     {
       "event_id": "401816140",
       "source_event_ids": [
@@ -127,161 +74,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401816134",
-      "source_event_ids": [
-        "401816134"
-      ],
-      "kickoff": "2026-07-12T18:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Minnesota Twins",
-      "away": "Los Angeles Angels",
-      "match": "Minnesota Twins - Los Angeles Angels",
-      "decision": "lean_home",
-      "net_team": "Minnesota Twins",
-      "reason": "Los Angeles Angels plus penalise par calendrier/voyage (1.57 vs 0.00)",
-      "pressure_score": 1.567,
-      "home_fade": 0.0,
-      "away_fade": 1.567,
-      "travel_score": 1.567,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "travel_extreme": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "Deplacement estime 2438 km, decalage ~1.6h",
-        "2 match dans les 48h + 2438 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.548,
-        "away_score": -1.567,
-        "home_fade": 0.0,
-        "away_fade": 1.567,
-        "reason": "Direction nette: Minnesota Twins (+0.55)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.567
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401816128",
-      "source_event_ids": [
-        "401816128"
-      ],
-      "kickoff": "2026-07-12T17:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Miami Marlins",
-      "away": "Cleveland Guardians",
-      "match": "Miami Marlins - Cleveland Guardians",
-      "decision": "lean_home",
-      "net_team": "Miami Marlins",
-      "reason": "Cleveland Guardians plus penalise par calendrier/voyage (0.96 vs 0.00)",
-      "pressure_score": 0.961,
-      "home_fade": 0.0,
-      "away_fade": 0.961,
-      "travel_score": 0.961,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "2 match dans les 48h + 1753 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.664,
-        "away_score": -0.611,
-        "home_fade": 1.0,
-        "away_fade": 0.961,
-        "reason": "Signaux opposes: Miami Marlins fade 1.00, Cleveland Guardians fade 0.96 -> prudence",
-        "detail": [
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.961
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401816129",
-      "source_event_ids": [
-        "401816129"
-      ],
-      "kickoff": "2026-07-12T17:35Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Baltimore Orioles",
-      "away": "Kansas City Royals",
-      "match": "Baltimore Orioles - Kansas City Royals",
-      "decision": "lean_home",
-      "net_team": "Baltimore Orioles",
-      "reason": "Kansas City Royals plus penalise par calendrier/voyage (0.92 vs 0.00)",
-      "pressure_score": 0.917,
-      "home_fade": 0.0,
-      "away_fade": 0.917,
-      "travel_score": 0.917,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "2 match dans les 48h + 1537 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.461,
-        "away_score": -1.317,
-        "home_fade": 0.0,
-        "away_fade": 1.317,
-        "reason": "Direction nette: Baltimore Orioles (+0.46)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.917
           }
         ]
       }
