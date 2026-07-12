@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-07-12T18:33:32Z",
+  "generated_at": "2026-07-12T19:40:54Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401816137",
-      "kickoff": "2026-07-12T18:35Z",
-      "league": "MLB",
-      "match": "Houston Astros at Texas Rangers",
-      "home": "Texas Rangers",
-      "away": "Houston Astros",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Texas Rangers",
-          "pitcher": "MacKenzie Gore",
-          "label": "MacKenzie Gore plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.5719,
-          "fair_odds": 1.75,
-          "expected_strikeouts": 5.84,
-          "projected_ip": 5.32,
-          "inputs": {
-            "k9": 9.89,
-            "era": 4.72,
-            "whip": 1.31,
-            "hand": "L"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Texas Rangers",
-          "pitcher": "MacKenzie Gore",
-          "label": "MacKenzie Gore ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.5606,
-          "fair_odds": 1.78,
-          "expected_hr_allowed": 0.579,
-          "projected_ip": 5.32,
-          "inputs": {
-            "hr9": 0.98,
-            "era": 4.72,
-            "whip": 1.31
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Houston Astros",
-          "pitcher": "Cristian Javier",
-          "label": "Cristian Javier plus de 2,5 strikeouts",
-          "line": 2.5,
-          "pick": "over",
-          "probability": 0.537,
-          "fair_odds": 1.86,
-          "expected_strikeouts": 2.62,
-          "projected_ip": 4.03,
-          "inputs": {
-            "k9": 5.84,
-            "era": 10.22,
-            "whip": 2.27,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Houston Astros",
-          "pitcher": "Cristian Javier",
-          "label": "Cristian Javier concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6252,
-          "fair_odds": 1.6,
-          "expected_hr_allowed": 0.981,
-          "projected_ip": 4.03,
-          "inputs": {
-            "hr9": 2.19,
-            "era": 10.22,
-            "whip": 2.27
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401816139",
       "kickoff": "2026-07-12T20:05Z",
@@ -332,7 +250,7 @@
       ]
     }
   ],
-  "props": 16,
+  "props": 12,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"

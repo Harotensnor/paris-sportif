@@ -1,45 +1,27 @@
 {
-  "generated_at": "2026-07-12T18:33:33Z",
+  "generated_at": "2026-07-12T19:40:55Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 24,
-    "actionable": 3,
+    "active_events": 23,
+    "actionable": 2,
     "watch": 1,
     "risk": 20,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 2,
       "back_to_back_travel": 2,
       "travel_extreme": 1,
-      "market_uncertain": 21
+      "injury_imbalance": 1,
+      "market_uncertain": 22
     },
     "by_quality": {
-      "actionable": 3,
+      "actionable": 2,
       "watch": 1,
       "risk": 20
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401816137",
-      "date": "2026-07-12T18:35Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Texas Rangers",
-      "away": "Houston Astros",
-      "match": "Texas Rangers - Houston Astros",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Texas Rangers",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 12-7"
-    },
     {
       "event_id": "401816140",
       "date": "2026-07-12T20:10Z",
@@ -135,6 +117,24 @@
       "context": "marge bookmaker anormale 12.1%"
     },
     {
+      "event_id": "181613",
+      "date": "2026-07-14T04:00Z",
+      "sport": "tennis",
+      "league_code": "vandapharmaceuticals",
+      "league_name": "Vanda Pharmaceuticals Athens Open",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 12.1%"
+    },
+    {
       "event_id": "178743",
       "date": "2026-07-14T04:00Z",
       "sport": "tennis",
@@ -169,24 +169,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 12.1%"
-    },
-    {
-      "event_id": "181611",
-      "date": "2026-07-14T04:00Z",
-      "sport": "tennis",
-      "league_code": "vandapharmaceuticals",
-      "league_name": "Vanda Pharmaceuticals Athens Open",
-      "home": "",
-      "away": "",
-      "match": "? - ?",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 12.9%"
     },
     {
       "event_id": "401877044",
