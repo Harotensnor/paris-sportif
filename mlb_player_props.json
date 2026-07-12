@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-07-11T23:35:52Z",
+  "generated_at": "2026-07-12T01:09:10Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401816125",
-      "kickoff": "2026-07-12T00:40Z",
-      "league": "MLB",
-      "match": "Toronto Blue Jays at San Diego Padres",
-      "home": "San Diego Padres",
-      "away": "Toronto Blue Jays",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "San Diego Padres",
-          "pitcher": "Germán Márquez",
-          "label": "Germán Márquez moins de 3,5 strikeouts",
-          "line": 3.5,
-          "pick": "under",
-          "probability": 0.5324,
-          "fair_odds": 1.88,
-          "expected_strikeouts": 3.38,
-          "projected_ip": 5.31,
-          "inputs": {
-            "k9": 5.73,
-            "era": 5.02,
-            "whip": 1.43,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "San Diego Padres",
-          "pitcher": "Germán Márquez",
-          "label": "Germán Márquez concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6763,
-          "fair_odds": 1.48,
-          "expected_hr_allowed": 1.128,
-          "projected_ip": 5.31,
-          "inputs": {
-            "hr9": 1.91,
-            "era": 5.02,
-            "whip": 1.43
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Toronto Blue Jays",
-          "pitcher": "Kevin Gausman",
-          "label": "Kevin Gausman plus de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "over",
-          "probability": 0.5367,
-          "fair_odds": 1.86,
-          "expected_strikeouts": 5.67,
-          "projected_ip": 5.58,
-          "inputs": {
-            "k9": 9.14,
-            "era": 4.32,
-            "whip": 1.22,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Toronto Blue Jays",
-          "pitcher": "Kevin Gausman",
-          "label": "Kevin Gausman concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.5452,
-          "fair_odds": 1.83,
-          "expected_hr_allowed": 0.788,
-          "projected_ip": 5.58,
-          "inputs": {
-            "hr9": 1.27,
-            "era": 4.32,
-            "whip": 1.22
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401816123",
       "kickoff": "2026-07-12T01:10Z",
@@ -1244,7 +1162,7 @@
       ]
     }
   ],
-  "props": 60,
+  "props": 56,
   "markets": [
     "pitcher_strikeouts",
     "pitcher_home_run_allowed"

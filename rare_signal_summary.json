@@ -1,46 +1,28 @@
 {
-  "generated_at": "2026-07-11T23:35:53Z",
+  "generated_at": "2026-07-12T01:09:11Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 35,
-    "actionable": 13,
+    "active_events": 34,
+    "actionable": 12,
     "watch": 3,
     "risk": 19,
     "expired_sample": 0,
     "by_type": {
-      "travel_extreme": 4,
-      "back_to_back_travel": 7,
       "market_uncertain": 21,
       "injury_imbalance": 10,
-      "signal_conflict": 1
+      "back_to_back_travel": 6,
+      "signal_conflict": 1,
+      "travel_extreme": 3
     },
     "by_quality": {
-      "actionable": 13,
       "risk": 19,
+      "actionable": 12,
       "watch": 3
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401816125",
-      "date": "2026-07-12T00:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Diego Padres",
-      "away": "Toronto Blue Jays",
-      "match": "San Diego Padres - Toronto Blue Jays",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Toronto Blue Jays",
-      "side": "away",
-      "strength": 1.0,
-      "context": "1 match dans les 48h + 3483 km de voyage"
-    },
     {
       "event_id": "401816130",
       "date": "2026-07-12T16:15Z",

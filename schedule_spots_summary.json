@@ -1,22 +1,22 @@
 {
-  "generated_at": "2026-07-11T23:35:53Z",
+  "generated_at": "2026-07-12T01:09:11Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 9,
+    "active_events": 8,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 4,
-      "travel_extreme": 4,
-      "back_to_back_travel": 7,
-      "schedule_congestion": 4
+      "lookahead": 2,
+      "schedule_congestion": 2,
+      "back_to_back_travel": 6,
+      "travel_extreme": 3
     },
     "by_decision": {
       "abstain": 2,
-      "lean_home": 7
+      "lean_home": 6
     },
-    "lean_home": 7,
+    "lean_home": 6,
     "lean_away": 0,
     "abstain": 2,
     "monitor": 0
@@ -128,140 +128,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401816125",
-      "source_event_ids": [
-        "401816125"
-      ],
-      "kickoff": "2026-07-12T00:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Diego Padres",
-      "away": "Toronto Blue Jays",
-      "match": "San Diego Padres - Toronto Blue Jays",
-      "decision": "lean_home",
-      "net_team": "San Diego Padres",
-      "reason": "Toronto Blue Jays plus penalise par calendrier/voyage (1.96 vs 0.15)",
-      "pressure_score": 2.477,
-      "home_fade": 0.15,
-      "away_fade": 1.96,
-      "travel_score": 1.81,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2,
-        "travel_extreme": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours",
-        "Deplacement estime 3483 km, decalage ~2.5h",
-        "1 match dans les 48h + 3483 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.136,
-        "away_score": -1.767,
-        "home_fade": 0.55,
-        "away_fade": 1.96,
-        "reason": "Direction nette: San Diego Padres (+0.14)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.81
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401816139",
-      "source_event_ids": [
-        "401816139"
-      ],
-      "kickoff": "2026-07-12T20:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Francisco Giants",
-      "away": "Colorado Rockies",
-      "match": "San Francisco Giants - Colorado Rockies",
-      "decision": "lean_home",
-      "net_team": "San Francisco Giants",
-      "reason": "Colorado Rockies plus penalise par calendrier/voyage (1.51 vs 0.60)",
-      "pressure_score": 2.114,
-      "home_fade": 0.6,
-      "away_fade": 1.514,
-      "travel_score": 0.914,
-      "lookahead_score": 0,
-      "congestion_score": 1.2,
-      "types": {
-        "schedule_congestion": 2,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "3 matchs sur les 7 derniers jours",
-        "3 matchs sur les 7 derniers jours",
-        "2 match dans les 48h + 1522 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.07,
-        "away_score": -1.304,
-        "home_fade": 0.6,
-        "away_fade": 1.514,
-        "reason": "Direction nette: San Francisco Giants (-0.07)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "schedule_congestion",
-            "direction": "fade",
-            "strength": 0.6
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.914
           }
         ]
       }
@@ -529,6 +395,51 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.917
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401816139",
+      "source_event_ids": [
+        "401816139"
+      ],
+      "kickoff": "2026-07-12T20:05Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "San Francisco Giants",
+      "away": "Colorado Rockies",
+      "match": "San Francisco Giants - Colorado Rockies",
+      "decision": "lean_home",
+      "net_team": "San Francisco Giants",
+      "reason": "Colorado Rockies plus penalise par calendrier/voyage (0.91 vs 0.00)",
+      "pressure_score": 0.914,
+      "home_fade": 0.0,
+      "away_fade": 0.914,
+      "travel_score": 0.914,
+      "lookahead_score": 0,
+      "congestion_score": 0,
+      "types": {
+        "back_to_back_travel": 1
+      },
+      "contexts": [
+        "2 match dans les 48h + 1522 km de voyage"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": 0.32,
+        "away_score": -0.914,
+        "home_fade": 0.0,
+        "away_fade": 0.914,
+        "reason": "Direction nette: San Francisco Giants (+0.32)",
+        "detail": [
+          {
+            "side": "away",
+            "type": "back_to_back_travel",
+            "direction": "fade",
+            "strength": 0.914
           }
         ]
       }
