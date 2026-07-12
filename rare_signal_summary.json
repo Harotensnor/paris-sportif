@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-07-12T12:05:41Z",
+  "generated_at": "2026-07-12T13:49:17Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 33,
+    "active_events": 34,
     "actionable": 12,
     "watch": 3,
-    "risk": 18,
+    "risk": 19,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 10,
       "back_to_back_travel": 6,
       "signal_conflict": 1,
       "travel_extreme": 3,
-      "market_uncertain": 19
+      "market_uncertain": 20
     },
     "by_quality": {
       "actionable": 12,
       "watch": 3,
-      "risk": 18
+      "risk": 19
     }
   },
   "active_actionable": [
@@ -388,6 +388,24 @@
       "context": "marge bookmaker anormale 18.9%"
     },
     {
+      "event_id": "401861424",
+      "date": "2026-07-17T12:00Z",
+      "sport": "football",
+      "league_code": "chn.1",
+      "league_name": "Chinese Super League",
+      "home": "Yunnan Yukun",
+      "away": "Shanghai Port",
+      "match": "Yunnan Yukun - Shanghai Port",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.2%"
+    },
+    {
       "event_id": "401842759",
       "date": "2026-07-17T17:00Z",
       "sport": "football",
@@ -404,24 +422,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.5%"
-    },
-    {
-      "event_id": "401842757",
-      "date": "2026-07-17T17:00Z",
-      "sport": "football",
-      "league_code": "allsvenskan",
-      "league_name": "Allsvenskan",
-      "home": "Mjällby AIF",
-      "away": "Västerås SK",
-      "match": "Mjällby AIF - Västerås SK",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.6%"
     },
     {
       "event_id": "401877043",
@@ -494,6 +494,24 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 19.0%"
+    },
+    {
+      "event_id": "401861426",
+      "date": "2026-07-18T11:35Z",
+      "sport": "football",
+      "league_code": "chn.1",
+      "league_name": "Chinese Super League",
+      "home": "Dalian Yingbo",
+      "away": "Shandong Taishan",
+      "match": "Dalian Yingbo - Shandong Taishan",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 19.1%"
     },
     {
       "event_id": "401861427",
