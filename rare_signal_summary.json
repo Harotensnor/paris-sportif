@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-07-12T14:45:38Z",
+  "generated_at": "2026-07-12T15:42:50Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 34,
+    "active_events": 33,
     "actionable": 12,
-    "watch": 3,
+    "watch": 2,
     "risk": 19,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 10,
+      "injury_imbalance": 9,
       "back_to_back_travel": 6,
       "signal_conflict": 1,
       "travel_extreme": 3,
-      "market_uncertain": 20
+      "market_uncertain": 21
     },
     "by_quality": {
       "actionable": 12,
-      "watch": 3,
+      "watch": 2,
       "risk": 19
     }
   },
@@ -39,7 +39,7 @@
       "team": "Chicago Cubs",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 6-14"
+      "context": "Absences severes 7-14"
     },
     {
       "event_id": "401816128",
@@ -242,24 +242,6 @@
   ],
   "active_watch": [
     {
-      "event_id": "401816126",
-      "date": "2026-07-12T17:40Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "New York Mets",
-      "away": "Boston Red Sox",
-      "match": "New York Mets - Boston Red Sox",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Boston Red Sox",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 9-12"
-    },
-    {
       "event_id": "401816135",
       "date": "2026-07-12T18:10Z",
       "sport": "baseball",
@@ -298,8 +280,8 @@
   ],
   "active_risk": [
     {
-      "event_id": "178769",
-      "date": "2026-07-13T04:00Z",
+      "event_id": "178774",
+      "date": "2026-07-13T16:00Z",
       "sport": "tennis",
       "league_code": "plavalagunacroatiaop",
       "league_name": "Plava Laguna Croatia Open Umag",
@@ -313,7 +295,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 12.1%"
+      "context": "marge bookmaker anormale 12.5%"
     },
     {
       "event_id": "178651",
@@ -339,6 +321,24 @@
       "sport": "tennis",
       "league_code": "efgswissopengstaad",
       "league_name": "EFG Swiss Open Gstaad",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 12.1%"
+    },
+    {
+      "event_id": "178769",
+      "date": "2026-07-14T04:00Z",
+      "sport": "tennis",
+      "league_code": "plavalagunacroatiaop",
+      "league_name": "Plava Laguna Croatia Open Umag",
       "home": "",
       "away": "",
       "match": "? - ?",
@@ -404,24 +404,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.2%"
-    },
-    {
-      "event_id": "401842759",
-      "date": "2026-07-17T17:00Z",
-      "sport": "football",
-      "league_code": "allsvenskan",
-      "league_name": "Allsvenskan",
-      "home": "IFK Göteborg",
-      "away": "IF Brommapojkarna",
-      "match": "IFK Göteborg - IF Brommapojkarna",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.5%"
     },
     {
       "event_id": "401877043",
@@ -550,24 +532,6 @@
       "context": "marge bookmaker anormale 18.4%"
     },
     {
-      "event_id": "401842754",
-      "date": "2026-07-18T13:00Z",
-      "sport": "football",
-      "league_code": "allsvenskan",
-      "league_name": "Allsvenskan",
-      "home": "AIK",
-      "away": "GAIS",
-      "match": "AIK - GAIS",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 19.8%"
-    },
-    {
       "event_id": "401877040",
       "date": "2026-07-18T23:00Z",
       "sport": "football",
@@ -638,6 +602,24 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.4%"
+    },
+    {
+      "event_id": "401842760",
+      "date": "2026-07-19T14:30Z",
+      "sport": "football",
+      "league_code": "allsvenskan",
+      "league_name": "Allsvenskan",
+      "home": "Hammarby IF",
+      "away": "Degerfors IF",
+      "match": "Hammarby IF - Degerfors IF",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.5%"
     }
   ],
   "expired_sample": []
