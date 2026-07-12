@@ -1,90 +1,8 @@
 {
-  "generated_at": "2026-07-12T01:09:10Z",
+  "generated_at": "2026-07-12T02:32:37Z",
   "source": "derived from mlb_pitchers already patched into data.js",
   "status": "ok",
   "events": [
-    {
-      "event_id": "401816123",
-      "kickoff": "2026-07-12T01:10Z",
-      "league": "MLB",
-      "match": "Arizona Diamondbacks at Los Angeles Dodgers",
-      "home": "Los Angeles Dodgers",
-      "away": "Arizona Diamondbacks",
-      "props": [
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Los Angeles Dodgers",
-          "pitcher": "Emmet Sheehan",
-          "label": "Emmet Sheehan moins de 5,5 strikeouts",
-          "line": 5.5,
-          "pick": "under",
-          "probability": 0.5278,
-          "fair_odds": 1.89,
-          "expected_strikeouts": 5.37,
-          "projected_ip": 4.81,
-          "inputs": {
-            "k9": 10.05,
-            "era": 4.91,
-            "whip": 1.27,
-            "hand": "R"
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Los Angeles Dodgers",
-          "pitcher": "Emmet Sheehan",
-          "label": "Emmet Sheehan concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6077,
-          "fair_odds": 1.65,
-          "expected_hr_allowed": 0.936,
-          "projected_ip": 4.81,
-          "inputs": {
-            "hr9": 1.75,
-            "era": 4.91,
-            "whip": 1.27
-          },
-          "side": "home"
-        },
-        {
-          "market": "pitcher_strikeouts",
-          "team": "Arizona Diamondbacks",
-          "pitcher": "Zac Gallen",
-          "label": "Zac Gallen moins de 3,5 strikeouts",
-          "line": 3.5,
-          "pick": "under",
-          "probability": 0.5824,
-          "fair_odds": 1.72,
-          "expected_strikeouts": 3.21,
-          "projected_ip": 5.16,
-          "inputs": {
-            "k9": 5.6,
-            "era": 6.34,
-            "whip": 1.56,
-            "hand": "R"
-          },
-          "side": "away"
-        },
-        {
-          "market": "pitcher_home_run_allowed",
-          "team": "Arizona Diamondbacks",
-          "pitcher": "Zac Gallen",
-          "label": "Zac Gallen concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6116,
-          "fair_odds": 1.64,
-          "expected_hr_allowed": 0.946,
-          "projected_ip": 5.16,
-          "inputs": {
-            "hr9": 1.65,
-            "era": 6.34,
-            "whip": 1.56
-          },
-          "side": "away"
-        }
-      ]
-    },
     {
       "event_id": "401816130",
       "kickoff": "2026-07-12T16:15Z",
@@ -132,36 +50,36 @@
         {
           "market": "pitcher_strikeouts",
           "team": "Milwaukee Brewers",
-          "pitcher": "Jacob Misiorowski",
-          "label": "Jacob Misiorowski moins de 9,5 strikeouts",
-          "line": 9.5,
-          "pick": "under",
-          "probability": 0.5373,
-          "fair_odds": 1.86,
-          "expected_strikeouts": 9.28,
-          "projected_ip": 6.17,
+          "pitcher": "Robert Gasser",
+          "label": "Robert Gasser plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.6075,
+          "fair_odds": 1.65,
+          "expected_strikeouts": 4.97,
+          "projected_ip": 5.39,
           "inputs": {
-            "k9": 13.54,
-            "era": 1.62,
-            "whip": 0.76,
-            "hand": "R"
+            "k9": 8.31,
+            "era": 4.15,
+            "whip": 1.18,
+            "hand": "L"
           },
           "side": "away"
         },
         {
           "market": "pitcher_home_run_allowed",
           "team": "Milwaukee Brewers",
-          "pitcher": "Jacob Misiorowski",
-          "label": "Jacob Misiorowski ne concède pas de home run",
-          "pick": "no",
-          "probability": 0.6064,
-          "fair_odds": 1.65,
-          "expected_hr_allowed": 0.5,
-          "projected_ip": 6.17,
+          "pitcher": "Robert Gasser",
+          "label": "Robert Gasser concède au moins 1 home run",
+          "pick": "yes",
+          "probability": 0.6298,
+          "fair_odds": 1.59,
+          "expected_hr_allowed": 0.994,
+          "projected_ip": 5.39,
           "inputs": {
-            "hr9": 0.73,
-            "era": 1.62,
-            "whip": 0.76
+            "hr9": 1.66,
+            "era": 4.15,
+            "whip": 1.18
           },
           "side": "away"
         }
@@ -259,6 +177,42 @@
       "props": [
         {
           "market": "pitcher_strikeouts",
+          "team": "Washington Nationals",
+          "pitcher": "Cade Cavalli",
+          "label": "Cade Cavalli moins de 5,5 strikeouts",
+          "line": 5.5,
+          "pick": "under",
+          "probability": 0.5001,
+          "fair_odds": 2.0,
+          "expected_strikeouts": 5.5,
+          "projected_ip": 4.85,
+          "inputs": {
+            "k9": 10.2,
+            "era": 3.88,
+            "whip": 1.38,
+            "hand": "R"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "Washington Nationals",
+          "pitcher": "Cade Cavalli",
+          "label": "Cade Cavalli ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6567,
+          "fair_odds": 1.52,
+          "expected_hr_allowed": 0.421,
+          "projected_ip": 4.85,
+          "inputs": {
+            "hr9": 0.78,
+            "era": 3.88,
+            "whip": 1.38
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_strikeouts",
           "team": "New York Yankees",
           "pitcher": "Will Warren",
           "label": "Will Warren moins de 5,5 strikeouts",
@@ -303,6 +257,42 @@
       "home": "New York Mets",
       "away": "Boston Red Sox",
       "props": [
+        {
+          "market": "pitcher_strikeouts",
+          "team": "New York Mets",
+          "pitcher": "Zach Thornton",
+          "label": "Zach Thornton plus de 4,5 strikeouts",
+          "line": 4.5,
+          "pick": "over",
+          "probability": 0.5889,
+          "fair_odds": 1.7,
+          "expected_strikeouts": 4.89,
+          "projected_ip": 5.05,
+          "inputs": {
+            "k9": 8.71,
+            "era": 4.35,
+            "whip": 1.16,
+            "hand": "L"
+          },
+          "side": "home"
+        },
+        {
+          "market": "pitcher_home_run_allowed",
+          "team": "New York Mets",
+          "pitcher": "Zach Thornton",
+          "label": "Zach Thornton ne concède pas de home run",
+          "pick": "no",
+          "probability": 0.6138,
+          "fair_odds": 1.63,
+          "expected_hr_allowed": 0.488,
+          "projected_ip": 5.05,
+          "inputs": {
+            "hr9": 0.87,
+            "era": 4.35,
+            "whip": 1.16
+          },
+          "side": "home"
+        },
         {
           "market": "pitcher_strikeouts",
           "team": "Boston Red Sox",
@@ -1044,36 +1034,36 @@
         {
           "market": "pitcher_strikeouts",
           "team": "Arizona Diamondbacks",
-          "pitcher": "Zac Gallen",
-          "label": "Zac Gallen moins de 3,5 strikeouts",
+          "pitcher": "Mitch Bratt",
+          "label": "Mitch Bratt moins de 3,5 strikeouts",
           "line": 3.5,
           "pick": "under",
-          "probability": 0.5824,
-          "fair_odds": 1.72,
-          "expected_strikeouts": 3.21,
-          "projected_ip": 5.16,
+          "probability": 0.6443,
+          "fair_odds": 1.55,
+          "expected_strikeouts": 3.0,
+          "projected_ip": 3.0,
           "inputs": {
-            "k9": 5.6,
-            "era": 6.34,
-            "whip": 1.56,
-            "hand": "R"
+            "k9": 9.0,
+            "era": 3.0,
+            "whip": 1.33,
+            "hand": "L"
           },
           "side": "away"
         },
         {
           "market": "pitcher_home_run_allowed",
           "team": "Arizona Diamondbacks",
-          "pitcher": "Zac Gallen",
-          "label": "Zac Gallen concède au moins 1 home run",
-          "pick": "yes",
-          "probability": 0.6116,
-          "fair_odds": 1.64,
-          "expected_hr_allowed": 0.946,
-          "projected_ip": 5.16,
+          "pitcher": "Mitch Bratt",
+          "label": "Mitch Bratt ne concède pas de home run",
+          "pick": "no",
+          "probability": 1.0,
+          "fair_odds": 1.01,
+          "expected_hr_allowed": 0.0,
+          "projected_ip": 3.0,
           "inputs": {
-            "hr9": 1.65,
-            "era": 6.34,
-            "whip": 1.56
+            "hr9": 0.0,
+            "era": 3.0,
+            "whip": 1.33
           },
           "side": "away"
         }
