@@ -1,16 +1,33 @@
 {
-  "generated_at": "2026-07-12T02:32:38Z",
+  "generated_at": "2026-07-12T05:45:24Z",
   "source": "data.js event.smart_money derived from odds_history",
-  "status": "watch",
+  "status": "ok",
   "summary": {
-    "active": 0,
-    "expired_sample": 3,
+    "active": 1,
+    "expired_sample": 2,
     "by_type": {
-      "balanced_steam": 1,
-      "underdog_steam": 2
+      "balanced_steam": 2,
+      "underdog_steam": 1
     }
   },
-  "active": [],
+  "active": [
+    {
+      "event_id": "401816130",
+      "kickoff": "2026-07-12T16:15Z",
+      "sport": "baseball",
+      "league": "mlb",
+      "match": "Milwaukee Brewers at Pittsburgh Pirates",
+      "side": "home",
+      "pick_key": "1",
+      "type": "balanced_steam",
+      "reason": "Mouvement cote net 15.8% sur home",
+      "odd_open": 2.13,
+      "odd_latest": 1.794,
+      "odd_drop_pct": 15.79,
+      "confidence": 0.95,
+      "snapshots": 2
+    }
+  ],
   "expired_sample": [
     {
       "event_id": "401816104",
@@ -43,22 +60,6 @@
       "odd_drop_pct": 10.03,
       "confidence": 0.937,
       "snapshots": 8
-    },
-    {
-      "event_id": "401857058",
-      "kickoff": "2026-07-11T22:00Z",
-      "sport": "basketball",
-      "league": "wnba",
-      "match": "Phoenix Mercury at Las Vegas Aces",
-      "side": "away",
-      "pick_key": "2",
-      "type": "underdog_steam",
-      "reason": "Cote outsider compressee de 9.1%",
-      "odd_open": 4.4,
-      "odd_latest": 4.0,
-      "odd_drop_pct": 9.09,
-      "confidence": 0.91,
-      "snapshots": 10
     }
   ]
 }
