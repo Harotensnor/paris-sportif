@@ -1,128 +1,18 @@
 {
-  "generated_at": "2026-07-12T19:40:55Z",
+  "generated_at": "2026-07-12T20:26:12Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
-  "status": "ok",
+  "status": "empty",
   "summary": {
-    "active_events": 2,
+    "active_events": 0,
     "expired_sample": 0,
-    "by_type": {
-      "back_to_back_travel": 2,
-      "travel_extreme": 1
-    },
-    "by_decision": {
-      "lean_home": 2
-    },
-    "lean_home": 2,
+    "by_type": {},
+    "by_decision": {},
+    "lean_home": 0,
     "lean_away": 0,
     "abstain": 0,
     "monitor": 0
   },
-  "active": [
-    {
-      "event_id": "401816140",
-      "source_event_ids": [
-        "401816140"
-      ],
-      "kickoff": "2026-07-12T20:10Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Diego Padres",
-      "away": "Toronto Blue Jays",
-      "match": "San Diego Padres - Toronto Blue Jays",
-      "decision": "lean_home",
-      "net_team": "San Diego Padres",
-      "reason": "Toronto Blue Jays plus penalise par calendrier/voyage (1.81 vs 0.00)",
-      "pressure_score": 1.81,
-      "home_fade": 0.0,
-      "away_fade": 1.81,
-      "travel_score": 1.81,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "travel_extreme": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "Deplacement estime 3483 km, decalage ~2.5h",
-        "2 match dans les 48h + 3483 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.233,
-        "away_score": -1.67,
-        "home_fade": 0.4,
-        "away_fade": 1.81,
-        "reason": "Direction nette: San Diego Padres (+0.23)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.81
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 1.0
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401816139",
-      "source_event_ids": [
-        "401816139"
-      ],
-      "kickoff": "2026-07-12T20:05Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "San Francisco Giants",
-      "away": "Colorado Rockies",
-      "match": "San Francisco Giants - Colorado Rockies",
-      "decision": "lean_home",
-      "net_team": "San Francisco Giants",
-      "reason": "Colorado Rockies plus penalise par calendrier/voyage (0.91 vs 0.00)",
-      "pressure_score": 0.914,
-      "home_fade": 0.0,
-      "away_fade": 0.914,
-      "travel_score": 0.914,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "2 match dans les 48h + 1522 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.32,
-        "away_score": -0.914,
-        "home_fade": 0.0,
-        "away_fade": 0.914,
-        "reason": "Direction nette: San Francisco Giants (+0.32)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.914
-          }
-        ]
-      }
-    }
-  ],
+  "active": [],
   "expired_sample": []
 }
