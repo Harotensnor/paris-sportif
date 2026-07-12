@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-12T11:01:47Z",
+  "generated_at": "2026-07-12T11:09:47Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -159,7 +159,7 @@
       },
       "contexts": [
         "Deplacement estime 3483 km, decalage ~2.5h",
-        "1 match dans les 48h + 3483 km de voyage"
+        "2 match dans les 48h + 3483 km de voyage"
       ],
       "global_resolution": {
         "status": "net",
@@ -296,6 +296,57 @@
       }
     },
     {
+      "event_id": "401816129",
+      "source_event_ids": [
+        "401816129"
+      ],
+      "kickoff": "2026-07-12T17:35Z",
+      "sport": "baseball",
+      "league_code": "mlb",
+      "league_name": "MLB",
+      "home": "Baltimore Orioles",
+      "away": "Kansas City Royals",
+      "match": "Baltimore Orioles - Kansas City Royals",
+      "decision": "lean_home",
+      "net_team": "Baltimore Orioles",
+      "reason": "Kansas City Royals plus penalise par calendrier/voyage (0.92 vs 0.00)",
+      "pressure_score": 0.917,
+      "home_fade": 0.0,
+      "away_fade": 0.917,
+      "travel_score": 0.917,
+      "lookahead_score": 0,
+      "congestion_score": 0,
+      "types": {
+        "back_to_back_travel": 1
+      },
+      "contexts": [
+        "2 match dans les 48h + 1537 km de voyage"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": 0.461,
+        "away_score": -1.317,
+        "home_fade": 0.0,
+        "away_fade": 1.317,
+        "reason": "Direction nette: Baltimore Orioles (+0.46)",
+        "detail": [
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.4
+          },
+          {
+            "side": "away",
+            "type": "back_to_back_travel",
+            "direction": "fade",
+            "strength": 0.917
+          }
+        ]
+      }
+    },
+    {
       "event_id": "401816139",
       "source_event_ids": [
         "401816139"
@@ -336,57 +387,6 @@
             "type": "back_to_back_travel",
             "direction": "fade",
             "strength": 0.914
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401816129",
-      "source_event_ids": [
-        "401816129"
-      ],
-      "kickoff": "2026-07-12T17:35Z",
-      "sport": "baseball",
-      "league_code": "mlb",
-      "league_name": "MLB",
-      "home": "Baltimore Orioles",
-      "away": "Kansas City Royals",
-      "match": "Baltimore Orioles - Kansas City Royals",
-      "decision": "lean_home",
-      "net_team": "Baltimore Orioles",
-      "reason": "Kansas City Royals plus penalise par calendrier/voyage (0.84 vs 0.00)",
-      "pressure_score": 0.837,
-      "home_fade": 0.0,
-      "away_fade": 0.837,
-      "travel_score": 0.837,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "1 match dans les 48h + 1537 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.433,
-        "away_score": -1.237,
-        "home_fade": 0.0,
-        "away_fade": 1.237,
-        "reason": "Direction nette: Baltimore Orioles (+0.43)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.4
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.837
           }
         ]
       }
