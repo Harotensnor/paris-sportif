@@ -1,23 +1,44 @@
 {
-  "generated_at": "2026-07-13T21:10:11Z",
+  "generated_at": "2026-07-13T22:06:46Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "watch",
   "summary": {
-    "active_events": 16,
+    "active_events": 17,
     "actionable": 0,
-    "watch": 0,
+    "watch": 1,
     "risk": 16,
     "expired_sample": 0,
     "by_type": {
-      "market_uncertain": 16
+      "market_uncertain": 16,
+      "injury_imbalance": 1
     },
     "by_quality": {
-      "risk": 16
+      "risk": 16,
+      "watch": 1
     }
   },
   "active_actionable": [],
-  "active_watch": [],
+  "active_watch": [
+    {
+      "event_id": "401857067",
+      "date": "2026-07-14T23:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Toronto Tempo",
+      "away": "Washington Mystics",
+      "match": "Toronto Tempo - Washington Mystics",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Toronto Tempo",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 3-0"
+    }
+  ],
   "active_risk": [
     {
       "event_id": "178772",
