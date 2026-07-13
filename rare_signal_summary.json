@@ -1,22 +1,20 @@
 {
-  "generated_at": "2026-07-12T23:06:42Z",
+  "generated_at": "2026-07-13T00:00:59Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 22,
+    "active_events": 21,
     "actionable": 1,
-    "watch": 1,
+    "watch": 0,
     "risk": 20,
     "expired_sample": 0,
     "by_type": {
-      "market_move": 2,
-      "signal_conflict": 1,
       "injury_imbalance": 1,
+      "market_move": 1,
       "market_uncertain": 23
     },
     "by_quality": {
-      "watch": 1,
       "actionable": 1,
       "risk": 20
     }
@@ -37,30 +35,11 @@
       "direction": "steam",
       "team": null,
       "side": "away",
-      "strength": 0.862,
-      "context": "Cote away: 2.90 -> 2.45 (+15.5%)"
+      "strength": 0.694,
+      "context": "Cote away: 2.80 -> 2.45 (+12.5%)"
     }
   ],
-  "active_watch": [
-    {
-      "event_id": "401857062",
-      "date": "2026-07-12T23:00Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Dallas Wings",
-      "away": "Chicago Sky",
-      "match": "Dallas Wings - Chicago Sky",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.604,
-      "context": "Cote away: 4.60 -> 4.10 (+10.9%)"
-    }
-  ],
+  "active_watch": [],
   "active_risk": [
     {
       "event_id": "178774",
@@ -99,6 +78,24 @@
       "context": "marge bookmaker anormale 12.1%"
     },
     {
+      "event_id": "181613",
+      "date": "2026-07-14T04:00Z",
+      "sport": "tennis",
+      "league_code": "vandapharmaceuticals",
+      "league_name": "Vanda Pharmaceuticals Athens Open",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 12.1%"
+    },
+    {
       "event_id": "178743",
       "date": "2026-07-14T04:00Z",
       "sport": "tennis",
@@ -122,24 +119,6 @@
       "sport": "tennis",
       "league_code": "plavalagunacroatiaop",
       "league_name": "Plava Laguna Croatia Open Umag",
-      "home": "",
-      "away": "",
-      "match": "? - ?",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 12.1%"
-    },
-    {
-      "event_id": "181613",
-      "date": "2026-07-14T04:00Z",
-      "sport": "tennis",
-      "league_code": "vandapharmaceuticals",
-      "league_name": "Vanda Pharmaceuticals Athens Open",
       "home": "",
       "away": "",
       "match": "? - ?",
