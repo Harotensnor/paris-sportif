@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-07-13T09:23:34Z",
+  "generated_at": "2026-07-13T12:23:25Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 69,
-    "actionable": 44,
+    "active_events": 70,
+    "actionable": 45,
     "watch": 5,
     "risk": 20,
     "expired_sample": 0,
@@ -14,11 +14,12 @@
       "injury_imbalance": 26,
       "signal_conflict": 5,
       "travel_extreme": 24,
-      "back_to_back_travel": 31
+      "back_to_back_travel": 31,
+      "weather_extreme": 1
     },
     "by_quality": {
       "risk": 20,
-      "actionable": 44,
+      "actionable": 45,
       "watch": 5
     }
   },
@@ -814,6 +815,24 @@
       "side": "away",
       "strength": 0.737,
       "context": "Deplacement estime 3169 km, decalage ~2.3h"
+    },
+    {
+      "event_id": "401843385",
+      "date": "2026-07-18T16:00Z",
+      "sport": "football",
+      "league_code": "eliteserien",
+      "league_name": "Eliteserien",
+      "home": "Viking FK",
+      "away": "Sandefjord",
+      "match": "Viking FK - Sandefjord",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "weather_extreme",
+      "direction": "under_goals",
+      "team": null,
+      "side": null,
+      "strength": 0.65,
+      "context": "Meteo dure: vent 39 km/h, pluie 0.0 mm"
     }
   ],
   "active_watch": [
@@ -910,6 +929,24 @@
   ],
   "active_risk": [
     {
+      "event_id": "181613",
+      "date": "2026-07-14T04:00Z",
+      "sport": "tennis",
+      "league_code": "vandapharmaceuticals",
+      "league_name": "Vanda Pharmaceuticals Athens Open",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 12.1%"
+    },
+    {
       "event_id": "178727",
       "date": "2026-07-14T04:00Z",
       "sport": "tennis",
@@ -933,24 +970,6 @@
       "sport": "tennis",
       "league_code": "plavalagunacroatiaop",
       "league_name": "Plava Laguna Croatia Open Umag",
-      "home": "",
-      "away": "",
-      "match": "? - ?",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 12.1%"
-    },
-    {
-      "event_id": "181613",
-      "date": "2026-07-14T04:00Z",
-      "sport": "tennis",
-      "league_code": "vandapharmaceuticals",
-      "league_name": "Vanda Pharmaceuticals Athens Open",
       "home": "",
       "away": "",
       "match": "? - ?",
