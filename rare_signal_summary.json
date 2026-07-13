@@ -1,27 +1,26 @@
 {
-  "generated_at": "2026-07-13T17:28:53Z",
+  "generated_at": "2026-07-13T19:01:48Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 75,
-    "actionable": 45,
-    "watch": 7,
-    "risk": 23,
+    "active_events": 74,
+    "actionable": 44,
+    "watch": 6,
+    "risk": 24,
     "expired_sample": 0,
     "by_type": {
-      "market_move": 2,
+      "market_move": 1,
       "market_uncertain": 22,
       "injury_imbalance": 26,
       "signal_conflict": 5,
       "travel_extreme": 24,
-      "back_to_back_travel": 31,
-      "weather_extreme": 1
+      "back_to_back_travel": 31
     },
     "by_quality": {
-      "watch": 7,
-      "risk": 23,
-      "actionable": 45
+      "watch": 6,
+      "risk": 24,
+      "actionable": 44
     }
   },
   "active_actionable": [
@@ -816,24 +815,6 @@
       "side": "away",
       "strength": 0.737,
       "context": "Deplacement estime 3169 km, decalage ~2.3h"
-    },
-    {
-      "event_id": "401843385",
-      "date": "2026-07-18T16:00Z",
-      "sport": "football",
-      "league_code": "eliteserien",
-      "league_name": "Eliteserien",
-      "home": "Viking FK",
-      "away": "Sandefjord",
-      "match": "Viking FK - Sandefjord",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "weather_extreme",
-      "direction": "under_goals",
-      "team": null,
-      "side": null,
-      "strength": 0.65,
-      "context": "Meteo dure: vent 39 km/h, pluie 0.0 mm"
     }
   ],
   "active_watch": [
@@ -892,24 +873,6 @@
       "context": "Cote away: 3.80 -> 3.40 (+10.5%)"
     },
     {
-      "event_id": "401857065",
-      "date": "2026-07-14T01:00Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Minnesota Lynx",
-      "away": "Phoenix Mercury",
-      "match": "Minnesota Lynx - Phoenix Mercury",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.578,
-      "context": "Cote away: 6.25 -> 5.60 (+10.4%)"
-    },
-    {
       "event_id": "401816150",
       "date": "2026-07-18T00:10Z",
       "sport": "baseball",
@@ -965,24 +928,6 @@
     }
   ],
   "active_risk": [
-    {
-      "event_id": "181613",
-      "date": "2026-07-14T04:00Z",
-      "sport": "tennis",
-      "league_code": "vandapharmaceuticals",
-      "league_name": "Vanda Pharmaceuticals Athens Open",
-      "home": "",
-      "away": "",
-      "match": "? - ?",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 12.1%"
-    },
     {
       "event_id": "178732",
       "date": "2026-07-14T08:30Z",
@@ -1074,6 +1019,24 @@
       "context": "marge bookmaker anormale 12.0%"
     },
     {
+      "event_id": "181613",
+      "date": "2026-07-14T16:00Z",
+      "sport": "tennis",
+      "league_code": "vandapharmaceuticals",
+      "league_name": "Vanda Pharmaceuticals Athens Open",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 12.1%"
+    },
+    {
       "event_id": "178791",
       "date": "2026-07-14T16:00Z",
       "sport": "tennis",
@@ -1090,6 +1053,24 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 12.1%"
+    },
+    {
+      "event_id": "181611",
+      "date": "2026-07-14T18:00Z",
+      "sport": "tennis",
+      "league_code": "vandapharmaceuticals",
+      "league_name": "Vanda Pharmaceuticals Athens Open",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 12.9%"
     },
     {
       "event_id": "401877044",
