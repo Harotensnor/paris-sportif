@@ -1,23 +1,23 @@
 {
-  "generated_at": "2026-07-13T19:01:47Z",
+  "generated_at": "2026-07-13T20:08:40Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 61,
+    "active_events": 62,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 92,
+      "lookahead": 93,
       "travel_extreme": 28,
       "schedule_congestion": 68,
       "back_to_back_travel": 31
     },
     "by_decision": {
       "abstain": 18,
-      "lean_home": 38,
+      "lean_home": 39,
       "lean_away": 5
     },
-    "lean_home": 38,
+    "lean_home": 39,
     "lean_away": 5,
     "abstain": 18,
     "monitor": 0
@@ -4214,6 +4214,51 @@
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.8
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401861419",
+      "source_event_ids": [
+        "401861419"
+      ],
+      "kickoff": "2026-07-14T11:35Z",
+      "sport": "football",
+      "league_code": "chn.1",
+      "league_name": "Chinese Super League",
+      "home": "Zhejiang Professional FC",
+      "away": "Qingdao Hainiu",
+      "match": "Zhejiang Professional FC - Qingdao Hainiu",
+      "decision": "lean_home",
+      "net_team": "Zhejiang Professional FC",
+      "reason": "Qingdao Hainiu plus penalise par calendrier/voyage (0.15 vs 0.00)",
+      "pressure_score": 0.333,
+      "home_fade": 0.0,
+      "away_fade": 0.15,
+      "travel_score": 0,
+      "lookahead_score": 0.333,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 1
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": 0.052,
+        "away_score": -0.15,
+        "home_fade": 0.0,
+        "away_fade": 0.15,
+        "reason": "Direction nette: Zhejiang Professional FC (+0.05)",
+        "detail": [
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
           }
         ]
       }
