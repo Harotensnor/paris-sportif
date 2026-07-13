@@ -1,13 +1,13 @@
 {
-  "generated_at": "2026-07-13T12:26:03Z",
+  "generated_at": "2026-07-13T15:24:06Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 71,
-    "actionable": 46,
-    "watch": 6,
-    "risk": 19,
+    "active_events": 73,
+    "actionable": 45,
+    "watch": 7,
+    "risk": 21,
     "expired_sample": 0,
     "by_type": {
       "market_move": 2,
@@ -19,9 +19,9 @@
       "weather_extreme": 1
     },
     "by_quality": {
-      "actionable": 46,
-      "watch": 6,
-      "risk": 19
+      "watch": 7,
+      "risk": 21,
+      "actionable": 45
     }
   },
   "active_actionable": [
@@ -818,24 +818,6 @@
       "context": "Deplacement estime 3169 km, decalage ~2.3h"
     },
     {
-      "event_id": "181623",
-      "date": "2026-07-13T14:30Z",
-      "sport": "tennis",
-      "league_code": "vandapharmaceuticals",
-      "league_name": "Vanda Pharmaceuticals Athens Open",
-      "home": "",
-      "away": "",
-      "match": "? - ?",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "home",
-      "strength": 0.725,
-      "context": "Cote home: 4.60 -> 5.20 (-13.0%)"
-    },
-    {
       "event_id": "401843385",
       "date": "2026-07-18T16:00Z",
       "sport": "football",
@@ -855,24 +837,6 @@
     }
   ],
   "active_watch": [
-    {
-      "event_id": "178779",
-      "date": "2026-07-13T19:00Z",
-      "sport": "tennis",
-      "league_code": "plavalagunacroatiaop",
-      "league_name": "Plava Laguna Croatia Open Umag",
-      "home": "",
-      "away": "",
-      "match": "? - ?",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "away",
-      "strength": 0.627,
-      "context": "Cote away: 3.10 -> 3.45 (-11.3%)"
-    },
     {
       "event_id": "401816153",
       "date": "2026-07-18T02:10Z",
@@ -908,6 +872,42 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 10-7"
+    },
+    {
+      "event_id": "401857064",
+      "date": "2026-07-13T23:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Atlanta Dream",
+      "away": "Los Angeles Sparks",
+      "match": "Atlanta Dream - Los Angeles Sparks",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.585,
+      "context": "Cote away: 3.80 -> 3.40 (+10.5%)"
+    },
+    {
+      "event_id": "401857065",
+      "date": "2026-07-14T01:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Minnesota Lynx",
+      "away": "Phoenix Mercury",
+      "match": "Minnesota Lynx - Phoenix Mercury",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.578,
+      "context": "Cote away: 6.25 -> 5.60 (+10.4%)"
     },
     {
       "event_id": "401816150",
@@ -966,6 +966,24 @@
   ],
   "active_risk": [
     {
+      "event_id": "178769",
+      "date": "2026-07-14T04:00Z",
+      "sport": "tennis",
+      "league_code": "plavalagunacroatiaop",
+      "league_name": "Plava Laguna Croatia Open Umag",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 12.1%"
+    },
+    {
       "event_id": "181613",
       "date": "2026-07-14T04:00Z",
       "sport": "tennis",
@@ -984,8 +1002,8 @@
       "context": "marge bookmaker anormale 12.1%"
     },
     {
-      "event_id": "178727",
-      "date": "2026-07-14T04:00Z",
+      "event_id": "178732",
+      "date": "2026-07-14T08:30Z",
       "sport": "tennis",
       "league_code": "efgswissopengstaad",
       "league_name": "EFG Swiss Open Gstaad",
@@ -1002,11 +1020,29 @@
       "context": "marge bookmaker anormale 12.1%"
     },
     {
-      "event_id": "178769",
-      "date": "2026-07-14T04:00Z",
+      "event_id": "178727",
+      "date": "2026-07-14T11:30Z",
       "sport": "tennis",
-      "league_code": "plavalagunacroatiaop",
-      "league_name": "Plava Laguna Croatia Open Umag",
+      "league_code": "efgswissopengstaad",
+      "league_name": "EFG Swiss Open Gstaad",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 12.1%"
+    },
+    {
+      "event_id": "178743",
+      "date": "2026-07-14T13:00Z",
+      "sport": "tennis",
+      "league_code": "efgswissopengstaad",
+      "league_name": "EFG Swiss Open Gstaad",
       "home": "",
       "away": "",
       "match": "? - ?",
