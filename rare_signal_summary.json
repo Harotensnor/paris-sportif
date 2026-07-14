@@ -1,21 +1,21 @@
 {
-  "generated_at": "2026-07-14T05:13:17Z",
+  "generated_at": "2026-07-14T07:24:07Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "watch",
   "summary": {
-    "active_events": 22,
+    "active_events": 21,
     "actionable": 0,
-    "watch": 1,
-    "risk": 21,
+    "watch": 2,
+    "risk": 19,
     "expired_sample": 0,
     "by_type": {
-      "market_uncertain": 22,
-      "injury_imbalance": 1
+      "injury_imbalance": 2,
+      "market_uncertain": 20
     },
     "by_quality": {
-      "risk": 21,
-      "watch": 1
+      "watch": 2,
+      "risk": 19
     }
   },
   "active_actionable": [],
@@ -37,27 +37,27 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 3-0"
+    },
+    {
+      "event_id": "401857070",
+      "date": "2026-07-16T00:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Indiana Fever",
+      "away": "Golden State Valkyries",
+      "match": "Indiana Fever - Golden State Valkyries",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Golden State Valkyries",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 1-4"
     }
   ],
   "active_risk": [
-    {
-      "event_id": "178772",
-      "date": "2026-07-14T19:00Z",
-      "sport": "tennis",
-      "league_code": "plavalagunacroatiaop",
-      "league_name": "Plava Laguna Croatia Open Umag",
-      "home": "",
-      "away": "",
-      "match": "? - ?",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 12.1%"
-    },
     {
       "event_id": "180315",
       "date": "2026-07-15T04:00Z",
@@ -74,25 +74,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 12.5%"
-    },
-    {
-      "event_id": "401877044",
-      "date": "2026-07-17T03:00Z",
-      "sport": "football",
-      "league_code": "ligamx",
-      "league_name": "Liga MX",
-      "home": "Tijuana",
-      "away": "Tigres UANL",
-      "match": "Tijuana - Tigres UANL",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.9%"
+      "context": "marge bookmaker anormale 12.1%"
     },
     {
       "event_id": "401861423",
