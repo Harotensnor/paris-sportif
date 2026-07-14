@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-13T23:06:51Z",
+  "generated_at": "2026-07-14T00:02:16Z",
   "source": "data.js bookable feed + sofascore_events source feed",
   "status": "ok",
   "categories": {
@@ -149,9 +149,25 @@
     },
     "J6_coupes": {
       "label": "Coupes",
-      "bookable": 0,
+      "bookable": 2,
       "source": 43,
       "samples": [
+        {
+          "event_id": "401874150",
+          "source": "winamax_exact",
+          "kickoff": "2026-07-21T22:00Z",
+          "match": "Tigre at Nacional",
+          "league": "Copa Sudamericana",
+          "code": "conmebol.sudamericana"
+        },
+        {
+          "event_id": "401874072",
+          "source": "winamax_exact",
+          "kickoff": "2026-07-22T00:30Z",
+          "match": "Santos at UCV FC",
+          "league": "Copa Sudamericana",
+          "code": "conmebol.sudamericana"
+        },
         {
           "event_id": "sofa_15832759",
           "source": "sofascore_watch",
@@ -199,29 +215,13 @@
           "match": "Universidad Católica vs Cruzeiro",
           "league": "CONMEBOL Libertadores, Group D",
           "code": "conmebol.libertadores"
-        },
-        {
-          "event_id": "sofa_15832796",
-          "source": "sofascore_watch",
-          "kickoff": "2026-05-07T00:30Z",
-          "match": "Independiente Santa Fe vs Corinthians",
-          "league": "CONMEBOL Libertadores, Group E",
-          "code": "conmebol.libertadores"
-        },
-        {
-          "event_id": "sofa_15832803",
-          "source": "sofascore_watch",
-          "kickoff": "2026-05-05T22:00Z",
-          "match": "Club Sporting Cristal vs Palmeiras",
-          "league": "CONMEBOL Libertadores, Group F",
-          "code": "conmebol.libertadores"
         }
       ],
-      "status": "watch"
+      "status": "ok"
     },
     "J7_asie_latam": {
       "label": "Asie / Amérique latine",
-      "bookable": 9,
+      "bookable": 11,
       "source": 66,
       "samples": [
         {
@@ -293,8 +293,8 @@
     }
   },
   "summary": {
-    "bookable_total": 9,
+    "bookable_total": 13,
     "source_total": 141,
-    "ok_categories": 1
+    "ok_categories": 2
   }
 }
