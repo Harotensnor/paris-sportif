@@ -1,45 +1,42 @@
 {
-  "generated_at": "2026-07-14T22:34:02Z",
+  "generated_at": "2026-07-14T23:28:23Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "watch",
   "summary": {
     "active_events": 10,
     "actionable": 0,
-    "watch": 1,
-    "risk": 9,
+    "watch": 0,
+    "risk": 10,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 1,
-      "market_uncertain": 11
+      "market_uncertain": 12
     },
     "by_quality": {
-      "watch": 1,
-      "risk": 9
+      "risk": 10
     }
   },
   "active_actionable": [],
-  "active_watch": [
-    {
-      "event_id": "401857067",
-      "date": "2026-07-14T23:00Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Toronto Tempo",
-      "away": "Washington Mystics",
-      "match": "Toronto Tempo - Washington Mystics",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Toronto Tempo",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 3-0"
-    }
-  ],
+  "active_watch": [],
   "active_risk": [
+    {
+      "event_id": "178639",
+      "date": "2026-07-16T04:00Z",
+      "sport": "tennis",
+      "league_code": "nordeaopen",
+      "league_name": "Nordea Open",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 12.0%"
+    },
     {
       "event_id": "178725",
       "date": "2026-07-16T04:00Z",
