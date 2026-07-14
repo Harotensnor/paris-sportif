@@ -1,21 +1,21 @@
 {
-  "generated_at": "2026-07-14T21:34:08Z",
+  "generated_at": "2026-07-14T22:34:02Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "watch",
   "summary": {
-    "active_events": 14,
+    "active_events": 10,
     "actionable": 0,
     "watch": 1,
-    "risk": 13,
+    "risk": 9,
     "expired_sample": 0,
     "by_type": {
       "injury_imbalance": 1,
-      "market_uncertain": 13
+      "market_uncertain": 11
     },
     "by_quality": {
       "watch": 1,
-      "risk": 13
+      "risk": 9
     }
   },
   "active_actionable": [],
@@ -41,6 +41,24 @@
   ],
   "active_risk": [
     {
+      "event_id": "178725",
+      "date": "2026-07-16T04:00Z",
+      "sport": "tennis",
+      "league_code": "efgswissopengstaad",
+      "league_name": "EFG Swiss Open Gstaad",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 12.9%"
+    },
+    {
       "event_id": "179307",
       "date": "2026-07-16T04:00Z",
       "sport": "tennis",
@@ -57,24 +75,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 12.1%"
-    },
-    {
-      "event_id": "401861293",
-      "date": "2026-07-18T11:00Z",
-      "sport": "football",
-      "league_code": "chn.1",
-      "league_name": "Chinese Super League",
-      "home": "Chongqing Tonglianglong",
-      "away": "Zhejiang Professional FC",
-      "match": "Chongqing Tonglianglong - Zhejiang Professional FC",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.7%"
     },
     {
       "event_id": "401861426",
@@ -113,78 +113,6 @@
       "context": "marge bookmaker anormale 18.5%"
     },
     {
-      "event_id": "401877040",
-      "date": "2026-07-18T23:00Z",
-      "sport": "football",
-      "league_code": "ligamx",
-      "league_name": "Liga MX",
-      "home": "Pumas UNAM",
-      "away": "Pachuca",
-      "match": "Pumas UNAM - Pachuca",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 19.5%"
-    },
-    {
-      "event_id": "401877038",
-      "date": "2026-07-19T01:00Z",
-      "sport": "football",
-      "league_code": "ligamx",
-      "league_name": "Liga MX",
-      "home": "Monterrey",
-      "away": "Santos",
-      "match": "Monterrey - Santos",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.7%"
-    },
-    {
-      "event_id": "401877037",
-      "date": "2026-07-19T03:00Z",
-      "sport": "football",
-      "league_code": "ligamx",
-      "league_name": "Liga MX",
-      "home": "Querétaro",
-      "away": "América",
-      "match": "Querétaro - América",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.4%"
-    },
-    {
-      "event_id": "401842755",
-      "date": "2026-07-19T14:30Z",
-      "sport": "football",
-      "league_code": "allsvenskan",
-      "league_name": "Allsvenskan",
-      "home": "IF Elfsborg",
-      "away": "IK Sirius",
-      "match": "IF Elfsborg - IK Sirius",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 19.1%"
-    },
-    {
       "event_id": "401842758",
       "date": "2026-07-20T17:00Z",
       "sport": "football",
@@ -200,7 +128,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 19.7%"
+      "context": "marge bookmaker anormale 18.2%"
     },
     {
       "event_id": "401874150",
