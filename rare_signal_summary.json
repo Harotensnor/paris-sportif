@@ -1,45 +1,25 @@
 {
-  "generated_at": "2026-07-14T14:31:17Z",
+  "generated_at": "2026-07-14T15:59:15Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
-  "status": "ok",
+  "status": "watch",
   "summary": {
-    "active_events": 20,
-    "actionable": 1,
-    "watch": 2,
-    "risk": 17,
+    "active_events": 15,
+    "actionable": 0,
+    "watch": 3,
+    "risk": 12,
     "expired_sample": 0,
     "by_type": {
-      "market_move": 2,
       "injury_imbalance": 2,
-      "market_uncertain": 17
+      "market_move": 3,
+      "market_uncertain": 12
     },
     "by_quality": {
-      "actionable": 1,
-      "watch": 2,
-      "risk": 17
+      "watch": 3,
+      "risk": 12
     }
   },
-  "active_actionable": [
-    {
-      "event_id": "401857066",
-      "date": "2026-07-14T15:00Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Connecticut Sun",
-      "away": "Portland Fire",
-      "match": "Connecticut Sun - Portland Fire",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 1.0,
-      "context": "Cote away: 2.20 -> 1.74 (+20.9%)"
-    }
-  ],
+  "active_actionable": [],
   "active_watch": [
     {
       "event_id": "401857067",
@@ -76,26 +56,6 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 1-4"
-    }
-  ],
-  "active_risk": [
-    {
-      "event_id": "181609",
-      "date": "2026-07-15T04:00Z",
-      "sport": "tennis",
-      "league_code": "vandapharmaceuticals",
-      "league_name": "Vanda Pharmaceuticals Athens Open",
-      "home": "",
-      "away": "",
-      "match": "? - ?",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 12.1%"
     },
     {
       "event_id": "401861423",
@@ -106,24 +66,26 @@
       "home": "Henan",
       "away": "Qingdao Hainiu",
       "match": "Henan - Qingdao Hainiu",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "drift",
       "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.1%"
-    },
+      "side": "draw",
+      "strength": 0.463,
+      "context": "Cote draw: 3.60 -> 3.90 (-8.3%)"
+    }
+  ],
+  "active_risk": [
     {
-      "event_id": "401861424",
-      "date": "2026-07-17T12:00Z",
+      "event_id": "401861293",
+      "date": "2026-07-18T11:00Z",
       "sport": "football",
       "league_code": "chn.1",
       "league_name": "Chinese Super League",
-      "home": "Yunnan Yukun",
-      "away": "Shanghai Port",
-      "match": "Yunnan Yukun - Shanghai Port",
+      "home": "Chongqing Tonglianglong",
+      "away": "Zhejiang Professional FC",
+      "match": "Chongqing Tonglianglong - Zhejiang Professional FC",
       "quality": "risk",
       "quality_reason": "Signal de prudence, pas une opportunite directe",
       "type": "market_uncertain",
@@ -134,42 +96,6 @@
       "context": "marge bookmaker anormale 18.7%"
     },
     {
-      "event_id": "401877043",
-      "date": "2026-07-18T01:00Z",
-      "sport": "football",
-      "league_code": "ligamx",
-      "league_name": "Liga MX",
-      "home": "Atlético de San Luis",
-      "away": "Cruz Azul",
-      "match": "Atlético de San Luis - Cruz Azul",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.8%"
-    },
-    {
-      "event_id": "401877041",
-      "date": "2026-07-18T03:00Z",
-      "sport": "football",
-      "league_code": "ligamx",
-      "league_name": "Liga MX",
-      "home": "FC Juarez",
-      "away": "Puebla",
-      "match": "FC Juarez - Puebla",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.3%"
-    },
-    {
       "event_id": "401861426",
       "date": "2026-07-18T11:35Z",
       "sport": "football",
@@ -178,24 +104,6 @@
       "home": "Dalian Yingbo",
       "away": "Shandong Taishan",
       "match": "Dalian Yingbo - Shandong Taishan",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.4%"
-    },
-    {
-      "event_id": "401861428",
-      "date": "2026-07-18T12:00Z",
-      "sport": "football",
-      "league_code": "chn.1",
-      "league_name": "Chinese Super League",
-      "home": "Wuhan Three Towns",
-      "away": "Shenzhen Xinpengcheng",
-      "match": "Wuhan Three Towns - Shenzhen Xinpengcheng",
       "quality": "risk",
       "quality_reason": "Signal de prudence, pas une opportunite directe",
       "type": "market_uncertain",
