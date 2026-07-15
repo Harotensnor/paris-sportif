@@ -1,44 +1,23 @@
 {
-  "generated_at": "2026-07-15T05:11:42Z",
+  "generated_at": "2026-07-15T07:26:32Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "watch",
   "summary": {
-    "active_events": 14,
+    "active_events": 13,
     "actionable": 0,
-    "watch": 1,
+    "watch": 0,
     "risk": 13,
     "expired_sample": 0,
     "by_type": {
-      "market_uncertain": 15,
-      "weather_extreme": 1
+      "market_uncertain": 15
     },
     "by_quality": {
-      "risk": 13,
-      "watch": 1
+      "risk": 13
     }
   },
   "active_actionable": [],
-  "active_watch": [
-    {
-      "event_id": "401842760",
-      "date": "2026-07-19T14:30Z",
-      "sport": "football",
-      "league_code": "allsvenskan",
-      "league_name": "Allsvenskan",
-      "home": "Hammarby IF",
-      "away": "Degerfors IF",
-      "match": "Hammarby IF - Degerfors IF",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "weather_extreme",
-      "direction": "under_goals",
-      "team": null,
-      "side": null,
-      "strength": 0.592,
-      "context": "Meteo dure: vent 36 km/h, pluie 1.4 mm"
-    }
-  ],
+  "active_watch": [],
   "active_risk": [
     {
       "event_id": "178639",
@@ -59,24 +38,6 @@
       "context": "marge bookmaker anormale 12.0%"
     },
     {
-      "event_id": "179307",
-      "date": "2026-07-16T04:00Z",
-      "sport": "tennis",
-      "league_code": "unicreditiasiopen",
-      "league_name": "Unicredit Iasi Open",
-      "home": "",
-      "away": "",
-      "match": "? - ?",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 12.1%"
-    },
-    {
       "event_id": "178725",
       "date": "2026-07-16T04:00Z",
       "sport": "tennis",
@@ -93,6 +54,24 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 12.9%"
+    },
+    {
+      "event_id": "179307",
+      "date": "2026-07-16T04:00Z",
+      "sport": "tennis",
+      "league_code": "unicreditiasiopen",
+      "league_name": "Unicredit Iasi Open",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 12.1%"
     },
     {
       "event_id": "401861426",
