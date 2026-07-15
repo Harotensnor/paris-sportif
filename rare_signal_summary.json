@@ -1,63 +1,24 @@
 {
-  "generated_at": "2026-07-15T16:02:29Z",
+  "generated_at": "2026-07-15T17:17:42Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "watch",
   "summary": {
-    "active_events": 14,
+    "active_events": 13,
     "actionable": 0,
-    "watch": 1,
+    "watch": 0,
     "risk": 13,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 1,
       "market_uncertain": 13
     },
     "by_quality": {
-      "watch": 1,
       "risk": 13
     }
   },
   "active_actionable": [],
-  "active_watch": [
-    {
-      "event_id": "401857068",
-      "date": "2026-07-15T16:00Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Chicago Sky",
-      "away": "Seattle Storm",
-      "match": "Chicago Sky - Seattle Storm",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Chicago Sky",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 5-2"
-    }
-  ],
+  "active_watch": [],
   "active_risk": [
-    {
-      "event_id": "178728",
-      "date": "2026-07-16T04:00Z",
-      "sport": "tennis",
-      "league_code": "efgswissopengstaad",
-      "league_name": "EFG Swiss Open Gstaad",
-      "home": "",
-      "away": "",
-      "match": "? - ?",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 12.1%"
-    },
     {
       "event_id": "179306",
       "date": "2026-07-16T11:30Z",
@@ -82,6 +43,24 @@
       "sport": "tennis",
       "league_code": "nordeaopen",
       "league_name": "Nordea Open",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 12.1%"
+    },
+    {
+      "event_id": "178728",
+      "date": "2026-07-16T13:00Z",
+      "sport": "tennis",
+      "league_code": "efgswissopengstaad",
+      "league_name": "EFG Swiss Open Gstaad",
       "home": "",
       "away": "",
       "match": "? - ?",
