@@ -1,23 +1,44 @@
 {
-  "generated_at": "2026-07-15T19:41:30Z",
+  "generated_at": "2026-07-15T20:41:09Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "watch",
   "summary": {
-    "active_events": 13,
+    "active_events": 14,
     "actionable": 0,
-    "watch": 0,
+    "watch": 1,
     "risk": 13,
     "expired_sample": 0,
     "by_type": {
-      "market_uncertain": 13
+      "market_uncertain": 13,
+      "injury_imbalance": 1
     },
     "by_quality": {
-      "risk": 13
+      "risk": 13,
+      "watch": 1
     }
   },
   "active_actionable": [],
-  "active_watch": [],
+  "active_watch": [
+    {
+      "event_id": "401857071",
+      "date": "2026-07-16T23:00Z",
+      "sport": "basketball",
+      "league_code": "wnba",
+      "league_name": "WNBA",
+      "home": "Washington Mystics",
+      "away": "Portland Fire",
+      "match": "Washington Mystics - Portland Fire",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Portland Fire",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 0-3"
+    }
+  ],
   "active_risk": [
     {
       "event_id": "179306",
