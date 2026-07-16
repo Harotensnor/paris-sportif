@@ -11,7 +11,7 @@
 // The "Stamp sw.js" step replaces this entire line with the current UTC timestamp,
 // so every deploy invalidates all caches → users see the new pronostics.html
 // without needing Ctrl+Shift+R. Manual edits stay valid for local dev.
-const CACHE_VERSION = 'paris-sportif-v55.4-20260716-125946';
+const CACHE_VERSION = 'paris-sportif-v55.4-20260716-145626';
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
