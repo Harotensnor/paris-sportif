@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-16T07:38:11Z",
-  "calculated_at": "2026-07-16T07:38:11Z",
+  "generated_at": "2026-07-16T09:39:12Z",
+  "calculated_at": "2026-07-16T09:39:12Z",
   "source_of_truth": "data.js",
   "data_age_min": 1,
   "data_file_age_min": 0,
@@ -42,7 +42,7 @@
       "events": 4835
     },
     "referees_soccer": {
-      "age_min": 1,
+      "age_min": 2,
       "events": 106,
       "status": "retained_existing_referees"
     },
@@ -74,19 +74,19 @@
     },
     "h2h_extended": {
       "age_min": 2,
-      "events": 52,
+      "events": 50,
       "events_with_meetings": 17,
       "meetings": 66,
-      "coverage_pct": 32.7,
-      "empty_events": 35,
+      "coverage_pct": 34.0,
+      "empty_events": 33,
       "sports": 3,
       "by_sport": {
         "tennis": {
-          "events": 17,
+          "events": 15,
           "events_with_meetings": 0,
           "meetings": 0,
           "sources": {
-            "espn_summary_empty": 17
+            "espn_summary_empty": 15
           }
         },
         "football": {
@@ -309,8 +309,8 @@
     },
     "daily_insights": {
       "age_min": 2,
-      "insights": 7,
-      "events_today": 19,
+      "insights": 8,
+      "events_today": 18,
       "events_next_36h": 28,
       "sources_loaded": 8
     },
@@ -354,17 +354,17 @@
     },
     "timing_edges": {
       "age_min": 0,
-      "events": 36,
-      "bet_now": 5,
+      "events": 38,
+      "bet_now": 7,
       "wait": 0,
       "price_shortening": 31
     },
     "injuries_multisport": {
       "age_min": 2,
-      "teams": 128,
+      "teams": 131,
       "sports": 4,
-      "injuries": 675,
-      "severe": 413
+      "injuries": 701,
+      "severe": 439
     },
     "thesportsdb_meta": {
       "age_min": 2,
@@ -389,8 +389,8 @@
     },
     "public_team_profiles": {
       "age_min": 0,
-      "teams": 1003,
-      "upcoming": 112,
+      "teams": 999,
+      "upcoming": 108,
       "availability": 62,
       "deep_context": 0
     },
@@ -530,7 +530,7 @@
     "referees_soccer": {
       "script": "scripts/fetch_referees_soccer.py",
       "output": "referees_soccer.json",
-      "age_min": 1,
+      "age_min": 2,
       "threshold_min": 480,
       "fast_red_min": null,
       "status": "ok"
@@ -1042,7 +1042,7 @@
   ],
   "overall": "warning",
   "quality_checks": {
-    "data_generated_at": "2026-07-16T07:37:00.493464Z",
+    "data_generated_at": "2026-07-16T09:37:51.357432Z",
     "truth_scope": "all_events",
     "all_winamax_available": 84,
     "all_winamax_exact": 84,
@@ -1101,7 +1101,7 @@
   "data_truth": {
     "source_of_truth": "data.js",
     "scope": "all_events",
-    "data_generated_at": "2026-07-16T07:37:00.493464Z",
+    "data_generated_at": "2026-07-16T09:37:51.357432Z",
     "winamax_available": 84,
     "winamax_exact": 84,
     "winamax_exact_ratio": 1.0,
@@ -1121,7 +1121,7 @@
     "anomalies_emitted": 8
   },
   "source_health": {
-    "generated_at": "2026-07-16T07:38:11Z",
+    "generated_at": "2026-07-16T09:39:12Z",
     "sources_total": 11,
     "sources_ok": 5,
     "sources_warning": 6,
@@ -1221,7 +1221,7 @@
   },
   "observability": {
     "pipeline_traces": {
-      "generated_at": "2026-07-16T07:38:11Z",
+      "generated_at": "2026-07-16T09:39:12Z",
       "runs_observed": 99,
       "by_status": {
         "warning": 71,
@@ -1239,7 +1239,7 @@
     }
   },
   "data_lineage": {
-    "generated_at": "2026-07-16T07:38:11Z",
+    "generated_at": "2026-07-16T09:39:12Z",
     "status": "ok",
     "events": 84,
     "events_missing_inline_lineage": 0,
@@ -1247,7 +1247,7 @@
     "source_counts": {
       "espn": 84,
       "winamax": 84,
-      "h2h": 48,
+      "h2h": 46,
       "weather": 35,
       "xg": 17,
       "injuries": 4,
