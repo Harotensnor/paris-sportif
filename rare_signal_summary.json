@@ -1,22 +1,22 @@
 {
-  "generated_at": "2026-07-16T11:28:22Z",
+  "generated_at": "2026-07-16T12:59:37Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 26,
+    "active_events": 25,
     "actionable": 5,
     "watch": 5,
-    "risk": 16,
+    "risk": 15,
     "expired_sample": 0,
     "by_type": {
-      "market_uncertain": 16,
+      "market_uncertain": 15,
       "market_move": 16,
       "injury_imbalance": 1,
       "signal_conflict": 1
     },
     "by_quality": {
-      "risk": 16,
+      "risk": 15,
       "actionable": 5,
       "watch": 5
     }
@@ -56,25 +56,7 @@
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 11.51 -> 6.75 (+41.4%)"
-    },
-    {
-      "event_id": "401873893",
-      "date": "2026-07-16T17:00Z",
-      "sport": "football",
-      "league_code": "eliteserien",
-      "league_name": "Eliteserien",
-      "home": "Vålerenga",
-      "away": "Aalesund",
-      "match": "Vålerenga - Aalesund",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.947,
-      "context": "Cote away: 4.40 -> 3.65 (+17.0%)"
+      "context": "Cote home: 11.73 -> 6.75 (+42.5%)"
     },
     {
       "event_id": "401857071",
@@ -93,6 +75,24 @@
       "side": "away",
       "strength": 0.942,
       "context": "Cote away: 2.95 -> 2.45 (+16.9%)"
+    },
+    {
+      "event_id": "401873893",
+      "date": "2026-07-16T17:00Z",
+      "sport": "football",
+      "league_code": "eliteserien",
+      "league_name": "Eliteserien",
+      "home": "Vålerenga",
+      "away": "Aalesund",
+      "match": "Vålerenga - Aalesund",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.84,
+      "context": "Cote away: 4.30 -> 3.65 (+15.1%)"
     },
     {
       "event_id": "181607",
@@ -151,24 +151,6 @@
       "context": "Cote draw: 3.75 -> 3.35 (+10.7%)"
     },
     {
-      "event_id": "178725",
-      "date": "2026-07-16T15:30Z",
-      "sport": "tennis",
-      "league_code": "efgswissopengstaad",
-      "league_name": "EFG Swiss Open Gstaad",
-      "home": "",
-      "away": "",
-      "match": "? - ?",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "home",
-      "strength": 0.543,
-      "context": "Cote home: 1.86 -> 1.68 (+9.8%)"
-    },
-    {
       "event_id": "179317",
       "date": "2026-07-16T16:00Z",
       "sport": "tennis",
@@ -183,8 +165,26 @@
       "direction": "steam",
       "team": null,
       "side": "away",
-      "strength": 0.499,
-      "context": "Cote away: 1.76 -> 1.60 (+9.0%)"
+      "strength": 0.531,
+      "context": "Cote away: 1.77 -> 1.60 (+9.6%)"
+    },
+    {
+      "event_id": "178725",
+      "date": "2026-07-16T15:30Z",
+      "sport": "tennis",
+      "league_code": "efgswissopengstaad",
+      "league_name": "EFG Swiss Open Gstaad",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 0.502,
+      "context": "Cote home: 1.85 -> 1.68 (+9.0%)"
     },
     {
       "event_id": "179316",
@@ -206,24 +206,6 @@
     }
   ],
   "active_risk": [
-    {
-      "event_id": "179306",
-      "date": "2026-07-16T11:50Z",
-      "sport": "tennis",
-      "league_code": "unicreditiasiopen",
-      "league_name": "Unicredit Iasi Open",
-      "home": "",
-      "away": "",
-      "match": "? - ?",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 12.2%"
-    },
     {
       "event_id": "178638",
       "date": "2026-07-16T13:00Z",
