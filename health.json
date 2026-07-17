@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-17T21:24:58Z",
-  "calculated_at": "2026-07-17T21:24:58Z",
+  "generated_at": "2026-07-17T22:11:31Z",
+  "calculated_at": "2026-07-17T22:11:31Z",
   "source_of_truth": "data.js",
   "data_age_min": 1,
   "data_file_age_min": 0,
@@ -47,13 +47,13 @@
       "status": "retained_existing_referees"
     },
     "xg_team_stats": {
-      "age_min": 2,
+      "age_min": 1,
       "teams": 112,
       "leagues": 6,
       "source": "understat"
     },
     "fbref_xg": {
-      "age_min": 2,
+      "age_min": 1,
       "teams": 112,
       "leagues": 6,
       "source": "understat_compat"
@@ -73,20 +73,20 @@
       "sports": 4
     },
     "h2h_extended": {
-      "age_min": 2,
-      "events": 25,
+      "age_min": 1,
+      "events": 26,
       "events_with_meetings": 5,
       "meetings": 16,
-      "coverage_pct": 20.0,
-      "empty_events": 20,
+      "coverage_pct": 19.2,
+      "empty_events": 21,
       "sports": 2,
       "by_sport": {
         "football": {
-          "events": 24,
+          "events": 25,
           "events_with_meetings": 4,
           "meetings": 14,
           "sources": {
-            "espn_summary_empty": 20,
+            "espn_summary_empty": 21,
             "headToHeadGames": 4
           }
         },
@@ -347,11 +347,11 @@
       "price_shortening": 0
     },
     "injuries_multisport": {
-      "age_min": 2,
-      "teams": 130,
+      "age_min": 1,
+      "teams": 133,
       "sports": 4,
-      "injuries": 661,
-      "severe": 399
+      "injuries": 688,
+      "severe": 425
     },
     "thesportsdb_meta": {
       "age_min": 2,
@@ -525,7 +525,7 @@
     "xg_team_stats": {
       "script": "scripts/fetch_understat_xg.py",
       "output": "xg_team_stats.json",
-      "age_min": 2,
+      "age_min": 1,
       "threshold_min": 360,
       "fast_red_min": null,
       "status": "ok"
@@ -533,7 +533,7 @@
     "fbref_xg": {
       "script": "scripts/fetch_understat_xg.py",
       "output": "fbref_xg.json",
-      "age_min": 2,
+      "age_min": 1,
       "threshold_min": 360,
       "fast_red_min": null,
       "status": "ok"
@@ -565,7 +565,7 @@
     "h2h_extended": {
       "script": "h2h_extended.json",
       "output": "h2h_extended.json",
-      "age_min": 2,
+      "age_min": 1,
       "threshold_min": 60,
       "fast_red_min": null,
       "status": "ok"
@@ -861,7 +861,7 @@
     "injuries_multisport": {
       "script": "scripts/fetch_injuries.py",
       "output": "injuries_multisport.json",
-      "age_min": 2,
+      "age_min": 1,
       "threshold_min": 60,
       "fast_red_min": null,
       "status": "ok"
@@ -1028,7 +1028,7 @@
   ],
   "overall": "warning",
   "quality_checks": {
-    "data_generated_at": "2026-07-17T21:23:19.243437Z",
+    "data_generated_at": "2026-07-17T22:10:15.665870Z",
     "truth_scope": "all_events",
     "all_winamax_available": 90,
     "all_winamax_exact": 90,
@@ -1087,7 +1087,7 @@
   "data_truth": {
     "source_of_truth": "data.js",
     "scope": "all_events",
-    "data_generated_at": "2026-07-17T21:23:19.243437Z",
+    "data_generated_at": "2026-07-17T22:10:15.665870Z",
     "winamax_available": 90,
     "winamax_exact": 90,
     "winamax_exact_ratio": 1.0,
@@ -1107,7 +1107,7 @@
     "anomalies_emitted": 4
   },
   "source_health": {
-    "generated_at": "2026-07-17T21:24:58Z",
+    "generated_at": "2026-07-17T22:11:31Z",
     "sources_total": 11,
     "sources_ok": 6,
     "sources_warning": 5,
@@ -1159,7 +1159,7 @@
         "score": 100,
         "status": "ok",
         "items": 4853,
-        "age_min": 2,
+        "age_min": 1,
         "sla_min": 60,
         "issues": 1
       },
@@ -1207,7 +1207,7 @@
   },
   "observability": {
     "pipeline_traces": {
-      "generated_at": "2026-07-17T21:24:58Z",
+      "generated_at": "2026-07-17T22:11:31Z",
       "runs_observed": 99,
       "by_status": {
         "warning": 69,
@@ -1225,7 +1225,7 @@
     }
   },
   "data_lineage": {
-    "generated_at": "2026-07-17T21:24:58Z",
+    "generated_at": "2026-07-17T22:11:31Z",
     "status": "ok",
     "events": 90,
     "events_missing_inline_lineage": 0,
