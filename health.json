@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-17T18:41:22Z",
-  "calculated_at": "2026-07-17T18:41:22Z",
+  "generated_at": "2026-07-17T19:44:56Z",
+  "calculated_at": "2026-07-17T19:44:56Z",
   "source_of_truth": "data.js",
   "data_age_min": 1,
   "data_file_age_min": 0,
@@ -74,19 +74,19 @@
     },
     "h2h_extended": {
       "age_min": 1,
-      "events": 27,
+      "events": 25,
       "events_with_meetings": 5,
       "meetings": 16,
-      "coverage_pct": 18.5,
-      "empty_events": 22,
+      "coverage_pct": 20.0,
+      "empty_events": 20,
       "sports": 2,
       "by_sport": {
         "football": {
-          "events": 26,
+          "events": 24,
           "events_with_meetings": 4,
           "meetings": 14,
           "sources": {
-            "espn_summary_empty": 22,
+            "espn_summary_empty": 20,
             "headToHeadGames": 4
           }
         },
@@ -295,8 +295,8 @@
     },
     "backtest_training_rows": {
       "age_min": 0,
-      "rows": 29,
-      "positive_rate": 0.3793,
+      "rows": 35,
+      "positive_rate": 0.3714,
       "sports": 2
     },
     "daily_insights": {
@@ -350,7 +350,7 @@
       "age_min": 1,
       "teams": 133,
       "sports": 4,
-      "injuries": 690,
+      "injuries": 691,
       "severe": 426
     },
     "thesportsdb_meta": {
@@ -1024,21 +1024,21 @@
     "mlb_player_props: status=empty",
     "nhl_playoff_markets: status=empty",
     "pipeline_drift: 1 divergence(s) auto_refresh/refresh.yml",
-    "winamax_detailed_ratio bas: 0% (0/39) — top-up détails recommandé cap=220",
+    "winamax_detailed_ratio bas: 0% (0/37) — top-up détails recommandé cap=220",
     "data_integrity: alertes non bloquantes"
   ],
   "overall": "warning",
   "quality_checks": {
-    "data_generated_at": "2026-07-17T18:40:10.112052Z",
+    "data_generated_at": "2026-07-17T19:43:44.265089Z",
     "truth_scope": "all_events",
     "all_winamax_available": 90,
     "all_winamax_exact": 90,
     "all_winamax_exact_ratio": 1.0,
     "quality_scope": "upcoming_uncompleted_events",
     "total_events": 90,
-    "upcoming_events": 39,
-    "winamax_available": 39,
-    "winamax_exact": 39,
+    "upcoming_events": 37,
+    "winamax_available": 37,
+    "winamax_exact": 37,
     "winamax_detailed": 0,
     "winamax_tournament_only": 0,
     "winamax_exact_ratio": 1.0,
@@ -1062,9 +1062,9 @@
           "detailed_ratio": 0.0
         },
         "football": {
-          "upcoming": 35,
-          "available": 35,
-          "exact": 35,
+          "upcoming": 33,
+          "available": 33,
+          "exact": 33,
           "detailed": 0,
           "tournament_only": 0,
           "missing": 0,
@@ -1088,13 +1088,13 @@
   "data_truth": {
     "source_of_truth": "data.js",
     "scope": "all_events",
-    "data_generated_at": "2026-07-17T18:40:10.112052Z",
+    "data_generated_at": "2026-07-17T19:43:44.265089Z",
     "winamax_available": 90,
     "winamax_exact": 90,
     "winamax_exact_ratio": 1.0,
     "quality_scope": "upcoming_uncompleted_events",
-    "upcoming_winamax_available": 39,
-    "upcoming_winamax_exact": 39,
+    "upcoming_winamax_available": 37,
+    "upcoming_winamax_exact": 37,
     "upcoming_winamax_exact_ratio": 1.0
   },
   "data_integrity": {
@@ -1108,7 +1108,7 @@
     "anomalies_emitted": 8
   },
   "source_health": {
-    "generated_at": "2026-07-17T18:41:22Z",
+    "generated_at": "2026-07-17T19:44:56Z",
     "sources_total": 11,
     "sources_ok": 5,
     "sources_warning": 6,
@@ -1208,7 +1208,7 @@
   },
   "observability": {
     "pipeline_traces": {
-      "generated_at": "2026-07-17T18:41:22Z",
+      "generated_at": "2026-07-17T19:44:56Z",
       "runs_observed": 99,
       "by_status": {
         "warning": 71,
@@ -1226,7 +1226,7 @@
     }
   },
   "data_lineage": {
-    "generated_at": "2026-07-17T18:41:22Z",
+    "generated_at": "2026-07-17T19:44:56Z",
     "status": "ok",
     "events": 90,
     "events_missing_inline_lineage": 0,
@@ -1349,7 +1349,7 @@
       "niche_markets: status=empty",
       "mlb_player_props: status=empty",
       "nhl_playoff_markets: status=empty",
-      "winamax_detailed_ratio bas: 0% (0/39) — top-up détails recommandé cap=220",
+      "winamax_detailed_ratio bas: 0% (0/37) — top-up détails recommandé cap=220",
       "data_integrity: alertes non bloquantes"
     ],
     "7j": [],
