@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-17T11:08:43Z",
+  "generated_at": "2026-07-17T11:14:45Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -47,24 +47,18 @@
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "away",
+        "net_side": "home",
         "home_score": 0.052,
-        "away_score": 0.517,
+        "away_score": -0.15,
         "home_fade": 0.0,
         "away_fade": 0.15,
-        "reason": "Direction nette: Santos (+0.52)",
+        "reason": "Direction nette: Monterrey (+0.05)",
         "detail": [
           {
             "side": "away",
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.667
           }
         ]
       }
