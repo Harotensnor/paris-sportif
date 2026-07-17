@@ -1,23 +1,23 @@
 {
-  "generated_at": "2026-07-17T07:35:08Z",
+  "generated_at": "2026-07-17T09:30:55Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 40,
-    "actionable": 21,
-    "watch": 7,
+    "actionable": 22,
+    "watch": 6,
     "risk": 12,
     "expired_sample": 0,
     "by_type": {
       "market_uncertain": 17,
       "market_move": 59,
-      "signal_conflict": 5
+      "signal_conflict": 4
     },
     "by_quality": {
       "risk": 12,
-      "actionable": 21,
-      "watch": 7
+      "actionable": 22,
+      "watch": 6
     }
   },
   "active_actionable": [
@@ -274,6 +274,24 @@
       "context": "Cote away: 6.50 -> 5.60 (+13.8%)"
     },
     {
+      "event_id": "401842759",
+      "date": "2026-07-17T17:00Z",
+      "sport": "football",
+      "league_code": "allsvenskan",
+      "league_name": "Allsvenskan",
+      "home": "IFK Göteborg",
+      "away": "IF Brommapojkarna",
+      "match": "IFK Göteborg - IF Brommapojkarna",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.741,
+      "context": "Cote away: 3.75 -> 3.25 (+13.3%)"
+    },
+    {
       "event_id": "401877038",
       "date": "2026-07-19T01:05Z",
       "sport": "football",
@@ -456,24 +474,6 @@
       "context": "Cote away: 3.05 -> 2.70 (+11.5%)"
     },
     {
-      "event_id": "401861424",
-      "date": "2026-07-17T12:00Z",
-      "sport": "football",
-      "league_code": "chn.1",
-      "league_name": "Chinese Super League",
-      "home": "Yunnan Yukun",
-      "away": "Shanghai Port",
-      "match": "Yunnan Yukun - Shanghai Port",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "home",
-      "strength": 0.629,
-      "context": "Cote home: 2.65 -> 2.35 (+11.3%)"
-    },
-    {
       "event_id": "401843387",
       "date": "2026-07-18T16:00Z",
       "sport": "football",
@@ -492,22 +492,22 @@
       "context": "Cote away: 3.15 -> 2.80 (+11.1%)"
     },
     {
-      "event_id": "401842759",
-      "date": "2026-07-17T17:00Z",
+      "event_id": "401861424",
+      "date": "2026-07-17T12:00Z",
       "sport": "football",
-      "league_code": "allsvenskan",
-      "league_name": "Allsvenskan",
-      "home": "IFK Göteborg",
-      "away": "IF Brommapojkarna",
-      "match": "IFK Göteborg - IF Brommapojkarna",
+      "league_code": "chn.1",
+      "league_name": "Chinese Super League",
+      "home": "Yunnan Yukun",
+      "away": "Shanghai Port",
+      "match": "Yunnan Yukun - Shanghai Port",
       "quality": "watch",
       "quality_reason": "Signal rare present mais intensite moyenne",
       "type": "market_move",
       "direction": "steam",
       "team": null,
-      "side": "home",
-      "strength": 0.546,
-      "context": "Cote home: 1.95 -> 1.76 (+9.8%)"
+      "side": "draw",
+      "strength": 0.556,
+      "context": "Cote draw: 4.00 -> 3.60 (+10.0%)"
     },
     {
       "event_id": "401842754",
