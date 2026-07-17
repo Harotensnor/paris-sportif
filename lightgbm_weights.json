@@ -1,13 +1,13 @@
 {
   "schema": "paris-sportif.learned_weights.v1",
-  "generated_at": "2026-07-17T05:27:50Z",
+  "generated_at": "2026-07-17T07:35:08Z",
   "status": "row_level_table_detected_training_pending",
   "reason": "No backtest_training_rows.jsonl row-level feature table yet; exported conservative weights from backtest_report_v2 aggregates.",
   "runtime_dependency": "none",
   "source": {
     "report": "backtest_report_v2.json",
-    "report_generated_at": "2026-07-16T06:08:37Z",
-    "n_events": 692,
+    "report_generated_at": "2026-07-17T06:07:38Z",
+    "n_events": 693,
     "training_rows": "backtest_training_rows.jsonl",
     "training_rows_found": true,
     "training_rows_count": 9
@@ -32,16 +32,16 @@
         "n": 44,
         "roi_pct": 4.12,
         "win_rate": 0.7045,
-        "brier": 0.2143,
-        "weight": 0.01237,
+        "brier": 0.2136,
+        "weight": 0.01244,
         "status": "neutral"
       },
       "football": {
-        "n": 93,
-        "roi_pct": 16.65,
-        "win_rate": 0.5699,
-        "brier": 0.24,
-        "weight": 0.03099,
+        "n": 94,
+        "roi_pct": 17.14,
+        "win_rate": 0.5745,
+        "brier": 0.239,
+        "weight": 0.03183,
         "status": "boost"
       },
       "hockey": {
@@ -90,16 +90,16 @@
         "n": 2,
         "roi_pct": -100.0,
         "win_rate": 0.0,
-        "brier": 0.3121,
-        "weight": -0.00107,
+        "brier": 0.3009,
+        "weight": -0.00102,
         "status": "watch"
       },
       "eliteserien": {
-        "n": 9,
-        "roi_pct": 72.0,
-        "win_rate": 0.8889,
-        "brier": 0.2408,
-        "weight": 0.00328,
+        "n": 10,
+        "roi_pct": 71.0,
+        "win_rate": 0.9,
+        "brier": 0.2383,
+        "weight": 0.00371,
         "status": "watch"
       },
       "esp.2": {
@@ -170,8 +170,8 @@
         "n": 3,
         "roi_pct": -49.57,
         "win_rate": 0.3333,
-        "brier": 0.2281,
-        "weight": -0.00102,
+        "brier": 0.2131,
+        "weight": -0.00091,
         "status": "watch"
       },
       "swe.1": {
@@ -194,18 +194,18 @@
         "n": 39,
         "roi_pct": 8.9,
         "win_rate": 0.7436,
-        "brier": 0.2061,
-        "weight": 0.01738,
+        "brier": 0.2054,
+        "weight": 0.01745,
         "status": "boost"
       }
     },
     "by_tier": {
       "skip": {
-        "n": 692,
-        "roi_pct": 1.43,
-        "win_rate": 0.5838,
-        "brier": 0.2418,
-        "weight": 0.01104,
+        "n": 693,
+        "roi_pct": 1.52,
+        "win_rate": 0.5844,
+        "brier": 0.2416,
+        "weight": 0.01155,
         "status": "neutral"
       },
       "big_bet": {
