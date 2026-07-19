@@ -1,80 +1,18 @@
 {
-  "generated_at": "2026-07-18T23:58:23Z",
+  "generated_at": "2026-07-19T02:32:30Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
-  "status": "ok",
+  "status": "empty",
   "summary": {
-    "active_events": 1,
+    "active_events": 0,
     "expired_sample": 0,
-    "by_type": {
-      "lookahead": 1
-    },
-    "by_decision": {
-      "lean_home": 1
-    },
-    "lean_home": 1,
+    "by_type": {},
+    "by_decision": {},
+    "lean_home": 0,
     "lean_away": 0,
     "abstain": 0,
     "monitor": 0
   },
-  "active": [
-    {
-      "event_id": "401877038",
-      "source_event_ids": [
-        "401877038"
-      ],
-      "kickoff": "2026-07-19T01:05Z",
-      "sport": "football",
-      "league_code": "ligamx",
-      "league_name": "Liga MX",
-      "home": "Monterrey",
-      "away": "Santos",
-      "match": "Monterrey - Santos",
-      "decision": "lean_home",
-      "net_team": "Monterrey",
-      "reason": "Santos plus penalise par calendrier/voyage (0.15 vs 0.00)",
-      "pressure_score": 0.333,
-      "home_fade": 0.0,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.333,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 1
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "mixed",
-        "net_side": null,
-        "home_score": 0.502,
-        "away_score": 0.749,
-        "home_fade": 0.0,
-        "away_fade": 0.15,
-        "reason": "Signaux mitigés: avantage net trop faible (Monterrey +0.50, Santos +0.75)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.45
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 0.899
-          }
-        ]
-      }
-    }
-  ],
+  "active": [],
   "expired_sample": []
 }
