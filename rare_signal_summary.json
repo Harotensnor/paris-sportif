@@ -1,64 +1,25 @@
 {
-  "generated_at": "2026-07-20T16:13:18Z",
+  "generated_at": "2026-07-20T18:16:05Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
-  "status": "ok",
+  "status": "watch",
   "summary": {
-    "active_events": 19,
-    "actionable": 1,
+    "active_events": 17,
+    "actionable": 0,
     "watch": 0,
-    "risk": 18,
+    "risk": 17,
     "expired_sample": 0,
     "by_type": {
-      "market_uncertain": 18,
-      "market_move": 5,
-      "signal_conflict": 1
+      "market_uncertain": 17,
+      "weather_extreme": 1
     },
     "by_quality": {
-      "risk": 18,
-      "actionable": 1
+      "risk": 17
     }
   },
-  "active_actionable": [
-    {
-      "event_id": "401892393",
-      "date": "2026-07-21T00:00Z",
-      "sport": "basketball",
-      "league_code": "wnba",
-      "league_name": "WNBA",
-      "home": "Dallas Wings",
-      "away": "New York Liberty",
-      "match": "Dallas Wings - New York Liberty",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 2.40 -> 1.72 (+28.3%)"
-    }
-  ],
+  "active_actionable": [],
   "active_watch": [],
   "active_risk": [
-    {
-      "event_id": "401842758",
-      "date": "2026-07-20T17:00Z",
-      "sport": "football",
-      "league_code": "allsvenskan",
-      "league_name": "Allsvenskan",
-      "home": "Kalmar FF",
-      "away": "Malmö FF",
-      "match": "Kalmar FF - Malmö FF",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.2%"
-    },
     {
       "event_id": "401874150",
       "date": "2026-07-21T22:00Z",
