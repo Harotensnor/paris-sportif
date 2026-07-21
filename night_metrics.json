@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-07-21T05:37:01Z",
-  "calculated_at": "2026-07-21T05:37:01Z",
+  "generated_at": "2026-07-21T07:58:07Z",
+  "calculated_at": "2026-07-21T07:58:07Z",
   "source_of_truth": "data.js",
-  "data_generated_at": "2026-07-21T05:35:48.482625Z",
+  "data_generated_at": "2026-07-21T07:56:58.618280Z",
   "data_today_field": "2026-07-21",
   "events": {
-    "total": 57,
+    "total": 56,
     "upcoming": 20,
-    "winamax_available": 57,
-    "winamax_exact": 57,
+    "winamax_available": 56,
+    "winamax_exact": 56,
     "winamax_exact_ratio": 1.0,
     "markets_more_than_1n2": 0,
     "form_l10": 0,
-    "h2h": 0,
+    "h2h": 3,
     "lineups": 0,
     "football_lineups": 0,
     "starter_signals": 0,
     "clubelo": 0,
     "weather": 20,
-    "injuries": 1,
+    "injuries": 0,
     "referee": 0,
     "referee_named": 0,
     "referee_context": 0,
@@ -26,7 +26,7 @@
     "fd_calibration": 0,
     "fd_closing_odds": 0,
     "xg": 11,
-    "smart_money": 1
+    "smart_money": 0
   },
   "signal_health": {
     "referee": {
@@ -36,7 +36,7 @@
       "note": "referee is effective coverage: named referee or referee_context usable by the model."
     },
     "smart_money": {
-      "events": 1,
+      "events": 0,
       "status": "rare_event",
       "note": "Smart money is intentionally rare; low count is OK when odds movement does not confirm a strong signal."
     }
@@ -44,8 +44,8 @@
   "winamax_markets": {
     "matches": 531,
     "detailed_market_matches": 16,
-    "detailed_ratio_vs_exact": 0.2807,
-    "gap_to_50pct_exact": 0.2193,
+    "detailed_ratio_vs_exact": 0.2857,
+    "gap_to_50pct_exact": 0.2143,
     "recommended_detail_fetch_cap": 150,
     "detail_by_sport": {
       "football": {
@@ -64,19 +64,19 @@
     "market_family_counts": {}
   },
   "backtest": {
-    "overall_roi_pct": 0.01,
-    "overall_brier": 0.2415,
+    "overall_roi_pct": 0.27,
+    "overall_brier": 0.2418,
     "by_sport_roi_pct": {
       "baseball": -2.65,
-      "basketball": 0.68,
-      "football": 9.66,
+      "basketball": -2.96,
+      "football": 12.42,
       "hockey": 39.76
     },
     "cold_sports": []
   },
   "health": {
     "status": "warning",
-    "warnings": 10,
+    "warnings": 11,
     "pipeline_drift": "warn"
   }
 }
