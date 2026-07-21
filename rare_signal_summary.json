@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-07-21T11:44:47Z",
+  "generated_at": "2026-07-21T13:07:42Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
-  "status": "ok",
+  "status": "watch",
   "summary": {
     "active_events": 19,
-    "actionable": 4,
+    "actionable": 0,
     "watch": 0,
-    "risk": 15,
+    "risk": 19,
     "expired_sample": 0,
     "by_type": {
-      "market_uncertain": 19,
-      "market_move": 8
+      "market_uncertain": 19
     },
     "by_quality": {
-      "actionable": 4,
-      "risk": 15
+      "risk": 19
     }
   },
-  "active_actionable": [
+  "active_actionable": [],
+  "active_watch": [],
+  "active_risk": [
     {
       "event_id": "401874150",
       "date": "2026-07-21T22:00Z",
@@ -28,50 +28,14 @@
       "home": "Nacional",
       "away": "Tigre",
       "match": "Nacional - Tigre",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
       "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 2.35 -> 1.84 (+21.7%)"
-    },
-    {
-      "event_id": "401877036",
-      "date": "2026-07-22T01:00Z",
-      "sport": "football",
-      "league_code": "ligamx",
-      "league_name": "Liga MX",
-      "home": "Cruz Azul",
-      "away": "Puebla",
-      "match": "Cruz Azul - Puebla",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "draw",
-      "strength": 1.0,
-      "context": "Cote draw: 5.25 -> 4.20 (+20.0%)"
-    },
-    {
-      "event_id": "401877035",
-      "date": "2026-07-22T03:05Z",
-      "sport": "football",
-      "league_code": "ligamx",
-      "league_name": "Liga MX",
-      "home": "Toluca",
-      "away": "Pumas UNAM",
-      "match": "Toluca - Pumas UNAM",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 1.0,
-      "context": "Cote away: 5.00 -> 3.80 (+24.0%)"
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.5%"
     },
     {
       "event_id": "401874072",
@@ -82,18 +46,51 @@
       "home": "UCV FC",
       "away": "Santos",
       "match": "UCV FC - Santos",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
       "team": null,
-      "side": "home",
-      "strength": 0.949,
-      "context": "Cote home: 4.10 -> 3.40 (+17.1%)"
-    }
-  ],
-  "active_watch": [],
-  "active_risk": [
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 19.1%"
+    },
+    {
+      "event_id": "401877036",
+      "date": "2026-07-22T01:00Z",
+      "sport": "football",
+      "league_code": "ligamx",
+      "league_name": "Liga MX",
+      "home": "Cruz Azul",
+      "away": "Puebla",
+      "match": "Cruz Azul - Puebla",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.6%"
+    },
+    {
+      "event_id": "401877035",
+      "date": "2026-07-22T03:05Z",
+      "sport": "football",
+      "league_code": "ligamx",
+      "league_name": "Liga MX",
+      "home": "Toluca",
+      "away": "Pumas UNAM",
+      "match": "Toluca - Pumas UNAM",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.6%"
+    },
     {
       "event_id": "401874157",
       "date": "2026-07-22T22:00Z",
