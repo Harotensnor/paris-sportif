@@ -1,42 +1,25 @@
 {
-  "generated_at": "2026-07-22T15:16:16Z",
+  "generated_at": "2026-07-22T16:45:31Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 18,
-    "actionable": 2,
+    "actionable": 1,
     "watch": 0,
-    "risk": 16,
+    "risk": 17,
     "expired_sample": 0,
     "by_type": {
       "market_uncertain": 18,
-      "market_move": 4
+      "market_move": 4,
+      "signal_conflict": 1
     },
     "by_quality": {
-      "actionable": 2,
-      "risk": 16
+      "risk": 17,
+      "actionable": 1
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401874157",
-      "date": "2026-07-22T22:00Z",
-      "sport": "football",
-      "league_code": "conmebol.sudamericana",
-      "league_name": "Copa Sudamericana",
-      "home": "Independiente Medellín",
-      "away": "Vasco da Gama",
-      "match": "Independiente Medellín - Vasco da Gama",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 1.0,
-      "context": "Cote away: 3.20 -> 2.55 (+20.3%)"
-    },
     {
       "event_id": "401874166",
       "date": "2026-07-23T00:30Z",
@@ -58,6 +41,24 @@
   ],
   "active_watch": [],
   "active_risk": [
+    {
+      "event_id": "401874157",
+      "date": "2026-07-22T22:00Z",
+      "sport": "football",
+      "league_code": "conmebol.sudamericana",
+      "league_name": "Copa Sudamericana",
+      "home": "Independiente Medellín",
+      "away": "Vasco da Gama",
+      "match": "Independiente Medellín - Vasco da Gama",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 19.1%"
+    },
     {
       "event_id": "401874148",
       "date": "2026-07-23T00:30Z",
