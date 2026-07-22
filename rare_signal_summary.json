@@ -1,13 +1,13 @@
 {
-  "generated_at": "2026-07-22T17:55:39Z",
+  "generated_at": "2026-07-22T18:53:14Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 18,
-    "actionable": 1,
+    "actionable": 2,
     "watch": 0,
-    "risk": 17,
+    "risk": 16,
     "expired_sample": 0,
     "by_type": {
       "market_uncertain": 18,
@@ -15,8 +15,8 @@
       "signal_conflict": 1
     },
     "by_quality": {
-      "risk": 17,
-      "actionable": 1
+      "actionable": 2,
+      "risk": 16
     }
   },
   "active_actionable": [
@@ -37,10 +37,7 @@
       "side": "away",
       "strength": 1.0,
       "context": "Cote away: 9.00 -> 5.50 (+38.9%)"
-    }
-  ],
-  "active_watch": [],
-  "active_risk": [
+    },
     {
       "event_id": "401874157",
       "date": "2026-07-22T22:00Z",
@@ -50,15 +47,18 @@
       "home": "Independiente Medellín",
       "away": "Vasco da Gama",
       "match": "Independiente Medellín - Vasco da Gama",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
       "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 19.1%"
-    },
+      "side": "home",
+      "strength": 0.871,
+      "context": "Cote home: 2.55 -> 2.15 (+15.7%)"
+    }
+  ],
+  "active_watch": [],
+  "active_risk": [
     {
       "event_id": "401874148",
       "date": "2026-07-23T00:30Z",
