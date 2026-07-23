@@ -1,14 +1,14 @@
 {
-  "generated_at": "2026-07-23T16:53:15Z",
-  "calculated_at": "2026-07-23T16:53:15Z",
+  "generated_at": "2026-07-23T18:06:37Z",
+  "calculated_at": "2026-07-23T18:06:37Z",
   "source_of_truth": "data.js",
-  "data_generated_at": "2026-07-23T16:52:20.933890Z",
+  "data_generated_at": "2026-07-23T18:03:59.612134Z",
   "data_today_field": "2026-07-23",
   "events": {
-    "total": 24,
+    "total": 27,
     "upcoming": 20,
-    "winamax_available": 24,
-    "winamax_exact": 24,
+    "winamax_available": 27,
+    "winamax_exact": 27,
     "winamax_exact_ratio": 1.0,
     "markets_more_than_1n2": 0,
     "form_l10": 0,
@@ -17,7 +17,7 @@
     "football_lineups": 0,
     "starter_signals": 0,
     "clubelo": 0,
-    "weather": 19,
+    "weather": 22,
     "injuries": 0,
     "referee": 0,
     "referee_named": 0,
@@ -25,8 +25,8 @@
     "referee_signal": 0,
     "fd_calibration": 0,
     "fd_closing_odds": 0,
-    "xg": 14,
-    "smart_money": 0
+    "xg": 17,
+    "smart_money": 1
   },
   "signal_health": {
     "referee": {
@@ -36,7 +36,7 @@
       "note": "referee is effective coverage: named referee or referee_context usable by the model."
     },
     "smart_money": {
-      "events": 0,
+      "events": 1,
       "status": "rare_event",
       "note": "Smart money is intentionally rare; low count is OK when odds movement does not confirm a strong signal."
     }
@@ -44,7 +44,7 @@
   "winamax_markets": {
     "matches": 531,
     "detailed_market_matches": 16,
-    "detailed_ratio_vs_exact": 0.6667,
+    "detailed_ratio_vs_exact": 0.5926,
     "gap_to_50pct_exact": 0,
     "recommended_detail_fetch_cap": 90,
     "detail_by_sport": {
@@ -76,7 +76,7 @@
   },
   "health": {
     "status": "warning",
-    "warnings": 11,
+    "warnings": 10,
     "pipeline_drift": "warn"
   }
 }
