@@ -1,21 +1,21 @@
 {
-  "generated_at": "2026-07-24T12:57:44Z",
+  "generated_at": "2026-07-24T14:43:56Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 17,
+    "active_events": 18,
     "actionable": 2,
     "watch": 0,
-    "risk": 15,
+    "risk": 16,
     "expired_sample": 0,
     "by_type": {
-      "market_uncertain": 17,
+      "market_uncertain": 18,
       "market_move": 4
     },
     "by_quality": {
       "actionable": 2,
-      "risk": 15
+      "risk": 16
     }
   },
   "active_actionable": [
@@ -35,7 +35,7 @@
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 5.00 -> 3.80 (+24.0%)"
+      "context": "Cote home: 5.25 -> 3.80 (+27.6%)"
     },
     {
       "event_id": "401877032",
@@ -58,6 +58,24 @@
   ],
   "active_watch": [],
   "active_risk": [
+    {
+      "event_id": "178885",
+      "date": "2026-07-25T11:00Z",
+      "sport": "tennis",
+      "league_code": "generaliopen",
+      "league_name": "Generali Open",
+      "home": "",
+      "away": "",
+      "match": "? - ?",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 12.1%"
+    },
     {
       "event_id": "401877031",
       "date": "2026-07-25T23:07Z",
