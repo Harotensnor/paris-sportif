@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-07-25T11:00:51Z",
+  "generated_at": "2026-07-25T12:05:58Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
-  "status": "ok",
+  "status": "watch",
   "summary": {
-    "active_events": 19,
-    "actionable": 3,
+    "active_events": 18,
+    "actionable": 0,
     "watch": 0,
-    "risk": 16,
+    "risk": 18,
     "expired_sample": 0,
     "by_type": {
-      "market_uncertain": 19,
-      "market_move": 5
+      "market_uncertain": 18
     },
     "by_quality": {
-      "risk": 16,
-      "actionable": 3
+      "risk": 18
     }
   },
-  "active_actionable": [
+  "active_actionable": [],
+  "active_watch": [],
+  "active_risk": [
     {
       "event_id": "401877031",
       "date": "2026-07-25T23:07Z",
@@ -28,14 +28,14 @@
       "home": "Guadalajara",
       "away": "FC Juarez",
       "match": "Guadalajara - FC Juarez",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
       "team": null,
-      "side": "draw",
-      "strength": 1.0,
-      "context": "Cote draw: 4.90 -> 3.65 (+25.5%)"
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 19.2%"
     },
     {
       "event_id": "401877030",
@@ -46,14 +46,14 @@
       "home": "Santos",
       "away": "Atlas",
       "match": "Santos - Atlas",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
       "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 2.50 -> 2.00 (+20.0%)"
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 19.3%"
     },
     {
       "event_id": "401877034",
@@ -64,27 +64,6 @@
       "home": "Tigres UANL",
       "away": "Atlético de San Luis",
       "match": "Tigres UANL - Atlético de San Luis",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "draw",
-      "strength": 1.0,
-      "context": "Cote draw: 5.00 -> 4.10 (+18.0%)"
-    }
-  ],
-  "active_watch": [],
-  "active_risk": [
-    {
-      "event_id": "178885",
-      "date": "2026-07-25T11:05Z",
-      "sport": "tennis",
-      "league_code": "generaliopen",
-      "league_name": "Generali Open",
-      "home": "",
-      "away": "",
-      "match": "? - ?",
       "quality": "risk",
       "quality_reason": "Signal de prudence, pas une opportunite directe",
       "type": "market_uncertain",
@@ -92,7 +71,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 12.1%"
+      "context": "marge bookmaker anormale 19.1%"
     },
     {
       "event_id": "401877029",
