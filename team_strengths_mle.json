@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-07-25T15:54:15Z",
+  "generated_at": "2026-07-25T16:41:14Z",
   "method": "Full Bivariate Poisson MLE Dixon-Coles. Coordinate-descent avec golden-section search 1D. Pure Python (pas de scipy).",
   "min_matches_per_league": 40,
   "min_matches_per_team": 5,
-  "n_leagues_fit": 7,
+  "n_leagues_fit": 8,
   "leagues": {
     "chn.1": {
       "n_matches": 80,
@@ -696,6 +696,82 @@
           "beta": -0.1336,
           "rank_off": 5,
           "rank_def": 8
+        }
+      }
+    },
+    "nor.1": {
+      "n_matches": 40,
+      "n_teams": 11,
+      "gamma": 0.4143,
+      "rho": 0.0984,
+      "log_lik": -109.52,
+      "iterations": 3,
+      "teams": {
+        "Bodo/Glimt": {
+          "alpha": 0.4241,
+          "beta": 1.3724,
+          "rank_off": 4,
+          "rank_def": 11
+        },
+        "Hamarkameratene": {
+          "alpha": -0.2748,
+          "beta": -0.4027,
+          "rank_off": 8,
+          "rank_def": 3
+        },
+        "IK Start": {
+          "alpha": -0.0287,
+          "beta": -0.707,
+          "rank_off": 7,
+          "rank_def": 1
+        },
+        "KFUM Oslo": {
+          "alpha": 0.0258,
+          "beta": 0.1046,
+          "rank_off": 6,
+          "rank_def": 7
+        },
+        "Kristiansund BK": {
+          "alpha": -0.6974,
+          "beta": 0.1835,
+          "rank_off": 10,
+          "rank_def": 8
+        },
+        "Lillestrom": {
+          "alpha": 0.4578,
+          "beta": -0.3087,
+          "rank_off": 3,
+          "rank_def": 4
+        },
+        "SK Brann": {
+          "alpha": 0.5762,
+          "beta": 0.3693,
+          "rank_off": 1,
+          "rank_def": 10
+        },
+        "Sandefjord": {
+          "alpha": -0.3236,
+          "beta": -0.1509,
+          "rank_off": 9,
+          "rank_def": 6
+        },
+        "Sarpsborg FK": {
+          "alpha": -0.7914,
+          "beta": 0.2265,
+          "rank_off": 11,
+          "rank_def": 9
+        },
+        "Tromso": {
+          "alpha": 0.1536,
+          "beta": -0.5154,
+          "rank_off": 5,
+          "rank_def": 2
+        },
+        "Viking FK": {
+          "alpha": 0.4786,
+          "beta": -0.1717,
+          "rank_off": 2,
+          "rank_def": 5
         }
       }
     }
