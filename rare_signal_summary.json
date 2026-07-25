@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-07-25T12:05:58Z",
+  "generated_at": "2026-07-25T13:51:19Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
-  "status": "watch",
+  "status": "ok",
   "summary": {
     "active_events": 18,
-    "actionable": 0,
+    "actionable": 2,
     "watch": 0,
-    "risk": 18,
+    "risk": 16,
     "expired_sample": 0,
     "by_type": {
-      "market_uncertain": 18
+      "market_uncertain": 18,
+      "market_move": 5
     },
     "by_quality": {
-      "risk": 18
+      "actionable": 2,
+      "risk": 16
     }
   },
-  "active_actionable": [],
-  "active_watch": [],
-  "active_risk": [
+  "active_actionable": [
     {
       "event_id": "401877031",
       "date": "2026-07-25T23:07Z",
@@ -28,14 +28,14 @@
       "home": "Guadalajara",
       "away": "FC Juarez",
       "match": "Guadalajara - FC Juarez",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
       "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 19.2%"
+      "side": "draw",
+      "strength": 1.0,
+      "context": "Cote draw: 4.90 -> 3.65 (+25.5%)"
     },
     {
       "event_id": "401877030",
@@ -46,15 +46,18 @@
       "home": "Santos",
       "away": "Atlas",
       "match": "Santos - Atlas",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
       "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 19.3%"
-    },
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 2.60 -> 2.00 (+23.1%)"
+    }
+  ],
+  "active_watch": [],
+  "active_risk": [
     {
       "event_id": "401877034",
       "date": "2026-07-26T03:00Z",
