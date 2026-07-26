@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-07-26T15:57:33Z",
+  "generated_at": "2026-07-26T16:44:03Z",
   "method": "Full Bivariate Poisson MLE Dixon-Coles. Coordinate-descent avec golden-section search 1D. Pure Python (pas de scipy).",
   "min_matches_per_league": 40,
   "min_matches_per_team": 5,
-  "n_leagues_fit": 8,
+  "n_leagues_fit": 9,
   "leagues": {
     "chn.1": {
       "n_matches": 84,
@@ -771,6 +771,82 @@
           "alpha": 0.4957,
           "beta": -0.1386,
           "rank_off": 2,
+          "rank_def": 5
+        }
+      }
+    },
+    "swe.1": {
+      "n_matches": 41,
+      "n_teams": 11,
+      "gamma": 0.3806,
+      "rho": -0.0649,
+      "log_lik": -108.79,
+      "iterations": 2,
+      "teams": {
+        "Degerfors IF": {
+          "alpha": -0.8104,
+          "beta": -0.053,
+          "rank_off": 11,
+          "rank_def": 7
+        },
+        "Djurgården": {
+          "alpha": 0.4145,
+          "beta": 0.3603,
+          "rank_off": 2,
+          "rank_def": 10
+        },
+        "GAIS": {
+          "alpha": 0.0708,
+          "beta": 0.3115,
+          "rank_off": 5,
+          "rank_def": 9
+        },
+        "Halmstads BK": {
+          "alpha": -0.707,
+          "beta": -0.2051,
+          "rank_off": 10,
+          "rank_def": 4
+        },
+        "Hammarby IF": {
+          "alpha": 0.1741,
+          "beta": 0.6064,
+          "rank_off": 4,
+          "rank_def": 11
+        },
+        "IF Brommapojkarna": {
+          "alpha": -0.0778,
+          "beta": -0.068,
+          "rank_off": 8,
+          "rank_def": 6
+        },
+        "IF Elfsborg": {
+          "alpha": -0.1359,
+          "beta": 0.2175,
+          "rank_off": 9,
+          "rank_def": 8
+        },
+        "IFK Göteborg": {
+          "alpha": 0.065,
+          "beta": -0.5,
+          "rank_off": 6,
+          "rank_def": 1
+        },
+        "IK Sirius": {
+          "alpha": 0.6304,
+          "beta": -0.2295,
+          "rank_off": 1,
+          "rank_def": 3
+        },
+        "Malmö FF": {
+          "alpha": -0.0383,
+          "beta": -0.284,
+          "rank_off": 7,
+          "rank_def": 2
+        },
+        "Mjällby AIF": {
+          "alpha": 0.4145,
+          "beta": -0.1563,
+          "rank_off": 3,
           "rank_def": 5
         }
       }
