@@ -1,19 +1,19 @@
 {
-  "generated_at": "2026-07-27T21:24:04Z",
+  "generated_at": "2026-07-27T22:31:35Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "watch",
   "summary": {
-    "active_events": 18,
+    "active_events": 19,
     "actionable": 0,
     "watch": 0,
-    "risk": 18,
+    "risk": 19,
     "expired_sample": 0,
     "by_type": {
-      "market_uncertain": 18
+      "market_uncertain": 19
     },
     "by_quality": {
-      "risk": 18
+      "risk": 19
     }
   },
   "active_actionable": [],
@@ -342,6 +342,24 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.6%"
+    },
+    {
+      "event_id": "401878411",
+      "date": "2026-08-03T18:30Z",
+      "sport": "football",
+      "league_code": "scottishpremiership",
+      "league_name": "Scottish Premiership",
+      "home": "Celtic",
+      "away": "Dundee",
+      "match": "Celtic - Dundee",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.9%"
     }
   ],
   "expired_sample": []
