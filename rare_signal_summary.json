@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-07-28T13:23:39Z",
+  "generated_at": "2026-07-28T15:39:51Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
-  "status": "ok",
+  "status": "watch",
   "summary": {
     "active_events": 19,
-    "actionable": 2,
+    "actionable": 0,
     "watch": 0,
-    "risk": 17,
+    "risk": 19,
     "expired_sample": 0,
     "by_type": {
-      "market_uncertain": 19,
-      "market_move": 5
+      "market_uncertain": 19
     },
     "by_quality": {
-      "actionable": 2,
-      "risk": 17
+      "risk": 19
     }
   },
-  "active_actionable": [
+  "active_actionable": [],
+  "active_watch": [],
+  "active_risk": [
     {
       "event_id": "401874071",
       "date": "2026-07-28T22:00Z",
@@ -28,14 +28,14 @@
       "home": "Tigre",
       "away": "Nacional",
       "match": "Tigre - Nacional",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
       "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 2.05 -> 3.25 (-58.5%)"
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.5%"
     },
     {
       "event_id": "401874146",
@@ -46,18 +46,15 @@
       "home": "Santos",
       "away": "UCV FC",
       "match": "Santos - UCV FC",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
       "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 1.26 -> 1.74 (-38.5%)"
-    }
-  ],
-  "active_watch": [],
-  "active_risk": [
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 19.1%"
+    },
     {
       "event_id": "401874167",
       "date": "2026-07-29T22:00Z",
