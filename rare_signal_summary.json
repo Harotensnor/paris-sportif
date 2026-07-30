@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-07-30T15:24:30Z",
+  "generated_at": "2026-07-30T16:55:23Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
-  "status": "ok",
+  "status": "watch",
   "summary": {
     "active_events": 14,
-    "actionable": 3,
+    "actionable": 0,
     "watch": 0,
-    "risk": 11,
+    "risk": 14,
     "expired_sample": 0,
     "by_type": {
-      "market_uncertain": 14,
-      "market_move": 9
+      "market_uncertain": 14
     },
     "by_quality": {
-      "actionable": 3,
-      "risk": 11
+      "risk": 14
     }
   },
-  "active_actionable": [
+  "active_actionable": [],
+  "active_watch": [],
+  "active_risk": [
     {
       "event_id": "401874159",
       "date": "2026-07-30T22:00Z",
@@ -28,14 +28,14 @@
       "home": "Grêmio",
       "away": "Bolívar",
       "match": "Grêmio - Bolívar",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
       "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 1.31 -> 3.75 (-185.8%)"
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 19.4%"
     },
     {
       "event_id": "401874162",
@@ -46,14 +46,14 @@
       "home": "Caracas FC",
       "away": "Independiente Santa Fe",
       "match": "Caracas FC - Independiente Santa Fe",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
       "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 3.10 -> 6.25 (-101.6%)"
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.4%"
     },
     {
       "event_id": "401874164",
@@ -64,18 +64,15 @@
       "home": "O'Higgins",
       "away": "Boca Juniors",
       "match": "O'Higgins - Boca Juniors",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
       "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 4.00 -> 8.00 (-100.0%)"
-    }
-  ],
-  "active_watch": [],
-  "active_risk": [
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.8%"
+    },
     {
       "event_id": "401881821",
       "date": "2026-07-31T17:30Z",
