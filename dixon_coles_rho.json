@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-30T02:07:11Z",
+  "generated_at": "2026-07-30T05:19:28Z",
   "method": "Dixon-Coles MLE grid search (ρ ∈ [-0.30, 0.10] step 0.005), λ_h, λ_a fixés à moyenne empirique par ligue. CI 95% via LR test.",
   "min_matches": 40,
   "default_rho": -0.13,
@@ -236,17 +236,17 @@
       "reason": "n=31 < 40"
     },
     "conmebol.sudamericana": {
-      "n": 40,
-      "rho_measured": -0.3,
+      "n": 42,
+      "rho_measured": -0.275,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "CI trop large (0.365) ou fit nul",
-      "log_lik": -121.94,
+      "reason": "CI trop large (0.400) ou fit nul",
+      "log_lik": -128.53,
       "ci_lo": -0.3,
-      "ci_hi": 0.065,
-      "lambda_h": 1.575,
-      "lambda_a": 1.125
+      "ci_hi": 0.1,
+      "lambda_h": 1.619,
+      "lambda_a": 1.071
     },
     "conmebollibertadores": {
       "n": 4,
