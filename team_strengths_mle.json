@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-08-01T14:55:50Z",
+  "generated_at": "2026-08-01T15:55:03Z",
   "method": "Full Bivariate Poisson MLE Dixon-Coles. Coordinate-descent avec golden-section search 1D. Pure Python (pas de scipy).",
   "min_matches_per_league": 40,
   "min_matches_per_team": 5,
-  "n_leagues_fit": 9,
+  "n_leagues_fit": 10,
   "leagues": {
     "chn.1": {
       "n_matches": 89,
@@ -799,84 +799,166 @@
         }
       }
     },
-    "swe.1": {
-      "n_matches": 42,
-      "n_teams": 12,
-      "gamma": 0.3139,
-      "rho": -0.116,
-      "log_lik": -109.07,
+    "rus.1": {
+      "n_matches": 40,
+      "n_teams": 10,
+      "gamma": 0.1955,
+      "rho": -0.1213,
+      "log_lik": -102.39,
       "iterations": 2,
       "teams": {
-        "AIK": {
-          "alpha": -0.5405,
-          "beta": 0.7417,
+        "Akhmat Grozny": {
+          "alpha": -0.1558,
+          "beta": 0.0459,
+          "rank_off": 7,
+          "rank_def": 6
+        },
+        "Akron Tolyatti": {
+          "alpha": -0.6028,
+          "beta": -0.7843,
           "rank_off": 10,
-          "rank_def": 12
+          "rank_def": 1
         },
-        "Degerfors IF": {
-          "alpha": -0.8017,
-          "beta": -0.0792,
-          "rank_off": 12,
-          "rank_def": 7
+        "CSKA Moscow": {
+          "alpha": 0.2087,
+          "beta": -0.1794,
+          "rank_off": 5,
+          "rank_def": 3
         },
-        "Djurgården": {
-          "alpha": 0.4626,
-          "beta": 0.3284,
+        "Dinamo Moscow": {
+          "alpha": 0.2819,
+          "beta": 0.6321,
           "rank_off": 2,
           "rank_def": 10
         },
-        "GAIS": {
-          "alpha": 0.1827,
-          "beta": 0.1519,
+        "Dynamo Makhachkala": {
+          "alpha": -0.3323,
+          "beta": -0.1155,
+          "rank_off": 9,
+          "rank_def": 5
+        },
+        "Krasnodar": {
+          "alpha": 0.4247,
+          "beta": 0.2188,
+          "rank_off": 1,
+          "rank_def": 8
+        },
+        "Krylia Sovetov": {
+          "alpha": 0.2575,
+          "beta": 0.5927,
           "rank_off": 4,
           "rank_def": 9
         },
-        "Halmstads BK": {
-          "alpha": -0.7077,
-          "beta": -0.237,
+        "Rostov": {
+          "alpha": -0.2196,
+          "beta": -0.3071,
+          "rank_off": 8,
+          "rank_def": 2
+        },
+        "Rubin Kazan": {
+          "alpha": -0.135,
+          "beta": -0.1701,
+          "rank_off": 6,
+          "rank_def": 4
+        },
+        "Spartak Moscow": {
+          "alpha": 0.2726,
+          "beta": 0.0667,
+          "rank_off": 3,
+          "rank_def": 7
+        }
+      }
+    },
+    "swe.1": {
+      "n_matches": 43,
+      "n_teams": 14,
+      "gamma": 0.2669,
+      "rho": -0.221,
+      "log_lik": -110.02,
+      "iterations": 2,
+      "teams": {
+        "AIK": {
+          "alpha": -0.5019,
+          "beta": 0.6229,
+          "rank_off": 12,
+          "rank_def": 14
+        },
+        "BK Häcken": {
+          "alpha": -0.2709,
+          "beta": 0.5346,
           "rank_off": 11,
+          "rank_def": 13
+        },
+        "Degerfors IF": {
+          "alpha": -0.7667,
+          "beta": -0.1643,
+          "rank_off": 14,
+          "rank_def": 6
+        },
+        "Djurgården": {
+          "alpha": 0.4582,
+          "beta": 0.3129,
+          "rank_off": 3,
+          "rank_def": 11
+        },
+        "GAIS": {
+          "alpha": 0.1876,
+          "beta": 0.1213,
+          "rank_off": 4,
+          "rank_def": 10
+        },
+        "Halmstads BK": {
+          "alpha": -0.7028,
+          "beta": -0.292,
+          "rank_off": 13,
           "rank_def": 4
         },
         "Hammarby IF": {
-          "alpha": 0.1827,
-          "beta": 0.5745,
+          "alpha": 0.1876,
+          "beta": 0.5289,
           "rank_off": 5,
-          "rank_def": 11
+          "rank_def": 12
         },
         "IF Brommapojkarna": {
-          "alpha": -0.0239,
-          "beta": -0.1036,
-          "rank_off": 8,
-          "rank_def": 6
+          "alpha": 0.0147,
+          "beta": -0.1248,
+          "rank_off": 9,
+          "rank_def": 7
         },
         "IF Elfsborg": {
-          "alpha": -0.0239,
-          "beta": 0.1031,
-          "rank_off": 9,
+          "alpha": -0.0097,
+          "beta": 0.0668,
+          "rank_off": 10,
           "rank_def": 8
         },
         "IFK Göteborg": {
-          "alpha": 0.0737,
-          "beta": -0.547,
+          "alpha": 0.0449,
+          "beta": -0.5869,
           "rank_off": 7,
           "rank_def": 1
         },
         "IK Sirius": {
-          "alpha": 0.6936,
-          "beta": -0.2916,
+          "alpha": 0.7774,
+          "beta": -0.3802,
           "rank_off": 1,
           "rank_def": 3
         },
+        "Kalmar FF": {
+          "alpha": 0.0298,
+          "beta": 0.0725,
+          "rank_off": 8,
+          "rank_def": 9
+        },
         "Malmö FF": {
-          "alpha": 0.0794,
-          "beta": -0.4437,
+          "alpha": 0.0692,
+          "beta": -0.4441,
           "rank_off": 6,
           "rank_def": 2
         },
         "Mjällby AIF": {
-          "alpha": 0.4231,
-          "beta": -0.1976,
-          "rank_off": 3,
+          "alpha": 0.4825,
+          "beta": -0.2676,
+          "rank_off": 2,
           "rank_def": 5
         }
       }
