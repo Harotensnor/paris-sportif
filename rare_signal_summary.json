@@ -1,21 +1,21 @@
 {
-  "generated_at": "2026-08-01T05:49:00Z",
+  "generated_at": "2026-08-01T07:58:14Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 11,
-    "actionable": 3,
+    "actionable": 2,
     "watch": 0,
-    "risk": 8,
+    "risk": 9,
     "expired_sample": 0,
     "by_type": {
       "market_uncertain": 11,
-      "market_move": 6
+      "market_move": 7
     },
     "by_quality": {
-      "actionable": 3,
-      "risk": 8
+      "actionable": 2,
+      "risk": 9
     }
   },
   "active_actionable": [
@@ -54,7 +54,10 @@
       "side": "away",
       "strength": 0.926,
       "context": "Cote away: 3.60 -> 3.00 (+16.7%)"
-    },
+    }
+  ],
+  "active_watch": [],
+  "active_risk": [
     {
       "event_id": "401881820",
       "date": "2026-08-01T15:00Z",
@@ -64,18 +67,15 @@
       "home": "WSG Swarovski Tirol",
       "away": "SK Sturm Graz",
       "match": "WSG Swarovski Tirol - SK Sturm Graz",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
       "team": null,
-      "side": "home",
-      "strength": 0.913,
-      "context": "Cote home: 3.65 -> 3.05 (+16.4%)"
-    }
-  ],
-  "active_watch": [],
-  "active_risk": [
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.5%"
+    },
     {
       "event_id": "401878413",
       "date": "2026-08-02T13:00Z",
