@@ -1,22 +1,62 @@
 {
-  "generated_at": "2026-07-31T23:18:25Z",
+  "generated_at": "2026-08-01T00:18:53Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
-  "status": "watch",
+  "status": "ok",
   "summary": {
     "active_events": 11,
-    "actionable": 0,
+    "actionable": 2,
     "watch": 0,
-    "risk": 11,
+    "risk": 9,
     "expired_sample": 0,
     "by_type": {
-      "market_uncertain": 11
+      "market_uncertain": 11,
+      "market_move": 7,
+      "signal_conflict": 1
     },
     "by_quality": {
-      "risk": 11
+      "risk": 9,
+      "actionable": 2
     }
   },
-  "active_actionable": [],
+  "active_actionable": [
+    {
+      "event_id": "401878414",
+      "date": "2026-08-01T16:30Z",
+      "sport": "football",
+      "league_code": "scottishpremiership",
+      "league_name": "Scottish Premiership",
+      "home": "Aberdeen",
+      "away": "Heart of Midlothian",
+      "match": "Aberdeen - Heart of Midlothian",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 1.0,
+      "context": "Cote away: 2.20 -> 1.62 (+26.4%)"
+    },
+    {
+      "event_id": "401881820",
+      "date": "2026-08-01T15:00Z",
+      "sport": "football",
+      "league_code": "bundesligaautriche",
+      "league_name": "Bundesliga Autriche",
+      "home": "WSG Swarovski Tirol",
+      "away": "SK Sturm Graz",
+      "match": "WSG Swarovski Tirol - SK Sturm Graz",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 0.913,
+      "context": "Cote home: 3.65 -> 3.05 (+16.4%)"
+    }
+  ],
   "active_watch": [],
   "active_risk": [
     {
@@ -36,42 +76,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.5%"
-    },
-    {
-      "event_id": "401881820",
-      "date": "2026-08-01T15:00Z",
-      "sport": "football",
-      "league_code": "bundesligaautriche",
-      "league_name": "Bundesliga Autriche",
-      "home": "WSG Swarovski Tirol",
-      "away": "SK Sturm Graz",
-      "match": "WSG Swarovski Tirol - SK Sturm Graz",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.5%"
-    },
-    {
-      "event_id": "401878414",
-      "date": "2026-08-01T16:30Z",
-      "sport": "football",
-      "league_code": "scottishpremiership",
-      "league_name": "Scottish Premiership",
-      "home": "Aberdeen",
-      "away": "Heart of Midlothian",
-      "match": "Aberdeen - Heart of Midlothian",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.9%"
     },
     {
       "event_id": "401878413",
