@@ -1,21 +1,22 @@
 {
-  "generated_at": "2026-08-01T11:16:06Z",
+  "generated_at": "2026-08-01T12:16:39Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 11,
-    "actionable": 2,
+    "actionable": 1,
     "watch": 0,
-    "risk": 9,
+    "risk": 10,
     "expired_sample": 0,
     "by_type": {
       "market_uncertain": 11,
-      "market_move": 7
+      "market_move": 8,
+      "signal_conflict": 1
     },
     "by_quality": {
-      "actionable": 2,
-      "risk": 9
+      "risk": 10,
+      "actionable": 1
     }
   },
   "active_actionable": [
@@ -36,7 +37,10 @@
       "side": "home",
       "strength": 1.0,
       "context": "Cote home: 2.85 -> 3.60 (-26.3%)"
-    },
+    }
+  ],
+  "active_watch": [],
+  "active_risk": [
     {
       "event_id": "401878415",
       "date": "2026-08-01T14:00Z",
@@ -46,18 +50,15 @@
       "home": "Falkirk",
       "away": "St Mirren",
       "match": "Falkirk - St Mirren",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
       "team": null,
-      "side": "away",
-      "strength": 0.926,
-      "context": "Cote away: 3.60 -> 3.00 (+16.7%)"
-    }
-  ],
-  "active_watch": [],
-  "active_risk": [
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.5%"
+    },
     {
       "event_id": "401881820",
       "date": "2026-08-01T15:00Z",
