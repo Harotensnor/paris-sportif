@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-08-01T15:55:02Z",
+  "generated_at": "2026-08-01T16:41:59Z",
   "method": "Dixon-Coles MLE grid search (ρ ∈ [-0.30, 0.10] step 0.005), λ_h, λ_a fixés à moyenne empirique par ligue. CI 95% via LR test.",
   "min_matches": 40,
   "default_rho": -0.13,
-  "n_leagues": 140,
+  "n_leagues": 141,
   "n_measured": 0,
   "leagues": {
     "1lig": {
@@ -397,6 +397,14 @@
       "source": "literature_fallback",
       "reason": "n=3 < 40"
     },
+    "eng.league_cup": {
+      "n": 1,
+      "rho_measured": null,
+      "rho_literature": -0.13,
+      "rho_used": -0.13,
+      "source": "literature_fallback",
+      "reason": "n=1 < 40"
+    },
     "erovnuliliga": {
       "n": 2,
       "rho_measured": null,
@@ -783,17 +791,17 @@
       "reason": "n=27 < 40"
     },
     "nor.1": {
-      "n": 46,
+      "n": 47,
       "rho_measured": 0.1,
       "rho_literature": -0.11,
       "rho_used": -0.11,
       "source": "literature_fallback",
-      "reason": "CI trop large (0.355) ou fit nul",
-      "log_lik": -145.97,
-      "ci_lo": -0.255,
+      "reason": "CI trop large (0.315) ou fit nul",
+      "log_lik": -148.45,
+      "ci_lo": -0.215,
       "ci_hi": 0.1,
-      "lambda_h": 1.696,
-      "lambda_a": 1.457
+      "lambda_h": 1.681,
+      "lambda_a": 1.426
     },
     "nwsl": {
       "n": 1,
@@ -929,12 +937,12 @@
       "reason": "n=2 < 40"
     },
     "sco.1": {
-      "n": 27,
+      "n": 28,
       "rho_measured": null,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "n=27 < 40"
+      "reason": "n=28 < 40"
     },
     "scottishpremiership": {
       "n": 2,
