@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-02T08:01:00Z",
+  "generated_at": "2026-08-02T10:03:31Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
@@ -11,7 +11,7 @@
     "expired_sample": 0,
     "by_type": {
       "market_uncertain": 8,
-      "market_move": 12,
+      "market_move": 11,
       "signal_conflict": 2
     },
     "by_quality": {
@@ -20,6 +20,42 @@
     }
   },
   "active_actionable": [
+    {
+      "event_id": "401881817",
+      "date": "2026-08-02T15:00Z",
+      "sport": "football",
+      "league_code": "bundesligaautriche",
+      "league_name": "Bundesliga Autriche",
+      "home": "Austria Lustenau",
+      "away": "SV Josko Ried",
+      "match": "Austria Lustenau - SV Josko Ried",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 2.90 -> 2.35 (+19.0%)"
+    },
+    {
+      "event_id": "401878412",
+      "date": "2026-08-02T15:30Z",
+      "sport": "football",
+      "league_code": "scottishpremiership",
+      "league_name": "Scottish Premiership",
+      "home": "Hibernian",
+      "away": "Motherwell",
+      "match": "Hibernian - Motherwell",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 1.0,
+      "context": "Cote away: 3.30 -> 2.70 (+18.2%)"
+    },
     {
       "event_id": "401881816",
       "date": "2026-08-02T17:00Z",
@@ -37,42 +73,6 @@
       "side": "away",
       "strength": 1.0,
       "context": "Cote away: 4.40 -> 3.60 (+18.2%)"
-    },
-    {
-      "event_id": "401881817",
-      "date": "2026-08-02T15:00Z",
-      "sport": "football",
-      "league_code": "bundesligaautriche",
-      "league_name": "Bundesliga Autriche",
-      "home": "Austria Lustenau",
-      "away": "SV Josko Ried",
-      "match": "Austria Lustenau - SV Josko Ried",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "home",
-      "strength": 0.893,
-      "context": "Cote home: 2.80 -> 2.35 (+16.1%)"
-    },
-    {
-      "event_id": "401878412",
-      "date": "2026-08-02T15:30Z",
-      "sport": "football",
-      "league_code": "scottishpremiership",
-      "league_name": "Scottish Premiership",
-      "home": "Hibernian",
-      "away": "Motherwell",
-      "match": "Hibernian - Motherwell",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.868,
-      "context": "Cote away: 3.20 -> 2.70 (+15.6%)"
     }
   ],
   "active_watch": [],
