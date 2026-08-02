@@ -1,61 +1,24 @@
 {
-  "generated_at": "2026-08-02T15:00:41Z",
+  "generated_at": "2026-08-02T15:54:49Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 7,
-    "actionable": 3,
+    "active_events": 4,
+    "actionable": 1,
     "watch": 0,
-    "risk": 4,
+    "risk": 3,
     "expired_sample": 0,
     "by_type": {
-      "market_uncertain": 7,
-      "market_move": 8,
-      "signal_conflict": 1
+      "market_uncertain": 4,
+      "market_move": 2
     },
     "by_quality": {
-      "actionable": 3,
-      "risk": 4
+      "actionable": 1,
+      "risk": 3
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401881817",
-      "date": "2026-08-02T15:00Z",
-      "sport": "football",
-      "league_code": "bundesligaautriche",
-      "league_name": "Bundesliga Autriche",
-      "home": "Austria Lustenau",
-      "away": "SV Josko Ried",
-      "match": "Austria Lustenau - SV Josko Ried",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 3.25 -> 2.35 (+27.7%)"
-    },
-    {
-      "event_id": "401878412",
-      "date": "2026-08-02T15:30Z",
-      "sport": "football",
-      "league_code": "scottishpremiership",
-      "league_name": "Scottish Premiership",
-      "home": "Hibernian",
-      "away": "Motherwell",
-      "match": "Hibernian - Motherwell",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 1.0,
-      "context": "Cote away: 3.75 -> 2.70 (+28.0%)"
-    },
     {
       "event_id": "401881816",
       "date": "2026-08-02T17:00Z",
@@ -72,29 +35,11 @@
       "team": null,
       "side": "away",
       "strength": 1.0,
-      "context": "Cote away: 4.50 -> 3.60 (+20.0%)"
+      "context": "Cote away: 4.70 -> 3.60 (+23.4%)"
     }
   ],
   "active_watch": [],
   "active_risk": [
-    {
-      "event_id": "401881818",
-      "date": "2026-08-02T15:00Z",
-      "sport": "football",
-      "league_code": "bundesligaautriche",
-      "league_name": "Bundesliga Autriche",
-      "home": "Wolfsberger",
-      "away": "Austria Vienna",
-      "match": "Wolfsberger - Austria Vienna",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 20.0%"
-    },
     {
       "event_id": "401878411",
       "date": "2026-08-03T18:30Z",
