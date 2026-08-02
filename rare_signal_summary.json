@@ -1,46 +1,43 @@
 {
-  "generated_at": "2026-08-02T05:47:59Z",
+  "generated_at": "2026-08-02T08:01:00Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 8,
-    "actionable": 1,
+    "actionable": 3,
     "watch": 0,
-    "risk": 7,
+    "risk": 5,
     "expired_sample": 0,
     "by_type": {
       "market_uncertain": 8,
       "market_move": 12,
-      "signal_conflict": 3
+      "signal_conflict": 2
     },
     "by_quality": {
-      "actionable": 1,
-      "risk": 7
+      "risk": 5,
+      "actionable": 3
     }
   },
   "active_actionable": [
     {
-      "event_id": "401878413",
-      "date": "2026-08-02T13:00Z",
+      "event_id": "401881816",
+      "date": "2026-08-02T17:00Z",
       "sport": "football",
-      "league_code": "scottishpremiership",
-      "league_name": "Scottish Premiership",
-      "home": "St Johnstone",
-      "away": "Kilmarnock",
-      "match": "St Johnstone - Kilmarnock",
+      "league_code": "bundesligaautriche",
+      "league_name": "Bundesliga Autriche",
+      "home": "Rapid Vienna",
+      "away": "SC Rheindorf Altach",
+      "match": "Rapid Vienna - SC Rheindorf Altach",
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
       "type": "market_move",
       "direction": "steam",
       "team": null,
-      "side": "home",
-      "strength": 0.87,
-      "context": "Cote home: 2.30 -> 1.94 (+15.7%)"
-    }
-  ],
-  "active_watch": [],
-  "active_risk": [
+      "side": "away",
+      "strength": 1.0,
+      "context": "Cote away: 4.40 -> 3.60 (+18.2%)"
+    },
     {
       "event_id": "401881817",
       "date": "2026-08-02T15:00Z",
@@ -50,6 +47,45 @@
       "home": "Austria Lustenau",
       "away": "SV Josko Ried",
       "match": "Austria Lustenau - SV Josko Ried",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 0.893,
+      "context": "Cote home: 2.80 -> 2.35 (+16.1%)"
+    },
+    {
+      "event_id": "401878412",
+      "date": "2026-08-02T15:30Z",
+      "sport": "football",
+      "league_code": "scottishpremiership",
+      "league_name": "Scottish Premiership",
+      "home": "Hibernian",
+      "away": "Motherwell",
+      "match": "Hibernian - Motherwell",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.868,
+      "context": "Cote away: 3.20 -> 2.70 (+15.6%)"
+    }
+  ],
+  "active_watch": [],
+  "active_risk": [
+    {
+      "event_id": "401878413",
+      "date": "2026-08-02T13:00Z",
+      "sport": "football",
+      "league_code": "scottishpremiership",
+      "league_name": "Scottish Premiership",
+      "home": "St Johnstone",
+      "away": "Kilmarnock",
+      "match": "St Johnstone - Kilmarnock",
       "quality": "risk",
       "quality_reason": "Signal de prudence, pas une opportunite directe",
       "type": "market_uncertain",
@@ -57,7 +93,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 19.4%"
+      "context": "marge bookmaker anormale 19.0%"
     },
     {
       "event_id": "401881818",
@@ -76,42 +112,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 20.0%"
-    },
-    {
-      "event_id": "401878412",
-      "date": "2026-08-02T15:30Z",
-      "sport": "football",
-      "league_code": "scottishpremiership",
-      "league_name": "Scottish Premiership",
-      "home": "Hibernian",
-      "away": "Motherwell",
-      "match": "Hibernian - Motherwell",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 19.3%"
-    },
-    {
-      "event_id": "401881816",
-      "date": "2026-08-02T17:00Z",
-      "sport": "football",
-      "league_code": "bundesligaautriche",
-      "league_name": "Bundesliga Autriche",
-      "home": "Rapid Vienna",
-      "away": "SC Rheindorf Altach",
-      "match": "Rapid Vienna - SC Rheindorf Altach",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.6%"
     },
     {
       "event_id": "401878411",

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Crédibilité — Le modèle est-il honnête sur ses probabilités ?</title>
-<meta name="description" content="Diagramme de calibration du modèle Paris-Sportif : quand on dit 70%, gagne-t-on vraiment 70% ? Brier 0.2410, log-loss 0.6752. Test ultime de l'honnêteté d'un modèle probabiliste.">
+<meta name="description" content="Diagramme de calibration du modèle Paris-Sportif : quand on dit 70%, gagne-t-on vraiment 70% ? Brier 0.2400, log-loss 0.6726. Test ultime de l'honnêteté d'un modèle probabiliste.">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://harotensnor.github.io/paris-sportif/credibilite.html">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
@@ -38,8 +38,8 @@
       "@type": "TechArticle",
       "headline": "Calibration probabiliste du modèle Paris-Sportif",
       "url": "https://harotensnor.github.io/paris-sportif/credibilite.html",
-      "datePublished": "2026-08-01T06:19:06Z",
-      "dateModified": "2026-08-01T06:19:06Z",
+      "datePublished": "2026-08-02T06:24:41Z",
+      "dateModified": "2026-08-02T06:24:41Z",
       "author": { "@type": "Person", "name": "Théo Boulnois" },
       "publisher": { "@id": "https://harotensnor.github.io/paris-sportif/#org" },
       "inLanguage": "fr-FR"
@@ -124,30 +124,30 @@
   <div class="kpi-strip">
     <div class="kpi-card">
       <div class="kpi-label">Paris réglés</div>
-      <div class="kpi-value">460</div>
-      <div class="kpi-sub">2026-06-21 → 2026-07-31</div>
+      <div class="kpi-value">452</div>
+      <div class="kpi-sub">2026-06-25 → 2026-08-01</div>
     </div>
     <div class="kpi-card">
       <div class="kpi-label">Brier score</div>
-      <div class="kpi-value" style="color:#fbbf24;">0.2410</div>
+      <div class="kpi-value" style="color:#fbbf24;">0.2400</div>
       <div class="kpi-sub">0 = parfait · 0.25 = pile/face · &lt; 0.22 = signal réel</div>
     </div>
     <div class="kpi-card">
       <div class="kpi-label">Log-loss</div>
-      <div class="kpi-value">0.6752</div>
+      <div class="kpi-value">0.6726</div>
       <div class="kpi-sub">Plus bas = mieux calibré</div>
     </div>
     <div class="kpi-card">
       <div class="kpi-label">Win rate</div>
-      <div class="kpi-value">55.9%</div>
-      <div class="kpi-sub">Sur cote moyenne 1.80</div>
+      <div class="kpi-value">56.0%</div>
+      <div class="kpi-sub">Sur cote moyenne 1.82</div>
     </div>
   </div>
 
   <h2>📈 Calibration : ce qu'on annonce vs ce qu'on observe</h2>
   <section class="card">
     <p>Chaque cercle est un bin de prédictions, positionné par sa probabilité moyenne (axe X) et son win rate observé (axe Y). La taille du cercle reflète le nombre de paris dans le bin. <strong>La diagonale violette est la calibration parfaite</strong> : modèle qui dit X%, gagne X%.</p>
-    <svg viewBox="0 0 480 360" width="100%" style="height:auto;display:block;" role="img" aria-label="Diagramme de calibration"><line x1="38" y1="322" x2="442" y2="322" stroke="#2a2a30" stroke-width="0.5" stroke-dasharray="2,3"/><line x1="38" y1="38" x2="38" y2="322" stroke="#2a2a30" stroke-width="0.5" stroke-dasharray="2,3"/><line x1="38" y1="251" x2="442" y2="251" stroke="#2a2a30" stroke-width="0.5" stroke-dasharray="2,3"/><line x1="139" y1="38" x2="139" y2="322" stroke="#2a2a30" stroke-width="0.5" stroke-dasharray="2,3"/><line x1="38" y1="180" x2="442" y2="180" stroke="#2a2a30" stroke-width="0.5" stroke-dasharray="2,3"/><line x1="240" y1="38" x2="240" y2="322" stroke="#2a2a30" stroke-width="0.5" stroke-dasharray="2,3"/><line x1="38" y1="109" x2="442" y2="109" stroke="#2a2a30" stroke-width="0.5" stroke-dasharray="2,3"/><line x1="341" y1="38" x2="341" y2="322" stroke="#2a2a30" stroke-width="0.5" stroke-dasharray="2,3"/><line x1="38" y1="38" x2="442" y2="38" stroke="#2a2a30" stroke-width="0.5" stroke-dasharray="2,3"/><line x1="442" y1="38" x2="442" y2="322" stroke="#2a2a30" stroke-width="0.5" stroke-dasharray="2,3"/><line x1="38" y1="322" x2="442" y2="38" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="6,4" opacity="0.7"/><text x="240" y="352" text-anchor="middle" fill="#a3a3aa" font-size="11">Probabilité prédite par le modèle</text><text x="14" y="180" text-anchor="middle" fill="#a3a3aa" font-size="11" transform="rotate(-90 14 180)">Win rate observé</text><text x="38" y="336" text-anchor="middle" fill="#6b6b73" font-size="10">0%</text><text x="32" y="325" text-anchor="end" fill="#6b6b73" font-size="10">0%</text><text x="139" y="336" text-anchor="middle" fill="#6b6b73" font-size="10">25%</text><text x="32" y="254" text-anchor="end" fill="#6b6b73" font-size="10">25%</text><text x="240" y="336" text-anchor="middle" fill="#6b6b73" font-size="10">50%</text><text x="32" y="183" text-anchor="end" fill="#6b6b73" font-size="10">50%</text><text x="341" y="336" text-anchor="middle" fill="#6b6b73" font-size="10">75%</text><text x="32" y="112" text-anchor="end" fill="#6b6b73" font-size="10">75%</text><text x="442" y="336" text-anchor="middle" fill="#6b6b73" font-size="10">100%</text><text x="32" y="41" text-anchor="end" fill="#6b6b73" font-size="10">100%</text><circle cx="187.9" cy="214.4" r="5.7" fill="#34d399" fill-opacity="0.25" stroke="#34d399" stroke-width="2"/><title>n=29 · prédit 37.1% · réel 37.9% (gap +0.8pp)</title><circle cx="226.7" cy="178.0" r="8.0" fill="#34d399" fill-opacity="0.25" stroke="#34d399" stroke-width="2"/><title>n=67 · prédit 46.7% · réel 50.7% (gap +4.0pp)</title><circle cx="258.2" cy="164.1" r="20.0" fill="#34d399" fill-opacity="0.25" stroke="#34d399" stroke-width="2"/><title>n=268 · prédit 54.5% · réel 55.6% (gap +1.1pp)</title><circle cx="297.8" cy="149.3" r="8.4" fill="#34d399" fill-opacity="0.25" stroke="#34d399" stroke-width="2"/><title>n=74 · prédit 64.3% · réel 60.8% (gap -3.5pp)</title><circle cx="334.9" cy="71.5" r="5.0" fill="#f87171" fill-opacity="0.25" stroke="#f87171" stroke-width="2"/><title>n=17 · prédit 73.5% · réel 88.2% (gap +14.7pp)</title><circle cx="375.3" cy="151.6" r="4.3" fill="#f87171" fill-opacity="0.25" stroke="#f87171" stroke-width="2"/><title>n=5 · prédit 83.5% · réel 60.0% (gap -23.5pp)</title></svg>
+    <svg viewBox="0 0 480 360" width="100%" style="height:auto;display:block;" role="img" aria-label="Diagramme de calibration"><line x1="38" y1="322" x2="442" y2="322" stroke="#2a2a30" stroke-width="0.5" stroke-dasharray="2,3"/><line x1="38" y1="38" x2="38" y2="322" stroke="#2a2a30" stroke-width="0.5" stroke-dasharray="2,3"/><line x1="38" y1="251" x2="442" y2="251" stroke="#2a2a30" stroke-width="0.5" stroke-dasharray="2,3"/><line x1="139" y1="38" x2="139" y2="322" stroke="#2a2a30" stroke-width="0.5" stroke-dasharray="2,3"/><line x1="38" y1="180" x2="442" y2="180" stroke="#2a2a30" stroke-width="0.5" stroke-dasharray="2,3"/><line x1="240" y1="38" x2="240" y2="322" stroke="#2a2a30" stroke-width="0.5" stroke-dasharray="2,3"/><line x1="38" y1="109" x2="442" y2="109" stroke="#2a2a30" stroke-width="0.5" stroke-dasharray="2,3"/><line x1="341" y1="38" x2="341" y2="322" stroke="#2a2a30" stroke-width="0.5" stroke-dasharray="2,3"/><line x1="38" y1="38" x2="442" y2="38" stroke="#2a2a30" stroke-width="0.5" stroke-dasharray="2,3"/><line x1="442" y1="38" x2="442" y2="322" stroke="#2a2a30" stroke-width="0.5" stroke-dasharray="2,3"/><line x1="38" y1="322" x2="442" y2="38" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="6,4" opacity="0.7"/><text x="240" y="352" text-anchor="middle" fill="#a3a3aa" font-size="11">Probabilité prédite par le modèle</text><text x="14" y="180" text-anchor="middle" fill="#a3a3aa" font-size="11" transform="rotate(-90 14 180)">Win rate observé</text><text x="38" y="336" text-anchor="middle" fill="#6b6b73" font-size="10">0%</text><text x="32" y="325" text-anchor="end" fill="#6b6b73" font-size="10">0%</text><text x="139" y="336" text-anchor="middle" fill="#6b6b73" font-size="10">25%</text><text x="32" y="254" text-anchor="end" fill="#6b6b73" font-size="10">25%</text><text x="240" y="336" text-anchor="middle" fill="#6b6b73" font-size="10">50%</text><text x="32" y="183" text-anchor="end" fill="#6b6b73" font-size="10">50%</text><text x="341" y="336" text-anchor="middle" fill="#6b6b73" font-size="10">75%</text><text x="32" y="112" text-anchor="end" fill="#6b6b73" font-size="10">75%</text><text x="442" y="336" text-anchor="middle" fill="#6b6b73" font-size="10">100%</text><text x="32" y="41" text-anchor="end" fill="#6b6b73" font-size="10">100%</text><circle cx="188.7" cy="219.5" r="6.3" fill="#34d399" fill-opacity="0.25" stroke="#34d399" stroke-width="2"/><title>n=36 · prédit 37.3% · réel 36.1% (gap -1.2pp)</title><circle cx="224.6" cy="180.0" r="8.9" fill="#34d399" fill-opacity="0.25" stroke="#34d399" stroke-width="2"/><title>n=76 · prédit 46.2% · réel 50.0% (gap +3.8pp)</title><circle cx="259.0" cy="162.1" r="20.0" fill="#34d399" fill-opacity="0.25" stroke="#34d399" stroke-width="2"/><title>n=247 · prédit 54.7% · réel 56.3% (gap +1.6pp)</title><circle cx="299.0" cy="143.4" r="8.5" fill="#34d399" fill-opacity="0.25" stroke="#34d399" stroke-width="2"/><title>n=70 · prédit 64.6% · réel 62.9% (gap -1.7pp)</title><circle cx="334.5" cy="82.9" r="5.2" fill="#f87171" fill-opacity="0.25" stroke="#f87171" stroke-width="2"/><title>n=19 · prédit 73.4% · réel 84.2% (gap +10.8pp)</title><circle cx="372.5" cy="109.0" r="4.3" fill="#fbbf24" fill-opacity="0.25" stroke="#fbbf24" stroke-width="2"/><title>n=4 · prédit 82.8% · réel 75.0% (gap -7.8pp)</title></svg>
     <div class="legend">
       <span><span class="swatch" style="background:#34d399;"></span>Gap &lt; 5pp (bien calibré)</span>
       <span><span class="swatch" style="background:#fbbf24;"></span>Gap 5-10pp (acceptable)</span>
@@ -156,7 +156,7 @@
   </section>
 
   <h2>📋 Données par bin</h2>
-  <table><thead><tr><th>Bin probabilité</th><th>N</th><th>Prob moyenne</th><th>WR observé</th><th>Gap</th></tr></thead><tbody><tr><td>[0.3–0.4]</td><td>29</td><td>37.1%</td><td>37.9%</td><td><span style="color:#34d399;font-weight:600;">+0.8pp</span></td></tr><tr><td>[0.4–0.5]</td><td>67</td><td>46.7%</td><td>50.7%</td><td><span style="color:#34d399;font-weight:600;">+4.0pp</span></td></tr><tr><td>[0.5–0.6]</td><td>268</td><td>54.5%</td><td>55.6%</td><td><span style="color:#34d399;font-weight:600;">+1.1pp</span></td></tr><tr><td>[0.6–0.7]</td><td>74</td><td>64.3%</td><td>60.8%</td><td><span style="color:#34d399;font-weight:600;">-3.5pp</span></td></tr><tr><td>[0.7–0.8]</td><td>17</td><td>73.5%</td><td>88.2%</td><td><span style="color:#f87171;font-weight:600;">+14.8pp</span></td></tr><tr><td>[0.8–0.9]</td><td>5</td><td>83.5%</td><td>60.0%</td><td><span style="color:#f87171;font-weight:600;">-23.5pp</span></td></tr></tbody></table>
+  <table><thead><tr><th>Bin probabilité</th><th>N</th><th>Prob moyenne</th><th>WR observé</th><th>Gap</th></tr></thead><tbody><tr><td>[0.3–0.4]</td><td>36</td><td>37.3%</td><td>36.1%</td><td><span style="color:#34d399;font-weight:600;">-1.2pp</span></td></tr><tr><td>[0.4–0.5]</td><td>76</td><td>46.2%</td><td>50.0%</td><td><span style="color:#34d399;font-weight:600;">+3.8pp</span></td></tr><tr><td>[0.5–0.6]</td><td>247</td><td>54.7%</td><td>56.3%</td><td><span style="color:#34d399;font-weight:600;">+1.6pp</span></td></tr><tr><td>[0.6–0.7]</td><td>70</td><td>64.6%</td><td>62.9%</td><td><span style="color:#34d399;font-weight:600;">-1.7pp</span></td></tr><tr><td>[0.7–0.8]</td><td>19</td><td>73.4%</td><td>84.2%</td><td><span style="color:#f87171;font-weight:600;">+10.8pp</span></td></tr><tr><td>[0.8–0.9]</td><td>4</td><td>82.8%</td><td>75.0%</td><td><span style="color:#fbbf24;font-weight:600;">-7.8pp</span></td></tr></tbody></table>
 
   <h2>🧠 Comment lire ces chiffres</h2>
   <section class="card">
@@ -175,7 +175,7 @@
     📐 Métriques détaillées (WR par tier, ROI par sport, calibration sur sous-segments) :
     <a href="backtest.html">Backtest</a>. Définitions : <a href="academie.html">Académie</a>. Protocole formel : <a href="methodologie.html">Méthodologie</a>.
     <br><br>
-    Régénéré : <b>2026-08-01 06:19 UTC</b>
+    Régénéré : <b>2026-08-02 06:24 UTC</b>
   </p>
 </main>
 
