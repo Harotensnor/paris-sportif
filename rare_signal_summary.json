@@ -1,22 +1,44 @@
 {
-  "generated_at": "2026-08-01T23:31:28Z",
+  "generated_at": "2026-08-02T02:39:10Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
-  "status": "watch",
+  "status": "ok",
   "summary": {
     "active_events": 8,
-    "actionable": 0,
+    "actionable": 1,
     "watch": 0,
-    "risk": 8,
+    "risk": 7,
     "expired_sample": 0,
     "by_type": {
-      "market_uncertain": 8
+      "market_uncertain": 8,
+      "market_move": 12,
+      "signal_conflict": 3
     },
     "by_quality": {
-      "risk": 8
+      "risk": 7,
+      "actionable": 1
     }
   },
-  "active_actionable": [],
+  "active_actionable": [
+    {
+      "event_id": "401881816",
+      "date": "2026-08-02T17:00Z",
+      "sport": "football",
+      "league_code": "bundesligaautriche",
+      "league_name": "Bundesliga Autriche",
+      "home": "Rapid Vienna",
+      "away": "SC Rheindorf Altach",
+      "match": "Rapid Vienna - SC Rheindorf Altach",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 1.0,
+      "context": "Cote away: 4.40 -> 3.60 (+18.2%)"
+    }
+  ],
   "active_watch": [],
   "active_risk": [
     {
@@ -90,24 +112,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 19.3%"
-    },
-    {
-      "event_id": "401881816",
-      "date": "2026-08-02T17:00Z",
-      "sport": "football",
-      "league_code": "bundesligaautriche",
-      "league_name": "Bundesliga Autriche",
-      "home": "Rapid Vienna",
-      "away": "SC Rheindorf Altach",
-      "match": "Rapid Vienna - SC Rheindorf Altach",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.6%"
     },
     {
       "event_id": "401878411",
