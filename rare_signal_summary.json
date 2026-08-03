@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-08-02T23:32:19Z",
+  "generated_at": "2026-08-03T02:38:47Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
-  "status": "watch",
+  "status": "ok",
   "summary": {
     "active_events": 3,
-    "actionable": 0,
+    "actionable": 1,
     "watch": 0,
-    "risk": 3,
+    "risk": 2,
     "expired_sample": 0,
     "by_type": {
-      "market_uncertain": 3
+      "market_uncertain": 3,
+      "market_move": 2
     },
     "by_quality": {
-      "risk": 3
+      "actionable": 1,
+      "risk": 2
     }
   },
-  "active_actionable": [],
-  "active_watch": [],
-  "active_risk": [
+  "active_actionable": [
     {
       "event_id": "401878411",
       "date": "2026-08-03T18:30Z",
@@ -28,15 +28,18 @@
       "home": "Celtic",
       "away": "Dundee",
       "match": "Celtic - Dundee",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
       "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.9%"
-    },
+      "side": "draw",
+      "strength": 1.0,
+      "context": "Cote draw: 7.50 -> 5.50 (+26.7%)"
+    }
+  ],
+  "active_watch": [],
+  "active_risk": [
     {
       "event_id": "401875655",
       "date": "2026-08-07T18:00Z",
