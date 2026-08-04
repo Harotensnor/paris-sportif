@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-04T05:33:03Z",
-  "calculated_at": "2026-08-04T05:33:03Z",
+  "generated_at": "2026-08-04T10:54:13Z",
+  "calculated_at": "2026-08-04T10:54:13Z",
   "source_of_truth": "data.js",
   "data_age_min": 1,
   "data_file_age_min": 0,
@@ -16,7 +16,7 @@
       "matches_detailed": 16,
       "details_ratio_pct": 3.0,
       "last_run_delta": 0,
-      "last_run_limit": 400
+      "last_run_limit": 1000
     },
     "injuries_soccer": {
       "age_min": 6,
@@ -347,8 +347,8 @@
       "age_min": 6,
       "teams": 130,
       "sports": 4,
-      "injuries": 707,
-      "severe": 481
+      "injuries": 706,
+      "severe": 480
     },
     "thesportsdb_meta": {
       "age_min": 6,
@@ -447,10 +447,10 @@
     },
     "clv_history": {
       "age_min": 6,
-      "matches": 933,
-      "observations": 2239,
+      "matches": 955,
+      "observations": 2289,
       "mean_clv_pct": -0.13,
-      "positive_clv_rate": 38.5,
+      "positive_clv_rate": 38.3,
       "sample_status": "validated"
     }
   },
@@ -1026,7 +1026,7 @@
   ],
   "overall": "warning",
   "quality_checks": {
-    "data_generated_at": "2026-08-04T05:31:58.510080Z",
+    "data_generated_at": "2026-08-04T10:52:37.290434Z",
     "truth_scope": "all_events",
     "all_winamax_available": 28,
     "all_winamax_exact": 22,
@@ -1087,7 +1087,7 @@
   "data_truth": {
     "source_of_truth": "data.js",
     "scope": "all_events",
-    "data_generated_at": "2026-08-04T05:31:58.510080Z",
+    "data_generated_at": "2026-08-04T10:52:37.290434Z",
     "winamax_available": 28,
     "winamax_exact": 22,
     "winamax_exact_ratio": 0.7857,
@@ -1107,7 +1107,7 @@
     "anomalies_emitted": 8
   },
   "source_health": {
-    "generated_at": "2026-08-04T05:33:03Z",
+    "generated_at": "2026-08-04T10:54:13Z",
     "sources_total": 11,
     "sources_ok": 5,
     "sources_warning": 6,
@@ -1127,7 +1127,7 @@
         "score": 84,
         "status": "warning",
         "items": 531,
-        "age_min": 1,
+        "age_min": 0,
         "sla_min": 15,
         "issues": 3
       },
@@ -1159,7 +1159,7 @@
         "score": 100,
         "status": "ok",
         "items": 6102,
-        "age_min": 1,
+        "age_min": 2,
         "sla_min": 60,
         "issues": 1
       },
@@ -1207,7 +1207,7 @@
   },
   "observability": {
     "pipeline_traces": {
-      "generated_at": "2026-08-04T05:33:03Z",
+      "generated_at": "2026-08-04T10:54:13Z",
       "runs_observed": 99,
       "by_status": {
         "warning": 71,
@@ -1225,7 +1225,7 @@
     }
   },
   "data_lineage": {
-    "generated_at": "2026-08-04T05:33:03Z",
+    "generated_at": "2026-08-04T10:54:13Z",
     "status": "ok",
     "events": 28,
     "events_missing_inline_lineage": 0,
