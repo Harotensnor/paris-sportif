@@ -1,0 +1,123 @@
+name: Build musically corrected Jump in the Line V3
+
+on:
+  push:
+    branches:
+      - tmp-tab-recovery-zrwvp-scqeys
+    paths:
+      - .github/workflows/tmp-build-jump-v3.yml
+      - tmp/build_jump_v3.py
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Guitar Pro, MIDI and audio tooling
+        shell: bash
+        run: |
+          set -euxo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg fluidsynth fluid-soundfont-gm
+          git clone --depth 1 https://github.com/Perlence/PyGuitarPro.git /tmp/PyGuitarPro
+          python -m pip install --upgrade pip
+          python -m pip install /tmp/PyGuitarPro mido
+
+      - name: Generate both Guitar Pro versions and strict round-trip validation
+        shell: bash
+        run: |
+          set -euxo pipefail
+          python tmp/build_jump_v3.py
+          file out_v3/*
+          ls -lah out_v3
+
+      - name: Export modern Guitar Pro files and validate them with alphaTab
+        shell: bash
+        run: |
+          set -euxo pipefail
+          mkdir -p /tmp/alphatab
+          cd /tmp/alphatab
+          npm init -y >/dev/null 2>&1
+          npm install @coderline/alphatab
+          cat > export.mjs <<'JS'
+          import fs from 'node:fs';
+          import path from 'node:path';
+          import * as alphaTab from '@coderline/alphatab';
+
+          const root = path.resolve(process.env.GITHUB_WORKSPACE, 'out_v3');
+          const settings = new alphaTab.Settings();
+          const summaries = [];
+          for (const name of fs.readdirSync(root).filter(n => n.endsWith('.gp5'))) {
+              const input = path.join(root, name);
+              const bytes = new Uint8Array(fs.readFileSync(input));
+              const score = alphaTab.importer.ScoreLoader.loadScoreFromBytes(bytes, settings);
+              if (score.masterBars.length !== 59) throw new Error(`${name}: expected 59 bars, got ${score.masterBars.length}`);
+              if (score.tracks.length < 1) throw new Error(`${name}: no tracks`);
+              const output = path.join(root, name.replace(/\.gp5$/i, '.gp'));
+              const exporter = new alphaTab.exporter.Gp7Exporter();
+              fs.writeFileSync(output, exporter.export(score, settings));
+              const roundtrip = alphaTab.importer.ScoreLoader.loadScoreFromBytes(new Uint8Array(fs.readFileSync(output)), settings);
+              if (roundtrip.masterBars.length !== 59) throw new Error(`${output}: roundtrip lost bars`);
+              summaries.push({
+                  source: name,
+                  modern: path.basename(output),
+                  bars: roundtrip.masterBars.length,
+                  tempo: roundtrip.tempo,
+                  tracks: roundtrip.tracks.map(t => t.name),
+              });
+          }
+          fs.writeFileSync(path.join(root, 'modern-gp-validation.json'), JSON.stringify(summaries, null, 2));
+          JS
+          node export.mjs
+          find "$GITHUB_WORKSPACE/out_v3" -maxdepth 1 -type f -printf '%f %s bytes\n' | sort
+
+      - name: Render listenable MP3 previews from the validated MIDI
+        shell: bash
+        run: |
+          set -euxo pipefail
+          SF2=$(find /usr/share/sounds -type f -name '*.sf2' | head -n 1)
+          test -n "$SF2"
+          echo "$SF2" > out_v3/soundfont-used.txt
+          for MIDI in out_v3/*.mid; do
+            BASE="${MIDI%.mid}"
+            fluidsynth -ni "$SF2" "$MIDI" -F "${BASE}.wav" -r 44100
+            ffmpeg -hide_banner -loglevel error -y -i "${BASE}.wav" \
+              -af 'loudnorm=I=-16:LRA=11:TP=-1.5' -codec:a libmp3lame -b:a 192k "${BASE}.mp3"
+            rm -f "${BASE}.wav"
+          done
+          ffprobe -v error -show_entries format=filename,duration,size -of json out_v3/*.mp3 > out_v3/mp3-validation.json
+          ls -lah out_v3/*.mp3
+
+      - name: Write package guide and checksums
+        shell: bash
+        run: |
+          cat > out_v3/LISEZ-MOI.txt <<'TXT'
+          JUMP IN THE LINE — V3
+
+          1) Jump_in_the_Line_V3_melodie_originale.gp / .gp5
+             La tablature visible de la video, seule. Les notes, silences, valeurs rythmiques et liaisons
+             restent ceux de la partition originale. Le playback a ete raccourci et accentue pour imiter
+             une guitare acoustique jouee au mediator au lieu d'un MIDI qui tient toutes les notes.
+
+          2) Jump_in_the_Line_V3_playback_complet.gp / .gp5
+             La meme piste melodique, avec des pistes separees de guitare rythmique calypso, basse et,
+             quand le format GP5 l'a permis, percussions. Chaque piste peut etre mutee dans Guitar Pro.
+
+          Les MP3 servent a ecouter rapidement les deux versions avant ouverture dans Guitar Pro.
+          TXT
+          cd out_v3
+          sha256sum *.gp *.gp5 *.mid *.mp3 > SHA256SUMS.txt
+
+      - name: Upload final corrected tablature bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: Jump-in-the-Line-V3-musically-corrected
+          path: out_v3/**
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 1
