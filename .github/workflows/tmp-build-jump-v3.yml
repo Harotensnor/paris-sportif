@@ -90,7 +90,15 @@ jobs:
               -af 'loudnorm=I=-16:LRA=11:TP=-1.5' -codec:a libmp3lame -b:a 192k "${BASE}.mp3"
             rm -f "${BASE}.wav"
           done
-          ffprobe -v error -show_entries format=filename,duration,size -of json out_v3/*.mp3 > out_v3/mp3-validation.json
+          printf '[\n' > out_v3/mp3-validation.json
+          FIRST=1
+          for MP3 in out_v3/*.mp3; do
+            if [[ $FIRST -eq 0 ]]; then printf ',\n' >> out_v3/mp3-validation.json; fi
+            ffprobe -v error -show_entries format=filename,duration,size -of json "$MP3" \
+              | jq -c '.format' >> out_v3/mp3-validation.json
+            FIRST=0
+          done
+          printf '\n]\n' >> out_v3/mp3-validation.json
           ls -lah out_v3/*.mp3
 
       - name: Write package guide and checksums
