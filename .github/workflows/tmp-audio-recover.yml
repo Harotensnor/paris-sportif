@@ -1,0 +1,115 @@
+name: Recover exact tutorial audio for transcription QA
+
+on:
+  push:
+    branches:
+      - tmp-tab-recovery-zrwvp-scqeys
+    paths:
+      - .github/workflows/tmp-audio-recover.yml
+
+permissions:
+  contents: read
+
+jobs:
+  recover-audio:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install audio tools
+        shell: bash
+        run: |
+          set -euxo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg jq
+          mkdir -p out/responses
+
+      - name: Resolve the public YouTube video through Cobalt instances
+        shell: bash
+        run: |
+          set -uo pipefail
+          VIDEO='https://www.youtube.com/watch?v=ZRwvPScqEys'
+          PAYLOAD=$(jq -nc --arg url "$VIDEO" '{url:$url,downloadMode:"audio",audioFormat:"best",audioBitrate:"320",filenameStyle:"basic",youtubeBetterAudio:true,alwaysProxy:true}')
+
+          INSTANCES=(
+            'https://cobalt-backend.canine.tools/'
+            'https://cobalt-api.kwiatekmiki.com/'
+            'https://capi.3kh0.net/'
+            'https://cobalt-api.meowing.de/'
+            'https://kityune.imput.net/'
+            'https://nachos.imput.net/'
+            'https://sunny.imput.net/'
+            'https://blossom.imput.net/'
+            'https://cobalt-7.kwiatekmiki.com/'
+            'https://downloadapi.stuff.solutions/'
+          )
+
+          curl -fsSL --max-time 20 'https://instances.cobalt.best/api/instances.json' -o out/instances.json || true
+          if [[ -s out/instances.json ]]; then
+            while IFS= read -r api; do
+              [[ -n "$api" ]] && INSTANCES+=("$api")
+            done < <(jq -r '.[] | (.api // .api_url // empty)' out/instances.json 2>/dev/null | sed 's#/*$#/#')
+          fi
+
+          : > out/attempts.tsv
+          SUCCESS=''
+          INDEX=0
+          for API in "${INSTANCES[@]}"; do
+            INDEX=$((INDEX+1))
+            SAFE=$(printf '%s' "$API" | sed 's#https\?://##; s#[^A-Za-z0-9]#_#g')
+            RESPONSE="out/responses/${INDEX}_${SAFE}.json"
+            CODE=$(curl -sS -L --max-time 35 \
+              -o "$RESPONSE" -w '%{http_code}' \
+              -H 'Accept: application/json' \
+              -H 'Content-Type: application/json' \
+              -H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/151 Safari/537.36' \
+              -H "Origin: ${API%/}" \
+              -H "Referer: $API" \
+              --data-raw "$PAYLOAD" "$API" || true)
+            STATUS=$(jq -r '.status // empty' "$RESPONSE" 2>/dev/null || true)
+            ERROR=$(jq -r '.error.code // .error // empty' "$RESPONSE" 2>/dev/null || true)
+            printf '%s\t%s\t%s\t%s\n' "$API" "$CODE" "$STATUS" "$ERROR" >> out/attempts.tsv
+            echo "[$INDEX] $API HTTP=$CODE status=$STATUS error=$ERROR"
+
+            URL=$(jq -r 'if (.status=="redirect" or .status=="tunnel") then .url elif .status=="picker" then .picker[0].url else empty end' "$RESPONSE" 2>/dev/null || true)
+            [[ -z "$URL" ]] && continue
+
+            echo "$API" > out/success-instance.txt
+            printf '%s' "$URL" > out/resolved-url.txt
+            if curl -fL --retry 4 --retry-all-errors --max-time 240 \
+              -A 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/151 Safari/537.36' \
+              "$URL" -o out/tutorial-source.bin; then
+              SUCCESS=1
+              break
+            fi
+          done
+
+          if [[ -z "$SUCCESS" ]]; then
+            echo 'No Cobalt instance returned a downloadable audio URL.' > out/failure.txt
+            exit 1
+          fi
+
+      - name: Normalize and inspect recovered audio
+        shell: bash
+        run: |
+          set -euxo pipefail
+          file out/tutorial-source.bin | tee out/file.txt
+          ffprobe -v error -show_format -show_streams -of json out/tutorial-source.bin > out/ffprobe.json
+          ffmpeg -hide_banner -loglevel error -y -i out/tutorial-source.bin \
+            -vn -ac 2 -ar 44100 -c:a pcm_s16le out/tutorial.wav
+          ffmpeg -hide_banner -loglevel error -y -i out/tutorial-source.bin \
+            -vn -c:a libmp3lame -b:a 192k out/tutorial.mp3
+          ffmpeg -hide_banner -loglevel error -y -i out/tutorial.wav \
+            -filter_complex 'showwavespic=s=1800x500:colors=black' -frames:v 1 out/waveform.png
+          ls -lah out
+
+      - name: Upload recovered reference audio
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Jump-in-the-Line-tutorial-audio-recovery
+          path: out/**
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 1
