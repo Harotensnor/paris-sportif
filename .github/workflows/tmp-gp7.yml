@@ -1,0 +1,69 @@
+name: Temporary inspect and export modern Guitar Pro
+
+on:
+  push:
+    branches:
+      - tmp-tab-recovery-zrwvp-scqeys
+    paths:
+      - .github/workflows/tmp-gp7.yml
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Recover V2
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          mkdir -p input out
+          gh api repos/${GITHUB_REPOSITORY}/actions/artifacts/9007171940/zip > input/v2.zip
+          unzip -o input/v2.zip -d input/v2
+          cp input/v2/Jump_in_the_Line_Mitchs_Music_V2.gp5 input/source.gp5
+      - name: Inspect model and export GP7
+        shell: bash
+        run: |
+          npm init -y >/dev/null 2>&1
+          npm install @coderline/alphatab
+          cat > inspect.mjs <<'JS'
+          import fs from 'node:fs';
+          import * as alphaTab from '@coderline/alphatab';
+          const settings = new alphaTab.Settings();
+          const bytes = new Uint8Array(fs.readFileSync('input/source.gp5'));
+          const score = alphaTab.importer.ScoreLoader.loadScoreFromBytes(bytes, settings);
+          fs.writeFileSync('out/model.json', JSON.stringify(alphaTab.model.JsonConverter.scoreToJson(score), null, 2));
+          const summary = {
+            title: score.title,
+            tempo: score.tempo,
+            masterBars: score.masterBars.length,
+            tracks: score.tracks.map(t => ({
+              name:t.name,
+              shortName:t.shortName,
+              systemsLayout:t.systemsLayout,
+              defaultSystemsLayout:t.defaultSystemsLayout,
+              staves:t.staves.map(s => ({
+                showStandardNotation:s.showStandardNotation,
+                showTablature:s.showTablature,
+                tuning:s.tuning,
+                chords:s.chords ? [...s.chords.entries()].map(([id,c])=>({id,name:c.name,strings:c.strings,barreFrets:c.barreFrets,firstFret:c.firstFret,showDiagram:c.showDiagram,showName:c.showName,showFingering:c.showFingering})) : []
+              }))
+            }))
+          };
+          fs.writeFileSync('out/summary.json', JSON.stringify(summary,null,2));
+          const exporter = new alphaTab.exporter.Gp7Exporter();
+          fs.writeFileSync('out/roundtrip.gp', exporter.export(score, settings));
+          JS
+          node inspect.mjs
+          find out -type f -printf '%P %s bytes\n'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gp7-model-inspection
+          path: out/**
+          retention-days: 1
+          compression-level: 0
