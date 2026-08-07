@@ -1,22 +1,21 @@
 {
-  "generated_at": "2026-08-07T06:03:39Z",
+  "generated_at": "2026-08-07T07:39:31Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 2,
-    "actionable": 1,
+    "actionable": 2,
     "watch": 0,
-    "risk": 1,
+    "risk": 0,
     "expired_sample": 0,
     "by_type": {
       "market_uncertain": 2,
-      "market_move": 5,
+      "market_move": 4,
       "signal_conflict": 1
     },
     "by_quality": {
-      "risk": 1,
-      "actionable": 1
+      "actionable": 2
     }
   },
   "active_actionable": [
@@ -37,10 +36,7 @@
       "side": "away",
       "strength": 1.0,
       "context": "Cote away: 3.05 -> 2.40 (+21.3%)"
-    }
-  ],
-  "active_watch": [],
-  "active_risk": [
+    },
     {
       "event_id": "401875655",
       "date": "2026-08-07T18:00Z",
@@ -50,15 +46,17 @@
       "home": "SC Cambuur",
       "away": "Excelsior",
       "match": "SC Cambuur - Excelsior",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
       "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 19.4%"
+      "side": "home",
+      "strength": 0.871,
+      "context": "Cote home: 2.55 -> 2.15 (+15.7%)"
     }
   ],
+  "active_watch": [],
+  "active_risk": [],
   "expired_sample": []
 }
