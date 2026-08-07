@@ -11,287 +11,165 @@ permissions:
   contents: read
 
 jobs:
-  recover:
+  capture:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install tools
+      - name: Prepare browser capture
         run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq ffmpeg
-          python -m pip install --upgrade requests
+          node --version
+          which google-chrome || which google-chrome-stable || which chromium || true
+          npm init -y >/dev/null 2>&1
+          npm install --no-save playwright-core
+          mkdir -p out/frames
 
-      - name: Retrieve the public tutorial through multiple public endpoints
+      - name: Capture the tutorial frames from the embedded player
         shell: bash
         run: |
-          mkdir -p out
-          cat > /tmp/recover.py <<'PY'
-          import json, os, re, subprocess, sys, time
-          from urllib.parse import urlparse
-          import requests
+          cat > /tmp/capture.js <<'JS'
+          const fs = require('fs');
+          const { chromium } = require('playwright-core');
 
-          VIDEO_ID = "ZRwvPScqEys"
-          WATCH = f"https://www.youtube.com/watch?v={VIDEO_ID}"
-          OUT = "out"
-          UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/151.0 Safari/537.36"
-          S = requests.Session()
-          S.headers.update({"User-Agent": UA, "Accept-Language": "en-US,en;q=0.9"})
-          diagnostics = []
+          const id = 'ZRwvPScqEys';
+          const out = 'out';
+          const frameDir = `${out}/frames`;
+          fs.mkdirSync(frameDir, { recursive: true });
 
-          def note(kind, target, status, detail=""):
-              row = {"kind": kind, "target": target, "status": status, "detail": str(detail)[:2000]}
-              diagnostics.append(row)
-              print(json.dumps(row, ensure_ascii=False), flush=True)
-
-          def save_json(name, obj):
-              with open(os.path.join(OUT, name), "w", encoding="utf-8") as f:
-                  json.dump(obj, f, ensure_ascii=False, indent=2)
-
-          def get_json(url, timeout=15, method="GET", payload=None, headers=None):
-              try:
-                  if method == "POST":
-                      r = S.post(url, json=payload, headers=headers or {}, timeout=timeout)
-                  else:
-                      r = S.get(url, headers=headers or {}, timeout=timeout)
-                  note("http", url, r.status_code, r.text[:300])
-                  if r.ok:
-                      return r.json()
-              except Exception as e:
-                  note("http", url, "error", repr(e))
-              return None
-
-          def download(url, path, headers=None, max_bytes=900_000_000):
-              try:
-                  h = {"User-Agent": UA, "Referer": "https://www.youtube.com/"}
-                  if headers:
-                      h.update(headers)
-                  with S.get(url, headers=h, stream=True, timeout=(20, 60), allow_redirects=True) as r:
-                      note("download", url, r.status_code, {"type": r.headers.get("content-type"), "length": r.headers.get("content-length"), "final": r.url})
-                      r.raise_for_status()
-                      total = 0
-                      with open(path, "wb") as f:
-                          for chunk in r.iter_content(1024 * 1024):
-                              if not chunk:
-                                  continue
-                              total += len(chunk)
-                              if total > max_bytes:
-                                  raise RuntimeError("download exceeded safety size")
-                              f.write(chunk)
-                  return os.path.getsize(path) > 100_000
-              except Exception as e:
-                  note("download", url, "error", repr(e))
-                  try:
-                      os.remove(path)
-                  except OSError:
-                      pass
-                  return False
-
-          def merge(video, audio, output):
-              p = subprocess.run(["ffmpeg", "-y", "-hide_banner", "-loglevel", "error", "-i", video, "-i", audio, "-c", "copy", output], text=True, capture_output=True)
-              note("ffmpeg-merge", output, p.returncode, p.stderr[-1000:])
-              return p.returncode == 0 and os.path.getsize(output) > 100_000
-
-          def ffmpeg_url(url, output):
-              p = subprocess.run(["ffmpeg", "-y", "-hide_banner", "-loglevel", "error", "-user_agent", UA, "-headers", "Referer: https://www.youtube.com/\r\n", "-i", url, "-c", "copy", output], text=True, capture_output=True, timeout=900)
-              note("ffmpeg-url", url, p.returncode, p.stderr[-1500:])
-              return p.returncode == 0 and os.path.exists(output) and os.path.getsize(output) > 100_000
-
-          # Basic metadata endpoints.
-          endpoints = {
-              "youtube_oembed.json": f"https://www.youtube.com/oembed?url={WATCH}&format=json",
-              "noembed.json": f"https://noembed.com/embed?url={WATCH}",
+          function findChrome() {
+            const candidates = [
+              '/usr/bin/google-chrome', '/usr/bin/google-chrome-stable',
+              '/usr/bin/chromium', '/usr/bin/chromium-browser',
+              '/opt/google/chrome/chrome'
+            ];
+            return candidates.find(p => fs.existsSync(p));
           }
-          for filename, url in endpoints.items():
-              obj = get_json(url)
-              if obj is not None:
-                  save_json(filename, obj)
 
-          source = os.path.join(OUT, "source.mp4")
-
-          # Invidious: live instance catalogue plus a broad fallback set.
-          inv_hosts = []
-          catalog = get_json("https://api.invidious.io/instances.json?sort_by=health", timeout=25)
-          if isinstance(catalog, list):
-              save_json("invidious_instances.json", catalog)
-              for item in catalog:
-                  try:
-                      host, info = item
-                      if isinstance(info, dict) and info.get("api"):
-                          inv_hosts.append(host)
-                  except Exception:
-                      pass
-          inv_hosts += [
-              "inv.nadeko.net", "yewtu.be", "invidious.private.coffee", "invidious.nerdvpn.de",
-              "invidious.jing.rocks", "iv.ggtyler.dev", "invidious.protokolla.fi",
-              "invidious.adminforge.de", "inv.tux.pizza", "inv.us.projectsegfau.lt",
-              "invidious.projectsegfau.lt", "invidious.privacydev.net", "inv.perditum.com",
-              "invidious.drgns.space", "invidious.einfachzocken.eu", "invidious.0011.lt"
-          ]
-          seen = set()
-          inv_hosts = [h for h in inv_hosts if h and not (h in seen or seen.add(h))]
-
-          for host in inv_hosts[:60]:
-              if os.path.exists(source):
-                  break
-              api = f"https://{host}/api/v1/videos/{VIDEO_ID}"
-              data = get_json(api, timeout=12)
-              if not isinstance(data, dict):
-                  continue
-              save_json("invidious_video.json", data)
-              formats = data.get("formatStreams") or []
-              formats = [x for x in formats if isinstance(x, dict) and x.get("url")]
-              formats.sort(key=lambda x: int(re.sub(r"\D", "", str(x.get("qualityLabel") or x.get("quality") or "0")) or 0), reverse=True)
-              for fmt in formats:
-                  if download(fmt["url"], source):
-                      note("success", host, "progressive", fmt.get("qualityLabel") or fmt.get("quality"))
-                      break
-              if os.path.exists(source):
-                  break
-              hls = data.get("hlsUrl") or data.get("dashUrl")
-              if hls and ffmpeg_url(hls, source):
-                  note("success", host, "manifest", hls)
-                  break
-
-          # Piped: obtain instances dynamically and try known APIs.
-          piped_apis = []
-          for list_url in ["https://piped.video/api/v1/instances", "https://piped-instances.kavin.rocks/"]:
-              obj = get_json(list_url, timeout=20)
-              if obj is not None:
-                  save_json("piped_instances.json", obj)
-              items = obj if isinstance(obj, list) else (obj.get("instances", []) if isinstance(obj, dict) else [])
-              for item in items:
-                  if not isinstance(item, dict):
-                      continue
-                  for key in ("api_url", "apiUrl", "api"):
-                      val = item.get(key)
-                      if isinstance(val, str) and val.startswith("http"):
-                          piped_apis.append(val.rstrip("/"))
-          piped_apis += [
-              "https://pipedapi.kavin.rocks", "https://pipedapi.adminforge.de",
-              "https://pipedapi.reallyaweso.me", "https://pipedapi.leptons.xyz",
-              "https://pipedapi.r4fo.com", "https://pipedapi.ducks.party",
-              "https://pipedapi.drgns.space", "https://pipedapi.nosebs.ru",
-              "https://pipedapi.privacy.com.de", "https://pipedapi.owo.si",
-              "https://pipedapi.rivo.lol", "https://pipedapi.syncpundit.io"
-          ]
-          seen = set()
-          piped_apis = [h for h in piped_apis if h and not (h in seen or seen.add(h))]
-
-          for base in piped_apis[:60]:
-              if os.path.exists(source):
-                  break
-              data = get_json(f"{base}/streams/{VIDEO_ID}", timeout=15)
-              if not isinstance(data, dict):
-                  continue
-              save_json("piped_streams.json", data)
-              videos = [x for x in (data.get("videoStreams") or []) if isinstance(x, dict) and x.get("url")]
-              audios = [x for x in (data.get("audioStreams") or []) if isinstance(x, dict) and x.get("url")]
-              videos.sort(key=lambda x: int(re.sub(r"\D", "", str(x.get("quality") or "0")) or 0), reverse=True)
-              audios.sort(key=lambda x: int(x.get("bitrate") or 0), reverse=True)
-              progressive = [x for x in videos if not x.get("videoOnly")]
-              for fmt in progressive:
-                  if download(fmt["url"], source):
-                      note("success", base, "progressive", fmt.get("quality"))
-                      break
-              if os.path.exists(source):
-                  break
-              for v in videos[:4]:
-                  vpath = os.path.join(OUT, "video_only.bin")
-                  if not download(v["url"], vpath):
-                      continue
-                  for a in audios[:3]:
-                      apath = os.path.join(OUT, "audio_only.bin")
-                      if download(a["url"], apath) and merge(vpath, apath, source):
-                          note("success", base, "adaptive", {"video": v.get("quality"), "audio": a.get("bitrate")})
-                          break
-                  if os.path.exists(source):
-                      break
-              if os.path.exists(source):
-                  break
-              hls = data.get("hls") or data.get("hlsUrl")
-              if hls and ffmpeg_url(hls, source):
-                  note("success", base, "hls", hls)
-                  break
-
-          # Direct Innertube clients. Some public videos expose unciphered URLs here.
-          if not os.path.exists(source):
-              api_key = "AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"
-              clients = [
-                  ("ANDROID", "20.10.38", "com.google.android.youtube/20.10.38 (Linux; U; Android 14) gzip"),
-                  ("IOS", "20.10.4", "com.google.ios.youtube/20.10.4 (iPhone16,2; U; CPU iOS 18_3 like Mac OS X)"),
-                  ("TVHTML5_SIMPLY_EMBEDDED_PLAYER", "2.0", UA),
-                  ("WEB_EMBEDDED_PLAYER", "1.20260730.00.00", UA),
+          (async () => {
+            const executablePath = findChrome();
+            if (!executablePath) throw new Error('Chrome executable not found');
+            const browser = await chromium.launch({
+              executablePath,
+              headless: true,
+              args: [
+                '--autoplay-policy=no-user-gesture-required',
+                '--disable-blink-features=AutomationControlled',
+                '--disable-dev-shm-usage',
+                '--no-sandbox',
+                '--window-size=1280,720'
               ]
-              for client_name, version, client_ua in clients:
-                  payload = {
-                      "videoId": VIDEO_ID,
-                      "context": {"client": {"clientName": client_name, "clientVersion": version, "hl": "en", "gl": "US", "userAgent": client_ua}},
-                      "contentCheckOk": True,
-                      "racyCheckOk": True,
-                  }
-                  if "EMBEDDED" in client_name:
-                      payload["context"]["thirdParty"] = {"embedUrl": f"https://www.youtube.com/embed/{VIDEO_ID}"}
-                  data = get_json(f"https://www.youtube.com/youtubei/v1/player?key={api_key}", timeout=20, method="POST", payload=payload, headers={"User-Agent": client_ua, "Content-Type": "application/json"})
-                  if not isinstance(data, dict):
-                      continue
-                  save_json(f"innertube_{client_name}.json", data)
-                  streaming = data.get("streamingData") or {}
-                  formats = (streaming.get("formats") or [])
-                  formats = [x for x in formats if isinstance(x, dict) and x.get("url")]
-                  formats.sort(key=lambda x: int(x.get("height") or 0), reverse=True)
-                  for fmt in formats:
-                      if download(fmt["url"], source, headers={"User-Agent": client_ua}):
-                          note("success", client_name, "innertube-progressive", fmt.get("qualityLabel"))
-                          break
-                  if os.path.exists(source):
-                      break
-                  hls = streaming.get("hlsManifestUrl")
-                  if hls and ffmpeg_url(hls, source):
-                      note("success", client_name, "innertube-hls", hls)
-                      break
+            });
+            const context = await browser.newContext({
+              viewport: { width: 1280, height: 720 },
+              locale: 'en-US',
+              timezoneId: 'America/New_York',
+              userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36',
+              extraHTTPHeaders: { 'Accept-Language': 'en-US,en;q=0.9' }
+            });
+            const page = await context.newPage();
+            const logs = [];
+            page.on('console', m => logs.push({ type: 'console', level: m.type(), text: m.text() }));
+            page.on('pageerror', e => logs.push({ type: 'pageerror', text: String(e) }));
+            page.on('requestfailed', r => logs.push({ type: 'requestfailed', url: r.url(), failure: r.failure() }));
 
-          # Cobalt's public API, as a final public endpoint fallback.
-          if not os.path.exists(source):
-              cobalt_payload = {"url": WATCH, "videoQuality": "1080", "downloadMode": "auto"}
-              for base in ["https://api.cobalt.tools", "https://cobalt.tools/api"]:
-                  data = get_json(base + "/", timeout=30, method="POST", payload=cobalt_payload,
-                                  headers={"Accept": "application/json", "Content-Type": "application/json"})
-                  if not isinstance(data, dict):
-                      continue
-                  save_json("cobalt.json", data)
-                  candidate = data.get("url")
-                  if candidate and download(candidate, source):
-                      note("success", base, "cobalt", candidate)
-                      break
+            const urls = [
+              `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&mute=1&controls=0&playsinline=1&rel=0&modestbranding=1`,
+              `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&controls=0&playsinline=1&rel=0&modestbranding=1`,
+              `https://www.youtube.com/watch?v=${id}`
+            ];
 
-          save_json("diagnostics.json", diagnostics)
-          if os.path.exists(source):
-              print("SOURCE_OK", os.path.getsize(source))
-              sys.exit(0)
-          print("NO_SOURCE")
-          sys.exit(0)
-          PY
-          python /tmp/recover.py
+            let playable = false;
+            let chosenUrl = null;
+            let info = null;
 
-      - name: Produce overview frames
-        if: always()
-        shell: bash
-        run: |
-          set +e
-          if [ -s out/source.mp4 ]; then
-            mkdir -p out/overview
-            ffprobe -v error -show_format -show_streams -of json out/source.mp4 > out/ffprobe.json
-            ffmpeg -hide_banner -loglevel error -i out/source.mp4 -vf "fps=1/5,scale=960:-2,tile=4x4" -q:v 3 out/overview/contact_%03d.jpg
-          fi
-          ls -lahR out
+            for (const url of urls) {
+              logs.push({ type: 'navigate', url });
+              try {
+                await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
+                await page.waitForTimeout(8000);
+                await page.screenshot({ path: `${out}/attempt_${urls.indexOf(url)}.jpg`, type: 'jpeg', quality: 90 });
+                info = await page.evaluate(() => {
+                  const v = document.querySelector('video');
+                  const body = document.body ? document.body.innerText.slice(0, 5000) : '';
+                  return {
+                    title: document.title,
+                    url: location.href,
+                    body,
+                    video: v ? {
+                      duration: Number.isFinite(v.duration) ? v.duration : null,
+                      currentTime: v.currentTime,
+                      paused: v.paused,
+                      readyState: v.readyState,
+                      networkState: v.networkState,
+                      error: v.error ? { code: v.error.code, message: v.error.message } : null,
+                      videoWidth: v.videoWidth,
+                      videoHeight: v.videoHeight,
+                      src: v.currentSrc || v.src || null
+                    } : null
+                  };
+                });
+                logs.push({ type: 'info', url, info });
+                if (info.video && info.video.duration && info.video.readyState >= 1 && !info.video.error) {
+                  playable = true;
+                  chosenUrl = url;
+                  break;
+                }
+              } catch (e) {
+                logs.push({ type: 'attempt-error', url, text: String(e), stack: e.stack });
+              }
+            }
 
-      - name: Upload recovery bundle
+            fs.writeFileSync(`${out}/browser-log.json`, JSON.stringify(logs, null, 2));
+            fs.writeFileSync(`${out}/player-info.json`, JSON.stringify({ playable, chosenUrl, info }, null, 2));
+
+            if (playable) {
+              const duration = Math.min(info.video.duration, 900);
+              await page.evaluate(() => {
+                const v = document.querySelector('video');
+                if (v) { v.muted = true; v.pause(); }
+                document.documentElement.style.overflow = 'hidden';
+                document.body.style.overflow = 'hidden';
+              });
+
+              // Seek at half-second intervals so every distinct tab overlay is captured.
+              for (let t = 0; t <= duration + 0.001; t += 0.5) {
+                try {
+                  await page.evaluate(async (target) => {
+                    const v = document.querySelector('video');
+                    if (!v) throw new Error('video disappeared');
+                    v.pause();
+                    const done = new Promise(resolve => {
+                      const timer = setTimeout(resolve, 2500);
+                      v.addEventListener('seeked', () => { clearTimeout(timer); resolve(); }, { once: true });
+                    });
+                    v.currentTime = Math.min(target, Math.max(0, v.duration - 0.02));
+                    await done;
+                    await new Promise(r => setTimeout(r, 120));
+                  }, t);
+                  const name = String(Math.round(t * 2)).padStart(5, '0');
+                  await page.screenshot({ path: `${frameDir}/frame_${name}_${t.toFixed(1)}s.jpg`, type: 'jpeg', quality: 92 });
+                } catch (e) {
+                  logs.push({ type: 'frame-error', t, text: String(e) });
+                }
+              }
+              fs.writeFileSync(`${out}/browser-log.json`, JSON.stringify(logs, null, 2));
+            }
+
+            await browser.close();
+          })().catch(err => {
+            fs.writeFileSync('out/fatal.txt', String(err.stack || err));
+            process.exitCode = 0;
+          });
+          JS
+          node /tmp/capture.js
+          find out -maxdepth 2 -type f -printf '%P %s bytes\n' | sort | head -1000
+
+      - name: Upload browser capture
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: yt-tab-recovery-ZRwvPScqEys
+          name: yt-tab-browser-capture-ZRwvPScqEys
           path: out/**
           if-no-files-found: error
           compression-level: 0
