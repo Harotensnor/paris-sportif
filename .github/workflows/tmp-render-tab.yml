@@ -1,4 +1,4 @@
-name: Temporary render Guitar Pro for visual QA
+name: Build clean Guitar Pro V2 and visual QA
 
 on:
   push:
@@ -12,13 +12,13 @@ permissions:
   actions: read
 
 jobs:
-  render:
+  build-and-render:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
 
-      - name: Recover generated Guitar Pro artifact
+      - name: Recover V1 Guitar Pro artifact
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
@@ -27,27 +27,213 @@ jobs:
           mkdir -p input out
           gh api repos/${GITHUB_REPOSITORY}/actions/artifacts/9006732232/zip > input/artifact.zip
           unzip -o input/artifact.zip -d input/artifact
-          find input/artifact -type f -printf '%P %s bytes\n'
-          cp input/artifact/Jump_in_the_Line_Mitchs_Music.gp5 input/score.gp5
+          cp input/artifact/Jump_in_the_Line_Mitchs_Music.gp5 input/v1.gp5
 
-      - name: Install MuseScore and render
+      - name: Install current PyGuitarPro
         shell: bash
         run: |
           set -euxo pipefail
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq musescore3 xvfb poppler-utils || sudo apt-get install -y -qq musescore xvfb poppler-utils
-          BIN=$(command -v musescore3 || command -v musescore || command -v mscore || true)
-          echo "MuseScore=$BIN"
-          xvfb-run -a "$BIN" -o out/score.pdf input/score.gp5
-          xvfb-run -a "$BIN" -o out/score.musicxml input/score.gp5 || true
-          pdftoppm -png -r 150 out/score.pdf out/render
-          pdfinfo out/score.pdf > out/pdfinfo.txt
-          find out -type f -printf '%P %s bytes\n' | sort
+          git clone --depth 1 https://github.com/Perlence/PyGuitarPro.git /tmp/PyGuitarPro
+          python -m pip install --upgrade pip
+          python -m pip install /tmp/PyGuitarPro
 
-      - name: Upload visual QA bundle
+      - name: Clean layout and metadata without changing the transcription
+        shell: bash
+        run: |
+          cat > /tmp/clean_gp5.py <<'PY'
+          from pathlib import Path
+          import json
+          import guitarpro
+          from guitarpro import models as gp
+
+          src = Path('input/v1.gp5')
+          dst = Path('out/Jump_in_the_Line_Mitchs_Music_V2.gp5')
+          song = guitarpro.parse(src)
+
+          # Match the original sheet: title only, no invented subtitle/artist/footer clutter.
+          song.title = 'Jump in the Line'
+          song.subtitle = ''
+          song.artist = ''
+          song.album = ''
+          song.words = ''
+          song.music = ''
+          song.copyright = ''
+          song.tab = ''
+          song.instructions = ''
+          song.notice = []
+          song.tempoName = ''
+          song.tempo = 101
+          song.hideTempo = False
+          song.key = gp.KeySignature.FMajor
+
+          song.pageSetup.pageSize = gp.Point(216, 279)  # US Letter proportions, close to source PDF.
+          song.pageSetup.pageMargin = gp.Padding(15, 15, 15, 15)
+          song.pageSetup.scoreSizeProportion = 1.0
+          song.pageSetup.headerAndFooter = gp.HeaderFooterElements.title
+          song.pageSetup.title = '%title%'
+          song.pageSetup.subtitle = ''
+          song.pageSetup.artist = ''
+          song.pageSetup.album = ''
+          song.pageSetup.words = ''
+          song.pageSetup.music = ''
+          song.pageSetup.wordsAndMusic = ''
+          song.pageSetup.copyright = ''
+          song.pageSetup.pageNumber = ''
+
+          track = song.tracks[0]
+          track.name = ''
+          track.indicateTuning = False
+          track.channel.instrument = 25  # Acoustic guitar (steel)
+          track.channel.bank = 0
+          track.settings.tablature = True
+          track.settings.notation = True
+          track.settings.diagramsAreBelow = False
+          track.settings.showRhythm = False  # The original TAB has digits only; rhythm is on the staff.
+          track.settings.forceHorizontal = False
+          track.settings.forceChannels = False
+          track.settings.diagramList = False
+          track.settings.diagramsInScore = True
+          track.settings.autoLetRing = False
+          track.settings.autoBrush = False
+          track.settings.extendRhythmic = False
+          track.clefTranspose = 0
+          track.clefTransposeSecondary = 0
+
+          line_ends = {6, 12, 18, 24, 30, 36, 41, 47, 53, 59}
+          for number, measure in enumerate(track.measures, 1):
+              measure.lineBreak = gp.LineBreak.break_ if number in line_ends else gp.LineBreak.none
+              measure.header.keySignature = gp.KeySignature.FMajor
+              measure.header.timeSignature.numerator = 4
+              measure.header.timeSignature.denominator = gp.Duration(value=gp.Duration.quarter)
+              measure.header.hasDoubleBar = number == 59
+              for voice in measure.voices:
+                  for beat in voice.beats:
+                      # V1 duplicated each chord as free text below the staff. Keep only the chord object/diagram.
+                      if beat.text in {'F', 'C7', 'Bb', 'B♭'}:
+                          beat.text = ''
+                      if beat.effect.chord is not None:
+                          beat.effect.chord.show = True
+
+          guitarpro.write(song, dst, version=(5, 1, 0))
+
+          # Strict round-trip verification: musical contents must be unchanged from V1.
+          before = guitarpro.parse(src)
+          after = guitarpro.parse(dst)
+          assert after.title == 'Jump in the Line'
+          assert after.subtitle == after.artist == after.album == ''
+          assert after.tempo == 101
+          assert after.key == gp.KeySignature.FMajor
+          assert len(after.tracks) == 1
+          assert len(after.tracks[0].measures) == 59
+          assert after.tracks[0].settings.tablature
+          assert after.tracks[0].settings.notation
+          assert not after.tracks[0].settings.showRhythm
+          assert not after.tracks[0].settings.diagramList
+          assert after.tracks[0].settings.diagramsInScore
+
+          def musical_signature(s):
+              result = []
+              t = s.tracks[0]
+              for m in t.measures:
+                  beats = []
+                  for b in m.voices[0].beats:
+                      notes = [(n.string, n.value, n.type.value) for n in b.notes]
+                      chord = b.effect.chord.name if b.effect.chord else None
+                      beats.append((b.status.value, b.duration.value, b.duration.isDotted,
+                                    b.duration.tuplet.enters, b.duration.tuplet.times, notes, chord))
+                  result.append(beats)
+              return result
+
+          assert musical_signature(before) == musical_signature(after)
+          report = {
+              'valid': True,
+              'file': dst.name,
+              'size_bytes': dst.stat().st_size,
+              'measures': len(after.tracks[0].measures),
+              'tempo': after.tempo,
+              'key': after.key.name,
+              'notation': after.tracks[0].settings.notation,
+              'tablature': after.tracks[0].settings.tablature,
+              'tab_rhythm_stems': after.tracks[0].settings.showRhythm,
+              'diagram_list': after.tracks[0].settings.diagramList,
+              'diagrams_in_score': after.tracks[0].settings.diagramsInScore,
+              'music_unchanged_from_v1': True,
+          }
+          Path('out/validation-v2.json').write_text(json.dumps(report, indent=2), encoding='utf-8')
+          print(json.dumps(report, indent=2))
+          PY
+          python /tmp/clean_gp5.py
+          sha256sum out/Jump_in_the_Line_Mitchs_Music_V2.gp5 > out/sha256.txt
+
+      - name: Render V2 through alphaTab (Guitar Pro-native parser)
+        shell: bash
+        run: |
+          set -euxo pipefail
+          mkdir -p /tmp/alphatab
+          cd /tmp/alphatab
+          npm init -y >/dev/null 2>&1
+          npm install @coderline/alphatab
+          cat > render.mjs <<'JS'
+          import fs from 'node:fs';
+          import path from 'node:path';
+          import * as alphaTab from '@coderline/alphatab';
+
+          const input = path.resolve(process.env.GITHUB_WORKSPACE, 'out/Jump_in_the_Line_Mitchs_Music_V2.gp5');
+          const output = path.resolve(process.env.GITHUB_WORKSPACE, 'out/alphatab');
+          fs.mkdirSync(output, { recursive: true });
+
+          const settings = new alphaTab.Settings();
+          settings.core.engine = 'svg';
+          settings.display.layoutMode = alphaTab.LayoutMode.Page;
+          settings.display.systemsLayoutMode = alphaTab.SystemsLayoutMode.UseModelLayout;
+          settings.display.scale = 1.0;
+          settings.display.stretchForce = 0.8;
+          settings.display.barCountPerPartial = 6;
+          settings.display.firstSystemPaddingTop = 10;
+          settings.display.systemPaddingTop = 12;
+          settings.display.systemPaddingBottom = 12;
+
+          const bytes = new Uint8Array(fs.readFileSync(input));
+          const score = alphaTab.importer.ScoreLoader.loadScoreFromBytes(bytes, settings);
+          const track = score.tracks[0];
+          track.systemsLayout = [6, 6, 6, 6, 6, 6, 5, 6, 6, 6];
+          track.defaultSystemsLayout = 6;
+
+          const renderer = new alphaTab.rendering.ScoreRenderer(settings);
+          renderer.width = 1200;
+          let chunks = [];
+          renderer.preRender.on(() => { chunks = []; });
+          renderer.partialLayoutFinished.on(r => renderer.renderResult(r.id));
+          renderer.partialRenderFinished.on(r => {
+              const index = chunks.length + 1;
+              const name = `chunk-${String(index).padStart(2, '0')}.svg`;
+              fs.writeFileSync(path.join(output, name), r.renderResult, 'utf8');
+              chunks.push({ name, width: r.width, height: r.height });
+          });
+          renderer.error.on(e => {
+              fs.writeFileSync(path.join(output, 'error.txt'), String(e?.stack ?? e), 'utf8');
+              process.exitCode = 1;
+          });
+          renderer.renderFinished.on(r => {
+              fs.writeFileSync(path.join(output, 'render-summary.json'), JSON.stringify({
+                  title: score.title,
+                  tracks: score.tracks.length,
+                  bars: score.masterBars.length,
+                  systemsLayout: track.systemsLayout,
+                  totalWidth: r.totalWidth,
+                  totalHeight: r.totalHeight,
+                  chunks
+              }, null, 2));
+          });
+          renderer.renderScore(score, [0]);
+          JS
+          node render.mjs
+          find "$GITHUB_WORKSPACE/out" -type f -printf '%P %s bytes\n' | sort
+
+      - name: Upload clean V2 and visual proof
         uses: actions/upload-artifact@v4
         with:
-          name: Jump-in-the-Line-GP5-render-QA
+          name: Jump-in-the-Line-clean-Guitar-Pro-V2
           path: out/**
           if-no-files-found: error
           compression-level: 0
