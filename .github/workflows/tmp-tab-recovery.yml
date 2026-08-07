@@ -1,0 +1,66 @@
+name: Temporary YouTube tab recovery
+
+on:
+  push:
+    branches:
+      - tmp-tab-recovery-zrwvp-scqeys
+    paths:
+      - .github/workflows/tmp-tab-recovery.yml
+
+permissions:
+  contents: read
+
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade "yt-dlp[default,curl-cffi]"
+
+      - name: Retrieve metadata and video
+        shell: bash
+        run: |
+          set -euxo pipefail
+          mkdir -p out
+          URL='https://www.youtube.com/watch?v=ZRwvPScqEys'
+
+          COMMON=(--no-playlist --remote-components ejs:github --impersonate chrome --socket-timeout 30 --retries 10 --fragment-retries 10)
+
+          if ! yt-dlp "${COMMON[@]}" --dump-single-json "$URL" > out/metadata.json; then
+            yt-dlp --no-playlist --socket-timeout 30 --retries 10 --dump-single-json "$URL" > out/metadata.json
+          fi
+
+          if ! yt-dlp "${COMMON[@]}" -f 'bv*[height<=1080]+ba/b[height<=1080]/best' --merge-output-format mp4 -o 'out/source.%(ext)s' "$URL"; then
+            yt-dlp --no-playlist --socket-timeout 30 --retries 10 -f 'bv*[height<=1080]+ba/b[height<=1080]/best' --merge-output-format mp4 -o 'out/source.%(ext)s' "$URL"
+          fi
+
+          ls -lah out
+          ffprobe -v error -show_format -show_streams -of json out/source.* > out/ffprobe.json
+
+      - name: Produce overview frames
+        shell: bash
+        run: |
+          set -euxo pipefail
+          mkdir -p out/overview
+          INPUT=$(find out -maxdepth 1 -type f -name 'source.*' | head -n 1)
+          ffmpeg -hide_banner -loglevel error -i "$INPUT" -vf "fps=1/5,scale=960:-2,tile=4x4" -q:v 3 out/overview/contact_%03d.jpg
+
+      - name: Upload recovery bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: yt-tab-recovery-ZRwvPScqEys
+          path: |
+            out/metadata.json
+            out/ffprobe.json
+            out/source.*
+            out/overview/*.jpg
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 1
