@@ -1,4 +1,4 @@
-name: Temporary metadata extraction
+name: Temporary storyboard recovery
 
 on:
   push:
@@ -11,91 +11,46 @@ permissions:
   contents: read
 
 jobs:
-  extract:
+  storyboards:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
-      - name: Install Playwright helper
-        run: |
-          npm init -y >/dev/null 2>&1
-          npm install --no-save playwright-core
-          mkdir -p out_metadata
-      - name: Extract complete YouTube metadata and description links
+      - name: Probe and download YouTube storyboard sprites
         shell: bash
         run: |
-          cat > extract.js <<'JS'
-          const fs = require('fs');
-          const { chromium } = require('playwright-core');
-          const id = 'ZRwvPScqEys';
-          const out = 'out_metadata';
-          const chrome = ['/usr/bin/google-chrome','/usr/bin/google-chrome-stable','/usr/bin/chromium'].find(fs.existsSync);
-          (async()=>{
-            const browser=await chromium.launch({executablePath:chrome,headless:true,args:['--no-sandbox','--disable-dev-shm-usage','--window-size=1440,1200']});
-            const ctx=await browser.newContext({viewport:{width:1440,height:1200},locale:'en-US',extraHTTPHeaders:{'Accept-Language':'en-US,en;q=0.9'}});
-            const page=await ctx.newPage();
-            const responses=[];
-            page.on('response',async r=>{
-              const u=r.url();
-              if(/youtubei\/v1\/(player|next|browse)/.test(u)){
-                try{const text=await r.text(); responses.push({url:u,status:r.status(),body:text});}catch{}
-              }
-            });
-            await page.goto(`https://www.youtube.com/watch?v=${id}&hl=en&gl=US`,{waitUntil:'domcontentloaded',timeout:60000});
-            await page.waitForTimeout(10000);
-            for(const name of ['Accept all','Reject all','I agree']){try{const b=page.getByRole('button',{name,exact:false}).first();if(await b.isVisible({timeout:500})){await b.click();await page.waitForTimeout(2000)}}catch{}}
-            for(const sel of ['#description-inline-expander tp-yt-paper-button#expand','#description-inline-expander #expand','tp-yt-paper-button#expand','button[aria-label*="more" i]']){
-              try{const e=page.locator(sel).first();if(await e.isVisible({timeout:800})){await e.click();await page.waitForTimeout(2000);break}}catch{}
-            }
-            await page.screenshot({path:`${out}/page-full.jpg`,fullPage:true,type:'jpeg',quality:90});
-            fs.writeFileSync(`${out}/page.html`,await page.content());
-            const data=await page.evaluate(()=>{
-              const anchors=[...document.querySelectorAll('a')].map(a=>({text:(a.innerText||a.textContent||'').trim(),href:a.href,title:a.title||'',aria:a.getAttribute('aria-label')||''}));
-              const scripts=[...document.scripts].map((s,i)=>({i,id:s.id||'',type:s.type||'',src:s.src||'',text:s.textContent||''}));
-              const desc=document.querySelector('#description-inline-expander')||document.querySelector('ytd-text-inline-expander')||document.querySelector('#description');
-              const metas=[...document.querySelectorAll('meta')].map(m=>({name:m.name,property:m.getAttribute('property'),itemprop:m.getAttribute('itemprop'),content:m.content}));
-              let initialData=null, playerResponse=null, ytcfgData=null;
-              try{initialData=window.ytInitialData}catch{}
-              try{playerResponse=window.ytInitialPlayerResponse}catch{}
-              try{ytcfgData=window.ytcfg&&window.ytcfg.data_}catch{}
-              return {url:location.href,title:document.title,body:document.body.innerText,description:desc?{text:desc.innerText,html:desc.innerHTML}:null,anchors,metas,scripts,initialData,playerResponse,ytcfgData};
-            });
-            fs.writeFileSync(`${out}/dom-data.json`,JSON.stringify(data,null,2));
-            fs.writeFileSync(`${out}/youtubei-responses.json`,JSON.stringify(responses,null,2));
-            const interesting=data.anchors.filter(a=>/mitch|tab|pdf|drive|dropbox|patreon|music/i.test(`${a.text} ${a.href} ${a.title} ${a.aria}`));
-            fs.writeFileSync(`${out}/interesting-links.json`,JSON.stringify(interesting,null,2));
-            await browser.close();
-          })().catch(e=>{fs.writeFileSync(`${out}/fatal.txt`,String(e.stack||e));process.exitCode=0});
-          JS
-          node extract.js
-          find out_metadata -type f -printf '%P %s bytes\n' | sort
-      - name: Query WordPress API precisely
-        shell: bash
-        run: |
-          python - <<'PY'
-          import requests,json,os,re
-          from urllib.parse import quote
-          out='out_metadata'; s=requests.Session(); s.headers['User-Agent']='Mozilla/5.0'
-          base='https://mitchgissendaner.com'
-          log=[]
-          for ep in ['search','posts','pages','media','categories','tags']:
-            for term in ['Jump in the Line','Beetlejuice','Harry Belafonte']:
-              u=f'{base}/wp-json/wp/v2/{ep}?search={quote(term)}&per_page=100&_embed=1'
-              try:
-                r=s.get(u,timeout=30); log.append([u,r.status_code,len(r.content)])
-                open(f'{out}/wp-{ep}-{re.sub("[^a-z0-9]+","-",term.lower()).strip("-")}.json','wb').write(r.content)
-              except Exception as e: log.append([u,'error',repr(e)])
-          for u,name in [(base+'/','site-home.html'),(base+'/wp-sitemap.xml','site-map.xml'),(base+'/wp-json/','wp-root.json')]:
-            try:r=s.get(u,timeout=30);open(f'{out}/{name}','wb').write(r.content);log.append([u,r.status_code,len(r.content)])
-            except Exception as e:log.append([u,'error',repr(e)])
-          json.dump(log,open(f'{out}/wp-log.json','w'),indent=2)
-          PY
-      - name: Upload metadata
+          mkdir -p out_storyboards
+          ID='ZRwvPScqEys'
+          LOG=out_storyboards/status.tsv
+          printf 'url\tstatus\ttype\tsize\n' > "$LOG"
+          fetch() {
+            url="$1"; name="$2"
+            tmp="out_storyboards/$name"
+            status=$(curl -L --max-time 20 --retry 2 -A 'Mozilla/5.0' -sS -w '%{http_code}' -o "$tmp" "$url" || true)
+            type=$(file -b --mime-type "$tmp" 2>/dev/null || true)
+            size=$(stat -c%s "$tmp" 2>/dev/null || echo 0)
+            printf '%s\t%s\t%s\t%s\n' "$url" "$status" "$type" "$size" >> "$LOG"
+            if [ "$status" != '200' ] || [ "$size" -lt 1000 ]; then rm -f "$tmp"; fi
+          }
+          for level in 0 1 2 3; do
+            fetch "https://i.ytimg.com/sb/$ID/storyboard3_L${level}/default.jpg" "L${level}_default.jpg"
+            for i in $(seq 0 30); do
+              fetch "https://i.ytimg.com/sb/$ID/storyboard3_L${level}/M${i}.jpg" "L${level}_M${i}.jpg"
+            done
+          done
+          for n in default 0 1 2 3 mqdefault hqdefault sddefault maxresdefault; do
+            fetch "https://i.ytimg.com/vi/$ID/$n.jpg" "thumb_$n.jpg"
+          done
+          for sec in $(seq 0 3 300); do
+            fetch "https://i.ytimg.com/an_webp/$ID/mqdefault_${sec}s.webp" "anim_${sec}s.webp"
+          done
+          cat "$LOG"
+          find out_storyboards -type f -printf '%P %s bytes\n' | sort
+      - name: Upload storyboard sprites
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: exact-youtube-metadata-ZRwvPScqEys
-          path: out_metadata/**
+          name: youtube-storyboards-ZRwvPScqEys
+          path: out_storyboards/**
           if-no-files-found: error
-          compression-level: 1
+          compression-level: 0
           retention-days: 1
