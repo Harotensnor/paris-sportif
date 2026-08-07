@@ -39,7 +39,8 @@ jobs:
           nohup node build/main.js --port 4416 > "$GITHUB_WORKSPACE/out/logs/bgutil-server.log" 2>&1 &
           echo $! > "$GITHUB_WORKSPACE/out/bgutil.pid"
           for i in $(seq 1 30); do
-            if curl -fsS --max-time 2 http://127.0.0.1:4416/ > "$GITHUB_WORKSPACE/out/bgutil-health.json"; then
+            if timeout 2 bash -c '</dev/tcp/127.0.0.1/4416' 2>/dev/null; then
+              cat "$GITHUB_WORKSPACE/out/logs/bgutil-server.log"
               exit 0
             fi
             sleep 1
@@ -113,7 +114,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: Jump-in-the-Line-tutorial-audio-PO-token
+          name: Jump-in-the-Line-tutorial-audio-PO-token-v2
           path: out/**
           if-no-files-found: error
           compression-level: 0
