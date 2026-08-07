@@ -1,0 +1,54 @@
+name: Temporary render Guitar Pro for visual QA
+
+on:
+  push:
+    branches:
+      - tmp-tab-recovery-zrwvp-scqeys
+    paths:
+      - .github/workflows/tmp-render-tab.yml
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Recover generated Guitar Pro artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euxo pipefail
+          mkdir -p input out
+          gh api repos/${GITHUB_REPOSITORY}/actions/artifacts/9006732232/zip > input/artifact.zip
+          unzip -o input/artifact.zip -d input/artifact
+          find input/artifact -type f -printf '%P %s bytes\n'
+          cp input/artifact/Jump_in_the_Line_Mitchs_Music.gp5 input/score.gp5
+
+      - name: Install MuseScore and render
+        shell: bash
+        run: |
+          set -euxo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq musescore3 xvfb poppler-utils || sudo apt-get install -y -qq musescore xvfb poppler-utils
+          BIN=$(command -v musescore3 || command -v musescore || command -v mscore || true)
+          echo "MuseScore=$BIN"
+          xvfb-run -a "$BIN" -o out/score.pdf input/score.gp5
+          xvfb-run -a "$BIN" -o out/score.musicxml input/score.gp5 || true
+          pdftoppm -png -r 150 out/score.pdf out/render
+          pdfinfo out/score.pdf > out/pdfinfo.txt
+          find out -type f -printf '%P %s bytes\n' | sort
+
+      - name: Upload visual QA bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: Jump-in-the-Line-GP5-render-QA
+          path: out/**
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 1
