@@ -1,4 +1,4 @@
-name: Temporary storyboard recovery
+name: Temporary original PDF recovery
 
 on:
   push:
@@ -11,46 +11,29 @@ permissions:
   contents: read
 
 jobs:
-  storyboards:
+  recover-pdf:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Probe and download YouTube storyboard sprites
+      - name: Download the creator's original TAB PDFs
         shell: bash
         run: |
-          mkdir -p out_storyboards
-          ID='ZRwvPScqEys'
-          LOG=out_storyboards/status.tsv
-          printf 'url\tstatus\ttype\tsize\n' > "$LOG"
-          fetch() {
-            url="$1"; name="$2"
-            tmp="out_storyboards/$name"
-            status=$(curl -L --max-time 20 --retry 2 -A 'Mozilla/5.0' -sS -w '%{http_code}' -o "$tmp" "$url" || true)
-            type=$(file -b --mime-type "$tmp" 2>/dev/null || true)
-            size=$(stat -c%s "$tmp" 2>/dev/null || echo 0)
-            printf '%s\t%s\t%s\t%s\n' "$url" "$status" "$type" "$size" >> "$LOG"
-            if [ "$status" != '200' ] || [ "$size" -lt 1000 ]; then rm -f "$tmp"; fi
-          }
-          for level in 0 1 2 3; do
-            fetch "https://i.ytimg.com/sb/$ID/storyboard3_L${level}/default.jpg" "L${level}_default.jpg"
-            for i in $(seq 0 30); do
-              fetch "https://i.ytimg.com/sb/$ID/storyboard3_L${level}/M${i}.jpg" "L${level}_M${i}.jpg"
-            done
-          done
-          for n in default 0 1 2 3 mqdefault hqdefault sddefault maxresdefault; do
-            fetch "https://i.ytimg.com/vi/$ID/$n.jpg" "thumb_$n.jpg"
-          done
-          for sec in $(seq 0 3 300); do
-            fetch "https://i.ytimg.com/an_webp/$ID/mqdefault_${sec}s.webp" "anim_${sec}s.webp"
-          done
-          cat "$LOG"
-          find out_storyboards -type f -printf '%P %s bytes\n' | sort
-      - name: Upload storyboard sprites
-        if: always()
+          mkdir -p out_original
+          UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/151 Safari/537.36'
+          curl -fL --retry 5 --max-time 90 -A "$UA" \
+            'https://mitchgissendaner.com/wp-content/uploads/2023/04/Jump-in-the-Line1.pdf' \
+            -o 'out_original/Jump-in-the-Line1-2023.pdf'
+          curl -fL --retry 5 --max-time 90 -A "$UA" \
+            'https://mitchgissendaner.com/wp-content/uploads/2021/10/Jump-in-the-Line1.pdf' \
+            -o 'out_original/Jump-in-the-Line1-2021.pdf'
+          file out_original/*
+          sha256sum out_original/* | tee out_original/sha256.txt
+          ls -lah out_original
+      - name: Upload original TAB
         uses: actions/upload-artifact@v4
         with:
-          name: youtube-storyboards-ZRwvPScqEys
-          path: out_storyboards/**
+          name: original-jump-in-the-line-tab-pdfs
+          path: out_original/**
           if-no-files-found: error
           compression-level: 0
           retention-days: 1
