@@ -1,4 +1,4 @@
-name: Temporary YouTube tab recovery
+name: Temporary tab recovery
 
 on:
   push:
@@ -11,166 +11,253 @@ permissions:
   contents: read
 
 jobs:
-  capture:
+  browser-capture:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
-
-      - name: Prepare browser capture
+      - name: Install browser helper
         run: |
-          node --version
-          which google-chrome || which google-chrome-stable || which chromium || true
           npm init -y >/dev/null 2>&1
           npm install --no-save playwright-core
-          mkdir -p out/frames
-
-      - name: Capture the tutorial frames from the embedded player
+          mkdir -p out_browser/frames
+      - name: Capture visible tablature from YouTube player
         shell: bash
         run: |
-          cat > /tmp/capture.js <<'JS'
+          cat > capture.js <<'JS'
           const fs = require('fs');
           const { chromium } = require('playwright-core');
-
           const id = 'ZRwvPScqEys';
-          const out = 'out';
+          const out = 'out_browser';
           const frameDir = `${out}/frames`;
           fs.mkdirSync(frameDir, { recursive: true });
+          const chrome = ['/usr/bin/google-chrome','/usr/bin/google-chrome-stable','/usr/bin/chromium'].find(fs.existsSync);
 
-          function findChrome() {
-            const candidates = [
-              '/usr/bin/google-chrome', '/usr/bin/google-chrome-stable',
-              '/usr/bin/chromium', '/usr/bin/chromium-browser',
-              '/opt/google/chrome/chrome'
-            ];
-            return candidates.find(p => fs.existsSync(p));
+          async function acceptConsent(page) {
+            for (const label of ['Accept all', 'Reject all', 'I agree', 'Accept', 'Agree']) {
+              try {
+                const b = page.getByRole('button', { name: label, exact: false }).first();
+                if (await b.isVisible({ timeout: 800 })) { await b.click(); await page.waitForTimeout(1500); }
+              } catch {}
+            }
           }
 
           (async () => {
-            const executablePath = findChrome();
-            if (!executablePath) throw new Error('Chrome executable not found');
+            const logs = [];
             const browser = await chromium.launch({
-              executablePath,
+              executablePath: chrome,
               headless: true,
-              args: [
-                '--autoplay-policy=no-user-gesture-required',
-                '--disable-blink-features=AutomationControlled',
-                '--disable-dev-shm-usage',
-                '--no-sandbox',
-                '--window-size=1280,720'
-              ]
+              args: ['--autoplay-policy=no-user-gesture-required','--disable-dev-shm-usage','--no-sandbox','--window-size=1280,720']
             });
             const context = await browser.newContext({
-              viewport: { width: 1280, height: 720 },
-              locale: 'en-US',
-              timezoneId: 'America/New_York',
-              userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36',
+              viewport: { width: 1280, height: 720 }, locale: 'en-US', timezoneId: 'America/New_York',
               extraHTTPHeaders: { 'Accept-Language': 'en-US,en;q=0.9' }
             });
             const page = await context.newPage();
-            const logs = [];
-            page.on('console', m => logs.push({ type: 'console', level: m.type(), text: m.text() }));
-            page.on('pageerror', e => logs.push({ type: 'pageerror', text: String(e) }));
-            page.on('requestfailed', r => logs.push({ type: 'requestfailed', url: r.url(), failure: r.failure() }));
+            page.on('console', m => logs.push({ type:'console', level:m.type(), text:m.text() }));
+            page.on('pageerror', e => logs.push({ type:'pageerror', text:String(e) }));
+            page.on('requestfailed', r => logs.push({ type:'requestfailed', url:r.url(), failure:r.failure() }));
 
             const urls = [
-              `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&mute=1&controls=0&playsinline=1&rel=0&modestbranding=1`,
-              `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&controls=0&playsinline=1&rel=0&modestbranding=1`,
-              `https://www.youtube.com/watch?v=${id}`
+              `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&mute=1&controls=0&playsinline=1&rel=0`,
+              `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&controls=0&playsinline=1&rel=0`,
+              `https://www.youtube.com/watch?v=${id}&hl=en&gl=US`
             ];
+            let playable = false, chosenUrl = null, info = null;
 
-            let playable = false;
-            let chosenUrl = null;
-            let info = null;
-
-            for (const url of urls) {
-              logs.push({ type: 'navigate', url });
+            for (let i = 0; i < urls.length; i++) {
+              const url = urls[i];
               try {
-                await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
-                await page.waitForTimeout(8000);
-                await page.screenshot({ path: `${out}/attempt_${urls.indexOf(url)}.jpg`, type: 'jpeg', quality: 90 });
+                logs.push({ type:'navigate', url });
+                await page.goto(url, { waitUntil:'domcontentloaded', timeout:60000 });
+                await acceptConsent(page);
+                await page.waitForTimeout(7000);
+                try { await page.mouse.click(640, 360); } catch {}
+                await page.waitForTimeout(3000);
+                await page.screenshot({ path:`${out}/attempt_${i}.jpg`, type:'jpeg', quality:92 });
                 info = await page.evaluate(() => {
                   const v = document.querySelector('video');
-                  const body = document.body ? document.body.innerText.slice(0, 5000) : '';
                   return {
-                    title: document.title,
-                    url: location.href,
-                    body,
+                    title: document.title, url: location.href,
+                    body: document.body ? document.body.innerText.slice(0,8000) : '',
+                    html: document.documentElement.outerHTML.slice(0,30000),
                     video: v ? {
                       duration: Number.isFinite(v.duration) ? v.duration : null,
-                      currentTime: v.currentTime,
-                      paused: v.paused,
-                      readyState: v.readyState,
-                      networkState: v.networkState,
-                      error: v.error ? { code: v.error.code, message: v.error.message } : null,
-                      videoWidth: v.videoWidth,
-                      videoHeight: v.videoHeight,
-                      src: v.currentSrc || v.src || null
+                      currentTime: v.currentTime, paused:v.paused, readyState:v.readyState,
+                      networkState:v.networkState, error:v.error ? {code:v.error.code,message:v.error.message}:null,
+                      videoWidth:v.videoWidth, videoHeight:v.videoHeight, src:v.currentSrc||v.src||null
                     } : null
                   };
                 });
-                logs.push({ type: 'info', url, info });
+                logs.push({ type:'info', url, info });
                 if (info.video && info.video.duration && info.video.readyState >= 1 && !info.video.error) {
-                  playable = true;
-                  chosenUrl = url;
-                  break;
+                  playable = true; chosenUrl = url; break;
                 }
-              } catch (e) {
-                logs.push({ type: 'attempt-error', url, text: String(e), stack: e.stack });
-              }
+              } catch (e) { logs.push({ type:'attempt-error', url, text:String(e), stack:e.stack }); }
             }
 
-            fs.writeFileSync(`${out}/browser-log.json`, JSON.stringify(logs, null, 2));
-            fs.writeFileSync(`${out}/player-info.json`, JSON.stringify({ playable, chosenUrl, info }, null, 2));
+            fs.writeFileSync(`${out}/browser-log.json`, JSON.stringify(logs,null,2));
+            fs.writeFileSync(`${out}/player-info.json`, JSON.stringify({playable,chosenUrl,info},null,2));
 
             if (playable) {
               const duration = Math.min(info.video.duration, 900);
-              await page.evaluate(() => {
-                const v = document.querySelector('video');
-                if (v) { v.muted = true; v.pause(); }
-                document.documentElement.style.overflow = 'hidden';
-                document.body.style.overflow = 'hidden';
-              });
-
-              // Seek at half-second intervals so every distinct tab overlay is captured.
-              for (let t = 0; t <= duration + 0.001; t += 0.5) {
+              await page.evaluate(() => { const v=document.querySelector('video'); if(v){v.muted=true;v.pause();} });
+              for (let t=0; t<=duration; t+=0.5) {
                 try {
-                  await page.evaluate(async (target) => {
-                    const v = document.querySelector('video');
-                    if (!v) throw new Error('video disappeared');
+                  await page.evaluate(async target => {
+                    const v=document.querySelector('video'); if(!v) throw new Error('video missing');
                     v.pause();
-                    const done = new Promise(resolve => {
-                      const timer = setTimeout(resolve, 2500);
-                      v.addEventListener('seeked', () => { clearTimeout(timer); resolve(); }, { once: true });
-                    });
-                    v.currentTime = Math.min(target, Math.max(0, v.duration - 0.02));
-                    await done;
-                    await new Promise(r => setTimeout(r, 120));
+                    const done=new Promise(resolve=>{const timer=setTimeout(resolve,2500);v.addEventListener('seeked',()=>{clearTimeout(timer);resolve();},{once:true});});
+                    v.currentTime=Math.min(target,Math.max(0,v.duration-0.03)); await done; await new Promise(r=>setTimeout(r,120));
                   }, t);
-                  const name = String(Math.round(t * 2)).padStart(5, '0');
-                  await page.screenshot({ path: `${frameDir}/frame_${name}_${t.toFixed(1)}s.jpg`, type: 'jpeg', quality: 92 });
-                } catch (e) {
-                  logs.push({ type: 'frame-error', t, text: String(e) });
-                }
+                  const n=String(Math.round(t*2)).padStart(5,'0');
+                  await page.screenshot({path:`${frameDir}/frame_${n}_${t.toFixed(1)}s.jpg`,type:'jpeg',quality:94});
+                } catch(e) { logs.push({type:'frame-error',t,text:String(e)}); }
               }
-              fs.writeFileSync(`${out}/browser-log.json`, JSON.stringify(logs, null, 2));
+              fs.writeFileSync(`${out}/browser-log.json`, JSON.stringify(logs,null,2));
             }
-
             await browser.close();
-          })().catch(err => {
-            fs.writeFileSync('out/fatal.txt', String(err.stack || err));
-            process.exitCode = 0;
-          });
+          })().catch(e => { fs.mkdirSync(out,{recursive:true}); fs.writeFileSync(`${out}/fatal.txt`,String(e.stack||e)); });
           JS
-          node /tmp/capture.js
-          find out -maxdepth 2 -type f -printf '%P %s bytes\n' | sort | head -1000
-
+          node capture.js
+          find out_browser -type f -printf '%P %s bytes\n' | sort | head -2000
       - name: Upload browser capture
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: yt-tab-browser-capture-ZRwvPScqEys
-          path: out/**
+          name: yt-browser-capture-ZRwvPScqEys
+          path: out_browser/**
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 1
+
+  songsterr-candidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Clone current Songsterr converter
+        run: |
+          git clone --depth 1 https://git.wompmacho.com/wompmacho/tab-downloader.git tool
+          cd tool
+          npm ci
+      - name: Download and convert matching public tab
+        shell: bash
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE/out_songsterr"
+          cd tool
+          node --experimental-strip-types songsterr_dl.ts \
+            --url 'https://www.songsterr.com/a/wsa/harry-belafonte-jump-in-the-line-tab-s684261' \
+            --output "$GITHUB_WORKSPACE/out_songsterr" | tee "$GITHUB_WORKSPACE/out_songsterr/run.log" || true
+          curl -L --retry 5 -A 'Mozilla/5.0' \
+            'https://www.songsterr.com/a/wsa/harry-belafonte-jump-in-the-line-tab-s684261' \
+            -o "$GITHUB_WORKSPACE/out_songsterr/songsterr-page.html" || true
+          find "$GITHUB_WORKSPACE/out_songsterr" -type f -printf '%P %s bytes\n' | sort
+      - name: Upload candidate tab
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: songsterr-candidate-jump-in-the-line
+          path: out_songsterr/**
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 1
+
+  site-and-archive-search:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Search current site, YouTube metadata mirrors, and web archives
+        shell: bash
+        run: |
+          mkdir -p out_research
+          python - <<'PY'
+          import json, os, re, time
+          from urllib.parse import quote
+          import requests
+          S=requests.Session(); S.headers['User-Agent']='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/151 Safari/537.36'
+          out='out_research'; log=[]
+          def fetch(name,url,binary=False):
+              try:
+                  r=S.get(url,timeout=35,allow_redirects=True)
+                  log.append({'name':name,'url':url,'status':r.status_code,'final':r.url,'type':r.headers.get('content-type'),'length':len(r.content)})
+                  mode='wb' if binary else 'w'
+                  with open(os.path.join(out,name),mode,encoding=None if binary else 'utf-8') as f:
+                      f.write(r.content if binary else r.text)
+                  return r
+              except Exception as e:
+                  log.append({'name':name,'url':url,'error':repr(e)}); return None
+
+          base='https://mitchgissendaner.com'
+          fetch('site-home.html',base+'/')
+          fetch('site-robots.txt',base+'/robots.txt')
+          fetch('site-sitemap.xml',base+'/wp-sitemap.xml')
+          fetch('wp-root.json',base+'/wp-json/')
+          terms=['Jump in the Line','Jump In The Line','Beetlejuice','Harry Belafonte','Jump']
+          endpoints=['search','posts','pages','media']
+          for term in terms:
+              safe=re.sub(r'[^A-Za-z0-9]+','_',term).strip('_').lower()
+              for ep in endpoints:
+                  url=f'{base}/wp-json/wp/v2/{ep}?search={quote(term)}&per_page=100'
+                  fetch(f'wp-{ep}-{safe}.json',url)
+              fetch(f'site-search-{safe}.html',f'{base}/?s={quote(term)}')
+
+          # Try likely direct asset names and common year/month folders.
+          stems=['Jump-in-the-Line','Jump-In-The-Line','Jump-in-the-line','jump-in-the-line','JumpintheLine','Beetlejuice-Jump-in-the-Line']
+          for year in range(2018,2027):
+              for month in range(1,13):
+                  for stem in stems:
+                      for ext in ['pdf','gp','gp5','gpx','musicxml']:
+                          url=f'{base}/wp-content/uploads/{year}/{month:02d}/{stem}.{ext}'
+                          try:
+                              r=S.head(url,timeout=8,allow_redirects=True)
+                              if r.status_code==200 and int(r.headers.get('content-length') or 0)>500:
+                                  fetch(f'asset-{year}-{month:02d}-{stem}.{ext}',url,binary=True)
+                          except Exception: pass
+
+          # Wayback CDX wildcard queries across likely current/legacy domains.
+          domains=['mitchgissendaner.com','www.mitchgissendaner.com','musicwithmrg.com','www.musicwithmrg.com','mitchsmusic.com','www.mitchsmusic.com']
+          patterns=['*jump*','*beetlejuice*','wp-content/uploads/*Jump*','wp-content/uploads/*jump*']
+          for domain in domains:
+              for pat in patterns:
+                  key=re.sub(r'[^A-Za-z0-9]+','_',domain+'_'+pat).strip('_')
+                  url='https://web.archive.org/cdx/search/cdx?url='+quote(domain+'/'+pat,safe='*/')+'&output=json&fl=timestamp,original,mimetype,statuscode,digest&filter=statuscode:200&collapse=digest&limit=500'
+                  fetch(f'wayback-{key}.json',url)
+
+          # Alternate public metadata endpoints.
+          vid='ZRwvPScqEys'
+          mirrors={
+              'lemnos-video.json':f'https://yt.lemnoslife.com/noKey/videos?part=snippet,contentDetails,status&id={vid}',
+              'youtube-watch.html':f'https://www.youtube.com/watch?v={vid}&hl=en&gl=US',
+              'youtube-embed.html':f'https://www.youtube.com/embed/{vid}',
+              'youtube-oembed.json':f'https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v={vid}&format=json',
+              'noembed.json':f'https://noembed.com/embed?url=https://www.youtube.com/watch?v={vid}',
+              'channel-handle.html':'https://www.youtube.com/@MitchsMusic?hl=en&gl=US',
+          }
+          for name,url in mirrors.items(): fetch(name,url)
+
+          # Extract candidate external links and channel IDs from fetched HTML.
+          candidates=set(); channel_ids=set()
+          for fn in os.listdir(out):
+              if not fn.endswith(('.html','.json','.xml','.txt')): continue
+              try: text=open(os.path.join(out,fn),encoding='utf-8',errors='ignore').read()
+              except: continue
+              for u in re.findall(r'https?[^"\'<>\\ ]+',text):
+                  u=u.replace('\\u0026','&').replace('\\/','/').replace('&amp;','&')
+                  if any(k in u.lower() for k in ['mitch','patreon','drive.google','dropbox','pdf','tab']): candidates.add(u[:2000])
+              channel_ids.update(re.findall(r'UC[A-Za-z0-9_-]{20,30}',text))
+          open(os.path.join(out,'candidate-links.txt'),'w').write('\n'.join(sorted(candidates)))
+          open(os.path.join(out,'channel-ids.txt'),'w').write('\n'.join(sorted(channel_ids)))
+          for cid in sorted(channel_ids):
+              fetch(f'feed-{cid}.xml',f'https://www.youtube.com/feeds/videos.xml?channel_id={cid}')
+          json.dump(log,open(os.path.join(out,'fetch-log.json'),'w'),indent=2)
+          PY
+          find out_research -type f -printf '%P %s bytes\n' | sort | head -3000
+      - name: Upload research bundle
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: source-site-archive-research-ZRwvPScqEys
+          path: out_research/**
           if-no-files-found: error
           compression-level: 0
           retention-days: 1
