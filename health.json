@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-07T17:10:05Z",
-  "calculated_at": "2026-08-07T17:10:05Z",
+  "generated_at": "2026-08-07T17:59:21Z",
+  "calculated_at": "2026-08-07T17:59:21Z",
   "source_of_truth": "data.js",
   "data_age_min": 1,
   "data_file_age_min": 0,
@@ -300,10 +300,10 @@
     "detected_angles": {
       "age_min": 0,
       "events": 2,
-      "angles": 6,
+      "angles": 5,
       "by_type": {
         "market_uncertain": 2,
-        "market_move": 4
+        "market_move": 3
       }
     },
     "schedule_spots_summary": {
@@ -316,10 +316,10 @@
     },
     "rare_signals": {
       "age_min": 0,
-      "signals": 6,
+      "signals": 5,
       "by_type": {
         "market_uncertain": 2,
-        "market_move": 4
+        "market_move": 3
       }
     },
     "rare_signal_summary": {
@@ -1020,7 +1020,7 @@
   ],
   "overall": "warning",
   "quality_checks": {
-    "data_generated_at": "2026-08-07T17:08:51.376072Z",
+    "data_generated_at": "2026-08-07T17:58:16.012452Z",
     "truth_scope": "all_events",
     "all_winamax_available": 27,
     "all_winamax_exact": 21,
@@ -1071,7 +1071,7 @@
   "data_truth": {
     "source_of_truth": "data.js",
     "scope": "all_events",
-    "data_generated_at": "2026-08-07T17:08:51.376072Z",
+    "data_generated_at": "2026-08-07T17:58:16.012452Z",
     "winamax_available": 27,
     "winamax_exact": 21,
     "winamax_exact_ratio": 0.7778,
@@ -1084,26 +1084,26 @@
     "status": "degraded",
     "schema_version": 2,
     "sources_validated": 11,
-    "sources_ok": 5,
-    "sources_warning": 6,
+    "sources_ok": 4,
+    "sources_warning": 7,
     "sources_critical": 0,
-    "quarantine_records": 8,
-    "anomalies_emitted": 6
+    "quarantine_records": 10,
+    "anomalies_emitted": 9
   },
   "source_health": {
-    "generated_at": "2026-08-07T17:10:05Z",
+    "generated_at": "2026-08-07T17:59:21Z",
     "sources_total": 11,
-    "sources_ok": 5,
-    "sources_warning": 6,
+    "sources_ok": 4,
+    "sources_warning": 7,
     "sources_critical": 0,
-    "source_health_avg": 88.7,
-    "source_health_min": 57,
+    "source_health_avg": 87.3,
+    "source_health_min": 49,
     "by_source": {
       "winamax_catalog": {
         "score": 92,
         "status": "warning",
         "items": 600,
-        "age_min": 4,
+        "age_min": 3,
         "sla_min": 15,
         "issues": 2
       },
@@ -1116,20 +1116,20 @@
         "issues": 3
       },
       "injuries_soccer": {
-        "score": 57,
+        "score": 49,
         "status": "warning",
         "items": 0,
-        "age_min": 4,
+        "age_min": 3,
         "sla_min": 180,
-        "issues": 2
+        "issues": 3
       },
       "lineups_soccer": {
-        "score": 100,
-        "status": "ok",
+        "score": 92,
+        "status": "warning",
         "items": 97,
-        "age_min": 4,
+        "age_min": 3,
         "sla_min": 180,
-        "issues": 1
+        "issues": 2
       },
       "referees_soccer": {
         "score": 100,
@@ -1151,7 +1151,7 @@
         "score": 59,
         "status": "warning",
         "items": 22,
-        "age_min": 4,
+        "age_min": 3,
         "sla_min": 300,
         "issues": 2
       },
@@ -1159,7 +1159,7 @@
         "score": 92,
         "status": "warning",
         "items": 588,
-        "age_min": 4,
+        "age_min": 3,
         "sla_min": 1440,
         "issues": 2
       },
@@ -1167,7 +1167,7 @@
         "score": 92,
         "status": "warning",
         "items": 1941,
-        "age_min": 4,
+        "age_min": 3,
         "sla_min": 30,
         "issues": 2
       },
@@ -1175,7 +1175,7 @@
         "score": 100,
         "status": "ok",
         "items": 5284,
-        "age_min": 4,
+        "age_min": 3,
         "sla_min": 1440,
         "issues": 1
       },
@@ -1183,7 +1183,7 @@
         "score": 100,
         "status": "ok",
         "items": 3,
-        "age_min": 4,
+        "age_min": 3,
         "sla_min": 1440,
         "issues": 1
       }
@@ -1191,12 +1191,12 @@
   },
   "observability": {
     "pipeline_traces": {
-      "generated_at": "2026-08-07T17:10:05Z",
+      "generated_at": "2026-08-07T17:59:21Z",
       "runs_observed": 99,
       "by_status": {
-        "warning": 71,
+        "warning": 73,
         "critical": 1,
-        "ok": 27
+        "ok": 25
       },
       "by_script": {
         "data_integrity_monitor.py": {
@@ -1209,7 +1209,7 @@
     }
   },
   "data_lineage": {
-    "generated_at": "2026-08-07T17:10:05Z",
+    "generated_at": "2026-08-07T17:59:21Z",
     "status": "ok",
     "events": 27,
     "events_missing_inline_lineage": 0,
@@ -1321,7 +1321,7 @@
     "data": {
       "status": "degraded",
       "sources_validated": 11,
-      "quarantine_records": 8,
+      "quarantine_records": 10,
       "lineage_coverage_pct": 100.0
     },
     "model": {
