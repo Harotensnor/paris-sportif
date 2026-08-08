@@ -1,0 +1,73 @@
+name: Temporary test alternate YouTube frontends
+
+on:
+  push:
+    branches:
+      - tmp-tab-recovery-zrwvp-scqeys
+    paths:
+      - .github/workflows/tmp-alt-frontends.yml
+
+permissions:
+  contents: read
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install browser helper
+        run: |
+          npm init -y >/dev/null 2>&1
+          npm install --no-save playwright-core
+          mkdir -p out
+      - name: Test alternate players and capture media traffic
+        shell: bash
+        run: |
+          cat > test.js <<'JS'
+          const fs=require('fs');
+          const {chromium}=require('playwright-core');
+          const id='ZRwvPScqEys';
+          const chrome=['/usr/bin/google-chrome','/usr/bin/google-chrome-stable','/usr/bin/chromium'].find(fs.existsSync);
+          const urls={
+            tube613:`https://613tube.com/watch/?v=${id}`,
+            muitube:`https://muitube.com/watch?v=${id}`,
+            purify:`https://purify.video/watch?v=${id}`,
+            ttools:`https://www.youtube.ttools.io/watch?v=${id}`,
+            nocookie:`https://www.youtube-nocookie.com/embed/${id}?autoplay=1&mute=1&controls=1`,
+            embed:`https://www.youtube.com/embed/${id}?autoplay=1&mute=1&controls=1`
+          };
+          (async()=>{
+            const browser=await chromium.launch({executablePath:chrome,headless:true,args:['--no-sandbox','--disable-dev-shm-usage','--autoplay-policy=no-user-gesture-required','--window-size=1440,900']});
+            for(const [name,url] of Object.entries(urls)){
+              const ctx=await browser.newContext({viewport:{width:1440,height:900},locale:'en-US'});
+              const p=await ctx.newPage(); const events=[];
+              p.on('request',r=>{const u=r.url();if(/googlevideo|videoplayback|initplayback|\.m3u8|\.mpd|\.mp4|\.webm|youtubei\/v1\/player/i.test(u))events.push({type:'request',method:r.method(),url:u,headers:r.headers(),postData:r.postData()});});
+              p.on('response',async r=>{const u=r.url();if(/googlevideo|videoplayback|initplayback|\.m3u8|\.mpd|\.mp4|\.webm|youtubei\/v1\/player/i.test(u)){let body='';try{if(/youtubei\/v1\/player/i.test(u))body=(await r.text()).slice(0,300000);}catch{}events.push({type:'response',status:r.status(),url:u,headers:r.headers(),body});}});
+              p.on('console',m=>events.push({type:'console',level:m.type(),text:m.text()}));
+              try{
+                await p.goto(url,{waitUntil:'domcontentloaded',timeout:90000});
+                for(const label of ['Reject all','Accept all','I agree','Accept']){try{const b=p.getByRole('button',{name:label,exact:false}).first();if(await b.isVisible({timeout:500})){await b.click();await p.waitForTimeout(1000);}}catch{}}
+                await p.waitForTimeout(8000);
+                try{await p.mouse.click(720,450);}catch{}
+                await p.waitForTimeout(12000);
+                const info=await p.evaluate(()=>({title:document.title,text:document.body?.innerText?.slice(0,20000),videos:[...document.querySelectorAll('video')].map(v=>({src:v.currentSrc||v.src,duration:Number.isFinite(v.duration)?v.duration:null,currentTime:v.currentTime,readyState:v.readyState,paused:v.paused,error:v.error?{code:v.error.code,message:v.error.message}:null,width:v.videoWidth,height:v.videoHeight}))}));
+                fs.writeFileSync(`out/${name}-info.json`,JSON.stringify(info,null,2));
+                fs.writeFileSync(`out/${name}-network.json`,JSON.stringify(events,null,2));
+                fs.writeFileSync(`out/${name}.html`,await p.content());
+                await p.screenshot({path:`out/${name}.jpg`,fullPage:false,type:'jpeg',quality:92});
+              }catch(e){fs.writeFileSync(`out/${name}-error.txt`,String(e.stack||e));}
+              await ctx.close();
+            }
+            await browser.close();
+          })().catch(e=>{fs.writeFileSync('out/fatal.txt',String(e.stack||e));process.exitCode=0;});
+          JS
+          node test.js
+          find out -type f -printf '%P %s bytes\n' | sort
+      - uses: actions/upload-artifact@v4
+        with:
+          name: alternate-frontends-ZRwvPScqEys
+          path: out/**
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 1
