@@ -1,0 +1,106 @@
+name: Temporary capture YouTube search hover preview
+
+on:
+  push:
+    branches:
+      - tmp-tab-recovery-zrwvp-scqeys
+    paths:
+      - .github/workflows/tmp-youtube-hover-preview.yml
+
+permissions:
+  contents: read
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Playwright helper
+        shell: bash
+        run: |
+          npm init -y >/dev/null 2>&1
+          npm install --no-save playwright-core
+          mkdir -p out
+
+      - name: Fetch search HTML and exercise hover preview
+        shell: bash
+        run: |
+          set -euxo pipefail
+          SEARCH='https://www.youtube.com/results?search_query=Jump+in+the+Line+Mitch+Gissendaner&hl=en&gl=US'
+          curl -fL --retry 3 --max-time 60 -A 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/151 Safari/537.36' "$SEARCH" -o out/search.html || true
+          python - <<'PY'
+          from pathlib import Path
+          import re, html
+          text=Path('out/search.html').read_text(errors='ignore') if Path('out/search.html').exists() else ''
+          target='ZRwvPScqEys'
+          chunks=[]
+          pos=0
+          while True:
+              i=text.find(target,pos)
+              if i<0: break
+              chunks.append(text[max(0,i-5000):i+10000])
+              pos=i+1
+          Path('out/target-context.txt').write_text('\n\n===== OCCURRENCE =====\n\n'.join(chunks),errors='ignore')
+          urls=[]
+          for m in re.finditer(r'https://i\.ytimg\.com/an_webp/[^"\\]+', text):
+              u=html.unescape(m.group(0)).replace('\\u0026','&')
+              if target in u: urls.append(u)
+          Path('out/target-animated-urls.txt').write_text('\n'.join(dict.fromkeys(urls)))
+          print('target occurrences',len(chunks),'animated urls',urls)
+          PY
+
+          cat > capture.js <<'JS'
+          const fs = require('fs');
+          const { chromium } = require('playwright-core');
+          const target = 'ZRwvPScqEys';
+          const search = 'https://www.youtube.com/results?search_query=Jump+in+the+Line+Mitch+Gissendaner&hl=en&gl=US';
+          const chrome = ['/usr/bin/google-chrome','/usr/bin/google-chrome-stable','/usr/bin/chromium'].find(fs.existsSync);
+          (async()=>{
+            const browser=await chromium.launch({executablePath:chrome,headless:true,args:['--no-sandbox','--disable-dev-shm-usage','--autoplay-policy=no-user-gesture-required','--window-size=1440,1000']});
+            const context=await browser.newContext({viewport:{width:1440,height:1000},locale:'en-US',timezoneId:'America/New_York'});
+            const page=await context.newPage();
+            const events=[];
+            page.on('request',r=>{ const u=r.url(); if(u.includes('googlevideo')||u.includes('/an_webp/')||u.includes('/sb/')||u.includes('videoplayback')) events.push({type:'request',url:u,method:r.method(),resourceType:r.resourceType()}); });
+            page.on('response',r=>{ const u=r.url(); if(u.includes('googlevideo')||u.includes('/an_webp/')||u.includes('/sb/')||u.includes('videoplayback')) events.push({type:'response',url:u,status:r.status(),headers:r.headers()}); });
+            page.on('console',m=>events.push({type:'console',level:m.type(),text:m.text()}));
+            await page.goto(search,{waitUntil:'domcontentloaded',timeout:60000});
+            for(const label of ['Reject all','Accept all','I agree','Accept']){ try{const b=page.getByRole('button',{name:label,exact:false}).first(); if(await b.isVisible({timeout:800})){await b.click(); await page.waitForTimeout(1500);}}catch{} }
+            await page.waitForTimeout(7000);
+            await page.screenshot({path:'out/search-before.jpg',type:'jpeg',quality:92,fullPage:false});
+            const links=page.locator(`a[href*="watch?v=${target}"]`);
+            const count=await links.count();
+            events.push({type:'target-count',count});
+            if(count){
+              const link=links.first();
+              await link.scrollIntoViewIfNeeded();
+              await page.screenshot({path:'out/target-visible.jpg',type:'jpeg',quality:94,fullPage:false});
+              await link.hover({force:true});
+              for(let i=0;i<8;i++){
+                await page.waitForTimeout(1500);
+                const info=await page.evaluate((target)=>{
+                  const videos=[...document.querySelectorAll('video')].map((v,i)=>({i,currentSrc:v.currentSrc||v.src,duration:Number.isFinite(v.duration)?v.duration:null,currentTime:v.currentTime,readyState:v.readyState,paused:v.paused,videoWidth:v.videoWidth,videoHeight:v.videoHeight,outer:v.outerHTML.slice(0,2000)}));
+                  const imgs=[...document.querySelectorAll(`a[href*="watch?v=${target}"] img`)].map(x=>x.currentSrc||x.src);
+                  return {videos,imgs};
+                },target);
+                fs.writeFileSync(`out/hover-info-${i}.json`,JSON.stringify(info,null,2));
+                await page.screenshot({path:`out/hover-${i}.jpg`,type:'jpeg',quality:94,fullPage:false});
+              }
+            }
+            fs.writeFileSync('out/network-events.json',JSON.stringify(events,null,2));
+            fs.writeFileSync('out/final-html.html',await page.content());
+            await browser.close();
+          })().catch(e=>{fs.writeFileSync('out/fatal.txt',String(e.stack||e));process.exitCode=0;});
+          JS
+          node capture.js
+          find out -type f -printf '%P %s bytes\n' | sort
+
+      - name: Upload hover evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: youtube-hover-preview-ZRwvPScqEys
+          path: out/**
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 1
