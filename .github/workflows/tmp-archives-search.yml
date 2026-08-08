@@ -1,0 +1,106 @@
+name: Temporary search video archives for exact YouTube ID
+
+on:
+  push:
+    branches:
+      - tmp-tab-recovery-zrwvp-scqeys
+    paths:
+      - .github/workflows/tmp-archives-search.yml
+
+permissions:
+  contents: read
+
+jobs:
+  search:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install browser helper
+        shell: bash
+        run: |
+          npm init -y >/dev/null 2>&1
+          npm install --no-save playwright-core
+          mkdir -p out
+
+      - name: Search archives and capture API traffic
+        shell: bash
+        run: |
+          cat > archive.js <<'JS'
+          const fs=require('fs');
+          const {chromium}=require('playwright-core');
+          const target='ZRwvPScqEys';
+          const chrome=['/usr/bin/google-chrome','/usr/bin/google-chrome-stable','/usr/bin/chromium'].find(fs.existsSync);
+          (async()=>{
+            const browser=await chromium.launch({executablePath:chrome,headless:true,args:['--no-sandbox','--disable-dev-shm-usage','--window-size=1440,1000']});
+            const context=await browser.newContext({viewport:{width:1440,height:1000},locale:'en-US'});
+            const page=await context.newPage();
+            const events=[];
+            page.on('request',r=>events.push({type:'request',method:r.method(),url:r.url(),postData:r.postData()}));
+            page.on('response',async r=>{
+              const u=r.url();
+              if(/api|search|video|archive|youtube/i.test(u)){
+                let body=''; try{body=(await r.text()).slice(0,200000);}catch{}
+                events.push({type:'response',status:r.status(),url:u,headers:r.headers(),body});
+              }
+            });
+            page.on('console',m=>events.push({type:'console',level:m.type(),text:m.text()}));
+            await page.goto('https://tube.archivarix.net/',{waitUntil:'networkidle',timeout:90000});
+            await page.screenshot({path:'out/archivarix-home.jpg',fullPage:true,type:'jpeg',quality:90});
+            const inputs=page.locator('input');
+            events.push({type:'inputs',count:await inputs.count()});
+            let done=false;
+            for(let i=0;i<await inputs.count();i++){
+              const inp=inputs.nth(i);
+              try{
+                if(await inp.isVisible()){
+                  await inp.fill(target);
+                  await page.screenshot({path:`out/archivarix-filled-${i}.jpg`,fullPage:false,type:'jpeg',quality:92});
+                  const buttons=page.locator('button');
+                  for(let j=0;j<await buttons.count();j++){
+                    const b=buttons.nth(j); const txt=(await b.innerText().catch(()=>''));
+                    if(await b.isVisible() && /search|find|lookup|go/i.test(txt)) { await b.click(); done=true; break; }
+                  }
+                  if(!done) await inp.press('Enter');
+                  await page.waitForTimeout(30000);
+                  break;
+                }
+              }catch(e){events.push({type:'input-error',i,text:String(e)});}
+            }
+            await page.screenshot({path:'out/archivarix-result.jpg',fullPage:true,type:'jpeg',quality:92});
+            fs.writeFileSync('out/archivarix-html.html',await page.content());
+            fs.writeFileSync('out/archivarix-text.txt',(await page.locator('body').innerText()).slice(0,100000));
+            fs.writeFileSync('out/network.json',JSON.stringify(events,null,2));
+
+            for(const [name,url] of Object.entries({
+              ghost:`https://ghostarchive.org/varchive/${target}`,
+              preserve:`https://preservetube.com/watch?v=${target}`,
+              filmot:`https://filmot.com/video/${target}`,
+              wayback:`https://archive.org/wayback/available?url=https://www.youtube.com/watch?v=${target}`,
+              wayback2:`https://archive.org/wayback/available?url=youtube.com/watch?v=${target}`
+            })){
+              try{
+                const p=await context.newPage();
+                await p.goto(url,{waitUntil:'domcontentloaded',timeout:90000});
+                await p.waitForTimeout(5000);
+                await p.screenshot({path:`out/${name}.jpg`,fullPage:true,type:'jpeg',quality:90});
+                fs.writeFileSync(`out/${name}.html`,await p.content());
+                fs.writeFileSync(`out/${name}.txt`,(await p.locator('body').innerText()).slice(0,100000));
+                await p.close();
+              }catch(e){fs.writeFileSync(`out/${name}-error.txt`,String(e.stack||e));}
+            }
+            await browser.close();
+          })().catch(e=>{fs.writeFileSync('out/fatal.txt',String(e.stack||e));process.exitCode=0;});
+          JS
+          node archive.js
+          find out -type f -printf '%P %s bytes\n' | sort
+
+      - name: Upload archive research
+        uses: actions/upload-artifact@v4
+        with:
+          name: exact-video-archive-search-ZRwvPScqEys
+          path: out/**
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 1
