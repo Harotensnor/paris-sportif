@@ -1,0 +1,46 @@
+name: Temporary Terminator main opening transcription
+
+on:
+  push:
+    branches:
+      - chatgpt-terminator-v3-20260808
+    paths:
+      - .github/workflows/chatgpt-terminator-main-opening-basicpitch.yml
+
+permissions:
+  contents: read
+
+jobs:
+  transcribe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Prepare audio and Basic Pitch
+        shell: bash
+        run: |
+          set -euxo pipefail
+          mkdir -p evidence/default evidence/sensitive evidence/logs
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+          curl --fail --location --retry 4 --retry-delay 2 \
+            'https://savestream.site/download/Terminator%20-%20Judgment%20Day%20%EF%BD%9C%20Classical%20Guitar.webm' \
+            -o evidence/source.webm
+          ffmpeg -hide_banner -y -ss 60 -i evidence/source.webm -t 36 -vn -ac 1 -ar 22050 -c:a pcm_s16le evidence/main-opening-60-96.wav
+          python -m pip install --upgrade pip
+          python -m pip install 'basic-pitch[onnx]==0.4.0'
+      - name: Transcribe two profiles
+        shell: bash
+        run: |
+          set -euxo pipefail
+          basic-pitch evidence/default evidence/main-opening-60-96.wav --model-serialization onnx --save-note-events --onset-threshold 0.42 --frame-threshold 0.28 --minimum-note-length 75 --minimum-frequency 70 --maximum-frequency 1400 > evidence/logs/default.txt 2>&1
+          basic-pitch evidence/sensitive evidence/main-opening-60-96.wav --model-serialization onnx --save-note-events --onset-threshold 0.30 --frame-threshold 0.20 --minimum-note-length 55 --minimum-frequency 70 --maximum-frequency 1400 > evidence/logs/sensitive.txt 2>&1
+      - name: Upload transcription
+        uses: actions/upload-artifact@v4
+        with:
+          name: terminator-main-opening-basicpitch
+          path: evidence/
+          if-no-files-found: error
+          retention-days: 1
