@@ -1,0 +1,67 @@
+name: Temporary Terminator intro transcription
+
+on:
+  push:
+    branches:
+      - chatgpt-terminator-v3-20260808
+    paths:
+      - .github/workflows/chatgpt-terminator-intro-basicpitch.yml
+
+permissions:
+  contents: read
+
+jobs:
+  transcribe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Download actual video audio and install tools
+        shell: bash
+        run: |
+          set -euxo pipefail
+          mkdir -p evidence/default evidence/sensitive evidence/logs
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+          curl --fail --location --retry 4 --retry-delay 2 \
+            'https://savestream.site/download/Terminator%20-%20Judgment%20Day%20%EF%BD%9C%20Classical%20Guitar.webm' \
+            -o evidence/source.webm
+          ffmpeg -hide_banner -y -i evidence/source.webm -t 61.2 -vn -ac 1 -ar 22050 -c:a pcm_s16le evidence/intro-61.wav
+          python -m pip install --upgrade pip
+          python -m pip install 'basic-pitch[onnx]==0.4.0'
+          ffprobe -v error -show_format -show_streams -of json evidence/intro-61.wav > evidence/ffprobe.json
+
+      - name: Run two polyphonic transcription profiles
+        shell: bash
+        run: |
+          set -euxo pipefail
+          basic-pitch evidence/default evidence/intro-61.wav \
+            --model-serialization onnx \
+            --save-note-events \
+            --onset-threshold 0.42 \
+            --frame-threshold 0.28 \
+            --minimum-note-length 75 \
+            --minimum-frequency 75 \
+            --maximum-frequency 1400 \
+            > evidence/logs/default.txt 2>&1
+          basic-pitch evidence/sensitive evidence/intro-61.wav \
+            --model-serialization onnx \
+            --save-note-events \
+            --onset-threshold 0.30 \
+            --frame-threshold 0.20 \
+            --minimum-note-length 55 \
+            --minimum-frequency 75 \
+            --maximum-frequency 1400 \
+            > evidence/logs/sensitive.txt 2>&1
+          find evidence -type f -printf '%P %s bytes\n' | sort > evidence/logs/files.txt
+
+      - name: Upload intro transcription
+        uses: actions/upload-artifact@v4
+        with:
+          name: terminator-actual-intro-basicpitch
+          path: evidence/
+          if-no-files-found: error
+          retention-days: 1
