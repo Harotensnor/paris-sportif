@@ -1,0 +1,163 @@
+name: Temporary call YouTube inline player endpoint
+
+on:
+  push:
+    branches:
+      - tmp-tab-recovery-zrwvp-scqeys
+    paths:
+      - .github/workflows/tmp-youtube-player-inline.yml
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Probe target video with fresh search-page context
+        shell: bash
+        run: |
+          set -euxo pipefail
+          mkdir -p out/responses out/storyboards out/media
+          python - <<'PY'
+          import json, re, html, urllib.parse, os, sys, time
+          from pathlib import Path
+          import requests
+
+          TARGET='ZRwvPScqEys'
+          SEARCH='https://www.youtube.com/results?search_query=Jump+in+the+Line+Mitch+Gissendaner&hl=en&gl=US'
+          UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36'
+          s=requests.Session(); s.headers.update({'User-Agent':UA,'Accept-Language':'en-US,en;q=0.9'})
+          r=s.get(SEARCH,timeout=60)
+          r.raise_for_status()
+          text=r.text
+          Path('out/search.html').write_text(text,encoding='utf-8')
+
+          def first(pattern):
+              m=re.search(pattern,text,re.S)
+              return m.group(1) if m else None
+
+          api_key=first(r'"INNERTUBE_API_KEY":"([^"]+)"')
+          client_version=first(r'"INNERTUBE_CLIENT_VERSION":"([^"]+)"')
+          visitor=first(r'"VISITOR_DATA":"([^"]+)"')
+          if visitor: visitor=urllib.parse.unquote(visitor)
+
+          # Parse the JSON object assigned to INNERTUBE_CONTEXT using balanced braces.
+          marker='"INNERTUBE_CONTEXT":'
+          p=text.find(marker)
+          if p<0: raise RuntimeError('INNERTUBE_CONTEXT missing')
+          p=text.find('{',p+len(marker))
+          depth=0; in_str=False; esc=False; end=None
+          for i,ch in enumerate(text[p:],start=p):
+              if in_str:
+                  if esc: esc=False
+                  elif ch=='\\': esc=True
+                  elif ch=='"': in_str=False
+              else:
+                  if ch=='"': in_str=True
+                  elif ch=='{': depth+=1
+                  elif ch=='}':
+                      depth-=1
+                      if depth==0: end=i+1; break
+          if end is None: raise RuntimeError('context object not balanced')
+          context=json.loads(text[p:end])
+          # Decode visitorData in context if it is percent-encoded.
+          if context.get('client',{}).get('visitorData'):
+              context['client']['visitorData']=urllib.parse.unquote(context['client']['visitorData'])
+          context['client']['originalUrl']=SEARCH
+
+          # Collect every playerParams close to a target videoId occurrence; try all unique values.
+          player_params=[]
+          pos=0
+          while True:
+              i=text.find(f'"videoId":"{TARGET}"',pos)
+              if i<0: break
+              chunk=text[max(0,i-2000):i+60000]
+              for m in re.finditer(r'"playerParams":"([^"]+)"',chunk):
+                  val=urllib.parse.unquote(m.group(1))
+                  if val not in player_params: player_params.append(val)
+              pos=i+1
+          # Explicitly include the inline player parameter seen in search results if regex ordering misses it.
+          if not player_params:
+              player_params=['YAHIAQGiBhUBrf4zjyxHV2-rjyjkxvgaKFwa7m0=']
+
+          meta={'api_key':api_key,'client_version':client_version,'visitor':visitor,'player_params':player_params,'context':context}
+          Path('out/extracted.json').write_text(json.dumps(meta,indent=2),encoding='utf-8')
+
+          endpoint=f'https://www.youtube.com/youtubei/v1/player?key={api_key}&prettyPrint=false'
+          headers={
+              'User-Agent':UA,
+              'Content-Type':'application/json',
+              'Origin':'https://www.youtube.com',
+              'Referer':SEARCH,
+              'X-Youtube-Client-Name':'1',
+              'X-Youtube-Client-Version':client_version,
+              'X-Goog-Visitor-Id':visitor or context.get('client',{}).get('visitorData',''),
+          }
+
+          attempts=[]
+          bodies=[]
+          for pp in player_params[:20]:
+              base={'context':context,'videoId':TARGET,'params':pp}
+              bodies.append(('plain',base))
+              bodies.append(('checks',{**base,'contentCheckOk':True,'racyCheckOk':True}))
+              bodies.append(('inline',{**base,'contentCheckOk':True,'racyCheckOk':True,'playbackContext':{'contentPlaybackContext':{'html5Preference':'HTML5_PREF_WANTS','lactMilliseconds':'0'}}}))
+          # Also try without params.
+          bodies.append(('no_params',{'context':context,'videoId':TARGET,'contentCheckOk':True,'racyCheckOk':True}))
+
+          successful=[]
+          for idx,(kind,body) in enumerate(bodies):
+              try:
+                  rr=s.post(endpoint,headers=headers,json=body,timeout=60)
+                  fn=f'out/responses/{idx:03d}_{kind}.json'
+                  Path(fn).write_bytes(rr.content)
+                  try: data=rr.json()
+                  except Exception: data={}
+                  status=(data.get('playabilityStatus') or {}).get('status')
+                  reason=(data.get('playabilityStatus') or {}).get('reason')
+                  row={'index':idx,'kind':kind,'http':rr.status_code,'status':status,'reason':reason,'has_streaming':bool(data.get('streamingData')),'has_storyboards':bool(data.get('storyboards')),'videoDetails':data.get('videoDetails',{}),'file':fn}
+                  attempts.append(row)
+                  if data.get('streamingData') or data.get('storyboards'):
+                      successful.append((idx,data))
+              except Exception as e:
+                  attempts.append({'index':idx,'kind':kind,'error':repr(e)})
+          Path('out/summary.json').write_text(json.dumps(attempts,indent=2),encoding='utf-8')
+
+          # Download any direct format URL from the first successful response.
+          for idx,data in successful:
+              sd=data.get('streamingData') or {}
+              formats=(sd.get('formats') or [])+(sd.get('adaptiveFormats') or [])
+              direct=[f for f in formats if f.get('url')]
+              direct.sort(key=lambda f:(f.get('height') or 9999, f.get('bitrate') or 999999))
+              for j,f in enumerate(direct[:8]):
+                  url=f['url']; ext='mp4' if 'mp4' in (f.get('mimeType') or '') else 'webm'
+                  try:
+                      with s.get(url,headers={'User-Agent':UA,'Referer':'https://www.youtube.com/'},stream=True,timeout=120) as dr:
+                          if dr.status_code not in (200,206): continue
+                          path=Path(f'out/media/attempt{idx}_{j}_{f.get("itag")}.{ext}')
+                          with path.open('wb') as out:
+                              total=0
+                              for chunk in dr.iter_content(1024*1024):
+                                  if not chunk: continue
+                                  out.write(chunk); total+=len(chunk)
+                                  if total>80_000_000: break
+                          if path.stat().st_size>10000:
+                              raise SystemExit(0)
+                  except SystemExit: raise
+                  except Exception: pass
+          PY
+          true
+          find out -type f -printf '%P %s bytes\n' | sort | head -1000
+
+      - name: Upload player probe
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: youtube-inline-player-probe-ZRwvPScqEys
+          path: out/**
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 1
