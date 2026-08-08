@@ -1,0 +1,79 @@
+name: Temporary inspect YouTube initplayback endpoint
+
+on:
+  push:
+    branches:
+      - tmp-tab-recovery-zrwvp-scqeys
+    paths:
+      - .github/workflows/tmp-initplayback-probe.yml
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch fresh search page and call target initplayback
+        shell: bash
+        run: |
+          set -euxo pipefail
+          mkdir -p out
+          python - <<'PY'
+          import json,re,html,urllib.parse
+          from pathlib import Path
+          import requests
+
+          TARGET='ZRwvPScqEys'
+          SEARCH='https://www.youtube.com/results?search_query=Jump+in+the+Line+Mitch+Gissendaner&hl=en&gl=US'
+          UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36'
+          s=requests.Session(); s.headers.update({'User-Agent':UA,'Accept-Language':'en-US,en;q=0.9'})
+          r=s.get(SEARCH,timeout=60); r.raise_for_status(); text=r.text
+          Path('out/search.html').write_text(text,encoding='utf-8')
+          i=text.find(f'"videoId":"{TARGET}"')
+          if i<0: raise RuntimeError('target missing from search')
+          chunk=text[i:i+80000]
+          m=re.search(r'"watchEndpointSupportedOnesieConfig":\{"html5PlaybackOnesieConfig":\{"commonConfig":\{"url":"([^"]+)"',chunk)
+          if not m: raise RuntimeError('initplayback url missing')
+          url=m.group(1).replace('\\u0026','&').replace('\\/','/')
+          Path('out/initplayback-url.txt').write_text(url)
+          cases=[
+            ('get', 'GET', {}, None),
+            ('get_range','GET',{'Range':'bytes=0-1048575'},None),
+            ('head','HEAD',{},None),
+            ('post_empty','POST',{'Content-Type':'application/octet-stream'},b''),
+          ]
+          summary=[]
+          for name,method,extra,data in cases:
+            h={'User-Agent':UA,'Referer':SEARCH,'Origin':'https://www.youtube.com',**extra}
+            try:
+              rr=s.request(method,url,headers=h,data=data,timeout=90,allow_redirects=True,stream=True)
+              row={'name':name,'status':rr.status_code,'url':rr.url,'history':[(x.status_code,x.url) for x in rr.history],'headers':dict(rr.headers)}
+              total=0; body=bytearray()
+              if method!='HEAD':
+                for part in rr.iter_content(1024*1024):
+                  if not part: continue
+                  body.extend(part); total+=len(part)
+                  if total>=8_000_000: break
+                Path(f'out/{name}.body').write_bytes(body)
+                row['bytes']=len(body)
+              summary.append(row)
+            except Exception as e:
+              summary.append({'name':name,'error':repr(e)})
+          Path('out/summary.json').write_text(json.dumps(summary,indent=2),encoding='utf-8')
+          PY
+          file out/*.body || true
+          find out -type f -printf '%P %s bytes\n' | sort
+          cat out/summary.json
+
+      - name: Upload probe
+        uses: actions/upload-artifact@v4
+        with:
+          name: youtube-initplayback-probe-ZRwvPScqEys
+          path: out/**
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 1
