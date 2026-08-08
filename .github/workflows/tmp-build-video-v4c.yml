@@ -1,0 +1,241 @@
+name: Build final video-verified Jump in the Line V4C
+
+on:
+  push:
+    branches:
+      - tmp-tab-recovery-zrwvp-scqeys
+    paths:
+      - .github/workflows/tmp-build-video-v4c.yml
+      - tmp/build_jump_video_v4.py
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Recover the 59-measure source transcription
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euxo pipefail
+          mkdir -p input output_v4
+          gh api repos/${GITHUB_REPOSITORY}/actions/artifacts/9006732232/zip > input/source.zip
+          unzip -o input/source.zip -d input/source
+          cp input/source/Jump_in_the_Line_Mitchs_Music.gp5 input/source.gp5
+          cp input/source/validation.json input/validation.json
+
+      - name: Install score, rendering and audio tools
+        shell: bash
+        run: |
+          set -euxo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg fluidsynth fluid-soundfont-gm librsvg2-bin
+          git clone --depth 1 https://github.com/Perlence/PyGuitarPro.git /tmp/PyGuitarPro
+          python -m pip install --upgrade pip
+          python -m pip install /tmp/PyGuitarPro mido
+
+      - name: Build and round-trip validate GP5 and MIDI
+        shell: bash
+        run: |
+          set -euxo pipefail
+          python tmp/build_jump_video_v4.py
+
+      - name: Export modern Guitar Pro, validate music, and render the source notation
+        shell: bash
+        run: |
+          set -euxo pipefail
+          mkdir -p /tmp/alphatab output_v4/render
+          cd /tmp/alphatab
+          npm init -y >/dev/null 2>&1
+          npm install @coderline/alphatab
+          cat > export-and-render.mjs <<'JS'
+          import fs from 'node:fs';
+          import path from 'node:path';
+          import * as alphaTab from '@coderline/alphatab';
+
+          const root = process.env.GITHUB_WORKSPACE;
+          const sourcePath = path.join(root, 'output_v4/Jump_in_the_Line_TAB_VIDEO_V4.gp5');
+          const targetPath = path.join(root, 'output_v4/Jump_in_the_Line_TAB_VIDEO_V4.gp');
+          const renderDir = path.join(root, 'output_v4/render');
+          const settings = new alphaTab.Settings();
+          const score = alphaTab.importer.ScoreLoader.loadScoreFromBytes(
+              new Uint8Array(fs.readFileSync(sourcePath)), settings
+          );
+
+          function musicalSignature(s) {
+              const staff = s.tracks[0].staves[0];
+              return staff.bars.map(bar => bar.voices.map(voice => voice.beats.map(beat => ({
+                  duration: beat.duration,
+                  dots: beat.dots,
+                  isRest: beat.isRest,
+                  notes: beat.notes.map(note => ({
+                      string: note.string,
+                      fret: note.fret,
+                      tieDestination: note.isTieDestination,
+                      tieOrigin: note.isTieOrigin
+                  }))
+              }))));
+          }
+
+          if (score.tempo !== 202) throw new Error(`GP5 import tempo is ${score.tempo}`);
+          const beforeSignature = musicalSignature(score);
+          score.title = 'Jump in the Line';
+          score.subTitle = 'Melody on Guitar with TAB — transcription de la vidéo';
+          score.artist = 'Harry Belafonte';
+          score.album = 'Beetlejuice';
+
+          for (const masterBar of score.masterBars) {
+              masterBar.timeSignatureNumerator = 4;
+              masterBar.timeSignatureDenominator = 4;
+              // The MP4 visibly uses C (common time). Keep that flag for the source render.
+              masterBar.timeSignatureCommon = true;
+          }
+
+          const track = score.tracks[0];
+          track.name = 'Electric Guitar';
+          track.shortName = 'E. Gtr.';
+          track.systemsLayout = [6, 6, 6, 6, 6, 6, 5, 6, 6, 6];
+          track.defaultSystemsLayout = 6;
+          const staff = track.staves[0];
+          staff.showStandardNotation = true;
+          staff.showTablature = true;
+          staff.capo = 0;
+          if (staff.chords) {
+              for (const chord of staff.chords.values()) {
+                  chord.showDiagram = true;
+                  chord.showName = true;
+                  chord.showFingering = false;
+              }
+          }
+
+          // Render the in-memory source model before GP7 export, so the visual proof shows the
+          // same C common-time symbol as the MP4. The GP7 exporter currently serializes it as
+          // the musically equivalent numeric 4/4; this does not alter timing or playback.
+          const renderSettings = new alphaTab.Settings();
+          renderSettings.core.engine = 'svg';
+          renderSettings.display.layoutMode = alphaTab.LayoutMode.Page;
+          renderSettings.display.systemsLayoutMode = alphaTab.SystemsLayoutMode.UseModelLayout;
+          renderSettings.display.scale = 0.85;
+          renderSettings.display.stretchForce = 0.8;
+          renderSettings.display.firstSystemPaddingTop = 20;
+          renderSettings.display.systemPaddingTop = 16;
+          renderSettings.display.systemPaddingBottom = 16;
+          const renderer = new alphaTab.rendering.ScoreRenderer(renderSettings);
+          renderer.width = 1500;
+          let chunkIndex = 0;
+          const chunks = [];
+          renderer.partialLayoutFinished.on(result => renderer.renderResult(result.id));
+          renderer.partialRenderFinished.on(result => {
+              chunkIndex += 1;
+              const name = `system-${String(chunkIndex).padStart(2, '0')}.svg`;
+              fs.writeFileSync(path.join(renderDir, name), result.renderResult, 'utf8');
+              chunks.push({ name, width: result.width, height: result.height });
+          });
+          renderer.error.on(error => {
+              fs.writeFileSync(path.join(renderDir, 'render-error.txt'), String(error?.stack ?? error), 'utf8');
+              process.exitCode = 1;
+          });
+          renderer.renderFinished.on(result => {
+              fs.writeFileSync(path.join(renderDir, 'render-summary.json'), JSON.stringify({
+                  totalWidth: result.totalWidth,
+                  totalHeight: result.totalHeight,
+                  chunks
+              }, null, 2));
+          });
+          renderer.renderScore(score, [0]);
+
+          const exporter = new alphaTab.exporter.Gp7Exporter();
+          fs.writeFileSync(targetPath, exporter.export(score, settings));
+          const roundtrip = alphaTab.importer.ScoreLoader.loadScoreFromBytes(
+              new Uint8Array(fs.readFileSync(targetPath)), settings
+          );
+          const afterSignature = musicalSignature(roundtrip);
+          if (JSON.stringify(beforeSignature) !== JSON.stringify(afterSignature)) {
+              throw new Error('Modern GP export changed notes, rests, durations or ties');
+          }
+          if (roundtrip.masterBars.length !== 59) throw new Error('Modern GP lost measures');
+          if (roundtrip.tempo !== 202) throw new Error(`Modern GP tempo is ${roundtrip.tempo}`);
+          for (const bar of roundtrip.masterBars) {
+              if (bar.timeSignatureNumerator !== 4 || bar.timeSignatureDenominator !== 4) {
+                  throw new Error('Modern GP lost 4/4 time');
+              }
+          }
+          if (roundtrip.tracks[0].systemsLayout.join(',') !== '6,6,6,6,6,6,5,6,6,6') {
+              throw new Error(`Modern GP systems layout is ${roundtrip.tracks[0].systemsLayout}`);
+          }
+
+          fs.writeFileSync(path.join(root, 'output_v4/validation_modern_v4.json'), JSON.stringify({
+              valid: true,
+              measures: 59,
+              sourceMeter: 'C — common time 4/4',
+              modernGpMeter: '4/4 numeric (musically identical)',
+              sourceCommonTimeRenderPreserved: true,
+              quarterBpm: roundtrip.tempo,
+              sourcePulse: 'half note = 101',
+              systemLayout: roundtrip.tracks[0].systemsLayout,
+              musicalSignatureUnchanged: true,
+              trackName: roundtrip.tracks[0].name
+          }, null, 2));
+          JS
+          node export-and-render.mjs
+          test -s "$GITHUB_WORKSPACE/output_v4/render/system-01.svg"
+          rsvg-convert -o "$GITHUB_WORKSPACE/output_v4/render/system-01.png" \
+            "$GITHUB_WORKSPACE/output_v4/render/system-01.svg"
+
+      - name: Render listening proof at the exact video pulse
+        shell: bash
+        run: |
+          set -euxo pipefail
+          SF2=$(find /usr/share/sounds -type f -name '*.sf2' | head -n 1)
+          test -n "$SF2"
+          fluidsynth -ni "$SF2" output_v4/Jump_in_the_Line_TAB_VIDEO_V4.mid \
+            -F output_v4/Jump_in_the_Line_TAB_VIDEO_V4.raw.wav -r 44100
+          ffmpeg -hide_banner -loglevel error -y \
+            -i output_v4/Jump_in_the_Line_TAB_VIDEO_V4.raw.wav \
+            -af 'apad,atrim=duration=70.099,loudnorm=I=-16:LRA=11:TP=-1.5' \
+            -codec:a libmp3lame -b:a 192k output_v4/Jump_in_the_Line_TAB_VIDEO_V4.mp3
+          rm output_v4/Jump_in_the_Line_TAB_VIDEO_V4.raw.wav
+          DURATION=$(ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 \
+            output_v4/Jump_in_the_Line_TAB_VIDEO_V4.mp3)
+          python - "$DURATION" <<'PY'
+          import json, sys
+          duration = float(sys.argv[1])
+          assert 70.0 <= duration <= 70.25, duration
+          with open('output_v4/validation_mp3_v4.json', 'w', encoding='utf-8') as handle:
+              json.dump({'valid': True, 'duration_seconds': duration}, handle, indent=2)
+          PY
+
+      - name: Package validation evidence
+        shell: bash
+        run: |
+          set -euxo pipefail
+          cat > output_v4/LISEZ-MOI.txt <<'TXT'
+          JUMP IN THE LINE — TAB VIDEO V4
+
+          Correction majeure : le symbole visible dans le MP4 est C (temps commun 4/4), pas 2/2.
+          Le tempo visible est blanche = 101, donc noire = 202 pour le moteur de lecture Guitar Pro.
+
+          Les 59 mesures, cordes/cases, valeurs rythmiques, silences, liaisons et accords ont été
+          revalidés après réouverture. Le fichier .gp conserve le 4/4, le tempo et la mise en lignes
+          6/6/6/6/6/6/5/6/6/6. L'exporteur GP moderne écrit le C sous forme numérique 4/4 ; la preuve
+          graphique jointe conserve le symbole C exactement comme dans la vidéo.
+          TXT
+          cd output_v4
+          sha256sum *.gp *.gp5 *.mid *.mp3 > SHA256SUMS.txt
+          find . -maxdepth 2 -type f -printf '%P %s bytes\n' | sort
+
+      - name: Upload final improved V4
+        uses: actions/upload-artifact@v4
+        with:
+          name: Jump-in-the-Line-TAB-VIDEO-V4C
+          path: output_v4/**
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 1
