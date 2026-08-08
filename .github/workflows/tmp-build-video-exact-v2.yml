@@ -1,0 +1,148 @@
+name: Build final video-exact Jump in the Line tab
+
+on:
+  push:
+    branches:
+      - tmp-tab-recovery-zrwvp-scqeys
+    paths:
+      - .github/workflows/tmp-build-video-exact-v2.yml
+      - tmp/build_video_exact.py
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Recover the 59-measure note and rhythm transcription
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euxo pipefail
+          mkdir -p input output
+          gh api repos/${GITHUB_REPOSITORY}/actions/artifacts/9006732232/zip > input/source.zip
+          unzip -o input/source.zip -d input/source
+          cp input/source/Jump_in_the_Line_Mitchs_Music.gp5 input/source.gp5
+          cp input/source/validation.json input/source-validation.json
+
+      - name: Install score and audio tooling
+        shell: bash
+        run: |
+          set -euxo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fluidsynth fluid-soundfont-gm ffmpeg
+          git clone --depth 1 https://github.com/Perlence/PyGuitarPro.git /tmp/PyGuitarPro
+          python -m pip install --upgrade pip
+          python -m pip install /tmp/PyGuitarPro mido
+
+      - name: Build GP5 and MIDI from the actual video marking
+        shell: bash
+        run: |
+          set -euxo pipefail
+          python tmp/build_video_exact.py
+          file output/*
+
+      - name: Export and round-trip validate modern Guitar Pro
+        shell: bash
+        run: |
+          set -euxo pipefail
+          mkdir -p /tmp/alphatab
+          cd /tmp/alphatab
+          npm init -y >/dev/null 2>&1
+          npm install @coderline/alphatab
+          cat > export.mjs <<'JS'
+          import fs from 'node:fs';
+          import path from 'node:path';
+          import * as alphaTab from '@coderline/alphatab';
+
+          const root = process.env.GITHUB_WORKSPACE;
+          const source = path.join(root, 'output/Jump_in_the_Line_TAB_VIDEO_EXACTE.gp5');
+          const target = path.join(root, 'output/Jump_in_the_Line_TAB_VIDEO_EXACTE.gp');
+          const settings = new alphaTab.Settings();
+          const score = alphaTab.importer.ScoreLoader.loadScoreFromBytes(
+              new Uint8Array(fs.readFileSync(source)), settings
+          );
+          if (score.masterBars.length !== 59) throw new Error(`Expected 59 bars, got ${score.masterBars.length}`);
+          if (score.tempo !== 202) throw new Error(`Expected quarter BPM 202, got ${score.tempo}`);
+          if (score.masterBars[0].timeSignatureNumerator !== 2 ||
+              score.masterBars[0].timeSignatureDenominator !== 2) {
+              throw new Error('Expected 2/2 time');
+          }
+          const exporter = new alphaTab.exporter.Gp7Exporter();
+          fs.writeFileSync(target, exporter.export(score, settings));
+
+          const roundtrip = alphaTab.importer.ScoreLoader.loadScoreFromBytes(
+              new Uint8Array(fs.readFileSync(target)), settings
+          );
+          const first = roundtrip.masterBars[0];
+          if (roundtrip.masterBars.length !== 59) throw new Error('Modern GP lost bars');
+          if (roundtrip.tempo !== 202) throw new Error(`Modern GP tempo ${roundtrip.tempo}`);
+          if (first.timeSignatureNumerator !== 2 || first.timeSignatureDenominator !== 2) {
+              throw new Error('Modern GP lost 2/2 time');
+          }
+          fs.writeFileSync(path.join(root, 'output/validation_modern_gp.json'), JSON.stringify({
+              valid: true,
+              measures: roundtrip.masterBars.length,
+              quarterBpm: roundtrip.tempo,
+              displayedHalfNoteBpm: roundtrip.tempo / 2,
+              timeSignature: `${first.timeSignatureNumerator}/${first.timeSignatureDenominator}`,
+              tracks: roundtrip.tracks.map(t => t.name)
+          }, null, 2));
+          JS
+          node export.mjs
+
+      - name: Render an exact-speed listening proof
+        shell: bash
+        run: |
+          set -euxo pipefail
+          SF2=$(find /usr/share/sounds -type f -name '*.sf2' | head -n 1)
+          test -n "$SF2"
+          fluidsynth -ni "$SF2" output/Jump_in_the_Line_TAB_VIDEO_EXACTE.mid \
+            -F output/Jump_in_the_Line_TAB_VIDEO_EXACTE.raw.wav -r 44100
+          ffmpeg -hide_banner -loglevel error -y \
+            -i output/Jump_in_the_Line_TAB_VIDEO_EXACTE.raw.wav \
+            -af 'apad,atrim=duration=70.099,loudnorm=I=-16:LRA=11:TP=-1.5' \
+            -codec:a libmp3lame -b:a 192k output/Jump_in_the_Line_TAB_VIDEO_EXACTE.mp3
+          rm output/Jump_in_the_Line_TAB_VIDEO_EXACTE.raw.wav
+          DURATION=$(ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 \
+            output/Jump_in_the_Line_TAB_VIDEO_EXACTE.mp3)
+          python - "$DURATION" <<'PY'
+          import json, sys
+          duration = float(sys.argv[1])
+          assert 70.0 <= duration <= 70.25, duration
+          with open('output/validation_mp3.json', 'w', encoding='utf-8') as f:
+              json.dump({'valid': True, 'duration_seconds': duration}, f, indent=2)
+          PY
+
+      - name: Package checksums
+        shell: bash
+        run: |
+          set -euxo pipefail
+          cat > output/LISEZ-MOI.txt <<'TXT'
+          JUMP IN THE LINE — TABLATURE DE LA VIDEO
+
+          Correction principale : la video indique une mesure alla breve 2/2 avec BLANCHE = 101.
+          Guitar Pro stocke donc le tempo comme NOIRE = 202. Les anciennes versions a noire = 101
+          jouaient la tablature presque deux fois trop lentement.
+
+          Le fichier contient les 59 mesures, les memes cordes/cases, rythmes, silences et liaisons
+          que la tablature affichee. Accordage standard, aucun capo.
+          TXT
+          cd output
+          sha256sum *.gp *.gp5 *.mid *.mp3 > SHA256SUMS.txt
+          ls -lah
+
+      - name: Upload final files
+        uses: actions/upload-artifact@v4
+        with:
+          name: Jump-in-the-Line-TAB-VIDEO-EXACTE-FINAL
+          path: output/**
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 1
