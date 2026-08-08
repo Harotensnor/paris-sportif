@@ -1,0 +1,80 @@
+name: Temporary sample many YouTube animated previews
+
+on:
+  push:
+    branches:
+      - tmp-tab-recovery-zrwvp-scqeys
+    paths:
+      - .github/workflows/tmp-preview-sampler.yml
+
+permissions:
+  contents: read
+
+jobs:
+  sample:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Fetch repeated search previews
+        shell: bash
+        run: |
+          python -m pip install requests
+          mkdir -p out/webp
+          python - <<'PY'
+          import requests,re,html,hashlib,json,time,random,os
+          from pathlib import Path
+          target='ZRwvPScqEys'
+          terms=[
+            'Jump in the Line Mitch Gissendaner',
+            'Jump in the Line Mitch Music guitar tab',
+            'Harry Belafonte Jump in the Line guitar Mitch',
+            'ZRwvPScqEys',
+            'Jump in the Line guitar tutorial tablature',
+          ]
+          uas=[
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/151 Safari/537.36',
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 Version/18.0 Safari/605.1.15',
+            'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/151 Safari/537.36',
+          ]
+          rows=[]
+          for i in range(30):
+            s=requests.Session(); s.headers.update({'User-Agent':uas[i%len(uas)],'Accept-Language':['en-US,en;q=0.9','fr-FR,fr;q=0.9,en;q=0.8'][i%2]})
+            q=requests.utils.quote(terms[i%len(terms)])
+            url=f'https://www.youtube.com/results?search_query={q}&hl={"fr" if i%2 else "en"}&gl={"FR" if i%3==1 else "US"}'
+            try:
+              r=s.get(url,timeout=45); text=r.text
+              # exact target moving thumbnail
+              pattern=rf'https://i\.ytimg\.com/an_webp/{target}/[^"\\]+'
+              m=re.search(pattern,text)
+              if not m:
+                rows.append({'i':i,'search':url,'status':r.status_code,'error':'no moving url'}); continue
+              u=html.unescape(m.group(0)).replace('\\u0026','&').replace('\\/','/')
+              rr=s.get(u,timeout=45)
+              body=rr.content
+              sha=hashlib.sha256(body).hexdigest()
+              p=Path(f'out/webp/{i:02d}_{sha[:12]}.webp'); p.write_bytes(body)
+              rows.append({'i':i,'search':url,'status':r.status_code,'preview_url':u,'preview_status':rr.status_code,'bytes':len(body),'sha256':sha,'etag':rr.headers.get('etag'),'file':str(p)})
+            except Exception as e:
+              rows.append({'i':i,'search':url,'error':repr(e)})
+            time.sleep(.3)
+          Path('out/results.json').write_text(json.dumps(rows,indent=2))
+          unique={r.get('sha256') for r in rows if r.get('sha256')}
+          Path('out/summary.txt').write_text(f'runner={os.environ.get("RUNNER_OS")} samples={len(rows)} unique={len(unique)}\n'+'\n'.join(sorted(x for x in unique if x)))
+          print(Path('out/summary.txt').read_text())
+          PY
+          find out -type f -printf '%P %s bytes\n' 2>/dev/null || ls -lR out
+      - uses: actions/upload-artifact@v4
+        with:
+          name: animated-preview-samples-${{ matrix.os }}
+          path: out/**
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 1
