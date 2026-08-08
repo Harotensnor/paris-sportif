@@ -1,0 +1,34 @@
+name: Temporary package alphaTab runtime
+
+on:
+  push:
+    branches:
+      - tmp-tab-recovery-zrwvp-scqeys
+    paths:
+      - .github/workflows/tmp-pack-alphatab.yml
+
+permissions:
+  contents: read
+
+jobs:
+  pack:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download and package the current alphaTab npm runtime
+        shell: bash
+        run: |
+          set -euxo pipefail
+          mkdir -p out
+          cd out
+          npm pack @coderline/alphatab
+          sha256sum *.tgz > SHA256SUMS.txt
+          ls -lah
+      - uses: actions/upload-artifact@v4
+        with:
+          name: alphatab-runtime-package
+          path: out/**
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 1
