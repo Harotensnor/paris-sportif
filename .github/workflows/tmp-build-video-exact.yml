@@ -1,0 +1,304 @@
+name: Build video-exact Jump in the Line Guitar Pro
+
+on:
+  push:
+    branches:
+      - tmp-tab-recovery-zrwvp-scqeys
+    paths:
+      - .github/workflows/tmp-build-video-exact.yml
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Recover the previously transcribed 59-measure score
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euxo pipefail
+          mkdir -p input output
+          gh api repos/${GITHUB_REPOSITORY}/actions/artifacts/9006732232/zip > input/exact-score.zip
+          unzip -o input/exact-score.zip -d input/exact-score
+          cp input/exact-score/Jump_in_the_Line_Mitchs_Music.gp5 input/source.gp5
+          cp input/exact-score/validation.json input/source-validation.json
+
+      - name: Install score, MIDI and audio tools
+        shell: bash
+        run: |
+          set -euxo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fluidsynth fluid-soundfont-gm ffmpeg
+          git clone --depth 1 https://github.com/Perlence/PyGuitarPro.git /tmp/PyGuitarPro
+          python -m pip install --upgrade pip
+          python -m pip install /tmp/PyGuitarPro mido
+
+      - name: Correct the source marking exactly — cut time, half note equals 101
+        shell: bash
+        run: |
+          cat > /tmp/build_exact.py <<'PY'
+          from __future__ import annotations
+
+          import json
+          from pathlib import Path
+          from collections import defaultdict
+
+          import guitarpro
+          from guitarpro import models as gp
+          from mido import Message, MetaMessage, MidiFile, MidiTrack, bpm2tempo
+
+          SOURCE = Path('input/source.gp5')
+          EXPECTED = json.loads(Path('input/source-validation.json').read_text(encoding='utf-8'))['roundtrip']
+          OUT = Path('output/Jump_in_the_Line_TAB_VIDEO_EXACTE.gp5')
+          MIDI = Path('output/Jump_in_the_Line_TAB_VIDEO_EXACTE.mid')
+
+          song = guitarpro.parse(SOURCE)
+          song.title = 'Jump in the Line'
+          song.subtitle = 'Tablature affichée dans la vidéo'
+          song.artist = 'Harry Belafonte'
+          song.album = 'Beetlejuice'
+          song.music = ''
+          song.words = ''
+          song.copyright = ''
+          song.tab = 'Relevé mesure par mesure depuis la vidéo fournie'
+          song.instructions = (
+              'Mesure alla breve 2/2. Indication originale visible dans la vidéo : '
+              'blanche = 101, soit noire = 202 pour le moteur de lecture Guitar Pro. '
+              'Accordage standard E A D G B E, sans capo.'
+          )
+          song.notice = [
+              'Les 59 mesures, cases, cordes, valeurs rythmiques, silences et liaisons ont été conservés.',
+              'Correction essentielle : la vidéo indique une blanche à 101 en 2/2, et non une noire à 101 en 4/4.',
+          ]
+          song.tempoName = 'Blanche = 101 (alla breve)'
+          # Guitar Pro stores tempo against the quarter-note pulse.
+          song.tempo = 202
+          song.hideTempo = False
+          song.key = gp.KeySignature.FMajor
+
+          for header in song.measureHeaders:
+              header.keySignature = gp.KeySignature.FMajor
+              header.timeSignature.numerator = 2
+              header.timeSignature.denominator = gp.Duration(value=gp.Duration.half)
+              header.timeSignature.beams = [4, 4, 0, 0]
+
+          track = song.tracks[0]
+          track.name = 'Electric Guitar'
+          track.offset = 0
+          track.indicateTuning = False
+          track.channel.instrument = 25  # Acoustic Guitar (steel), closest to the guitar heard in the video.
+          track.channel.bank = 0
+          track.settings.tablature = True
+          track.settings.notation = True
+          track.settings.showRhythm = False
+          track.settings.diagramList = False
+          track.settings.diagramsInScore = True
+          track.clefTranspose = 0
+          track.clefTransposeSecondary = 0
+
+          # Remove only duplicate free-text chord labels from the old reconstruction.
+          # Chord objects and diagrams remain encoded.
+          for measure in track.measures:
+              for voice in measure.voices:
+                  for beat in voice.beats:
+                      if beat.text in {'F', 'C7', 'Bb', 'B♭'}:
+                          beat.text = ''
+
+          guitarpro.write(song, OUT, version=(5, 1, 0))
+
+          def duration_token(beat: gp.Beat) -> str:
+              mapping = {
+                  (gp.Duration.eighth, False): 'e',
+                  (gp.Duration.quarter, False): 'q',
+                  (gp.Duration.quarter, True): 'dq',
+                  (gp.Duration.half, False): 'h',
+                  (gp.Duration.whole, False): 'w',
+              }
+              token = mapping[(beat.duration.value, beat.duration.isDotted)]
+              if beat.status == gp.BeatStatus.rest:
+                  token = 'R' + token
+              return token
+
+          # Strict round-trip audit against all 59 measures previously read from the displayed TAB.
+          check = guitarpro.parse(OUT)
+          assert check.tempo == 202
+          assert check.key == gp.KeySignature.FMajor
+          assert len(check.tracks) == 1
+          assert len(check.tracks[0].measures) == 59
+          assert [(s.number, s.value) for s in check.tracks[0].strings] == [
+              (1, 64), (2, 59), (3, 55), (4, 50), (5, 45), (6, 40)
+          ]
+          for header in check.measureHeaders:
+              assert header.timeSignature.numerator == 2
+              assert header.timeSignature.denominator.value == gp.Duration.half
+              assert header.length == gp.Duration.quarterTime * 4
+
+          audit_measures = {}
+          for number, measure in enumerate(check.tracks[0].measures, 1):
+              beats = measure.voices[0].beats
+              rhythm = [duration_token(b) for b in beats]
+              notes = []
+              ties = []
+              note_index = 0
+              for beat in beats:
+                  for note in beat.notes:
+                      note_index += 1
+                      notes.append([note.string, note.value])
+                      if note.type == gp.NoteType.tie:
+                          ties.append(note_index)
+              exp = EXPECTED[str(number)]
+              assert rhythm == exp['rhythm'], (number, rhythm, exp['rhythm'])
+              assert notes == exp['notes'], (number, notes, exp['notes'])
+              assert ties == exp['ties'], (number, ties, exp['ties'])
+              audit_measures[str(number)] = {'rhythm': rhythm, 'notes': notes, 'ties': ties}
+
+          # Build a neutral MIDI proof directly from the validated GP score.
+          # Tied segments are merged, so the preview follows the displayed notation exactly.
+          mid = MidiFile(type=1, ticks_per_beat=960)
+          meta = MidiTrack()
+          mid.tracks.append(meta)
+          meta.append(MetaMessage('track_name', name='Jump in the Line — video exact', time=0))
+          meta.append(MetaMessage('time_signature', numerator=2, denominator=2,
+                                  clocks_per_click=48, notated_32nd_notes_per_beat=8, time=0))
+          meta.append(MetaMessage('set_tempo', tempo=bpm2tempo(202), time=0))
+
+          melody = MidiTrack()
+          mid.tracks.append(melody)
+          melody.append(MetaMessage('track_name', name='Electric Guitar', time=0))
+          melody.append(Message('program_change', program=25, channel=0, time=0))
+
+          events: list[tuple[int, int, int, int]] = []  # tick, order, note, velocity; velocity 0 = off
+          active: dict[int, tuple[int, int]] = {}  # pitch -> (event index for off, start tick)
+          quarter = gp.Duration.quarterTime
+
+          for measure in check.tracks[0].measures:
+              for beat in measure.voices[0].beats:
+                  start = int(beat.start - quarter)
+                  end = start + int(beat.duration.time)
+                  for note in beat.notes:
+                      pitch = note.realValue
+                      if note.type == gp.NoteType.tie and pitch in active:
+                          off_index, old_start = active[pitch]
+                          old = events[off_index]
+                          events[off_index] = (end, old[1], old[2], old[3])
+                      else:
+                          events.append((start, 1, pitch, 88))
+                          events.append((end, 0, pitch, 0))
+                          active[pitch] = (len(events) - 1, start)
+
+          events.sort(key=lambda e: (e[0], e[1]))  # note-off before note-on at the same tick
+          last = 0
+          for tick, order, pitch, velocity in events:
+              delta = tick - last
+              if velocity:
+                  melody.append(Message('note_on', note=pitch, velocity=velocity, channel=0, time=delta))
+              else:
+                  melody.append(Message('note_off', note=pitch, velocity=0, channel=0, time=delta))
+              last = tick
+          # Preserve the full final measure including its rests.
+          total_ticks = 59 * 4 * 960
+          melody.append(MetaMessage('end_of_track', time=max(0, total_ticks - last)))
+          mid.save(MIDI)
+
+          theoretical_seconds = 59 * 2 * 60 / 101
+          report = {
+              'valid': True,
+              'source': 'tablature displayed in the user-provided video',
+              'measures': 59,
+              'time_signature': '2/2 (alla breve)',
+              'source_tempo_marking': 'half note = 101',
+              'guitar_pro_quarter_bpm': 202,
+              'theoretical_full_score_duration_seconds': theoretical_seconds,
+              'standard_tuning': ['E4', 'B3', 'G3', 'D3', 'A2', 'E2'],
+              'capo': 0,
+              'all_measure_notes_rhythms_rests_and_ties_roundtrip_validated': True,
+              'measure_audit': audit_measures,
+          }
+          Path('output/validation_video_exacte.json').write_text(
+              json.dumps(report, indent=2, ensure_ascii=False), encoding='utf-8'
+          )
+          print(json.dumps({k: v for k, v in report.items() if k != 'measure_audit'}, indent=2, ensure_ascii=False))
+          PY
+          python /tmp/build_exact.py
+
+      - name: Export a modern Guitar Pro file and validate playback metadata
+        shell: bash
+        run: |
+          set -euxo pipefail
+          mkdir -p /tmp/alphatab
+          cd /tmp/alphatab
+          npm init -y >/dev/null 2>&1
+          npm install @coderline/alphatab
+          cat > export.mjs <<'JS'
+          import fs from 'node:fs';
+          import path from 'node:path';
+          import * as alphaTab from '@coderline/alphatab';
+
+          const root = process.env.GITHUB_WORKSPACE;
+          const source = path.join(root, 'output/Jump_in_the_Line_TAB_VIDEO_EXACTE.gp5');
+          const target = path.join(root, 'output/Jump_in_the_Line_TAB_VIDEO_EXACTE.gp');
+          const settings = new alphaTab.Settings();
+          const score = alphaTab.importer.ScoreLoader.loadScoreFromBytes(
+              new Uint8Array(fs.readFileSync(source)), settings
+          );
+          if (score.masterBars.length !== 59) throw new Error(`Expected 59 bars, got ${score.masterBars.length}`);
+          if (score.tempo !== 202) throw new Error(`Expected quarter tempo 202, got ${score.tempo}`);
+          const exporter = new alphaTab.exporter.Gp7Exporter();
+          fs.writeFileSync(target, exporter.export(score, settings));
+          const roundtrip = alphaTab.importer.ScoreLoader.loadScoreFromBytes(
+              new Uint8Array(fs.readFileSync(target)), settings
+          );
+          if (roundtrip.masterBars.length !== 59) throw new Error('Modern GP round-trip lost bars');
+          if (roundtrip.tempo !== 202) throw new Error(`Modern GP round-trip tempo is ${roundtrip.tempo}`);
+          const first = roundtrip.masterBars[0];
+          fs.writeFileSync(path.join(root, 'output/validation_modern_gp.json'), JSON.stringify({
+              valid: true,
+              bars: roundtrip.masterBars.length,
+              quarterTempo: roundtrip.tempo,
+              timeSignatureNumerator: first.timeSignatureNumerator,
+              timeSignatureDenominator: first.timeSignatureDenominator,
+              tracks: roundtrip.tracks.map(t => t.name)
+          }, null, 2));
+          JS
+          node export.mjs
+
+      - name: Render a listening proof and check the corrected duration
+        shell: bash
+        run: |
+          set -euxo pipefail
+          SF2=$(find /usr/share/sounds -type f -name '*.sf2' | head -n 1)
+          test -n "$SF2"
+          fluidsynth -ni "$SF2" output/Jump_in_the_Line_TAB_VIDEO_EXACTE.mid \
+            -F output/Jump_in_the_Line_TAB_VIDEO_EXACTE.wav -r 44100
+          ffmpeg -hide_banner -loglevel error -y \
+            -i output/Jump_in_the_Line_TAB_VIDEO_EXACTE.wav \
+            -af 'loudnorm=I=-16:LRA=11:TP=-1.5' \
+            -codec:a libmp3lame -b:a 192k output/Jump_in_the_Line_TAB_VIDEO_EXACTE.mp3
+          rm output/Jump_in_the_Line_TAB_VIDEO_EXACTE.wav
+          DURATION=$(ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 \
+            output/Jump_in_the_Line_TAB_VIDEO_EXACTE.mp3)
+          python - "$DURATION" <<'PY'
+          import json, sys
+          duration=float(sys.argv[1])
+          # MP3 encoder padding is allowed; the score itself is 70.099 seconds.
+          assert 69.8 <= duration <= 70.5, duration
+          open('output/mp3_duration.json','w').write(json.dumps({'valid':True,'duration_seconds':duration},indent=2))
+          PY
+          sha256sum output/* > output/SHA256SUMS.txt
+          ls -lah output
+
+      - name: Upload the final video-exact tablature
+        uses: actions/upload-artifact@v4
+        with:
+          name: Jump-in-the-Line-TAB-VIDEO-EXACTE
+          path: output/**
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 1
