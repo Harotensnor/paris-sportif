@@ -1,42 +1,64 @@
 {
-  "generated_at": "2026-08-09T14:01:13Z",
+  "generated_at": "2026-08-09T14:33:56Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
-  "status": "watch",
+  "status": "ok",
   "summary": {
-    "active_events": 18,
-    "actionable": 0,
+    "active_events": 17,
+    "actionable": 2,
     "watch": 0,
-    "risk": 18,
+    "risk": 15,
     "expired_sample": 0,
     "by_type": {
-      "market_uncertain": 18
+      "market_uncertain": 17,
+      "market_move": 6,
+      "signal_conflict": 1
     },
     "by_quality": {
-      "risk": 18
+      "risk": 15,
+      "actionable": 2
     }
   },
-  "active_actionable": [],
-  "active_watch": [],
-  "active_risk": [
+  "active_actionable": [
     {
-      "event_id": "401879035",
-      "date": "2026-08-09T14:00Z",
+      "event_id": "401879034",
+      "date": "2026-08-09T16:30Z",
       "sport": "football",
       "league_code": "proleague",
       "league_name": "Pro League",
-      "home": "Zulte-Waregem",
-      "away": "Racing Genk",
-      "match": "Zulte-Waregem - Racing Genk",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
+      "home": "Anderlecht",
+      "away": "RAAL La Louvière",
+      "match": "Anderlecht - RAAL La Louvière",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
       "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.9%"
+      "side": "away",
+      "strength": 1.0,
+      "context": "Cote away: 4.80 -> 3.85 (+19.8%)"
     },
+    {
+      "event_id": "401879033",
+      "date": "2026-08-09T17:15Z",
+      "sport": "football",
+      "league_code": "proleague",
+      "league_name": "Pro League",
+      "home": "Antwerp",
+      "away": "Waasland-Beveren",
+      "match": "Antwerp - Waasland-Beveren",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 1.95 -> 1.56 (+20.1%)"
+    }
+  ],
+  "active_watch": [],
+  "active_risk": [
     {
       "event_id": "401875647",
       "date": "2026-08-09T14:45Z",
@@ -54,42 +76,6 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.8%"
-    },
-    {
-      "event_id": "401879034",
-      "date": "2026-08-09T16:30Z",
-      "sport": "football",
-      "league_code": "proleague",
-      "league_name": "Pro League",
-      "home": "Anderlecht",
-      "away": "RAAL La Louvière",
-      "match": "Anderlecht - RAAL La Louvière",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 19.0%"
-    },
-    {
-      "event_id": "401879033",
-      "date": "2026-08-09T17:15Z",
-      "sport": "football",
-      "league_code": "proleague",
-      "league_name": "Pro League",
-      "home": "Antwerp",
-      "away": "Waasland-Beveren",
-      "match": "Antwerp - Waasland-Beveren",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.6%"
     },
     {
       "event_id": "401874070",
