@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-08-09T19:55:09Z",
+  "generated_at": "2026-08-09T20:15:54Z",
   "method": "Full Bivariate Poisson MLE Dixon-Coles. Coordinate-descent avec golden-section search 1D. Pure Python (pas de scipy).",
   "min_matches_per_league": 40,
   "min_matches_per_team": 5,
-  "n_leagues_fit": 10,
+  "n_leagues_fit": 11,
   "leagues": {
     "chn.1": {
       "n_matches": 96,
@@ -796,6 +796,76 @@
           "beta": 0.1267,
           "rank_off": 5,
           "rank_def": 10
+        }
+      }
+    },
+    "per.1": {
+      "n_matches": 40,
+      "n_teams": 10,
+      "gamma": 0.2988,
+      "rho": 0.0984,
+      "log_lik": -100.94,
+      "iterations": 3,
+      "teams": {
+        "ADT": {
+          "alpha": 0.3184,
+          "beta": 0.2599,
+          "rank_off": 4,
+          "rank_def": 8
+        },
+        "Atlético Grau": {
+          "alpha": -0.6453,
+          "beta": 0.0497,
+          "rank_off": 10,
+          "rank_def": 6
+        },
+        "Comerciantes Unidos": {
+          "alpha": 0.5401,
+          "beta": -0.2603,
+          "rank_off": 1,
+          "rank_def": 5
+        },
+        "Deportivo Garcilaso": {
+          "alpha": 0.3485,
+          "beta": 1.4603,
+          "rank_off": 3,
+          "rank_def": 10
+        },
+        "Deportivo Moquegua": {
+          "alpha": -0.5326,
+          "beta": 0.3051,
+          "rank_off": 9,
+          "rank_def": 9
+        },
+        "FC Cajamarca": {
+          "alpha": 0.4124,
+          "beta": -0.4483,
+          "rank_off": 2,
+          "rank_def": 3
+        },
+        "Juan Pablo II": {
+          "alpha": -0.232,
+          "beta": -0.4914,
+          "rank_off": 7,
+          "rank_def": 1
+        },
+        "Los Chankas": {
+          "alpha": -0.326,
+          "beta": 0.0497,
+          "rank_off": 8,
+          "rank_def": 7
+        },
+        "Sport Huancayo": {
+          "alpha": 0.294,
+          "beta": -0.4426,
+          "rank_off": 5,
+          "rank_def": 4
+        },
+        "UTC": {
+          "alpha": -0.1774,
+          "beta": -0.482,
+          "rank_off": 6,
+          "rank_def": 2
         }
       }
     },

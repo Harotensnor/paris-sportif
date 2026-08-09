@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-09T19:55:08Z",
+  "generated_at": "2026-08-09T20:15:53Z",
   "method": "Dixon-Coles MLE grid search (ρ ∈ [-0.30, 0.10] step 0.005), λ_h, λ_a fixés à moyenne empirique par ligue. CI 95% via LR test.",
   "min_matches": 40,
   "default_rho": -0.13,
@@ -47,12 +47,12 @@
       "reason": "n=21 < 40"
     },
     "arg.1": {
-      "n": 33,
+      "n": 34,
       "rho_measured": null,
       "rho_literature": -0.15,
       "rho_used": -0.15,
       "source": "literature_fallback",
-      "reason": "n=33 < 40"
+      "reason": "n=34 < 40"
     },
     "aus.1": {
       "n": 13,
@@ -820,12 +820,17 @@
       "reason": "n=27 < 40"
     },
     "per.1": {
-      "n": 39,
-      "rho_measured": null,
+      "n": 40,
+      "rho_measured": 0.1,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "n=39 < 40"
+      "reason": "CI trop large (0.275) ou fit nul",
+      "log_lik": -110.34,
+      "ci_lo": -0.175,
+      "ci_hi": 0.1,
+      "lambda_h": 1.575,
+      "lambda_a": 0.95
     },
     "por.1": {
       "n": 36,
@@ -1118,12 +1123,12 @@
       "reason": "n=1 < 40"
     },
     "uru.1": {
-      "n": 38,
+      "n": 39,
       "rho_measured": null,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "n=38 < 40"
+      "reason": "n=39 < 40"
     },
     "usa.1": {
       "n": 17,
