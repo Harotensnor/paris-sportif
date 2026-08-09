@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-08-09T08:21:22Z",
-  "calculated_at": "2026-08-09T08:21:22Z",
+  "generated_at": "2026-08-09T09:08:23Z",
+  "calculated_at": "2026-08-09T09:08:23Z",
   "source_of_truth": "data.js",
-  "data_age_min": 0,
+  "data_age_min": 1,
   "data_file_age_min": 0,
   "sources": {
     "winamax_catalog": {
@@ -38,7 +38,7 @@
       "clubs": 594
     },
     "weather": {
-      "age_min": 0,
+      "age_min": 1,
       "events": 6282
     },
     "referees_soccer": {
@@ -510,7 +510,7 @@
     "weather": {
       "script": "scripts/fetch_weather.py",
       "output": "weather.json",
-      "age_min": 0,
+      "age_min": 1,
       "threshold_min": 60,
       "fast_red_min": 30,
       "status": "ok"
@@ -1030,7 +1030,7 @@
   ],
   "overall": "warning",
   "quality_checks": {
-    "data_generated_at": "2026-08-09T08:20:31.409591Z",
+    "data_generated_at": "2026-08-09T09:07:18.704635Z",
     "truth_scope": "all_events",
     "all_winamax_available": 83,
     "all_winamax_exact": 52,
@@ -1091,7 +1091,7 @@
   "data_truth": {
     "source_of_truth": "data.js",
     "scope": "all_events",
-    "data_generated_at": "2026-08-09T08:20:31.409591Z",
+    "data_generated_at": "2026-08-09T09:07:18.704635Z",
     "winamax_available": 83,
     "winamax_exact": 52,
     "winamax_exact_ratio": 0.6265,
@@ -1111,7 +1111,7 @@
     "anomalies_emitted": 6
   },
   "source_health": {
-    "generated_at": "2026-08-09T08:21:22Z",
+    "generated_at": "2026-08-09T09:08:23Z",
     "sources_total": 11,
     "sources_ok": 6,
     "sources_warning": 5,
@@ -1155,7 +1155,7 @@
         "score": 100,
         "status": "ok",
         "items": 106,
-        "age_min": 1,
+        "age_min": 2,
         "sla_min": 180,
         "issues": 1
       },
@@ -1211,7 +1211,7 @@
   },
   "observability": {
     "pipeline_traces": {
-      "generated_at": "2026-08-09T08:21:22Z",
+      "generated_at": "2026-08-09T09:08:23Z",
       "runs_observed": 99,
       "by_status": {
         "warning": 69,
@@ -1229,7 +1229,7 @@
     }
   },
   "data_lineage": {
-    "generated_at": "2026-08-09T08:21:22Z",
+    "generated_at": "2026-08-09T09:08:23Z",
     "status": "ok",
     "events": 83,
     "events_missing_inline_lineage": 0,
@@ -1332,7 +1332,7 @@
   "sections": {
     "pipeline": {
       "status": "degraded",
-      "data_age_min": 0,
+      "data_age_min": 1,
       "drift_status": "warn",
       "sources_red": 0
     },
