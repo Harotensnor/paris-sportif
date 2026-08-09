@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-08-09T23:14:31Z",
+  "generated_at": "2026-08-09T23:47:31Z",
   "method": "Full Bivariate Poisson MLE Dixon-Coles. Coordinate-descent avec golden-section search 1D. Pure Python (pas de scipy).",
   "min_matches_per_league": 40,
   "min_matches_per_team": 5,
-  "n_leagues_fit": 11,
+  "n_leagues_fit": 12,
   "leagues": {
     "chn.1": {
       "n_matches": 96,
@@ -1066,6 +1066,76 @@
           "beta": -0.321,
           "rank_off": 10,
           "rank_def": 4
+        }
+      }
+    },
+    "uru.1": {
+      "n_matches": 40,
+      "n_teams": 10,
+      "gamma": -0.0037,
+      "rho": 0.0984,
+      "log_lik": -95.34,
+      "iterations": 3,
+      "teams": {
+        "Boston River": {
+          "alpha": 0.4437,
+          "beta": -0.5005,
+          "rank_off": 2,
+          "rank_def": 2
+        },
+        "Central Español Fútbol Club": {
+          "alpha": -0.0578,
+          "beta": 0.2263,
+          "rank_off": 7,
+          "rank_def": 7
+        },
+        "Cerro": {
+          "alpha": 0.0943,
+          "beta": -0.4668,
+          "rank_off": 4,
+          "rank_def": 3
+        },
+        "Cerro Largo": {
+          "alpha": -0.4561,
+          "beta": -0.1812,
+          "rank_off": 9,
+          "rank_def": 5
+        },
+        "Danubio": {
+          "alpha": 0.2069,
+          "beta": -0.8105,
+          "rank_off": 3,
+          "rank_def": 1
+        },
+        "Deportivo Maldonado": {
+          "alpha": -0.0485,
+          "beta": 0.0986,
+          "rank_off": 6,
+          "rank_def": 6
+        },
+        "Liverpool": {
+          "alpha": 0.0943,
+          "beta": 0.6245,
+          "rank_off": 5,
+          "rank_def": 9
+        },
+        "Peñarol": {
+          "alpha": 0.5621,
+          "beta": 0.8219,
+          "rank_off": 1,
+          "rank_def": 10
+        },
+        "Progreso": {
+          "alpha": -0.7115,
+          "beta": -0.4274,
+          "rank_off": 10,
+          "rank_def": 4
+        },
+        "Racing (Montevideo)": {
+          "alpha": -0.1274,
+          "beta": 0.6152,
+          "rank_off": 8,
+          "rank_def": 8
         }
       }
     }
