@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-10T21:25:34Z",
+  "generated_at": "2026-08-10T22:04:54Z",
   "method": "Dixon-Coles MLE grid search (ρ ∈ [-0.30, 0.10] step 0.005), λ_h, λ_a fixés à moyenne empirique par ligue. CI 95% via LR test.",
   "min_matches": 40,
   "default_rho": -0.13,
@@ -321,12 +321,12 @@
       "reason": "n=2 < 40"
     },
     "ecu.1": {
-      "n": 30,
+      "n": 31,
       "rho_measured": null,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "n=30 < 40"
+      "reason": "n=31 < 40"
     },
     "egyptianpremierleagu": {
       "n": 3,
@@ -398,12 +398,12 @@
       "reason": "n=3 < 40"
     },
     "eng.league_cup": {
-      "n": 33,
+      "n": 34,
       "rho_measured": null,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "n=33 < 40"
+      "reason": "n=34 < 40"
     },
     "erovnuliliga": {
       "n": 2,
@@ -833,12 +833,17 @@
       "lambda_a": 1.024
     },
     "por.1": {
-      "n": 39,
-      "rho_measured": null,
+      "n": 40,
+      "rho_measured": -0.005,
       "rho_literature": -0.14,
       "rho_used": -0.14,
       "source": "literature_fallback",
-      "reason": "n=39 < 40"
+      "reason": "CI trop large (0.400) ou fit nul",
+      "log_lik": -113.65,
+      "ci_lo": -0.3,
+      "ci_hi": 0.1,
+      "lambda_h": 1.525,
+      "lambda_a": 1.15
     },
     "premierdivision": {
       "n": 6,
@@ -921,17 +926,17 @@
       "reason": "n=1 < 40"
     },
     "rus.1": {
-      "n": 49,
-      "rho_measured": -0.22,
+      "n": 50,
+      "rho_measured": -0.265,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
       "reason": "CI trop large (0.400) ou fit nul",
-      "log_lik": -135.15,
+      "log_lik": -137.42,
       "ci_lo": -0.3,
       "ci_hi": 0.1,
-      "lambda_h": 1.347,
-      "lambda_a": 1.306
+      "lambda_h": 1.32,
+      "lambda_a": 1.28
     },
     "saudiproleague": {
       "n": 2,
@@ -1022,17 +1027,17 @@
       "reason": "n=1 < 40"
     },
     "swe.1": {
-      "n": 52,
-      "rho_measured": -0.05,
+      "n": 54,
+      "rho_measured": -0.015,
       "rho_literature": -0.11,
       "rho_used": -0.11,
       "source": "literature_fallback",
       "reason": "CI trop large (0.400) ou fit nul",
-      "log_lik": -158.98,
+      "log_lik": -164.25,
       "ci_lo": -0.3,
       "ci_hi": 0.1,
-      "lambda_h": 1.673,
-      "lambda_a": 1.231
+      "lambda_h": 1.667,
+      "lambda_a": 1.222
     },
     "tha.1": {
       "n": 18,
@@ -1160,12 +1165,12 @@
       "reason": "n=1 < 40"
     },
     "ven.1": {
-      "n": 19,
+      "n": 20,
       "rho_measured": null,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "n=19 < 40"
+      "reason": "n=20 < 40"
     },
     "virsliga": {
       "n": 2,
