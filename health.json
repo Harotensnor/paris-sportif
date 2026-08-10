@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-08-10T11:40:47Z",
-  "calculated_at": "2026-08-10T11:40:47Z",
+  "generated_at": "2026-08-10T12:30:20Z",
+  "calculated_at": "2026-08-10T12:30:20Z",
   "source_of_truth": "data.js",
-  "data_age_min": 1,
+  "data_age_min": 0,
   "data_file_age_min": 0,
   "sources": {
     "winamax_catalog": {
@@ -38,7 +38,7 @@
       "clubs": 594
     },
     "weather": {
-      "age_min": 1,
+      "age_min": 0,
       "events": 6315
     },
     "referees_soccer": {
@@ -508,7 +508,7 @@
     "weather": {
       "script": "scripts/fetch_weather.py",
       "output": "weather.json",
-      "age_min": 1,
+      "age_min": 0,
       "threshold_min": 60,
       "fast_red_min": 30,
       "status": "ok"
@@ -1028,7 +1028,7 @@
   ],
   "overall": "warning",
   "quality_checks": {
-    "data_generated_at": "2026-08-10T11:39:47.027673Z",
+    "data_generated_at": "2026-08-10T12:29:27.858877Z",
     "truth_scope": "all_events",
     "all_winamax_available": 80,
     "all_winamax_exact": 52,
@@ -1087,7 +1087,7 @@
   "data_truth": {
     "source_of_truth": "data.js",
     "scope": "all_events",
-    "data_generated_at": "2026-08-10T11:39:47.027673Z",
+    "data_generated_at": "2026-08-10T12:29:27.858877Z",
     "winamax_available": 80,
     "winamax_exact": 52,
     "winamax_exact_ratio": 0.65,
@@ -1107,7 +1107,7 @@
     "anomalies_emitted": 9
   },
   "source_health": {
-    "generated_at": "2026-08-10T11:40:47Z",
+    "generated_at": "2026-08-10T12:30:20Z",
     "sources_total": 11,
     "sources_ok": 5,
     "sources_warning": 6,
@@ -1207,7 +1207,7 @@
   },
   "observability": {
     "pipeline_traces": {
-      "generated_at": "2026-08-10T11:40:47Z",
+      "generated_at": "2026-08-10T12:30:20Z",
       "runs_observed": 99,
       "by_status": {
         "warning": 71,
@@ -1225,7 +1225,7 @@
     }
   },
   "data_lineage": {
-    "generated_at": "2026-08-10T11:40:47Z",
+    "generated_at": "2026-08-10T12:30:20Z",
     "status": "ok",
     "events": 80,
     "events_missing_inline_lineage": 0,
@@ -1319,7 +1319,7 @@
   "sections": {
     "pipeline": {
       "status": "degraded",
-      "data_age_min": 1,
+      "data_age_min": 0,
       "drift_status": "warn",
       "sources_red": 0
     },
