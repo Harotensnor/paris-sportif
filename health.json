@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-10T05:08:28Z",
-  "calculated_at": "2026-08-10T05:08:28Z",
+  "generated_at": "2026-08-10T06:23:05Z",
+  "calculated_at": "2026-08-10T06:23:05Z",
   "source_of_truth": "data.js",
   "data_age_min": 1,
   "data_file_age_min": 0,
@@ -42,7 +42,7 @@
       "events": 6315
     },
     "referees_soccer": {
-      "age_min": 2,
+      "age_min": 3,
       "events": 106,
       "status": "retained_existing_referees"
     },
@@ -154,20 +154,20 @@
     },
     "league_bias_audit": {
       "age_min": 0,
-      "leagues": 30,
-      "deprioritize": 1,
+      "leagues": 33,
+      "deprioritize": 2,
       "watch": 4,
       "trusted": 1,
-      "risky_current_leagues": 1,
-      "risky_current_events": 2,
+      "risky_current_leagues": 0,
+      "risky_current_events": 0,
       "current_deprioritize_events": 0,
-      "current_watch_events": 2
+      "current_watch_events": 0
     },
     "league_inefficiencies": {
       "age_min": 0,
-      "leagues": 14,
+      "leagues": 15,
       "exploit": 1,
-      "avoid": 1,
+      "avoid": 2,
       "current_exploit_events": 0
     },
     "market_biases_by_league": {
@@ -518,7 +518,7 @@
     "referees_soccer": {
       "script": "scripts/fetch_referees_soccer.py",
       "output": "referees_soccer.json",
-      "age_min": 2,
+      "age_min": 3,
       "threshold_min": 480,
       "fast_red_min": null,
       "status": "ok"
@@ -1030,7 +1030,7 @@
   ],
   "overall": "warning",
   "quality_checks": {
-    "data_generated_at": "2026-08-10T05:07:10.136516Z",
+    "data_generated_at": "2026-08-10T06:21:57.180276Z",
     "truth_scope": "all_events",
     "all_winamax_available": 80,
     "all_winamax_exact": 52,
@@ -1089,7 +1089,7 @@
   "data_truth": {
     "source_of_truth": "data.js",
     "scope": "all_events",
-    "data_generated_at": "2026-08-10T05:07:10.136516Z",
+    "data_generated_at": "2026-08-10T06:21:57.180276Z",
     "winamax_available": 80,
     "winamax_exact": 52,
     "winamax_exact_ratio": 0.65,
@@ -1109,7 +1109,7 @@
     "anomalies_emitted": 9
   },
   "source_health": {
-    "generated_at": "2026-08-10T05:08:28Z",
+    "generated_at": "2026-08-10T06:23:05Z",
     "sources_total": 11,
     "sources_ok": 5,
     "sources_warning": 6,
@@ -1209,7 +1209,7 @@
   },
   "observability": {
     "pipeline_traces": {
-      "generated_at": "2026-08-10T05:08:28Z",
+      "generated_at": "2026-08-10T06:23:05Z",
       "runs_observed": 99,
       "by_status": {
         "warning": 71,
@@ -1227,7 +1227,7 @@
     }
   },
   "data_lineage": {
-    "generated_at": "2026-08-10T05:08:28Z",
+    "generated_at": "2026-08-10T06:23:05Z",
     "status": "ok",
     "events": 80,
     "events_missing_inline_lineage": 0,
