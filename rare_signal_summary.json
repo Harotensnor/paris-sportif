@@ -1,13 +1,13 @@
 {
-  "generated_at": "2026-08-11T09:59:59Z",
+  "generated_at": "2026-08-11T10:42:13Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 14,
-    "actionable": 2,
+    "actionable": 3,
     "watch": 0,
-    "risk": 12,
+    "risk": 11,
     "expired_sample": 0,
     "by_type": {
       "market_uncertain": 14,
@@ -15,8 +15,8 @@
       "signal_conflict": 1
     },
     "by_quality": {
-      "risk": 12,
-      "actionable": 2
+      "actionable": 3,
+      "risk": 11
     }
   },
   "active_actionable": [
@@ -54,11 +54,8 @@
       "team": null,
       "side": "away",
       "strength": 1.0,
-      "context": "Cote away: 5.75 -> 4.00 (+30.4%)"
-    }
-  ],
-  "active_watch": [],
-  "active_risk": [
+      "context": "Cote away: 5.50 -> 4.00 (+27.3%)"
+    },
     {
       "event_id": "401874070",
       "date": "2026-08-11T22:00Z",
@@ -68,15 +65,18 @@
       "home": "Fluminense",
       "away": "Independiente Rivadavia",
       "match": "Fluminense - Independiente Rivadavia",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
       "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.7%"
-    },
+      "side": "home",
+      "strength": 0.888,
+      "context": "Cote home: 1.71 -> 1.44 (+16.0%)"
+    }
+  ],
+  "active_watch": [],
+  "active_risk": [
     {
       "event_id": "401874076",
       "date": "2026-08-12T22:00Z",
