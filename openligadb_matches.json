@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-09T16:01:52Z",
+  "generated_at": "2026-08-11T12:04:37Z",
   "source": "OpenLigaDB public API",
   "status": "ok",
   "season": 2026,
@@ -164,15 +164,7 @@
         "home": 0,
         "away": 1
       },
-      "finished": true,
-      "local_event": {
-        "day": "2026-08-07",
-        "id": "401885155",
-        "league": "Bundesliga 2 bundesliga2",
-        "home": "VfL Bochum",
-        "away": "Hertha Berlin",
-        "kickoff_utc": "2026-08-07T18:30:00Z"
-      }
+      "finished": true
     },
     {
       "source": "openligadb",
@@ -793,10 +785,10 @@
       "home_icon": "https://upload.wikimedia.org/wikipedia/de/thumb/f/ff/1._FC_Saarbr%C3%BCcken.svg/960px-1._FC_Saarbr%C3%BCcken.svg.png",
       "away_icon": "https://upload.wikimedia.org/wikipedia/commons/c/c0/Rot-Weiss_Essen.png",
       "score": {
-        "home": 2,
+        "home": 5,
         "away": 2
       },
-      "finished": false
+      "finished": true
     },
     {
       "source": "openligadb",
@@ -810,8 +802,11 @@
       "away": "SC Verl",
       "home_icon": "https://upload.wikimedia.org/wikipedia/commons/9/94/Alemannia_Aachen_2010.svg",
       "away_icon": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/SC_Verl_Logo.svg/960px-SC_Verl_Logo.svg.png",
-      "score": null,
-      "finished": false
+      "score": {
+        "home": 4,
+        "away": 1
+      },
+      "finished": true
     },
     {
       "source": "openligadb",
@@ -1097,10 +1092,25 @@
       "away_icon": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/Svwaldhof.svg/960px-Svwaldhof.svg.png",
       "score": null,
       "finished": false
+    },
+    {
+      "source": "openligadb",
+      "league_code": "bl3",
+      "league": "3. Liga",
+      "season": 2026,
+      "match_id": 84771,
+      "matchday": 3,
+      "kickoff_utc": "2026-08-30T17:30:00Z",
+      "home": "Viktoria Köln",
+      "away": "Preußen Münster",
+      "home_icon": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dc/FC_Viktoria_K%C3%B6ln_1904_Logo.svg/960px-FC_Viktoria_K%C3%B6ln_1904_Logo.svg.png",
+      "away_icon": "https://upload.wikimedia.org/wikipedia/de/7/7e/SC_Preussen_Muenster_Logo_2018.svg",
+      "score": null,
+      "finished": false
     }
   ],
-  "matched_local_events": 7,
-  "matched_local_ratio": 0.1077,
+  "matched_local_events": 6,
+  "matched_local_ratio": 0.0909,
   "by_league": {
     "bl1": {
       "league": "Bundesliga",
@@ -1114,13 +1124,13 @@
       "matches": 27,
       "upcoming": 18,
       "finished": 9,
-      "matched_local_events": 7
+      "matched_local_events": 6
     },
     "bl3": {
       "league": "3. Liga",
-      "matches": 29,
-      "upcoming": 21,
-      "finished": 8,
+      "matches": 30,
+      "upcoming": 20,
+      "finished": 10,
       "matched_local_events": 0
     }
   },
