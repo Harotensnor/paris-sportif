@@ -1,42 +1,24 @@
 {
-  "generated_at": "2026-08-10T23:54:51Z",
+  "generated_at": "2026-08-11T00:40:33Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
-  "status": "watch",
+  "status": "ok",
   "summary": {
     "active_events": 14,
-    "actionable": 0,
+    "actionable": 3,
     "watch": 0,
-    "risk": 14,
+    "risk": 11,
     "expired_sample": 0,
     "by_type": {
-      "market_uncertain": 14
+      "market_uncertain": 14,
+      "market_move": 5
     },
     "by_quality": {
-      "risk": 14
+      "actionable": 3,
+      "risk": 11
     }
   },
-  "active_actionable": [],
-  "active_watch": [],
-  "active_risk": [
-    {
-      "event_id": "401874070",
-      "date": "2026-08-11T22:00Z",
-      "sport": "football",
-      "league_code": "conmebol.libertadores",
-      "league_name": "Copa Libertadores",
-      "home": "Fluminense",
-      "away": "Independiente Rivadavia",
-      "match": "Fluminense - Independiente Rivadavia",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.7%"
-    },
+  "active_actionable": [
     {
       "event_id": "401874152",
       "date": "2026-08-12T00:30Z",
@@ -46,14 +28,14 @@
       "home": "Deportes Tolima",
       "away": "Independiente del Valle",
       "match": "Deportes Tolima - Independiente del Valle",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
       "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 19.2%"
+      "side": "home",
+      "strength": 1.0,
+      "context": "Cote home: 2.95 -> 2.25 (+23.7%)"
     },
     {
       "event_id": "401874145",
@@ -64,15 +46,36 @@
       "home": "Estudiantes de La Plata",
       "away": "Universidad Católica",
       "match": "Estudiantes de La Plata - Universidad Católica",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
       "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 19.1%"
+      "side": "away",
+      "strength": 1.0,
+      "context": "Cote away: 5.75 -> 4.00 (+30.4%)"
     },
+    {
+      "event_id": "401874070",
+      "date": "2026-08-11T22:00Z",
+      "sport": "football",
+      "league_code": "conmebol.libertadores",
+      "league_name": "Copa Libertadores",
+      "home": "Fluminense",
+      "away": "Independiente Rivadavia",
+      "match": "Fluminense - Independiente Rivadavia",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 0.888,
+      "context": "Cote home: 1.71 -> 1.44 (+16.0%)"
+    }
+  ],
+  "active_watch": [],
+  "active_risk": [
     {
       "event_id": "401874076",
       "date": "2026-08-12T22:00Z",
