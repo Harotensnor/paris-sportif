@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-12T18:29:29Z",
-  "calculated_at": "2026-08-12T18:29:29Z",
+  "generated_at": "2026-08-12T19:36:57Z",
+  "calculated_at": "2026-08-12T19:36:57Z",
   "source_of_truth": "data.js",
   "data_age_min": 1,
   "data_file_age_min": 0,
@@ -16,7 +16,7 @@
       "matches_detailed": 16,
       "details_ratio_pct": 3.0,
       "last_run_delta": 0,
-      "last_run_limit": 400
+      "last_run_limit": 1000
     },
     "injuries_soccer": {
       "age_min": 2,
@@ -39,7 +39,7 @@
     },
     "weather": {
       "age_min": 2,
-      "events": 6356
+      "events": 6357
     },
     "referees_soccer": {
       "age_min": 2,
@@ -74,19 +74,19 @@
     },
     "h2h_extended": {
       "age_min": 2,
-      "events": 25,
+      "events": 27,
       "events_with_meetings": 0,
       "meetings": 0,
       "coverage_pct": 0.0,
-      "empty_events": 25,
+      "empty_events": 27,
       "sports": 2,
       "by_sport": {
         "football": {
-          "events": 24,
+          "events": 26,
           "events_with_meetings": 0,
           "meetings": 0,
           "sources": {
-            "espn_summary_empty": 24
+            "espn_summary_empty": 26
           }
         },
         "basketball": {
@@ -338,9 +338,9 @@
     },
     "timing_edges": {
       "age_min": 0,
-      "events": 0,
+      "events": 2,
       "bet_now": 0,
-      "wait": 0,
+      "wait": 2,
       "price_shortening": 0
     },
     "injuries_multisport": {
@@ -447,10 +447,10 @@
     },
     "clv_history": {
       "age_min": 2,
-      "matches": 1125,
-      "observations": 2828,
+      "matches": 1124,
+      "observations": 2826,
       "mean_clv_pct": -0.27,
-      "positive_clv_rate": 35.1,
+      "positive_clv_rate": 35.2,
       "sample_status": "validated"
     }
   },
@@ -1026,7 +1026,7 @@
   ],
   "overall": "warning",
   "quality_checks": {
-    "data_generated_at": "2026-08-12T18:27:51.221747Z",
+    "data_generated_at": "2026-08-12T19:35:19.045873Z",
     "truth_scope": "all_events",
     "all_winamax_available": 39,
     "all_winamax_exact": 39,
@@ -1085,7 +1085,7 @@
   "data_truth": {
     "source_of_truth": "data.js",
     "scope": "all_events",
-    "data_generated_at": "2026-08-12T18:27:51.221747Z",
+    "data_generated_at": "2026-08-12T19:35:19.045873Z",
     "winamax_available": 39,
     "winamax_exact": 39,
     "winamax_exact_ratio": 1.0,
@@ -1105,7 +1105,7 @@
     "anomalies_emitted": 4
   },
   "source_health": {
-    "generated_at": "2026-08-12T18:29:29Z",
+    "generated_at": "2026-08-12T19:36:57Z",
     "sources_total": 11,
     "sources_ok": 6,
     "sources_warning": 5,
@@ -1125,7 +1125,7 @@
         "score": 84,
         "status": "warning",
         "items": 531,
-        "age_min": 1,
+        "age_min": 0,
         "sla_min": 15,
         "issues": 3
       },
@@ -1133,7 +1133,7 @@
         "score": 57,
         "status": "warning",
         "items": 0,
-        "age_min": 3,
+        "age_min": 2,
         "sla_min": 180,
         "issues": 2
       },
@@ -1141,7 +1141,7 @@
         "score": 100,
         "status": "ok",
         "items": 97,
-        "age_min": 3,
+        "age_min": 2,
         "sla_min": 180,
         "issues": 1
       },
@@ -1149,14 +1149,14 @@
         "score": 100,
         "status": "ok",
         "items": 106,
-        "age_min": 3,
+        "age_min": 2,
         "sla_min": 180,
         "issues": 1
       },
       "weather": {
         "score": 100,
         "status": "ok",
-        "items": 6356,
+        "items": 6357,
         "age_min": 2,
         "sla_min": 60,
         "issues": 1
@@ -1205,7 +1205,7 @@
   },
   "observability": {
     "pipeline_traces": {
-      "generated_at": "2026-08-12T18:29:29Z",
+      "generated_at": "2026-08-12T19:36:57Z",
       "runs_observed": 99,
       "by_status": {
         "warning": 69,
@@ -1223,7 +1223,7 @@
     }
   },
   "data_lineage": {
-    "generated_at": "2026-08-12T18:29:29Z",
+    "generated_at": "2026-08-12T19:36:57Z",
     "status": "ok",
     "events": 39,
     "events_missing_inline_lineage": 0,
@@ -1231,7 +1231,7 @@
     "source_counts": {
       "espn": 39,
       "winamax": 39,
-      "weather": 29,
+      "weather": 30,
       "xg": 23,
       "clubelo": 14,
       "sofascore_referees": 7,
