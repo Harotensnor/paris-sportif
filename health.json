@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-12T10:50:51Z",
-  "calculated_at": "2026-08-12T10:50:51Z",
+  "generated_at": "2026-08-12T11:35:18Z",
+  "calculated_at": "2026-08-12T11:35:18Z",
   "source_of_truth": "data.js",
   "data_age_min": 1,
   "data_file_age_min": 0,
@@ -47,13 +47,13 @@
       "status": "retained_existing_referees"
     },
     "xg_team_stats": {
-      "age_min": 1,
+      "age_min": 2,
       "teams": 112,
       "leagues": 6,
       "source": "understat"
     },
     "fbref_xg": {
-      "age_min": 1,
+      "age_min": 2,
       "teams": 112,
       "leagues": 6,
       "source": "understat_compat"
@@ -73,7 +73,7 @@
       "sports": 4
     },
     "h2h_extended": {
-      "age_min": 1,
+      "age_min": 2,
       "events": 25,
       "events_with_meetings": 0,
       "meetings": 0,
@@ -308,10 +308,10 @@
     "detected_angles": {
       "age_min": 0,
       "events": 14,
-      "angles": 18,
+      "angles": 19,
       "by_type": {
         "market_uncertain": 14,
-        "market_move": 4
+        "market_move": 5
       }
     },
     "schedule_spots_summary": {
@@ -324,10 +324,10 @@
     },
     "rare_signals": {
       "age_min": 0,
-      "signals": 18,
+      "signals": 19,
       "by_type": {
         "market_uncertain": 14,
-        "market_move": 4
+        "market_move": 5
       }
     },
     "rare_signal_summary": {
@@ -346,7 +346,7 @@
       "price_shortening": 3
     },
     "injuries_multisport": {
-      "age_min": 1,
+      "age_min": 2,
       "teams": 0,
       "sports": 4,
       "injuries": 0,
@@ -452,7 +452,7 @@
       "matches": 1125,
       "observations": 2828,
       "mean_clv_pct": -0.26,
-      "positive_clv_rate": 35.2,
+      "positive_clv_rate": 35.3,
       "sample_status": "validated"
     }
   },
@@ -524,7 +524,7 @@
     "xg_team_stats": {
       "script": "scripts/fetch_understat_xg.py",
       "output": "xg_team_stats.json",
-      "age_min": 1,
+      "age_min": 2,
       "threshold_min": 360,
       "fast_red_min": null,
       "status": "ok"
@@ -532,7 +532,7 @@
     "fbref_xg": {
       "script": "scripts/fetch_understat_xg.py",
       "output": "fbref_xg.json",
-      "age_min": 1,
+      "age_min": 2,
       "threshold_min": 360,
       "fast_red_min": null,
       "status": "ok"
@@ -564,7 +564,7 @@
     "h2h_extended": {
       "script": "h2h_extended.json",
       "output": "h2h_extended.json",
-      "age_min": 1,
+      "age_min": 2,
       "threshold_min": 60,
       "fast_red_min": null,
       "status": "ok"
@@ -860,7 +860,7 @@
     "injuries_multisport": {
       "script": "scripts/fetch_injuries.py",
       "output": "injuries_multisport.json",
-      "age_min": 1,
+      "age_min": 2,
       "threshold_min": 60,
       "fast_red_min": null,
       "status": "ok"
@@ -1029,7 +1029,7 @@
   ],
   "overall": "warning",
   "quality_checks": {
-    "data_generated_at": "2026-08-12T10:49:17.184619Z",
+    "data_generated_at": "2026-08-12T11:33:45.658505Z",
     "truth_scope": "all_events",
     "all_winamax_available": 43,
     "all_winamax_exact": 42,
@@ -1088,7 +1088,7 @@
   "data_truth": {
     "source_of_truth": "data.js",
     "scope": "all_events",
-    "data_generated_at": "2026-08-12T10:49:17.184619Z",
+    "data_generated_at": "2026-08-12T11:33:45.658505Z",
     "winamax_available": 43,
     "winamax_exact": 42,
     "winamax_exact_ratio": 0.9767,
@@ -1108,7 +1108,7 @@
     "anomalies_emitted": 6
   },
   "source_health": {
-    "generated_at": "2026-08-12T10:50:51Z",
+    "generated_at": "2026-08-12T11:35:18Z",
     "sources_total": 11,
     "sources_ok": 6,
     "sources_warning": 5,
@@ -1208,7 +1208,7 @@
   },
   "observability": {
     "pipeline_traces": {
-      "generated_at": "2026-08-12T10:50:51Z",
+      "generated_at": "2026-08-12T11:35:18Z",
       "runs_observed": 99,
       "by_status": {
         "warning": 69,
@@ -1226,7 +1226,7 @@
     }
   },
   "data_lineage": {
-    "generated_at": "2026-08-12T10:50:51Z",
+    "generated_at": "2026-08-12T11:35:18Z",
     "status": "ok",
     "events": 43,
     "events_missing_inline_lineage": 0,
