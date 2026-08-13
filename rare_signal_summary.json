@@ -1,25 +1,24 @@
 {
-  "generated_at": "2026-08-13T20:07:58Z",
+  "generated_at": "2026-08-13T20:57:12Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
-  "status": "ok",
+  "status": "watch",
   "summary": {
     "active_events": 16,
-    "actionable": 2,
+    "actionable": 0,
     "watch": 0,
-    "risk": 14,
+    "risk": 16,
     "expired_sample": 0,
     "by_type": {
-      "market_uncertain": 16,
-      "market_move": 4,
-      "signal_conflict": 1
+      "market_uncertain": 16
     },
     "by_quality": {
-      "actionable": 2,
-      "risk": 14
+      "risk": 16
     }
   },
-  "active_actionable": [
+  "active_actionable": [],
+  "active_watch": [],
+  "active_risk": [
     {
       "event_id": "401874073",
       "date": "2026-08-13T22:00Z",
@@ -29,14 +28,14 @@
       "home": "Mirassol",
       "away": "Liga de Quito",
       "match": "Mirassol - Liga de Quito",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
       "team": null,
-      "side": "away",
-      "strength": 1.0,
-      "context": "Cote away: 5.75 -> 3.60 (+37.4%)"
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 19.1%"
     },
     {
       "event_id": "401874075",
@@ -47,18 +46,15 @@
       "home": "Rosario Central",
       "away": "Corinthians",
       "match": "Rosario Central - Corinthians",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
       "team": null,
-      "side": "away",
-      "strength": 1.0,
-      "context": "Cote away: 3.80 -> 2.90 (+23.7%)"
-    }
-  ],
-  "active_watch": [],
-  "active_risk": [
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 19.0%"
+    },
     {
       "event_id": "401880338",
       "date": "2026-08-15T14:00Z",
