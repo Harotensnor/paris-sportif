@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-14T21:26:49Z",
+  "generated_at": "2026-08-14T21:47:39Z",
   "method": "Full Bivariate Poisson MLE Dixon-Coles. Coordinate-descent avec golden-section search 1D. Pure Python (pas de scipy).",
   "min_matches_per_league": 40,
   "min_matches_per_team": 5,
@@ -870,72 +870,78 @@
       }
     },
     "por.1": {
-      "n_matches": 40,
-      "n_teams": 10,
-      "gamma": 0.2895,
-      "rho": -0.0236,
-      "log_lik": -101.23,
+      "n_matches": 41,
+      "n_teams": 11,
+      "gamma": 0.2773,
+      "rho": -0.0577,
+      "log_lik": -103.83,
       "iterations": 2,
       "teams": {
         "Benfica": {
-          "alpha": 0.7055,
-          "beta": -0.3461,
+          "alpha": 0.768,
+          "beta": -0.2811,
           "rank_off": 2,
-          "rank_def": 1
-        },
-        "Braga": {
-          "alpha": 0.1831,
-          "beta": -0.1337,
-          "rank_off": 5,
-          "rank_def": 5
-        },
-        "C.D. Nacional": {
-          "alpha": 0.2133,
-          "beta": 0.1311,
-          "rank_off": 4,
-          "rank_def": 8
-        },
-        "FC Famalicao": {
-          "alpha": -0.2546,
-          "beta": 0.8938,
-          "rank_off": 8,
-          "rank_def": 10
-        },
-        "Gil Vicente": {
-          "alpha": -0.5495,
-          "beta": -0.1581,
-          "rank_off": 9,
-          "rank_def": 4
-        },
-        "Moreirense": {
-          "alpha": -0.1118,
-          "beta": -0.3066,
-          "rank_off": 7,
           "rank_def": 2
         },
-        "Rio Ave": {
-          "alpha": -1.1788,
-          "beta": -0.2033,
-          "rank_off": 10,
-          "rank_def": 3
-        },
-        "Santa Clara": {
-          "alpha": 0.2376,
-          "beta": 0.0916,
-          "rank_off": 3,
+        "Braga": {
+          "alpha": 0.242,
+          "beta": -0.0593,
+          "rank_off": 4,
           "rank_def": 7
         },
+        "C.D. Nacional": {
+          "alpha": 0.2269,
+          "beta": 0.1566,
+          "rank_off": 5,
+          "rank_def": 9
+        },
+        "FC Famalicao": {
+          "alpha": -0.205,
+          "beta": 0.9438,
+          "rank_off": 8,
+          "rank_def": 11
+        },
+        "Gil Vicente": {
+          "alpha": -0.5451,
+          "beta": -0.144,
+          "rank_off": 10,
+          "rank_def": 5
+        },
+        "Moreirense": {
+          "alpha": -0.0436,
+          "beta": -0.2474,
+          "rank_off": 6,
+          "rank_def": 3
+        },
+        "Rio Ave": {
+          "alpha": -1.1988,
+          "beta": -0.2416,
+          "rank_off": 11,
+          "rank_def": 4
+        },
+        "Santa Clara": {
+          "alpha": 0.2908,
+          "beta": 0.1415,
+          "rank_off": 3,
+          "rank_def": 8
+        },
         "Sporting CP": {
-          "alpha": 0.8275,
-          "beta": -0.1243,
+          "alpha": 0.8074,
+          "beta": -0.3205,
           "rank_off": 1,
-          "rank_def": 6
+          "rank_def": 1
         },
         "Tondela": {
-          "alpha": -0.0723,
-          "beta": 0.1555,
-          "rank_off": 6,
-          "rank_def": 9
+          "alpha": -0.0529,
+          "beta": 0.1961,
+          "rank_off": 7,
+          "rank_def": 10
+        },
+        "Vitória de Guimaraes": {
+          "alpha": -0.2897,
+          "beta": -0.144,
+          "rank_off": 9,
+          "rank_def": 6
         }
       }
     },
