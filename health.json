@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-08-14T06:58:19Z",
-  "calculated_at": "2026-08-14T06:58:19Z",
+  "generated_at": "2026-08-14T08:15:55Z",
+  "calculated_at": "2026-08-14T08:15:55Z",
   "source_of_truth": "data.js",
-  "data_age_min": 1,
+  "data_age_min": 0,
   "data_file_age_min": 0,
   "sources": {
     "winamax_catalog": {
@@ -38,8 +38,8 @@
       "clubs": 594
     },
     "weather": {
-      "age_min": 1,
-      "events": 6422
+      "age_min": 0,
+      "events": 6423
     },
     "referees_soccer": {
       "age_min": 2,
@@ -454,7 +454,7 @@
       "matches": 1144,
       "observations": 2903,
       "mean_clv_pct": -0.27,
-      "positive_clv_rate": 34.4,
+      "positive_clv_rate": 34.5,
       "sample_status": "validated"
     }
   },
@@ -510,7 +510,7 @@
     "weather": {
       "script": "scripts/fetch_weather.py",
       "output": "weather.json",
-      "age_min": 1,
+      "age_min": 0,
       "threshold_min": 60,
       "fast_red_min": 30,
       "status": "ok"
@@ -1031,7 +1031,7 @@
   ],
   "overall": "warning",
   "quality_checks": {
-    "data_generated_at": "2026-08-14T06:57:09.731744Z",
+    "data_generated_at": "2026-08-14T08:15:00.393145Z",
     "truth_scope": "all_events",
     "all_winamax_available": 38,
     "all_winamax_exact": 38,
@@ -1090,7 +1090,7 @@
   "data_truth": {
     "source_of_truth": "data.js",
     "scope": "all_events",
-    "data_generated_at": "2026-08-14T06:57:09.731744Z",
+    "data_generated_at": "2026-08-14T08:15:00.393145Z",
     "winamax_available": 38,
     "winamax_exact": 38,
     "winamax_exact_ratio": 1.0,
@@ -1110,7 +1110,7 @@
     "anomalies_emitted": 9
   },
   "source_health": {
-    "generated_at": "2026-08-14T06:58:19Z",
+    "generated_at": "2026-08-14T08:15:55Z",
     "sources_total": 11,
     "sources_ok": 5,
     "sources_warning": 6,
@@ -1161,7 +1161,7 @@
       "weather": {
         "score": 100,
         "status": "ok",
-        "items": 6422,
+        "items": 6423,
         "age_min": 1,
         "sla_min": 60,
         "issues": 1
@@ -1210,7 +1210,7 @@
   },
   "observability": {
     "pipeline_traces": {
-      "generated_at": "2026-08-14T06:58:19Z",
+      "generated_at": "2026-08-14T08:15:55Z",
       "runs_observed": 99,
       "by_status": {
         "warning": 71,
@@ -1228,7 +1228,7 @@
     }
   },
   "data_lineage": {
-    "generated_at": "2026-08-14T06:58:19Z",
+    "generated_at": "2026-08-14T08:15:55Z",
     "status": "ok",
     "events": 38,
     "events_missing_inline_lineage": 0,
@@ -1338,7 +1338,7 @@
   "sections": {
     "pipeline": {
       "status": "degraded",
-      "data_age_min": 1,
+      "data_age_min": 0,
       "drift_status": "warn",
       "sources_red": 0
     },
