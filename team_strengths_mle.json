@@ -1,83 +1,89 @@
 {
-  "generated_at": "2026-08-15T20:48:44Z",
+  "generated_at": "2026-08-15T21:01:49Z",
   "method": "Full Bivariate Poisson MLE Dixon-Coles. Coordinate-descent avec golden-section search 1D. Pure Python (pas de scipy).",
   "min_matches_per_league": 40,
   "min_matches_per_team": 5,
   "n_leagues_fit": 16,
   "leagues": {
     "bel.1": {
-      "n_matches": 42,
-      "n_teams": 11,
-      "gamma": 0.3702,
-      "rho": -0.2348,
-      "log_lik": -120.09,
+      "n_matches": 43,
+      "n_teams": 12,
+      "gamma": 0.3562,
+      "rho": -0.118,
+      "log_lik": -121.96,
       "iterations": 3,
       "teams": {
         "Anderlecht": {
-          "alpha": 0.0743,
-          "beta": -0.4124,
-          "rank_off": 6,
-          "rank_def": 4
+          "alpha": 0.1543,
+          "beta": -0.3784,
+          "rank_off": 4,
+          "rank_def": 5
         },
         "Antwerp": {
-          "alpha": -0.1324,
-          "beta": -0.2301,
+          "alpha": -0.1349,
+          "beta": -0.2809,
           "rank_off": 9,
           "rank_def": 6
         },
         "Club Brugge": {
-          "alpha": 0.5759,
-          "beta": 0.7278,
+          "alpha": 0.6465,
+          "beta": 0.728,
           "rank_off": 1,
-          "rank_def": 10
+          "rank_def": 11
         },
         "KAA Gent": {
-          "alpha": -0.9984,
-          "beta": 0.6639,
-          "rank_off": 11,
-          "rank_def": 9
+          "alpha": -0.907,
+          "beta": 0.6979,
+          "rank_off": 12,
+          "rank_def": 10
         },
         "KV Mechelen": {
-          "alpha": -0.0383,
-          "beta": -0.5006,
-          "rank_off": 7,
+          "alpha": 0.0323,
+          "beta": -0.4574,
+          "rank_off": 8,
           "rank_def": 3
         },
         "KVC Westerlo": {
-          "alpha": -0.0836,
-          "beta": -0.8257,
-          "rank_off": 8,
+          "alpha": 0.0718,
+          "beta": -0.9345,
+          "rank_off": 7,
           "rank_def": 1
         },
         "OH Leuven": {
-          "alpha": 0.1625,
-          "beta": -0.5215,
-          "rank_off": 3,
+          "alpha": 0.1449,
+          "beta": -0.4631,
+          "rank_off": 5,
           "rank_def": 2
         },
+        "Racing Genk": {
+          "alpha": -0.7304,
+          "beta": 0.1174,
+          "rank_off": 11,
+          "rank_def": 8
+        },
         "Royal Charleroi SC": {
-          "alpha": -0.3634,
-          "beta": 0.9251,
+          "alpha": -0.2289,
+          "beta": 0.85,
           "rank_off": 10,
-          "rank_def": 11
+          "rank_def": 12
         },
         "Sint-Truidense": {
-          "alpha": 0.5515,
-          "beta": -0.4124,
+          "alpha": 0.6314,
+          "beta": -0.3993,
           "rank_off": 2,
-          "rank_def": 5
+          "rank_def": 4
         },
         "Standard Liege": {
-          "alpha": 0.0894,
-          "beta": 0.0892,
-          "rank_off": 5,
+          "alpha": 0.1449,
+          "beta": -0.0498,
+          "rank_off": 6,
           "rank_def": 7
         },
         "Union St.-Gilloise": {
-          "alpha": 0.1625,
-          "beta": 0.4967,
-          "rank_off": 4,
-          "rank_def": 8
+          "alpha": 0.1751,
+          "beta": 0.5701,
+          "rank_off": 3,
+          "rank_def": 9
         }
       }
     },
@@ -846,48 +852,54 @@
       }
     },
     "ned.1": {
-      "n_matches": 40,
-      "n_teams": 6,
-      "gamma": 0.4079,
+      "n_matches": 41,
+      "n_teams": 7,
+      "gamma": 0.4247,
       "rho": 0.0984,
-      "log_lik": -121.55,
+      "log_lik": -123.62,
       "iterations": 2,
       "teams": {
         "Ajax Amsterdam": {
-          "alpha": -0.0364,
-          "beta": 1.0423,
+          "alpha": 0.0202,
+          "beta": 1.1091,
           "rank_off": 3,
-          "rank_def": 6
+          "rank_def": 7
         },
         "Excelsior": {
-          "alpha": 0.5197,
-          "beta": -0.0455,
+          "alpha": 0.5856,
+          "beta": 0.0328,
           "rank_off": 1,
-          "rank_def": 4
+          "rank_def": 5
         },
         "FC Groningen": {
-          "alpha": -0.1641,
-          "beta": -0.4286,
+          "alpha": -0.0889,
+          "beta": -0.341,
+          "rank_off": 4,
+          "rank_def": 3
+        },
+        "FC Utrecht": {
+          "alpha": -0.1922,
+          "beta": -0.529,
+          "rank_off": 6,
+          "rank_def": 1
+        },
+        "Fortuna Sittard": {
+          "alpha": -0.1133,
+          "beta": -0.435,
           "rank_off": 5,
           "rank_def": 2
         },
-        "FC Utrecht": {
-          "alpha": -0.149,
-          "beta": -0.6109,
-          "rank_off": 4,
-          "rank_def": 1
-        },
         "Heerenveen": {
-          "alpha": -0.2767,
-          "beta": 0.1124,
-          "rank_off": 6,
-          "rank_def": 5
+          "alpha": -0.335,
+          "beta": 0.1698,
+          "rank_off": 7,
+          "rank_def": 6
         },
         "NEC Nijmegen": {
-          "alpha": 0.1064,
-          "beta": -0.0698,
+          "alpha": 0.1235,
+          "beta": -0.0067,
           "rank_off": 2,
-          "rank_def": 3
+          "rank_def": 4
         }
       }
     },
