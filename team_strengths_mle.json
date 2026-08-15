@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-08-15T19:44:27Z",
+  "generated_at": "2026-08-15T19:56:34Z",
   "method": "Full Bivariate Poisson MLE Dixon-Coles. Coordinate-descent avec golden-section search 1D. Pure Python (pas de scipy).",
   "min_matches_per_league": 40,
   "min_matches_per_team": 5,
-  "n_leagues_fit": 15,
+  "n_leagues_fit": 16,
   "leagues": {
     "bel.1": {
       "n_matches": 41,
@@ -824,6 +824,52 @@
           "beta": -0.2683,
           "rank_off": 5,
           "rank_def": 5
+        }
+      }
+    },
+    "ned.1": {
+      "n_matches": 40,
+      "n_teams": 6,
+      "gamma": 0.4079,
+      "rho": 0.0984,
+      "log_lik": -121.55,
+      "iterations": 2,
+      "teams": {
+        "Ajax Amsterdam": {
+          "alpha": -0.0364,
+          "beta": 1.0423,
+          "rank_off": 3,
+          "rank_def": 6
+        },
+        "Excelsior": {
+          "alpha": 0.5197,
+          "beta": -0.0455,
+          "rank_off": 1,
+          "rank_def": 4
+        },
+        "FC Groningen": {
+          "alpha": -0.1641,
+          "beta": -0.4286,
+          "rank_off": 5,
+          "rank_def": 2
+        },
+        "FC Utrecht": {
+          "alpha": -0.149,
+          "beta": -0.6109,
+          "rank_off": 4,
+          "rank_def": 1
+        },
+        "Heerenveen": {
+          "alpha": -0.2767,
+          "beta": 0.1124,
+          "rank_off": 6,
+          "rank_def": 5
+        },
+        "NEC Nijmegen": {
+          "alpha": 0.1064,
+          "beta": -0.0698,
+          "rank_off": 2,
+          "rank_def": 3
         }
       }
     },
