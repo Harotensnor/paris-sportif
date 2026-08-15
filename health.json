@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-15T22:44:32Z",
-  "calculated_at": "2026-08-15T22:44:32Z",
+  "generated_at": "2026-08-15T22:59:40Z",
+  "calculated_at": "2026-08-15T22:59:40Z",
   "source_of_truth": "data.js",
   "data_age_min": 1,
   "data_file_age_min": 0,
@@ -47,13 +47,13 @@
       "status": "retained_existing_referees"
     },
     "xg_team_stats": {
-      "age_min": 1,
+      "age_min": 2,
       "teams": 112,
       "leagues": 6,
       "source": "understat"
     },
     "fbref_xg": {
-      "age_min": 1,
+      "age_min": 2,
       "teams": 112,
       "leagues": 6,
       "source": "understat_compat"
@@ -73,7 +73,7 @@
       "sports": 4
     },
     "h2h_extended": {
-      "age_min": 1,
+      "age_min": 2,
       "events": 16,
       "events_with_meetings": 0,
       "meetings": 0,
@@ -300,7 +300,7 @@
     },
     "daily_insights": {
       "age_min": 2,
-      "insights": 7,
+      "insights": 6,
       "events_today": 6,
       "events_next_36h": 6,
       "sources_loaded": 8
@@ -344,7 +344,7 @@
       "price_shortening": 0
     },
     "injuries_multisport": {
-      "age_min": 1,
+      "age_min": 2,
       "teams": 0,
       "sports": 4,
       "injuries": 0,
@@ -522,7 +522,7 @@
     "xg_team_stats": {
       "script": "scripts/fetch_understat_xg.py",
       "output": "xg_team_stats.json",
-      "age_min": 1,
+      "age_min": 2,
       "threshold_min": 360,
       "fast_red_min": null,
       "status": "ok"
@@ -530,7 +530,7 @@
     "fbref_xg": {
       "script": "scripts/fetch_understat_xg.py",
       "output": "fbref_xg.json",
-      "age_min": 1,
+      "age_min": 2,
       "threshold_min": 360,
       "fast_red_min": null,
       "status": "ok"
@@ -562,7 +562,7 @@
     "h2h_extended": {
       "script": "h2h_extended.json",
       "output": "h2h_extended.json",
-      "age_min": 1,
+      "age_min": 2,
       "threshold_min": 60,
       "fast_red_min": null,
       "status": "ok"
@@ -858,7 +858,7 @@
     "injuries_multisport": {
       "script": "scripts/fetch_injuries.py",
       "output": "injuries_multisport.json",
-      "age_min": 1,
+      "age_min": 2,
       "threshold_min": 60,
       "fast_red_min": null,
       "status": "ok"
@@ -1026,7 +1026,7 @@
   ],
   "overall": "warning",
   "quality_checks": {
-    "data_generated_at": "2026-08-15T22:43:20.593645Z",
+    "data_generated_at": "2026-08-15T22:58:36.638489Z",
     "truth_scope": "all_events",
     "all_winamax_available": 51,
     "all_winamax_exact": 51,
@@ -1085,7 +1085,7 @@
   "data_truth": {
     "source_of_truth": "data.js",
     "scope": "all_events",
-    "data_generated_at": "2026-08-15T22:43:20.593645Z",
+    "data_generated_at": "2026-08-15T22:58:36.638489Z",
     "winamax_available": 51,
     "winamax_exact": 51,
     "winamax_exact_ratio": 1.0,
@@ -1105,7 +1105,7 @@
     "anomalies_emitted": 5
   },
   "source_health": {
-    "generated_at": "2026-08-15T22:44:32Z",
+    "generated_at": "2026-08-15T22:59:40Z",
     "sources_total": 11,
     "sources_ok": 5,
     "sources_warning": 6,
@@ -1205,7 +1205,7 @@
   },
   "observability": {
     "pipeline_traces": {
-      "generated_at": "2026-08-15T22:44:32Z",
+      "generated_at": "2026-08-15T22:59:40Z",
       "runs_observed": 99,
       "by_status": {
         "warning": 71,
@@ -1223,7 +1223,7 @@
     }
   },
   "data_lineage": {
-    "generated_at": "2026-08-15T22:44:32Z",
+    "generated_at": "2026-08-15T22:59:40Z",
     "status": "ok",
     "events": 51,
     "events_missing_inline_lineage": 0,
