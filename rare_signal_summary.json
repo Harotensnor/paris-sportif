@@ -1,35 +1,34 @@
 {
-  "generated_at": "2026-08-15T13:25:00Z",
+  "generated_at": "2026-08-15T13:48:38Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 21,
-    "actionable": 8,
+    "actionable": 10,
     "watch": 1,
-    "risk": 12,
+    "risk": 10,
     "expired_sample": 0,
     "by_type": {
       "market_uncertain": 15,
-      "market_move": 21,
-      "signal_conflict": 2
+      "market_move": 21
     },
     "by_quality": {
-      "risk": 12,
-      "actionable": 8,
-      "watch": 1
+      "actionable": 10,
+      "watch": 1,
+      "risk": 10
     }
   },
   "active_actionable": [
     {
-      "event_id": "401880337",
+      "event_id": "401880336",
       "date": "2026-08-15T14:00Z",
       "sport": "football",
       "league_code": "championship",
       "league_name": "Championship",
-      "home": "Charlton Athletic",
-      "away": "Derby County",
-      "match": "Charlton Athletic - Derby County",
+      "home": "Middlesbrough",
+      "away": "Lincoln City",
+      "match": "Middlesbrough - Lincoln City",
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
       "type": "market_move",
@@ -37,7 +36,7 @@
       "team": null,
       "side": "home",
       "strength": 1.0,
-      "context": "Cote home: 2.80 -> 2.25 (+19.6%)"
+      "context": "Cote home: 1.49 -> 1.22 (+18.0%)"
     },
     {
       "event_id": "401880335",
@@ -56,24 +55,6 @@
       "side": "away",
       "strength": 1.0,
       "context": "Cote away: 3.70 -> 3.00 (+18.9%)"
-    },
-    {
-      "event_id": "401880334",
-      "date": "2026-08-15T14:00Z",
-      "sport": "football",
-      "league_code": "championship",
-      "league_name": "Championship",
-      "home": "Portsmouth",
-      "away": "Queens Park Rangers",
-      "match": "Portsmouth - Queens Park Rangers",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 2.45 -> 1.94 (+20.8%)"
     },
     {
       "event_id": "401873910",
@@ -130,22 +111,76 @@
       "context": "Cote away: 3.05 -> 2.50 (+18.0%)"
     },
     {
-      "event_id": "401880336",
+      "event_id": "401880333",
       "date": "2026-08-15T14:00Z",
       "sport": "football",
       "league_code": "championship",
       "league_name": "Championship",
-      "home": "Middlesbrough",
-      "away": "Lincoln City",
-      "match": "Middlesbrough - Lincoln City",
+      "home": "Stoke City",
+      "away": "Swansea City",
+      "match": "Stoke City - Swansea City",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.97,
+      "context": "Cote away: 3.15 -> 2.60 (+17.5%)"
+    },
+    {
+      "event_id": "401880334",
+      "date": "2026-08-15T14:00Z",
+      "sport": "football",
+      "league_code": "championship",
+      "league_name": "Championship",
+      "home": "Portsmouth",
+      "away": "Queens Park Rangers",
+      "match": "Portsmouth - Queens Park Rangers",
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
       "type": "market_move",
       "direction": "steam",
       "team": null,
       "side": "home",
-      "strength": 0.832,
-      "context": "Cote home: 1.44 -> 1.22 (+15.0%)"
+      "strength": 0.969,
+      "context": "Cote home: 2.35 -> 1.94 (+17.4%)"
+    },
+    {
+      "event_id": "401880338",
+      "date": "2026-08-15T14:00Z",
+      "sport": "football",
+      "league_code": "championship",
+      "league_name": "Championship",
+      "home": "Bristol City",
+      "away": "Millwall",
+      "match": "Bristol City - Millwall",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 0.943,
+      "context": "Cote home: 2.65 -> 2.20 (+17.0%)"
+    },
+    {
+      "event_id": "401880337",
+      "date": "2026-08-15T14:00Z",
+      "sport": "football",
+      "league_code": "championship",
+      "league_name": "Championship",
+      "home": "Charlton Athletic",
+      "away": "Derby County",
+      "match": "Charlton Athletic - Derby County",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 0.926,
+      "context": "Cote home: 2.70 -> 2.25 (+16.7%)"
     },
     {
       "event_id": "401882918",
@@ -187,42 +222,6 @@
     }
   ],
   "active_risk": [
-    {
-      "event_id": "401880338",
-      "date": "2026-08-15T14:00Z",
-      "sport": "football",
-      "league_code": "championship",
-      "league_name": "Championship",
-      "home": "Bristol City",
-      "away": "Millwall",
-      "match": "Bristol City - Millwall",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.0%"
-    },
-    {
-      "event_id": "401880333",
-      "date": "2026-08-15T14:00Z",
-      "sport": "football",
-      "league_code": "championship",
-      "league_name": "Championship",
-      "home": "Stoke City",
-      "away": "Swansea City",
-      "match": "Stoke City - Swansea City",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.3%"
-    },
     {
       "event_id": "401880330",
       "date": "2026-08-16T15:00Z",
