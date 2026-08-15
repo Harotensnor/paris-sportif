@@ -1,23 +1,23 @@
 {
-  "generated_at": "2026-08-15T12:57:45Z",
+  "generated_at": "2026-08-15T13:25:00Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 21,
-    "actionable": 7,
-    "watch": 2,
+    "actionable": 8,
+    "watch": 1,
     "risk": 12,
     "expired_sample": 0,
     "by_type": {
       "market_uncertain": 15,
-      "market_move": 19,
+      "market_move": 21,
       "signal_conflict": 2
     },
     "by_quality": {
       "risk": 12,
-      "actionable": 7,
-      "watch": 2
+      "actionable": 8,
+      "watch": 1
     }
   },
   "active_actionable": [
@@ -55,7 +55,7 @@
       "team": null,
       "side": "away",
       "strength": 1.0,
-      "context": "Cote away: 3.80 -> 3.00 (+21.1%)"
+      "context": "Cote away: 3.70 -> 3.00 (+18.9%)"
     },
     {
       "event_id": "401880334",
@@ -87,11 +87,11 @@
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
       "type": "market_move",
-      "direction": "drift",
+      "direction": "steam",
       "team": null,
-      "side": "home",
+      "side": "away",
       "strength": 1.0,
-      "context": "Cote home: 3.20 -> 3.80 (-18.7%)"
+      "context": "Cote away: 2.05 -> 1.60 (+22.0%)"
     },
     {
       "event_id": "401881808",
@@ -127,7 +127,7 @@
       "team": null,
       "side": "away",
       "strength": 1.0,
-      "context": "Cote away: 3.10 -> 2.50 (+19.4%)"
+      "context": "Cote away: 3.05 -> 2.50 (+18.0%)"
     },
     {
       "event_id": "401880336",
@@ -146,6 +146,24 @@
       "side": "home",
       "strength": 0.832,
       "context": "Cote home: 1.44 -> 1.22 (+15.0%)"
+    },
+    {
+      "event_id": "401882918",
+      "date": "2026-08-15T19:30Z",
+      "sport": "football",
+      "league_code": "esp.1",
+      "league_name": "La Liga",
+      "home": "Sevilla",
+      "away": "Rayo Vallecano",
+      "match": "Sevilla - Rayo Vallecano",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "home",
+      "strength": 0.68,
+      "context": "Cote home: 2.45 -> 2.15 (+12.2%)"
     }
   ],
   "active_watch": [
@@ -164,26 +182,8 @@
       "direction": "steam",
       "team": null,
       "side": "away",
-      "strength": 0.601,
-      "context": "Cote away: 3.70 -> 3.30 (+10.8%)"
-    },
-    {
-      "event_id": "401882918",
-      "date": "2026-08-15T19:30Z",
-      "sport": "football",
-      "league_code": "esp.1",
-      "league_name": "La Liga",
-      "home": "Sevilla",
-      "away": "Rayo Vallecano",
-      "match": "Sevilla - Rayo Vallecano",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "home",
-      "strength": 0.579,
-      "context": "Cote home: 2.40 -> 2.15 (+10.4%)"
+      "strength": 0.533,
+      "context": "Cote away: 3.65 -> 3.30 (+9.6%)"
     }
   ],
   "active_risk": [
