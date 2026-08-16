@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-16T14:17:59Z",
+  "generated_at": "2026-08-16T14:40:22Z",
   "method": "Full Bivariate Poisson MLE Dixon-Coles. Coordinate-descent avec golden-section search 1D. Pure Python (pas de scipy).",
   "min_matches_per_league": 40,
   "min_matches_per_team": 5,
@@ -910,154 +910,172 @@
       }
     },
     "ned.1": {
-      "n_matches": 42,
-      "n_teams": 7,
-      "gamma": 0.4096,
+      "n_matches": 44,
+      "n_teams": 9,
+      "gamma": 0.4265,
       "rho": 0.0984,
-      "log_lik": -128.97,
+      "log_lik": -133.3,
       "iterations": 2,
       "teams": {
         "Ajax Amsterdam": {
-          "alpha": -0.0111,
-          "beta": 1.1201,
+          "alpha": -0.0072,
+          "beta": 1.1197,
           "rank_off": 4,
-          "rank_def": 7
+          "rank_def": 9
         },
         "Excelsior": {
-          "alpha": 0.545,
-          "beta": 0.0682,
+          "alpha": 0.5547,
+          "beta": 0.0864,
           "rank_off": 1,
-          "rank_def": 5
+          "rank_def": 6
         },
         "FC Groningen": {
-          "alpha": 0.1769,
-          "beta": -0.2813,
+          "alpha": 0.2296,
+          "beta": -0.2479,
           "rank_off": 2,
-          "rank_def": 3
+          "rank_def": 4
         },
-        "FC Utrecht": {
-          "alpha": -0.2364,
-          "beta": -0.5216,
+        "FC Twente": {
+          "alpha": -0.071,
+          "beta": -0.5486,
           "rank_off": 6,
           "rank_def": 1
         },
-        "Fortuna Sittard": {
-          "alpha": -0.1632,
-          "beta": -0.4822,
-          "rank_off": 5,
+        "FC Utrecht": {
+          "alpha": -0.2325,
+          "beta": -0.5034,
+          "rank_off": 8,
           "rank_def": 2
         },
-        "Heerenveen": {
-          "alpha": -0.3942,
-          "beta": 0.1227,
+        "Feyenoord Rotterdam": {
+          "alpha": 0.1263,
+          "beta": 0.4696,
+          "rank_off": 3,
+          "rank_def": 8
+        },
+        "Fortuna Sittard": {
+          "alpha": -0.0804,
+          "beta": -0.4697,
           "rank_off": 7,
-          "rank_def": 6
+          "rank_def": 3
+        },
+        "Heerenveen": {
+          "alpha": -0.503,
+          "beta": 0.1352,
+          "rank_off": 9,
+          "rank_def": 7
         },
         "NEC Nijmegen": {
-          "alpha": 0.0829,
-          "beta": -0.0258,
-          "rank_off": 3,
-          "rank_def": 4
+          "alpha": -0.0165,
+          "beta": -0.0413,
+          "rank_off": 5,
+          "rank_def": 5
         }
       }
     },
     "nor.1": {
-      "n_matches": 58,
-      "n_teams": 15,
-      "gamma": 0.4079,
+      "n_matches": 59,
+      "n_teams": 16,
+      "gamma": 0.4595,
       "rho": 0.0984,
-      "log_lik": -163.5,
+      "log_lik": -169.71,
       "iterations": 3,
       "teams": {
         "Aalesund": {
-          "alpha": -0.0584,
-          "beta": -0.3012,
+          "alpha": 0.1017,
+          "beta": -0.4523,
           "rank_off": 9,
           "rank_def": 4
         },
         "Bodo/Glimt": {
-          "alpha": 0.4339,
-          "beta": 1.583,
-          "rank_off": 3,
-          "rank_def": 15
+          "alpha": 0.4454,
+          "beta": 1.5898,
+          "rank_off": 4,
+          "rank_def": 16
         },
         "Fredrikstad": {
-          "alpha": -0.3533,
-          "beta": -0.35,
-          "rank_off": 11,
-          "rank_def": 3
-        },
-        "Hamarkameratene": {
-          "alpha": -0.4717,
-          "beta": -0.3012,
-          "rank_off": 13,
+          "alpha": -0.3417,
+          "beta": -0.3583,
+          "rank_off": 12,
           "rank_def": 5
         },
+        "Hamarkameratene": {
+          "alpha": -0.6065,
+          "beta": -0.1667,
+          "rank_off": 15,
+          "rank_def": 6
+        },
         "IK Start": {
-          "alpha": -0.171,
-          "beta": -0.6112,
-          "rank_off": 10,
+          "alpha": -0.1595,
+          "beta": -0.6044,
+          "rank_off": 11,
           "rank_def": 1
         },
         "KFUM Oslo": {
-          "alpha": -0.0433,
-          "beta": -0.0458,
-          "rank_off": 8,
-          "rank_def": 9
+          "alpha": -0.1293,
+          "beta": 0.0399,
+          "rank_off": 10,
+          "rank_def": 10
         },
         "Kristiansund BK": {
-          "alpha": -0.5262,
-          "beta": 0.2793,
+          "alpha": -0.5426,
+          "beta": 0.2767,
           "rank_off": 14,
           "rank_def": 14
         },
         "Lillestrom": {
-          "alpha": 0.1483,
-          "beta": -0.1584,
-          "rank_off": 7,
+          "alpha": 0.1261,
+          "beta": -0.1517,
+          "rank_off": 8,
           "rank_def": 7
         },
         "Molde": {
-          "alpha": 0.6893,
-          "beta": -0.1039,
+          "alpha": 0.5243,
+          "beta": 0.0004,
           "rank_off": 1,
-          "rank_def": 8
+          "rank_def": 9
         },
         "Rosenborg": {
-          "alpha": 0.2365,
-          "beta": 0.1817,
-          "rank_off": 6,
-          "rank_def": 12
-        },
-        "SK Brann": {
-          "alpha": 0.4037,
-          "beta": 0.2456,
-          "rank_off": 4,
+          "alpha": 0.1806,
+          "beta": 0.2071,
+          "rank_off": 7,
           "rank_def": 13
         },
+        "SK Brann": {
+          "alpha": 0.284,
+          "beta": 0.3197,
+          "rank_off": 6,
+          "rank_def": 15
+        },
         "Sandefjord": {
-          "alpha": -0.7027,
-          "beta": -0.1735,
-          "rank_off": 15,
-          "rank_def": 6
+          "alpha": -0.7249,
+          "beta": -0.1273,
+          "rank_off": 16,
+          "rank_def": 8
         },
         "Sarpsborg FK": {
-          "alpha": -0.4171,
-          "beta": 0.1759,
-          "rank_off": 12,
+          "alpha": -0.4149,
+          "beta": 0.1583,
+          "rank_off": 13,
           "rank_def": 11
         },
         "Tromso": {
-          "alpha": 0.492,
-          "beta": -0.5323,
-          "rank_off": 2,
+          "alpha": 0.4698,
+          "beta": -0.4616,
+          "rank_off": 3,
           "rank_def": 2
         },
         "Viking FK": {
-          "alpha": 0.3399,
-          "beta": 0.1121,
+          "alpha": 0.2933,
+          "beta": 0.192,
           "rank_off": 5,
-          "rank_def": 10
+          "rank_def": 12
+        },
+        "Vålerenga": {
+          "alpha": 0.4942,
+          "beta": -0.4616,
+          "rank_off": 2,
+          "rank_def": 3
         }
       }
     },
