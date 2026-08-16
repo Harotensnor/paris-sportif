@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-16T13:12:47Z",
+  "generated_at": "2026-08-16T13:44:57Z",
   "method": "Full Bivariate Poisson MLE Dixon-Coles. Coordinate-descent avec golden-section search 1D. Pure Python (pas de scipy).",
   "min_matches_per_league": 40,
   "min_matches_per_team": 5,
@@ -40,82 +40,82 @@
       }
     },
     "bel.1": {
-      "n_matches": 43,
+      "n_matches": 44,
       "n_teams": 12,
-      "gamma": 0.3562,
-      "rho": -0.118,
-      "log_lik": -121.96,
+      "gamma": 0.3429,
+      "rho": -0.0532,
+      "log_lik": -124.46,
       "iterations": 3,
       "teams": {
         "Anderlecht": {
-          "alpha": 0.1543,
-          "beta": -0.3784,
-          "rank_off": 4,
-          "rank_def": 5
-        },
-        "Antwerp": {
-          "alpha": -0.1349,
-          "beta": -0.2809,
-          "rank_off": 9,
+          "alpha": 0.0112,
+          "beta": -0.2762,
+          "rank_off": 8,
           "rank_def": 6
         },
-        "Club Brugge": {
-          "alpha": 0.6465,
-          "beta": 0.728,
-          "rank_off": 1,
-          "rank_def": 11
+        "Antwerp": {
+          "alpha": -0.1223,
+          "beta": -0.2855,
+          "rank_off": 9,
+          "rank_def": 5
         },
-        "KAA Gent": {
-          "alpha": -0.907,
-          "beta": 0.6979,
-          "rank_off": 12,
+        "Club Brugge": {
+          "alpha": 0.6742,
+          "beta": 0.6839,
+          "rank_off": 1,
           "rank_def": 10
         },
+        "KAA Gent": {
+          "alpha": -0.9187,
+          "beta": 0.7083,
+          "rank_off": 12,
+          "rank_def": 11
+        },
         "KV Mechelen": {
-          "alpha": 0.0323,
-          "beta": -0.4574,
-          "rank_off": 8,
-          "rank_def": 3
+          "alpha": 0.0507,
+          "beta": -0.4922,
+          "rank_off": 7,
+          "rank_def": 2
         },
         "KVC Westerlo": {
-          "alpha": 0.0718,
-          "beta": -0.9345,
-          "rank_off": 7,
+          "alpha": 0.0844,
+          "beta": -0.9449,
+          "rank_off": 6,
           "rank_def": 1
         },
         "OH Leuven": {
-          "alpha": 0.1449,
-          "beta": -0.4631,
+          "alpha": 0.1482,
+          "beta": -0.4434,
           "rank_off": 5,
-          "rank_def": 2
+          "rank_def": 3
         },
         "Racing Genk": {
-          "alpha": -0.7304,
-          "beta": 0.1174,
+          "alpha": -0.7365,
+          "beta": 0.1371,
           "rank_off": 11,
           "rank_def": 8
         },
         "Royal Charleroi SC": {
-          "alpha": -0.2289,
-          "beta": 0.85,
+          "alpha": -0.1861,
+          "beta": 0.8453,
           "rank_off": 10,
           "rank_def": 12
         },
         "Sint-Truidense": {
-          "alpha": 0.6314,
-          "beta": -0.3993,
+          "alpha": 0.6498,
+          "beta": -0.4434,
           "rank_off": 2,
           "rank_def": 4
         },
         "Standard Liege": {
-          "alpha": 0.1449,
-          "beta": -0.0498,
-          "rank_off": 6,
+          "alpha": 0.1575,
+          "beta": -0.0394,
+          "rank_off": 4,
           "rank_def": 7
         },
         "Union St.-Gilloise": {
-          "alpha": 0.1751,
-          "beta": 0.5701,
+          "alpha": 0.1877,
+          "beta": 0.5504,
           "rank_off": 3,
           "rank_def": 9
         }
@@ -516,66 +516,84 @@
       }
     },
     "ger.2": {
-      "n_matches": 43,
-      "n_teams": 9,
-      "gamma": 0.5054,
+      "n_matches": 46,
+      "n_teams": 12,
+      "gamma": 0.4764,
       "rho": 0.0984,
-      "log_lik": -124.94,
+      "log_lik": -127.43,
       "iterations": 3,
       "teams": {
         "1. FC Magdeburg": {
-          "alpha": 0.0957,
-          "beta": 0.7243,
+          "alpha": 0.2483,
+          "beta": 0.8163,
           "rank_off": 5,
-          "rank_def": 8
+          "rank_def": 11
         },
         "1. FC Nürnberg": {
-          "alpha": 0.5125,
-          "beta": 0.2077,
+          "alpha": 0.6221,
+          "beta": 0.2207,
           "rank_off": 2,
-          "rank_def": 6
-        },
-        "Hannover 96": {
-          "alpha": 0.5334,
-          "beta": -0.7222,
-          "rank_off": 1,
-          "rank_def": 1
-        },
-        "Hertha Berlin": {
-          "alpha": 0.0167,
-          "beta": -0.54,
-          "rank_off": 6,
-          "rank_def": 3
-        },
-        "Holstein Kiel": {
-          "alpha": 0.1538,
-          "beta": -0.3427,
-          "rank_off": 4,
-          "rank_def": 5
-        },
-        "Kaiserslautern": {
-          "alpha": -0.84,
-          "beta": 1.2747,
-          "rank_off": 9,
           "rank_def": 9
         },
-        "Karlsruher SC": {
-          "alpha": -0.2143,
-          "beta": -0.5644,
-          "rank_off": 7,
-          "rank_def": 2
+        "Arminia Bielefeld": {
+          "alpha": 0.8288,
+          "beta": -0.3296,
+          "rank_off": 1,
+          "rank_def": 5
         },
-        "SpVgg Greuther Fürth": {
-          "alpha": 0.2722,
-          "beta": -0.3577,
+        "Dynamo Dresden": {
+          "alpha": -0.4693,
+          "beta": -0.0103,
+          "rank_off": 11,
+          "rank_def": 8
+        },
+        "Hannover 96": {
+          "alpha": 0.3516,
+          "beta": -0.5664,
           "rank_off": 3,
+          "rank_def": 3
+        },
+        "Hertha Berlin": {
+          "alpha": -0.0165,
+          "beta": -0.1474,
+          "rank_off": 7,
+          "rank_def": 7
+        },
+        "Holstein Kiel": {
+          "alpha": 0.0962,
+          "beta": -0.3842,
+          "rank_off": 6,
           "rank_def": 4
         },
-        "VfL Bochum": {
-          "alpha": -0.53,
-          "beta": 0.3203,
+        "Kaiserslautern": {
+          "alpha": -0.9127,
+          "beta": 1.3666,
+          "rank_off": 12,
+          "rank_def": 12
+        },
+        "Karlsruher SC": {
+          "alpha": -0.3322,
+          "beta": -0.5758,
+          "rank_off": 9,
+          "rank_def": 2
+        },
+        "SV Darmstadt 98": {
+          "alpha": -0.3171,
+          "beta": -0.7673,
           "rank_off": 8,
-          "rank_def": 7
+          "rank_def": 1
+        },
+        "SpVgg Greuther Fürth": {
+          "alpha": 0.3121,
+          "beta": -0.2019,
+          "rank_off": 4,
+          "rank_def": 6
+        },
+        "VfL Bochum": {
+          "alpha": -0.4112,
+          "beta": 0.5795,
+          "rank_off": 10,
+          "rank_def": 10
         }
       }
     },
@@ -1214,94 +1232,94 @@
       }
     },
     "rus.1": {
-      "n_matches": 55,
+      "n_matches": 56,
       "n_teams": 14,
-      "gamma": 0.1786,
+      "gamma": 0.1833,
       "rho": -0.2984,
-      "log_lik": -135.6,
+      "log_lik": -137.79,
       "iterations": 3,
       "teams": {
         "Akhmat Grozny": {
-          "alpha": -0.3851,
-          "beta": 0.2173,
+          "alpha": -0.3771,
+          "beta": 0.2096,
           "rank_off": 13,
           "rank_def": 11
         },
         "Akron Tolyatti": {
-          "alpha": -0.1146,
-          "beta": -0.7277,
+          "alpha": -0.1159,
+          "beta": -0.7296,
           "rank_off": 9,
           "rank_def": 1
         },
         "CSKA Moscow": {
-          "alpha": 0.2348,
-          "beta": 0.1627,
-          "rank_off": 5,
+          "alpha": 0.2522,
+          "beta": 0.1608,
+          "rank_off": 4,
           "rank_def": 10
         },
         "Dinamo Moscow": {
-          "alpha": 0.308,
-          "beta": 0.0408,
-          "rank_off": 4,
-          "rank_def": 9
+          "alpha": 0.2429,
+          "beta": -0.0609,
+          "rank_off": 5,
+          "rank_def": 8
         },
         "Dynamo Makhachkala": {
-          "alpha": -0.0995,
-          "beta": -0.2054,
+          "alpha": -0.0972,
+          "beta": -0.2187,
           "rank_off": 7,
           "rank_def": 4
         },
         "FC Baltika Kaliningrad": {
-          "alpha": -0.7833,
-          "beta": -0.1566,
+          "alpha": -0.7997,
+          "beta": -0.1944,
           "rank_off": 14,
-          "rank_def": 6
+          "rank_def": 5
         },
         "Gazovik Orenburg": {
-          "alpha": -0.2725,
-          "beta": -0.3388,
+          "alpha": -0.2493,
+          "beta": -0.3314,
           "rank_off": 11,
           "rank_def": 3
         },
         "Krasnodar": {
-          "alpha": 0.4264,
-          "beta": 0.3148,
+          "alpha": 0.4251,
+          "beta": 0.3072,
           "rank_off": 2,
           "rank_def": 12
         },
         "Krylia Sovetov": {
-          "alpha": 0.2255,
-          "beta": 0.6399,
+          "alpha": 0.2185,
+          "beta": 0.6172,
           "rank_off": 6,
           "rank_def": 13
         },
         "Lokomotiv Moscow": {
-          "alpha": -0.2179,
-          "beta": -0.3876,
+          "alpha": -0.2343,
+          "beta": -0.3953,
           "rank_off": 10,
           "rank_def": 2
         },
         "Rostov": {
-          "alpha": -0.3062,
-          "beta": -0.0834,
+          "alpha": -0.2831,
+          "beta": -0.076,
           "rank_off": 12,
           "rank_def": 7
         },
         "Rubin Kazan": {
-          "alpha": -0.1053,
-          "beta": -0.1659,
+          "alpha": -0.1066,
+          "beta": -0.1642,
           "rank_off": 8,
-          "rank_def": 5
+          "rank_def": 6
         },
         "Spartak Moscow": {
-          "alpha": 0.4171,
-          "beta": -0.0195,
+          "alpha": 0.4194,
+          "beta": -0.0272,
           "rank_off": 3,
-          "rank_def": 8
+          "rank_def": 9
         },
         "Zenit St Petersburg": {
-          "alpha": 0.6725,
-          "beta": 0.7095,
+          "alpha": 0.705,
+          "beta": 0.9028,
           "rank_off": 1,
           "rank_def": 14
         }
