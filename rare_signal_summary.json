@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-08-16T14:40:04Z",
+  "generated_at": "2026-08-16T14:57:55Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
-  "status": "watch",
+  "status": "ok",
   "summary": {
     "active_events": 14,
-    "actionable": 0,
-    "watch": 2,
+    "actionable": 1,
+    "watch": 1,
     "risk": 12,
     "expired_sample": 0,
     "by_type": {
@@ -15,12 +15,12 @@
       "signal_conflict": 1
     },
     "by_quality": {
-      "watch": 2,
-      "risk": 12
+      "actionable": 1,
+      "risk": 12,
+      "watch": 1
     }
   },
-  "active_actionable": [],
-  "active_watch": [
+  "active_actionable": [
     {
       "event_id": "401882920",
       "date": "2026-08-16T15:00Z",
@@ -30,15 +30,17 @@
       "home": "Racing Santander",
       "away": "Villarreal",
       "match": "Racing Santander - Villarreal",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
       "type": "market_move",
       "direction": "steam",
       "team": null,
       "side": "home",
-      "strength": 0.635,
-      "context": "Cote home: 3.50 -> 3.10 (+11.4%)"
-    },
+      "strength": 0.901,
+      "context": "Cote home: 3.70 -> 3.10 (+16.2%)"
+    }
+  ],
+  "active_watch": [
     {
       "event_id": "401882922",
       "date": "2026-08-16T17:00Z",
