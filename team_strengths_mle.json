@@ -1,10 +1,44 @@
 {
-  "generated_at": "2026-08-15T23:50:17Z",
+  "generated_at": "2026-08-16T00:00:37Z",
   "method": "Full Bivariate Poisson MLE Dixon-Coles. Coordinate-descent avec golden-section search 1D. Pure Python (pas de scipy).",
   "min_matches_per_league": 40,
   "min_matches_per_team": 5,
-  "n_leagues_fit": 16,
+  "n_leagues_fit": 17,
   "leagues": {
+    "arg.1": {
+      "n_matches": 41,
+      "n_teams": 4,
+      "gamma": 0.2407,
+      "rho": -0.1764,
+      "log_lik": -107.94,
+      "iterations": 1,
+      "teams": {
+        "Belgrano (Córdoba)": {
+          "alpha": 0.0343,
+          "beta": 0.1385,
+          "rank_off": 2,
+          "rank_def": 4
+        },
+        "Gimnasia La Plata": {
+          "alpha": -0.0052,
+          "beta": 0.0653,
+          "rank_off": 3,
+          "rank_def": 3
+        },
+        "Independiente Rivadavia": {
+          "alpha": 0.0888,
+          "beta": -0.1263,
+          "rank_off": 1,
+          "rank_def": 1
+        },
+        "Newell's Old Boys": {
+          "alpha": -0.1179,
+          "beta": -0.0775,
+          "rank_off": 4,
+          "rank_def": 2
+        }
+      }
+    },
     "bel.1": {
       "n_matches": 43,
       "n_teams": 12,
