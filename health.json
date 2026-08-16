@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-16T17:41:02Z",
-  "calculated_at": "2026-08-16T17:41:02Z",
+  "generated_at": "2026-08-16T17:54:42Z",
+  "calculated_at": "2026-08-16T17:54:42Z",
   "source_of_truth": "data.js",
   "data_age_min": 1,
   "data_file_age_min": 0,
@@ -74,27 +74,27 @@
     },
     "h2h_extended": {
       "age_min": 2,
-      "events": 13,
+      "events": 14,
       "events_with_meetings": 0,
       "meetings": 0,
       "coverage_pct": 0.0,
-      "empty_events": 13,
+      "empty_events": 14,
       "sports": 2,
       "by_sport": {
+        "football": {
+          "events": 13,
+          "events_with_meetings": 0,
+          "meetings": 0,
+          "sources": {
+            "espn_summary_empty": 13
+          }
+        },
         "basketball": {
           "events": 1,
           "events_with_meetings": 0,
           "meetings": 0,
           "sources": {
             "espn_summary_empty": 1
-          }
-        },
-        "football": {
-          "events": 12,
-          "events_with_meetings": 0,
-          "meetings": 0,
-          "sources": {
-            "espn_summary_empty": 12
           }
         }
       }
@@ -1030,7 +1030,7 @@
   ],
   "overall": "warning",
   "quality_checks": {
-    "data_generated_at": "2026-08-16T17:40:00.730354Z",
+    "data_generated_at": "2026-08-16T17:53:40.280600Z",
     "truth_scope": "all_events",
     "all_winamax_available": 59,
     "all_winamax_exact": 59,
@@ -1089,7 +1089,7 @@
   "data_truth": {
     "source_of_truth": "data.js",
     "scope": "all_events",
-    "data_generated_at": "2026-08-16T17:40:00.730354Z",
+    "data_generated_at": "2026-08-16T17:53:40.280600Z",
     "winamax_available": 59,
     "winamax_exact": 59,
     "winamax_exact_ratio": 1.0,
@@ -1109,7 +1109,7 @@
     "anomalies_emitted": 5
   },
   "source_health": {
-    "generated_at": "2026-08-16T17:41:02Z",
+    "generated_at": "2026-08-16T17:54:42Z",
     "sources_total": 11,
     "sources_ok": 5,
     "sources_warning": 6,
@@ -1153,7 +1153,7 @@
         "score": 100,
         "status": "ok",
         "items": 106,
-        "age_min": 3,
+        "age_min": 2,
         "sla_min": 180,
         "issues": 1
       },
@@ -1209,7 +1209,7 @@
   },
   "observability": {
     "pipeline_traces": {
-      "generated_at": "2026-08-16T17:41:02Z",
+      "generated_at": "2026-08-16T17:54:42Z",
       "runs_observed": 99,
       "by_status": {
         "warning": 71,
@@ -1227,7 +1227,7 @@
     }
   },
   "data_lineage": {
-    "generated_at": "2026-08-16T17:41:02Z",
+    "generated_at": "2026-08-16T17:54:42Z",
     "status": "ok",
     "events": 59,
     "events_missing_inline_lineage": 0,
