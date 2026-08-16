@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-16T23:13:17Z",
+  "generated_at": "2026-08-16T23:35:33Z",
   "method": "Dixon-Coles MLE grid search (ρ ∈ [-0.30, 0.10] step 0.005), λ_h, λ_a fixés à moyenne empirique par ligue. CI 95% via LR test.",
   "min_matches": 40,
   "default_rho": -0.13,
@@ -113,12 +113,17 @@
       "reason": "n=4 < 40"
     },
     "bra.1": {
-      "n": 38,
-      "rho_measured": null,
+      "n": 40,
+      "rho_measured": -0.005,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "n=38 < 40"
+      "reason": "CI trop large (0.400) ou fit nul",
+      "log_lik": -121.04,
+      "ci_lo": -0.3,
+      "ci_hi": 0.1,
+      "lambda_h": 1.45,
+      "lambda_a": 1.325
     },
     "bulgariancup": {
       "n": 1,
@@ -331,12 +336,12 @@
       "reason": "n=2 < 40"
     },
     "ecu.1": {
-      "n": 35,
+      "n": 36,
       "rho_measured": null,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "n=35 < 40"
+      "reason": "n=36 < 40"
     },
     "egyptianpremierleagu": {
       "n": 3,
@@ -837,12 +842,12 @@
       "reason": "n=1 < 40"
     },
     "par.1": {
-      "n": 35,
+      "n": 36,
       "rho_measured": null,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "n=35 < 40"
+      "reason": "n=36 < 40"
     },
     "per.1": {
       "n": 47,
@@ -1153,17 +1158,17 @@
       "reason": "n=1 < 40"
     },
     "uru.1": {
-      "n": 46,
+      "n": 47,
       "rho_measured": 0.1,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "CI trop large (0.285) ou fit nul",
-      "log_lik": -119.76,
-      "ci_lo": -0.185,
+      "reason": "CI trop large (0.280) ou fit nul",
+      "log_lik": -122.3,
+      "ci_lo": -0.18,
       "ci_hi": 0.1,
-      "lambda_h": 1.196,
-      "lambda_a": 0.848
+      "lambda_h": 1.213,
+      "lambda_a": 0.851
     },
     "usa.1": {
       "n": 17,

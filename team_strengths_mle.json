@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-08-16T23:13:18Z",
+  "generated_at": "2026-08-16T23:35:34Z",
   "method": "Full Bivariate Poisson MLE Dixon-Coles. Coordinate-descent avec golden-section search 1D. Pure Python (pas de scipy).",
   "min_matches_per_league": 40,
   "min_matches_per_team": 5,
-  "n_leagues_fit": 17,
+  "n_leagues_fit": 18,
   "leagues": {
     "arg.1": {
       "n_matches": 43,
@@ -124,6 +124,52 @@
           "beta": 0.592,
           "rank_off": 6,
           "rank_def": 10
+        }
+      }
+    },
+    "bra.1": {
+      "n_matches": 40,
+      "n_teams": 6,
+      "gamma": 0.3167,
+      "rho": -0.0204,
+      "log_lik": -119.95,
+      "iterations": 2,
+      "teams": {
+        "Bahia": {
+          "alpha": 0.1939,
+          "beta": -0.2789,
+          "rank_off": 3,
+          "rank_def": 1
+        },
+        "Botafogo": {
+          "alpha": 0.2577,
+          "beta": 0.1194,
+          "rank_off": 2,
+          "rank_def": 4
+        },
+        "Internacional": {
+          "alpha": 0.3948,
+          "beta": 0.2564,
+          "rank_off": 1,
+          "rank_def": 5
+        },
+        "Red Bull Bragantino": {
+          "alpha": -0.3134,
+          "beta": 0.369,
+          "rank_off": 5,
+          "rank_def": 6
+        },
+        "Santos": {
+          "alpha": 0.036,
+          "beta": -0.2452,
+          "rank_off": 4,
+          "rank_def": 2
+        },
+        "Vasco da Gama": {
+          "alpha": -0.5689,
+          "beta": -0.2208,
+          "rank_off": 6,
+          "rank_def": 3
         }
       }
     },
@@ -1492,84 +1538,84 @@
       }
     },
     "uru.1": {
-      "n_matches": 46,
+      "n_matches": 47,
       "n_teams": 12,
-      "gamma": -0.0298,
+      "gamma": -0.013,
       "rho": 0.0984,
-      "log_lik": -110.33,
+      "log_lik": -112.71,
       "iterations": 3,
       "teams": {
         "Boston River": {
-          "alpha": 0.2278,
-          "beta": -0.3442,
+          "alpha": 0.1839,
+          "beta": -0.2925,
           "rank_off": 4,
           "rank_def": 5
         },
         "Central Español Fútbol Club": {
-          "alpha": -0.131,
-          "beta": 0.1422,
-          "rank_off": 9,
-          "rank_def": 8
+          "alpha": -0.0264,
+          "beta": 0.0627,
+          "rank_off": 8,
+          "rank_def": 7
         },
         "Cerro": {
-          "alpha": 0.3462,
-          "beta": -0.4777,
+          "alpha": 0.3324,
+          "beta": -0.4446,
           "rank_off": 2,
           "rank_def": 4
         },
         "Cerro Largo": {
-          "alpha": -0.4804,
-          "beta": -0.1376,
+          "alpha": -0.5337,
+          "beta": -0.065,
           "rank_off": 11,
           "rank_def": 6
         },
         "Danubio": {
-          "alpha": -0.0915,
-          "beta": -0.5114,
-          "rank_off": 8,
+          "alpha": -0.0867,
+          "beta": -0.4934,
+          "rank_off": 9,
           "rank_def": 2
         },
         "Defensor Sporting": {
-          "alpha": -0.2099,
-          "beta": -0.797,
+          "alpha": -0.2388,
+          "beta": -0.7639,
           "rank_off": 10,
           "rank_def": 1
         },
         "Deportivo Maldonado": {
-          "alpha": 0.1244,
-          "beta": 0.0841,
+          "alpha": 0.1258,
+          "beta": 0.0964,
           "rank_off": 6,
-          "rank_def": 7
+          "rank_def": 8
         },
         "Juventud": {
-          "alpha": 0.179,
-          "beta": 0.3245,
+          "alpha": 0.1652,
+          "beta": 0.3425,
           "rank_off": 5,
           "rank_def": 9
         },
         "Liverpool": {
-          "alpha": 0.2672,
-          "beta": 0.6496,
+          "alpha": 0.2535,
+          "beta": 0.6919,
           "rank_off": 3,
-          "rank_def": 10
+          "rank_def": 11
         },
         "Peñarol": {
-          "alpha": 0.6411,
-          "beta": 0.8167,
+          "alpha": 0.7005,
+          "beta": 0.5886,
           "rank_off": 1,
-          "rank_def": 12
+          "rank_def": 10
         },
         "Progreso": {
-          "alpha": -0.9971,
-          "beta": -0.5021,
+          "alpha": -0.9958,
+          "beta": -0.4934,
           "rank_off": 12,
           "rank_def": 3
         },
         "Racing (Montevideo)": {
-          "alpha": 0.1244,
-          "beta": 0.7529,
+          "alpha": 0.12,
+          "beta": 0.7709,
           "rank_off": 7,
-          "rank_def": 11
+          "rank_def": 12
         }
       }
     }
