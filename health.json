@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-17T20:21:43Z",
-  "calculated_at": "2026-08-17T20:21:43Z",
+  "generated_at": "2026-08-17T20:48:23Z",
+  "calculated_at": "2026-08-17T20:48:23Z",
   "source_of_truth": "data.js",
   "data_age_min": 1,
   "data_file_age_min": 0,
@@ -30,7 +30,7 @@
       "status": "retained_existing_lineups"
     },
     "team_stats": {
-      "age_min": 2,
+      "age_min": 1,
       "teams": 0
     },
     "clubelo": {
@@ -73,7 +73,7 @@
       "sports": 4
     },
     "h2h_extended": {
-      "age_min": 2,
+      "age_min": 1,
       "events": 29,
       "events_with_meetings": 0,
       "meetings": 0,
@@ -345,7 +345,7 @@
       "severe": 0
     },
     "thesportsdb_meta": {
-      "age_min": 1,
+      "age_min": 2,
       "requested": 40,
       "matched": 27,
       "status": "ok"
@@ -441,10 +441,10 @@
     },
     "clv_history": {
       "age_min": 2,
-      "matches": 1076,
-      "observations": 2831,
-      "mean_clv_pct": -0.31,
-      "positive_clv_rate": 32.9,
+      "matches": 1055,
+      "observations": 2768,
+      "mean_clv_pct": -0.32,
+      "positive_clv_rate": 33.5,
       "sample_status": "validated"
     }
   },
@@ -484,7 +484,7 @@
     "team_stats": {
       "script": "scripts/fetch_team_stats.py",
       "output": "team_stats.json",
-      "age_min": 2,
+      "age_min": 1,
       "threshold_min": 300,
       "fast_red_min": null,
       "status": "ok"
@@ -556,7 +556,7 @@
     "h2h_extended": {
       "script": "h2h_extended.json",
       "output": "h2h_extended.json",
-      "age_min": 2,
+      "age_min": 1,
       "threshold_min": 60,
       "fast_red_min": null,
       "status": "ok"
@@ -860,7 +860,7 @@
     "thesportsdb_meta": {
       "script": "scripts/fetch_thesportsdb_meta.py",
       "output": "thesportsdb_meta.json",
-      "age_min": 1,
+      "age_min": 2,
       "threshold_min": 1440,
       "fast_red_min": null,
       "status": "ok"
@@ -1020,7 +1020,7 @@
   ],
   "overall": "warning",
   "quality_checks": {
-    "data_generated_at": "2026-08-17T20:20:00.911614Z",
+    "data_generated_at": "2026-08-17T20:46:40.431768Z",
     "truth_scope": "all_events",
     "all_winamax_available": 61,
     "all_winamax_exact": 61,
@@ -1079,7 +1079,7 @@
   "data_truth": {
     "source_of_truth": "data.js",
     "scope": "all_events",
-    "data_generated_at": "2026-08-17T20:20:00.911614Z",
+    "data_generated_at": "2026-08-17T20:46:40.431768Z",
     "winamax_available": 61,
     "winamax_exact": 61,
     "winamax_exact_ratio": 1.0,
@@ -1099,7 +1099,7 @@
     "anomalies_emitted": 4
   },
   "source_health": {
-    "generated_at": "2026-08-17T20:21:43Z",
+    "generated_at": "2026-08-17T20:48:23Z",
     "sources_total": 11,
     "sources_ok": 6,
     "sources_warning": 5,
@@ -1111,7 +1111,7 @@
         "score": 92,
         "status": "warning",
         "items": 600,
-        "age_min": 3,
+        "age_min": 2,
         "sla_min": 15,
         "issues": 2
       },
@@ -1127,7 +1127,7 @@
         "score": 57,
         "status": "warning",
         "items": 0,
-        "age_min": 3,
+        "age_min": 2,
         "sla_min": 180,
         "issues": 2
       },
@@ -1135,7 +1135,7 @@
         "score": 100,
         "status": "ok",
         "items": 97,
-        "age_min": 3,
+        "age_min": 2,
         "sla_min": 180,
         "issues": 1
       },
@@ -1143,7 +1143,7 @@
         "score": 100,
         "status": "ok",
         "items": 106,
-        "age_min": 3,
+        "age_min": 2,
         "sla_min": 180,
         "issues": 1
       },
@@ -1167,7 +1167,7 @@
         "score": 100,
         "status": "ok",
         "items": 594,
-        "age_min": 3,
+        "age_min": 2,
         "sla_min": 1440,
         "issues": 1
       },
@@ -1175,7 +1175,7 @@
         "score": 92,
         "status": "warning",
         "items": 1941,
-        "age_min": 3,
+        "age_min": 2,
         "sla_min": 30,
         "issues": 2
       },
@@ -1183,7 +1183,7 @@
         "score": 100,
         "status": "ok",
         "items": 5443,
-        "age_min": 3,
+        "age_min": 2,
         "sla_min": 1440,
         "issues": 1
       },
@@ -1191,7 +1191,7 @@
         "score": 100,
         "status": "ok",
         "items": 3,
-        "age_min": 3,
+        "age_min": 2,
         "sla_min": 1440,
         "issues": 1
       }
@@ -1199,7 +1199,7 @@
   },
   "observability": {
     "pipeline_traces": {
-      "generated_at": "2026-08-17T20:21:43Z",
+      "generated_at": "2026-08-17T20:48:23Z",
       "runs_observed": 99,
       "by_status": {
         "warning": 69,
@@ -1217,7 +1217,7 @@
     }
   },
   "data_lineage": {
-    "generated_at": "2026-08-17T20:21:43Z",
+    "generated_at": "2026-08-17T20:48:23Z",
     "status": "ok",
     "events": 61,
     "events_missing_inline_lineage": 0,
@@ -1229,7 +1229,7 @@
       "xg": 44,
       "clubelo": 42,
       "sofascore_referees": 33,
-      "h2h": 26,
+      "h2h": 28,
       "smart_money": 3,
       "sofascore_lineups": 2
     },
