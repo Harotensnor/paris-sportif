@@ -1,21 +1,20 @@
 {
-  "generated_at": "2026-08-17T18:49:53Z",
+  "generated_at": "2026-08-17T19:17:42Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 36,
-    "actionable": 31,
+    "active_events": 34,
+    "actionable": 29,
     "watch": 4,
     "risk": 1,
     "expired_sample": 0,
     "by_type": {
-      "market_move": 53,
-      "signal_conflict": 1,
-      "market_uncertain": 11
+      "market_uncertain": 11,
+      "market_move": 49
     },
     "by_quality": {
-      "actionable": 31,
+      "actionable": 29,
       "risk": 1,
       "watch": 4
     }
@@ -488,42 +487,6 @@
       "side": "home",
       "strength": 0.766,
       "context": "Cote home: 5.22 -> 4.50 (+13.8%)"
-    },
-    {
-      "event_id": "401882923",
-      "date": "2026-08-17T19:00Z",
-      "sport": "football",
-      "league_code": "esp.1",
-      "league_name": "La Liga",
-      "home": "Deportivo",
-      "away": "Elche",
-      "match": "Deportivo - Elche",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.714,
-      "context": "Cote away: 3.50 -> 3.05 (+12.9%)"
-    },
-    {
-      "event_id": "401880329",
-      "date": "2026-08-17T19:00Z",
-      "sport": "football",
-      "league_code": "championship",
-      "league_name": "Championship",
-      "home": "Cardiff City",
-      "away": "Wrexham",
-      "match": "Cardiff City - Wrexham",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.707,
-      "context": "Cote away: 2.75 -> 2.40 (+12.7%)"
     },
     {
       "event_id": "401879321",
