@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-17T15:47:35Z",
-  "calculated_at": "2026-08-17T15:47:35Z",
+  "generated_at": "2026-08-17T16:02:17Z",
+  "calculated_at": "2026-08-17T16:02:17Z",
   "source_of_truth": "data.js",
   "data_age_min": 2,
   "data_file_age_min": 0,
@@ -11,7 +11,7 @@
       "matches": 600
     },
     "winamax_markets": {
-      "age_min": 1,
+      "age_min": 2,
       "matches_with_odds": 531,
       "matches_detailed": 16,
       "details_ratio_pct": 3.0,
@@ -462,7 +462,7 @@
     "winamax_markets": {
       "script": "scripts/fetch_winamax_match_details.py",
       "output": "winamax_markets.json",
-      "age_min": 1,
+      "age_min": 2,
       "threshold_min": 15,
       "fast_red_min": 30,
       "status": "ok"
@@ -1022,7 +1022,7 @@
   ],
   "overall": "warning",
   "quality_checks": {
-    "data_generated_at": "2026-08-17T15:44:56.310165Z",
+    "data_generated_at": "2026-08-17T15:59:40.154633Z",
     "truth_scope": "all_events",
     "all_winamax_available": 61,
     "all_winamax_exact": 61,
@@ -1081,7 +1081,7 @@
   "data_truth": {
     "source_of_truth": "data.js",
     "scope": "all_events",
-    "data_generated_at": "2026-08-17T15:44:56.310165Z",
+    "data_generated_at": "2026-08-17T15:59:40.154633Z",
     "winamax_available": 61,
     "winamax_exact": 61,
     "winamax_exact_ratio": 1.0,
@@ -1101,7 +1101,7 @@
     "anomalies_emitted": 6
   },
   "source_health": {
-    "generated_at": "2026-08-17T15:47:35Z",
+    "generated_at": "2026-08-17T16:02:17Z",
     "sources_total": 11,
     "sources_ok": 6,
     "sources_warning": 5,
@@ -1201,7 +1201,7 @@
   },
   "observability": {
     "pipeline_traces": {
-      "generated_at": "2026-08-17T15:47:35Z",
+      "generated_at": "2026-08-17T16:02:17Z",
       "runs_observed": 99,
       "by_status": {
         "warning": 69,
@@ -1219,7 +1219,7 @@
     }
   },
   "data_lineage": {
-    "generated_at": "2026-08-17T15:47:35Z",
+    "generated_at": "2026-08-17T16:02:17Z",
     "status": "ok",
     "events": 61,
     "events_missing_inline_lineage": 0,
