@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-08-17T09:10:22Z",
-  "calculated_at": "2026-08-17T09:10:22Z",
+  "generated_at": "2026-08-17T09:57:03Z",
+  "calculated_at": "2026-08-17T09:57:03Z",
   "source_of_truth": "data.js",
-  "data_age_min": 1,
+  "data_age_min": 0,
   "data_file_age_min": 0,
   "sources": {
     "winamax_catalog": {
@@ -34,11 +34,11 @@
       "teams": 0
     },
     "clubelo": {
-      "age_min": 2,
+      "age_min": 1,
       "clubs": 594
     },
     "weather": {
-      "age_min": 1,
+      "age_min": 0,
       "events": 6696
     },
     "referees_soccer": {
@@ -47,13 +47,13 @@
       "status": "retained_existing_referees"
     },
     "xg_team_stats": {
-      "age_min": 2,
+      "age_min": 1,
       "teams": 112,
       "leagues": 6,
       "source": "understat"
     },
     "fbref_xg": {
-      "age_min": 2,
+      "age_min": 1,
       "teams": 112,
       "leagues": 6,
       "source": "understat_compat"
@@ -73,7 +73,7 @@
       "sports": 4
     },
     "h2h_extended": {
-      "age_min": 2,
+      "age_min": 1,
       "events": 15,
       "events_with_meetings": 0,
       "meetings": 0,
@@ -494,7 +494,7 @@
     "clubelo": {
       "script": "scripts/fetch_clubelo.py",
       "output": "clubelo.json",
-      "age_min": 2,
+      "age_min": 1,
       "threshold_min": 1440,
       "fast_red_min": null,
       "status": "ok"
@@ -502,7 +502,7 @@
     "weather": {
       "script": "scripts/fetch_weather.py",
       "output": "weather.json",
-      "age_min": 1,
+      "age_min": 0,
       "threshold_min": 60,
       "fast_red_min": 30,
       "status": "ok"
@@ -518,7 +518,7 @@
     "xg_team_stats": {
       "script": "scripts/fetch_understat_xg.py",
       "output": "xg_team_stats.json",
-      "age_min": 2,
+      "age_min": 1,
       "threshold_min": 360,
       "fast_red_min": null,
       "status": "ok"
@@ -526,7 +526,7 @@
     "fbref_xg": {
       "script": "scripts/fetch_understat_xg.py",
       "output": "fbref_xg.json",
-      "age_min": 2,
+      "age_min": 1,
       "threshold_min": 360,
       "fast_red_min": null,
       "status": "ok"
@@ -558,7 +558,7 @@
     "h2h_extended": {
       "script": "h2h_extended.json",
       "output": "h2h_extended.json",
-      "age_min": 2,
+      "age_min": 1,
       "threshold_min": 60,
       "fast_red_min": null,
       "status": "ok"
@@ -1022,7 +1022,7 @@
   ],
   "overall": "warning",
   "quality_checks": {
-    "data_generated_at": "2026-08-17T09:09:18.319673Z",
+    "data_generated_at": "2026-08-17T09:56:10.560091Z",
     "truth_scope": "all_events",
     "all_winamax_available": 61,
     "all_winamax_exact": 61,
@@ -1081,7 +1081,7 @@
   "data_truth": {
     "source_of_truth": "data.js",
     "scope": "all_events",
-    "data_generated_at": "2026-08-17T09:09:18.319673Z",
+    "data_generated_at": "2026-08-17T09:56:10.560091Z",
     "winamax_available": 61,
     "winamax_exact": 61,
     "winamax_exact_ratio": 1.0,
@@ -1094,19 +1094,19 @@
     "status": "degraded",
     "schema_version": 2,
     "sources_validated": 11,
-    "sources_ok": 5,
-    "sources_warning": 6,
+    "sources_ok": 6,
+    "sources_warning": 5,
     "sources_critical": 0,
-    "quarantine_records": 8,
-    "anomalies_emitted": 7
+    "quarantine_records": 7,
+    "anomalies_emitted": 6
   },
   "source_health": {
-    "generated_at": "2026-08-17T09:10:22Z",
+    "generated_at": "2026-08-17T09:57:03Z",
     "sources_total": 11,
-    "sources_ok": 5,
-    "sources_warning": 6,
+    "sources_ok": 6,
+    "sources_warning": 5,
     "sources_critical": 0,
-    "source_health_avg": 87.8,
+    "source_health_avg": 88.5,
     "source_health_min": 49,
     "by_source": {
       "winamax_catalog": {
@@ -1166,12 +1166,12 @@
         "issues": 2
       },
       "clubelo": {
-        "score": 92,
-        "status": "warning",
+        "score": 100,
+        "status": "ok",
         "items": 594,
         "age_min": 2,
         "sla_min": 1440,
-        "issues": 2
+        "issues": 1
       },
       "sofascore_events": {
         "score": 92,
@@ -1201,12 +1201,12 @@
   },
   "observability": {
     "pipeline_traces": {
-      "generated_at": "2026-08-17T09:10:22Z",
+      "generated_at": "2026-08-17T09:57:03Z",
       "runs_observed": 99,
       "by_status": {
-        "warning": 71,
+        "warning": 69,
         "critical": 1,
-        "ok": 27
+        "ok": 29
       },
       "by_script": {
         "data_integrity_monitor.py": {
@@ -1219,7 +1219,7 @@
     }
   },
   "data_lineage": {
-    "generated_at": "2026-08-17T09:10:22Z",
+    "generated_at": "2026-08-17T09:57:03Z",
     "status": "ok",
     "events": 61,
     "events_missing_inline_lineage": 0,
@@ -1325,14 +1325,14 @@
   "sections": {
     "pipeline": {
       "status": "degraded",
-      "data_age_min": 1,
+      "data_age_min": 0,
       "drift_status": "warn",
       "sources_red": 0
     },
     "data": {
       "status": "degraded",
       "sources_validated": 11,
-      "quarantine_records": 8,
+      "quarantine_records": 7,
       "lineage_coverage_pct": 100.0
     },
     "model": {
