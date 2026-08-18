@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-08-18T10:50:01Z",
+  "generated_at": "2026-08-18T11:06:26Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
-  "status": "ok",
+  "status": "watch",
   "summary": {
     "active_events": 12,
-    "actionable": 3,
+    "actionable": 0,
     "watch": 0,
-    "risk": 9,
+    "risk": 12,
     "expired_sample": 0,
     "by_type": {
-      "market_uncertain": 12,
-      "market_move": 7
+      "market_uncertain": 12
     },
     "by_quality": {
-      "actionable": 3,
-      "risk": 9
+      "risk": 12
     }
   },
-  "active_actionable": [
+  "active_actionable": [],
+  "active_watch": [],
+  "active_risk": [
     {
       "event_id": "401874156",
       "date": "2026-08-18T22:00Z",
@@ -28,14 +28,14 @@
       "home": "Independiente Rivadavia",
       "away": "Fluminense",
       "match": "Independiente Rivadavia - Fluminense",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
       "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 2.50 -> 4.50 (-80.0%)"
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.7%"
     },
     {
       "event_id": "401874152",
@@ -46,14 +46,14 @@
       "home": "Deportes Tolima",
       "away": "Independiente del Valle",
       "match": "Deportes Tolima - Independiente del Valle",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
       "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 3.05 -> 2.25 (+26.2%)"
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 19.2%"
     },
     {
       "event_id": "401874163",
@@ -64,18 +64,15 @@
       "home": "Universidad Católica",
       "away": "Estudiantes de La Plata",
       "match": "Universidad Católica - Estudiantes de La Plata",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
       "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 3.05 -> 4.00 (-31.1%)"
-    }
-  ],
-  "active_watch": [],
-  "active_risk": [
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 19.1%"
+    },
     {
       "event_id": "401874155",
       "date": "2026-08-19T22:00Z",
