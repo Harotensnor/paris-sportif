@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-18T06:19:38Z",
-  "calculated_at": "2026-08-18T06:19:38Z",
+  "generated_at": "2026-08-18T07:11:54Z",
+  "calculated_at": "2026-08-18T07:11:54Z",
   "source_of_truth": "data.js",
   "data_age_min": 1,
   "data_file_age_min": 0,
@@ -16,7 +16,7 @@
       "matches_detailed": 16,
       "details_ratio_pct": 3.0,
       "last_run_delta": 0,
-      "last_run_limit": 1000
+      "last_run_limit": 400
     },
     "injuries_soccer": {
       "age_min": 2,
@@ -300,10 +300,10 @@
     "detected_angles": {
       "age_min": 0,
       "events": 35,
-      "angles": 60,
+      "angles": 61,
       "by_type": {
         "market_uncertain": 12,
-        "market_move": 48
+        "market_move": 49
       }
     },
     "schedule_spots_summary": {
@@ -316,10 +316,10 @@
     },
     "rare_signals": {
       "age_min": 0,
-      "signals": 60,
+      "signals": 61,
       "by_type": {
         "market_uncertain": 12,
-        "market_move": 48
+        "market_move": 49
       }
     },
     "rare_signal_summary": {
@@ -1020,7 +1020,7 @@
   ],
   "overall": "warning",
   "quality_checks": {
-    "data_generated_at": "2026-08-18T06:17:53.046219Z",
+    "data_generated_at": "2026-08-18T07:10:22.509103Z",
     "truth_scope": "all_events",
     "all_winamax_available": 53,
     "all_winamax_exact": 50,
@@ -1081,7 +1081,7 @@
   "data_truth": {
     "source_of_truth": "data.js",
     "scope": "all_events",
-    "data_generated_at": "2026-08-18T06:17:53.046219Z",
+    "data_generated_at": "2026-08-18T07:10:22.509103Z",
     "winamax_available": 53,
     "winamax_exact": 50,
     "winamax_exact_ratio": 0.9434,
@@ -1094,20 +1094,20 @@
     "status": "degraded",
     "schema_version": 2,
     "sources_validated": 11,
-    "sources_ok": 6,
-    "sources_warning": 5,
+    "sources_ok": 5,
+    "sources_warning": 6,
     "sources_critical": 0,
-    "quarantine_records": 6,
-    "anomalies_emitted": 4
+    "quarantine_records": 8,
+    "anomalies_emitted": 7
   },
   "source_health": {
-    "generated_at": "2026-08-18T06:19:38Z",
+    "generated_at": "2026-08-18T07:11:53Z",
     "sources_total": 11,
-    "sources_ok": 6,
-    "sources_warning": 5,
+    "sources_ok": 5,
+    "sources_warning": 6,
     "sources_critical": 0,
-    "source_health_avg": 89.3,
-    "source_health_min": 57,
+    "source_health_avg": 87.8,
+    "source_health_min": 49,
     "by_source": {
       "winamax_catalog": {
         "score": 92,
@@ -1121,25 +1121,25 @@
         "score": 84,
         "status": "warning",
         "items": 531,
-        "age_min": 0,
+        "age_min": 1,
         "sla_min": 15,
         "issues": 3
       },
       "injuries_soccer": {
-        "score": 57,
+        "score": 49,
         "status": "warning",
         "items": 0,
         "age_min": 3,
         "sla_min": 180,
-        "issues": 2
+        "issues": 3
       },
       "lineups_soccer": {
-        "score": 100,
-        "status": "ok",
+        "score": 92,
+        "status": "warning",
         "items": 97,
         "age_min": 3,
         "sla_min": 180,
-        "issues": 1
+        "issues": 2
       },
       "referees_soccer": {
         "score": 100,
@@ -1201,12 +1201,12 @@
   },
   "observability": {
     "pipeline_traces": {
-      "generated_at": "2026-08-18T06:19:38Z",
+      "generated_at": "2026-08-18T07:11:53Z",
       "runs_observed": 99,
       "by_status": {
-        "warning": 69,
+        "warning": 71,
         "critical": 1,
-        "ok": 29
+        "ok": 27
       },
       "by_script": {
         "data_integrity_monitor.py": {
@@ -1219,7 +1219,7 @@
     }
   },
   "data_lineage": {
-    "generated_at": "2026-08-18T06:19:38Z",
+    "generated_at": "2026-08-18T07:11:53Z",
     "status": "ok",
     "events": 53,
     "events_missing_inline_lineage": 0,
@@ -1231,7 +1231,7 @@
       "xg": 43,
       "clubelo": 36,
       "sofascore_referees": 31,
-      "h2h": 23,
+      "h2h": 26,
       "sofascore_lineups": 2,
       "smart_money": 1
     },
@@ -1339,7 +1339,7 @@
     "data": {
       "status": "degraded",
       "sources_validated": 11,
-      "quarantine_records": 6,
+      "quarantine_records": 8,
       "lineage_coverage_pct": 100.0
     },
     "model": {
