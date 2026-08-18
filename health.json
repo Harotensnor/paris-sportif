@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-18T00:04:37Z",
-  "calculated_at": "2026-08-18T00:04:37Z",
+  "generated_at": "2026-08-18T01:06:20Z",
+  "calculated_at": "2026-08-18T01:06:20Z",
   "source_of_truth": "data.js",
   "data_age_min": 2,
   "data_file_age_min": 0,
@@ -178,10 +178,10 @@
     },
     "picks_history_summary": {
       "age_min": 3,
-      "total": 8878,
+      "total": 8879,
       "settled": 8833,
-      "pending": 45,
-      "days": 113
+      "pending": 46,
+      "days": 114
     },
     "team_priors": {
       "age_min": 3,
@@ -292,7 +292,7 @@
     },
     "daily_insights": {
       "age_min": 3,
-      "insights": 7,
+      "insights": 6,
       "events_today": 0,
       "events_next_36h": 3,
       "sources_loaded": 8
@@ -439,10 +439,10 @@
     },
     "clv_history": {
       "age_min": 3,
-      "matches": 1033,
-      "observations": 2710,
-      "mean_clv_pct": -0.31,
-      "positive_clv_rate": 33.1,
+      "matches": 1030,
+      "observations": 2702,
+      "mean_clv_pct": -0.32,
+      "positive_clv_rate": 33.0,
       "sample_status": "validated"
     }
   },
@@ -1018,7 +1018,7 @@
   ],
   "overall": "warning",
   "quality_checks": {
-    "data_generated_at": "2026-08-18T00:02:06.165159Z",
+    "data_generated_at": "2026-08-18T01:03:40.605864Z",
     "truth_scope": "all_events",
     "all_winamax_available": 53,
     "all_winamax_exact": 50,
@@ -1079,7 +1079,7 @@
   "data_truth": {
     "source_of_truth": "data.js",
     "scope": "all_events",
-    "data_generated_at": "2026-08-18T00:02:06.165159Z",
+    "data_generated_at": "2026-08-18T01:03:40.605864Z",
     "winamax_available": 53,
     "winamax_exact": 50,
     "winamax_exact_ratio": 0.9434,
@@ -1099,7 +1099,7 @@
     "anomalies_emitted": 4
   },
   "source_health": {
-    "generated_at": "2026-08-18T00:04:37Z",
+    "generated_at": "2026-08-18T01:06:20Z",
     "sources_total": 11,
     "sources_ok": 6,
     "sources_warning": 5,
@@ -1111,7 +1111,7 @@
         "score": 92,
         "status": "warning",
         "items": 600,
-        "age_min": 3,
+        "age_min": 4,
         "sla_min": 15,
         "issues": 2
       },
@@ -1159,7 +1159,7 @@
         "score": 57,
         "status": "warning",
         "items": 0,
-        "age_min": 3,
+        "age_min": 4,
         "sla_min": 300,
         "issues": 1
       },
@@ -1167,7 +1167,7 @@
         "score": 100,
         "status": "ok",
         "items": 594,
-        "age_min": 3,
+        "age_min": 4,
         "sla_min": 1440,
         "issues": 1
       },
@@ -1175,7 +1175,7 @@
         "score": 92,
         "status": "warning",
         "items": 1941,
-        "age_min": 3,
+        "age_min": 4,
         "sla_min": 30,
         "issues": 2
       },
@@ -1183,7 +1183,7 @@
         "score": 100,
         "status": "ok",
         "items": 5450,
-        "age_min": 3,
+        "age_min": 4,
         "sla_min": 1440,
         "issues": 1
       },
@@ -1191,7 +1191,7 @@
         "score": 100,
         "status": "ok",
         "items": 3,
-        "age_min": 3,
+        "age_min": 4,
         "sla_min": 1440,
         "issues": 1
       }
@@ -1199,7 +1199,7 @@
   },
   "observability": {
     "pipeline_traces": {
-      "generated_at": "2026-08-18T00:04:37Z",
+      "generated_at": "2026-08-18T01:06:20Z",
       "runs_observed": 99,
       "by_status": {
         "warning": 69,
@@ -1217,7 +1217,7 @@
     }
   },
   "data_lineage": {
-    "generated_at": "2026-08-18T00:04:37Z",
+    "generated_at": "2026-08-18T01:06:20Z",
     "status": "ok",
     "events": 53,
     "events_missing_inline_lineage": 0,
@@ -1255,24 +1255,24 @@
         ]
       },
       {
-        "event_id": "401882920",
-        "sport": "football",
-        "league": "esp.1",
-        "lineage": [
-          "espn",
-          "sofascore_referees",
-          "weather",
-          "winamax",
-          "xg"
-        ]
-      },
-      {
         "event_id": "401880330",
         "sport": "football",
         "league": "championship",
         "lineage": [
           "clubelo",
           "espn",
+          "weather",
+          "winamax",
+          "xg"
+        ]
+      },
+      {
+        "event_id": "401882920",
+        "sport": "football",
+        "league": "esp.1",
+        "lineage": [
+          "espn",
+          "sofascore_referees",
           "weather",
           "winamax",
           "xg"
@@ -1302,17 +1302,6 @@
         ]
       },
       {
-        "event_id": "401880329",
-        "sport": "football",
-        "league": "championship",
-        "lineage": [
-          "clubelo",
-          "espn",
-          "weather",
-          "winamax"
-        ]
-      },
-      {
         "event_id": "401882923",
         "sport": "football",
         "league": "esp.1",
@@ -1322,6 +1311,17 @@
           "weather",
           "winamax",
           "xg"
+        ]
+      },
+      {
+        "event_id": "401880329",
+        "sport": "football",
+        "league": "championship",
+        "lineage": [
+          "clubelo",
+          "espn",
+          "weather",
+          "winamax"
         ]
       }
     ]
