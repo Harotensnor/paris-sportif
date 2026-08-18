@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-18T05:17:26Z",
-  "calculated_at": "2026-08-18T05:17:26Z",
+  "generated_at": "2026-08-18T05:50:29Z",
+  "calculated_at": "2026-08-18T05:50:29Z",
   "source_of_truth": "data.js",
   "data_age_min": 1,
   "data_file_age_min": 0,
@@ -433,7 +433,7 @@
       "status": "no_explicit_boosts"
     },
     "footballdata": {
-      "age_min": 1,
+      "age_min": 0,
       "rows": 5038,
       "matches": 5038,
       "leagues": 14,
@@ -441,10 +441,10 @@
     },
     "clv_history": {
       "age_min": 2,
-      "matches": 1013,
-      "observations": 2647,
+      "matches": 1014,
+      "observations": 2649,
       "mean_clv_pct": -0.32,
-      "positive_clv_rate": 33.4,
+      "positive_clv_rate": 33.3,
       "sample_status": "validated"
     }
   },
@@ -964,7 +964,7 @@
     "footballdata": {
       "script": "scripts/fetch_footballdata.py",
       "output": "footballdata.json",
-      "age_min": 1,
+      "age_min": 0,
       "threshold_min": 1440,
       "fast_red_min": null,
       "status": "ok"
@@ -1020,7 +1020,7 @@
   ],
   "overall": "warning",
   "quality_checks": {
-    "data_generated_at": "2026-08-18T05:15:38.388753Z",
+    "data_generated_at": "2026-08-18T05:49:02.869653Z",
     "truth_scope": "all_events",
     "all_winamax_available": 53,
     "all_winamax_exact": 50,
@@ -1081,7 +1081,7 @@
   "data_truth": {
     "source_of_truth": "data.js",
     "scope": "all_events",
-    "data_generated_at": "2026-08-18T05:15:38.388753Z",
+    "data_generated_at": "2026-08-18T05:49:02.869653Z",
     "winamax_available": 53,
     "winamax_exact": 50,
     "winamax_exact_ratio": 0.9434,
@@ -1101,7 +1101,7 @@
     "anomalies_emitted": 4
   },
   "source_health": {
-    "generated_at": "2026-08-18T05:17:26Z",
+    "generated_at": "2026-08-18T05:50:29Z",
     "sources_total": 11,
     "sources_ok": 6,
     "sources_warning": 5,
@@ -1113,7 +1113,7 @@
         "score": 92,
         "status": "warning",
         "items": 600,
-        "age_min": 2,
+        "age_min": 3,
         "sla_min": 15,
         "issues": 2
       },
@@ -1129,7 +1129,7 @@
         "score": 57,
         "status": "warning",
         "items": 0,
-        "age_min": 2,
+        "age_min": 3,
         "sla_min": 180,
         "issues": 2
       },
@@ -1137,7 +1137,7 @@
         "score": 100,
         "status": "ok",
         "items": 97,
-        "age_min": 2,
+        "age_min": 3,
         "sla_min": 180,
         "issues": 1
       },
@@ -1145,7 +1145,7 @@
         "score": 100,
         "status": "ok",
         "items": 106,
-        "age_min": 2,
+        "age_min": 3,
         "sla_min": 180,
         "issues": 1
       },
@@ -1153,7 +1153,7 @@
         "score": 100,
         "status": "ok",
         "items": 6716,
-        "age_min": 2,
+        "age_min": 1,
         "sla_min": 60,
         "issues": 1
       },
@@ -1161,7 +1161,7 @@
         "score": 57,
         "status": "warning",
         "items": 0,
-        "age_min": 2,
+        "age_min": 3,
         "sla_min": 300,
         "issues": 1
       },
@@ -1169,7 +1169,7 @@
         "score": 100,
         "status": "ok",
         "items": 594,
-        "age_min": 2,
+        "age_min": 3,
         "sla_min": 1440,
         "issues": 1
       },
@@ -1177,7 +1177,7 @@
         "score": 92,
         "status": "warning",
         "items": 1941,
-        "age_min": 2,
+        "age_min": 3,
         "sla_min": 30,
         "issues": 2
       },
@@ -1185,7 +1185,7 @@
         "score": 100,
         "status": "ok",
         "items": 5450,
-        "age_min": 2,
+        "age_min": 3,
         "sla_min": 1440,
         "issues": 1
       },
@@ -1193,7 +1193,7 @@
         "score": 100,
         "status": "ok",
         "items": 3,
-        "age_min": 2,
+        "age_min": 3,
         "sla_min": 1440,
         "issues": 1
       }
@@ -1201,7 +1201,7 @@
   },
   "observability": {
     "pipeline_traces": {
-      "generated_at": "2026-08-18T05:17:26Z",
+      "generated_at": "2026-08-18T05:50:29Z",
       "runs_observed": 99,
       "by_status": {
         "warning": 69,
@@ -1219,7 +1219,7 @@
     }
   },
   "data_lineage": {
-    "generated_at": "2026-08-18T05:17:26Z",
+    "generated_at": "2026-08-18T05:50:29Z",
     "status": "ok",
     "events": 53,
     "events_missing_inline_lineage": 0,
