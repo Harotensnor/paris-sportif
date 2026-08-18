@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-16T16:00:14Z",
+  "generated_at": "2026-08-18T00:01:32Z",
   "source": "OpenLigaDB public API",
   "status": "ok",
   "season": 2026,
@@ -569,15 +569,7 @@
         "home": 0,
         "away": 1
       },
-      "finished": true,
-      "local_event": {
-        "day": "2026-08-16",
-        "id": "401885146",
-        "league": "Bundesliga 2 ger.2",
-        "home": "Hannover 96",
-        "away": "VfL Wolfsburg",
-        "kickoff_utc": "2026-08-16T11:30:00Z"
-      }
+      "finished": true
     },
     {
       "source": "openligadb",
@@ -595,15 +587,7 @@
         "home": 1,
         "away": 0
       },
-      "finished": true,
-      "local_event": {
-        "day": "2026-08-16",
-        "id": "401885143",
-        "league": "Bundesliga 2 ger.2",
-        "home": "Dynamo Dresden",
-        "away": "SV Darmstadt 98",
-        "kickoff_utc": "2026-08-16T11:30:00Z"
-      }
+      "finished": true
     },
     {
       "source": "openligadb",
@@ -621,15 +605,7 @@
         "home": 3,
         "away": 0
       },
-      "finished": true,
-      "local_event": {
-        "day": "2026-08-16",
-        "id": "401885141",
-        "league": "Bundesliga 2 ger.2",
-        "home": "Arminia Bielefeld",
-        "away": "Energie Cottbus",
-        "kickoff_utc": "2026-08-16T11:30:00Z"
-      }
+      "finished": true
     },
     {
       "source": "openligadb",
@@ -1239,9 +1215,9 @@
       "away_icon": "https://upload.wikimedia.org/wikipedia/de/thumb/f/ff/1._FC_Saarbr%C3%BCcken.svg/960px-1._FC_Saarbr%C3%BCcken.svg.png",
       "score": {
         "home": 0,
-        "away": 0
+        "away": 1
       },
-      "finished": false
+      "finished": true
     },
     {
       "source": "openligadb",
@@ -1255,8 +1231,11 @@
       "away": "Viktoria Köln",
       "home_icon": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/VfB_Stuttgart_1893_Logo.svg/960px-VfB_Stuttgart_1893_Logo.svg.png",
       "away_icon": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dc/FC_Viktoria_K%C3%B6ln_1904_Logo.svg/960px-FC_Viktoria_K%C3%B6ln_1904_Logo.svg.png",
-      "score": null,
-      "finished": false
+      "score": {
+        "home": 1,
+        "away": 3
+      },
+      "finished": true
     },
     {
       "source": "openligadb",
@@ -1542,10 +1521,25 @@
       "away_icon": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Logo_TSG_Hoffenheim.svg/960px-Logo_TSG_Hoffenheim.svg.png",
       "score": null,
       "finished": false
+    },
+    {
+      "source": "openligadb",
+      "league_code": "bl3",
+      "league": "3. Liga",
+      "season": 2026,
+      "match_id": 84781,
+      "matchday": 4,
+      "kickoff_utc": "2026-09-06T17:30:00Z",
+      "home": "Fortuna Köln",
+      "away": "Fortuna Düsseldorf",
+      "home_icon": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/SC_Fortuna_Koeln_Logo_2013–2019%2C_2026–.svg/250px-SC_Fortuna_Koeln_Logo_2013–2019%2C_2026–.svg.png",
+      "away_icon": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/Fortuna_D%C3%BCsseldorf.svg/960px-Fortuna_D%C3%BCsseldorf.svg.png",
+      "score": null,
+      "finished": false
     }
   ],
-  "matched_local_events": 3,
-  "matched_local_ratio": 0.0323,
+  "matched_local_events": 0,
+  "matched_local_ratio": 0.0,
   "by_league": {
     "bl1": {
       "league": "Bundesliga",
@@ -1559,13 +1553,13 @@
       "matches": 36,
       "upcoming": 18,
       "finished": 18,
-      "matched_local_events": 3
+      "matched_local_events": 0
     },
     "bl3": {
       "league": "3. Liga",
-      "matches": 39,
-      "upcoming": 21,
-      "finished": 18,
+      "matches": 40,
+      "upcoming": 20,
+      "finished": 20,
       "matched_local_events": 0
     }
   },
