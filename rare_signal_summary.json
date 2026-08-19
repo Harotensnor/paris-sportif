@@ -1,24 +1,24 @@
 {
-  "generated_at": "2026-08-19T13:12:20Z",
+  "generated_at": "2026-08-19T13:55:49Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
-  "status": "ok",
+  "status": "watch",
   "summary": {
     "active_events": 9,
-    "actionable": 3,
+    "actionable": 0,
     "watch": 0,
-    "risk": 6,
+    "risk": 9,
     "expired_sample": 0,
     "by_type": {
-      "market_uncertain": 9,
-      "market_move": 8
+      "market_uncertain": 9
     },
     "by_quality": {
-      "actionable": 3,
-      "risk": 6
+      "risk": 9
     }
   },
-  "active_actionable": [
+  "active_actionable": [],
+  "active_watch": [],
+  "active_risk": [
     {
       "event_id": "401874155",
       "date": "2026-08-19T22:00Z",
@@ -28,14 +28,14 @@
       "home": "Cerro Porteño",
       "away": "Palmeiras",
       "match": "Cerro Porteño - Palmeiras",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
       "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 4.90 -> 6.25 (-27.6%)"
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 19.2%"
     },
     {
       "event_id": "401874143",
@@ -46,14 +46,14 @@
       "home": "Coquimbo Unido",
       "away": "Platense",
       "match": "Coquimbo Unido - Platense",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
       "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 2.30 -> 4.20 (-82.6%)"
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.9%"
     },
     {
       "event_id": "401874141",
@@ -64,18 +64,15 @@
       "home": "Flamengo",
       "away": "Cruzeiro",
       "match": "Flamengo - Cruzeiro",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
       "team": null,
-      "side": "home",
-      "strength": 1.0,
-      "context": "Cote home: 1.65 -> 2.40 (-45.9%)"
-    }
-  ],
-  "active_watch": [],
-  "active_risk": [
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 19.0%"
+    },
     {
       "event_id": "401874142",
       "date": "2026-08-20T22:00Z",
