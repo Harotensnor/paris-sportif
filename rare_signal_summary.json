@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-08-19T07:12:28Z",
+  "generated_at": "2026-08-19T07:59:22Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 32,
-    "actionable": 25,
-    "watch": 6,
+    "actionable": 24,
+    "watch": 7,
     "risk": 1,
     "expired_sample": 0,
     "by_type": {
@@ -14,8 +14,8 @@
       "market_uncertain": 9
     },
     "by_quality": {
-      "actionable": 25,
-      "watch": 6,
+      "watch": 7,
+      "actionable": 24,
       "risk": 1
     }
   },
@@ -381,24 +381,6 @@
       "context": "Cote away: 3.98 -> 3.30 (+17.1%)"
     },
     {
-      "event_id": "401882925",
-      "date": "2026-08-19T19:00Z",
-      "sport": "football",
-      "league_code": "esp.1",
-      "league_name": "La Liga",
-      "home": "Atlético Madrid",
-      "away": "Málaga",
-      "match": "Atlético Madrid - Málaga",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "steam",
-      "team": null,
-      "side": "away",
-      "strength": 0.877,
-      "context": "Cote away: 9.50 -> 8.00 (+15.8%)"
-    },
-    {
       "event_id": "401876486",
       "date": "2026-08-22T18:45Z",
       "sport": "football",
@@ -507,6 +489,24 @@
       "side": "home",
       "strength": 0.637,
       "context": "Cote home: 2.88 -> 2.55 (+11.5%)"
+    },
+    {
+      "event_id": "401882925",
+      "date": "2026-08-19T19:00Z",
+      "sport": "football",
+      "league_code": "esp.1",
+      "league_name": "La Liga",
+      "home": "Atlético Madrid",
+      "away": "Málaga",
+      "match": "Atlético Madrid - Málaga",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.617,
+      "context": "Cote away: 9.00 -> 8.00 (+11.1%)"
     },
     {
       "event_id": "401876492",
