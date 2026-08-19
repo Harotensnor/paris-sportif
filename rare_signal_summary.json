@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-19T18:15:19Z",
+  "generated_at": "2026-08-19T18:53:45Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
@@ -19,6 +19,24 @@
     }
   },
   "active_actionable": [
+    {
+      "event_id": "401882925",
+      "date": "2026-08-19T19:00Z",
+      "sport": "football",
+      "league_code": "esp.1",
+      "league_name": "La Liga",
+      "home": "Atlético Madrid",
+      "away": "Málaga",
+      "match": "Atlético Madrid - Málaga",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "drift",
+      "team": null,
+      "side": "away",
+      "strength": 1.0,
+      "context": "Cote away: 6.50 -> 8.00 (-23.1%)"
+    },
     {
       "event_id": "401874155",
       "date": "2026-08-19T22:00Z",
@@ -72,24 +90,6 @@
       "side": "home",
       "strength": 1.0,
       "context": "Cote home: 1.65 -> 2.40 (-45.9%)"
-    },
-    {
-      "event_id": "401882925",
-      "date": "2026-08-19T19:00Z",
-      "sport": "football",
-      "league_code": "esp.1",
-      "league_name": "La Liga",
-      "home": "Atlético Madrid",
-      "away": "Málaga",
-      "match": "Atlético Madrid - Málaga",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "market_move",
-      "direction": "drift",
-      "team": null,
-      "side": "away",
-      "strength": 0.794,
-      "context": "Cote away: 7.00 -> 8.00 (-14.3%)"
     }
   ],
   "active_watch": [],
