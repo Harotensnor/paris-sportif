@@ -1,15 +1,15 @@
 {
-  "generated_at": "2026-08-20T01:05:08Z",
-  "calculated_at": "2026-08-20T01:05:08Z",
+  "generated_at": "2026-08-20T02:24:18Z",
+  "calculated_at": "2026-08-20T02:24:18Z",
   "source_of_truth": "data.js",
-  "data_generated_at": "2026-08-20T01:04:01.028423Z",
+  "data_generated_at": "2026-08-20T02:23:02.580638Z",
   "data_today_field": "2026-08-20",
   "events": {
-    "total": 48,
-    "upcoming": 42,
-    "winamax_available": 48,
-    "winamax_exact": 45,
-    "winamax_exact_ratio": 0.9375,
+    "total": 45,
+    "upcoming": 41,
+    "winamax_available": 45,
+    "winamax_exact": 42,
+    "winamax_exact_ratio": 0.9333,
     "markets_more_than_1n2": 0,
     "form_l10": 33,
     "h2h": 0,
@@ -17,7 +17,7 @@
     "football_lineups": 2,
     "starter_signals": 2,
     "clubelo": 34,
-    "weather": 45,
+    "weather": 42,
     "injuries": 0,
     "referee": 31,
     "referee_named": 1,
@@ -25,8 +25,8 @@
     "referee_signal": 31,
     "fd_calibration": 0,
     "fd_closing_odds": 0,
-    "xg": 42,
-    "smart_money": 1
+    "xg": 39,
+    "smart_money": 0
   },
   "signal_health": {
     "referee": {
@@ -36,7 +36,7 @@
       "note": "referee is effective coverage: named referee or referee_context usable by the model."
     },
     "smart_money": {
-      "events": 1,
+      "events": 0,
       "status": "rare_event",
       "note": "Smart money is intentionally rare; low count is OK when odds movement does not confirm a strong signal."
     }
@@ -44,8 +44,8 @@
   "winamax_markets": {
     "matches": 531,
     "detailed_market_matches": 16,
-    "detailed_ratio_vs_exact": 0.3556,
-    "gap_to_50pct_exact": 0.1444,
+    "detailed_ratio_vs_exact": 0.381,
+    "gap_to_50pct_exact": 0.119,
     "recommended_detail_fetch_cap": 150,
     "detail_by_sport": {
       "basketball": {
@@ -55,7 +55,7 @@
         "detailed_ratio": 0.0
       },
       "football": {
-        "exact": 40,
+        "exact": 39,
         "detailed": 0,
         "families": {},
         "detailed_ratio": 0.0
@@ -81,7 +81,7 @@
   },
   "health": {
     "status": "warning",
-    "warnings": 11,
+    "warnings": 12,
     "pipeline_drift": "warn"
   }
 }
