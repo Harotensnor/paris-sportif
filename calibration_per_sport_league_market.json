@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-21T04:26:34Z",
+  "generated_at": "2026-08-22T04:20:15Z",
   "schema": "calibration_per_sport_league_market_v1",
   "top5_leagues": [
     "eng.1",
@@ -60,29 +60,54 @@
       "n_with_clv": 7
     },
     "football:other|1n2": {
-      "n": 263,
-      "wins": 141,
-      "losses": 122,
-      "win_rate": 0.5361216730038023,
+      "n": 248,
+      "wins": 133,
+      "losses": 115,
+      "win_rate": 0.5362903225806451,
       "win_rate_ci": [
-        0.4758,
-        0.5954
+        0.4741,
+        0.5973
       ],
-      "flat_pnl": 14.31,
-      "flat_roi_pct": 5.44,
+      "flat_pnl": 14.33,
+      "flat_roi_pct": 5.78,
       "flat_roi_ci_pct": [
-        -7.39,
-        18.49
+        -7.74,
+        18.94
       ],
-      "kelly_pnl": 76.52,
-      "brier": 0.2321,
-      "logloss": 0.6577,
+      "kelly_pnl": 78.19,
+      "brier": 0.232,
+      "logloss": 0.6575,
       "avg_cote": 2.1,
-      "avg_pick_prob": 0.505,
-      "avg_edge_pct": -0.83,
-      "avg_ev_pct": -0.4,
-      "avg_clv_pct": -0.39,
-      "n_with_clv": 254
+      "avg_pick_prob": 0.504,
+      "avg_edge_pct": -0.79,
+      "avg_ev_pct": -0.29,
+      "avg_clv_pct": -0.4,
+      "n_with_clv": 240
+    },
+    "football:top5|1n2": {
+      "n": 3,
+      "wins": 3,
+      "losses": 0,
+      "win_rate": 1.0,
+      "win_rate_ci": [
+        0.4385,
+        1.0
+      ],
+      "flat_pnl": 2.08,
+      "flat_roi_pct": 69.17,
+      "flat_roi_ci_pct": [
+        21.1,
+        115.0
+      ],
+      "kelly_pnl": 0.14,
+      "brier": 0.1688,
+      "logloss": 0.5135,
+      "avg_cote": 1.69,
+      "avg_pick_prob": 0.614,
+      "avg_edge_pct": -1.11,
+      "avg_ev_pct": -1.47,
+      "avg_clv_pct": null,
+      "n_with_clv": 0
     }
   },
   "calibration_by_sport_league_market": {
@@ -118,46 +143,46 @@
         "bin": 3,
         "lo": 0.3,
         "hi": 0.4,
-        "n": 64,
+        "n": 62,
         "prob_mean": 0.365,
-        "win_rate": 0.375,
-        "gap": 0.01
+        "win_rate": 0.371,
+        "gap": 0.006
       },
       {
         "bin": 4,
         "lo": 0.4,
         "hi": 0.5,
-        "n": 82,
-        "prob_mean": 0.446,
-        "win_rate": 0.427,
+        "n": 77,
+        "prob_mean": 0.447,
+        "win_rate": 0.429,
         "gap": -0.019
       },
       {
         "bin": 5,
         "lo": 0.5,
         "hi": 0.6,
-        "n": 57,
-        "prob_mean": 0.552,
-        "win_rate": 0.702,
-        "gap": 0.15
+        "n": 52,
+        "prob_mean": 0.554,
+        "win_rate": 0.712,
+        "gap": 0.158
       },
       {
         "bin": 6,
         "lo": 0.6,
         "hi": 0.7,
-        "n": 38,
-        "prob_mean": 0.65,
-        "win_rate": 0.737,
-        "gap": 0.087
+        "n": 36,
+        "prob_mean": 0.648,
+        "win_rate": 0.75,
+        "gap": 0.102
       },
       {
         "bin": 7,
         "lo": 0.7,
         "hi": 0.8,
-        "n": 19,
-        "prob_mean": 0.742,
-        "win_rate": 0.632,
-        "gap": -0.111
+        "n": 18,
+        "prob_mean": 0.744,
+        "win_rate": 0.611,
+        "gap": -0.133
       },
       {
         "bin": 8,
@@ -274,29 +299,29 @@
   "isotonic_pairs_by_sport_league_market": {
     "football:other|1n2": [
       {
-        "predicted": 0.3654,
-        "actual": 0.375,
-        "n": 64
+        "predicted": 0.3655,
+        "actual": 0.371,
+        "n": 62
       },
       {
-        "predicted": 0.4461,
-        "actual": 0.4268,
-        "n": 82
+        "predicted": 0.4472,
+        "actual": 0.4286,
+        "n": 77
       },
       {
-        "predicted": 0.5516,
-        "actual": 0.7017,
-        "n": 114
+        "predicted": 0.5538,
+        "actual": 0.7066,
+        "n": 692
       },
       {
-        "predicted": 0.6495,
-        "actual": 0.7017,
-        "n": 114
+        "predicted": 0.6476,
+        "actual": 0.7066,
+        "n": 1118
       },
       {
-        "predicted": 0.7425,
-        "actual": 0.7017,
-        "n": 57
+        "predicted": 0.7442,
+        "actual": 0.7066,
+        "n": 1118
       }
     ]
   }
