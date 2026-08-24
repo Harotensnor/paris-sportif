@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-24T20:41:44Z",
+  "generated_at": "2026-08-24T21:05:22Z",
   "method": "Full Bivariate Poisson MLE Dixon-Coles. Coordinate-descent avec golden-section search 1D. Pure Python (pas de scipy).",
   "min_matches_per_league": 40,
   "min_matches_per_team": 5,
@@ -286,114 +286,120 @@
       }
     },
     "eng.1": {
-      "n_matches": 62,
-      "n_teams": 17,
-      "gamma": 0.452,
-      "rho": -0.2505,
-      "log_lik": -165.54,
+      "n_matches": 63,
+      "n_teams": 18,
+      "gamma": 0.4735,
+      "rho": -0.2413,
+      "log_lik": -169.52,
       "iterations": 3,
       "teams": {
         "AFC Bournemouth": {
-          "alpha": -0.0289,
-          "beta": 0.5753,
-          "rank_off": 11,
-          "rank_def": 16
-        },
-        "Arsenal": {
-          "alpha": 0.2021,
-          "beta": 1.4356,
-          "rank_off": 4,
+          "alpha": -0.049,
+          "beta": 0.6375,
+          "rank_off": 13,
           "rank_def": 17
         },
+        "Arsenal": {
+          "alpha": 0.1426,
+          "beta": 1.4641,
+          "rank_off": 5,
+          "rank_def": 18
+        },
         "Aston Villa": {
-          "alpha": 0.0837,
-          "beta": -0.4429,
-          "rank_off": 7,
-          "rank_def": 4
+          "alpha": 0.0637,
+          "beta": -0.3993,
+          "rank_off": 8,
+          "rank_def": 3
         },
         "Brentford": {
-          "alpha": 0.0199,
-          "beta": -0.0597,
-          "rank_off": 10,
-          "rank_def": 9
+          "alpha": 0.0393,
+          "beta": -0.0255,
+          "rank_off": 11,
+          "rank_def": 10
         },
         "Brighton & Hove Albion": {
-          "alpha": 0.0593,
-          "beta": -0.0934,
+          "alpha": 0.0637,
+          "beta": -0.0557,
           "rank_off": 9,
-          "rank_def": 8
+          "rank_def": 9
+        },
+        "Chelsea": {
+          "alpha": 0.1821,
+          "beta": -0.3656,
+          "rank_off": 4,
+          "rank_def": 5
         },
         "Crystal Palace": {
-          "alpha": -0.5455,
-          "beta": -0.5311,
-          "rank_off": 17,
+          "alpha": -0.5168,
+          "beta": -0.4933,
+          "rank_off": 18,
           "rank_def": 2
         },
         "Everton": {
-          "alpha": -0.044,
-          "beta": -0.7679,
+          "alpha": -0.0303,
+          "beta": -0.7337,
           "rank_off": 12,
           "rank_def": 1
         },
         "Fulham": {
-          "alpha": -0.4967,
-          "beta": 0.2746,
-          "rank_off": 16,
-          "rank_def": 14
-        },
-        "Leeds United": {
-          "alpha": 0.1081,
-          "beta": 0.4232,
-          "rank_off": 6,
-          "rank_def": 15
-        },
-        "Liverpool": {
-          "alpha": 0.1476,
-          "beta": -0.4673,
-          "rank_off": 5,
-          "rank_def": 3
-        },
-        "Manchester City": {
-          "alpha": 0.2115,
-          "beta": -0.0992,
-          "rank_off": 2,
-          "rank_def": 7
-        },
-        "Manchester United": {
-          "alpha": 0.2115,
-          "beta": 0.0737,
-          "rank_off": 3,
+          "alpha": -0.3891,
+          "beta": -0.0162,
+          "rank_off": 17,
           "rank_def": 11
         },
-        "Newcastle United": {
-          "alpha": 0.0744,
-          "beta": 0.0041,
-          "rank_off": 8,
-          "rank_def": 10
+        "Leeds United": {
+          "alpha": 0.1031,
+          "beta": 0.4308,
+          "rank_off": 6,
+          "rank_def": 16
         },
-        "Nottingham Forest": {
-          "alpha": 0.4877,
-          "beta": 0.0737,
-          "rank_off": 1,
-          "rank_def": 12
+        "Liverpool": {
+          "alpha": 0.073,
+          "beta": -0.3993,
+          "rank_off": 7,
+          "rank_def": 4
         },
-        "Sunderland": {
-          "alpha": -0.181,
-          "beta": -0.2456,
-          "rank_off": 15,
-          "rank_def": 6
+        "Manchester City": {
+          "alpha": 0.2308,
+          "beta": -0.065,
+          "rank_off": 2,
+          "rank_def": 8
         },
-        "Tottenham Hotspur": {
-          "alpha": -0.1473,
-          "beta": 0.0981,
-          "rank_off": 13,
+        "Manchester United": {
+          "alpha": 0.2308,
+          "beta": 0.0871,
+          "rank_off": 3,
           "rank_def": 13
         },
+        "Newcastle United": {
+          "alpha": 0.0543,
+          "beta": 0.0233,
+          "rank_off": 10,
+          "rank_def": 12
+        },
+        "Nottingham Forest": {
+          "alpha": 0.4375,
+          "beta": 0.1417,
+          "rank_off": 1,
+          "rank_def": 14
+        },
+        "Sunderland": {
+          "alpha": -0.2614,
+          "beta": -0.1834,
+          "rank_off": 16,
+          "rank_def": 7
+        },
+        "Tottenham Hotspur": {
+          "alpha": -0.2162,
+          "beta": 0.1754,
+          "rank_off": 15,
+          "rank_def": 15
+        },
         "West Ham United": {
-          "alpha": -0.1624,
-          "beta": -0.2513,
+          "alpha": -0.1581,
+          "beta": -0.2228,
           "rank_off": 14,
-          "rank_def": 5
+          "rank_def": 6
         }
       }
     },
