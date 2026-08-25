@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-25T20:57:28Z",
+  "generated_at": "2026-08-25T21:18:42Z",
   "method": "Full Bivariate Poisson MLE Dixon-Coles. Coordinate-descent avec golden-section search 1D. Pure Python (pas de scipy).",
   "min_matches_per_league": 40,
   "min_matches_per_team": 5,
@@ -438,126 +438,132 @@
       }
     },
     "esp.1": {
-      "n_matches": 67,
-      "n_teams": 19,
-      "gamma": 0.3365,
-      "rho": -0.1115,
-      "log_lik": -169.96,
+      "n_matches": 68,
+      "n_teams": 20,
+      "gamma": 0.3336,
+      "rho": -0.0787,
+      "log_lik": -171.74,
       "iterations": 3,
       "teams": {
         "Alavés": {
-          "alpha": 0.0807,
-          "beta": 0.0009,
+          "alpha": 0.0783,
+          "beta": 0.0143,
           "rank_off": 10,
-          "rank_def": 9
+          "rank_def": 11
         },
         "Athletic Club": {
-          "alpha": 0.804,
-          "beta": -0.5459,
+          "alpha": 0.8016,
+          "beta": -0.5418,
           "rank_off": 1,
           "rank_def": 1
         },
         "Atlético Madrid": {
-          "alpha": 0.1295,
-          "beta": 0.1042,
-          "rank_off": 8,
-          "rank_def": 12
-        },
-        "Barcelona": {
-          "alpha": 0.4395,
-          "beta": 0.6244,
-          "rank_off": 3,
-          "rank_def": 19
-        },
-        "Celta Vigo": {
-          "alpha": 0.0656,
-          "beta": 0.4328,
-          "rank_off": 11,
-          "rank_def": 16
-        },
-        "Elche": {
-          "alpha": -0.0075,
-          "beta": -0.2754,
-          "rank_off": 13,
-          "rank_def": 5
-        },
-        "Espanyol": {
-          "alpha": -0.1898,
-          "beta": 0.4572,
-          "rank_off": 16,
-          "rank_def": 17
-        },
-        "Getafe": {
-          "alpha": -0.8492,
-          "beta": -0.1663,
-          "rank_off": 18,
-          "rank_def": 8
-        },
-        "Girona": {
-          "alpha": -0.776,
-          "beta": 0.1379,
-          "rank_off": 17,
+          "alpha": 0.0934,
+          "beta": 0.1269,
+          "rank_off": 9,
           "rank_def": 13
         },
-        "Levante": {
-          "alpha": 0.1446,
-          "beta": -0.2754,
-          "rank_off": 7,
+        "Barcelona": {
+          "alpha": 0.4916,
+          "beta": 0.6284,
+          "rank_off": 3,
+          "rank_def": 20
+        },
+        "Celta Vigo": {
+          "alpha": 0.0539,
+          "beta": 0.4311,
+          "rank_off": 12,
+          "rank_def": 17
+        },
+        "Elche": {
+          "alpha": 0.0051,
+          "beta": -0.2771,
+          "rank_off": 14,
           "rank_def": 6
         },
+        "Espanyol": {
+          "alpha": -0.1922,
+          "beta": 0.4763,
+          "rank_off": 17,
+          "rank_def": 18
+        },
+        "Getafe": {
+          "alpha": -0.8365,
+          "beta": -0.1529,
+          "rank_off": 19,
+          "rank_def": 9
+        },
+        "Girona": {
+          "alpha": -0.8215,
+          "beta": 0.1513,
+          "rank_off": 18,
+          "rank_def": 14
+        },
+        "Levante": {
+          "alpha": 0.1572,
+          "beta": -0.2713,
+          "rank_off": 7,
+          "rank_def": 7
+        },
         "Mallorca": {
-          "alpha": -0.141,
-          "beta": 0.0102,
-          "rank_off": 14,
+          "alpha": -0.1434,
+          "beta": 0.0085,
+          "rank_off": 15,
           "rank_def": 10
         },
         "Osasuna": {
-          "alpha": -0.141,
-          "beta": -0.388,
-          "rank_off": 15,
+          "alpha": -0.1434,
+          "beta": -0.3596,
+          "rank_off": 16,
           "rank_def": 4
         },
         "Rayo Vallecano": {
-          "alpha": 0.2967,
-          "beta": 0.0834,
+          "alpha": 0.2513,
+          "beta": 0.1025,
           "rank_off": 6,
-          "rank_def": 11
+          "rank_def": 12
         },
         "Real Betis": {
-          "alpha": 0.1202,
-          "beta": 0.1379,
-          "rank_off": 9,
-          "rank_def": 14
+          "alpha": 0.0783,
+          "beta": 0.3185,
+          "rank_off": 11,
+          "rank_def": 16
         },
         "Real Madrid": {
-          "alpha": 0.3211,
-          "beta": 0.5419,
+          "alpha": 0.3395,
+          "beta": 0.5553,
           "rank_off": 5,
-          "rank_def": 18
+          "rank_def": 19
         },
         "Real Oviedo": {
-          "alpha": -1.4785,
-          "beta": -0.467,
-          "rank_off": 19,
+          "alpha": -1.4902,
+          "beta": -0.4536,
+          "rank_off": 20,
           "rank_def": 2
         },
         "Real Sociedad": {
-          "alpha": 0.3756,
-          "beta": -0.4275,
+          "alpha": 0.3581,
+          "beta": -0.4292,
           "rank_off": 4,
           "rank_def": 3
         },
         "Sevilla": {
-          "alpha": 0.0412,
-          "beta": 0.2656,
-          "rank_off": 12,
+          "alpha": 0.0539,
+          "beta": 0.2639,
+          "rank_off": 13,
           "rank_def": 15
         },
+        "Valencia": {
+          "alpha": 0.1027,
+          "beta": -0.3352,
+          "rank_off": 8,
+          "rank_def": 5
+        },
         "Villarreal": {
-          "alpha": 0.7645,
-          "beta": -0.251,
+          "alpha": 0.7621,
+          "beta": -0.2563,
           "rank_off": 2,
-          "rank_def": 7
+          "rank_def": 8
         }
       }
     },
