@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-26T04:23:21Z",
+  "generated_at": "2026-08-26T05:06:52Z",
   "source": "data.js bookable feed + sofascore_events source feed",
   "status": "ok",
   "categories": {
@@ -149,7 +149,7 @@
     },
     "J6_coupes": {
       "label": "Coupes",
-      "bookable": 3,
+      "bookable": 4,
       "source": 43,
       "samples": [
         {
@@ -175,6 +175,14 @@
           "match": "West Ham United at Southampton",
           "league": "EFL Cup",
           "code": "football.cup"
+        },
+        {
+          "event_id": "401874147",
+          "source": "winamax_exact",
+          "kickoff": "2026-08-26T00:30Z",
+          "match": "Deportes Tolima at Independiente del Valle",
+          "league": "Copa Libertadores",
+          "code": "conmebol.libertadores"
         },
         {
           "event_id": "sofa_15832759",
@@ -207,23 +215,23 @@
           "match": "Independiente Rivadavia vs Fluminense",
           "league": "CONMEBOL Libertadores, Group C",
           "code": "conmebol.libertadores"
-        },
-        {
-          "event_id": "sofa_15832840",
-          "source": "sofascore_watch",
-          "kickoff": "2026-05-06T00:00Z",
-          "match": "Barcelona SC Guayaquil vs Boca Juniors",
-          "league": "CONMEBOL Libertadores, Group D",
-          "code": "conmebol.libertadores"
         }
       ],
       "status": "ok"
     },
     "J7_asie_latam": {
       "label": "Asie / Amérique latine",
-      "bookable": 0,
+      "bookable": 1,
       "source": 66,
       "samples": [
+        {
+          "event_id": "401874147",
+          "source": "winamax_exact",
+          "kickoff": "2026-08-26T00:30Z",
+          "match": "Deportes Tolima at Independiente del Valle",
+          "league": "Copa Libertadores",
+          "code": "conmebol.libertadores"
+        },
         {
           "event_id": "sofa_15832759",
           "source": "sofascore_watch",
@@ -279,22 +287,14 @@
           "match": "Independiente Santa Fe vs Corinthians",
           "league": "CONMEBOL Libertadores, Group E",
           "code": "conmebol.libertadores"
-        },
-        {
-          "event_id": "sofa_15832803",
-          "source": "sofascore_watch",
-          "kickoff": "2026-05-05T22:00Z",
-          "match": "Club Sporting Cristal vs Palmeiras",
-          "league": "CONMEBOL Libertadores, Group F",
-          "code": "conmebol.libertadores"
         }
       ],
-      "status": "watch"
+      "status": "ok"
     }
   },
   "summary": {
-    "bookable_total": 3,
+    "bookable_total": 5,
     "source_total": 141,
-    "ok_categories": 1
+    "ok_categories": 2
   }
 }
