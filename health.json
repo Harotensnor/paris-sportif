@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-26T00:28:33Z",
-  "calculated_at": "2026-08-26T00:28:33Z",
+  "generated_at": "2026-08-26T01:08:38Z",
+  "calculated_at": "2026-08-26T01:08:38Z",
   "source_of_truth": "data.js",
   "data_age_min": 0,
   "data_file_age_min": 0,
@@ -35,21 +35,21 @@
     },
     "weather": {
       "age_min": 0,
-      "events": 6904
+      "events": 6906
     },
     "referees_soccer": {
-      "age_min": 2,
+      "age_min": 1,
       "events": 106,
       "status": "retained_existing_referees"
     },
     "xg_team_stats": {
-      "age_min": 2,
+      "age_min": 1,
       "teams": 112,
       "leagues": 6,
       "source": "understat"
     },
     "fbref_xg": {
-      "age_min": 2,
+      "age_min": 1,
       "teams": 112,
       "leagues": 6,
       "source": "understat_compat"
@@ -69,7 +69,7 @@
       "sports": 4
     },
     "h2h_extended": {
-      "age_min": 2,
+      "age_min": 1,
       "events": 13,
       "events_with_meetings": 0,
       "meetings": 0,
@@ -289,8 +289,8 @@
     "daily_insights": {
       "age_min": 2,
       "insights": 5,
-      "events_today": 2,
-      "events_next_36h": 2,
+      "events_today": 1,
+      "events_next_36h": 1,
       "sources_loaded": 8
     },
     "detected_angles": {
@@ -433,7 +433,7 @@
       "age_min": 2,
       "matches": 806,
       "observations": 2177,
-      "mean_clv_pct": -0.32,
+      "mean_clv_pct": -0.31,
       "positive_clv_rate": 33.9,
       "sample_status": "validated"
     }
@@ -498,7 +498,7 @@
     "referees_soccer": {
       "script": "scripts/fetch_referees_soccer.py",
       "output": "referees_soccer.json",
-      "age_min": 2,
+      "age_min": 1,
       "threshold_min": 480,
       "fast_red_min": null,
       "status": "ok"
@@ -506,7 +506,7 @@
     "xg_team_stats": {
       "script": "scripts/fetch_understat_xg.py",
       "output": "xg_team_stats.json",
-      "age_min": 2,
+      "age_min": 1,
       "threshold_min": 360,
       "fast_red_min": null,
       "status": "ok"
@@ -514,7 +514,7 @@
     "fbref_xg": {
       "script": "scripts/fetch_understat_xg.py",
       "output": "fbref_xg.json",
-      "age_min": 2,
+      "age_min": 1,
       "threshold_min": 360,
       "fast_red_min": null,
       "status": "ok"
@@ -546,7 +546,7 @@
     "h2h_extended": {
       "script": "h2h_extended.json",
       "output": "h2h_extended.json",
-      "age_min": 2,
+      "age_min": 1,
       "threshold_min": 60,
       "fast_red_min": null,
       "status": "ok"
@@ -1013,7 +1013,7 @@
   ],
   "overall": "warning",
   "quality_checks": {
-    "data_generated_at": "2026-08-26T00:27:40.986611Z",
+    "data_generated_at": "2026-08-26T01:07:59.996212Z",
     "truth_scope": "all_events",
     "all_winamax_available": 32,
     "all_winamax_exact": 0,
@@ -1064,7 +1064,7 @@
   "data_truth": {
     "source_of_truth": "data.js",
     "scope": "all_events",
-    "data_generated_at": "2026-08-26T00:27:40.986611Z",
+    "data_generated_at": "2026-08-26T01:07:59.996212Z",
     "winamax_available": 32,
     "winamax_exact": 0,
     "winamax_exact_ratio": 0.0,
@@ -1077,26 +1077,26 @@
     "status": "critical",
     "schema_version": 2,
     "sources_validated": 11,
-    "sources_ok": 5,
-    "sources_warning": 5,
+    "sources_ok": 4,
+    "sources_warning": 6,
     "sources_critical": 1,
-    "quarantine_records": 6,
-    "anomalies_emitted": 4
+    "quarantine_records": 8,
+    "anomalies_emitted": 7
   },
   "source_health": {
-    "generated_at": "2026-08-26T00:28:33Z",
+    "generated_at": "2026-08-26T01:08:38Z",
     "sources_total": 11,
-    "sources_ok": 5,
-    "sources_warning": 5,
+    "sources_ok": 4,
+    "sources_warning": 6,
     "sources_critical": 1,
-    "source_health_avg": 89,
-    "source_health_min": 57,
+    "source_health_avg": 87.4,
+    "source_health_min": 49,
     "by_source": {
       "winamax_catalog": {
         "score": 92,
         "status": "warning",
         "items": 600,
-        "age_min": 3,
+        "age_min": 2,
         "sla_min": 15,
         "issues": 2
       },
@@ -1109,33 +1109,33 @@
         "issues": 1
       },
       "injuries_soccer": {
-        "score": 57,
+        "score": 49,
         "status": "warning",
         "items": 0,
-        "age_min": 3,
+        "age_min": 2,
         "sla_min": 180,
-        "issues": 2
+        "issues": 3
       },
       "lineups_soccer": {
-        "score": 100,
-        "status": "ok",
+        "score": 92,
+        "status": "warning",
         "items": 97,
-        "age_min": 3,
+        "age_min": 2,
         "sla_min": 180,
-        "issues": 1
+        "issues": 2
       },
       "referees_soccer": {
         "score": 100,
         "status": "ok",
         "items": 106,
-        "age_min": 3,
+        "age_min": 2,
         "sla_min": 180,
         "issues": 1
       },
       "weather": {
         "score": 100,
         "status": "ok",
-        "items": 6904,
+        "items": 6906,
         "age_min": 1,
         "sla_min": 60,
         "issues": 1
@@ -1144,7 +1144,7 @@
         "score": 57,
         "status": "warning",
         "items": 0,
-        "age_min": 3,
+        "age_min": 2,
         "sla_min": 300,
         "issues": 1
       },
@@ -1152,7 +1152,7 @@
         "score": 92,
         "status": "warning",
         "items": 594,
-        "age_min": 3,
+        "age_min": 2,
         "sla_min": 1440,
         "issues": 2
       },
@@ -1160,7 +1160,7 @@
         "score": 92,
         "status": "warning",
         "items": 1941,
-        "age_min": 3,
+        "age_min": 2,
         "sla_min": 30,
         "issues": 2
       },
@@ -1168,7 +1168,7 @@
         "score": 100,
         "status": "ok",
         "items": 5530,
-        "age_min": 3,
+        "age_min": 2,
         "sla_min": 1440,
         "issues": 1
       },
@@ -1176,7 +1176,7 @@
         "score": 100,
         "status": "ok",
         "items": 3,
-        "age_min": 3,
+        "age_min": 2,
         "sla_min": 1440,
         "issues": 1
       }
@@ -1184,12 +1184,12 @@
   },
   "observability": {
     "pipeline_traces": {
-      "generated_at": "2026-08-26T00:28:33Z",
+      "generated_at": "2026-08-26T01:08:38Z",
       "runs_observed": 99,
       "by_status": {
-        "warning": 69,
+        "warning": 71,
         "critical": 1,
-        "ok": 27,
+        "ok": 25,
         "missing": 2
       },
       "by_script": {
@@ -1203,7 +1203,7 @@
     }
   },
   "data_lineage": {
-    "generated_at": "2026-08-26T00:28:33Z",
+    "generated_at": "2026-08-26T01:08:38Z",
     "status": "ok",
     "events": 32,
     "events_missing_inline_lineage": 0,
@@ -1331,7 +1331,7 @@
     "data": {
       "status": "critical",
       "sources_validated": 11,
-      "quarantine_records": 6,
+      "quarantine_records": 8,
       "lineage_coverage_pct": 100.0
     },
     "model": {
