@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-27T07:13:31Z",
-  "calculated_at": "2026-08-27T07:13:31Z",
+  "generated_at": "2026-08-27T18:20:22Z",
+  "calculated_at": "2026-08-27T18:20:22Z",
   "source_of_truth": "data.js",
   "data_age_min": 0,
   "data_file_age_min": 0,
@@ -142,9 +142,9 @@
     },
     "league_bias_audit": {
       "age_min": 0,
-      "leagues": 39,
+      "leagues": 37,
       "deprioritize": 1,
-      "watch": 7,
+      "watch": 5,
       "trusted": 0,
       "risky_current_leagues": 0,
       "risky_current_events": 0,
@@ -153,7 +153,7 @@
     },
     "league_inefficiencies": {
       "age_min": 0,
-      "leagues": 12,
+      "leagues": 13,
       "exploit": 0,
       "avoid": 1,
       "current_exploit_events": 0
@@ -181,7 +181,7 @@
     },
     "team_priors": {
       "age_min": 1,
-      "teams": 5543,
+      "teams": 5544,
       "leagues": 397,
       "decay_k": 0.05,
       "max_matches": 20
@@ -288,9 +288,9 @@
     },
     "daily_insights": {
       "age_min": 1,
-      "insights": 3,
-      "events_today": 0,
-      "events_next_36h": 0,
+      "insights": 5,
+      "events_today": 2,
+      "events_next_36h": 2,
       "sources_loaded": 8
     },
     "detected_angles": {
@@ -322,8 +322,8 @@
     },
     "timing_edges": {
       "age_min": 0,
-      "events": 0,
-      "bet_now": 0,
+      "events": 2,
+      "bet_now": 2,
       "wait": 0,
       "price_shortening": 0
     },
@@ -431,10 +431,10 @@
     },
     "clv_history": {
       "age_min": 1,
-      "matches": 832,
-      "observations": 2238,
+      "matches": 844,
+      "observations": 2268,
       "mean_clv_pct": -0.32,
-      "positive_clv_rate": 34.0,
+      "positive_clv_rate": 33.8,
       "sample_status": "validated"
     }
   },
@@ -1013,7 +1013,7 @@
   ],
   "overall": "warning",
   "quality_checks": {
-    "data_generated_at": "2026-08-27T07:12:42.255280Z",
+    "data_generated_at": "2026-08-27T18:19:25.067640Z",
     "truth_scope": "all_events",
     "all_winamax_available": 9,
     "all_winamax_exact": 0,
@@ -1064,7 +1064,7 @@
   "data_truth": {
     "source_of_truth": "data.js",
     "scope": "all_events",
-    "data_generated_at": "2026-08-27T07:12:42.255280Z",
+    "data_generated_at": "2026-08-27T18:19:25.067640Z",
     "winamax_available": 9,
     "winamax_exact": 0,
     "winamax_exact_ratio": 0.0,
@@ -1084,7 +1084,7 @@
     "anomalies_emitted": 8
   },
   "source_health": {
-    "generated_at": "2026-08-27T07:13:31Z",
+    "generated_at": "2026-08-27T18:20:22Z",
     "sources_total": 11,
     "sources_ok": 5,
     "sources_warning": 5,
@@ -1152,7 +1152,7 @@
         "score": 100,
         "status": "ok",
         "items": 594,
-        "age_min": 2,
+        "age_min": 1,
         "sla_min": 1440,
         "issues": 1
       },
@@ -1167,7 +1167,7 @@
       "team_priors": {
         "score": 100,
         "status": "ok",
-        "items": 5543,
+        "items": 5544,
         "age_min": 2,
         "sla_min": 1440,
         "issues": 1
@@ -1184,7 +1184,7 @@
   },
   "observability": {
     "pipeline_traces": {
-      "generated_at": "2026-08-27T07:13:31Z",
+      "generated_at": "2026-08-27T18:20:22Z",
       "runs_observed": 99,
       "by_status": {
         "warning": 69,
@@ -1203,7 +1203,7 @@
     }
   },
   "data_lineage": {
-    "generated_at": "2026-08-27T07:13:31Z",
+    "generated_at": "2026-08-27T18:20:22Z",
     "status": "ok",
     "events": 9,
     "events_missing_inline_lineage": 0,
