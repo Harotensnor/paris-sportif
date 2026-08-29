@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-29T11:51:08Z",
+  "generated_at": "2026-08-29T14:48:45Z",
   "method": "Dixon-Coles MLE grid search (ρ ∈ [-0.30, 0.10] step 0.005), λ_h, λ_a fixés à moyenne empirique par ligue. CI 95% via LR test.",
   "min_matches": 40,
   "default_rho": -0.13,
@@ -214,17 +214,17 @@
       "reason": "n=5 < 40"
     },
     "chn.1": {
-      "n": 110,
-      "rho_measured": -0.03,
+      "n": 114,
+      "rho_measured": -0.055,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "CI trop large (0.345) ou fit nul",
-      "log_lik": -343.36,
-      "ci_lo": -0.245,
+      "reason": "CI trop large (0.365) ou fit nul",
+      "log_lik": -356.54,
+      "ci_lo": -0.265,
       "ci_hi": 0.1,
-      "lambda_h": 1.845,
-      "lambda_a": 1.5
+      "lambda_h": 1.868,
+      "lambda_a": 1.474
     },
     "col.1": {
       "n": 27,
@@ -373,51 +373,56 @@
       "reason": "n=18 < 40"
     },
     "eng.1": {
-      "n": 64,
-      "rho_measured": 0.025,
+      "n": 65,
+      "rho_measured": 0.03,
       "rho_literature": -0.07,
       "rho_used": -0.07,
       "source": "literature_fallback",
       "reason": "CI trop large (0.385) ou fit nul",
-      "log_lik": -187.59,
+      "log_lik": -190.43,
       "ci_lo": -0.285,
       "ci_hi": 0.1,
-      "lambda_h": 1.812,
-      "lambda_a": 1.203
+      "lambda_h": 1.815,
+      "lambda_a": 1.215
     },
     "eng.2": {
-      "n": 43,
+      "n": 46,
       "rho_measured": -0.3,
       "rho_literature": -0.1,
       "rho_used": -0.1,
       "source": "literature_fallback",
-      "reason": "CI trop large (0.335) ou fit nul",
-      "log_lik": -123.48,
+      "reason": "CI trop large (0.330) ou fit nul",
+      "log_lik": -134.24,
       "ci_lo": -0.3,
-      "ci_hi": 0.035,
-      "lambda_h": 1.605,
-      "lambda_a": 1.326
+      "ci_hi": 0.03,
+      "lambda_h": 1.652,
+      "lambda_a": 1.348
     },
     "eng.3": {
-      "n": 42,
-      "rho_measured": 0.09,
+      "n": 44,
+      "rho_measured": 0.015,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "CI trop large (0.345) ou fit nul",
-      "log_lik": -129.52,
-      "ci_lo": -0.245,
+      "reason": "CI trop large (0.390) ou fit nul",
+      "log_lik": -137.36,
+      "ci_lo": -0.29,
       "ci_hi": 0.1,
-      "lambda_h": 1.5,
-      "lambda_a": 1.619
+      "lambda_h": 1.523,
+      "lambda_a": 1.545
     },
     "eng.4": {
-      "n": 38,
-      "rho_measured": null,
+      "n": 41,
+      "rho_measured": -0.155,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "n=38 < 40"
+      "reason": "CI trop large (0.400) ou fit nul",
+      "log_lik": -123.56,
+      "ci_lo": -0.3,
+      "ci_hi": 0.1,
+      "lambda_h": 1.707,
+      "lambda_a": 1.024
     },
     "eng.fa": {
       "n": 3,
@@ -536,17 +541,17 @@
       "lambda_a": 1.476
     },
     "fra.2": {
-      "n": 41,
-      "rho_measured": -0.13,
+      "n": 43,
+      "rho_measured": -0.155,
       "rho_literature": -0.14,
       "rho_used": -0.14,
       "source": "literature_fallback",
       "reason": "CI trop large (0.400) ou fit nul",
-      "log_lik": -129.38,
+      "log_lik": -135.83,
       "ci_lo": -0.3,
       "ci_hi": 0.1,
-      "lambda_h": 1.488,
-      "lambda_a": 1.293
+      "lambda_h": 1.465,
+      "lambda_a": 1.349
     },
     "frauenbundesliga": {
       "n": 1,
@@ -565,17 +570,17 @@
       "reason": "n=33 < 40"
     },
     "ger.2": {
-      "n": 48,
+      "n": 51,
       "rho_measured": 0.1,
       "rho_literature": -0.11,
       "rho_used": 0.1,
       "source": "measured",
-      "reason": "MLE n=48, CI95=[-0.095, 0.100]",
-      "log_lik": -152.1,
-      "ci_lo": -0.095,
+      "reason": "MLE n=51, CI95=[-0.085, 0.100]",
+      "log_lik": -168.78,
+      "ci_lo": -0.085,
       "ci_hi": 0.1,
-      "lambda_h": 1.729,
-      "lambda_a": 1.333
+      "lambda_h": 1.824,
+      "lambda_a": 1.49
     },
     "ger.dfb_pokal": {
       "n": 5,
@@ -684,17 +689,17 @@
       "reason": "n=3 < 40"
     },
     "jpn.1": {
-      "n": 94,
-      "rho_measured": 0.0,
+      "n": 100,
+      "rho_measured": 0.025,
       "rho_literature": -0.12,
       "rho_used": -0.12,
       "source": "literature_fallback",
-      "reason": "CI trop large (0.330) ou fit nul",
-      "log_lik": -286.71,
-      "ci_lo": -0.23,
+      "reason": "CI trop large (0.305) ou fit nul",
+      "log_lik": -305.04,
+      "ci_lo": -0.205,
       "ci_hi": 0.1,
-      "lambda_h": 1.447,
-      "lambda_a": 1.383
+      "lambda_h": 1.48,
+      "lambda_a": 1.38
     },
     "laliga2": {
       "n": 10,
@@ -986,17 +991,17 @@
       "reason": "n=1 < 40"
     },
     "rus.1": {
-      "n": 60,
-      "rho_measured": -0.22,
+      "n": 61,
+      "rho_measured": -0.175,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
       "reason": "CI trop large (0.400) ou fit nul",
-      "log_lik": -166.52,
+      "log_lik": -169.19,
       "ci_lo": -0.3,
       "ci_hi": 0.1,
-      "lambda_h": 1.35,
-      "lambda_a": 1.3
+      "lambda_h": 1.328,
+      "lambda_a": 1.295
     },
     "saudiproleague": {
       "n": 2,
