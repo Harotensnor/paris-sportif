@@ -1,42 +1,49 @@
 {
-  "generated_at": "2026-08-30T21:02:23Z",
+  "generated_at": "2026-08-30T23:16:53Z",
   "method": "Maher (1982) Poisson regression simplifiée. alpha_off = goals_for / expected_gf · beta_def = goals_against / expected_ga · normalisé par moyennes ligue home/away.",
   "min_matches_per_league": 40,
   "min_matches_per_team": 5,
   "n_leagues_with_strengths": 30,
   "leagues": {
     "arg.1": {
-      "league_avg_home": 1.29,
+      "league_avg_home": 1.3,
       "league_avg_away": 0.9,
-      "n_matches": 49,
+      "n_matches": 50,
       "teams": {
         "Independiente Rivadavia": {
-          "alpha_off": 1.435,
-          "beta_def": 0.993,
+          "alpha_off": 1.429,
+          "beta_def": 0.984,
           "n_matches": 5,
           "gf_avg": 1.4,
           "ga_avg": 1.2
         },
         "Belgrano (Córdoba)": {
-          "alpha_off": 1.441,
-          "beta_def": 0.811,
+          "alpha_off": 1.429,
+          "beta_def": 0.806,
           "n_matches": 6,
           "gf_avg": 1.67,
           "ga_avg": 0.83
         },
         "Gimnasia La Plata": {
-          "alpha_off": 1.46,
-          "beta_def": 0.865,
+          "alpha_off": 1.452,
+          "beta_def": 0.857,
           "n_matches": 6,
           "gf_avg": 1.5,
           "ga_avg": 1.0
         },
         "Newell's Old Boys": {
-          "alpha_off": 1.159,
-          "beta_def": 1.025,
+          "alpha_off": 1.148,
+          "beta_def": 1.02,
           "n_matches": 5,
           "gf_avg": 1.4,
           "ga_avg": 1.0
+        },
+        "Argentinos Juniors": {
+          "alpha_off": 0.755,
+          "beta_def": 1.053,
+          "n_matches": 5,
+          "gf_avg": 0.8,
+          "ga_avg": 1.2
         }
       }
     },
@@ -153,55 +160,62 @@
       }
     },
     "bra.1": {
-      "league_avg_home": 1.52,
+      "league_avg_home": 1.49,
       "league_avg_away": 1.33,
-      "n_matches": 42,
+      "n_matches": 43,
       "teams": {
         "Botafogo": {
-          "alpha_off": 0.817,
-          "beta_def": 1.05,
+          "alpha_off": 0.829,
+          "beta_def": 1.066,
           "n_matches": 6,
           "gf_avg": 1.17,
           "ga_avg": 1.5
         },
         "Internacional": {
-          "alpha_off": 1.135,
-          "beta_def": 0.691,
+          "alpha_off": 1.151,
+          "beta_def": 0.703,
           "n_matches": 5,
           "gf_avg": 1.6,
           "ga_avg": 1.0
         },
         "Bahia": {
-          "alpha_off": 1.027,
-          "beta_def": 1.074,
+          "alpha_off": 1.046,
+          "beta_def": 1.087,
           "n_matches": 6,
           "gf_avg": 1.5,
           "ga_avg": 1.5
         },
         "Santos": {
-          "alpha_off": 0.851,
-          "beta_def": 1.105,
+          "alpha_off": 0.846,
+          "beta_def": 0.93,
+          "n_matches": 6,
+          "gf_avg": 1.17,
+          "ga_avg": 1.33
+        },
+        "Corinthians": {
+          "alpha_off": 0.719,
+          "beta_def": 0.703,
           "n_matches": 5,
-          "gf_avg": 1.2,
-          "ga_avg": 1.6
+          "gf_avg": 1.0,
+          "ga_avg": 1.0
         },
         "Vasco da Gama": {
-          "alpha_off": 0.438,
-          "beta_def": 1.346,
+          "alpha_off": 0.442,
+          "beta_def": 1.374,
           "n_matches": 5,
           "gf_avg": 0.6,
           "ga_avg": 2.0
         },
         "Red Bull Bragantino": {
-          "alpha_off": 0.571,
-          "beta_def": 0.597,
+          "alpha_off": 0.581,
+          "beta_def": 0.604,
           "n_matches": 6,
           "gf_avg": 0.83,
           "ga_avg": 0.83
         },
         "Athletico-PR": {
-          "alpha_off": 1.481,
-          "beta_def": 0.729,
+          "alpha_off": 1.511,
+          "beta_def": 0.736,
           "n_matches": 5,
           "gf_avg": 2.2,
           "ga_avg": 1.0
@@ -628,68 +642,68 @@
       "teams": {}
     },
     "esp.1": {
-      "league_avg_home": 1.71,
-      "league_avg_away": 1.12,
-      "n_matches": 77,
+      "league_avg_home": 1.69,
+      "league_avg_away": 1.13,
+      "n_matches": 78,
       "teams": {
         "Real Betis": {
-          "alpha_off": 1.15,
-          "beta_def": 1.045,
+          "alpha_off": 1.156,
+          "beta_def": 1.048,
           "n_matches": 9,
           "gf_avg": 1.67,
           "ga_avg": 1.44
         },
         "Real Madrid": {
-          "alpha_off": 1.589,
-          "beta_def": 0.53,
+          "alpha_off": 1.595,
+          "beta_def": 0.532,
           "n_matches": 8,
           "gf_avg": 2.25,
           "ga_avg": 0.75
         },
         "Alavés": {
-          "alpha_off": 1.018,
-          "beta_def": 0.888,
+          "alpha_off": 1.026,
+          "beta_def": 0.886,
           "n_matches": 7,
           "gf_avg": 1.57,
           "ga_avg": 1.14
         },
         "Mallorca": {
-          "alpha_off": 0.888,
-          "beta_def": 0.74,
+          "alpha_off": 0.886,
+          "beta_def": 0.746,
           "n_matches": 7,
           "gf_avg": 1.14,
           "ga_avg": 1.14
         },
         "Getafe": {
-          "alpha_off": 0.392,
-          "beta_def": 0.936,
+          "alpha_off": 0.394,
+          "beta_def": 0.939,
           "n_matches": 7,
           "gf_avg": 0.57,
           "ga_avg": 1.29
         },
         "Barcelona": {
-          "alpha_off": 1.295,
-          "beta_def": 0.353,
+          "alpha_off": 1.3,
+          "beta_def": 0.355,
           "n_matches": 6,
           "gf_avg": 1.83,
           "ga_avg": 0.5
         },
         "Atlético Madrid": {
-          "alpha_off": 1.236,
-          "beta_def": 0.883,
+          "alpha_off": 1.241,
+          "beta_def": 0.886,
           "n_matches": 8,
           "gf_avg": 1.75,
           "ga_avg": 1.25
         },
         "Athletic Club": {
-          "alpha_off": 1.233,
-          "beta_def": 1.445,
-          "n_matches": 6,
-          "gf_avg": 1.5,
-          "ga_avg": 2.33
+          "alpha_off": 1.3,
+          "beta_def": 1.241,
+          "n_matches": 7,
+          "gf_avg": 1.57,
+          "ga_avg": 2.0
         },
         "Valencia": {
-          "alpha_off": 0.88,
+          "alpha_off": 0.886,
           "beta_def": 1.393,
           "n_matches": 6,
           "gf_avg": 1.33,
@@ -697,69 +711,69 @@
         },
         "Girona": {
           "alpha_off": 0.443,
-          "beta_def": 0.813,
+          "beta_def": 0.818,
           "n_matches": 5,
           "gf_avg": 0.6,
           "ga_avg": 1.2
         },
         "Rayo Vallecano": {
-          "alpha_off": 1.249,
-          "beta_def": 0.784,
+          "alpha_off": 1.251,
+          "beta_def": 0.788,
           "n_matches": 7,
           "gf_avg": 1.71,
           "ga_avg": 1.14
         },
         "Real Sociedad": {
-          "alpha_off": 1.098,
-          "beta_def": 1.32,
+          "alpha_off": 1.097,
+          "beta_def": 1.33,
           "n_matches": 9,
           "gf_avg": 1.44,
           "ga_avg": 2.0
         },
         "Real Oviedo": {
           "alpha_off": 0.118,
-          "beta_def": 1.295,
+          "beta_def": 1.3,
           "n_matches": 6,
           "gf_avg": 0.17,
           "ga_avg": 1.83
         },
         "Elche": {
-          "alpha_off": 0.999,
-          "beta_def": 1.018,
+          "alpha_off": 0.997,
+          "beta_def": 1.026,
           "n_matches": 7,
           "gf_avg": 1.29,
           "ga_avg": 1.57
         },
         "Osasuna": {
-          "alpha_off": 0.755,
-          "beta_def": 1.119,
+          "alpha_off": 0.76,
+          "beta_def": 1.12,
           "n_matches": 8,
           "gf_avg": 1.12,
           "ga_avg": 1.5
         },
         "Sevilla": {
-          "alpha_off": 0.839,
-          "beta_def": 1.025,
+          "alpha_off": 0.844,
+          "beta_def": 1.026,
           "n_matches": 8,
           "gf_avg": 1.25,
           "ga_avg": 1.38
         },
         "Villarreal": {
-          "alpha_off": 1.665,
-          "beta_def": 1.145,
+          "alpha_off": 1.674,
+          "beta_def": 1.147,
           "n_matches": 7,
           "gf_avg": 2.43,
           "ga_avg": 1.57
         },
         "Celta Vigo": {
-          "alpha_off": 0.98,
-          "beta_def": 0.936,
-          "n_matches": 7,
-          "gf_avg": 1.43,
-          "ga_avg": 1.29
+          "alpha_off": 0.844,
+          "beta_def": 1.026,
+          "n_matches": 8,
+          "gf_avg": 1.25,
+          "ga_avg": 1.38
         },
         "Espanyol": {
-          "alpha_off": 0.839,
+          "alpha_off": 0.844,
           "beta_def": 0.746,
           "n_matches": 8,
           "gf_avg": 1.25,
@@ -767,7 +781,7 @@
         },
         "Levante": {
           "alpha_off": 1.266,
-          "beta_def": 1.173,
+          "beta_def": 1.182,
           "n_matches": 9,
           "gf_avg": 1.67,
           "ga_avg": 1.78
@@ -775,118 +789,125 @@
       }
     },
     "esp.2": {
-      "league_avg_home": 1.42,
-      "league_avg_away": 1.25,
-      "n_matches": 69,
+      "league_avg_home": 1.41,
+      "league_avg_away": 1.27,
+      "n_matches": 70,
       "teams": {
         "Real Valladolid": {
-          "alpha_off": 0.523,
-          "beta_def": 1.198,
+          "alpha_off": 0.515,
+          "beta_def": 1.199,
           "n_matches": 6,
           "gf_avg": 0.67,
           "ga_avg": 1.67
         },
         "Real Sociedad II": {
-          "alpha_off": 0.625,
-          "beta_def": 1.0,
+          "alpha_off": 0.621,
+          "beta_def": 0.993,
           "n_matches": 6,
           "gf_avg": 0.83,
           "ga_avg": 1.33
         },
         "Burgos": {
-          "alpha_off": 0.734,
-          "beta_def": 0.383,
+          "alpha_off": 0.732,
+          "beta_def": 0.379,
           "n_matches": 6,
           "gf_avg": 1.0,
           "ga_avg": 0.5
         },
         "Deportivo La Coruña": {
-          "alpha_off": 1.036,
-          "beta_def": 0.76,
+          "alpha_off": 1.032,
+          "beta_def": 0.753,
           "n_matches": 5,
           "gf_avg": 1.4,
           "ga_avg": 1.0
         },
         "Málaga": {
-          "alpha_off": 1.789,
-          "beta_def": 0.856,
+          "alpha_off": 1.769,
+          "beta_def": 0.854,
           "n_matches": 6,
           "gf_avg": 2.33,
           "ga_avg": 1.17
         },
         "Castellón": {
-          "alpha_off": 1.125,
-          "beta_def": 0.875,
+          "alpha_off": 1.117,
+          "beta_def": 0.869,
           "n_matches": 6,
           "gf_avg": 1.5,
           "ga_avg": 1.17
         },
+        "Córdoba": {
+          "alpha_off": 1.326,
+          "beta_def": 1.656,
+          "n_matches": 5,
+          "gf_avg": 1.8,
+          "ga_avg": 2.2
+        },
         "Sporting Gijón": {
-          "alpha_off": 1.064,
-          "beta_def": 0.888,
+          "alpha_off": 1.054,
+          "beta_def": 0.884,
           "n_matches": 5,
           "gf_avg": 1.4,
           "ga_avg": 1.2
         },
         "Granada": {
-          "alpha_off": 0.74,
-          "beta_def": 0.76,
-          "n_matches": 5,
-          "gf_avg": 1.0,
+          "alpha_off": 0.993,
+          "beta_def": 0.745,
+          "n_matches": 6,
+          "gf_avg": 1.33,
           "ga_avg": 1.0
         },
         "Almería": {
-          "alpha_off": 1.158,
-          "beta_def": 0.755,
+          "alpha_off": 1.152,
+          "beta_def": 0.749,
           "n_matches": 9,
           "gf_avg": 1.56,
           "ga_avg": 1.0
         },
         "Leganés": {
-          "alpha_off": 0.489,
-          "beta_def": 0.894,
+          "alpha_off": 0.488,
+          "beta_def": 0.884,
           "n_matches": 6,
           "gf_avg": 0.67,
           "ga_avg": 1.17
         },
         "FC Andorra": {
-          "alpha_off": 1.125,
-          "beta_def": 1.125,
+          "alpha_off": 1.117,
+          "beta_def": 1.117,
           "n_matches": 8,
           "gf_avg": 1.5,
           "ga_avg": 1.5
         },
         "Ceuta": {
-          "alpha_off": 0.757,
-          "beta_def": 1.486,
+          "alpha_off": 0.75,
+          "beta_def": 1.478,
           "n_matches": 7,
           "gf_avg": 1.0,
           "ga_avg": 2.0
         },
         "Cádiz": {
-          "alpha_off": 0.637,
-          "beta_def": 1.19,
+          "alpha_off": 0.633,
+          "beta_def": 1.179,
           "n_matches": 7,
           "gf_avg": 0.86,
           "ga_avg": 1.57
         },
         "Las Palmas": {
-          "alpha_off": 1.533,
-          "beta_def": 1.223,
+          "alpha_off": 1.516,
+          "beta_def": 1.22,
           "n_matches": 6,
           "gf_avg": 2.0,
           "ga_avg": 1.67
         },
         "Albacete": {
-          "alpha_off": 1.125,
-          "beta_def": 0.75,
+          "alpha_off": 1.117,
+          "beta_def": 0.745,
           "n_matches": 6,
           "gf_avg": 1.5,
           "ga_avg": 1.0
         },
         "Eibar": {
-          "alpha_off": 0.912,
-          "beta_def": 1.629,
+          "alpha_off": 0.903,
+          "beta_def": 1.621,
           "n_matches": 5,
           "gf_avg": 1.2,
           "ga_avg": 2.2
@@ -1986,111 +2007,111 @@
       }
     },
     "per.1": {
-      "league_avg_home": 1.59,
-      "league_avg_away": 1.29,
-      "n_matches": 51,
+      "league_avg_home": 1.58,
+      "league_avg_away": 1.27,
+      "n_matches": 52,
       "teams": {
         "Los Chankas": {
-          "alpha_off": 0.57,
-          "beta_def": 1.348,
+          "alpha_off": 0.576,
+          "beta_def": 1.368,
           "n_matches": 7,
           "gf_avg": 0.86,
           "ga_avg": 1.86
         },
         "Deportivo Moquegua": {
-          "alpha_off": 0.507,
-          "beta_def": 0.979,
+          "alpha_off": 0.513,
+          "beta_def": 0.993,
           "n_matches": 8,
           "gf_avg": 0.75,
           "ga_avg": 1.38
         },
         "FC Cajamarca": {
-          "alpha_off": 1.466,
-          "beta_def": 1.308,
+          "alpha_off": 1.483,
+          "beta_def": 1.325,
           "n_matches": 7,
           "gf_avg": 2.14,
           "ga_avg": 1.86
         },
         "Comerciantes Unidos": {
-          "alpha_off": 0.925,
-          "beta_def": 0.925,
+          "alpha_off": 0.937,
+          "beta_def": 0.937,
           "n_matches": 6,
           "gf_avg": 1.33,
           "ga_avg": 1.33
         },
         "Sporting Cristal": {
-          "alpha_off": 1.224,
-          "beta_def": 0.992,
-          "n_matches": 5,
-          "gf_avg": 1.8,
-          "ga_avg": 1.4
+          "alpha_off": 1.054,
+          "beta_def": 0.937,
+          "n_matches": 6,
+          "gf_avg": 1.5,
+          "ga_avg": 1.33
         },
         "UTC": {
-          "alpha_off": 0.671,
-          "beta_def": 1.556,
+          "alpha_off": 0.678,
+          "beta_def": 1.579,
           "n_matches": 6,
           "gf_avg": 1.0,
           "ga_avg": 2.17
         },
         "Sport Huancayo": {
-          "alpha_off": 1.097,
-          "beta_def": 1.32,
+          "alpha_off": 1.114,
+          "beta_def": 1.333,
           "n_matches": 8,
           "gf_avg": 1.5,
           "ga_avg": 2.0
         },
         "Atlético Grau": {
-          "alpha_off": 0.447,
-          "beta_def": 0.718,
+          "alpha_off": 0.452,
+          "beta_def": 0.729,
           "n_matches": 6,
           "gf_avg": 0.67,
           "ga_avg": 1.0
         },
         "Sport Boys": {
-          "alpha_off": 0.992,
-          "beta_def": 0.68,
-          "n_matches": 5,
-          "gf_avg": 1.4,
-          "ga_avg": 1.0
+          "alpha_off": 0.937,
+          "beta_def": 0.586,
+          "n_matches": 6,
+          "gf_avg": 1.33,
+          "ga_avg": 0.83
         },
         "Juan Pablo II": {
-          "alpha_off": 0.925,
-          "beta_def": 1.388,
+          "alpha_off": 0.937,
+          "beta_def": 1.405,
           "n_matches": 6,
           "gf_avg": 1.33,
           "ga_avg": 2.0
         },
         "ADT": {
-          "alpha_off": 0.806,
-          "beta_def": 0.845,
+          "alpha_off": 0.813,
+          "beta_def": 0.86,
           "n_matches": 8,
           "gf_avg": 1.25,
           "ga_avg": 1.12
         },
         "Universitario": {
-          "alpha_off": 2.07,
-          "beta_def": 1.046,
+          "alpha_off": 2.104,
+          "beta_def": 1.056,
           "n_matches": 5,
           "gf_avg": 2.8,
           "ga_avg": 1.6
         },
         "Alianza Atlético": {
-          "alpha_off": 1.737,
-          "beta_def": 0.65,
+          "alpha_off": 1.767,
+          "beta_def": 0.655,
           "n_matches": 6,
           "gf_avg": 2.33,
           "ga_avg": 1.0
         },
         "Deportivo Garcilaso": {
-          "alpha_off": 1.007,
-          "beta_def": 0.12,
+          "alpha_off": 1.017,
+          "beta_def": 0.121,
           "n_matches": 6,
           "gf_avg": 1.5,
           "ga_avg": 0.17
         },
         "Melgar": {
-          "alpha_off": 1.275,
-          "beta_def": 0.816,
+          "alpha_off": 1.293,
+          "beta_def": 0.825,
           "n_matches": 5,
           "gf_avg": 1.8,
           "ga_avg": 1.2
@@ -2098,125 +2119,125 @@
       }
     },
     "por.1": {
-      "league_avg_home": 1.48,
-      "league_avg_away": 1.31,
-      "n_matches": 54,
+      "league_avg_home": 1.45,
+      "league_avg_away": 1.29,
+      "n_matches": 55,
       "teams": {
         "Tondela": {
-          "alpha_off": 0.869,
-          "beta_def": 0.99,
+          "alpha_off": 0.885,
+          "beta_def": 1.008,
           "n_matches": 5,
           "gf_avg": 1.2,
           "ga_avg": 1.4
         },
         "C.D. Nacional": {
-          "alpha_off": 1.114,
-          "beta_def": 0.927,
+          "alpha_off": 1.135,
+          "beta_def": 0.945,
           "n_matches": 7,
           "gf_avg": 1.57,
           "ga_avg": 1.29
         },
         "Benfica": {
-          "alpha_off": 2.384,
-          "beta_def": 0.954,
+          "alpha_off": 2.428,
+          "beta_def": 0.971,
           "n_matches": 6,
           "gf_avg": 3.33,
           "ga_avg": 1.33
         },
         "Moreirense": {
-          "alpha_off": 0.721,
-          "beta_def": 1.418,
+          "alpha_off": 0.735,
+          "beta_def": 1.445,
           "n_matches": 7,
           "gf_avg": 1.0,
           "ga_avg": 2.0
         },
         "Vitória de Guimaraes": {
-          "alpha_off": 0.724,
-          "beta_def": 1.555,
+          "alpha_off": 0.737,
+          "beta_def": 1.584,
           "n_matches": 5,
           "gf_avg": 1.0,
           "ga_avg": 2.2
         },
         "Rio Ave": {
-          "alpha_off": 0.238,
-          "beta_def": 1.192,
+          "alpha_off": 0.243,
+          "beta_def": 1.214,
           "n_matches": 6,
           "gf_avg": 0.33,
           "ga_avg": 1.67
         },
         "Estoril": {
-          "alpha_off": 0.424,
-          "beta_def": 1.158,
+          "alpha_off": 0.432,
+          "beta_def": 1.18,
           "n_matches": 5,
           "gf_avg": 0.6,
           "ga_avg": 1.6
         },
         "FC Famalicao": {
-          "alpha_off": 0.715,
-          "beta_def": 0.596,
-          "n_matches": 6,
-          "gf_avg": 1.0,
-          "ga_avg": 0.83
+          "alpha_off": 0.619,
+          "beta_def": 0.525,
+          "n_matches": 7,
+          "gf_avg": 0.86,
+          "ga_avg": 0.71
         },
         "Santa Clara": {
-          "alpha_off": 1.031,
-          "beta_def": 0.709,
+          "alpha_off": 1.05,
+          "beta_def": 0.722,
           "n_matches": 7,
           "gf_avg": 1.43,
           "ga_avg": 1.0
         },
         "Braga": {
-          "alpha_off": 1.158,
-          "beta_def": 1.272,
+          "alpha_off": 1.18,
+          "beta_def": 1.296,
           "n_matches": 5,
           "gf_avg": 1.6,
           "ga_avg": 1.8
         },
         "Estrela": {
-          "alpha_off": 1.216,
-          "beta_def": 1.286,
+          "alpha_off": 1.239,
+          "beta_def": 1.31,
           "n_matches": 6,
           "gf_avg": 1.67,
           "ga_avg": 1.83
         },
         "FC Porto": {
-          "alpha_off": 1.311,
-          "beta_def": 0.119,
+          "alpha_off": 1.336,
+          "beta_def": 0.121,
           "n_matches": 6,
           "gf_avg": 1.83,
           "ga_avg": 0.17
         },
         "Sporting CP": {
-          "alpha_off": 2.104,
-          "beta_def": 0.851,
+          "alpha_off": 2.143,
+          "beta_def": 0.867,
           "n_matches": 6,
           "gf_avg": 3.0,
           "ga_avg": 1.17
         },
         "Gil Vicente": {
-          "alpha_off": 0.701,
-          "beta_def": 0.851,
-          "n_matches": 6,
-          "gf_avg": 1.0,
-          "ga_avg": 1.17
+          "alpha_off": 0.619,
+          "beta_def": 0.735,
+          "n_matches": 7,
+          "gf_avg": 0.86,
+          "ga_avg": 1.0
         },
         "Casa Pia": {
-          "alpha_off": 0.304,
-          "beta_def": 1.443,
+          "alpha_off": 0.31,
+          "beta_def": 1.469,
           "n_matches": 7,
           "gf_avg": 0.43,
           "ga_avg": 2.0
         },
         "Arouca": {
-          "alpha_off": 1.934,
-          "beta_def": 0.742,
+          "alpha_off": 1.969,
+          "beta_def": 0.755,
           "n_matches": 5,
           "gf_avg": 2.8,
           "ga_avg": 1.0
         },
         "Alverca": {
-          "alpha_off": 0.434,
-          "beta_def": 0.99,
+          "alpha_off": 0.442,
+          "beta_def": 1.008,
           "n_matches": 5,
           "gf_avg": 0.6,
           "ga_avg": 1.4
