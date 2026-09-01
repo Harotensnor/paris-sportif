@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-09-01T20:11:45Z",
+  "generated_at": "2026-09-01T22:35:25Z",
   "method": "Full Bivariate Poisson MLE Dixon-Coles. Coordinate-descent avec golden-section search 1D. Pure Python (pas de scipy).",
   "min_matches_per_league": 40,
   "min_matches_per_team": 5,
-  "n_leagues_fit": 28,
+  "n_leagues_fit": 29,
   "leagues": {
     "arg.1": {
       "n_matches": 50,
@@ -510,94 +510,296 @@
       }
     },
     "eng.2": {
-      "n_matches": 54,
-      "n_teams": 6,
-      "gamma": 0.5037,
-      "rho": -0.2485,
-      "log_lik": -158.09,
-      "iterations": 2,
+      "n_matches": 62,
+      "n_teams": 15,
+      "gamma": 0.4595,
+      "rho": -0.2505,
+      "log_lik": -172.61,
+      "iterations": 3,
       "teams": {
+        "Birmingham City": {
+          "alpha": -0.1456,
+          "beta": 0.6043,
+          "rank_off": 12,
+          "rank_def": 13
+        },
+        "Bristol City": {
+          "alpha": -0.0666,
+          "beta": -0.1039,
+          "rank_off": 8,
+          "rank_def": 8
+        },
+        "Derby County": {
+          "alpha": 0.0367,
+          "beta": -0.213,
+          "rank_off": 7,
+          "rank_def": 7
+        },
         "Hull City": {
-          "alpha": -0.3992,
-          "beta": 0.6428,
-          "rank_off": 6,
-          "rank_def": 6
+          "alpha": -0.0666,
+          "beta": 0.8748,
+          "rank_off": 9,
+          "rank_def": 15
         },
         "Middlesbrough": {
-          "alpha": 0.2208,
-          "beta": 0.0379,
+          "alpha": 0.3316,
+          "beta": 0.2154,
           "rank_off": 2,
-          "rank_def": 4
+          "rank_def": 12
         },
         "Millwall": {
-          "alpha": -0.095,
-          "beta": -0.0016,
+          "alpha": 0.1795,
+          "beta": 0.191,
           "rank_off": 5,
-          "rank_def": 3
+          "rank_def": 11
         },
         "Norwich City": {
-          "alpha": -0.0892,
-          "beta": -0.5971,
-          "rank_off": 4,
+          "alpha": -0.091,
+          "beta": -0.2467,
+          "rank_off": 10,
+          "rank_def": 6
+        },
+        "Portsmouth": {
+          "alpha": -0.1944,
+          "beta": -0.523,
+          "rank_off": 13,
           "rank_def": 1
         },
-        "Southampton": {
-          "alpha": 0.4274,
-          "beta": 0.0379,
-          "rank_off": 1,
+        "Preston North End": {
+          "alpha": -0.1398,
+          "beta": -0.3105,
+          "rank_off": 11,
+          "rank_def": 4
+        },
+        "Sheffield United": {
+          "alpha": 0.2921,
+          "beta": -0.3105,
+          "rank_off": 3,
           "rank_def": 5
         },
-        "West Bromwich Albion": {
-          "alpha": -0.0648,
-          "beta": -0.12,
-          "rank_off": 3,
+        "Southampton": {
+          "alpha": 0.5139,
+          "beta": 0.1515,
+          "rank_off": 1,
+          "rank_def": 10
+        },
+        "Stoke City": {
+          "alpha": -0.6564,
+          "beta": -0.5079,
+          "rank_off": 15,
           "rank_def": 2
+        },
+        "Swansea City": {
+          "alpha": 0.2677,
+          "beta": 0.638,
+          "rank_off": 4,
+          "rank_def": 14
+        },
+        "Watford": {
+          "alpha": -0.401,
+          "beta": -0.4684,
+          "rank_off": 14,
+          "rank_def": 3
+        },
+        "West Bromwich Albion": {
+          "alpha": 0.14,
+          "beta": 0.0088,
+          "rank_off": 6,
+          "rank_def": 9
         }
       }
     },
     "eng.3": {
-      "n_matches": 53,
-      "n_teams": 6,
-      "gamma": 0.4538,
-      "rho": -0.0046,
-      "log_lik": -166.9,
+      "n_matches": 60,
+      "n_teams": 11,
+      "gamma": 0.4218,
+      "rho": -0.0341,
+      "log_lik": -183.23,
       "iterations": 2,
       "teams": {
         "Barnsley": {
-          "alpha": 0.077,
-          "beta": 0.0995,
-          "rank_off": 3,
-          "rank_def": 4
+          "alpha": -0.1403,
+          "beta": 0.1946,
+          "rank_off": 8,
+          "rank_def": 8
         },
         "Bradford City": {
-          "alpha": -0.3061,
-          "beta": 0.0565,
-          "rank_off": 4,
-          "rank_def": 3
+          "alpha": -0.4897,
+          "beta": 0.031,
+          "rank_off": 9,
+          "rank_def": 7
         },
-        "Mansfield Town": {
-          "alpha": 0.8979,
-          "beta": -0.4903,
-          "rank_off": 1,
-          "rank_def": 1
-        },
-        "Peterborough United": {
-          "alpha": -1.1327,
-          "beta": -0.2593,
-          "rank_off": 6,
-          "rank_def": 2
-        },
-        "Stevenage": {
-          "alpha": -0.3119,
-          "beta": 0.4001,
+        "Doncaster Rovers": {
+          "alpha": 0.2429,
+          "beta": -0.0666,
           "rank_off": 5,
           "rank_def": 6
         },
-        "Stockport County": {
-          "alpha": 0.7759,
-          "beta": 0.1935,
+        "Huddersfield Town": {
+          "alpha": 0.5134,
+          "beta": 0.2828,
           "rank_off": 2,
+          "rank_def": 10
+        },
+        "Leyton Orient": {
+          "alpha": 0.2185,
+          "beta": -0.2001,
+          "rank_off": 6,
+          "rank_def": 2
+        },
+        "Mansfield Town": {
+          "alpha": 0.7537,
+          "beta": -0.1549,
+          "rank_off": 1,
+          "rank_def": 4
+        },
+        "Peterborough United": {
+          "alpha": -1.3709,
+          "beta": -0.2001,
+          "rank_off": 11,
+          "rank_def": 3
+        },
+        "Plymouth Argyle": {
+          "alpha": 0.1245,
+          "beta": -0.1305,
+          "rank_off": 7,
           "rank_def": 5
+        },
+        "Stevenage": {
+          "alpha": -0.6627,
+          "beta": 0.4988,
+          "rank_off": 10,
+          "rank_def": 11
+        },
+        "Stockport County": {
+          "alpha": 0.5134,
+          "beta": 0.2585,
+          "rank_off": 3,
+          "rank_def": 9
+        },
+        "Wycombe Wanderers": {
+          "alpha": 0.2974,
+          "beta": -0.5136,
+          "rank_off": 4,
+          "rank_def": 1
+        }
+      }
+    },
+    "eng.4": {
+      "n_matches": 62,
+      "n_teams": 18,
+      "gamma": 0.4398,
+      "rho": -0.2984,
+      "log_lik": -159.39,
+      "iterations": 3,
+      "teams": {
+        "Accrington Stanley": {
+          "alpha": 0.4017,
+          "beta": -0.653,
+          "rank_off": 4,
+          "rank_def": 1
+        },
+        "Barnet": {
+          "alpha": 0.5236,
+          "beta": -0.1515,
+          "rank_off": 2,
+          "rank_def": 7
+        },
+        "Bristol Rovers": {
+          "alpha": 0.5236,
+          "beta": 0.4685,
+          "rank_off": 3,
+          "rank_def": 16
+        },
+        "Cheltenham Town": {
+          "alpha": 0.2926,
+          "beta": -0.4557,
+          "rank_off": 7,
+          "rank_def": 3
+        },
+        "Chesterfield": {
+          "alpha": -0.3704,
+          "beta": 0.3013,
+          "rank_off": 14,
+          "rank_def": 14
+        },
+        "Colchester United": {
+          "alpha": -0.1393,
+          "beta": 0.4685,
+          "rank_off": 11,
+          "rank_def": 17
+        },
+        "Crawley Town": {
+          "alpha": -0.4551,
+          "beta": -0.0238,
+          "rank_off": 15,
+          "rank_def": 10
+        },
+        "Crewe Alexandra": {
+          "alpha": -0.7442,
+          "beta": 0.3802,
+          "rank_off": 17,
+          "rank_def": 15
+        },
+        "Fleetwood Town": {
+          "alpha": 0.2983,
+          "beta": 0.1097,
+          "rank_off": 5,
+          "rank_def": 11
+        },
+        "Gillingham": {
+          "alpha": -0.4551,
+          "beta": -0.5196,
+          "rank_off": 16,
+          "rank_def": 2
+        },
+        "Grimsby Town": {
+          "alpha": 0.2983,
+          "beta": 0.2467,
+          "rank_off": 6,
+          "rank_def": 13
+        },
+        "Newport County": {
+          "alpha": 0.627,
+          "beta": -0.112,
+          "rank_off": 1,
+          "rank_def": 8
+        },
+        "Oldham Athletic": {
+          "alpha": 0.2438,
+          "beta": 0.7541,
+          "rank_off": 8,
+          "rank_def": 18
+        },
+        "Salford City": {
+          "alpha": -0.1846,
+          "beta": 0.1886,
+          "rank_off": 13,
+          "rank_def": 12
+        },
+        "Shrewsbury Town": {
+          "alpha": -0.8533,
+          "beta": -0.1701,
+          "rank_off": 18,
+          "rank_def": 6
+        },
+        "Swindon Town": {
+          "alpha": -0.1602,
+          "beta": -0.328,
+          "rank_off": 12,
+          "rank_def": 5
+        },
+        "Tranmere Rovers": {
+          "alpha": 0.0128,
+          "beta": -0.0819,
+          "rank_off": 10,
+          "rank_def": 9
+        },
+        "Walsall": {
+          "alpha": 0.1405,
+          "beta": -0.422,
+          "rank_off": 9,
+          "rank_def": 4
         }
       }
     },
@@ -1748,183 +1950,183 @@
       }
     },
     "par.1": {
-      "n_matches": 42,
+      "n_matches": 43,
       "n_teams": 12,
-      "gamma": 0.1194,
+      "gamma": 0.1345,
       "rho": -0.2984,
-      "log_lik": -98.17,
+      "log_lik": -101.31,
       "iterations": 2,
       "teams": {
         "2 de Mayo": {
-          "alpha": 0.2076,
-          "beta": 0.5658,
+          "alpha": 0.2061,
+          "beta": 0.564,
           "rank_off": 5,
           "rank_def": 12
         },
         "Cerro Porteño": {
-          "alpha": -0.0629,
-          "beta": -0.2063,
+          "alpha": -0.0795,
+          "beta": -0.2081,
           "rank_off": 9,
           "rank_def": 4
         },
         "Club Olimpia": {
-          "alpha": 0.542,
-          "beta": -0.0298,
+          "alpha": 0.516,
+          "beta": -0.0108,
           "rank_off": 1,
           "rank_def": 5
         },
         "Deportivo Recoleta": {
-          "alpha": 0.3992,
-          "beta": -0.4129,
+          "alpha": 0.3826,
+          "beta": -0.3846,
           "rank_off": 3,
           "rank_def": 2
         },
         "Guaraní": {
-          "alpha": 0.0591,
-          "beta": 0.0398,
-          "rank_off": 6,
+          "alpha": 0.0331,
+          "beta": 0.0682,
+          "rank_off": 7,
           "rank_def": 8
         },
         "Libertad": {
-          "alpha": 0.5025,
-          "beta": 0.4079,
+          "alpha": 0.4859,
+          "beta": 0.3968,
           "rank_off": 2,
           "rank_def": 10
         },
         "Nacional Asunción": {
-          "alpha": 0.0404,
-          "beta": 0.113,
+          "alpha": 0.0331,
+          "beta": 0.1414,
           "rank_off": 8,
           "rank_def": 9
         },
         "Rubio Ñú": {
-          "alpha": 0.0497,
-          "beta": -0.644,
-          "rank_off": 7,
+          "alpha": 0.2061,
+          "beta": -0.6946,
+          "rank_off": 6,
           "rank_def": 1
         },
         "Sportivo Ameliano": {
-          "alpha": -0.5645,
-          "beta": 0.4079,
+          "alpha": -0.5567,
+          "beta": 0.4025,
           "rank_off": 11,
           "rank_def": 11
         },
         "Sportivo Luqueño": {
-          "alpha": -0.1174,
-          "beta": 0.0097,
+          "alpha": -0.1434,
+          "beta": 0.038,
           "rank_off": 10,
-          "rank_def": 6
+          "rank_def": 7
         },
         "Sportivo San Lorenzo": {
-          "alpha": -1.4549,
-          "beta": -0.2759,
+          "alpha": -1.4565,
+          "beta": -0.3358,
           "rank_off": 12,
           "rank_def": 3
         },
         "Sportivo Trinidense": {
-          "alpha": 0.3992,
-          "beta": 0.0248,
+          "alpha": 0.3732,
+          "beta": 0.023,
           "rank_off": 4,
-          "rank_def": 7
+          "rank_def": 6
         }
       }
     },
     "per.1": {
-      "n_matches": 52,
+      "n_matches": 53,
       "n_teams": 15,
       "gamma": 0.4567,
       "rho": 0.0984,
-      "log_lik": -134.59,
-      "iterations": 2,
+      "log_lik": -136.54,
+      "iterations": 3,
       "teams": {
         "ADT": {
-          "alpha": -0.155,
-          "beta": 0.0861,
+          "alpha": -0.146,
+          "beta": 0.0863,
           "rank_off": 11,
           "rank_def": 11
         },
         "Alianza Atlético": {
-          "alpha": 0.7448,
-          "beta": 0.4692,
-          "rank_off": 2,
+          "alpha": 0.784,
+          "beta": 0.4601,
+          "rank_off": 1,
           "rank_def": 14
         },
         "Atlético Grau": {
-          "alpha": -0.8445,
-          "beta": 0.1105,
+          "alpha": -0.8089,
+          "beta": 0.2535,
           "rank_off": 15,
-          "rank_def": 12
+          "rank_def": 13
         },
         "Comerciantes Unidos": {
-          "alpha": 0.0854,
-          "beta": -0.3667,
-          "rank_off": 6,
-          "rank_def": 3
+          "alpha": 0.1152,
+          "beta": -0.3758,
+          "rank_off": 5,
+          "rank_def": 4
         },
         "Deportivo Garcilaso": {
-          "alpha": -0.0423,
-          "beta": 1.463,
+          "alpha": -0.067,
+          "beta": 1.4482,
           "rank_off": 10,
           "rank_def": 15
         },
         "Deportivo Moquegua": {
-          "alpha": -0.6774,
-          "beta": -0.0567,
+          "alpha": -0.7207,
+          "beta": -0.0658,
           "rank_off": 14,
-          "rank_def": 7
+          "rank_def": 8
         },
         "FC Cajamarca": {
-          "alpha": 0.386,
-          "beta": -0.3667,
+          "alpha": 0.4008,
+          "beta": -0.4002,
           "rank_off": 3,
-          "rank_def": 4
+          "rank_def": 3
         },
         "Juan Pablo II": {
-          "alpha": 0.0703,
-          "beta": -0.2785,
+          "alpha": 0.0851,
+          "beta": -0.2782,
           "rank_off": 7,
           "rank_def": 5
         },
         "Los Chankas": {
-          "alpha": -0.4499,
-          "beta": -0.5339,
+          "alpha": -0.4409,
+          "beta": -0.558,
           "rank_off": 13,
           "rank_def": 2
         },
         "Melgar": {
-          "alpha": 0.2189,
-          "beta": -0.0173,
-          "rank_off": 4,
-          "rank_def": 8
+          "alpha": 0.1152,
+          "beta": -0.0809,
+          "rank_off": 6,
+          "rank_def": 7
         },
         "Sport Boys": {
-          "alpha": -0.033,
-          "beta": 0.2289,
+          "alpha": -0.0182,
+          "beta": 0.2384,
           "rank_off": 9,
-          "rank_def": 13
+          "rank_def": 12
         },
         "Sport Huancayo": {
-          "alpha": 0.2038,
-          "beta": -0.239,
-          "rank_off": 5,
+          "alpha": 0.2128,
+          "beta": -0.2388,
+          "rank_off": 4,
           "rank_def": 6
         },
         "Sporting Cristal": {
-          "alpha": 0.0064,
-          "beta": 0.0617,
+          "alpha": 0.0026,
+          "beta": 0.0712,
           "rank_off": 8,
           "rank_def": 10
         },
         "UTC": {
-          "alpha": -0.3128,
-          "beta": -0.592,
+          "alpha": -0.2981,
+          "beta": -0.6068,
           "rank_off": 12,
           "rank_def": 1
         },
         "Universitario": {
-          "alpha": 0.7993,
-          "beta": 0.0315,
-          "rank_off": 1,
+          "alpha": 0.784,
+          "beta": 0.0468,
+          "rank_off": 2,
           "rank_def": 9
         }
       }
