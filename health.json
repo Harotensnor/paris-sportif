@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-09-01T03:29:52Z",
-  "calculated_at": "2026-09-01T03:29:52Z",
+  "generated_at": "2026-09-01T08:53:36Z",
+  "calculated_at": "2026-09-01T08:53:36Z",
   "source_of_truth": "data.js",
   "data_age_min": 0,
   "data_file_age_min": 0,
@@ -431,10 +431,10 @@
     },
     "clv_history": {
       "age_min": 1,
-      "matches": 1170,
-      "observations": 3190,
-      "mean_clv_pct": -0.29,
-      "positive_clv_rate": 33.8,
+      "matches": 1218,
+      "observations": 3321,
+      "mean_clv_pct": -0.28,
+      "positive_clv_rate": 32.5,
       "sample_status": "validated"
     }
   },
@@ -1012,7 +1012,7 @@
   ],
   "overall": "warning",
   "quality_checks": {
-    "data_generated_at": "2026-09-01T03:29:09.576920Z",
+    "data_generated_at": "2026-09-01T08:52:54.230647Z",
     "truth_scope": "all_events",
     "all_winamax_available": 13,
     "all_winamax_exact": 0,
@@ -1063,7 +1063,7 @@
   "data_truth": {
     "source_of_truth": "data.js",
     "scope": "all_events",
-    "data_generated_at": "2026-09-01T03:29:09.576920Z",
+    "data_generated_at": "2026-09-01T08:52:54.230647Z",
     "winamax_available": 13,
     "winamax_exact": 0,
     "winamax_exact_ratio": 0.0,
@@ -1076,26 +1076,26 @@
     "status": "critical",
     "schema_version": 2,
     "sources_validated": 11,
-    "sources_ok": 5,
-    "sources_warning": 5,
+    "sources_ok": 4,
+    "sources_warning": 6,
     "sources_critical": 1,
-    "quarantine_records": 7,
-    "anomalies_emitted": 6
+    "quarantine_records": 9,
+    "anomalies_emitted": 9
   },
   "source_health": {
-    "generated_at": "2026-09-01T03:29:52Z",
+    "generated_at": "2026-09-01T08:53:36Z",
     "sources_total": 11,
-    "sources_ok": 5,
-    "sources_warning": 5,
+    "sources_ok": 4,
+    "sources_warning": 6,
     "sources_critical": 1,
-    "source_health_avg": 88.2,
+    "source_health_avg": 86.6,
     "source_health_min": 49,
     "by_source": {
       "winamax_catalog": {
         "score": 92,
         "status": "warning",
         "items": 600,
-        "age_min": 1,
+        "age_min": 2,
         "sla_min": 15,
         "issues": 2
       },
@@ -1111,7 +1111,7 @@
         "score": 49,
         "status": "warning",
         "items": 0,
-        "age_min": 1,
+        "age_min": 2,
         "sla_min": 180,
         "issues": 3
       },
@@ -1119,7 +1119,7 @@
         "score": 92,
         "status": "warning",
         "items": 97,
-        "age_min": 1,
+        "age_min": 2,
         "sla_min": 180,
         "issues": 2
       },
@@ -1140,26 +1140,26 @@
         "issues": 1
       },
       "team_stats": {
-        "score": 57,
+        "score": 49,
         "status": "warning",
         "items": 0,
-        "age_min": 1,
+        "age_min": 2,
         "sla_min": 300,
-        "issues": 1
+        "issues": 2
       },
       "clubelo": {
-        "score": 100,
-        "status": "ok",
+        "score": 92,
+        "status": "warning",
         "items": 594,
-        "age_min": 1,
+        "age_min": 2,
         "sla_min": 1440,
-        "issues": 1
+        "issues": 2
       },
       "sofascore_events": {
         "score": 92,
         "status": "warning",
         "items": 1941,
-        "age_min": 1,
+        "age_min": 2,
         "sla_min": 30,
         "issues": 2
       },
@@ -1167,7 +1167,7 @@
         "score": 100,
         "status": "ok",
         "items": 5574,
-        "age_min": 1,
+        "age_min": 2,
         "sla_min": 1440,
         "issues": 1
       },
@@ -1175,7 +1175,7 @@
         "score": 100,
         "status": "ok",
         "items": 3,
-        "age_min": 1,
+        "age_min": 2,
         "sla_min": 1440,
         "issues": 1
       }
@@ -1183,12 +1183,12 @@
   },
   "observability": {
     "pipeline_traces": {
-      "generated_at": "2026-09-01T03:29:52Z",
+      "generated_at": "2026-09-01T08:53:36Z",
       "runs_observed": 99,
       "by_status": {
-        "warning": 69,
+        "warning": 71,
         "critical": 1,
-        "ok": 27,
+        "ok": 25,
         "missing": 2
       },
       "by_script": {
@@ -1202,7 +1202,7 @@
     }
   },
   "data_lineage": {
-    "generated_at": "2026-09-01T03:29:52Z",
+    "generated_at": "2026-09-01T08:53:36Z",
     "status": "ok",
     "events": 13,
     "events_missing_inline_lineage": 0,
@@ -1334,7 +1334,7 @@
     "data": {
       "status": "critical",
       "sources_validated": 11,
-      "quarantine_records": 7,
+      "quarantine_records": 9,
       "lineage_coverage_pct": 100.0
     },
     "model": {
