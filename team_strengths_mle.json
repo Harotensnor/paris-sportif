@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-09-01T17:53:43Z",
+  "generated_at": "2026-09-01T20:11:45Z",
   "method": "Full Bivariate Poisson MLE Dixon-Coles. Coordinate-descent avec golden-section search 1D. Pure Python (pas de scipy).",
   "min_matches_per_league": 40,
   "min_matches_per_team": 5,
-  "n_leagues_fit": 27,
+  "n_leagues_fit": 28,
   "leagues": {
     "arg.1": {
       "n_matches": 50,
@@ -42,6 +42,82 @@
           "beta": -0.0356,
           "rank_off": 4,
           "rank_def": 2
+        }
+      }
+    },
+    "aut.1": {
+      "n_matches": 40,
+      "n_teams": 11,
+      "gamma": 0.405,
+      "rho": -0.1468,
+      "log_lik": -111.72,
+      "iterations": 2,
+      "teams": {
+        "Austria Vienna": {
+          "alpha": -0.4896,
+          "beta": -0.1228,
+          "rank_off": 11,
+          "rank_def": 5
+        },
+        "Grazer AK": {
+          "alpha": -0.1459,
+          "beta": -0.5605,
+          "rank_off": 8,
+          "rank_def": 1
+        },
+        "LASK Linz": {
+          "alpha": 0.8873,
+          "beta": 0.6981,
+          "rank_off": 1,
+          "rank_def": 11
+        },
+        "RB Salzburg": {
+          "alpha": 0.0026,
+          "beta": 0.1965,
+          "rank_off": 4,
+          "rank_def": 8
+        },
+        "Rapid Vienna": {
+          "alpha": 0.5192,
+          "beta": 0.3637,
+          "rank_off": 2,
+          "rank_def": 10
+        },
+        "SC Rheindorf Altach": {
+          "alpha": -0.2586,
+          "beta": -0.1529,
+          "rank_off": 9,
+          "rank_def": 4
+        },
+        "SK Sturm Graz": {
+          "alpha": -0.1251,
+          "beta": 0.3149,
+          "rank_off": 7,
+          "rank_def": 9
+        },
+        "SV Josko Ried": {
+          "alpha": -0.0125,
+          "beta": -0.0833,
+          "rank_off": 5,
+          "rank_def": 6
+        },
+        "TSV Hartberg": {
+          "alpha": -0.0914,
+          "beta": -0.4327,
+          "rank_off": 6,
+          "rank_def": 2
+        },
+        "WSG Swarovski Tirol": {
+          "alpha": -0.298,
+          "beta": -0.4026,
+          "rank_off": 10,
+          "rank_def": 3
+        },
+        "Wolfsberger": {
+          "alpha": 0.0119,
+          "beta": 0.1815,
+          "rank_off": 3,
+          "rank_def": 7
         }
       }
     },
