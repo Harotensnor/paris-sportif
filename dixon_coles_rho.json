@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-02T17:30:00Z",
+  "generated_at": "2026-09-02T20:00:26Z",
   "method": "Dixon-Coles MLE grid search (ρ ∈ [-0.30, 0.10] step 0.005), λ_h, λ_a fixés à moyenne empirique par ligue. CI 95% via LR test.",
   "min_matches": 40,
   "default_rho": -0.13,
@@ -68,17 +68,17 @@
       "reason": "n=13 < 40"
     },
     "aut.1": {
-      "n": 40,
-      "rho_measured": 0.02,
+      "n": 41,
+      "rho_measured": 0.09,
       "rho_literature": -0.11,
       "rho_used": -0.11,
       "source": "literature_fallback",
       "reason": "CI trop large (0.400) ou fit nul",
-      "log_lik": -127.99,
+      "log_lik": -130.59,
       "ci_lo": -0.3,
       "ci_hi": 0.1,
-      "lambda_h": 1.7,
-      "lambda_a": 1.2
+      "lambda_h": 1.659,
+      "lambda_a": 1.195
     },
     "bel.1": {
       "n": 56,
@@ -688,12 +688,12 @@
       "lambda_a": 1.064
     },
     "ita.coppa_italia": {
-      "n": 22,
+      "n": 23,
       "rho_measured": null,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "n=22 < 40"
+      "reason": "n=23 < 40"
     },
     "jleague": {
       "n": 3,
