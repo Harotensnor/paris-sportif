@@ -1,42 +1,42 @@
 {
-  "generated_at": "2026-09-03T17:28:35Z",
-  "calculated_at": "2026-09-03T17:28:35Z",
+  "generated_at": "2026-09-03T20:02:03Z",
+  "calculated_at": "2026-09-03T20:02:03Z",
   "source_of_truth": "data.js",
-  "data_generated_at": "2026-09-03T17:27:54.367822Z",
+  "data_generated_at": "2026-09-03T20:01:02.940733Z",
   "data_today_field": "2026-09-03",
   "events": {
-    "total": 13,
-    "upcoming": 4,
-    "winamax_available": 13,
+    "total": 5,
+    "upcoming": 5,
+    "winamax_available": 5,
     "winamax_exact": 0,
     "winamax_exact_ratio": 0.0,
     "markets_more_than_1n2": 0,
-    "form_l10": 10,
+    "form_l10": 2,
     "h2h": 0,
     "lineups": 0,
     "football_lineups": 0,
     "starter_signals": 0,
-    "clubelo": 9,
-    "weather": 11,
+    "clubelo": 2,
+    "weather": 3,
     "injuries": 0,
-    "referee": 10,
+    "referee": 2,
     "referee_named": 0,
-    "referee_context": 10,
-    "referee_signal": 10,
-    "fd_calibration": 1,
+    "referee_context": 2,
+    "referee_signal": 2,
+    "fd_calibration": 0,
     "fd_closing_odds": 0,
-    "xg": 10,
-    "smart_money": 1
+    "xg": 3,
+    "smart_money": 0
   },
   "signal_health": {
     "referee": {
-      "effective_events": 10,
+      "effective_events": 2,
       "named_events": 0,
-      "context_events": 10,
+      "context_events": 2,
       "note": "referee is effective coverage: named referee or referee_context usable by the model."
     },
     "smart_money": {
-      "events": 1,
+      "events": 0,
       "status": "rare_event",
       "note": "Smart money is intentionally rare; low count is OK when odds movement does not confirm a strong signal."
     }
@@ -49,7 +49,7 @@
     "recommended_detail_fetch_cap": 220,
     "detail_by_sport": {
       "football": {
-        "exact": 3,
+        "exact": 4,
         "detailed": 0,
         "families": {},
         "detailed_ratio": 0.0
@@ -77,7 +77,7 @@
   },
   "health": {
     "status": "warning",
-    "warnings": 13,
+    "warnings": 14,
     "pipeline_drift": "warn"
   }
 }
