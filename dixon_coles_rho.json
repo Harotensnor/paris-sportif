@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-08T17:42:12Z",
+  "generated_at": "2026-09-08T20:18:59Z",
   "method": "Dixon-Coles MLE grid search (ρ ∈ [-0.30, 0.10] step 0.005), λ_h, λ_a fixés à moyenne empirique par ligue. CI 95% via LR test.",
   "min_matches": 40,
   "default_rho": -0.13,
@@ -863,17 +863,17 @@
       "reason": "n=1 < 40"
     },
     "ned.1": {
-      "n": 64,
+      "n": 65,
       "rho_measured": 0.015,
       "rho_literature": -0.08,
       "rho_used": -0.08,
       "source": "literature_fallback",
       "reason": "CI trop large (0.400) ou fit nul",
-      "log_lik": -204.78,
+      "log_lik": -207.42,
       "ci_lo": -0.3,
       "ci_hi": 0.1,
-      "lambda_h": 1.672,
-      "lambda_a": 2.016
+      "lambda_h": 1.677,
+      "lambda_a": 2.015
     },
     "nor.1": {
       "n": 79,
@@ -1188,12 +1188,12 @@
       "reason": "n=2 < 40"
     },
     "uefa.champions": {
-      "n": 3,
+      "n": 5,
       "rho_measured": null,
       "rho_literature": -0.1,
       "rho_used": -0.1,
       "source": "literature_fallback",
-      "reason": "n=3 < 40"
+      "reason": "n=5 < 40"
     },
     "uefa.europa": {
       "n": 5,
