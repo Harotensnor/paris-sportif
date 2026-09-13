@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-13T08:16:45Z",
+  "generated_at": "2026-09-13T13:24:07Z",
   "method": "Full Bivariate Poisson MLE Dixon-Coles. Coordinate-descent avec golden-section search 1D. Pure Python (pas de scipy).",
   "min_matches_per_league": 40,
   "min_matches_per_team": 5,
@@ -676,156 +676,162 @@
       }
     },
     "eng.2": {
-      "n_matches": 98,
-      "n_teams": 24,
-      "gamma": 0.4172,
+      "n_matches": 99,
+      "n_teams": 25,
+      "gamma": 0.4096,
       "rho": -0.2984,
-      "log_lik": -264.97,
+      "log_lik": -267.04,
       "iterations": 3,
       "teams": {
         "Birmingham City": {
-          "alpha": 0.0965,
-          "beta": 0.2621,
+          "alpha": 0.0784,
+          "beta": 0.3,
           "rank_off": 9,
-          "rank_def": 20
+          "rank_def": 21
         },
         "Blackburn Rovers": {
-          "alpha": -0.2831,
-          "beta": -0.2093,
-          "rank_off": 20,
-          "rank_def": 8
+          "alpha": -0.271,
+          "beta": -0.1133,
+          "rank_off": 21,
+          "rank_def": 13
         },
         "Bolton Wanderers": {
-          "alpha": -0.253,
-          "beta": -0.4066,
-          "rank_off": 18,
-          "rank_def": 3
+          "alpha": -0.2373,
+          "beta": -0.472,
+          "rank_off": 20,
+          "rank_def": 2
         },
         "Bristol City": {
-          "alpha": 0.1603,
-          "beta": -0.0084,
+          "alpha": 0.1516,
+          "beta": -0.0343,
           "rank_off": 7,
-          "rank_def": 17
+          "rank_def": 16
         },
         "Burnley": {
-          "alpha": 0.0269,
-          "beta": -0.2545,
+          "alpha": 0.0146,
+          "beta": -0.2711,
           "rank_off": 11,
-          "rank_def": 4
+          "rank_def": 5
         },
         "Cardiff City": {
-          "alpha": -0.715,
-          "beta": -0.2,
-          "rank_off": 24,
-          "rank_def": 9
+          "alpha": -0.6994,
+          "beta": -0.2468,
+          "rank_off": 25,
+          "rank_def": 7
         },
         "Charlton Athletic": {
-          "alpha": -0.3563,
-          "beta": -0.0572,
-          "rank_off": 21,
+          "alpha": -0.3744,
+          "beta": -0.0738,
+          "rank_off": 22,
           "rank_def": 14
         },
         "Derby County": {
-          "alpha": -0.2623,
-          "beta": -0.2394,
+          "alpha": -0.2316,
+          "beta": -0.2862,
           "rank_off": 19,
-          "rank_def": 5
+          "rank_def": 4
         },
         "Hull City": {
-          "alpha": -0.0463,
-          "beta": 0.9308,
+          "alpha": -0.0794,
+          "beta": 0.9142,
           "rank_off": 14,
-          "rank_def": 23
-        },
-        "Lincoln City": {
-          "alpha": -0.4991,
-          "beta": 1.0492,
-          "rank_off": 23,
           "rank_def": 24
         },
+        "Lincoln City": {
+          "alpha": -0.5171,
+          "beta": 1.0419,
+          "rank_off": 24,
+          "rank_def": 25
+        },
         "Middlesbrough": {
-          "alpha": 0.5586,
-          "beta": 0.2226,
-          "rank_off": 3,
-          "rank_def": 19
+          "alpha": 0.5254,
+          "beta": 0.206,
+          "rank_off": 4,
+          "rank_def": 20
         },
         "Millwall": {
-          "alpha": 0.1847,
-          "beta": -0.0235,
-          "rank_off": 6,
-          "rank_def": 16
+          "alpha": 0.1516,
+          "beta": -0.0401,
+          "rank_off": 8,
+          "rank_def": 15
         },
         "Norwich City": {
-          "alpha": 0.3275,
-          "beta": -0.1361,
-          "rank_off": 4,
-          "rank_def": 12
+          "alpha": 0.3489,
+          "beta": -0.1922,
+          "rank_off": 5,
+          "rank_def": 8
         },
         "Portsmouth": {
-          "alpha": -0.1647,
-          "beta": -0.1512,
-          "rank_off": 16,
-          "rank_def": 11
-        },
-        "Preston North End": {
-          "alpha": -0.1984,
-          "beta": -0.4403,
+          "alpha": -0.1828,
+          "beta": -0.1621,
           "rank_off": 17,
-          "rank_def": 2
-        },
-        "Queens Park Rangers": {
-          "alpha": -0.0126,
-          "beta": -0.1698,
-          "rank_off": 13,
           "rank_def": 10
         },
-        "Sheffield United": {
-          "alpha": 0.1302,
-          "beta": -0.5344,
-          "rank_off": 8,
+        "Preston North End": {
+          "alpha": -0.1921,
+          "beta": -0.4778,
+          "rank_off": 18,
           "rank_def": 1
         },
+        "Queens Park Rangers": {
+          "alpha": -0.04,
+          "beta": -0.1771,
+          "rank_off": 13,
+          "rank_def": 9
+        },
+        "Sheffield United": {
+          "alpha": -0.0945,
+          "beta": -0.3745,
+          "rank_off": 15,
+          "rank_def": 3
+        },
         "Southampton": {
-          "alpha": 0.6956,
-          "beta": 0.2133,
+          "alpha": 0.6589,
+          "beta": 0.1967,
           "rank_off": 2,
-          "rank_def": 18
+          "rank_def": 19
         },
         "Stoke City": {
-          "alpha": 0.0663,
-          "beta": -0.2244,
+          "alpha": 0.0332,
+          "beta": -0.1284,
           "rank_off": 10,
-          "rank_def": 7
+          "rank_def": 12
         },
         "Swansea City": {
-          "alpha": 0.3031,
-          "beta": 0.4594,
-          "rank_off": 5,
-          "rank_def": 22
+          "alpha": 0.27,
+          "beta": 0.4521,
+          "rank_off": 6,
+          "rank_def": 23
         },
         "Watford": {
-          "alpha": -0.4295,
-          "beta": -0.2394,
-          "rank_off": 22,
+          "alpha": -0.4231,
+          "beta": -0.2711,
+          "rank_off": 23,
           "rank_def": 6
         },
         "West Bromwich Albion": {
-          "alpha": -0.1159,
-          "beta": 0.326,
-          "rank_off": 15,
-          "rank_def": 21
+          "alpha": -0.1526,
+          "beta": 0.3244,
+          "rank_off": 16,
+          "rank_def": 22
         },
         "West Ham United": {
-          "alpha": 0.7595,
-          "beta": -0.0479,
+          "alpha": 0.717,
+          "beta": 0.0539,
           "rank_off": 1,
-          "rank_def": 15
+          "rank_def": 18
+        },
+        "Wolverhampton Wanderers": {
+          "alpha": 0.5312,
+          "beta": -0.0157,
+          "rank_off": 3,
+          "rank_def": 17
         },
         "Wrexham": {
-          "alpha": 0.0269,
-          "beta": -0.121,
+          "alpha": 0.0146,
+          "beta": -0.1527,
           "rank_off": 12,
-          "rank_def": 13
+          "rank_def": 11
         }
       }
     },
@@ -2150,248 +2156,248 @@
       }
     },
     "jpn.1": {
-      "n_matches": 128,
+      "n_matches": 130,
       "n_teams": 20,
-      "gamma": 0.3626,
-      "rho": -0.1286,
-      "log_lik": -364.57,
+      "gamma": 0.3609,
+      "rho": -0.1456,
+      "log_lik": -369.09,
       "iterations": 3,
       "teams": {
         "Avispa Fukuoka": {
-          "alpha": -0.1835,
-          "beta": -0.0704,
+          "alpha": -0.1926,
+          "beta": -0.0714,
           "rank_off": 15,
           "rank_def": 9
         },
         "Cerezo Osaka": {
-          "alpha": 0.181,
-          "beta": -0.0554,
+          "alpha": 0.1905,
+          "beta": -0.0563,
           "rank_off": 7,
-          "rank_def": 10
+          "rank_def": 11
         },
         "FC Tokyo": {
-          "alpha": 0.2298,
-          "beta": 0.1513,
+          "alpha": 0.2207,
+          "beta": 0.1504,
           "rank_off": 5,
           "rank_def": 16
         },
         "Fagiano Okayama": {
-          "alpha": 0.0777,
-          "beta": 0.6679,
-          "rank_off": 12,
+          "alpha": 0.1174,
+          "beta": 0.667,
+          "rank_off": 9,
           "rank_def": 20
         },
         "Gamba Osaka": {
-          "alpha": 0.1961,
-          "beta": -0.0554,
+          "alpha": 0.2056,
+          "beta": -0.0656,
           "rank_off": 6,
-          "rank_def": 11
+          "rank_def": 10
         },
         "JEF United Ichihara-Chiba": {
-          "alpha": 0.087,
-          "beta": -0.4687,
-          "rank_off": 10,
+          "alpha": 0.0628,
+          "beta": -0.4545,
+          "rank_off": 12,
           "rank_def": 1
         },
         "Kashima Antlers": {
-          "alpha": 0.1416,
-          "beta": -0.0159,
+          "alpha": 0.1418,
+          "beta": -0.0168,
           "rank_off": 8,
           "rank_def": 13
         },
         "Kashiwa Reysol": {
-          "alpha": -0.36,
-          "beta": -0.0252,
+          "alpha": -0.3598,
+          "beta": -0.0261,
           "rank_off": 18,
           "rank_def": 12
         },
         "Kawasaki Frontale": {
-          "alpha": 0.0533,
-          "beta": 0.0143,
+          "alpha": 0.0628,
+          "beta": 0.0076,
           "rank_off": 13,
-          "rank_def": 14
+          "rank_def": 15
         },
         "Kyoto Sanga": {
-          "alpha": -0.2473,
-          "beta": -0.1587,
+          "alpha": -0.2472,
+          "beta": -0.1596,
           "rank_off": 16,
           "rank_def": 5
         },
         "Machida Zelvia": {
-          "alpha": 0.087,
-          "beta": 0.5402,
+          "alpha": 0.093,
+          "beta": 0.5393,
           "rank_off": 11,
           "rank_def": 19
         },
         "Mito Hollyhock": {
-          "alpha": -0.3449,
-          "beta": -0.3596,
+          "alpha": -0.3505,
+          "beta": -0.3605,
           "rank_off": 17,
           "rank_def": 2
         },
         "Nagoya Grampus": {
-          "alpha": 0.2542,
-          "beta": -0.2957,
+          "alpha": 0.2544,
+          "beta": -0.2873,
           "rank_off": 3,
           "rank_def": 3
         },
         "Sanfrecce Hiroshima": {
-          "alpha": 0.6431,
-          "beta": 0.2697,
+          "alpha": 0.6433,
+          "beta": 0.2781,
           "rank_off": 1,
           "rank_def": 17
         },
         "Shimizu S-Pulse": {
-          "alpha": -0.8127,
-          "beta": -0.0798,
+          "alpha": -0.8126,
+          "beta": -0.0807,
           "rank_off": 20,
           "rank_def": 8
         },
         "Tokyo Verdy 1969": {
-          "alpha": -0.67,
-          "beta": -0.1831,
+          "alpha": -0.6942,
+          "beta": -0.1689,
           "rank_off": 19,
           "rank_def": 4
         },
         "Urawa Red Diamonds": {
-          "alpha": 0.2542,
-          "beta": 0.0329,
+          "alpha": 0.2544,
+          "beta": -0.0018,
           "rank_off": 4,
-          "rank_def": 15
+          "rank_def": 14
         },
         "V-Varen Nagasaki": {
-          "alpha": -0.0558,
-          "beta": -0.1041,
+          "alpha": -0.0556,
+          "beta": -0.0958,
           "rank_off": 14,
           "rank_def": 6
         },
         "Vissel Kobe": {
-          "alpha": 0.1114,
-          "beta": 0.2848,
-          "rank_off": 9,
+          "alpha": 0.1174,
+          "beta": 0.2931,
+          "rank_off": 10,
           "rank_def": 18
         },
         "Yokohama F. Marinos": {
-          "alpha": 0.3575,
-          "beta": -0.0891,
+          "alpha": 0.3484,
+          "beta": -0.09,
           "rank_off": 2,
           "rank_def": 7
         }
       }
     },
     "ned.1": {
-      "n_matches": 71,
+      "n_matches": 72,
       "n_teams": 18,
-      "gamma": 0.4932,
-      "rho": -0.1699,
-      "log_lik": -217.12,
+      "gamma": 0.4782,
+      "rho": -0.1764,
+      "log_lik": -221.79,
       "iterations": 3,
       "teams": {
         "ADO Den Haag": {
-          "alpha": -0.457,
-          "beta": -0.2737,
+          "alpha": -0.443,
+          "beta": -0.2604,
           "rank_off": 15,
-          "rank_def": 4
+          "rank_def": 3
         },
         "AZ Alkmaar": {
-          "alpha": 0.2813,
-          "beta": -0.1912,
+          "alpha": 0.3047,
+          "beta": -0.1571,
           "rank_off": 4,
-          "rank_def": 6
+          "rank_def": 8
         },
         "Ajax Amsterdam": {
-          "alpha": 0.4334,
-          "beta": 0.7538,
+          "alpha": 0.4324,
+          "beta": 0.7764,
           "rank_off": 2,
           "rank_def": 18
         },
         "Excelsior": {
-          "alpha": 0.4334,
-          "beta": 0.4833,
+          "alpha": 0.3105,
+          "beta": 0.3689,
           "rank_off": 3,
           "rank_def": 16
         },
         "FC Groningen": {
-          "alpha": 0.1084,
-          "beta": 0.0061,
+          "alpha": 0.1224,
+          "beta": 0.0043,
           "rank_off": 7,
           "rank_def": 12
         },
         "FC Twente": {
-          "alpha": -0.0832,
-          "beta": 0.2917,
-          "rank_off": 10,
+          "alpha": -0.0842,
+          "beta": 0.305,
+          "rank_off": 12,
           "rank_def": 14
         },
         "FC Utrecht": {
-          "alpha": -0.1227,
-          "beta": -0.3526,
-          "rank_off": 13,
-          "rank_def": 3
+          "alpha": -0.0297,
+          "beta": -0.2267,
+          "rank_off": 9,
+          "rank_def": 4
         },
         "Feyenoord Rotterdam": {
-          "alpha": 0.2361,
-          "beta": 0.3649,
+          "alpha": 0.2315,
+          "beta": 0.3631,
           "rank_off": 5,
           "rank_def": 15
         },
         "Fortuna Sittard": {
-          "alpha": 0.0689,
-          "beta": -0.0484,
+          "alpha": 0.0737,
+          "beta": -0.0294,
           "rank_off": 8,
           "rank_def": 11
         },
         "Go Ahead Eagles": {
-          "alpha": 0.1873,
-          "beta": -0.2098,
+          "alpha": 0.1921,
+          "beta": -0.1966,
           "rank_off": 6,
           "rank_def": 5
         },
         "Heerenveen": {
-          "alpha": -0.0925,
-          "beta": 0.2279,
-          "rank_off": 12,
+          "alpha": -0.0691,
+          "beta": 0.2411,
+          "rank_off": 10,
           "rank_def": 13
         },
         "NEC Nijmegen": {
-          "alpha": -0.132,
-          "beta": -0.1704,
+          "alpha": -0.1423,
+          "beta": -0.1872,
           "rank_off": 14,
-          "rank_def": 8
+          "rank_def": 6
         },
         "PEC Zwolle": {
-          "alpha": -0.6335,
-          "beta": -0.1854,
+          "alpha": -0.6439,
+          "beta": -0.1872,
           "rank_off": 18,
           "rank_def": 7
         },
         "PSV Eindhoven": {
-          "alpha": 0.935,
-          "beta": 0.5472,
+          "alpha": 0.9641,
+          "beta": 0.5303,
           "rank_off": 1,
           "rank_def": 17
         },
         "SC Cambuur": {
-          "alpha": -0.0832,
-          "beta": -0.6626,
-          "rank_off": 11,
+          "alpha": -0.0935,
+          "beta": -0.6888,
+          "rank_off": 13,
           "rank_def": 1
         },
         "Sparta Rotterdam": {
-          "alpha": -0.0588,
-          "beta": -0.0821,
-          "rank_off": 9,
-          "rank_def": 10
-        },
-        "Telstar": {
-          "alpha": -0.4663,
-          "beta": -0.0972,
-          "rank_off": 16,
+          "alpha": -0.0784,
+          "beta": -0.1385,
+          "rank_off": 11,
           "rank_def": 9
         },
+        "Telstar": {
+          "alpha": -0.4824,
+          "beta": -0.099,
+          "rank_off": 16,
+          "rank_def": 10
+        },
         "Willem II": {
-          "alpha": -0.5546,
-          "beta": -0.4014,
+          "alpha": -0.5649,
+          "beta": -0.4183,
           "rank_off": 17,
           "rank_def": 2
         }
