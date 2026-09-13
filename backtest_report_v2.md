@@ -1,29 +1,29 @@
 # Backtest ROI — VRAI modèle (v2)
 
-Généré : 2026-09-12T08:10:59Z
+Généré : 2026-09-13T08:35:24Z
 Source modèle : `pronostics.html` via `scripts/model_loader.py` (V8 embarqué, zéro duplication)
-Univers : 825 picks sur 2026-08-16T12:00Z → 2026-09-11T21:30Z
-Bankroll simulée (Kelly 0.25× cap 10%) : **100u → 1788228.63u**
+Univers : 911 picks sur 2026-08-16T17:35Z → 2026-09-12T20:30Z
+Bankroll simulée (Kelly 0.25× cap 10%) : **100u → 1692980.95u**
 
 > 📊 **v2** évalue la vraie fonction `predictMatch` qui vit dans `pronostics.html`. Les chiffres ci-dessous reflètent ce que le dashboard aurait fait si tu avais parié flat 1u chaque pick. La baseline marché reste dans `backtest_baselines.py` / `backtest_report.md`.
 
 ## 🟢 Vue d'ensemble
 
-- **825 picks** · 496 gagnés / 329 perdus · WR **60.1%**
-- ROI flat (1u/pick) : **+22.87%** (+188.66u cumulé)
-- Kelly 0.25× cap 10% : cumulé **+1788128.63u**
-- Cote moyenne : 2.14 · Pick prob moyenne : 54.1%
-- **Brier** : 0.2203 (0 = parfait, 0.25 = pile/face)
-- **Log-loss** : 0.6297 (plus bas = mieux calibré)
-- Bankroll simulée 1000€ : **17882286.27€** (+1788128.6%) · DD max 14.8% · Sharpe/pick +0.327
+- **911 picks** · 538 gagnés / 373 perdus · WR **59.1%**
+- ROI flat (1u/pick) : **+21.82%** (+198.78u cumulé)
+- Kelly 0.25× cap 10% : cumulé **+1692880.95u**
+- Cote moyenne : 2.15 · Pick prob moyenne : 53.6%
+- **Brier** : 0.2248 (0 = parfait, 0.25 = pile/face)
+- **Log-loss** : 0.6387 (plus bas = mieux calibré)
+- Bankroll simulée 1000€ : **16929809.51€** (+1692880.9%) · DD max 33.4% · Sharpe/pick +0.301
 
 ## Séries
 
-- Streak courante : ❄️ **1** loses consécutifs
+- Streak courante : 🔥 **4** wins consécutifs
 - Plus longue série gagnante : **13**
-- Plus longue série perdante : **5**
+- Plus longue série perdante : **6**
 - Top run win : 13 picks (2026-09-09T16:45Z → 2026-09-09T19:00Z)
-- Top run lose : 5 picks (2026-08-19T17:10Z → 2026-08-19T21:00Z)
+- Top run lose : 6 picks (2026-09-12T14:00Z → 2026-09-12T14:00Z)
 
 ## Par tier de fiabilité
 
@@ -33,7 +33,7 @@ Bankroll simulée (Kelly 0.25× cap 10%) : **100u → 1788228.63u**
 | `lock` | 0 | 0% | 0–0% | ⚪ +0.0% | +0.00u | 0.0 | +0.0pt |
 | `standard` | 0 | 0% | 0–0% | ⚪ +0.0% | +0.00u | 0.0 | +0.0pt |
 | `lowconf` | 0 | 0% | 0–0% | ⚪ +0.0% | +0.00u | 0.0 | +0.0pt |
-| `skip` | 825 | 60% | 57–63% | 🟢 +22.9% | +1788128.63u | 0.2203 | +2.6pt |
+| `skip` | 911 | 59% | 56–62% | 🟢 +21.8% | +1692880.95u | 0.2248 | +2.6pt |
 
 ## Calibration par tier
 
@@ -43,7 +43,7 @@ Bankroll simulée (Kelly 0.25× cap 10%) : **100u → 1788228.63u**
 | `lock` | 0 | — | — | en apprentissage |
 | `standard` | 0 | — | — | en apprentissage |
 | `lowconf` | 0 | — | — | en apprentissage |
-| `skip` | 825 | 0.0616 | 0.755 | à surveiller |
+| `skip` | 911 | 0.0552 | 0.755 | à surveiller |
 
 > ⚠️ Big Bets en apprentissage : pas assez de paris réglés pour valider la calibration.
 
@@ -51,28 +51,28 @@ Bankroll simulée (Kelly 0.25× cap 10%) : **100u → 1788228.63u**
 
 | Sport | N | WR | ROI flat | Kelly cumul | Brier |
 |---|---:|---:|---:|---:|---:|
-| football | 744 | 61% | 🟢 +26.1% | +1788128.63u | 0.2179 |
-| baseball | 75 | 52% | 🔴 -10.8% | +0.00u | 0.2462 |
+| football | 833 | 59% | 🟢 +24.3% | +1692880.95u | 0.2235 |
+| baseball | 72 | 54% | 🔴 -8.1% | +0.00u | 0.242 |
 | basketball | 6 | 83% | 🟢 +37.7% | +0.00u | 0.2012 |
 
 ## Calibration par segment sport/ligue
 
 | Segment | N | WR | ROI flat | Brier |
 |---|---:|---:|---:|---:|
-| `football:other` | 612 | 59% | 🟢 +20.8% | 0.2179 |
-| `football:top5` | 132 | 67% | 🟢 +51.1% | 0.2176 |
-| `baseball:all` | 75 | 52% | 🔴 -10.8% | 0.2462 |
+| `football:other` | 676 | 58% | 🟢 +19.8% | 0.2226 |
+| `football:top5` | 157 | 64% | 🟢 +43.6% | 0.2271 |
+| `baseball:all` | 72 | 54% | 🔴 -8.1% | 0.242 |
 | `basketball:all` | 6 | 83% | 🟢 +37.7% | 0.2012 |
 
 ## Par range de cote
 
 | Bucket | N | WR | ROI flat | Brier |
 |---|---:|---:|---:|---:|
-| heavy_fav | 125 | 79% | 🟢 +4.8% | 0.1507 |
-| fav | 338 | 60% | 🟢 +4.7% | 0.222 |
-| toss_up | 212 | 60% | 🟢 +38.2% | 0.2405 |
-| dog | 147 | 45% | 🟢 +49.4% | 0.2426 |
-| heavy_dog | 3 | 67% | 🟢 +433.3% | 0.4169 |
+| heavy_fav | 134 | 78% | 🟢 +3.4% | 0.1524 |
+| fav | 361 | 58% | 🟢 +2.6% | 0.2261 |
+| toss_up | 242 | 58% | 🟢 +34.9% | 0.2449 |
+| dog | 171 | 46% | 🟢 +52.8% | 0.2475 |
+| heavy_dog | 3 | 67% | 🟢 +330.0% | 0.3792 |
 
 ## Calibration (diagramme de fiabilité)
 
@@ -80,26 +80,26 @@ Bankroll simulée (Kelly 0.25× cap 10%) : **100u → 1788228.63u**
 
 | Bin | N | Prob moy | WR observé | Gap |
 |---|---:|---:|---:|---:|
-| [0.2–0.3] | 2 | 24.5% | 100.0% | 🟢 +75.5% |
-| [0.3–0.4] | 135 | 36.5% | 38.5% | ⚪ +2.1% |
-| [0.4–0.5] | 194 | 45.4% | 48.5% | ⚪ +3.0% |
-| [0.5–0.6] | 262 | 54.9% | 60.7% | 🟢 +5.7% |
-| [0.6–0.7] | 128 | 64.0% | 76.6% | 🟢 +12.6% |
-| [0.7–0.8] | 60 | 74.6% | 83.3% | 🟢 +8.7% |
-| [0.8–0.9] | 38 | 84.6% | 94.7% | 🟢 +10.2% |
-| [0.9–1.0] | 6 | 91.4% | 83.3% | 🔴 -8.1% |
+| [0.2–0.3] | 1 | 24.5% | 100.0% | 🟢 +75.5% |
+| [0.3–0.4] | 166 | 36.8% | 43.4% | 🟢 +6.5% |
+| [0.4–0.5] | 224 | 45.2% | 49.1% | ⚪ +3.9% |
+| [0.5–0.6] | 270 | 55.0% | 58.1% | ⚪ +3.2% |
+| [0.6–0.7] | 133 | 64.0% | 72.2% | 🟢 +8.1% |
+| [0.7–0.8] | 73 | 74.4% | 83.6% | 🟢 +9.2% |
+| [0.8–0.9] | 37 | 85.1% | 94.6% | 🟢 +9.5% |
+| [0.9–1.0] | 7 | 91.5% | 85.7% | 🔴 -5.8% |
 
 ## Top ligues (par volume)
 
 | Ligue | N | WR | ROI flat | Brier |
 |---|---:|---:|---:|---:|
-| `mlb` | 75 | 52% | 🔴 -10.8% | 0.2462 |
-| `eng.2` | 49 | 59% | 🟢 +31.4% | 0.2153 |
-| `eng.3` | 36 | 50% | 🟢 +16.1% | 0.2165 |
-| `eng.4` | 36 | 64% | 🟢 +59.2% | 0.2427 |
-| `jpn.1` | 32 | 53% | 🟢 +7.7% | 0.2159 |
-| `eng.1` | 30 | 60% | 🟢 +41.2% | 0.2092 |
-| `ita.1` | 29 | 86% | 🟢 +83.2% | 0.1982 |
-| `esp.1` | 28 | 61% | 🟢 +19.4% | 0.1895 |
-| `esp.2` | 28 | 57% | 🟢 +24.5% | 0.196 |
-| `fra.1` | 27 | 74% | 🟢 +101.6% | 0.262 |
+| `mlb` | 72 | 54% | 🔴 -8.1% | 0.242 |
+| `eng.2` | 58 | 59% | 🟢 +31.4% | 0.218 |
+| `eng.3` | 47 | 51% | 🟢 +19.8% | 0.2536 |
+| `eng.4` | 47 | 57% | 🟢 +38.3% | 0.2396 |
+| `jpn.1` | 38 | 55% | 🟢 +16.2% | 0.2264 |
+| `eng.1` | 37 | 62% | 🟢 +58.5% | 0.2471 |
+| `esp.1` | 32 | 56% | 🟢 +8.0% | 0.2008 |
+| `fra.1` | 32 | 62% | 🟢 +53.1% | 0.2487 |
+| `ita.1` | 32 | 81% | 🟢 +75.7% | 0.2143 |
+| `esp.2` | 30 | 57% | 🟢 +31.0% | 0.2052 |
