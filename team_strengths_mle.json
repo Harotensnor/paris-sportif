@@ -1,89 +1,95 @@
 {
-  "generated_at": "2026-09-13T19:30:08Z",
+  "generated_at": "2026-09-13T21:33:15Z",
   "method": "Full Bivariate Poisson MLE Dixon-Coles. Coordinate-descent avec golden-section search 1D. Pure Python (pas de scipy).",
   "min_matches_per_league": 40,
   "min_matches_per_team": 5,
   "n_leagues_fit": 31,
   "leagues": {
     "arg.1": {
-      "n_matches": 61,
-      "n_teams": 12,
-      "gamma": 0.1861,
-      "rho": -0.1488,
-      "log_lik": -155.65,
+      "n_matches": 63,
+      "n_teams": 13,
+      "gamma": 0.1693,
+      "rho": -0.1626,
+      "log_lik": -159.2,
       "iterations": 3,
       "teams": {
         "Aldosivi": {
-          "alpha": 0.0636,
-          "beta": -0.4815,
+          "alpha": 0.0835,
+          "beta": -0.4931,
           "rank_off": 7,
           "rank_def": 2
         },
         "Argentinos Juniors": {
-          "alpha": -0.5657,
-          "beta": 0.2116,
+          "alpha": -0.5608,
+          "beta": 0.2058,
           "rank_off": 11,
-          "rank_def": 9
-        },
-        "Atlético Tucumán": {
-          "alpha": -0.8513,
-          "beta": 0.9442,
-          "rank_off": 12,
-          "rank_def": 12
-        },
-        "Banfield": {
-          "alpha": -0.1129,
-          "beta": -0.3387,
-          "rank_off": 9,
-          "rank_def": 5
-        },
-        "Belgrano (Córdoba)": {
-          "alpha": 0.1123,
-          "beta": 0.33,
-          "rank_off": 6,
           "rank_def": 10
         },
-        "Estudiantes de La Plata": {
-          "alpha": 0.3341,
-          "beta": 0.4879,
-          "rank_off": 2,
+        "Atlético Tucumán": {
+          "alpha": -0.8313,
+          "beta": 0.9628,
+          "rank_off": 13,
+          "rank_def": 13
+        },
+        "Banfield": {
+          "alpha": -0.1081,
+          "beta": -0.3352,
+          "rank_off": 10,
+          "rank_def": 4
+        },
+        "Belgrano (Córdoba)": {
+          "alpha": 0.0835,
+          "beta": 0.3522,
+          "rank_off": 8,
           "rank_def": 11
         },
+        "Estudiantes de La Plata": {
+          "alpha": 0.3447,
+          "beta": 0.5007,
+          "rank_off": 2,
+          "rank_def": 12
+        },
         "Gimnasia (Mendoza)": {
-          "alpha": 0.1518,
-          "beta": -0.3689,
+          "alpha": 0.1624,
+          "beta": -0.356,
           "rank_off": 5,
           "rank_def": 3
         },
         "Gimnasia La Plata": {
-          "alpha": 0.3341,
-          "beta": 0.0839,
+          "alpha": 0.3296,
+          "beta": 0.063,
           "rank_off": 3,
-          "rank_def": 7
+          "rank_def": 8
         },
         "Independiente Rivadavia": {
-          "alpha": 0.3039,
-          "beta": -0.3689,
+          "alpha": 0.3052,
+          "beta": -0.3352,
           "rank_off": 4,
-          "rank_def": 4
+          "rank_def": 5
         },
         "Newell's Old Boys": {
-          "alpha": 0.0148,
-          "beta": 0.0258,
-          "rank_off": 8,
-          "rank_def": 6
+          "alpha": 0.029,
+          "beta": 0.0386,
+          "rank_off": 9,
+          "rank_def": 7
         },
         "River Plate": {
-          "alpha": 0.6534,
-          "beta": -0.6882,
+          "alpha": 0.664,
+          "beta": -0.6846,
           "rank_off": 1,
           "rank_def": 1
         },
+        "Sarmiento (Junín)": {
+          "alpha": 0.1624,
+          "beta": -0.0554,
+          "rank_off": 6,
+          "rank_def": 6
+        },
         "Tigre": {
-          "alpha": -0.438,
-          "beta": 0.1628,
-          "rank_off": 10,
-          "rank_def": 8
+          "alpha": -0.6642,
+          "beta": 0.1362,
+          "rank_off": 12,
+          "rank_def": 9
         }
       }
     },
@@ -276,96 +282,102 @@
       }
     },
     "bra.1": {
-      "n_matches": 52,
-      "n_teams": 14,
-      "gamma": 0.311,
-      "rho": 0.057,
-      "log_lik": -145.77,
+      "n_matches": 53,
+      "n_teams": 15,
+      "gamma": 0.3261,
+      "rho": 0.0826,
+      "log_lik": -148.26,
       "iterations": 2,
       "teams": {
         "Athletico-PR": {
-          "alpha": 0.3096,
-          "beta": 0.0079,
-          "rank_off": 2,
-          "rank_def": 7
+          "alpha": 0.2514,
+          "beta": 0.0521,
+          "rank_off": 3,
+          "rank_def": 8
         },
         "Bahia": {
-          "alpha": 0.1912,
-          "beta": -0.287,
-          "rank_off": 4,
+          "alpha": 0.1782,
+          "beta": -0.2729,
+          "rank_off": 7,
           "rank_def": 4
         },
         "Botafogo": {
-          "alpha": -0.1131,
-          "beta": 0.1507,
-          "rank_off": 9,
-          "rank_def": 11
-        },
-        "Chapecoense": {
-          "alpha": -0.0097,
-          "beta": -0.5876,
-          "rank_off": 7,
-          "rank_def": 1
-        },
-        "Corinthians": {
-          "alpha": -0.2616,
-          "beta": 0.2483,
+          "alpha": -0.1561,
+          "beta": 0.1892,
           "rank_off": 10,
           "rank_def": 12
         },
-        "Coritiba": {
-          "alpha": -0.3046,
-          "beta": -0.0071,
+        "Chapecoense": {
+          "alpha": -0.0191,
+          "beta": -0.5922,
+          "rank_off": 8,
+          "rank_def": 1
+        },
+        "Corinthians": {
+          "alpha": -0.2595,
+          "beta": 0.2437,
           "rank_off": 11,
-          "rank_def": 6
+          "rank_def": 13
+        },
+        "Coritiba": {
+          "alpha": -0.3477,
+          "beta": 0.0615,
+          "rank_off": 13,
+          "rank_def": 10
         },
         "Flamengo": {
-          "alpha": 0.8018,
-          "beta": 0.7405,
+          "alpha": 0.7982,
+          "beta": 0.7546,
           "rank_off": 1,
-          "rank_def": 14
+          "rank_def": 15
         },
         "Fluminense": {
-          "alpha": 0.2794,
-          "beta": -0.4204,
-          "rank_off": 3,
+          "alpha": 0.2758,
+          "beta": -0.425,
+          "rank_off": 2,
           "rank_def": 3
         },
         "Internacional": {
-          "alpha": 0.1912,
-          "beta": 0.0567,
+          "alpha": 0.1876,
+          "beta": 0.0521,
           "rank_off": 5,
           "rank_def": 9
         },
         "Mirassol": {
-          "alpha": -0.055,
-          "beta": -0.4599,
-          "rank_off": 8,
+          "alpha": -0.0191,
+          "beta": -0.4401,
+          "rank_off": 9,
           "rank_def": 2
         },
         "Palmeiras": {
-          "alpha": -0.5113,
-          "beta": 0.5734,
-          "rank_off": 14,
-          "rank_def": 13
+          "alpha": -0.5206,
+          "beta": 0.5874,
+          "rank_off": 15,
+          "rank_def": 14
         },
         "Red Bull Bragantino": {
-          "alpha": -0.3893,
-          "beta": 0.0567,
-          "rank_off": 13,
-          "rank_def": 10
+          "alpha": -0.4266,
+          "beta": 0.0765,
+          "rank_off": 14,
+          "rank_def": 11
         },
         "Santos": {
-          "alpha": 0.1761,
-          "beta": -0.0803,
+          "alpha": 0.1876,
+          "beta": -0.0813,
           "rank_off": 6,
-          "rank_def": 5
+          "rank_def": 6
         },
         "Vasco da Gama": {
-          "alpha": -0.3046,
-          "beta": 0.0079,
+          "alpha": -0.3233,
+          "beta": 0.0371,
           "rank_off": 12,
-          "rank_def": 8
+          "rank_def": 7
+        },
+        "Vitória": {
+          "alpha": 0.1933,
+          "beta": -0.2428,
+          "rank_off": 4,
+          "rank_def": 5
         }
       }
     },
@@ -482,78 +494,84 @@
       }
     },
     "ecu.1": {
-      "n_matches": 43,
-      "n_teams": 11,
-      "gamma": 0.1739,
+      "n_matches": 44,
+      "n_teams": 12,
+      "gamma": 0.1617,
       "rho": 0.0984,
-      "log_lik": -111.92,
+      "log_lik": -114.13,
       "iterations": 2,
       "teams": {
         "Aucas": {
-          "alpha": -0.0926,
-          "beta": 0.1146,
-          "rank_off": 7,
-          "rank_def": 7
+          "alpha": -0.1786,
+          "beta": 0.026,
+          "rank_off": 8,
+          "rank_def": 6
         },
         "Delfín": {
-          "alpha": -0.5396,
-          "beta": 0.4188,
-          "rank_off": 9,
+          "alpha": -0.528,
+          "beta": 0.3546,
+          "rank_off": 10,
           "rank_def": 11
         },
         "Deportivo Cuenca": {
-          "alpha": -0.8797,
-          "beta": -0.1408,
-          "rank_off": 11,
+          "alpha": -0.8868,
+          "beta": -0.205,
+          "rank_off": 12,
           "rank_def": 4
         },
         "Independiente del Valle": {
-          "alpha": 0.6795,
-          "beta": 0.3155,
+          "alpha": 0.6724,
+          "beta": 0.2327,
           "rank_off": 1,
           "rank_def": 10
         },
+        "Leones": {
+          "alpha": 0.1407,
+          "beta": 0.4637,
+          "rank_off": 5,
+          "rank_def": 12
+        },
         "Libertad (Ecuador)": {
-          "alpha": 0.1141,
-          "beta": 0.2179,
-          "rank_off": 6,
+          "alpha": 0.0524,
+          "beta": 0.1387,
+          "rank_off": 7,
           "rank_def": 9
         },
         "Macará": {
-          "alpha": 0.6156,
-          "beta": -0.2499,
+          "alpha": 0.554,
+          "beta": -0.3327,
           "rank_off": 2,
-          "rank_def": 3
+          "rank_def": 2
         },
         "Manta F.C.": {
-          "alpha": -0.2899,
-          "beta": -0.0131,
-          "rank_off": 8,
+          "alpha": -0.2726,
+          "beta": -0.0622,
+          "rank_off": 9,
           "rank_def": 5
         },
         "Mushuc Runa": {
-          "alpha": 0.3753,
-          "beta": -0.3869,
+          "alpha": 0.417,
+          "beta": -0.378,
           "rank_off": 4,
-          "rank_def": 2
+          "rank_def": 1
         },
         "Orense": {
-          "alpha": 0.2023,
-          "beta": 0.1146,
-          "rank_off": 5,
+          "alpha": 0.1407,
+          "beta": 0.0504,
+          "rank_off": 6,
           "rank_def": 8
         },
         "Técnico Universitario": {
-          "alpha": -0.6881,
-          "beta": -0.4903,
-          "rank_off": 10,
-          "rank_def": 1
+          "alpha": -0.5374,
+          "beta": -0.3234,
+          "rank_off": 11,
+          "rank_def": 3
         },
         "Universidad Católica (Quito)": {
-          "alpha": 0.503,
-          "beta": 0.0995,
+          "alpha": 0.4263,
+          "beta": 0.0353,
           "rank_off": 3,
-          "rank_def": 6
+          "rank_def": 7
         }
       }
     },
@@ -1138,367 +1156,367 @@
       }
     },
     "esp.1": {
-      "n_matches": 99,
+      "n_matches": 100,
       "n_teams": 22,
-      "gamma": 0.3383,
-      "rho": -0.1679,
-      "log_lik": -262.47,
+      "gamma": 0.3289,
+      "rho": -0.1731,
+      "log_lik": -266.15,
       "iterations": 3,
       "teams": {
         "Alavés": {
-          "alpha": 0.3663,
-          "beta": -0.0513,
+          "alpha": 0.3707,
+          "beta": -0.0462,
           "rank_off": 7,
-          "rank_def": 11
+          "rank_def": 10
         },
         "Athletic Club": {
-          "alpha": 0.494,
-          "beta": -0.0119,
+          "alpha": 0.5343,
+          "beta": -0.0067,
           "rank_off": 4,
-          "rank_def": 12
+          "rank_def": 11
         },
         "Atlético Madrid": {
-          "alpha": 0.2235,
-          "beta": -0.1059,
-          "rank_off": 10,
-          "rank_def": 9
+          "alpha": 0.2975,
+          "beta": 0.0479,
+          "rank_off": 8,
+          "rank_def": 13
         },
         "Barcelona": {
-          "alpha": 0.7889,
-          "beta": 0.6418,
+          "alpha": 0.784,
+          "beta": 0.6377,
           "rank_off": 1,
           "rank_def": 22
         },
         "Celta Vigo": {
-          "alpha": -0.2142,
-          "beta": 0.1855,
+          "alpha": -0.2041,
+          "beta": 0.2,
           "rank_off": 18,
-          "rank_def": 17
+          "rank_def": 18
         },
         "Deportivo": {
-          "alpha": 0.2479,
-          "beta": -0.085,
+          "alpha": 0.2487,
+          "beta": -0.0705,
           "rank_off": 9,
-          "rank_def": 10
+          "rank_def": 9
         },
         "Elche": {
-          "alpha": 0.1353,
-          "beta": -0.2429,
+          "alpha": 0.1152,
+          "beta": -0.2528,
           "rank_off": 12,
           "rank_def": 7
         },
         "Espanyol": {
-          "alpha": -0.047,
-          "beta": 0.456,
+          "alpha": -0.0613,
+          "beta": 0.4403,
           "rank_off": 14,
           "rank_def": 20
         },
         "Getafe": {
-          "alpha": -0.8191,
-          "beta": 0.0764,
+          "alpha": -0.8183,
+          "beta": 0.0722,
           "rank_off": 19,
           "rank_def": 14
         },
         "Girona": {
-          "alpha": -0.8922,
-          "beta": 0.1855,
+          "alpha": -0.8879,
+          "beta": 0.1756,
           "rank_off": 20,
-          "rank_def": 18
+          "rank_def": 16
         },
         "Levante": {
-          "alpha": 0.4452,
-          "beta": -0.3369,
+          "alpha": 0.4403,
+          "beta": -0.3411,
           "rank_off": 5,
-          "rank_def": 2
+          "rank_def": 3
         },
         "Mallorca": {
-          "alpha": -0.0865,
-          "beta": 0.1216,
+          "alpha": -0.0914,
+          "beta": 0.1268,
           "rank_off": 15,
           "rank_def": 15
         },
         "Málaga": {
-          "alpha": -1.0106,
-          "beta": 0.0032,
+          "alpha": -0.9761,
+          "beta": 0.0084,
           "rank_off": 21,
-          "rank_def": 13
+          "rank_def": 12
         },
         "Osasuna": {
-          "alpha": -0.0226,
-          "beta": -0.3312,
+          "alpha": -0.0067,
+          "beta": -0.326,
           "rank_off": 13,
-          "rank_def": 3
+          "rank_def": 4
         },
         "Rayo Vallecano": {
-          "alpha": 0.4452,
-          "beta": -0.2336,
+          "alpha": 0.431,
+          "beta": -0.2471,
           "rank_off": 6,
           "rank_def": 8
         },
         "Real Betis": {
-          "alpha": 0.1654,
-          "beta": 0.268,
+          "alpha": 0.1396,
+          "beta": 0.2394,
           "rank_off": 11,
           "rank_def": 19
         },
         "Real Madrid": {
-          "alpha": 0.6217,
-          "beta": 0.5686,
-          "rank_off": 2,
+          "alpha": 0.6075,
+          "beta": 0.5494,
+          "rank_off": 3,
           "rank_def": 21
         },
         "Real Oviedo": {
-          "alpha": -1.4727,
-          "beta": -0.2731,
+          "alpha": -1.4777,
+          "beta": -0.2865,
           "rank_off": 22,
-          "rank_def": 6
+          "rank_def": 5
         },
         "Real Sociedad": {
-          "alpha": 0.3419,
-          "beta": -0.3218,
-          "rank_off": 8,
-          "rank_def": 4
+          "alpha": 0.2185,
+          "beta": -0.3898,
+          "rank_off": 10,
+          "rank_def": 2
         },
         "Sevilla": {
-          "alpha": -0.1051,
-          "beta": 0.1797,
+          "alpha": -0.1007,
+          "beta": 0.1756,
           "rank_off": 16,
-          "rank_def": 16
+          "rank_def": 17
         },
         "Valencia": {
-          "alpha": -0.2084,
-          "beta": -0.4008,
+          "alpha": -0.1948,
+          "beta": -0.42,
           "rank_off": 17,
           "rank_def": 1
         },
         "Villarreal": {
-          "alpha": 0.6031,
-          "beta": -0.2917,
-          "rank_off": 3,
-          "rank_def": 5
+          "alpha": 0.6318,
+          "beta": -0.2865,
+          "rank_off": 2,
+          "rank_def": 6
         }
       }
     },
     "esp.2": {
-      "n_matches": 92,
+      "n_matches": 93,
       "n_teams": 18,
-      "gamma": 0.2105,
-      "rho": 0.021,
-      "log_lik": -252.77,
+      "gamma": 0.2152,
+      "rho": 0.0262,
+      "log_lik": -254.81,
       "iterations": 3,
       "teams": {
         "Albacete": {
-          "alpha": -0.0646,
-          "beta": 0.2251,
+          "alpha": -0.0563,
+          "beta": 0.2287,
           "rank_off": 12,
           "rank_def": 14
         },
         "Almería": {
-          "alpha": 0.3185,
-          "beta": 0.3435,
+          "alpha": 0.3268,
+          "beta": 0.3564,
           "rank_off": 4,
           "rank_def": 16
         },
         "Burgos": {
-          "alpha": -0.2225,
-          "beta": 0.6442,
+          "alpha": -0.2084,
+          "beta": 0.6513,
           "rank_off": 14,
           "rank_def": 17
         },
         "Castellón": {
-          "alpha": 0.1606,
-          "beta": 0.3285,
+          "alpha": 0.1747,
+          "beta": 0.3413,
           "rank_off": 6,
           "rank_def": 15
         },
         "Ceuta": {
-          "alpha": -0.2074,
-          "beta": -0.5319,
+          "alpha": -0.1991,
+          "beta": -0.519,
           "rank_off": 13,
           "rank_def": 2
         },
         "Cádiz": {
-          "alpha": -0.2864,
-          "beta": -0.2613,
+          "alpha": -0.278,
+          "beta": -0.2635,
           "rank_off": 15,
           "rank_def": 5
         },
         "Córdoba": {
-          "alpha": 0.4857,
-          "beta": -0.6933,
+          "alpha": 0.494,
+          "beta": -0.6768,
           "rank_off": 2,
           "rank_def": 1
         },
         "Deportivo La Coruña": {
-          "alpha": 0.0875,
-          "beta": -0.0152,
+          "alpha": 0.0714,
+          "beta": -0.0174,
           "rank_off": 8,
           "rank_def": 10
         },
         "Eibar": {
-          "alpha": 0.264,
-          "beta": -0.2764,
+          "alpha": 0.2723,
+          "beta": -0.2729,
           "rank_off": 5,
           "rank_def": 4
         },
         "FC Andorra": {
-          "alpha": -0.0159,
-          "beta": -0.4529,
+          "alpha": -0.0075,
+          "beta": -0.4551,
           "rank_off": 11,
           "rank_def": 3
         },
         "Granada": {
-          "alpha": 0.0538,
-          "beta": 0.0579,
+          "alpha": 0.0621,
+          "beta": 0.0615,
           "rank_off": 9,
           "rank_def": 11
         },
         "Las Palmas": {
-          "alpha": 0.358,
-          "beta": -0.1824,
+          "alpha": 0.3512,
+          "beta": -0.1846,
           "rank_off": 3,
           "rank_def": 8
         },
         "Leganés": {
-          "alpha": -0.8274,
-          "beta": 0.2065,
+          "alpha": -0.9317,
+          "beta": 0.0952,
           "rank_off": 18,
-          "rank_def": 13
+          "rank_def": 12
         },
         "Mallorca": {
-          "alpha": -0.0008,
-          "beta": 0.9333,
+          "alpha": 0.0075,
+          "beta": 0.9369,
           "rank_off": 10,
           "rank_def": 18
         },
         "Málaga": {
-          "alpha": 0.7411,
-          "beta": 0.1821,
+          "alpha": 0.7495,
+          "beta": 0.1985,
           "rank_off": 1,
-          "rank_def": 12
+          "rank_def": 13
         },
         "Real Sociedad II": {
-          "alpha": 0.1606,
-          "beta": -0.2312,
+          "alpha": 0.169,
+          "beta": -0.2148,
           "rank_off": 7,
-          "rank_def": 6
-        },
-        "Real Valladolid": {
-          "alpha": -0.6451,
-          "beta": -0.2312,
-          "rank_off": 17,
           "rank_def": 7
         },
+        "Real Valladolid": {
+          "alpha": -0.6461,
+          "beta": -0.2241,
+          "rank_off": 17,
+          "rank_def": 6
+        },
         "Sporting Gijón": {
-          "alpha": -0.3596,
-          "beta": -0.0454,
+          "alpha": -0.3512,
+          "beta": -0.0418,
           "rank_off": 16,
           "rank_def": 9
         }
       }
     },
     "fra.1": {
-      "n_matches": 67,
+      "n_matches": 68,
       "n_teams": 16,
-      "gamma": 0.3092,
-      "rho": -0.0256,
-      "log_lik": -192.51,
+      "gamma": 0.297,
+      "rho": 0.0262,
+      "log_lik": -195.22,
       "iterations": 3,
       "teams": {
         "AJ Auxerre": {
-          "alpha": 0.3408,
-          "beta": -0.692,
+          "alpha": 0.3395,
+          "beta": -0.6897,
           "rank_off": 4,
           "rank_def": 1
         },
         "AS Monaco": {
-          "alpha": 0.3652,
-          "beta": 0.3204,
+          "alpha": 0.379,
+          "beta": 0.274,
           "rank_off": 3,
           "rank_def": 13
         },
         "Angers": {
-          "alpha": -0.7017,
-          "beta": -0.0233,
+          "alpha": -0.6694,
+          "beta": -0.0697,
           "rank_off": 15,
-          "rank_def": 8
-        },
-        "Brest": {
-          "alpha": 0.0854,
-          "beta": -0.4273,
-          "rank_off": 8,
-          "rank_def": 3
-        },
-        "Le Havre AC": {
-          "alpha": -0.0969,
-          "beta": -0.0628,
-          "rank_off": 12,
           "rank_def": 7
         },
+        "Brest": {
+          "alpha": -0.0401,
+          "beta": -0.3252,
+          "rank_off": 11,
+          "rank_def": 4
+        },
+        "Le Havre AC": {
+          "alpha": -0.0738,
+          "beta": -0.0697,
+          "rank_off": 12,
+          "rank_def": 8
+        },
         "Lens": {
-          "alpha": 0.1586,
-          "beta": 0.0348,
+          "alpha": 0.1967,
+          "beta": -0.0152,
           "rank_off": 7,
-          "rank_def": 12
+          "rank_def": 9
         },
         "Lille": {
-          "alpha": -0.1758,
-          "beta": 0.6791,
+          "alpha": -0.1527,
+          "beta": 0.6478,
           "rank_off": 13,
           "rank_def": 15
         },
         "Lorient": {
-          "alpha": -0.249,
-          "beta": -0.0779,
+          "alpha": -0.2317,
+          "beta": -0.1185,
           "rank_off": 14,
           "rank_def": 5
         },
         "Lyon": {
-          "alpha": -0.0237,
-          "beta": 0.0255,
+          "alpha": -0.025,
+          "beta": 0.0487,
           "rank_off": 9,
-          "rank_def": 10
+          "rank_def": 11
         },
         "Marseille": {
-          "alpha": -0.0423,
-          "beta": 0.0011,
+          "alpha": -0.0343,
+          "beta": 0.0034,
           "rank_off": 10,
-          "rank_def": 9
+          "rank_def": 10
         },
         "Nice": {
-          "alpha": -1.2428,
-          "beta": 0.3505,
+          "alpha": -1.2348,
+          "beta": 0.3586,
           "rank_off": 16,
           "rank_def": 14
         },
         "Paris FC": {
-          "alpha": 0.2074,
-          "beta": 0.743,
+          "alpha": 0.2699,
+          "beta": 0.7116,
           "rank_off": 6,
           "rank_def": 16
         },
         "Paris Saint-Germain": {
-          "alpha": 0.5382,
-          "beta": 0.0255,
+          "alpha": 0.3883,
+          "beta": 0.2008,
           "rank_off": 2,
-          "rank_def": 11
+          "rank_def": 12
         },
         "Stade Rennais": {
-          "alpha": 0.277,
-          "beta": -0.4366,
+          "alpha": 0.2943,
+          "beta": -0.4529,
           "rank_off": 5,
           "rank_def": 2
         },
         "Strasbourg": {
-          "alpha": 0.602,
-          "beta": -0.3878,
+          "alpha": 0.61,
+          "beta": -0.4099,
           "rank_off": 1,
-          "rank_def": 4
+          "rank_def": 3
         },
         "Toulouse": {
-          "alpha": -0.0423,
-          "beta": -0.0721,
-          "rank_off": 11,
+          "alpha": -0.0157,
+          "beta": -0.0941,
+          "rank_off": 8,
           "rank_def": 6
         }
       }
@@ -1816,88 +1834,88 @@
       }
     },
     "gre.1": {
-      "n_matches": 47,
+      "n_matches": 50,
       "n_teams": 13,
-      "gamma": 0.3289,
+      "gamma": 0.3307,
       "rho": -0.2984,
-      "log_lik": -120.05,
+      "log_lik": -127.48,
       "iterations": 3,
       "teams": {
         "AEK Athens": {
-          "alpha": 0.5262,
-          "beta": 0.6113,
-          "rank_off": 2,
+          "alpha": 0.5764,
+          "beta": 0.6215,
+          "rank_off": 1,
           "rank_def": 12
         },
         "Aris": {
-          "alpha": 0.2406,
-          "beta": 0.0796,
+          "alpha": 0.1445,
+          "beta": 0.0073,
           "rank_off": 4,
-          "rank_def": 8
+          "rank_def": 7
         },
         "Asteras Tripoli": {
-          "alpha": -0.1182,
-          "beta": 0.0853,
+          "alpha": -0.1074,
+          "beta": 0.1049,
           "rank_off": 8,
-          "rank_def": 9
+          "rank_def": 10
         },
         "Atromitos": {
-          "alpha": 0.5355,
-          "beta": -0.2792,
-          "rank_off": 1,
+          "alpha": 0.5671,
+          "beta": -0.2934,
+          "rank_off": 2,
           "rank_def": 5
         },
         "Kifisia": {
-          "alpha": -0.1332,
-          "beta": -0.0725,
-          "rank_off": 9,
-          "rank_def": 6
+          "alpha": -0.3234,
+          "beta": 0.0561,
+          "rank_off": 11,
+          "rank_def": 8
         },
         "Larissa FC": {
-          "alpha": -0.2516,
-          "beta": -0.2885,
-          "rank_off": 10,
+          "alpha": -0.2445,
+          "beta": -0.3027,
+          "rank_off": 9,
           "rank_def": 4
         },
         "Levadiakos": {
-          "alpha": 0.2255,
-          "beta": -0.6286,
-          "rank_off": 5,
+          "alpha": 0.0748,
+          "beta": -0.4605,
+          "rank_off": 6,
           "rank_def": 2
         },
         "OFI Crete": {
-          "alpha": 0.0583,
-          "beta": 0.0157,
-          "rank_off": 6,
-          "rank_def": 7
+          "alpha": 0.0992,
+          "beta": -0.0566,
+          "rank_off": 5,
+          "rank_def": 6
         },
         "Olympiacos": {
-          "alpha": -0.3004,
-          "beta": 0.4929,
-          "rank_off": 11,
+          "alpha": -0.3083,
+          "beta": 0.5669,
+          "rank_off": 10,
           "rank_def": 11
         },
         "Panathinaikos": {
-          "alpha": 0.2951,
-          "beta": 0.6845,
+          "alpha": 0.5125,
+          "beta": 0.7341,
           "rank_off": 3,
           "rank_def": 13
         },
         "Panetolikos": {
-          "alpha": -0.3887,
-          "beta": 0.335,
+          "alpha": -0.3535,
+          "beta": 0.0955,
           "rank_off": 12,
-          "rank_def": 10
+          "rank_def": 9
         },
         "Panserraikos FC": {
-          "alpha": -0.6836,
-          "beta": -0.3581,
+          "alpha": -0.6728,
+          "beta": -0.3572,
           "rank_off": 13,
           "rank_def": 3
         },
         "Volos NFC": {
-          "alpha": -0.0055,
-          "beta": -0.6774,
+          "alpha": 0.0354,
+          "beta": -0.716,
           "rank_off": 7,
           "rank_def": 1
         }
@@ -1974,132 +1992,132 @@
       }
     },
     "ita.1": {
-      "n_matches": 83,
+      "n_matches": 84,
       "n_teams": 20,
-      "gamma": 0.0143,
-      "rho": -0.0236,
-      "log_lik": -211.12,
+      "gamma": 0.0312,
+      "rho": -0.0321,
+      "log_lik": -215.18,
       "iterations": 3,
       "teams": {
         "AC Milan": {
-          "alpha": 0.2092,
-          "beta": -0.3613,
-          "rank_off": 6,
-          "rank_def": 5
+          "alpha": 0.1496,
+          "beta": -0.3066,
+          "rank_off": 9,
+          "rank_def": 6
         },
         "AS Roma": {
-          "alpha": 0.8686,
-          "beta": 1.4627,
+          "alpha": 0.8822,
+          "beta": 1.4686,
           "rank_off": 2,
           "rank_def": 20
         },
         "Atalanta": {
-          "alpha": 0.1998,
-          "beta": -0.1998,
-          "rank_off": 7,
+          "alpha": 0.189,
+          "beta": -0.1788,
+          "rank_off": 8,
           "rank_def": 8
         },
         "Bologna": {
-          "alpha": 0.0327,
-          "beta": 0.1159,
+          "alpha": 0.0125,
+          "beta": 0.1462,
           "rank_off": 13,
-          "rank_def": 14
+          "rank_def": 15
         },
         "Cagliari": {
-          "alpha": -0.0068,
-          "beta": 0.2831,
+          "alpha": 0.0068,
+          "beta": 0.2739,
           "rank_off": 14,
           "rank_def": 16
         },
         "Como": {
-          "alpha": 0.6562,
-          "beta": 0.5478,
+          "alpha": 0.6569,
+          "beta": 0.5537,
           "rank_off": 3,
-          "rank_def": 19
+          "rank_def": 18
         },
         "Cremonese": {
-          "alpha": 0.057,
-          "beta": -0.4402,
+          "alpha": 0.0462,
+          "beta": -0.425,
           "rank_off": 11,
-          "rank_def": 3
+          "rank_def": 2
         },
         "Fiorentina": {
-          "alpha": -0.052,
-          "beta": -0.367,
+          "alpha": -0.0966,
+          "beta": -0.331,
           "rank_off": 15,
-          "rank_def": 4
+          "rank_def": 5
         },
         "Genoa": {
-          "alpha": -1.1771,
-          "beta": -0.0965,
+          "alpha": -1.1635,
+          "beta": -0.0999,
           "rank_off": 20,
           "rank_def": 11
         },
         "Hellas Verona": {
-          "alpha": -0.7939,
-          "beta": 0.5328,
+          "alpha": -0.8385,
+          "beta": 0.5537,
           "rank_off": 17,
-          "rank_def": 18
+          "rank_def": 19
         },
         "Internazionale": {
-          "alpha": 0.9174,
-          "beta": -0.1604,
+          "alpha": 0.9274,
+          "beta": -0.1545,
           "rank_off": 1,
           "rank_def": 9
         },
         "Juventus": {
-          "alpha": -0.2041,
-          "beta": 0.1984,
+          "alpha": -0.0966,
+          "beta": -0.0662,
           "rank_off": 16,
-          "rank_def": 15
+          "rank_def": 12
         },
         "Lazio": {
-          "alpha": 0.1998,
-          "beta": -0.1209,
-          "rank_off": 8,
+          "alpha": 0.1948,
+          "beta": -0.115,
+          "rank_off": 7,
           "rank_def": 10
         },
         "Lecce": {
-          "alpha": 0.0721,
-          "beta": -0.4553,
-          "rank_off": 10,
-          "rank_def": 2
+          "alpha": 0.0276,
+          "beta": -0.3948,
+          "rank_off": 12,
+          "rank_def": 3
         },
         "Napoli": {
-          "alpha": 0.4646,
-          "beta": 0.3469,
+          "alpha": 0.4653,
+          "beta": 0.3622,
           "rank_off": 4,
           "rank_def": 17
         },
         "Parma": {
-          "alpha": -1.0645,
-          "beta": 0.0857,
+          "alpha": -1.1183,
+          "beta": 0.1218,
           "rank_off": 19,
-          "rank_def": 13
+          "rank_def": 14
         },
         "Pisa": {
-          "alpha": -0.9274,
-          "beta": -0.7351,
+          "alpha": -0.9116,
+          "beta": -0.7443,
           "rank_off": 18,
           "rank_def": 1
         },
         "Sassuolo": {
-          "alpha": 0.057,
-          "beta": -0.273,
-          "rank_off": 12,
-          "rank_def": 7
+          "alpha": 0.2343,
+          "beta": -0.3611,
+          "rank_off": 6,
+          "rank_def": 4
         },
         "Torino": {
-          "alpha": 0.1546,
-          "beta": -0.3613,
-          "rank_off": 9,
-          "rank_def": 6
+          "alpha": 0.1008,
+          "beta": -0.3066,
+          "rank_off": 10,
+          "rank_def": 7
         },
         "Udinese": {
-          "alpha": 0.3369,
-          "beta": -0.0025,
+          "alpha": 0.3318,
+          "beta": 0.0034,
           "rank_off": 5,
-          "rank_def": 12
+          "rank_def": 13
         }
       }
     },
@@ -2322,118 +2340,118 @@
       }
     },
     "ned.1": {
-      "n_matches": 74,
+      "n_matches": 75,
       "n_teams": 18,
       "gamma": 0.4613,
-      "rho": -0.1764,
-      "log_lik": -229.21,
+      "rho": -0.1731,
+      "log_lik": -232.2,
       "iterations": 3,
       "teams": {
         "ADO Den Haag": {
-          "alpha": -0.431,
-          "beta": -0.2094,
+          "alpha": -0.4369,
+          "beta": -0.2127,
           "rank_off": 15,
           "rank_def": 5
         },
         "AZ Alkmaar": {
-          "alpha": 0.3259,
-          "beta": -0.185,
-          "rank_off": 4,
+          "alpha": 0.3201,
+          "beta": -0.1883,
+          "rank_off": 5,
           "rank_def": 6
         },
         "Ajax Amsterdam": {
-          "alpha": 0.4293,
-          "beta": 0.7391,
+          "alpha": 0.4234,
+          "beta": 0.7115,
           "rank_off": 2,
           "rank_def": 18
         },
         "Excelsior": {
-          "alpha": 0.3166,
-          "beta": 0.371,
-          "rank_off": 5,
+          "alpha": 0.3294,
+          "beta": 0.3621,
+          "rank_off": 4,
           "rank_def": 15
         },
         "FC Groningen": {
-          "alpha": 0.1401,
-          "beta": 0.0216,
+          "alpha": 0.1378,
+          "beta": 0.0277,
           "rank_off": 7,
           "rank_def": 12
         },
         "FC Twente": {
-          "alpha": -0.0967,
-          "beta": 0.2828,
-          "rank_off": 11,
-          "rank_def": 14
+          "alpha": -0.0932,
+          "beta": 0.2587,
+          "rank_off": 12,
+          "rank_def": 13
         },
         "FC Utrecht": {
-          "alpha": -0.0177,
-          "beta": -0.2396,
+          "alpha": -0.0143,
+          "beta": -0.2428,
           "rank_off": 9,
           "rank_def": 4
         },
         "Feyenoord Rotterdam": {
-          "alpha": 0.4106,
-          "beta": 0.4292,
+          "alpha": 0.4141,
+          "beta": 0.4317,
           "rank_off": 3,
           "rank_def": 16
         },
         "Fortuna Sittard": {
-          "alpha": 0.1007,
-          "beta": -0.0272,
+          "alpha": 0.1041,
+          "beta": -0.0548,
           "rank_off": 8,
-          "rank_def": 10
+          "rank_def": 9
         },
         "Go Ahead Eagles": {
-          "alpha": 0.204,
-          "beta": -0.1607,
+          "alpha": 0.2168,
+          "beta": -0.1581,
           "rank_off": 6,
           "rank_def": 8
         },
         "Heerenveen": {
-          "alpha": -0.2093,
-          "beta": 0.277,
+          "alpha": -0.2116,
+          "beta": 0.2738,
           "rank_off": 14,
-          "rank_def": 13
+          "rank_def": 14
         },
         "NEC Nijmegen": {
-          "alpha": -0.1211,
-          "beta": -0.185,
+          "alpha": -0.1176,
+          "beta": -0.179,
           "rank_off": 13,
           "rank_def": 7
         },
         "PEC Zwolle": {
-          "alpha": -0.7654,
-          "beta": -0.4462,
+          "alpha": -0.7526,
+          "beta": -0.4437,
           "rank_off": 18,
           "rank_def": 2
         },
         "PSV Eindhoven": {
-          "alpha": 0.9517,
-          "beta": 0.5232,
+          "alpha": 0.8855,
+          "beta": 0.4862,
           "rank_off": 1,
           "rank_def": 17
         },
         "SC Cambuur": {
-          "alpha": -0.0665,
-          "beta": -0.6564,
+          "alpha": -0.0688,
+          "beta": -0.6504,
           "rank_off": 10,
           "rank_def": 1
         },
         "Sparta Rotterdam": {
-          "alpha": -0.0967,
-          "beta": -0.1212,
-          "rank_off": 12,
-          "rank_def": 9
+          "alpha": -0.0688,
+          "beta": -0.0211,
+          "rank_off": 11,
+          "rank_def": 10
         },
         "Telstar": {
-          "alpha": -0.525,
-          "beta": 0.0123,
+          "alpha": -0.5216,
+          "beta": 0.0184,
           "rank_off": 16,
           "rank_def": 11
         },
         "Willem II": {
-          "alpha": -0.5494,
-          "beta": -0.4254,
+          "alpha": -0.546,
+          "beta": -0.4193,
           "rank_off": 17,
           "rank_def": 3
         }
@@ -2546,182 +2564,182 @@
       }
     },
     "par.1": {
-      "n_matches": 52,
+      "n_matches": 53,
       "n_teams": 12,
-      "gamma": 0.1316,
+      "gamma": 0.1374,
       "rho": -0.2984,
-      "log_lik": -125.82,
+      "log_lik": -128.2,
       "iterations": 2,
       "teams": {
         "2 de Mayo": {
-          "alpha": 0.0212,
-          "beta": 0.4517,
+          "alpha": 0.0338,
+          "beta": 0.4455,
           "rank_off": 7,
           "rank_def": 12
         },
         "Cerro Porteño": {
-          "alpha": -0.1065,
-          "beta": -0.1324,
+          "alpha": -0.1033,
+          "beta": -0.1293,
           "rank_off": 9,
-          "rank_def": 4
+          "rank_def": 5
         },
         "Club Olimpia": {
-          "alpha": 0.4287,
-          "beta": 0.1324,
-          "rank_off": 3,
-          "rank_def": 7
+          "alpha": 0.4865,
+          "beta": 0.2051,
+          "rank_off": 2,
+          "rank_def": 9
         },
         "Deportivo Recoleta": {
-          "alpha": 0.2859,
-          "beta": -0.3936,
+          "alpha": 0.2892,
+          "beta": -0.3847,
           "rank_off": 5,
           "rank_def": 2
         },
         "Guaraní": {
-          "alpha": -0.0578,
-          "beta": 0.2659,
+          "alpha": -0.0545,
+          "beta": 0.2539,
           "rank_off": 8,
           "rank_def": 10
         },
         "Libertad": {
-          "alpha": 0.4926,
-          "beta": 0.1625,
+          "alpha": 0.4959,
+          "beta": 0.1749,
           "rank_off": 1,
-          "rank_def": 9
+          "rank_def": 8
         },
         "Nacional Asunción": {
-          "alpha": 0.1977,
-          "beta": 0.3936,
+          "alpha": 0.1916,
+          "beta": 0.3816,
           "rank_off": 6,
           "rank_def": 11
         },
         "Rubio Ñú": {
-          "alpha": 0.2917,
-          "beta": -0.7129,
+          "alpha": 0.295,
+          "beta": -0.7098,
           "rank_off": 4,
           "rank_def": 1
         },
         "Sportivo Ameliano": {
-          "alpha": -0.3828,
-          "beta": 0.1381,
+          "alpha": -0.3795,
+          "beta": 0.1506,
           "rank_off": 11,
-          "rank_def": 8
+          "rank_def": 7
         },
         "Sportivo Luqueño": {
-          "alpha": -0.1309,
-          "beta": -0.0894,
+          "alpha": -0.2217,
+          "beta": -0.1781,
           "rank_off": 10,
-          "rank_def": 5
+          "rank_def": 4
         },
         "Sportivo San Lorenzo": {
-          "alpha": -1.4986,
-          "beta": -0.2902,
+          "alpha": -1.4953,
+          "beta": -0.2965,
           "rank_off": 12,
           "rank_def": 3
         },
         "Sportivo Trinidense": {
-          "alpha": 0.4589,
-          "beta": 0.0743,
-          "rank_off": 2,
+          "alpha": 0.4622,
+          "beta": 0.0867,
+          "rank_off": 3,
           "rank_def": 6
         }
       }
     },
     "per.1": {
-      "n_matches": 63,
+      "n_matches": 64,
       "n_teams": 15,
-      "gamma": 0.4857,
+      "gamma": 0.4932,
       "rho": 0.0984,
-      "log_lik": -171.53,
+      "log_lik": -173.33,
       "iterations": 2,
       "teams": {
         "ADT": {
-          "alpha": -0.1866,
-          "beta": 0.1335,
+          "alpha": -0.1864,
+          "beta": 0.1282,
           "rank_off": 11,
           "rank_def": 12
         },
         "Alianza Atlético": {
-          "alpha": 0.6586,
-          "beta": 0.346,
+          "alpha": 0.6553,
+          "beta": 0.3406,
           "rank_off": 2,
-          "rank_def": 14
+          "rank_def": 13
         },
         "Atlético Grau": {
-          "alpha": -0.4234,
-          "beta": -0.0186,
+          "alpha": -0.4175,
+          "beta": -0.0332,
           "rank_off": 13,
           "rank_def": 8
         },
         "Comerciantes Unidos": {
-          "alpha": -0.1529,
-          "beta": -0.1463,
+          "alpha": -0.1563,
+          "beta": -0.1423,
           "rank_off": 10,
           "rank_def": 4
         },
         "Deportivo Garcilaso": {
-          "alpha": 0.157,
-          "beta": 0.8475,
-          "rank_off": 5,
+          "alpha": 0.0898,
+          "beta": 0.7575,
+          "rank_off": 6,
           "rank_def": 15
         },
         "Deportivo Moquegua": {
-          "alpha": -0.6789,
-          "beta": -0.0824,
+          "alpha": -0.6729,
+          "beta": -0.0878,
           "rank_off": 15,
           "rank_def": 6
         },
         "FC Cajamarca": {
-          "alpha": 0.373,
-          "beta": -0.505,
+          "alpha": 0.3847,
+          "beta": -0.5011,
           "rank_off": 3,
           "rank_def": 2
         },
         "Juan Pablo II": {
-          "alpha": 0.0049,
-          "beta": -0.1463,
+          "alpha": 0.0109,
+          "beta": -0.1423,
           "rank_off": 8,
           "rank_def": 5
         },
         "Los Chankas": {
-          "alpha": -0.6243,
-          "beta": -0.5445,
+          "alpha": -0.6334,
+          "beta": -0.5405,
           "rank_off": 14,
           "rank_def": 1
         },
         "Melgar": {
-          "alpha": 0.0386,
-          "beta": 0.0754,
+          "alpha": 0.0353,
+          "beta": 0.0643,
           "rank_off": 7,
           "rank_def": 9
         },
         "Sport Boys": {
-          "alpha": -0.074,
-          "beta": 0.2763,
+          "alpha": -0.0379,
+          "beta": 0.3894,
           "rank_off": 9,
-          "rank_def": 13
+          "rank_def": 14
         },
         "Sport Huancayo": {
-          "alpha": 0.157,
-          "beta": -0.0673,
-          "rank_off": 6,
+          "alpha": 0.163,
+          "beta": -0.0634,
+          "rank_off": 5,
           "rank_def": 7
         },
         "Sporting Cristal": {
-          "alpha": 0.2453,
-          "beta": 0.1092,
+          "alpha": 0.257,
+          "beta": 0.1189,
           "rank_off": 4,
           "rank_def": 11
         },
         "UTC": {
-          "alpha": -0.2713,
-          "beta": -0.3529,
+          "alpha": -0.2747,
+          "beta": -0.3676,
           "rank_off": 12,
           "rank_def": 3
         },
         "Universitario": {
-          "alpha": 0.777,
-          "beta": 0.0754,
+          "alpha": 0.783,
+          "beta": 0.0794,
           "rank_off": 1,
           "rank_def": 10
         }
@@ -3252,101 +3270,101 @@
       }
     },
     "uru.1": {
-      "n_matches": 63,
+      "n_matches": 64,
       "n_teams": 15,
-      "gamma": -0.0205,
+      "gamma": -0.0159,
       "rho": 0.0984,
-      "log_lik": -151.94,
+      "log_lik": -154.86,
       "iterations": 3,
       "teams": {
         "Albion FC": {
-          "alpha": -0.0971,
-          "beta": -0.2994,
-          "rank_off": 10,
+          "alpha": -0.1126,
+          "beta": -0.3388,
+          "rank_off": 11,
           "rank_def": 4
         },
         "Boston River": {
-          "alpha": 0.2221,
-          "beta": -0.2994,
-          "rank_off": 5,
+          "alpha": 0.231,
+          "beta": -0.3051,
+          "rank_off": 6,
           "rank_def": 5
         },
         "Central Español Fútbol Club": {
-          "alpha": -0.1424,
-          "beta": 0.129,
-          "rank_off": 11,
-          "rank_def": 9
+          "alpha": -0.0732,
+          "beta": 0.1477,
+          "rank_off": 10,
+          "rank_def": 10
         },
         "Cerro": {
-          "alpha": 0.3649,
-          "beta": -0.275,
+          "alpha": 0.3494,
+          "beta": -0.2807,
           "rank_off": 2,
           "rank_def": 6
         },
         "Cerro Largo": {
-          "alpha": -0.5255,
-          "beta": -0.0289,
+          "alpha": -0.5259,
+          "beta": -0.0195,
           "rank_off": 14,
           "rank_def": 8
         },
         "Danubio": {
-          "alpha": -0.3433,
-          "beta": -0.4364,
+          "alpha": -0.3494,
+          "beta": -0.4479,
           "rank_off": 12,
           "rank_def": 2
         },
         "Defensor Sporting": {
-          "alpha": 0.0004,
-          "beta": -0.7952,
-          "rank_off": 9,
+          "alpha": 0.0337,
+          "beta": -0.6244,
+          "rank_off": 8,
           "rank_def": 1
         },
         "Deportivo Maldonado": {
-          "alpha": 0.1734,
-          "beta": 0.1441,
-          "rank_off": 7,
-          "rank_def": 10
+          "alpha": 0.0093,
+          "beta": 0.1175,
+          "rank_off": 9,
+          "rank_def": 9
         },
         "Juventud": {
-          "alpha": 0.3162,
-          "beta": 0.2022,
+          "alpha": 0.3042,
+          "beta": 0.1627,
           "rank_off": 3,
           "rank_def": 11
         },
         "Liverpool": {
-          "alpha": 0.2128,
-          "beta": 0.7978,
-          "rank_off": 6,
+          "alpha": 0.2798,
+          "beta": 0.8013,
+          "rank_off": 4,
           "rank_def": 15
         },
         "Montevideo Wanderers": {
-          "alpha": -0.4861,
-          "beta": 0.3206,
+          "alpha": -0.447,
+          "beta": 0.2905,
           "rank_off": 13,
           "rank_def": 12
         },
         "Nacional": {
-          "alpha": 0.2767,
-          "beta": -0.3969,
-          "rank_off": 4,
+          "alpha": 0.2612,
+          "beta": -0.3933,
+          "rank_off": 5,
           "rank_def": 3
         },
         "Peñarol": {
-          "alpha": 0.6204,
-          "beta": 0.5911,
+          "alpha": 0.62,
+          "beta": 0.6098,
           "rank_off": 1,
           "rank_def": 14
         },
         "Progreso": {
-          "alpha": -0.6776,
-          "beta": -0.2204,
+          "alpha": -0.6594,
+          "beta": -0.2749,
           "rank_off": 15,
           "rank_def": 7
         },
         "Racing (Montevideo)": {
-          "alpha": 0.0851,
-          "beta": 0.5667,
-          "rank_off": 8,
+          "alpha": 0.0789,
+          "beta": 0.5552,
+          "rank_off": 7,
           "rank_def": 13
         }
       }
