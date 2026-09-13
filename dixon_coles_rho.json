@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-09-13T21:33:12Z",
+  "generated_at": "2026-09-13T23:25:44Z",
   "method": "Dixon-Coles MLE grid search (ρ ∈ [-0.30, 0.10] step 0.005), λ_h, λ_a fixés à moyenne empirique par ligue. CI 95% via LR test.",
   "min_matches": 40,
   "default_rho": -0.13,
   "n_leagues": 141,
-  "n_measured": 2,
+  "n_measured": 3,
   "leagues": {
     "1lig": {
       "n": 4,
@@ -47,16 +47,16 @@
       "reason": "n=21 < 40"
     },
     "arg.1": {
-      "n": 63,
-      "rho_measured": -0.095,
+      "n": 64,
+      "rho_measured": -0.12,
       "rho_literature": -0.15,
       "rho_used": -0.15,
       "source": "literature_fallback",
       "reason": "CI trop large (0.400) ou fit nul",
-      "log_lik": -169.49,
+      "log_lik": -171.43,
       "ci_lo": -0.3,
       "ci_hi": 0.1,
-      "lambda_h": 1.317,
+      "lambda_h": 1.312,
       "lambda_a": 0.984
     },
     "aus.1": {
@@ -118,17 +118,17 @@
       "reason": "n=4 < 40"
     },
     "bra.1": {
-      "n": 53,
+      "n": 54,
       "rho_measured": 0.02,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
       "reason": "CI trop large (0.380) ou fit nul",
-      "log_lik": -160.66,
+      "log_lik": -163.11,
       "ci_lo": -0.28,
       "ci_hi": 0.1,
-      "lambda_h": 1.491,
-      "lambda_a": 1.396
+      "lambda_h": 1.5,
+      "lambda_a": 1.389
     },
     "bulgariancup": {
       "n": 1,
@@ -208,12 +208,12 @@
       "reason": "n=1 < 40"
     },
     "chi.1": {
-      "n": 36,
+      "n": 37,
       "rho_measured": null,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "n=36 < 40"
+      "reason": "n=37 < 40"
     },
     "chinesesuperleague": {
       "n": 5,
@@ -237,12 +237,12 @@
       "lambda_a": 1.427
     },
     "col.1": {
-      "n": 32,
+      "n": 33,
       "rho_measured": null,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "n=32 < 40"
+      "reason": "n=33 < 40"
     },
     "conferenceleague": {
       "n": 1,
@@ -351,17 +351,17 @@
       "reason": "n=2 < 40"
     },
     "ecu.1": {
-      "n": 44,
+      "n": 45,
       "rho_measured": 0.1,
       "rho_literature": -0.13,
-      "rho_used": -0.13,
-      "source": "literature_fallback",
-      "reason": "CI trop large (0.210) ou fit nul",
-      "log_lik": -125.87,
-      "ci_lo": -0.11,
+      "rho_used": 0.1,
+      "source": "measured",
+      "reason": "MLE n=45, CI95=[-0.090, 0.100]",
+      "log_lik": -128.04,
+      "ci_lo": -0.09,
       "ci_hi": 0.1,
-      "lambda_h": 1.364,
-      "lambda_a": 1.227
+      "lambda_h": 1.356,
+      "lambda_a": 1.2
     },
     "egyptianpremierleagu": {
       "n": 3,
@@ -915,30 +915,30 @@
       "lambda_a": 1.019
     },
     "per.1": {
-      "n": 64,
+      "n": 65,
       "rho_measured": 0.1,
       "rho_literature": -0.13,
       "rho_used": 0.1,
       "source": "measured",
-      "reason": "MLE n=64, CI95=[-0.080, 0.100]",
-      "log_lik": -194.86,
+      "reason": "MLE n=65, CI95=[-0.080, 0.100]",
+      "log_lik": -197.85,
       "ci_lo": -0.08,
       "ci_hi": 0.1,
-      "lambda_h": 1.625,
-      "lambda_a": 1.312
+      "lambda_h": 1.646,
+      "lambda_a": 1.308
     },
     "por.1": {
-      "n": 73,
-      "rho_measured": -0.025,
+      "n": 74,
+      "rho_measured": -0.045,
       "rho_literature": -0.14,
       "rho_used": -0.14,
       "source": "literature_fallback",
       "reason": "CI trop large (0.400) ou fit nul",
-      "log_lik": -219.89,
+      "log_lik": -221.97,
       "ci_lo": -0.3,
       "ci_hi": 0.1,
-      "lambda_h": 1.425,
-      "lambda_a": 1.329
+      "lambda_h": 1.419,
+      "lambda_a": 1.324
     },
     "premierdivision": {
       "n": 6,
@@ -1270,12 +1270,12 @@
       "reason": "n=1 < 40"
     },
     "ven.1": {
-      "n": 32,
+      "n": 34,
       "rho_measured": null,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "n=32 < 40"
+      "reason": "n=34 < 40"
     },
     "virsliga": {
       "n": 2,
