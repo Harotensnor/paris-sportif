@@ -1,19 +1,42 @@
 {
-  "generated_at": "2026-09-14T16:02:56Z",
+  "generated_at": "2026-09-14T20:16:54Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
-  "status": "empty",
+  "status": "watch",
   "summary": {
-    "active_events": 0,
+    "active_events": 1,
     "actionable": 0,
-    "watch": 0,
+    "watch": 1,
     "risk": 0,
     "expired_sample": 0,
-    "by_type": {},
-    "by_quality": {}
+    "by_type": {
+      "weather_extreme": 1
+    },
+    "by_quality": {
+      "watch": 1
+    }
   },
   "active_actionable": [],
-  "active_watch": [],
+  "active_watch": [
+    {
+      "event_id": "401879271",
+      "date": "2026-09-19T14:00Z",
+      "sport": "football",
+      "league_code": "eng.1",
+      "league_name": "Premier League",
+      "home": "Newcastle United",
+      "away": "Hull City",
+      "match": "Newcastle United - Hull City",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "weather_extreme",
+      "direction": "under_goals",
+      "team": null,
+      "side": null,
+      "strength": 0.63,
+      "context": "Meteo dure: vent 38 km/h, pluie 0.0 mm"
+    }
+  ],
   "active_risk": [],
   "expired_sample": []
 }
