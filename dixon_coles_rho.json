@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-18T21:56:05Z",
+  "generated_at": "2026-09-18T23:41:39Z",
   "method": "Dixon-Coles MLE grid search (ρ ∈ [-0.30, 0.10] step 0.005), λ_h, λ_a fixés à moyenne empirique par ligue. CI 95% via LR test.",
   "min_matches": 40,
   "default_rho": -0.13,
@@ -47,17 +47,17 @@
       "reason": "n=21 < 40"
     },
     "arg.1": {
-      "n": 64,
+      "n": 65,
       "rho_measured": -0.12,
       "rho_literature": -0.15,
       "rho_used": -0.15,
       "source": "literature_fallback",
       "reason": "CI trop large (0.400) ou fit nul",
-      "log_lik": -171.43,
+      "log_lik": -174.59,
       "ci_lo": -0.3,
       "ci_hi": 0.1,
-      "lambda_h": 1.312,
-      "lambda_a": 0.984
+      "lambda_h": 1.323,
+      "lambda_a": 1.0
     },
     "aus.1": {
       "n": 13,
@@ -237,12 +237,12 @@
       "lambda_a": 1.424
     },
     "col.1": {
-      "n": 33,
+      "n": 34,
       "rho_measured": null,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "n=33 < 40"
+      "reason": "n=34 < 40"
     },
     "conferenceleague": {
       "n": 1,
@@ -902,30 +902,30 @@
       "reason": "n=1 < 40"
     },
     "par.1": {
-      "n": 54,
-      "rho_measured": -0.24,
+      "n": 55,
+      "rho_measured": -0.235,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
       "reason": "CI trop large (0.390) ou fit nul",
-      "log_lik": -151.06,
+      "log_lik": -154.22,
       "ci_lo": -0.3,
       "ci_hi": 0.09,
-      "lambda_h": 1.426,
-      "lambda_a": 1.019
+      "lambda_h": 1.455,
+      "lambda_a": 1.0
     },
     "per.1": {
-      "n": 65,
+      "n": 66,
       "rho_measured": 0.1,
       "rho_literature": -0.13,
       "rho_used": 0.1,
       "source": "measured",
-      "reason": "MLE n=65, CI95=[-0.080, 0.100]",
-      "log_lik": -197.85,
+      "reason": "MLE n=66, CI95=[-0.080, 0.100]",
+      "log_lik": -200.23,
       "ci_lo": -0.08,
       "ci_hi": 0.1,
-      "lambda_h": 1.646,
-      "lambda_a": 1.308
+      "lambda_h": 1.652,
+      "lambda_a": 1.303
     },
     "por.1": {
       "n": 77,
