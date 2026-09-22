@@ -1,13 +1,13 @@
 {
   "schema": "paris-sportif.learned_weights.v1",
-  "generated_at": "2026-09-22T08:41:22Z",
+  "generated_at": "2026-09-22T13:43:12Z",
   "status": "row_level_table_detected_training_pending",
   "reason": "No backtest_training_rows.jsonl row-level feature table yet; exported conservative weights from backtest_report_v2 aggregates.",
   "runtime_dependency": "none",
   "source": {
     "report": "backtest_report_v2.json",
-    "report_generated_at": "2026-09-21T09:22:03Z",
-    "n_events": 1295,
+    "report_generated_at": "2026-09-22T08:51:44Z",
+    "n_events": 1296,
     "training_rows": "backtest_training_rows.jsonl",
     "training_rows_found": true,
     "training_rows_count": 0
@@ -37,11 +37,11 @@
         "status": "watch"
       },
       "football": {
-        "n": 1186,
-        "roi_pct": 17.55,
-        "win_rate": 0.5759,
-        "brier": 0.2229,
-        "weight": 0.04526,
+        "n": 1187,
+        "roi_pct": 17.46,
+        "win_rate": 0.5754,
+        "brier": 0.2228,
+        "weight": 0.04525,
         "status": "boost"
       }
     },
@@ -63,11 +63,11 @@
         "status": "watch"
       },
       "arg.1": {
-        "n": 26,
-        "roi_pct": 1.23,
-        "win_rate": 0.5,
-        "brier": 0.2378,
-        "weight": 0.00099,
+        "n": 27,
+        "roi_pct": -2.52,
+        "win_rate": 0.4815,
+        "brier": 0.2348,
+        "weight": -0.00292,
         "status": "watch"
       },
       "aut.1": {
@@ -409,11 +409,11 @@
     },
     "by_tier": {
       "skip": {
-        "n": 1295,
-        "roi_pct": 15.85,
-        "win_rate": 0.5776,
-        "brier": 0.2234,
-        "weight": 0.04526,
+        "n": 1296,
+        "roi_pct": 15.76,
+        "win_rate": 0.5772,
+        "brier": 0.2233,
+        "weight": 0.04525,
         "status": "boost"
       },
       "big_bet": {
