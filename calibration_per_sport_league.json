@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-22T08:51:44Z",
+  "generated_at": "2026-09-23T08:53:21Z",
   "schema": "calibration_per_sport_league_v1",
   "top5_leagues": [
     "eng.1",
@@ -10,29 +10,29 @@
   ],
   "groups": {
     "baseball:all": {
-      "n": 101,
-      "wins": 59,
+      "n": 102,
+      "wins": 60,
       "losses": 42,
-      "win_rate": 0.5841584158415841,
+      "win_rate": 0.5882352941176471,
       "win_rate_ci": [
-        0.4867,
-        0.6755
+        0.4912,
+        0.6788
       ],
-      "flat_pnl": -2.97,
-      "flat_roi_pct": -2.94,
+      "flat_pnl": -2.18,
+      "flat_roi_pct": -2.13,
       "flat_roi_ci_pct": [
-        -19.29,
-        13.04
+        -18.02,
+        14.82
       ],
       "kelly_pnl": 0.0,
-      "brier": 0.2341,
-      "logloss": 0.6604,
+      "brier": 0.234,
+      "logloss": 0.6602,
       "avg_cote": 1.69,
       "avg_pick_prob": 0.567,
       "avg_edge_pct": -2.8,
-      "avg_ev_pct": -4.69,
+      "avg_ev_pct": -4.7,
       "avg_clv_pct": 0.09,
-      "n_with_clv": 101
+      "n_with_clv": 102
     },
     "basketball:all": {
       "n": 8,
@@ -61,26 +61,26 @@
     },
     "football:other": {
       "n": 957,
-      "wins": 541,
-      "losses": 416,
-      "win_rate": 0.5653082549634274,
+      "wins": 539,
+      "losses": 418,
+      "win_rate": 0.5632183908045977,
       "win_rate_ci": [
-        0.5337,
-        0.5964
+        0.5316,
+        0.5943
       ],
-      "flat_pnl": 141.22,
-      "flat_roi_pct": 14.76,
+      "flat_pnl": 135.22,
+      "flat_roi_pct": 14.13,
       "flat_roi_ci_pct": [
-        7.88,
-        21.87
+        7.18,
+        21.37
       ],
-      "kelly_pnl": 10658368.26,
-      "brier": 0.2247,
-      "logloss": 0.6386,
+      "kelly_pnl": 8916807.39,
+      "brier": 0.2243,
+      "logloss": 0.638,
       "avg_cote": 2.12,
       "avg_pick_prob": 0.535,
       "avg_edge_pct": 2.08,
-      "avg_ev_pct": 6.58,
+      "avg_ev_pct": 6.57,
       "avg_clv_pct": 0.01,
       "n_with_clv": 953
     },
@@ -96,21 +96,113 @@
       "flat_pnl": 65.97,
       "flat_roi_pct": 28.68,
       "flat_roi_ci_pct": [
-        14.6,
-        44.74
+        14.11,
+        45.29
       ],
-      "kelly_pnl": 3421034.98,
-      "brier": 0.2152,
-      "logloss": 0.6149,
+      "kelly_pnl": 2905369.84,
+      "brier": 0.2154,
+      "logloss": 0.6152,
       "avg_cote": 2.17,
       "avg_pick_prob": 0.555,
-      "avg_edge_pct": 3.5,
-      "avg_ev_pct": 10.79,
+      "avg_edge_pct": 3.48,
+      "avg_ev_pct": 10.76,
       "avg_clv_pct": -0.3,
       "n_with_clv": 205
     }
   },
   "calibration_by_sport_league_tier": {
+    "football:other": [
+      {
+        "bin": 0,
+        "lo": 0.0,
+        "hi": 0.1,
+        "n": 0,
+        "prob_mean": null,
+        "win_rate": null,
+        "gap": null
+      },
+      {
+        "bin": 1,
+        "lo": 0.1,
+        "hi": 0.2,
+        "n": 0,
+        "prob_mean": null,
+        "win_rate": null,
+        "gap": null
+      },
+      {
+        "bin": 2,
+        "lo": 0.2,
+        "hi": 0.3,
+        "n": 0,
+        "prob_mean": null,
+        "win_rate": null,
+        "gap": null
+      },
+      {
+        "bin": 3,
+        "lo": 0.3,
+        "hi": 0.4,
+        "n": 161,
+        "prob_mean": 0.366,
+        "win_rate": 0.453,
+        "gap": 0.088
+      },
+      {
+        "bin": 4,
+        "lo": 0.4,
+        "hi": 0.5,
+        "n": 286,
+        "prob_mean": 0.453,
+        "win_rate": 0.416,
+        "gap": -0.037
+      },
+      {
+        "bin": 5,
+        "lo": 0.5,
+        "hi": 0.6,
+        "n": 236,
+        "prob_mean": 0.549,
+        "win_rate": 0.576,
+        "gap": 0.027
+      },
+      {
+        "bin": 6,
+        "lo": 0.6,
+        "hi": 0.7,
+        "n": 153,
+        "prob_mean": 0.644,
+        "win_rate": 0.686,
+        "gap": 0.042
+      },
+      {
+        "bin": 7,
+        "lo": 0.7,
+        "hi": 0.8,
+        "n": 75,
+        "prob_mean": 0.748,
+        "win_rate": 0.827,
+        "gap": 0.079
+      },
+      {
+        "bin": 8,
+        "lo": 0.8,
+        "hi": 0.9,
+        "n": 40,
+        "prob_mean": 0.841,
+        "win_rate": 0.975,
+        "gap": 0.134
+      },
+      {
+        "bin": 9,
+        "lo": 0.9,
+        "hi": 1.0,
+        "n": 6,
+        "prob_mean": 0.907,
+        "win_rate": 0.833,
+        "gap": -0.074
+      }
+    ],
     "football:top5": [
       {
         "bin": 0,
@@ -162,9 +254,9 @@
         "lo": 0.5,
         "hi": 0.6,
         "n": 48,
-        "prob_mean": 0.549,
+        "prob_mean": 0.548,
         "win_rate": 0.667,
-        "gap": 0.117
+        "gap": 0.118
       },
       {
         "bin": 6,
@@ -201,98 +293,6 @@
         "prob_mean": 0.935,
         "win_rate": 1.0,
         "gap": 0.065
-      }
-    ],
-    "football:other": [
-      {
-        "bin": 0,
-        "lo": 0.0,
-        "hi": 0.1,
-        "n": 0,
-        "prob_mean": null,
-        "win_rate": null,
-        "gap": null
-      },
-      {
-        "bin": 1,
-        "lo": 0.1,
-        "hi": 0.2,
-        "n": 0,
-        "prob_mean": null,
-        "win_rate": null,
-        "gap": null
-      },
-      {
-        "bin": 2,
-        "lo": 0.2,
-        "hi": 0.3,
-        "n": 0,
-        "prob_mean": null,
-        "win_rate": null,
-        "gap": null
-      },
-      {
-        "bin": 3,
-        "lo": 0.3,
-        "hi": 0.4,
-        "n": 161,
-        "prob_mean": 0.365,
-        "win_rate": 0.46,
-        "gap": 0.094
-      },
-      {
-        "bin": 4,
-        "lo": 0.4,
-        "hi": 0.5,
-        "n": 285,
-        "prob_mean": 0.453,
-        "win_rate": 0.418,
-        "gap": -0.035
-      },
-      {
-        "bin": 5,
-        "lo": 0.5,
-        "hi": 0.6,
-        "n": 237,
-        "prob_mean": 0.549,
-        "win_rate": 0.578,
-        "gap": 0.029
-      },
-      {
-        "bin": 6,
-        "lo": 0.6,
-        "hi": 0.7,
-        "n": 153,
-        "prob_mean": 0.645,
-        "win_rate": 0.686,
-        "gap": 0.042
-      },
-      {
-        "bin": 7,
-        "lo": 0.7,
-        "hi": 0.8,
-        "n": 75,
-        "prob_mean": 0.748,
-        "win_rate": 0.827,
-        "gap": 0.079
-      },
-      {
-        "bin": 8,
-        "lo": 0.8,
-        "hi": 0.9,
-        "n": 40,
-        "prob_mean": 0.841,
-        "win_rate": 0.975,
-        "gap": 0.134
-      },
-      {
-        "bin": 9,
-        "lo": 0.9,
-        "hi": 1.0,
-        "n": 6,
-        "prob_mean": 0.907,
-        "win_rate": 0.833,
-        "gap": -0.074
       }
     ],
     "baseball:all": [
@@ -345,10 +345,10 @@
         "bin": 5,
         "lo": 0.5,
         "hi": 0.6,
-        "n": 76,
+        "n": 77,
         "prob_mean": 0.553,
-        "win_rate": 0.553,
-        "gap": -0.0
+        "win_rate": 0.558,
+        "gap": 0.006
       },
       {
         "bin": 6,
@@ -389,6 +389,38 @@
     ]
   },
   "isotonic_pairs_by_sport_league_tier": {
+    "football:other": [
+      {
+        "predicted": 0.3656,
+        "actual": 0.4295,
+        "n": 447
+      },
+      {
+        "predicted": 0.4526,
+        "actual": 0.4295,
+        "n": 447
+      },
+      {
+        "predicted": 0.549,
+        "actual": 0.5763,
+        "n": 236
+      },
+      {
+        "predicted": 0.6444,
+        "actual": 0.6863,
+        "n": 153
+      },
+      {
+        "predicted": 0.7476,
+        "actual": 0.8267,
+        "n": 75
+      },
+      {
+        "predicted": 0.8408,
+        "actual": 0.975,
+        "n": 40
+      }
+    ],
     "football:top5": [
       {
         "predicted": 0.3618,
@@ -401,7 +433,7 @@
         "n": 64
       },
       {
-        "predicted": 0.5492,
+        "predicted": 0.5483,
         "actual": 0.6667,
         "n": 48
       },
@@ -419,38 +451,6 @@
         "predicted": 0.8501,
         "actual": 1.0,
         "n": 16
-      }
-    ],
-    "football:other": [
-      {
-        "predicted": 0.3653,
-        "actual": 0.4327,
-        "n": 446
-      },
-      {
-        "predicted": 0.4526,
-        "actual": 0.4327,
-        "n": 446
-      },
-      {
-        "predicted": 0.5489,
-        "actual": 0.5781,
-        "n": 237
-      },
-      {
-        "predicted": 0.6445,
-        "actual": 0.6863,
-        "n": 153
-      },
-      {
-        "predicted": 0.7476,
-        "actual": 0.8267,
-        "n": 75
-      },
-      {
-        "predicted": 0.8408,
-        "actual": 0.975,
-        "n": 40
       }
     ],
     "baseball:all": []
