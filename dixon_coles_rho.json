@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-27T14:54:57Z",
+  "generated_at": "2026-09-27T18:42:32Z",
   "method": "Dixon-Coles MLE grid search (ρ ∈ [-0.30, 0.10] step 0.005), λ_h, λ_a fixés à moyenne empirique par ligue. CI 95% via LR test.",
   "min_matches": 40,
   "default_rho": -0.13,
@@ -482,25 +482,25 @@
       "lambda_a": 1.235
     },
     "esp.2": {
-      "n": 111,
-      "rho_measured": -0.05,
+      "n": 114,
+      "rho_measured": -0.015,
       "rho_literature": -0.12,
       "rho_used": -0.12,
       "source": "literature_fallback",
-      "reason": "CI trop large (0.365) ou fit nul",
-      "log_lik": -330.08,
-      "ci_lo": -0.265,
+      "reason": "CI trop large (0.325) ou fit nul",
+      "log_lik": -338.62,
+      "ci_lo": -0.225,
       "ci_hi": 0.1,
-      "lambda_h": 1.405,
-      "lambda_a": 1.288
+      "lambda_h": 1.404,
+      "lambda_a": 1.281
     },
     "esp.copa_del_rey": {
-      "n": 7,
+      "n": 10,
       "rho_measured": null,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "n=7 < 40"
+      "reason": "n=10 < 40"
     },
     "ettannorra": {
       "n": 1,
@@ -1225,12 +1225,12 @@
       "reason": "n=4 < 40"
     },
     "uefa.nations": {
-      "n": 26,
+      "n": 31,
       "rho_measured": null,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "n=26 < 40"
+      "reason": "n=31 < 40"
     },
     "uefaconferenceleague": {
       "n": 1,
@@ -1249,17 +1249,17 @@
       "reason": "n=1 < 40"
     },
     "uru.1": {
-      "n": 71,
+      "n": 72,
       "rho_measured": 0.1,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
       "reason": "CI trop large (0.240) ou fit nul",
-      "log_lik": -189.54,
+      "log_lik": -192.22,
       "ci_lo": -0.14,
       "ci_hi": 0.1,
-      "lambda_h": 1.197,
-      "lambda_a": 1.028
+      "lambda_h": 1.194,
+      "lambda_a": 1.042
     },
     "usa.1": {
       "n": 18,
