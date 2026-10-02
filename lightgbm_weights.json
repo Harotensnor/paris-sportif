@@ -1,13 +1,13 @@
 {
   "schema": "paris-sportif.learned_weights.v1",
-  "generated_at": "2026-10-02T04:00:56Z",
+  "generated_at": "2026-10-02T10:26:23Z",
   "status": "row_level_table_detected_training_pending",
   "reason": "No backtest_training_rows.jsonl row-level feature table yet; exported conservative weights from backtest_report_v2 aggregates.",
   "runtime_dependency": "none",
   "source": {
     "report": "backtest_report_v2.json",
-    "report_generated_at": "2026-10-01T10:31:28Z",
-    "n_events": 1408,
+    "report_generated_at": "2026-10-02T10:06:36Z",
+    "n_events": 1416,
     "training_rows": "backtest_training_rows.jsonl",
     "training_rows_found": true,
     "training_rows_count": 0
@@ -37,11 +37,11 @@
         "status": "watch"
       },
       "football": {
-        "n": 1270,
-        "roi_pct": 16.01,
-        "win_rate": 0.5724,
-        "brier": 0.2217,
-        "weight": 0.04532,
+        "n": 1278,
+        "roi_pct": 15.52,
+        "win_rate": 0.5704,
+        "brier": 0.2222,
+        "weight": 0.04502,
         "status": "boost"
       }
     },
@@ -367,12 +367,12 @@
         "status": "watch"
       },
       "uefa.nations": {
-        "n": 50,
-        "roi_pct": 13.76,
-        "win_rate": 0.64,
-        "brier": 0.2055,
-        "weight": 0.02236,
-        "status": "boost"
+        "n": 58,
+        "roi_pct": 3.46,
+        "win_rate": 0.5862,
+        "brier": 0.2201,
+        "weight": 0.01278,
+        "status": "neutral"
       },
       "uru.1": {
         "n": 25,
@@ -409,11 +409,11 @@
     },
     "by_tier": {
       "skip": {
-        "n": 1408,
-        "roi_pct": 14.64,
-        "win_rate": 0.5774,
-        "brier": 0.2222,
-        "weight": 0.04558,
+        "n": 1416,
+        "roi_pct": 14.21,
+        "win_rate": 0.5756,
+        "brier": 0.2227,
+        "weight": 0.04529,
         "status": "boost"
       },
       "big_bet": {
