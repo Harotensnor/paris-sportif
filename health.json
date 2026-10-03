@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-10-03T21:08:05Z",
-  "calculated_at": "2026-10-03T21:08:05Z",
+  "generated_at": "2026-10-03T23:46:00Z",
+  "calculated_at": "2026-10-03T23:46:00Z",
   "source_of_truth": "data.js",
   "data_age_min": 0,
   "data_file_age_min": 0,
@@ -38,18 +38,18 @@
       "events": 9714
     },
     "referees_soccer": {
-      "age_min": 0,
+      "age_min": 1,
       "events": 106,
       "status": "retained_existing_referees"
     },
     "xg_team_stats": {
-      "age_min": 0,
+      "age_min": 1,
       "teams": 112,
       "leagues": 6,
       "source": "understat"
     },
     "fbref_xg": {
-      "age_min": 0,
+      "age_min": 1,
       "teams": 112,
       "leagues": 6,
       "source": "understat_compat"
@@ -181,7 +181,7 @@
     },
     "team_priors": {
       "age_min": 1,
-      "teams": 6165,
+      "teams": 6175,
       "leagues": 403,
       "decay_k": 0.05,
       "max_matches": 20
@@ -328,10 +328,10 @@
       "price_shortening": 0
     },
     "injuries_multisport": {
-      "age_min": 0,
+      "age_min": 1,
       "teams": 131,
       "sports": 4,
-      "injuries": 690,
+      "injuries": 691,
       "severe": 563
     },
     "thesportsdb_meta": {
@@ -498,7 +498,7 @@
     "referees_soccer": {
       "script": "scripts/fetch_referees_soccer.py",
       "output": "referees_soccer.json",
-      "age_min": 0,
+      "age_min": 1,
       "threshold_min": 480,
       "fast_red_min": null,
       "status": "ok"
@@ -506,7 +506,7 @@
     "xg_team_stats": {
       "script": "scripts/fetch_understat_xg.py",
       "output": "xg_team_stats.json",
-      "age_min": 0,
+      "age_min": 1,
       "threshold_min": 360,
       "fast_red_min": null,
       "status": "ok"
@@ -514,7 +514,7 @@
     "fbref_xg": {
       "script": "scripts/fetch_understat_xg.py",
       "output": "fbref_xg.json",
-      "age_min": 0,
+      "age_min": 1,
       "threshold_min": 360,
       "fast_red_min": null,
       "status": "ok"
@@ -842,7 +842,7 @@
     "injuries_multisport": {
       "script": "scripts/fetch_injuries.py",
       "output": "injuries_multisport.json",
-      "age_min": 0,
+      "age_min": 1,
       "threshold_min": 60,
       "fast_red_min": null,
       "status": "ok"
@@ -1013,7 +1013,7 @@
   ],
   "overall": "warning",
   "quality_checks": {
-    "data_generated_at": "2026-10-03T21:07:13.883904Z",
+    "data_generated_at": "2026-10-03T23:45:03.256663Z",
     "truth_scope": "all_events",
     "all_winamax_available": 5,
     "all_winamax_exact": 0,
@@ -1064,7 +1064,7 @@
   "data_truth": {
     "source_of_truth": "data.js",
     "scope": "all_events",
-    "data_generated_at": "2026-10-03T21:07:13.883904Z",
+    "data_generated_at": "2026-10-03T23:45:03.256663Z",
     "winamax_available": 5,
     "winamax_exact": 0,
     "winamax_exact_ratio": 0.0,
@@ -1084,7 +1084,7 @@
     "anomalies_emitted": 8
   },
   "source_health": {
-    "generated_at": "2026-10-03T21:08:05Z",
+    "generated_at": "2026-10-03T23:46:00Z",
     "sources_total": 11,
     "sources_ok": 4,
     "sources_warning": 6,
@@ -1167,7 +1167,7 @@
       "team_priors": {
         "score": 100,
         "status": "ok",
-        "items": 6165,
+        "items": 6175,
         "age_min": 1,
         "sla_min": 1440,
         "issues": 1
@@ -1184,7 +1184,7 @@
   },
   "observability": {
     "pipeline_traces": {
-      "generated_at": "2026-10-03T21:08:05Z",
+      "generated_at": "2026-10-03T23:46:00Z",
       "runs_observed": 99,
       "by_status": {
         "warning": 71,
@@ -1203,7 +1203,7 @@
     }
   },
   "data_lineage": {
-    "generated_at": "2026-10-03T21:08:05Z",
+    "generated_at": "2026-10-03T23:46:00Z",
     "status": "ok",
     "events": 5,
     "events_missing_inline_lineage": 0,
