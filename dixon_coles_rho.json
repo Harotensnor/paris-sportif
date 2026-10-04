@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-04T10:38:45Z",
+  "generated_at": "2026-10-04T15:03:54Z",
   "method": "Dixon-Coles MLE grid search (ρ ∈ [-0.30, 0.10] step 0.005), λ_h, λ_a fixés à moyenne empirique par ligue. CI 95% via LR test.",
   "min_matches": 40,
   "default_rho": -0.13,
@@ -487,17 +487,17 @@
       "lambda_a": 1.235
     },
     "esp.2": {
-      "n": 120,
-      "rho_measured": -0.015,
+      "n": 121,
+      "rho_measured": -0.02,
       "rho_literature": -0.12,
       "rho_used": -0.12,
       "source": "literature_fallback",
       "reason": "CI trop large (0.320) ou fit nul",
-      "log_lik": -358.75,
+      "log_lik": -362.48,
       "ci_lo": -0.22,
       "ci_hi": 0.1,
-      "lambda_h": 1.442,
-      "lambda_a": 1.275
+      "lambda_h": 1.446,
+      "lambda_a": 1.289
     },
     "esp.copa_del_rey": {
       "n": 13,
@@ -1230,17 +1230,17 @@
       "reason": "n=4 < 40"
     },
     "uefa.nations": {
-      "n": 78,
-      "rho_measured": -0.285,
+      "n": 79,
+      "rho_measured": -0.25,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "CI trop large (0.290) ou fit nul",
-      "log_lik": -238.0,
+      "reason": "CI trop large (0.325) ou fit nul",
+      "log_lik": -240.81,
       "ci_lo": -0.3,
-      "ci_hi": -0.01,
-      "lambda_h": 1.218,
-      "lambda_a": 1.346
+      "ci_hi": 0.025,
+      "lambda_h": 1.215,
+      "lambda_a": 1.329
     },
     "uefaconferenceleague": {
       "n": 1,
@@ -1259,16 +1259,16 @@
       "reason": "n=1 < 40"
     },
     "uru.1": {
-      "n": 77,
+      "n": 78,
       "rho_measured": 0.1,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
       "reason": "CI trop large (0.240) ou fit nul",
-      "log_lik": -208.15,
+      "log_lik": -210.65,
       "ci_lo": -0.14,
       "ci_hi": 0.1,
-      "lambda_h": 1.247,
+      "lambda_h": 1.256,
       "lambda_a": 1.026
     },
     "usa.1": {
