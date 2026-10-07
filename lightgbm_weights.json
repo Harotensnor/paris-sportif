@@ -1,13 +1,13 @@
 {
   "schema": "paris-sportif.learned_weights.v1",
-  "generated_at": "2026-10-07T04:14:58Z",
+  "generated_at": "2026-10-07T11:09:25Z",
   "status": "row_level_table_detected_training_pending",
   "reason": "No backtest_training_rows.jsonl row-level feature table yet; exported conservative weights from backtest_report_v2 aggregates.",
   "runtime_dependency": "none",
   "source": {
     "report": "backtest_report_v2.json",
-    "report_generated_at": "2026-10-06T10:51:36Z",
-    "n_events": 1479,
+    "report_generated_at": "2026-10-07T10:38:53Z",
+    "n_events": 1489,
     "training_rows": "backtest_training_rows.jsonl",
     "training_rows_found": true,
     "training_rows_count": 0
@@ -37,11 +37,11 @@
         "status": "watch"
       },
       "football": {
-        "n": 1337,
-        "roi_pct": 14.98,
-        "win_rate": 0.5684,
-        "brier": 0.2231,
-        "weight": 0.04461,
+        "n": 1347,
+        "roi_pct": 14.59,
+        "win_rate": 0.5679,
+        "brier": 0.2225,
+        "weight": 0.04473,
         "status": "boost"
       },
       "hockey": {
@@ -64,10 +64,10 @@
       },
       "arg.1": {
         "n": 31,
-        "roi_pct": -1.06,
-        "win_rate": 0.4839,
-        "brier": 0.2302,
-        "weight": -0.00127,
+        "roi_pct": 8.29,
+        "win_rate": 0.5161,
+        "brier": 0.2366,
+        "weight": 0.00947,
         "status": "neutral"
       },
       "aut.1": {
@@ -114,8 +114,8 @@
         "n": 16,
         "roi_pct": -32.31,
         "win_rate": 0.4375,
-        "brier": 0.2188,
-        "weight": -0.00489,
+        "brier": 0.2184,
+        "weight": -0.00487,
         "status": "watch"
       },
       "conmebol.libertadores": {
@@ -192,10 +192,10 @@
       },
       "esp.2": {
         "n": 60,
-        "roi_pct": 18.94,
-        "win_rate": 0.5333,
-        "brier": 0.235,
-        "weight": 0.01923,
+        "roi_pct": 14.78,
+        "win_rate": 0.5167,
+        "brier": 0.2318,
+        "weight": 0.01901,
         "status": "boost"
       },
       "fra.1": {
@@ -320,10 +320,10 @@
       },
       "par.1": {
         "n": 26,
-        "roi_pct": 40.42,
-        "win_rate": 0.6923,
-        "brier": 0.222,
-        "weight": 0.01063,
+        "roi_pct": 21.18,
+        "win_rate": 0.6154,
+        "brier": 0.2021,
+        "weight": 0.01175,
         "status": "watch"
       },
       "per.1": {
@@ -341,6 +341,14 @@
         "brier": 0.2065,
         "weight": 0.01586,
         "status": "boost"
+      },
+      "primeraargentine": {
+        "n": 1,
+        "roi_pct": -100.0,
+        "win_rate": 0.0,
+        "brier": 0.22,
+        "weight": -0.00032,
+        "status": "watch"
       },
       "sco.1": {
         "n": 29,
@@ -383,26 +391,26 @@
         "status": "watch"
       },
       "uefa.nations": {
-        "n": 84,
-        "roi_pct": 1.43,
-        "win_rate": 0.5833,
-        "brier": 0.2081,
-        "weight": 0.0143,
+        "n": 93,
+        "roi_pct": -0.33,
+        "win_rate": 0.5914,
+        "brier": 0.2039,
+        "weight": 0.01111,
         "status": "neutral"
       },
       "uru.1": {
         "n": 30,
-        "roi_pct": 1.29,
-        "win_rate": 0.4667,
-        "brier": 0.2189,
-        "weight": 0.00186,
+        "roi_pct": 12.29,
+        "win_rate": 0.5,
+        "brier": 0.2305,
+        "weight": 0.00926,
         "status": "neutral"
       },
       "usa.1": {
         "n": 1,
         "roi_pct": -100.0,
         "win_rate": 0.0,
-        "brier": 0.1562,
+        "brier": 0.1561,
         "weight": -0.00019,
         "status": "watch"
       },
@@ -425,11 +433,11 @@
     },
     "by_tier": {
       "skip": {
-        "n": 1479,
-        "roi_pct": 13.67,
-        "win_rate": 0.5734,
-        "brier": 0.2234,
-        "weight": 0.04492,
+        "n": 1489,
+        "roi_pct": 13.32,
+        "win_rate": 0.5729,
+        "brier": 0.223,
+        "weight": 0.04499,
         "status": "boost"
       },
       "big_bet": {
