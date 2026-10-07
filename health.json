@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-10-06T21:03:51Z",
-  "calculated_at": "2026-10-06T21:03:51Z",
+  "generated_at": "2026-10-07T00:34:54Z",
+  "calculated_at": "2026-10-07T00:34:54Z",
   "source_of_truth": "data.js",
   "data_age_min": 0,
   "data_file_age_min": 0,
@@ -27,15 +27,15 @@
     },
     "team_stats": {
       "age_min": 1,
-      "teams": 28
+      "teams": 34
     },
     "clubelo": {
       "age_min": 1,
       "clubs": 594
     },
     "weather": {
-      "age_min": 1,
-      "events": 9851
+      "age_min": 0,
+      "events": 9865
     },
     "referees_soccer": {
       "age_min": 1,
@@ -70,28 +70,20 @@
     },
     "h2h_extended": {
       "age_min": 1,
-      "events": 4,
-      "events_with_meetings": 2,
-      "meetings": 8,
+      "events": 2,
+      "events_with_meetings": 1,
+      "meetings": 3,
       "coverage_pct": 50.0,
-      "empty_events": 2,
-      "sports": 2,
+      "empty_events": 1,
+      "sports": 1,
       "by_sport": {
         "football": {
-          "events": 3,
-          "events_with_meetings": 2,
-          "meetings": 8,
+          "events": 2,
+          "events_with_meetings": 1,
+          "meetings": 3,
           "sources": {
-            "seasonseries": 2,
-            "espn_summary_empty": 1
-          }
-        },
-        "tennis": {
-          "events": 1,
-          "events_with_meetings": 0,
-          "meetings": 0,
-          "sources": {
-            "espn_summary_empty": 1
+            "espn_summary_empty": 1,
+            "seasonseries": 1
           }
         }
       }
@@ -137,17 +129,17 @@
     "xg_coverage": {
       "age_min": 0,
       "events": 7,
-      "both_teams": 1,
-      "one_team": 1,
+      "both_teams": 2,
+      "one_team": 0,
       "without_xg": 5,
-      "both_teams_pct": 14.3,
+      "both_teams_pct": 28.6,
       "leagues": 5
     },
     "match_previews": {
       "age_min": 0,
-      "previews": 2,
+      "previews": 6,
       "espn_hits": 0,
-      "local_fallbacks": 2
+      "local_fallbacks": 6
     },
     "league_bias_audit": {
       "age_min": 0,
@@ -190,8 +182,8 @@
     },
     "team_priors": {
       "age_min": 1,
-      "teams": 6201,
-      "leagues": 403,
+      "teams": 6203,
+      "leagues": 404,
       "decay_k": 0.05,
       "max_matches": 20
     },
@@ -340,8 +332,8 @@
       "age_min": 1,
       "teams": 134,
       "sports": 4,
-      "injuries": 731,
-      "severe": 519
+      "injuries": 734,
+      "severe": 521
     },
     "thesportsdb_meta": {
       "age_min": 1,
@@ -351,22 +343,22 @@
     },
     "openligadb_matches": {
       "age_min": 1,
-      "matches": 94,
+      "matches": 95,
       "matched_local_events": 0,
       "matched_ratio_pct": 0,
       "leagues": 3,
-      "upcoming": 66,
+      "upcoming": 94,
       "status": "ok"
     },
     "public_team_stats": {
       "age_min": 0,
-      "teams": 1031,
+      "teams": 1036,
       "teams_with_xg": 112,
-      "teams_with_form": 826
+      "teams_with_form": 830
     },
     "public_team_profiles": {
       "age_min": 0,
-      "teams": 1041,
+      "teams": 1045,
       "upcoming": 13,
       "availability": 65,
       "deep_context": 0
@@ -499,7 +491,7 @@
     "weather": {
       "script": "scripts/fetch_weather.py",
       "output": "weather.json",
-      "age_min": 1,
+      "age_min": 0,
       "threshold_min": 60,
       "fast_red_min": 30,
       "status": "ok"
@@ -1022,7 +1014,7 @@
   ],
   "overall": "warning",
   "quality_checks": {
-    "data_generated_at": "2026-10-06T21:03:00.830626Z",
+    "data_generated_at": "2026-10-07T00:33:59.784803Z",
     "truth_scope": "all_events",
     "all_winamax_available": 10,
     "all_winamax_exact": 0,
@@ -1073,7 +1065,7 @@
   "data_truth": {
     "source_of_truth": "data.js",
     "scope": "all_events",
-    "data_generated_at": "2026-10-06T21:03:00.830626Z",
+    "data_generated_at": "2026-10-07T00:33:59.784803Z",
     "winamax_available": 10,
     "winamax_exact": 0,
     "winamax_exact_ratio": 0.0,
@@ -1089,16 +1081,16 @@
     "sources_ok": 5,
     "sources_warning": 5,
     "sources_critical": 1,
-    "quarantine_records": 7,
-    "anomalies_emitted": 5
+    "quarantine_records": 6,
+    "anomalies_emitted": 4
   },
   "source_health": {
-    "generated_at": "2026-10-06T21:03:51Z",
+    "generated_at": "2026-10-07T00:34:54Z",
     "sources_total": 11,
     "sources_ok": 5,
     "sources_warning": 5,
     "sources_critical": 1,
-    "source_health_avg": 89.4,
+    "source_health_avg": 90.5,
     "source_health_min": 57,
     "by_source": {
       "winamax_catalog": {
@@ -1144,18 +1136,18 @@
       "weather": {
         "score": 100,
         "status": "ok",
-        "items": 9851,
+        "items": 9865,
         "age_min": 1,
         "sla_min": 60,
         "issues": 1
       },
       "team_stats": {
-        "score": 61,
+        "score": 72,
         "status": "warning",
-        "items": 28,
-        "age_min": 2,
+        "items": 34,
+        "age_min": 1,
         "sla_min": 300,
-        "issues": 2
+        "issues": 1
       },
       "clubelo": {
         "score": 92,
@@ -1176,7 +1168,7 @@
       "team_priors": {
         "score": 100,
         "status": "ok",
-        "items": 6201,
+        "items": 6203,
         "age_min": 2,
         "sla_min": 1440,
         "issues": 1
@@ -1193,7 +1185,7 @@
   },
   "observability": {
     "pipeline_traces": {
-      "generated_at": "2026-10-06T21:03:51Z",
+      "generated_at": "2026-10-07T00:34:54Z",
       "runs_observed": 99,
       "by_status": {
         "warning": 69,
@@ -1212,7 +1204,7 @@
     }
   },
   "data_lineage": {
-    "generated_at": "2026-10-06T21:03:51Z",
+    "generated_at": "2026-10-07T00:34:54Z",
     "status": "ok",
     "events": 10,
     "events_missing_inline_lineage": 0,
@@ -1220,8 +1212,8 @@
     "source_counts": {
       "espn": 10,
       "winamax": 10,
+      "weather": 7,
       "clubelo": 4,
-      "weather": 3,
       "xg": 2,
       "sofascore_referees": 1
     },
@@ -1273,6 +1265,7 @@
         "league": "allsvenskan",
         "lineage": [
           "espn",
+          "weather",
           "winamax"
         ]
       },
@@ -1284,6 +1277,7 @@
           "clubelo",
           "espn",
           "sofascore_referees",
+          "weather",
           "winamax",
           "xg"
         ]
@@ -1295,6 +1289,7 @@
         "lineage": [
           "clubelo",
           "espn",
+          "weather",
           "winamax"
         ]
       },
@@ -1305,6 +1300,7 @@
         "lineage": [
           "clubelo",
           "espn",
+          "weather",
           "winamax"
         ]
       }
@@ -1320,7 +1316,7 @@
     "data": {
       "status": "critical",
       "sources_validated": 11,
-      "quarantine_records": 7,
+      "quarantine_records": 6,
       "lineage_coverage_pct": 100.0
     },
     "model": {
