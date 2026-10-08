@@ -1,6 +1,6 @@
 # Backtest ROI — VRAI modèle (v2)
 
-Généré : 2026-10-07T10:38:53Z
+Généré : 2026-10-08T10:59:38Z
 Source modèle : `pronostics.html` via `scripts/model_loader.py` (V8 embarqué, zéro duplication)
 Univers : 1489 picks sur 2026-08-19T11:35Z → 2026-10-06T18:45Z
 Bankroll simulée (Kelly 0.25× cap 10%) : **100u → 12766176.03u**
