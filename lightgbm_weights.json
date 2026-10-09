@@ -1,13 +1,13 @@
 {
   "schema": "paris-sportif.learned_weights.v1",
-  "generated_at": "2026-10-09T04:30:16Z",
+  "generated_at": "2026-10-09T11:30:25Z",
   "status": "row_level_table_detected_training_pending",
   "reason": "No backtest_training_rows.jsonl row-level feature table yet; exported conservative weights from backtest_report_v2 aggregates.",
   "runtime_dependency": "none",
   "source": {
     "report": "backtest_report_v2.json",
-    "report_generated_at": "2026-10-08T10:59:38Z",
-    "n_events": 1489,
+    "report_generated_at": "2026-10-09T10:58:37Z",
+    "n_events": 1490,
     "training_rows": "backtest_training_rows.jsonl",
     "training_rows_found": true,
     "training_rows_count": 0
@@ -37,10 +37,10 @@
         "status": "watch"
       },
       "football": {
-        "n": 1347,
-        "roi_pct": 14.59,
-        "win_rate": 0.5679,
-        "brier": 0.2225,
+        "n": 1348,
+        "roi_pct": 14.5,
+        "win_rate": 0.5675,
+        "brier": 0.2224,
         "weight": 0.04473,
         "status": "boost"
       },
@@ -88,10 +88,10 @@
       },
       "bra.1": {
         "n": 19,
-        "roi_pct": -14.2,
-        "win_rate": 0.4737,
-        "brier": 0.2381,
-        "weight": -0.0062,
+        "roi_pct": -26.31,
+        "win_rate": 0.4211,
+        "brier": 0.2202,
+        "weight": -0.00608,
         "status": "watch"
       },
       "chi.1": {
@@ -327,11 +327,11 @@
         "status": "watch"
       },
       "per.1": {
-        "n": 20,
-        "roi_pct": 66.29,
-        "win_rate": 0.75,
-        "brier": 0.2282,
-        "weight": 0.00788,
+        "n": 21,
+        "roi_pct": 68.85,
+        "win_rate": 0.7619,
+        "brier": 0.2362,
+        "weight": 0.00789,
         "status": "watch"
       },
       "por.1": {
@@ -346,8 +346,8 @@
         "n": 1,
         "roi_pct": -100.0,
         "win_rate": 0.0,
-        "brier": 0.22,
-        "weight": -0.00032,
+        "brier": 0.2422,
+        "weight": -0.00037,
         "status": "watch"
       },
       "sco.1": {
@@ -433,10 +433,10 @@
     },
     "by_tier": {
       "skip": {
-        "n": 1489,
-        "roi_pct": 13.32,
-        "win_rate": 0.5729,
-        "brier": 0.223,
+        "n": 1490,
+        "roi_pct": 13.24,
+        "win_rate": 0.5725,
+        "brier": 0.2229,
         "weight": 0.04499,
         "status": "boost"
       },
