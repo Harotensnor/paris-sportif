@@ -1,13 +1,13 @@
 {
   "schema": "paris-sportif.learned_weights.v1",
-  "generated_at": "2026-10-15T08:13:47Z",
+  "generated_at": "2026-10-15T13:31:16Z",
   "status": "row_level_table_detected_training_pending",
   "reason": "No backtest_training_rows.jsonl row-level feature table yet; exported conservative weights from backtest_report_v2 aggregates.",
   "runtime_dependency": "none",
   "source": {
     "report": "backtest_report_v2.json",
-    "report_generated_at": "2026-10-14T09:05:42Z",
-    "n_events": 1750,
+    "report_generated_at": "2026-10-15T08:38:57Z",
+    "n_events": 1766,
     "training_rows": "backtest_training_rows.jsonl",
     "training_rows_found": true,
     "training_rows_count": 0
@@ -37,11 +37,11 @@
         "status": "watch"
       },
       "football": {
-        "n": 1608,
-        "roi_pct": 13.77,
-        "win_rate": 0.5678,
-        "brier": 0.2229,
-        "weight": 0.04461,
+        "n": 1624,
+        "roi_pct": 13.85,
+        "win_rate": 0.569,
+        "brier": 0.2225,
+        "weight": 0.04482,
         "status": "boost"
       },
       "hockey": {
@@ -55,11 +55,11 @@
     },
     "by_league": {
       "afc.champions": {
-        "n": 25,
-        "roi_pct": 2.59,
-        "win_rate": 0.6,
-        "brier": 0.2274,
-        "weight": 0.0045,
+        "n": 27,
+        "roi_pct": 4.76,
+        "win_rate": 0.6296,
+        "brier": 0.2167,
+        "weight": 0.00809,
         "status": "watch"
       },
       "allsvenskan": {
@@ -167,11 +167,11 @@
         "status": "boost"
       },
       "eng.2": {
-        "n": 90,
-        "roi_pct": 27.8,
-        "win_rate": 0.5667,
-        "brier": 0.2402,
-        "weight": 0.02976,
+        "n": 94,
+        "roi_pct": 29.28,
+        "win_rate": 0.5745,
+        "brier": 0.2383,
+        "weight": 0.03199,
         "status": "boost"
       },
       "eng.3": {
@@ -263,11 +263,11 @@
         "status": "neutral"
       },
       "ind.1": {
-        "n": 2,
-        "roi_pct": -18.75,
-        "win_rate": 0.5,
-        "brier": 0.2174,
-        "weight": -0.00052,
+        "n": 3,
+        "roi_pct": 19.23,
+        "win_rate": 0.6667,
+        "brier": 0.2379,
+        "weight": 0.00111,
         "status": "watch"
       },
       "ita.1": {
@@ -407,12 +407,12 @@
         "status": "neutral"
       },
       "uefa.champions": {
-        "n": 27,
-        "roi_pct": -0.51,
-        "win_rate": 0.6667,
-        "brier": 0.1912,
-        "weight": 0.00436,
-        "status": "watch"
+        "n": 36,
+        "roi_pct": -1.82,
+        "win_rate": 0.6389,
+        "brier": 0.1885,
+        "weight": 0.00427,
+        "status": "neutral"
       },
       "uefa.europa": {
         "n": 18,
@@ -465,11 +465,11 @@
     },
     "by_tier": {
       "skip": {
-        "n": 1750,
-        "roi_pct": 12.93,
-        "win_rate": 0.5731,
-        "brier": 0.223,
-        "weight": 0.04501,
+        "n": 1766,
+        "roi_pct": 13.02,
+        "win_rate": 0.5742,
+        "brier": 0.2226,
+        "weight": 0.04521,
         "status": "boost"
       },
       "big_bet": {
