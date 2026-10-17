@@ -1,149 +1,155 @@
 {
-  "generated_at": "2026-10-17T21:02:26Z",
+  "generated_at": "2026-10-17T22:53:13Z",
   "method": "Full Bivariate Poisson MLE Dixon-Coles. Coordinate-descent avec golden-section search 1D. Pure Python (pas de scipy).",
   "min_matches_per_league": 40,
   "min_matches_per_team": 5,
   "n_leagues_fit": 34,
   "leagues": {
     "arg.1": {
-      "n_matches": 83,
-      "n_teams": 22,
-      "gamma": 0.1571,
-      "rho": -0.08,
-      "log_lik": -201.37,
+      "n_matches": 85,
+      "n_teams": 23,
+      "gamma": 0.1269,
+      "rho": -0.0597,
+      "log_lik": -205.87,
       "iterations": 3,
       "teams": {
         "Aldosivi": {
-          "alpha": 0.1373,
-          "beta": -0.3918,
-          "rank_off": 10,
-          "rank_def": 7
+          "alpha": 0.1137,
+          "beta": -0.3683,
+          "rank_off": 12,
+          "rank_def": 8
         },
         "Argentinos Juniors": {
-          "alpha": -0.2667,
-          "beta": 0.4441,
+          "alpha": -0.2451,
+          "beta": 0.4038,
           "rank_off": 16,
-          "rank_def": 18
+          "rank_def": 17
         },
         "Atlético Tucumán": {
-          "alpha": -0.5558,
-          "beta": 0.4441,
-          "rank_off": 19,
-          "rank_def": 19
+          "alpha": -0.5493,
+          "beta": 0.4282,
+          "rank_off": 20,
+          "rank_def": 20
         },
         "Banfield": {
-          "alpha": 0.034,
-          "beta": -0.1759,
+          "alpha": 0.0405,
+          "beta": -0.2011,
           "rank_off": 13,
           "rank_def": 10
         },
         "Barracas Central": {
-          "alpha": 0.4717,
-          "beta": -0.3825,
-          "rank_off": 7,
-          "rank_def": 8
+          "alpha": 0.4538,
+          "beta": -0.3984,
+          "rank_off": 8,
+          "rank_def": 6
         },
         "Belgrano (Córdoba)": {
-          "alpha": 0.3289,
-          "beta": 0.5323,
+          "alpha": 0.3261,
+          "beta": 0.5258,
           "rank_off": 9,
-          "rank_def": 21
+          "rank_def": 22
         },
         "Central Córdoba (Santiago del Estero)": {
-          "alpha": -0.0693,
-          "beta": -0.4012,
+          "alpha": -0.0872,
+          "beta": -0.3496,
           "rank_off": 15,
-          "rank_def": 5
-        },
-        "Defensa y Justicia": {
-          "alpha": 0.0885,
-          "beta": -0.3431,
-          "rank_off": 11,
           "rank_def": 9
         },
+        "Defensa y Justicia": {
+          "alpha": 0.1833,
+          "beta": -0.4472,
+          "rank_off": 10,
+          "rank_def": 4
+        },
         "Deportivo Riestra": {
-          "alpha": -1.4463,
-          "beta": 0.213,
-          "rank_off": 22,
+          "alpha": -1.4397,
+          "beta": 0.1275,
+          "rank_off": 23,
           "rank_def": 13
         },
         "Estudiantes de La Plata": {
-          "alpha": 0.481,
-          "beta": 0.3071,
+          "alpha": 0.4782,
+          "beta": 0.3399,
           "rank_off": 6,
-          "rank_def": 15
+          "rank_def": 16
         },
         "Gimnasia (Mendoza)": {
-          "alpha": -0.0449,
-          "beta": -0.4012,
+          "alpha": -0.0628,
+          "beta": -0.3833,
           "rank_off": 14,
-          "rank_def": 6
+          "rank_def": 7
         },
         "Gimnasia La Plata": {
-          "alpha": 0.4961,
-          "beta": 0.1097,
+          "alpha": 0.5026,
+          "beta": 0.0881,
           "rank_off": 3,
           "rank_def": 12
         },
         "Huracán": {
-          "alpha": -0.7869,
-          "beta": 0.4498,
+          "alpha": -0.7617,
+          "beta": 0.4038,
           "rank_off": 21,
-          "rank_def": 20
+          "rank_def": 18
         },
         "Independiente": {
-          "alpha": 0.4868,
-          "beta": 0.5567,
-          "rank_off": 4,
-          "rank_def": 22
+          "alpha": 0.5909,
+          "beta": 0.4224,
+          "rank_off": 2,
+          "rank_def": 19
         },
         "Independiente Rivadavia": {
-          "alpha": 0.3834,
-          "beta": -0.4464,
-          "rank_off": 8,
-          "rank_def": 3
-        },
-        "Newell's Old Boys": {
-          "alpha": 0.0677,
-          "beta": 0.2676,
-          "rank_off": 12,
-          "rank_def": 14
-        },
-        "River Plate": {
-          "alpha": 0.7967,
-          "beta": -0.4858,
-          "rank_off": 1,
-          "rank_def": 2
-        },
-        "Rosario Central": {
-          "alpha": 0.5262,
-          "beta": 0.4104,
-          "rank_off": 2,
-          "rank_def": 17
-        },
-        "San Lorenzo": {
-          "alpha": -0.7625,
-          "beta": -0.5892,
-          "rank_off": 20,
+          "alpha": 0.4631,
+          "beta": -0.5412,
+          "rank_off": 7,
           "rank_def": 1
         },
+        "Lanús": {
+          "alpha": -0.5098,
+          "beta": 0.5803,
+          "rank_off": 19,
+          "rank_def": 23
+        },
+        "Newell's Old Boys": {
+          "alpha": 0.1195,
+          "beta": 0.2065,
+          "rank_off": 11,
+          "rank_def": 15
+        },
+        "River Plate": {
+          "alpha": 0.8126,
+          "beta": -0.5017,
+          "rank_off": 1,
+          "rank_def": 3
+        },
+        "Rosario Central": {
+          "alpha": 0.4875,
+          "beta": 0.477,
+          "rank_off": 4,
+          "rank_def": 21
+        },
+        "San Lorenzo": {
+          "alpha": -0.7861,
+          "beta": -0.5412,
+          "rank_off": 22,
+          "rank_def": 2
+        },
         "Sarmiento (Junín)": {
-          "alpha": 0.4868,
-          "beta": -0.0029,
+          "alpha": 0.4875,
+          "beta": -0.0153,
           "rank_off": 5,
           "rank_def": 11
         },
         "Tigre": {
-          "alpha": -0.4583,
-          "beta": 0.3314,
-          "rank_off": 18,
-          "rank_def": 16
+          "alpha": -0.2451,
+          "beta": 0.1914,
+          "rank_off": 17,
+          "rank_def": 14
         },
         "Unión (Santa Fe)": {
-          "alpha": -0.3944,
-          "beta": -0.4464,
-          "rank_off": 17,
-          "rank_def": 4
+          "alpha": -0.3728,
+          "beta": -0.4472,
+          "rank_off": 18,
+          "rank_def": 5
         }
       }
     },
@@ -654,142 +660,154 @@
       }
     },
     "col.1": {
-      "n_matches": 44,
-      "n_teams": 7,
-      "gamma": 0.4265,
-      "rho": -0.2984,
-      "log_lik": -123.47,
+      "n_matches": 45,
+      "n_teams": 9,
+      "gamma": 0.4247,
+      "rho": -0.2793,
+      "log_lik": -125.15,
       "iterations": 2,
       "teams": {
         "Alianza FC": {
-          "alpha": 0.1902,
-          "beta": -0.0945,
-          "rank_off": 2,
-          "rank_def": 4
-        },
-        "Deportes Tolima": {
-          "alpha": -0.1197,
-          "beta": 0.2004,
-          "rank_off": 5,
-          "rank_def": 7
-        },
-        "Deportivo Pereira": {
-          "alpha": -0.2324,
-          "beta": 0.1272,
-          "rank_off": 6,
-          "rank_def": 6
-        },
-        "Fortaleza CEIF": {
-          "alpha": -0.3601,
-          "beta": -0.1132,
-          "rank_off": 7,
-          "rank_def": 2
-        },
-        "Internacional de Bogotá": {
-          "alpha": 0.1415,
-          "beta": -0.1038,
+          "alpha": 0.0792,
+          "beta": -0.2323,
           "rank_off": 3,
           "rank_def": 3
         },
-        "Jaguares de Córdoba": {
-          "alpha": 0.0718,
-          "beta": -0.1189,
+        "Atlético Nacional": {
+          "alpha": 0.3289,
+          "beta": 0.9925,
+          "rank_off": 1,
+          "rank_def": 9
+        },
+        "Boyacá Chicó FC": {
+          "alpha": 0.0246,
+          "beta": -0.1591,
+          "rank_off": 6,
+          "rank_def": 5
+        },
+        "Deportes Tolima": {
+          "alpha": -0.2459,
+          "beta": 0.0382,
+          "rank_off": 8,
+          "rank_def": 7
+        },
+        "Deportivo Pereira": {
+          "alpha": -0.1669,
+          "beta": 0.0626,
+          "rank_off": 7,
+          "rank_def": 8
+        },
+        "Fortaleza CEIF": {
+          "alpha": -0.4037,
+          "beta": -0.2323,
+          "rank_off": 9,
+          "rank_def": 4
+        },
+        "Internacional de Bogotá": {
+          "alpha": 0.0641,
+          "beta": -0.2416,
           "rank_off": 4,
           "rank_def": 1
         },
+        "Jaguares de Córdoba": {
+          "alpha": 0.0641,
+          "beta": -0.2416,
+          "rank_off": 5,
+          "rank_def": 2
+        },
         "Águilas Doradas": {
-          "alpha": 0.3086,
-          "beta": 0.1028,
-          "rank_off": 1,
-          "rank_def": 5
+          "alpha": 0.2557,
+          "beta": 0.0138,
+          "rank_off": 2,
+          "rank_def": 6
         }
       }
     },
     "ecu.1": {
-      "n_matches": 55,
+      "n_matches": 56,
       "n_teams": 13,
-      "gamma": 0.2181,
+      "gamma": 0.2209,
       "rho": 0.0984,
-      "log_lik": -142.66,
+      "log_lik": -145.72,
       "iterations": 2,
       "teams": {
         "Aucas": {
-          "alpha": -0.0688,
-          "beta": 0.175,
+          "alpha": -0.0442,
+          "beta": 0.1496,
           "rank_off": 8,
-          "rank_def": 10
+          "rank_def": 9
         },
         "Delfín": {
-          "alpha": -0.4914,
-          "beta": 0.2144,
+          "alpha": -0.5028,
+          "beta": 0.2343,
           "rank_off": 11,
           "rank_def": 12
         },
         "Deportivo Cuenca": {
-          "alpha": -0.6887,
-          "beta": -0.0561,
+          "alpha": -0.6886,
+          "beta": -0.0663,
           "rank_off": 13,
-          "rank_def": 5
+          "rank_def": 4
         },
         "Guayaquil City FC": {
-          "alpha": -0.3694,
-          "beta": -0.1838,
+          "alpha": -0.3449,
+          "beta": -0.2034,
           "rank_off": 10,
           "rank_def": 3
         },
         "Independiente del Valle": {
-          "alpha": 0.7184,
-          "beta": 0.1262,
+          "alpha": 0.6037,
+          "beta": 0.2042,
           "rank_off": 1,
-          "rank_def": 8
-        },
-        "Leones": {
-          "alpha": -0.0107,
-          "beta": 0.2051,
-          "rank_off": 7,
           "rank_def": 11
         },
+        "Leones": {
+          "alpha": 0.0139,
+          "beta": 0.1647,
+          "rank_off": 7,
+          "rank_def": 10
+        },
         "Libertad (Ecuador)": {
-          "alpha": 0.4328,
-          "beta": 0.2632,
-          "rank_off": 3,
+          "alpha": 0.4365,
+          "beta": 0.2587,
+          "rank_off": 2,
           "rank_def": 13
         },
         "Macará": {
-          "alpha": 0.4479,
-          "beta": -0.1199,
-          "rank_off": 2,
-          "rank_def": 4
+          "alpha": 0.4028,
+          "beta": -0.0025,
+          "rank_off": 3,
+          "rank_def": 7
         },
         "Manta F.C.": {
-          "alpha": -0.157,
-          "beta": -0.0561,
+          "alpha": -0.1533,
+          "beta": -0.057,
           "rank_off": 9,
           "rank_def": 6
         },
         "Mushuc Runa": {
-          "alpha": 0.3538,
-          "beta": -0.2871,
-          "rank_off": 4,
+          "alpha": 0.3482,
+          "beta": -0.2974,
+          "rank_off": 5,
           "rank_def": 2
         },
         "Orense": {
-          "alpha": 0.0102,
-          "beta": -0.0166,
+          "alpha": 0.0533,
+          "beta": -0.0663,
           "rank_off": 6,
-          "rank_def": 7
+          "rank_def": 5
         },
         "Técnico Universitario": {
-          "alpha": -0.5065,
-          "beta": -0.4242,
+          "alpha": -0.5028,
+          "beta": -0.4251,
           "rank_off": 12,
           "rank_def": 1
         },
         "Universidad Católica (Quito)": {
-          "alpha": 0.3295,
-          "beta": 0.1599,
-          "rank_off": 5,
-          "rank_def": 9
+          "alpha": 0.3784,
+          "beta": 0.1066,
+          "rank_off": 4,
+          "rank_def": 8
         }
       }
     },
@@ -2986,194 +3004,194 @@
       }
     },
     "par.1": {
-      "n_matches": 65,
+      "n_matches": 66,
       "n_teams": 12,
-      "gamma": 0.1298,
+      "gamma": 0.1241,
       "rho": -0.2984,
-      "log_lik": -158.42,
+      "log_lik": -160.73,
       "iterations": 2,
       "teams": {
         "2 de Mayo": {
-          "alpha": 0.0303,
-          "beta": 0.0994,
+          "alpha": 0.0333,
+          "beta": 0.1021,
           "rank_off": 7,
           "rank_def": 7
         },
         "Cerro Porteño": {
-          "alpha": -0.0579,
-          "beta": -0.2443,
-          "rank_off": 9,
+          "alpha": -0.0608,
+          "beta": -0.2474,
+          "rank_off": 8,
           "rank_def": 4
         },
         "Club Olimpia": {
-          "alpha": 0.4831,
-          "beta": 0.2572,
+          "alpha": 0.4803,
+          "beta": 0.2542,
           "rank_off": 2,
           "rank_def": 10
         },
         "Deportivo Recoleta": {
-          "alpha": 0.0848,
-          "beta": -0.3139,
+          "alpha": 0.082,
+          "beta": -0.3205,
           "rank_off": 6,
           "rank_def": 2
         },
         "Guaraní": {
-          "alpha": -0.0429,
-          "beta": 0.4244,
-          "rank_off": 8,
-          "rank_def": 12
+          "alpha": -0.0851,
+          "beta": 0.3331,
+          "rank_off": 9,
+          "rank_def": 11
         },
         "Libertad": {
-          "alpha": 0.5075,
-          "beta": 0.1238,
+          "alpha": 0.5047,
+          "beta": 0.1265,
           "rank_off": 1,
           "rank_def": 8
         },
         "Nacional Asunción": {
-          "alpha": 0.4099,
-          "beta": 0.4094,
+          "alpha": 0.4652,
+          "beta": 0.5061,
           "rank_off": 3,
-          "rank_def": 11
+          "rank_def": 12
         },
         "Rubio Ñú": {
-          "alpha": 0.3554,
-          "beta": -0.6088,
+          "alpha": 0.3619,
+          "beta": -0.6061,
           "rank_off": 4,
           "rank_def": 1
         },
         "Sportivo Ameliano": {
-          "alpha": -0.3041,
-          "beta": 0.1539,
+          "alpha": -0.3069,
+          "beta": 0.1566,
           "rank_off": 11,
           "rank_def": 9
         },
         "Sportivo Luqueño": {
-          "alpha": -0.2739,
-          "beta": -0.0133,
+          "alpha": -0.2767,
+          "beta": -0.0163,
           "rank_off": 10,
           "rank_def": 5
         },
         "Sportivo San Lorenzo": {
-          "alpha": -1.4442,
-          "beta": -0.2838,
+          "alpha": -1.447,
+          "beta": -0.2868,
           "rank_off": 12,
           "rank_def": 3
         },
         "Sportivo Trinidense": {
-          "alpha": 0.252,
-          "beta": -0.004,
+          "alpha": 0.2492,
+          "beta": -0.0013,
           "rank_off": 5,
           "rank_def": 6
         }
       }
     },
     "per.1": {
-      "n_matches": 78,
+      "n_matches": 79,
       "n_teams": 17,
-      "gamma": 0.5356,
+      "gamma": 0.5374,
       "rho": 0.0984,
-      "log_lik": -212.39,
+      "log_lik": -214.64,
       "iterations": 3,
       "teams": {
         "ADT": {
-          "alpha": -0.4,
-          "beta": 0.1744,
+          "alpha": -0.4059,
+          "beta": 0.1592,
           "rank_off": 15,
           "rank_def": 13
         },
         "Alianza Atlético": {
-          "alpha": 0.6089,
-          "beta": 0.1744,
+          "alpha": 0.6216,
+          "beta": 0.1685,
           "rank_off": 2,
-          "rank_def": 14
+          "rank_def": 15
         },
         "Atlético Grau": {
-          "alpha": -0.1876,
-          "beta": -0.0322,
+          "alpha": -0.1899,
+          "beta": -0.0382,
           "rank_off": 12,
           "rank_def": 7
         },
         "Cienciano del Cusco": {
-          "alpha": 0.2688,
-          "beta": -0.081,
+          "alpha": 0.2779,
+          "beta": -0.0776,
           "rank_off": 3,
           "rank_def": 5
         },
         "Comerciantes Unidos": {
-          "alpha": -0.2177,
-          "beta": 0.0374,
+          "alpha": -0.2085,
+          "beta": 0.0408,
           "rank_off": 13,
           "rank_def": 10
         },
         "Cusco FC": {
-          "alpha": 0.2444,
-          "beta": -0.0021,
+          "alpha": 0.2385,
+          "beta": 0.0013,
           "rank_off": 4,
-          "rank_def": 9
+          "rank_def": 8
         },
         "Deportivo Garcilaso": {
-          "alpha": 0.0133,
-          "beta": 0.7549,
+          "alpha": 0.0167,
+          "beta": 0.749,
           "rank_off": 9,
           "rank_def": 17
         },
         "Deportivo Moquegua": {
-          "alpha": -0.8864,
-          "beta": -0.2482,
+          "alpha": -0.883,
+          "beta": -0.2448,
           "rank_off": 17,
           "rank_def": 4
         },
         "FC Cajamarca": {
-          "alpha": 0.1956,
-          "beta": -0.3608,
+          "alpha": 0.1897,
+          "beta": -0.3668,
           "rank_off": 6,
           "rank_def": 2
         },
         "Juan Pablo II": {
-          "alpha": 0.0772,
-          "beta": -0.0265,
+          "alpha": 0.105,
+          "beta": 0.0315,
           "rank_off": 8,
-          "rank_def": 8
+          "rank_def": 9
         },
         "Los Chankas": {
-          "alpha": -0.5126,
-          "beta": -0.5431,
+          "alpha": -0.5092,
+          "beta": -0.5397,
           "rank_off": 16,
           "rank_def": 1
         },
         "Melgar": {
-          "alpha": 0.0133,
-          "beta": 0.0862,
+          "alpha": 0.0074,
+          "beta": 0.0802,
           "rank_off": 10,
           "rank_def": 12
         },
         "Sport Boys": {
-          "alpha": -0.0842,
-          "beta": 0.1895,
+          "alpha": -0.1504,
+          "beta": 0.1592,
           "rank_off": 11,
-          "rank_def": 15
+          "rank_def": 14
         },
         "Sport Huancayo": {
-          "alpha": 0.1468,
-          "beta": -0.0717,
+          "alpha": 0.1445,
+          "beta": -0.0776,
           "rank_off": 7,
           "rank_def": 6
         },
         "Sporting Cristal": {
-          "alpha": 0.2257,
-          "beta": 0.1988,
+          "alpha": 0.2292,
+          "beta": 0.1929,
           "rank_off": 5,
           "rank_def": 16
         },
         "UTC": {
-          "alpha": -0.3153,
-          "beta": -0.297,
+          "alpha": -0.3025,
+          "beta": -0.2936,
           "rank_off": 14,
           "rank_def": 3
         },
         "Universitario": {
-          "alpha": 0.8098,
-          "beta": 0.0467,
+          "alpha": 0.819,
+          "beta": 0.0558,
           "rank_off": 1,
           "rank_def": 11
         }
@@ -3822,71 +3840,71 @@
       }
     },
     "ven.1": {
-      "n_matches": 43,
+      "n_matches": 45,
       "n_teams": 10,
-      "gamma": 0.1496,
+      "gamma": 0.1316,
       "rho": -0.2984,
-      "log_lik": -107.73,
-      "iterations": 3,
+      "log_lik": -113.2,
+      "iterations": 2,
       "teams": {
         "Anzoátegui FC": {
-          "alpha": -0.2469,
-          "beta": -0.662,
+          "alpha": -0.2224,
+          "beta": -0.5815,
           "rank_off": 9,
           "rank_def": 2
         },
         "Carabobo": {
-          "alpha": 0.0839,
-          "beta": 0.5327,
+          "alpha": 0.0969,
+          "beta": 0.5307,
           "rank_off": 4,
           "rank_def": 9
         },
         "Caracas FC": {
-          "alpha": -0.168,
-          "beta": 1.3349,
+          "alpha": -0.1679,
+          "beta": 1.3271,
           "rank_off": 8,
           "rank_def": 10
         },
         "Deportivo Táchira": {
-          "alpha": 0.5402,
-          "beta": 0.0125,
+          "alpha": 0.5159,
+          "beta": 0.0047,
           "rank_off": 1,
-          "rank_def": 7
+          "rank_def": 6
         },
         "Estudiantes de Mérida": {
-          "alpha": -0.5174,
-          "beta": -0.121,
+          "alpha": -0.5023,
+          "beta": -0.123,
           "rank_off": 10,
           "rank_def": 5
         },
         "Monagas SC": {
-          "alpha": -0.1041,
-          "beta": -0.1999,
+          "alpha": -0.0947,
+          "beta": -0.2019,
           "rank_off": 6,
           "rank_def": 4
         },
         "Portuguesa": {
-          "alpha": 0.1815,
-          "beta": 0.1345,
+          "alpha": 0.1909,
+          "beta": 0.1267,
           "rank_off": 3,
           "rank_def": 8
         },
         "Rayo Zuliano": {
-          "alpha": 0.3788,
-          "beta": -0.2882,
+          "alpha": 0.358,
+          "beta": -0.3203,
           "rank_off": 2,
           "rank_def": 3
         },
         "Trujillanos": {
-          "alpha": -0.1529,
-          "beta": 0.0067,
-          "rank_off": 7,
-          "rank_def": 6
+          "alpha": -0.0553,
+          "beta": 0.0047,
+          "rank_off": 5,
+          "rank_def": 7
         },
         "Zamora FC": {
-          "alpha": 0.005,
-          "beta": -0.7502,
-          "rank_off": 5,
+          "alpha": -0.1191,
+          "beta": -0.7673,
+          "rank_off": 7,
           "rank_def": 1
         }
       }
