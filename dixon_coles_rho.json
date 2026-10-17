@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-17T03:03:26Z",
+  "generated_at": "2026-10-17T07:38:00Z",
   "method": "Dixon-Coles MLE grid search (ρ ∈ [-0.30, 0.10] step 0.005), λ_h, λ_a fixés à moyenne empirique par ligue. CI 95% via LR test.",
   "min_matches": 40,
   "default_rho": -0.13,
@@ -60,12 +60,12 @@
       "lambda_a": 0.988
     },
     "aus.1": {
-      "n": 14,
+      "n": 15,
       "rho_measured": null,
       "rho_literature": -0.12,
       "rho_used": -0.12,
       "source": "literature_fallback",
-      "reason": "n=14 < 40"
+      "reason": "n=15 < 40"
     },
     "aut.1": {
       "n": 61,
@@ -737,17 +737,17 @@
       "reason": "n=3 < 40"
     },
     "jpn.1": {
-      "n": 150,
-      "rho_measured": 0.005,
+      "n": 154,
+      "rho_measured": -0.015,
       "rho_literature": -0.12,
       "rho_used": -0.12,
       "source": "literature_fallback",
-      "reason": "CI trop large (0.285) ou fit nul",
-      "log_lik": -451.89,
-      "ci_lo": -0.185,
+      "reason": "CI trop large (0.300) ou fit nul",
+      "log_lik": -465.82,
+      "ci_lo": -0.2,
       "ci_hi": 0.1,
-      "lambda_h": 1.507,
-      "lambda_a": 1.333
+      "lambda_h": 1.5,
+      "lambda_a": 1.338
     },
     "laliga2": {
       "n": 10,
