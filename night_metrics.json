@@ -1,32 +1,32 @@
 {
-  "generated_at": "2026-10-21T18:58:20Z",
-  "calculated_at": "2026-10-21T18:58:20Z",
+  "generated_at": "2026-10-21T22:04:52Z",
+  "calculated_at": "2026-10-21T22:04:52Z",
   "source_of_truth": "data.js",
-  "data_generated_at": "2026-10-21T18:57:29.617614Z",
+  "data_generated_at": "2026-10-21T22:03:43.507048Z",
   "data_today_field": "2026-10-21",
   "events": {
-    "total": 14,
-    "upcoming": 3,
-    "winamax_available": 14,
+    "total": 5,
+    "upcoming": 5,
+    "winamax_available": 5,
     "winamax_exact": 0,
     "winamax_exact_ratio": 0.0,
     "markets_more_than_1n2": 0,
     "form_l10": 2,
-    "h2h": 2,
+    "h2h": 0,
     "lineups": 0,
     "football_lineups": 0,
     "starter_signals": 0,
-    "clubelo": 6,
-    "weather": 9,
+    "clubelo": 2,
+    "weather": 2,
     "injuries": 0,
     "referee": 1,
     "referee_named": 0,
     "referee_context": 1,
     "referee_signal": 1,
-    "fd_calibration": 1,
+    "fd_calibration": 0,
     "fd_closing_odds": 0,
-    "xg": 3,
-    "smart_money": 1
+    "xg": 2,
+    "smart_money": 0
   },
   "signal_health": {
     "referee": {
@@ -36,7 +36,7 @@
       "note": "referee is effective coverage: named referee or referee_context usable by the model."
     },
     "smart_money": {
-      "events": 1,
+      "events": 0,
       "status": "rare_event",
       "note": "Smart money is intentionally rare; low count is OK when odds movement does not confirm a strong signal."
     }
@@ -49,7 +49,7 @@
     "recommended_detail_fetch_cap": 220,
     "detail_by_sport": {
       "football": {
-        "exact": 2,
+        "exact": 4,
         "detailed": 0,
         "families": {},
         "detailed_ratio": 0.0
@@ -76,7 +76,7 @@
   },
   "health": {
     "status": "warning",
-    "warnings": 14,
+    "warnings": 15,
     "pipeline_drift": "warn"
   }
 }
