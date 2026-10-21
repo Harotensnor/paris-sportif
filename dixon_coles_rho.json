@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-21T14:47:34Z",
+  "generated_at": "2026-10-21T18:58:26Z",
   "method": "Dixon-Coles MLE grid search (ρ ∈ [-0.30, 0.10] step 0.005), λ_h, λ_a fixés à moyenne empirique par ligue. CI 95% via LR test.",
   "min_matches": 40,
   "default_rho": -0.13,
@@ -147,17 +147,17 @@
       "reason": "n=6 < 40"
     },
     "caf.champions": {
-      "n": 75,
+      "n": 76,
       "rho_measured": 0.02,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "CI trop large (0.360) ou fit nul",
-      "log_lik": -211.71,
-      "ci_lo": -0.26,
+      "reason": "CI trop large (0.355) ou fit nul",
+      "log_lik": -216.3,
+      "ci_lo": -0.255,
       "ci_hi": 0.1,
-      "lambda_h": 1.213,
-      "lambda_a": 0.84
+      "lambda_h": 1.25,
+      "lambda_a": 0.842
     },
     "campeonatonacionalwo": {
       "n": 1,
@@ -1219,17 +1219,17 @@
       "reason": "n=2 < 40"
     },
     "uefa.champions": {
-      "n": 48,
+      "n": 50,
       "rho_measured": 0.1,
       "rho_literature": -0.1,
       "rho_used": -0.1,
       "source": "literature_fallback",
-      "reason": "CI trop large (0.285) ou fit nul",
-      "log_lik": -168.47,
-      "ci_lo": -0.185,
+      "reason": "CI trop large (0.280) ou fit nul",
+      "log_lik": -175.77,
+      "ci_lo": -0.18,
       "ci_hi": 0.1,
-      "lambda_h": 2.5,
-      "lambda_a": 1.667
+      "lambda_h": 2.52,
+      "lambda_a": 1.7
     },
     "uefa.europa": {
       "n": 41,
