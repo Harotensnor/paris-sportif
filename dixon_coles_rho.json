@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-22T18:51:34Z",
+  "generated_at": "2026-10-22T21:58:36Z",
   "method": "Dixon-Coles MLE grid search (ρ ∈ [-0.30, 0.10] step 0.005), λ_h, λ_a fixés à moyenne empirique par ligue. CI 95% via LR test.",
   "min_matches": 40,
   "default_rho": -0.13,
@@ -1232,25 +1232,30 @@
       "lambda_a": 1.614
     },
     "uefa.europa": {
-      "n": 49,
-      "rho_measured": 0.06,
+      "n": 59,
+      "rho_measured": 0.1,
       "rho_literature": -0.12,
       "rho_used": -0.12,
       "source": "literature_fallback",
-      "reason": "CI trop large (0.390) ou fit nul",
-      "log_lik": -156.57,
-      "ci_lo": -0.29,
+      "reason": "CI trop large (0.325) ou fit nul",
+      "log_lik": -191.72,
+      "ci_lo": -0.225,
       "ci_hi": 0.1,
-      "lambda_h": 1.571,
-      "lambda_a": 1.408
+      "lambda_h": 1.542,
+      "lambda_a": 1.525
     },
     "uefa.europa.conf": {
-      "n": 32,
-      "rho_measured": null,
+      "n": 40,
+      "rho_measured": -0.015,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "n=32 < 40"
+      "reason": "CI trop large (0.400) ou fit nul",
+      "log_lik": -120.46,
+      "ci_lo": -0.3,
+      "ci_hi": 0.1,
+      "lambda_h": 1.575,
+      "lambda_a": 1.325
     },
     "uefa.nations": {
       "n": 97,
