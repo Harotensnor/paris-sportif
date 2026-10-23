@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-10-23T14:33:38Z",
+  "generated_at": "2026-10-23T18:39:33Z",
   "method": "Dixon-Coles MLE grid search (ρ ∈ [-0.30, 0.10] step 0.005), λ_h, λ_a fixés à moyenne empirique par ligue. CI 95% via LR test.",
   "min_matches": 40,
   "default_rho": -0.13,
   "n_leagues": 144,
-  "n_measured": 4,
+  "n_measured": 3,
   "leagues": {
     "1lig": {
       "n": 4,
@@ -147,17 +147,17 @@
       "reason": "n=6 < 40"
     },
     "caf.champions": {
-      "n": 76,
-      "rho_measured": 0.02,
+      "n": 77,
+      "rho_measured": 0.025,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
       "reason": "CI trop large (0.355) ou fit nul",
-      "log_lik": -216.3,
+      "log_lik": -219.49,
       "ci_lo": -0.255,
       "ci_hi": 0.1,
-      "lambda_h": 1.25,
-      "lambda_a": 0.842
+      "lambda_h": 1.273,
+      "lambda_a": 0.831
     },
     "campeonatonacionalwo": {
       "n": 1,
@@ -608,17 +608,17 @@
       "lambda_a": 1.407
     },
     "ger.2": {
-      "n": 100,
-      "rho_measured": 0.1,
+      "n": 102,
+      "rho_measured": 0.085,
       "rho_literature": -0.11,
-      "rho_used": 0.1,
-      "source": "measured",
-      "reason": "MLE n=100, CI95=[-0.085, 0.100]",
-      "log_lik": -312.11,
-      "ci_lo": -0.085,
+      "rho_used": -0.11,
+      "source": "literature_fallback",
+      "reason": "CI trop large (0.225) ou fit nul",
+      "log_lik": -317.75,
+      "ci_lo": -0.125,
       "ci_hi": 0.1,
-      "lambda_h": 1.79,
-      "lambda_a": 1.28
+      "lambda_h": 1.765,
+      "lambda_a": 1.265
     },
     "ger.dfb_pokal": {
       "n": 7,
@@ -1047,17 +1047,17 @@
       "reason": "n=1 < 40"
     },
     "rus.1": {
-      "n": 107,
-      "rho_measured": -0.145,
+      "n": 108,
+      "rho_measured": -0.125,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "CI trop large (0.385) ou fit nul",
-      "log_lik": -306.55,
+      "reason": "CI trop large (0.400) ou fit nul",
+      "log_lik": -309.21,
       "ci_lo": -0.3,
-      "ci_hi": 0.085,
-      "lambda_h": 1.43,
-      "lambda_a": 1.29
+      "ci_hi": 0.1,
+      "lambda_h": 1.417,
+      "lambda_a": 1.287
     },
     "saudiproleague": {
       "n": 2,
