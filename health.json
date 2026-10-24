@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-10-24T08:19:18Z",
-  "calculated_at": "2026-10-24T08:19:18Z",
+  "generated_at": "2026-10-24T12:49:38Z",
+  "calculated_at": "2026-10-24T12:49:38Z",
   "source_of_truth": "data.js",
   "data_age_min": 1,
   "data_file_age_min": 0,
@@ -71,19 +71,27 @@
     "h2h_extended": {
       "age_min": 5,
       "events": 8,
-      "events_with_meetings": 6,
-      "meetings": 30,
-      "coverage_pct": 75.0,
-      "empty_events": 2,
-      "sports": 1,
+      "events_with_meetings": 5,
+      "meetings": 25,
+      "coverage_pct": 62.5,
+      "empty_events": 3,
+      "sports": 2,
       "by_sport": {
         "football": {
-          "events": 8,
-          "events_with_meetings": 6,
-          "meetings": 30,
+          "events": 7,
+          "events_with_meetings": 5,
+          "meetings": 25,
           "sources": {
-            "seasonseries": 6,
+            "seasonseries": 5,
             "espn_summary_empty": 2
+          }
+        },
+        "tennis": {
+          "events": 1,
+          "events_with_meetings": 0,
+          "meetings": 0,
+          "sources": {
+            "espn_summary_empty": 1
           }
         }
       }
@@ -144,20 +152,20 @@
     "league_bias_audit": {
       "age_min": 0,
       "leagues": 51,
-      "deprioritize": 1,
-      "watch": 14,
+      "deprioritize": 2,
+      "watch": 15,
       "trusted": 13,
-      "risky_current_leagues": 0,
-      "risky_current_events": 0,
+      "risky_current_leagues": 1,
+      "risky_current_events": 1,
       "current_deprioritize_events": 0,
-      "current_watch_events": 0
+      "current_watch_events": 1
     },
     "league_inefficiencies": {
       "age_min": 0,
       "leagues": 40,
       "exploit": 24,
-      "avoid": 5,
-      "current_exploit_events": 2
+      "avoid": 6,
+      "current_exploit_events": 1
     },
     "market_biases_by_league": {
       "age_min": 0,
@@ -182,7 +190,7 @@
     },
     "team_priors": {
       "age_min": 5,
-      "teams": 6304,
+      "teams": 6305,
       "leagues": 404,
       "decay_k": 0.05,
       "max_matches": 20
@@ -291,7 +299,7 @@
       "age_min": 5,
       "insights": 6,
       "events_today": 1,
-      "events_next_36h": 2,
+      "events_next_36h": 1,
       "sources_loaded": 8
     },
     "detected_angles": {
@@ -358,8 +366,8 @@
     },
     "public_team_profiles": {
       "age_min": 0,
-      "teams": 1055,
-      "upcoming": 6,
+      "teams": 1057,
+      "upcoming": 8,
       "availability": 64,
       "deep_context": 0
     },
@@ -397,7 +405,7 @@
     },
     "tennis_challenger_watchlist": {
       "age_min": 0,
-      "bookable": 1,
+      "bookable": 2,
       "watchlist": 40,
       "itf": 692,
       "challenger_like": 92,
@@ -432,10 +440,10 @@
     },
     "clv_history": {
       "age_min": 5,
-      "matches": 3948,
-      "observations": 10466,
-      "mean_clv_pct": -0.1,
-      "positive_clv_rate": 36.5,
+      "matches": 4121,
+      "observations": 10932,
+      "mean_clv_pct": -0.09,
+      "positive_clv_rate": 35.6,
       "sample_status": "validated"
     }
   },
@@ -1015,13 +1023,13 @@
   ],
   "overall": "warning",
   "quality_checks": {
-    "data_generated_at": "2026-10-24T08:18:12.056340Z",
+    "data_generated_at": "2026-10-24T12:48:31.512489Z",
     "truth_scope": "all_events",
-    "all_winamax_available": 5,
+    "all_winamax_available": 6,
     "all_winamax_exact": 0,
     "all_winamax_exact_ratio": 0.0,
     "quality_scope": "upcoming_uncompleted_events",
-    "total_events": 5,
+    "total_events": 6,
     "upcoming_events": 5,
     "winamax_available": 5,
     "winamax_exact": 0,
@@ -1034,25 +1042,25 @@
     "winamax_detail_status": "urgent",
     "actionable_external_odds": 0,
     "football_invalid_form": 0,
-    "events_with_xg": 2,
+    "events_with_xg": 1,
     "winamax_coverage": {
       "by_sport": {
         "football": {
-          "upcoming": 4,
-          "available": 4,
+          "upcoming": 3,
+          "available": 3,
           "exact": 0,
           "detailed": 0,
-          "tournament_only": 4,
+          "tournament_only": 3,
           "missing": 0,
           "exact_ratio": 0.0,
           "detailed_ratio": null
         },
         "tennis": {
-          "upcoming": 1,
-          "available": 1,
+          "upcoming": 2,
+          "available": 2,
           "exact": 0,
           "detailed": 0,
-          "tournament_only": 1,
+          "tournament_only": 2,
           "missing": 0,
           "exact_ratio": 0.0,
           "detailed_ratio": null
@@ -1066,8 +1074,8 @@
   "data_truth": {
     "source_of_truth": "data.js",
     "scope": "all_events",
-    "data_generated_at": "2026-10-24T08:18:12.056340Z",
-    "winamax_available": 5,
+    "data_generated_at": "2026-10-24T12:48:31.512489Z",
+    "winamax_available": 6,
     "winamax_exact": 0,
     "winamax_exact_ratio": 0.0,
     "quality_scope": "upcoming_uncompleted_events",
@@ -1086,7 +1094,7 @@
     "anomalies_emitted": 8
   },
   "source_health": {
-    "generated_at": "2026-10-24T08:19:18Z",
+    "generated_at": "2026-10-24T12:49:38Z",
     "sources_total": 11,
     "sources_ok": 4,
     "sources_warning": 6,
@@ -1169,7 +1177,7 @@
       "team_priors": {
         "score": 100,
         "status": "ok",
-        "items": 6304,
+        "items": 6305,
         "age_min": 6,
         "sla_min": 1440,
         "issues": 1
@@ -1186,7 +1194,7 @@
   },
   "observability": {
     "pipeline_traces": {
-      "generated_at": "2026-10-24T08:19:18Z",
+      "generated_at": "2026-10-24T12:49:38Z",
       "runs_observed": 99,
       "by_status": {
         "warning": 71,
@@ -1205,14 +1213,14 @@
     }
   },
   "data_lineage": {
-    "generated_at": "2026-10-24T08:19:18Z",
+    "generated_at": "2026-10-24T12:49:38Z",
     "status": "ok",
-    "events": 5,
+    "events": 6,
     "events_missing_inline_lineage": 0,
     "coverage_pct": 100.0,
     "source_counts": {
-      "espn": 5,
-      "winamax": 5,
+      "espn": 6,
+      "winamax": 6,
       "weather": 4,
       "h2h": 3,
       "xg": 2,
@@ -1243,6 +1251,15 @@
           "weather",
           "winamax",
           "xg"
+        ]
+      },
+      {
+        "event_id": "185137",
+        "sport": "tennis",
+        "league": "swissindoorsbasel",
+        "lineage": [
+          "espn",
+          "winamax"
         ]
       },
       {
