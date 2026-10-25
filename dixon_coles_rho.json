@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-25T13:20:56Z",
+  "generated_at": "2026-10-25T14:05:37Z",
   "method": "Dixon-Coles MLE grid search (ρ ∈ [-0.30, 0.10] step 0.005), λ_h, λ_a fixés à moyenne empirique par ligue. CI 95% via LR test.",
   "min_matches": 40,
   "default_rho": -0.13,
@@ -679,12 +679,17 @@
       "reason": "n=2 < 40"
     },
     "ind.1": {
-      "n": 39,
-      "rho_measured": null,
+      "n": 40,
+      "rho_measured": -0.3,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "n=39 < 40"
+      "reason": "CI trop large (0.220) ou fit nul",
+      "log_lik": -114.46,
+      "ci_lo": -0.3,
+      "ci_hi": -0.08,
+      "lambda_h": 1.25,
+      "lambda_a": 1.25
     },
     "indonesiasuperleague": {
       "n": 1,
@@ -695,17 +700,17 @@
       "reason": "n=1 < 40"
     },
     "ita.1": {
-      "n": 121,
+      "n": 122,
       "rho_measured": -0.04,
       "rho_literature": -0.18,
       "rho_used": -0.18,
       "source": "literature_fallback",
       "reason": "CI trop large (0.360) ou fit nul",
-      "log_lik": -363.43,
+      "log_lik": -365.89,
       "ci_lo": -0.26,
       "ci_hi": 0.1,
-      "lambda_h": 1.438,
-      "lambda_a": 1.347
+      "lambda_h": 1.443,
+      "lambda_a": 1.344
     },
     "ita.2": {
       "n": 105,
@@ -1068,17 +1073,17 @@
       "reason": "n=2 < 40"
     },
     "sco.1": {
-      "n": 81,
+      "n": 82,
       "rho_measured": 0.1,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
       "reason": "CI trop large (0.235) ou fit nul",
-      "log_lik": -251.49,
+      "log_lik": -254.04,
       "ci_lo": -0.135,
       "ci_hi": 0.1,
-      "lambda_h": 1.568,
-      "lambda_a": 1.37
+      "lambda_h": 1.561,
+      "lambda_a": 1.378
     },
     "scottishpremiership": {
       "n": 2,
