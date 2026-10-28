@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-10-28T16:21:01Z",
+  "generated_at": "2026-10-28T21:13:25Z",
   "method": "Dixon-Coles MLE grid search (ρ ∈ [-0.30, 0.10] step 0.005), λ_h, λ_a fixés à moyenne empirique par ligue. CI 95% via LR test.",
   "min_matches": 40,
   "default_rho": -0.13,
   "n_leagues": 144,
-  "n_measured": 5,
+  "n_measured": 4,
   "leagues": {
     "1lig": {
       "n": 4,
@@ -31,17 +31,17 @@
       "reason": "n=8 < 40"
     },
     "afc.champions": {
-      "n": 43,
-      "rho_measured": 0.065,
+      "n": 45,
+      "rho_measured": 0.03,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "CI trop large (0.370) ou fit nul",
-      "log_lik": -133.21,
-      "ci_lo": -0.27,
+      "reason": "CI trop large (0.395) ou fit nul",
+      "log_lik": -138.42,
+      "ci_lo": -0.295,
       "ci_hi": 0.1,
-      "lambda_h": 1.767,
-      "lambda_a": 1.116
+      "lambda_h": 1.778,
+      "lambda_a": 1.089
     },
     "allsvenskan": {
       "n": 21,
@@ -626,12 +626,12 @@
       "lambda_a": 1.211
     },
     "ger.dfb_pokal": {
-      "n": 15,
+      "n": 19,
       "rho_measured": null,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "n=15 < 40"
+      "reason": "n=19 < 40"
     },
     "gre.1": {
       "n": 77,
@@ -684,17 +684,17 @@
       "reason": "n=2 < 40"
     },
     "ind.1": {
-      "n": 42,
+      "n": 43,
       "rho_measured": -0.3,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "CI trop large (0.235) ou fit nul",
-      "log_lik": -119.33,
+      "reason": "CI trop large (0.215) ou fit nul",
+      "log_lik": -121.11,
       "ci_lo": -0.3,
-      "ci_hi": -0.065,
-      "lambda_h": 1.214,
-      "lambda_a": 1.19
+      "ci_hi": -0.085,
+      "lambda_h": 1.209,
+      "lambda_a": 1.186
     },
     "indonesiasuperleague": {
       "n": 1,
@@ -705,30 +705,30 @@
       "reason": "n=1 < 40"
     },
     "ita.1": {
-      "n": 129,
-      "rho_measured": -0.02,
+      "n": 132,
+      "rho_measured": -0.045,
       "rho_literature": -0.18,
       "rho_used": -0.18,
       "source": "literature_fallback",
-      "reason": "CI trop large (0.330) ou fit nul",
-      "log_lik": -395.82,
-      "ci_lo": -0.23,
+      "reason": "CI trop large (0.350) ou fit nul",
+      "log_lik": -406.08,
+      "ci_lo": -0.25,
       "ci_hi": 0.1,
-      "lambda_h": 1.457,
-      "lambda_a": 1.419
+      "lambda_h": 1.439,
+      "lambda_a": 1.432
     },
     "ita.2": {
-      "n": 114,
-      "rho_measured": -0.08,
+      "n": 117,
+      "rho_measured": -0.055,
       "rho_literature": -0.16,
       "rho_used": -0.16,
       "source": "literature_fallback",
-      "reason": "CI trop large (0.400) ou fit nul",
-      "log_lik": -331.06,
-      "ci_lo": -0.3,
+      "reason": "CI trop large (0.375) ou fit nul",
+      "log_lik": -340.6,
+      "ci_lo": -0.275,
       "ci_hi": 0.1,
-      "lambda_h": 1.447,
-      "lambda_a": 1.211
+      "lambda_h": 1.453,
+      "lambda_a": 1.222
     },
     "ita.coppa_italia": {
       "n": 27,
@@ -943,17 +943,17 @@
       "lambda_a": 1.086
     },
     "per.1": {
-      "n": 89,
+      "n": 91,
       "rho_measured": 0.1,
       "rho_literature": -0.13,
       "rho_used": 0.1,
       "source": "measured",
-      "reason": "MLE n=89, CI95=[-0.075, 0.100]",
-      "log_lik": -269.02,
+      "reason": "MLE n=91, CI95=[-0.075, 0.100]",
+      "log_lik": -275.12,
       "ci_lo": -0.075,
       "ci_hi": 0.1,
-      "lambda_h": 1.674,
-      "lambda_a": 1.292
+      "lambda_h": 1.67,
+      "lambda_a": 1.297
     },
     "por.1": {
       "n": 101,
@@ -1163,17 +1163,17 @@
       "reason": "n=1 < 40"
     },
     "swe.1": {
-      "n": 122,
+      "n": 126,
       "rho_measured": 0.1,
       "rho_literature": -0.11,
-      "rho_used": 0.1,
-      "source": "measured",
-      "reason": "MLE n=122, CI95=[-0.070, 0.100]",
-      "log_lik": -379.34,
-      "ci_lo": -0.07,
+      "rho_used": -0.11,
+      "source": "literature_fallback",
+      "reason": "CI trop large (0.205) ou fit nul",
+      "log_lik": -392.26,
+      "ci_lo": -0.105,
       "ci_hi": 0.1,
-      "lambda_h": 1.525,
-      "lambda_a": 1.279
+      "lambda_h": 1.484,
+      "lambda_a": 1.294
     },
     "tha.1": {
       "n": 18,
