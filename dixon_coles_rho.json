@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-10-29T16:33:52Z",
+  "generated_at": "2026-10-29T21:20:42Z",
   "method": "Dixon-Coles MLE grid search (ρ ∈ [-0.30, 0.10] step 0.005), λ_h, λ_a fixés à moyenne empirique par ligue. CI 95% via LR test.",
   "min_matches": 40,
   "default_rho": -0.13,
   "n_leagues": 144,
-  "n_measured": 4,
+  "n_measured": 5,
   "leagues": {
     "1lig": {
       "n": 4,
@@ -510,12 +510,17 @@
       "lambda_a": 1.223
     },
     "esp.copa_del_rey": {
-      "n": 38,
-      "rho_measured": null,
+      "n": 53,
+      "rho_measured": 0.1,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "n=38 < 40"
+      "reason": "CI trop large (0.220) ou fit nul",
+      "log_lik": -188.65,
+      "ci_lo": -0.12,
+      "ci_hi": 0.1,
+      "lambda_h": 1.453,
+      "lambda_a": 2.057
     },
     "ettannorra": {
       "n": 1,
@@ -705,17 +710,17 @@
       "reason": "n=1 < 40"
     },
     "ita.1": {
-      "n": 132,
+      "n": 133,
       "rho_measured": -0.045,
       "rho_literature": -0.18,
       "rho_used": -0.18,
       "source": "literature_fallback",
       "reason": "CI trop large (0.350) ou fit nul",
-      "log_lik": -406.08,
+      "log_lik": -411.52,
       "ci_lo": -0.25,
       "ci_hi": 0.1,
-      "lambda_h": 1.439,
-      "lambda_a": 1.432
+      "lambda_h": 1.466,
+      "lambda_a": 1.429
     },
     "ita.2": {
       "n": 117,
@@ -943,17 +948,17 @@
       "lambda_a": 1.086
     },
     "per.1": {
-      "n": 91,
+      "n": 92,
       "rho_measured": 0.1,
       "rho_literature": -0.13,
       "rho_used": 0.1,
       "source": "measured",
-      "reason": "MLE n=91, CI95=[-0.075, 0.100]",
-      "log_lik": -275.12,
-      "ci_lo": -0.075,
+      "reason": "MLE n=92, CI95=[-0.060, 0.100]",
+      "log_lik": -277.67,
+      "ci_lo": -0.06,
       "ci_hi": 0.1,
-      "lambda_h": 1.67,
-      "lambda_a": 1.297
+      "lambda_h": 1.652,
+      "lambda_a": 1.293
     },
     "por.1": {
       "n": 101,
@@ -1163,17 +1168,17 @@
       "reason": "n=1 < 40"
     },
     "swe.1": {
-      "n": 126,
+      "n": 129,
       "rho_measured": 0.1,
       "rho_literature": -0.11,
-      "rho_used": -0.11,
-      "source": "literature_fallback",
-      "reason": "CI trop large (0.205) ou fit nul",
-      "log_lik": -392.26,
-      "ci_lo": -0.105,
+      "rho_used": 0.1,
+      "source": "measured",
+      "reason": "MLE n=129, CI95=[-0.090, 0.100]",
+      "log_lik": -399.89,
+      "ci_lo": -0.09,
       "ci_hi": 0.1,
-      "lambda_h": 1.484,
-      "lambda_a": 1.294
+      "lambda_h": 1.473,
+      "lambda_a": 1.287
     },
     "tha.1": {
       "n": 18,
