@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-10-31T04:11:31Z",
-  "calculated_at": "2026-10-31T04:11:31Z",
+  "generated_at": "2026-10-31T10:27:14Z",
+  "calculated_at": "2026-10-31T10:27:14Z",
   "source_of_truth": "data.js",
-  "data_generated_at": "2026-10-31T04:10:39.174033Z",
+  "data_generated_at": "2026-10-31T10:26:15.916422Z",
   "data_today_field": "2026-10-31",
   "events": {
     "total": 10,
@@ -26,7 +26,7 @@
     "fd_calibration": 1,
     "fd_closing_odds": 0,
     "xg": 4,
-    "smart_money": 0
+    "smart_money": 1
   },
   "signal_health": {
     "referee": {
@@ -36,7 +36,7 @@
       "note": "referee is effective coverage: named referee or referee_context usable by the model."
     },
     "smart_money": {
-      "events": 0,
+      "events": 1,
       "status": "rare_event",
       "note": "Smart money is intentionally rare; low count is OK when odds movement does not confirm a strong signal."
     }
@@ -64,12 +64,12 @@
     "market_family_counts": {}
   },
   "backtest": {
-    "overall_roi_pct": 10.36,
+    "overall_roi_pct": 9.87,
     "overall_brier": 0.2205,
     "by_sport_roi_pct": {
-      "baseball": 10.85,
-      "basketball": -15.01,
-      "football": 10.47,
+      "baseball": 9.54,
+      "basketball": -16.22,
+      "football": 10.0,
       "hockey": 23.64
     },
     "cold_sports": [
@@ -78,7 +78,7 @@
   },
   "health": {
     "status": "warning",
-    "warnings": 15,
+    "warnings": 14,
     "pipeline_drift": "warn"
   }
 }
