@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-03T22:31:00Z",
-  "calculated_at": "2026-11-03T22:31:00Z",
+  "generated_at": "2026-11-04T02:35:14Z",
+  "calculated_at": "2026-11-04T02:35:14Z",
   "source_of_truth": "data.js",
   "data_age_min": 0,
   "data_file_age_min": 0,
@@ -35,10 +35,10 @@
     },
     "weather": {
       "age_min": 0,
-      "events": 12436
+      "events": 12461
     },
     "referees_soccer": {
-      "age_min": 6,
+      "age_min": 7,
       "events": 106,
       "status": "retained_existing_referees"
     },
@@ -172,7 +172,7 @@
     },
     "team_priors": {
       "age_min": 7,
-      "teams": 6469,
+      "teams": 6479,
       "leagues": 406,
       "decay_k": 0.05,
       "max_matches": 20
@@ -279,9 +279,9 @@
     },
     "daily_insights": {
       "age_min": 7,
-      "insights": 5,
+      "insights": 3,
       "events_today": 1,
-      "events_next_36h": 1,
+      "events_next_36h": 0,
       "sources_loaded": 8
     },
     "detected_angles": {
@@ -320,10 +320,10 @@
     },
     "injuries_multisport": {
       "age_min": 7,
-      "teams": 133,
+      "teams": 134,
       "sports": 4,
       "injuries": 618,
-      "severe": 452
+      "severe": 457
     },
     "thesportsdb_meta": {
       "age_min": 7,
@@ -422,10 +422,10 @@
     },
     "clv_history": {
       "age_min": 7,
-      "matches": 4215,
-      "observations": 11185,
+      "matches": 4252,
+      "observations": 11277,
       "mean_clv_pct": -0.07,
-      "positive_clv_rate": 35.8,
+      "positive_clv_rate": 35.7,
       "sample_status": "validated"
     }
   },
@@ -489,7 +489,7 @@
     "referees_soccer": {
       "script": "scripts/fetch_referees_soccer.py",
       "output": "referees_soccer.json",
-      "age_min": 6,
+      "age_min": 7,
       "threshold_min": 480,
       "fast_red_min": null,
       "status": "ok"
@@ -1004,7 +1004,7 @@
   ],
   "overall": "warning",
   "quality_checks": {
-    "data_generated_at": "2026-11-03T22:30:07.711999Z",
+    "data_generated_at": "2026-11-04T02:34:26.403872Z",
     "truth_scope": "all_events",
     "all_winamax_available": 12,
     "all_winamax_exact": 0,
@@ -1055,7 +1055,7 @@
   "data_truth": {
     "source_of_truth": "data.js",
     "scope": "all_events",
-    "data_generated_at": "2026-11-03T22:30:07.711999Z",
+    "data_generated_at": "2026-11-04T02:34:26.403872Z",
     "winamax_available": 12,
     "winamax_exact": 0,
     "winamax_exact_ratio": 0.0,
@@ -1068,26 +1068,26 @@
     "status": "critical",
     "schema_version": 2,
     "sources_validated": 11,
-    "sources_ok": 2,
-    "sources_warning": 8,
+    "sources_ok": 4,
+    "sources_warning": 6,
     "sources_critical": 1,
-    "quarantine_records": 10,
-    "anomalies_emitted": 10
+    "quarantine_records": 8,
+    "anomalies_emitted": 8
   },
   "source_health": {
-    "generated_at": "2026-11-03T22:31:00Z",
+    "generated_at": "2026-11-04T02:35:14Z",
     "sources_total": 11,
-    "sources_ok": 2,
-    "sources_warning": 8,
+    "sources_ok": 4,
+    "sources_warning": 6,
     "sources_critical": 1,
-    "source_health_avg": 89.3,
+    "source_health_avg": 90.9,
     "source_health_min": 49,
     "by_source": {
       "winamax_catalog": {
         "score": 92,
         "status": "warning",
         "items": 600,
-        "age_min": 7,
+        "age_min": 8,
         "sla_min": 15,
         "issues": 2
       },
@@ -1103,7 +1103,7 @@
         "score": 49,
         "status": "warning",
         "items": 0,
-        "age_min": 7,
+        "age_min": 8,
         "sla_min": 180,
         "issues": 3
       },
@@ -1111,7 +1111,7 @@
         "score": 92,
         "status": "warning",
         "items": 97,
-        "age_min": 7,
+        "age_min": 8,
         "sla_min": 180,
         "issues": 2
       },
@@ -1126,7 +1126,7 @@
       "weather": {
         "score": 100,
         "status": "ok",
-        "items": 12436,
+        "items": 12461,
         "age_min": 1,
         "sla_min": 60,
         "issues": 1
@@ -1135,7 +1135,7 @@
         "score": 92,
         "status": "warning",
         "items": 192,
-        "age_min": 7,
+        "age_min": 8,
         "sla_min": 300,
         "issues": 1
       },
@@ -1143,7 +1143,7 @@
         "score": 92,
         "status": "warning",
         "items": 594,
-        "age_min": 7,
+        "age_min": 8,
         "sla_min": 1440,
         "issues": 2
       },
@@ -1151,50 +1151,50 @@
         "score": 92,
         "status": "warning",
         "items": 1941,
-        "age_min": 7,
+        "age_min": 8,
         "sla_min": 30,
         "issues": 2
       },
       "team_priors": {
-        "score": 92,
-        "status": "warning",
-        "items": 6469,
-        "age_min": 7,
+        "score": 100,
+        "status": "ok",
+        "items": 6479,
+        "age_min": 8,
         "sla_min": 1440,
-        "issues": 2
+        "issues": 1
       },
       "bayesian_priors": {
-        "score": 92,
-        "status": "warning",
+        "score": 100,
+        "status": "ok",
         "items": 3,
-        "age_min": 7,
+        "age_min": 8,
         "sla_min": 1440,
-        "issues": 2
+        "issues": 1
       }
     }
   },
   "observability": {
     "pipeline_traces": {
-      "generated_at": "2026-11-03T22:31:00Z",
+      "generated_at": "2026-11-04T02:35:14Z",
       "runs_observed": 99,
       "by_status": {
-        "warning": 75,
+        "warning": 71,
         "critical": 1,
-        "ok": 21,
+        "ok": 25,
         "missing": 2
       },
       "by_script": {
         "data_integrity_monitor.py": {
           "runs": 99,
           "errors": 3,
-          "last_status": "warning",
+          "last_status": "ok",
           "max_duration_ms": 460
         }
       }
     }
   },
   "data_lineage": {
-    "generated_at": "2026-11-03T22:31:00Z",
+    "generated_at": "2026-11-04T02:35:14Z",
     "status": "ok",
     "events": 12,
     "events_missing_inline_lineage": 0,
@@ -1311,7 +1311,7 @@
     "data": {
       "status": "critical",
       "sources_validated": 11,
-      "quarantine_records": 10,
+      "quarantine_records": 8,
       "lineage_coverage_pct": 100.0
     },
     "model": {
