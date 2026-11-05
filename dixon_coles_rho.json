@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-11-05T17:53:24Z",
+  "generated_at": "2026-11-05T23:01:36Z",
   "method": "Dixon-Coles MLE grid search (ρ ∈ [-0.30, 0.10] step 0.005), λ_h, λ_a fixés à moyenne empirique par ligue. CI 95% via LR test.",
   "min_matches": 40,
   "default_rho": -0.13,
-  "n_leagues": 144,
+  "n_leagues": 145,
   "n_measured": 6,
   "leagues": {
     "1lig": {
@@ -260,12 +260,12 @@
       "lambda_a": 1.208
     },
     "conferenceleague": {
-      "n": 1,
+      "n": 14,
       "rho_measured": null,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "n=1 < 40"
+      "reason": "n=14 < 40"
     },
     "conmebol.libertadores": {
       "n": 42,
@@ -537,6 +537,14 @@
       "rho_used": -0.13,
       "source": "literature_fallback",
       "reason": "n=2 < 40"
+    },
+    "europaleague": {
+      "n": 15,
+      "rho_measured": null,
+      "rho_literature": -0.13,
+      "rho_used": -0.13,
+      "source": "literature_fallback",
+      "reason": "n=15 < 40"
     },
     "firstdivision": {
       "n": 5,
