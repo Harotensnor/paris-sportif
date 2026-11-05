@@ -1,78 +1,26 @@
 {
-  "generated_at": "2026-11-04T22:59:50Z",
+  "generated_at": "2026-11-05T03:04:30Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 22,
+    "active_events": 19,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 26,
-      "travel_extreme": 3
+      "travel_extreme": 1,
+      "lookahead": 24
     },
     "by_decision": {
-      "abstain": 7,
-      "lean_home": 7,
+      "abstain": 6,
+      "lean_home": 5,
       "lean_away": 8
     },
-    "lean_home": 7,
+    "lean_home": 5,
     "lean_away": 8,
-    "abstain": 7,
+    "abstain": 6,
     "monitor": 0
   },
   "active": [
-    {
-      "event_id": "401909923",
-      "source_event_ids": [
-        "401909923"
-      ],
-      "kickoff": "2026-11-05T00:00Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "Washington Wizards",
-      "away": "Atlanta Hawks",
-      "match": "Washington Wizards - Atlanta Hawks",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Washington Wizards 0.15, Atlanta Hawks 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
-        "home_fade": 0.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Atlanta Hawks (-0.10)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          }
-        ]
-      }
-    },
     {
       "event_id": "401915537",
       "source_event_ids": [
@@ -432,96 +380,6 @@
             "type": "travel_extreme",
             "direction": "fade",
             "strength": 0.876
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401909931",
-      "source_event_ids": [
-        "401909931"
-      ],
-      "kickoff": "2026-11-05T02:00Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "Denver Nuggets",
-      "away": "Toronto Raptors",
-      "match": "Denver Nuggets - Toronto Raptors",
-      "decision": "lean_home",
-      "net_team": "Denver Nuggets",
-      "reason": "Toronto Raptors plus penalise par calendrier/voyage (0.50 vs 0.00)",
-      "pressure_score": 0.503,
-      "home_fade": 0.0,
-      "away_fade": 0.503,
-      "travel_score": 0.503,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "travel_extreme": 1
-      },
-      "contexts": [
-        "Deplacement estime 2162 km, decalage ~1.7h"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.176,
-        "away_score": -0.503,
-        "home_fade": 0.0,
-        "away_fade": 0.503,
-        "reason": "Direction nette: Denver Nuggets (+0.18)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.503
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401892645",
-      "source_event_ids": [
-        "401892645"
-      ],
-      "kickoff": "2026-11-05T00:30Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Florida Panthers",
-      "away": "Chicago Blackhawks",
-      "match": "Florida Panthers - Chicago Blackhawks",
-      "decision": "lean_home",
-      "net_team": "Florida Panthers",
-      "reason": "Chicago Blackhawks plus penalise par calendrier/voyage (0.44 vs 0.00)",
-      "pressure_score": 0.436,
-      "home_fade": 0.0,
-      "away_fade": 0.436,
-      "travel_score": 0.436,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "travel_extreme": 1
-      },
-      "contexts": [
-        "Deplacement estime 1873 km, decalage ~0.5h"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.152,
-        "away_score": -0.436,
-        "home_fade": 0.0,
-        "away_fade": 0.436,
-        "reason": "Direction nette: Florida Panthers (+0.15)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.436
           }
         ]
       }

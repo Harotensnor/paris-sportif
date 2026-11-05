@@ -1,45 +1,27 @@
 {
-  "generated_at": "2026-11-04T22:59:50Z",
+  "generated_at": "2026-11-05T03:04:30Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 12,
-    "actionable": 2,
-    "watch": 4,
+    "active_events": 8,
+    "actionable": 1,
+    "watch": 1,
     "risk": 6,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 5,
-      "travel_extreme": 2,
+      "injury_imbalance": 2,
+      "travel_extreme": 1,
       "signal_conflict": 1,
       "market_uncertain": 6
     },
     "by_quality": {
-      "actionable": 2,
-      "watch": 4,
+      "watch": 1,
+      "actionable": 1,
       "risk": 6
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401909927",
-      "date": "2026-11-05T01:00Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "Memphis Grizzlies",
-      "away": "Indiana Pacers",
-      "match": "Memphis Grizzlies - Indiana Pacers",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Indiana Pacers",
-      "side": null,
-      "strength": 1.0,
-      "context": "Absences severes 1-6"
-    },
     {
       "event_id": "401909935",
       "date": "2026-11-05T03:30Z",
@@ -61,42 +43,6 @@
   ],
   "active_watch": [
     {
-      "event_id": "401909929",
-      "date": "2026-11-05T01:00Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "Oklahoma City Thunder",
-      "away": "Cleveland Cavaliers",
-      "match": "Oklahoma City Thunder - Cleveland Cavaliers",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Oklahoma City Thunder",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 5-2"
-    },
-    {
-      "event_id": "401909933",
-      "date": "2026-11-05T02:30Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "San Antonio Spurs",
-      "away": "Dallas Mavericks",
-      "match": "San Antonio Spurs - Dallas Mavericks",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Dallas Mavericks",
-      "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 2-5"
-    },
-    {
       "event_id": "401909934",
       "date": "2026-11-05T03:00Z",
       "sport": "basketball",
@@ -113,24 +59,6 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 4-1"
-    },
-    {
-      "event_id": "401909931",
-      "date": "2026-11-05T02:00Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "Denver Nuggets",
-      "away": "Toronto Raptors",
-      "match": "Denver Nuggets - Toronto Raptors",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "travel_extreme",
-      "direction": "fade",
-      "team": "Toronto Raptors",
-      "side": "away",
-      "strength": 0.503,
-      "context": "Deplacement estime 2162 km, decalage ~1.7h"
     }
   ],
   "active_risk": [
