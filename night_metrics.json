@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-11-05T05:11:18Z",
-  "calculated_at": "2026-11-05T05:11:18Z",
+  "generated_at": "2026-11-05T13:12:19Z",
+  "calculated_at": "2026-11-05T13:12:19Z",
   "source_of_truth": "data.js",
-  "data_generated_at": "2026-11-05T05:08:55.213927Z",
+  "data_generated_at": "2026-11-05T13:09:57.544462Z",
   "data_today_field": "2026-11-05",
   "events": {
     "total": 261,
-    "upcoming": 218,
+    "upcoming": 208,
     "winamax_available": 261,
     "winamax_exact": 260,
     "winamax_exact_ratio": 0.9962,
@@ -17,7 +17,7 @@
     "football_lineups": 0,
     "starter_signals": 4,
     "clubelo": 103,
-    "weather": 201,
+    "weather": 202,
     "injuries": 20,
     "referee": 52,
     "referee_named": 1,
@@ -49,19 +49,19 @@
     "recommended_detail_fetch_cap": 90,
     "detail_by_sport": {
       "basketball": {
-        "exact": 6,
-        "detailed": 5,
+        "exact": 3,
+        "detailed": 2,
         "families": {
-          "basket_handicap": 5,
-          "basket_team_total": 5,
-          "basket_total": 5,
-          "dnb": 5,
-          "dnb_rows": 5,
-          "ht_1n2": 5,
-          "ht_1n2_rows": 5,
-          "match_winner": 5
+          "basket_handicap": 2,
+          "basket_team_total": 2,
+          "basket_total": 2,
+          "dnb": 2,
+          "dnb_rows": 2,
+          "ht_1n2": 2,
+          "ht_1n2_rows": 2,
+          "match_winner": 2
         },
-        "detailed_ratio": 0.8333
+        "detailed_ratio": 0.6667
       },
       "football": {
         "exact": 197,
@@ -82,64 +82,48 @@
         },
         "detailed_ratio": 0.5939
       },
-      "hockey": {
-        "exact": 2,
-        "detailed": 2,
-        "families": {
-          "btts": 2,
-          "btts_rows": 2,
-          "dnb": 2,
-          "dnb_rows": 2,
-          "double_chance": 2,
-          "match_winner": 2,
-          "ou": 2,
-          "puck_line": 2,
-          "team_total": 2
-        },
-        "detailed_ratio": 1.0
-      },
       "tennis": {
-        "exact": 13,
-        "detailed": 9,
+        "exact": 8,
+        "detailed": 4,
         "families": {
-          "match_winner": 9,
-          "tennis_games": 9,
-          "tennis_handicap": 9
+          "match_winner": 4,
+          "tennis_games": 4,
+          "tennis_handicap": 4
         },
-        "detailed_ratio": 0.6923
+        "detailed_ratio": 0.5
       }
     },
     "market_family_counts": {
-      "match_winner": 133,
-      "dnb": 124,
-      "dnb_rows": 123,
-      "ht_1n2": 122,
-      "ht_1n2_rows": 122,
-      "btts": 119,
-      "btts_rows": 119,
-      "double_chance": 119,
-      "ou": 119,
-      "team_total": 118,
+      "match_winner": 123,
+      "dnb": 119,
+      "ht_1n2": 119,
+      "ht_1n2_rows": 119,
+      "dnb_rows": 118,
+      "btts": 117,
+      "btts_rows": 117,
+      "double_chance": 117,
       "ht_ou": 117,
+      "ou": 117,
       "ou15": 117,
       "ou25": 117,
       "ou35": 117,
       "handicap": 116,
-      "tennis_games": 9,
-      "tennis_handicap": 9,
-      "basket_handicap": 5,
-      "basket_team_total": 5,
-      "basket_total": 5
+      "team_total": 116,
+      "tennis_games": 4,
+      "tennis_handicap": 4,
+      "basket_handicap": 2,
+      "basket_team_total": 2,
+      "basket_total": 2
     }
   },
   "backtest": {
-    "overall_roi_pct": 9.68,
-    "overall_brier": 0.2209,
+    "overall_roi_pct": 12.73,
+    "overall_brier": 0.219,
     "by_sport_roi_pct": {
-      "baseball": 9.81,
-      "basketball": -16.13,
-      "football": 9.74,
-      "hockey": 28.16
+      "baseball": 21.75,
+      "basketball": -12.67,
+      "football": 12.64,
+      "hockey": 36.31
     },
     "cold_sports": [
       "basketball"
