@@ -1,21 +1,20 @@
 {
-  "generated_at": "2026-11-05T03:04:30Z",
+  "generated_at": "2026-11-05T05:11:14Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 19,
+    "active_events": 18,
     "expired_sample": 0,
     "by_type": {
-      "travel_extreme": 1,
       "lookahead": 24
     },
     "by_decision": {
       "abstain": 6,
-      "lean_home": 5,
-      "lean_away": 8
+      "lean_away": 8,
+      "lean_home": 4
     },
-    "lean_home": 5,
+    "lean_home": 4,
     "lean_away": 8,
     "abstain": 6,
     "monitor": 0
@@ -329,57 +328,6 @@
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401909935",
-      "source_event_ids": [
-        "401909935"
-      ],
-      "kickoff": "2026-11-05T03:30Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "LA Clippers",
-      "away": "Miami Heat",
-      "match": "LA Clippers - Miami Heat",
-      "decision": "lean_home",
-      "net_team": "LA Clippers",
-      "reason": "Miami Heat plus penalise par calendrier/voyage (0.88 vs 0.00)",
-      "pressure_score": 0.876,
-      "home_fade": 0.0,
-      "away_fade": 0.876,
-      "travel_score": 0.876,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "travel_extreme": 1
-      },
-      "contexts": [
-        "Deplacement estime 3767 km, decalage ~2.5h"
-      ],
-      "global_resolution": {
-        "status": "abstain",
-        "net_side": null,
-        "home_score": -0.493,
-        "away_score": -0.596,
-        "home_fade": 0.8,
-        "away_fade": 0.876,
-        "reason": "Signaux opposes: LA Clippers fade 0.80, Miami Heat fade 0.88 -> prudence",
-        "detail": [
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.8
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.876
           }
         ]
       }
