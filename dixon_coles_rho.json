@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-11-06T17:09:26Z",
+  "generated_at": "2026-11-06T22:05:46Z",
   "method": "Dixon-Coles MLE grid search (ρ ∈ [-0.30, 0.10] step 0.005), λ_h, λ_a fixés à moyenne empirique par ligue. CI 95% via LR test.",
   "min_matches": 40,
   "default_rho": -0.13,
-  "n_leagues": 145,
+  "n_leagues": 147,
   "n_measured": 6,
   "leagues": {
     "1lig": {
@@ -44,12 +44,12 @@
       "lambda_a": 1.148
     },
     "allsvenskan": {
-      "n": 21,
+      "n": 22,
       "rho_measured": null,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "n=21 < 40"
+      "reason": "n=22 < 40"
     },
     "arg.1": {
       "n": 97,
@@ -143,13 +143,21 @@
       "source": "literature_fallback",
       "reason": "n=1 < 40"
     },
-    "bundesligaautriche": {
-      "n": 6,
+    "bundesliga2": {
+      "n": 2,
       "rho_measured": null,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "n=6 < 40"
+      "reason": "n=2 < 40"
+    },
+    "bundesligaautriche": {
+      "n": 7,
+      "rho_measured": null,
+      "rho_literature": -0.13,
+      "rho_used": -0.13,
+      "source": "literature_fallback",
+      "reason": "n=7 < 40"
     },
     "caf.champions": {
       "n": 91,
@@ -197,12 +205,12 @@
       "reason": "n=2 < 40"
     },
     "championship": {
-      "n": 8,
+      "n": 9,
       "rho_measured": null,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "n=8 < 40"
+      "reason": "n=9 < 40"
     },
     "championsleague": {
       "n": 10,
@@ -403,17 +411,17 @@
       "reason": "n=18 < 40"
     },
     "eng.1": {
-      "n": 141,
+      "n": 142,
       "rho_measured": -0.005,
       "rho_literature": -0.07,
       "rho_used": -0.07,
       "source": "literature_fallback",
       "reason": "CI trop large (0.300) ou fit nul",
-      "log_lik": -418.85,
+      "log_lik": -421.86,
       "ci_lo": -0.2,
       "ci_hi": 0.1,
-      "lambda_h": 1.589,
-      "lambda_a": 1.213
+      "lambda_h": 1.599,
+      "lambda_a": 1.211
     },
     "eng.2": {
       "n": 182,
@@ -475,6 +483,14 @@
       "lambda_h": 1.478,
       "lambda_a": 1.638
     },
+    "eredivisie": {
+      "n": 1,
+      "rho_measured": null,
+      "rho_literature": -0.13,
+      "rho_used": -0.13,
+      "source": "literature_fallback",
+      "reason": "n=1 < 40"
+    },
     "erovnuliliga": {
       "n": 2,
       "rho_measured": null,
@@ -484,17 +500,17 @@
       "reason": "n=2 < 40"
     },
     "esp.1": {
-      "n": 154,
-      "rho_measured": -0.065,
+      "n": 155,
+      "rho_measured": -0.085,
       "rho_literature": -0.1,
       "rho_used": -0.1,
       "source": "literature_fallback",
-      "reason": "CI trop large (0.340) ou fit nul",
-      "log_lik": -477.0,
-      "ci_lo": -0.24,
-      "ci_hi": 0.1,
-      "lambda_h": 1.701,
-      "lambda_a": 1.24
+      "reason": "CI trop large (0.350) ou fit nul",
+      "log_lik": -479.78,
+      "ci_lo": -0.255,
+      "ci_hi": 0.095,
+      "lambda_h": 1.69,
+      "lambda_a": 1.232
     },
     "esp.2": {
       "n": 164,
@@ -579,30 +595,30 @@
       "reason": "n=3 < 40"
     },
     "fra.1": {
-      "n": 109,
+      "n": 110,
       "rho_measured": -0.09,
       "rho_literature": -0.15,
       "rho_used": -0.15,
       "source": "literature_fallback",
       "reason": "CI trop large (0.390) ou fit nul",
-      "log_lik": -344.73,
+      "log_lik": -347.71,
       "ci_lo": -0.29,
       "ci_hi": 0.1,
-      "lambda_h": 1.679,
-      "lambda_a": 1.422
+      "lambda_h": 1.691,
+      "lambda_a": 1.418
     },
     "fra.2": {
-      "n": 99,
-      "rho_measured": -0.035,
+      "n": 105,
+      "rho_measured": 0.0,
       "rho_literature": -0.14,
       "rho_used": -0.14,
       "source": "literature_fallback",
-      "reason": "CI trop large (0.350) ou fit nul",
-      "log_lik": -298.28,
-      "ci_lo": -0.25,
+      "reason": "CI trop large (0.310) ou fit nul",
+      "log_lik": -317.35,
+      "ci_lo": -0.21,
       "ci_hi": 0.1,
-      "lambda_h": 1.444,
-      "lambda_a": 1.384
+      "lambda_h": 1.486,
+      "lambda_a": 1.352
     },
     "frauenbundesliga": {
       "n": 1,
@@ -1030,12 +1046,12 @@
       "reason": "n=1 < 40"
     },
     "proleague": {
-      "n": 2,
+      "n": 3,
       "rho_measured": null,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "n=2 < 40"
+      "reason": "n=3 < 40"
     },
     "proleaguerelegationr": {
       "n": 1,
@@ -1152,12 +1168,12 @@
       "reason": "n=1 < 40"
     },
     "superlig": {
-      "n": 5,
+      "n": 6,
       "rho_measured": null,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "n=5 < 40"
+      "reason": "n=6 < 40"
     },
     "superligachampionshi": {
       "n": 1,
