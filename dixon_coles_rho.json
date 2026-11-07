@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-11-07T04:42:47Z",
+  "generated_at": "2026-11-07T11:26:48Z",
   "method": "Dixon-Coles MLE grid search (ρ ∈ [-0.30, 0.10] step 0.005), λ_h, λ_a fixés à moyenne empirique par ligue. CI 95% via LR test.",
   "min_matches": 40,
   "default_rho": -0.13,
-  "n_leagues": 147,
+  "n_leagues": 148,
   "n_measured": 6,
   "leagues": {
     "1lig": {
@@ -43,6 +43,14 @@
       "lambda_h": 1.889,
       "lambda_a": 1.148
     },
+    "aleague": {
+      "n": 1,
+      "rho_measured": null,
+      "rho_literature": -0.13,
+      "rho_used": -0.13,
+      "source": "literature_fallback",
+      "reason": "n=1 < 40"
+    },
     "allsvenskan": {
       "n": 22,
       "rho_measured": null,
@@ -65,12 +73,12 @@
       "lambda_a": 1.031
     },
     "aus.1": {
-      "n": 29,
+      "n": 30,
       "rho_measured": null,
       "rho_literature": -0.12,
       "rho_used": -0.12,
       "source": "literature_fallback",
-      "reason": "n=29 < 40"
+      "reason": "n=30 < 40"
     },
     "aut.1": {
       "n": 78,
@@ -768,25 +776,25 @@
       "reason": "n=27 < 40"
     },
     "jleague": {
-      "n": 3,
+      "n": 4,
       "rho_measured": null,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "n=3 < 40"
+      "reason": "n=4 < 40"
     },
     "jpn.1": {
-      "n": 190,
-      "rho_measured": -0.05,
+      "n": 195,
+      "rho_measured": -0.065,
       "rho_literature": -0.12,
       "rho_used": -0.12,
       "source": "literature_fallback",
-      "reason": "CI trop large (0.315) ou fit nul",
-      "log_lik": -588.11,
-      "ci_lo": -0.215,
+      "reason": "CI trop large (0.330) ou fit nul",
+      "log_lik": -600.46,
+      "ci_lo": -0.23,
       "ci_hi": 0.1,
-      "lambda_h": 1.579,
-      "lambda_a": 1.342
+      "lambda_h": 1.569,
+      "lambda_a": 1.333
     },
     "laliga2": {
       "n": 10,
@@ -861,12 +869,12 @@
       "reason": "n=2 < 40"
     },
     "ligamx": {
-      "n": 23,
+      "n": 24,
       "rho_measured": null,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "n=23 < 40"
+      "reason": "n=24 < 40"
     },
     "ligaportugal2": {
       "n": 2,
