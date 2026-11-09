@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-09T13:24:32Z",
+  "generated_at": "2026-11-09T20:21:07Z",
   "method": "Dixon-Coles MLE grid search (ρ ∈ [-0.30, 0.10] step 0.005), λ_h, λ_a fixés à moyenne empirique par ligue. CI 95% via LR test.",
   "min_matches": 40,
   "default_rho": -0.13,
@@ -382,17 +382,17 @@
       "reason": "n=2 < 40"
     },
     "ecu.1": {
-      "n": 68,
+      "n": 69,
       "rho_measured": 0.1,
       "rho_literature": -0.13,
       "rho_used": 0.1,
       "source": "measured",
-      "reason": "MLE n=68, CI95=[-0.100, 0.100]",
-      "log_lik": -195.61,
+      "reason": "MLE n=69, CI95=[-0.100, 0.100]",
+      "log_lik": -198.02,
       "ci_lo": -0.1,
       "ci_hi": 0.1,
-      "lambda_h": 1.441,
-      "lambda_a": 1.118
+      "lambda_h": 1.449,
+      "lambda_a": 1.116
     },
     "egyptianpremierleagu": {
       "n": 3,
@@ -869,12 +869,12 @@
       "reason": "n=2 < 40"
     },
     "ligamx": {
-      "n": 30,
+      "n": 28,
       "rho_measured": null,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "n=30 < 40"
+      "reason": "n=28 < 40"
     },
     "ligaportugal2": {
       "n": 2,
@@ -946,17 +946,17 @@
       "lambda_a": 1.892
     },
     "nor.1": {
-      "n": 127,
-      "rho_measured": 0.0,
+      "n": 128,
+      "rho_measured": 0.02,
       "rho_literature": -0.11,
       "rho_used": -0.11,
       "source": "literature_fallback",
-      "reason": "CI trop large (0.315) ou fit nul",
-      "log_lik": -420.82,
-      "ci_lo": -0.215,
+      "reason": "CI trop large (0.295) ou fit nul",
+      "log_lik": -423.66,
+      "ci_lo": -0.195,
       "ci_hi": 0.1,
-      "lambda_h": 1.874,
-      "lambda_a": 1.614
+      "lambda_h": 1.867,
+      "lambda_a": 1.602
     },
     "nwsl": {
       "n": 1,
