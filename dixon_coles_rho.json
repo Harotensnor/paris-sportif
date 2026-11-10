@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-11-10T17:26:50Z",
+  "generated_at": "2026-11-10T22:32:27Z",
   "method": "Dixon-Coles MLE grid search (ρ ∈ [-0.30, 0.10] step 0.005), λ_h, λ_a fixés à moyenne empirique par ligue. CI 95% via LR test.",
   "min_matches": 40,
   "default_rho": -0.13,
   "n_leagues": 148,
-  "n_measured": 6,
+  "n_measured": 7,
   "leagues": {
     "1lig": {
       "n": 4,
@@ -534,17 +534,17 @@
       "lambda_a": 1.226
     },
     "esp.copa_del_rey": {
-      "n": 53,
+      "n": 59,
       "rho_measured": 0.1,
       "rho_literature": -0.13,
-      "rho_used": -0.13,
-      "source": "literature_fallback",
-      "reason": "CI trop large (0.220) ou fit nul",
-      "log_lik": -188.65,
-      "ci_lo": -0.12,
+      "rho_used": 0.1,
+      "source": "measured",
+      "reason": "MLE n=59, CI95=[-0.070, 0.100]",
+      "log_lik": -210.59,
+      "ci_lo": -0.07,
       "ci_hi": 0.1,
-      "lambda_h": 1.453,
-      "lambda_a": 2.057
+      "lambda_h": 1.356,
+      "lambda_a": 2.153
     },
     "ettannorra": {
       "n": 1,
