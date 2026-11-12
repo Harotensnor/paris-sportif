@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-11-12T17:49:36Z",
+  "generated_at": "2026-11-12T22:55:21Z",
   "method": "Full Bivariate Poisson MLE Dixon-Coles. Coordinate-descent avec golden-section search 1D. Pure Python (pas de scipy).",
   "min_matches_per_league": 40,
   "min_matches_per_team": 5,
-  "n_leagues_fit": 35,
+  "n_leagues_fit": 36,
   "leagues": {
     "arg.1": {
       "n_matches": 97,
@@ -3848,6 +3848,76 @@
           "beta": -0.1095,
           "rank_off": 2,
           "rank_def": 7
+        }
+      }
+    },
+    "uefa.nations": {
+      "n_matches": 105,
+      "n_teams": 10,
+      "gamma": 0.1147,
+      "rho": -0.2878,
+      "log_lik": -285.99,
+      "iterations": 3,
+      "teams": {
+        "Albania": {
+          "alpha": 0.2561,
+          "beta": 0.6297,
+          "rank_off": 4,
+          "rank_def": 9
+        },
+        "Belarus": {
+          "alpha": -0.1026,
+          "beta": 1.165,
+          "rank_off": 7,
+          "rank_def": 10
+        },
+        "Croatia": {
+          "alpha": 0.0402,
+          "beta": -0.5406,
+          "rank_off": 5,
+          "rank_def": 2
+        },
+        "Cyprus": {
+          "alpha": -0.0237,
+          "beta": 0.0399,
+          "rank_off": 6,
+          "rank_def": 5
+        },
+        "Czechia": {
+          "alpha": -1.0024,
+          "beta": -0.1876,
+          "rank_off": 10,
+          "rank_def": 4
+        },
+        "England": {
+          "alpha": 0.8424,
+          "beta": 0.192,
+          "rank_off": 1,
+          "rank_def": 8
+        },
+        "Finland": {
+          "alpha": 0.6845,
+          "beta": 0.1619,
+          "rank_off": 3,
+          "rank_def": 7
+        },
+        "Latvia": {
+          "alpha": -0.4463,
+          "beta": -0.4825,
+          "rank_off": 8,
+          "rank_def": 3
+        },
+        "San Marino": {
+          "alpha": -0.9873,
+          "beta": -1.0421,
+          "rank_off": 9,
+          "rank_def": 1
+        },
+        "Spain": {
+          "alpha": 0.7391,
+          "beta": 0.0643,
+          "rank_off": 2,
+          "rank_def": 6
         }
       }
     },

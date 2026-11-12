@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-11-12T17:49:32Z",
+  "generated_at": "2026-11-12T22:55:14Z",
   "method": "Dixon-Coles MLE grid search (ρ ∈ [-0.30, 0.10] step 0.005), λ_h, λ_a fixés à moyenne empirique par ligue. CI 95% via LR test.",
   "min_matches": 40,
   "default_rho": -0.13,
-  "n_leagues": 148,
+  "n_leagues": 149,
   "n_measured": 7,
   "leagues": {
     "1lig": {
@@ -534,17 +534,17 @@
       "lambda_a": 1.226
     },
     "esp.copa_del_rey": {
-      "n": 59,
+      "n": 62,
       "rho_measured": 0.1,
       "rho_literature": -0.13,
       "rho_used": 0.1,
       "source": "measured",
-      "reason": "MLE n=59, CI95=[-0.070, 0.100]",
-      "log_lik": -210.59,
+      "reason": "MLE n=62, CI95=[-0.070, 0.100]",
+      "log_lik": -219.02,
       "ci_lo": -0.07,
       "ci_hi": 0.1,
-      "lambda_h": 1.356,
-      "lambda_a": 2.153
+      "lambda_h": 1.339,
+      "lambda_a": 2.177
     },
     "ettannorra": {
       "n": 1,
@@ -627,6 +627,14 @@
       "ci_hi": 0.1,
       "lambda_h": 1.472,
       "lambda_a": 1.333
+    },
+    "fra.coupe_de_france": {
+      "n": 1,
+      "rho_measured": null,
+      "rho_literature": -0.13,
+      "rho_used": -0.13,
+      "source": "literature_fallback",
+      "reason": "n=1 < 40"
     },
     "frauenbundesliga": {
       "n": 1,
@@ -1305,17 +1313,17 @@
       "lambda_a": 1.325
     },
     "uefa.nations": {
-      "n": 97,
-      "rho_measured": -0.23,
+      "n": 105,
+      "rho_measured": -0.24,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "CI trop large (0.325) ou fit nul",
-      "log_lik": -289.85,
+      "reason": "CI trop large (0.310) ou fit nul",
+      "log_lik": -310.92,
       "ci_lo": -0.3,
-      "ci_hi": 0.025,
-      "lambda_h": 1.216,
-      "lambda_a": 1.278
+      "ci_hi": 0.01,
+      "lambda_h": 1.229,
+      "lambda_a": 1.276
     },
     "uefaconferenceleague": {
       "n": 1,
