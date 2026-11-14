@@ -1,18 +1,59 @@
 {
-  "generated_at": "2026-11-13T22:46:05Z",
+  "generated_at": "2026-11-14T02:46:22Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
-  "status": "empty",
+  "status": "ok",
   "summary": {
-    "active_events": 0,
-    "actionable": 0,
+    "active_events": 2,
+    "actionable": 2,
     "watch": 0,
     "risk": 0,
     "expired_sample": 0,
-    "by_type": {},
-    "by_quality": {}
+    "by_type": {
+      "market_move": 3
+    },
+    "by_quality": {
+      "actionable": 2
+    }
   },
-  "active_actionable": [],
+  "active_actionable": [
+    {
+      "event_id": "401883134",
+      "date": "2026-11-14T15:15Z",
+      "sport": "football",
+      "league_code": "laliga2",
+      "league_name": "La Liga 2",
+      "home": "Real Sociedad II",
+      "away": "Sporting Gijón",
+      "match": "Real Sociedad II - Sporting Gijón",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 1.0,
+      "context": "Cote away: 3.00 -> 2.10 (+30.0%)"
+    },
+    {
+      "event_id": "401861163",
+      "date": "2026-11-14T14:00Z",
+      "sport": "football",
+      "league_code": "nationsleague",
+      "league_name": "Nations League",
+      "home": "Kosovo",
+      "away": "Israel",
+      "match": "Kosovo - Israel",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "market_move",
+      "direction": "steam",
+      "team": null,
+      "side": "away",
+      "strength": 0.661,
+      "context": "Cote away: 4.20 -> 3.70 (+11.9%)"
+    }
+  ],
   "active_watch": [],
   "active_risk": [],
   "expired_sample": []
