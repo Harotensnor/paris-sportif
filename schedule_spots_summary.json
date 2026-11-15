@@ -1,18 +1,200 @@
 {
-  "generated_at": "2026-11-15T00:20:26Z",
+  "generated_at": "2026-11-15T04:48:20Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
-  "status": "empty",
+  "status": "ok",
   "summary": {
-    "active_events": 0,
+    "active_events": 3,
     "expired_sample": 0,
-    "by_type": {},
-    "by_decision": {},
-    "lean_home": 0,
+    "by_type": {
+      "travel_extreme": 3
+    },
+    "by_decision": {
+      "lean_home": 3
+    },
+    "lean_home": 3,
     "lean_away": 0,
     "abstain": 0,
     "monitor": 0
   },
-  "active": [],
+  "active": [
+    {
+      "event_id": "401892721",
+      "source_event_ids": [
+        "401892721"
+      ],
+      "kickoff": "2026-11-16T00:30Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Philadelphia Flyers",
+      "away": "Edmonton Oilers",
+      "match": "Philadelphia Flyers - Edmonton Oilers",
+      "decision": "lean_home",
+      "net_team": "Philadelphia Flyers",
+      "reason": "Edmonton Oilers plus penalise par calendrier/voyage (0.75 vs 0.00)",
+      "pressure_score": 0.753,
+      "home_fade": 0.0,
+      "away_fade": 0.753,
+      "travel_score": 0.753,
+      "lookahead_score": 0,
+      "congestion_score": 0,
+      "types": {
+        "travel_extreme": 1
+      },
+      "contexts": [
+        "Deplacement estime 3239 km, decalage ~2.6h"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": -0.131,
+        "away_score": -2.132,
+        "home_fade": 1.0,
+        "away_fade": 2.482,
+        "reason": "Direction nette: Philadelphia Flyers (-0.13)",
+        "detail": [
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.8
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 0.929
+          },
+          {
+            "side": "away",
+            "type": "travel_extreme",
+            "direction": "fade",
+            "strength": 0.753
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401909993",
+      "source_event_ids": [
+        "401909993"
+      ],
+      "kickoff": "2026-11-16T02:00Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "Sacramento Kings",
+      "away": "Oklahoma City Thunder",
+      "match": "Sacramento Kings - Oklahoma City Thunder",
+      "decision": "lean_home",
+      "net_team": "Sacramento Kings",
+      "reason": "Oklahoma City Thunder plus penalise par calendrier/voyage (0.50 vs 0.00)",
+      "pressure_score": 0.5,
+      "home_fade": 0.0,
+      "away_fade": 0.5,
+      "travel_score": 0.5,
+      "lookahead_score": 0,
+      "congestion_score": 0,
+      "types": {
+        "travel_extreme": 1
+      },
+      "contexts": [
+        "Deplacement estime 2151 km, decalage ~1.6h"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": 1.385,
+        "away_score": -1.1,
+        "home_fade": 0.0,
+        "away_fade": 1.1,
+        "reason": "Direction nette: Sacramento Kings (+1.39)",
+        "detail": [
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.6
+          },
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "steam",
+            "strength": 1.0
+          },
+          {
+            "side": "away",
+            "type": "travel_extreme",
+            "direction": "fade",
+            "strength": 0.5
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401892723",
+      "source_event_ids": [
+        "401892723"
+      ],
+      "kickoff": "2026-11-16T01:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Anaheim Ducks",
+      "away": "Calgary Flames",
+      "match": "Anaheim Ducks - Calgary Flames",
+      "decision": "lean_home",
+      "net_team": "Anaheim Ducks",
+      "reason": "Calgary Flames plus penalise par calendrier/voyage (0.45 vs 0.00)",
+      "pressure_score": 0.451,
+      "home_fade": 0.0,
+      "away_fade": 0.451,
+      "travel_score": 0.451,
+      "lookahead_score": 0,
+      "congestion_score": 0,
+      "types": {
+        "travel_extreme": 1
+      },
+      "contexts": [
+        "Deplacement estime 1941 km, decalage ~0.3h"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": -0.407,
+        "away_score": -0.995,
+        "home_fade": 0.861,
+        "away_fade": 1.297,
+        "reason": "Direction nette: Anaheim Ducks (-0.41)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 0.861
+          },
+          {
+            "side": "away",
+            "type": "market_move",
+            "direction": "drift",
+            "strength": 0.845
+          },
+          {
+            "side": "away",
+            "type": "travel_extreme",
+            "direction": "fade",
+            "strength": 0.451
+          }
+        ]
+      }
+    }
+  ],
   "expired_sample": []
 }
