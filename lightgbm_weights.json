@@ -1,16 +1,16 @@
 {
   "schema": "paris-sportif.learned_weights.v1",
-  "generated_at": "2026-11-15T04:48:11Z",
+  "generated_at": "2026-11-15T12:21:07Z",
   "status": "row_level_table_detected_training_pending",
   "reason": "No backtest_training_rows.jsonl row-level feature table yet; exported conservative weights from backtest_report_v2 aggregates.",
   "runtime_dependency": "none",
   "source": {
     "report": "backtest_report_v2.json",
-    "report_generated_at": "2026-11-14T11:02:36Z",
-    "n_events": 217,
+    "report_generated_at": "2026-11-15T11:36:15Z",
+    "n_events": 243,
     "training_rows": "backtest_training_rows.jsonl",
     "training_rows_found": true,
-    "training_rows_count": 0
+    "training_rows_count": 6
   },
   "blend": {
     "base_model_weight": 0.92,
@@ -21,19 +21,19 @@
   "weights": {
     "by_sport": {
       "basketball": {
-        "n": 1,
-        "roi_pct": 30.9,
+        "n": 2,
+        "roi_pct": 15.55,
         "win_rate": 1.0,
-        "brier": 0.1155,
-        "weight": 0.00054,
+        "brier": 0.059,
+        "weight": 0.00108,
         "status": "watch"
       },
       "football": {
-        "n": 215,
-        "roi_pct": -5.05,
-        "win_rate": 0.5395,
-        "brier": 0.2076,
-        "weight": -0.01209,
+        "n": 240,
+        "roi_pct": -2.22,
+        "win_rate": 0.55,
+        "brier": 0.2106,
+        "weight": 0.00064,
         "status": "neutral"
       },
       "hockey": {
@@ -134,6 +134,22 @@
         "weight": 0.00406,
         "status": "watch"
       },
+      "eng.3": {
+        "n": 5,
+        "roi_pct": 42.84,
+        "win_rate": 0.8,
+        "brier": 0.1856,
+        "weight": 0.00247,
+        "status": "watch"
+      },
+      "eng.4": {
+        "n": 10,
+        "roi_pct": 46.1,
+        "win_rate": 0.7,
+        "brier": 0.2909,
+        "weight": 0.00248,
+        "status": "watch"
+      },
       "eredivisie": {
         "n": 8,
         "roi_pct": -53.12,
@@ -151,11 +167,11 @@
         "status": "watch"
       },
       "esp.2": {
-        "n": 1,
-        "roi_pct": -100.0,
-        "win_rate": 0.0,
-        "brier": 0.1745,
-        "weight": -0.00021,
+        "n": 5,
+        "roi_pct": -21.0,
+        "win_rate": 0.4,
+        "brier": 0.2024,
+        "weight": -0.00139,
         "status": "watch"
       },
       "esp.copa_del_rey": {
@@ -191,11 +207,11 @@
         "status": "watch"
       },
       "fra.coupe_de_france": {
-        "n": 1,
-        "roi_pct": -100.0,
-        "win_rate": 0.0,
-        "brier": 0.33,
-        "weight": -0.00054,
+        "n": 4,
+        "roi_pct": -65.9,
+        "win_rate": 0.25,
+        "brier": 0.2169,
+        "weight": -0.00125,
         "status": "watch"
       },
       "ger.1": {
@@ -311,11 +327,11 @@
         "status": "watch"
       },
       "uefa.nations": {
-        "n": 17,
-        "roi_pct": -5.52,
-        "win_rate": 0.6471,
-        "brier": 0.1607,
-        "weight": 0.00059,
+        "n": 20,
+        "roi_pct": -2.45,
+        "win_rate": 0.65,
+        "brier": 0.1718,
+        "weight": 0.00268,
         "status": "watch"
       },
       "uru.1": {
@@ -325,15 +341,23 @@
         "brier": 0.3437,
         "weight": -0.00054,
         "status": "watch"
+      },
+      "womens-college-basketball": {
+        "n": 1,
+        "roi_pct": 0.2,
+        "win_rate": 1.0,
+        "brier": 0.0025,
+        "weight": 0.00025,
+        "status": "watch"
       }
     },
     "by_tier": {
       "skip": {
-        "n": 217,
-        "roi_pct": -4.71,
-        "win_rate": 0.5438,
-        "brier": 0.2066,
-        "weight": -0.00994,
+        "n": 243,
+        "roi_pct": -1.93,
+        "win_rate": 0.5556,
+        "brier": 0.2089,
+        "weight": 0.00287,
         "status": "neutral"
       },
       "big_bet": {

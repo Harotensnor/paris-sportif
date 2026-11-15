@@ -1,23 +1,137 @@
 {
-  "generated_at": "2026-11-15T04:48:20Z",
+  "generated_at": "2026-11-15T12:21:19Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 3,
+    "active_events": 4,
     "expired_sample": 0,
     "by_type": {
-      "travel_extreme": 3
+      "lookahead": 2,
+      "travel_extreme": 3,
+      "back_to_back_travel": 1
     },
     "by_decision": {
+      "abstain": 1,
       "lean_home": 3
     },
     "lean_home": 3,
     "lean_away": 0,
-    "abstain": 0,
+    "abstain": 1,
     "monitor": 0
   },
   "active": [
+    {
+      "event_id": "401909990",
+      "source_event_ids": [
+        "401909990"
+      ],
+      "kickoff": "2026-11-15T23:00Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "Toronto Raptors",
+      "away": "New York Knicks",
+      "match": "Toronto Raptors - New York Knicks",
+      "decision": "abstain",
+      "net_team": null,
+      "reason": "Fatigue/agenda des deux cotes: Toronto Raptors 0.15, New York Knicks 0.15",
+      "pressure_score": 0.667,
+      "home_fade": 0.15,
+      "away_fade": 0.15,
+      "travel_score": 0,
+      "lookahead_score": 0.667,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 2
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours",
+        "1 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "away",
+        "home_score": -0.698,
+        "away_score": 0.112,
+        "home_fade": 0.75,
+        "away_fade": 0.15,
+        "reason": "Direction nette: New York Knicks (+0.11)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "home",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 0.6
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401892723",
+      "source_event_ids": [
+        "401892723"
+      ],
+      "kickoff": "2026-11-16T01:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Anaheim Ducks",
+      "away": "Calgary Flames",
+      "match": "Anaheim Ducks - Calgary Flames",
+      "decision": "lean_home",
+      "net_team": "Anaheim Ducks",
+      "reason": "Calgary Flames plus penalise par calendrier/voyage (1.37 vs 0.00)",
+      "pressure_score": 1.369,
+      "home_fade": 0.0,
+      "away_fade": 1.369,
+      "travel_score": 1.369,
+      "lookahead_score": 0,
+      "congestion_score": 0,
+      "types": {
+        "travel_extreme": 1,
+        "back_to_back_travel": 1
+      },
+      "contexts": [
+        "Deplacement estime 1941 km, decalage ~0.3h",
+        "1 match dans les 48h + 1941 km de voyage"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": 0.479,
+        "away_score": -1.369,
+        "home_fade": 0.0,
+        "away_fade": 1.369,
+        "reason": "Direction nette: Anaheim Ducks (+0.48)",
+        "detail": [
+          {
+            "side": "away",
+            "type": "travel_extreme",
+            "direction": "fade",
+            "strength": 0.451
+          },
+          {
+            "side": "away",
+            "type": "back_to_back_travel",
+            "direction": "fade",
+            "strength": 0.918
+          }
+        ]
+      }
+    },
     {
       "event_id": "401892721",
       "source_event_ids": [
@@ -48,29 +162,17 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": -0.131,
-        "away_score": -2.132,
-        "home_fade": 1.0,
-        "away_fade": 2.482,
-        "reason": "Direction nette: Philadelphia Flyers (-0.13)",
+        "home_score": 0.544,
+        "away_score": -1.553,
+        "home_fade": 0.0,
+        "away_fade": 1.553,
+        "reason": "Direction nette: Philadelphia Flyers (+0.54)",
         "detail": [
           {
             "side": "away",
             "type": "injury_imbalance",
             "direction": "fade",
             "strength": 0.8
-          },
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 0.929
           },
           {
             "side": "away",
@@ -111,11 +213,11 @@
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 1.385,
+        "home_score": 0.385,
         "away_score": -1.1,
         "home_fade": 0.0,
         "away_fade": 1.1,
-        "reason": "Direction nette: Sacramento Kings (+1.39)",
+        "reason": "Direction nette: Sacramento Kings (+0.39)",
         "detail": [
           {
             "side": "away",
@@ -124,73 +226,10 @@
             "strength": 0.6
           },
           {
-            "side": "home",
-            "type": "market_move",
-            "direction": "steam",
-            "strength": 1.0
-          },
-          {
             "side": "away",
             "type": "travel_extreme",
             "direction": "fade",
             "strength": 0.5
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401892723",
-      "source_event_ids": [
-        "401892723"
-      ],
-      "kickoff": "2026-11-16T01:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Anaheim Ducks",
-      "away": "Calgary Flames",
-      "match": "Anaheim Ducks - Calgary Flames",
-      "decision": "lean_home",
-      "net_team": "Anaheim Ducks",
-      "reason": "Calgary Flames plus penalise par calendrier/voyage (0.45 vs 0.00)",
-      "pressure_score": 0.451,
-      "home_fade": 0.0,
-      "away_fade": 0.451,
-      "travel_score": 0.451,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "travel_extreme": 1
-      },
-      "contexts": [
-        "Deplacement estime 1941 km, decalage ~0.3h"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.407,
-        "away_score": -0.995,
-        "home_fade": 0.861,
-        "away_fade": 1.297,
-        "reason": "Direction nette: Anaheim Ducks (-0.41)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 0.861
-          },
-          {
-            "side": "away",
-            "type": "market_move",
-            "direction": "drift",
-            "strength": 0.845
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.451
           }
         ]
       }
