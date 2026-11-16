@@ -1,65 +1,26 @@
 {
-  "generated_at": "2026-11-15T21:22:26Z",
+  "generated_at": "2026-11-16T01:12:24Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 19,
-    "actionable": 2,
+    "active_events": 15,
+    "actionable": 3,
     "watch": 1,
-    "risk": 16,
+    "risk": 11,
     "expired_sample": 0,
     "by_type": {
-      "market_uncertain": 16,
-      "injury_imbalance": 6,
-      "travel_extreme": 3,
-      "back_to_back_travel": 1
+      "travel_extreme": 2,
+      "injury_imbalance": 2,
+      "market_uncertain": 11
     },
     "by_quality": {
-      "risk": 16,
-      "actionable": 2,
-      "watch": 1
+      "watch": 1,
+      "actionable": 3,
+      "risk": 11
     }
   },
   "active_actionable": [
-    {
-      "event_id": "401892723",
-      "date": "2026-11-16T01:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Anaheim Ducks",
-      "away": "Calgary Flames",
-      "match": "Anaheim Ducks - Calgary Flames",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
-      "direction": "fade",
-      "team": "Calgary Flames",
-      "side": "away",
-      "strength": 0.918,
-      "context": "1 match dans les 48h + 1941 km de voyage"
-    },
-    {
-      "event_id": "401892721",
-      "date": "2026-11-16T00:30Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Philadelphia Flyers",
-      "away": "Edmonton Oilers",
-      "match": "Philadelphia Flyers - Edmonton Oilers",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "Edmonton Oilers",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 1-5"
-    }
-  ],
-  "active_watch": [
     {
       "event_id": "401892725",
       "date": "2026-11-16T02:00Z",
@@ -69,89 +30,53 @@
       "home": "San Jose Sharks",
       "away": "Nashville Predators",
       "match": "San Jose Sharks - Nashville Predators",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
       "type": "injury_imbalance",
       "direction": "fade",
       "team": "San Jose Sharks",
       "side": null,
-      "strength": 0.6,
-      "context": "Absences severes 3-0"
+      "strength": 0.8,
+      "context": "Absences severes 4-0"
+    },
+    {
+      "event_id": "401892740",
+      "date": "2026-11-19T00:30Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "New Jersey Devils",
+      "away": "Montreal Canadiens",
+      "match": "New Jersey Devils - Montreal Canadiens",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Montreal Canadiens",
+      "side": null,
+      "strength": 0.8,
+      "context": "Absences severes 3-7"
+    },
+    {
+      "event_id": "401910005",
+      "date": "2026-11-18T04:00Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "Los Angeles Lakers",
+      "away": "Charlotte Hornets",
+      "match": "Los Angeles Lakers - Charlotte Hornets",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "travel_extreme",
+      "direction": "fade",
+      "team": "Charlotte Hornets",
+      "side": "away",
+      "strength": 0.792,
+      "context": "Deplacement estime 3407 km, decalage ~2.5h"
     }
   ],
-  "active_risk": [
-    {
-      "event_id": "401909988",
-      "date": "2026-11-15T22:00Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "Utah Jazz",
-      "away": "San Antonio Spurs",
-      "match": "Utah Jazz - San Antonio Spurs",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 15.3%"
-    },
-    {
-      "event_id": "401909990",
-      "date": "2026-11-15T23:00Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "Toronto Raptors",
-      "away": "New York Knicks",
-      "match": "Toronto Raptors - New York Knicks",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 15.4%"
-    },
-    {
-      "event_id": "401909991",
-      "date": "2026-11-16T00:00Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "Washington Wizards",
-      "away": "Houston Rockets",
-      "match": "Washington Wizards - Houston Rockets",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 15.8%"
-    },
-    {
-      "event_id": "401909992",
-      "date": "2026-11-16T01:00Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "Milwaukee Bucks",
-      "away": "Atlanta Hawks",
-      "match": "Milwaukee Bucks - Atlanta Hawks",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 15.7%"
-    },
+  "active_watch": [
     {
       "event_id": "401909993",
       "date": "2026-11-16T02:00Z",
@@ -161,15 +86,17 @@
       "home": "Sacramento Kings",
       "away": "Oklahoma City Thunder",
       "match": "Sacramento Kings - Oklahoma City Thunder",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 15.5%"
-    },
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "travel_extreme",
+      "direction": "fade",
+      "team": "Oklahoma City Thunder",
+      "side": "away",
+      "strength": 0.5,
+      "context": "Deplacement estime 2151 km, decalage ~1.6h"
+    }
+  ],
+  "active_risk": [
     {
       "event_id": "401910002",
       "date": "2026-11-18T00:30Z",
@@ -186,7 +113,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 15.4%"
+      "context": "marge bookmaker anormale 13.2%"
     },
     {
       "event_id": "401888247",
@@ -204,25 +131,7 @@
       "team": null,
       "side": null,
       "strength": 0.85,
-      "context": "marge bookmaker anormale 19.2%"
-    },
-    {
-      "event_id": "401888245",
-      "date": "2026-11-21T13:00Z",
-      "sport": "football",
-      "league_code": "superlig",
-      "league_name": "Süper Lig",
-      "home": "Galatasaray",
-      "away": "Samsunspor",
-      "match": "Galatasaray - Samsunspor",
-      "quality": "risk",
-      "quality_reason": "Signal de prudence, pas une opportunite directe",
-      "type": "market_uncertain",
-      "direction": "abstain",
-      "team": null,
-      "side": null,
-      "strength": 0.85,
-      "context": "marge bookmaker anormale 18.6%"
+      "context": "marge bookmaker anormale 18.0%"
     },
     {
       "event_id": "401880160",
@@ -367,6 +276,24 @@
       "side": null,
       "strength": 0.85,
       "context": "marge bookmaker anormale 18.9%"
+    },
+    {
+      "event_id": "401888370",
+      "date": "2026-11-23T17:00Z",
+      "sport": "football",
+      "league_code": "superlig",
+      "league_name": "Süper Lig",
+      "home": "Istanbul Basaksehir",
+      "away": "Çorum FK",
+      "match": "Istanbul Basaksehir - Çorum FK",
+      "quality": "risk",
+      "quality_reason": "Signal de prudence, pas une opportunite directe",
+      "type": "market_uncertain",
+      "direction": "abstain",
+      "team": null,
+      "side": null,
+      "strength": 0.85,
+      "context": "marge bookmaker anormale 18.8%"
     }
   ],
   "expired_sample": []
