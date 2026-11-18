@@ -1,22 +1,23 @@
 {
-  "generated_at": "2026-11-18T15:11:46Z",
+  "generated_at": "2026-11-18T18:36:31Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
-    "active_events": 20,
+    "active_events": 23,
     "actionable": 2,
-    "watch": 0,
+    "watch": 3,
     "risk": 18,
     "expired_sample": 0,
     "by_type": {
       "market_uncertain": 19,
       "travel_extreme": 2,
-      "injury_imbalance": 2,
+      "injury_imbalance": 5,
       "back_to_back_travel": 1
     },
     "by_quality": {
       "risk": 18,
+      "watch": 3,
       "actionable": 2
     }
   },
@@ -58,7 +59,62 @@
       "context": "Absences severes 3-7"
     }
   ],
-  "active_watch": [],
+  "active_watch": [
+    {
+      "event_id": "401892739",
+      "date": "2026-11-19T00:30Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Detroit Red Wings",
+      "away": "Boston Bruins",
+      "match": "Detroit Red Wings - Boston Bruins",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Detroit Red Wings",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 4-1"
+    },
+    {
+      "event_id": "401910017",
+      "date": "2026-11-19T03:00Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "Los Angeles Lakers",
+      "away": "Utah Jazz",
+      "match": "Los Angeles Lakers - Utah Jazz",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Utah Jazz",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 0-3"
+    },
+    {
+      "event_id": "401910044",
+      "date": "2026-11-24T03:00Z",
+      "sport": "basketball",
+      "league_code": "nba",
+      "league_name": "NBA",
+      "home": "Los Angeles Lakers",
+      "away": "Utah Jazz",
+      "match": "Los Angeles Lakers - Utah Jazz",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Utah Jazz",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 0-3"
+    }
+  ],
   "active_risk": [
     {
       "event_id": "401910007",
