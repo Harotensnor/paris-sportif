@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-11-20T05:45:21Z",
-  "calculated_at": "2026-11-20T05:45:21Z",
+  "generated_at": "2026-11-20T14:28:30Z",
+  "calculated_at": "2026-11-20T14:28:30Z",
   "source_of_truth": "data.js",
-  "data_generated_at": "2026-11-20T05:42:10.899854Z",
+  "data_generated_at": "2026-11-20T14:26:59.868000Z",
   "data_today_field": "2026-11-20",
   "events": {
     "total": 285,
-    "upcoming": 273,
+    "upcoming": 267,
     "winamax_available": 285,
     "winamax_exact": 258,
     "winamax_exact_ratio": 0.9053,
@@ -17,7 +17,7 @@
     "football_lineups": 2,
     "starter_signals": 18,
     "clubelo": 114,
-    "weather": 186,
+    "weather": 211,
     "injuries": 25,
     "referee": 56,
     "referee_named": 1,
@@ -26,7 +26,7 @@
     "fd_calibration": 0,
     "fd_closing_odds": 0,
     "xg": 114,
-    "smart_money": 0
+    "smart_money": 1
   },
   "signal_health": {
     "referee": {
@@ -36,7 +36,7 @@
       "note": "referee is effective coverage: named referee or referee_context usable by the model."
     },
     "smart_money": {
-      "events": 0,
+      "events": 1,
       "status": "rare_event",
       "note": "Smart money is intentionally rare; low count is OK when odds movement does not confirm a strong signal."
     }
@@ -70,26 +70,26 @@
         "detailed_ratio": 1.0
       },
       "football": {
-        "exact": 230,
-        "detailed": 230,
+        "exact": 226,
+        "detailed": 226,
         "families": {
-          "dnb": 230,
-          "match_winner": 230,
-          "dnb_rows": 229,
-          "double_chance": 224,
-          "btts": 213,
-          "btts_rows": 213,
-          "ht_1n2": 213,
-          "ht_1n2_rows": 213,
-          "ht_ou": 213,
-          "ou": 213,
-          "ou25": 213,
-          "ou35": 213
+          "dnb": 226,
+          "match_winner": 226,
+          "dnb_rows": 225,
+          "double_chance": 220,
+          "btts": 209,
+          "btts_rows": 209,
+          "ht_1n2": 209,
+          "ht_1n2_rows": 209,
+          "ht_ou": 209,
+          "ou": 209,
+          "ou25": 209,
+          "ou35": 209
         },
         "detailed_ratio": 1.0
       },
       "hockey": {
-        "exact": 16,
+        "exact": 15,
         "detailed": 15,
         "families": {
           "btts": 15,
@@ -102,54 +102,54 @@
           "puck_line": 15,
           "team_total": 15
         },
-        "detailed_ratio": 0.9375
+        "detailed_ratio": 1.0
       },
       "tennis": {
-        "exact": 2,
-        "detailed": 2,
+        "exact": 1,
+        "detailed": 1,
         "families": {
-          "match_winner": 2,
-          "tennis_games": 2,
-          "tennis_handicap": 2
+          "match_winner": 1,
+          "tennis_games": 1,
+          "tennis_handicap": 1
         },
         "detailed_ratio": 1.0
       }
     },
     "market_family_counts": {
-      "match_winner": 258,
-      "dnb": 254,
-      "dnb_rows": 253,
-      "double_chance": 239,
-      "btts": 228,
-      "btts_rows": 228,
-      "ou": 228,
-      "team_total": 227,
-      "ht_1n2": 222,
-      "ht_1n2_rows": 222,
-      "ht_ou": 213,
-      "ou25": 213,
-      "ou35": 213,
-      "handicap": 212,
-      "ou15": 210,
+      "match_winner": 253,
+      "dnb": 250,
+      "dnb_rows": 249,
+      "double_chance": 235,
+      "btts": 224,
+      "btts_rows": 224,
+      "ou": 224,
+      "team_total": 223,
+      "ht_1n2": 218,
+      "ht_1n2_rows": 218,
+      "ht_ou": 209,
+      "ou25": 209,
+      "ou35": 209,
+      "handicap": 208,
+      "ou15": 206,
       "puck_line": 15,
       "basket_handicap": 11,
       "basket_total": 11,
       "basket_team_total": 9,
-      "tennis_games": 2
+      "tennis_games": 1
     }
   },
   "backtest": {
-    "overall_roi_pct": -7.03,
-    "overall_brier": 0.2763,
+    "overall_roi_pct": -28.72,
+    "overall_brier": 0.3014,
     "by_sport_roi_pct": {
       "basketball": 6.92,
-      "hockey": -34.93
+      "hockey": -100.0
     },
     "cold_sports": []
   },
   "health": {
     "status": "warning",
-    "warnings": 10,
+    "warnings": 9,
     "pipeline_drift": "warn"
   }
 }
