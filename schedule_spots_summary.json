@@ -1,163 +1,267 @@
 {
-  "generated_at": "2026-11-18T18:36:31Z",
+  "generated_at": "2026-11-20T05:45:19Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 6,
+    "active_events": 8,
     "expired_sample": 0,
     "by_type": {
-      "travel_extreme": 2,
-      "back_to_back_travel": 1,
-      "lookahead": 3
+      "travel_extreme": 5,
+      "lookahead": 3,
+      "back_to_back_travel": 1
     },
     "by_decision": {
-      "lean_home": 5,
+      "lean_home": 7,
       "lean_away": 1
     },
-    "lean_home": 5,
+    "lean_home": 7,
     "lean_away": 1,
     "abstain": 0,
     "monitor": 0
   },
   "active": [
     {
-      "event_id": "401892753",
+      "event_id": "401892764",
       "source_event_ids": [
-        "401892753"
+        "401892764"
       ],
-      "kickoff": "2026-11-20T03:00Z",
+      "kickoff": "2026-11-22T00:00Z",
       "sport": "hockey",
       "league_code": "nhl",
       "league_name": "NHL",
-      "home": "Vegas Golden Knights",
-      "away": "Dallas Stars",
-      "match": "Vegas Golden Knights - Dallas Stars",
+      "home": "Winnipeg Jets",
+      "away": "Vegas Golden Knights",
+      "match": "Winnipeg Jets - Vegas Golden Knights",
       "decision": "lean_home",
-      "net_team": "Vegas Golden Knights",
-      "reason": "Dallas Stars plus penalise par calendrier/voyage (0.87 vs 0.00)",
-      "pressure_score": 0.874,
+      "net_team": "Winnipeg Jets",
+      "reason": "Vegas Golden Knights plus penalise par calendrier/voyage (1.44 vs 0.00)",
+      "pressure_score": 1.443,
       "home_fade": 0.0,
-      "away_fade": 0.874,
-      "travel_score": 0.874,
+      "away_fade": 1.443,
+      "travel_score": 1.443,
       "lookahead_score": 0,
       "congestion_score": 0,
       "types": {
+        "travel_extreme": 1,
         "back_to_back_travel": 1
       },
       "contexts": [
-        "1 match dans les 48h + 1721 km de voyage"
+        "Deplacement estime 2111 km, decalage ~1.2h",
+        "1 match dans les 48h + 2111 km de voyage"
       ],
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.516,
-        "away_score": -1.474,
-        "home_fade": 0.0,
-        "away_fade": 1.474,
-        "reason": "Direction nette: Vegas Golden Knights (+0.52)",
+        "home_score": -0.295,
+        "away_score": -1.163,
+        "home_fade": 0.8,
+        "away_fade": 1.443,
+        "reason": "Direction nette: Winnipeg Jets (-0.29)",
         "detail": [
           {
-            "side": "away",
+            "side": "home",
             "type": "injury_imbalance",
             "direction": "fade",
-            "strength": 0.6
+            "strength": 0.8
+          },
+          {
+            "side": "away",
+            "type": "travel_extreme",
+            "direction": "fade",
+            "strength": 0.491
           },
           {
             "side": "away",
             "type": "back_to_back_travel",
             "direction": "fade",
-            "strength": 0.874
+            "strength": 0.952
           }
         ]
       }
     },
     {
-      "event_id": "401910015",
+      "event_id": "401892754",
       "source_event_ids": [
-        "401910015"
+        "401892754"
       ],
-      "kickoff": "2026-11-19T02:30Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "Denver Nuggets",
-      "away": "Boston Celtics",
-      "match": "Denver Nuggets - Boston Celtics",
+      "kickoff": "2026-11-21T18:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Carolina Hurricanes",
+      "away": "Edmonton Oilers",
+      "match": "Carolina Hurricanes - Edmonton Oilers",
       "decision": "lean_home",
-      "net_team": "Denver Nuggets",
-      "reason": "Boston Celtics plus penalise par calendrier/voyage (0.66 vs 0.00)",
-      "pressure_score": 0.661,
+      "net_team": "Carolina Hurricanes",
+      "reason": "Edmonton Oilers plus penalise par calendrier/voyage (0.77 vs 0.00)",
+      "pressure_score": 0.775,
       "home_fade": 0.0,
-      "away_fade": 0.661,
-      "travel_score": 0.661,
+      "away_fade": 0.775,
+      "travel_score": 0.775,
       "lookahead_score": 0,
       "congestion_score": 0,
       "types": {
         "travel_extreme": 1
       },
       "contexts": [
-        "Deplacement estime 2842 km, decalage ~2.3h"
+        "Deplacement estime 3332 km, decalage ~2.3h"
       ],
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.231,
-        "away_score": -0.661,
+        "home_score": 0.621,
+        "away_score": -1.775,
         "home_fade": 0.0,
-        "away_fade": 0.661,
-        "reason": "Direction nette: Denver Nuggets (+0.23)",
+        "away_fade": 1.775,
+        "reason": "Direction nette: Carolina Hurricanes (+0.62)",
         "detail": [
+          {
+            "side": "away",
+            "type": "injury_imbalance",
+            "direction": "fade",
+            "strength": 1.0
+          },
           {
             "side": "away",
             "type": "travel_extreme",
             "direction": "fade",
-            "strength": 0.661
+            "strength": 0.775
           }
         ]
       }
     },
     {
-      "event_id": "401910009",
+      "event_id": "401892766",
       "source_event_ids": [
-        "401910009"
+        "401892766"
       ],
-      "kickoff": "2026-11-19T00:00Z",
-      "sport": "basketball",
-      "league_code": "nba",
-      "league_name": "NBA",
-      "home": "Miami Heat",
-      "away": "Milwaukee Bucks",
-      "match": "Miami Heat - Milwaukee Bucks",
+      "kickoff": "2026-11-22T03:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Vancouver Canucks",
+      "away": "Minnesota Wild",
+      "match": "Vancouver Canucks - Minnesota Wild",
       "decision": "lean_home",
-      "net_team": "Miami Heat",
-      "reason": "Milwaukee Bucks plus penalise par calendrier/voyage (0.48 vs 0.00)",
-      "pressure_score": 0.475,
+      "net_team": "Vancouver Canucks",
+      "reason": "Minnesota Wild plus penalise par calendrier/voyage (0.54 vs 0.00)",
+      "pressure_score": 0.536,
       "home_fade": 0.0,
-      "away_fade": 0.475,
-      "travel_score": 0.475,
+      "away_fade": 0.536,
+      "travel_score": 0.536,
       "lookahead_score": 0,
       "congestion_score": 0,
       "types": {
         "travel_extreme": 1
       },
       "contexts": [
-        "Deplacement estime 2044 km, decalage ~0.5h"
+        "Deplacement estime 2305 km, decalage ~2.0h"
       ],
       "global_resolution": {
         "status": "net",
         "net_side": "home",
-        "home_score": 0.166,
-        "away_score": -0.475,
+        "home_score": 0.188,
+        "away_score": -0.536,
         "home_fade": 0.0,
-        "away_fade": 0.475,
-        "reason": "Direction nette: Miami Heat (+0.17)",
+        "away_fade": 0.536,
+        "reason": "Direction nette: Vancouver Canucks (+0.19)",
         "detail": [
           {
             "side": "away",
             "type": "travel_extreme",
             "direction": "fade",
-            "strength": 0.475
+            "strength": 0.536
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401892755",
+      "source_event_ids": [
+        "401892755"
+      ],
+      "kickoff": "2026-11-21T20:30Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Calgary Flames",
+      "away": "Chicago Blackhawks",
+      "match": "Calgary Flames - Chicago Blackhawks",
+      "decision": "lean_home",
+      "net_team": "Calgary Flames",
+      "reason": "Chicago Blackhawks plus penalise par calendrier/voyage (0.52 vs 0.00)",
+      "pressure_score": 0.522,
+      "home_fade": 0.0,
+      "away_fade": 0.522,
+      "travel_score": 0.522,
+      "lookahead_score": 0,
+      "congestion_score": 0,
+      "types": {
+        "travel_extreme": 1
+      },
+      "contexts": [
+        "Deplacement estime 2246 km, decalage ~1.8h"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": 0.183,
+        "away_score": -0.522,
+        "home_fade": 0.0,
+        "away_fade": 0.522,
+        "reason": "Direction nette: Calgary Flames (+0.18)",
+        "detail": [
+          {
+            "side": "away",
+            "type": "travel_extreme",
+            "direction": "fade",
+            "strength": 0.522
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401892756",
+      "source_event_ids": [
+        "401892756"
+      ],
+      "kickoff": "2026-11-21T23:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Florida Panthers",
+      "away": "Buffalo Sabres",
+      "match": "Florida Panthers - Buffalo Sabres",
+      "decision": "lean_home",
+      "net_team": "Florida Panthers",
+      "reason": "Buffalo Sabres plus penalise par calendrier/voyage (0.43 vs 0.00)",
+      "pressure_score": 0.433,
+      "home_fade": 0.0,
+      "away_fade": 0.433,
+      "travel_score": 0.433,
+      "lookahead_score": 0,
+      "congestion_score": 0,
+      "types": {
+        "travel_extreme": 1
+      },
+      "contexts": [
+        "Deplacement estime 1864 km, decalage ~0.1h"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": 0.152,
+        "away_score": -0.433,
+        "home_fade": 0.0,
+        "away_fade": 0.433,
+        "reason": "Direction nette: Florida Panthers (+0.15)",
+        "detail": [
+          {
+            "side": "away",
+            "type": "travel_extreme",
+            "direction": "fade",
+            "strength": 0.433
           }
         ]
       }
