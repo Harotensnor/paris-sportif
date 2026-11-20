@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-11-20T14:28:27Z",
+  "generated_at": "2026-11-20T18:12:53Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 22,
-    "actionable": 5,
-    "watch": 4,
+    "actionable": 6,
+    "watch": 3,
     "risk": 13,
     "expired_sample": 0,
     "by_type": {
@@ -18,25 +18,25 @@
     },
     "by_quality": {
       "risk": 13,
-      "actionable": 5,
-      "watch": 4
+      "actionable": 6,
+      "watch": 3
     }
   },
   "active_actionable": [
     {
-      "event_id": "401892754",
-      "date": "2026-11-21T18:00Z",
+      "event_id": "401892757",
+      "date": "2026-11-21T23:00Z",
       "sport": "hockey",
       "league_code": "nhl",
       "league_name": "NHL",
-      "home": "Carolina Hurricanes",
-      "away": "Edmonton Oilers",
-      "match": "Carolina Hurricanes - Edmonton Oilers",
+      "home": "Nashville Predators",
+      "away": "Pittsburgh Penguins",
+      "match": "Nashville Predators - Pittsburgh Penguins",
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
       "type": "injury_imbalance",
       "direction": "fade",
-      "team": "Edmonton Oilers",
+      "team": "Pittsburgh Penguins",
       "side": null,
       "strength": 1.0,
       "context": "Absences severes 0-5"
@@ -75,7 +75,7 @@
       "team": "Montreal Canadiens",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 8-1"
+      "context": "Absences severes 7-1"
     },
     {
       "event_id": "401892764",
@@ -96,43 +96,43 @@
       "context": "1 match dans les 48h + 2111 km de voyage"
     },
     {
-      "event_id": "401892757",
-      "date": "2026-11-21T23:00Z",
+      "event_id": "401915378",
+      "date": "2026-11-25T17:45Z",
+      "sport": "football",
+      "league_code": "championsleague",
+      "league_name": "Champions League",
+      "home": "Sabah FK",
+      "away": "Barcelona",
+      "match": "Sabah FK - Barcelona",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "weather_extreme",
+      "direction": "under_goals",
+      "team": null,
+      "side": null,
+      "strength": 0.845,
+      "context": "Meteo dure: vent 51 km/h, pluie 0.8 mm"
+    },
+    {
+      "event_id": "401892754",
+      "date": "2026-11-21T18:00Z",
       "sport": "hockey",
       "league_code": "nhl",
       "league_name": "NHL",
-      "home": "Nashville Predators",
-      "away": "Pittsburgh Penguins",
-      "match": "Nashville Predators - Pittsburgh Penguins",
+      "home": "Carolina Hurricanes",
+      "away": "Edmonton Oilers",
+      "match": "Carolina Hurricanes - Edmonton Oilers",
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
       "type": "injury_imbalance",
       "direction": "fade",
-      "team": "Pittsburgh Penguins",
+      "team": "Edmonton Oilers",
       "side": null,
       "strength": 0.8,
       "context": "Absences severes 0-4"
     }
   ],
   "active_watch": [
-    {
-      "event_id": "401876400",
-      "date": "2026-11-22T19:45Z",
-      "sport": "football",
-      "league_code": "fra.1",
-      "league_name": "Ligue 1",
-      "home": "Marseille",
-      "away": "Le Mans",
-      "match": "Marseille - Le Mans",
-      "quality": "watch",
-      "quality_reason": "Signal rare present mais intensite moyenne",
-      "type": "weather_extreme",
-      "direction": "under_goals",
-      "team": null,
-      "side": null,
-      "strength": 0.607,
-      "context": "Meteo dure: vent 36 km/h, pluie 0.0 mm"
-    },
     {
       "event_id": "401892765",
       "date": "2026-11-22T02:00Z",
