@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-20T12:17:46Z",
+  "generated_at": "2026-11-21T11:52:55Z",
   "schema": "calibration_per_sport_league_v1",
   "top5_leagues": [
     "eng.1",
@@ -10,54 +10,104 @@
   ],
   "groups": {
     "basketball:all": {
-      "n": 6,
-      "wins": 4,
+      "n": 5,
+      "wins": 3,
       "losses": 2,
-      "win_rate": 0.6666666666666666,
+      "win_rate": 0.6,
       "win_rate_ci": [
-        0.3,
-        0.9032
+        0.2307,
+        0.8824
       ],
-      "flat_pnl": 0.42,
-      "flat_roi_pct": 6.92,
+      "flat_pnl": -0.33,
+      "flat_roi_pct": -6.52,
       "flat_roi_ci_pct": [
-        -51.58,
-        62.38
+        -73.08,
+        60.04
       ],
       "kelly_pnl": 0.0,
-      "brier": 0.2684,
-      "logloss": 0.7341,
-      "avg_cote": 1.51,
-      "avg_pick_prob": 0.6,
-      "avg_edge_pct": -7.4,
-      "avg_ev_pct": -10.5,
+      "brier": 0.2811,
+      "logloss": 0.7603,
+      "avg_cote": 1.46,
+      "avg_pick_prob": 0.61,
+      "avg_edge_pct": -8.34,
+      "avg_ev_pct": -11.65,
       "avg_clv_pct": 0.0,
-      "n_with_clv": 6
+      "n_with_clv": 5
+    },
+    "football:other": {
+      "n": 12,
+      "wins": 5,
+      "losses": 7,
+      "win_rate": 0.4166666666666667,
+      "win_rate_ci": [
+        0.1933,
+        0.6805
+      ],
+      "flat_pnl": -1.91,
+      "flat_roi_pct": -15.95,
+      "flat_roi_ci_pct": [
+        -68.79,
+        41.63
+      ],
+      "kelly_pnl": 6.86,
+      "brier": 0.2499,
+      "logloss": 0.6929,
+      "avg_cote": 1.82,
+      "avg_pick_prob": 0.507,
+      "avg_edge_pct": -5.71,
+      "avg_ev_pct": -8.95,
+      "avg_clv_pct": null,
+      "n_with_clv": 0
+    },
+    "football:top5": {
+      "n": 3,
+      "wins": 1,
+      "losses": 2,
+      "win_rate": 0.3333333333333333,
+      "win_rate_ci": [
+        0.0615,
+        0.7923
+      ],
+      "flat_pnl": -0.75,
+      "flat_roi_pct": -25.0,
+      "flat_roi_ci_pct": [
+        -100.0,
+        125.0
+      ],
+      "kelly_pnl": 2.6,
+      "brier": 0.411,
+      "logloss": 1.0696,
+      "avg_cote": 1.6,
+      "avg_pick_prob": 0.619,
+      "avg_edge_pct": -6.63,
+      "avg_ev_pct": -7.05,
+      "avg_clv_pct": null,
+      "n_with_clv": 0
     },
     "hockey:all": {
-      "n": 3,
+      "n": 2,
       "wins": 0,
-      "losses": 3,
+      "losses": 2,
       "win_rate": 0.0,
       "win_rate_ci": [
         0.0,
-        0.5615
+        0.6576
       ],
-      "flat_pnl": -3.0,
+      "flat_pnl": -2.0,
       "flat_roi_pct": -100.0,
       "flat_roi_ci_pct": [
         -100.0,
         -100.0
       ],
       "kelly_pnl": 0.0,
-      "brier": 0.3673,
-      "logloss": 0.9475,
-      "avg_cote": 1.63,
-      "avg_pick_prob": 0.597,
-      "avg_edge_pct": -3.24,
-      "avg_ev_pct": -5.16,
+      "brier": 0.2969,
+      "logloss": 0.7871,
+      "avg_cote": 1.77,
+      "avg_pick_prob": 0.545,
+      "avg_edge_pct": -2.01,
+      "avg_ev_pct": -3.54,
       "avg_clv_pct": 0.0,
-      "n_with_clv": 3
+      "n_with_clv": 2
     }
   },
   "calibration_by_sport_league_tier": {},
