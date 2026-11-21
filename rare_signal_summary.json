@@ -1,25 +1,24 @@
 {
-  "generated_at": "2026-11-20T18:12:53Z",
+  "generated_at": "2026-11-21T00:05:21Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
   "status": "ok",
   "summary": {
     "active_events": 22,
-    "actionable": 6,
-    "watch": 3,
+    "actionable": 5,
+    "watch": 4,
     "risk": 13,
     "expired_sample": 0,
     "by_type": {
       "market_uncertain": 13,
-      "injury_imbalance": 7,
+      "injury_imbalance": 8,
       "travel_extreme": 4,
-      "back_to_back_travel": 1,
-      "weather_extreme": 1
+      "back_to_back_travel": 1
     },
     "by_quality": {
       "risk": 13,
-      "actionable": 6,
-      "watch": 3
+      "actionable": 5,
+      "watch": 4
     }
   },
   "active_actionable": [
@@ -57,7 +56,7 @@
       "team": "Toronto Maple Leafs",
       "side": null,
       "strength": 1.0,
-      "context": "Absences severes 9-1"
+      "context": "Absences severes 10-1"
     },
     {
       "event_id": "401892760",
@@ -88,30 +87,12 @@
       "match": "Winnipeg Jets - Vegas Golden Knights",
       "quality": "actionable",
       "quality_reason": "Signal rare fort et directionnel",
-      "type": "back_to_back_travel",
+      "type": "injury_imbalance",
       "direction": "fade",
-      "team": "Vegas Golden Knights",
-      "side": "away",
-      "strength": 0.952,
-      "context": "1 match dans les 48h + 2111 km de voyage"
-    },
-    {
-      "event_id": "401915378",
-      "date": "2026-11-25T17:45Z",
-      "sport": "football",
-      "league_code": "championsleague",
-      "league_name": "Champions League",
-      "home": "Sabah FK",
-      "away": "Barcelona",
-      "match": "Sabah FK - Barcelona",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "weather_extreme",
-      "direction": "under_goals",
-      "team": null,
+      "team": "Winnipeg Jets",
       "side": null,
-      "strength": 0.845,
-      "context": "Meteo dure: vent 51 km/h, pluie 0.8 mm"
+      "strength": 1.0,
+      "context": "Absences severes 5-0"
     },
     {
       "event_id": "401892754",
@@ -150,6 +131,24 @@
       "side": null,
       "strength": 0.6,
       "context": "Absences severes 5-2"
+    },
+    {
+      "event_id": "401892785",
+      "date": "2026-11-26T00:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "New York Islanders",
+      "away": "St. Louis Blues",
+      "match": "New York Islanders - St. Louis Blues",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "St. Louis Blues",
+      "side": null,
+      "strength": 0.6,
+      "context": "Absences severes 1-4"
     },
     {
       "event_id": "401892766",
