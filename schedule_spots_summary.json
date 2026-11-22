@@ -1,309 +1,70 @@
 {
-  "generated_at": "2026-11-21T00:05:21Z",
+  "generated_at": "2026-11-22T17:30:05Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 8,
+    "active_events": 19,
     "expired_sample": 0,
     "by_type": {
-      "travel_extreme": 5,
-      "lookahead": 3,
-      "back_to_back_travel": 1
+      "lookahead": 24
     },
     "by_decision": {
-      "lean_home": 7,
-      "lean_away": 1
+      "abstain": 5,
+      "lean_home": 5,
+      "lean_away": 9
     },
-    "lean_home": 7,
-    "lean_away": 1,
-    "abstain": 0,
+    "lean_home": 5,
+    "lean_away": 9,
+    "abstain": 5,
     "monitor": 0
   },
   "active": [
     {
-      "event_id": "401892764",
+      "event_id": "401915376",
       "source_event_ids": [
-        "401892764"
+        "401915376"
       ],
-      "kickoff": "2026-11-22T00:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Winnipeg Jets",
-      "away": "Vegas Golden Knights",
-      "match": "Winnipeg Jets - Vegas Golden Knights",
-      "decision": "lean_home",
-      "net_team": "Winnipeg Jets",
-      "reason": "Vegas Golden Knights plus penalise par calendrier/voyage (1.44 vs 0.00)",
-      "pressure_score": 1.443,
-      "home_fade": 0.0,
-      "away_fade": 1.443,
-      "travel_score": 1.443,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "travel_extreme": 1,
-        "back_to_back_travel": 1
-      },
-      "contexts": [
-        "Deplacement estime 2111 km, decalage ~1.2h",
-        "1 match dans les 48h + 2111 km de voyage"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": -0.495,
-        "away_score": -1.093,
-        "home_fade": 1.0,
-        "away_fade": 1.443,
-        "reason": "Direction nette: Winnipeg Jets (-0.49)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 1.0
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.491
-          },
-          {
-            "side": "away",
-            "type": "back_to_back_travel",
-            "direction": "fade",
-            "strength": 0.952
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401892754",
-      "source_event_ids": [
-        "401892754"
-      ],
-      "kickoff": "2026-11-21T18:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Carolina Hurricanes",
-      "away": "Edmonton Oilers",
-      "match": "Carolina Hurricanes - Edmonton Oilers",
-      "decision": "lean_home",
-      "net_team": "Carolina Hurricanes",
-      "reason": "Edmonton Oilers plus penalise par calendrier/voyage (0.77 vs 0.00)",
-      "pressure_score": 0.775,
-      "home_fade": 0.0,
-      "away_fade": 0.775,
-      "travel_score": 0.775,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "travel_extreme": 1
-      },
-      "contexts": [
-        "Deplacement estime 3332 km, decalage ~2.3h"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.551,
-        "away_score": -1.575,
-        "home_fade": 0.0,
-        "away_fade": 1.575,
-        "reason": "Direction nette: Carolina Hurricanes (+0.55)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "injury_imbalance",
-            "direction": "fade",
-            "strength": 0.8
-          },
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.775
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401892766",
-      "source_event_ids": [
-        "401892766"
-      ],
-      "kickoff": "2026-11-22T03:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Vancouver Canucks",
-      "away": "Minnesota Wild",
-      "match": "Vancouver Canucks - Minnesota Wild",
-      "decision": "lean_home",
-      "net_team": "Vancouver Canucks",
-      "reason": "Minnesota Wild plus penalise par calendrier/voyage (0.54 vs 0.00)",
-      "pressure_score": 0.536,
-      "home_fade": 0.0,
-      "away_fade": 0.536,
-      "travel_score": 0.536,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "travel_extreme": 1
-      },
-      "contexts": [
-        "Deplacement estime 2305 km, decalage ~2.0h"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.188,
-        "away_score": -0.536,
-        "home_fade": 0.0,
-        "away_fade": 0.536,
-        "reason": "Direction nette: Vancouver Canucks (+0.19)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.536
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401892755",
-      "source_event_ids": [
-        "401892755"
-      ],
-      "kickoff": "2026-11-21T20:30Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Calgary Flames",
-      "away": "Chicago Blackhawks",
-      "match": "Calgary Flames - Chicago Blackhawks",
-      "decision": "lean_home",
-      "net_team": "Calgary Flames",
-      "reason": "Chicago Blackhawks plus penalise par calendrier/voyage (0.52 vs 0.00)",
-      "pressure_score": 0.522,
-      "home_fade": 0.0,
-      "away_fade": 0.522,
-      "travel_score": 0.522,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "travel_extreme": 1
-      },
-      "contexts": [
-        "Deplacement estime 2246 km, decalage ~1.8h"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.183,
-        "away_score": -0.522,
-        "home_fade": 0.0,
-        "away_fade": 0.522,
-        "reason": "Direction nette: Calgary Flames (+0.18)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.522
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401892756",
-      "source_event_ids": [
-        "401892756"
-      ],
-      "kickoff": "2026-11-21T23:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "Florida Panthers",
-      "away": "Buffalo Sabres",
-      "match": "Florida Panthers - Buffalo Sabres",
-      "decision": "lean_home",
-      "net_team": "Florida Panthers",
-      "reason": "Buffalo Sabres plus penalise par calendrier/voyage (0.43 vs 0.00)",
-      "pressure_score": 0.433,
-      "home_fade": 0.0,
-      "away_fade": 0.433,
-      "travel_score": 0.433,
-      "lookahead_score": 0,
-      "congestion_score": 0,
-      "types": {
-        "travel_extreme": 1
-      },
-      "contexts": [
-        "Deplacement estime 1864 km, decalage ~0.1h"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.152,
-        "away_score": -0.433,
-        "home_fade": 0.0,
-        "away_fade": 0.433,
-        "reason": "Direction nette: Florida Panthers (+0.15)",
-        "detail": [
-          {
-            "side": "away",
-            "type": "travel_extreme",
-            "direction": "fade",
-            "strength": 0.433
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401882798",
-      "source_event_ids": [
-        "401882798"
-      ],
-      "kickoff": "2026-11-21T20:00Z",
+      "kickoff": "2026-11-25T20:00Z",
       "sport": "football",
-      "league_code": "esp.1",
-      "league_name": "La Liga",
-      "home": "Real Madrid",
-      "away": "Celta Vigo",
-      "match": "Real Madrid - Celta Vigo",
-      "decision": "lean_away",
-      "net_team": "Celta Vigo",
-      "reason": "Real Madrid plus penalise par calendrier/voyage (0.15 vs 0.00)",
-      "pressure_score": 0.333,
+      "league_code": "championsleague",
+      "league_name": "Champions League",
+      "home": "Internazionale",
+      "away": "VfB Stuttgart",
+      "match": "Internazionale - VfB Stuttgart",
+      "decision": "abstain",
+      "net_team": null,
+      "reason": "Fatigue/agenda des deux cotes: Internazionale 0.15, VfB Stuttgart 0.15",
+      "pressure_score": 0.667,
       "home_fade": 0.15,
-      "away_fade": 0.0,
+      "away_fade": 0.15,
       "travel_score": 0,
-      "lookahead_score": 0.333,
+      "lookahead_score": 0.667,
       "congestion_score": 0,
       "types": {
-        "lookahead": 1
+        "lookahead": 2
       },
       "contexts": [
+        "1 match important/proche dans les 3 jours",
         "1 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
         "status": "net",
         "net_side": "away",
-        "home_score": -0.15,
-        "away_score": 0.052,
+        "home_score": -0.098,
+        "away_score": -0.098,
         "home_fade": 0.15,
-        "away_fade": 0.0,
-        "reason": "Direction nette: Celta Vigo (+0.05)",
+        "away_fade": 0.15,
+        "reason": "Direction nette: VfB Stuttgart (-0.10)",
         "detail": [
           {
             "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
@@ -312,41 +73,204 @@
       }
     },
     {
-      "event_id": "401878333",
+      "event_id": "401915519",
       "source_event_ids": [
-        "401878333"
+        "401915519"
       ],
-      "kickoff": "2026-11-21T20:00Z",
+      "kickoff": "2026-11-26T17:45Z",
       "sport": "football",
-      "league_code": "scottishpremiership",
-      "league_name": "Scottish Premiership",
-      "home": "Motherwell",
-      "away": "Rangers",
-      "match": "Motherwell - Rangers",
-      "decision": "lean_home",
-      "net_team": "Motherwell",
-      "reason": "Rangers plus penalise par calendrier/voyage (0.15 vs 0.00)",
-      "pressure_score": 0.333,
-      "home_fade": 0.0,
+      "league_code": "europaleague",
+      "league_name": "Europa League",
+      "home": "Celta Vigo",
+      "away": "AFC Bournemouth",
+      "match": "Celta Vigo - AFC Bournemouth",
+      "decision": "abstain",
+      "net_team": null,
+      "reason": "Fatigue/agenda des deux cotes: Celta Vigo 0.15, AFC Bournemouth 0.15",
+      "pressure_score": 0.667,
+      "home_fade": 0.15,
       "away_fade": 0.15,
       "travel_score": 0,
-      "lookahead_score": 0.333,
+      "lookahead_score": 0.667,
       "congestion_score": 0,
       "types": {
-        "lookahead": 1
+        "lookahead": 2
       },
       "contexts": [
+        "1 match important/proche dans les 3 jours",
         "1 match important/proche dans les 3 jours"
       ],
       "global_resolution": {
         "status": "net",
-        "net_side": "home",
-        "home_score": 0.052,
-        "away_score": -0.15,
-        "home_fade": 0.0,
+        "net_side": "away",
+        "home_score": -0.098,
+        "away_score": -0.098,
+        "home_fade": 0.15,
         "away_fade": 0.15,
-        "reason": "Direction nette: Motherwell (+0.05)",
+        "reason": "Direction nette: AFC Bournemouth (-0.10)",
         "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401915504",
+      "source_event_ids": [
+        "401915504"
+      ],
+      "kickoff": "2026-11-26T20:00Z",
+      "sport": "football",
+      "league_code": "europaleague",
+      "league_name": "Europa League",
+      "home": "Crystal Palace",
+      "away": "Real Sociedad",
+      "match": "Crystal Palace - Real Sociedad",
+      "decision": "abstain",
+      "net_team": null,
+      "reason": "Fatigue/agenda des deux cotes: Crystal Palace 0.15, Real Sociedad 0.15",
+      "pressure_score": 0.667,
+      "home_fade": 0.15,
+      "away_fade": 0.15,
+      "travel_score": 0,
+      "lookahead_score": 0.667,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 2
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours",
+        "1 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "away",
+        "home_score": -0.098,
+        "away_score": -0.098,
+        "home_fade": 0.15,
+        "away_fade": 0.15,
+        "reason": "Direction nette: Real Sociedad (-0.10)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401915515",
+      "source_event_ids": [
+        "401915515"
+      ],
+      "kickoff": "2026-11-26T20:00Z",
+      "sport": "football",
+      "league_code": "europaleague",
+      "league_name": "Europa League",
+      "home": "TSG Hoffenheim",
+      "away": "SK Sturm Graz",
+      "match": "TSG Hoffenheim - SK Sturm Graz",
+      "decision": "abstain",
+      "net_team": null,
+      "reason": "Fatigue/agenda des deux cotes: TSG Hoffenheim 0.15, SK Sturm Graz 0.15",
+      "pressure_score": 0.667,
+      "home_fade": 0.15,
+      "away_fade": 0.15,
+      "travel_score": 0,
+      "lookahead_score": 0.667,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 2
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours",
+        "1 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "away",
+        "home_score": -0.098,
+        "away_score": -0.098,
+        "home_fade": 0.15,
+        "away_fade": 0.15,
+        "reason": "Direction nette: SK Sturm Graz (-0.10)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401915801",
+      "source_event_ids": [
+        "401915801"
+      ],
+      "kickoff": "2026-11-26T20:00Z",
+      "sport": "football",
+      "league_code": "conferenceleague",
+      "league_name": "Conference League",
+      "home": "SC Freiburg",
+      "away": "FC Twente",
+      "match": "SC Freiburg - FC Twente",
+      "decision": "abstain",
+      "net_team": null,
+      "reason": "Fatigue/agenda des deux cotes: SC Freiburg 0.15, FC Twente 0.15",
+      "pressure_score": 0.667,
+      "home_fade": 0.15,
+      "away_fade": 0.15,
+      "travel_score": 0,
+      "lookahead_score": 0.667,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 2
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours",
+        "1 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "away",
+        "home_score": -0.098,
+        "away_score": -0.098,
+        "home_fade": 0.15,
+        "away_fade": 0.15,
+        "reason": "Direction nette: FC Twente (-0.10)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
           {
             "side": "away",
             "type": "lookahead",
@@ -391,6 +315,591 @@
         "home_fade": 0.0,
         "away_fade": 0.15,
         "reason": "Direction nette: Getafe (+0.05)",
+        "detail": [
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401915291",
+      "source_event_ids": [
+        "401915291"
+      ],
+      "kickoff": "2026-11-25T20:00Z",
+      "sport": "football",
+      "league_code": "championsleague",
+      "league_name": "Champions League",
+      "home": "Atlético Madrid",
+      "away": "Viking FK",
+      "match": "Atlético Madrid - Viking FK",
+      "decision": "lean_away",
+      "net_team": "Viking FK",
+      "reason": "Atlético Madrid plus penalise par calendrier/voyage (0.15 vs 0.00)",
+      "pressure_score": 0.333,
+      "home_fade": 0.15,
+      "away_fade": 0.0,
+      "travel_score": 0,
+      "lookahead_score": 0.333,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 1
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "away",
+        "home_score": -0.15,
+        "away_score": 0.052,
+        "home_fade": 0.15,
+        "away_fade": 0.0,
+        "reason": "Direction nette: Viking FK (+0.05)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401915377",
+      "source_event_ids": [
+        "401915377"
+      ],
+      "kickoff": "2026-11-25T20:00Z",
+      "sport": "football",
+      "league_code": "championsleague",
+      "league_name": "Champions League",
+      "home": "Lille",
+      "away": "Bayern Munich",
+      "match": "Lille - Bayern Munich",
+      "decision": "lean_away",
+      "net_team": "Bayern Munich",
+      "reason": "Lille plus penalise par calendrier/voyage (0.15 vs 0.00)",
+      "pressure_score": 0.333,
+      "home_fade": 0.15,
+      "away_fade": 0.0,
+      "travel_score": 0,
+      "lookahead_score": 0.333,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 1
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "away",
+        "home_score": -0.15,
+        "away_score": 0.052,
+        "home_fade": 0.15,
+        "away_fade": 0.0,
+        "reason": "Direction nette: Bayern Munich (+0.05)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401915374",
+      "source_event_ids": [
+        "401915374"
+      ],
+      "kickoff": "2026-11-25T20:00Z",
+      "sport": "football",
+      "league_code": "championsleague",
+      "league_name": "Champions League",
+      "home": "Paris Saint-Germain",
+      "away": "AS Roma",
+      "match": "Paris Saint-Germain - AS Roma",
+      "decision": "lean_away",
+      "net_team": "AS Roma",
+      "reason": "Paris Saint-Germain plus penalise par calendrier/voyage (0.15 vs 0.00)",
+      "pressure_score": 0.333,
+      "home_fade": 0.15,
+      "away_fade": 0.0,
+      "travel_score": 0,
+      "lookahead_score": 0.333,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 1
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "away",
+        "home_score": -0.15,
+        "away_score": 0.052,
+        "home_fade": 0.15,
+        "away_fade": 0.0,
+        "reason": "Direction nette: AS Roma (+0.05)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401915373",
+      "source_event_ids": [
+        "401915373"
+      ],
+      "kickoff": "2026-11-25T20:00Z",
+      "sport": "football",
+      "league_code": "championsleague",
+      "league_name": "Champions League",
+      "home": "Sporting CP",
+      "away": "Manchester United",
+      "match": "Sporting CP - Manchester United",
+      "decision": "lean_home",
+      "net_team": "Sporting CP",
+      "reason": "Manchester United plus penalise par calendrier/voyage (0.15 vs 0.00)",
+      "pressure_score": 0.333,
+      "home_fade": 0.0,
+      "away_fade": 0.15,
+      "travel_score": 0,
+      "lookahead_score": 0.333,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 1
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": 0.052,
+        "away_score": -0.15,
+        "home_fade": 0.0,
+        "away_fade": 0.15,
+        "reason": "Direction nette: Sporting CP (+0.05)",
+        "detail": [
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401915507",
+      "source_event_ids": [
+        "401915507"
+      ],
+      "kickoff": "2026-11-26T17:45Z",
+      "sport": "football",
+      "league_code": "europaleague",
+      "league_name": "Europa League",
+      "home": "Marseille",
+      "away": "Levski Sofia",
+      "match": "Marseille - Levski Sofia",
+      "decision": "lean_away",
+      "net_team": "Levski Sofia",
+      "reason": "Marseille plus penalise par calendrier/voyage (0.15 vs 0.00)",
+      "pressure_score": 0.333,
+      "home_fade": 0.15,
+      "away_fade": 0.0,
+      "travel_score": 0,
+      "lookahead_score": 0.333,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 1
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "away",
+        "home_score": -0.15,
+        "away_score": 0.052,
+        "home_fade": 0.15,
+        "away_fade": 0.0,
+        "reason": "Direction nette: Levski Sofia (+0.05)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401915814",
+      "source_event_ids": [
+        "401915814"
+      ],
+      "kickoff": "2026-11-26T17:45Z",
+      "sport": "football",
+      "league_code": "conferenceleague",
+      "league_name": "Conference League",
+      "home": "Brighton & Hove Albion",
+      "away": "CSU Craiova",
+      "match": "Brighton & Hove Albion - CSU Craiova",
+      "decision": "lean_away",
+      "net_team": "CSU Craiova",
+      "reason": "Brighton & Hove Albion plus penalise par calendrier/voyage (0.15 vs 0.00)",
+      "pressure_score": 0.333,
+      "home_fade": 0.15,
+      "away_fade": 0.0,
+      "travel_score": 0,
+      "lookahead_score": 0.333,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 1
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "away",
+        "home_score": -0.15,
+        "away_score": 0.052,
+        "home_fade": 0.15,
+        "away_fade": 0.0,
+        "reason": "Direction nette: CSU Craiova (+0.05)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401915811",
+      "source_event_ids": [
+        "401915811"
+      ],
+      "kickoff": "2026-11-26T17:45Z",
+      "sport": "football",
+      "league_code": "conferenceleague",
+      "league_name": "Conference League",
+      "home": "Heart of Midlothian",
+      "away": "AS Monaco",
+      "match": "Heart of Midlothian - AS Monaco",
+      "decision": "lean_away",
+      "net_team": "AS Monaco",
+      "reason": "Heart of Midlothian plus penalise par calendrier/voyage (0.15 vs 0.00)",
+      "pressure_score": 0.333,
+      "home_fade": 0.15,
+      "away_fade": 0.0,
+      "travel_score": 0,
+      "lookahead_score": 0.333,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 1
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "away",
+        "home_score": -0.15,
+        "away_score": 0.052,
+        "home_fade": 0.15,
+        "away_fade": 0.0,
+        "reason": "Direction nette: AS Monaco (+0.05)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401915502",
+      "source_event_ids": [
+        "401915502"
+      ],
+      "kickoff": "2026-11-26T20:00Z",
+      "sport": "football",
+      "league_code": "europaleague",
+      "league_name": "Europa League",
+      "home": "Juventus",
+      "away": "Omonia Nicosia",
+      "match": "Juventus - Omonia Nicosia",
+      "decision": "lean_away",
+      "net_team": "Omonia Nicosia",
+      "reason": "Juventus plus penalise par calendrier/voyage (0.15 vs 0.00)",
+      "pressure_score": 0.333,
+      "home_fade": 0.15,
+      "away_fade": 0.0,
+      "travel_score": 0,
+      "lookahead_score": 0.333,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 1
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "away",
+        "home_score": -0.15,
+        "away_score": 0.052,
+        "home_fade": 0.15,
+        "away_fade": 0.0,
+        "reason": "Direction nette: Omonia Nicosia (+0.05)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401915503",
+      "source_event_ids": [
+        "401915503"
+      ],
+      "kickoff": "2026-11-26T20:00Z",
+      "sport": "football",
+      "league_code": "europaleague",
+      "league_name": "Europa League",
+      "home": "OFI Crete",
+      "away": "Anderlecht",
+      "match": "OFI Crete - Anderlecht",
+      "decision": "lean_away",
+      "net_team": "Anderlecht",
+      "reason": "OFI Crete plus penalise par calendrier/voyage (0.15 vs 0.00)",
+      "pressure_score": 0.333,
+      "home_fade": 0.15,
+      "away_fade": 0.0,
+      "travel_score": 0,
+      "lookahead_score": 0.333,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 1
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "away",
+        "home_score": -0.15,
+        "away_score": 0.052,
+        "home_fade": 0.15,
+        "away_fade": 0.0,
+        "reason": "Direction nette: Anderlecht (+0.05)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401915514",
+      "source_event_ids": [
+        "401915514"
+      ],
+      "kickoff": "2026-11-26T20:00Z",
+      "sport": "football",
+      "league_code": "europaleague",
+      "league_name": "Europa League",
+      "home": "Sparta Prague",
+      "away": "AZ Alkmaar",
+      "match": "Sparta Prague - AZ Alkmaar",
+      "decision": "lean_home",
+      "net_team": "Sparta Prague",
+      "reason": "AZ Alkmaar plus penalise par calendrier/voyage (0.15 vs 0.00)",
+      "pressure_score": 0.333,
+      "home_fade": 0.0,
+      "away_fade": 0.15,
+      "travel_score": 0,
+      "lookahead_score": 0.333,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 1
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": 0.052,
+        "away_score": -0.15,
+        "home_fade": 0.0,
+        "away_fade": 0.15,
+        "reason": "Direction nette: Sparta Prague (+0.05)",
+        "detail": [
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401915513",
+      "source_event_ids": [
+        "401915513"
+      ],
+      "kickoff": "2026-11-26T20:00Z",
+      "sport": "football",
+      "league_code": "europaleague",
+      "league_name": "Europa League",
+      "home": "Sunderland",
+      "away": "Jagiellonia Bialystok",
+      "match": "Sunderland - Jagiellonia Bialystok",
+      "decision": "lean_away",
+      "net_team": "Jagiellonia Bialystok",
+      "reason": "Sunderland plus penalise par calendrier/voyage (0.15 vs 0.00)",
+      "pressure_score": 0.333,
+      "home_fade": 0.15,
+      "away_fade": 0.0,
+      "travel_score": 0,
+      "lookahead_score": 0.333,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 1
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "away",
+        "home_score": -0.15,
+        "away_score": 0.052,
+        "home_fade": 0.15,
+        "away_fade": 0.0,
+        "reason": "Direction nette: Jagiellonia Bialystok (+0.05)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401915512",
+      "source_event_ids": [
+        "401915512"
+      ],
+      "kickoff": "2026-11-26T20:00Z",
+      "sport": "football",
+      "league_code": "europaleague",
+      "league_name": "Europa League",
+      "home": "Torreense",
+      "away": "Celtic",
+      "match": "Torreense - Celtic",
+      "decision": "lean_home",
+      "net_team": "Torreense",
+      "reason": "Celtic plus penalise par calendrier/voyage (0.15 vs 0.00)",
+      "pressure_score": 0.333,
+      "home_fade": 0.0,
+      "away_fade": 0.15,
+      "travel_score": 0,
+      "lookahead_score": 0.333,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 1
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": 0.052,
+        "away_score": -0.15,
+        "home_fade": 0.0,
+        "away_fade": 0.15,
+        "reason": "Direction nette: Torreense (+0.05)",
+        "detail": [
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401915807",
+      "source_event_ids": [
+        "401915807"
+      ],
+      "kickoff": "2026-11-26T20:00Z",
+      "sport": "football",
+      "league_code": "conferenceleague",
+      "league_name": "Conference League",
+      "home": "FC Nordsjælland",
+      "away": "Panathinaikos",
+      "match": "FC Nordsjælland - Panathinaikos",
+      "decision": "lean_home",
+      "net_team": "FC Nordsjælland",
+      "reason": "Panathinaikos plus penalise par calendrier/voyage (0.15 vs 0.00)",
+      "pressure_score": 0.333,
+      "home_fade": 0.0,
+      "away_fade": 0.15,
+      "travel_score": 0,
+      "lookahead_score": 0.333,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 1
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": 0.052,
+        "away_score": -0.15,
+        "home_fade": 0.0,
+        "away_fade": 0.15,
+        "reason": "Direction nette: FC Nordsjælland (+0.05)",
         "detail": [
           {
             "side": "away",
