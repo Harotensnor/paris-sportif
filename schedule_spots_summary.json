@@ -1,20 +1,20 @@
 {
-  "generated_at": "2026-11-22T17:30:05Z",
+  "generated_at": "2026-11-22T22:42:24Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 19,
+    "active_events": 18,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 24
+      "lookahead": 23
     },
     "by_decision": {
       "abstain": 5,
-      "lean_home": 5,
-      "lean_away": 9
+      "lean_away": 9,
+      "lean_home": 4
     },
-    "lean_home": 5,
+    "lean_home": 4,
     "lean_away": 9,
     "abstain": 5,
     "monitor": 0
@@ -271,51 +271,6 @@
             "direction": "caution",
             "strength": 0.15
           },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401882803",
-      "source_event_ids": [
-        "401882803"
-      ],
-      "kickoff": "2026-11-22T20:00Z",
-      "sport": "football",
-      "league_code": "esp.1",
-      "league_name": "La Liga",
-      "home": "Getafe",
-      "away": "Atlético Madrid",
-      "match": "Getafe - Atlético Madrid",
-      "decision": "lean_home",
-      "net_team": "Getafe",
-      "reason": "Atlético Madrid plus penalise par calendrier/voyage (0.15 vs 0.00)",
-      "pressure_score": 0.333,
-      "home_fade": 0.0,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.333,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 1
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.052,
-        "away_score": -0.15,
-        "home_fade": 0.0,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Getafe (+0.05)",
-        "detail": [
           {
             "side": "away",
             "type": "lookahead",
