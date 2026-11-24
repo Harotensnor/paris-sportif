@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-11-24T19:36:44Z",
+  "generated_at": "2026-11-24T20:27:13Z",
   "method": "Dixon-Coles MLE grid search (ρ ∈ [-0.30, 0.10] step 0.005), λ_h, λ_a fixés à moyenne empirique par ligue. CI 95% via LR test.",
   "min_matches": 40,
   "default_rho": -0.13,
   "n_leagues": 149,
-  "n_measured": 7,
+  "n_measured": 8,
   "leagues": {
     "1lig": {
       "n": 4,
@@ -31,17 +31,17 @@
       "reason": "n=8 < 40"
     },
     "afc.champions": {
-      "n": 54,
-      "rho_measured": 0.005,
+      "n": 62,
+      "rho_measured": 0.01,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "CI trop large (0.385) ou fit nul",
-      "log_lik": -173.92,
-      "ci_lo": -0.285,
+      "reason": "CI trop large (0.365) ou fit nul",
+      "log_lik": -199.02,
+      "ci_lo": -0.265,
       "ci_hi": 0.1,
-      "lambda_h": 1.889,
-      "lambda_a": 1.148
+      "lambda_h": 1.887,
+      "lambda_a": 1.21
     },
     "aleague": {
       "n": 7,
@@ -734,17 +734,17 @@
       "reason": "n=2 < 40"
     },
     "ind.1": {
-      "n": 48,
+      "n": 49,
       "rho_measured": -0.3,
       "rho_literature": -0.13,
       "rho_used": -0.3,
       "source": "measured",
-      "reason": "MLE n=48, CI95=[-0.300, -0.115]",
-      "log_lik": -133.98,
+      "reason": "MLE n=49, CI95=[-0.300, -0.125]",
+      "log_lik": -135.77,
       "ci_lo": -0.3,
-      "ci_hi": -0.115,
-      "lambda_h": 1.208,
-      "lambda_a": 1.208
+      "ci_hi": -0.125,
+      "lambda_h": 1.204,
+      "lambda_a": 1.204
     },
     "indonesiasuperleague": {
       "n": 1,
@@ -768,17 +768,17 @@
       "lambda_a": 1.378
     },
     "ita.2": {
-      "n": 141,
+      "n": 142,
       "rho_measured": -0.045,
       "rho_literature": -0.16,
       "rho_used": -0.16,
       "source": "literature_fallback",
-      "reason": "CI trop large (0.345) ou fit nul",
-      "log_lik": -406.37,
-      "ci_lo": -0.245,
+      "reason": "CI trop large (0.340) ou fit nul",
+      "log_lik": -409.94,
+      "ci_lo": -0.24,
       "ci_hi": 0.1,
-      "lambda_h": 1.447,
-      "lambda_a": 1.163
+      "lambda_h": 1.444,
+      "lambda_a": 1.176
     },
     "ita.coppa_italia": {
       "n": 27,
@@ -1279,17 +1279,17 @@
       "reason": "n=2 < 40"
     },
     "uefa.champions": {
-      "n": 66,
+      "n": 68,
       "rho_measured": 0.1,
       "rho_literature": -0.1,
-      "rho_used": -0.1,
-      "source": "literature_fallback",
-      "reason": "CI trop large (0.250) ou fit nul",
-      "log_lik": -233.48,
-      "ci_lo": -0.15,
+      "rho_used": 0.1,
+      "source": "measured",
+      "reason": "MLE n=68, CI95=[-0.100, 0.100]",
+      "log_lik": -239.31,
+      "ci_lo": -0.1,
       "ci_hi": 0.1,
-      "lambda_h": 2.333,
-      "lambda_a": 1.606
+      "lambda_h": 2.294,
+      "lambda_a": 1.559
     },
     "uefa.europa": {
       "n": 59,
