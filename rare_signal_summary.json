@@ -1,22 +1,43 @@
 {
-  "generated_at": "2026-11-25T17:50:40Z",
+  "generated_at": "2026-11-25T19:41:55Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
-  "status": "watch",
+  "status": "ok",
   "summary": {
-    "active_events": 1,
-    "actionable": 0,
+    "active_events": 2,
+    "actionable": 1,
     "watch": 1,
     "risk": 0,
     "expired_sample": 0,
     "by_type": {
+      "injury_imbalance": 1,
       "weather_extreme": 1
     },
     "by_quality": {
+      "actionable": 1,
       "watch": 1
     }
   },
-  "active_actionable": [],
+  "active_actionable": [
+    {
+      "event_id": "401892785",
+      "date": "2026-11-26T00:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "New York Islanders",
+      "away": "St. Louis Blues",
+      "match": "New York Islanders - St. Louis Blues",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "St. Louis Blues",
+      "side": null,
+      "strength": 0.8,
+      "context": "Absences severes 3-7"
+    }
+  ],
   "active_watch": [
     {
       "event_id": "401896721",
