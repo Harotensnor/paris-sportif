@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-26T06:49:01Z",
+  "generated_at": "2026-11-26T17:23:47Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
@@ -56,58 +56,6 @@
         "home_fade": 0.15,
         "away_fade": 0.15,
         "reason": "Direction nette: AFC Bournemouth (-0.10)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401915801",
-      "source_event_ids": [
-        "401915801"
-      ],
-      "kickoff": "2026-11-26T20:00Z",
-      "sport": "football",
-      "league_code": "conferenceleague",
-      "league_name": "Conference League",
-      "home": "SC Freiburg",
-      "away": "FC Twente",
-      "match": "SC Freiburg - FC Twente",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: SC Freiburg 0.15, FC Twente 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
-        "home_fade": 0.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: FC Twente (-0.10)",
         "detail": [
           {
             "side": "home",
@@ -229,6 +177,103 @@
       }
     },
     {
+      "event_id": "401915801",
+      "source_event_ids": [
+        "401915801"
+      ],
+      "kickoff": "2026-11-26T20:00Z",
+      "sport": "football",
+      "league_code": "conferenceleague",
+      "league_name": "Conference League",
+      "home": "SC Freiburg",
+      "away": "FC Twente",
+      "match": "SC Freiburg - FC Twente",
+      "decision": "abstain",
+      "net_team": null,
+      "reason": "Fatigue/agenda des deux cotes: SC Freiburg 0.15, FC Twente 0.15",
+      "pressure_score": 0.667,
+      "home_fade": 0.15,
+      "away_fade": 0.15,
+      "travel_score": 0,
+      "lookahead_score": 0.667,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 2
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours",
+        "1 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "away",
+        "home_score": -0.098,
+        "away_score": -0.098,
+        "home_fade": 0.15,
+        "away_fade": 0.15,
+        "reason": "Direction nette: FC Twente (-0.10)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          },
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401915507",
+      "source_event_ids": [
+        "401915507"
+      ],
+      "kickoff": "2026-11-26T17:45Z",
+      "sport": "football",
+      "league_code": "europaleague",
+      "league_name": "Europa League",
+      "home": "Marseille",
+      "away": "Levski Sofia",
+      "match": "Marseille - Levski Sofia",
+      "decision": "lean_away",
+      "net_team": "Levski Sofia",
+      "reason": "Marseille plus penalise par calendrier/voyage (0.15 vs 0.00)",
+      "pressure_score": 0.333,
+      "home_fade": 0.15,
+      "away_fade": 0.0,
+      "travel_score": 0,
+      "lookahead_score": 0.333,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 1
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "away",
+        "home_score": -0.15,
+        "away_score": 0.052,
+        "home_fade": 0.15,
+        "away_fade": 0.0,
+        "reason": "Direction nette: Levski Sofia (+0.05)",
+        "detail": [
+          {
+            "side": "home",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          }
+        ]
+      }
+    },
+    {
       "event_id": "401915814",
       "source_event_ids": [
         "401915814"
@@ -311,96 +356,6 @@
         "detail": [
           {
             "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401915507",
-      "source_event_ids": [
-        "401915507"
-      ],
-      "kickoff": "2026-11-26T17:45Z",
-      "sport": "football",
-      "league_code": "europaleague",
-      "league_name": "Europa League",
-      "home": "Marseille",
-      "away": "Levski Sofia",
-      "match": "Marseille - Levski Sofia",
-      "decision": "lean_away",
-      "net_team": "Levski Sofia",
-      "reason": "Marseille plus penalise par calendrier/voyage (0.15 vs 0.00)",
-      "pressure_score": 0.333,
-      "home_fade": 0.15,
-      "away_fade": 0.0,
-      "travel_score": 0,
-      "lookahead_score": 0.333,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 1
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.15,
-        "away_score": 0.052,
-        "home_fade": 0.15,
-        "away_fade": 0.0,
-        "reason": "Direction nette: Levski Sofia (+0.05)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401915807",
-      "source_event_ids": [
-        "401915807"
-      ],
-      "kickoff": "2026-11-26T20:00Z",
-      "sport": "football",
-      "league_code": "conferenceleague",
-      "league_name": "Conference League",
-      "home": "FC Nordsjælland",
-      "away": "Panathinaikos",
-      "match": "FC Nordsjælland - Panathinaikos",
-      "decision": "lean_home",
-      "net_team": "FC Nordsjælland",
-      "reason": "Panathinaikos plus penalise par calendrier/voyage (0.15 vs 0.00)",
-      "pressure_score": 0.333,
-      "home_fade": 0.0,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.333,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 1
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.052,
-        "away_score": -0.15,
-        "home_fade": 0.0,
-        "away_fade": 0.15,
-        "reason": "Direction nette: FC Nordsjælland (+0.05)",
-        "detail": [
-          {
-            "side": "away",
             "type": "lookahead",
             "direction": "caution",
             "strength": 0.15
@@ -623,6 +578,51 @@
         "home_fade": 0.0,
         "away_fade": 0.15,
         "reason": "Direction nette: Torreense (+0.05)",
+        "detail": [
+          {
+            "side": "away",
+            "type": "lookahead",
+            "direction": "caution",
+            "strength": 0.15
+          }
+        ]
+      }
+    },
+    {
+      "event_id": "401915807",
+      "source_event_ids": [
+        "401915807"
+      ],
+      "kickoff": "2026-11-26T20:00Z",
+      "sport": "football",
+      "league_code": "conferenceleague",
+      "league_name": "Conference League",
+      "home": "FC Nordsjælland",
+      "away": "Panathinaikos",
+      "match": "FC Nordsjælland - Panathinaikos",
+      "decision": "lean_home",
+      "net_team": "FC Nordsjælland",
+      "reason": "Panathinaikos plus penalise par calendrier/voyage (0.15 vs 0.00)",
+      "pressure_score": 0.333,
+      "home_fade": 0.0,
+      "away_fade": 0.15,
+      "travel_score": 0,
+      "lookahead_score": 0.333,
+      "congestion_score": 0,
+      "types": {
+        "lookahead": 1
+      },
+      "contexts": [
+        "1 match important/proche dans les 3 jours"
+      ],
+      "global_resolution": {
+        "status": "net",
+        "net_side": "home",
+        "home_score": 0.052,
+        "away_score": -0.15,
+        "home_fade": 0.0,
+        "away_fade": 0.15,
+        "reason": "Direction nette: FC Nordsjælland (+0.05)",
         "detail": [
           {
             "side": "away",

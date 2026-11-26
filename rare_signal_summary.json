@@ -1,18 +1,41 @@
 {
-  "generated_at": "2026-11-26T06:49:01Z",
+  "generated_at": "2026-11-26T17:23:47Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
-  "status": "empty",
+  "status": "ok",
   "summary": {
-    "active_events": 0,
-    "actionable": 0,
+    "active_events": 1,
+    "actionable": 1,
     "watch": 0,
     "risk": 0,
     "expired_sample": 0,
-    "by_type": {},
-    "by_quality": {}
+    "by_type": {
+      "weather_extreme": 1
+    },
+    "by_quality": {
+      "actionable": 1
+    }
   },
-  "active_actionable": [],
+  "active_actionable": [
+    {
+      "event_id": "401896721",
+      "date": "2026-11-29T19:00Z",
+      "sport": "football",
+      "league_code": "superleaguegrece",
+      "league_name": "Super League Grèce",
+      "home": "AEK Athens",
+      "away": "PAOK",
+      "match": "AEK Athens - PAOK",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "weather_extreme",
+      "direction": "under_goals",
+      "team": null,
+      "side": null,
+      "strength": 0.652,
+      "context": "Meteo dure: vent 39 km/h, pluie 0.2 mm"
+    }
+  ],
   "active_watch": [],
   "active_risk": [],
   "expired_sample": []
