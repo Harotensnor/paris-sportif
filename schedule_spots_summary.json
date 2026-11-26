@@ -1,77 +1,25 @@
 {
-  "generated_at": "2026-11-25T19:41:55Z",
+  "generated_at": "2026-11-26T02:27:43Z",
   "schema": "schedule_spots_summary_v1",
   "source": "detected_angles.json lookahead/travel/fatigue only",
   "status": "ok",
   "summary": {
-    "active_events": 18,
+    "active_events": 13,
     "expired_sample": 0,
     "by_type": {
-      "lookahead": 23
+      "lookahead": 17
     },
     "by_decision": {
-      "abstain": 5,
-      "lean_away": 9,
-      "lean_home": 4
+      "abstain": 4,
+      "lean_away": 6,
+      "lean_home": 3
     },
-    "lean_home": 4,
-    "lean_away": 9,
-    "abstain": 5,
+    "lean_home": 3,
+    "lean_away": 6,
+    "abstain": 4,
     "monitor": 0
   },
   "active": [
-    {
-      "event_id": "401915376",
-      "source_event_ids": [
-        "401915376"
-      ],
-      "kickoff": "2026-11-25T20:00Z",
-      "sport": "football",
-      "league_code": "championsleague",
-      "league_name": "Champions League",
-      "home": "Internazionale",
-      "away": "VfB Stuttgart",
-      "match": "Internazionale - VfB Stuttgart",
-      "decision": "abstain",
-      "net_team": null,
-      "reason": "Fatigue/agenda des deux cotes: Internazionale 0.15, VfB Stuttgart 0.15",
-      "pressure_score": 0.667,
-      "home_fade": 0.15,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.667,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 2
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours",
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.098,
-        "away_score": -0.098,
-        "home_fade": 0.15,
-        "away_fade": 0.15,
-        "reason": "Direction nette: VfB Stuttgart (-0.10)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          }
-        ]
-      }
-    },
     {
       "event_id": "401915519",
       "source_event_ids": [
@@ -271,186 +219,6 @@
             "direction": "caution",
             "strength": 0.15
           },
-          {
-            "side": "away",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401915291",
-      "source_event_ids": [
-        "401915291"
-      ],
-      "kickoff": "2026-11-25T20:00Z",
-      "sport": "football",
-      "league_code": "championsleague",
-      "league_name": "Champions League",
-      "home": "Atlético Madrid",
-      "away": "Viking FK",
-      "match": "Atlético Madrid - Viking FK",
-      "decision": "lean_away",
-      "net_team": "Viking FK",
-      "reason": "Atlético Madrid plus penalise par calendrier/voyage (0.15 vs 0.00)",
-      "pressure_score": 0.333,
-      "home_fade": 0.15,
-      "away_fade": 0.0,
-      "travel_score": 0,
-      "lookahead_score": 0.333,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 1
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.15,
-        "away_score": 0.052,
-        "home_fade": 0.15,
-        "away_fade": 0.0,
-        "reason": "Direction nette: Viking FK (+0.05)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401915377",
-      "source_event_ids": [
-        "401915377"
-      ],
-      "kickoff": "2026-11-25T20:00Z",
-      "sport": "football",
-      "league_code": "championsleague",
-      "league_name": "Champions League",
-      "home": "Lille",
-      "away": "Bayern Munich",
-      "match": "Lille - Bayern Munich",
-      "decision": "lean_away",
-      "net_team": "Bayern Munich",
-      "reason": "Lille plus penalise par calendrier/voyage (0.15 vs 0.00)",
-      "pressure_score": 0.333,
-      "home_fade": 0.15,
-      "away_fade": 0.0,
-      "travel_score": 0,
-      "lookahead_score": 0.333,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 1
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.15,
-        "away_score": 0.052,
-        "home_fade": 0.15,
-        "away_fade": 0.0,
-        "reason": "Direction nette: Bayern Munich (+0.05)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401915374",
-      "source_event_ids": [
-        "401915374"
-      ],
-      "kickoff": "2026-11-25T20:00Z",
-      "sport": "football",
-      "league_code": "championsleague",
-      "league_name": "Champions League",
-      "home": "Paris Saint-Germain",
-      "away": "AS Roma",
-      "match": "Paris Saint-Germain - AS Roma",
-      "decision": "lean_away",
-      "net_team": "AS Roma",
-      "reason": "Paris Saint-Germain plus penalise par calendrier/voyage (0.15 vs 0.00)",
-      "pressure_score": 0.333,
-      "home_fade": 0.15,
-      "away_fade": 0.0,
-      "travel_score": 0,
-      "lookahead_score": 0.333,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 1
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "away",
-        "home_score": -0.15,
-        "away_score": 0.052,
-        "home_fade": 0.15,
-        "away_fade": 0.0,
-        "reason": "Direction nette: AS Roma (+0.05)",
-        "detail": [
-          {
-            "side": "home",
-            "type": "lookahead",
-            "direction": "caution",
-            "strength": 0.15
-          }
-        ]
-      }
-    },
-    {
-      "event_id": "401915373",
-      "source_event_ids": [
-        "401915373"
-      ],
-      "kickoff": "2026-11-25T20:00Z",
-      "sport": "football",
-      "league_code": "championsleague",
-      "league_name": "Champions League",
-      "home": "Sporting CP",
-      "away": "Manchester United",
-      "match": "Sporting CP - Manchester United",
-      "decision": "lean_home",
-      "net_team": "Sporting CP",
-      "reason": "Manchester United plus penalise par calendrier/voyage (0.15 vs 0.00)",
-      "pressure_score": 0.333,
-      "home_fade": 0.0,
-      "away_fade": 0.15,
-      "travel_score": 0,
-      "lookahead_score": 0.333,
-      "congestion_score": 0,
-      "types": {
-        "lookahead": 1
-      },
-      "contexts": [
-        "1 match important/proche dans les 3 jours"
-      ],
-      "global_resolution": {
-        "status": "net",
-        "net_side": "home",
-        "home_score": 0.052,
-        "away_score": -0.15,
-        "home_fade": 0.0,
-        "away_fade": 0.15,
-        "reason": "Direction nette: Sporting CP (+0.05)",
-        "detail": [
           {
             "side": "away",
             "type": "lookahead",

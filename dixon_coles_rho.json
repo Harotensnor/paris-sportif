@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-25T19:42:34Z",
+  "generated_at": "2026-11-26T02:28:36Z",
   "method": "Dixon-Coles MLE grid search (ρ ∈ [-0.30, 0.10] step 0.005), λ_h, λ_a fixés à moyenne empirique par ligue. CI 95% via LR test.",
   "min_matches": 40,
   "default_rho": -0.13,
@@ -213,20 +213,25 @@
       "reason": "n=2 < 40"
     },
     "championship": {
-      "n": 38,
-      "rho_measured": null,
+      "n": 42,
+      "rho_measured": -0.13,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "n=38 < 40"
+      "reason": "CI trop large (0.400) ou fit nul",
+      "log_lik": -124.0,
+      "ci_lo": -0.3,
+      "ci_hi": 0.1,
+      "lambda_h": 1.571,
+      "lambda_a": 1.167
     },
     "championsleague": {
-      "n": 19,
+      "n": 26,
       "rho_measured": null,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "n=19 < 40"
+      "reason": "n=26 < 40"
     },
     "chi.1": {
       "n": 49,
@@ -768,17 +773,17 @@
       "lambda_a": 1.378
     },
     "ita.2": {
-      "n": 146,
-      "rho_measured": -0.025,
+      "n": 148,
+      "rho_measured": -0.01,
       "rho_literature": -0.16,
       "rho_used": -0.16,
       "source": "literature_fallback",
-      "reason": "CI trop large (0.320) ou fit nul",
-      "log_lik": -425.76,
-      "ci_lo": -0.22,
+      "reason": "CI trop large (0.305) ou fit nul",
+      "log_lik": -431.53,
+      "ci_lo": -0.205,
       "ci_hi": 0.1,
       "lambda_h": 1.486,
-      "lambda_a": 1.164
+      "lambda_a": 1.155
     },
     "ita.coppa_italia": {
       "n": 27,

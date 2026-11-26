@@ -1,43 +1,22 @@
 {
-  "generated_at": "2026-11-25T19:41:55Z",
+  "generated_at": "2026-11-26T02:27:43Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
-  "status": "ok",
+  "status": "watch",
   "summary": {
     "active_events": 2,
-    "actionable": 1,
-    "watch": 1,
+    "actionable": 0,
+    "watch": 2,
     "risk": 0,
     "expired_sample": 0,
     "by_type": {
-      "injury_imbalance": 1,
-      "weather_extreme": 1
+      "weather_extreme": 2
     },
     "by_quality": {
-      "actionable": 1,
-      "watch": 1
+      "watch": 2
     }
   },
-  "active_actionable": [
-    {
-      "event_id": "401892785",
-      "date": "2026-11-26T00:00Z",
-      "sport": "hockey",
-      "league_code": "nhl",
-      "league_name": "NHL",
-      "home": "New York Islanders",
-      "away": "St. Louis Blues",
-      "match": "New York Islanders - St. Louis Blues",
-      "quality": "actionable",
-      "quality_reason": "Signal rare fort et directionnel",
-      "type": "injury_imbalance",
-      "direction": "fade",
-      "team": "St. Louis Blues",
-      "side": null,
-      "strength": 0.8,
-      "context": "Absences severes 3-7"
-    }
-  ],
+  "active_actionable": [],
   "active_watch": [
     {
       "event_id": "401896721",
@@ -54,8 +33,26 @@
       "direction": "under_goals",
       "team": null,
       "side": null,
-      "strength": 0.602,
-      "context": "Meteo dure: vent 36 km/h, pluie 0.1 mm"
+      "strength": 0.592,
+      "context": "Meteo dure: vent 36 km/h, pluie 0.0 mm"
+    },
+    {
+      "event_id": "401915810",
+      "date": "2026-11-26T17:45Z",
+      "sport": "football",
+      "league_code": "conferenceleague",
+      "league_name": "Conference League",
+      "home": "Egnatia",
+      "away": "Lincoln Red Imps",
+      "match": "Egnatia - Lincoln Red Imps",
+      "quality": "watch",
+      "quality_reason": "Signal rare present mais intensite moyenne",
+      "type": "weather_extreme",
+      "direction": "under_goals",
+      "team": null,
+      "side": null,
+      "strength": 0.59,
+      "context": "Meteo dure: vent 2 km/h, pluie 11.8 mm"
     }
   ],
   "active_risk": [],

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-25T19:41:43Z",
+  "generated_at": "2026-11-26T02:27:30Z",
   "source": "data.js bookable feed + sofascore_events source feed",
   "status": "ok",
   "categories": {
@@ -77,25 +77,9 @@
     },
     "J5_football_tier2": {
       "label": "Ligues tier 2",
-      "bookable": 9,
+      "bookable": 7,
       "source": 20,
       "samples": [
-        {
-          "event_id": "401876686",
-          "source": "winamax_exact",
-          "kickoff": "2026-11-23T19:45Z",
-          "match": "Grenoble at Nantes",
-          "league": "Ligue 2",
-          "code": "fra.2"
-        },
-        {
-          "event_id": "401876683",
-          "source": "winamax_exact",
-          "kickoff": "2026-11-23T19:45Z",
-          "match": "Dunkerque at Sochaux",
-          "league": "Ligue 2",
-          "code": "fra.2"
-        },
         {
           "event_id": "401899536",
           "source": "winamax_exact",
@@ -143,6 +127,22 @@
           "match": "US Avellino at Cremonese",
           "league": "Serie B",
           "code": "ita.2"
+        },
+        {
+          "event_id": "401899534",
+          "source": "winamax_exact",
+          "kickoff": "2026-11-25T19:00Z",
+          "match": "Arezzo at Mantova",
+          "league": "Serie B",
+          "code": "ita.2"
+        },
+        {
+          "event_id": "sofa_15345973",
+          "source": "sofascore_watch",
+          "kickoff": "2026-05-06T05:00Z",
+          "match": "Montedio Yamagata vs Thespa Gunma",
+          "league": "J2/J3 League, East A",
+          "code": "jpn.2"
         }
       ],
       "status": "ok"
@@ -293,7 +293,7 @@
     }
   },
   "summary": {
-    "bookable_total": 11,
+    "bookable_total": 9,
     "source_total": 141,
     "ok_categories": 3
   }
