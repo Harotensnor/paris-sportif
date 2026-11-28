@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-28T06:15:01Z",
+  "generated_at": "2026-11-28T15:41:59Z",
   "method": "Dixon-Coles MLE grid search (ρ ∈ [-0.30, 0.10] step 0.005), λ_h, λ_a fixés à moyenne empirique par ligue. CI 95% via LR test.",
   "min_matches": 40,
   "default_rho": -0.13,
@@ -44,12 +44,12 @@
       "lambda_a": 1.21
     },
     "aleague": {
-      "n": 7,
+      "n": 8,
       "rho_measured": null,
       "rho_literature": -0.13,
       "rho_used": -0.13,
       "source": "literature_fallback",
-      "reason": "n=7 < 40"
+      "reason": "n=8 < 40"
     },
     "allsvenskan": {
       "n": 32,
@@ -513,17 +513,17 @@
       "reason": "n=2 < 40"
     },
     "esp.1": {
-      "n": 173,
-      "rho_measured": -0.095,
+      "n": 174,
+      "rho_measured": -0.085,
       "rho_literature": -0.1,
       "rho_used": -0.1,
       "source": "literature_fallback",
-      "reason": "CI trop large (0.335) ou fit nul",
-      "log_lik": -530.23,
-      "ci_lo": -0.26,
-      "ci_hi": 0.075,
-      "lambda_h": 1.636,
-      "lambda_a": 1.231
+      "reason": "CI trop large (0.330) ou fit nul",
+      "log_lik": -533.04,
+      "ci_lo": -0.245,
+      "ci_hi": 0.085,
+      "lambda_h": 1.626,
+      "lambda_a": 1.23
     },
     "esp.2": {
       "n": 170,
