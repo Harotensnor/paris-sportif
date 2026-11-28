@@ -1,22 +1,44 @@
 {
-  "generated_at": "2026-11-27T19:17:07Z",
+  "generated_at": "2026-11-28T01:59:50Z",
   "schema": "rare_signal_summary_v1",
   "source": "rare_signals.json quality layer",
-  "status": "watch",
+  "status": "ok",
   "summary": {
-    "active_events": 1,
-    "actionable": 0,
+    "active_events": 2,
+    "actionable": 1,
     "watch": 1,
     "risk": 0,
     "expired_sample": 0,
     "by_type": {
-      "weather_extreme": 1
+      "weather_extreme": 1,
+      "injury_imbalance": 1,
+      "travel_extreme": 1
     },
     "by_quality": {
-      "watch": 1
+      "watch": 1,
+      "actionable": 1
     }
   },
-  "active_actionable": [],
+  "active_actionable": [
+    {
+      "event_id": "401892867",
+      "date": "2026-12-06T00:00Z",
+      "sport": "hockey",
+      "league_code": "nhl",
+      "league_name": "NHL",
+      "home": "Vegas Golden Knights",
+      "away": "Winnipeg Jets",
+      "match": "Vegas Golden Knights - Winnipeg Jets",
+      "quality": "actionable",
+      "quality_reason": "Signal rare fort et directionnel",
+      "type": "injury_imbalance",
+      "direction": "fade",
+      "team": "Winnipeg Jets",
+      "side": null,
+      "strength": 0.8,
+      "context": "Absences severes 0-4"
+    }
+  ],
   "active_watch": [
     {
       "event_id": "401896719",
@@ -33,8 +55,8 @@
       "direction": "under_goals",
       "team": null,
       "side": null,
-      "strength": 0.525,
-      "context": "Meteo dure: vent 21 km/h, pluie 10.5 mm"
+      "strength": 0.485,
+      "context": "Meteo dure: vent 25 km/h, pluie 9.7 mm"
     }
   ],
   "active_risk": [],
